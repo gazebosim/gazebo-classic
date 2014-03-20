@@ -16,7 +16,8 @@ if (HAVE_BULLET)
 endif()
 
 set (test_sources 
-  gzlog_TEST.cc 
+  gz_log_TEST.cc 
+  gz_TEST.cc
 )
 
 gz_build_tests(${test_sources})
@@ -41,7 +42,25 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-install (PROGRAMS gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
+if (${GAZEBO_VERSION} VERSION_GREATER 3.0)
+  message (WARNING
+    "Installing deprecated manpages. This should be removed after Gazebo 3.0")
+  manpage(gzfactory 1)
+  manpage(gzlog 1)
+  manpage(gzsdf 1)
+  manpage(gzstats 1)
+  manpage(gztopic 1)
+endif()
+
+add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+target_link_libraries(gz
+ gazebo_msgs gazebo_common gazebo_transport gazebo_gui gazebo_physics
+ gazebo_sensors ${QT_LIBRARIES} ${Boost_LIBRARIES} pthread)
+gz_install_executable(gz)
+
+roffman(gz 1)
+
+install (PROGRAMS gzmodel_create gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
 manpage(gzprop 1)

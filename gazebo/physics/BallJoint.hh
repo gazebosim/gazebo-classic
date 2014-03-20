@@ -23,6 +23,7 @@
 #define _BALLJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     ///
     /// Each physics engine should implement this class.
     template< class T>
-    class BallJoint : public T
+    class GAZEBO_VISIBLE BallJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent link.
@@ -63,12 +64,12 @@ namespace gazebo
       /// \internal
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int /*_index*/,
-                                       math::Angle /*_angle*/) {}
+                                 const math::Angle &/*_angle*/) {}
 
       /// \internal
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int /*_index*/,
-                  math::Angle /*_angle*/) {}
+                                 const math::Angle &/*_angle*/) {}
 
       /// \internal
       /// \brief Get the high stop of an axis(index).

@@ -567,7 +567,7 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    if (this->simbodyPhysicsInitialized)
+    if (this->simbodyPhysicsInitialized && this->world->GetModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
     else
@@ -845,6 +845,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           gzJoint->damper[nj] =
             Force::MobilityLinearDamper(this->forces, mobod, nj,
                                      gzJoint->GetDamping(nj));
+          // add spring (stiffness proportional to mass)
+          gzJoint->spring[nj] =
+            Force::MobilityLinearSpring(this->forces, mobod, nj,
+              gzJoint->GetStiffness(nj),
+              gzJoint->GetSpringReferencePosition(nj));
         }
       }
       else if (type == "revolute")
@@ -881,11 +886,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "prismatic")
       {
@@ -918,11 +923,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "ball")
       {

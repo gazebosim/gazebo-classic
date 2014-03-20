@@ -42,6 +42,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -73,7 +74,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -312,11 +313,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() {return 0;}
+      public: virtual float GetAvgFPS() const {return 0;}
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() {return 0;}
+      public: virtual unsigned int GetTriangleCount() const {return 0;}
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels

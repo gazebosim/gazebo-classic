@@ -27,6 +27,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -47,7 +48,7 @@ namespace gazebo
 
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
-    class BuildingMaker : public EntityMaker
+    class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
       /// \brief Constructor
       public: BuildingMaker();

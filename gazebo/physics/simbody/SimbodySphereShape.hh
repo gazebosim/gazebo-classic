@@ -19,6 +19,7 @@
 #define _SIMBODY_SPHERE_SHAPE_HH_
 
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody sphere collision
-    class SimbodySphereShape : public SphereShape
+    class GAZEBO_VISIBLE SimbodySphereShape : public SphereShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent pointer

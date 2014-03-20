@@ -265,7 +265,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (this->TrackVisualImpl((*iter).data()))
+      if (!this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
     else if ((*iter).request() == "attach_visual")
@@ -1457,6 +1457,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   // if (this->sceneNode->getParent())
   //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
+  bool result = false;
   if (_visual)
   {
     this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
@@ -1464,13 +1465,14 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
 
     this->dataPtr->trackedVisual = _visual;
+    result = true;
   }
   else
   {
     this->dataPtr->trackedVisual.reset();
   }
 
-  return true;
+  return result;
 }
 
 //////////////////////////////////////////////////

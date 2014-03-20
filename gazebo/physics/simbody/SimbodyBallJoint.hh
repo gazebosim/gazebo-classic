@@ -21,6 +21,7 @@
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
     /// \{
 
     /// \brief SimbodyBallJoint class models a ball joint in Simbody.
-    class SimbodyBallJoint : public BallJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyBallJoint : public BallJoint<SimbodyJoint>
     {
       /// \brief Simbody Ball Joint Constructor
       public: SimbodyBallJoint(SimTK::MultibodySystem *_world, BasePtr _parent);
@@ -63,14 +64,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetMaxForce(unsigned int _index, double _t);
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

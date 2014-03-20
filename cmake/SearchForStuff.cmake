@@ -68,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.10)
+  pkg_check_modules(SDF sdformat>=2.0.0)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -194,12 +194,6 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
-
-  #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
   if (NOT TBB_FOUND)
@@ -283,6 +277,15 @@ if (PKG_CONFIG_FOUND)
   else()
     # This variable will be substituted into cmake/setup.sh.in
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
+  endif()
+
+  ########################################
+  # Check and find libccd (if needed)
+  pkg_check_modules(CCD ccd>=1.4)
+  if (NOT CCD_FOUND)
+    message(STATUS "Using internal copy of libccd")
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
   endif()
 
   ########################################
@@ -432,6 +435,7 @@ endif ()
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################

@@ -23,13 +23,14 @@
 
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A two axis hinge joint
-    class DARTHinge2Joint : public Hinge2Joint<DARTJoint>
+    class GAZEBO_VISIBLE DARTHinge2Joint : public Hinge2Joint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
