@@ -1251,17 +1251,24 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
   if (_key == "type")
+  {
     return this->GetType();
-  // else if (_key == "rms_error")
-  //   return dWorldGetQuickStepRMSDeltaLambda(this->worldId);
-  // else if (_key == "constraint_residual")
-  //   return dWorldGetQuickStepConstraintResidual(this->worldId);
-  // else if (_key == "bilateral_residual")
-  //   return dWorldGetQuickStepBilateralResidual(this->worldId);
-  // else if (_key == "contact_residual")
-  //   return dWorldGetQuickStepContactResidual(this->worldId);
-  // else if (_key == "num_contacts")
-  //   return dWorldGetQuickStepNumContacts(this->worldId);
+  }
+  else if (_key == "integrator_type")
+  {
+    return this->integratorType;
+  }
+  else if (_key == "accuracy")
+  {
+    if (this->integ)
+      return this->integ->getAccuracyInUse();
+    else
+      return 0.0f;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    return this->contact.getTransitionVelocity();
+  }
   else
   {
     gzwarn << "key [" << _key
