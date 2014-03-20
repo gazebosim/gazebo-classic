@@ -321,12 +321,12 @@ namespace gazebo
       ///       -# "rms_error" - RMS of dlambda at the end of time step
       ///          error[0]: bilateral constraints
       ///          error[1]: contact normal constraints
-      ///          error[2]: friciton constraints
+      ///          error[2]: friction constraints
       ///          error[3]: all constraints
       ///       -# "constraint_residual" - RMS of residuals: Jv
       ///          residual[0]: bilateral constraints
       ///          residual[1]: contact normal constraints
-      ///          residual[2]: friciton constraints
+      ///          residual[2]: friction constraints
       ///          residual[3]: all constraints
       ///       -# "num_contacts"
       ///       -# "inertia_ratio_reduction"
