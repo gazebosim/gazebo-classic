@@ -94,7 +94,8 @@ namespace gazebo
       public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.

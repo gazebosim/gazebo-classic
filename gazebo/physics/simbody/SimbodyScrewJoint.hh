@@ -82,7 +82,8 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.

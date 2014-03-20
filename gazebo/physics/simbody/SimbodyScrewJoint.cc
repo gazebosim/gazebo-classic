@@ -240,7 +240,8 @@ double SimbodyScrewJoint::GetThreadPitch()
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAttribute(const std::string &_key, int _index,
+void SimbodyScrewJoint::SetAttribute(const std::string &_key,
+  unsigned int _index,
   const boost::any &_value)
 {
   if (_key  == "thread_pitch")

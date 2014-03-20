@@ -246,8 +246,8 @@ double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAttribute(const std::string &_key, int _index,
-                                   const boost::any &_value)
+void ODEScrewJoint::SetAttribute(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
 {
   if (_key  == "thread_pitch")
   {
