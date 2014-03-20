@@ -40,6 +40,7 @@ set (files
   simple_gripper.world
   sonar_demo.world
   sphere_atlas_demo.world
+  stacks.world
   trigger.world
   willowgarage.world
   wireless_sensors.world
