@@ -698,18 +698,17 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
               this->GetChildItem((*iter),
               "split impulse penetration threshold")).toDouble());
       }
-      else if (this->physicsType == msgs::Physics::DART)
-      {
-        /// \TODO
-      }
-      else if (this->physicsType == msgs::Physics::SIMBODY)
-      {
-        /// \TODO
-      }
-      else
-      {
-        // custom physics engine?
-      }
+      // \TODO: fill this in for DART and SIMBODY
+      // else if (this->physicsType == msgs::Physics::DART)
+      // {
+      // }
+      // else if (this->physicsType == msgs::Physics::SIMBODY)
+      // {
+      // }
+      // else
+      // {
+      //   // custom physics engine?
+      // }
     }
     else if ((*iter)->propertyName().toStdString() == "real time update rate")
     {

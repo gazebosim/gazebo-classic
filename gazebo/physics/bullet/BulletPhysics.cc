@@ -443,33 +443,32 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     {
       this->SetParam(SOR, msgBullet->sor());
     }
-  
+
     if (msgBullet->has_cfm())
     {
       this->SetParam(GLOBAL_CFM, msgBullet->cfm());
     }
-  
+
     if (msgBullet->has_erp())
     {
       this->SetParam(GLOBAL_ERP, msgBullet->erp());
     }
-  
+
     if (msgBullet->has_contact_surface_layer())
     {
       this->SetParam(CONTACT_SURFACE_LAYER, msgBullet->contact_surface_layer());
     }
-  
+
     if (msgBullet->has_split_impulse())
     {
       this->SetParam(SPLIT_IMPULSE, msgBullet->split_impulse());
     }
-  
+
     if (msgBullet->has_split_impulse_penetration_threshold())
     {
       this->SetParam(SPLIT_IMPULSE_PENETRATION_THRESHOLD,
         msgBullet->split_impulse_penetration_threshold());
     }
-
   }
 
   // Parent class handles many generic parameters
