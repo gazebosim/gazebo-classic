@@ -508,11 +508,11 @@ namespace gazebo
 
       /// \brief Accessor for link filtered linear velocity
       /// \return pointer to linVelFil
-      public: common::MovingWindowFilter<math::Vector3> *GetLinVelFil();
+      public: common::MovingWindowFilter<math::Vector3> *GetLinVelFil() const;
 
       /// \brief Accessor for link filtered angular velocity
       /// \return pointer to angVelFil
-      public: common::MovingWindowFilter<math::Vector3> *GetAngVelFil();
+      public: common::MovingWindowFilter<math::Vector3> *GetAngVelFil() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();

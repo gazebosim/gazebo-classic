@@ -1206,13 +1206,13 @@ double Link::GetWorldEnergyKineticVibrational()
 }
 
 /////////////////////////////////////////////////
-common::MovingWindowFilter<math::Vector3> *Link::GetLinVelFil()
+common::MovingWindowFilter<math::Vector3> *Link::GetLinVelFil() const
 {
   return this->linVelFil;
 }
 
 /////////////////////////////////////////////////
-common::MovingWindowFilter<math::Vector3> *Link::GetAngVelFil()
+common::MovingWindowFilter<math::Vector3> *Link::GetAngVelFil() const
 {
   return this->angVelFil;
 }

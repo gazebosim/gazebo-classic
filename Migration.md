@@ -200,8 +200,8 @@
     + virtual void SetParam(const std::string &_key, const boost::any &_value)
 
 1. **gazebo/physics/Link.hh**
-    + common::MovingWindowFilter<math::Vector3> *GetLinVelFil()
-    + common::MovingWindowFilter<math::Vector3> *GetAngVelFil()
+    + common::MovingWindowFilter<math::Vector3> *GetLinVelFil() const
+    + common::MovingWindowFilter<math::Vector3> *GetAngVelFil() const
 
 ### Deletions
 
