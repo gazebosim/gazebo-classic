@@ -15,6 +15,8 @@
  *
  */
 
+#include <string>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
