@@ -237,8 +237,8 @@ void BulletScrewJoint::Init()
   // joint limit is set on the revolute dof in sdf,
   double upper = limitElem->Get<double>("upper");
   double lower = limitElem->Get<double>("lower");
-  this->bulletScrew->setLowerAngLimit(std::min(lower, upper));
-  this->bulletScrew->setUpperAngLimit(std::max(lower, upper));
+  this->bulletScrew->setLowerAngLimit(lower);
+  this->bulletScrew->setUpperAngLimit(upper);
   // enforce linear dof in bullet.
   double tp = this->threadPitch;
   if (math::equal(tp, 0.0))
@@ -249,13 +249,13 @@ void BulletScrewJoint::Init()
   }
   if (tp > 0)
   {
-    this->bulletScrew->setLowerLinLimit(std::min(lower/tp, upper/tp));
-    this->bulletScrew->setUpperLinLimit(std::max(lower/tp, upper/tp));
+    this->bulletScrew->setLowerLinLimit(lower/tp);
+    this->bulletScrew->setUpperLinLimit(upper/tp);
   }
   else
   {
-    this->bulletScrew->setLowerLinLimit(std::min(upper/tp, lower/tp));
-    this->bulletScrew->setUpperLinLimit(std::max(upper/tp, lower/tp));
+    this->bulletScrew->setLowerLinLimit(upper/tp);
+    this->bulletScrew->setUpperLinLimit(lower/tp);
   }
   this->bulletScrew->setThreadPitch(tp);
 
