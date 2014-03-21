@@ -169,6 +169,14 @@
     + virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
     + virtual double GetAttribute(const std::string &_key, unsigned int _index)
 
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + virtual void SetThreadPitch(double _threadPitch)
+    + virtual void GetThreadPitch() 
+
+1. **gazebo/physics/ode/ODEScrewJoint.hh**
+    + virtual void SetThreadPitch(double _threadPitch)
+    + virtual void GetThreadPitch() 
+
 ### Deletions
 
 1. **Removed libtool**
