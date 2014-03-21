@@ -14,11 +14,18 @@
 1. **gazebo/physics/ScrewJoint.hh**
     + ***Deprecation*** virtual void SetThreadPitch(unsigned int _index, double _threadPitch) = 0
     + ***Replacement*** virtual void SetThreadPitch(double _threadPitch) = 0
+    ---
+    + ***Deprecation*** virtual void GetThreadPitch(unsigned int _index) = 0
+    + ***Replacement*** virtual void GetThreadPitch() = 0
+
+1. **gazebo/physics/bullet/BulletScrewJoint.hh**
+    + ***Deprecation*** protected: virtual void Load(sdf::ElementPtr _sdf)
+    + ***Replacement*** public: virtual void Load(sdf::ElementPtr _sdf)
 
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
-    + ***Replacement:*** bool load();
+    + ***Replacement:*** bool load()
     + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
@@ -37,7 +44,7 @@
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **gazebo/transport/TransportIface.hh**
     + ***Removed:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0) `ABI change`
-    + ***Replacement:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0, uint32_t _timeoutIterations = 30);
+    + ***Replacement:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0, uint32_t _timeoutIterations = 30)
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **gazebo/transport/Publication.hh**
     + ***Removed:*** void Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb, uint32_t _id) `ABI change`
@@ -84,8 +91,8 @@
     +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
     + unsigned int GetFilterCount()
-    + bool HasFilter(const std::string &_name);
-    + void RemoveFilter(const std::string &_name);
+    + bool HasFilter(const std::string &_name)
+    + void RemoveFilter(const std::string &_name)
 
 1. **gazebo/physics/Joint.hh**
     + math::Pose GetAnchorErrorPose() const
@@ -176,6 +183,14 @@
 1. **gazebo/physics/ode/ODEScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
     + virtual void GetThreadPitch() 
+
+1. **gazebo/physics/ScrewJoint.hh**
+    + virtual math::Vector3 GetAnchor(unsigned int _index) const
+    + virtual void SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + virtual math::Angle GetHighStop(unsigned int _index)
+    + virtual math::Angle GetLowStop(unsigned int _index)
 
 ### Deletions
 
