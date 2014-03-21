@@ -116,6 +116,13 @@ namespace gazebo
     GAZEBO_VISIBLE
     math::Vector3    Convert(const msgs::Vector3d &_v);
 
+    /// \brief Convert a msgs::Vector2d to a math::Vector
+    /// \param[in] _v The plane to convert
+    /// \return A math::Vector2d object
+    GAZEBO_VISIBLE
+    math::Vector2d    Convert(const msgs::Vector2d &_v);
+
+
     /// \brief Convert a msgs::Quaternion to a math::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A math::Quaternion object

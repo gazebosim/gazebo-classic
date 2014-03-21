@@ -324,6 +324,19 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       elem->GetElement("normal")->Set(plane.normal);
       elem->GetElement("size")->Set(plane.size);
     }
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+     sdf::ElementPtr elem = geomElem->AddElement("polyline");
+     elem->GetElement("height")->Set(_msg->geometry().polyline().height());
+     elem = elem->GetElement("point");
+     for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
+     {
+
+        elem->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
+        elem = elem->GetNextElement("point");
+     }
+
+    }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       sdf::ElementPtr elem = geomElem->AddElement("mesh");
@@ -2234,6 +2247,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
       geomScale.x = geomScale.y = geomScale.z = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+     {
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
+     }
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
