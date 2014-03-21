@@ -71,7 +71,7 @@ math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
 void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
     const math::Vector3 &_anchor)
 {
-  if (this->jointId)
+  if (!this->jointId)
   {
     gzerr << "ODE Joint ID is invalid, anchor not set.\n";
     return;
