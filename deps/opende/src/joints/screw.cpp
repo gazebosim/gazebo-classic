@@ -97,7 +97,7 @@ dxJointScrew::dxJointScrew( dxWorld *w ) :
     dSetZero( qrel, 4 );
     limot.init( world );
     cumulative_angle = 0;
-    thread_pitch = 0.0;  // rad/m (3141.6 rad/m is about 0.002 m/rev)
+    thread_pitch = 1.0;  // rad/m (3141.6 rad/m is about 0.002 m/rev)
 }
 
 
