@@ -29,6 +29,7 @@
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART physics engine
-    class DARTPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.

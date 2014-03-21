@@ -19,6 +19,7 @@
 #define _SIMBODY_MULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody specific version of MultiRayShape
-    class SimbodyMultiRayShape : public MultiRayShape
+    class GAZEBO_VISIBLE SimbodyMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
       public: SimbodyMultiRayShape(CollisionPtr parent);

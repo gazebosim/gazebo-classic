@@ -38,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -73,7 +73,7 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 echo "missingIncludeSystem" >> $SUPPRESS
 
 #cppcheck
-CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
@@ -123,7 +123,8 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
+        | grep -v 'use --check-config for details' \
+        | grep -v 'Include file: .*not found'
     fi
 
     # Undo changes to suppression file

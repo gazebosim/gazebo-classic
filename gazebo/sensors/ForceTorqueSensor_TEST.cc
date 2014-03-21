@@ -35,7 +35,8 @@ static std::string forceTorqueSensorString =
 /// \brief Test Creation of a ForceTorque sensor
 TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
 {
-  Load("worlds/pioneer2dx.world");
+  Load("worlds/pioneer2dx.world", true);
+
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
@@ -46,7 +47,7 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   physics::ModelPtr model = world->GetModel("pioneer2dx");
   physics::JointPtr joint = model->GetJoint("left_wheel_hinge");
 
-  // Create the Ray sensor
+  // Create the force torque sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
       "pioneer2dx::left_wheel_hinge", joint->GetId());
 
@@ -57,7 +58,7 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the force torque sensor
   sensors::ForceTorqueSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         mgr->GetSensor(sensorName));

@@ -43,13 +43,6 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
-  if (SDF_MAJOR_VERSION == 1 && SDF_MINOR_VERSION < 5)
-  {
-    gzerr << "SDF version [" << SDF_VERSION << "] detected, "
-          << "1.5 or greater required"
-          << std::endl;
-    return;
-  }
   if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")))
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine

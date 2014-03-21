@@ -27,6 +27,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -50,7 +51,7 @@ namespace gazebo
   {
     class ModelEditWidget;
 
-    class ModelListWidget : public QWidget
+    class GAZEBO_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT
       public: ModelListWidget(QWidget *_parent = 0);
@@ -247,7 +248,7 @@ namespace gazebo
       private: msgs::Physics_Type physicsType;
     };
 
-    class ModelListSheetDelegate: public QItemDelegate
+    class GAZEBO_VISIBLE ModelListSheetDelegate: public QItemDelegate
     {
       Q_OBJECT
       public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);

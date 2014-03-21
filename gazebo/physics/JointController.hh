@@ -26,6 +26,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
 
     /// \class JointController JointController.hh physics/physics.hh
     /// \brief A class for manipulating physics::Joint
-    class JointController
+    class GAZEBO_VISIBLE JointController
     {
       /// \brief Constructor
       /// \param[in] _model Model that uses this joint controller.

@@ -20,13 +20,14 @@
 
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A screw joint.
-    class DARTScrewJoint : public ScrewJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -69,6 +70,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetMaxForce(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
