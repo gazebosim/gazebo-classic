@@ -377,6 +377,7 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
+    BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
 
 else (PKG_CONFIG_FOUND)
