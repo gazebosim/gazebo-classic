@@ -27,45 +27,7 @@ if(HAVE_DART)
 endif()
 
 set(tests
-  bandwidth.cc
-  concave_mesh.cc
-  contact_sensor.cc
-  dem.cc
-  factory.cc
-  file_handling.cc
   gripper.cc
-  gz_joint.cc
-  gz_log.cc
-  gz_model.cc
-  gz_physics.cc
-  gz_world.cc
-  imu.cc
-  joint_force_torque.cc
-  joint_gearbox.cc
-  joint_revolute.cc
-  joint_spawn.cc
-  joint_test.cc
-  joint_universal.cc
-  laser.cc
-  model_database.cc
-  noise.cc
-  nondefault_world.cc
-  physics.cc
-  physics_friction.cc
-  physics_link.cc
-  physics_msgs.cc
-  physics_thread_safe.cc
-  pioneer2dx.cc
-  server_fixture.cc
-  speed.cc
-  stress_spawn_models.cc
-  #state_log.cc
-  surface_properties.cc
-  transceiver.cc
-  transport.cc
-  world.cc
-  world_entity_below_point.cc
-  worlds_installed.cc
   )
 
 if (MANPAGES_SUPPORT)
@@ -74,12 +36,6 @@ if (MANPAGES_SUPPORT)
 endif()
 
 gz_build_tests(${tests})
-
-if (ENABLE_TESTS_COMPILATION)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-endif()
 
 set(display_tests
 )
@@ -101,14 +57,3 @@ set(dri_tests
   speed_pr2.cc
   world_reset.cc
 )
-
-gz_build_dri_tests(${dri_tests})
-
-
-if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)
-
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
-endif()
