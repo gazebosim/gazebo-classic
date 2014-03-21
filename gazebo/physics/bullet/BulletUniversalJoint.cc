@@ -344,7 +344,7 @@ math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    double limit1, limit2;
+    btScalar limit1, limit2;
     this->bulletUniversal->getLowerLimit(limit1, limit2);
     if (_index == 1)
       result.SetFromRadian(-limit1);
@@ -364,7 +364,7 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    double limit1, limit2;
+    btScalar limit1, limit2;
     this->bulletUniversal->getUpperLimit(limit1, limit2);
     if (_index == 1)
       result.SetFromRadian(-limit1);
