@@ -51,6 +51,14 @@ namespace gazebo
                   const math::Vector3 &_axis);
 
       // Documentation inherited.
+      public: virtual void SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 

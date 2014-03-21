@@ -104,9 +104,9 @@ void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetThreadPitch(double _threadPitch)
+void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
 {
-  gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
+  gzerr << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
         << "not yet tested.  The pitch are set during joint construction "
         << "in SimbodyPhysics.cc for now.\n";
   /* need to figure out how to down cast correctly
@@ -280,4 +280,131 @@ double SimbodyScrewJoint::GetAttribute(const std::string &_key,
     return this->threadPitch;
   else
     return SimbodyJoint::GetAttribute(_key, _index);
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetHighStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetHighStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    if (this->physicsInitialized)
+    {
+      if (_index == 0)
+      {
+        // angular limit is specified
+        this->limitForce[0].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          this->GetLowStop(_index).Radian(), _angle.Radian());
+      }
+      else if (_index == 1)
+      {
+        double tp = this->GetThreadPitch();
+        if (math::equal(tp, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using thread pitch = 1.0e6\n";
+          tp = 1.0e6;
+        }
+        // onlye angular limiting force element is added for
+        // screw joints in SimbodyPhysics.cc
+        if (tp > 0)
+        {
+          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // convert linear limit ot angular limit
+          double upper = _angle.Radian() / tp;
+          this->limitForce[0].setBounds(
+            this->simbodyPhysics->integ->updAdvancedState(),
+            this->GetLowStop(_index).Radian(), upper);
+        }
+        else
+        {
+          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // convert linear limit ot angular limit
+          // tp is negative, this is actually upper linear limit, or the
+          // lower angular limit.
+          double lower = _angle.Radian() / tp;
+          this->limitForce[0].setBounds(
+            this->simbodyPhysics->integ->updAdvancedState(),
+            lower, this->GetHighStop(_index).Radian());
+        }
+      }
+      else
+      {
+        gzerr << "Should never be here. Joint index invalid limit not set.\n";
+      }
+    }
+    else
+    {
+      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
+    }
+  }
+  else
+    gzerr << "SetHighStop: index out of bounds.\n";
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetLowStop(
+  unsigned int _index, const math::Angle &_angle)
+{
+  Joint::SetLowStop(_index, _angle);
+
+  if (_index < this->GetAngleCount())
+  {
+    if (this->physicsInitialized)
+    {
+      if (_index == 0)
+      {
+        // angular limit is specified
+        this->limitForce[0].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          _angle.Radian(),
+          this->GetHighStop(_index).Radian());
+      }
+      else if (_index == 1)
+      {
+        double tp = this->GetThreadPitch();
+        if (math::equal(tp, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using thread pitch = 1.0e6\n";
+          tp = 1.0e6;
+        }
+        // onlye angular limiting force element is added for
+        // screw joints in SimbodyPhysics.cc
+        if (tp > 0)
+        {
+          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // convert linear limit ot angular limit
+          double lower = _angle.Radian() / tp;
+          this->limitForce[0].setBounds(
+            this->simbodyPhysics->integ->updAdvancedState(),
+            lower, this->GetHighStop(_index).Radian());
+        }
+        else
+        {
+          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // convert linear limit ot angular limit
+          // tp is negative, this is actually lower linear limit, or the
+          // upper angular limit.
+          double upper = _angle.Radian() / tp;
+          this->limitForce[0].setBounds(
+            this->simbodyPhysics->integ->updAdvancedState(),
+            this->GetHighStop(_index).Radian(), upper);
+        }
+      }
+      else
+      {
+        gzerr << "Should never be here. Joint index invalid limit not set.\n";
+      }
+    }
+    else
+    {
+      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+    }
+  }
+  else
+    gzerr << "SetLowStop: index out of bounds.\n";
 }
