@@ -50,6 +50,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
 void LiftDragPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "LiftDragPlugin _model pointer is NULL");
+  GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
   this->model = _model;
   this->modelName = _model->GetName();
   this->sdf = _sdf;
