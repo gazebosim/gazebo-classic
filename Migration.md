@@ -12,6 +12,25 @@
     + ***Deprecation*** void CFMDamping()
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation*** virtual void SetSORPGSPreconIters(unsigned int _iters)
+    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    ---
+    + ***Deprecation*** virtual void SetSORPGSIters(unsigned int _iters)
+    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    ---
+    + ***Deprecation*** virtual void SetSORPGSW(double _w)
+    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    ---
+    + ***Deprecation*** virtual int GetSORPGSPreconIters() GAZEBO_DEPRECATED(3.0)
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+    ---
+    + ***Deprecation*** virtual int GetSORPGSIters() GAZEBO_DEPRECATED(3.0)
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+    ---
+    + ***Deprecation*** virtual double GetSORPGSW() GAZEBO_DEPRECATED(3.0)
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
