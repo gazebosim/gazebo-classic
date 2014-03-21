@@ -210,7 +210,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       {
           pos2 = node[1].body->posr.pos;
           R2 = node[1].body->posr.R;
-          for (int i = 0; i < 3; i++ )
+          for (int i = 0; i < 3; ++i )
           {
               // store distance between cg's in cgdiff
               cgdiff[i] = pos2[i] - pos1[i];
@@ -247,7 +247,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             //  node[0].body->posr.pos[2],
             //  node[1].body->posr.pos[0], node[1].body->posr.pos[1],
             //  node[1].body->posr.pos[2]);
-            for ( int ii = 0; ii < 3; ii++)
+            for ( int ii = 0; ii < 3; ++ii )
               q[ii] = node[0].body->posr.pos[ii] - q[ii] -
                 node[1].body->posr.pos[ii];
         }
@@ -283,8 +283,8 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
       // linear constraints for the hinge joint
       // perpendicular to the sliding axis direction.
-      for (int i = 0; i < 3; i++ ) info->J1l[s0+i] = p[i];
-      for (int i = 0; i < 3; i++ ) info->J1l[s1+i] = q[i];
+      for (int i = 0; i < 3; ++i ) info->J1l[s0+i] = p[i];
+      for (int i = 0; i < 3; ++i ) info->J1l[s1+i] = q[i];
 
       // if p and q do not pass through body CG's,
       // we need to add angular constraints to balance out the forces
@@ -303,41 +303,41 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       {
         dVector3 tmpp;
         dCalcVectorCross3(tmpp, p, a1);
-        for (int i = 0; i < 3; i++ ) info->J1a[s0+i] = -tmpp[i];
+        for (int i = 0; i < 3; ++i ) info->J1a[s0+i] = -tmpp[i];
       }
 
       // tmpq is similar to tmpp, but for q.
       {
         dVector3 tmpq;
         dCalcVectorCross3(tmpq, q, a1);
-        for (int i = 0; i < 3; i++ ) info->J1a[s1+i] = -tmpq[i];
+        for (int i = 0; i < 3; ++i ) info->J1a[s1+i] = -tmpq[i];
       }
 
       // screw constraint:
       // now constrain the sliding axis by rotation of the other body
-      for (int i = 0; i < 3; i++ ) info->J1l[s2+i] = ax1[i]*thread_pitch;
-      for (int i = 0; i < 3; i++ ) info->J1a[s2+i] = -ax1[i];
+      for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i]*thread_pitch;
+      for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i];
 
       // repeat above for child body if one exists
       if ( node[1].body )
       {
         // linear constraints for s0 and s1
-        for (int i = 0; i < 3; i++ ) info->J2l[s0+i] = -p[i];
-        for (int i = 0; i < 3; i++ ) info->J2l[s1+i] = -q[i];
+        for (int i = 0; i < 3; ++i ) info->J2l[s0+i] = -p[i];
+        for (int i = 0; i < 3; ++i ) info->J2l[s1+i] = -q[i];
 
         // angular compensation if p and q do not pass through CG
         dMultiply0_331( a2, R2, anchor2 );
         dVector3 tmpp;
         dCalcVectorCross3(tmpp, p, a2);
-        for (int i = 0; i < 3; i++ ) info->J2a[s0+i] = tmpp[i];
+        for (int i = 0; i < 3; ++i ) info->J2a[s0+i] = tmpp[i];
         dVector3 tmpq;
         dCalcVectorCross3(tmpq, q, a2);
-        for (int i = 0; i < 3; i++ ) info->J2a[s1+i] = tmpq[i];
+        for (int i = 0; i < 3; ++i ) info->J2a[s1+i] = tmpq[i];
 
         // screw constraint:
         // constrain the sliding axis by rotation of the other body
-        for (int i = 0; i < 3; i++ ) info->J2a[s2+i] =  ax1[i];
-        for (int i = 0; i < 3; i++ ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
+        for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i];
+        for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
       }
 
       // debug
@@ -368,11 +368,11 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       {
           // dVector3 ofs;  // offset point in global coordinates
           // dMultiply0_331 ( ofs, R2, offset );
-          // for (int i = 0; i < 3; i++ ) cgdiff[i] += ofs[i];
+          // for (int i = 0; i < 3; ++i ) cgdiff[i] += ofs[i];
 
           // error between body anchors
           dVector3 error12;
-          for (int i = 0; i < 3; i++)
+          for (int i = 0; i < 3; ++i)
             error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] -
               node[0].body->posr.pos[i];
 
@@ -396,7 +396,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
           // error of body's anchor
           dVector3 error1;
-          for (int i = 0; i < 3; i++) error1[i] = anchor2[i] - a1[i] -
+          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] -
             node[0].body->posr.pos[i];
           // printf ("error1 %f %f %f\n", error1[0], error1[1], error1[2]);
 
@@ -408,7 +408,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->c[2] = k * lin_err;
 
           if ( flags & dJOINT_REVERSE )
-              for (int i = 0; i < 3; i++) ax1[i] = -ax1[i];
+              for (int i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
       }
 
       // uncommnet to enforce slider joint limit
@@ -741,7 +741,7 @@ dReal dJointGetScrewPosition ( dJointID j )
     {
         // get body2 + offset point in global coordinates
         dMultiply0_331 ( q, joint->node[1].body->posr.R, joint->offset );
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; ++i )
             q[i] = joint->node[0].body->posr.pos[i]
                    - q[i]
                    - joint->node[1].body->posr.pos[i];
