@@ -69,6 +69,12 @@ math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
 void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
     const math::Vector3 &_anchor)
 {
+  if (this->jointId)
+  {
+    gzerr << "ODE Joint ID is invalid, anchor not set.\n";
+    return;
+  }
+
   if (this->childLink)
     this->childLink->SetEnabled(true);
   if (this->parentLink)
@@ -76,8 +82,6 @@ void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
 
   if (this->jointId)
     dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -131,9 +135,9 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
     }
     else
     {
-      gzerr << "ODEScrewJoint::GetAngleImpl(" << _index
-            << "): index exceeds allowed range(" << this->GetAngleCount()
-            << ").\n";
+      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+             << "): invalid index exceeds allowed range("
+             << this->GetAngleCount() << ").\n";
     }
   }
   else
