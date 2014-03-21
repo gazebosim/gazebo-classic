@@ -80,7 +80,6 @@ namespace gazebo
       /// with positive thread_pitch, i.e. the child Link is the nut
       /// (interior threads) while the parent Link is the bolt/screw
       /// (exterior threads).
-      /// \param[in] _index Index of the axis.
       /// \param[in] _threadPitch Thread pitch value.
       public: virtual void SetThreadPitch(double _threadPitch) = 0;
 
@@ -97,7 +96,6 @@ namespace gazebo
       /// Thread Pitch is defined as angular motion per linear
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
-      /// \param[in] _index Index of the axis.
       /// \return _threadPitch Thread pitch value.
       public: virtual double GetThreadPitch() = 0;
 
