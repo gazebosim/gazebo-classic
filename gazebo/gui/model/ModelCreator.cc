@@ -65,11 +65,8 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
-  if (g_deleteAct)
-  {
-    connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
-            SLOT(OnDelete(const std::string &)));
-  }
+  connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
+          SLOT(OnDelete(const std::string &)));
 }
 
 /////////////////////////////////////////////////
@@ -95,11 +92,6 @@ std::string ModelCreator::CreateModel()
 /////////////////////////////////////////////////
 void ModelCreator::AddJoint(JointMaker::JointType _type)
 {
-  if (!this->modelVisual)
-  {
-    this->Reset();
-  }
-
   this->Stop();
   if (this->jointMaker)
     this->jointMaker->CreateJoint(_type);
