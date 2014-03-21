@@ -22,11 +22,14 @@ set (files
   multilink_shape.world
   openal.world
   pioneer2dx.world
+  plane_demo.world
   plugin.world
   pr2.world
   presentation.world
   pressure_sensor.world
   projector.world
+  quad_rotor_demo.world
+  quad_rotor_demo_2.world
   ray_cpu.world
   ray_noise_plugin.world
   road.world
