@@ -56,11 +56,13 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
+  // initialize to 0
+  result[0] = result[1] = result[2] = 0.0;
 
   if (this->jointId)
     dJointGetScrewAnchor(this->jointId, result);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
 
   return math::Vector3(result[0], result[1], result[2]);
 }
