@@ -141,4 +141,3 @@ set (gtest_sources
   PhysicsEngine_TEST.cc
   SphereShape_TEST.cc
 )
-gz_build_tests(${gtest_sources})

@@ -27,5 +27,4 @@ if (NOT APPLE)
     transport_stress.cc
   )
   
-  gz_build_tests(${tests})
 endif()

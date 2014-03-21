@@ -126,7 +126,6 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-gz_build_tests(${gtest_sources})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

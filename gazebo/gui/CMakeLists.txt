@@ -106,7 +106,6 @@ if (ENABLE_SCREEN_TESTS)
 endif()
 
 # Generate executables for each of the QT unit tests
-gz_build_qt_tests(${qt_tests})
 
 set (resources resources.qrc)
 

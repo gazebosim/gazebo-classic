@@ -53,7 +53,6 @@ set (gtest_sources
   Vector3_TEST.cc
   Vector4_TEST.cc
 )
-gz_build_tests(${gtest_sources})
 
 set (math_headers "" CACHE INTERNAL "transport headers" FORCE)
 foreach (hdr ${headers})

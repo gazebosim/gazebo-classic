@@ -26,7 +26,6 @@ set (gtest_sources
   OpenAL_TEST.cc
 )
 
-gz_build_tests(${gtest_sources})
 
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
 foreach (hdr ${headers})

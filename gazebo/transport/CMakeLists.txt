@@ -63,4 +63,3 @@ gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport
 set (gtest_sources
   Connection_TEST.cc
 )
-gz_build_tests(${gtest_sources})

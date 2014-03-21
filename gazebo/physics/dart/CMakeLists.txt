@@ -49,7 +49,6 @@ SET (headers
 set (gtest_sources
   #DARTPhysics_TEST.cc
 )
-gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_physics_dart ${headers} ${sources})
 
@@ -61,4 +60,3 @@ gz_install_library(gazebo_physics_dart)
 #set (gtest_sources
 #  DARTJoint_TEST.cc
 #)
-#gz_build_tests(${gtest_sources})
