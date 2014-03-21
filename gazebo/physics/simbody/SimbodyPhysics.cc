@@ -1268,7 +1268,7 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   /// \TODO fill this out, see issue #1116
   if (_key == "accuracy")
@@ -1281,10 +1281,11 @@ void SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     gzerr << "Setting [" << _key << "] in Simbody to [" << value
           << "] not yet supported.\n";
+    return false;
   }
   else if (_key == "max_transient_velocity")
   {
@@ -1296,10 +1297,11 @@ void SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     gzerr << "Setting [" << _key << "] in Simbody to [" << value
           << "] not yet supported.\n";
+    return false;
   }
   else if (_key == "max_step_size")
   {
@@ -1311,13 +1313,17 @@ void SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     gzerr << "Setting [" << _key << "] in Simbody to [" << value
           << "] not yet supported.\n";
+    return false;
   }
   else
   {
     gzwarn << _key << " is not supported in Simbody" << std::endl;
+    return false;
   }
+  // should never get here
+  return false;
 }

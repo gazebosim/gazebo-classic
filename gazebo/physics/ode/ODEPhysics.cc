@@ -1145,7 +1145,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
+bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
   GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
@@ -1162,7 +1162,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       this->SetStepType(value);
       break;
@@ -1177,7 +1177,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       odeElem->GetElement("constraints")->GetElement("cfm")->Set(value);
       dWorldSetCFM(this->worldId, value);
@@ -1193,7 +1193,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       odeElem->GetElement("constraints")->GetElement("erp")->Set(value);
       dWorldSetERP(this->worldId, value);
@@ -1204,11 +1204,19 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       int value;
       try
       {
-        value = boost::any_cast<int>(_value);
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(const boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
       }
       catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       odeElem->GetElement("solver")->GetElement("precon_iters")->Set(value);
       dWorldSetQuickStepPreconIterations(this->worldId, value);
@@ -1219,11 +1227,19 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       int value;
       try
       {
-        value = boost::any_cast<int>(_value);
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(const boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
       }
       catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       odeElem->GetElement("solver")->GetElement("iters")->Set(value);
       dWorldSetQuickStepNumIterations(this->worldId, value);
@@ -1245,7 +1261,8 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       }
       catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       odeElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
@@ -1254,7 +1271,16 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     }
     case CONTACT_MAX_CORRECTING_VEL:
     {
-      double value = boost::any_cast<double>(_value);
+      double value;
+      try
+      {
+        value = boost::any_cast<double>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
+      }
       odeElem->GetElement("constraints")->GetElement(
           "contact_max_correcting_vel")->Set(value);
       dWorldSetContactMaxCorrectingVel(this->worldId, value);
@@ -1265,11 +1291,19 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       int value;
       try
       {
-        value = boost::any_cast<int>(_value);
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(const boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
       }
       catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
       break;
@@ -1284,7 +1318,8 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       }
       catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
       break;
@@ -1292,13 +1327,14 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     default:
     {
       gzwarn << "Param not supported in ode" << std::endl;
-      break;
+      return false;
     }
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   ODEParam param;
 
@@ -1325,57 +1361,57 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "max_step_size")
   {
     this->SetMaxStepSize(boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else if (_key == "sor_lcp_tolerance")
   {
     dWorldSetQuickStepTolerance(this->worldId,
         boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else if (_key == "rms_error_tolerance")
   {
     gzwarn << "please use sor_lcp_tolerance in the future.\n";
     dWorldSetQuickStepTolerance(this->worldId,
         boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else if (_key == "inertia_ratio_reduction")
   {
     dWorldSetQuickStepInertiaRatioReduction(this->worldId,
         boost::any_cast<bool>(_value));
-    return;
+    return true;
   }
   else if (_key == "contact_residual_smoothing")
   {
     dWorldSetQuickStepContactResidualSmoothing(this->worldId,
       boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else if (_key == "experimental_row_reordering")
   {
     dWorldSetQuickStepExperimentalRowReordering(this->worldId,
       boost::any_cast<bool>(_value));
-    return;
+    return true;
   }
   else if (_key == "warm_start_factor")
   {
     dWorldSetQuickStepWarmStartFactor(this->worldId,
       boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else if (_key == "extra_friction_iterations")
   {
     dWorldSetQuickStepExtraFrictionIterations(this->worldId,
       boost::any_cast<int>(_value));
-    return;
+    return true;
   }
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
-    return;
+    return false;
   }
-  this->SetParam(param, _value);
+  return this->SetParam(param, _value);
 }
 
 //////////////////////////////////////////////////

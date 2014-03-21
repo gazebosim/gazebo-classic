@@ -517,10 +517,10 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
+bool BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
 {
   if (!this->dynamicsWorld)
-    return;
+    return false;
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
@@ -536,10 +536,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<std::string>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       if (value == "sequential_impulse")
       {
@@ -548,7 +548,7 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       }
       else
         gzwarn << "Currently only 'sequential_impulse' solver is supported"
-            << std::endl;
+               << std::endl;
       break;
     }
     case GLOBAL_CFM:
@@ -558,10 +558,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
       info.m_globalCfm = value;
@@ -574,10 +574,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
       info.m_erp = value;
@@ -588,11 +588,19 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       int value;
       try
       {
-        value = boost::any_cast<int>(_value);
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(const boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
       info.m_numIterations = value;
@@ -605,10 +613,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
       info.m_sor = value;
@@ -622,10 +630,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("constraints")->GetElement(
           "contact_surface_layer")->Set(value);
@@ -639,10 +647,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<bool>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("constraints")->GetElement(
           "split_impulse")->Set(value);
@@ -656,10 +664,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("constraints")->GetElement(
           "split_impulse_penetration_threshold")->Set(value);
@@ -671,11 +679,19 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       int value;
       try
       {
-        value = boost::any_cast<int>(_value);
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(const boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
-        value = boost::any_cast<unsigned int>(_value);
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
       }
       this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
       break;
@@ -688,10 +704,10 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
+        return false;
       }
       bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
       break;
@@ -699,13 +715,14 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
     default:
     {
       gzwarn << "Param not supported in bullet" << std::endl;
-      break;
+      return false;
     }
+    return true;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   BulletParam param;
 
@@ -732,15 +749,15 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "max_step_size")
   {
     this->SetMaxStepSize(boost::any_cast<double>(_value));
-    return;
+    return true;
   }
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
-    return;
+    return false;
   }
 
-  this->SetParam(param, _value);
+  return this->SetParam(param, _value);
 }
 
 //////////////////////////////////////////////////

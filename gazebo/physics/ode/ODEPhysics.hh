@@ -206,11 +206,11 @@ namespace gazebo
       /// \brief Set a parameter of the bullet physics engine
       /// \param[in] _param A parameter listed in the ODEParam enum
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(ODEParam _param,
+      public: virtual bool SetParam(ODEParam _param,
                   const boost::any &_value);
 
       /// Documentation inherited
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// Documentation inherited

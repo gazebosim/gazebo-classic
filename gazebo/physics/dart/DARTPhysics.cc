@@ -393,7 +393,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
+bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   /// \TODO fill this out, see issue #1115
   if (_key == "max_contacts")
@@ -406,7 +406,7 @@ void DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     gzerr << "Setting [" << _key << "] in DART to [" << value
           << "] not yet supported.\n";
@@ -421,7 +421,7 @@ void DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     gzerr << "Setting [" << _key << "] in DART to [" << value
           << "] not yet supported.\n";
@@ -436,14 +436,16 @@ void DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
-      return;
+      return false;
     }
     this->dtWorld->setTimeStep(value);
   }
   else
   {
     gzwarn << _key << " is not supported in DART" << std::endl;
+    return false;
   }
+  return true;
 }
 
 //////////////////////////////////////////////////

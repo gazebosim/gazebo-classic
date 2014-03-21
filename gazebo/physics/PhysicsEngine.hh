@@ -272,7 +272,10 @@ namespace gazebo
       ///       -# "erp" (double) - global ERP
       ///       -# "precon_iters" (bool) - precondition iterations
       ///          (experimental).
-      ///       -# "iters" (int) - number of LCP iterations.
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
       ///       -# "sor" (double) - relaxation parameter for Projected
       ///          Gauss-Seidel (PGS) updates.
       ///       -# "contact_max_correcting_vel" (double) - truncates correction
@@ -327,35 +330,13 @@ namespace gazebo
       ///       -# (note: features are not yet implemented, issue #1116)
       ///
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
-      /// Below is a list of _key parameter definitions:
+      /// \sa SetParam, non-overlapping variables are listed below
       ///   - ode
-      ///       -# "type" (string) - returns "ode"
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
-      ///       -# "precon_iters" (int) - precondition iterations
-      ///          (experimental).
-      ///       -# "iters" (int) - number of LCP PGS iterations. If
-      ///          sor_lcp_tolerance is negative, full iteration count is
-      ///          executed.  Otherwise, PGS may stop iteration early if
-      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
-      ///       -# "sor" (double) - relaxation parameter for the Projected
-      ///          Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" (double) - truncates correction
-      ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
-      ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between any pair of collision bodies.
-      ///       -# "min_step_size" (double) - minimum internal step size
-      ///          (defined but not used in ode).
-      ///       -# "max_step_size" (double) - maximum physics step size when
-      ///          physics update step must return.
-      ///       -# "sor_lcp_tolerance" (double) - threshold for stopping PGS.
       ///       -# "rms_error" (double) - RMS of dlambda at the end of time step
       ///          error[0]: bilateral constraints
       ///          error[1]: contact normal constraints
@@ -368,38 +349,9 @@ namespace gazebo
       ///          residual[3]: all constraints
       ///       -# "num_contacts" (int) - returns number of active
       ///          contact constraints.
-      ///       -# "inertia_ratio_reduction" (bool) -
-      ///          turn on/off quickstep inertia reduction  (experimental).
-      ///       -# "contact_residual_smoothing" (double) -
-      ///          option to smooth friction residuals if > 0 (experimental).
-      ///       -# "experimental_row_reordering" (bool) -
-      ///          true if reorder constraint rows with the following order:
-      ///          bilateral constrains, contact normal constraints
-      ///          and lastly frictional constraints (experimental).
-      ///       -# "warm_start_factor" (double) -
-      ///          relaxation factor for warm starting bilateral constraints
-      ///          from last time step's value (experimental).
-      ///       -# "extra_friction_iterations" (int) -
-      ///          extra PGS iterations on only the frictional constraints
-      ///          (experimental).
       ///   - bullet
-      ///       -# "type" (string) - returns "bullet"
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
-      ///       -# "iters" (int) - number of LCP PGS iterations.
-      ///       -# "sor" (double) - relaxation parameter for the Projected
-      ///          Gauss-Seidel updates.
-      ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
-      ///       -# "split_impulse" (bool) - true turns on/off split impulse.
-      ///       -# "split_impulse_penetration_threshold" (double) -
-      ///          Split impulse penetration threshold.
-      ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between any pair of collision bodies.
-      ///       -# "min_step_size" (double) - minimum internal step size.
-      ///       -# "max_step_size" (double) - maximum physics step size when
-      ///          physics update step must return.
-      ///   - dart (note: most features are not yet implemented, issue #1115)
+      ///       -# \sa SetParam
+      ///   - dart
       ///       -# "min_step_size" (double) - minimum internal step size.
       ///       -# "max_contacts" (int) - max number of contact constraints
       ///          between any pair of collision bodies.

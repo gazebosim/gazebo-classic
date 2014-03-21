@@ -132,7 +132,7 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       // Documentation inherited
-      public: virtual void SetParam(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
