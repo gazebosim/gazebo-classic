@@ -247,7 +247,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             //  node[0].body->posr.pos[2],
             //  node[1].body->posr.pos[0], node[1].body->posr.pos[1],
             //  node[1].body->posr.pos[2]);
-            for ( int ii = 0; ii < 3; ++ii )
+            for ( int ii = 0; ii < 3; ii++)
               q[ii] = node[0].body->posr.pos[ii] - q[ii] -
                 node[1].body->posr.pos[ii];
         }
@@ -372,7 +372,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
           // error between body anchors
           dVector3 error12;
-          for (int i = 0; i < 3; ++i)
+          for (int i = 0; i < 3; i++)
             error12[i] = a2[i] + node[1].body->posr.pos[i] - a1[i] -
               node[0].body->posr.pos[i];
 
@@ -396,7 +396,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
           // error of body's anchor
           dVector3 error1;
-          for (int i = 0; i < 3; ++i) error1[i] = anchor2[i] - a1[i] -
+          for (int i = 0; i < 3; i++) error1[i] = anchor2[i] - a1[i] -
             node[0].body->posr.pos[i];
           // printf ("error1 %f %f %f\n", error1[0], error1[1], error1[2]);
 
@@ -408,7 +408,7 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
           info->c[2] = k * lin_err;
 
           if ( flags & dJOINT_REVERSE )
-              for (int i = 0; i < 3; ++i ) ax1[i] = -ax1[i];
+              for (int i = 0; i < 3; i++) ax1[i] = -ax1[i];
       }
 
       // uncommnet to enforce slider joint limit
@@ -741,7 +741,7 @@ dReal dJointGetScrewPosition ( dJointID j )
     {
         // get body2 + offset point in global coordinates
         dMultiply0_331 ( q, joint->node[1].body->posr.R, joint->offset );
-        for (int i = 0; i < 3; i++ )
+        for (int i = 0; i < 3; i++)
             q[i] = joint->node[0].body->posr.pos[i]
                    - q[i]
                    - joint->node[1].body->posr.pos[i];
