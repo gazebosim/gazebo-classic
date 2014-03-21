@@ -419,65 +419,66 @@ void BulletScrewJoint::SetHighStop(unsigned int _index,
   Joint::SetHighStop(0, _angle);
 
   // bulletScrew axial rotation is backward
-  if (this->bulletScrew)
+  if (!this->bulletScrew)
   {
-    if (_index == 0)
-    {
-      // _index = 0: angular constraint
-      double upperAng = this->bulletScrew->getUpperAngLimit();
-      this->bulletScrew->setUpperAngLimit(std::max(upperAng, _angle.Radian()));
+    gzerr << "bulletScrew not created yet.\n";
+    return;
+  }
 
-      // set corresponding linear constraints
-      double tp = this->threadPitch;
-      if (math::equal(tp, 0.0))
-      {
-        gzerr << "thread pitch should not be zero (joint is a slider?)"
-              << " using thread pitch = 1.0e6\n";
-        tp = 1.0e6;
-      }
-      // linear is angular / threadPitch
-      if (tp > 0)
-      {
-        double lowerLin = this->bulletScrew->getLowerLinLimit();
-        this->bulletScrew->setUpperLinLimit(std::max(lowerLin,
-          _angle.Radian()/tp));
-      }
-      else
-      {
-        // flip upper lower because thread pitch is negative
-        double upperLin = this->bulletScrew->getUpperLinLimit();
-        this->bulletScrew->setLowerLinLimit(std::min(upperLin,
-          _angle.Radian()/tp));
-      }
+  if (_index == 0)
+  {
+    // _index = 0: angular constraint
+    double upperAng = this->bulletScrew->getUpperAngLimit();
+    this->bulletScrew->setUpperAngLimit(std::max(upperAng, _angle.Radian()));
+
+    // set corresponding linear constraints
+    double tp = this->threadPitch;
+    if (math::equal(tp, 0.0))
+    {
+      gzerr << "thread pitch should not be zero (joint is a slider?)"
+            << " using thread pitch = 1.0e6\n";
+      tp = 1.0e6;
     }
-    else if (_index == 1)
+    // linear is angular / threadPitch
+    if (tp > 0)
     {
-      // _index = 1: linear constraint
       double lowerLin = this->bulletScrew->getLowerLinLimit();
-      this->bulletScrew->setUpperLinLimit(std::max(lowerLin, _angle.Radian()));
-
-      // set corresponding angular constraints
-      double tp = this->threadPitch;
-      // angular is linear * threadPitch
-      if (tp > 0)
-      {
-        double lowerAng = this->bulletScrew->getLowerAngLimit();
-        this->bulletScrew->setUpperAngLimit(std::max(lowerAng,
-          _angle.Radian()*tp));
-      }
-      else
-      {
-        // flip upper lower because thread pitch is negative
-        double upperAng = this->bulletScrew->getUpperAngLimit();
-        this->bulletScrew->setLowerAngLimit(std::min(upperAng,
-          _angle.Radian()*tp));
-      }
+      this->bulletScrew->setUpperLinLimit(std::max(lowerLin,
+        _angle.Radian()/tp));
     }
     else
-      gzerr << "Invalid index [" << _index << "]\n";
+    {
+      // flip upper lower because thread pitch is negative
+      double upperLin = this->bulletScrew->getUpperLinLimit();
+      this->bulletScrew->setLowerLinLimit(std::min(upperLin,
+        _angle.Radian()/tp));
+    }
+  }
+  else if (_index == 1)
+  {
+    // _index = 1: linear constraint
+    double lowerLin = this->bulletScrew->getLowerLinLimit();
+    this->bulletScrew->setUpperLinLimit(std::max(lowerLin, _angle.Radian()));
+
+    // set corresponding angular constraints
+    double tp = this->threadPitch;
+    // angular is linear * threadPitch
+    if (tp > 0)
+    {
+      double lowerAng = this->bulletScrew->getLowerAngLimit();
+      this->bulletScrew->setUpperAngLimit(std::max(lowerAng,
+        _angle.Radian()*tp));
+    }
+    else
+    {
+      // flip upper lower because thread pitch is negative
+      double upperAng = this->bulletScrew->getUpperAngLimit();
+      this->bulletScrew->setLowerAngLimit(std::min(upperAng,
+        _angle.Radian()*tp));
+    }
   }
   else
-    gzerr << "bulletScrew not created yet.\n";
+    gzerr << "Invalid index [" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
