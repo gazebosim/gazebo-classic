@@ -664,6 +664,7 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       else
       {
         // custom physics engine?
+        gzwarn << "Physics type [" << this->physicsType << "] unhandled.\n";
       }
     }
     else if ((*iter)->propertyName().toStdString() == "constraints")
@@ -2765,6 +2766,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
   else
   {
     // custom physics engine?
+    gzwarn << "Physics type [" << this->physicsType << "] unhandled.\n";
   }
 }
 
