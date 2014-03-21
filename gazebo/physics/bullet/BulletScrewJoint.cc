@@ -14,6 +14,10 @@
  * limitations under the License.
  *
  */
+#include <algorithm>
+#include <limits>
+#include <string>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
