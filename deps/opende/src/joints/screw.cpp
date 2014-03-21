@@ -125,7 +125,7 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
                                      axis1, qrel );
         // from angle, update cumulative_angle, which does not wrap
         cumulative_angle = cumulative_angle +
-          shortest_angular_distance(cumulative_angle,angle);
+          shortest_angular_distance(cumulative_angle, angle);
 
         // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle,
         //   limot.lostop, limot.histop);
