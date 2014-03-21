@@ -496,6 +496,21 @@ namespace gazebo
         msgs::Set(result.mutable_plane()->mutable_size(),
             geomElem->Get<math::Vector2d>("size"));
       }
+/**/  else if (geomElem->GetName() == "polyline")
+      {
+        result.set_type(msgs::Geometry::POLYLINE);
+        result.mutable_polyline()->set_height(geomElem->Get<double>("height"));
+         sdf::ElementPtr pointElem = geomElem->GetElement("point");
+        while(pointElem)
+        { 
+           math::Vector2d point = pointElem->Get<math::Vector2d>();
+           pointElem = pointElem->GetNextElement("point");
+       
+           msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
+
+           msgs::Set( ptMsg, point);
+        }
+      } 
       else if (geomElem->GetName() == "image")
       {
         result.set_type(msgs::Geometry::IMAGE);

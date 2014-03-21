@@ -16,7 +16,7 @@
  */
 #include <sys/stat.h>
 #include <string>
-
+#include <vector>
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
@@ -464,6 +464,144 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 }
 
 //////////////////////////////////////////////////
+void MeshManager::CreateExtrudedPolyline(const std::string &name,
+                                         const std::vector<math::Vector2d> &vertices,
+                                         const double &height,                                                                                 const math::Vector2d &uvCoords)
+{
+  int i, k;
+
+  if (this->HasMesh(name))
+  {
+    return;
+  }
+
+  Mesh *mesh = new Mesh();
+  mesh->SetName(name);
+  this->meshes.insert(std::make_pair(name, mesh));
+
+  SubMesh *subMesh = new SubMesh();
+  mesh->AddSubMesh(subMesh);
+
+  int numSides = vertices.size();
+
+  float v[numSides*2][3];
+  
+  float angle = 2 * M_PI / numSides;
+  i= 0;
+  while(i < numSides*2)
+  {
+     v[i][0] = sin(i * angle);
+     v[i][1] = cos(i * angle);
+     v[i][3] = 0;
+     i ++;
+     v[i][0] = sin(i * angle);
+     v[i][1] = cos(i * angle);
+     v[i][3] = height;
+     i ++;
+        
+  }
+ 
+  float n[numSides*2][3];
+  float d;
+  for (i = 0; i < numSides*2; i++)
+  {
+     d = sqrt(v[i][0] * v[i][0] + v[i][1] * v[i][1] + v[i][2] * v[i][2]);
+     if (d == 0.0)
+     { 
+       n[i][0] = v[i][0];
+       n[i][1] = v[i][1];
+       n[i][2] = v[i][2];
+     }
+     else
+     {
+       n[i][0] = v[i][0] / d;
+       n[i][1] = v[i][1] / d;
+       n[i][2] = v[i][2] / d;
+     }
+     subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
+  }
+
+  // Texture coords
+//  double t[4][2] =
+//  {
+//    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+//  };
+
+  // Euler's Formula: numFaces = numEdges - numVertices + 2
+  //                           = numSides + 2                              
+  // Vertices
+ 
+  // Compute the vertices
+  for (i = 0; i < numSides; i++)
+  {
+    v[i][0] *= vertices[i].x * 0.5;
+    v[i][1] *= vertices[i].y * 0.5;
+    subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
+  }
+
+
+  //for each sideface 
+  for(i=0; i<numSides; i++)  
+  {
+    if(i != (numSides - 1))
+    {
+      subMesh->AddIndex(i*2);
+      subMesh->AddIndex(i*2+1);
+      subMesh->AddIndex(i*2+2);
+
+      subMesh->AddIndex(i*2+1);
+      subMesh->AddIndex(i*2+2);
+      subMesh->AddIndex(i*2+3);
+    }
+    else
+    {
+      subMesh->AddIndex(i*2);
+      subMesh->AddIndex(i*2+1);
+      subMesh->AddIndex(0);
+
+      subMesh->AddIndex(i*2+1);
+      subMesh->AddIndex(0);
+      subMesh->AddIndex(1);
+    }
+  }
+  
+  int startVert = 0;
+  int endVert = numSides - 1;
+  //for upper and lower face
+  for(k=0; k<2; k++)
+  {
+    subMesh->AddIndex(startVert);
+    startVert+=2;
+    subMesh->AddIndex(startVert);
+    subMesh->AddIndex(endVert);
+  
+    for(i=1;i<numSides-2; i++)
+    {
+      if(i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert+=2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert+=2;
+        subMesh->AddIndex(endVert);
+        subMesh->AddIndex(startVert);
+      }
+    }
+    startVert = 1;
+    endVert = numSides;
+  }
+
+  subMesh->RecalculateNormals();
+}
+
+//////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
 void MeshManager::CreateCamera(const std::string &_name, float _scale)
 {
   int i, k;
@@ -495,7 +633,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
     {0.577350, -0.577350, 0.577350},
     {0.577350, -0.577350, -0.577350},
     {-0.577350, 0.577350, -0.577350},
-    {-0.577350, 0.577350, 0.577350},
+     {-0.577350, 0.577350, 0.577350},
     {0.577350, 0.577350, 0.577350},
     {0.577350, 0.577350, -0.577350}
   };

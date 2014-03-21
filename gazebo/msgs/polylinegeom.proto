@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Poly_lineGeom 
+/// \brief Information about PolyLine geometry
+
+
+import "vector2d.proto";
+
+message Polyline
+{
+  required double height        = 1;
+  repeated Vector2d point       = 2;  
+}

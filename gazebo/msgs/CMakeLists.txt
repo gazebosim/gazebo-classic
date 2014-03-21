@@ -60,6 +60,7 @@ set (msgs
   pose_trajectory.proto
   pose_v.proto
   poses_stamped.proto
+  polylinegeom.proto
   projector.proto
   propagation_particle.proto
   propagation_grid.proto
