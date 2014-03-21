@@ -172,6 +172,14 @@
     + virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
     + virtual double GetAttribute(const std::string &_key, unsigned int _index)
 
+1. **gazebo/physics/simbody/SimbodyPhysics.hh**
+    + virtual boost::any GetParam(const std::string &_key) const
+    + virtual void SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + virtual boost::any GetParam(const std::string &_key) const
+    + virtual void SetParam(const std::string &_key, const boost::any &_value)
+
 ### Deletions
 
 1. **Removed libtool**
