@@ -227,7 +227,7 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetHighStop(
+bool ODEUniversalJoint::SetHighStop(
   unsigned int _index, const math::Angle &_angle)
 {
   // Overload because we switched axis orders
@@ -236,18 +236,18 @@ void ODEUniversalJoint::SetHighStop(
   {
     case UniversalJoint::AXIS_CHILD:
       this->SetParam(dParamHiStop, _angle.Radian());
-      break;
+      return true;
     case UniversalJoint::AXIS_PARENT:
       this->SetParam(dParamHiStop2, _angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      break;
+      return false;
   };
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetLowStop(
+bool ODEUniversalJoint::SetLowStop(
   unsigned int _index, const math::Angle &_angle)
 {
   // Overload because we switched axis orders
@@ -256,13 +256,13 @@ void ODEUniversalJoint::SetLowStop(
   {
     case UniversalJoint::AXIS_CHILD:
       this->SetParam(dParamLoStop, _angle.Radian());
-      break;
+      return true;
     case UniversalJoint::AXIS_PARENT:
       this->SetParam(dParamLoStop2, _angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      break;
+      return false;
   };
 }
 

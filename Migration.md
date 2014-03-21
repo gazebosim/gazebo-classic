@@ -22,6 +22,96 @@
     + ***Deprecation*** protected: virtual void Load(sdf::ElementPtr _sdf)
     + ***Replacement*** public: virtual void Load(sdf::ElementPtr _sdf)
 
+1. **gazebo/physics/BallJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+ 
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletBallJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+ 
+1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletHingeJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletScrewJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletSliderJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletUniversalJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + ***Deprecation*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Deprecation*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`

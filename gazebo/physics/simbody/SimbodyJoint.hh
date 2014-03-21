@@ -192,11 +192,11 @@ namespace gazebo
       public: bool physicsInitialized;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                                        const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
 
       // Documentation inherited.

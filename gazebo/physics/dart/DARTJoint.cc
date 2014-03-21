@@ -303,7 +303,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -311,15 +311,15 @@ void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     case 1:
     case 2:
       this->dtJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      break;
+      return false;
   };
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -327,9 +327,10 @@ void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   case 1:
   case 2:
     this->dtJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
-    break;
+    return true;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
+    return false;
   };
 }
 

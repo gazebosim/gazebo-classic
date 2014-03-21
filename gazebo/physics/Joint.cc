@@ -519,15 +519,19 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
+  // switch below to return this->SetUpperLimit when we update
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle);
+  // switch below to return this->SetLowerLimit when we update
+  return true;
 }
 
 //////////////////////////////////////////////////

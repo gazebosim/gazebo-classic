@@ -283,7 +283,7 @@ double SimbodyScrewJoint::GetAttribute(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(
+bool SimbodyScrewJoint::SetHighStop(
   unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
@@ -334,19 +334,25 @@ void SimbodyScrewJoint::SetHighStop(
       else
       {
         gzerr << "Should never be here. Joint index invalid limit not set.\n";
+        return false;
       }
     }
     else
     {
       gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetHighStop: index out of bounds.\n";
+    return false;
+  }
+return true;
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(
+bool SimbodyScrewJoint::SetLowStop(
   unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
@@ -398,13 +404,19 @@ void SimbodyScrewJoint::SetLowStop(
       else
       {
         gzerr << "Should never be here. Joint index invalid limit not set.\n";
+        return false;
       }
     }
     else
     {
       gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetLowStop: index out of bounds.\n";
+    return false;
+  }
+return true;
 }

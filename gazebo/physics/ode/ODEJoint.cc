@@ -301,43 +301,44 @@ dJointFeedback *ODEJoint::GetFeedback()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
   switch (_index)
   {
     case 0:
       this->SetParam(dParamHiStop, _angle.Radian());
-      break;
+      return true;
     case 1:
       this->SetParam(dParamHiStop2, _angle.Radian());
-      break;
+      return true;
     case 2:
       this->SetParam(dParamHiStop3, _angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      break;
+      return false;
   };
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
   switch (_index)
   {
     case 0:
       this->SetParam(dParamLoStop, _angle.Radian());
-      break;
+      return true;
     case 1:
       this->SetParam(dParamLoStop2, _angle.Radian());
-      break;
+      return true;
     case 2:
       this->SetParam(dParamLoStop3, _angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
+      return false;
   };
 }
 

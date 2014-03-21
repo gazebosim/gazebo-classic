@@ -78,11 +78,11 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.

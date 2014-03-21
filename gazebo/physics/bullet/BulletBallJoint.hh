@@ -71,11 +71,11 @@ namespace gazebo
       public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       /// \brief Set the high stop of an axis(index).
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
