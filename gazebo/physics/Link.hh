@@ -506,6 +506,14 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      /// \brief Accessor for link filtered linear velocity
+      /// \return pointer to linVelFil
+      public: common::MovingWindowFilter<math::Vector3> *GetLinVelFil();
+
+      /// \brief Accessor for link filtered angular velocity
+      /// \return pointer to angVelFil
+      public: common::MovingWindowFilter<math::Vector3> *GetAngVelFil();
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -583,10 +591,10 @@ namespace gazebo
       private: Collision_V collisions;
 
       /// \brief For moving window average of kinetic energy
-      private: common::MovingWindowFilter<math::Vector3> linVelFil;
+      private: common::MovingWindowFilter<math::Vector3> *linVelFil;
 
       /// \brief For moving window average of kinetic energy
-      private: common::MovingWindowFilter<math::Vector3> angVelFil;
+      private: common::MovingWindowFilter<math::Vector3> *angVelFil;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

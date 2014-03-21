@@ -34,7 +34,7 @@
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
-    + ***Replacement:*** bool load();
+    + ***Replacement:*** bool load()
     + ***Note:*** Changed return type from void to bool.
 1. **Functions in joint classes use unsigned int, instead of int**
     + All functions in Joint classes (gazebo/physics/\*Joint\*) and subclasses (gazebo/physics/[ode,bullet,simbody,dart]/\*Joint\*) now use unsigned integers instead of integers when referring to a specific joint axis.
@@ -198,6 +198,10 @@
 1. **gazebo/physics/dart/DARTPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual void SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/Link.hh**
+    + common::MovingWindowFilter<math::Vector3> *GetLinVelFil()
+    + common::MovingWindowFilter<math::Vector3> *GetAngVelFil()
 
 ### Deletions
 
