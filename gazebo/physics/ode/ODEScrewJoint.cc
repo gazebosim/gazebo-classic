@@ -173,7 +173,8 @@ void ODEScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
   if (this->jointId)
   {
     /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -185,7 +186,7 @@ void ODEScrewJoint::SetThreadPitch(double _threadPitch)
   if (this->jointId)
   {
     /// \TODO: create an issue on making thread pitch = translation / angle
-    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -194,7 +195,7 @@ void ODEScrewJoint::SetThreadPitch(double _threadPitch)
 //////////////////////////////////////////////////
 double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  return this->threadPitch;
+  return this->GetThreadPitch();
 }
 
 //////////////////////////////////////////////////

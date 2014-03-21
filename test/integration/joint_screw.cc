@@ -107,12 +107,12 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // move child link 45deg about x
   double pitch_00 = joint_00->GetAttribute("thread_pitch", 0);
-  math::Pose pose_00 = math::Pose(0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
+  math::Pose pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
   math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI/pitch_00);
+  EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
@@ -125,14 +125,14 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   // move child link 45deg about y
   double pitch_01 = joint_01->GetAttribute("thread_pitch", 0);
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
-  pose_00 = math::Pose(0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
-  pose_01 = math::Pose(0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
+  pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
+  pose_01 = math::Pose(-0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI/pitch_00);
+  EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
   EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
-  EXPECT_EQ(joint_01->GetAngle(1), 0.3*M_PI/pitch_01);
+  EXPECT_EQ(joint_01->GetAngle(1), -0.3*M_PI/pitch_01);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
@@ -149,9 +149,9 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // move child link 90deg about both x and "rotated y axis" (z)
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI/pitch_00);
+  EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
   EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
-  EXPECT_EQ(joint_01->GetAngle(1), 0.3*M_PI/pitch_01);
+  EXPECT_EQ(joint_01->GetAngle(1), -0.3*M_PI/pitch_01);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
@@ -235,7 +235,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     // check link pose
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     EXPECT_EQ(link_00->GetWorldPose(),
-      math::Pose(angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
+      math::Pose(-angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
 
     if (_physicsEngine == "simbody")
     {
@@ -270,7 +270,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
     EXPECT_EQ(pose_00, math::Pose(
-      angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
+      -angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
       if (!once)
@@ -288,7 +288,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
       EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
     }
     EXPECT_NEAR(pose_01.pos.x,
-      angle_00_angular / pitch_00 + angle_01_angular / pitch_01, 1e-8);
+      -angle_00_angular / pitch_00 - angle_01_angular / pitch_01, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
   }
@@ -309,7 +309,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
     EXPECT_EQ(pose_00, math::Pose(
-      angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
+      -angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
       if (!once)
@@ -327,7 +327,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
       EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
     }
     EXPECT_NEAR(pose_01.pos.x,
-      angle_00_angular / pitch_00 + angle_01_angular / pitch_01, 1e-8);
+      -angle_00_angular / pitch_00 - angle_01_angular / pitch_01, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
   }

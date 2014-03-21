@@ -95,19 +95,37 @@ void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
-    double /*_threadPitch*/)
+    double _threadPitch)
 {
   gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
-        << "not yet implemented.  The pitch are set during joint construction "
+        << "not yet tested.  The pitch are set during joint construction "
         << "in SimbodyPhysics.cc for now.\n";
+  this->SetThreadPitch(_threadPitch);
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
+void SimbodyScrewJoint::SetThreadPitch(double _threadPitch)
 {
   gzdbg << "SimbodyScrewJoint::SetThreadPitch: setting thread pitch is "
-        << "not yet implemented.  The pitch are set during joint construction "
+        << "not yet tested.  The pitch are set during joint construction "
         << "in SimbodyPhysics.cc for now.\n";
+  /* need to figure out how to down cast correctly
+  if (this->physicsInitialized &&
+      this->simbodyPhysics->simbodyPhysicsInitialized)
+  {
+    // downcast mobod to screw mobod first
+    // the way pitch is defined in simbody is -1.0 / gazebo thread pitch
+    SimTK::MobilizedBody::Screw screw =
+      static_cast<SimTK::MobilizedBody::Screw>(this->mobod);
+    screw.setDefaultPitch(-1.0/_threadPitch);
+  }
+  else
+  {
+    gzwarn << "SimbodyScrewJoint physics not initialized yet, or failed"
+           << " to initialize. Returning thread pitch from SDF.\n"
+    return this->threadPitch;
+  }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -219,24 +237,20 @@ double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch()
 {
-  return this->threadPitch;
-
-  /* if we want to get active thread pitch, use below
-  /// \TODO: deprecate _index parameter, thread pitch is a property of the
-  /// joint, not related to an axis.
   if (this->physicsInitialized &&
       this->simbodyPhysics->simbodyPhysicsInitialized)
   {
     // downcast mobod to screw mobod first
-    return SimTK::MobilizedBody::Screw::downcast(this->mobod).getDefaultPitch();
+    // the way pitch is defined in simbody is -1.0 / gazebo thread pitch
+    return
+      -1.0/SimTK::MobilizedBody::Screw::downcast(this->mobod).getDefaultPitch();
   }
   else
   {
-    gzdbg << "SimbodyScrewJoint::GetThreadPitch() failed, "
-          << " simbody not yet initialized\n";
-    return 0.0;
+    gzwarn << "SimbodyScrewJoint physics not initialized yet, or failed"
+           << " to initialize. Returning thread pitch from SDF.\n";
+    return this->threadPitch;
   }
-  */
 }
 
 //////////////////////////////////////////////////

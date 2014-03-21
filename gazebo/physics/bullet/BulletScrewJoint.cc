@@ -75,12 +75,12 @@ namespace gazebo
 
       public: virtual void setThreadPitch(double _threadPitch)
       {
-        this->threadPitch = _threadPitch;
+        this->threadPitch = -_threadPitch;
       }
 
       public: virtual double getThreadPitch() const
       {
-        return this->threadPitch;
+        return -this->threadPitch;
       }
 
       private: double threadPitch;
@@ -317,7 +317,7 @@ void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
 void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
     double _threadPitch)
 {
-  this->threadPitch = _threadPitch;
+  this->SetThreadPitch(_threadPitch);
 }
 
 //////////////////////////////////////////////////
@@ -340,12 +340,7 @@ double BulletScrewJoint::GetThreadPitch()
 //////////////////////////////////////////////////
 double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  double result = this->threadPitch;
-  if (this->bulletScrew)
-    result = this->bulletScrew->getThreadPitch();
-  else
-    gzwarn << "bulletScrew not created yet, returning cached threadPitch.\n";
-  return result;
+  return this->GetThreadPitch();
 }
 
 //////////////////////////////////////////////////

@@ -833,7 +833,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         MobilizedBody::Screw screwJoint(
             parentMobod,      X_IF,
             massProps,        X_OM,
-            1.0/pitch,
+            -1.0/pitch,
             direction);
         mobod = screwJoint;
 
