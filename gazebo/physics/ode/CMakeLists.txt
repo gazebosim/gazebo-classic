@@ -53,7 +53,6 @@ SET (headers
 
 set (gtest_sources
   ODEPhysics_TEST.cc
-  ODEGearboxJoint_TEST.cc
 )
 gz_build_tests(${gtest_sources})
 
@@ -70,6 +69,5 @@ gz_install_library(gazebo_physics_ode)
 
 # unit tests
 set (gtest_sources
-  ODEJoint_TEST.cc
 )
 gz_build_tests(${gtest_sources})
