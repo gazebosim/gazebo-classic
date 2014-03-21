@@ -1159,7 +1159,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<std::string>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return;
@@ -1174,7 +1174,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return;
@@ -1190,7 +1190,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return;
@@ -1206,7 +1206,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1221,7 +1221,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1243,7 +1243,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1267,7 +1267,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<int>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
@@ -1282,7 +1282,7 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       {
         value = boost::any_cast<double>(_value);
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         value = boost::any_cast<unsigned int>(_value);
       }
