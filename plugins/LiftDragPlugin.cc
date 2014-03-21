@@ -47,8 +47,7 @@ LiftDragPlugin::LiftDragPlugin() : cla(1.0), cda(0.01), cma(0.01), rho(1.2041)
 }
 
 /////////////////////////////////////////////////
-void LiftDragPlugin::Load(physics::ModelPtr _model,
-                     sdf::ElementPtr _sdf)
+void LiftDragPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "LiftDragPlugin _model pointer is NULL");
   this->model = _model;
