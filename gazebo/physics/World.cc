@@ -669,15 +669,6 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
-    /* debug rms_error, using sphere_stack.world
-    double *rmsError = boost::any_cast<double*>(
-      this->physicsEngine->GetParam("rms_error"));
-    gzerr << "rms [" << rmsError[0]
-          << ", " << rmsError[1]
-          << ", " << rmsError[2]
-          << "]\n";
-    */
-
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
