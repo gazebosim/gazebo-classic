@@ -83,6 +83,8 @@ namespace gazebo
 
                  /// \brief Width of the road.
                  public: double width;
+
+                 public: std::string texture;
                };
 
 

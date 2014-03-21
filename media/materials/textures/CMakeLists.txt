@@ -19,6 +19,7 @@ set (files
   projection_filter.png
   random.png
   road1.jpg
+  sidewalk.jpg
   stereo_projection_pattern_high_res.png
   stereo_projection_pattern_high_res_red.png
   terrain_detail.jpg
@@ -27,6 +28,11 @@ set (files
   willowMap.png
   wood.jpg
   WoodPallet.png
+  primary.jpg
+  motorway.jpg
+  trunk.jpg
+  secondary.jpg
+  residential.jpg
 )
 
 

@@ -14,9 +14,7 @@
  * limitations under the License.
  *
 */
-
 #include "gazebo/transport/transport.hh"
-
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Road2d.hh"
 
@@ -205,7 +203,7 @@ void Road2d::OnRoadMsg(ConstRoadPtr &_msg)
 void Road2d::Segment::Load(msgs::Road _msg)
 {
   this->width = _msg.width();
-
+  
   for (int i = 0; i < _msg.point_size(); ++i)
   {
     this->points.push_back(msgs::Convert(_msg.point(i)));
@@ -354,9 +352,44 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   vBuf->unlock();
 
-  this->setMaterial("Gazebo/Road");
-}
+  this->texture = _msg.texture();
+  
+  if ((this->texture == "footway") ||
+      (this->texture == "pedestrian"))
+  { 
+    this->setMaterial("Gazebo/Sidewalk");
+  }
+  else if ((this->texture == "motorway") ||
+           (this->texture == "lanes_6"))
+  {
+    this->setMaterial("Gazebo/Motorway");
+  }
+  else if ((this->texture == "trunk") ||
+           (this->texture == "lanes_4"))
+  { 
+    this->setMaterial("Gazebo/Trunk");
+  }
+  else if ((this->texture == "primary") ||
+           (this->texture == "lanes_2"))
+  {
+    this->setMaterial("Gazebo/Primary");
+  }
+  else if ((this->texture == "tertiary") ||
+           (this->texture == "residential"))
+  {  
+    this->setMaterial("Gazebo/Residential");
+  }
+  else if ((this->texture == "secondary") ||
+           (this->texture == "lane_1"))
+  {
+    this->setMaterial("Gazebo/Secondary");
+  }
+  else
+  {
+    this->setMaterial("Gazebo/Road");
+  }
 
+}
 //////////////////////////////////////////////////
 Ogre::Real Road2d::Segment::getBoundingRadius() const
 {

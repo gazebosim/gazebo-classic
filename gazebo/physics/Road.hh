@@ -19,7 +19,8 @@
 #define _ROAD_HH_
 
 #include <vector>
-
+#include <string>
+#include <algorithm>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -51,9 +52,12 @@ namespace gazebo
 
       /// \brief Width of the road.
       private: double width;
-
+      
       /// \brief Points that makes up the mid-line of the road.
       private: std::vector<math::Vector3> points;
+
+      /// \brief Texture of the road
+      public: std::string texture;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;

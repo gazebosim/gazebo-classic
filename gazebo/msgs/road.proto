@@ -9,9 +9,8 @@ import "vector3d.proto";
 
 message Road
 {
-  required string name      = 1;
-  required double width     = 2;
-  repeated Vector3d point   = 3;
+  required string name          = 1;
+  required double width         = 2;
+  repeated Vector3d point       = 3;
+  optional string texture       = 4; 
 }
-
-
