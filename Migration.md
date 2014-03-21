@@ -13,14 +13,17 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+    ---
     + ***Deprecation*** virtual void SetSORPGSPreconIters(unsigned int _iters)
-    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
     ---
     + ***Deprecation*** virtual void SetSORPGSIters(unsigned int _iters)
-    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
     ---
     + ***Deprecation*** virtual void SetSORPGSW(double _w)
-    + ***Replacement*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
     ---
     + ***Deprecation*** virtual int GetSORPGSPreconIters()
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
@@ -30,6 +33,14 @@
     ---
     + ***Deprecation*** virtual double GetSORPGSW()
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+
+1. **gazebo/physics/ode/ODEPhysics.hh**
+    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/bullet/BulletPhysics.hh**
+    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
@@ -193,11 +204,11 @@
 
 1. **gazebo/physics/simbody/SimbodyPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
-    + virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 1. **gazebo/physics/dart/DARTPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
-    + virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 1. **gazebo/physics/Link.hh**
     + common::MovingWindowFilter<math::Vector3> *GetLinVelFil() const
