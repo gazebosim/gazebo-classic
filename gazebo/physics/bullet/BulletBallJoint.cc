@@ -247,13 +247,13 @@ void BulletBallJoint::SetAxis(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
 {
-  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
 {
-  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
   return math::Angle();
 }

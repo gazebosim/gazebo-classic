@@ -111,14 +111,14 @@ void DARTBallJoint::SetAxis(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Angle DARTBallJoint::GetHighStop(unsigned int /*_index*/)
 {
-  gzerr << "DARTBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "DARTBallJoint::GetHighStop not implemented" << std::endl;
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle DARTBallJoint::GetLowStop(unsigned int /*_index*/)
 {
-  gzerr << "DARTBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "DARTBallJoint::GetLowStop not implemented" << std::endl;
   return math::Angle();
 }
 

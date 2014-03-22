@@ -113,14 +113,14 @@ void ODEBallJoint::SetAxis(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Angle ODEBallJoint::GetHighStop(unsigned int /*_index*/)
 {
-  gzerr << "ODEBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle ODEBallJoint::GetLowStop(unsigned int /*_index*/)
 {
-  gzerr << "ODEBallJoint::SetAxis not implemented" << std::endl;
+  gzerr << "ODEBallJoint::GetLowStop not implemented" << std::endl;
   return math::Angle();
 }
 
