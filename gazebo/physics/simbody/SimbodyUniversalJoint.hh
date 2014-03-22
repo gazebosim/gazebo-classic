@@ -21,6 +21,7 @@
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,8 @@ namespace gazebo
     /// \{
 
     /// \brief A simbody universal joint class
-    class SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyUniversalJoint
+      : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the Simbody world.

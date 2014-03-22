@@ -20,6 +20,7 @@ set (files
   lights.world
   mud_bitmask.world
   mud.world
+  multilink_shape.world
   openal.world
   pioneer2dx.world
   plane_demo.world
@@ -39,11 +40,14 @@ set (files
   robocup_3Dsim.world
   rubble.world
   shapes.world
+  simple_arm.world
   simple_gripper.world
+  single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
   trigger.world
+  twin_rotor_demo.world
   willowgarage.world
   wireless_sensors.world
 )

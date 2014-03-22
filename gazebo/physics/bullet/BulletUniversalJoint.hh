@@ -14,17 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
+#ifndef _GAZEBO_BULLETUNIVERSALJOINT_HH_
+#define _GAZEBO_BULLETUNIVERSALJOINT_HH_
 
-#ifndef _BULLETUNIVERSALJOINT_HH_
-#define _BULLETUNIVERSALJOINT_HH_
-
+#include "gazebo/physics/bullet/gzBtUniversalConstraint.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btUniversalConstraint;
 
@@ -37,7 +34,8 @@ namespace gazebo
     /// \{
 
     /// \brief A bullet universal joint class
-    class BulletUniversalJoint : public UniversalJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletUniversalJoint
+      : public UniversalJoint<BulletJoint>
     {
       /// \brief Constructor
       public: BulletUniversalJoint(btDynamicsWorld *world, BasePtr _parent);
@@ -56,12 +54,6 @@ namespace gazebo
 
       /// \brief Set the first axis of rotation
       public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
-
-      /// \brief Get the first axis of rotation
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
-
-      /// \brief Get the angle of axis 1
-      public: virtual math::Angle GetAngle(unsigned int _index) const;
 
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -99,9 +91,16 @@ namespace gazebo
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       /// \brief Pointer to bullet universal constraint
-      private: btUniversalConstraint *bulletUniversal;
-    };
+      private: gzBtUniversalConstraint *bulletUniversal;
 
+      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// relative to the initial configuration.
+      private: double angleOffset[2];
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      /// in world frame.
+      private: math::Vector3 initialWorldAxis[2];
+    };
     /// \}
   }
 }

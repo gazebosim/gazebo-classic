@@ -16,9 +16,8 @@
 */
 
 #include "kbhit.h"
-
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
+#include <algorithm>
+#include <string>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
@@ -58,6 +57,7 @@ void LiftDragPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "LiftDragPlugin _model pointer is NULL");
+  GZ_ASSERT(_sdf, "LiftDragPlugin _sdf pointer is NULL");
   this->model = _model;
   this->modelName = _model->GetName();
   this->sdf = _sdf;
@@ -217,7 +217,7 @@ void LiftDragPlugin::OnUpdate()
   {
     cl = (this->cla * this->alphaStall +
           this->claStall * (this->alpha - this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
     // make sure cl is still great than 0
     cl = std::max(0.0, cl);
   }
@@ -225,12 +225,12 @@ void LiftDragPlugin::OnUpdate()
   {
     cl = (-this->cla * this->alphaStall +
           this->claStall * (this->alpha + this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
     // make sure cl is still less than 0
     cl = std::min(0.0, cl);
   }
   else
-    cl = this->cla * this->alpha / cosSweepAngle2;
+    cl = this->cla * this->alpha * cosSweepAngle2;
 
   // compute lift force at cp
   math::Vector3 lift = cl * q * this->area * liftDirection;
@@ -241,16 +241,16 @@ void LiftDragPlugin::OnUpdate()
   {
     cd = (this->cda * this->alphaStall +
           this->cdaStall * (this->alpha - this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
   }
   else if (this->alpha < -this->alphaStall)
   {
     cd = (-this->cda * this->alphaStall +
           this->cdaStall * (this->alpha + this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
   }
   else
-    cd = (this->cda * this->alpha) / cosSweepAngle2;
+    cd = (this->cda * this->alpha) * cosSweepAngle2;
 
   // make sure drag is positive
   cd = fabs(cd);
@@ -264,7 +264,7 @@ void LiftDragPlugin::OnUpdate()
   {
     cm = (this->cma * this->alphaStall +
           this->cmaStall * (this->alpha - this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
     // make sure cm is still great than 0
     cm = std::max(0.0, cm);
   }
@@ -272,12 +272,12 @@ void LiftDragPlugin::OnUpdate()
   {
     cm = (-this->cma * this->alphaStall +
           this->cmaStall * (this->alpha + this->alphaStall))
-         / cosSweepAngle2;
+         * cosSweepAngle2;
     // make sure cm is still less than 0
     cm = std::min(0.0, cm);
   }
   else
-    cm = this->cma * this->alpha / cosSweepAngle2;
+    cm = this->cma * this->alpha * cosSweepAngle2;
 
   // reset cm to zero, as cm needs testing
   cm = 0.0;

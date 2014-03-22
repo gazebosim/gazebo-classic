@@ -22,6 +22,7 @@
 #include <OgreTechnique.h>
 
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
     /// Deferred light geometry. Each instance matches a normal light.
     /// Should not be created by the user.
     /// XXX support other types of light other than point lights.
-    class DeferredLight: public Ogre::SimpleRenderable
+    class GAZEBO_VISIBLE DeferredLight: public Ogre::SimpleRenderable
     {
       /// \brief Constructor
       public: DeferredLight(MaterialGenerator *_gen, Ogre::Light *_parentLight,
