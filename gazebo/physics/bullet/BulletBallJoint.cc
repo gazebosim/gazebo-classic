@@ -237,3 +237,23 @@ math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
   return math::Vector3();
 }
 
+//////////////////////////////////////////////////
+void BulletBallJoint::SetAxis(unsigned int /*_index*/,
+                        const math::Vector3 &/*_axis*/)
+{
+  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
+  return math::Angle();
+}
