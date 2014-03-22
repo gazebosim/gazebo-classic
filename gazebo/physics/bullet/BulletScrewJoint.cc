@@ -815,8 +815,11 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // fill two rows
     tmpA = relA.cross(p);
     tmpB = relB.cross(p);
-    for (i = 0; i < 3; ++i) info->m_J1angularAxis[s2+i] = tmpA[i];
-    for (i = 0; i < 3; ++i) info->m_J2angularAxis[s2+i] = -tmpB[i];
+    for (i = 0; i < 3; ++i)
+    {
+      info->m_J1angularAxis[s2+i] = tmpA[i];
+      info->m_J2angularAxis[s2+i] = -tmpB[i];
+    }
     tmpA = relA.cross(q);
     tmpB = relB.cross(q);
     if (hasStaticBody && getSolveAngLimit())
@@ -825,12 +828,15 @@ void btScrewConstraint::_getInfo2NonVirtual(
       tmpB *= factB;
       tmpA *= factA;
     }
-    for (i = 0; i < 3; ++i) info->m_J1angularAxis[s3+i] = tmpA[i];
-    for (i = 0; i < 3; ++i) info->m_J2angularAxis[s3+i] = -tmpB[i];
-    for (i = 0; i < 3; ++i) info->m_J1linearAxis[s2+i] = p[i];
-    for (i = 0; i < 3; ++i) info->m_J1linearAxis[s3+i] = q[i];
-    for (i = 0; i < 3; ++i) info->m_J2linearAxis[s2+i] = -p[i];
-    for (i = 0; i < 3; ++i) info->m_J2linearAxis[s3+i] = -q[i];
+    for (i = 0; i < 3; ++i)
+    {
+      info->m_J1angularAxis[s3+i] = tmpA[i];
+      info->m_J2angularAxis[s3+i] = -tmpB[i];
+      info->m_J1linearAxis[s2+i] = p[i];
+      info->m_J1linearAxis[s3+i] = q[i];
+      info->m_J2linearAxis[s2+i] = -p[i];
+      info->m_J2linearAxis[s3+i] = -q[i];
+    }
   }
   else
   {
@@ -839,16 +845,21 @@ void btScrewConstraint::_getInfo2NonVirtual(
     // http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?f=9&t=4024&start=0
     c = bodyB_trans.getOrigin() - bodyA_trans.getOrigin();
     btVector3 tmp = c.cross(p);
-    for (i = 0; i < 3; ++i) info->m_J1angularAxis[s2+i] = factA*tmp[i];
-    for (i = 0; i < 3; ++i) info->m_J2angularAxis[s2+i] = factB*tmp[i];
+    for (i = 0; i < 3; ++i)
+    {
+     info->m_J1angularAxis[s2+i] = factA*tmp[i];
+     info->m_J2angularAxis[s2+i] = factB*tmp[i];
+    }
     tmp = c.cross(q);
-    for (i = 0; i < 3; ++i) info->m_J1angularAxis[s3+i] = factA*tmp[i];
-    for (i = 0; i < 3; ++i) info->m_J2angularAxis[s3+i] = factB*tmp[i];
-
-    for (i = 0; i < 3; ++i) info->m_J1linearAxis[s2+i] = p[i];
-    for (i = 0; i < 3; ++i) info->m_J1linearAxis[s3+i] = q[i];
-    for (i = 0; i < 3; ++i) info->m_J2linearAxis[s2+i] = -p[i];
-    for (i = 0; i < 3; ++i) info->m_J2linearAxis[s3+i] = -q[i];
+    for (i = 0; i < 3; ++i)
+    {
+      info->m_J1angularAxis[s3+i] = factA*tmp[i];
+      info->m_J2angularAxis[s3+i] = factB*tmp[i];
+      info->m_J1linearAxis[s2+i] = p[i];
+      info->m_J1linearAxis[s3+i] = q[i];
+      info->m_J2linearAxis[s2+i] = -p[i];
+      info->m_J2linearAxis[s3+i] = -q[i];
+    }
   }
   // compute two elements of right hand side
 
