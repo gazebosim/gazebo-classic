@@ -106,7 +106,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
         << "]\n";
 
   // move child link 45deg about x
-  double pitch_00 = joint_00->GetAttribute("thread_pitch", 0);
+  double pitch_00 = joint_00->GetParam("thread_pitch", 0);
   math::Pose pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
   math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
@@ -123,7 +123,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
         << "]\n";
 
   // move child link 45deg about y
-  double pitch_01 = joint_01->GetAttribute("thread_pitch", 0);
+  double pitch_01 = joint_01->GetParam("thread_pitch", 0);
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
   pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
   pose_01 = math::Pose(-0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
@@ -217,8 +217,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
   physics::JointPtr joint_00 = model_1->GetJoint("joint_00");
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
-  double pitch_00 = joint_00->GetAttribute("thread_pitch", 0);
-  double pitch_01 = joint_01->GetAttribute("thread_pitch", 0);
+  double pitch_00 = joint_00->GetParam("thread_pitch", 0);
+  double pitch_01 = joint_01->GetParam("thread_pitch", 0);
 
   // both initial angles should be zero
   EXPECT_EQ(joint_00->GetAngle(0), 0);
