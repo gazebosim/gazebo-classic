@@ -40,6 +40,7 @@ set (files
   shapes.world
   simple_arm.world
   simple_gripper.world
+  single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
