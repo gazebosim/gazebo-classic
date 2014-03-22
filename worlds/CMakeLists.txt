@@ -22,11 +22,14 @@ set (files
   multilink_shape.world
   openal.world
   pioneer2dx.world
+  plane_demo.world
   plugin.world
   pr2.world
   presentation.world
   pressure_sensor.world
   projector.world
+  quad_rotor_demo.world
+  quad_rotor_demo_2.world
   ray_cpu.world
   ray_noise_plugin.world
   road.world
@@ -37,10 +40,12 @@ set (files
   shapes.world
   simple_arm.world
   simple_gripper.world
+  single_rotor_demo.world
   sonar_demo.world
   sphere_atlas_demo.world
   stacks.world
   trigger.world
+  twin_rotor_demo.world
   willowgarage.world
   wireless_sensors.world
 )
