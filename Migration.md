@@ -61,6 +61,38 @@
     + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
 
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value) = 0
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value) = 0
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEScrewJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`

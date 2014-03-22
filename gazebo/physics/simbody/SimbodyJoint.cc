@@ -475,10 +475,18 @@ void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
+void SimbodyJoint::SetAttribute(const std::string &_key,
+    unsigned int _index, const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Simbody\n";
+  return false;
 }
 
 //////////////////////////////////////////////////

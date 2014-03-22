@@ -270,6 +270,13 @@ bool ODEUniversalJoint::SetLowStop(
 void ODEUniversalJoint::SetAttribute(
   const std::string &_key, unsigned int _index, const boost::any &_value)
 {
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool ODEUniversalJoint::SetParam(
+  const std::string &_key, unsigned int _index, const boost::any &_value)
+{
   if (_key == "stop_erp")
   {
     try
@@ -284,12 +291,13 @@ void ODEUniversalJoint::SetAttribute(
           break;
         default:
           gzerr << "Invalid index[" << _index << "]\n";
-          break;
+          return false;
       };
     }
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else if (_key == "stop_cfm")
@@ -306,12 +314,13 @@ void ODEUniversalJoint::SetAttribute(
           break;
         default:
           gzerr << "Invalid index[" << _index << "]\n";
-          break;
+          return false;
       };
     }
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else if (_key == "hi_stop")
@@ -328,12 +337,13 @@ void ODEUniversalJoint::SetAttribute(
           break;
         default:
           gzerr << "Invalid index[" << _index << "]\n";
-          break;
+          return false;
       };
     }
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else if (_key == "lo_stop")
@@ -350,19 +360,21 @@ void ODEUniversalJoint::SetAttribute(
           break;
         default:
           gzerr << "Invalid index[" << _index << "]\n";
-          break;
+          return false;
       };
     }
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else
   {
     // Overload because we switched axis orders
-    ODEJoint::SetAttribute(_key, _index, _value);
+    return ODEJoint::SetParam(_key, _index, _value);
   }
+  return true;
 }
 
 //////////////////////////////////////////////////

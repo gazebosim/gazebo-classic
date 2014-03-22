@@ -458,6 +458,13 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
                              const boost::any &_value)
 {
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
+                             const boost::any &_value)
+{
   if (_key == "hi_stop")
   {
     try
@@ -467,6 +474,7 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
     catch(boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else if (_key == "lo_stop")
@@ -478,19 +486,15 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
     catch(boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else
   {
-    try
-    {
-      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
-    }
-    catch(boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-    }
+    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+    return false;
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -499,6 +503,7 @@ double DARTJoint::GetAttribute(const std::string& _key,
 {
   return this->GetParam(_key, _index);
 }
+
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string& _key,
                                unsigned int _index)

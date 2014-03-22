@@ -260,6 +260,14 @@ void SimbodyScrewJoint::SetAttribute(const std::string &_key,
   unsigned int _index,
   const boost::any &_value)
 {
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyScrewJoint::SetParam(const std::string &_key,
+  unsigned int _index,
+  const boost::any &_value)
+{
   if (_key  == "thread_pitch")
   {
     try
@@ -269,10 +277,13 @@ void SimbodyScrewJoint::SetAttribute(const std::string &_key,
     catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else
-    SimbodyJoint::SetAttribute(_key, _index, _value);
+    return SimbodyJoint::SetParam(_key, _index, _value);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

@@ -539,7 +539,15 @@ void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(const std::string &/*_key*/,
+void BulletJoint::SetAttribute(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
 {

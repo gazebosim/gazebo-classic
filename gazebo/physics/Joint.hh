@@ -398,9 +398,20 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value) = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// Deprecated by bool SetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value) = 0;
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
       /// \param[in] _key String key.
