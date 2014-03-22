@@ -45,6 +45,7 @@ set (files
   sphere_atlas_demo.world
   stacks.world
   trigger.world
+  twin_rotor_demo.world
   willowgarage.world
   wireless_sensors.world
 )
