@@ -13,9 +13,6 @@
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
 
 1. **gazebo/physics/PhysicsEngine.hh**
-    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
-    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
-    ---
     + ***Deprecation*** virtual void SetSORPGSPreconIters(unsigned int _iters)
     + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
     ---
@@ -33,14 +30,6 @@
     ---
     + ***Deprecation*** virtual double GetSORPGSW()
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
-
-1. **gazebo/physics/ode/ODEPhysics.hh**
-    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
-    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
-
-1. **gazebo/physics/bullet/BulletPhysics.hh**
-    + ***Deprecation*** virtual void SetParam(const std::string &_key, const boost::any &_value)
-    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
@@ -101,6 +90,18 @@
     + ***Removed:*** double RaySensor::GetFiducial(int _index)
     + ***Replacement:*** double RaySensor::GetFiducial(unsigned int _index)
     + ***Note:*** Changed argument type from int to unsigned int.
+
+1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Removed*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEPhysics.hh**
+    + ***Removed*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/bullet/BulletPhysics.hh**
+    + ***Removed*** virtual void SetParam(const std::string &_key, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 ### Additions
 
