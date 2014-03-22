@@ -676,7 +676,7 @@ void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
+double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
 {
   if (_key == "fudge_factor")
   {
@@ -886,6 +886,12 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
 
   gzerr << "should not be here\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

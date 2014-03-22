@@ -497,6 +497,12 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
 double DARTJoint::GetAttribute(const std::string& _key,
                                unsigned int _index)
 {
+  return this->GetParam(_key, _index);
+}
+//////////////////////////////////////////////////
+double DARTJoint::GetParam(const std::string& _key,
+                               unsigned int _index)
+{
   if (_key == "hi_stop")
   {
     try

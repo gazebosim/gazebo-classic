@@ -482,7 +482,12 @@ void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
+double SimbodyJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+//////////////////////////////////////////////////
+double SimbodyJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
   gzdbg << "Not implement in Simbody\n";

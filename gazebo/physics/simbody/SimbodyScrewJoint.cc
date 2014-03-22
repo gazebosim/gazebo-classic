@@ -274,14 +274,22 @@ void SimbodyScrewJoint::SetAttribute(const std::string &_key,
   else
     SimbodyJoint::SetAttribute(_key, _index, _value);
 }
+
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetAttribute(const std::string &_key,
+  unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetParam(const std::string &_key,
   unsigned int _index)
 {
   if (_key  == "thread_pitch")
     return this->threadPitch;
   else
-    return SimbodyJoint::GetAttribute(_key, _index);
+    return SimbodyJoint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

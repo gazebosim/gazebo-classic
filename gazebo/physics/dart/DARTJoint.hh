@@ -103,8 +103,12 @@ namespace gazebo
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);

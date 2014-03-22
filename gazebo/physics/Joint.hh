@@ -406,8 +406,16 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index) = 0;
+
+      /// \brief Get a non-generic parameter for the joint.
+      /// Deprecated by GetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.

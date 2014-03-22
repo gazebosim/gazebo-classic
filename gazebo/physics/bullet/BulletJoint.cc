@@ -547,11 +547,18 @@ void BulletJoint::SetAttribute(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetAttribute(const std::string &/*_key*/,
+double BulletJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
   gzdbg << "Not implement in Bullet\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+double BulletJoint::GetAttribute(const std::string &_key,
+    unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

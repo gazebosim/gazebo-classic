@@ -270,11 +270,18 @@ void ODEScrewJoint::SetAttribute(const std::string &_key,
   else
     ODEJoint::SetAttribute(_key, _index, _value);
 }
+
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
+double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 {
   if (_key  == "thread_pitch")
     return this->threadPitch;
   else
-    return ODEJoint::GetAttribute(_key, _index);
+    return ODEJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }

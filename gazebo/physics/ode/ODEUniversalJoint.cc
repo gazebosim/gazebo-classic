@@ -207,9 +207,9 @@ double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 {
   // flipping axis 1 and 2 around
   if (_index == UniversalJoint::AXIS_CHILD)
-    return this->GetParam(dParamFMax);
+    return ODEJoint::GetParam(dParamFMax);
   else if (_index == UniversalJoint::AXIS_PARENT)
-    return this->GetParam(dParamFMax2);
+    return ODEJoint::GetParam(dParamFMax2);
 
   gzerr << "Joint index out of bounds.\n";
   return 0;
@@ -369,6 +369,13 @@ void ODEUniversalJoint::SetAttribute(
 double ODEUniversalJoint::GetAttribute(
   const std::string &_key, unsigned int _index)
 {
+  return this->GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double ODEUniversalJoint::GetParam(
+  const std::string &_key, unsigned int _index)
+{
   // Overload because we switched axis orders
   if (_key == "hi_stop")
   {
@@ -377,9 +384,9 @@ double ODEUniversalJoint::GetAttribute(
       switch (_index)
       {
         case UniversalJoint::AXIS_CHILD:
-          return this->GetParam(dParamHiStop);
+          return ODEJoint::GetParam(dParamHiStop);
         case UniversalJoint::AXIS_PARENT:
-          return this->GetParam(dParamHiStop2);
+          return ODEJoint::GetParam(dParamHiStop2);
         default:
           gzerr << "Invalid index[" << _index << "]\n";
           return 0;
@@ -399,9 +406,9 @@ double ODEUniversalJoint::GetAttribute(
       switch (_index)
       {
         case UniversalJoint::AXIS_CHILD:
-          return this->GetParam(dParamLoStop);
+          return ODEJoint::GetParam(dParamLoStop);
         case UniversalJoint::AXIS_PARENT:
-          return this->GetParam(dParamLoStop2);
+          return ODEJoint::GetParam(dParamLoStop2);
         default:
           gzerr << "Invalid index[" << _index << "]\n";
           return 0;
@@ -416,6 +423,6 @@ double ODEUniversalJoint::GetAttribute(
   }
   else
   {
-    return ODEJoint::GetAttribute(_key, _index);
+    return ODEJoint::GetParam(_key, _index);
   }
 }
