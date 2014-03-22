@@ -552,6 +552,7 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
     const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Bullet\n";
+  return false;
 }
 
 //////////////////////////////////////////////////
