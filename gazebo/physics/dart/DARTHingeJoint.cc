@@ -114,7 +114,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(0)->getConfig();
     result.SetFromRadian(radianAngle);
   }
   else
@@ -129,7 +129,7 @@ math::Angle DARTHingeJoint::GetAngleImpl(unsigned int _index) const
 void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->setVel(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -140,7 +140,7 @@ double DARTHingeJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->getVel();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -151,7 +151,7 @@ double DARTHingeJoint::GetVelocity(unsigned int _index) const
 void DARTHingeJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->setForceMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -162,7 +162,7 @@ double DARTHingeJoint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->getForceMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -173,7 +173,7 @@ double DARTHingeJoint::GetMaxForce(unsigned int _index)
 void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->setForce(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

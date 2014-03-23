@@ -170,8 +170,8 @@ void DARTModel::Fini()
 //////////////////////////////////////////////////
 void DARTModel::BackupState()
 {
-  dtConfig = this->dtSkeleton->get_q();
-  dtVelocity = this->dtSkeleton->get_dq();
+  dtConfig = this->dtSkeleton->getConfigs();
+  dtVelocity = this->dtSkeleton->getGenVels();
 }
 
 //////////////////////////////////////////////////
@@ -182,8 +182,8 @@ void DARTModel::RestoreState()
   GZ_ASSERT(dtVelocity.size() == this->dtSkeleton->getNumGenCoords(),
             "Cannot RestoreState, invalid size");
 
-  this->dtSkeleton->set_q(dtConfig);
-  this->dtSkeleton->set_dq(dtVelocity);
+  this->dtSkeleton->setConfigs(dtConfig, true, false, false);
+  this->dtSkeleton->setGenVels(dtVelocity, true, false);
 }
 
 //////////////////////////////////////////////////

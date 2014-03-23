@@ -253,13 +253,11 @@ void DARTLink::OnPoseChange()
   if (joint == NULL)
     return;
 
-  if (joint->getJointType() == dart::dynamics::Joint::FREE)
+  dart::dynamics::FreeJoint* freeJoint =
+      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
+  if (freeJoint)
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
-    dart::dynamics::FreeJoint* freeJoint =
-        dynamic_cast<dart::dynamics::FreeJoint*>(joint);
-    GZ_ASSERT(freeJoint, "The parent joint is not free joint.");
-
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
     const Eigen::Isometry3d &T1 = joint->getTransformFromParentBodyNode();
     const Eigen::Isometry3d &InvT2 = joint->getTransformFromChildBodyNode();
@@ -269,10 +267,8 @@ void DARTLink::OnPoseChange()
       P = this->dtBodyNode->getParentBodyNode()->getWorldTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
-    freeJoint->set_q(dart::math::logMap(Q));
-
-    this->dtBodyNode->getSkeleton()->setConfig(
-          this->dtBodyNode->getSkeleton()->getConfig());
+    // Set generalized coordinate and update the transformations only
+    freeJoint->setConfigs(dart::math::logMap(Q), true, false, false);
   }
   else if (joint->getNumGenCoords() > 0)
   {

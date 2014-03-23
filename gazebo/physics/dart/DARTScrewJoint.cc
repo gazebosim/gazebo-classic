@@ -123,7 +123,7 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->getVel();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -134,7 +134,7 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
 void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->setVel(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -183,12 +183,12 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     if (_index == 0)
     {
       // angular position
-      result.SetFromRadian(this->dartScrewJoint->getGenCoord(0)->get_q());
+      result.SetFromRadian(this->dartScrewJoint->getGenCoord(0)->getConfig());
     }
     else if (_index == 1)
     {
       // linear position
-      double angPos = this->dartScrewJoint->getGenCoord(0)->get_q();
+      double angPos = this->dartScrewJoint->getGenCoord(0)->getConfig();
       result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
     }
     else
@@ -208,7 +208,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 void DARTScrewJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->setForceMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -219,7 +219,7 @@ double DARTScrewJoint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->getForceMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -230,7 +230,7 @@ double DARTScrewJoint::GetMaxForce(unsigned int _index)
 void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->setForce(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

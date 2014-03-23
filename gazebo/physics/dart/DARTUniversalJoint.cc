@@ -133,12 +133,12 @@ math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(0)->getConfig();
     result.SetFromRadian(radianAngle);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dtJoint->getGenCoord(1)->get_q();
+    double radianAngle = this->dtJoint->getGenCoord(1)->getConfig();
     result.SetFromRadian(radianAngle);
   }
   else
@@ -155,9 +155,9 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getGenCoord(0)->getVel();
   else if (_index == 1)
-    result = this->dtJoint->getGenCoord(1)->get_dq();
+    result = this->dtJoint->getGenCoord(1)->getVel();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -168,9 +168,9 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->getGenCoord(0)->setVel(_vel);
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_dq(_vel);
+    this->dtJoint->getGenCoord(1)->setVel(_vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -179,9 +179,9 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 void DARTUniversalJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(0)->setForceMax(_force);
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_tauMax(_force);
+    this->dtJoint->getGenCoord(1)->setForceMax(_force);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -192,9 +192,9 @@ double DARTUniversalJoint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+    result = this->dtJoint->getGenCoord(0)->getForceMax();
   else if (_index == 1)
-    result = this->dtJoint->getGenCoord(1)->get_tauMax();
+    result = this->dtJoint->getGenCoord(1)->getForceMax();
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -205,9 +205,9 @@ double DARTUniversalJoint::GetMaxForce(unsigned int _index)
 void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->getGenCoord(0)->setForce(_effort);
   else if (_index == 1)
-    this->dtJoint->getGenCoord(1)->set_tau(_effort);
+    this->dtJoint->getGenCoord(1)->setForce(_effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
