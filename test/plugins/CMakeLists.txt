@@ -16,6 +16,7 @@ endif()
 set (plugins
   ModelTrajectoryTestPlugin
   SpringTestPlugin
+  ForceTorqueModelRemovalTestPlugin
 )
 
 foreach (src ${plugins})
