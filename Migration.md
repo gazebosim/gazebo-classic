@@ -74,6 +74,9 @@
 
 ### Additions
 
+1. **gazebo/transport/TransportIface.hh**
+    +  transport::ConnectionPtr connectToMaster()
+
 1. **gazebo/physics/World.hh**
     +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
@@ -156,6 +159,12 @@
     + NoisePtr GetNoise(unsigned int _index = 0) const
 
 1. **gazebo/sensors/GaussianNoiseModel.hh**
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + virtual double GetAttribute(const std::string &_key, unsigned int _index)
 
 ### Deletions
 

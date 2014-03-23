@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETHINGEJOINT_HH_
 #define _BULLETHINGEJOINT_HH_
 

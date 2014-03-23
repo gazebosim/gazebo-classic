@@ -26,8 +26,7 @@ namespace po = boost::program_options;
 /////////////////////////////////////////////////
 void help(po::options_description &_options)
 {
-  std::cerr << "gzfactory -- Tool to spawn or delete models from "
-    << " simulation\n\n";
+  std::cerr << "gzfactory -- DEPRECATED(see 'gz help model')\n\n";
 
   std::cerr << "`gzfactory` <spawn|delete> [options]\n\n";
 

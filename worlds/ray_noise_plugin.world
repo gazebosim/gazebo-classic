@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
     <include>
@@ -9,14 +9,12 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-
     <model name="noisy_ray">
       <pose>0 0 0.1 0 0 0</pose>
       <link name="link">
         <inertial>
           <mass>0.1</mass>
         </inertial>
-
         <collision name="collision">
           <geometry>
             <box>
@@ -24,7 +22,6 @@
             </box>
           </geometry>
         </collision>
-
         <visual name="visual">
           <geometry>
             <box>
@@ -32,7 +29,6 @@
             </box>
           </geometry>
         </visual>
-
         <sensor name="laser" type="ray">
           <pose>0.1 0 0.0175 0 -0 0</pose>
           <ray>

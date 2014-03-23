@@ -22,6 +22,10 @@
 #ifndef _ODEUNIVERSALJOINT_HH_
 #define _ODEUNIVERSALJOINT_HH_
 
+#include <boost/any.hpp>
+#include <string>
+
+#include "gazebo/common/Exception.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/util/system.hh"
@@ -72,6 +76,23 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetParam(unsigned int _parameter, double _value);
+
+      // Documentation inherited.
+      public: virtual void SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                                                unsigned int _index);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
