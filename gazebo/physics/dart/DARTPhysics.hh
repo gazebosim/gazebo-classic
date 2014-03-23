@@ -132,7 +132,7 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \param[in] _param A parameter listed in the DARTParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(DARTParam _param) const;
 

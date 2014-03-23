@@ -388,7 +388,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
     param = MIN_STEP_SIZE;
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
+    gzwarn << _key << " is not supported in dart" << std::endl;
     return 0;
   }
 
