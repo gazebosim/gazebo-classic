@@ -241,7 +241,7 @@ math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->get_qMax();
+    return this->dtJoint->getGenCoord(_index)->getConfigMax();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -255,7 +255,7 @@ math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->get_qMin();
+    return this->dtJoint->getGenCoord(_index)->getConfigMin();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
