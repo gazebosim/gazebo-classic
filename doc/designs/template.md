@@ -1,5 +1,5 @@
 ## Project: TITLE
-Gazebo Design Document
+***Gazebo Design Document***
 
 ### Overview
 
@@ -11,6 +11,7 @@ Create a graphical tool to plot simulation data.
 List the set of requirements that this project must fulfill. If the list gets too long, consider splitting the project into multiple small projects.
 
 For example:
+
     + GUI should plot values over time, where values can be joint angles, poses of objects, forces on objects, diagnostic signals, and values from topics.
     + Up to four values per plot is allowed.
     + Multiple plots should be supported.
@@ -31,6 +32,7 @@ Will this project cause changes to performance? If so, describe how. One or more
 
 ### Tests
 List and describe the tests that will be created. For example:
+
     + Test: Plot View
         + case: Plot window should appear when signaled by QT.
         + case: Plot simulation time should produce correct results when save to CSV
