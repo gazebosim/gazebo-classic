@@ -40,14 +40,15 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
-  transport.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   transceiver.cc
+  transport.cc
   world.cc
+  world_entity_below_point.cc
   )
 
 if (MANPAGES_SUPPORT)
@@ -79,6 +80,7 @@ set(dri_tests
   projector.cc
   rendering_sensor.cc
   speed_pr2.cc
+  world_reset.cc
 )
 
 gz_build_dri_tests(${dri_tests})

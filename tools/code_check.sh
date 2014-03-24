@@ -38,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -124,7 +124,8 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
+        | grep -v 'use --check-config for details' \
+        | grep -v 'Include file: .*not found'
     fi
 
     # Undo changes to suppression file
