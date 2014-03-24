@@ -266,7 +266,6 @@ namespace gazebo
       /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
       /// Below is a list of _key parameter definitions:
-      ///   - ode
       ///       -# "type" (string) - returns "ode"
       ///       -# "cfm" (double) - global CFM
       ///       -# "erp" (double) - global ERP
@@ -288,46 +287,6 @@ namespace gazebo
       ///          (defined but not used in ode).
       ///       -# "max_step_size" (double) - maximum physics step size when
       ///          physics update step must return.
-      ///       -# "sor_lcp_tolerance" (double) - threshold for stopping
-      ///          Projected Gauss-Seidel udpates. I.e.
-      ///          if total RMS residual < this value, stop PGS iterations.
-      ///          The error metric is the residual for the constraint
-      ///          equations, i.e. RMS( J inv(M) J' \lambda - rhs ).
-      ///       -# "inertia_ratio_reduction" (bool) -
-      ///          turn on/off quickstep inertia reduction  (experimental).
-      ///       -# "contact_residual_smoothing" (double) -
-      ///          option to smooth friction residuals if > 0 (experimental).
-      ///       -# "experimental_row_reordering" (bool) -
-      ///          if true, reorder constraint rows with the following order:
-      ///          bilateral constrains, contact normal constraints
-      ///          and lastly frictional constraints (experimental).
-      ///       -# "warm_start_factor" (double) -
-      ///          relaxation factor for warm starting bilateral constraints
-      ///          from last time step's value (experimental).
-      ///       -# "extra_friction_iterations" (int) -
-      ///          extra PGS iterations on only the frictional constraints
-      ///          (experimental).
-      ///   - bullet
-      ///       -# "type" (string) - returns "bullet"
-      ///       -# "cfm" (double) - global CFM
-      ///       -# "erp" (double) - global ERP
-      ///       -# "iters" (int) - number of LCP PGS iterations.
-      ///       -# "sor" (double) - relaxation parameter for Projected
-      ///          Gauss-Seidel updates.
-      ///       -# "contact_surface_layer" (double) - ERP is 0 for
-      ///          interpenetration depths below this value.
-      ///       -# "split_impulse" (bool) - turns on/off split impulse.
-      ///       -# "split_impulse_penetration_threshold" (double) -
-      ///          Split impulse penetration threshold.
-      ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between any pair of collision bodies.
-      ///       -# "min_step_size" (double) - minimum internal step size.
-      ///       -# "max_step_size" (double) - maximum physics step size when
-      ///          physics update step must return.
-      ///   - dart
-      ///       -# (note: features are not yet implemented, issue #1115)
-      ///   - simbody
-      ///       -# (note: features are not yet implemented, issue #1116)
       ///
       /// \param[in] _value The value to set to
       public: virtual bool SetParam(const std::string &_key,
@@ -335,35 +294,7 @@ namespace gazebo
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
-      /// \sa SetParam, non-overlapping variables are listed below
-      ///   - ode
-      ///       -# "rms_error" (double) - RMS of dlambda at the end of time step
-      ///          error[0]: bilateral constraints
-      ///          error[1]: contact normal constraints
-      ///          error[2]: friction constraints
-      ///          error[3]: all constraints
-      ///       -# "constraint_residual" (double) - RMS of residuals: Jv
-      ///          residual[0]: bilateral constraints
-      ///          residual[1]: contact normal constraints
-      ///          residual[2]: friction constraints
-      ///          residual[3]: all constraints
-      ///       -# "num_contacts" (int) - returns number of active
-      ///          contact constraints.
-      ///   - bullet
-      ///       -# \sa SetParam
-      ///   - dart
-      ///       -# "min_step_size" (double) - minimum internal step size.
-      ///       -# "max_contacts" (int) - max number of contact constraints
-      ///          between any pair of collision bodies.
-      ///   - simbody (note: most features are not yet implemented, issue #1116)
-      ///       -* "type" (string) - returns "simbody"
-      ///       -* "integrator_type" (string) - returns integrator type.
-      ///       -* "accuracy" (double) - returns integrator accuracy tolerance.
-      ///          Returns result of SimTK::Integrator::getAccuracyInUse.
-      ///       -* "max_transient_velocity" (double) - returns contact
-      ///          maximum transient velocity tolerance.  Returns result of
-      ///          SimTK::CompliantContactSubsystem::getTransitionVelocity.
-      ///
+      /// \sa SetParam
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 

@@ -50,7 +50,6 @@ set(tests
   model_database.cc
   noise.cc
   nondefault_world.cc
-  pgs_tests.cc
   physics.cc
   physics_friction.cc
   physics_link.cc
