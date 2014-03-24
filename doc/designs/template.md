@@ -12,9 +12,9 @@ List the set of requirements that this project must fulfill. If the list gets to
 
 For example:
 
-    + GUI should plot values over time, where values can be joint angles, poses of objects, forces on objects, diagnostic signals, and values from topics.
-    + Up to four values per plot is allowed.
-    + Multiple plots should be supported.
+1. GUI should plot values over time, where values can be joint angles, poses of objects, forces on objects, diagnostic signals, and values from topics.
+1. Up to four values per plot is allowed.
+1. Multiple plots should be supported.
 
 ### Architecture
 Include a system architecture diagram. This should be a conceptual diagram that describes what components of Gazebo will be utilized or changed, the flow of information, new classes, etc.
