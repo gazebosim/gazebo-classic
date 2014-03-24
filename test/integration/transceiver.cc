@@ -402,7 +402,7 @@ TEST_P(TransceiverTest, Obstacle)
   if (std::string(GetParam()) == "dart")
   {
     gzerr << "Abort test since this test frequently fails with dart, "
-          << " see (issues #916, #911)" << std::endl;
+          << " see (issues #911)" << std::endl;
     return;
   }
 
