@@ -154,7 +154,10 @@ void Gripper::OnUpdate()
   else if (this->zeroCount > this->detachSteps && this->attached)
     this->HandleDetach();
 
+  this->mutex_contacts.lock();
   this->contacts.clear();
+  this->mutex_contacts.unlock();
+
   this->prevUpdateTime = common::Time::GetWallTime();
 }
 
@@ -171,6 +174,10 @@ void Gripper::HandleAttach()
   std::map<std::string, int> contactCounts;
   std::map<std::string, int>::iterator iter;
 
+  // This function is only called from the OnUpdate function so
+  // the call to contacts.clear() is not going to happen in
+  // parallel with the reads in the following code, no mutex
+  // needed.
   for (unsigned int i = 0; i < this->contacts.size(); ++i)
   {
     std::string name1 = this->contacts[i].collision1();
@@ -249,7 +256,9 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
+      this->mutex_contacts.lock();
       this->contacts.push_back(_msg->contact(i));
+      this->mutex_contacts.unlock();
     }
   }
 }
