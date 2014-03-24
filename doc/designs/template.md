@@ -33,9 +33,9 @@ Will this project cause changes to performance? If so, describe how. One or more
 ### Tests
 List and describe the tests that will be created. For example:
 
-    + Test: Plot View
-        + case: Plot window should appear when signaled by QT.
-        + case: Plot simulation time should produce correct results when save to CSV
-        + case: Signalling a close should close the plotting window.
-    + Test: Multiple plots
-        +case: Create two plots with identical data. Saved CSV data from each should be identical
+1. Test: Plot View
+    1. case: Plot window should appear when signaled by QT.
+    1. case: Plot simulation time should produce correct results when save to CSV
+    1. case: Signalling a close should close the plotting window.
+1. Test: Multiple plots
+    1. case: Create two plots with identical data. Saved CSV data from each should be identical
