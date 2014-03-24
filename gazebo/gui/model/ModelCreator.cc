@@ -67,6 +67,8 @@ ModelCreator::ModelCreator()
 
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
+
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
