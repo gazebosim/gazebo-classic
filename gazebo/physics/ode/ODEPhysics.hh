@@ -83,9 +83,6 @@ namespace gazebo
         /// \brief SOR over-relaxation parameter
         SOR,
 
-        /// \brief SOR LCP Tolerance
-        SOR_LCP_TOLERANCE,
-
         /// \brief Max correcting velocity
         CONTACT_MAX_CORRECTING_VEL,
 
