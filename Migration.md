@@ -131,19 +131,13 @@
 
 1. **gazebo/physics/Link.hh**
     + double GetWorldEnergy() const
-    + double GetWorldEnergyFiltered() const
     + double GetWorldEnergyKinetic() const
-    + double GetWorldEnergyKineticFiltered() const
-    + double GetWorldEnergyKineticVibrational() const
     + double GetWorldEnergyPotential() const
     + bool initialized
 
 1. **gazebo/physics/Model.hh**
     + double GetWorldEnergy() const
-    + double GetWorldEnergyFiltered() const
     + double GetWorldEnergyKinetic() const
-    + double GetWorldEnergyKineticFiltered() const
-    + double GetWorldEnergyKineticVibrational() const
     + double GetWorldEnergyPotential() const
 
 1. **gazebo/physics/SurfaceParams.hh**
