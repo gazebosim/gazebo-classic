@@ -14,6 +14,10 @@
  * limitations under the License.
  *
 */
+
+#include <algorithm>
+#include <string>
+
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
