@@ -153,7 +153,12 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
       if (_msg->position().has_i_max())
         this->posPids[_msg->name()].SetIMax(_msg->position().i_max());
       if (_msg->position().has_i_min())
-        this->posPids[_msg->name()].SetIMax(_msg->position().i_min());
+        this->posPids[_msg->name()].SetIMin(_msg->position().i_min());
+      if (_msg->position().has_limit())
+      {
+        this->posPids[_msg->name()].SetCmdMax(_msg->position().limit());
+        this->posPids[_msg->name()].SetCmdMin(-_msg->position().limit());
+      }
     }
 
     if (_msg->has_velocity())
@@ -169,7 +174,12 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
       if (_msg->velocity().has_i_max())
         this->velPids[_msg->name()].SetIMax(_msg->velocity().i_max());
       if (_msg->velocity().has_i_min())
-        this->velPids[_msg->name()].SetIMax(_msg->velocity().i_min());
+        this->velPids[_msg->name()].SetIMin(_msg->velocity().i_min());
+      if (_msg->velocity().has_limit())
+      {
+        this->velPids[_msg->name()].SetCmdMax(_msg->velocity().limit());
+        this->velPids[_msg->name()].SetCmdMin(-_msg->velocity().limit());
+      }
     }
   }
   else
