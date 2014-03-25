@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <string>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
