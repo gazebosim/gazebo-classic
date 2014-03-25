@@ -188,6 +188,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  /* template if accuracy parameters were somewhere
   if (_msg->has_simbody())
   {
     const msgs::PhysicsSimbody *msgSimbody = &_msg->simbody();
@@ -205,6 +206,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
       _msg->simbody().max_transient_velocity());
     }
   }
+  */
 
   // Parent class handles many generic parameters
   PhysicsEngine::OnPhysicsMsg(_msg);
