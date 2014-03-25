@@ -59,12 +59,16 @@ MeshManager::MeshManager()
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
-
+  
   this->CreateCylinder("axis_shaft", 0.01, 0.2, 1, 16);
   this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
-
+  std::vector<math::Vector2d> vertices;
+  vertices.push_back(math::Vector2d(0,0));
+  vertices.push_back(math::Vector2d(1,0));
+  vertices.push_back(math::Vector2d(0,1));
+  this->CreateExtrudedPolyline("polyline", vertices , 1, math::Vector2d(1,1));
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
 }

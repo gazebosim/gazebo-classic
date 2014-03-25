@@ -32,7 +32,7 @@ namespace gazebo
       /// \param[in] _scale Scale of the polyLine.
       public: virtual void SetScale(const math::Vector3 &_scale);
 
-//      public: virtual void SetVertices(const msgs::Vector2d vertices);
+      public: virtual void SetVertices(const msgs::Geometry &_msg);
 //      public: std::vector<math::Vector2d>* GetVertices() const;
       /// \brief Get the height of the polyLine.
       /// \return The height of each side of the polyLine.

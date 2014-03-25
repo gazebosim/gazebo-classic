@@ -15,7 +15,7 @@
  *
 */
 #include "gazebo/rendering/ogre_gazebo.h"
-
+#include <stdio.h>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/Assert.hh"
@@ -326,14 +326,16 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
     {
+     std::cout << "in1" << std::endl;
      sdf::ElementPtr elem = geomElem->AddElement("polyline");
-     elem->GetElement("height")->Set(_msg->geometry().polyline().height());
-     elem = elem->GetElement("point");
+     std::cout << "in2" << std::endl;
+     elem->AddElement("height")->Set(_msg->geometry().polyline().height());
+     std::cout << "in3" << std::endl;
      for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
      {
-
-        elem->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
-        elem = elem->GetNextElement("point");
+        std::cout << i << std::endl;
+        elem->AddElement("point")->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
+  
      }
 
     }
@@ -533,6 +535,11 @@ void Visual::Load()
       this->dataPtr->scale =
           geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
+//    else if (geomElem->HasElement("polyline"))
+//    {
+//      this->dataPtr->scale = 
+//          geomElem->GetElement("polyline")->Get<math::Vector3>("scale");
+//    }
   }
 
   this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,
@@ -814,6 +821,10 @@ void Visual::SetScale(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
+
+//  else if (geomElem->HasElement("polyline"))
+  //  geomElem->GetElement("polyline")->GetElement("scale")->Set(_scale);
+
 
   this->dataPtr->sceneNode->setScale(
       Conversions::Convert(this->dataPtr->scale));
@@ -2317,6 +2328,8 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
+    else if (geomElem->HasElement("polyline"))
+      return "polyline";
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
