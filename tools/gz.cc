@@ -329,9 +329,7 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("iters"))
   {
-    msg.mutable_ode()->set_iters(this->vm["iters"].as<double>());
-    msg.mutable_bullet()->set_iters(this->vm["iters"].as<double>());
-    msg.mutable_dart()->set_iters(this->vm["iters"].as<double>());
+    msg.set_iters(this->vm["iters"].as<double>());
     good = true;
   }
 
