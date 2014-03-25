@@ -412,55 +412,41 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_max_step_size())
-  {
-    this->SetParam("max_step_size", _msg->max_step_size());
-  }
-
-  if (_msg->has_real_time_update_rate())
-  {
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-  }
-
-  if (_msg->has_real_time_factor())
-  {
-    this->SetTargetRealTimeFactor(_msg->real_time_factor());
-  }
+  if (_msg->has_min_step_size())
+    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
 
   if (_msg->has_solver_type())
-  {
     this->SetParam(SOLVER_TYPE, _msg->solver_type());
-  }
-
-  if (_msg->has_min_step_size())
-  {
-    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
-  }
 
   if (_msg->has_iters())
-  {
     this->SetParam(PGS_ITERS, _msg->iters());
-  }
 
   if (_msg->has_sor())
-  {
     this->SetParam(SOR, _msg->sor());
-  }
 
   if (_msg->has_cfm())
-  {
     this->SetParam(GLOBAL_CFM, _msg->cfm());
-  }
 
   if (_msg->has_erp())
-  {
     this->SetParam(GLOBAL_ERP, _msg->erp());
-  }
+
+  if (_msg->has_enable_physics())
+    this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
-  {
     this->SetParam(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
-  }
+
+  if (_msg->has_gravity())
+    this->SetGravity(msgs::Convert(_msg->gravity()));
+
+  if (_msg->has_max_step_size())
+    this->SetMaxStepSize(_msg->max_step_size());
+
+  if (_msg->has_real_time_update_rate())
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+
+  if (_msg->has_real_time_factor())
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
   // Parent class handles many generic parameters
   PhysicsEngine::OnPhysicsMsg(_msg);
