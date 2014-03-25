@@ -22,49 +22,49 @@
 
 using namespace gazebo;
 
-GZ_REGISTER_SENSOR_PLUGIN(GazeboForceTorqueModelRemovalTestPlugin)
+GZ_REGISTER_SENSOR_PLUGIN(ForceTorqueModelRemovalTestPlugin)
 
 /////////////////////////////////////////////////
-GazeboForceTorqueModelRemovalTestPlugin::GazeboForceTorqueModelRemovalTestPlugin() : SensorPlugin(), parentSensor(0)
+ForceTorqueModelRemovalTestPlugin::ForceTorqueModelRemovalTestPlugin() : 
+    SensorPlugin(), parentSensor(0)
 {
 }
 
 /////////////////////////////////////////////////
-void GazeboForceTorqueModelRemovalTestPlugin::Init()
+void ForceTorqueModelRemovalTestPlugin::Init()
 {
 }
 
 /////////////////////////////////////////////////
-GazeboForceTorqueModelRemovalTestPlugin::~GazeboForceTorqueModelRemovalTestPlugin()
+ForceTorqueModelRemovalTestPlugin::~ForceTorqueModelRemovalTestPlugin()
 {
-  if (this->updateConnection.get()) 
+  if (this->updateConnection.get())
   {
-    event::Events::DisconnectWorldUpdateBegin (this->updateConnection);
+    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
     this->updateConnection = gazebo::event::ConnectionPtr();
   }
-    
+
   parentSensor = 0;
 }
 
-void GazeboForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
-{    
+void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor, 
+                                             sdf::ElementPtr /*_sdf*/)
+{
   _sensor->SetActive(true);
-    
+
   parentSensor = (gazebo::sensors::ForceTorqueSensor*) boost::get_pointer(_sensor);
-    
+
   //Create connection
-  this->updateConnection = gazebo::event::Events::ConnectWorldUpdateBegin (
-                           boost::bind ( &GazeboForceTorqueModelRemovalTestPlugin::onUpdate, this, _1 ) );
-    
-    
+  this->updateConnection = gazebo::event::Events::ConnectWorldUpdateBegin(
+                           boost::bind( &ForceTorqueModelRemovalTestPlugin::onUpdate, this, _1 ));
 }
 
-void GazeboForceTorqueModelRemovalTestPlugin::onUpdate(const gazebo::common::UpdateInfo & /*_info*/)
+void ForceTorqueModelRemovalTestPlugin::onUpdate(const gazebo::common::UpdateInfo & /*_info*/)
 {
   gazebo::math::Vector3 force;
   gazebo::math::Vector3 torque;
-    
-  if( parentSensor ) 
+
+  if( parentSensor )
   {
     force = this->parentSensor->GetForce();
     torque = this->parentSensor->GetTorque();

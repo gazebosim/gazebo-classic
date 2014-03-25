@@ -27,10 +27,10 @@ namespace gazebo
     class ForceTorqueSensor;
   }
     
-  class GAZEBO_VISIBLE GazeboForceTorqueModelRemovalTestPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE ForceTorqueModelRemovalTestPlugin : public SensorPlugin
   {
-    public: GazeboForceTorqueModelRemovalTestPlugin();
-    public: virtual ~GazeboForceTorqueModelRemovalTestPlugin();
+    public: ForceTorqueModelRemovalTestPlugin();
+    public: virtual ~ForceTorqueModelRemovalTestPlugin();
     
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
     public: void onUpdate(const gazebo::common::UpdateInfo & /*_info*/);
