@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -188,7 +190,7 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  /* below will set accuracy for ssimbody if the messages exist
+  /* below will set accuracy for simbody if the messages exist
   // Set integrator accuracy (measured with Richardson Extrapolation)
   if (_msg->has_accuracy())
   {
