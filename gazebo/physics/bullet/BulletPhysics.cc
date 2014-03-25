@@ -439,14 +439,21 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
 
-  if (_msg->has_max_step_size())
-    this->SetMaxStepSize(_msg->max_step_size());
-
-  if (_msg->has_real_time_update_rate())
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-
   if (_msg->has_real_time_factor())
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+
+  if (_msg->has_max_step_size())
+  {
+    this->SetMaxStepSize(_msg->max_step_size());
+  }
+
+  /// Make sure all models get at least one update cycle.
+  this->world->EnableAllModels();
 
   // Parent class handles many generic parameters
   PhysicsEngine::OnPhysicsMsg(_msg);
