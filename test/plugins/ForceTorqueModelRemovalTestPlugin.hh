@@ -26,22 +26,22 @@ namespace gazebo
   namespace sensors {
     class ForceTorqueSensor;
   }
-    
+
   class GAZEBO_VISIBLE ForceTorqueModelRemovalTestPlugin : public SensorPlugin
   {
     public: ForceTorqueModelRemovalTestPlugin();
     public: virtual ~ForceTorqueModelRemovalTestPlugin();
-    
+
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
     public: void onUpdate(const gazebo::common::UpdateInfo & /*_info*/);
 
     private: virtual void Init();
-    
+
     private: sensors::ForceTorqueSensor* parentSensor;
-        
+
     private: std::string sensorName;
     private: double forcetorque_data[6];
-       
+
     private: gazebo::event::ConnectionPtr updateConnection;
   };
 }
