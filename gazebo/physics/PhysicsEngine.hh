@@ -266,7 +266,8 @@ namespace gazebo
       /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
       /// Below is a list of _key parameter definitions:
-      ///       -# "type" (string) - returns "ode"
+      ///       -# "type" (string) - returns engine type, could be
+      ///          "bullet', "dart", "ode" or "simbody".
       ///       -# "cfm" (double) - global CFM
       ///       -# "erp" (double) - global ERP
       ///       -# "precon_iters" (bool) - precondition iterations
