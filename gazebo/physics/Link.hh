@@ -30,7 +30,6 @@
 
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/MovingWindowFilter.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/LinkState.hh"
@@ -485,34 +484,10 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
-      /// \brief Returns this link's kinetic energy filtered
-      /// by moving window average.
-      /// \return this link's kinetic energy filtered by moving window average.
-      public: double GetWorldEnergyKineticFiltered();
-
-      /// \brief Returns this link's total energy with kinetic energy filtered
-      /// by moving window average.
-      /// \return this link's filtered total energy.
-      public: double GetWorldEnergyFiltered();
-
-      /// \brief Returns this link's kinetic vibrational
-      /// "thermal" energy.  Where this is basically
-      ///   GetWorldEnergyKinetic() - GetWorldEnergyKineticFiltered()
-      /// \return this link's kinetic vibrational energy
-      public: double GetWorldEnergyKineticVibrational();
-
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
-
-      /// \brief Accessor for link filtered linear velocity
-      /// \return pointer to linVelFil
-      public: common::MovingWindowFilter<math::Vector3> *GetLinVelFil() const;
-
-      /// \brief Accessor for link filtered angular velocity
-      /// \return pointer to angVelFil
-      public: common::MovingWindowFilter<math::Vector3> *GetAngVelFil() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -589,12 +564,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief For moving window average of kinetic energy
-      private: common::MovingWindowFilter<math::Vector3> *linVelFil;
-
-      /// \brief For moving window average of kinetic energy
-      private: common::MovingWindowFilter<math::Vector3> *angVelFil;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
