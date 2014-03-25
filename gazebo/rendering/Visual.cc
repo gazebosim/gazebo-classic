@@ -15,7 +15,6 @@
  *
 */
 #include "gazebo/rendering/ogre_gazebo.h"
-#include <stdio.h>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/Assert.hh"
@@ -326,14 +325,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
     {
-     std::cout << "in1" << std::endl;
      sdf::ElementPtr elem = geomElem->AddElement("polyline");
-     std::cout << "in2" << std::endl;
      elem->AddElement("height")->Set(_msg->geometry().polyline().height());
-     std::cout << "in3" << std::endl;
      for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
      {
-        std::cout << i << std::endl;
         elem->AddElement("point")->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
   
      }
