@@ -381,25 +381,18 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
       boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
-    physicsMsg.mutable_bullet()->set_iters(
+    physicsMsg.set_iters(
       boost::any_cast<int>(this->GetParam(PGS_ITERS)));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    physicsMsg.mutable_bullet()->set_sor(
+    physicsMsg.set_sor(
       boost::any_cast<double>(this->GetParam(SOR)));
-    physicsMsg.mutable_bullet()->set_cfm(
+    physicsMsg.set_cfm(
       boost::any_cast<double>(this->GetParam(GLOBAL_CFM)));
-    physicsMsg.mutable_bullet()->set_erp(
+    physicsMsg.set_erp(
       boost::any_cast<double>(this->GetParam(GLOBAL_ERP)));
 
-    physicsMsg.mutable_bullet()->set_contact_surface_layer(
+    physicsMsg.set_contact_surface_layer(
       boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
-
-    physicsMsg.mutable_bullet()->set_split_impulse(
-      boost::any_cast<bool>(this->GetParam("split_impulse")));
-
-    physicsMsg.mutable_bullet()->set_split_impulse_penetration_threshold(
-      boost::any_cast<double>(
-      this->GetParam("split_impulse_penetration_threshold")));
 
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -425,45 +418,29 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
   }
 
-  if (_msg->has_bullet())
+  if (_msg->has_iters())
   {
-    const msgs::PhysicsBullet *msgBullet = &_msg->bullet();
+    this->SetParam(PGS_ITERS, _msg->iters());
+  }
 
-    if (msgBullet->has_iters())
-    {
-      this->SetParam(PGS_ITERS, msgBullet->iters());
-    }
+  if (_msg->has_sor())
+  {
+    this->SetParam(SOR, _msg->sor());
+  }
 
-    if (msgBullet->has_sor())
-    {
-      this->SetParam(SOR, msgBullet->sor());
-    }
+  if (_msg->has_cfm())
+  {
+    this->SetParam(GLOBAL_CFM, _msg->cfm());
+  }
 
-    if (msgBullet->has_cfm())
-    {
-      this->SetParam(GLOBAL_CFM, msgBullet->cfm());
-    }
+  if (_msg->has_erp())
+  {
+    this->SetParam(GLOBAL_ERP, _msg->erp());
+  }
 
-    if (msgBullet->has_erp())
-    {
-      this->SetParam(GLOBAL_ERP, msgBullet->erp());
-    }
-
-    if (msgBullet->has_contact_surface_layer())
-    {
-      this->SetParam(CONTACT_SURFACE_LAYER, msgBullet->contact_surface_layer());
-    }
-
-    if (msgBullet->has_split_impulse())
-    {
-      this->SetParam("split_impulse", msgBullet->split_impulse());
-    }
-
-    if (msgBullet->has_split_impulse_penetration_threshold())
-    {
-      this->SetParam("split_impulse_penetration_threshold",
-        msgBullet->split_impulse_penetration_threshold());
-    }
+  if (_msg->has_contact_surface_layer())
+  {
+    this->SetParam(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
   }
 
   // Parent class handles many generic parameters
@@ -683,13 +660,16 @@ bool BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
       gzwarn << "Param not supported in bullet" << std::endl;
       return false;
     }
-    return true;
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
 bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
+
   BulletParam param;
 
   if (_key == "type")
@@ -718,7 +698,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse")->Set(value);
-    break;
+    return true;
   }
   else if (_key == "split_impulse_penetration_threshold")
   {
@@ -734,7 +714,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     bulletElem->GetElement("constraints")->GetElement(
         "split_impulse_penetration_threshold")->Set(value);
-    break;
+    return true;
   }
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
@@ -827,6 +807,9 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
   BulletParam param;
+
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "type")
     param = SOLVER_TYPE;
