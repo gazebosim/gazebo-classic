@@ -56,10 +56,11 @@ namespace gazebo
     class SphereShape;
     class MeshShape;
     class HeightmapShape;
+    class PolyLineShape;
     class ModelState;
     class LinkState;
     class JointState;
-
+  
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
     typedef boost::shared_ptr<Base> BasePtr;
@@ -148,6 +149,7 @@ namespace gazebo
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
 
+    typedef boost::shared_ptr<PolyLineShape> PolyLineShapePtr;
     /// \def GripperPtr
     /// \brief Boost shared pointer to a Gripper object
     typedef boost::shared_ptr<Gripper> GripperPtr;

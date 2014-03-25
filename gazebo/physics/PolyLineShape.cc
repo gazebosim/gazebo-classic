@@ -41,7 +41,6 @@ void PolyLineShape::SetScale(const math::Vector3 &_scale)
   if (_scale == this->scale)
     return;
 
-  this->SetHeight((_scale.z/this->scale.z)*this->GetHeight());
 
   this->scale = _scale;
 }

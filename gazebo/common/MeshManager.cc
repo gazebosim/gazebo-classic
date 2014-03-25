@@ -68,6 +68,7 @@ MeshManager::MeshManager()
   vertices.push_back(math::Vector2d(0,0));
   vertices.push_back(math::Vector2d(1,0));
   vertices.push_back(math::Vector2d(0,1));
+  vertices.push_back(math::Vector2d(1,1));
   this->CreateExtrudedPolyline("polyline", vertices , 1, math::Vector2d(1,1));
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -488,7 +489,9 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
 
   int numSides = vertices.size();
 
-  float v[numSides*2][3];
+  float **v = new float *[numSides*2];
+  for(i=0;i<numSides*2;i++)
+    v[i]=new float[3];    
   
   float angle = 2 * M_PI / numSides;
   i= 0;
@@ -505,12 +508,16 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
         
   }
  
-  float n[numSides*2][3];
+ 
+  float **n = new float *[numSides*2];
+  for(i=0;i<numSides*2;i++)
+    n[i]=new float[3];
+
   float d;
   for (i = 0; i < numSides*2; i++)
   {
      d = sqrt(v[i][0] * v[i][0] + v[i][1] * v[i][1] + v[i][2] * v[i][2]);
-     if (d == 0.0)
+     if (d <= 0.0)
      { 
        n[i][0] = v[i][0];
        n[i][1] = v[i][1];
@@ -526,10 +533,10 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
   }
 
   // Texture coords
-//  double t[4][2] =
-//  {
-//    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
-//  };
+  double t[4][2] =
+  {
+    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+  };
 
   // Euler's Formula: numFaces = numEdges - numVertices + 2
   //                           = numSides + 2                              
@@ -569,36 +576,36 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
     }
   }
   
-  int startVert = 0;
-  int endVert = numSides - 1;
-  //for upper and lower face
-  for(k=0; k<2; k++)
-  {
-    subMesh->AddIndex(startVert);
-    startVert+=2;
-    subMesh->AddIndex(startVert);
-    subMesh->AddIndex(endVert);
-  
-    for(i=1;i<numSides-2; i++)
-    {
-      if(i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert+=2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert+=2;
-        subMesh->AddIndex(endVert);
-        subMesh->AddIndex(startVert);
-      }
-    }
-    startVert = 1;
-    endVert = numSides;
-  }
+//  int startVert = 0;
+//  int endVert = numSides - 1;
+//  //for upper and lower face
+//  for(k=0; k<2; k++)
+//  {
+//    subMesh->AddIndex(startVert);
+//    startVert+=2;
+//    subMesh->AddIndex(startVert);
+//    subMesh->AddIndex(endVert);
+//  
+//    for(i=1;i<numSides-2; i++)
+//    {
+//      if(i%2)
+//      {
+//        subMesh->AddIndex(startVert);
+//        startVert+=2;
+//        subMesh->AddIndex(startVert);
+//        subMesh->AddIndex(endVert);
+//      }
+//      else
+//      {
+//        subMesh->AddIndex(endVert);
+//        endVert+=2;
+//        subMesh->AddIndex(endVert);
+//        subMesh->AddIndex(startVert);
+//      }
+//    }
+//    startVert = 1;
+//    endVert = numSides;
+//  }
 
   subMesh->RecalculateNormals();
 }
@@ -890,7 +897,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
     subMesh->AddIndex(verticeIndex - segments + seg - 1);
   }
 
-  // Create the bottom fan
+  //Create the bottom fan
   verticeIndex++;
   for (seg = 0; seg < segments; seg++)
   {
