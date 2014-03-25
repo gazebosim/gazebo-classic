@@ -154,9 +154,11 @@ void Gripper::OnUpdate()
   else if (this->zeroCount > this->detachSteps && this->attached)
     this->HandleDetach();
 
+  gzdbg << "OnUpdate Lock" << std::endl;
   this->mutex_contacts.lock();
   this->contacts.clear();
   this->mutex_contacts.unlock();
+  gzdbg << "OnUpdate UnLock" << std::endl;
 
   this->prevUpdateTime = common::Time::GetWallTime();
 }
@@ -256,9 +258,11 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
+      gzdbg << "OnContacts Lock" << std::endl;
       this->mutex_contacts.lock();
       this->contacts.push_back(_msg->contact(i));
       this->mutex_contacts.unlock();
+      gzdbg << "OnContacts Unlock" << std::endl;
     }
   }
 }

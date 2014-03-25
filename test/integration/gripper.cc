@@ -31,6 +31,8 @@ class GripperTest : public ServerFixture
 TEST_F(GripperTest, Close)
 {
   Load("worlds/gripper.world");
+  gzdbg << "End of loading the gripper world" << std::endl;
+
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
@@ -49,6 +51,7 @@ TEST_F(GripperTest, Close)
   // The gripper should not be attached to anything
   EXPECT_FALSE(gripper->IsAttached());
 
+  gzdbg << "Star closing the gripper" << std::endl;
   // Close the gripper.
   leftJoint->SetForce(0, -0.5);
   rightJoint->SetForce(0, 0.5);
