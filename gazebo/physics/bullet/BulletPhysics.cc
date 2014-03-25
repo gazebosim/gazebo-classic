@@ -412,6 +412,21 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
+  if (_msg->has_max_step_size())
+  {
+    this->SetParam("max_step_size", _msg->max_step_size());
+  }
+
+  if (_msg->has_real_time_update_rate())
+  {
+    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
+  }
+
+  if (_msg->has_real_time_factor())
+  {
+    this->SetTargetRealTimeFactor(_msg->real_time_factor());
+  }
+
   if (_msg->has_solver_type())
   {
     this->SetParam(SOLVER_TYPE, _msg->solver_type());
