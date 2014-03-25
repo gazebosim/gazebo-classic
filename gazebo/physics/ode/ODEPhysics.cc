@@ -839,7 +839,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       MAX_COLLIDE_RETURNS, _contactCollisions, sizeof(_contactCollisions[0]));
 
   // Return if no contacts.
-  if (numc <= 0)
+  if (numc == 0)
     return;
 
   // Store the indices of the contacts.
