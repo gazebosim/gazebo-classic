@@ -72,9 +72,9 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   bulletPhysics->SetParam(BulletPhysics::GLOBAL_ERP, erp);
   bulletPhysics->SetParam(BulletPhysics::CONTACT_SURFACE_LAYER,
       contactSurfaceLayer);
-  bulletPhysics->SetParam(BulletPhysics::SPLIT_IMPULSE,
+  bulletPhysics->SetParam("split_impulse",
       splitImpulse);
-  bulletPhysics->SetParam(BulletPhysics::SPLIT_IMPULSE_PENETRATION_THRESHOLD,
+  bulletPhysics->SetParam("split_impulse_penetration_threshold",
       splitImpulsePenetrationThreshold);
 
   boost::any value;
@@ -98,12 +98,11 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   double contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
-  value = bulletPhysics->GetParam(BulletPhysics::SPLIT_IMPULSE);
+  value = bulletPhysics->GetParam("split_impulse");
   double splitImpulseRet = boost::any_cast<bool>(value);
   EXPECT_DOUBLE_EQ(splitImpulse, splitImpulseRet);
 
-  value = bulletPhysics->GetParam(
-    BulletPhysics::SPLIT_IMPULSE_PENETRATION_THRESHOLD);
+  value = bulletPhysics->GetParam("split_impulse_penetration_threshold");
   double splitImpulsePenetrationThresholdRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(splitImpulsePenetrationThreshold,
     splitImpulsePenetrationThresholdRet);

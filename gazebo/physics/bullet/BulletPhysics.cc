@@ -315,10 +315,10 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
   info.m_splitImpulse =
-      boost::any_cast<bool>(this->GetParam(SPLIT_IMPULSE));
+      boost::any_cast<bool>(this->GetParam("split_impulse"));
   info.m_splitImpulsePenetrationThreshold =
     boost::any_cast<double>(
-    this->GetParam(SPLIT_IMPULSE_PENETRATION_THRESHOLD));
+    this->GetParam("split_impulse_penetration_threshold"));
 
   // Use multiple friction directions.
   // This is important for rolling without slip (see issue #480)
@@ -395,11 +395,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
 
     physicsMsg.mutable_bullet()->set_split_impulse(
-      boost::any_cast<bool>(this->GetParam(SPLIT_IMPULSE)));
+      boost::any_cast<bool>(this->GetParam("split_impulse")));
 
     physicsMsg.mutable_bullet()->set_split_impulse_penetration_threshold(
       boost::any_cast<double>(
-      this->GetParam(SPLIT_IMPULSE_PENETRATION_THRESHOLD)));
+      this->GetParam("split_impulse_penetration_threshold")));
 
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
@@ -456,12 +456,12 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
     if (msgBullet->has_split_impulse())
     {
-      this->SetParam(SPLIT_IMPULSE, msgBullet->split_impulse());
+      this->SetParam("split_impulse", msgBullet->split_impulse());
     }
 
     if (msgBullet->has_split_impulse_penetration_threshold())
     {
-      this->SetParam(SPLIT_IMPULSE_PENETRATION_THRESHOLD,
+      this->SetParam("split_impulse_penetration_threshold",
         msgBullet->split_impulse_penetration_threshold());
     }
   }
@@ -639,40 +639,6 @@ bool BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
           "contact_surface_layer")->Set(value);
       break;
     }
-    case SPLIT_IMPULSE:
-    {
-      /// TODO: Implement contact surface layer param
-      bool value;
-      try
-      {
-        value = boost::any_cast<bool>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return false;
-      }
-      bulletElem->GetElement("constraints")->GetElement(
-          "split_impulse")->Set(value);
-      break;
-    }
-    case SPLIT_IMPULSE_PENETRATION_THRESHOLD:
-    {
-      /// TODO: Implement contact surface layer param
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(const boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return false;
-      }
-      bulletElem->GetElement("constraints")->GetElement(
-          "split_impulse_penetration_threshold")->Set(value);
-      break;
-    }
     case MAX_CONTACTS:
     {
       /// TODO: Implement max contacts param
@@ -739,16 +705,54 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   else if (_key == "contact_surface_layer")
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "split_impulse")
-    param = SPLIT_IMPULSE;
+  {
+    bool value;
+    try
+    {
+      value = boost::any_cast<bool>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement(
+        "split_impulse")->Set(value);
+    break;
+  }
   else if (_key == "split_impulse_penetration_threshold")
-    param = SPLIT_IMPULSE_PENETRATION_THRESHOLD;
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement(
+        "split_impulse_penetration_threshold")->Set(value);
+    break;
+  }
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
   else if (_key == "max_step_size")
   {
-    this->SetMaxStepSize(boost::any_cast<double>(_value));
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    this->SetMaxStepSize(value);
     return true;
   }
   else
@@ -800,18 +804,6 @@ boost::any BulletPhysics::GetParam(BulletParam _param) const
           "contact_surface_layer");
       break;
     }
-    case SPLIT_IMPULSE:
-    {
-      value = bulletElem->GetElement("constraints")->Get<bool>(
-          "split_impulse");
-      break;
-    }
-    case SPLIT_IMPULSE_PENETRATION_THRESHOLD:
-    {
-      value = bulletElem->GetElement("constraints")->Get<double>(
-          "split_impulse_penetration_threshold");
-      break;
-    }
     case MAX_CONTACTS:
     {
       value = this->sdf->GetElement("max_contacts")->Get<int>();
@@ -849,9 +841,15 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
   else if (_key == "contact_surface_layer")
     param = CONTACT_SURFACE_LAYER;
   else if (_key == "split_impulse")
-    param = SPLIT_IMPULSE;
+  {
+    return bulletElem->GetElement("constraints")->Get<bool>(
+      "split_impulse");
+  }
   else if (_key == "split_impulse_penetration_threshold")
-    param = SPLIT_IMPULSE_PENETRATION_THRESHOLD;
+  {
+    return bulletElem->GetElement("constraints")->Get<double>(
+      "split_impulse_penetration_threshold");
+  }
   else if (_key == "max_contacts")
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
