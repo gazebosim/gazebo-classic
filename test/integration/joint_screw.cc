@@ -227,19 +227,24 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   // set new upper limit for joint_00
   joint_00->SetHighStop(0, 0.3);
   bool once = false;
+  int count = 0;
+  int maxCount = 5000;
   // push joint_00 till it hits new upper limit
-  while (joint_00->GetAngle(0) < 0.3)
+  while (count < maxCount && joint_00->GetAngle(0) < 0.3)
   {
     joint_00->SetForce(0, 0.1);
     world->Step(1);
+    ++count;
     // check link pose
     double angle_00_angular = joint_00->GetAngle(0).Radian();
+    double angle_00_linear = joint_00->GetAngle(1).Radian();
+    double angle_01_linear = joint_01->GetAngle(1).Radian();
+    math::Pose pose_01 = link_01->GetWorldPose();
     EXPECT_EQ(link_00->GetWorldPose(),
       math::Pose(-angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
 
     if (_physicsEngine == "simbody")
     {
-      double angle_00_linear = joint_00->GetAngle(1).Radian();
       if (!once)
       {
         once = true;
@@ -248,18 +253,37 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
               << " shoudl be 0.3\n";
       }
     }
+    else
+    {
+      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+    }
   }
+  gzdbg << "took [" << count << "] steps.\n";
+
+  // continue pushing for 1000 steps to make sure there is no overshoot
+  double maxOvershootRadians = 0.01;
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    joint_00->SetForce(0, 0.1);
+    world->Step(1);
+    EXPECT_LT(joint_00->GetAngle(0), 0.3 + maxOvershootRadians);
+  }
+
+
   // lock joint at this location by setting lower limit here too
   joint_00->SetLowStop(0, 0.3);
 
   // set joint_01 upper limit to 1.0
   joint_01->SetHighStop(0, 1.0);
+
   // push joint_01 until limit is reached
   once = false;
-  while (joint_01->GetAngle(0) < 1.0)
+  count = 0;
+  while (count < maxCount && joint_01->GetAngle(0) < 1.0)
   {
     joint_01->SetForce(0, 0.1);
     world->Step(1);
+    ++count;
 
     // check link pose
     math::Pose pose_00 = link_00->GetWorldPose();
@@ -292,13 +316,24 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
   }
+  gzdbg << "took [" << count << "] steps.\n";
+
+  // continue pushing for 1000 steps to make sure there is no overshoot
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    joint_01->SetForce(0, 0.1);
+    world->Step(1);
+    EXPECT_LT(joint_01->GetAngle(0), 1.0 + maxOvershootRadians);
+  }
 
   // push joint_01 the other way until -1 is reached
   once = false;
-  while (joint_01->GetAngle(0) > -1.0)
+  count = 0;
+  while (count < maxCount && joint_01->GetAngle(0) > -1.0)
   {
     joint_01->SetForce(0, -0.1);
     world->Step(1);
+    ++count;
 
     // check link pose
     math::Pose pose_00 = link_00->GetWorldPose();
@@ -330,6 +365,16 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
       -angle_00_angular / pitch_00 - angle_01_angular / pitch_01, 1e-8);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
       angle_00_angular + angle_01_angular, 1e-8);
+  }
+  gzdbg << "took [" << count << "] steps.\n";
+
+  // continue pushing for 1000 steps to make sure there is no overshoot
+  joint_01->SetLowStop(0, -1.0);
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    joint_01->SetForce(0, -0.1);
+    world->Step(1);
+    EXPECT_GT(joint_01->GetAngle(0), -1.0 - maxOvershootRadians);
   }
 }
 
