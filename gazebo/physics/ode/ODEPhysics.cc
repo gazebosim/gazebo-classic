@@ -1124,7 +1124,7 @@ bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     }
     case SOR_PRECON_ITERS:
     {
-      return this->SetParam("sor_precon_iters", _value);
+      return this->SetParam("precon_iters", _value);
     }
     case PGS_ITERS:
     {
@@ -1402,7 +1402,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case SOR_PRECON_ITERS:
     {
-      return this->GetParam("sor_precon_iters");
+      return this->GetParam("precon_iters");
     }
     case PGS_ITERS:
     {

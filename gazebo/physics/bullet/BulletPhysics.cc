@@ -386,7 +386,7 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(
       boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
     physicsMsg.set_iters(
-      boost::any_cast<int>(this->GetParam(PGS_ITERS)));
+      boost::any_cast<int>(this->GetParam("iters")));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
       boost::any_cast<double>(this->GetParam(SOR)));
@@ -419,7 +419,7 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("solver_type", _msg->solver_type());
 
   if (_msg->has_iters())
-    this->SetParam("pgs_iters", _msg->iters());
+    this->SetParam("iters", _msg->iters());
 
   if (_msg->has_sor())
     this->SetParam("sor", _msg->sor());
