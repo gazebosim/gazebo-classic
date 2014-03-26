@@ -155,7 +155,7 @@ void Gripper::OnUpdate()
     this->HandleDetach();
 
   {
-    boost::scoped_lock lock(this->mutexContacts);
+    boost::mutex::scoped_lock lock(this->mutexContacts);
     this->contacts.clear();
   }
 
@@ -257,7 +257,7 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
-      boost::scoped_lock lock(this->mutexContacts);
+      boost::mutex::scoped_lock lock(this->mutexContacts);
       this->contacts.push_back(_msg->contact(i));
     }
   }
