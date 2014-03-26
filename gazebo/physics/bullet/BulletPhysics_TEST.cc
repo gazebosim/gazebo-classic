@@ -66,12 +66,12 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
   double splitImpulsePenetrationThreshold = 0.02;
 
   // test setting/getting physics engine params
-  bulletPhysics->SetParam(BulletPhysics::SOLVER_TYPE, type);
-  bulletPhysics->SetParam(BulletPhysics::PGS_ITERS, iters);
-  bulletPhysics->SetParam(BulletPhysics::SOR, sor);
-  bulletPhysics->SetParam(BulletPhysics::GLOBAL_CFM, cfm);
-  bulletPhysics->SetParam(BulletPhysics::GLOBAL_ERP, erp);
-  bulletPhysics->SetParam(BulletPhysics::CONTACT_SURFACE_LAYER,
+  bulletPhysics->SetParam("solver_type", type);
+  bulletPhysics->SetParam("iters", iters);
+  bulletPhysics->SetParam("sor", sor);
+  bulletPhysics->SetParam("cfm", cfm);
+  bulletPhysics->SetParam("erp", erp);
+  bulletPhysics->SetParam("contact_surface_layer",
       contactSurfaceLayer);
   bulletPhysics->SetParam("split_impulse",
       splitImpulse);
@@ -79,23 +79,23 @@ TEST_F(BulletPhysics_TEST, PhysicsParam)
       splitImpulsePenetrationThreshold);
 
   boost::any value;
-  value = bulletPhysics->GetParam(BulletPhysics::SOLVER_TYPE);
+  value = bulletPhysics->GetParam("solver_type");
   std::string typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
-  value = bulletPhysics->GetParam(BulletPhysics::PGS_ITERS);
+  value = bulletPhysics->GetParam("iters");
   int itersRet = boost::any_cast<int>(value);
   EXPECT_EQ(iters, itersRet);
-  value = bulletPhysics->GetParam(BulletPhysics::SOR);
+  value = bulletPhysics->GetParam("sor");
   double sorRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(sor, sorRet);
-  value = bulletPhysics->GetParam(BulletPhysics::GLOBAL_CFM);
+  value = bulletPhysics->GetParam("cfm");
   double cfmRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(cfm, cfmRet);
-  value = bulletPhysics->GetParam(BulletPhysics::GLOBAL_ERP);
+  value = bulletPhysics->GetParam("erp");
   double erpRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(erp, erpRet);
 
-  value = bulletPhysics->GetParam(BulletPhysics::CONTACT_SURFACE_LAYER);
+  value = bulletPhysics->GetParam("contact_surface_layer");
   double contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
 
