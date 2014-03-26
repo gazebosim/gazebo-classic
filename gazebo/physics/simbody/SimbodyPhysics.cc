@@ -1254,7 +1254,12 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
   if (_key == "type")
   {
-    return this->GetType();
+    gzwarn << "Please use keyword `solver_typ` in the future.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
+  {
+    return "Spatial Algebra and Elastic Foundation";
   }
   else if (_key == "integrator_type")
   {

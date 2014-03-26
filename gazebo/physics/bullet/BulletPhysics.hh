@@ -172,9 +172,11 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Get an parameter of the physics engine
+      /// Deprecated by GetParam(const std::string &_key)
       /// \param[in] _param A parameter listed in the BulletParam enum
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(BulletParam _param) const;
+      public: virtual boost::any GetParam(BulletParam _param) const
+                GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited
       public: virtual void SetSORPGSIters(unsigned int iters);
