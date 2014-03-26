@@ -569,7 +569,7 @@ bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
            << " use `solver_type`.\n";
-    return this->SetParam("sovler_type", _value);
+    return this->SetParam("solver_type", _value);
   }
   else if (_key == "solver_type")
   {

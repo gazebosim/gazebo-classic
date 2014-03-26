@@ -1112,7 +1112,7 @@ bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
   {
     case SOLVER_TYPE:
     {
-      return this->SetParam("sovler_type", _value);
+      return this->SetParam("solver_type", _value);
     }
     case GLOBAL_CFM:
     {
@@ -1168,7 +1168,7 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
   {
     gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
            << " use `solver_type`.\n";
-    return this->SetParam("sovler_type", _value);
+    return this->SetParam("solver_type", _value);
   }
   else if (_key == "solver_type")
   {
@@ -1277,8 +1277,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       return false;
     }
     odeElem->GetElement("constraints")->GetElement(
-        "contact_surface_layer")->Set(value);
-    dWorldSetContactSurfaceLayer(this->worldId, value);
+        "contact_max_correcting_vel")->Set(value);
+    dWorldSetContactMaxCorrectingVel(this->worldId, value);
   }
   else if (_key == "contact_surface_layer")
   {
@@ -1293,8 +1293,8 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       return false;
     }
     odeElem->GetElement("constraints")->GetElement(
-        "contact_max_correcting_vel")->Set(value);
-    dWorldSetContactMaxCorrectingVel(this->worldId, value);
+        "contact_surface_layer")->Set(value);
+    dWorldSetContactSurfaceLayer(this->worldId, value);
   }
   else if (_key == "max_contacts")
   {
@@ -1446,7 +1446,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
   {
     gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
            << " use `solver_type`.\n";
-    return this->GetParam("sovler_type");
+    return this->GetParam("solver_type");
   }
   else if (_key == "solver_type")
   {
