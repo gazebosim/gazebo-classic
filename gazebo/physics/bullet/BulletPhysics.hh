@@ -158,9 +158,10 @@ namespace gazebo
       public: virtual void DebugPrint() const;
 
       /// \brief Set a parameter of the bullet physics engine
-      /// Deprecated by bool SetParam(const std::string&, const boost::any&)
+      /// \sa bool SetParam(const std::string&, const boost::any&)
       /// \param[in] _param A parameter listed in the BulletParam enum
       /// \param[in] _value The value to set to
+      /// \return true if SetParam is successful, false if operation fails.
       public: virtual bool SetParam(BulletParam _param,
                   const boost::any &_value) GAZEBO_DEPRECATED(3.0);
 
@@ -172,7 +173,7 @@ namespace gazebo
       public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Get an parameter of the physics engine
-      /// Deprecated by GetParam(const std::string &_key)
+      /// \sa bool GetParam(const std::string &_key)
       /// \param[in] _param A parameter listed in the BulletParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(BulletParam _param) const

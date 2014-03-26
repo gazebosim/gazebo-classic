@@ -293,6 +293,7 @@ namespace gazebo
       ///          physics update step must return.
       ///
       /// \param[in] _value The value to set to
+      /// \return true if SetParam is successful, false if operation fails.
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 

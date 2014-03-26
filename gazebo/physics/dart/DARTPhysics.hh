@@ -136,7 +136,7 @@ namespace gazebo
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
-      /// Deprecated by boost::any GetParam(const std::string &_key) const
+      /// \sa boost::any GetParam(const std::string &_key) const
       /// \param[in] _param A parameter listed in the ODEParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(DARTParam _param) const
