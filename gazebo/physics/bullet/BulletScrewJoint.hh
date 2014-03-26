@@ -81,6 +81,14 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetThreadPitch();
 
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
+
       /// \brief Get the rate of change
       /// \param[in] _index Axis index.
       public: virtual double GetVelocity(unsigned int _index) const;
@@ -104,14 +112,6 @@ namespace gazebo
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
