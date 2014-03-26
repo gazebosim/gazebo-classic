@@ -1116,11 +1116,11 @@ bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     }
     case GLOBAL_CFM:
     {
-      return this->SetParam("global_cfm", _value);
+      return this->SetParam("cfm", _value);
     }
     case GLOBAL_ERP:
     {
-      return this->SetParam("global_erp", _value);
+      return this->SetParam("erp", _value);
     }
     case SOR_PRECON_ITERS:
     {
@@ -1128,7 +1128,7 @@ bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     }
     case PGS_ITERS:
     {
-      return this->SetParam("pgs_iters", _value);
+      return this->SetParam("iters", _value);
     }
     case SOR:
     {
@@ -1394,11 +1394,11 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case GLOBAL_CFM:
     {
-      return this->GetParam("global_cfm");
+      return this->GetParam("cfm");
     }
     case GLOBAL_ERP:
     {
-      return this->GetParam("global_erp");
+      return this->GetParam("erp");
     }
     case SOR_PRECON_ITERS:
     {
@@ -1406,7 +1406,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case PGS_ITERS:
     {
-      return this->GetParam("pgs_iters");
+      return this->GetParam("iters");
     }
     case SOR:
     {

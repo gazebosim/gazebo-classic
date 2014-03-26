@@ -389,11 +389,11 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
       boost::any_cast<int>(this->GetParam("iters")));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
-      boost::any_cast<double>(this->GetParam(SOR)));
+      boost::any_cast<double>(this->GetParam("sor")));
     physicsMsg.set_cfm(
-      boost::any_cast<double>(this->GetParam(GLOBAL_CFM)));
+      boost::any_cast<double>(this->GetParam("cfm")));
     physicsMsg.set_erp(
-      boost::any_cast<double>(this->GetParam(GLOBAL_ERP)));
+      boost::any_cast<double>(this->GetParam("erp")));
 
     physicsMsg.set_contact_surface_layer(
       boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
@@ -425,10 +425,10 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetParam("sor", _msg->sor());
 
   if (_msg->has_cfm())
-    this->SetParam("global_cfm", _msg->cfm());
+    this->SetParam("cfm", _msg->cfm());
 
   if (_msg->has_erp())
-    this->SetParam("global_erp", _msg->erp());
+    this->SetParam("erp", _msg->erp());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
