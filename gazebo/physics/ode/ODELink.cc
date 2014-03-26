@@ -30,7 +30,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
-#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 
@@ -126,18 +126,18 @@ void ODELink::Init()
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
-          if (g->GetSurface()->maxVel < 0)
+          if (g->GetODESurface()->maxVel < 0)
           {
-            g->GetSurface()->maxVel =
+            g->GetODESurface()->maxVel =
              this->GetWorld()->GetPhysicsEngine()->GetContactMaxCorrectingVel();
           }
-          dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
-          dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
+          dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
+          dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
         }
       }
     }
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to place collision bodies"
@@ -152,7 +152,7 @@ void ODELink::Init()
     dBodySetMovedCallback(this->linkId, MoveCallback);
     dBodySetDisabledCallback(this->linkId, DisabledCallback);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to set callbacks in ODELink::Init"
@@ -211,7 +211,7 @@ void ODELink::SetGravityMode(bool _mode)
   {
     dBodySetGravityMode(this->linkId, _mode ? 1: 0);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetGravityMode" << std::endl;
@@ -226,7 +226,7 @@ bool ODELink::GetGravityMode() const
   {
     mode = dBodyGetGravityMode(this->linkId);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetGravityMode returns default of "
@@ -251,7 +251,7 @@ void ODELink::OnPoseChange()
 
   if (!this->linkId)
   {
-    if (!this->IsStatic())
+    if (!this->IsStatic() && this->initialized)
       gzlog << "ODE body for link [" << this->GetScopedName() << "]"
             << " does not exist, unable to respond to OnPoseChange"
             << std::endl;
@@ -293,7 +293,7 @@ void ODELink::SetEnabled(bool _enable) const
 {
   if (!this->linkId)
   {
-    if (!this->IsStatic())
+    if (!this->IsStatic() && this->initialized)
       gzlog << "ODE body for link [" << this->GetScopedName() << "]"
             << " does not exist, unable to SetEnabled" << std::endl;
     return;
@@ -312,7 +312,7 @@ bool ODELink::GetEnabled() const
 
   if (this->linkId)
     result = dBodyIsEnabled(this->linkId);
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetEnabled returns default of "
@@ -335,8 +335,8 @@ void ODELink::UpdateSurface()
       if (g->IsPlaceable() && g->GetCollisionId())
       {
         // Set surface properties max_vel and min_depth
-        dBodySetMaxVel(this->linkId, g->GetSurface()->maxVel);
-        dBodySetMinDepth(this->linkId, g->GetSurface()->minDepth);
+        dBodySetMaxVel(this->linkId, g->GetODESurface()->maxVel);
+        dBodySetMinDepth(this->linkId, g->GetODESurface()->minDepth);
       }
     }
   }
@@ -346,7 +346,7 @@ void ODELink::UpdateMass()
 {
   if (!this->linkId)
   {
-    if (!this->IsStatic())
+    if (!this->IsStatic() && this->initialized)
       gzlog << "ODE body for link [" << this->GetScopedName() << "]"
             << " does not exist, unable to UpdateMass" << std::endl;
     return;
@@ -383,7 +383,7 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
   {
     dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetLinearVel" << std::endl;
 }
@@ -402,7 +402,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -429,7 +429,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -450,7 +450,7 @@ math::Vector3 ODELink::GetWorldCoGLinearVel() const
     dvel = dBodyGetLinearVel(this->linkId);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldCoGLinearVel returns default of "
@@ -467,7 +467,7 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
   {
     dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetAngularVel" << std::endl;
 }
@@ -485,7 +485,7 @@ math::Vector3 ODELink::GetWorldAngularVel() const
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldAngularVel returns default of "
@@ -503,7 +503,7 @@ void ODELink::SetForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetForce" << std::endl;
 }
@@ -516,7 +516,7 @@ void ODELink::SetTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetTorque" << std::endl;
 }
@@ -529,7 +529,7 @@ void ODELink::AddForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForce" << std::endl;
 }
@@ -542,7 +542,7 @@ void ODELink::AddRelativeForce(const math::Vector3 &_force)
     this->SetEnabled(true);
     dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddRelativeForce" << std::endl;
 }
@@ -557,7 +557,7 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
     dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
                           _relpos.x, _relpos.y, _relpos.z);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForceAtRelativePosition"
@@ -575,7 +575,7 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
     dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
                           _pos.x, _pos.y, _pos.z);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddForceAtWorldPosition"
@@ -591,7 +591,7 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddTorque" << std::endl;
 }
@@ -604,7 +604,7 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
     this->SetEnabled(true);
     dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
   }
-  else
+  else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to AddRelativeTorque" << std::endl;
 }
@@ -624,7 +624,7 @@ math::Vector3 ODELink::GetWorldForce() const
     force.y = dforce[1];
     force.z = dforce[2];
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldForce returns default of "
@@ -649,7 +649,7 @@ math::Vector3 ODELink::GetWorldTorque() const
     torque.y = dtorque[1];
     torque.z = dtorque[2];
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetWorldTorque returns default of "
@@ -676,7 +676,7 @@ void ODELink::SetLinearDamping(double _damping)
 {
   if (this->GetODEId())
     dBodySetLinearDamping(this->GetODEId(), _damping);
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetLinearDamping" << std::endl;
 }
@@ -686,7 +686,7 @@ void ODELink::SetAngularDamping(double _damping)
 {
   if (this->GetODEId())
     dBodySetAngularDamping(this->GetODEId(), _damping);
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetAngularDamping" << std::endl;
 }
@@ -702,7 +702,7 @@ void ODELink::SetKinematic(const bool &_state)
     else if (dBodyIsKinematic(this->linkId))
       dBodySetDynamic(this->linkId);
   }
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, unable to SetKinematic" << std::endl;
 }
@@ -714,7 +714,7 @@ bool ODELink::GetKinematic() const
 
   if (this->linkId)
     result = dBodyIsKinematic(this->linkId);
-  else if (!this->IsStatic())
+  else if (!this->IsStatic() && this->initialized)
   {
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
           << " does not exist, GetKinematic returns default of "

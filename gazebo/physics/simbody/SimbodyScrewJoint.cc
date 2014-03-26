@@ -53,88 +53,60 @@ void SimbodyScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::GetVelocity(int /*_index*/) const
+double SimbodyScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented in simbody\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void SimbodyScrewJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   gzerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
+void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
+    double /*_threadPitch*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
+void SimbodyScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetForceImpl(int /*_index*/, double /*_force*/)
+void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
 {
   gzerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetHighStop(int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetLowStop(int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(int /*_index*/)
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(int /*_index*/)
-{
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-void SimbodyScrewJoint::SetMaxForce(int /*_index*/, double /*_force*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyScrewJoint::GetMaxForce(int /*index*/)
+double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyScrewJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyScrewJoint::GetGlobalAxis not implemented\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
   return math::Angle();

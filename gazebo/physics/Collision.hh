@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all collision entities
-    class Collision : public Entity
+    class GAZEBO_VISIBLE Collision : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _link Link that contains this collision object.
@@ -192,12 +193,12 @@ namespace gazebo
       /// \brief Number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \param[in] _maxContacts max num contacts allowed for this collision.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -213,7 +214,7 @@ namespace gazebo
       protected: ShapePtr shape;
 
       /// \brief The surface parameters.
-      private: SurfaceParamsPtr surface;
+      protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
@@ -222,7 +223,7 @@ namespace gazebo
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
 
       /// \brief Unique id for collision visual.
       private: uint32_t collisionVisualId;

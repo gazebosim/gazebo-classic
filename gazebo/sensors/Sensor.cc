@@ -35,6 +35,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -77,6 +78,9 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
+
+  for (unsigned int i = 0; i < this->noises.size(); ++i)
+    this->noises[i].reset();
 }
 
 //////////////////////////////////////////////////
@@ -162,25 +166,47 @@ uint32_t Sensor::GetParentId() const
 }
 
 //////////////////////////////////////////////////
+bool Sensor::NeedsUpdate()
+{
+  // Adjust time-to-update period to compensate for delays caused by another
+  // sensor's update in the same thread.
+
+  common::Time simTime;
+  if (this->category == IMAGE && this->scene)
+    simTime = this->scene->GetSimTime();
+  else
+    simTime = this->world->GetSimTime();
+
+  if (simTime <= this->lastMeasurementTime)
+    return false;
+
+  return (simTime - this->lastMeasurementTime +
+      this->updateDelay) >= this->updatePeriod;
+}
+
+//////////////////////////////////////////////////
 void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
+    common::Time simTime;
+    if (this->category == IMAGE && this->scene)
+      simTime = this->scene->GetSimTime();
+    else
+      simTime = this->world->GetSimTime();
+
     {
       boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
-      common::Time simTime;
-      if (this->category == IMAGE && this->scene)
-        simTime = this->scene->GetSimTime();
-      else
-        simTime = this->world->GetSimTime();
 
-      if (simTime == this->lastUpdateTime && !_force)
+      if (simTime <= this->lastUpdateTime && !_force)
         return;
 
       // Adjust time-to-update period to compensate for delays caused by another
       // sensor's update in the same thread.
+      // NOTE: If you change this equation, also change the matching equation in
+      // Sensor::NeedsUpdate
       common::Time adjustedElapsed = simTime - this->lastUpdateTime +
-          this->updateDelay;
+        this->updateDelay;
 
       if (adjustedElapsed < this->updatePeriod && !_force)
         return;
@@ -194,17 +220,23 @@ void Sensor::Update(bool _force)
       // target update rate (worst case).
       if (this->updateDelay >= this->updatePeriod)
         this->updateDelay = common::Time::Zero;
-
-      this->lastUpdateTime = simTime;
     }
-    this->UpdateImpl(_force);
-    this->updated();
+
+    if (this->UpdateImpl(_force))
+    {
+      boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+      this->lastUpdateTime = simTime;
+      this->updated();
+    }
   }
 }
 
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  for (unsigned int i= 0; i < this->noises.size(); ++i)
+    this->noises[i]->Fini();
+
   this->active = false;
   this->plugins.clear();
 }
@@ -348,6 +380,17 @@ std::string Sensor::GetWorldName() const
 SensorCategory Sensor::GetCategory() const
 {
   return this->category;
+}
+
+//////////////////////////////////////////////////
+NoisePtr Sensor::GetNoise(unsigned int _index) const
+{
+  if (_index >= this->noises.size())
+  {
+    gzerr << "Get noise index out of range" << std::endl;
+    return NoisePtr();
+  }
+  return this->noises[_index];
 }
 
 //////////////////////////////////////////////////

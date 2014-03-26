@@ -19,9 +19,9 @@
 
 #include <string>
 #include <map>
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -31,7 +31,10 @@ namespace gazebo
 {
   namespace gui
   {
-    class InsertModelWidget : public QWidget
+    /// \brief Private
+    class InsertModelWidgetPrivate;
+
+    class GAZEBO_VISIBLE InsertModelWidget : public QWidget
     {
       Q_OBJECT
 
@@ -65,20 +68,8 @@ namespace gazebo
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
 
-      /// \brief Widget that display all the models that can be inserted.
-      private: QTreeWidget *fileTreeWidget;
-
-      /// \brief Tree item that is populated with models from the ModelDatabase.
-      private: QTreeWidgetItem *modelDatabaseItem;
-
-      /// \brief Mutex to protect the modelBuffer.
-      private: boost::mutex mutex;
-
-      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
-      private: std::map<std::string, std::string> modelBuffer;
-
-      /// \brief A file/directory watcher.
-      private: QFileSystemWatcher *watcher;
+      /// \brief Private data pointer.
+      private: InsertModelWidgetPrivate *dataPtr;
     };
   }
 }

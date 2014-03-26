@@ -15,8 +15,11 @@
  *
 */
 
+#include <boost/filesystem.hpp>
 #include "ServerFixture.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/common/SystemPaths.hh"
+
 
 using namespace gazebo;
 class FileHandling : public ServerFixture
@@ -26,8 +29,9 @@ class FileHandling : public ServerFixture
 TEST_F(FileHandling, Save)
 {
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
-  boost::filesystem::create_directories("/tmp/gazebo_test");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
+  boost::filesystem::create_directories(paths->GetDefaultTestPath());
 
   Load("worlds/empty.world");
 
@@ -37,7 +41,6 @@ TEST_F(FileHandling, Save)
   transport::PublisherPtr requestPub =
     node->Advertise<msgs::Request>("~/request");
 
-
   // Find a valid filename
   FILE *file = NULL;
   std::ostringstream filename;
@@ -45,7 +48,7 @@ TEST_F(FileHandling, Save)
   do
   {
     filename.str("");
-    filename << "/tmp/gazebo_test/test_" << i << ".world";
+    filename << paths->GetDefaultTestPath() << "/test_" << i << ".world";
     i++;
   } while ((file = fopen(filename.str().c_str(), "r")) != NULL);
 
@@ -66,7 +69,7 @@ TEST_F(FileHandling, Save)
   EXPECT_LT(i, 10);
 
   // Cleanup test directory.
-  boost::filesystem::remove_all("/tmp/gazebo_test");
+  boost::filesystem::remove_all(paths->GetDefaultTestPath());
 }
 
 int main(int argc, char **argv)

@@ -543,7 +543,9 @@ QTabBar::tab:!selected
 
 QTabWidget#mainTab::pane,
 QTabWidget#buildingEditorTab::pane,
-QTabWidget#terrainEditorTab::pane
+QTabWidget#modelEditorTab::pane,
+QTabWidget#terrainEditorTab::pane,
+QTabWidget#partInspectorTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -581,10 +583,10 @@ QWidget#toolsWidget
   color: #d0d0d0;
 }
 
-
 QWidget#modelList > QFrame,
 QWidget#insertModel > QFrame,
 QWidget#jointControl > QFrame,
+QWidget#modelEditorPalette > QFrame,
 QWidget#toolsWidget > QFrame
 {
   padding: 4px;
@@ -606,6 +608,7 @@ QWidget#renderWidget > QWidget
 }
 
 QWidget#buildingEditorWidget > QWidget,
+QWidget#modelEditorWidget > QWidget
 QWidget#terrainEditorWidget > QWidget
 {
   padding: 2px;

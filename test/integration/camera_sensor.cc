@@ -30,6 +30,8 @@ class CameraSensor : public ServerFixture
 {
 };
 
+boost::mutex mutex;
+
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 int imageCount = 0;
@@ -42,6 +44,7 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
+  boost::mutex::scoped_lock lock(mutex);
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
 }
@@ -116,7 +119,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 0;
-  math::Pose setPose, testPose(
+  math::Pose setPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
@@ -278,7 +281,7 @@ TEST_F(CameraSensor, CheckNoise)
   double updateRate = 10;
   double noiseMean = 0.1;
   double noiseStdDev = 0.01;
-  math::Pose setPose, testPose(
+  math::Pose setPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
@@ -329,4 +332,115 @@ int main(int argc, char **argv)
   math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+}
+
+
+// Place two cameras at some distance apart and a box in between
+// them. Verify they generate different images.
+TEST_F(CameraSensor, CompareSideBySideCamera)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn two cameras at 2m apart.
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  std::string modelName2 = "camera_model2";
+  std::string cameraName2 = "camera_sensor2";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+
+  math::Pose testPose(
+      math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+  math::Pose testPose2(
+      math::Vector3(0, 2, 0.5), math::Quaternion(0, 0, 0));
+  SpawnCamera(modelName, cameraName, testPose.pos,
+      testPose.rot.GetAsEuler(), width, height, updateRate);
+  SpawnCamera(modelName2, cameraName2, testPose2.pos,
+      testPose.rot.GetAsEuler(), width, height, updateRate);
+
+  // Spawn a box in front of the cameras
+  SpawnBox("test_box", math::Vector3(1, 1, 1),
+      math::Vector3(4, 1, 0.5), math::Vector3(0, 0, 0));
+
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  sensor = sensors::get_sensor(cameraName2);
+  sensors::CameraSensorPtr camSensor2 =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height*3];
+  unsigned char *prevImg = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
+  unsigned char *prevImg2 = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+    camSensor->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+          _1, _2, _3, _4, _5));
+  event::ConnectionPtr c2 =
+    camSensor2->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          _1, _2, _3, _4, _5));
+
+  while (imageCount < 10 || imageCount2 < 10)
+    common::Time::MSleep(10);
+
+  memcpy(prevImg, img, width * height * 3);
+  memcpy(prevImg2, img2, width * height * 3);
+
+  for (int i = 0; i < 10; ++i)
+  {
+    imageCount = 0;
+    imageCount2 = 0;
+
+    // Get some images
+    while (imageCount < 1 || imageCount2 < 1)
+      common::Time::MSleep(10);
+
+    unsigned int diffMax = 0, diffSum = 0;
+    double diffAvg = 0.0;
+    unsigned int diffMax2 = 0, diffSum2 = 0;
+    double diffAvg2 = 0.0;
+    unsigned int diffMax12 = 0, diffSum12 = 0;
+    double diffAvg12 = 0.0;
+
+    {
+      boost::mutex::scoped_lock lock(mutex);
+      this->ImageCompare(img, prevImg, width, height, 3,
+                         diffMax, diffSum, diffAvg);
+      this->ImageCompare(prevImg2, prevImg2, width, height, 3,
+                         diffMax2, diffSum2, diffAvg2);
+      this->ImageCompare(img, img2, width, height, 3,
+                         diffMax12, diffSum12, diffAvg12);
+      memcpy(prevImg, img, width * height * 3);
+      memcpy(prevImg2, img2, width * height * 3);
+    }
+
+    // Images from the same camera should be identical
+    EXPECT_EQ(diffSum, 0u);
+    EXPECT_EQ(diffSum2, 0u);
+
+    // We expect that there will some noticeable difference
+    // between the two different camera images.
+    EXPECT_NE(diffSum12, 1000000u);
+    EXPECT_GT(diffAvg12, 0.0);
+    EXPECT_GT(diffMax12, 0.0);
+
+    common::Time::MSleep(100);
+  }
+  delete[] img;
+  delete[] img2;
+  delete[] prevImg;
+  delete[] prevImg2;
 }

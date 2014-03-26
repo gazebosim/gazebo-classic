@@ -23,6 +23,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Ray collision
-    class DARTRayShape : public RayShape
+    class GAZEBO_VISIBLE DARTRayShape : public RayShape
     {
       /// \brief Constructor for a global ray.
       /// \param[in] _physicsEngine Pointer to the physics engine.

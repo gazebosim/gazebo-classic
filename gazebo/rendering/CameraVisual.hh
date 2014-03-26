@@ -14,16 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera Visualization Class
- * Author: Nate Koenig
- */
 
-#ifndef CAMERAVISUAL_HH
-#define CAMERAVISUAL_HH
+#ifndef _CAMERAVISUAL_HH_
+#define _CAMERAVISUAL_HH_
 
 #include <string>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +39,7 @@ namespace gazebo
     /// This class is used to visualize a camera image generated from
     /// a CameraSensor. The sensor's image is drawn on a billboard in the 3D
     /// environment.
-    class CameraVisual : public Visual
+    class GAZEBO_VISIBLE CameraVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual
@@ -54,8 +53,10 @@ namespace gazebo
       /// \param[in] _width Width of the Camera image
       /// \param[in] _height Height of the Camera image
       public: void Load(unsigned int _width, unsigned int _height);
+      using Visual::Load;
 
-      private: CameraPtr camera;
+      /// \brief Update the visual
+      private: void Update();
     };
     /// \}
   }

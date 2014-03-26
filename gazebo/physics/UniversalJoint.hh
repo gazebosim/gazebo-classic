@@ -14,16 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _UNIVERSALJOINT_HH_
-#define _UNIVERSALJOINT_HH_
+#ifndef _GAZEBO_UNIVERSALJOINT_HH_
+#define _GAZEBO_UNIVERSALJOINT_HH_
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,9 +30,19 @@ namespace gazebo
 
     /// \class UniversalJoint UniversalJoint.hh physics/physics.hh
     /// \brief A universal joint.
+    /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
+    /// body and axis2 attached to child body.
     template<class T>
-    class UniversalJoint : public T
+    class GAZEBO_VISIBLE UniversalJoint : public T
     {
+      /// \enum AxisIndex
+      /// \brief Map joint axes to corresponding link.
+      public: enum AxisIndex
+      {
+        AXIS_PARENT = 0,
+        AXIS_CHILD  = 1
+      };
+
       /// \brief Constructor.
       /// \param[in] _parent Parent link of the univeral joint.
       public: explicit UniversalJoint(BasePtr _parent) : T(_parent)
@@ -46,7 +52,7 @@ namespace gazebo
       public: virtual ~UniversalJoint()
               { }
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 
@@ -63,6 +69,12 @@ namespace gazebo
                     this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
                     */
               }
+
+      /// \brief Initialize joint
+      protected: virtual void Init()
+                 {
+                   T::Init();
+                 }
     };
     /// \}
   }

@@ -53,7 +53,7 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
+math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
 
@@ -66,7 +66,7 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
+math::Angle ODEScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
@@ -78,7 +78,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetVelocity(int /*index*/) const
+double ODEScrewJoint::GetVelocity(unsigned int /*index*/) const
 {
   double result = 0;
 
@@ -91,16 +91,18 @@ double ODEScrewJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetVelocity(int /*index*/, double _angle)
+void ODEScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
 {
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
   /// \TODO: currently we assume joint axis is specified in model frame,
@@ -118,7 +120,7 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
+void ODEScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
 {
   if (this->jointId)
     dJointSetScrewThreadPitch(this->jointId, _threadPitch);
@@ -134,7 +136,7 @@ double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForceImpl(int /*_index*/, double _effort)
+void ODEScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->jointId)
   {
@@ -146,7 +148,7 @@ void ODEScrewJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetParam(int _parameter, double _value)
+void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
   if (this->jointId)
@@ -156,7 +158,7 @@ void ODEScrewJoint::SetParam(int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetParam(int _parameter) const
+double ODEScrewJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -169,13 +171,13 @@ double ODEScrewJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetMaxForce(int /*_index*/, double _t)
+void ODEScrewJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
   this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetMaxForce(int /*_index*/)
+double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }

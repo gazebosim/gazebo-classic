@@ -44,8 +44,7 @@ bool setup(int _argc, char **_argv)
 
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  if (!gazebo::common::Console::Instance()->IsInitialized())
-    gazebo::common::Console::Instance()->Init("default.log");
+  gzLogInit("default.log");
 
   // Load all the system plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =

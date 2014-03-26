@@ -50,7 +50,6 @@ void MultiRayShape::Init()
   int vertSamples = 1;
   // double vertResolution = 1.0;
   double vertMinAngle = 0;
-  double vertMaxAngle = 0;
 
   double minRange, maxRange;
 
@@ -63,7 +62,7 @@ void MultiRayShape::Init()
   {
     this->vertElem = this->scanElem->GetElement("vertical");
     vertMinAngle = this->vertElem->Get<double>("min_angle");
-    vertMaxAngle = this->vertElem->Get<double>("max_angle");
+    double vertMaxAngle = this->vertElem->Get<double>("max_angle");
     vertSamples = this->vertElem->Get<unsigned int>("samples");
     // vertResolution = this->vertElem->Get<double>("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
@@ -91,7 +90,9 @@ void MultiRayShape::Init()
       pitchAngle = (vertSamples == 1)? 0 :
         j * pDiff / (vertSamples - 1) + vertMinAngle;
 
-      ray.SetFromEuler(math::Vector3(0.0, pitchAngle, yawAngle));
+      // since we're rotating a unit x vector, a pitch rotation will now be
+      // around the negative y axis
+      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
       axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
@@ -117,9 +118,9 @@ void MultiRayShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRange(int _index)
+double MultiRayShape::GetRange(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -132,9 +133,9 @@ double MultiRayShape::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRetro(int _index)
+double MultiRayShape::GetRetro(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -146,9 +147,9 @@ double MultiRayShape::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int MultiRayShape::GetFiducial(int _index)
+int MultiRayShape::GetFiducial(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"

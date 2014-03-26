@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -58,6 +53,7 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -278,6 +274,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
 
 //////////////////////////////////////////////////

@@ -23,6 +23,7 @@
 #define _SLIDERJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
     /// \class SliderJoint SliderJoint.hh physics/physics.hh
     /// \brief A slider joint
     template<class T>
-    class SliderJoint : public T
+    class GAZEBO_VISIBLE SliderJoint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.
@@ -50,32 +51,11 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf)
               {T::Load(_sdf);}
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 1;}
-
-      /// \brief Set the anchor.
-      /// \param[in] _index Index of the axis. Not used.
-      /// \param[in] _anchor Anchor for the axis.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
-
-      /// \brief Get the anchor.
-      /// \param[in] _index Index of the axis. Not used.
-      /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
-
-      /// \brief The anchor value is not used internally.
-      protected: math::Vector3 fakeAnchor;
     };
     /// \}
-
-    template<class T>
-    void SliderJoint<T>::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
-    {this->fakeAnchor = _anchor;}
-
-    template<class T>
-    math::Vector3 SliderJoint<T>::GetAnchor(int /*_index*/) const
-    {return this->fakeAnchor;}
   }
 }
 #endif

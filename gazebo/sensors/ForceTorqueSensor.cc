@@ -108,7 +108,7 @@ math::Vector3 ForceTorqueSensor::GetTorque() const
 }
 
 //////////////////////////////////////////////////
-void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
+bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
 
@@ -127,6 +127,8 @@ void ForceTorqueSensor::UpdateImpl(bool /*_force*/)
 
   if (this->wrenchPub)
     this->wrenchPub->Publish(this->wrenchMsg);
+
+  return true;
 }
 
 //////////////////////////////////////////////////

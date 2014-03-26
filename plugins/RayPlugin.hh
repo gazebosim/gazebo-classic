@@ -15,7 +15,7 @@
  *
 */
 /*
- * Desc: Contact Plugin
+ * Desc: Ray Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
@@ -26,11 +26,12 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
-  class RayPlugin : public SensorPlugin
+  /// \brief A Ray Sensor Plugin
+  class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: RayPlugin();

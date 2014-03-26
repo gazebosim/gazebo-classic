@@ -54,7 +54,6 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
 
   this->collisionVisualId = physics::getUniqueId();
@@ -86,7 +85,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
@@ -105,13 +104,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
-  }
-
-  // Force max correcting velocity to zero for certain collision entities
-  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->shape->HasType(Base::MAP_SHAPE))
-  {
-    this->surface->maxVel = 0.0;
   }
 }
 
@@ -380,14 +372,14 @@ void Collision::SetState(const CollisionState &_state)
 }
 
 /////////////////////////////////////////////////
-void Collision::SetMaxContacts(double _maxContacts)
+void Collision::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContacts = static_cast<int>(_maxContacts);
+  this->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 /////////////////////////////////////////////////
-int Collision::GetMaxContacts()
+unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
 }

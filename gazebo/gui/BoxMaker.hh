@@ -20,6 +20,7 @@
 #include <string>
 #include "gazebo/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class BoxMaker BoxMaker.hh gui/gui.hh
     /// \brief to make a box
-    class BoxMaker : public EntityMaker
+    class GAZEBO_VISIBLE BoxMaker : public EntityMaker
     {
       /// \brief Constructor
       public: BoxMaker();
@@ -53,12 +54,16 @@ namespace gazebo
 
       /// Documentation inherited
       public: virtual bool IsActive() const;
+
       /// Documentation inherited
       public: virtual void OnMousePush(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+
       /// Documentation inherited
       public: virtual void OnMouseMove(const common::MouseEvent &_event);
 

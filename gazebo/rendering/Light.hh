@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A Light
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #ifndef _LIGHT_HH_
 #define _LIGHT_HH_
 
@@ -31,6 +25,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -54,7 +49,7 @@ namespace gazebo
     /// class encapsulates all three. Point lights are light light bulbs,
     /// spot lights project a cone of light, and directional lights are light
     /// sun light.
-    class Light
+    class GAZEBO_VISIBLE Light
     {
       /// \brief Constructor.
       /// \param[in] _scene Pointer to the scene that contains the Light.
@@ -74,6 +69,10 @@ namespace gazebo
       /// \brief Load from a light message.
       /// \param[in] _msg Containing the light information.
       public: void LoadFromMsg(ConstLightPtr &_msg);
+
+      /// \brief Load from a light message.
+      /// \param[in] _msg Message containing the light information.
+      public: void LoadFromMsg(const msgs::Light &_msg);
 
       /// \brief Set the name of the visual.
       /// \param[in] _name Name of the light source.
@@ -106,6 +105,10 @@ namespace gazebo
       /// \brief Set whether to show the visual
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(bool _s);
+
+      /// \brief Get whether the light is visible.
+      /// \return True if the light is visible.
+      public: bool GetVisible() const;
 
       /// \brief Set the light type.
       /// \param[in] _type The light type: "point", "spot", "directional"
@@ -182,7 +185,7 @@ namespace gazebo
 
       /// \brief Update SDF value based on a message.
       /// \param[in] _msg The light message to update from.
-      private: void UpdateSDFFromMsg(ConstLightPtr &_msg);
+      private: void UpdateSDFFromMsg(const msgs::Light &_msg);
 
       /// \brief The ogre light source
       private: Ogre::Light *light;
@@ -204,10 +207,6 @@ namespace gazebo
 
       /// \brief Pointer to the scene.
       private: ScenePtr scene;
-
-      /// \brief Get whether the light is visible.
-      /// \return True if the light is visible.
-      public: bool GetVisible() const;
     };
     /// \}
   }

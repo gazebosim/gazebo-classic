@@ -31,10 +31,13 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 */
 
+#include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 class btCollisionShape;
 
@@ -47,7 +50,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collisions
-    class BulletCollision : public Collision
+    class GAZEBO_VISIBLE BulletCollision : public Collision
     {
       /// \brief Constructor
       public: BulletCollision(LinkPtr _parent);
@@ -91,6 +94,11 @@ namespace gazebo
 
       /// \brief Set the index of the compound shape
       public: void SetCompoundShapeIndex(int _index);
+
+      /// \brief Similar to Collision::GetSurface, but provides dynamically
+      ///        casted pointer to BulletSurfaceParams.
+      /// \return Dynamically casted pointer to BulletSurfaceParams.
+      public: BulletSurfaceParamsPtr GetBulletSurface() const;
 
       protected: btCollisionShape *collisionShape;
 

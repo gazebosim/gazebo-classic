@@ -21,11 +21,12 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/gazebo.hh"
+#include <gazebo/gazebo.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class RubblePlugin : public WorldPlugin
+  class GAZEBO_VISIBLE RubblePlugin : public WorldPlugin
   {
     /// \brief Constructor.
     public: RubblePlugin();

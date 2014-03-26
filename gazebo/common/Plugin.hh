@@ -22,11 +22,7 @@
 #include <sys/stat.h>
 
 #include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
@@ -41,6 +37,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -69,7 +66,7 @@ namespace gazebo
   /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
-  class PluginT
+  class GAZEBO_VISIBLE PluginT
   {
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
@@ -83,9 +80,12 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-#ifdef HAVE_DL
-              dlclose(this->dlHandle);
-#endif
+              // dlclose has been disabled due to segfaults in the test suite
+              // This workaround is detailed in #1026 and #1066. After the test
+              // or gazebo execution the plugin is not loaded in memory anymore
+              // \todo Figure out the right thing to do.
+
+              // dlclose(this->dlHandle);
             }
 
     /// \brief Get the name of the handler
@@ -142,7 +142,6 @@ namespace gazebo
               if (!found)
                 fullname = filename;
 
-#ifdef HAVE_DL
               fptr_union_t registerFunc;
               std::string registerName = "RegisterPlugin";
 
@@ -166,55 +165,6 @@ namespace gazebo
               // Register the new controller.
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
-
-#elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-              result->dlHandle = NULL;
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
 
               result->handle = _handle;
               result->filename = filename;
@@ -253,7 +203,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::World.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class WorldPlugin : public PluginT<WorldPlugin>
+  class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
     public: WorldPlugin()
@@ -278,7 +228,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::Model.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class ModelPlugin : public PluginT<ModelPlugin>
+  class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
     public: ModelPlugin()
@@ -307,7 +257,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class SensorPlugin : public PluginT<SensorPlugin>
+  class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
     public: SensorPlugin()
@@ -336,7 +286,7 @@ namespace gazebo
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  class SystemPlugin : public PluginT<SystemPlugin>
+  class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Constructor
     public: SystemPlugin()
@@ -364,7 +314,7 @@ namespace gazebo
   /// \brief A plugin loaded within the gzserver on startup.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class VisualPlugin : public PluginT<VisualPlugin>
+  class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()
              {this->type = VISUAL_PLUGIN;}
@@ -394,7 +344,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_MODEL_PLUGIN(classname) \
-  extern "C" gazebo::ModelPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::ModelPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::ModelPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -405,7 +356,8 @@ namespace gazebo
 /// to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_WORLD_PLUGIN(classname) \
-  extern "C" gazebo::WorldPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::WorldPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::WorldPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -416,7 +368,8 @@ namespace gazebo
 /// the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SENSOR_PLUGIN(classname) \
-  extern "C" gazebo::SensorPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SensorPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SensorPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -427,7 +380,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_SYSTEM_PLUGIN(classname) \
-  extern "C" gazebo::SystemPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::SystemPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::SystemPlugin *RegisterPlugin() \
   {\
     return new classname();\
@@ -438,7 +392,8 @@ namespace gazebo
 /// library to add the plugin to the registered list.
 /// \return the name of the registered plugin
 #define GZ_REGISTER_VISUAL_PLUGIN(classname) \
-  extern "C" gazebo::VisualPlugin *RegisterPlugin(); \
+  extern "C" GAZEBO_VISIBLE gazebo::VisualPlugin *RegisterPlugin(); \
+  GAZEBO_VISIBLE \
   gazebo::VisualPlugin *RegisterPlugin() \
   {\
     return new classname();\

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
@@ -126,7 +127,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
     }
 
-    assert(collision1 && collision2);
+    GZ_ASSERT(collision1, "collision1 is null");
+    GZ_ASSERT(collision2, "collision2 is null");
 
     ODECollision *rayCollision = NULL;
     ODECollision *hitCollision = NULL;
@@ -142,7 +144,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
-      assert(rayCollision == NULL);
+      GZ_ASSERT(rayCollision == NULL, "rayCollision is not null");
       rayCollision = static_cast<ODECollision*>(collision2);
       hitCollision = static_cast<ODECollision*>(collision1);
       dGeomRaySetParams(_o2, 0, 0);

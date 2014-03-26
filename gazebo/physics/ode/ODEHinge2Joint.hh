@@ -27,13 +27,14 @@
 
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A two axis hinge joint
-    class ODEHinge2Joint : public Hinge2Joint<ODEJoint>
+    class GAZEBO_VISIBLE ODEHinge2Joint : public Hinge2Joint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
@@ -47,39 +48,41 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(unsigned int _index,
+                                     const math::Vector3 &_anchor);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int index, double angle);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(int index, double t);
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
-      public: virtual double GetMaxForce(int index);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual double GetParam(int parameter) const;
+      public: virtual double GetParam(unsigned int _parameter) const;
 
-      public: virtual void SetParam(int parameter, double value);
+      public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _effort);
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
   }
 }

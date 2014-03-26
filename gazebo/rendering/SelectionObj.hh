@@ -18,9 +18,9 @@
 #define _SELECTIONOBJ_HH_
 
 #include <string>
-#include <boost/unordered/unordered_map.hpp>
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class SelectionObj SelectionObj.hh
     /// \brief Interactive selection object for models and links
-    class SelectionObj : public Visual
+    class GAZEBO_VISIBLE SelectionObj : public Visual
     {
       /// \enum Manipulation modes
       /// \brief Unique identifiers for manipulation modes.
@@ -125,76 +125,8 @@ namespace gazebo
 
       /// \brief Helper function to create translate visuals.
       private: void CreateTranslateVisual();
-
-      /// \brief Translation visual.
-      private: VisualPtr transVisual;
-
-      /// \brief X translation visual.
-      private: VisualPtr transXVisual;
-
-      /// \brief Y translation visual.
-      private: VisualPtr transYVisual;
-
-      /// \brief Z translation visual.
-      private: VisualPtr transZVisual;
-
-      /// \brief Scale visual.
-      private: VisualPtr scaleVisual;
-
-      /// \brief X scale visual.
-      private: VisualPtr scaleXVisual;
-
-      /// \brief Y Scale visual.
-      private: VisualPtr scaleYVisual;
-
-      /// \brief Z scale visual.
-      private: VisualPtr scaleZVisual;
-
-      /// \brief Rotation visual.
-      private: VisualPtr rotVisual;
-
-      /// \brief X rotation visual.
-      private: VisualPtr rotXVisual;
-
-      /// \brief Y rotation visual.
-      private: VisualPtr rotYVisual;
-
-      /// \brief Z rotation visual.
-      private: VisualPtr rotZVisual;
-
-      /// \brief Current manipulation mode.
-      private: SelectionMode mode;
-
-      /// \brief Current selection state.
-      private: SelectionMode state;
-
-      /// \brief Pointer to visual that is currently selected.
-      private: VisualPtr selectedVis;
-
-      /// \brief Minimum scale of the selection object visual.
-      private: double minScale;
-
-      /// \brief Maximum scale of the selection object visual.
-      private: double maxScale;
-
-      /// \brief Material name for the x axis.
-      private: std::string xAxisMat;
-
-      /// \brief Material name for the y axis.
-      private: std::string yAxisMat;
-
-      /// \brief Material name for the z axis.
-      private: std::string zAxisMat;
-
-      /// \brief Overlay material name for the x axis.
-      private: std::string xAxisMatOverlay;
-
-      /// \brief Overlay material name for the y axis.
-      private: std::string yAxisMatOverlay;
-
-      /// \brief Overlay material name for the z axis.
-      private: std::string zAxisMatOverlay;
     };
+    /// \}
   }
 }
 

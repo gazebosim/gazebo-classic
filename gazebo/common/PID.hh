@@ -19,6 +19,7 @@
 #define _GAZEBO_PID_HH_
 
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
     /// the state of a system and a user specified target state.
-    class PID
+    class GAZEBO_VISIBLE PID
     {
       /// \brief Constructor, zeros out Pid values when created and
       /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
@@ -128,6 +129,12 @@ namespace gazebo
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
                 this->cmdMax = _p.cmdMax;
+                this->cmdMin = _p.cmdMin;
+                this->pErrLast = _p.pErrLast;
+                this->pErr = _p.pErr;
+                this->iErr = _p.iErr;
+                this->dErr = _p.dErr;
+                this->cmd = _p.cmd;
 
                 this->Reset();
                 return *this;

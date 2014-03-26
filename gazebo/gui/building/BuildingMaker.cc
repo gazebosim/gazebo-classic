@@ -41,7 +41,7 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/building/FinishBuildingDialog.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
@@ -90,8 +90,6 @@ double BuildingMaker::conversionScale;
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
   this->finishDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);
-
-  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -184,6 +182,11 @@ std::string BuildingMaker::AddPart(const std::string &_type,
 std::string BuildingMaker::AddWall(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Wall_" << wallCounter++;
   std::string linkName = linkNameStream.str();
@@ -220,6 +223,11 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
 std::string BuildingMaker::AddWindow(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
@@ -257,6 +265,11 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 std::string BuildingMaker::AddDoor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
   linkNameStream << "Door_" << this->doorCounter++;
@@ -295,6 +308,11 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 std::string BuildingMaker::AddStairs(const QVector3D &_size,
     const QVector3D &_pos, double _angle, int _steps)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
@@ -360,6 +378,11 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
 std::string BuildingMaker::AddFloor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
   linkNameStream << "Floor_" << this->floorCounter++;

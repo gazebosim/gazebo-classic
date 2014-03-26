@@ -137,54 +137,54 @@ void BulletBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 BulletBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 /////////////////////////////////////////////////
-void BulletBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void BulletBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
-double BulletBallJoint::GetVelocity(int /*_index*/) const
-{
-  gzerr << "Not implemented\n";
-  return 0;
-}
-
-/////////////////////////////////////////////////
-double BulletBallJoint::GetMaxForce(int /*_index*/)
+double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-void BulletBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+double BulletBallJoint::GetMaxForce(unsigned int /*_index*/)
+{
+  gzerr << "Not implemented\n";
+  return 0;
+}
+
+/////////////////////////////////////////////////
+void BulletBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
   return;
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngleImpl(int /*_index*/) const
+math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetHighStop(int /*_index*/,
+void BulletBallJoint::SetHighStop(unsigned int /*_index*/,
                                    const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -200,13 +200,13 @@ void BulletBallJoint::SetHighStop(int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void BulletBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetLowStop(int /*_index*/,
+void BulletBallJoint::SetLowStop(unsigned int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
   if (this->bulletBall)
@@ -219,5 +219,11 @@ void BulletBallJoint::SetLowStop(int /*_index*/,
   }
   else
     gzerr << "bulletBall does not yet exist" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
+{
+  return math::Vector3();
 }
 

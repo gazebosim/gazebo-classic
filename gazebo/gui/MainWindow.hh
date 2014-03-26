@@ -26,6 +26,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
 
-    class MainWindow : public QMainWindow
+    class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
@@ -81,6 +82,10 @@ namespace gazebo
       private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
+
+      /// \brief Save GUI configuration to INI file.
+      private slots: void SaveINI();
+
       private slots: void About();
       private slots: void Step();
       private slots: void NewModel();

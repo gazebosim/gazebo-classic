@@ -128,15 +128,16 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::UpdateImpl(bool /*_force*/)
+bool ContactSensor::UpdateImpl(bool /*_force*/)
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  std::vector<std::string>::iterator collIter;
-  std::string collision1;
 
   // Don't do anything if there is no new data to process.
   if (this->incomingContacts.empty())
-    return;
+    return false;
+
+  std::vector<std::string>::iterator collIter;
+  std::string collision1;
 
   // Clear the outgoing contact message.
   this->contactsMsg.clear_contact();
@@ -195,11 +196,23 @@ void ContactSensor::UpdateImpl(bool /*_force*/)
     msgs::Set(this->contactsMsg.mutable_time(), this->lastMeasurementTime);
     this->contactsPub->Publish(this->contactsMsg);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    std::string entityName =
+        this->world->GetEntity(this->parentName)->GetScopedName();
+
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(entityName);
+  }
+
   this->contactSub.reset();
   this->contactsPub.reset();
   Sensor::Fini();

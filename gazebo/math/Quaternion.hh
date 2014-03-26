@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
   /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
-  class Quaternion
+  class GAZEBO_VISIBLE Quaternion
   {
     /// \brief Default Constructor
     public: Quaternion();
@@ -276,13 +277,13 @@ namespace gazebo
     /// \brief Correct any nan
     public: inline void Correct()
             {
-              if (!finite(this->x))
+              if (!std::isfinite(this->x))
                 this->x = 0;
-              if (!finite(this->y))
+              if (!std::isfinite(this->y))
                 this->y = 0;
-              if (!finite(this->z))
+              if (!std::isfinite(this->z))
                 this->z = 0;
-              if (!finite(this->w))
+              if (!std::isfinite(this->w))
                 this->w = 1;
 
               if (math::equal(this->w, 0.0) &&

@@ -19,11 +19,9 @@
 #define _TRANSMITTERVISUAL_HH_
 
 #include <string>
-#include <vector>
 
-#include "gazebo/rendering/Visual.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
 {
@@ -34,7 +32,7 @@ namespace gazebo
 
     /// \class TransmitterVisual TransmitterVisual.hh rendering/rendering.hh
     /// \brief Visualization for the wireless propagation data.
-    class TransmitterVisual : public Visual
+    class GAZEBO_VISIBLE TransmitterVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.
@@ -55,34 +53,6 @@ namespace gazebo
       /// \brief Callback when a new propagation grid is received
       /// \brief[in] _msg New transmitter propagation grid received
       private: void OnNewPropagationGrid(ConstPropagationGridPtr &_msg);
-
-      /// \brief Pointer to a node that handles communication.
-      private: transport::NodePtr node;
-
-      /// \brief Subscription to the propagation data.
-      private: transport::SubscriberPtr signalPropagationSub;
-
-      /// \brief Renders the points representing the signal strength.
-      private: DynamicLines *points;
-
-      /// \brief Use for allocate the visuals for the grid only the first time
-      /// you receive the grid. The next times there are just updates.
-      private: bool isFirst;
-
-      /// \brief Store the list of visuals
-      private: std::vector<rendering::VisualPtr> vectorLink;
-
-       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief Mutex to protect the contact message.
-      private: boost::mutex mutex;
-
-      /// \brief The current contact message.
-      private: boost::shared_ptr<msgs::PropagationGrid const> gridMsg;
-
-      /// \brief True if we have received a message.
-      private: bool receivedMsg;
     };
     /// \}
   }

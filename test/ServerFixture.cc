@@ -55,29 +55,32 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  common::Console::Instance()->Init("test.log");
+  gzLogInit("test.log");
+  gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
 
   // Add local search paths
-  std::string path = TEST_INTEGRATION_PATH;
-  path += "/../..";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  boost::filesystem::path path;
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../sdf";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../gazebo";
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  path = PROJECT_SOURCE_PATH;
+  path /= "gazebo";
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-  path = TEST_INTEGRATION_PATH;
-  path += "/../../build/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+  path = PROJECT_BINARY_PATH;
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
+
+  path = PROJECT_BINARY_PATH;
+  path /= "test";
+  path /= "plugins";
+  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
   path = TEST_PATH;
-  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 }
 
 /////////////////////////////////////////////////
@@ -342,13 +345,12 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
     unsigned int _sampleCount, float &_diffMax,
     float &_diffSum, float &_diffAvg)
 {
-  float diff;
   _diffMax = 0;
   _diffSum = 0;
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
+    double diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
@@ -364,13 +366,12 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
     unsigned int _sampleCount, double &_diffMax,
     double &_diffSum, double &_diffAvg)
 {
-  double diff;
   _diffMax = 0;
   _diffSum = 0;
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
+    double diff = fabs(math::precision(_scanA[i], 10) -
                 math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
@@ -390,11 +391,10 @@ void ServerFixture::ImageCompare(unsigned char *_imageA,
 {
   _diffMax = 0;
   _diffSum = 0;
-  _diffAvg = 0;
 
-  for (unsigned int y = 0; y < _height; y++)
+  for (unsigned int y = 0; y < _height; ++y)
   {
-    for (unsigned int x = 0; x < _width*_depth; x++)
+    for (unsigned int x = 0; x < _width*_depth; ++x)
     {
       unsigned int a = _imageA[(y*_width*_depth)+x];
       unsigned int b = _imageB[(y*_width*_depth)+x];
@@ -513,8 +513,11 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
     double _hMinAngle, double _hMaxAngle,
+    double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -540,10 +543,16 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
+    << "        <vertical>"
+    << "          <samples>" << _vSamples << "</samples>"
+    << "          <resolution>" << _vResolution << "</resolution>"
+    << "          <min_angle>" << _vMinAngle << "</min_angle>"
+    << "          <max_angle>" << _vMaxAngle << "</max_angle>"
+    << "        </vertical>"
     << "      </scan>"
     << "      <range>"
     << "        <min>" << _minRange << "</min>"
@@ -559,6 +568,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      </noise>";
 
   newModelStr << "    </ray>"
+    << "    <visualize>true</visualize>"
     << "  </sensor>"
     << "</link>"
     << "</model>"

@@ -130,11 +130,11 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 
   // step world and verify imu's linear acceleration is zero on free fall
-  world->StepWorld(200);
+  world->Step(200);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
-  world->StepWorld(1);
+  world->Step(1);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, 0, TOL);
@@ -146,7 +146,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
   double steps = ceil(dtHit / stepSize);
   EXPECT_GT(steps, 0);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Issue #848
   if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)

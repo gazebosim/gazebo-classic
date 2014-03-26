@@ -46,6 +46,14 @@ void Node::Fini()
   if (!this->initialized)
     return;
 
+  // Unadvertise all the publishers.
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    (*iter)->Fini();
+    TopicManager::Instance()->Unadvertise(*iter);
+  }
+
   this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 
@@ -131,6 +139,9 @@ unsigned int Node::GetId() const
 /////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
+  if (!this->initialized)
+    return;
+
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
 
@@ -264,7 +275,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -282,7 +296,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleMessage(_msg);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -310,6 +327,9 @@ bool Node::HasLatchedSubscriber(const std::string &_topic) const
 /////////////////////////////////////////////////
 void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 {
+  if (!this->initialized)
+    return;
+
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
 
   // Find the topic list in the map.
