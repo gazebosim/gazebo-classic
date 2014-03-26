@@ -820,6 +820,12 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "type")
+  {
+    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
+           << " use `solver_type`.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
     return bulletElem->GetElement("solver")->Get<std::string>("type");
   else if (_key == "cfm")
     return bulletElem->GetElement("constraints")->Get<double>("cfm");
