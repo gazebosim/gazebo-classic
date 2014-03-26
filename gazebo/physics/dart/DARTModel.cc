@@ -193,7 +193,8 @@ dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 }
 
 //////////////////////////////////////////////////
-DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const {
+DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
+{
   return boost::dynamic_pointer_cast<DARTPhysics>(
     this->GetWorld()->GetPhysicsEngine());
 }
