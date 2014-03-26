@@ -154,9 +154,10 @@ void Gripper::OnUpdate()
   else if (this->zeroCount > this->detachSteps && this->attached)
     this->HandleDetach();
 
-  this->mutex_contacts.lock();
-  this->contacts.clear();
-  this->mutex_contacts.unlock();
+  {
+    boost::scoped_lock lock(this->mutexContacts);
+    this->contacts.clear();
+  }
 
   this->prevUpdateTime = common::Time::GetWallTime();
 }
@@ -256,9 +257,8 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
     if ((collision1 && !collision1->IsStatic()) &&
         (collision2 && !collision2->IsStatic()))
     {
-      this->mutex_contacts.lock();
+      boost::scoped_lock lock(this->mutexContacts);
       this->contacts.push_back(_msg->contact(i));
-      this->mutex_contacts.unlock();
     }
   }
 }

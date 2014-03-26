@@ -107,7 +107,7 @@ namespace gazebo
       private: std::vector<msgs::Contact> contacts;
 
       /// \brief Mutex used to protect reading/writing the sonar message.
-      private: boost::mutex mutex_contacts;
+      private: boost::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
       private: bool attached;
