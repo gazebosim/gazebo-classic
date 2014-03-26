@@ -35,8 +35,13 @@ TEST_F(Issue1112Test, Reset)
   world->Clear();
 
   // Wait some bit of time since World::Clear is not immediate.
-  for (unsigned int i = 0; i < 4; ++i)
-    common::Time::MSleep(500);
+  int sleepCount = 20;
+  int sleep = 0;
+  while (world->GetModelCount() > 0u && sleep < sleepCount)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
 
   // Expecting that the world is empty (and the simulation did not crash)
   EXPECT_EQ(world->GetModelCount(), 0u);

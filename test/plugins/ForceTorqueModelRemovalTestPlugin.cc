@@ -73,12 +73,12 @@ void ForceTorqueModelRemovalTestPlugin::onUpdate(
 
     int i = 0;
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; ++i)
     {
       forcetorque_data[0+i] = force[i];
     }
 
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; ++i)
     {
       forcetorque_data[3+i] = torque[i];
     }
