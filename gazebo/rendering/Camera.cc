@@ -1496,7 +1496,7 @@ bool Camera::IsVisible(VisualPtr _visual)
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
     box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
-
+    box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
     return this->camera->isVisible(box);
   }
 
