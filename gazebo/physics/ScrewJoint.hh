@@ -76,7 +76,7 @@ namespace gazebo
       /// Thread Pitch is defined as angular motion per linear
       /// motion or rad / m in metric.
       /// This must be implemented in a child class
-      /// To clarify direction, these are modelig right handed threads
+      /// To clarify direction, these are modeling right handed threads
       /// with positive thread_pitch, i.e. the child Link is the nut
       /// (interior threads) while the parent Link is the bolt/screw
       /// (exterior threads).
