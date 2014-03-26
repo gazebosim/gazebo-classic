@@ -27,6 +27,7 @@ set(tests
   876_random_number_generator.cc
   978_joint_anchor.cc
   1082_pid_limits.cc
+  1112_force_torque_model_removal.cc
 )
 
 gz_build_tests(${tests})
