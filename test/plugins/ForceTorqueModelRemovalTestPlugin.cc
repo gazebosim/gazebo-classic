@@ -25,8 +25,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(ForceTorqueModelRemovalTestPlugin)
 
 /////////////////////////////////////////////////
-ForceTorqueModelRemovalTestPlugin::ForceTorqueModelRemovalTestPlugin() : 
-    SensorPlugin(), parentSensor(0)
+ForceTorqueModelRemovalTestPlugin::ForceTorqueModelRemovalTestPlugin()
+  : SensorPlugin(), parentSensor(0)
 {
 }
 
@@ -47,38 +47,42 @@ ForceTorqueModelRemovalTestPlugin::~ForceTorqueModelRemovalTestPlugin()
   parentSensor = 0;
 }
 
-void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor, 
+void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor,
                                              sdf::ElementPtr /*_sdf*/)
 {
   _sensor->SetActive(true);
 
-  parentSensor = (gazebo::sensors::ForceTorqueSensor*) boost::get_pointer(_sensor);
+  parentSensor =
+    (gazebo::sensors::ForceTorqueSensor*) boost::get_pointer(_sensor);
 
-  //Create connection
+  // Create connection
   this->updateConnection = gazebo::event::Events::ConnectWorldUpdateBegin(
-                           boost::bind( &ForceTorqueModelRemovalTestPlugin::onUpdate, this, _1 ));
+       boost::bind(&ForceTorqueModelRemovalTestPlugin::onUpdate, this, _1));
 }
 
-void ForceTorqueModelRemovalTestPlugin::onUpdate(const gazebo::common::UpdateInfo & /*_info*/)
+void ForceTorqueModelRemovalTestPlugin::onUpdate(
+    const gazebo::common::UpdateInfo & /*_info*/)
 {
   gazebo::math::Vector3 force;
   gazebo::math::Vector3 torque;
 
-  if( parentSensor )
+  if ( parentSensor )
   {
     force = this->parentSensor->GetForce();
     torque = this->parentSensor->GetTorque();
-    
-    int i=0;
-        
-    for(i = 0; i < 3; i++ ) {
+
+    int i = 0;
+
+    for (i = 0; i < 3; i++)
+    {
       forcetorque_data[0+i] = force[i];
     }
-    
-    for(i = 0; i < 3; i++ ) {
+
+    for (i = 0; i < 3; i++)
+    {
       forcetorque_data[3+i] = torque[i];
     }
   }
-        
+
   return;
 }
