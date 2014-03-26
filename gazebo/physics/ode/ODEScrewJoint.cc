@@ -151,6 +151,7 @@ void ODEScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
+
   if (this->jointId)
     dJointSetScrewParam(this->jointId, _parameter, _value);
   else
@@ -180,4 +181,48 @@ void ODEScrewJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAttribute(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool ODEScrewJoint::SetParam(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else
+    return ODEJoint::SetParam(_key, _index, _value);
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return ODEJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }

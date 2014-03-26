@@ -456,11 +456,13 @@ math::Vector3 SimbodyLink::GetWorldTorque() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetLinearDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::SetAngularDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
@@ -471,33 +473,39 @@ void SimbodyLink::AddForce(const math::Vector3 &/*_force*/)
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeForce(const math::Vector3 &/*_force*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
                                          const math::Vector3 &/*_pos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
                   const math::Vector3 &/*_relpos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

@@ -171,23 +171,35 @@ double BulletHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setUpperLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
+bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletHinge2)
+  {
     this->bulletHinge2->setLowerLimit(_angle.Radian());
+    return true;
+  }
   else
+  {
     gzerr << "Joint must be created first.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////

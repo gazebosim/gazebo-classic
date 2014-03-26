@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -68,6 +70,17 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
+      , contactMaterialStiffness(0.0)
+      , contactMaterialDissipation(0.0)
+      , contactMaterialPlasticCoefRestitution(0.0)
+      , contactMaterialPlasticImpactVelocity(0.0)
+      , contactMaterialStaticFriction(0.0)
+      , contactMaterialDynamicFriction(0.0)
+      , contactMaterialViscousFriction(0.0)
+      , contactImpactCaptureVelocity(0.0)
+      , contactStictionTransitionVelocity(0.0)
+      , dynamicsWorld(NULL)
+      , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem

@@ -475,14 +475,27 @@ void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
-    unsigned int /*_index*/, const boost::any &/*_value*/)
+void SimbodyJoint::SetAttribute(const std::string &_key,
+    unsigned int _index, const boost::any &_value)
 {
-  gzdbg << "Not implement in Simbody\n";
+  this->SetParam(_key, _index, _value);
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
+bool SimbodyJoint::SetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/, const boost::any &/*_value*/)
+{
+  gzdbg << "Not implement in Simbody\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+double SimbodyJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+//////////////////////////////////////////////////
+double SimbodyJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
   gzdbg << "Not implement in Simbody\n";
@@ -490,7 +503,7 @@ double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
@@ -505,14 +518,19 @@ void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     else
     {
       gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetHighStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
@@ -528,10 +546,15 @@ void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
     else
     {
       gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetLowStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
