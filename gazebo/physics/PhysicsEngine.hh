@@ -266,8 +266,11 @@ namespace gazebo
       /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
       /// Below is a list of _key parameter definitions:
-      ///       -# "type" (string) - returns engine type, could be
-      ///          "bullet', "dart", "ode" or "simbody".
+      ///       -# "solver_type" (string) - returns solver used by engine, e.g.
+      ///          "sequential_impulse' for Bullet, "quick" for ODE
+      ///          "Featherstone and Lemkes" for DART and
+      ///          "Spatial Algebra and Elastic Foundation" for Simbody.
+      ///       -# "type" (string) - deprecated, use keyword "solver_type".
       ///       -# "cfm" (double) - global CFM
       ///       -# "erp" (double) - global ERP
       ///       -# "precon_iters" (bool) - precondition iterations

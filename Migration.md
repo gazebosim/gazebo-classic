@@ -31,6 +31,10 @@
     + ***Deprecation*** virtual double GetSORPGSW()
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
 
+1. **gazebo/physics/bullet/BulletPhysics.hh**
+    + ***Deprecation*** virtual bool SetParam(BulletParam _param, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
