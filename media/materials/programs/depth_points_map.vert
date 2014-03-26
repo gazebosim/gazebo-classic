@@ -7,5 +7,5 @@ void main()
   // Vertex in world space
   point = gl_ModelViewMatrix * gl_Vertex;
 
-  point.z *= -1;
+  point.z *= -1.0;
 }

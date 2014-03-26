@@ -21,68 +21,11 @@
  *************************************************************************/
 
 
+#include <ode/misc.h>
 #include "config.h"
 #include "hinge.h"
 #include "joint_internal.h"
 
-//****************************************************************************
-// helper function: shortest_angular_distance implementation
-    
-  /*!
-   * \brief normalize_angle_positive
-   *
-   *        Normalizes the angle to be 0 to 2*M_PI
-   *        It takes and returns radians.
-   */
-  static inline double normalize_angle_positive(double angle)
-  {
-    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
-  }
-
-
-  /*!
-   * \brief normalize
-   *
-   * Normalizes the angle to be -M_PI circle to +M_PI circle
-   * It takes and returns radians.
-   *
-   */    
-  static inline double normalize_angle(double angle)
-  {
-    double a = normalize_angle_positive(angle);
-    if (a > M_PI)
-      a -= 2.0 *M_PI;
-    return a;
-  }
-
-    
-  /*!
-   * \function
-   * \brief shortest_angular_distance
-   *
-   * Given 2 angles, this returns the shortest angular
-   * difference.  The inputs and ouputs are of course radians.
-   *
-   * The result
-   * would always be -pi <= result <= pi.  Adding the result
-   * to "from" will always get you an equivelent angle to "to".
-   */
-    
-  static inline double shortest_angular_distance(double from, double to)
-  {
-    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
-	
-    if (result > M_PI)
-      // If the result > 180,
-      // It's shorter the other way.
-      result = -(2.0*M_PI - result);
-	
-    return normalize_angle(result);
-  }
-
-
-
-//****************************************************************************
 // hinge
 
 dxJointHinge::dxJointHinge( dxWorld *w ) :
@@ -124,8 +67,10 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         dReal angle = getHingeAngle( node[0].body,
                                      node[1].body,
                                      axis1, qrel );
-        // from angle, update cumulative_angle, which does not wrap
-        cumulative_angle = cumulative_angle + shortest_angular_distance(cumulative_angle,angle);
+        // From angle, update cumulative_angle, which does not wrap.
+        // Assume this is called only once per time step.
+        cumulative_angle = 
+          dShortestAngularDistanceUpdate(cumulative_angle,angle);
 
         if ( limot.testRotationalLimit( cumulative_angle ) )
             info->m = 6;
@@ -169,6 +114,18 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
     dVector3 p, q; // plane space vectors for ax1
     dMultiply0_331( ax1, node[0].body->posr.R, axis1 );
     dPlaneSpace( ax1, p, q );
+
+    // strange the rotation matrix is not really a rotation matrix (non-orthogonal vectors)
+    // normals of columns and rows are not exactly 1 when velocity is large.
+    // printf("posr.R\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+    //   node[0].body->posr.R[0*4+0],node[0].body->posr.R[0*4+1],node[0].body->posr.R[0*4+2],node[0].body->posr.R[0*4+3],
+    //   node[0].body->posr.R[1*4+0],node[0].body->posr.R[1*4+1],node[0].body->posr.R[1*4+2],node[0].body->posr.R[1*4+3],
+    //   node[0].body->posr.R[2*4+0],node[0].body->posr.R[2*4+1],node[0].body->posr.R[2*4+2],node[0].body->posr.R[2*4+3]);
+
+    // printf("axis1 [%f %f %f] ax1 [%f %f %f]\n",
+    //         axis1[0], axis1[1], axis1[2],
+    //         ax1[0], ax1[1], ax1[2]);
+
 
     int s3 = 3 * info->rowskip;
     int s4 = 4 * info->rowskip;
@@ -412,11 +369,15 @@ dReal dJointGetHingeAngle( dJointID j )
                                    joint->axis1,
                                    joint->qrel );
         // from angle, update cumulative_angle, which does not wrap
-        joint->cumulative_angle = joint->cumulative_angle + shortest_angular_distance(joint->cumulative_angle,ang);
+        // dJointGetHingeAngle is static, so do not overwrite
+        // joint->cumulative_angle by updated joint angle.
+        // Simply calculate the current angle and return it.
+        dReal joint_angle =
+          dShortestAngularDistanceUpdate(joint->cumulative_angle,ang);
         if ( joint->flags & dJOINT_REVERSE )
-            return -joint->cumulative_angle;
+            return -joint_angle;
         else
-            return joint->cumulative_angle;
+            return joint_angle;
     }
     else return 0;
 }

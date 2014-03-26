@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class Road Road.hh physics/physics.hh
     /// \brief for building a Road from SDF
-    class Road : public Base
+    class GAZEBO_VISIBLE Road : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of this road object.

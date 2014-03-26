@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -37,6 +38,7 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class Gripper;
     class Joint;
     class JointController;
     class Contact;
@@ -145,6 +147,10 @@ namespace gazebo
     /// \def MeshShapePtr
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
+
+    /// \def GripperPtr
+    /// \brief Boost shared pointer to a Gripper object
+    typedef boost::shared_ptr<Gripper> GripperPtr;
 
     /// \def Base_V
     /// \brief Vector of BasePtr

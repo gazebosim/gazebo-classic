@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,17 @@ void RayShape::SetLength(double _len)
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  /// TODO RayShape::SetScale not yet implemented.
 }
 
 //////////////////////////////////////////////////

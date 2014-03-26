@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@
 
 using namespace gazebo;
 
-class BandwidthTest : public ServerFixture
+class BandwidthTest : public ServerFixture,
+                      public testing::WithParamInterface<const char*>
 {
   public: void Bandwidth(const std::string &_physicsEngine);
 };
@@ -41,6 +42,21 @@ void BandwidthMsg(const std::string &_msg)
 
 void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+          << "Please see issue #857.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support closed loops in PR2, "
+          << "Please see issue #913. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/913)\n";
+    return;
+  }
+
   Load("worlds/pr2.world", false, _physicsEngine);
 
   transport::NodePtr node(new transport::Node());
@@ -88,7 +104,7 @@ TEST_P(BandwidthTest, Bandwidth)
   Bandwidth(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(BandwidthTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, BandwidthTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

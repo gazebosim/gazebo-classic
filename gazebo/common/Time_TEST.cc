@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@
 
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Time.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(TimeTest, Time)
+class TimeTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(TimeTest, Time)
 {
   common::Timer timer;
   timer.Start();
@@ -39,12 +42,15 @@ TEST(TimeTest, Time)
   time.SetToWallTime();
   EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0, 1000000));
 
-  time = common::Time(1, 1000) + common::Time(1.5, 1000000000);
-  EXPECT_TRUE(time == common::Time(3.5, 1000));
+  time = common::Time(1, 1000)
+       + common::Time(1.5)
+       + common::Time(0, 1e9);
+  EXPECT_EQ(time, common::Time(3, 5e8 + 1000));
 
   time.Set(1, 1000);
-  time += common::Time(1.5, 1000000000);
-  EXPECT_TRUE(time == common::Time(3.5, 1000));
+  time += common::Time(1.5);
+  time += common::Time(0, 1e9);
+  EXPECT_EQ(time, common::Time(3, 5e8 + 1000));
 
   time.Set(1, 1000);
   time -= common::Time(1, 1000);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,81 +14,120 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTION_OBJ_
-#define _SELECTION_OBJ_
+#ifndef _SELECTIONOBJ_HH_
+#define _SELECTIONOBJ_HH_
 
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace rendering
   {
-    class Scene;
-
     /// \addtogroup gazebo_rendering
     /// \{
 
-    /// \class SelectionObj SelectionObj.hh rendering/rendering.hh
-    /// \brief A graphical selection object
-    ///
-    /// Used to draw a visual around a selected object.
-    class SelectionObj
+    /// \class SelectionObj SelectionObj.hh
+    /// \brief Interactive selection object for models and links
+    class GAZEBO_VISIBLE SelectionObj : public Visual
     {
-      /// \brief Constructor
-      /// \param[in] _scene Scene to use.
-      public: SelectionObj(Scene *_scene);
+      /// \enum Manipulation modes
+      /// \brief Unique identifiers for manipulation modes.
+      public: enum SelectionMode
+      {
+        /// \brief Translation in x
+        SELECTION_NONE = 0,
+        /// \brief Translation mode
+        TRANS,
+        /// \brief Rotation mode
+        ROT,
+        /// \brief Scale mode
+        SCALE,
+        /// \brief Translation in x
+        TRANS_X,
+        /// \brief Translation in y
+        TRANS_Y,
+        /// \brief Translation in z
+        TRANS_Z,
+        /// \brief Rotation in x
+        ROT_X,
+        /// \brief Rotation in y
+        ROT_Y,
+        /// \brief Rotation in z
+        ROT_Z,
+        /// \brief Scale in x
+        SCALE_X,
+        /// \brief Scale in y
+        SCALE_Y,
+        /// \brief Scale in z
+        SCALE_Z
+      };
 
-      /// \brief Destructor
+      /// \brief Constructor
+      /// \param[in] _name Name of selection object.
+      /// \param[in] _vis Parent visual that the selection object is
+      /// attached to.
+      public: SelectionObj(const std::string &_name, VisualPtr _vis);
+
+      /// \brief Deconstructor
       public: virtual ~SelectionObj();
 
-      /// \brief Initialize the rendering::SelectionObj object
-      public: void Init();
+      /// \brief Load
+      public: void Load();
 
-      /// \brief Set the position of the node
-      /// \param[in] This draws the selection object around the passed in
+      /// \brief Attach the selection object to the given visual
+      /// \param[in] _vis Pointer to visual to which the selection object
+      /// will be attached.
+      public: void Attach(rendering::VisualPtr _vis);
+
+      /// \brief Detach the selection object from the current visual.
+      public: void Detach();
+
+      /// \brief Set the manipulation mode.
+      /// \param[in] _mode Manipulation mode in string: translate rotate, scale.
+      public: void SetMode(const std::string &_mode);
+
+      /// \brief Set the selection mode.
+      /// \_name Selection mode: TRANS, ROT, SCALE.
+      public: void SetMode(SelectionMode _mode);
+
+      /// \brief Set state by highlighting the corresponding selection object
       /// visual.
-      public: void Attach(VisualPtr _visual);
+      /// \param[in] _state Selection state in string format.
+      public: void SetState(const std::string &_state);
 
-      /// \brief Clear the rendering::SelectionObj object
-      public: void Clear();
+      /// \brief Set state by highlighting the corresponding selection object
+      /// visual.
+      /// \param[in] _state Selection state.
+      /// \sa SelectionMode
+      public: void SetState(SelectionMode _state);
 
-      /// \brief Return true if the user is move the selection obj
-      /// \return True if something is selected.
-      public: bool IsActive() const;
+      /// \brief Get the current selection state.
+      public: SelectionMode GetState();
 
-      /// \brief Set true if the user is moving the selection obj
-      /// \param[in] _active True if the user is interacting with the
-      /// selection object.
-      public: void SetActive(bool _active);
+      /// \brief Get the current selection mode.
+      public: SelectionMode GetMode();
 
-      /// \brief Get the name of the visual the selection obj is attached to
-      /// \return Name of the selected visual.
-      public: std::string GetVisualName() const;
+      /// \brief Set selection object to ignore local transforms.
+      /// \param[in] _global True to set the visuals to be in global frame.
+      public: void SetGlobal(bool _global);
 
-      /// \brief Highlight the selection object based on a modifier
-      /// \param[in] _mod Modifier used when highlighting the selection
-      /// object.
-      public: void SetHighlight(const std::string &_mod);
+      /// \brief Update selection object size to match the parent visual.
+      public: void UpdateSize();
 
-      /// \brief The visual node for the selection object
-      private: VisualPtr node;
+      /// \brief Helper function to create scale visuals.
+      private: void CreateScaleVisual();
 
-      /// \brief Pointer to the scene
-      private: Scene *scene;
+      /// \brief Helper function to create rotate visuals.
+      private: void CreateRotateVisual();
 
-      /// \brief Name of the visual selected.
-      private: std::string visualName;
-
-      /// \brief True if a user is interacting with the selection object.
-      private: bool active;
-
-      /// \brief Size of the selection object box.
-      private: double boxSize;
+      /// \brief Helper function to create translate visuals.
+      private: void CreateTranslateVisual();
     };
     /// \}
   }
 }
+
 #endif

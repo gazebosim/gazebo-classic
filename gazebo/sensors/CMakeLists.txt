@@ -1,10 +1,11 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-set (sources 
+set (sources
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
   ForceTorqueSensor.cc
+  GaussianNoiseModel.cc
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
@@ -21,13 +22,14 @@ set (sources
   WirelessReceiver.cc
   WirelessTransceiver.cc
   WirelessTransmitter.cc
-) 
+)
 
 set (headers
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
   ForceTorqueSensor.hh
+  GaussianNoiseModel.hh
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
@@ -55,6 +57,8 @@ set (gtest_sources
   RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc
+  WirelessReceiver_TEST.cc
+  WirelessTransmitter_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})
@@ -77,16 +81,13 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY
 add_library(gazebo_sensors SHARED ${sources})
 
 target_link_libraries(gazebo_sensors
-  gazebo_common 
+  gazebo_common
   gazebo_rendering
   gazebo_physics
-  ${libtool_library} 
+  ${libtool_library}
   ${Boost_LIBRARIES}
   ${ogre_ldflags}
   )
 
 gz_install_library(gazebo_sensors)
 gz_install_includes("sensors" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
-
-# Deprecated Sensors.hh
-gz_issue_775("Sensors")

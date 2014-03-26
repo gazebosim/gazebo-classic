@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/CollisionState.hh"
 #include "gazebo/physics/Entity.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all collision entities
-    class Collision : public Entity
+    class GAZEBO_VISIBLE Collision : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _link Link that contains this collision object.
@@ -113,18 +114,25 @@ namespace gazebo
       /// \return The collision shape.
       public: ShapePtr GetShape() const;
 
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const math::Vector3 &_scale);
+
       /// \brief Turn contact recording on or off.
+      /// Deprecated by?
       /// \param[in] _enable True to enable collision contacts.
-      public: void SetContactsEnabled(bool _enable);
+      public: void SetContactsEnabled(bool _enable) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Return true of contacts are on.
+      /// Deprecated by?
       /// \return True of contact are on.
-      public: bool GetContactsEnabled() const;
+      public: bool GetContactsEnabled() const GAZEBO_DEPRECATED(2.0);
 
       /// \brief Add an occurance of a contact to this collision.
+      /// Deprecated by?
       /// \param[in] _contact The contact which was detected by a collision
       /// engine.
-      public: void AddContact(const Contact &_contact);
+      public: void AddContact(const Contact &_contact) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
@@ -169,15 +177,6 @@ namespace gazebo
       /// \param[in] The collision state.
       public: void SetState(const CollisionState &_state);
 
-      /// Deprecated.
-      public: template<typename T>
-              event::ConnectionPtr ConnectContact(T _subscriber)
-              {return contact.Connect(_subscriber);}
-
-      /// Deprecated.
-      public: void DisconnectContact(event::ConnectionPtr &_conn)
-              {contact.Disconnect(_conn);}
-
       /// \brief Fill a collision message.
       /// \param[out] _msg The message to fill with this collision's data.
       public: void FillMsg(msgs::Collision &_msg);
@@ -194,12 +193,12 @@ namespace gazebo
       /// \brief Number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \param[in] _maxContacts max num contacts allowed for this collision.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \brief returns number of contacts allowed for this collision.
       /// This overrides global value (in PhysicsEngine) if specified.
       /// \return max num contacts allowed for this collision.
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
@@ -214,15 +213,8 @@ namespace gazebo
       /// \brief Pointer to physics::Shape.
       protected: ShapePtr shape;
 
-      /// \brief True if contacts are enabled.
-      private: bool contactsEnabled;
-
-      /// \brief The contact event.
-      private: event::EventT<void (const std::string &,
-                                   const Contact &)> contact;
-
       /// \brief The surface parameters.
-      private: SurfaceParamsPtr surface;
+      protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
       private: float laserRetro;
@@ -231,7 +223,10 @@ namespace gazebo
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
+
+      /// \brief Unique id for collision visual.
+      private: uint32_t collisionVisualId;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class GridLines GridLines.hh
     /// \brief A widget for adding and changing building levels.
-    class LevelWidget : public QWidget
+    class GAZEBO_VISIBLE LevelWidget : public QWidget
     {
       Q_OBJECT
 

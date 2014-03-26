@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 
@@ -124,18 +125,6 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetUpdateRate(double _value)
-{
-  this->SetRealTimeUpdateRate(_value);
-}
-
-//////////////////////////////////////////////////
-double PhysicsEngine::GetUpdateRate()
-{
-  return this->GetRealTimeUpdateRate();
-}
-
-//////////////////////////////////////////////////
 double PhysicsEngine::GetUpdatePeriod()
 {
   double updateRate = this->GetRealTimeUpdateRate();
@@ -146,15 +135,10 @@ double PhysicsEngine::GetUpdatePeriod()
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetStepTime(double _value)
+ModelPtr PhysicsEngine::CreateModel(BasePtr _base)
 {
-  this->SetMaxStepSize(_value);
-}
-
-//////////////////////////////////////////////////
-double PhysicsEngine::GetStepTime()
-{
-  return this->GetMaxStepSize();
+  ModelPtr ret(new Model(_base));
+  return ret;
 }
 
 //////////////////////////////////////////////////
@@ -232,7 +216,7 @@ void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(double /*_maxContacts*/)
+void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
 {
 }
 
@@ -252,13 +236,13 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(std::string /*_key*/,
+void PhysicsEngine::SetParam(const std::string &/*_key*/,
     const boost::any &/*_value*/)
 {
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 {
   return 0;
 }

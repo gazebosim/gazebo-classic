@@ -1,13 +1,10 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${prefix}/lib
-includedir=${prefix}/include
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: gazebo
 Description: Gazebo Libraries
 Version: @GAZEBO_VERSION_FULL@
 Requires:
-Libs: -Wl,-rpath,${libdir},-rpath,${prefix}/lib/gazebo-@GAZEBO_VERSION@/plugins -L${libdir} -L${prefix}/lib/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_transport -lgazebo_physics -lgazebo_sensors -lgazebo_rendering -l@SDF_LIBRARIES@ -lgazebo_msgs -lgazebo_math -lgazebo_common -lgazebo
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo -I@SDF_INCLUDE_DIRS@
-# The CFlags statement here is deprecated for gazebo-1.9 and will be replaced
-# in gazebo-2.0 with the following:
-# CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ -I@SDF_INCLUDE_DIRS@
+Libs: -Wl,-rpath,${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -L${libdir} -L${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_transport -lgazebo_physics -lgazebo_sensors -lgazebo_rendering -lgazebo_gui -l@SDF_LIBRARIES@ -lgazebo_msgs -lgazebo_math -lgazebo_common -lgazebo
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ -I@SDF_INCLUDE_DIRS@

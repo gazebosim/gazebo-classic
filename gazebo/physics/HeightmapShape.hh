@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,14 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/Image.hh"
+#include "gazebo/common/ImageHeightmap.hh"
+#include "gazebo/common/HeightmapData.hh"
+#include "gazebo/common/Dem.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -42,7 +45,7 @@ namespace gazebo
     /// \brief HeightmapShape collision shape builds a heightmap from
     /// an image.  The supplied image must be square with
     /// N*N+1 pixels per side, where N is an integer.
-    class HeightmapShape : public Shape
+    class GAZEBO_VISIBLE HeightmapShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision object.
@@ -57,6 +60,10 @@ namespace gazebo
 
       /// \brief Initialize the heightmap.
       public: virtual void Init();
+
+      /// \brief Set the scale of the heightmap shape.
+      /// \param[in] _scale Scale to set the heightmap shape to.
+      public: virtual void SetScale(const math::Vector3 &_scale);
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
@@ -107,8 +114,25 @@ namespace gazebo
       /// and black pixels the lowest.
       public: common::Image GetImage() const;
 
-      /// \brief Create a lookup table of the terrain's height.
-      private: void FillHeightMap();
+      /// \brief Load a terrain file specified by _filename. The terrain file
+      /// format might be an image or a DEM file. libgdal is required to enable
+      /// DEM support. For a list of all raster formats supported you can type
+      /// the command "gdalinfo --formats".
+      /// \param[in] _filename The path to the terrain file.
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadTerrainFile(const std::string &_filename);
+
+      #ifdef HAVE_GDAL
+      /// \brief Load a DEM specified by _filename as a terrain file.
+      /// \param[in] _filename The path to the terrain file.
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadDEMAsTerrain(const std::string &_filename);
+      #endif
+
+      /// \brief Load an image specified by _filename as a terrain file.
+      /// \param[in] _filename The path to the terrain file.
+      /// \return 0 when the operation succeeds to load a file or -1 when fails.
+      private: int LoadImageAsTerrain(const std::string &_filename);
 
       /// \brief Handle request messages.
       /// \param[in] _msg The request message.
@@ -118,13 +142,13 @@ namespace gazebo
       protected: std::vector<float> heights;
 
       /// \brief Image used to generate the heights.
-      protected: common::Image img;
+      protected: common::ImageHeightmap img;
+
+      /// \brief HeightmapData used to generate the heights.
+      protected: common::HeightmapData *heightmapData;
 
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;
-
-      /// \brief Scaling factor.
-      protected: math::Vector3 scale;
 
       /// \brief True to flip the heights along the y direction.
       protected: bool flipY;
@@ -140,6 +164,17 @@ namespace gazebo
 
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
+
+      /// \brief File format of the heightmap
+      private: std::string fileFormat;
+
+      /// \brief Terrain size
+      private: math::Vector3 heightmapSize;
+
+      #ifdef HAVE_GDAL
+      /// \brief DEM used to generate the heights.
+      private: common::Dem dem;
+      #endif
     };
     /// \}
   }

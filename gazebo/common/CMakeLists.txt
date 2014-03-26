@@ -4,11 +4,14 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
   add_definitions(${gts_CFLAGS})
+endif()
+
+if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
 set (sources
@@ -21,10 +24,12 @@ set (sources
   Color.cc
   CommonIface.cc
   Console.cc
+  Dem.cc
   Event.cc
   Events.cc
   Exception.cc
   Image.cc
+  ImageHeightmap.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -53,16 +58,22 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
+  Dem.hh
+  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
+  MovingWindowFilter.hh
+  HeightmapData.hh
   Image.hh
+  ImageHeightmap.hh
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
   Mesh.hh
   MeshLoader.hh
   MeshManager.hh
+  ModelDatabase.hh
   MouseEvent.hh
   PID.hh
   Plugin.hh
@@ -70,12 +81,14 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
+  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
   Video.hh
+  ffmpeg_inc.h
  )
 
 if (HAVE_GTS)
@@ -91,18 +104,28 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
-  AudioDecoder_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
+  CommonIface_TEST.cc
   Console_TEST.cc
+  Dem_TEST.cc
   Exception_TEST.cc
+  Event_TEST.cc
+  Image_TEST.cc
+  ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
-  Image_TEST.cc
+  MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_FFMPEG)
+  set (gtest_sources ${gtest_sources}
+                     AudioDecoder_TEST.cc)
+endif()
+
 gz_build_tests(${gtest_sources})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
@@ -128,24 +151,21 @@ target_link_libraries(gazebo_common
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
-  ${freeimage_library}
-  ${tinyxml_libraries}
+  ${freeimage_LIBRARIES}
+  ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
+  ${SDF_LIBRARIES}
   pthread
 )
 
 if (NOT APPLE)
   # rt is used for clock_gettime, which is not available on apple
   target_link_libraries(gazebo_common rt)
-endif()
-
-if (HAVE_SDF)
-  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
 endif()
 
 if (HAVE_GTS)
@@ -156,8 +176,9 @@ if (HAVE_OPENAL)
   target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
 endif()
 
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_common ${GDAL_LIBRARY})
+endif()
+
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
-
-# Deprecated Common.hh
-gz_issue_775("Common")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <sstream>
 #include "gazebo/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -63,28 +64,25 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
-  if (!transceiverElem)
+  if (!this->sdf->HasElement("transceiver"))
   {
-    gzerr << "Transceiver sensor is missing <transceiver> SDF element";
-    return;
+    gzthrow("Transceiver sensor is missing <transceiver> SDF element");
   }
 
+  sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
   this->gain = transceiverElem->Get<double>("gain");
   this->power = transceiverElem->Get<double>("power");
 
   if (this->gain < 0)
   {
-    gzerr << "Wireless transceiver gain must be > 0. Current value is ["
-      << this->gain << "]\n";
-    return;
+    gzthrow("Wireless transceiver gain must be > 0. Current value is [" <<
+        this->gain << "]");
   }
 
   if (this->power < 0)
   {
-    gzerr << "Wireless transceiver power must be > 0. Current value is ["
-      << this->power << "]\n";
-    return;
+    gzthrow("Wireless transceiver power must be > 0. Current value is [" <<
+        this->power << "]");
   }
 }
 

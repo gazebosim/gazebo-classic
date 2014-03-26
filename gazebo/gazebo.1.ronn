@@ -1,24 +1,26 @@
-gzserver -- Run the Gazebo server.
+gazebo -- Run the Gazebo server and GUI.
 =============================================
 
 ## SYNOPSIS
 
-`gzserver` [options] <world_file>
+`gazebo` [options] <world_file>
 
 ## DESCRIPTION
 
-Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops.
+Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops. This also starts the Gazebo GUI client in a separate process.
 
 ## OPTIONS
 
-* -q, --quiet :
- Reduce output to stdout.
+* -v, --version :
+ Output version information.
+* --verbose :
+ Increase the messages written to the terminal.
 * -h, --help :
  Produce this help message.
 * -u, --pause :
  Start the server in a paused state.
 * -e, --physics arg :
- Specify a physics engine (ode|bullet).
+ Specify a physics engine (ode|bullet|dart|simbody).
 * -p, --play arg :
  Play a log file.
 * -r, --record :
@@ -31,6 +33,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Start with a given random number seed.
 * --iters arg :
  Number of iterations to simulate.
+* --minimal_comms :
+ Reduce the TCP/IP traffic output by gazebo
 * -s, --server-plugin arg :
  Load a plugin.
 
@@ -39,7 +43,7 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
   Open Source Robotics Foundation
 
 ## COPYRIGHT 
-  Copyright 2013 Open Source Robotics Foundation
+  Copyright (C) 2012-2014 Open Source Robotics Foundation
        
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.

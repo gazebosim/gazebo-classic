@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -28,6 +23,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
+#include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/JointWrench.hh"
 
@@ -40,19 +36,27 @@ ODEJoint::ODEJoint(BasePtr _parent)
   : Joint(_parent)
 {
   this->jointId = NULL;
-  this->cfmDampingState[0] = ODEJoint::NONE;
-  this->cfmDampingState[1] = ODEJoint::NONE;
-  this->cfmDampingState[2] = ODEJoint::NONE;
-  this->dampingInitialized = false;
+  this->implicitDampingState[0] = ODEJoint::NONE;
+  this->implicitDampingState[1] = ODEJoint::NONE;
+  this->stiffnessDampingInitialized = false;
   this->feedback = NULL;
-  this->dStable[0] = 0;
-  this->dStable[1] = 0;
-  this->dStable[2] = 0;
+  this->currentKd[0] = 0;
+  this->currentKd[1] = 0;
+  this->currentKp[0] = 0;
+  this->currentKp[1] = 0;
+  this->forceApplied[0] = 0;
+  this->forceApplied[1] = 0;
+  this->useImplicitSpringDamper = false;
+  this->stopERP = 0.0;
+  this->stopCFM = 0.0;
 }
 
 //////////////////////////////////////////////////
 ODEJoint::~ODEJoint()
 {
+  if (this->applyDamping)
+    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+
   delete this->feedback;
   this->Detach();
 
@@ -70,14 +74,15 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
-    if (elem->HasElement("provide_feedback"))
-    {
-      this->SetProvideFeedback(elem->Get<bool>("provide_feedback"));
-    }
-
     if (elem->HasElement("cfm_damping"))
     {
-      this->useCFMDamping = elem->Get<bool>("cfm_damping");
+      gzwarn << "Deprecating sdf <cfm_damping>, "
+             << "replace with <implicit_spring_damper> in sdf 1.5.\n";
+      this->useImplicitSpringDamper = elem->Get<bool>("cfm_damping");
+    }
+    else if (elem->HasElement("implicit_spring_damper"))
+    {
+      this->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
     }
 
     // initializa both axis, \todo: make cfm, erp per axis
@@ -139,10 +144,29 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       }
     }
   }
+
+  if (this->sdf->HasElement("axis2"))
+  {
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    if (axisElem->HasElement("dynamics"))
+    {
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+
+      if (dynamicsElem->HasElement("damping"))
+      {
+        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
+      }
+      if (dynamicsElem->HasElement("friction"))
+      {
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
-LinkPtr ODEJoint::GetJointLink(int _index) const
+LinkPtr ODEJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
   if (!this->jointId)
@@ -179,7 +203,7 @@ bool ODEJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 
 //////////////////////////////////////////////////
 // child classes where appropriate
-double ODEJoint::GetParam(int /*parameter*/) const
+double ODEJoint::GetParam(unsigned int /*parameter*/) const
 {
   return 0;
 }
@@ -234,7 +258,7 @@ void ODEJoint::Detach()
 
 //////////////////////////////////////////////////
 // where appropriate
-void ODEJoint::SetParam(int /*parameter*/, double /*value*/)
+void ODEJoint::SetParam(unsigned int /*parameter*/, double /*value*/)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -277,7 +301,7 @@ dJointFeedback *ODEJoint::GetFeedback()
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
+void ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
   switch (_index)
@@ -298,7 +322,7 @@ void ODEJoint::SetHighStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
+void ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
   switch (_index)
@@ -318,13 +342,13 @@ void ODEJoint::SetLowStop(int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEJoint::GetHighStop(int _index)
+math::Angle ODEJoint::GetHighStop(unsigned int _index)
 {
   return this->GetUpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEJoint::GetLowStop(int _index)
+math::Angle ODEJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
 }
@@ -376,7 +400,7 @@ math::Vector3 ODEJoint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   // record axis in sdf element
   if (_index == 0)
@@ -388,7 +412,7 @@ void ODEJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
+void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
 {
   switch (_attr)
   {
@@ -402,38 +426,10 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
       this->SetParam(dParamSuspensionCFM, _value);
       break;
     case STOP_ERP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopERP, _value);
-          break;
-        case 1:
-          this->SetParam(dParamStopERP2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamStopERP3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("stop_erp", _index, _value);
       break;
     case STOP_CFM:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamStopCFM, _value);
-          break;
-        case 1:
-          this->SetParam(dParamStopCFM2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamStopCFM3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("stop_cfm", _index, _value);
       break;
     case ERP:
       this->SetParam(dParamERP, _value);
@@ -448,38 +444,10 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
       this->SetParam(dParamVel, _value);
       break;
     case HI_STOP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamHiStop, _value);
-          break;
-        case 1:
-          this->SetParam(dParamHiStop2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamHiStop3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("hi_stop", _index, _value);
       break;
     case LO_STOP:
-      switch (_index)
-      {
-        case 0:
-          this->SetParam(dParamLoStop, _value);
-          break;
-        case 1:
-          this->SetParam(dParamLoStop2, _value);
-          break;
-        case 2:
-          this->SetParam(dParamLoStop3, _value);
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          break;
-      };
+      this->SetAttribute("lo_stop", _index, _value);
       break;
     default:
       gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
@@ -488,7 +456,7 @@ void ODEJoint::SetAttribute(Attribute _attr, int _index, double _value)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAttribute(const std::string &_key, int _index,
+void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
                             const boost::any &_value)
 {
   if (_key == "fudge_factor")
@@ -684,17 +652,25 @@ void ODEJoint::SetAttribute(const std::string &_key, int _index,
       }
     }
   }
+  else if (_key == "gearbox_ratio")
+  {
+    GearboxJoint<ODEJoint>* gearboxJoint =
+      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+    if (gearboxJoint != NULL)
+    {
+      try
+      {
+        gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
+      }
+      catch(boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+      }
+    }
+  }
   else
   {
-    try
-    {
-      gzerr << "Unable to handle joint attribute["
-            << boost::any_cast<std::string>(_value) << "]\n";
-    }
-    catch(boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-    }
+    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
   }
 }
 
@@ -879,6 +855,28 @@ double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
       return 0;
     }
   }
+  else if (_key == "gearbox_ratio")
+  {
+    GearboxJoint<ODEJoint>* gearboxJoint =
+      dynamic_cast<GearboxJoint<ODEJoint>* >(this);
+    if (gearboxJoint != NULL)
+    {
+      try
+      {
+        return gearboxJoint->GetGearboxRatio();
+      }
+      catch(common::Exception &e)
+      {
+        gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+        return 0;
+      }
+    }
+    else
+    {
+      gzerr << "Trying to get thread_pitch for non-gearbox joints.\n";
+      return 0;
+    }
+  }
   else
   {
     gzerr << "Unable to get joint attribute[" << _key << "]\n";
@@ -901,27 +899,20 @@ void ODEJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-JointWrench ODEJoint::GetForceTorque(int _index)
-{
-  return this->GetForceTorque(static_cast<unsigned int>(_index));
-}
-
-//////////////////////////////////////////////////
 JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 {
-  JointWrench wrench;
   // Note that:
   // f2, t2 are the force torque measured on parent body's cg
   // f1, t1 are the force torque measured on child body's cg
-  dJointFeedback* fb = this->GetFeedback();
+  dJointFeedback *fb = this->GetFeedback();
   if (fb)
   {
     // kind of backwards here, body1 (parent) corresponds go f2, t2
     // and body2 (child) corresponds go f1, t1
-    wrench.body2Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
-    wrench.body2Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
-    wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
-    wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
+    this->wrench.body2Force.Set(fb->f1[0], fb->f1[1], fb->f1[2]);
+    this->wrench.body2Torque.Set(fb->t1[0], fb->t1[1], fb->t1[2]);
+    this->wrench.body1Force.Set(fb->f2[0], fb->f2[1], fb->f2[2]);
+    this->wrench.body1Torque.Set(fb->t2[0], fb->t2[1], fb->t2[2]);
 
     // get force applied through SetForce
     physics::JointWrench wrenchAppliedWorld;
@@ -970,20 +961,20 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // gzerr << "anchor [" << anchorPose
       //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
       //       << "] childMomentArm[" << childMomentArm
-      //       << "] f1[" << wrench.body2Force
-      //       << "] t1[" << wrench.body2Torque
-      //       << "] fxp[" << wrench.body2Force.Cross(childMomentArm)
+      //       << "] f1[" << this->wrench.body2Force
+      //       << "] t1[" << this->wrench.body2Torque
+      //       << "] fxp[" << this->wrench.body2Force.Cross(childMomentArm)
       //       << "]\n";
 
-      wrench.body2Torque += wrench.body2Force.Cross(childMomentArm);
+      this->wrench.body2Torque += this->wrench.body2Force.Cross(childMomentArm);
 
       // rotate resulting body2Force in world frame into link frame
-      wrench.body2Force = childPose.rot.RotateVectorReverse(
-        -wrench.body2Force);
+      this->wrench.body2Force = childPose.rot.RotateVectorReverse(
+        -this->wrench.body2Force);
 
       // rotate resulting body2Torque in world frame into link frame
-      wrench.body2Torque = childPose.rot.RotateVectorReverse(
-        -wrench.body2Torque);
+      this->wrench.body2Torque = childPose.rot.RotateVectorReverse(
+        -this->wrench.body2Torque);
     }
 
     // convert torque from about parent CG to joint anchor location
@@ -993,6 +984,8 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       math::Pose childPose;
       if (this->childLink)
         childPose = this->childLink->GetWorldPose();
+      else
+        gzerr << "missing child link, double check model.";
 
       math::Pose parentPose = this->parentLink->GetWorldPose();
 
@@ -1023,26 +1016,40 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       //       << "] iarm[" << cgPose
       //       << "] anc2pcg[" << this->anchorPose - parentCGInChildLink
       //       << "] parentMomentArm[" << parentMomentArm
-      //       << "] f1[" << wrench.body1Force
-      //       << "] t1[" << wrench.body1Torque
-      //       << "] fxp[" << wrench.body1Force.Cross(parentMomentArm)
+      //       << "] f1[" << this->wrench.body1Force
+      //       << "] t1[" << this->wrench.body1Torque
+      //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
       //       << "]\n";
 
-      wrench.body1Torque += wrench.body1Force.Cross(parentMomentArm);
+      this->wrench.body1Torque +=
+        this->wrench.body1Force.Cross(parentMomentArm);
 
       // rotate resulting body1Force in world frame into link frame
-      wrench.body1Force = parentPose.rot.RotateVectorReverse(
-        -wrench.body1Force);
+      this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
+        -this->wrench.body1Force);
 
       // rotate resulting body1Torque in world frame into link frame
-      wrench.body1Torque = parentPose.rot.RotateVectorReverse(
-        -wrench.body1Torque);
+      this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
+        -this->wrench.body1Torque);
 
       if (!this->childLink)
       {
+        gzlog << "Joint [" << this->GetScopedName()
+              << "] with parent Link [" << this->parentLink->GetScopedName()
+              << "] but no child Link.  Child Link must be world.\n";
         // if child link does not exist, use equal and opposite
-        wrench.body2Force = -wrench.body1Force;
-        wrench.body2Torque = -wrench.body1Torque;
+        this->wrench.body2Force = -this->wrench.body1Force;
+        this->wrench.body2Torque = -this->wrench.body1Torque;
+
+        // force/torque are in parent link frame, transform them into
+        // child link(world) frame.
+        math::Pose parentToWorldTransform = this->parentLink->GetWorldPose();
+        this->wrench.body1Force =
+          parentToWorldTransform.rot.RotateVector(
+          this->wrench.body1Force);
+        this->wrench.body1Torque =
+          parentToWorldTransform.rot.RotateVector(
+          this->wrench.body1Torque);
       }
     }
     else
@@ -1054,12 +1061,25 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       }
       else
       {
+        gzlog << "Joint [" << this->GetScopedName()
+              << "] with child Link [" << this->childLink->GetScopedName()
+              << "] but no parent Link.  Parent Link must be world.\n";
         // if parentLink does not exist, use equal opposite body1 wrench
-        wrench.body1Force = -wrench.body2Force;
-        wrench.body1Torque = -wrench.body2Torque;
+        this->wrench.body1Force = -this->wrench.body2Force;
+        this->wrench.body1Torque = -this->wrench.body2Torque;
+
+        // force/torque are in child link frame, transform them into
+        // parent link frame.  Here, parent link is world, so zero transform.
+        math::Pose childToWorldTransform = this->childLink->GetWorldPose();
+        this->wrench.body1Force =
+          childToWorldTransform.rot.RotateVector(
+          this->wrench.body1Force);
+        this->wrench.body1Torque =
+          childToWorldTransform.rot.RotateVector(
+          this->wrench.body1Torque);
       }
     }
-    wrench = wrench - wrenchAppliedWorld;
+    this->wrench = this->wrench - wrenchAppliedWorld;
   }
   else
   {
@@ -1067,11 +1087,23 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     gzwarn << "GetForceTorque: forgot to set <provide_feedback>?\n";
   }
 
-  return wrench;
+  return this->wrench;
 }
 
 //////////////////////////////////////////////////
 void ODEJoint::CFMDamping()
+{
+  this->ApplyImplicitStiffnessDamping();
+}
+
+//////////////////////////////////////////////////
+bool ODEJoint::UsesImplicitSpringDamper()
+{
+  return this->useImplicitSpringDamper;
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyImplicitStiffnessDamping()
 {
   // check if we are violating joint limits
   if (this->GetAngleCount() > 2)
@@ -1086,13 +1118,16 @@ void ODEJoint::CFMDamping()
   {
     double angle = this->GetAngle(i).Radian();
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
-    if (math::equal(this->dampingCoefficient, 0.0) ||
-        angle + dAngle >= this->upperLimit[i].Radian() ||
-        angle + dAngle <= this->lowerLimit[i].Radian())
+    angle += dAngle;
+
+    if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
+         math::equal(this->stiffnessCoefficient[i], 0.0)) ||
+        angle >= this->upperLimit[i].Radian() ||
+        angle <= this->lowerLimit[i].Radian())
     {
-      if (this->cfmDampingState[i] != ODEJoint::JOINT_LIMIT)
+      if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
-        // we have hit the actual joint limit!
+        // We have hit the actual joint limit!
         // turn off simulated damping by recovering cfm and erp,
         // and recover joint limits
         this->SetAttribute("stop_erp", i, this->stopERP);
@@ -1100,89 +1135,198 @@ void ODEJoint::CFMDamping()
         this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
         this->SetAttribute("lo_stop", i, this->lowerLimit[i].Radian());
         this->SetAttribute("hi_stop", i, this->upperLimit[i].Radian());
-        this->cfmDampingState[i] = ODEJoint::JOINT_LIMIT;
+        this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
-    }
-    else if (!math::equal(this->dampingCoefficient, 0.0))
-    {
-      /// \TODO: hardcoded thresholds for now, make them params.
-      static double vThreshold = 0.01;
-      static double fThreshold = 1.0;
-      double f = this->GetForce(i);
-      double v = this->GetVelocity(i);
-      double curDamp = fabs(this->dampingCoefficient);
-
-      /// \TODO: increase damping if resulting acceleration
-      /// is outside of stability region.  simple limiter based on (f, v).
-      // safeguard against unstable joint behavior
-      // at low speed and high force scenarios
-      if (this->dampingCoefficient < 0 &&
-          fabs(v) < vThreshold && fabs(f) > fThreshold)
+      /* test to see if we can reduce jitter at joint limits
+      // apply spring damper explicitly if in joint limit
+      // this limits oscillations if spring is pushing joint
+      // into the limit.
       {
-        double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
-        // gzerr << "joint [" << this->GetName()
-        //       << "] curDamp[" << curDamp
-        //       << "] f [" << f
-        //       << "] v [" << v
-        //       << "] f*v [" << f*v
-        //       << "] f/v [" << tmpDStable
-        //       << "] cur dStable[" << i << "] = [" << dStable[i] << "]\n";
-
-        // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
-        curDamp = std::max(curDamp, 0.5*tmpDStable);
+        double dampingForce = -fabs(this->dissipationCoefficient[i])
+          * this->GetVelocity(i);
+        double springForce = this->stiffnessCoefficient[i]
+          * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+        this->SetForceImpl(i, dampingForce + springForce);
       }
+      */
+    }
+    else if (!math::equal(this->dissipationCoefficient[i], 0.0) ||
+             !math::equal(this->stiffnessCoefficient[i], 0.0))
+    {
+      double kd = fabs(this->dissipationCoefficient[i]);
+      double kp = this->stiffnessCoefficient[i];
+
+      /// \TODO: This bit of code involving adaptive damping
+      /// might be too complicated, add some more comments or simplify it.
+      if (this->dissipationCoefficient[i] < 0)
+        kd = this->ApplyAdaptiveDamping(i, kd);
 
       // update if going into DAMPING_ACTIVE mode, or
       // if current applied damping value is not the same as predicted.
-      if (this->cfmDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
-          !math::equal(curDamp, this->dStable[i]))
+      if (this->implicitDampingState[i] != ODEJoint::DAMPING_ACTIVE ||
+          !math::equal(kd, this->currentKd[i]) ||
+          !math::equal(kp, this->currentKp[i]))
       {
-        this->dStable[i] = curDamp;
+        // save kp, kd applied for efficiency
+        this->currentKd[i] = kd;
+        this->currentKp[i] = kp;
+
+        // convert kp, kd to cfm, erp
+        double erp, cfm;
+        this->KpKdToCFMERP(dt, kp, kd, cfm, erp);
+
         // add additional constraint row by fake hitting joint limit
         // then, set erp and cfm to simulate viscous joint damping
-        this->SetAttribute("stop_erp", i, 0.0);
-        this->SetAttribute("stop_cfm", i, 1.0 / curDamp);
-        this->SetAttribute("hi_stop", i, 0.0);
-        this->SetAttribute("lo_stop", i, 0.0);
-        this->SetAttribute("hi_stop", i, 0.0);
-        this->cfmDampingState[i] = ODEJoint::DAMPING_ACTIVE;
+        this->SetAttribute("stop_erp", i, erp);
+        this->SetAttribute("stop_cfm", i, cfm);
+        this->SetAttribute("hi_stop", i, this->springReferencePosition[i]);
+        this->SetAttribute("lo_stop", i, this->springReferencePosition[i]);
+        this->SetAttribute("hi_stop", i, this->springReferencePosition[i]);
+        this->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
       }
     }
   }
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetDamping(int /*_index*/, double _damping)
+double ODEJoint::ApplyAdaptiveDamping(unsigned int _index,
+    const double _damping)
 {
-  this->dampingCoefficient = _damping;
+  /// \TODO: hardcoded thresholds for now, make them params.
+  static double vThreshold = 0.01;
+  static double fThreshold = 1.0;
 
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
-  // trigger an update in CFMDAmping if this is called
-  if (this->useCFMDamping)
+  double f = this->GetForce(_index);
+  double v = this->GetVelocity(_index);
+
+  if (fabs(v) < vThreshold && fabs(f) > fThreshold)
   {
-    if (this->GetAngleCount() > 2)
+    // guess what the stable damping value might be based on v.
+    double tmpDStable = f / (v/fabs(v)*std::max(fabs(v), vThreshold));
+
+    // debug
+    // gzerr << "joint [" << this->GetName()
+    //       << "] damping[" << _damping
+    //       << "] f [" << f
+    //       << "] v [" << v
+    //       << "] f*v [" << f*v
+    //       << "] f/v [" << tmpDStable
+    //       << "] cur currentKd[" << _index
+    //       << "] = [" << currentKd[_index] << "]\n";
+
+    // limit v(n+1)/v(n) to 2.0 by multiplying tmpDStable by 0.5
+    return std::max(_damping, 0.5*tmpDStable);
+  }
+  else
+    return _damping;
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::KpKdToCFMERP(const double _dt,
+                           const double _kp, const double _kd,
+                           double &_cfm, double &_erp)
+{
+  /// \TODO: check for NaN cases
+  _erp = _dt * _kp / (_dt * _kp + _kd);
+  _cfm = 1.0 / (_dt * _kp + _kd);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::CFMERPToKpKd(const double _dt,
+                           const double _cfm, const double _erp,
+                           double &_kp, double &_kd)
+{
+  /// \TODO: check for NaN cases
+  _kp = _erp / (_dt * _cfm);
+  _kd = (1.0 - _erp) / _cfm;
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetDamping(unsigned int _index, double _damping)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+      _damping);
+  }
+  else
+  {
+     gzerr << "ODEJoint::SetDamping: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->SetStiffnessDamping(_index, _stiffness,
+      this->dissipationCoefficient[_index]);
+  }
+  else
+  {
+     gzerr << "ODEJoint::SetStiffness: index[" << _index
+           << "] is out of bounds (GetAngleCount() = "
+           << this->GetAngleCount() << ").\n";
+     return;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetStiffnessDamping(unsigned int _index,
+  double _stiffness, double _damping, double _reference)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->stiffnessCoefficient[_index] = _stiffness;
+    this->dissipationCoefficient[_index] = _damping;
+    this->springReferencePosition[_index] = _reference;
+
+    /// reset state of implicit damping state machine.
+    if (this->useImplicitSpringDamper)
     {
-       gzerr << "Incompatible joint type, GetAngleCount() = "
-             << this->GetAngleCount() << " > 2\n";
-       return;
+      if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+      {
+        this->implicitDampingState[_index] = ODEJoint::NONE;
+      }
+      else
+      {
+         gzerr << "Incompatible joint type, index[" << _index
+               << "] is out of bounds (GetAngleCount() = "
+               << this->GetAngleCount() << ").\n";
+         return;
+      }
     }
-    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
-      this->cfmDampingState[i] = ODEJoint::NONE;
-  }
 
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
+    /// \TODO:  The check for static parent or child below might not be needed,
+    /// but we need to test first.  In theory, attaching an object to a static
+    /// body should not affect spring/damper application.
+    bool parentStatic =
+      this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+      this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-  if (!this->dampingInitialized && !parentStatic && !childStatic)
-  {
-    if (this->useCFMDamping)
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::CFMDamping, this));
-    else
-      this->applyDamping = physics::Joint::ConnectJointUpdate(
-        boost::bind(&ODEJoint::ApplyDamping, this));
-    this->dampingInitialized = true;
+    if (!this->stiffnessDampingInitialized)
+    {
+      if (!parentStatic && !childStatic)
+      {
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&ODEJoint::ApplyStiffnessDamping, this));
+        this->stiffnessDampingInitialized = true;
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
+    }
   }
+  else
+    gzerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
@@ -1193,10 +1337,103 @@ void ODEJoint::SetProvideFeedback(bool _enable)
   if (this->provideFeedback)
   {
     this->feedback = new dJointFeedback;
+    this->feedback->f1[0] = 0;
+    this->feedback->f1[1] = 0;
+    this->feedback->f1[2] = 0;
+    this->feedback->t1[0] = 0;
+    this->feedback->t1[1] = 0;
+    this->feedback->t1[2] = 0;
+    this->feedback->f2[0] = 0;
+    this->feedback->f2[1] = 0;
+    this->feedback->f2[2] = 0;
+    this->feedback->t2[0] = 0;
+    this->feedback->t2[1] = 0;
+    this->feedback->t2[2] = 0;
 
     if (this->jointId)
       dJointSetFeedback(this->jointId, this->feedback);
     else
       gzerr << "ODE Joint ID is invalid\n";
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SetForce(unsigned int _index, double _force)
+{
+  double force = Joint::CheckAndTruncateForce(_index, _force);
+  this->SaveForce(_index, force);
+  this->SetForceImpl(_index, force);
+
+  // for engines that supports auto-disable of links
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::SaveForce(unsigned int _index, double _force)
+{
+  // this bit of code actually doesn't do anything physical,
+  // it simply records the forces commanded inside forceApplied.
+  if (_index < this->GetAngleCount())
+  {
+    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    {
+      // reset forces if time step is new
+      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceApplied[0] = this->forceApplied[1] = 0;
+    }
+
+    this->forceApplied[_index] += _force;
+  }
+  else
+    gzerr << "Something's wrong, joint [" << this->GetScopedName()
+          << "] index [" << _index
+          << "] out of range.\n";
+}
+
+//////////////////////////////////////////////////
+double ODEJoint::GetForce(unsigned int _index)
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->forceApplied[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get force\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyStiffnessDamping()
+{
+  if (this->useImplicitSpringDamper)
+    this->ApplyImplicitStiffnessDamping();
+  else
+    this->ApplyExplicitStiffnessDamping();
+}
+
+//////////////////////////////////////////////////
+void ODEJoint::ApplyExplicitStiffnessDamping()
+{
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    // Take absolute value of dissipationCoefficient, since negative values of
+    // dissipationCoefficient are used for adaptive damping to
+    // enforce stability.
+    double dampingForce = -fabs(this->dissipationCoefficient[i])
+      * this->GetVelocity(i);
+
+    double springForce = this->stiffnessCoefficient[i]
+      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+
+    // do not change forceApplied if setting internal damping forces
+    this->SetForceImpl(i, dampingForce + springForce);
+
+    // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
 }

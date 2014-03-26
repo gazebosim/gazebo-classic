@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -58,6 +53,7 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -138,7 +134,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     CollisionPtr collisionPtr2 = link2->GetCollision(colIndex);
 
     if (!collisionPtr1 || !collisionPtr2)
-      return;
+      continue;
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
@@ -151,7 +147,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         collisionPtr1->GetWorld()->GetSimTime());
 
     if (!contactFeedback)
-      return;
+      continue;
 
     math::Pose body1Pose = link1->GetWorldPose();
     math::Pose body2Pose = link2->GetWorldPose();
@@ -209,11 +205,15 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 }
 
 //////////////////////////////////////////////////
-bool ContactCallback(btManifoldPoint &/*_cp*/,
-    const btCollisionObjectWrapper * /*_obj0*/, int /*_partId0*/,
-    int /*_index0*/, const btCollisionObjectWrapper * /*_obj1*/,
-    int /*_partId1*/, int /*_index1*/)
+bool ContactCallback(btManifoldPoint &_cp,
+    const btCollisionObjectWrapper *_obj0, int /*_partId0*/, int /*_index0*/,
+    const btCollisionObjectWrapper *_obj1, int /*_partId1*/, int /*_index1*/)
 {
+  _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
+    _obj0->m_collisionObject->getFriction());
+
+  // this return value is currently ignored, but to be on the safe side:
+  //  return false if you don't calculate friction
   return true;
 }
 
@@ -274,6 +274,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
 
 //////////////////////////////////////////////////
@@ -330,6 +332,23 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
       boost::any_cast<int>(this->GetParam(PGS_ITERS));
   info.m_sor =
       boost::any_cast<double>(this->GetParam(SOR));
+
+  gzlog << " debug physics: "
+        << " iters[" << info.m_numIterations
+        << "] sor[" << info.m_sor
+        << "] erp[" << info.m_erp
+        << "] cfm[" << info.m_globalCfm
+        << "] split[" << info.m_splitImpulse
+        << "] split tol[" << info.m_splitImpulsePenetrationThreshold
+        << "]\n";
+
+  // debugging
+  // info.m_numIterations = 1000;
+  // info.m_sor = 1.0;
+  // info.m_erp = 0.2;
+  // info.m_globalCfm = 0.0;
+  // info.m_splitImpulse = 0;
+  // info.m_splitImpulsePenetrationThreshold = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -418,21 +437,10 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
   }
-  else if (_msg->has_update_rate())
-  {
-    this->SetRealTimeUpdateRate(_msg->update_rate());
-    gzwarn <<
-        "Physics update rate is deprecated by real time update rate\n";
-  }
 
   if (_msg->has_max_step_size())
   {
     this->SetMaxStepSize(_msg->max_step_size());
-  }
-  else if (_msg->has_dt())
-  {
-    this->SetMaxStepSize(_msg->dt());
-    gzwarn << "Physics dt is deprecated by max step size\n";
   }
 
   /// Make sure all models get at least one update cycle.
@@ -451,11 +459,8 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  // common::Time currTime =  this->world->GetRealTime();
-
   this->dynamicsWorld->stepSimulation(
-      this->maxStepSize, 1, this->maxStepSize);
-  // this->lastUpdateTime = currTime;
+    this->maxStepSize, 1, this->maxStepSize);
 }
 
 //////////////////////////////////////////////////
@@ -475,14 +480,17 @@ void BulletPhysics::Reset()
 
 //////////////////////////////////////////////////
 
-// //////////////////////////////////////////////////
-// void BulletPhysics::SetSORPGSIters(unsigned int _iters)
-// {
-//   // TODO: set SDF parameter
-//   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
-//   // Line below commented out because it wasn't helping pendulum test.
-//   // info.m_numIterations = _iters;
-// }
+//////////////////////////////////////////////////
+void BulletPhysics::SetSORPGSIters(unsigned int _iters)
+{
+  // TODO: set SDF parameter
+  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+  // Line below commented out because it wasn't helping pendulum test.
+  info.m_numIterations = _iters;
+
+  this->sdf->GetElement("bullet")->GetElement(
+      "solver")->GetElement("iters")->Set(_iters);
+}
 
 
 //////////////////////////////////////////////////

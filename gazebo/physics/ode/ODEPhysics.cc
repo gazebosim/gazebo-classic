@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 
@@ -48,6 +44,7 @@
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODEScrewJoint.hh"
 #include "gazebo/physics/ode/ODEHingeJoint.hh"
+#include "gazebo/physics/ode/ODEGearboxJoint.hh"
 #include "gazebo/physics/ode/ODEHinge2Joint.hh"
 #include "gazebo/physics/ode/ODESliderJoint.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
@@ -63,6 +60,7 @@
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -170,7 +168,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
@@ -318,21 +316,10 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
   }
-  else if (_msg->has_update_rate())
-  {
-    this->SetRealTimeUpdateRate(_msg->update_rate());
-    gzwarn <<
-        "Physics update rate is deprecated by real time update rate\n";
-  }
 
   if (_msg->has_max_step_size())
   {
     this->SetMaxStepSize(_msg->max_step_size());
-  }
-  else if (_msg->has_dt())
-  {
-    this->SetMaxStepSize(_msg->dt());
-    gzwarn << "Physics dt is deprecated by max step size\n";
   }
 
   /// Make sure all models get at least on update cycle.
@@ -658,7 +645,7 @@ double ODEPhysics::GetContactSurfaceLayer()
 }
 
 //////////////////////////////////////////////////
-int ODEPhysics::GetMaxContacts()
+unsigned int ODEPhysics::GetMaxContacts()
 {
   return this->maxContacts;
 }
@@ -698,6 +685,8 @@ JointPtr ODEPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
     joint.reset(new ODEScrewJoint(this->worldId, _parent));
   else if (_type == "revolute")
     joint.reset(new ODEHingeJoint(this->worldId, _parent));
+  else if (_type == "gearbox")
+    joint.reset(new ODEGearboxJoint(this->worldId, _parent));
   else if (_type == "revolute2")
     joint.reset(new ODEHinge2Joint(this->worldId, _parent));
   else if (_type == "ball")
@@ -832,23 +821,21 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
       << "2[" << (*pos2)[0]<< " " << (*pos2)[1] << " " << (*pos2)[2] << "]\n";
   }*/
 
-  int numc = 0;
+  unsigned int numc = 0;
   dContact contact;
 
   // maxCollide must less than the size of this->indices. Check the header
-  int maxCollide = MAX_CONTACT_JOINTS;
+  unsigned int maxCollide = MAX_CONTACT_JOINTS;
 
   // max_contacts specified globally
   if (this->GetMaxContacts() > 0 && this->GetMaxContacts() < MAX_CONTACT_JOINTS)
     maxCollide = this->GetMaxContacts();
 
   // over-ride with minimum of max_contacts from both collisions
-  if (_collision1->GetMaxContacts() >= 0 &&
-      _collision1->GetMaxContacts() < maxCollide)
+  if (_collision1->GetMaxContacts() < maxCollide)
     maxCollide = _collision1->GetMaxContacts();
 
-  if (_collision2->GetMaxContacts() >= 0 &&
-      _collision2->GetMaxContacts() < maxCollide)
+  if (_collision2->GetMaxContacts() < maxCollide)
     maxCollide = _collision2->GetMaxContacts();
 
   // Generate the contacts
@@ -867,7 +854,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
-    for (int i = maxCollide; i < numc; i++)
+    for (unsigned int i = maxCollide; i < numc; ++i)
     {
       if (_contactCollisions[i].depth > max)
       {
@@ -889,11 +876,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactSlip1 |
                          dContactSlip2;
 
+  ODESurfaceParamsPtr surf1 = _collision1->GetODESurface();
+  ODESurfaceParamsPtr surf2 = _collision2->GetODESurface();
+
   // Compute the CFM and ERP by assuming the two bodies form a
   // spring-damper system.
-  double kp = 1.0 /
-    (1.0 / _collision1->GetSurface()->kp + 1.0 / _collision2->GetSurface()->kp);
-  double kd = _collision1->GetSurface()->kd + _collision2->GetSurface()->kd;
+  double kp = 1.0 / (1.0 / surf1->kp + 1.0 / surf2->kp);
+  double kd = surf1->kd + surf2->kd;
 
   contact.surface.soft_erp = (this->maxStepSize * kp) /
                              (this->maxStepSize * kp + kd);
@@ -906,14 +895,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = _collision1->GetSurface()->fdir1;
+  math::Vector3 fd = surf1->frictionPyramid.direction1;
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
-    fd = (_collision1->GetRelativePose() +
-      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -923,15 +909,14 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = _collision2->GetSurface()->fdir1;
+  math::Vector3 fd2 = surf2->frictionPyramid.direction1;
   if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
-        _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
+        surf1->frictionPyramid.GetMuPrimary() >
+        surf2->frictionPyramid.GetMuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
-    fd = (_collision2->GetRelativePose() +
-      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
     /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
@@ -950,24 +935,24 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Set the friction coefficients.
-  contact.surface.mu = std::min(_collision1->GetSurface()->mu1,
-                                _collision2->GetSurface()->mu1);
-  contact.surface.mu2 = std::min(_collision1->GetSurface()->mu2,
-                                 _collision2->GetSurface()->mu2);
+  contact.surface.mu = std::min(surf1->frictionPyramid.GetMuPrimary(),
+                                surf2->frictionPyramid.GetMuPrimary());
+  contact.surface.mu2 = std::min(surf1->frictionPyramid.GetMuSecondary(),
+                                 surf2->frictionPyramid.GetMuSecondary());
 
 
   // Set the slip values
-  contact.surface.slip1 = std::min(_collision1->GetSurface()->slip1,
-                                   _collision2->GetSurface()->slip1);
-  contact.surface.slip2 = std::min(_collision1->GetSurface()->slip2,
-                                   _collision2->GetSurface()->slip2);
+  contact.surface.slip1 = std::min(surf1->slip1,
+                                   surf2->slip1);
+  contact.surface.slip2 = std::min(surf1->slip2,
+                                   surf2->slip2);
 
   // Set the bounce values
-  contact.surface.bounce = std::min(_collision1->GetSurface()->bounce,
-                                    _collision2->GetSurface()->bounce);
+  contact.surface.bounce = std::min(surf1->bounce,
+                                    surf2->bounce);
   contact.surface.bounce_vel =
-    std::min(_collision1->GetSurface()->bounceThreshold,
-             _collision2->GetSurface()->bounceThreshold);
+    std::min(surf1->bounceThreshold,
+             surf2->bounceThreshold);
 
   // Get the ODE body IDs
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
@@ -997,7 +982,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   }
 
   // Create a joint for each contact
-  for (int j = 0; j < numc; j++)
+  for (unsigned int j = 0; j < numc; ++j)
   {
     contact.geom = _contactCollisions[this->indices[j]];
 

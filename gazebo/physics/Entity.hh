@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -52,7 +53,7 @@ namespace gazebo
 
     /// \class Entity Entity.hh physics/physics.hh
     /// \brief Base class for all physics objects in Gazebo.
-    class Entity : public Base
+    class GAZEBO_VISIBLE Entity : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the entity.
@@ -317,9 +318,6 @@ namespace gazebo
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
-      /// \brief Pose message container.
-      protected: msgs::Pose *poseMsg;
-
       /// \brief Current pose animation
       protected: common::PoseAnimationPtr animation;
 
@@ -337,6 +335,9 @@ namespace gazebo
 
       /// \brief The pose set by a physics engine.
       protected: math::Pose dirtyPose;
+
+      /// \brief Scale of the entity
+      protected: math::Vector3 scale;
 
       /// \brief Callback for when an animation completes.
       private: boost::function<void()> onAnimationComplete;

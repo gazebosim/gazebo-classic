@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ DepthCamera::~DepthCamera()
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::Load(sdf::ElementPtr &_sdf)
+void DepthCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
   this->outputPoints =
@@ -145,7 +145,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->pcdViewport->setOverlaysEnabled(false);
     this->pcdViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     this->pcdMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());

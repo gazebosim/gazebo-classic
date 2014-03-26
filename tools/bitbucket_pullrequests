@@ -1,68 +1,217 @@
 #!/usr/bin/env ruby
+#/ Usage: <progname> [options]...
+#/ Get info on pull requests from gazebo's bitbucket repository
 # based on http://www.alphadevx.com/a/88-Writing-a-REST-Client-in-Ruby
 
-# to install dependencies on Ubuntu (tested with Quantal):
-#sudo apt-get install ruby1.9.1-dev
-#sudo gem install rest-client json
+# to install dependencies on Ubuntu (tested with Precise, Quantal, and Raring):
+#sudo apt-get install rubygems ruby-rest-client ruby-json
 require 'rubygems'
 require 'rest_client'
 require 'json'
+require 'optparse'
+require 'date'
+
+$stderr.sync = true
 
 class BitbucketPullRequests
-  # URL for bitbucket 2.0 api
-  @url_prefix
-  @url_suffix
+  # Pull request summary
+  class Summary
+    attr_reader :id
+    attr_reader :source
+    attr_reader :destination
+    attr_reader :branch
+    attr_reader :createdOn
+
+    def initialize(jsonHash)
+      @id          = jsonHash["id"]
+      @source      = jsonHash["source"]["commit"]["hash"]
+      @destination = jsonHash["destination"]["commit"]["hash"]
+      @branch      = jsonHash["source"]["branch"]["name"]
+      @createdOn   = jsonHash["created_on"]
+    end
+
+    def to_s
+      @id.to_s.rjust(5, ' ') + "    " +
+        DateTime.parse(@createdOn).strftime("%Y-%m-%d") + "    " +
+        @source + "    " +
+        @destination + "    " +
+        @branch + "\n"
+    end
+
+    def date_and_string
+      [@createdOn, self.to_s]
+    end
+  end
 
   # constructor
-  def initialize
-    @url_domain = 'https://bitbucket.org'
-    @url_prefix = @url_domain + '/api/2.0/repositories/osrf/gazebo/pullrequests'
+  def initialize(options)
+    @url_pullrequests = 'https://bitbucket.org/api/2.0/repositories/osrf/gazebo/pullrequests'
+    @options = options
+  end
+
+  # helpers for RestClient.get calls
+  def getUrl(url)
+    puts url if @options["show-url"]
+    RestClient.get(url)
+  end
+  def getJson(url)
+    json = JSON.parse(getUrl(url).body)
+    if @options["verbose"]
+      puts JSON.pretty_generate(json)
+    end
+    json
   end
 
   # summary of open pull requests
-  def getPullRequestsSummary()
-    response = RestClient.get(@url_prefix)
-    jsonHash = JSON.parse(response.body)
+  def listPullRequests()
+    jsonHash = getJson(@url_pullrequests + "/?state=OPEN")
+
     output = ""
-    output += prettyPrintSummary(jsonHash)
+
+    # Hash of pull requests.
+    pullrequests = {}
+    jsonHash["values"].each { |pr|
+      date, str = Summary.new(pr).date_and_string
+      pullrequests[date] = str
+    }
+
     while jsonHash.has_key? "next"
-      response = RestClient.get(@url_domain + jsonHash["next"])
-      jsonHash = JSON.parse(response.body)
-      output += prettyPrintSummary(jsonHash)
+      jsonHash = getJson(jsonHash["next"])
+      jsonHash["values"].each { |pr|
+        date, str = Summary.new(pr).date_and_string
+        pullrequests[date] = str
+      }
     end
+
+    # Generate output sorted by creation time
+    pullrequests.keys.sort.each { |k| output += pullrequests[k] }
+
     return output
   end
 
-  def prettyPrintSummary(jsonHash)
-    output = ""
-    jsonHash["values"].each { |pr|
-      output += pr["id"].to_s
-      output += "\t"+pr["source"]["commit"]["sha"]
-      output += "\t"+pr["source"]["branch"]["name"]
-      output += "\n"
-    }
-    return output
+  # summary of one pull request
+  def getPullRequestSummary(id)
+    jsonHash = getJson(@url_pullrequests + "/" + id.to_s)
+    return Summary.new(jsonHash)
+  end
+
+  # diff of pull request
+  def getPullRequestDiff(id)
+    response = getUrl(@url_pullrequests + "/" + id.to_s + "/diff")
+    puts response if @options["verbose"]
+    return response
   end
 
   # list of files changed by pull request
-  def getPullRequestDetail(id)
-    url = @url_prefix + "/" + id.to_s + "/patch"
-    response = RestClient.get(url)
-    output = ""
-    response.lines.map(&:chomp).each do |line|
-      if line.include? '+++'
+  def getPullRequestFiles(id)
+    files = []
+    diff = getPullRequestDiff(id)
+    diff.lines.map(&:chomp).each do |line|
+      if line.start_with? '+++ b/'
         line["+++ b/"] = ""
-        output += line + "\n"
+        files << line
       end
     end
-    return output
+    return files
+  end
+
+  # get ids for open pull requests
+  def getOpenPullRequests()
+    jsonHash = getJson(@url_pullrequests + "/?state=OPEN")
+    ids = []
+    jsonHash["values"].each { |pr| ids << pr["id"].to_i }
+    while jsonHash.has_key? "next"
+      jsonHash = getJson(jsonHash["next"])
+      jsonHash["values"].each { |pr| ids << pr["id"].to_i }
+    end
+    return ids
+  end
+
+  # check changed files in pull request by id
+  def checkPullRequest(id, fork=true)
+    summary = getPullRequestSummary(id)
+    puts "checking pull request #{id}, branch #{summary.branch}"
+    files = getPullRequestFiles(id)
+    files_list = ""
+    files.each { |f| files_list += " " + f }
+    hg_root = `hg root`.chomp
+    `hg log -r #{summary.destination} 2>&1`
+    if $? != 0
+      puts "Unknown revision #{summary.destination}, try: hg pull"
+      return
+    end
+    `hg log -r #{summary.source} 2>&1`
+    if $? != 0
+      puts "Unknown revision #{summary.source}, try: hg pull " +
+           "(it could also be a fork)"
+      return
+    end
+    ancestor=`hg log -r "ancestor(#{summary.source},#{summary.destination})" | head -1 | sed -e 's@.*:@@'`.chomp
+    if ancestor != summary.destination
+      puts "Need to merge branch #{summary.branch} with #{summary.destination}"
+    end
+    if fork
+      # this will allow real-time console output
+      exec "echo #{files_list} | sh #{hg_root}/tools/code_check.sh --quick #{summary.source}"
+    else
+      puts `echo #{files_list} | sh "#{hg_root}"/tools/code_check.sh --quick #{summary.source}`
+    end
   end
 end
 
-client = BitbucketPullRequests.new
-if ARGV.length == 1
-  puts client.getPullRequestDetail(ARGV[0].to_i)
-else
-  puts client.getPullRequestsSummary()
-end
+# default options
+options  = {}
+options["list"]     = false
+options["summary"]  = nil
+options["check"]    = false
+options["check_id"] = nil
+options["diff"]     = nil
+options["files"]    = nil
+options["show-url"] = false
+options["verbose"]  = false
 
+opt_parser = OptionParser.new do |o|
+  o.on("-l", "--list",
+       "List open pull requests with fields:\n" + " "*37 +
+       "[id] [source] [dest] [branch]") { |o| options["list"] = o }
+  o.on("-c", "--check [id]", Integer,
+       "")  { |o| options["check_id"] = o; options["check"] = true }
+  o.on("-d", "--diff [id]", Integer,
+       "Show diff from pull request") { |o| options["diff"] = o }
+  o.on("-f", "--files [id]", Integer,
+       "Show changed files in a pull request") { |o| options["files"] = o }
+  o.on("-s", "--summary [id]", Integer,
+       "Summarize a pull request with fields:\n" + " "*37 +
+       "[id] [source] [dest] [branch]")  { |o| options["summary"] = o }
+  o.on("-u", "--show-url",
+       "Show urls accessed") { |o| options["show-url"] = o }
+  o.on("-v", "--verbose",
+       "Verbose output") { |o| options["verbose"] = o }
+  o.on("-h", "--help", "Display this help message") do
+    puts opt_parser
+    exit
+  end
+end
+opt_parser.parse!
+
+client = BitbucketPullRequests.new(options)
+if options["list"]
+  puts client.listPullRequests()
+elsif !options["summary"].nil?
+  puts client.getPullRequestSummary(options["summary"])
+elsif !options["diff"].nil?
+  puts client.getPullRequestDiff(options["diff"])
+elsif !options["files"].nil?
+  puts client.getPullRequestFiles(options["files"])
+elsif options["check"]
+  if options["check_id"].nil?
+    # check all open pull requests
+    client.getOpenPullRequests().each { |id|
+      client.checkPullRequest(id, false)
+    }
+  else
+    client.checkPullRequest(options["check_id"])
+  end
+else
+  puts opt_parser
+end

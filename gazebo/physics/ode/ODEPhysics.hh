@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,14 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ODEJointFeedback
+    class GAZEBO_VISIBLE ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -58,7 +59,7 @@ namespace gazebo
     };
 
     /// \brief ODE physics engine.
-    class ODEPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
       /// \enum ODEParam
       /// \brief ODE Physics parameter types.
@@ -191,7 +192,7 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer();
 
       // Documentation inherited
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -324,7 +325,7 @@ namespace gazebo
       private: int indices[MAX_CONTACT_JOINTS];
 
       /// \brief Maximum number of contact points per collision pair.
-      private: int maxContacts;
+      private: unsigned int maxContacts;
     };
   }
 }

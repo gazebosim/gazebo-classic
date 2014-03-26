@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,24 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/util/system.hh"
 #include "gazebo/gazebo_config.h"
 
+GAZEBO_VISIBLE
 void RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+GAZEBO_VISIBLE
+void RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
-  void RegisterBulletPhysics();
+GAZEBO_VISIBLE
+void RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  void RegisterDARTPhysics();
 #endif
 
 using namespace gazebo;
@@ -43,8 +55,16 @@ void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+  RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  RegisterDARTPhysics();
 #endif
 }
 

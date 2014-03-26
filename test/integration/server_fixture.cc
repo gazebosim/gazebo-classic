@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
-class ServerFixtureTest : public ServerFixture
+class ServerFixtureTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void LoadPaused(const std::string &_physicsType);
   public: void LoadEmptyOfType(const std::string &_physicsType);
@@ -122,7 +123,8 @@ TEST_P(ServerFixtureTest, SpawnSDF)
   SpawnSDF(GetParam());
 }
 
-INSTANTIATE_PHYSICS_ENGINES_TEST(ServerFixtureTest)
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, ServerFixtureTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

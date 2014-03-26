@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,33 @@
  *
 */
 
-#ifndef _TEST_GENERATOR_HH
-#define _TEST_GENERATOR_HH_
+#ifndef _HELPER_PHYSICS_GENERATOR_HH_
+#define _HELPER_PHYSICS_GENERATOR_HH_
 
-#define ODE_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestODE, \
-    testclass, ::testing::Values("ode"));
-#define BULLET_SUPPORT(testclass)
+#define BULLET_SUPPORT
 
 #ifdef HAVE_BULLET
-#undef BULLET_SUPPORT
-#define BULLET_SUPPORT(testclass) INSTANTIATE_TEST_CASE_P(TestBullet, \
-    testclass, ::testing::Values("bullet"));
+# undef BULLET_SUPPORT
+# define BULLET_SUPPORT , "bullet"
 #endif
 
-/// \brief Helper macro to instantiate gtest for using different physics engines
-#define INSTANTIATE_PHYSICS_ENGINES_TEST(testclass) \
-    ODE_SUPPORT(testclass) \
-    BULLET_SUPPORT(testclass)
+#define SIMBODY_SUPPORT
+#define DART_SUPPORT
+
+#ifdef HAVE_SIMBODY
+# undef SIMBODY_SUPPORT
+# define SIMBODY_SUPPORT , "simbody"
+#endif
+#ifdef HAVE_DART
+# undef DART_SUPPORT
+# define DART_SUPPORT , "dart"
+#endif
+
+/// \brief Helper macro to instantiate gtest for different physics engines
+#define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
+  BULLET_SUPPORT \
+  SIMBODY_SUPPORT \
+  DART_SUPPORT \
+  )
 
 #endif

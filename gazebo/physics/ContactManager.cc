@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/common/Time.hh"
 
@@ -32,6 +33,7 @@ using namespace physics;
 ContactManager::ContactManager()
 {
   this->contactIndex = 0;
+  this->customMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
@@ -55,6 +57,8 @@ ContactManager::~ContactManager()
     }
   }
   this->customContactPublishers.clear();
+  delete this->customMutex;
+  this->customMutex = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -85,37 +89,40 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   // processing necessary to get back contact information.
 
   std::vector<ContactPublisher *> publishers;
-  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
-  for (iter = this->customContactPublishers.begin();
-      iter != this->customContactPublishers.end(); ++iter)
   {
-    // A model can simply be loaded later, so convert ones that are not yet
-    // found
-    if (!iter->second->collisionNames.empty())
+    boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+    boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+    for (iter = this->customContactPublishers.begin();
+        iter != this->customContactPublishers.end(); ++iter)
     {
-      std::vector<std::string>::iterator it;
-      for (it = iter->second->collisionNames.begin();
-          it != iter->second->collisionNames.end();)
+      // A model can simply be loaded later, so convert ones that are not yet
+      // found
+      if (!iter->second->collisionNames.empty())
       {
-        Collision *col = boost::dynamic_pointer_cast<Collision>(
-            this->world->GetByName(*it)).get();
-        if (!col)
+        std::vector<std::string>::iterator it;
+        for (it = iter->second->collisionNames.begin();
+            it != iter->second->collisionNames.end();)
         {
-          ++it;
-          continue;
+          Collision *col = boost::dynamic_pointer_cast<Collision>(
+              this->world->GetByName(*it)).get();
+          if (!col)
+          {
+            ++it;
+            continue;
+          }
+          else
+            it = iter->second->collisionNames.erase(it);
+          iter->second->collisions.insert(col);
         }
-        else
-          it = iter->second->collisionNames.erase(it);
-        iter->second->collisions.insert(col);
       }
-    }
 
-    if (iter->second->collisions.find(_collision1) !=
-        iter->second->collisions.end() ||
-        iter->second->collisions.find(_collision2) !=
-        iter->second->collisions.end())
-    {
-      publishers.push_back(iter->second);
+      if (iter->second->collisions.find(_collision1) !=
+          iter->second->collisions.end() ||
+          iter->second->collisions.find(_collision2) !=
+          iter->second->collisions.end())
+      {
+        publishers.push_back(iter->second);
+      }
     }
   }
 
@@ -207,20 +214,24 @@ void ContactManager::PublishContacts()
   }
 
   // publish to default topic, ~/physics/contacts
-  msgs::Contacts msg;
-  for (unsigned int i = 0; i < this->contactIndex; ++i)
+  if (!transport::getMinimalComms())
   {
-    if (this->contacts[i]->count == 0)
-      continue;
+    msgs::Contacts msg;
+    for (unsigned int i = 0; i < this->contactIndex; ++i)
+    {
+      if (this->contacts[i]->count == 0)
+        continue;
 
-    msgs::Contact *contactMsg = msg.add_contact();
-    this->contacts[i]->FillMsg(*contactMsg);
+      msgs::Contact *contactMsg = msg.add_contact();
+      this->contacts[i]->FillMsg(*contactMsg);
+    }
+
+    msgs::Set(msg.mutable_time(), this->world->GetSimTime());
+    this->contactPub->Publish(msg);
   }
 
-  msgs::Set(msg.mutable_time(), this->world->GetSimTime());
-  this->contactPub->Publish(msg);
-
   // publish to other custom topics
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();
       iter != this->customContactPublishers.end(); ++iter)
@@ -253,11 +264,8 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 
 /////////////////////////////////////////////////
 std::string ContactManager::CreateFilter(const std::string &_name,
-    const std::vector<std::string> &_collisions)
+    const std::map<std::string, physics::CollisionPtr> &_collisions)
 {
-  if (_collisions.empty())
-    return "";
-
   std::string name = _name;
   boost::replace_all(name, "::", "/");
 
@@ -276,25 +284,95 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 
   ContactPublisher *contactPublisher = new ContactPublisher;
   contactPublisher->publisher = pub;
-  contactPublisher->collisionNames = _collisions;
-  // convert collision names to pointers
-  std::vector<std::string>::iterator iter;
-  for (iter = contactPublisher->collisionNames.begin();
-      iter != contactPublisher->collisionNames.end();)
+
+  std::map<std::string, physics::CollisionPtr>::const_iterator iter;
+  for (iter = _collisions.begin(); iter != _collisions.end(); ++iter)
   {
-    Collision *col = boost::dynamic_pointer_cast<Collision>(
-       this->world->GetByName(*iter)).get();
-    if (!col)
-    {
-      ++iter;
-      continue;
-    }
-    else
-      iter = contactPublisher->collisionNames.erase(iter);
-    contactPublisher->collisions.insert(col);
+    Collision *col = iter->second.get();
+    if (col)
+      contactPublisher->collisions.insert(col);
   }
 
-  this->customContactPublishers[name] = contactPublisher;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+    this->customContactPublishers[name] = contactPublisher;
+  }
 
   return topic;
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::vector<std::string> &_collisions)
+{
+  if (_collisions.empty())
+    return "";
+
+  std::map<std::string, physics::CollisionPtr> collisionMap;
+
+  // some collisions may not be loaded yet, so store their names in
+  // collisionNames and try to find them later.
+  std::vector<std::string> collisionNames;
+  for (unsigned int i = 0; i < _collisions.size(); ++i)
+  {
+    CollisionPtr colPtr = boost::dynamic_pointer_cast<Collision>(
+       this->world->GetByName(_collisions[i]));
+    if (colPtr)
+    {
+      collisionMap[_collisions[i]] = colPtr;
+    }
+    else
+    {
+      collisionNames.push_back(_collisions[i]);
+    }
+  }
+
+  std::string topic  = this->CreateFilter(_name, collisionMap);
+
+  // The filter should be created in the last call.
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+    GZ_ASSERT(this->customContactPublishers.count(name) > 0,
+        "Failed to create a custom filter");
+
+    // Let it know about collisions not yet found.
+    this->customContactPublishers[name]->collisionNames = collisionNames;
+  }
+
+  return topic;
+}
+
+/////////////////////////////////////////////////
+void ContactManager::RemoveFilter(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter
+      = this->customContactPublishers.find(_name);
+  if (iter != customContactPublishers.end())
+  {
+    ContactPublisher *contactPublisher = iter->second;
+    contactPublisher->contacts.clear();
+    contactPublisher->collisionNames.clear();
+    contactPublisher->collisions.clear();
+    contactPublisher->publisher.reset();
+    this->customContactPublishers.erase(iter);
+  }
+}
+
+/////////////////////////////////////////////////
+unsigned int ContactManager::GetFilterCount()
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  return this->customContactPublishers.size();
+}
+
+/////////////////////////////////////////////////
+bool ContactManager::HasFilter(const std::string &_name)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  return this->customContactPublishers.find(_name) !=
+      this->customContactPublishers.end();
 }

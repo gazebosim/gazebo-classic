@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     this->visualName = actorName + "::" + actorName + "_pose::"
                              + actorName + "_visual";
+
+    this->visualId = gazebo::physics::getUniqueId();
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
     {
@@ -328,13 +330,13 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     std::string animFile = _sdf->Get<std::string>("filename");
     std::string extension = animFile.substr(animFile.rfind(".") + 1,
         animFile.size());
-    double scale = _sdf->Get<double>("scale");
+    double animScale = _sdf->Get<double>("scale");
     Skeleton *skel = NULL;
 
     if (extension == "bvh")
     {
       BVHLoader loader;
-      skel = loader.Load(animFile, scale);
+      skel = loader.Load(animFile, animScale);
     }
     else
       if (extension == "dae")
@@ -346,7 +348,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
         if (animMesh && animMesh->HasSkeleton())
         {
           skel = animMesh->GetSkeleton();
-          skel->Scale(scale);
+          skel->Scale(animScale);
         }
       }
 
@@ -524,6 +526,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
+  msg.set_model_id(this->visualId);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
   math::Pose mainLinkPose;
@@ -692,4 +695,11 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   meshSdf->GetElement("filename")->Set(this->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
+}
+
+//////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),
+  translated(false)
+{
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,16 @@
 #include <string>
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class Events
+    class GAZEBO_VISIBLE Events
     {
       /////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the add entity signal
+      /// \brief Connect a boost::slot the add entity signal
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return createEntity.Connect(_subscriber); }

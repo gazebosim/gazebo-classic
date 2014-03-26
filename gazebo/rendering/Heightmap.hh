@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,14 @@
 
 #include <string>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-
 #include "gazebo/common/Image.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -45,12 +46,46 @@ namespace gazebo
   {
     class GzTerrainMatGen;
 
+    /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
+    /// \brief Pretends to provide procedural page content to avoid page loading
+    class GAZEBO_VISIBLE DummyPageProvider : public Ogre::PageProvider
+    {
+      /// \brief Give a provider the opportunity to prepare page content
+      /// procedurally. The parameters are not used.
+      public: bool prepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to load page content
+      /// procedurally. The parameters are not used.
+      public: bool loadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to unload page content
+      /// procedurally. The parameters are not used.
+      public: bool unloadProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+
+      /// \brief Give a provider the opportunity to unprepare page content
+      /// procedurally. The parameters are not used.
+      public:
+          bool unprepareProceduralPage(Ogre::Page*, Ogre::PagedWorldSection*)
+      {
+        return true;
+      }
+    };
+
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
-    class Heightmap
+    class GAZEBO_VISIBLE Heightmap
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
@@ -150,6 +185,18 @@ namespace gazebo
       public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
                   math::Vector2i _mousePos);
 
+      /// \brief Split a terrain into subterrains
+      /// \param[in] _heightmap Source vector of floats with the heights.
+      /// \param[in] _n Number of subterrains.
+      /// \param[out] _v Destination vector with the subterrains.
+      public: void SplitHeights(const std::vector<float> &_heightmap, int _n,
+                  std::vector<std::vector<float> > &_v);
+
+      /// \brief Get the number of subdivision the terrain will be split
+      /// into.
+      /// \return Number of terrain subdivisions
+      public: unsigned int GetTerrainSubdivisionCount() const;
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.
@@ -176,6 +223,54 @@ namespace gazebo
       /// \brief Internal function used to setup shadows for the terrain.
       /// \param[in] _enabled True to enable shadows.
       private: void SetupShadows(bool _enabled);
+
+      /// \brief Update the hash of a terrain file. The hash will be written in
+      /// a file called gzterrain.SHA1 . This method will be used when the
+      /// paging is enabled and the terrain is loaded for the first time or if
+      /// the heightmap's image has been modified.
+      /// \param[in] _hash New hash value
+      /// \param[in] _terrainDir Directory where the terrain hash and the
+      /// terrain pages are stored. Ex: $TMP/gazebo-paging/heigthmap_bowl
+      private: void UpdateTerrainHash(const std::string &_hash,
+          const boost::filesystem::path &_terrainDir);
+
+      /// \brief It checks if the terrain was previously loaded. In negative
+      /// case, it splits the original terrain into pieces and creates a hash
+      /// file.
+      /// \param[in] _terrainDirPath Path to the directory containing the
+      /// terrain pages and hash.
+      /// \return True if the terrain requires to regenerate the terrain files.
+      private: bool PrepareTerrainPaging(
+        const boost::filesystem::path &_terrainDirPath);
+
+      /// \brief Number of pieces in which a terrain is subdivided for paging.
+      private: static const unsigned int numTerrainSubdivisions;
+
+      /// \brief The terrain pages are loaded if the distance from the camera is
+      /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
+      /// LoadRadiusFactor is a multiplier applied to the terrain size to create
+      /// a load radius that depends on the terrain size.
+      private: static const double loadRadiusFactor;
+
+      /// \brief The terrain pages are held in memory but not loaded if they
+      /// are not ready when the camera is within holdRadius distance. See
+      /// Ogre::TerrainPaging::createWorldSection(). HoldRadiusFactor is a
+      /// multiplier applied to the terrain size to create a hold radius that
+      /// depends on the terrain size.
+      private: static const double holdRadiusFactor;
+
+      /// \brief Hash file name that should be present for every terrain file
+      /// loaded using paging.
+      private: static const boost::filesystem::path hashFilename;
+
+      /// \brief Name of the top level directory where all the paging info is
+      /// stored
+      private: static const boost::filesystem::path pagingDirname;
+
+      /// \brief When the terrain paging is enabled, the terrain information
+      /// for every piece of terrain is stored in disk. This is the path of
+      /// the top level directory where these files are located.
+      private: boost::filesystem::path gzPagingDir;
 
       /// \brief The scene.
       private: ScenePtr scene;
@@ -221,12 +316,38 @@ namespace gazebo
 
       /// \brief Pointer to the terrain material generator.
       private: GzTerrainMatGen *gzMatGen;
+
+      /// \brief A page provider is needed to use the paging system.
+      private: DummyPageProvider dummyPageProvider;
+
+      /// \brief Central registration point for extension classes,
+      /// such as the PageStrategy, PageContentFactory.
+      private: Ogre::PageManager *pageManager;
+
+      /// \brief Type of paging applied
+      private: Ogre::TerrainPaging *terrainPaging;
+
+      /// \brief Collection of world content
+      private: Ogre::PagedWorld *world;
+
+      /// \brief Collection of terrains. Every terrain might be paged.
+      private: std::vector<std::vector<float> > subTerrains;
+
+      /// \brief Used to iterate over all the terrains
+      private: int terrainIdx;
+
+      /// \brief Flag that enables/disables the terrain paging
+      private: bool useTerrainPaging;
+
+      /// \brief True if the terrain's hash does not match the image's hash
+      private: bool terrainHashChanged;
     };
     /// \}
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GzTerrainMatGen : public Ogre::TerrainMaterialGeneratorA
+    class GAZEBO_VISIBLE GzTerrainMatGen
+      : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
       public: GzTerrainMatGen();
@@ -259,6 +380,10 @@ namespace gazebo
         protected: virtual void addTechnique(const Ogre::MaterialPtr &_mat,
                        const Ogre::Terrain *_terrain, TechniqueType _tt);
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#endif  // ifdef __clang__
         /// \brief Utility class to help with generating shaders for GLSL.
         protected: class ShaderHelperGLSL :
             public Ogre::TerrainMaterialGeneratorA::SM2Profile::ShaderHelperGLSL
@@ -386,6 +511,9 @@ namespace gazebo
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif  // ifdef __clang__
       };
     };
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #define _SENSOR_HH_
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/thread/mutex.hpp>
 #include <vector>
 #include <string>
 
@@ -30,12 +31,14 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -66,7 +69,7 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class Sensor : public boost::enable_shared_from_this<Sensor>
+    class GAZEBO_VISIBLE Sensor : public boost::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _class
@@ -90,7 +93,13 @@ namespace gazebo
 
       /// \brief Set the parent of the sensor.
       /// \param[in] _name Name of the parent.
-      public: virtual void SetParent(const std::string &_name);
+      public: virtual void SetParent(const std::string &_name)
+              GAZEBO_DEPRECATED(2.0);
+
+      /// \brief Set the sensor's parent.
+      /// \param[in] _name The sensor's parent's name.
+      /// \param[in] _id The sensor's parent's ID.
+      public: void SetParent(const std::string &_name, uint32_t _id);
 
       /// \brief Returns the name of the sensor parent.  The parent name is
       ///        set by Sensor::SetParent.
@@ -106,7 +115,8 @@ namespace gazebo
       ///        And in turn, Sensor::Update is called by
       ///        SensorManager::Update
       /// \param[in] _force True if update is forced, false if not
-      protected: virtual void UpdateImpl(bool /*_force*/) {}
+      /// \return True if the sensor was updated.
+      protected: virtual bool UpdateImpl(bool /*_force*/) {return false;}
 
       /// \brief Get the update rate of the sensor.
       /// \return _hz update rate of sensor.  Returns 0 if unthrottled.
@@ -124,7 +134,7 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Get fully scoped name of the sensor.
-      /// \return world_name::parent_name::sensor_name.
+      /// \return world_name::model_name::link_name::sensor_name.
       public: std::string GetScopedName() const;
 
       /// \brief Get the current pose.
@@ -191,6 +201,24 @@ namespace gazebo
       /// \brief Reset the lastUpdateTime to zero.
       public: void ResetLastUpdateTime();
 
+      /// \brief Get the sensor's ID.
+      /// \return The sensor's ID.
+      public: uint32_t GetId() const;
+
+      /// \brief Get the sensor's parent's ID.
+      /// \return The sensor's parent's ID.
+      public: uint32_t GetParentId() const;
+
+      /// \brief Get the sensor's noise model.
+      /// \param[in] _index Index of the noise model. For most sensors this
+      /// will be 0. For a multi camera sensor the index can be >=0.
+      /// \return The sensor's noise model.
+      public: NoisePtr GetNoise(unsigned int _index = 0) const;
+
+      /// \brief Return true if the sensor needs to be updated.
+      /// \return True when sensor should be updated.
+      protected: bool NeedsUpdate();
+
       /// \brief Load a plugin for this sensor.
       /// \param[in] _sdf SDF parameters.
       private: void LoadPlugin(sdf::ElementPtr _sdf);
@@ -216,6 +244,9 @@ namespace gazebo
       /// \brief Name of the parent.
       protected: std::string parentName;
 
+      /// \brief The sensor's parent ID.
+      protected: uint32_t parentId;
+
       /// \brief All the plugins for the sensor.
       protected: std::vector<SensorPluginPtr> plugins;
 
@@ -236,6 +267,12 @@ namespace gazebo
       ///        this value must be updated within each sensor's UpdateImpl
       protected: common::Time lastMeasurementTime;
 
+      /// \brief Noise added to sensor data
+      protected: std::vector<NoisePtr> noises;
+
+      /// \brief Mutex to protect resetting lastUpdateTime.
+      private: boost::mutex mutexLastUpdateTime;
+
       /// \brief Event triggered when a sensor is updated.
       private: event::EventT<void()> updated;
 
@@ -250,6 +287,13 @@ namespace gazebo
 
       /// \brief Keep track how much the update has been delayed.
       private: common::Time updateDelay;
+
+      /// \brief The sensors unique ID.
+      private: uint32_t id;
+
+      /// \brief An SDF pointer that allows us to only read the sensor.sdf
+      /// file once, which in turns limits disk reads.
+      private: static sdf::ElementPtr sdfSensor;
     };
     /// \}
   }

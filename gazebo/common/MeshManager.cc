@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,7 +231,6 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float r0;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
   math::Vector3 vert, norm;
@@ -247,7 +246,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    r0 = radius * sinf(ring * deltaRingAngle);
+    float r0 = radius * sinf(ring * deltaRingAngle);
     vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
@@ -336,23 +335,30 @@ void MeshManager::CreatePlane(const std::string &name,
   double xTex = uvTile.x / segments.x;
   double yTex = uvTile.y / segments.y;
 
-  for (int y = 0; y <= segments.y; y++)
+  // Give it some thickness to reduce shadow artifacts.
+  double thickness = 0.01;
+
+  for (int i = 0; i <= 1; ++i)
   {
-    for (int x = 0; x <= segments.x; x++)
+    double z = i*thickness;
+    for (int y = 0; y <= segments.y; ++y)
     {
-      // Compute the position of the vertex
-      vec.x = (x * xSpace) - halfWidth;
-      vec.y = (y * ySpace) - halfHeight;
-      vec.z = 0.0;
-      vec = xform.TransformAffine(vec);
-      subMesh->AddVertex(vec);
+      for (int x = 0; x <= segments.x; ++x)
+      {
+        // Compute the position of the vertex
+        vec.x = (x * xSpace) - halfWidth;
+        vec.y = (y * ySpace) - halfHeight;
+        vec.z = -z;
+        vec = xform.TransformAffine(vec);
+        subMesh->AddVertex(vec);
 
-      // Compute the normal
-      vec = xform.TransformAffine(norm);
-      subMesh->AddNormal(vec);
+        // Compute the normal
+        vec = xform.TransformAffine(norm);
+        subMesh->AddNormal(vec);
 
-      // Compute the texture coordinate
-      subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
+        // Compute the texture coordinate
+        subMesh->AddTexCoord(x * xTex, 1 - (y * yTex));
+      }
     }
   }
 
@@ -685,14 +691,12 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   float deltaSegAngle = (2.0 * M_PI / segments);
 
-  double ringRadius;
-
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
     vert.z = ring * height/rings - height/2.0;
 
-    ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -901,8 +905,8 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     bool doubleSided)
 {
-  int vInc, uInc, v, u, iterations;
-  int vCount, uCount;
+  int vInc, v, iterations;
+  int uCount;
 
   if (doubleSided)
   {
@@ -922,10 +926,10 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   while (iterations--)
   {
     // Make tris in a zigzag pattern (compatible with strips)
-    u = 0;
-    uInc = 1;
+    int u = 0;
+    int uInc = 1;
 
-    vCount = meshHeight - 1;
+    int vCount = meshHeight - 1;
     while (vCount--)
     {
       uCount = meshWidth - 1;

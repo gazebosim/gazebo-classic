@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/KeyEvent.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
   {
     /// \class KeyEventHandler KeyEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters keyboard events.
-    class KeyEventHandler : public SingletonT<KeyEventHandler>
+    class GAZEBO_VISIBLE KeyEventHandler : public SingletonT<KeyEventHandler>
     {
       /// \def KeyEventFilter
       /// \brief Key event function pointer.

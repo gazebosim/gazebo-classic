@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,13 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class Root;
   class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo
@@ -50,7 +52,7 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.
-    class RenderEngine : public SingletonT<RenderEngine>
+    class GAZEBO_VISIBLE RenderEngine : public SingletonT<RenderEngine>
     {
       /// \enum RenderPathType
       /// \brief The type of rendering path used by the rendering engine.
@@ -126,6 +128,12 @@ namespace gazebo
       /// \return Pointer to the window manager.
       public: WindowManagerPtr GetWindowManager() const;
 
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      public: Ogre::OverlaySystem *GetOverlaySystem() const;
+#endif
+
       /// \brief Create a render context.
       /// \return True if the context was created.
       private: bool CreateContext();
@@ -179,6 +187,7 @@ namespace gazebo
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief Remove this in gazebo 3.0.
       /// \brief Node for communications.
       private: transport::NodePtr node;
 
@@ -187,6 +196,10 @@ namespace gazebo
 
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      private: Ogre::OverlaySystem *overlaySystem;
+#endif
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,7 +45,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet physics engine
-    class BulletPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE BulletPhysics : public PhysicsEngine
     {
       /// \enum BulletParam
       /// \brief Bullet physics parameter types.
@@ -173,6 +174,9 @@ namespace gazebo
       /// \param[in] _param A parameter listed in the BulletParam enum
       /// \return The value of the parameter
       public: virtual boost::any GetParam(BulletParam _param) const;
+
+      // Documentation inherited
+      public: virtual void SetSORPGSIters(unsigned int iters);
 
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;

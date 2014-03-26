@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -36,4 +38,10 @@ Shape::~Shape()
 {
   if (this->collisionParent)
     this->collisionParent->SetShape(ShapePtr());
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Shape::GetScale() const
+{
+  return this->scale;
 }

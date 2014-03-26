@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
 #ifdef  __APPLE__
 # include <QtCore/qglobal.h>
@@ -120,6 +116,12 @@ void RenderEngine::Load()
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+    // Must be created after this->root, but before this->root is
+    // initialized.
+    this->overlaySystem = new Ogre::OverlaySystem();
+#endif
+
     // Load all the plugins
     this->LoadPlugins();
 
@@ -148,14 +150,48 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   if (this->renderPathType == NONE)
     return ScenePtr();
 
-  ScenePtr scene(new Scene(_name, _enableVisualizations, _isServer));
-  this->scenes.push_back(scene);
-
-  scene->Load();
-  if (this->initialized)
-    scene->Init();
-  else
+  if (!this->initialized)
+  {
     gzerr << "RenderEngine is not initialized\n";
+    return ScenePtr();
+  }
+
+  ScenePtr scene;
+
+  try
+  {
+    scene.reset(new Scene(_name, _enableVisualizations, _isServer));
+  }
+  catch(...)
+  {
+    gzerr << "Failed to instantiate a scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Load();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to load scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  try
+  {
+    scene->Init();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to initialize scene\n";
+    scene.reset();
+    return scene;
+  }
+
+  this->scenes.push_back(scene);
 
   rendering::Events::createScene(_name);
 
@@ -243,8 +279,6 @@ void RenderEngine::Init()
   if (this->renderPathType == NONE)
     return;
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
   this->initialized = false;
 
   Ogre::ColourValue ambient;
@@ -278,10 +312,6 @@ void RenderEngine::Fini()
   if (!this->initialized)
     return;
 
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
-
   this->connections.clear();
 
   // TODO: this was causing a segfault on shutdown
@@ -290,7 +320,11 @@ void RenderEngine::Fini()
 
   RTShaderSystem::Instance()->Fini();
 
-  this->scenes.clear();
+  // Deallocate memory for every scene
+  while (!this->scenes.empty())
+  {
+    this->RemoveScene(this->scenes.front()->GetName());
+  }
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
@@ -312,12 +346,17 @@ void RenderEngine::Fini()
       delete this->root;
     }
     catch(...)
-    { }
+    {
+    }
   }
   this->root = NULL;
 
   delete this->logManager;
   this->logManager = NULL;
+
+  for (unsigned int i = 0; i < this->scenes.size(); ++i)
+    this->scenes[i].reset();
+  this->scenes.clear();
 
 #ifndef Q_OS_MAC
   if (this->dummyDisplay)
@@ -567,7 +606,7 @@ void RenderEngine::SetupRenderSystem()
   const Ogre::RenderSystemList *rsList;
 
   // Set parameters of render system (window size, etc.)
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
+#if  OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
   rsList = this->root->getAvailableRenderers();
 #else
   rsList = &(this->root->getAvailableRenderers());
@@ -728,3 +767,11 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
 {
   return this->windowManager;
 }
+
+#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+/////////////////////////////////////////////////
+Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
+{
+  return this->overlaySystem;
+}
+#endif

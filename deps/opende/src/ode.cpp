@@ -246,7 +246,7 @@ void dWorldCheck (dxWorld *w)
 dxBody::dxBody(dxWorld *w) :
     dObject(w)
 {
-    
+
 }
 
 
@@ -807,7 +807,7 @@ void dBodySetFiniteRotationMode (dBodyID b, int mode)
     if (!_dequal(b->finite_rot_axis[0], 0.0) ||
         !_dequal(b->finite_rot_axis[1], 0.0) ||
         !_dequal(b->finite_rot_axis[2], 0.0))
-    { 
+    {
       b->flags |= dxBodyFlagFiniteRotationAxis;
     }
   }
@@ -869,7 +869,7 @@ dJointID dBodyGetJoint (dBodyID b, int index)
 void dBodySetDynamic (dBodyID b)
 {
   dAASSERT (b);
-  
+
   dBodySetMass(b,&b->mass);
 }
 
@@ -877,7 +877,7 @@ void dBodySetKinematic (dBodyID b)
 {
   dAASSERT (b);
   dSetZero (b->invI,4*3);
-  b->invMass = 0; 
+  b->invMass = 0;
 }
 
 int dBodyIsKinematic (dBodyID b)
@@ -1208,11 +1208,11 @@ dxJoint* createJoint(dWorldID w, dJointGroupID group)
         group->num++;
     } else
         j = (dxJoint*) dAlloc(sizeof(T));
-    
+
     new(j) T(w);
     if (group)
         j->flags |= dJOINT_INGROUP;
-    
+
     return j;
 }
 
@@ -1323,6 +1323,24 @@ dxJoint * dJointCreatePlane2D (dWorldID w, dJointGroupID group)
     return createJoint<dxJointPlane2D> (w,group);
 }
 
+dxJoint * dJointCreateDBall (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointDBall> (w,group);
+}
+
+dxJoint * dJointCreateDHinge (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointDHinge> (w,group);
+}
+
+dxJoint * dJointCreateGearbox (dWorldID w, dJointGroupID group)
+{
+    dAASSERT (w);
+    return createJoint<dxJointGearbox> (w,group);
+}
+
 void dJointDestroy (dxJoint *j)
 {
     dAASSERT (j);
@@ -1361,7 +1379,7 @@ void dJointGroupEmpty (dJointGroupID group)
     // be at the start of those lists.
     // if any group joints have their world pointer set to 0, their world was
     // previously destroyed. no special handling is required for these joints.
-    
+
     dAASSERT (group);
     int i;
     dxJoint **jlist = (dxJoint**) ALLOCA (group->num * sizeof(dxJoint*));
@@ -1522,7 +1540,7 @@ void dJointSetDamping (dxJoint *joint, dReal damping)
 {
   dAASSERT (joint);
 
-  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider || 
+  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider ||
       joint->type() == dJointTypeScrew)
   {
     if (!_dequal(damping, 0.0))
@@ -1657,7 +1675,21 @@ dxWorld * dWorldCreate()
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
-  w->qs.sor_lcp_tolerance = 0;
+  w->qs.sor_lcp_tolerance = -1;
+  w->qs.rms_dlambda[0] = 0;
+  w->qs.rms_dlambda[1] = 0;
+  w->qs.rms_dlambda[2] = 0;
+  w->qs.rms_dlambda[3] = 0;
+  w->qs.rms_constraint_residual[0] = 0;
+  w->qs.rms_constraint_residual[1] = 0;
+  w->qs.rms_constraint_residual[2] = 0;
+  w->qs.rms_constraint_residual[3] = 0;
+  w->qs.num_contacts = 0;
+  w->qs.dynamic_inertia_reduction = true;
+  w->qs.smooth_contacts = 0.01;
+  w->qs.row_reorder1 = true;
+  w->qs.warm_start = 0.5;
+  w->qs.friction_iterations = 10;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -1665,7 +1697,7 @@ dxWorld * dWorldCreate()
   w->dampingp.linear_scale = 0;
   w->dampingp.angular_scale = 0;
   w->dampingp.linear_threshold = REAL(0.01) * REAL(0.01);
-  w->dampingp.angular_threshold = REAL(0.01) * REAL(0.01);  
+  w->dampingp.angular_threshold = REAL(0.01) * REAL(0.01);
   w->max_angular_speed = dInfinity;
 
   w->threadpool = NULL; // new boost::threadpool::pool(0);
@@ -1870,7 +1902,7 @@ void dWorldCleanupWorkingMemory(dWorldID w)
   dUASSERT (w,"bad world argument");
 
   dxStepWorkingMemory *wmem = w->wmem;
-  
+
   if (wmem)
   {
     wmem->CleanupMemory();
@@ -1948,7 +1980,7 @@ int dWorldStep (dWorldID w, dReal stepsize)
   if (dxReallocateWorldProcessContext (w, stepsize, &dxEstimateStepMemoryRequirements))
   {
     dxProcessIslands (w, stepsize, &dInternalStepIsland);
-    
+
     result = true;
   }
 
@@ -1965,7 +1997,7 @@ int dWorldQuickStep (dWorldID w, dReal stepsize)
   if (dxReallocateWorldProcessContext (w, stepsize, &dxEstimateQuickStepMemoryRequirements))
   {
     dxProcessIslands (w, stepsize, &dxQuickStepper);
-    
+
     result = true;
   }
 
@@ -2169,6 +2201,12 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
         w->max_angular_speed = max_speed;
 }
 
+double dWorldGetQuickStepTolerance (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.sor_lcp_tolerance;
+}
+
 void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
 {
 	dAASSERT(w);
@@ -2236,11 +2274,87 @@ dReal dWorldGetQuickStepW (dWorldID w)
 	return w->qs.w;
 }
 
-dReal dWorldGetQuickStepRMSError (dWorldID w)
+dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID w)
 {
 	dAASSERT(w);
-	return w->qs.rms_error;
+	return w->qs.rms_dlambda;
 }
+
+dReal* dWorldGetQuickStepRMSConstraintResidual (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.rms_constraint_residual;
+}
+
+int dWorldGetQuickStepNumContacts (dWorldID w)
+{
+	dAASSERT(w);
+	return w->qs.num_contacts;
+}
+
+/* experimental PGS */
+bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.dynamic_inertia_reduction;
+}
+
+dReal  dWorldGetQuickStepContactResidualSmoothing (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.smooth_contacts;
+}
+
+bool  dWorldGetQuickStepExperimentalRowReordering (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.row_reorder1;
+}
+
+dReal  dWorldGetQuickStepWarmStartFactor (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.warm_start;
+}
+
+int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.friction_iterations;
+}
+
+void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
+{
+	dAASSERT(w);
+  w->qs.dynamic_inertia_reduction = irr;
+}
+
+void dWorldSetQuickStepContactResidualSmoothing (dWorldID w, dReal smoo)
+{
+	dAASSERT(w);
+  w->qs.smooth_contacts = smoo;
+}
+
+void dWorldSetQuickStepExperimentalRowReordering (dWorldID w, bool order)
+{
+	dAASSERT(w);
+  w->qs.row_reorder1 = order;
+}
+
+void dWorldSetQuickStepWarmStartFactor (dWorldID w, dReal warm)
+{
+	dAASSERT(w);
+  w->qs.warm_start = warm;
+}
+
+void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
+{
+	dAASSERT(w);
+  w->qs.friction_iterations = iters;
+}
+
+
+
 
 
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)
@@ -2467,13 +2581,13 @@ int dCheckConfiguration( const char* extension )
 			break;
 
 		terminator = where + ext_length;
-	
-		if ( (where == start || *(where - 1) == ' ') && 
+
+		if ( (where == start || *(where - 1) == ' ') &&
 			 (*terminator == ' ' || *terminator == '\0') )
 		{
 			return 1;
 		}
-		
+
 		start = terminator;
 	}
 

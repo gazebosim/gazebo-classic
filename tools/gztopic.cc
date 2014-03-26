@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,7 @@ bool g_useShortDebugString = false;
 /////////////////////////////////////////////////
 void help(po::options_description &_options)
 {
-  std::cerr << "gztopic -- Tool to interact with gztopics on a "
-    "Gazebo master\n\n";
+  std::cerr << "gztopic -- DEPRECATED(see 'gz help topic')\n\n";
 
   std::cerr << "`gztopic` [options] <command>\n\n";
 
@@ -269,7 +268,10 @@ void hzCB(const std::string &/*_data*/)
   common::Time cur_time = common::Time::GetWallTime();
 
   if (hz_prev_time != common::Time(0, 0))
-    printf("Hz: %6.2f\n", 1.0 / (cur_time - hz_prev_time).Double());
+  {
+    std::cout << "Hz: " << std::setw(6) << std::fixed << std::setprecision(2)
+              << 1.0 / (cur_time - hz_prev_time).Double() << std::endl;
+  }
 
   hz_prev_time = cur_time;
 }
@@ -496,13 +498,11 @@ void hz()
 /////////////////////////////////////////////////
 void view(int _argc, char **_argv)
 {
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
   {
     printf("load error\n");
     return;
   }
-
-  gazebo::run();
 
   QApplication *app = new QApplication(_argc, _argv);
 
@@ -540,15 +540,9 @@ void view(int _argc, char **_argv)
       gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 
-  if (!gazebo::init())
-  {
-    gzerr << "Unable to initialize Gazebo\n";
-    return;
-  }
-
   app->exec();
 
-  gazebo::fini();
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -556,6 +550,8 @@ int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
     return 0;
+
+  gazebo::common::Console::SetQuiet(true);
 
   if (params[0] == "list")
     list();

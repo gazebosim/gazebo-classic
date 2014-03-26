@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ void WirelessReceiver::Load(const std::string &_worldName)
   WirelessTransceiver::Load(_worldName);
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
+  GZ_ASSERT(this->pub != NULL,
+      "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
 
@@ -62,75 +64,78 @@ void WirelessReceiver::Load(const std::string &_worldName)
   this->maxFreq = transceiverElem->Get<double>("max_frequency");
   this->sensitivity = transceiverElem->Get<double>("sensitivity");
 
-  if (this->minFreq < 0)
+  if (this->minFreq <= 0)
   {
-    gzerr << "Wireless receiver min. frequency must be > 0. Current value is ["
-      << this->minFreq << "]\n";
-    return;
+    gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
+      << this->minFreq << "]");
   }
 
-  if (this->maxFreq < 0)
+  if (this->maxFreq <= 0)
   {
-    gzerr << "Wireless receiver max. frequency must be > 0. Current value is ["
-      << this->maxFreq << "]\n";
-    return;
+    gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
+      << this->maxFreq << "]");
   }
 
-  if (this->sensitivity > 0)
+  if (this->minFreq > this->maxFreq)
   {
-    gzerr << "Wireless receiver sensitivity must be < 0. Current value is ["
-      << this->sensitivity << "]\n";
-    return;
+    gzthrow("Wireless receiver min. frequency must be less or equal than max. "
+        << "frequency. Current min. frequency is [" << this->minFreq <<
+        "] and max frequency is [" << this->maxFreq << "]");
+  }
+
+  if (this->sensitivity >= 0)
+  {
+    gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
+      << this->sensitivity << "]");
   }
 }
 
 //////////////////////////////////////////////////
-void WirelessReceiver::UpdateImpl(bool /*_force*/)
+bool WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
-  if (this->pub)
+  std::string txEssid;
+  msgs::WirelessNodes msg;
+  double rxPower;
+  double txFreq;
+
+  this->referencePose =
+      this->pose + this->parentEntity.lock()->GetWorldPose();
+
+  math::Pose myPos = this->referencePose;
+  Sensor_V sensors = SensorManager::Instance()->GetSensors();
+  for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {
-    std::string txEssid;
-    msgs::WirelessNodes msg;
-    double rxPower;
-    double txFreq;
-
-    this->referencePose =
-        this->pose + this->parentEntity.lock()->GetWorldPose();
-
-    math::Pose myPos = this->referencePose;
-    Sensor_V sensors = SensorManager::Instance()->GetSensors();
-    for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
+    if ((*it)->GetType() == "wireless_transmitter")
     {
-      if ((*it)->GetType() == "wireless_transmitter")
+      boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
+          boost::static_pointer_cast<WirelessTransmitter>(*it);
+
+      txFreq = transmitter->GetFreq();
+      rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
+
+      // Discard if the frequency received is out of our frequency range,
+      // or if the received signal strengh is lower than the sensivity
+      if ((txFreq < this->GetMinFreqFiltered()) ||
+          (txFreq > this->GetMaxFreqFiltered()) ||
+          (rxPower < this->GetSensitivity()))
       {
-        boost::shared_ptr<gazebo::sensors::WirelessTransmitter> transmitter =
-            boost::static_pointer_cast<WirelessTransmitter>(*it);
-
-        txFreq = transmitter->GetFreq();
-        rxPower = transmitter->GetSignalStrength(myPos, this->GetGain());
-
-        // Discard if the frequency received is out of our frequency range,
-        // or if the received signal strengh is lower than the sensivity
-        if ((txFreq < this->GetMinFreqFiltered()) ||
-            (txFreq > this->GetMaxFreqFiltered()) ||
-            (rxPower < this->GetSensitivity()))
-        {
-          continue;
-        }
-
-        txEssid = transmitter->GetESSID();
-
-        msgs::WirelessNode *wirelessNode = msg.add_node();
-        wirelessNode->set_essid(txEssid);
-        wirelessNode->set_frequency(txFreq);
-        wirelessNode->set_signal_level(rxPower);
+        continue;
       }
-    }
-    if (msg.node_size() > 0)
-    {
-      this->pub->Publish(msg);
+
+      txEssid = transmitter->GetESSID();
+
+      msgs::WirelessNode *wirelessNode = msg.add_node();
+      wirelessNode->set_essid(txEssid);
+      wirelessNode->set_frequency(txFreq);
+      wirelessNode->set_signal_level(rxPower);
     }
   }
+  if (msg.node_size() > 0)
+  {
+    this->pub->Publish(msg);
+  }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ const double g_physics_tol = 1e-2;
 
 using namespace gazebo;
 
-class PhysicsTest : public ServerFixture
+class SurfaceTest : public ServerFixture,
+                    public testing::WithParamInterface<const char*>
 {
   public: void CollideWithoutContact(const std::string &_physicsEngine);
 };
@@ -35,7 +36,7 @@ class PhysicsTest : public ServerFixture
 // a larger static box with a contact sensor. One of the boxes should be
 // detected by the contact sensor but not experience contact forces.
 ////////////////////////////////////////////////////////////////////////
-void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
+void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 {
   // load an empty world
   Load("worlds/collide_without_contact.world", true, _physicsEngine);
@@ -72,7 +73,7 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   // Step forward 0.2 s
   double stepTime = 0.2;
   unsigned int steps = floor(stepTime / dt);
-  world->StepWorld(steps);
+  world->Step(steps);
 
   // Expect boxes to be falling
   double fallVelocity = g.z * stepTime;
@@ -80,7 +81,7 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
 
   // Step forward another 0.2 s
-  world->StepWorld(steps);
+  world->Step(steps);
   fallVelocity = g.z * 2*stepTime;
   // Expect contactBox to be resting on contact sensor box
   EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
@@ -92,7 +93,7 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
     msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
-      world->StepWorld(1);
+      world->Step(1);
       contacts = contactSensor->GetContacts();
     }
 
@@ -122,7 +123,7 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   // Step forward another 0.4 s
   // The collideBox should have fallen through the ground and not
   // be in contact with the sensor
-  world->StepWorld(steps*2);
+  world->Step(steps*2);
   fallVelocity = g.z * 4*stepTime;
   // Expect contactBox to still be resting on contact sensor box
   EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
@@ -134,7 +135,7 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
     msgs::Contacts contacts;
     while (contacts.contact_size() == 0 && --steps > 0)
     {
-      world->StepWorld(1);
+      world->Step(1);
       contacts = contactSensor->GetContacts();
     }
 
@@ -162,14 +163,15 @@ void PhysicsTest::CollideWithoutContact(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(PhysicsTest, CollideWithoutContact)
+TEST_P(SurfaceTest, CollideWithoutContact)
 {
   CollideWithoutContact(GetParam());
 }
 
 // This test doesn't yet work in bullet, so we'll declare it only for ode.
-// INSTANTIATE_PHYSICS_ENGINES_TEST(PhysicsTest);
-INSTANTIATE_TEST_CASE_P(TestODE, PhysicsTest, ::testing::Values("ode"));
+// Issue #1038
+// INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
 
 int main(int argc, char **argv)
 {

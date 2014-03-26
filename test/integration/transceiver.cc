@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,17 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
-class TransceiverTest : public ServerFixture
+class TransceiverTest : public ServerFixture,
+                        public testing::WithParamInterface<const char*>
 {
   public: TransceiverTest();
   public: void TxRxEmptySpace(const std::string &_physicsEngine);
   public: void TxRxObstacle(const std::string &_physicsEngine);
+  public: void TxRxFreqOutOfBounds(const std::string &_physicsEngine);
   private: void RxMsg(const ConstWirelessNodesPtr &_msg);
 
   private: static const double MinFreq;
@@ -162,6 +165,81 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     }
   }
   FAIL();
+}
+
+/////////////////////////////////////////////////
+void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  double txFreq = this->MinFreq - 1.0;
+  std::string tx1ModelName = "tx1";
+  std::string tx1SensorName = "wirelessTransmitter1";
+  std::string tx2ModelName = "tx2";
+  std::string tx2SensorName = "wirelessTransmitter2";
+  std::string txEssid = "osrf";
+  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
+
+  SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,
+      txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
+
+  sensors::WirelessTransmitterPtr tx1 =
+      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+        sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
+
+  ASSERT_TRUE(tx1);
+
+  txFreq = this->MaxFreq + 1.0;
+  SpawnWirelessTransmitterSensor(tx2ModelName, tx2SensorName, txPose.pos,
+      txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
+
+  sensors::WirelessTransmitterPtr tx2 =
+      boost::static_pointer_cast<sensors::WirelessTransmitter>(
+        sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
+
+  ASSERT_TRUE(tx2);
+
+  // Wireless Receiver - rx
+  std::string rxModelName = "rx";
+  std::string rxSensorName = "wirelessReceiver";
+  math::Pose rxPose(math::Vector3(0, 2, 0.055),
+      math::Quaternion(0, 0, 0));
+
+  // Spawn rx
+  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
+      rxPose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+      this->Gain, this->Sensitivity);
+
+  sensors::WirelessReceiverPtr rx =
+    boost::static_pointer_cast<sensors::WirelessReceiver>(
+        sensors::SensorManager::Instance()->GetSensor(rxSensorName));
+
+  ASSERT_TRUE(rx);
+
+  // Initialize gazebo transport layer
+  transport::NodePtr node(new transport::Node());
+  node->Init("default");
+
+  std::string rxTopic = "/gazebo/default/rx/link/wirelessReceiver/transceiver";
+  transport::SubscriberPtr sub = node->Subscribe(rxTopic,
+      &TransceiverTest::RxMsg, this);
+  this->receivedMsg = false;
+
+  // Loop a max. of ~5 seconds
+  for (int i = 0; i < 50; ++i)
+  {
+    // Update the sensors
+    tx1->Update(true);
+    tx2->Update(true);
+    rx->Update(true);
+
+    common::Time::MSleep(100);
+    boost::mutex::scoped_lock lock(this->mutex);
+  }
+
+  EXPECT_FALSE(this->receivedMsg);
 }
 
 /////////////////////////////////////////////////
@@ -315,18 +393,31 @@ TEST_P(TransceiverTest, EmptyWorld)
 /////////////////////////////////////////////////
 TEST_P(TransceiverTest, Obstacle)
 {
+  if (std::string(GetParam()) == "simbody")
+  {
+    gzerr << "Abort test since this test frequently fails with simbody, "
+          << " see (issues #867)" << std::endl;
+    return;
+  }
+  if (std::string(GetParam()) == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issues #916, #911)" << std::endl;
+    return;
+  }
+
   TxRxObstacle(GetParam());
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
-    ::testing::Values("ode"));
+TEST_P(TransceiverTest, FreqOutOfBounds)
+{
+  TxRxFreqOutOfBounds(GetParam());
+}
 
 /////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, TransceiverTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class ForceTorqueSensor ForceTorqueSensor.hh sensors/sensors.hh
     /// \brief Sensor for measure force and torque on a joint.
-    class ForceTorqueSensor: public Sensor
+    class GAZEBO_VISIBLE ForceTorqueSensor: public Sensor
     {
       /// \brief Constructor.
       public: ForceTorqueSensor();
@@ -59,6 +60,10 @@ namespace gazebo
       /// \return The latested measured force.
       public: math::Vector3 GetForce() const;
 
+      /// \brief Get Parent Joint
+      /// \return Pointer to the joint containing this sensor
+      public: physics::JointPtr GetJoint() const;
+
       // Documentation inherited.
       public: virtual bool IsActive();
 
@@ -75,10 +80,13 @@ namespace gazebo
               {update.Disconnect(_conn);}
 
       // Documentation inherited.
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited.
       protected: virtual void Fini();
+
+      /// \brief Update event.
+      protected: event::EventT<void(msgs::WrenchStamped)> update;
 
       /// \brief Parent joint, from which we get force torque info.
       private: physics::JointPtr parentJoint;
@@ -91,9 +99,6 @@ namespace gazebo
 
       /// \brief Mutex to protect the wrench message
       private: boost::mutex mutex;
-
-      /// \brief Update event.
-      protected: event::EventT<void(msgs::WrenchStamped)> update;
     };
     /// \}
   }

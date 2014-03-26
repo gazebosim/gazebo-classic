@@ -1,13 +1,10 @@
 prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${prefix}/lib
-includedir=${prefix}/include
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 
 Name: gazebo_transport
 Description: Gazebo Transport Library
 Version: @GAZEBO_VERSION_FULL@
 Requires:
-Libs: -Wl,-rpath,${libdir} -L${libdir} -lgazebo_transport  -lgazebo_msgs 
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@/gazebo
-# The CFlags statement here is deprecated for gazebo-1.9 and will be replaced
-# in gazebo-2.0 with the following:
-# CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
+Libs: -L${libdir} -lgazebo_transport -lgazebo_msgs 
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@

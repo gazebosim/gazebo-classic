@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
 #include "gazebo/physics/JointState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
     ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
-    class ModelState : public State
+    class GAZEBO_VISIBLE ModelState : public State
     {
       /// \brief Default constructor.
       public: ModelState();
@@ -118,16 +119,6 @@ namespace gazebo
       /// \return List of joint states whose names match the regular
       /// expression.
       public: JointState_M GetJointStates(const boost::regex &_regex) const;
-
-      /// \brief Get a link state.
-      ///
-      /// Get a Link State based on an index, where index is in the range of
-      /// 0...ModelState::GetLinkStateCount
-      /// \param[in] _index Index of the LinkState
-      /// \return State of the Link.
-      /// \throws common::Exception When _index is out of range.
-      public: LinkState GetLinkState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
 
       /// \brief Get a link state by Link name
       ///

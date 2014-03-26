@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ using namespace sdf;
 /////////////////////////////////////////////////
 void help()
 {
-  std::cerr << "gzsdf -- Tool to provide information about SDF files.\n\n";
+  std::cerr << "gzsdf -- DEPRECATED(see 'gz help sdf')\n\n";
   std::cerr << "`gzsdf` <command>\n\n";
   std::cerr << "This tool provides information about SDF files.\n\n";
   std::cerr << "Commands:\n";
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzsdf.log");
+    gzLogInit("gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {

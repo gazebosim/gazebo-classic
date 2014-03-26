@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@
 #define _BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/BoxShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet box collision
-    class BulletBoxShape : public BoxShape
+    class GAZEBO_VISIBLE BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
@@ -47,9 +49,8 @@ namespace gazebo
               {
                 if (_size.x < 0 || _size.y < 0 || _size.z < 0)
                 {
-                    gzerr << "Box shape does not support negative"
-                          << " size\n";
-                    return;
+                  gzerr << "Box shape does not support negative size\n";
+                  return;
                 }
                 math::Vector3 size = _size;
                 if (math::equal(size.x, 0.0))
@@ -80,19 +81,45 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
+                  this->initialSize = size;
                   bParent->SetCollisionShape(new btBoxShape(
                       btVector3(size.x*0.5, size.y*0.5, size.z*0.5)));
                 }
                 else
                 {
-                  btVector3 scale = shape->getLocalScaling();
-                  math::Vector3 boxSize = this->GetSize();
-                  scale.setX(size.x / boxSize.x);
-                  scale.setY(size.y / boxSize.y);
-                  scale.setZ(size.z / boxSize.z);
-                  shape->setLocalScaling(scale);
+                  btVector3 boxScale = shape->getLocalScaling();
+                  boxScale.setX(size.x / this->initialSize.x);
+                  boxScale.setY(size.y / this->initialSize.y);
+                  boxScale.setZ(size.z / this->initialSize.z);
+
+                  shape->setLocalScaling(boxScale);
+
+                  // clear bullet cache and re-add the collision shape
+                  // otherwise collisions won't work properly after scaling
+                  BulletLinkPtr bLink =
+                    boost::dynamic_pointer_cast<BulletLink>(
+                    bParent->GetLink());
+                  bLink->ClearCollisionCache();
+
+                  // remove and add the shape again
+                  if (bLink->GetBulletLink()->getCollisionShape()->isCompound())
+                  {
+                    btCompoundShape *compoundShape =
+                        dynamic_cast<btCompoundShape *>(
+                        bLink->GetBulletLink()->getCollisionShape());
+
+                    compoundShape->removeChildShape(shape);
+                    math::Pose relativePose =
+                        this->collisionParent->GetRelativePose();
+                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    compoundShape->addChildShape(
+                        BulletTypes::ConvertPose(relativePose), shape);
+                  }
                 }
               }
+
+      /// \brief Initial size of box.
+      private: math::Vector3 initialSize;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class PhysicsEngine
+    class GAZEBO_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
@@ -68,7 +69,7 @@ namespace gazebo
       /// \brief Update the physics engine collision.
       public: virtual void UpdateCollision() = 0;
 
-      /// \brief Return the type of the physics engine (ode|bullet).
+      /// \brief Return the physics engine type (ode|bullet|dart|simbody).
       /// \return Type of the physics engine.
       public: virtual std::string GetType() const = 0;
 
@@ -76,29 +77,9 @@ namespace gazebo
       /// \param[in] _seed The random number seed.
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
-      /// \brief Set the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::SetRealTimeUpdateRate.
-      /// \param[in] _value Value of the update rate.
-      public: void SetUpdateRate(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation update rate.
-      /// This funciton is deprecated, use PhysicsEngine::GetRealTimeUpdateRate.
-      /// \return Update rate.
-      public: double GetUpdateRate() GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();
-
-      /// \brief Set the simulation step time.
-      /// This funciton is deprecated, use World::SetMaxStepSize.
-      /// \param[in] _value Value of the step time.
-      public: virtual void SetStepTime(double _value) GAZEBO_DEPRECATED(1.5);
-
-      /// \brief Get the simulation step time.
-      /// This funciton is deprecated, use World::GetMaxStepSize.
-      /// \return Simulation step time.
-      public: virtual double GetStepTime() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Get target real time factor
       /// \return Target real time factor
@@ -126,6 +107,10 @@ namespace gazebo
 
       /// \brief Update the physics engine.
       public: virtual void UpdatePhysics() {}
+
+      /// \brief Create a new model.
+      /// \param[in] _base Boost shared pointer to a new model.
+      public: virtual ModelPtr CreateModel(BasePtr _base);
 
       /// \brief Create a new body.
       /// \param[in] _parent Parent model for the link.
@@ -216,7 +201,7 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters
       /// \param[in] _maxContacts Maximum number of contacts.
-      public: virtual void SetMaxContacts(double _maxContacts);
+      public: virtual void SetMaxContacts(unsigned int _maxContacts);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -270,18 +255,18 @@ namespace gazebo
       /// property map.
       /// \brief access functions to set ODE parameters.
       /// \return Maximum number of allows contacts.
-      public: virtual int GetMaxContacts() {return 0;}
+      public: virtual unsigned int GetMaxContacts() {return 0;}
 
       /// \brief Set a parameter of the physics engine
       /// \param[in] _key String key
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(std::string _key,
+      public: virtual void SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
       /// \return The value of the parameter
-      public: virtual boost::any GetParam(std::string _key) const;
+      public: virtual boost::any GetParam(const std::string &_key) const;
 
       /// \brief Debug print out of the physic engine state.
       public: virtual void DebugPrint() const = 0;

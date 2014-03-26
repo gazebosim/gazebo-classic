@@ -45,6 +45,7 @@ set (sources
   RFIDTagVisual.cc
   RTShaderSystem.cc
   Scene.cc
+  SelectionObj.cc
   TransmitterVisual.cc
   UserCamera.cc
   VideoVisual.cc
@@ -88,6 +89,7 @@ set (headers
   RFIDTagVisual.hh
   RTShaderSystem.hh
   Scene.hh
+  SelectionObj.hh
   TransmitterVisual.hh
   UserCamera.hh
   VideoVisual.hh
@@ -100,6 +102,18 @@ set (headers
   cegui.h
 )
 
+set (gtest_sources
+)
+
+gz_build_tests(${gtest_sources})
+
+set (gtest_sources_dri
+  GpuLaser_TEST.cc
+  Heightmap_TEST.cc
+)
+
+gz_build_dri_tests(${gtest_sources_dri})
+
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
@@ -108,18 +122,20 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
 
-link_directories(  
+link_directories(
   ${ogre_library_dirs}
 )
 
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
-  gazebo_common 
+  gazebo_common
+  gazebo_msgs
   gazebo_skyx
   gazebo_selection_buffer
-  ${ogre_libraries} 
-  ${OPENGL_LIBRARIES} 
+  gazebo_transport
+  ${ogre_libraries}
+  ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
 
@@ -133,11 +149,3 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
-
-# Deprecated Rendering.hh
-gz_issue_775("Rendering")
-
-# unit tests
-set (gtest_sources
-  GpuLaser_TEST.cc)
-gz_build_dri_tests(${gtest_sources})

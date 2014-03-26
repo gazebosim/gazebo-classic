@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL
 /// \brief Render everything visibility mask.
@@ -31,9 +32,9 @@
 /// \brief Render GUI visuals mask.
 #define GZ_VISIBILITY_GUI             0x00000001
 
-/// \def GZ_VISIBILITY_NOT_SELECTABLE
-/// \brief Render visuals that are not selectable mask.
-#define GZ_VISIBILITY_NOT_SELECTABLE  0x00000002
+/// \def GZ_VISIBILITY_SELECTABLE
+/// \brief Render visuals that are selectable mask.
+#define GZ_VISIBILITY_SELECTABLE      0x00000002
 
 namespace gazebo
 {
@@ -59,6 +60,7 @@ namespace gazebo
     class RFIDVisual;
     class RFIDTagVisual;
     class WindowManager;
+    class SelectionObj;
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -139,6 +141,10 @@ namespace gazebo
     /// \def WindowManager
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
+
+    /// \def ContactVisualPtr
+    /// \brief Shared pointer to SelectionObj
+    typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

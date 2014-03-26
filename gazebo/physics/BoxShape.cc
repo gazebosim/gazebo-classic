@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,20 @@ void BoxShape::SetSize(const math::Vector3 &_size)
 math::Vector3 BoxShape::GetSize() const
 {
   return this->sdf->Get<math::Vector3>("size");
+}
+
+//////////////////////////////////////////////////
+void BoxShape::SetScale(const math::Vector3 &_scale)
+{
+  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+    return;
+
+  if (_scale == this->scale)
+    return;
+
+  this->SetSize((_scale/this->scale)*this->GetSize());
+
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////

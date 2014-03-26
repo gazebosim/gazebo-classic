@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,257 +14,620 @@
  * limitations under the License.
  *
 */
-#include <boost/lexical_cast.hpp>
 
-#include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Scene.hh"
 #include "gazebo/common/MeshManager.hh"
+
+#include "gazebo/gui/GuiIface.hh"
+
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/SelectionObjPrivate.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
-
-//////////////////////////////////////////////////
-SelectionObj::SelectionObj(Scene *scene_)
-  : scene(scene_)
+/////////////////////////////////////////////////
+SelectionObj::SelectionObj(const std::string &_name, VisualPtr _vis)
+  : Visual(*new SelectionObjPrivate, _name, _vis, false)
 {
-  this->active = false;
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  dPtr->state = SELECTION_NONE;
+  dPtr->mode = SELECTION_NONE;
+
+  dPtr->maxScale = 3.0;
+  dPtr->minScale = 0.5;
+
+  dPtr->xAxisMatOverlay = "Gazebo/RedTransparentOverlay";
+  dPtr->yAxisMatOverlay = "Gazebo/GreenTransparentOverlay";
+  dPtr->zAxisMatOverlay = "Gazebo/BlueTransparentOverlay";
+
+  dPtr->xAxisMat = "Gazebo/RedTransparent";
+  dPtr->yAxisMat = "Gazebo/GreenTransparent";
+  dPtr->zAxisMat = "Gazebo/BlueTransparent";
 }
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 SelectionObj::~SelectionObj()
 {
-  this->node.reset();
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+  dPtr->parent.reset();
 }
 
-//////////////////////////////////////////////////
-void SelectionObj::Init()
+/////////////////////////////////////////////////
+void SelectionObj::Load()
 {
-  this->node.reset(new Visual("selection_obj_visual",
-                              this->scene->GetWorldVisual()));
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  Visual::InsertMesh(common::MeshManager::Instance()->GetMesh("unit_box"));
+  Visual::Load();
 
- /* Ogre::SceneNode *transNode =
-    this->node->GetSceneNode()->createChildSceneNode("trans_node");
+  this->CreateRotateVisual();
+  this->CreateTranslateVisual();
+  this->CreateScaleVisual();
 
-  transNode->setInheritOrientation(false);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  Ogre::SceneNode *xBox[2], *yBox[2], *zBox[2];
+  dPtr->transVisual->SetVisible(false);
+  dPtr->rotVisual->SetVisible(false);
+  dPtr->scaleVisual->SetVisible(false);
 
-  for (int i = 0; i < 2; i++)
+  this->GetSceneNode()->setInheritScale(false);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::Attach(rendering::VisualPtr _vis)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (dPtr->parent)
   {
-    xBox[i] = transNode->createChildSceneNode(
-        "selection_transX" + boost::lexical_cast<std::string>(i));
-    xBox[i]->setInheritScale(true);
-
-    yBox[i] = transNode->createChildSceneNode(
-        "selection_transY" + boost::lexical_cast<std::string>(i));
-    yBox[i]->setInheritScale(true);
-
-    zBox[i] = transNode->createChildSceneNode(
-        "selection_transZ" + boost::lexical_cast<std::string>(i));
-    zBox[i]->setInheritScale(true);
+    if (dPtr->parent == _vis)
+      return;
+    dPtr->parent->DetachVisual(shared_from_this());
   }
 
-  Ogre::MovableObject *boxObjX1 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJX1__", "unit_box"));
-  boxObjX1->setCastShadows(false);
-  boxObjX1->setUserAny(Ogre::Any(std::string("transx")));
-  ((Ogre::Entity*)boxObjX1)->setMaterialName(
-    "__GAZEBO_TRANS_RED_MATERIAL__");
-  boxObjX1->setVisibilityFlags(GZ_VISIBILITY_GUI);
+  dPtr->parent = _vis;
+  dPtr->parent->AttachVisual(shared_from_this());
+  this->SetPosition(math::Vector3(0, 0, 0));
 
-  Ogre::MovableObject *boxObjX2 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJX2__", "unit_box"));
-  boxObjX2->setCastShadows(false);
-  boxObjX2->setUserAny(Ogre::Any(std::string("transx")));
-  ((Ogre::Entity*)boxObjX2)->setMaterialName(
-    "__GAZEBO_TRANS_RED_MATERIAL__");
-  boxObjX2->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-
-  Ogre::MovableObject *boxObjY1 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJY1__", "unit_box"));
-  boxObjY1->setCastShadows(false);
-  boxObjY1->setUserAny(Ogre::Any(std::string("transy")));
-  ((Ogre::Entity*)boxObjY1)->setMaterialName(
-    "__GAZEBO_TRANS_GREEN_MATERIAL__");
-  boxObjY1->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  Ogre::MovableObject *boxObjY2 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJY2__", "unit_box"));
-  boxObjY2->setCastShadows(false);
-  boxObjY2->setUserAny(Ogre::Any(std::string("transy")));
-  ((Ogre::Entity*)boxObjY2)->setMaterialName(
-    "__GAZEBO_TRANS_GREEN_MATERIAL__");
-  boxObjY2->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-
-  Ogre::MovableObject *boxObjZ1 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJZ1__", "unit_box"));
-  boxObjZ1->setCastShadows(false);
-  boxObjZ1->setUserAny(Ogre::Any(std::string("transz")));
-  ((Ogre::Entity*)boxObjZ1)->setMaterialName(
-    "__GAZEBO_TRANS_BLUE_MATERIAL__");
-  boxObjZ1->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  Ogre::MovableObject *boxObjZ2 =
-    (Ogre::MovableObject*)(this->scene->GetManager()->createEntity(
-          "__SELECTION_OBJZ2__", "unit_box"));
-  boxObjZ2->setCastShadows(false);
-  boxObjZ2->setUserAny(Ogre::Any(std::string("transz")));
-  ((Ogre::Entity*)boxObjZ2)->setMaterialName(
-    "__GAZEBO_TRANS_BLUE_MATERIAL__");
-  boxObjZ2->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  this->boxSize = 0.2;
-
-  xBox[0]->attachObject(boxObjX1);
-  xBox[0]->setInheritOrientation(false);
-  xBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  xBox[0]->setPosition(1.5, 0, 0);
-
-  xBox[1]->attachObject(boxObjX2);
-  xBox[1]->setInheritOrientation(false);
-  xBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  xBox[1]->setPosition(-1.5, 0, 0);
-
-  yBox[0]->attachObject(boxObjY1);
-  yBox[0]->setInheritOrientation(false);
-  yBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  yBox[0]->setPosition(0, 1.5, 0);
-
-  yBox[1]->attachObject(boxObjY2);
-  yBox[1]->setInheritOrientation(false);
-  yBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  yBox[1]->setPosition(0, -1.5, 0);
-
-
-  zBox[0]->attachObject(boxObjZ1);
-  zBox[0]->setInheritOrientation(false);
-  zBox[0]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  zBox[0]->setPosition(0, 0, 1.5);
-
-  zBox[1]->attachObject(boxObjZ2);
-  zBox[1]->setInheritOrientation(false);
-  zBox[1]->setScale(this->boxSize, this->boxSize, this->boxSize);
-  zBox[1]->setPosition(0, 0, -1.5);
-  */
-
-  this->node->SetVisible(false);
+  this->UpdateSize();
 }
 
-//////////////////////////////////////////////////
-void SelectionObj::Attach(VisualPtr _visual)
+/////////////////////////////////////////////////
+void SelectionObj::UpdateSize()
 {
-  this->Clear();
-  if (_visual)
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  VisualPtr vis = dPtr->parent;
+
+  // don't include the selection obj itself when calculating the size.
+  this->Detach();
+  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
+      * vis->GetScale();
+  dPtr->parent = vis;
+  dPtr->parent->AttachVisual(shared_from_this());
+
+  double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+
+  max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
+
+  // Handle special case for rotation visuals. Only set the visuals to be
+  // overlays for big objects.
+  if (math::equal(max, dPtr->maxScale))
   {
-  /*  Ogre::Node *transNode;
-
-    math::Box box = _visual->GetBoundingBox();
-    _visual->AttachVisual(this->node);
-
-    box = box - _visual->GetPose().pos;
-
-    transNode = this->node->GetSceneNode()->getChild("trans_node");
-    transNode->getChild("selection_transX0")->setPosition(
-        -box.GetXLength()*0.5 - this->boxSize, 0,
-        box.GetZLength()*0.5 + box.min.z);
-    transNode->getChild("selection_transX1")->setPosition(
-        box.GetXLength()*0.5 + this->boxSize, 0,
-        box.GetZLength()*0.5 + box.min.z);
-
-    transNode->getChild("selection_transY0")->setPosition(0,
-        -box.GetYLength()*0.5 - this->boxSize,
-        box.GetZLength()*0.5 + box.min.z);
-    transNode->getChild("selection_transY1")->setPosition(0,
-        box.GetYLength()*0.5 + this->boxSize,
-        box.GetZLength()*0.5 + box.min.z);
-
-    transNode->getChild("selection_transZ0")->setPosition(0, 0,
-        box.min.z - this->boxSize);
-    transNode->getChild("selection_transZ1")->setPosition(0, 0,
-        box.max.z + this->boxSize);
-    this->node->SetVisible(true);
-*/
-    this->visualName = _visual->GetName();
+    dPtr->rotXVisual->SetMaterial(dPtr->xAxisMatOverlay, false);
+    dPtr->rotYVisual->SetMaterial(dPtr->yAxisMatOverlay, false);
+    dPtr->rotZVisual->SetMaterial(dPtr->zAxisMatOverlay, false);
   }
   else
-    this->visualName.clear();
-}
-
-//////////////////////////////////////////////////
-void SelectionObj::Clear()
-{
-  /*if (this->node->GetSceneNode()->getParentSceneNode())
   {
-    this->node->GetSceneNode()->getParentSceneNode()->removeChild(
-        this->node->GetSceneNode());
+    dPtr->rotXVisual->SetMaterial(dPtr->xAxisMat, false);
+    dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat, false);
+    dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat, false);
   }
-
-  this->node->SetVisible(false);
-  */
+  this->SetScale(math::Vector3(max, max, max));
 }
 
-//////////////////////////////////////////////////
-std::string SelectionObj::GetVisualName() const
+/////////////////////////////////////////////////
+void SelectionObj::Detach()
 {
-  return this->visualName;
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (dPtr->parent)
+    dPtr->parent->DetachVisual(shared_from_this());
+  dPtr->parent.reset();
 }
 
-//////////////////////////////////////////////////
-bool SelectionObj::IsActive() const
+/////////////////////////////////////////////////
+void SelectionObj::SetMode(const std::string &_mode)
 {
-  return this->active;
+  SelectionMode tmpMode = SELECTION_NONE;
+
+  if (_mode == "translate")
+    tmpMode = TRANS;
+  else if (_mode == "rotate")
+    tmpMode = ROT;
+  else if (_mode == "scale")
+    tmpMode = SCALE;
+
+  this->SetMode(tmpMode);
 }
 
-//////////////////////////////////////////////////
-void SelectionObj::SetActive(bool _active)
+/////////////////////////////////////////////////
+void SelectionObj::SetMode(SelectionMode _mode)
 {
-  this->active = _active;
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (_mode == dPtr->mode)
+    return;
+
+  dPtr->mode = _mode;
+
+  dPtr->transVisual->SetVisible(false);
+  dPtr->rotVisual->SetVisible(false);
+  dPtr->scaleVisual->SetVisible(false);
+
+  if (dPtr->mode == TRANS)
+    dPtr->transVisual->SetVisible(true);
+  else if (dPtr->mode == ROT)
+    dPtr->rotVisual->SetVisible(true);
+  else if (dPtr->mode == SCALE)
+    dPtr->scaleVisual->SetVisible(true);
 }
 
-//////////////////////////////////////////////////
-void SelectionObj::SetHighlight(const std::string &_mod)
+/////////////////////////////////////////////////
+SelectionObj::SelectionMode SelectionObj::GetMode()
 {
-  Ogre::ColourValue color;
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
 
-  std::map<std::string, std::string> matNames;
-  matNames["transx"] = "__GAZEBO_TRANS_RED_MATERIAL__";
-  matNames["transy"] = "__GAZEBO_TRANS_GREEN_MATERIAL__";
-  matNames["transz"] = "__GAZEBO_TRANS_BLUE_MATERIAL__";
+  return dPtr->mode;
+}
 
-  std::map<std::string, std::string >::iterator iter;
-  for (iter = matNames.begin(); iter != matNames.end(); ++iter)
+/////////////////////////////////////////////////
+void SelectionObj::SetState(const std::string &_state)
+{
+  SelectionMode tmpState = SELECTION_NONE;
+
+  if (_state == "trans_x")
+  {
+    tmpState = TRANS_X;
+  }
+  else if (_state == "trans_y")
+  {
+    tmpState = TRANS_Y;
+  }
+  else if (_state == "trans_z")
+  {
+    tmpState = TRANS_Z;
+  }
+  else if (_state == "rot_x")
+  {
+    tmpState = ROT_X;
+  }
+  else if (_state == "rot_y")
+  {
+    tmpState = ROT_Y;
+  }
+  else if (_state == "rot_z")
+  {
+    tmpState = ROT_Z;
+  }
+  else if (_state == "scale_x")
+  {
+    tmpState = SCALE_X;
+  }
+  else if (_state == "scale_y")
+  {
+    tmpState = SCALE_Y;
+  }
+  else if (_state == "scale_z")
+  {
+    tmpState = SCALE_Z;
+  }
+  this->SetState(tmpState);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetState(SelectionMode _state)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  if (dPtr->state == _state)
+    return;
+
+  dPtr->state = _state;
+
+  if (dPtr->selectedVis)
   {
     Ogre::MaterialPtr mat =
-      Ogre::MaterialManager::getSingleton().getByName(iter->second);
-
-    if (!mat.isNull())
-    {
-      Ogre::Technique *technique = mat->getTechnique(0);
-      Ogre::Pass *pass = technique->getPass(0);
-
-      if (iter->first != _mod)
-      {
-        pass->setDepthWriteEnabled(false);
-        pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-      }
-      else
-      {
-        pass->setDepthWriteEnabled(true);
-        pass->setSceneBlending(Ogre::SBT_REPLACE);
-      }
-    }
+      Ogre::MaterialManager::getSingleton().getByName(
+      dPtr->selectedVis->GetMaterialName());
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
+      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.5);
+    dPtr->selectedVis.reset();
   }
+
+  if (dPtr->state == TRANS_X)
+    dPtr->selectedVis = dPtr->transXVisual;
+  else if (dPtr->state == TRANS_Y)
+    dPtr->selectedVis = dPtr->transYVisual;
+  else if (dPtr->state == TRANS_Z)
+    dPtr->selectedVis = dPtr->transZVisual;
+  else if (dPtr->state == ROT_X)
+    dPtr->selectedVis = dPtr->rotXVisual;
+  else if (dPtr->state == ROT_Y)
+    dPtr->selectedVis = dPtr->rotYVisual;
+  else if (dPtr->state == ROT_Z)
+    dPtr->selectedVis = dPtr->rotZVisual;
+  else if (dPtr->state == SCALE_X)
+    dPtr->selectedVis = dPtr->scaleXVisual;
+  else if (dPtr->state == SCALE_Y)
+    dPtr->selectedVis = dPtr->scaleYVisual;
+  else if (dPtr->state == SCALE_Z)
+    dPtr->selectedVis = dPtr->scaleZVisual;
+
+  if (dPtr->selectedVis)
+  {
+    Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(
+      dPtr->selectedVis->GetMaterialName());
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
+      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.7);
+  }
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::SetGlobal(bool _global)
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  dPtr->transVisual->GetSceneNode()->setInheritOrientation(!_global);
+  dPtr->rotVisual->GetSceneNode()->setInheritOrientation(!_global);
+}
+
+/////////////////////////////////////////////////
+SelectionObj::SelectionMode SelectionObj::GetState()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  return dPtr->state;
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::CreateTranslateVisual()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Translation mainipulation tool
+  dPtr->transVisual.reset(new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_TRANS__",
+      shared_from_this()));
+
+  dPtr->transXVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_TRANS_X__" + this->GetName(), dPtr->transVisual));
+  dPtr->transYVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_TRANS_Y__" + this->GetName(), dPtr->transVisual));
+  dPtr->transZVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_TRANS_Z__" + this->GetName(), dPtr->transVisual));
+
+  dPtr->transXVisual->Load();
+  dPtr->transYVisual->Load();
+  dPtr->transZVisual->Load();
+
+  this->InsertMesh("axis_shaft");
+  this->InsertMesh("axis_head");
+
+  Ogre::MovableObject *shaftXObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_SHAFT_X__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *headXObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_HEAD_X__" + this->GetName(), "axis_head"));
+  Ogre::SceneNode *transShaftXNode =
+      dPtr->transXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->GetName());
+  Ogre::SceneNode *transHeadXNode =
+      dPtr->transXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__TRANS_HEAD_NODE_X__"  + this->GetName());
+  transShaftXNode->attachObject(shaftXObj);
+  transShaftXNode->setScale(0.5, 0.5, 1.0);
+  transShaftXNode->setPosition(0, 0, 0.1);
+  transHeadXNode->attachObject(headXObj);
+  transHeadXNode->setScale(0.5, 0.5, 0.5);
+  transHeadXNode->setPosition(0, 0, 0.22);
+  shaftXObj->setUserAny(Ogre::Any(std::string("trans_x")));
+  headXObj->setUserAny(Ogre::Any(std::string("trans_x")));
+  shaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *shaftYObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_SHAFT_Y__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *headYObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_HEAD_Y__" + this->GetName(), "axis_head"));
+  Ogre::SceneNode *transShaftYNode =
+      dPtr->transYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Y__"  + this->GetName());
+  Ogre::SceneNode *transHeadYNode =
+      dPtr->transYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_TRANS_HEAD_NODE_Y__"  + this->GetName());
+  transShaftYNode->attachObject(shaftYObj);
+  transShaftYNode->setScale(0.5, 0.5, 1.0);
+  transShaftYNode->setPosition(0, 0, 0.1);
+  transHeadYNode->attachObject(headYObj);
+  transHeadYNode->setScale(0.5, 0.5, 0.5);
+  transHeadYNode->setPosition(0, 0, 0.22);
+  shaftYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  headYObj->setUserAny(Ogre::Any(std::string("trans_y")));
+  shaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *shaftZObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_SHAFT_Z__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *headZObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_TRANS_HEAD_Z__" + this->GetName(), "axis_head"));
+  Ogre::SceneNode *transShaftZNode =
+      dPtr->transZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_TRANS_SHAFT_NODE_Z__"  + this->GetName());
+  Ogre::SceneNode *transHeadZNode =
+      dPtr->transZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_TRANS_HEAD_NODE_Z__"  + this->GetName());
+  transShaftZNode->attachObject(shaftZObj);
+  transShaftZNode->setScale(0.5, 0.5, 1.0);
+  transShaftZNode->setPosition(0, 0, 0.1);
+  transHeadZNode->attachObject(headZObj);
+  transHeadZNode->setScale(0.5, 0.5, 0.5);
+  transHeadZNode->setPosition(0, 0, 0.22);
+  shaftZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  headZObj->setUserAny(Ogre::Any(std::string("trans_z")));
+  shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  dPtr->transXVisual->SetRotation(
+      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+  dPtr->transYVisual->SetRotation(
+      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+
+  dPtr->transXVisual->SetMaterial(dPtr->xAxisMatOverlay);
+  dPtr->transYVisual->SetMaterial(dPtr->yAxisMatOverlay);
+  dPtr->transZVisual->SetMaterial(dPtr->zAxisMatOverlay);
+
+  dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+
+  dPtr->transXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->transYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->transZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+
+  // Add to scene so they are selectable by the mouse
+  dPtr->scene->AddVisual(dPtr->transXVisual);
+  dPtr->scene->AddVisual(dPtr->transYVisual);
+  dPtr->scene->AddVisual(dPtr->transZVisual);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::CreateRotateVisual()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Rotation mainipulation tool
+  dPtr->rotVisual.reset(new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_ROT__",
+      shared_from_this()));
+
+  dPtr->rotXVisual.reset(
+      new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_ROT_X__", dPtr->rotVisual));
+  dPtr->rotYVisual.reset(
+      new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_ROT_Y__", dPtr->rotVisual));
+  dPtr->rotZVisual.reset(
+      new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual));
+
+  dPtr->rotVisual->InsertMesh("selection_tube");
+
+  Ogre::MovableObject *rotXObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_ROT_X__" + this->GetName(), "selection_tube"));
+  Ogre::SceneNode *xNode =
+      dPtr->rotXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__ROT_NODE_X__"  + this->GetName());
+  xNode->attachObject(rotXObj);
+  rotXObj->setUserAny(Ogre::Any(std::string("rot_x")));
+  rotXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *rotYObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_ROT_Y__" + this->GetName(), "selection_tube"));
+  Ogre::SceneNode *yNode =
+      dPtr->rotYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__ROT_NODE_Y__"  + this->GetName());
+  yNode->attachObject(rotYObj);
+  rotYObj->setUserAny(Ogre::Any(std::string("rot_y")));
+  rotYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *rotZObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_ROT_Z__" + this->GetName(), "selection_tube"));
+  Ogre::SceneNode *zNode =
+      dPtr->rotZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__ROT_NODE_Z__"  + this->GetName());
+  zNode->attachObject(rotZObj);
+  rotZObj->setUserAny(Ogre::Any(std::string("rot_z")));
+  rotZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  dPtr->rotXVisual->Load();
+  dPtr->rotYVisual->Load();
+  dPtr->rotZVisual->Load();
+
+  dPtr->rotXVisual->SetRotation(
+      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+  dPtr->rotYVisual->SetRotation(
+      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+
+  // By default the visuals are not overlays like translation or scale visuals.
+  // This is so that the rings does not block the object it's attached too,
+  // and also gives with better depth perception.
+  dPtr->rotXVisual->SetMaterial(dPtr->xAxisMat);
+  dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat);
+  dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat);
+
+  dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+
+  dPtr->rotXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->rotYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->rotZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+
+  // Add to scene so they are selectable by the mouse
+  dPtr->scene->AddVisual(dPtr->rotXVisual);
+  dPtr->scene->AddVisual(dPtr->rotYVisual);
+  dPtr->scene->AddVisual(dPtr->rotZVisual);
+}
+
+/////////////////////////////////////////////////
+void SelectionObj::CreateScaleVisual()
+{
+  SelectionObjPrivate *dPtr =
+      reinterpret_cast<SelectionObjPrivate *>(this->dataPtr);
+
+  // Scale mainipulation tool
+  dPtr->scaleVisual.reset(new rendering::Visual(
+      this->GetName() + "__SELECTION_OBJ_SCALE__",
+      shared_from_this()));
+
+  dPtr->scaleXVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_X__" + this->GetName(), dPtr->scaleVisual));
+  dPtr->scaleYVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_Y__" + this->GetName(), dPtr->scaleVisual));
+  dPtr->scaleZVisual.reset(
+      new rendering::Visual(
+      "__SELECTION_OBJ_SCALE_Z__" + this->GetName(), dPtr->scaleVisual));
+
+  dPtr->scaleXVisual->Load();
+  dPtr->scaleYVisual->Load();
+  dPtr->scaleZVisual->Load();
+
+  this->InsertMesh("unit_box");
+
+  Ogre::MovableObject *scaleShaftXObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_X__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *scaleHeadXObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_X__" + this->GetName(), "unit_box"));
+  Ogre::SceneNode *scaleShaftXNode =
+      dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->GetName());
+  Ogre::SceneNode *scaleHeadXNode =
+      dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->GetName());
+  scaleShaftXNode->attachObject(scaleShaftXObj);
+  scaleShaftXNode->setScale(0.5, 0.5, 1.0);
+  scaleShaftXNode->setPosition(0, 0, 0.1);
+  scaleHeadXNode->attachObject(scaleHeadXObj);
+  scaleHeadXNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadXNode->setPosition(0, 0, 0.21);
+  scaleShaftXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleHeadXObj->setUserAny(Ogre::Any(std::string("scale_x")));
+  scaleShaftXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadXObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *scaleShaftYObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_Y__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *scaleHeadYObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->GetName(), "unit_box"));
+  Ogre::SceneNode *scaleShaftYNode =
+      dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__"  + this->GetName());
+  Ogre::SceneNode *scaleHeadYNode =
+      dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Y__"  + this->GetName());
+  scaleShaftYNode->attachObject(scaleShaftYObj);
+  scaleShaftYNode->setScale(0.5, 0.5, 1.0);
+  scaleShaftYNode->setPosition(0, 0, 0.1);
+  scaleHeadYNode->attachObject(scaleHeadYObj);
+  scaleHeadYNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadYNode->setPosition(0, 0, 0.21);
+  scaleShaftYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleHeadYObj->setUserAny(Ogre::Any(std::string("scale_y")));
+  scaleShaftYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadYObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  Ogre::MovableObject *scaleShaftZObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_SHAFT_Z__" + this->GetName(), "axis_shaft"));
+  Ogre::MovableObject *scaleHeadZObj =
+      (Ogre::MovableObject*)(dPtr->scene->GetManager()->createEntity(
+      "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->GetName(), "unit_box"));
+  Ogre::SceneNode *scaleShaftZNode =
+      dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__"  + this->GetName());
+  Ogre::SceneNode *scaleHeadZNode =
+      dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(
+      "__SELECTION_OBJ_SCALE_HEAD_NODE_Z__"  + this->GetName());
+  scaleShaftZNode->attachObject(scaleShaftZObj);
+  scaleShaftZNode->setScale(0.5, 0.5, 1.0);
+  scaleShaftZNode->setPosition(0, 0, 0.1);
+  scaleHeadZNode->attachObject(scaleHeadZObj);
+  scaleHeadZNode->setScale(0.02, 0.02, 0.02);
+  scaleHeadZNode->setPosition(0, 0, 0.21);
+  scaleShaftZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleHeadZObj->setUserAny(Ogre::Any(std::string("scale_z")));
+  scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+  scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
+
+  dPtr->scaleXVisual->SetRotation(
+      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+  dPtr->scaleYVisual->SetRotation(
+      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+
+  dPtr->scaleXVisual->SetMaterial(dPtr->xAxisMatOverlay);
+  dPtr->scaleYVisual->SetMaterial(dPtr->yAxisMatOverlay);
+  dPtr->scaleZVisual->SetMaterial(dPtr->zAxisMatOverlay);
+
+  dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+
+  dPtr->scaleXVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->scaleYVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  dPtr->scaleZVisual->SetVisibilityFlags(
+      GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+
+  // Add to scene so they are selectable by the mouse
+  dPtr->scene->AddVisual(dPtr->scaleXVisual);
+  dPtr->scene->AddVisual(dPtr->scaleYVisual);
+  dPtr->scene->AddVisual(dPtr->scaleZVisual);
 }

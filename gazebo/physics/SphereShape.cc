@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,24 @@ void SphereShape::SetRadius(double _radius)
 double SphereShape::GetRadius() const
 {
   return this->sdf->Get<double>("radius");
+}
+
+//////////////////////////////////////////////////
+void SphereShape::SetScale(const math::Vector3 &_scale)
+{
+  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+    return;
+
+  if (_scale == this->scale)
+    return;
+
+  double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+  double oldRadius = std::max(this->scale.z,
+      std::max(this->scale.x, this->scale.y));
+
+  this->SetRadius((newRadius/oldRadius)*this->GetRadius());
+
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////

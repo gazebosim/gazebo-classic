@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,18 +41,24 @@
 #include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GLWidget : public QWidget
+    class GAZEBO_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
 
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      /// \brief View a scene in this widget.
+      /// This will use the scene's UserCamera to visualize the scene.
+      /// If a UserCamera does not exist, one is created with the
+      /// name "gzclient_camera".
+      /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;
@@ -87,9 +93,6 @@ namespace gazebo
       /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
 
-      /// \brief Process an object translate mouse move event.
-      private: void OnMouseMoveTranslate();
-
       /// \brief Process a make object mouse move event.
       private: void OnMouseMoveMakeEntity();
 
@@ -100,9 +103,6 @@ namespace gazebo
 
       /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
-
-      /// \brief Process an object translate mouse release event.
-      private: void OnMouseReleaseTranslate();
 
       /// \brief Process a make object mouse release event.
       private: void OnMouseReleaseMakeEntity();
@@ -115,21 +115,21 @@ namespace gazebo
       /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
 
-      /// \brief Process an object translate mouse press event.
-      private: void OnMousePressTranslate();
-
       /// \brief Process a make object mouse presse event.
       private: void OnMousePressMakeEntity();
 
+      /// \brief Callback for a mouse double click event.
+      /// \param[in] _event The mouse double click event
+      /// \return True if handled by this function.
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
+
       private: void OnRequest(ConstRequestPtr &_msg);
-
-      private: void SmartMoveVisual(rendering::VisualPtr _vis);
-
       private: void OnCreateScene(const std::string &_name);
       private: void OnRemoveScene(const std::string &_name);
       private: void OnMoveMode(bool _mode);
       private: void OnCreateEntity(const std::string &_type,
                                    const std::string &_data);
+
       private: void OnFPS();
       private: void OnOrbit();
       private: void OnManipMode(const std::string &_mode);
@@ -137,14 +137,10 @@ namespace gazebo
       private: void OnSetSelectedEntity(const std::string &_name,
                                         const std::string &_mode);
 
-      private: void RotateEntity(rendering::VisualPtr &_vis);
-      private: void TranslateEntity(rendering::VisualPtr &_vis);
-
-      private: void OnMouseMoveVisual(const std::string &_visualName);
       private: void OnSelectionMsg(ConstSelectionPtr &_msg);
 
       private: bool eventFilter(QObject *_obj, QEvent *_event);
-      private: void PublishVisualPose(rendering::VisualPtr _vis);
+
       private: void ClearSelection();
 
       /// \brief Copy an object by name
@@ -157,10 +153,6 @@ namespace gazebo
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
-
-      /// \brief Set the visual being moved, which will highlight the
-      /// visual
-      private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       private: int windowId;
 
@@ -184,17 +176,15 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis, mouseMoveVis;
+      private: rendering::VisualPtr hoverVis, selectedVis;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
-      private: transport::PublisherPtr lightPub;
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
       private: Qt::KeyboardModifiers keyModifiers;
       private: QPoint onShiftMousePos;
-      private: math::Pose mouseMoveVisStartPose;
 
       private: std::string copiedObject;
 
