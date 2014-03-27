@@ -202,7 +202,7 @@ bool ODEScrewJoint::SetParam(const std::string &_key,
     {
       this->threadPitch = boost::any_cast<double>(_value);
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
