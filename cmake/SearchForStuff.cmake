@@ -290,15 +290,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("GNU Triangulation Surface library not found - Gazebo will not have CSG support.")
   endif ()
 
-  #################################################
-  # Find bullet
-  pkg_check_modules(BULLET bullet)
-  if (BULLET_FOUND)
-    set (HAVE_BULLET TRUE)
-  else()
-    set (HAVE_BULLET FALSE)
-  endif()
-
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Error: pkg-config not found")
