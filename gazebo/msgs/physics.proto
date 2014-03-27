@@ -7,10 +7,6 @@ package gazebo.msgs;
 
 import "vector3d.proto";
 import "header.proto";
-import "physics_bullet.proto";
-import "physics_dart.proto";
-import "physics_ode.proto";
-import "physics_simbody.proto";
 
 message Physics
 {
@@ -24,14 +20,17 @@ message Physics
   optional Type type                         = 1[default=ODE];
 
   optional string solver_type                = 2;
-  optional Vector3d gravity                  = 3;
-  optional bool enable_physics               = 4;
-  optional double real_time_factor           = 5;
-  optional double real_time_update_rate      = 6;
-  optional double max_step_size              = 7;
-  optional double min_step_size              = 8;
-  optional PhysicsBullet bullet              = 9;
-  optional PhysicsDART dart                  = 10;
-  optional PhysicsODE ode                    = 11;
-  optional PhysicsSimbody simbody            = 12;
+  optional double min_step_size              = 3;
+  optional int32 precon_iters                = 4;
+  optional int32 iters                       = 5;
+  optional double sor                        = 6;
+  optional double cfm                        = 7;
+  optional double erp                        = 8;
+  optional double contact_max_correcting_vel = 9;
+  optional double contact_surface_layer      = 10;
+  optional Vector3d gravity                  = 11;
+  optional bool enable_physics               = 12;
+  optional double real_time_factor           = 13;
+  optional double real_time_update_rate      = 14;
+  optional double max_step_size              = 15;
 }
