@@ -157,7 +157,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   /// \TODO: bullet needs this to pass
   if (physics->GetType()  == "bullet")
-    physics->SetSORPGSIters(300);
+    physics->SetParam("iters", 300);
 
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
