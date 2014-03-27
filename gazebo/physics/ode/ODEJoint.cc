@@ -473,7 +473,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamFudgeFactor, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -485,7 +485,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamSuspensionERP, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -497,7 +497,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamSuspensionCFM, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -523,7 +523,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
           return false;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -549,7 +549,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
           return false;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -561,7 +561,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamERP, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -573,7 +573,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamCFM, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -585,7 +585,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamFMax, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -597,7 +597,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetParam(dParamVel, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -623,7 +623,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
           return false;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -649,7 +649,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
           return false;
       };
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -665,7 +665,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
       {
         screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return false;
@@ -682,7 +682,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
       {
         gearboxJoint->SetGearboxRatio(boost::any_cast<double>(_value));
       }
-      catch(boost::bad_any_cast &e)
+      catch(const boost::bad_any_cast &e)
       {
         gzerr << "boost any_cast error:" << e.what() << "\n";
         return false;

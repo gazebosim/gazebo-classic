@@ -471,7 +471,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetHighStop(_index, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
@@ -483,7 +483,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       this->SetLowStop(_index, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
       return false;
