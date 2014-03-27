@@ -314,6 +314,19 @@ void Joint::Init()
 }
 
 //////////////////////////////////////////////////
+void Joint::Fini()
+{
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
+
+  Base::Fini();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
   math::Vector3 vec;
