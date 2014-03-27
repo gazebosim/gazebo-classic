@@ -27,6 +27,7 @@ if(HAVE_DART)
 endif()
 
 set(tests
+  aero_plugin.cc
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
