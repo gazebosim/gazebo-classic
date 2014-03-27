@@ -52,29 +52,29 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Get joint's anchor point
+      // Documentation inherited.
       public: math::Vector3 GetAnchor(unsigned int _index) const;
 
-      /// \brief Get the axis of rotation
+      // Documentation inherited.
       public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
-      /// \brief Set the velocity of an axis(index).
+      // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
-      /// \brief Get the rotation rate of an axis(index)
+      // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;
 
-      /// \brief Get the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual double GetMaxForce(unsigned int _index);
 
-      /// \brief Set the max allowed force of an axis(index).
+      // Documentation inherited.
       public: virtual void SetMaxForce(unsigned int _index, double _t);
 
-      /// \brief Set the high stop of an axis(index).
+      // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
-      /// \brief Set the low stop of an axis(index).
+      // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
