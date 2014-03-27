@@ -487,7 +487,7 @@ void SimbodyJoint::SetAttribute(const std::string &_key,
 bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return false;
 }
 
