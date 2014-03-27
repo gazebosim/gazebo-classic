@@ -32,7 +32,6 @@ class Issue1082Test : public ServerFixture
 /////////////////////////////////////////////////
 TEST_F(Issue1082Test, PIDLimitsVelocity)
 {
-  // Load an empty world
   Load("worlds/pioneer2dx.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -66,6 +65,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
 
   double diffDist = (startPose - endPose).pos.GetLength();
 
+  // 0.002 chosen arbitrarily.
   EXPECT_LT(diffDist, 0.002);
   EXPECT_GT(diffDist, -0.002);
 }
