@@ -314,6 +314,19 @@ void Joint::Init()
 }
 
 //////////////////////////////////////////////////
+void Joint::Fini()
+{
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
+
+  Base::Fini();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
   math::Vector3 vec;
@@ -522,7 +535,8 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
-  // switch below to return this->SetUpperLimit when we update
+  // switch below to return this->SetUpperLimit when we implement
+  // issue #1108
   return true;
 }
 
@@ -530,7 +544,8 @@ bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle);
-  // switch below to return this->SetLowerLimit when we update
+  // switch below to return this->SetLowerLimit when we implement
+  // issue #1108
   return true;
 }
 
