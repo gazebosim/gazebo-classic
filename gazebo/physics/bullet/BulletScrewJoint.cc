@@ -19,6 +19,8 @@
  * Date: 13 Oct 2009
  */
 
+#include <string>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
