@@ -642,7 +642,7 @@ static void ComputeRows(
     if (iteration < num_iterations + precon_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
-      // and contact normals during extra friction iterations.
+      // and contact normals during extra friciton iterations.
       rms_dlambda[0] = 0;
       rms_dlambda[1] = 0;
       rms_error[0] = 0;
@@ -1593,7 +1593,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
   /// INERTIA PROPAGATION ACROSS CONSTRAINED JOINTS
   for (int j=0; j<infom; j++) {
 
-#undef DEBUG_INERTIA_PROPAGATION
+#define DEBUG_INERTIA_PROPAGATION
 #ifdef DEBUG_INERTIA_PROPAGATION
     printf("--------JAC---------------\n");
     printf("jacobian [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n", j,
@@ -1689,6 +1689,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
       // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
       dReal moi_sum = (moi_S1 + moi_S2);
+      /// \todo make max_moi_ratio adjustable
       const dReal max_moi_ratio = 10.0;
       bool modify_inertia = true;
       dReal moi_S1_new, moi_S2_new;
@@ -1849,6 +1850,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
           MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
           MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+
+        // double check resulting MOI along s
+        dMultiply0_133(tmp31, S, MOI_ptr1);
+        dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+        printf("new MOI1 along S %f\n", moi_S1);
 
         // Modify MOI_ptr2
         printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
