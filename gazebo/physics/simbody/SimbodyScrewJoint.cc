@@ -15,6 +15,8 @@
  *
  */
 
+#include <string>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -117,4 +119,52 @@ double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
   gzerr << "Not implemented in Simbody\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+void SimbodyScrewJoint::SetAttribute(const std::string &_key,
+  unsigned int _index,
+  const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyScrewJoint::SetParam(const std::string &_key,
+  unsigned int _index,
+  const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else
+    return SimbodyJoint::SetParam(_key, _index, _value);
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetAttribute(const std::string &_key,
+  unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double SimbodyScrewJoint::GetParam(const std::string &_key,
+  unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return SimbodyJoint::GetParam(_key, _index);
 }

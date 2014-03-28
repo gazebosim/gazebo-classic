@@ -15,6 +15,10 @@
  *
 */
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "SimplePendulumIntegrator.hh"
