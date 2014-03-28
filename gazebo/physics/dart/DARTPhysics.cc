@@ -377,19 +377,25 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
-  DARTParam param;
+  sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
 
   if (_key == "max_contacts")
-    param = MAX_CONTACTS;
+  {
+    return dartElem->GetElement("max_contacts")->Get<int>();
+  }
   else if (_key == "min_step_size")
-    param = MIN_STEP_SIZE;
+  {
+    return dartElem->GetElement("solver")->Get<double>("min_step_size");
+  }
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
     return 0;
   }
 
-  return this->GetParam(param);
+  gzerr << "We should not be here, something is wrong." << std::endl;
+  return 0;
 }
 
 //////////////////////////////////////////////////
@@ -451,21 +457,17 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
-  sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
 
   boost::any value = 0;
   switch (_param)
   {
     case MAX_CONTACTS:
     {
-      value = dartElem->GetElement("max_contacts")->Get<int>();
-      break;
+      return this->GetParam("max_contacts");
     }
     case MIN_STEP_SIZE:
     {
-      value = dartElem->GetElement("solver")->Get<double>("min_step_size");
-      break;
+      return this->GetParam("min_step_size");
     }
     default:
     {
