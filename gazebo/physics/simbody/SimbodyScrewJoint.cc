@@ -334,7 +334,7 @@ bool SimbodyScrewJoint::SetHighStop(
         if (tp > 0)
         {
           // incoming _angle is the linear dof, which is _angle / thread_pitch.
-          // convert linear limit ot angular limit
+          // convert linear limit to angular limit
           double upper = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
@@ -343,7 +343,7 @@ bool SimbodyScrewJoint::SetHighStop(
         else
         {
           // incoming _angle is the linear dof, which is _angle / thread_pitch.
-          // convert linear limit ot angular limit
+          // convert linear limit to angular limit
           // tp is negative, this is actually upper linear limit, or the
           // lower angular limit.
           double lower = _angle.Radian() / tp;
@@ -404,7 +404,7 @@ bool SimbodyScrewJoint::SetLowStop(
         if (tp > 0)
         {
           // incoming _angle is the linear dof, which is _angle / thread_pitch.
-          // convert linear limit ot angular limit
+          // convert linear limit to angular limit
           double lower = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
@@ -413,7 +413,7 @@ bool SimbodyScrewJoint::SetLowStop(
         else
         {
           // incoming _angle is the linear dof, which is _angle / thread_pitch.
-          // convert linear limit ot angular limit
+          // convert linear limit to angular limit
           // tp is negative, this is actually lower linear limit, or the
           // upper angular limit.
           double upper = _angle.Radian() / tp;
