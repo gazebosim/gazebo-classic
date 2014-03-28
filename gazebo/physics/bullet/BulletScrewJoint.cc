@@ -908,8 +908,10 @@ void btScrewConstraint::_getInfo2NonVirtual(
       -k * (lin_disp * this->threadPitch - ang_pos);
     info->cfm[srow] = -m_cfmOrthoLin;
 
-    // debug, set error to 0
-    info->m_constraintError[srow] = 0.0;
+    // debug, set cfm to 0
+    // info->cfm[srow] = 0;
+    // debug, set error correction to 0
+    // info->m_constraintError[srow] = 0.0;
   }
 
   // notes: below enforces
