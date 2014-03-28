@@ -19,6 +19,8 @@
  * Date: 13 Oct 2009
  */
 
+#include <string>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -210,19 +212,21 @@ void BulletScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetHighStop(unsigned int /*_index*/,
+bool BulletScrewJoint::SetHighStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setUpperLinLimit(_angle.Radian());
+  return true;
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetLowStop(unsigned int /*_index*/,
+bool BulletScrewJoint::SetLowStop(unsigned int /*_index*/,
     const math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setLowerLinLimit(_angle.Radian());
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -284,4 +288,21 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
   if (this->bulletScrew)
     result = this->bulletScrew->getLinearPos();
   return result;
+}
+
+//////////////////////////////////////////////////
+double BulletScrewJoint::GetAttribute(
+  const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double BulletScrewJoint::GetParam(
+  const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return BulletJoint::GetParam(_key, _index);
 }

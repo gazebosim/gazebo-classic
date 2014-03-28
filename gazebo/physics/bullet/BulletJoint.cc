@@ -19,6 +19,8 @@
  * Date: 15 May 2009
  */
 
+#include <string>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -539,19 +541,35 @@ void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(const std::string &/*_key*/,
+void BulletJoint::SetAttribute(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Bullet\n";
+  return false;
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetAttribute(const std::string &/*_key*/,
+double BulletJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
   gzdbg << "Not implement in Bullet\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+double BulletJoint::GetAttribute(const std::string &_key,
+    unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

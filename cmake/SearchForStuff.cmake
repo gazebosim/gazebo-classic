@@ -328,7 +328,15 @@ if (PKG_CONFIG_FOUND)
     link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)

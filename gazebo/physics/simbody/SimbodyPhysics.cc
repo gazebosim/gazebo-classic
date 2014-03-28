@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -68,16 +70,22 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
+      , contactMaterialStiffness(0.0)
+      , contactMaterialDissipation(0.0)
+      , contactMaterialPlasticCoefRestitution(0.0)
+      , contactMaterialPlasticImpactVelocity(0.0)
+      , contactMaterialStaticFriction(0.0)
+      , contactMaterialDynamicFriction(0.0)
+      , contactMaterialViscousFriction(0.0)
+      , contactImpactCaptureVelocity(0.0)
+      , contactStictionTransitionVelocity(0.0)
+      , dynamicsWorld(NULL)
+      , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
   // Instantiate the Simbody General Force Subsystem
 
-  // Create an integrator
-  // this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  // this->integ = new SimTK::RungeKutta3Integrator(system);
-  // this->integ = new SimTK::RungeKutta2Integrator(system);
-  this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   this->simbodyPhysicsInitialized = false;
   this->simbodyPhysicsStepped = false;
 }
@@ -102,6 +110,28 @@ ModelPtr SimbodyPhysics::CreateModel(BasePtr _parent)
 void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
 {
   PhysicsEngine::Load(_sdf);
+
+  // Create an integrator
+  /// \TODO: get from sdf for simbody physics
+  /// \TODO: use this when pgs rigid body solver is implemented
+  this->solverType = "elastic_foundation";
+
+  /// \TODO: get from sdf for simbody physics
+  this->integratorType = "semi_explicit_euler";
+
+  if (this->integratorType == "rk_merson")
+    this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
+  else if (this->integratorType == "rk3")
+    this->integ = new SimTK::RungeKutta3Integrator(system);
+  else if (this->integratorType == "rk2")
+    this->integ = new SimTK::RungeKutta2Integrator(system);
+  else if (this->integratorType == "semi_explicit_euler")
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  else
+  {
+    gzerr << "type not specified, using SemiExplicitEuler2Integrator.\n";
+    this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  }
 
   this->stepTimeDouble = this->GetMaxStepSize();
 
@@ -153,18 +183,10 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
   {
     msgs::Physics physicsMsg;
     physicsMsg.set_type(msgs::Physics::SIMBODY);
-    // physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
-    // physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
-    // physicsMsg.set_iters(this->GetSORPGSIters());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
-    // physicsMsg.set_sor(this->GetSORPGSW());
-    // physicsMsg.set_cfm(this->GetWorldCFM());
-    // physicsMsg.set_erp(this->GetWorldERP());
-    // physicsMsg.set_contact_max_correcting_vel(
-    //     this->GetContactMaxCorrectingVel());
-    // physicsMsg.set_contact_surface_layer(this->GetContactSurfaceLayer());
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -179,45 +201,8 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // if (_msg->has_solver_type())
-  // {
-  //   sdf::ElementPtr solverElem =
-  //     this->sdf->GetElement("ode")->GetElement("solver");
-  //   if (_msg->solver_type() == "quick")
-  //   {
-  //     solverElem->GetElement("type")->Set("quick");
-  //     this->physicsStepFunc = &dWorldQuickStep;
-  //   }
-  //   else if (_msg->solver_type() == "world")
-  //   {
-  //     solverElem->GetElement("type")->Set("world");
-  //     this->physicsStepFunc = &dWorldStep;
-  //   }
-  // }
-
-  // if (_msg->has_precon_iters())
-  //   this->SetSORPGSPreconIters(_msg->precon_iters());
-
-  // if (_msg->has_iters())
-  //   this->SetSORPGSIters(_msg->iters());
-
-  // if (_msg->has_sor())
-  //   this->SetSORPGSW(_msg->sor());
-
-  // if (_msg->has_cfm())
-  //   this->SetWorldCFM(_msg->cfm());
-
-  // if (_msg->has_erp())
-  //   this->SetWorldERP(_msg->erp());
-
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  // if (_msg->has_contact_max_correcting_vel())
-  //   this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
-
-  // if (_msg->has_contact_surface_layer())
-  //   this->SetContactSurfaceLayer(_msg->contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
@@ -226,17 +211,31 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
   if (_msg->has_real_time_update_rate())
-  {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-  }
 
   if (_msg->has_max_step_size())
-  {
     this->SetMaxStepSize(_msg->max_step_size());
+
+  /* below will set accuracy for simbody if the messages exist
+  // Set integrator accuracy (measured with Richardson Extrapolation)
+  if (_msg->has_accuracy())
+  {
+    this->integ->setAccuracy(_msg->simbody().accuracy());
   }
+
+  // Set stiction max slip velocity to make it less stiff.
+  if (_msg->has_max_transient_velocity())
+  {
+    this->contact.setTransitionVelocity(
+    _msg->simbody().max_transient_velocity());
+  }
+  */
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
+
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1305,4 +1304,100 @@ SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 {
   return GetTypeString(physics::Base::EntityType(_type));
+}
+
+//////////////////////////////////////////////////
+boost::any SimbodyPhysics::GetParam(const std::string &_key) const
+{
+  if (_key == "type")
+  {
+    gzwarn << "Please use keyword `solver_typ` in the future.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
+  {
+    return "Spatial Algebra and Elastic Foundation";
+  }
+  else if (_key == "integrator_type")
+  {
+    return this->integratorType;
+  }
+  else if (_key == "accuracy")
+  {
+    if (this->integ)
+      return this->integ->getAccuracyInUse();
+    else
+      return 0.0f;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    return this->contact.getTransitionVelocity();
+  }
+  else
+  {
+    gzwarn << "key [" << _key
+           << "] not supported, returning (int)0." << std::endl;
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1116
+  if (_key == "accuracy")
+  {
+    int value;
+    try
+    {
+      value = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in Simbody" << std::endl;
+    return false;
+  }
+  // should never get here
+  return false;
 }

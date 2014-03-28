@@ -310,7 +310,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -318,15 +318,15 @@ void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     case 1:
     case 2:
       this->dtJoint->getGenCoord(_index)->setConfigMax(_angle.Radian());
-      break;
+      return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      break;
+      return false;
   };
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   switch (_index)
   {
@@ -334,9 +334,10 @@ void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   case 1:
   case 2:
     this->dtJoint->getGenCoord(_index)->setConfigMin(_angle.Radian());
-    break;
+    return true;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
+    return false;
   };
 }
 
@@ -464,15 +465,23 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
                              const boost::any &_value)
 {
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
+                             const boost::any &_value)
+{
   if (_key == "hi_stop")
   {
     try
     {
       this->SetHighStop(_index, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else if (_key == "lo_stop")
@@ -481,26 +490,29 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
     {
       this->SetLowStop(_index, boost::any_cast<double>(_value));
     }
-    catch(boost::bad_any_cast &e)
+    catch(const boost::bad_any_cast &e)
     {
       gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
   }
   else
   {
-    try
-    {
-      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
-    }
-    catch(boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-    }
+    gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+    return false;
   }
+  return true;
 }
 
 //////////////////////////////////////////////////
 double DARTJoint::GetAttribute(const std::string& _key,
+                               unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double DARTJoint::GetParam(const std::string& _key,
                                unsigned int _index)
 {
   if (_key == "hi_stop")
