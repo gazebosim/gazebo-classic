@@ -369,7 +369,7 @@ bool SimbodyScrewJoint::SetHighStop(
     gzerr << "SetHighStop: index out of bounds.\n";
     return false;
   }
-return true;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -439,5 +439,91 @@ bool SimbodyScrewJoint::SetLowStop(
     gzerr << "SetLowStop: index out of bounds.\n";
     return false;
   }
-return true;
+  return true;
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get high stop\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper"));
+  }
+  else if (_index == 1)
+  {
+    double tp = this->GetThreadPitch();
+    if (math::equal(tp, 0.0))
+    {
+      gzerr << "thread pitch should not be zero (joint is a slider?)"
+            << " using thread pitch = 1.0e6\n";
+      tp = 1.0e6;
+    }
+    if (tp > 0)
+    {
+      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+               ->Get<double>("upper")) / tp;
+    }
+    else
+    {
+      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+               ->Get<double>("lower")) / tp;
+    }
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get low stop\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
+  else if (_index == 0)
+  {
+    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower"));
+  }
+  else if (_index == 1)
+  {
+    double tp = this->GetThreadPitch();
+    if (math::equal(tp, 0.0))
+    {
+      gzerr << "thread pitch should not be zero (joint is a slider?)"
+            << " using thread pitch = 1.0e6\n";
+      tp = 1.0e6;
+    }
+    if (tp > 0)
+    {
+      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+               ->Get<double>("lower")) / tp;
+    }
+    else
+    {
+      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+               ->Get<double>("upper")) / tp;
+    }
+  }
+  else
+  {
+    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    /// \TODO: should return NaN
+    return math::Angle(0.0);
+  }
 }
