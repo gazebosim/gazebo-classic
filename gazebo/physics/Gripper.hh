@@ -107,7 +107,7 @@ namespace gazebo
 
       /// \brief Mutex used to protect reading/writing the sonar message.
       /// static has little sense here but it was used to keep ABI stable
-      /// new releases alread have it defined as a non-static member.
+      /// new releases already have it defined as a non-static member.
       private: static boost::mutex mutexContacts;
 
       /// \brief True if the gripper has an object.
