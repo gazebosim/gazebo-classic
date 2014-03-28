@@ -454,8 +454,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->GetUpperLimit(0);
   }
   else if (_index == 1)
   {
@@ -468,13 +467,11 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-               ->Get<double>("upper")) / tp;
+      return this->GetUpperLimit(0) / tp;
     }
     else
     {
-      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-               ->Get<double>("lower")) / tp;
+      return this->GetLowerLimit(0) / tp;
     }
   }
   else
@@ -497,8 +494,7 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->GetLowerLimit(0);
   }
   else if (_index == 1)
   {
@@ -511,13 +507,11 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-               ->Get<double>("lower")) / tp;
+      return this->GetLowerLimit(0) / tp;
     }
     else
     {
-      return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-               ->Get<double>("upper")) / tp;
+      return this->GetUpperLimit(0) / tp;
     }
   }
   else
