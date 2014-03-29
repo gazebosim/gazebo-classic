@@ -46,6 +46,13 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
+
+      // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
@@ -57,7 +64,13 @@ namespace gazebo
                   double _threadPitch);
 
       // Documentation inherited
+      public: virtual void SetThreadPitch(double _threadPitch);
+
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

@@ -171,11 +171,12 @@ namespace gazebo
       public: double GetDamping(unsigned int _index);
 
       /// \brief Callback to apply damping force to joint.
-      /// Deprecated by ApplyStiffnessDamping.
+      /// Deprecated by ApplySpringStiffnessDamping.
       public: virtual void ApplyDamping() GAZEBO_DEPRECATED(3.0);
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
+      /// \TODO: rename to ApplySpringStiffnessDamping()
       public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the joint spring stiffness.
@@ -183,6 +184,7 @@ namespace gazebo
       ///                   implemented.
       /// \param[in] _stiffness Stiffness value for the axis.
       /// \param[in] _reference Spring zero load reference position.
+      /// \TODO: rename to SetSpringStiffnessDamping()
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0) = 0;
 
@@ -190,6 +192,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _stiffness Spring stiffness value for the axis.
+      /// \TODO: rename to SetSpringStiffness()
       public: virtual void SetStiffness(unsigned int _index,
                                         double _stiffness) = 0;
 
@@ -197,6 +200,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
+      /// \TODO: rename to GetSpringStiffness()
       public: double GetStiffness(unsigned int _index);
 
       /// \brief Get joint spring reference position.

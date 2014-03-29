@@ -67,6 +67,10 @@ namespace gazebo
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
+
+      // Documentation inherited.
       public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
