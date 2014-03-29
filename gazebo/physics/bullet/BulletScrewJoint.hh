@@ -28,12 +28,12 @@
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/util/system.hh"
 
-class btSliderConstraint;
-
 namespace gazebo
 {
   namespace physics
   {
+    class btScrewConstraint;
+
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_bullet Bullet Physics
     /// \{
@@ -51,7 +51,14 @@ namespace gazebo
 
       /// \brief Load the BulletScrewJoint
       /// \param[in] _sdf SDF values.
-      protected: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
 
       // Documentation inherited.
       public: virtual void Init();
@@ -66,7 +73,13 @@ namespace gazebo
                   double _threadPitch);
 
       // Documentation inherited
+      public: virtual void SetThreadPitch(double _threadPitch);
+
+      // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      // Documentation inherited
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
@@ -75,12 +88,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
-
-      /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Get the rate of change
       /// \param[in] _index Axis index.
@@ -115,13 +122,17 @@ namespace gazebo
                   unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _force);
 
       /// \brief Pointer to bullet screw constraint
-      private: btSliderConstraint *bulletScrew;
+      private: btScrewConstraint *bulletScrew;
+
+      /// \brief Initial value of joint axis, expressed as unit vector
+      ///        in world frame.
+      private: math::Vector3 initialWorldAxis;
     };
     /// \}
   }

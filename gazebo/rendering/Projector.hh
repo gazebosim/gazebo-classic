@@ -82,7 +82,7 @@ namespace gazebo
       public: void Toggle();
 
       /// \brief Get the parent visual.
-      /// \return Pointer ot the parent visual.
+      /// \return Pointer to the parent visual.
       public: VisualPtr GetParent();
 
       /// \brief Set whether the projector is enabled or disabled.

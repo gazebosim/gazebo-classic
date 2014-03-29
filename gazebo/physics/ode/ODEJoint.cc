@@ -663,7 +663,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       try
       {
-        screwJoint->SetThreadPitch(0, boost::any_cast<double>(_value));
+        screwJoint->SetThreadPitch(boost::any_cast<double>(_value));
       }
       catch(const boost::bad_any_cast &e)
       {
@@ -864,7 +864,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     {
       try
       {
-        return screwJoint->GetThreadPitch(0);
+        return screwJoint->GetThreadPitch();
       }
       catch(common::Exception &e)
       {

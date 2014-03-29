@@ -799,6 +799,59 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
+      else if (type == "screw")
+      {
+        UnitVec3 axis(
+          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+
+        double pitch =
+          dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
+
+        if (math::equal(pitch, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using pitch = 1.0e6\n";
+          pitch = 1.0e6;
+        }
+
+        // Simbody's screw joint axis (both rotation and translation) is along Z
+        Rotation R_JZ(axis, ZAxis);
+        Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+        Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+        MobilizedBody::Screw screwJoint(
+            parentMobod,      X_IF,
+            massProps,        X_OM,
+            -1.0/pitch,
+            direction);
+        mobod = screwJoint;
+
+        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
+
+        double low = gzJoint->GetLowerLimit(0u).Radian();
+        double high = gzJoint->GetUpperLimit(0u).Radian();
+
+        // initialize stop stiffness and dissipation from joint parameters
+        gzJoint->limitForce[0] =
+          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
+
+        // gzdbg << "SimbodyPhysics SetDamping ("
+        //       << gzJoint->GetDampingCoefficient()
+        //       << ")\n";
+        // Create a damper for every joint even if damping coefficient
+        // is zero.  This will allow user to change damping coefficients
+        // on the fly.
+        gzJoint->damper[0] =
+          Force::MobilityLinearDamper(this->forces, mobod, 0,
+                                   gzJoint->GetDamping(0));
+
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
+      }
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
