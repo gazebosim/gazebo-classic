@@ -1688,36 +1688,20 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 #endif
 
       // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
-      dReal moi_sum = (moi_S1 + moi_S2);
-      /// \todo make max_moi_ratio adjustable
-      const dReal max_moi_ratio = 10.0;
-      bool modify_inertia = true;
+      /// \todo make moi_ratio_tol adjustable
+      /// \todo automatically adjust moi_ratio_tol such that
+      /// abs sum of off-diagonals remains smaller than the diagonal
+      /// for all rows.
+      const dReal moi_ratio_tol = 10.0;  // increase moi_ratio_tol to skip checks and increase performance
       dReal moi_S1_new, moi_S2_new;
-      if (moi_S1 > max_moi_ratio * moi_S2)
-      {
-        moi_S2_new = (moi_sum)/(max_moi_ratio + 1.0);
-        moi_S1_new = max_moi_ratio*moi_S2_new;
-      }
-      else if (moi_S2 > max_moi_ratio * moi_S1)
-      {
-        moi_S1_new = (moi_sum)/(max_moi_ratio + 1.0);
-        moi_S2_new = max_moi_ratio*moi_S1_new;
-      }
-      else
-        modify_inertia = false;
-
-      if (modify_inertia)
+      if ((moi_S1 > moi_ratio_tol * moi_S2) ||
+          (moi_S2 > moi_ratio_tol * moi_S1))
       {
 #ifdef DEBUG_INERTIA_PROPAGATION
         printf("---------S Scalars--------\n");
         printf(" original    S1 [%g] S2 [%g]\n", moi_S1, moi_S2);
         printf(" distributed S1 [%g] S2 [%g]\n", moi_S1_new, moi_S2_new);
 #endif
-        // sum off-diagonals terms (to check diagonal dominance)
-        dReal sumAbsOffDiags1[4];
-        dReal sumAbsOffDiags2[4];
-        dSetZero(sumAbsOffDiags1,4);
-        dSetZero(sumAbsOffDiags2,4);
 
         /// Keep parent/child MOI/invMOI in inertial frame.
 
@@ -1740,15 +1724,131 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // year = {2003}
         // }
         //
-        // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiags.
+        // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiag.
+        // sum off-diagonals terms (to check diagonal dominance)
+        dReal sumAbsOffDiagMOI1[4];
+        dReal sumAbsOffDiagMOI2[4];
+        dReal sumAbsOffDiagSS[4];
+
+        dReal absDiagMOI1[4];
+        dReal absDiagMOI2[4];
+        dReal absDiagSS[4];
+
+        dSetZero(sumAbsOffDiagMOI1,4);
+        dSetZero(sumAbsOffDiagMOI2,4);
+        dSetZero(sumAbsOffDiagSS,4);
+
+        dSetZero(absDiagMOI1,4);
+        dSetZero(absDiagMOI2,4);
+        dSetZero(absDiagSS,4);
+
+        for (int si = 0; si < 12; ++si)
+        {
+          int col = si%4;
+          int row = si/4;
+          if (!(row == col))  // off-diagonal terms
+          {
+            // either we preserve off-diagonal terms
+            // tmpDiag1[row] += MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+            // tmpDiag2[row] += MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
+
+            // or update off-diagonal terms
+            sumAbsOffDiagMOI1[row] += dFabs(MOI_ptr1[si]);
+            sumAbsOffDiagMOI2[row] += dFabs(MOI_ptr2[si]);
+            sumAbsOffDiagSS[row] += dFabs(SS[si]);
+          }
+          else if (row == col)  // diagonal element
+          {
+            absDiagMOI1[row] = dFabs(MOI_ptr1[si]);
+            absDiagMOI2[row] = dFabs(MOI_ptr2[si]);
+            absDiagSS[row] = dFabs(SS[si]);
+          }
+        }
+
+        //
+        // use the abs sum of off diagonals to compute minimum allowed ratio
+        //
+        dReal alpha1Max = 1.0e16;
+        dReal alpha2Max = 1.0e16;
+        for (int row = 0; row < 3; ++row)
+        {
+          // for each row,
+          //   MOI_diag + alpha * SS_diag > M_offd + alpha * SS_offd
+          // therefore
+          //   alpha * (SS_diag - SS_offd) > (M_offd - M_diag)
+          // where
+          //   alpha = (moi_S_new - moi_S)
+          // check equation above, find minimum alpha
+          if ((absDiagSS[row] > sumAbsOffDiagSS[row] && sumAbsOffDiagMOI1[row] > absDiagMOI1[row]) ||
+              (absDiagSS[row] < sumAbsOffDiagSS[row] && sumAbsOffDiagMOI1[row] < absDiagMOI1[row]))
+          {
+            // find minimum alpha1Max
+            dReal nom = absDiagSS[row] - sumAbsOffDiagSS[row];
+            dReal den = sumAbsOffDiagMOI1[row] - absDiagMOI1[row];
+            if (!_dequal(den, 0.0))
+            {
+              dReal r = nom / den;
+              alpha1Max = (alpha1Max > r) ? r : alpha1Max;
+            }
+          }
+          if ((absDiagSS[row] > sumAbsOffDiagSS[row] && sumAbsOffDiagMOI2[row] > absDiagMOI2[row]) ||
+              (absDiagSS[row] < sumAbsOffDiagSS[row] && sumAbsOffDiagMOI2[row] < absDiagMOI2[row]))
+          {
+            // find minimum alpha2Max
+            dReal nom = absDiagSS[row] - sumAbsOffDiagSS[row];
+            dReal den = sumAbsOffDiagMOI2[row] - absDiagMOI2[row];
+            if (!_dequal(den, 0.0))
+            {
+              dReal r = nom / den;
+              alpha2Max = (alpha2Max > r) ? r : alpha2Max;
+            }
+          }
+        }
+
+        // below is how we calculate moi_S_new from moi_ratio
+        dReal moi_sum = (moi_S1 + moi_S2);
+
+        // debug: pick smaller of the 2
+        dReal alpha = (dFabs(alpha1Max) < dFabs(alpha2Max)) ? dFabs(alpha1Max) : dFabs(alpha2Max);
+        printf("debug alpha [%f] alpha1Max [%f] alpha2Max [%f]\n", alpha, alpha1Max, alpha2Max);
+
+        // given alpha, what is the ratio?
+        dReal r1 = (-moi_S1 / alpha -1.0)/(1.0 - moi_S2 / alpha);
+        dReal r2 = ( moi_S1 / alpha -1.0)/(1.0 + moi_S2 / alpha);
+        printf("debug ratio [%f] [%f]\n", r1, r2);
+
+        break;
+
+        dReal moi_ratio = 1;
+
+        if (moi_S1 > moi_S2)
+        {
+          moi_S2_new = (moi_sum)/(moi_ratio + 1.0);
+          moi_S1_new = moi_ratio*moi_S2_new;
+          // alpha1 = moi_S1_new - moi_S1
+          // alpha2 = moi_S2_new - moi_S2
+          // alpha1 + alpha2 = 0  // since moi sum is conserved
+          // make sure moi_S1 / moi_S2 < moi_ratio
+          // pick moi_ratio such that 
+        }
+        else // if (moi_S2 > moi_ratio * moi_S1)
+        {
+          moi_S1_new = (moi_sum)/(moi_ratio + 1.0);
+          moi_S2_new = moi_ratio*moi_S1_new;
+        }
+
+        // store temporary new MOI1 and MOI2
+        dReal tmpNewMOI1[12];
+        dReal tmpNewMOI2[12];
+
         for (int si = 0; si < 12; ++si)
         {
           int col = si%4;
           int row = si/4;
           if (col == 3) //  unused term
           {
-            MOI_ptr1[si] = 0;
-            MOI_ptr2[si] = 0;
+            tmpNewMOI1[si] = 0;
+            tmpNewMOI2[si] = 0;
           }
           if (!(row == col))  // off-diagonal terms
           {
@@ -1757,13 +1857,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             // tmpDiag2[row] += MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
 
             // or update off-diagonal terms
-            MOI_ptr1[si] += (moi_S1_new - moi_S1) * SS[si];
-            MOI_ptr2[si] += (moi_S2_new - moi_S2) * SS[si];
-            sumAbsOffDiags1[row] += dFabs(MOI_ptr1[si]);
-            sumAbsOffDiags2[row] += dFabs(MOI_ptr2[si]);
+            tmpNewMOI1[si] = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
+            tmpNewMOI2[si] = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
           }
         }
-        //
+
         // Then modify MOI by adding delta scalar MOI in tensor form, but
         // check and maintain diagonal dominance using the precomputed off-diagonal-sums.
         for (int si = 0; si < 12; ++si)
@@ -1776,7 +1874,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             // check per row, that sum of absolute values of off-diagonal elements
             // is less than absolute value of the diagonal element itself.
             dReal newMOI1 = MOI_ptr1[si] + (moi_S1_new - moi_S1) * SS[si];
-            if (newMOI1 > sumAbsOffDiags1[row])
+            if (1 || newMOI1 > sumAbsOffDiagMOI1[row])
             {
               // modify inertia in the constrained direction,
               // doing so should not alter dynamics of the system.
@@ -1787,11 +1885,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               /// Increase diagonal dominance to preserve stability,
               /// Even though this changes the dynamics of the system,
               /// it's either this or unstable simulation.
-              MOI_ptr1[si] = sumAbsOffDiags1[row];
+              MOI_ptr1[si] = sumAbsOffDiagMOI1[row];
             }
 
             dReal newMOI2 = MOI_ptr2[si] + (moi_S2_new - moi_S2) * SS[si];
-            if (newMOI2 > sumAbsOffDiags2[row])
+            if (1 || newMOI2 > sumAbsOffDiagMOI2[row])
             {
               // modify inertia in the constrained direction,
               // doing so should not alter dynamics of the system.
@@ -1802,7 +1900,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               /// Increase diagonal dominance to preserve stability,
               /// Even though this changes the dynamics of the system,
               /// it's either this or unstable simulation.
-              MOI_ptr2[si] = sumAbsOffDiags2[row];
+              MOI_ptr2[si] = sumAbsOffDiagMOI2[row];
             }
           }
         }
@@ -1851,16 +1949,22 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
           MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
 
-        // double check resulting MOI along s
-        dMultiply0_133(tmp31, S, MOI_ptr1);
-        dReal moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
-        printf("new MOI1 along S %f\n", moi_S1);
-
         // Modify MOI_ptr2
         printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
           MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
           MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
           MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+
+        // double check resulting MOI along s
+        dMultiply0_133(tmp31, S, MOI_ptr1);
+        moi_S1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+        printf("new MOI1 along S [%f]\n", moi_S1);
+        dMultiply0_133(tmp31, S, MOI_ptr2);
+        moi_S2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+        printf("new MOI2 along S [%f]\n", moi_S2);
+
+        /// \todo double check resulting MOI along joint axis and see that it's the same
+        /// question: where to get ax1 from?
 
         printf("----------new inv---------\n");
         printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
