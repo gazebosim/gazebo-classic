@@ -104,6 +104,13 @@ math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
+void ODEBallJoint::SetAxis(unsigned int /*_index*/,
+                            const math::Vector3 &/*_axis*/)
+{
+  gzerr << "ODEBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
 math::Angle ODEBallJoint::GetHighStop(unsigned int /*_index*/)
 {
   gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;

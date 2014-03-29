@@ -807,6 +807,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
 
+        if (math::equal(pitch, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using pitch = 1.0e6\n";
+          pitch = 1.0e6;
+        }
+
         // Simbody's screw joint axis (both rotation and translation) is along Z
         Rotation R_JZ(axis, ZAxis);
         Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
@@ -814,7 +821,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         MobilizedBody::Screw screwJoint(
             parentMobod,      X_IF,
             massProps,        X_OM,
-            pitch,
+            -1.0/pitch,
             direction);
         mobod = screwJoint;
 

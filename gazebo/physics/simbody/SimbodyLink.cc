@@ -485,8 +485,14 @@ void SimbodyLink::SetAngularDamping(double /*_damping*/)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForce(const math::Vector3 &/*_force*/)
+void SimbodyLink::AddForce(const math::Vector3 &_force)
 {
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+
+  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod,
+    SimTK::Vec3(0), f);
 }
 
 /////////////////////////////////////////////////
