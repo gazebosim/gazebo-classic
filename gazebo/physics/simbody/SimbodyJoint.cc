@@ -513,9 +513,9 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->GetLowStop(_index).Radian(), _angle.Radian());
+      // this->limitForce[_index].setBounds(
+      //   this->simbodyPhysics->integ->updAdvancedState(),
+      //   this->GetLowStop(_index).Radian(), _angle.Radian());
     }
     else
     {
@@ -540,10 +540,9 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->GetHighStop(_index).Radian());
+      // this->limitForce[_index].setBounds(
+      //   this->simbodyPhysics->integ->updAdvancedState(),
+      //   _angle.Radian(), //   this->GetHighStop(_index).Radian());
     }
     else
     {

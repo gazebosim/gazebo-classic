@@ -162,6 +162,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
           << " / 0 0 0"
           << "]\n";
   }
+  getchar();
 }
 
 /////////////////////////////////////////////////
@@ -308,6 +309,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
   gzdbg << "t after 20 steps : " << t << "\n";
+  getchar();
 }
 
 /////////////////////////////////////////////////
@@ -358,6 +360,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
+  while(1)
+  {
   for (unsigned int i = 0; i < 3388; ++i)
   {
     // pd control
@@ -432,6 +436,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
     gzlog << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
           << "] 2[" << joint_12->GetAngle(0)
           << "]\n";
+  }
+  getchar();
   }
 }
 

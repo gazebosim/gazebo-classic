@@ -32,8 +32,8 @@
         </constraints>
       </bullet>
       <simbody>
-        <accuracy>0.001</accuracy>
-        <max_transient_velocity>0.01</max_transient_velocity>
+        <accuracy>0.00001</accuracy>
+        <max_transient_velocity>0.00001</max_transient_velocity>
         <contact>
           <stiffness>1e8</stiffness>
           <dissipation>10</dissipation>

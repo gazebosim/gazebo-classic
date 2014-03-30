@@ -208,7 +208,9 @@ namespace gazebo
       public: SimTK::Force::DiscreteForces discreteForces;
       public: SimTK::ContactTrackerSubsystem tracker;
       public: SimTK::CompliantContactSubsystem contact;
-      public: SimTK:: Integrator *integ;
+
+      // public: SimTK:: Integrator *integ;
+      public: SimTK:: SemiExplicitEulerTimeStepper *integ;
 
       /// \brief true if initialized
       public: bool simbodyPhysicsInitialized;

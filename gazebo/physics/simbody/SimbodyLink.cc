@@ -346,6 +346,10 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
     // lock physics update mutex to ensure thread safety
     boost::recursive_mutex::scoped_lock lock(
       *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getState(), SimTK::Stage::Velocity);
+
     v = SimbodyPhysics::Vec3ToVector3(
       this->masterMobod.findStationVelocityInGround(
       this->simbodyPhysics->integ->getState(), station));

@@ -117,8 +117,9 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   this->solverType = "elastic_foundation";
 
   /// \TODO: get from sdf for simbody physics
-  this->integratorType = "semi_explicit_euler";
+  this->integratorType = "rigid_contact_solver_exp";
 
+/*
   if (this->integratorType == "rk_merson")
     this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
   else if (this->integratorType == "rk3")
@@ -127,15 +128,29 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
     this->integ = new SimTK::RungeKutta2Integrator(system);
   else if (this->integratorType == "semi_explicit_euler")
     this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
+  else if (this->integratorType == "rigid_contact_solver_exp")
+*/
+    this->integ = new SimTK::SemiExplicitEulerTimeStepper(system);
+    // this->integ->setImpulseSolverType(SemiExplicitEulerTimeStepper::PLUS);
+    this->integ->setImpulseSolverType(SemiExplicitEulerTimeStepper::PGS);
+/*
   else
   {
     gzerr << "type not specified, using SemiExplicitEuler2Integrator.\n";
     this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
   }
+*/
 
   this->stepTimeDouble = this->GetMaxStepSize();
 
   sdf::ElementPtr simbodyElem = this->sdf->GetElement("simbody");
+
+  // use max_transient_velocity for max friction transition velocity
+  this->integ->setDefaultFrictionTransitionVelocity(
+    simbodyElem->Get<double>("max_transient_velocity"));
+  // use accuracy for tolerance tolerance
+  this->integ->setConstraintTolerance(
+    simbodyElem->Get<double>("accuracy"));
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
   this->integ->setAccuracy(
@@ -417,8 +432,7 @@ void SimbodyPhysics::UpdatePhysics()
   {
     try
     {
-      this->integ->stepTo(this->world->GetSimTime().Double(),
-                         this->world->GetSimTime().Double());
+      this->integ->stepTo(this->world->GetSimTime().Double());
     }
     catch(const std::exception& e)
     {
@@ -923,10 +937,19 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double high = gzJoint->GetUpperLimit(0u).Radian();
 
         // initialize stop stiffness and dissipation from joint parameters
-        gzJoint->limitForce[0] =
-          Force::MobilityLinearStop(this->forces, mobod,
-          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
-          gzJoint->GetStopDissipation(0), low, high);
+        // gzJoint->limitForce[0] =
+        //   Force::MobilityLinearStop(this->forces, mobod,
+        //   SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+        //   gzJoint->GetStopDissipation(0), low, high);
+
+        // this will only work with rigidContact solver
+        const double coefRest = 0.0;
+        HardStopLower* lower =
+            new HardStopLower(mobod, MobilizerQIndex(0), low, coefRest); 
+        this->matter.adoptUnilateralContact(lower);
+        HardStopUpper* upper =
+            new HardStopUpper(mobod, MobilizerQIndex(0), high, coefRest); 
+        this->matter.adoptUnilateralContact(upper);
 
         // gzdbg << "SimbodyPhysics SetDamping ("
         //       << gzJoint->GetDampingCoefficient()
@@ -1184,7 +1207,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // skip compliant contact
+        // _mobod.updBody().addContactSurface(X_LC, surface);
       }
       break;
 
@@ -1209,7 +1234,9 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // skip compliant contact
+        // _mobod.updBody().addContactSurface(X_LC, surface);
       }
       break;
 
@@ -1234,7 +1261,26 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // skip compliant contact
+        // _mobod.updBody().addContactSurface(X_LC, surface);
+
+        // Manually add some contact points around the box
+        // for rigidContact experiment
+        const double CoefRest = 0.0;
+        const double mu_s = 1.0;
+        const double mu_d = 1.0;
+        const double mu_v = 0.0;
+        for (int i=-1; i<=1; i+=2)
+        for (int j=-1; j<=1; j+=2)
+        for (int k=-1; k<=1; k+=2)
+        {
+            const Vec3 pt = Vec3(i,j,k).elementwiseMultiply(hsz);
+            PointPlaneContact* rigidContact = new PointPlaneContact
+               (this->matter.Ground(), ZAxis, 0., _mobod, X_LC * pt,
+               CoefRest, mu_s, mu_d, mu_v);
+            this->matter.adoptUnilateralContact(rigidContact);
+        }
       }
       break;
       default:
