@@ -8,27 +8,6 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <!-- Invisible ground plane -->
-    <model name="ground">
-      <link name="body">
-        <collision name="geom">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-            </plane>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>100</mu>
-                <mu2>50</mu2>
-              </ode>
-            </friction>
-          </surface>
-        </collision>
-      </link>
-      <static>true</static>
-    </model>
     <road name="my_road1">
       <width>5</width>
       <point>38 -92 0</point>
@@ -68,28 +47,46 @@
     <road name="my_road7">
       <width>5</width>
       <point>92 38 0</point>
+      <point>-92 38 0</point>
+      <texture>lane_1</texture>
+    </road>
+    <road name="my_road8">
+      <width>5</width>
+      <point>92 38 0</point>
       <point>92 -38 0</point>
       <texture>lanes_2</texture>
     </road>
-    <road name="my_road8">
+    <road name="my_road9">
       <width>5</width>
       <point>92 -38 0</point>
       <point>38 -92 0</point>
       <texture>lanes_4</texture>
     </road>
-    <road name="my_road9">
+    <road name="my_road10">
       <width>5</width>
       <point>38 -92 0</point>
       <point>-92 38 0</point>
       <texture>lanes_6</texture>
     </road>
-    <road name="my_road10">
+    <road name="my_road11">
+      <width>5</width>
+      <point>-92 -38 0</point>
+      <point>-38 -92 0</point>
+      <texture>footway</texture>
+    </road>
+    <road name="my_road12">
+      <width>5</width>
+      <point>38 92 0</point>
+      <point>38 -92 0</point>
+      <texture>pedestrian</texture>
+    </road>
+    <road name="my_road13">
       <width>5</width>
       <point>38 92 0</point>
       <point>-38 -92 0</point>
       <texture>SomeInvalidValue</texture>
     </road>
-    <road name="my_road11">
+    <road name="my_road14">
       <width>5</width>
       <point>92 -38 0</point>
       <point>-92 -38 0</point>

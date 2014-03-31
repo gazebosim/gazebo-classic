@@ -53,60 +53,16 @@ void Road::Init()
   this->width = this->sdf->Get<double>("width");
   msg.set_width(this->width);
 
-  this->texture = this->sdf->Get<std::string>("texture");
-  
-  std::transform(this->texture.begin(), this->texture.end(), this->texture.begin(), ::tolower);
+  if (this->sdf->HasElement("texture"))
+  {
+    this->texture = this->sdf->Get<std::string>("texture");
 
-  msg.set_texture(this->texture);
+    std::transform(this->texture.begin(), this->texture.end(),
+                   this->texture.begin(), ::tolower);
 
+    msg.set_texture(this->texture);
+  }
 
-
-//  if (this->texture == "footway")
-//   
-//     msg.set_texture(msgs::Road::FOOTWAY);
-//    
-//  else if (this->texture == "pedestrian")
-//   
-//     msg.set_texture(msgs::Road::PEDESTRIAN);
-//
-//  else if (this->texture == "motorway")
-//  
-//    msg.set_texture(msgs::Road::MOTORWAY);
-//
-//  else if (this->texture == "lanes_6")
-//  
-//    msg.set_texture(msgs::Road::LANES_6);
-//
-//  else if (this->texture == "trunk")
-//   
-//     msg.set_texture(msgs::Road::TRUNK);
-//
-//  else if (this->texture == "lanes_4")
-//   
-//     msg.set_texture(msgs::Road::LANES_4);
-//
-//  else if (this->texture == "primary")
-//   
-//     msg.set_texture(msgs::Road::PRIMARY);
-//
-//  else if (this->texture == "secondary")
-//   
-//     msg.set_texture(msgs::Road::SECONDARY);
-//
-//  else if (this->texture == "tertiary")
-//   
-//     msg.set_texture(msgs::Road::TERTIARY);
-//
-//  else if (this->texture == "lanes_2")
-//   
-//     msg.set_texture(msgs::Road::LANES_2);
-//
-//  else if (this->texture == "residential")
-//   
-//     msg.set_texture(msgs::Road::RESIDENTIAL);
-//
-
- 
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
