@@ -92,6 +92,34 @@ namespace gazebo
       /// \param[in] _c The maximum value
       public: void SetCmdMin(double _c);
 
+      /// \brief Get the proportional Gain.
+      /// \return The proportional gain value
+      public: double GetPGain() const;
+
+      /// \brief Get the integral Gain.
+      /// \return The integral gain value
+      public: double GetIGain() const;
+
+      /// \brief Get the derivative Gain.
+      /// \return The dertivative gain value
+      public: double GetDGain() const;
+
+      /// \brief Get the integral upper limit.
+      /// \return The integral upper limit value
+      public: double GetIMax() const;
+
+      /// \brief Get the integral lower limit.
+      /// \return The integral lower limit value
+      public: double GetIMin() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMax() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMin() const;
+
       /// \brief Update the Pid loop with nonuniform time step size.
       /// \param[_in] _error  Error since last call (p_state - p_target).
       /// \param[_in] _dt Change in time since last update call.
