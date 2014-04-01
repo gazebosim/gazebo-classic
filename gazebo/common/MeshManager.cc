@@ -60,7 +60,7 @@ MeshManager::MeshManager()
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
-  
+
   this->CreateCylinder("axis_shaft", 0.01, 0.2, 1, 16);
   this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
 
@@ -474,32 +474,32 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateExtrudedPolyline(const std::string &name,
+void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                          const std::vector<math::Vector2d>
-                                               &vertices,
-                                         const double &height,
-                                         const math::Vector2d &uvCoords)
+                                               &_vertices,
+                                         double _height,
+                                         const math::Vector2d &_uvCoords)
 {
   int i, k;
 
-  if (this->HasMesh(name))
+  if (this->HasMesh(_name))
   {
     return;
   }
 
   Mesh *mesh = new Mesh();
-  mesh->SetName(name);
-  this->meshes.insert(std::make_pair(name, mesh));
+  mesh->SetName(_name);
+  this->meshes.insert(std::make_pair(_name, mesh));
 
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  int numSides = vertices.size();
+  int numSides = _vertices.size();
 
   // Texture coords
   double t[4][2] =
   {
-    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {_uvCoords.x, 0}, {0, 0}, {0, _uvCoords.y}, {_uvCoords.x, _uvCoords.y}
   };
 
   float **v = new float *[numSides*2];
@@ -520,17 +520,17 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
   // Compute the vertices
   for (i=0, k=0; i<numSides*2; i++, k++)
   {
-    v[i][0] = vertices[k].x;
-    v[i][1] = vertices[k].y;
+    v[i][0] = _vertices[k].x;
+    v[i][1] = _vertices[k].y;
     v[i][2] = 0.0;
     subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
     subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
     subMesh->AddTexCoord(t[k%4][0], t[k%4][1]);
     i++;
 
-    v[i][0] = vertices[k].x;
-    v[i][1] = vertices[k].y;
-    v[i][2] = height;
+    v[i][0] = _vertices[k].x;
+    v[i][1] = _vertices[k].y;
+    v[i][2] = _height;
     subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
     subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
     subMesh->AddTexCoord(t[k%4][0], t[k%4][1]);
@@ -633,7 +633,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
     {0.577350, -0.577350, 0.577350},
     {0.577350, -0.577350, -0.577350},
     {-0.577350, 0.577350, -0.577350},
-     {-0.577350, 0.577350, 0.577350},
+    {-0.577350, 0.577350, 0.577350},
     {0.577350, 0.577350, 0.577350},
     {0.577350, 0.577350, -0.577350}
   };

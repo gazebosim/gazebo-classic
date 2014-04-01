@@ -300,7 +300,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_geometry())
   {
-   if (_msg->geometry().type() == msgs::Geometry::BOX)
+    if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
       sdf::ElementPtr elem = geomElem->AddElement("box");
       elem->GetElement("size")->Set(
@@ -326,14 +326,13 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
     {
-     sdf::ElementPtr elem = geomElem->AddElement("polyline");
-     elem->GetElement("height")->Set(_msg->geometry().polyline().height());
-     for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
-     {
-        elem->AddElement("point")->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
-  
-     }
-
+      sdf::ElementPtr elem = geomElem->AddElement("polyline");
+      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
+      for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
+      {
+        elem->AddElement("point")->Set(
+          msgs::Convert(_msg->geometry().polyline().point(i)));
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
