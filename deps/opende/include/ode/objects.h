@@ -2785,6 +2785,16 @@ ODE_API dReal dJointGetScrewPosition (dJointID);
 ODE_API dReal dJointGetScrewAngle (dJointID);
 
 /**
+ * @brief Set the screw anchor
+ */
+ODE_API void dJointSetScrewAnchor( dJointID j, dReal x, dReal y, dReal z );
+
+/**
+ * @brief Get the screw anchor
+ */
+ODE_API void dJointGetScrewAnchor( dJointID j, dVector3 result );
+
+/**
  * @brief Get the screw linear position's time derivative.
  * @ingroup joints
  */
