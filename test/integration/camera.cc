@@ -23,7 +23,7 @@ class CameraTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-// \brief Test the at camera follow (gz camera -f <model> -c <camera>) moves
+// \brief Test that camera follow (gz camera -f <model> -c <camera>) moves
 // the camera
 TEST_F(CameraTest, Follow)
 {
