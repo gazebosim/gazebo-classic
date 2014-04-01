@@ -122,7 +122,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     math::Vector2d    Convert(const msgs::Vector2d &_v);
 
-
     /// \brief Convert a msgs::Quaternion to a math::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A math::Quaternion object

@@ -177,9 +177,10 @@ void DARTModel::BackupState()
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
-  int n = this->dtSkeleton->getNumGenCoords();
-  GZ_ASSERT(dtConfig.size() == n,   "Cannot RestoreState, invalid size");
-  GZ_ASSERT(dtVelocity.size() == n, "Cannot RestoreState, invalid size");
+  GZ_ASSERT(dtConfig.size() == this->dtSkeleton->getNumGenCoords(),
+            "Cannot RestoreState, invalid size");
+  GZ_ASSERT(dtVelocity.size() == this->dtSkeleton->getNumGenCoords(),
+            "Cannot RestoreState, invalid size");
 
   this->dtSkeleton->set_q(dtConfig);
   this->dtSkeleton->set_dq(dtVelocity);
@@ -192,7 +193,8 @@ dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 }
 
 //////////////////////////////////////////////////
-DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const {
+DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
+{
   return boost::dynamic_pointer_cast<DARTPhysics>(
     this->GetWorld()->GetPhysicsEngine());
 }

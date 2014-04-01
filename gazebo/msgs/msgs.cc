@@ -281,7 +281,6 @@ namespace gazebo
       return math::Vector2d(_v.x(), _v.y());
     }
 
-
     math::Quaternion Convert(const msgs::Quaternion &_q)
     {
       return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
