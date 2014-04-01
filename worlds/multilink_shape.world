@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <physics type="ode">
       <gravity>0 0 0</gravity>
@@ -10,7 +10,7 @@
     <model name="multilink">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="box_link">
-        <pose>1 0 0 0 0 0 </pose>
+        <pose>1 0 0 0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
@@ -32,9 +32,8 @@
           </material>
         </visual>
       </link>
-
       <link name="sphere_link">
-        <pose>-1.5 0 0 0 0 1.57 </pose>
+        <pose>-1.5 0 0 0 0 1.57</pose>
         <collision name="collision">
           <geometry>
             <sphere>
@@ -56,6 +55,6 @@
           </material>
         </visual>
       </link>
-
     </model>
+  </world>
 </sdf>

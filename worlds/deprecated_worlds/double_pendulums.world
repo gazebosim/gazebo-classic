@@ -1,4 +1,4 @@
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <scene>
       <ambient>0.500000 0.500000 0.500000 1.000000</ambient>
@@ -191,6 +191,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -226,6 +227,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -401,6 +403,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -436,6 +439,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>1.000000 0.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -611,6 +615,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>0.000000 1.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -646,6 +651,7 @@
             <friction>0.000000</friction>
           </dynamics>
           <xyz>0.000000 1.000000 0.000000</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>

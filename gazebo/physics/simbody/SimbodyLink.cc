@@ -199,20 +199,39 @@ void SimbodyLink::OnPoseChange()
   if (this->masterMobod.isEmptyHandle())
     return;
 
-  /// Limited functionality for now:
-  /// Setting 6 dof pose of a link works in simbody only if
-  /// the inboard joint is a free joint to the ground for now.
-  /// If the inboard joint is not free, simbody tries to project
-  /// target pose into available DOF's.
+  // debug
+  // gzerr << "original: [" << SimbodyPhysics::Transform2Pose(
+  //   this->masterMobod.getBodyTransform(
+  //   this->simbodyPhysics->integ->updAdvancedState()))
+  //       << "]\n";
 
-  /// Only change pose if parent is ground, otherwise do nothing
-  if (!this->masterMobod.isGround() &&
-      this->masterMobod.getParentMobilizedBody().isGround())
+  if (!this->masterMobod.isGround())
   {
-    this->masterMobod.setQToFitTransform(
-       this->simbodyPhysics->integ->updAdvancedState(),
-       SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
-
+    if (this->masterMobod.getParentMobilizedBody().isGround())
+    {
+      /// If parent is ground:
+      /// Setting 6 dof pose of a link works in simbody only if
+      /// the inboard joint is a free joint to the ground for now.
+      this->masterMobod.setQToFitTransform(
+         this->simbodyPhysics->integ->updAdvancedState(),
+         SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+    }
+    else
+    {
+      gzerr << "SetWorldPose (OnPoseChange) for child links need testing.\n";
+      /*
+      /// If the inboard joint is not free, simbody tries to project
+      /// target pose into available DOF's.
+      /// But first convert to relative pose to parent mobod.
+      math::Pose parentPose = SimbodyPhysics::Transform2Pose(
+        this->masterMobod.getBodyTransform(
+        this->simbodyPhysics->integ->updAdvancedState()));
+      math::Pose relPose = this->GetWorldPose() - parentPose;
+      this->masterMobod.setQToFitTransform(
+         this->simbodyPhysics->integ->updAdvancedState(),
+         SimbodyPhysics::Pose2Transform(relPose));
+      */
+    }
     // realize system after updating Q's
     this->simbodyPhysics->system.realize(
       this->simbodyPhysics->integ->getState(), SimTK::Stage::Position);
@@ -456,48 +475,62 @@ math::Vector3 SimbodyLink::GetWorldTorque() const
 //////////////////////////////////////////////////
 void SimbodyLink::SetLinearDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyLink::SetAngularDamping(double /*_damping*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForce(const math::Vector3 &/*_force*/)
+void SimbodyLink::AddForce(const math::Vector3 &_force)
 {
+  SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
+
+  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    this->masterMobod,
+    SimTK::Vec3(0), f);
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeForce(const math::Vector3 &/*_force*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
                                          const math::Vector3 &/*_pos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
                   const math::Vector3 &/*_relpos*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyLink::SetAutoDisable(bool /*_disable*/)
 {
+  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

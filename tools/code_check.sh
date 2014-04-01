@@ -47,6 +47,7 @@ then
 else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
+" ./test/examples ./test/plugins"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
