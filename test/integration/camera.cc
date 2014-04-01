@@ -81,7 +81,7 @@ TEST_F(CameraTest, Follow)
 // \brief Test the camera IsVisible function
 TEST_F(CameraTest, Visible)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty.world", true);
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
@@ -97,6 +97,11 @@ TEST_F(CameraTest, Visible)
   // Spawn a camera facing the box
   SpawnCamera("test_camera_model", cameraName,
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  ASSERT_TRUE(sensor);
+  // this makes sure a world step will trigger the camera render update
+  sensor->SetUpdateRate(1000);
 
   rendering::ScenePtr scene = rendering::get_scene();
   ASSERT_TRUE(scene);
@@ -126,6 +131,7 @@ TEST_F(CameraTest, Visible)
   // move the box behind the camera and it should not be visible to the camera
   math::Pose pose = math::Pose(-1, 0, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
+  world->Step(1);
   sleep = 0;
   maxSleep = 10;
   while (visual->GetWorldPose() != pose && sleep < maxSleep)
@@ -135,10 +141,12 @@ TEST_F(CameraTest, Visible)
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
   EXPECT_TRUE(!camera->IsVisible(visual));
+  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // move the box to the left of the camera and it should not be visible
   pose = math::Pose(0, -1, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
+  world->Step(1);
   sleep = 0;
   maxSleep = 10;
   while (visual->GetWorldPose() != pose && sleep < maxSleep)
@@ -148,11 +156,13 @@ TEST_F(CameraTest, Visible)
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
   EXPECT_TRUE(!camera->IsVisible(visual));
+  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // move the box to the right of the camera with some rotations,
   // it should still not be visible.
   pose = math::Pose(0, 1, 0.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
+  world->Step(1);
   sleep = 0;
   maxSleep = 10;
   while (visual->GetWorldPose() != pose && sleep < maxSleep)
@@ -162,34 +172,39 @@ TEST_F(CameraTest, Visible)
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
   EXPECT_TRUE(!camera->IsVisible(visual));
+  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // rotate the camera counter-clockwise to see the box
   camera->RotateYaw(math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
+  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
 
   // move the box up and let it drop. The camera should not see the box
   // initially but the box should eventually move into the camera view
   // as it falls
   pose = math::Pose(0, 1, 5.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
+  world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (math::equal(visual->GetWorldPose().pos.z, 0.5) && sleep < maxSleep)
+  while (visual->GetWorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->GetWorldPose().pos.z > 0.5);
+  EXPECT_TRUE(visual->GetWorldPose() == pose);
   EXPECT_TRUE(!camera->IsVisible(visual));
+  EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   sleep = 0;
-  maxSleep = 50;
+  maxSleep = 100;
   while (!camera->IsVisible(visual) && sleep < maxSleep)
   {
-    common::Time::MSleep(100);
+    world->Step(10);
     sleep++;
   }
   EXPECT_TRUE(camera->IsVisible(visual));
+  EXPECT_TRUE(camera->IsVisible(visual->GetName()));
 }
 
 /////////////////////////////////////////////////
