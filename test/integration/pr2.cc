@@ -32,12 +32,6 @@ class PR2Test : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PR2Test::LoadPR2(std::string _physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
@@ -101,12 +95,6 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
     gzerr << "Abort test since bullet screw joints don't work yet\n";
     return;
   }
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "
@@ -141,7 +129,7 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   world->Step(300);
 
   // Set a fixed velocity on revolute joint that connects to the screw joint
-  unsigned int steps = 100;
+  unsigned int steps = 1000;
   for (unsigned int i = 0; i < steps; ++i)
   {
     motor->SetForce(0, 10);

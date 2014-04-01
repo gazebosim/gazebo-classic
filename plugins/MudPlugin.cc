@@ -293,10 +293,10 @@ void MudPlugin::OnUpdate()
               double erp, cfm;
               erp = this->stiffness*dt / (this->stiffness*dt + this->damping);
               cfm = 1.0 / (this->stiffness*dt + this->damping);
-              (*iterJoint)->SetAttribute("erp", 0, erp);
-              (*iterJoint)->SetAttribute("cfm", 0, cfm);
-              (*iterJoint)->SetAttribute("stop_erp", 0, erp);
-              (*iterJoint)->SetAttribute("stop_cfm", 0, cfm);
+              (*iterJoint)->SetParam("erp", 0, erp);
+              (*iterJoint)->SetParam("cfm", 0, cfm);
+              (*iterJoint)->SetParam("stop_erp", 0, erp);
+              (*iterJoint)->SetParam("stop_cfm", 0, cfm);
             }
             (*iterJoint)->SetHighStop(0, 0.0);
             (*iterJoint)->SetLowStop(0, 0.0);
