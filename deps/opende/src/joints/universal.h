@@ -38,6 +38,8 @@ struct dxJointUniversal : public dxJoint
     dxJointLimitMotor limot1; // limit and motor information for axis1
     dxJointLimitMotor limot2; // limit and motor information for axis2
 
+    dReal cumulative_angle1; // save a cumulative angle for beyond +/-pi limits
+    dReal cumulative_angle2; // save a cumulative angle for beyond +/-pi limits
 
     void getAxes( dVector3 ax1, dVector3 ax2 );
     void getAngles( dReal *angle1, dReal *angle2 );

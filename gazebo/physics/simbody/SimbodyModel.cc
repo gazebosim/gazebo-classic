@@ -86,7 +86,9 @@ void SimbodyModel::Init()
     }
     catch(...)
     {
-      gzerr << "Init joint failed" << std::endl;
+      gzerr << "Init failed for joint ["
+            << (*iter)->GetScopedName() << "]"
+            << std::endl;
       return;
     }
   }
