@@ -15,7 +15,7 @@ set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 1)
+set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -25,7 +25,7 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 ########################################
-# Package Creation: 
+# Package Creation:
 include (${gazebo_cmake_dir}/gazebo_cpack.cmake)
 set (CPACK_PACKAGE_VERSION "${GAZEBO_VERSION_FULL}")
 set (CPACK_PACKAGE_VERSION_MAJOR "${GAZEBO_MAJOR_VERSION}")
@@ -87,10 +87,10 @@ if(LD_LIBRARY_PATH)
 endif()
 
 
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo")
 set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
 set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
-    
+
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
@@ -148,10 +148,10 @@ include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING 
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
         "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
-# TODO: still convert to uppercase to keep backwards compatibility with 
+# TODO: still convert to uppercase to keep backwards compatibility with
 # uppercase old supported and deprecated modes
 string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
@@ -178,7 +178,7 @@ unset (CMAKE_C_FLAGS_ALL CACHE)
 unset (CMAKE_CXX_FLAGS CACHE)
 
 # USE_HOST_CFLAGS (default TRUE)
-# Will check building host machine for proper cflags 
+# Will check building host machine for proper cflags
 if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
   message(STATUS "Enable host CFlags")
   include (${gazebo_cmake_dir}/HostCFlags.cmake)
@@ -192,8 +192,8 @@ if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
 endif()
 
 # Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
-filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
-                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow 
+filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
 
 # Check and add visibility hidden by default. Only in UNIX
@@ -261,7 +261,7 @@ else (build_errors)
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}/)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
- 
+
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
@@ -270,7 +270,7 @@ else (build_errors)
   endif()
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
- 
+
   if (BUILD_GAZEBO)
     set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
@@ -314,11 +314,11 @@ else (build_errors)
     gazebo_skyx
     gazebo_transport
     gazebo_util)
-    
+
   if (NOT HAVE_CCD)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
-    
+
   if (INCLUDE_PLAYER)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
   endif()
@@ -326,11 +326,11 @@ else (build_errors)
   if (HAVE_BULLET)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
   endif()
-  
+
   if (${OGRE_VERSION} GREATER 1.7.4)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
   endif()
-    
+
   set(PKG_DEPENDS Boost Protobuf SDFormat)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
