@@ -115,6 +115,16 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
+double DARTScrewJoint::GetAttribute(const std::string &_key,
+                                    unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return DARTJoint::GetAttribute(_key, _index);
+}
+
+//////////////////////////////////////////////////
 double DARTScrewJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0.0;
