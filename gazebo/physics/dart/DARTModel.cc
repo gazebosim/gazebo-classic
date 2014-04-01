@@ -117,7 +117,7 @@ void DARTModel::Init()
   // collidable.
   if (hasPairOfSelfCollidableLinks)
   {
-    this->dtSkeleton->setSelfCollidable(true);
+    this->dtSkeleton->enableSelfCollision();
 
     dart::simulation::SoftWorld *dtWorld = this->GetDARTPhysics()->GetDARTWorld();
     dart::collision::CollisionDetector *dtCollDet =

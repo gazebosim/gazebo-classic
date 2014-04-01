@@ -468,7 +468,7 @@ void DARTLink::SetSelfCollide(bool _collide)
   Link_V links = this->GetModel()->GetLinks();
 
   bool isSkeletonSelfCollidable =
-      this->dtBodyNode->getSkeleton()->isSelfCollidable();
+      this->dtBodyNode->getSkeleton()->isEnabledSelfCollisionCheck();
 
   if (_collide)
   {
@@ -501,7 +501,7 @@ void DARTLink::SetSelfCollide(bool _collide)
     // the pairs of which both of the links in the pair is not self collidable.
     else
     {
-      dtSkeleton->setSelfCollidable(true);
+      dtSkeleton->enableSelfCollision();
 
       for (size_t i = 0; i < links.size() - 1; ++i)
       {
@@ -554,7 +554,7 @@ void DARTLink::SetSelfCollide(bool _collide)
       }
     }
     if (isAllLinksNotCollidable)
-      dtSkeleton->setSelfCollidable(false);
+      dtSkeleton->disableSelfCollision();
   }
 }
 

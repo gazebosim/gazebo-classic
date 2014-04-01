@@ -56,6 +56,10 @@ namespace gazebo
       public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                  unsigned int _index) GAZEBO_DEPRECATED(3.0);
+
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
@@ -92,9 +96,6 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
-
-      /// \copydoc Joint::GetAttribute
-      public: double GetAttribute(const std::string &_key, unsigned int _index);
 
       /// \brief Universal joint of DART
       protected: dart::dynamics::ScrewJoint *dartScrewJoint;
