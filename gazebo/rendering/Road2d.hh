@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <algorithm>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
@@ -85,7 +84,7 @@ namespace gazebo
                  /// \brief Width of the road.
                  public: double width;
 
-                 /// \broef Texture of the road
+                 /// \brief Texture of the road
                  public: std::string texture;
                };
 

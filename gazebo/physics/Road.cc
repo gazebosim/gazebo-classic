@@ -15,8 +15,8 @@
  *
 */
 
-#include <string>
 #include <algorithm>
+#include <string>
 #include <vector>
 
 #include "gazebo/transport/transport.hh"

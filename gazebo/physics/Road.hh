@@ -18,9 +18,8 @@
 #ifndef _ROAD_HH_
 #define _ROAD_HH_
 
-#include <vector>
 #include <string>
-#include <algorithm>
+#include <vector>
 
 #include <gazebo/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
