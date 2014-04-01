@@ -14,6 +14,11 @@
  * limitations under the License.
  *
 */
+
+#include <string>
+#include <algorithm>
+#include <vector>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/Road.hh"
 #include "gazebo/msgs/msgs.hh"

@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <algorithm>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Road2d.hh"
