@@ -60,8 +60,12 @@ namespace gazebo
                 }
                 else
                 {
-                  gzerr << "should not see this\n";
+                  gzerr << "gearbox_ratio_not_specified, set to 1.\n";
                   this->gearRatio = 1.0;
+                  /* below should bring in default values for sdf 1.4+
+                  this->gearRatio =
+                    _sdf->Get<double>("gearbox_ratio");
+                  */
                 }
 
                 if (_sdf->HasElement("gearbox_reference_body"))
@@ -83,7 +87,7 @@ namespace gazebo
 
       /// \brief Get gearbox joint gear ratio.
       /// \return Gear ratio value.
-      public: virtual double GetGearRatio() const
+      public: virtual double GetGearboxRatio() const
               { return this->gearRatio; }
 
       /// \brief Set gearbox joint gear ratio.
@@ -91,7 +95,7 @@ namespace gazebo
       /// This must be implemented in a child class
       /// \param[in] _index Index of the axis.
       /// \param[in] _gearRatio Gear ratio value.
-      public: virtual void SetGearRatio(double _gearRatio) = 0;
+      public: virtual void SetGearboxRatio(double _gearRatio) = 0;
 
       /// \brief Gearbox gearRatio
       protected: double gearRatio;

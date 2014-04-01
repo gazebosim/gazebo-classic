@@ -67,7 +67,8 @@ dxJointHinge::getInfo1( dxJoint::Info1 *info )
         dReal angle = getHingeAngle( node[0].body,
                                      node[1].body,
                                      axis1, qrel );
-        // from angle, update cumulative_angle, which does not wrap
+        // From angle, update cumulative_angle, which does not wrap.
+        // Assume this is called only once per time step.
         cumulative_angle = 
           dShortestAngularDistanceUpdate(cumulative_angle,angle);
 

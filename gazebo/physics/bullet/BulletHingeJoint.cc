@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A BulletHingeJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -137,11 +133,15 @@ void BulletHingeJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "unable to create bullet hinge without links.\n";
+    return;
   }
 
   if (!this->bulletHinge)
-    gzthrow("unable to create bullet hinge constraint\n");
+  {
+    gzerr << "unable to create bullet hinge constraint\n";
+    return;
+  }
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
@@ -281,7 +281,7 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
+bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
                       const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
@@ -292,11 +292,17 @@ void BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
     // settings
     this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
                                 this->angleOffset + _angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletHinge not yet created.\n";
+    return false;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
+bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
                      const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
@@ -307,6 +313,12 @@ void BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
     // settings
     this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
                                 this->bulletHinge->getUpperLimit());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletHinge not yet created.\n";
+    return false;
   }
 }
 
