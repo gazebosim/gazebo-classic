@@ -56,6 +56,10 @@ namespace gazebo
       public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                  unsigned int _index) GAZEBO_DEPRECATED(3.0);
+
       // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
