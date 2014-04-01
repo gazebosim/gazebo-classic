@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -319,6 +314,19 @@ void Joint::Init()
 }
 
 //////////////////////////////////////////////////
+void Joint::Fini()
+{
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
+
+  Base::Fini();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
   math::Vector3 vec;
@@ -430,13 +438,10 @@ void Joint::FillMsg(msgs::Joint &_msg)
   if (this->HasType(Base::HINGE_JOINT))
   {
     _msg.set_type(msgs::Joint::REVOLUTE);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::HINGE2_JOINT))
   {
     _msg.set_type(msgs::Joint::REVOLUTE2);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
   else if (this->HasType(Base::BALL_JOINT))
   {
@@ -445,33 +450,39 @@ void Joint::FillMsg(msgs::Joint &_msg)
   else if (this->HasType(Base::SLIDER_JOINT))
   {
     _msg.set_type(msgs::Joint::PRISMATIC);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::SCREW_JOINT))
   {
     _msg.set_type(msgs::Joint::SCREW);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::GEARBOX_JOINT))
   {
     _msg.set_type(msgs::Joint::GEARBOX);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
     _msg.set_type(msgs::Joint::UNIVERSAL);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
 
-  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetLocalAxis(0));
-  _msg.mutable_axis1()->set_limit_lower(0);
-  _msg.mutable_axis1()->set_limit_upper(0);
-  _msg.mutable_axis1()->set_limit_effort(0);
-  _msg.mutable_axis1()->set_limit_velocity(0);
-  _msg.mutable_axis1()->set_damping(0);
-  _msg.mutable_axis1()->set_friction(0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    _msg.add_angle(this->GetAngle(i).Radian());
+    msgs::Axis *axis;
+    if (i == 0)
+      axis = _msg.mutable_axis1();
+    else if (i == 1)
+      axis = _msg.mutable_axis2();
+    else
+      break;
+
+    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i));
+    axis->set_limit_lower(this->GetLowStop(i).Radian());
+    axis->set_limit_upper(this->GetHighStop(i).Radian());
+    axis->set_limit_effort(this->GetEffortLimit(i));
+    axis->set_limit_velocity(this->GetVelocityLimit(i));
+    axis->set_damping(this->GetDamping(i));
+    axis->set_friction(0);
+  }
 
   if (this->GetParent())
   {
@@ -521,15 +532,21 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
+  // switch below to return this->SetUpperLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle);
+  // switch below to return this->SetLowerLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
