@@ -1,8 +1,10 @@
 #ifndef _POLYLINESHAPE_HH_
 #define _POLYLINESHAPE_HH_
 
-#include "gazebo/physics/Shape.hh"
 #include <vector>
+
+#include "gazebo/physics/Shape.hh"
+
 namespace gazebo
 {
   namespace physics
@@ -10,8 +12,8 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class BoxShape BoxShape.hh physics/physcs.hh
-    /// \brief Box geometry primitive.
+    /// \class PolyLineShape PolyLineShape.hh physics/physcs.hh
+    /// \brief PolyLine geometry primitive.
     class PolyLineShape : public Shape
     {
       /// \brief Constructor.
@@ -32,8 +34,10 @@ namespace gazebo
       /// \param[in] _scale Scale of the polyLine.
       public: virtual void SetScale(const math::Vector3 &_scale);
 
+      /// \brief Set the vertices of the polyline
+      /// \param[in] _msg geometry msg containing the vertex information
       public: virtual void SetVertices(const msgs::Geometry &_msg);
-//      public: std::vector<math::Vector2d>* GetVertices() const;
+     
       /// \brief Get the height of the polyLine.
       /// \return The height of each side of the polyLine.
       public: double GetHeight() const;

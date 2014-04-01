@@ -24,6 +24,7 @@ set (files
   openal.world
   pioneer2dx.world
   plugin.world
+  polyline.world
   pr2.world
   presentation.world
   pressure_sensor.world

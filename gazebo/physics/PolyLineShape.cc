@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/PolyLineShape.hh"
 
@@ -46,35 +48,18 @@ void PolyLineShape::SetScale(const math::Vector3 &_scale)
 }
 
 ////////////////////////////////////////////////////
-//std::vector<math::Vector2d>* PolyLineShape::GetVertices() const
-//{
-//  std::vector<math::Vector2d> *vertices;
-//  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
-//  
-//  while(pointElem)
-//  { 
-//     math::Vector2d point = pointElem->Get<math::Vector2d>();
-//     pointElem = pointElem->GetNextElement("point");
-// 
-//     vertices->push_back(point);
-//  }
-//  
-//  return vertices;
-//}
-//
-////////////////////////////////////////////////////
 void PolyLineShape::SetVertices(const msgs::Geometry &_msg)
 {
   int i;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
-  for(i =0; i < _msg.polyline().point_size(); i++)
+  for( i =0; i<_msg.polyline().point_size(); i++)
   { 
      
-    math::Vector2d point( _msg.polyline().point(i).x(),  _msg.polyline().point(i).y());
+    math::Vector2d point( _msg.polyline().point(i).x(),
+                          _msg.polyline().point(i).y());
     pointElem->Set(point);
     pointElem = pointElem->GetNextElement("point");
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -83,16 +68,13 @@ void PolyLineShape::FillMsg(msgs::Geometry &_msg)
   _msg.set_type(msgs::Geometry::POLYLINE);
   _msg.mutable_polyline()->set_height(this->GetHeight());
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
-  while(pointElem)
+  while (pointElem)
   { 
      math::Vector2d point = pointElem->Get<math::Vector2d>();
      pointElem = pointElem->GetNextElement("point");
- 
      msgs::Vector2d *ptMsg = _msg.mutable_polyline()->add_point();
-
      msgs::Set(ptMsg, point);
   }
-
 }
 
 //////////////////////////////////////////////////
