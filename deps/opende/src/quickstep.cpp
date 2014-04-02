@@ -1694,20 +1694,13 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// for all rows.
       const dReal moi_ratio_tol = 10.0;  // increase moi_ratio_tol to skip checks and increase performance
       dReal m1_new, m2_new;
-      if ((m1 > moi_ratio_tol * m2) ||
-          (m2 > moi_ratio_tol * m1))
+      if ((m1 > moi_ratio_tol * m2) || (m2 > moi_ratio_tol * m1))
       {
 #ifdef DEBUG_INERTIA_PROPAGATION
         printf("---------S Scalars--------\n");
         printf(" original    S1 [%g] S2 [%g]\n", m1, m2);
         printf(" distributed S1 [%g] S2 [%g]\n", m1_new, m2_new);
 #endif
-
-        // sum of moi along S1 and S2, should stay conserved
-        dReal moi_sum = (m1 + m2);
-
-        // some ratio
-        dReal moi_ratio = 10.0;
 
         /// Keep parent/child MOI/invMOI in inertial frame.
 
@@ -1773,403 +1766,601 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           }
         }
 #endif
-        for (int row = 0; row < 3; ++row)
+        // sum of moi along S1 and S2, should stay conserved
+        dReal moi_sum = (m1 + m2);
+
+        // some ratio
+        dReal moi_ratio = moi_ratio_tol;
+
+        bool problem = false;
+        for (int moi_iters = 0; moi_iters < 2; ++moi_iters)
         {
+          // printf("----------------------- iteration [%d] -----------------------------\n", moi_iters);
+          for (int row = 0; row < 3; ++row)
+          {
+            if (m1 > m2)
+            {
+              // check equations 13 and 14 (gamma1 > 1)
+              dReal denom_13 = moi_ratio * ( M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
+              dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
+              dReal left_14 = M1d[row] - M1od[row] + m2*(SSd[row] - SSod[row]);
+              dReal right_14 = m1*(SSd[row] - SSod[row]) - (M1d[row] - M1od[row]);
+              // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
+              //   denom_13, nomin_13, left_14, right_14);
+              if (denom_13 > 0)
+              {
+                // ok continue to 14
+                if (left_14 > 0)
+                {
+                  // r' > right_14 / left_14
+                  dReal tmp = right_14 / left_14;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_14 / left_14
+                  dReal tmp = right_14 / left_14;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+              else
+              {
+                // printf("denom_13 [%f]<0, do the checks backwards.\n", denom_13);
+                // continue to 14, but flip > to <
+                if (left_14 < 0)
+                {
+                  // r' > right_14 / left_14
+                  dReal tmp = right_14 / left_14;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_14 / left_14
+                  dReal tmp = right_14 / left_14;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+
+              // check equations 15 and 16 (gamma2 > 1)
+              dReal denom_15 = moi_ratio * ( M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
+              dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
+              dReal left_16 = M2d[row] - M2od[row] - m2*(SSd[row] - SSod[row]);
+              dReal right_16 = m1*(SSod[row] - SSd[row]) - (M2d[row] - M2od[row]);
+              // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
+              //   denom_15, nomin_15, left_16, right_16);
+              if (denom_15 > 0)
+              {
+                // ok continue to 16
+                if (left_16 > 0)
+                {
+                  // r' > right_16 / left_16
+                  dReal tmp = right_16 / left_16;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_16 / left_16
+                  dReal tmp = right_16 / left_16;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+              else
+              {
+                // printf("denom_15 [%f]<0, do the checks backwards.\n", denom_15);
+                // continue to 16, but flip > to <
+                if (left_16 < 0)
+                {
+                  // r' > right_16 / left_16
+                  dReal tmp = right_16 / left_16;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_16 / left_16
+                  dReal tmp = right_16 / left_16;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+            }
+            else if (m2 > m1)
+            {
+              // equations 13, 14 maps to 18, 19
+              // check equations 18 and 19 (gamma1 > 1)
+              dReal denom_18 = moi_ratio * ( M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
+              dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
+              dReal left_19 = M1d[row] - M1od[row] - m1*(SSd[row] - SSod[row]);
+              dReal right_19 = m2*(SSod[row] - SSd[row]) + (M1od[row] - M1d[row]);
+              // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
+              //   denom_18, nomin_18, left_19, right_19);
+              if (denom_18 > 0)
+              {
+                // ok continue to 19
+                if (left_19 > 0)
+                {
+                  // r' > right_19 / left_19
+                  dReal tmp = right_19 / left_19;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_19 / left_19
+                  // r' < right_19 / left_19
+                  dReal tmp = right_19 / left_19;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+              else
+              {
+                // printf("denom_18 [%f]<0, do the checks backwards.\n", denom_18);
+                // continue to 19, but flip > to <
+                if (left_19 < 0)
+                {
+                  // r' > right_19 / left_19
+                  dReal tmp = right_19 / left_19;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_19 / left_19
+                  // r' < right_19 / left_19
+                  dReal tmp = right_19 / left_19;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+
+              // equations 15, 16 maps to 20, 21
+              // check equations 20 and 21 (gamma2 > 1)
+              dReal denom_20 = moi_ratio * ( M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
+              dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
+              dReal left_21 = M2d[row] - M2od[row] + m1*(SSd[row] - SSod[row]);
+              dReal right_21 = m2*(SSd[row] - SSod[row]) - (M2d[row] - M2od[row]);
+              // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
+              //   denom_20, nomin_20, left_21, right_21);
+              if (denom_20 > 0)
+              {
+                // ok continue to 21
+                if (left_21 > 0)
+                {
+                  // r' > right_21 / left_21
+                  // r' > right_21 / left_21
+                  dReal tmp = right_21 / left_21;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_21 / left_21
+                  // r' < right_21 / left_21
+                  dReal tmp = right_21 / left_21;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+              else
+              {
+                // printf("denom_20 [%f]<0, do the checks backwards.\n", denom_20);
+                // continue to 21, but flip > to <
+                if (left_21 < 0)
+                {
+                  // r' > right_21 / left_21
+                  // r' > right_21 / left_21
+                  dReal tmp = right_21 / left_21;
+                  if (moi_ratio > tmp)
+                  {
+                    // satisfied
+                    // printf("satisfied: %f > %f\n", moi_ratio, tmp);
+                  }
+                  else
+                  {
+                    // update moi_ratio
+                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    moi_ratio = tmp;
+                  }
+                }
+                else
+                {
+                  // r' < right_21 / left_21
+                  // r' < right_21 / left_21
+                  dReal tmp = right_21 / left_21;
+                  if (tmp < 0)
+                  {
+                    // printf("problem, r' < %f\n", tmp);
+                    problem = true;
+                    break;
+                  }
+                  else
+                  {
+                    if (moi_ratio < tmp)
+                    {
+                      // moi_ratio is fine
+                      // printf("satisfied: %f < %f\n", moi_ratio, tmp);
+                    }
+                    else
+                    {
+                      // update moi_ratio
+                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      moi_ratio = tmp;
+                    }
+                  }
+                }
+              }
+            }
+            else
+            {
+              // nothing to do, m1 == m2
+            }
+          }
+        }
+
+        // only do the reduction if we've found a good new moi ratio candidate
+        if (!problem && ((m1 > moi_ratio * m2) || (m2 > moi_ratio * m1)))
+        {
+          // compute new m1 and m2 based on updated moi_ratio and moi_sum
           if (m1 > m2)
           {
-            // check equations 13 and 14 (gamma1 > 1)
-            dReal denom_13 = moi_ratio * ( M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
-            dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
-            dReal left_14 = M1d[row] - M1od[row] + m2*(SSd[row] - SSod[row]);
-            dReal right_14 = m1*(SSd[row] - SSod[row]) - (M1d[row] - M1od[row]);
-            printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
-              denom_13, nomin_13, left_14, right_14);
-            if (denom_13 > 0)
-            {
-              // ok continue to 14
-              if (left_14 > 0)
-              {
-                // r' > right_14 / left_14
-                printf("r' > %f\n", right_14 / left_14);
-              }
-              else
-              {
-                // r' < right_14 / left_14
-                printf("r' < %f\n", right_14 / left_14);
-              }
-            }
-            else
-            {
-              printf("YIKES!!!!!!!!\n");
-            }
-
-            // check equations 15 and 16 (gamma2 > 1)
-            dReal denom_15 = moi_ratio * ( M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
-            dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
-            dReal left_16 = M2d[row] - M2od[row] - m2*(SSd[row] - SSod[row]);
-            dReal right_16 = m1*(SSod[row] - SSd[row]) - (M2d[row] - M2od[row]);
-            printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
-              denom_15, nomin_15, left_16, right_16);
-            if (denom_15 > 0)
-            {
-              // ok continue to 16
-              if (left_16 > 0)
-              {
-                // r' > right_16 / left_16
-                printf("r' > %f\n", right_16 / left_16);
-              }
-              else
-              {
-                // r' < right_16 / left_16
-                printf("r' < %f\n", right_16 / left_16);
-              }
-            }
-            else
-            {
-              printf("YIKES!!!!!!!!\n");
-            }
+            m2_new = (moi_sum)/(moi_ratio + 1.0);
+            m1_new = moi_ratio*m2_new;
+            // alpha1 = m1_new - m1
+            // alpha2 = m2_new - m2
+            // alpha1 + alpha2 = 0  // since moi sum is conserved
+            // make sure m1 / m2 < moi_ratio
+            // pick moi_ratio such that 
           }
-          else if (m2 > m1)
+          else // if (m2 > moi_ratio * m1)
           {
-            // equations 13, 14 maps to 18, 19
-            // check equations 18 and 19 (gamma1 > 1)
-            dReal denom_18 = moi_ratio * ( M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
-            dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
-            dReal left_19 = M1d[row] - M1od[row] - m1*(SSd[row] - SSod[row]);
-            dReal right_19 = m2*(SSod[row] - SSd[row]) + (M1od[row] - M1d[row]);
-            printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
-              denom_18, nomin_18, left_19, right_19);
-            if (denom_18 > 0)
-            {
-              // ok continue to 19
-              if (left_19 > 0)
-              {
-                // r' > right_19 / left_19
-                printf("r' > %f\n", right_19 / left_19);
-              }
-              else
-              {
-                // r' < right_19 / left_19
-                printf("r' < %f\n", right_19 / left_19);
-              }
-            }
-            else
-            {
-              printf("YIKES!!!!!!!!\n");
-            }
-
-            // equations 15, 16 maps to 20, 21
-            // check equations 20 and 21 (gamma2 > 1)
-            dReal denom_20 = moi_ratio * ( M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
-            dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
-            dReal left_21 = M2d[row] - M2od[row] + m1*(SSd[row] - SSod[row]);
-            dReal right_21 = m2*(SSd[row] - SSod[row]) - (M2d[row] - M2od[row]);
-            printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
-              denom_20, nomin_20, left_21, right_21);
-            if (denom_20 > 0)
-            {
-              // ok continue to 21
-              if (left_21 > 0)
-              {
-                // r' > right_21 / left_21
-                printf("r' > %f\n", right_21 / left_21);
-              }
-              else
-              {
-                // r' < right_21 / left_21
-                printf("r' < %f\n", right_21 / left_21);
-              }
-            }
-            else
-            {
-              printf("YIKES!!!!!!!!\n");
-            }
-          }
-          else
-          {
-            // nothing to do, m1 == m2
-          }
-        }
-#if 0
-        dReal gamma[4];
-        dReal alpha1[4], alpha2[4];
-        for (int row = 0; row < 3; ++row)
-        {
-          // compute gamma (ratio of resulting abs diag over abs sum of off-diags)
-          gamma[row] = (M1d[row] + M2d[row]) /
-                       (M1od[row] + M2od[row]);
-          // compute what alpha1 and alpha 2 ought to be
-          dReal denom = SSd[row] - gamma[row]*SSod[row];
-          alpha1[row] = (gamma[row]*M1od[row] - M1d[row]) / denom;
-          alpha2[row] = (gamma[row]*M2od[row] - M2d[row]) / denom;
-          // debug pring
-          printf("gamma[%d] = %f, alpha1[%d] = %f, alpha2[%d] = %f\n",
-            row, gamma[row], row, alpha1[row], row, alpha2[row]);
-          printf("gamma1[%d] = %f, gamma2[%d] = %f\n",
-            row, M1d[row]/M1od[row], row, M2d[row]/M2od[row]);
-          // we know that alpha1 = m1_new - m1
-          //          and alpha2 = m2_new - m2
-          // so we could back out m1_new and m2_new?
-          m1_new = alpha1[row] + m1;
-          m2_new = alpha2[row] + m2;
-          printf("old m1 [%f] m2 [%f]\n", m1, m2);
-          printf("new m1 [%f] m2 [%f]\n", m1_new, m2_new);
-        }
-
-        // compute alpha1 and alpha2, they should add up to 1
-
-        //
-        // use the abs sum of off diagonals to compute minimum allowed ratio
-        //
-        dReal alpha1Max = 1.0e16;
-        dReal alpha2Max = 1.0e16;
-        for (int row = 0; row < 3; ++row)
-        {
-          // for each row,
-          //   MOI_diag + alpha * SS_diag > M_offd + alpha * SS_offd
-          // therefore
-          //   alpha * (SS_diag - SS_offd) > (M_offd - M_diag)
-          // where
-          //   alpha = (moi_S_new - moi_S)
-          // check equation above, find minimum alpha
-          if ((SSd[row] > SSod[row] && M1od[row] > M1d[row]) ||
-              (SSd[row] < SSod[row] && M1od[row] < M1d[row]))
-          {
-            // find minimum alpha1Max
-            dReal nom = SSd[row] - SSod[row];
-            dReal den = M1od[row] - M1d[row];
-            if (!_dequal(den, 0.0))
-            {
-              dReal r = nom / den;
-              alpha1Max = (alpha1Max > r) ? r : alpha1Max;
-            }
-          }
-          if ((SSd[row] > SSod[row] && M2od[row] > M2d[row]) ||
-              (SSd[row] < SSod[row] && M2od[row] < M2d[row]))
-          {
-            // find minimum alpha2Max
-            dReal nom = SSd[row] - SSod[row];
-            dReal den = M2od[row] - M2d[row];
-            if (!_dequal(den, 0.0))
-            {
-              dReal r = nom / den;
-              alpha2Max = (alpha2Max > r) ? r : alpha2Max;
-            }
-          }
-        }
-
-        // below is how we calculate moi_S_new from moi_ratio
-
-        // debug: pick smaller of the 2
-        dReal alpha = (dFabs(alpha1Max) < dFabs(alpha2Max)) ? dFabs(alpha1Max) : dFabs(alpha2Max);
-        printf("debug alpha [%f] alpha1Max [%f] alpha2Max [%f]\n", alpha, alpha1Max, alpha2Max);
-
-        // given alpha, what is the ratio?
-        dReal r1 = (-m1 / alpha -1.0)/(1.0 - m2 / alpha);
-        dReal r2 = ( m1 / alpha -1.0)/(1.0 + m2 / alpha);
-        printf("debug ratio [%f] [%f]\n", r1, r2);
-
-        break;
-#endif
-
-        if (m1 > m2)
-        {
-          m2_new = (moi_sum)/(moi_ratio + 1.0);
-          m1_new = moi_ratio*m2_new;
-          // alpha1 = m1_new - m1
-          // alpha2 = m2_new - m2
-          // alpha1 + alpha2 = 0  // since moi sum is conserved
-          // make sure m1 / m2 < moi_ratio
-          // pick moi_ratio such that 
-        }
-        else // if (m2 > moi_ratio * m1)
-        {
-          m1_new = (moi_sum)/(moi_ratio + 1.0);
-          m2_new = moi_ratio*m1_new;
-        }
-
-        // store temporary new MOI1 and MOI2
-        dReal tmpNewMOI1[12];
-        dReal tmpNewMOI2[12];
-
-        for (int si = 0; si < 12; ++si)
-        {
-          int col = si%4;
-          int row = si/4;
-          if (col == 3)
-          {
-            //  set unused terms to zero
-            tmpNewMOI1[si] = 0;
-            tmpNewMOI2[si] = 0;
+            m1_new = (moi_sum)/(moi_ratio + 1.0);
+            m2_new = moi_ratio*m1_new;
           }
 
+          // update MOI1 and MOI2
+          // Then modify MOI by adding delta scalar MOI in tensor form, but
           dReal alpha1 = m1_new - m1;
           dReal alpha2 = m2_new - m2;
-
-          if (row == col)
+          for (int si = 0; si < 12; ++si)
           {
-            tmpNewMOI1[si] = MOI_ptr1[si] + alpha1 * SS[si];
-            tmpNewMOI2[si] = MOI_ptr2[si] + alpha2 * SS[si];
-          }
-          else
-          {
-            // either we preserve off-diagonal terms
-            // tmpDiag1[row] += MOI_ptr1[si] + (m1_new - m1) * SS[si];
-            // tmpDiag2[row] += MOI_ptr2[si] + (m2_new - m2) * SS[si];
-
-            // ... or we update off-diagonal terms
-            tmpNewMOI1[si] = MOI_ptr1[si] + alpha1 * SS[si];
-            tmpNewMOI2[si] = MOI_ptr2[si] + alpha2 * SS[si];
-          }
-        }
-
-        // Then modify MOI by adding delta scalar MOI in tensor form, but
-        // check and maintain diagonal dominance using the precomputed off-diagonal-sums.
-        for (int si = 0; si < 12; ++si)
-        {
-          // dReal alpha1 = m1_new - m1;
-          // dReal alpha2 = m2_new - m2;
-
-          int col = si%4;
-          int row = si/4;
-          if (row == col)  // diagonal term
-          {
-
-            // check per row, that sum of absolute values of off-diagonal elements
-            // is less than absolute value of the diagonal element itself.
-            // dReal newMOI1 = MOI_ptr1[si] + alpha1 * SS[si];
-            // dReal newMOI2 = MOI_ptr2[si] + alpha2 * SS[si];
-
-            // if (newMOI1 > M1od[row])
+            int col = si%4;
+            if (col == 3)
             {
-              // modify inertia in the constrained direction,
-              // doing so should not alter dynamics of the system.
-              MOI_ptr1[si] = tmpNewMOI1[si];
+              //  set unused terms to zero
+              MOI_ptr1[si] = 0;
+              MOI_ptr2[si] = 0;
             }
-            // else
-            // {
-            //   /// Increase diagonal dominance to preserve stability,
-            //   /// Even though this changes the dynamics of the system,
-            //   /// it's either this or unstable simulation.
-            //   MOI_ptr1[si] = M1od[row];
-            // }
-
-            // if (newMOI2 > M2od[row])
+            else
             {
-              // modify inertia in the constrained direction,
-              // doing so should not alter dynamics of the system.
-              MOI_ptr2[si] = tmpNewMOI2[si];
+              MOI_ptr1[si] = MOI_ptr1[si] + alpha1 * SS[si];
+              MOI_ptr2[si] = MOI_ptr2[si] + alpha2 * SS[si];
+              /* update M1d M1od M2d M2od for additional DD check
+              // not needed if previous moi_ratio calculation is working as expected
+              M1d[row] = 
+              */
             }
-            // else
-            // {
-            //   /// Increase diagonal dominance to preserve stability,
-            //   /// Even though this changes the dynamics of the system,
-            //   /// it's either this or unstable simulation.
-            //   MOI_ptr2[si] = M2od[row];
-            // }
           }
-          else if (!(row == col))
+
+          /* check and maintain diagonal dominance using the precomputed off-diagonal-sums.
+          for (int si = 0; si < 12; ++si)
           {
-            // either we preserve off-diagonal terms
-            // tmpDiag1[row] += MOI_ptr1[si] + (m1_new - m1) * SS[si];
-            // tmpDiag2[row] += MOI_ptr2[si] + (m2_new - m2) * SS[si];
-
-            // ... or we update off-diagonal terms
-            MOI_ptr1[si] = tmpNewMOI1[si];
-            MOI_ptr2[si] = tmpNewMOI2[si];
+            int col = si%4;
+            int row = si/4;
+            if (col == 3)
+            {
+              //  set unused terms to zero
+              MOI_ptr1[si] = 0;
+              MOI_ptr2[si] = 0;
+            }
+            else
+            {
+              MOI_ptr1[si] = MOI_ptr1[si] + alpha1 * SS[si];
+              MOI_ptr2[si] = MOI_ptr2[si] + alpha2 * SS[si];
+              // this should be fine as long as moi_ratio check above is working correctly
+              if (row == col)
+              {
+                if (MOI_ptr1[si] < M1od[row])
+                {
+                  // something is wrong
+                  printf("debug %f %f\n", MOI_ptr1[si] < M1od[row]);
+                }
+                if (MOI_ptr2[si] < M2od[row])
+                {
+                  // something is wrong
+                  printf("debug %f %f\n", MOI_ptr1[si] < M1od[row]);
+                }
+              }
+            }
           }
+          */
+
+          // Update invMOI by inverting analytically (may not be efficient).
+          // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
+          //   (http://math.stackexchange.com/questions/17776/inverse-of-the-sum-of-matrices)
+          // try taking advantage of symmetry of MOI
+          dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
+                      -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
+                      +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
+          invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
+          invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
+          invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
+          // invMOI_ptr1[0*4+3] = 0.0;
+          invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
+          invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
+          invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
+          // invMOI_ptr1[1*4+3] = 0.0;
+          invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
+          invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
+          invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
+          // invMOI_ptr1[2*4+3] = 0.0;
+
+          dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
+                      -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
+                      +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
+          invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
+          invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
+          invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
+          // invMOI_ptr2[0*4+3] = 0.0;
+          invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
+          invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
+          invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
+          // invMOI_ptr2[1*4+3] = 0.0;
+          invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
+          invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
+          invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
+          // invMOI_ptr2[2*4+3] = 0.0;
+
+  #ifdef DEBUG_INERTIA_PROPAGATION
+          printf("----------new MOI---------\n");
+
+          printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+            MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+            MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+            MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+
+          // Modify MOI_ptr2
+          printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+            MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+            MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+            MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+
+          // double check resulting MOI along s
+          dMultiply0_133(tmp31, S, MOI_ptr1);
+          m1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+          printf("new MOI1 along S [%f]\n", m1);
+          dMultiply0_133(tmp31, S, MOI_ptr2);
+          m2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+          printf("new MOI2 along S [%f]\n", m2);
+
+          /// \todo double check resulting MOI along joint axis and see that it's the same
+          /// question: where to get ax1 from?
+
+          printf("----------new inv---------\n");
+          printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+            invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
+            invMOI_ptr1[1*4+0],invMOI_ptr1[1*4+1],invMOI_ptr1[1*4+2],invMOI_ptr1[1*4+3],
+            invMOI_ptr1[2*4+0],invMOI_ptr1[2*4+1],invMOI_ptr1[2*4+2],invMOI_ptr1[2*4+3]);
+
+          // Modify invMOI_ptr2
+          printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+            invMOI_ptr2[0*4+0],invMOI_ptr2[0*4+1],invMOI_ptr2[0*4+2],invMOI_ptr2[0*4+3],
+            invMOI_ptr2[1*4+0],invMOI_ptr2[1*4+1],invMOI_ptr2[1*4+2],invMOI_ptr2[1*4+3],
+            invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
+  #endif
+
+  #ifdef DEBUG_INERTIA_PROPAGATION
+          // check if diagonally-dominant
+          if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
+            printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
+          if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
+            printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n", MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
+          if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
+            printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n", MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
+
+          if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
+            printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n", MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
+          if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
+            printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n", MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
+          if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
+            printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n", MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
+  #endif
         }
-
-        // Update invMOI by inverting analytically (may not be efficient).
-        // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
-        //   (http://math.stackexchange.com/questions/17776/inverse-of-the-sum-of-matrices)
-        // try taking advantage of symmetry of MOI
-        dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
-                    -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
-                    +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
-        invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
-        invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
-        invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
-        // invMOI_ptr1[0*4+3] = 0.0;
-        invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
-        invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
-        invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
-        // invMOI_ptr1[1*4+3] = 0.0;
-        invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
-        invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
-        invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
-        // invMOI_ptr1[2*4+3] = 0.0;
-
-        dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
-                    -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
-                    +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
-        invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
-        invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
-        invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
-        // invMOI_ptr2[0*4+3] = 0.0;
-        invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
-        invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
-        invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
-        // invMOI_ptr2[1*4+3] = 0.0;
-        invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
-        invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
-        invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
-        // invMOI_ptr2[2*4+3] = 0.0;
-
-#ifdef DEBUG_INERTIA_PROPAGATION
-        printf("----------new MOI---------\n");
-
-        printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
-          MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
-          MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
-          MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
-
-        // Modify MOI_ptr2
-        printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
-          MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
-          MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
-          MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
-
-        // double check resulting MOI along s
-        dMultiply0_133(tmp31, S, MOI_ptr1);
-        m1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
-        printf("new MOI1 along S [%f]\n", m1);
-        dMultiply0_133(tmp31, S, MOI_ptr2);
-        m2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
-        printf("new MOI2 along S [%f]\n", m2);
-
-        /// \todo double check resulting MOI along joint axis and see that it's the same
-        /// question: where to get ax1 from?
-
-        printf("----------new inv---------\n");
-        printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
-          invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
-          invMOI_ptr1[1*4+0],invMOI_ptr1[1*4+1],invMOI_ptr1[1*4+2],invMOI_ptr1[1*4+3],
-          invMOI_ptr1[2*4+0],invMOI_ptr1[2*4+1],invMOI_ptr1[2*4+2],invMOI_ptr1[2*4+3]);
-
-        // Modify invMOI_ptr2
-        printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
-          invMOI_ptr2[0*4+0],invMOI_ptr2[0*4+1],invMOI_ptr2[0*4+2],invMOI_ptr2[0*4+3],
-          invMOI_ptr2[1*4+0],invMOI_ptr2[1*4+1],invMOI_ptr2[1*4+2],invMOI_ptr2[1*4+3],
-          invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
-#endif
-
-#ifdef DEBUG_INERTIA_PROPAGATION
-        // check if diagonally-dominant
-        if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
-          printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
-        if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
-          printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n", MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
-        if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
-          printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n", MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
-
-        if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
-          printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n", MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
-        if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
-          printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n", MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
-        if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
-          printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n", MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
-#endif
       }
     }
   }
