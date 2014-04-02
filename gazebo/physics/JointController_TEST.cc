@@ -37,8 +37,8 @@ class FakeJoint : public physics::Joint
   public: virtual physics::LinkPtr GetJointLink(unsigned int) const
           {return physics::LinkPtr();}
 
-  public: virtual bool AreConnected(physics::LinkPtr, physics::LinkPtr ) const
-          { return true; }
+  public: virtual bool AreConnected(physics::LinkPtr, physics::LinkPtr) const
+          {return true;}
 
   public: virtual void SetAxis(unsigned int, const math::Vector3 &)
           {}
@@ -103,6 +103,13 @@ class FakeJoint : public physics::Joint
               unsigned int)
           {return 0.0;}
 
+  public: virtual bool SetParam(const std::string &, unsigned int,
+              const boost::any &)
+          {return true;}
+
+  public: virtual double GetParam(const std::string &, unsigned int)
+          {return 0.0;}
+
   protected: virtual math::Angle GetAngleImpl(
                  unsigned int) const
           {return math::Angle::Zero;}
@@ -127,6 +134,9 @@ TEST_F(JointControllerTest, Construction)
   EXPECT_TRUE(jointController->GetForces().empty());
   EXPECT_TRUE(jointController->GetPositions().empty());
   EXPECT_TRUE(jointController->GetVelocities().empty());
+
+  // The last update time should be zero.
+  EXPECT_EQ(jointController->GetLastUpdateTime(), common::Time::Zero);
 }
 
 /////////////////////////////////////////////////
@@ -171,26 +181,65 @@ TEST_F(JointControllerTest, AddJoint)
         joint->GetScopedName(), 12.3));
   std::map<std::string, double> positions = jointController->GetPositions();
   EXPECT_EQ(positions.size(), 1);
-  EXPECT_EQ(positions[joint->GetScopedName()], 12.3);
+  EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
 
   // Set a joint velocity target
   EXPECT_TRUE(jointController->SetVelocityTarget(
         joint->GetScopedName(), 3.21));
   std::map<std::string, double> velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1);
-  EXPECT_EQ(velocities[joint->GetScopedName()], 3.21);
+  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
   // Try setting a position target on a joint that doesn't exist.
-  EXPECT_TRUE(jointController->SetPositionTarget("my_bad_name", 12.3));
+  EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
   EXPECT_EQ(positions.size(), 1);
-  EXPECT_EQ(positions[joint->GetScopedName()], 12.3);
+  EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
   velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1);
-  EXPECT_EQ(velocities[joint->GetScopedName()], 3.21);
+  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+
+  // Reset the controller
+  jointController->Reset();
+  positions = jointController->GetPositions();
+  velocities = jointController->GetVelocities();
+  EXPECT_EQ(positions.size(), 0);
+  EXPECT_EQ(velocities.size(), 0);
+}
+
+/////////////////////////////////////////////////
+TEST_F(JointControllerTest, SetJointPositions)
+{
+  // Create a dummy model
+  physics::ModelPtr model(new physics::Model(physics::BasePtr()));
+  EXPECT_TRUE(model);
+
+  // Create the joint controller
+  physics::JointControllerPtr jointController(
+      new physics::JointController(model));
+  EXPECT_TRUE(jointController);
+
+  physics::JointPtr joint1(new FakeJoint(model));
+  joint1->SetName("joint1");
+
+  physics::JointPtr joint2(new FakeJoint(model));
+  joint2->SetName("joint2");
+
+  // Add the joints.
+  jointController->AddJoint(joint1);
+  jointController->AddJoint(joint2);
+  std::map<std::string, physics::JointPtr> joints =
+    jointController->GetJoints();
+  EXPECT_EQ(joints.size(), 2);
+
+  // Set joint positions for the two joints, and expect no expections.
+  std::map<std::string, double> positions;
+  positions[joint1->GetScopedName()] = 1.2;
+  positions[joint2->GetScopedName()] = 2.3;
+  EXPECT_NO_THROW(jointController->SetJointPositions(positions));
 }
 
 /////////////////////////////////////////////////

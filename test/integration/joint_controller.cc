@@ -25,12 +25,12 @@
 #include "test_config.h"
 
 using namespace gazebo;
-class Issue1082Test : public ServerFixture
+class JointControllerTest : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
-TEST_F(Issue1082Test, PIDLimitsVelocity)
+TEST_F(JointControllerTest, PositionControl)
 {
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
@@ -45,37 +45,24 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
-
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
-  msg.mutable_velocity()->set_target(10);
-  msg.mutable_velocity()->set_p_gain(1);
-  msg.mutable_velocity()->set_i_gain(.1);
-  msg.mutable_velocity()->set_d_gain(.01);
-  msg.mutable_velocity()->set_i_max(0.5);
-  msg.mutable_velocity()->set_i_min(0.1);
-  msg.mutable_velocity()->set_limit(0.001);
+  msg.mutable_position()->set_target(1.0);
+  msg.mutable_position()->set_p_gain(10);
+  msg.mutable_position()->set_i_gain(0.1);
+  msg.mutable_position()->set_d_gain(4.5);
   pub->Publish(msg);
 
-  world->Step(500);
+  world->Step(5000);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
 
-  double diffDist = (startPose - endPose).pos.GetLength();
-
-  gzdbg << "Start[" << startPose << "] End[" << endPose << "] Dist["
-        << diffDist << "]\n";
-
-  // 0.002 chosen arbitrarily.
-  EXPECT_LT(diffDist, 0.002);
-  EXPECT_GT(diffDist, -0.002);
+  EXPECT_NEAR(angle.Radian(), 1.0, 0.1);
 }
 
 /////////////////////////////////////////////////
-TEST_F(Issue1082Test, PIDLimitsPosition)
+TEST_F(JointControllerTest, VelocityControl)
 {
-  // Load an empty world
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -83,34 +70,24 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 
+  world->Step(100);
+
   gazebo::transport::PublisherPtr pub =
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
-
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
-  msg.mutable_position()->set_target(10);
-  msg.mutable_position()->set_p_gain(1);
-  msg.mutable_position()->set_i_gain(.1);
-  msg.mutable_position()->set_d_gain(.01);
-  msg.mutable_position()->set_i_max(0.5);
-  msg.mutable_position()->set_i_min(0.1);
-  msg.mutable_position()->set_limit(0.001);
+  msg.mutable_velocity()->set_target(0.2);
+  msg.mutable_velocity()->set_p_gain(0.1);
+  msg.mutable_velocity()->set_i_gain(0.1);
+  msg.mutable_velocity()->set_d_gain(0.1);
   pub->Publish(msg);
 
-  world->Step(500);
+  world->Step(5000);
+  double vel = model->GetJoint("arm_shoulder_pan_joint")->GetVelocity(0);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
-
-  gzdbg << "Start Pose[" << startPose << "]\n";
-  gzdbg << "End Pose[" << endPose << "]\n";
-
-  double diffDist = (startPose - endPose).pos.GetLength();
-
-  EXPECT_LT(diffDist, 0.002);
-  EXPECT_GT(diffDist, -0.002);
+  EXPECT_NEAR(vel, 0.2, 0.05);
 }
 
 /////////////////////////////////////////////////
