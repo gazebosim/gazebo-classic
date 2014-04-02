@@ -1761,7 +1761,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //       M1od_new = M1od + alpha1 * SSod
         //       M2d_new  = M2d  + alpha1 * SSd
         //       M2od_new = M2od + alpha2 * SSod
-        //     For DD, enforce:w:
+        //     For DD, enforce:
         //       M1d_new / M1od_new > 1  (eq 5)
         //       M2d_new / M2od_new > 1  (eq 6)
         //     For simplicity, look at the case where m1 > m2:
