@@ -1723,9 +1723,75 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // year = {2003}
         // }
         //
+        // Adjust MOI ratio and make sure that each row of new MOI satisfies
+        // the line criterion on each row.
+        //
+        // Terminology:
+        //   S: an unit vector in the direction of constraint DOF for which we want to reduce inertia.
+        //   SS: MOI component matrix constructed by S*S'
+        //   M1: MOI of body 1
+        //   M1_new: MOI of body 1 after adjustment
+        //   m1: scalar MOI of body 1 along a vector S, m1 = S'*M1*S
+        //   M1d: absolute value of M1 diagonal
+        //   M1od: sum of absolute values of M1 off-diagonals
+        //   M2: MOI of body 2
+        //   M2_new: MOI of body 2 after adjustment
+        //   m2: scalar MOI of body 2 along a vector S, m2 = S'*M2*S
+        //   M2d: absolute value of M2 diagonal
+        //   M2od: sum of absolute values of M2 off-diagonals
+        //   SSd: absolute value of SS diagonal
+        //   SSod: sum of absolute values of SS off-diagonals
+        //   moi_sum: m1 + m2 (this should stay the same after adjustment to ensure dynamics does not change).
+        //   m1_new: desired m1 after adjustment.
+        //   m2_new: desired m2 after adjustment.
+        //   moi_ratio: desired ratio of m1_new / m2_new or m2_new / m1_new whichever is > 1
+        //   alpha1: m1_new - m1
+        //   alpha2: m2_new - m2
+        //
+        // Derivations:
+        //   (find a place to put detailed derivations).
+        //   Key equations:
+        //     Basic adjustment:
+        //       M1_new = M1 + alpha1 * SS
+        //       M2_new = M2 + alpha2 * SS
+        //     To eliminate alpha2, use:
+        //       alpha1 + alpha2 = 0  (eq 4) (easy to derive)
+        //     Check for DD:
+        //       M1d_new  = M1d  + alpha1 * SSd
+        //       M1od_new = M1od + alpha1 * SSod
+        //       M2d_new  = M2d  + alpha1 * SSd
+        //       M2od_new = M2od + alpha2 * SSod
+        //     For DD, enforce:w:
+        //       M1d_new / M1od_new > 1  (eq 5)
+        //       M2d_new / M2od_new > 1  (eq 6)
+        //     For simplicity, look at the case where m1 > m2:
+        //       (for m2 > m1, one can infer the results.)
+        //     To eliminate alpha1, find alpha1 as a function of moi_ratio:
+        //       moi_ratio = m1_new / m2_new = (m1 + alpha1) / (m2 + alpha2)
+        //       moi_ratio = (m1 + alpha1) / (m2 - alpha1)
+        //       alpha1 = (moi_ratio * m2 - m1) / (1 + moi_ratio) (eq 7)
+        //     Substitute eq 4, 7 into eq 5 and do some algebra:
+        //       (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd) / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod) > 1 (eq 13)
+        //     Solve eq 13 for moi_ratio:
+        //       moi_ratio * (M1d - M1od + m2*(SSd - SSod)) > m1*(SSd - SSod) - (M1d - M1od) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M1d - M1od + m2*(SSd - SSod)) < m1*(SSd - SSod) - (M1d - M1od) (eq 14)
+        //     Similarly, substitute eq 4, 7 into eq 6:
+        //       (moi_ratio * (M2d + m2 * SSd) + M2d - m1*SSd) / (moi_ratio*(M2od + m2*SSod) + M2od - m1*SSod) > 1 (eq 15)
+        //     Solve eq 15 for moi_ratio:
+        //       moi_ratio * (M2d - M2od + m2*(SSd - SSod)) > m1*(SSd - SSod) - (M2d - M2od) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M2d - M2od + m2*(SSd - SSod)) < m1*(SSd - SSod) - (M2d - M2od) (eq 16)
+        //     Lastly, repeat for the case where m2 > m1.
+        //       Implementation below refers to equations numbers 13, 14, 15, 16 for m1 > m2.
+        //       And similarly, equation numbers 18, 19, 20, 21 are analogs of 13-16 for m2 > m1.
+        //     
+        //   Goal:
+        //     select initial moi_ratio (currently set to 10)
+        //     increase moi_ratio as necessary if DD is violated.
+        //     A "problem" flag is introduced, if there are no solutions, skip inertia ratio reduction. So far, we have
+        //     not encountered any "problem" cases.
+
         // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiag.
         // sum off-diagonals terms (to check diagonal dominance)
-#if 1
         dReal M1od[4];  // abs sum of MOI1 off diagonal elements
         dReal M2od[4];  // abs sum of MOI2 off diagonal elements
         dReal SSod[4];  // abs sum of SS off diagonal elements
@@ -1765,13 +1831,14 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             SSd[row] = dFabs(SS[si]);
           }
         }
-#endif
+
         // sum of moi along S1 and S2, should stay conserved
         dReal moi_sum = (m1 + m2);
 
         // some ratio
         dReal moi_ratio = moi_ratio_tol;
 
+        // fixed point iteration for reducing moi_ratio across constraints
         bool problem = false;
         for (int moi_iters = 0; moi_iters < 2; ++moi_iters)
         {
