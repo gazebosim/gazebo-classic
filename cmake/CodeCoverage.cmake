@@ -35,7 +35,7 @@ function(setup_target_for_coverage _targetname _outputname)
 		# Capturing lcov counters and generating report
     COMMAND ${LCOV_PATH} --directory ${PROJECT_BINARY_DIR}/gazebo
       --capture --output-file ${_outputname}.info
-		COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'test/*' '/usr/*'
+      COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'include/sdformat*' 'include/SimTK*' 'include/simbody*' 'include/simmath*' 'deps/*' 'build/*' 'test/*' '/usr/*'
       --output-file ${_outputname}.info.cleaned
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
