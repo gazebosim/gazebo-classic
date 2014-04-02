@@ -1723,8 +1723,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // year = {2003}
         // }
         //
-        // Adjust MOI ratio and make sure that each row of new MOI satisfies
-        // the line criterion on each row.
+        // Adjust MOI ratio and make sure that each row of new MOI satisfies the line criterion.
         //
         // Terminology:
         //   S: an unit vector in the direction of constraint DOF for which we want to reduce inertia.
