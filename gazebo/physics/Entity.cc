@@ -326,6 +326,18 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
       if (_notify)
         entity->UpdatePhysicsPose(false);
+
+      // Update collision world pose.
+      for (Base_V::iterator iterC = (*iter)->children.begin();
+           iterC != (*iter)->children.end(); ++iterC)
+      {
+        if ((*iterC)->HasType(ENTITY))
+        {
+          EntityPtr entityC = boost::static_pointer_cast<Entity>(*iterC);
+          entityC->worldPose = ((entityC->worldPose - oldModelWorldPose) +
+              _pose);
+        }
+      }
     }
   }
 }
@@ -334,6 +346,8 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  math::Pose oldLinkWorldPose = this->worldPose;
+
   this->worldPose = _pose;
   this->worldPose.Correct();
 
@@ -354,6 +368,17 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     if (_publish)
       this->parentEntity->PublishPose();
+
+    // Update collision world pose.
+    for (Base_V::iterator iterC = this->children.begin();
+        iterC != this->children.end(); ++iterC)
+    {
+      if ((*iterC)->HasType(ENTITY))
+      {
+        EntityPtr entityC = boost::static_pointer_cast<Entity>(*iterC);
+        entityC->worldPose = ((entityC->worldPose - oldLinkWorldPose) + _pose);
+      }
+    }
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["
