@@ -101,7 +101,7 @@ namespace gazebo
       public: double GetIGain() const;
 
       /// \brief Get the derivative Gain.
-      /// \return The dertivative gain value
+      /// \return The derivative gain value
       public: double GetDGain() const;
 
       /// \brief Get the integral upper limit.
