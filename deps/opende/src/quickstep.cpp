@@ -1782,7 +1782,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             {
               // check equations 13 and 14 (gamma1 > 1)
               dReal denom_13 = moi_ratio * ( M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
-              dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
+              // dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
               dReal left_14 = M1d[row] - M1od[row] + m2*(SSd[row] - SSod[row]);
               dReal right_14 = m1*(SSd[row] - SSod[row]) - (M1d[row] - M1od[row]);
               // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
@@ -1827,7 +1827,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -1873,7 +1873,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -1881,7 +1881,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
               // check equations 15 and 16 (gamma2 > 1)
               dReal denom_15 = moi_ratio * ( M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
-              dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
+              // dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
               dReal left_16 = M2d[row] - M2od[row] - m2*(SSd[row] - SSod[row]);
               dReal right_16 = m1*(SSod[row] - SSd[row]) - (M2d[row] - M2od[row]);
               // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
@@ -1926,7 +1926,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -1972,7 +1972,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -1983,7 +1983,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // equations 13, 14 maps to 18, 19
               // check equations 18 and 19 (gamma1 > 1)
               dReal denom_18 = moi_ratio * ( M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
-              dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
+              // dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
               dReal left_19 = M1d[row] - M1od[row] - m1*(SSd[row] - SSod[row]);
               dReal right_19 = m2*(SSod[row] - SSd[row]) + (M1od[row] - M1d[row]);
               // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
@@ -2029,7 +2029,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -2076,7 +2076,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -2085,7 +2085,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // equations 15, 16 maps to 20, 21
               // check equations 20 and 21 (gamma2 > 1)
               dReal denom_20 = moi_ratio * ( M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
-              dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
+              // dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
               dReal left_21 = M2d[row] - M2od[row] + m1*(SSd[row] - SSod[row]);
               dReal right_21 = m2*(SSd[row] - SSod[row]) - (M2d[row] - M2od[row]);
               // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
@@ -2132,7 +2132,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
@@ -2180,7 +2180,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
-                      moi_ratio = tmp;
+                      // moi_ratio = std::max(1.0, tmp);
                     }
                   }
                 }
