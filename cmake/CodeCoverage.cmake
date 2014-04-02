@@ -33,12 +33,12 @@ function(setup_target_for_coverage _targetname _outputname)
 	# Setup target
 	add_custom_target(${_targetname}
 		# Capturing lcov counters and generating report
-    command ${LCOV_PATH} --directory ${PROJECT_BINARY_DIR}/gazebo
+    COMMAND ${LCOV_PATH} --directory ${PROJECT_BINARY_DIR}/gazebo
       --capture --output-file ${_outputname}.info
-		command ${LCOV_PATH} --remove ${_outputname}.info 'test/*' '/usr/*'
+		COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'test/*' '/usr/*'
       --output-file ${_outputname}.info.cleaned
-		command ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
-		command ${CMAKE_COMMAND} -E remove ${_outputname}.info
+		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
+		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
       ${_outputname}.info.cleaned
 		
 		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
