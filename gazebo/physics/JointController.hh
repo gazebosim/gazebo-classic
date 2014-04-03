@@ -32,7 +32,7 @@ namespace gazebo
 {
   namespace physics
   {
-    // Forward decalre private data values.
+    // Forward declare private data values.
     class JointControllerPrivate;
 
     /// \addtogroup gazebo_physics
