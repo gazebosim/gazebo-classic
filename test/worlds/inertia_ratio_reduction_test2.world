@@ -32,7 +32,9 @@
         </constraints>
       </bullet>
       <simbody>
-        <accuracy>0.001</accuracy>
+        <!-- for this combination of inertia and pid gains, incredible accuracy requirement
+        is needed to pass the PhysicsEngines/PhysicsTest.TrikeyWheelResponse2/2 test -->
+        <accuracy>0.000001</accuracy>
         <max_transient_velocity>0.01</max_transient_velocity>
         <contact>
           <stiffness>1e8</stiffness>

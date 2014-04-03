@@ -26,7 +26,8 @@
 #include "gazebo/msgs/msgs.hh"
 #include "helper_physics_generator.hh"
 
-#define TOL 5e-5
+#define PHYSICS_TOL 5e-5
+#define PHYSICS_TOL2 16.0e-5
 using namespace gazebo;
 
 class PhysicsTest : public ServerFixture,
@@ -51,9 +52,9 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
     gzerr << "bullet dynamics not working as expected, issue #1144.\n";
     return;
   }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  if (_physicsEngine == "dart")
   {
-    gzerr << "simbody and dart axis inteprtation is wrong, see issue #1143.\n";
+    gzerr << "dart axis inteprtation is wrong, see issue #1143.\n";
     return;
   }
 
@@ -127,10 +128,12 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
     joint2->SetForce(0, force2);
     joint3->SetForce(0, force3);
     EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint3->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), PHYSICS_TOL);
+    EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), PHYSICS_TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint2->GetAngle(0).Radian(), PHYSICS_TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint3->GetAngle(0).Radian(), PHYSICS_TOL);
     world->Step(1);
   }
 }
@@ -147,9 +150,9 @@ void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
     gzerr << "bullet dynamics not working as expected, issue #1144.\n";
     return;
   }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  if (_physicsEngine == "dart")
   {
-    gzerr << "simbody and dart axis inteprtation is wrong, see issue #1143.\n";
+    gzerr << "dart axis inteprtation is wrong, see issue #1143.\n";
     return;
   }
 
@@ -223,10 +226,22 @@ void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
     joint2->SetForce(0, force2);
     joint3->SetForce(0, force3);
     EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint3->GetAngle(0).Radian(), TOL);
+    if (_physicsEngine == "simbody")
+    {
+      // to look into later: strangely, for simbody, this test needs larger
+      // tolerance regardless how small the accuracy setting is.
+      EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), PHYSICS_TOL2);
+      EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), PHYSICS_TOL2);
+    }
+    else
+    {
+      EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), PHYSICS_TOL);
+      EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), PHYSICS_TOL);
+    }
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint2->GetAngle(0).Radian(), PHYSICS_TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint3->GetAngle(0).Radian(), PHYSICS_TOL);
     world->Step(1);
   }
 }
