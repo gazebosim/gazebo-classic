@@ -642,7 +642,7 @@ static void ComputeRows(
     if (iteration < num_iterations + precon_iterations)
     {
       // skip resetting rms_dlambda and rms_error for bilateral constraints
-      // and contact normals during extra friciton iterations.
+      // and contact normals during extra friction iterations.
       rms_dlambda[0] = 0;
       rms_dlambda[1] = 0;
       rms_error[0] = 0;
