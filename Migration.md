@@ -130,6 +130,10 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Entity.hh**
+    + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
+    + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
+
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -293,6 +297,10 @@
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
 
 ### Additions
+
+1. **gazebo/physics/Collision.hh**
+    + void SetWorldPoseDirty()
+    + virtual const math::Pose &GetWorldPose() const
 
 1. **gazebo/transport/TransportIface.hh**
     +  transport::ConnectionPtr connectToMaster()
