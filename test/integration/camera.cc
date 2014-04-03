@@ -140,6 +140,7 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
+  world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
@@ -155,6 +156,7 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
+  world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
@@ -171,6 +173,7 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
+  world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
@@ -193,6 +196,7 @@ TEST_F(CameraTest, Visible)
     sleep++;
   }
   EXPECT_TRUE(visual->GetWorldPose() == pose);
+  world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
