@@ -906,8 +906,19 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "revolute")
       {
+        // rotation from axis frame to child link frame
+        // simbody assumes links are in child link frame, but gazebo
+        // sdf 1.4 and earlier assumes joint axis are defined in model frame.
+        // Use function Joint::GetAxisFrame() to remedy this situation.
+        // Joint::GetAxisFrame() returns the frame joint axis is defined:
+        // either model frame or child link frame.
+        // simbody always assumes axis is specified in the child link frame.
+        // \TODO: come up with a test case where we might need to
+        // flip transform based on isReversed flag.
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameLocal(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
