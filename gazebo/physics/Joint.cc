@@ -942,6 +942,38 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrameLocal(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // axis is defined in model frame, so return the rotation from
+    // child link frame to model frame.
+    if (this->childLink)
+    {
+      return (-this->childLink->GetRelativePose()).rot;
+    }
+    else
+    {
+      // no child link... what's going on?
+      gzerr << "Joint has no child link.\n";
+      return math::Quaternion();
+    }
+  }
+
+  // axis is defined in the child link frame, so
+  // return the rotation from child link frame to child link frame.
+  return math::Quaternion();
+}
+
+//////////////////////////////////////////////////
 double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())

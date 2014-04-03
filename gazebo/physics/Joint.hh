@@ -549,6 +549,13 @@ namespace gazebo
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
+      /// \brief Get orientation of reference frame for specified axis,
+      /// relative to joint (child link) frame. The value of
+      /// axisParentModelFrame is used to determine the appropriate frame.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to world frame.
+      public: math::Quaternion GetAxisFrameLocal(unsigned int _index) const;
+
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.
       /// If using metric system, the unit of energy will be Joules.
