@@ -42,7 +42,7 @@
           <viscous_friction>0.0</viscous_friction>
         </contact>
       </simbody>
-      <real_time_update_rate>500.000000</real_time_update_rate>
+      <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
 
@@ -54,7 +54,7 @@
     </include>
 
     <!-- test contributed by jesper -->
-    <model name="boxes">
+    <model name="trikey">
       <pose>0 0 1.0 0 0 1.57</pose>
       <link name="body">
         <pose>0 0 0.5 0 0 1.57</pose>

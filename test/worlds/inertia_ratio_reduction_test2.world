@@ -42,7 +42,7 @@
           <viscous_friction>0.0</viscous_friction>
         </contact>
       </simbody>
-      <real_time_update_rate>500.000000</real_time_update_rate>
+      <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001000</max_step_size>
     </physics>
 
@@ -53,7 +53,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name='trikey_pinned_debugging'>
+    <model name='trikey'>
       <pose>0 0 0.5 0 -0 0</pose>
       <link name='trikey_base'>
         <pose>0 0 0 0 -0 0</pose>
@@ -159,7 +159,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='base_to_wheel_j0' type='revolute'>
+      <joint name='wheel1_joint' type='revolute'>
         <child>ow_transform_0_l</child>
         <parent>trikey_base</parent>
         <axis>
@@ -224,7 +224,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='base_to_wheel_j1' type='revolute'>
+      <joint name='wheel2_joint' type='revolute'>
         <child>ow_transform_1_l</child>
         <parent>trikey_base</parent>
         <axis>
@@ -289,7 +289,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='base_to_wheel_j2' type='revolute'>
+      <joint name='wheel3_joint' type='revolute'>
         <child>ow_transform_2_l</child>
         <parent>trikey_base</parent>
         <axis>
