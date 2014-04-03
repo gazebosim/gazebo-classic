@@ -163,7 +163,7 @@ void OculusCamera::Init()
     this->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
     this->rightCamera->setDirection(1, 0, 0);
 
-    this->pitchNode->attachObject(this->rightCamera);
+    this->sceneNode->attachObject(this->rightCamera);
 
     this->rightCamera->setAutoAspectRatio(false);
     this->camera->setAutoAspectRatio(false);
@@ -362,7 +362,7 @@ float OculusCamera::GetAvgFPS() const
 }
 
 //////////////////////////////////////////////////
-float OculusCamera::GetTriangleCount() const
+unsigned int OculusCamera::GetTriangleCount() const
 {
   return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
       this->windowId);

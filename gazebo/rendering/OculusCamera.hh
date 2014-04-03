@@ -139,7 +139,7 @@ namespace gazebo
 
       /// \brief Get the triangle count.
       /// \return The number of triangles currently being rendered.
-      public: float GetTriangleCount() const;
+      public: unsigned int GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.

@@ -26,6 +26,8 @@
 #cmakedefine HAVE_QWT 1
 #cmakedefine ENABLE_DIAGNOSTICS 1
 #cmakedefine HAVE_GDAL 1
+#cmakedefine HAVE_LIBUDEV 1
+#cmakedefine HAVE_XINERAMA 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>
