@@ -38,11 +38,25 @@ class PhysicsTest : public ServerFixture,
   // hence this test is added to ensure we get the same dynamics behavior
   // regardless the orientation of the inertia matricies in world frame.
   public: void TrikeyWheelResponse(const std::string &_physicsEngine);
+
+  // same test as TrikeyWheelResponse, but slightly different inertias
+  // and geometry.
   public: void TrikeyWheelResponse2(const std::string &_physicsEngine);
 };
 
 void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "bullet dynamics not working as expected, issue #1144.\n";
+    return;
+  }
+  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  {
+    gzerr << "simbody and dart axis inteprtation is wrong, see issue #1143.\n";
+    return;
+  }
+
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
   Load("worlds/inertia_ratio_reduction_test.world", true, _physicsEngine);
@@ -128,6 +142,17 @@ TEST_P(PhysicsTest, TrikeyWheelResponse)
 
 void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "bullet dynamics not working as expected, issue #1144.\n";
+    return;
+  }
+  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  {
+    gzerr << "simbody and dart axis inteprtation is wrong, see issue #1143.\n";
+    return;
+  }
+
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
   Load("worlds/inertia_ratio_reduction_test2.world", true, _physicsEngine);
