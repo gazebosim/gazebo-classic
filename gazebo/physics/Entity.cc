@@ -581,6 +581,9 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
+  if (this->HasType(COLLISION))
+    return static_cast<Collision*>(const_cast<Entity*>(this))->GetBoundingBox();
+
   math::Box box;
   for (Base_V::const_iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
