@@ -24,6 +24,7 @@ if (NOT APPLE)
     factory_stress.cc
     gz_stress.cc
     sensor_stress.cc
+    set_world_pose.cc
     transport_stress.cc
   )
   

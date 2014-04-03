@@ -200,6 +200,14 @@ namespace gazebo
       /// \return max num contacts allowed for this collision.
       public: virtual unsigned int GetMaxContacts();
 
+      /// \brief Indicate that the world pose should be recalculated.
+      /// The recalculation will be done when Collision::GetWorldPose is
+      /// called.
+      public: void SetWorldPoseDirty();
+
+      // Documentation inherited.
+      public: virtual const math::Pose &GetWorldPose() const;
+
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.
       private: msgs::Visual CreateCollisionVisual();
@@ -227,6 +235,9 @@ namespace gazebo
 
       /// \brief Unique id for collision visual.
       private: uint32_t collisionVisualId;
+
+      /// \brief True if the world pose should be recalculated.
+      private: mutable bool worldPoseDirty;
     };
     /// \}
   }
