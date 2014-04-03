@@ -1665,7 +1665,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->StepWorld(1000);
+    world->StepWorld(2000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {
@@ -1740,7 +1740,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
-    world->StepWorld(1000);
+    world->StepWorld(2000);
 
     for (unsigned int n = 0; n < 10; ++n)
     {

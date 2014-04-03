@@ -129,9 +129,11 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
     EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
     EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint3->GetAngle(0).Radian(), TOL);
-    world->Step(1);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian()
+               , joint2->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint3->GetAngle(0).Radian(), TOL);
+    world->StepWorld(1);
   }
 }
 
@@ -225,9 +227,11 @@ void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
     EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
     EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), joint3->GetAngle(0).Radian(), TOL);
-    world->Step(1);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint2->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
+                joint3->GetAngle(0).Radian(), TOL);
+    world->StepWorld(1);
   }
 }
 
