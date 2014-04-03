@@ -24,7 +24,6 @@
 #include "gazebo/common/PID.hh"
 #include "SimplePendulumIntegrator.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "helper_physics_generator.hh"
 
 #define TOL 5e-5
 using namespace gazebo;
@@ -137,9 +136,9 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(PhysicsTest, TrikeyWheelResponse)
+TEST_F(PhysicsTest, TrikeyWheelResponse)
 {
-  TrikeyWheelResponse(GetParam());
+  TrikeyWheelResponse("ode");
 }
 
 void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
@@ -235,12 +234,10 @@ void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(PhysicsTest, TrikeyWheelResponse2)
+TEST_F(PhysicsTest, TrikeyWheelResponse2)
 {
-  TrikeyWheelResponse2(GetParam());
+  TrikeyWheelResponse2("ode");
 }
-
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
