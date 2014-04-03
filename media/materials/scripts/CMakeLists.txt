@@ -10,6 +10,8 @@ set (files
   grid.material
   kitchen.material
   noise.compositor
+  warp.material
+  glsl120.program
   perpixel.program
   picker.material
   ShadowCaster.material
@@ -19,6 +21,7 @@ set (files
   VPL.material
   VPL.program
   shadow_caster.program
+  StdQuad_vp.program
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/scripts/)

@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://atlas</uri>
+    </include>
+
+    <plugin filename="libHydra.so" name="hydra">
+      <device>/dev/hidraw5</device>
+      <pivot>0.04 0 0</pivot>
+      <grab>0.12 0 0</grab>
+    </plugin>
+
+  <model name="right_arm_goal">
+    <static>true</static>
+    <pose>0.013 -.294 0.622 1.5707 0 3.1415</pose>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>.05 .2 .05</size>
+          </box>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+
+  <model name="left_arm_goal">
+    <static>true</static>
+    <pose>0.013 .294 0.622 -1.5707 0 -3.1415</pose>
+    <link name="link">
+      <!--
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>.05 .2 .05</size>
+          </box>
+        </geometry>
+      </visual>
+-->
+    </link>
+  </model>
+
+</world>
+</sdf>

@@ -5,6 +5,7 @@ include_directories(SYSTEM
   ${CEGUI_INCLUDE_DIRS}
   skyx
   skyx/include
+  ${CMAKE_SOURCE_DIR}/deps/oculus/include
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
@@ -36,6 +37,7 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OculusCamera.cc
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
@@ -79,6 +81,7 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OculusCamera.hh
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
@@ -128,7 +131,7 @@ link_directories(
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering
+target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
   gazebo_skyx
@@ -138,6 +141,14 @@ target_link_libraries( gazebo_rendering
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
+
+if (HAVE_LIBUDEV AND HAVE_XINERAMA)
+  target_link_libraries(gazebo_rendering
+    gazebo_ovr
+    udev
+    Xinerama
+  )
+endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)

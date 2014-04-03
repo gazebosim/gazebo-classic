@@ -66,8 +66,6 @@ namespace gazebo
       /// specified
       private slots: void OnClearOverlayMsg();
 
-      private: void OnFullScreen(bool &_value);
-
       /// \brief Handle follow model user event.
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
@@ -77,6 +75,10 @@ namespace gazebo
 
       /// \brief Building editor widget for creating a building model
       private: BuildingEditorWidget *buildingEditorWidget;
+
+      /// \brief Toggle full screen display.
+      /// \param[in] _value True to display in full screen mode.
+      private: void OnFullScreen(bool _value);
 
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
@@ -98,8 +100,7 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
-      private: QToolBar *mouseToolbar;
-      private: QToolBar *editToolbar;
+      private: QToolBar *toolbar;
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;

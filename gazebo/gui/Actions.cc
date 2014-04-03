@@ -98,6 +98,7 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
+QAction *gazebo::gui::g_viewOculusAct = 0;
 
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;

@@ -1,0 +1,22 @@
+material Ogre/Compositor/Oculus
+{
+  technique
+  {
+    pass
+    {
+      depth_check off
+
+      vertex_program_ref oculus_rviz_plugins/glsl120/warp.vert {}
+//      fragment_program_ref rviz/glsl120/warp.frag {}
+      fragment_program_ref rviz/glsl120/warpWithChromeAb.frag {}
+      
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode border
+        tex_border_colour 0 0 0
+        filtering linear linear linear
+      }
+    }
+  }
+}

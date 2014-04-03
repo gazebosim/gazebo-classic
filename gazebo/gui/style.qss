@@ -18,6 +18,8 @@ QLabel
 QFrame
 {
   background-color: transparent;
+  padding: 0px;
+  margin: 0px;
 }
 
 QDialog
@@ -591,6 +593,12 @@ QWidget#toolsWidget > QFrame
 {
   padding: 4px;
   background-color: #808080;
+}
+
+QWidget#oculusWindow
+{
+width: 1280px;
+height: 800px;
 }
 
 QWidget#renderWidget > QWidget

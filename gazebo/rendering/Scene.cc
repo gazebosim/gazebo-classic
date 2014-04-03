@@ -41,6 +41,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/OculusCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
@@ -561,6 +562,17 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
+{
+  OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
+  camera->Load();
+  camera->Init();
+  this->oculusCameras.push_back(camera);
+
+  return camera;
 }
 
 //////////////////////////////////////////////////
@@ -2523,8 +2535,18 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
     vclouds->setWheater(wheater.x,
                         math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
+  
+  
+  // added for oculus demo
+  this->skyx->setStarfieldEnabled(false);
+  this->skyxController->setEastDirection(Ogre::Vector2(1, 0));
+  this->skyx->getMoonManager()->setMoonSize(1.0);
+
 
   this->skyx->update(0);
+  
+  // TODO remove me
+  //Ogre::Root::getSingletonPtr()->removeFrameListener(this->skyx);
 }
 
 /////////////////////////////////////////////////
@@ -2549,11 +2571,12 @@ void Scene::SetSky()
       SkyX::AtmosphereManager::Options(
         9.77501f,   // Inner radius
         10.2963f,   // Outer radius
-        0.01f,      // Height position
+        0.0f,      // Height position
         0.0017f,    // RayleighMultiplier
         0.000675f,  // MieMultiplier
         30,         // Sun Intensity
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
+        //Ogre::Vector3(0.17f, 0.14f, 0.14f),  // Wavelength
         -0.991f, 2.5f, 4));
 
   this->skyx->getVCloudsManager()->setWindSpeed(0.6);
@@ -2576,7 +2599,7 @@ void Scene::SetSky()
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
   vclouds->setWheater(.6, .6, false);
 
-  if (true)
+  if (false)
   {
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())

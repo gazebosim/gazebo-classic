@@ -121,6 +121,7 @@ namespace gazebo
       private slots: void FullScreen();
       private slots: void FPS();
       private slots: void Orbit();
+      private slots: void ViewOculus();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
@@ -138,6 +139,8 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
+      /// \brief Toggle full screen display.
+      /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 

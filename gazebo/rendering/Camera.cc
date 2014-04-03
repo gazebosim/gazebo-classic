@@ -1279,7 +1279,10 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
   if (this->renderTarget)
   {
     // Setup the viewport to use the texture
-    this->viewport = this->renderTarget->addViewport(this->camera);
+    // Oculus
+    //this->viewport = this->renderTarget->addViewport(this->camera);
+    this->viewport = this->renderTarget->addViewport(this->camera,
+        0, 0, 0, 0.5, 1.0);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
     this->viewport->setOverlaysEnabled(false);
@@ -1377,7 +1380,10 @@ void Camera::AttachToVisual(const std::string &_visualName,
   if (visual)
     track.set_id(visual->GetId());
   else
+  {
+    gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
     track.set_id(GZ_UINT32_MAX);
+  }
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);

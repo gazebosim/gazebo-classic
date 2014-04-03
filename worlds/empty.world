@@ -1,6 +1,15 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <scene>
+      <sky>
+        <time>10.5</time>
+        <clouds>
+          <speed>0.5</speed>
+        </clouds>
+      </sky>
+    </scene>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>

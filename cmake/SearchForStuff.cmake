@@ -43,6 +43,12 @@ if (NOT PROTOBUF_PROTOC_LIBRARY)
 endif()
 
 ########################################
+find_package(orocos-KDL)
+if (NOT Orocos-KDL_FOUND)
+  BUILD_ERROR ("Missing: Orocos-KDL")
+endif()
+
+########################################
 include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
@@ -71,6 +77,22 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(SDF sdformat>=2.0.0)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
+  endif()
+
+  pkg_check_modules(libudev libudev)
+  if (NOT libudev_FOUND)
+    BUILD_ERROR ("Missing: libudev. Required for usb peripherals.")
+    set(HAVE_LIBUDEV False)
+  else()
+    set(HAVE_LIBUDEV True)
+  endif()
+
+  pkg_check_modules(xinerama xinerama)
+  if (NOT xinerama_FOUND)
+    BUILD_WARNING ("Missing: xinerama. Required for Oculus Rift")
+    set(HAVE_XINERAMA False)
+  else()
+    set(HAVE_XINERAMA True)
   endif()
 
   pkg_check_modules(CURL libcurl)

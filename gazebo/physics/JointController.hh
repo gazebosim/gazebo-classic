@@ -53,6 +53,26 @@ namespace gazebo
       /// \brief Reset all commands
       public: void Reset();
 
+      /// \brief Set the position PID values for a joint.
+      public: void SetPositionPID(const std::string &_jointName,
+                  const common::PID &_pid);
+
+      /// \brief Set the target for the position PID controller.
+      public: void SetPositionTarget(const std::string &_jointName,
+                                     double _target);
+
+      public: double GetPositionTarget(const std::string &_jointName);
+
+      /// \brief Set the velocity PID values for a joint.
+      public: void SetVelocityPID(const std::string &_jointName,
+                                  const common::PID &_pid);
+
+      /// \brief Set the target for the velocity PID controller.
+      public: void SetVelocityTarget(const std::string &_jointName,
+                                     double _target);
+
+      public: double GetVelocityTarget(const std::string &_jointName);
+
       /// \brief Set the positions of a Joint by name.
       /// \sa JointController::SetJointPosition(JointPtr, double)
       public: void SetJointPosition(
