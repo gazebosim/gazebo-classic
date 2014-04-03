@@ -28,7 +28,7 @@ class Issue1146Test : public ServerFixture
 // \brief Test for issue #1146
 TEST_F(Issue1146Test, Reset)
 {
-  Load("worlds/box_plane_low_friction_test.world");
+  Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
