@@ -802,7 +802,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "screw")
       {
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameLocal(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
@@ -855,9 +857,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT)));
+          gzJoint->GetAxisFrameLocal(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or GetAxisFrameLocal(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD)));
+          gzJoint->GetAxisFrameLocal(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -957,8 +962,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "prismatic")
       {
-        UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+        UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameLocal(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
