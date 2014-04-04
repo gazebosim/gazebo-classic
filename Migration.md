@@ -301,6 +301,27 @@
 1. **gazebo/physics/Collision.hh**
     + void SetWorldPoseDirty()
     + virtual const math::Pose &GetWorldPose() const
+1. **gazebo/physics/JointController.hh**
+      + common::Time GetLastUpdateTime() const
+      + std::map<std::string, JointPtr> GetJoints() const
+      + bool SetPositionTarget(const std::string &_jointName, double _target)
+      + bool SetVelocityTarget(const std::string &_jointName, double _target)
+      + std::map<std::string, common::PID> GetPositionPIDs() const
+      + std::map<std::string, common::PID> GetVelocityPIDs() const
+      + std::map<std::string, double> GetForces() const
+      + std::map<std::string, double> GetPositions() const
+      + std::map<std::string, double> GetVelocities() const
+
+
+1. **gazebo/common/PID.hh**
+      + double GetPGain() const
+      + double GetIGain() const
+      + double GetDGain() const
+      + double GetIMax() const
+      + double GetIMin() const
+      + double GetCmdMax() const
+      + double GetCmdMin() const
+
 
 1. **gazebo/transport/TransportIface.hh**
     +  transport::ConnectionPtr connectToMaster()

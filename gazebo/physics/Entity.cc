@@ -54,7 +54,14 @@ Entity::Entity(BasePtr _parent)
 
   this->visualMsg = new msgs::Visual;
   this->visualMsg->set_id(this->id);
-  this->visualMsg->set_parent_name(this->world->GetName());
+
+  if (this->world)
+    this->visualMsg->set_parent_name(this->world->GetName());
+  else
+  {
+    gzerr << "No world set when constructing an Entity.\n";
+    this->visualMsg->set_parent_name("no_world_name");
+  }
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
