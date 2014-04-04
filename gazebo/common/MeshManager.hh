@@ -34,6 +34,7 @@ namespace gazebo
   namespace common
   {
     class ColladaLoader;
+    class ColladaExporter;
     class STLLoader;
     class Mesh;
     class Plane;
@@ -58,6 +59,10 @@ namespace gazebo
       /// \param[in] _filename the path to the mesh
       /// \return a pointer to the created mesh
       public: const Mesh *Load(const std::string &_filename);
+
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh the mesh
+      public: void Export(const Mesh *_mesh);
 
       /// \brief Checks a path extension against the list of valid extensions.
       /// \return true if the file extension is loadable
@@ -206,6 +211,9 @@ namespace gazebo
 
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
+
+      /// \brief 3D mesh loader for COLLADA files
+      private: ColladaExporter *colladaExporter;
 
       /// \brief 3D mesh loader for STL files
       private: STLLoader *stlLoader;
