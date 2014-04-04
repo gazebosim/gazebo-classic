@@ -16,19 +16,23 @@
 */
 
 #include "ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/math/Box.hh"
 
 using namespace gazebo;
 
-class Issue1146Test : public ServerFixture
+class Issue1146Test : public ServerFixture,
+                      public testing::WithParamInterface<const char*>
 {
+  /// \brief Test for issue #1146
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void BoundingBox(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-// \brief Test for issue #1146
-TEST_F(Issue1146Test, Reset)
+void Issue1146Test::BoundingBox(const std::string &_physicsEngine)
 {
-  Load("worlds/box_plane_low_friction_test.world", true);
+  Load("worlds/box_plane_low_friction_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
@@ -51,6 +55,15 @@ TEST_F(Issue1146Test, Reset)
       math::Box(math::Vector3(9.5, 14.5, 19.5),
                 math::Vector3(10.5, 15.5, 20.5)));
 }
+
+/////////////////////////////////////////////////
+TEST_P(Issue1146Test, BoundingBox)
+{
+  BoundingBox(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue1146Test,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 /// Main
