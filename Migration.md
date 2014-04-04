@@ -130,6 +130,10 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Box.hh**
+    + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
+    + ***Replacement:***  bool operator==(const Box &_b) const
+
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
