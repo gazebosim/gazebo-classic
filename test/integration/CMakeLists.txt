@@ -53,6 +53,7 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_bounding_box.cc
   physics_friction.cc
   physics_link.cc
   physics_msgs.cc
