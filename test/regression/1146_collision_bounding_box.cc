@@ -59,6 +59,14 @@ void Issue1146Test::BoundingBox(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 TEST_P(Issue1146Test, BoundingBox)
 {
+  std::string physicsEngine(GetParam());
+  if (physicsEngine.compare("ode") != 0)
+  {
+    gzerr << "Skip test for " << physicsEngine
+          << " per issue #1148"
+          << std::endl;
+    return;
+  }
   BoundingBox(GetParam());
 }
 
