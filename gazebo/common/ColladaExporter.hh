@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Export asset element
       /// \return A pointer to the asset xml element
-      private: TiXmlElement *ExportAsset();
+      private: void ExportAsset(TiXmlElement *_assetXml);
 
       /// \brief Export geometry source
       /// TODO
@@ -69,34 +69,37 @@ namespace gazebo
           const char *meshID);
 
       /// \brief Export library geometries element
-      /// \return A pointer to the library_geometries xml element
-      private: TiXmlElement *ExportGeometries();
+      /// TODO
+      private: void ExportGeometries(TiXmlElement *_library_geometriesXml);
 
       /// \brief Export library images element
-      /// \return A pointer to the library_images xml element
-      private: TiXmlElement *ExportImages();
+      /// TODO
+      private: int ExportImages(TiXmlElement *_library_imagesXml);
 
       /// \brief Export library materials element
-      /// \return A pointer to the library_materials xml element
-      private: TiXmlElement *ExportMaterials();
+      /// TODO
+      private: void ExportMaterials(TiXmlElement *_library_materialsXml);
 
       /// \brief Export library effects element
-      /// \return A pointer to the library_effects xml element
-      private: TiXmlElement *ExportEffects();
+      /// TODO
+      private: void ExportEffects(TiXmlElement *_library_effectsXml);
 
       /// \brief Export library visual scenes element
-      /// \return A pointer to the library_visual_scenes xml element
-      private: TiXmlElement *ExportVisualScenes();
+      /// TODO
+      private: void ExportVisualScenes(TiXmlElement *_library_visual_scenesXml);
 
       /// \brief Export scene element
-      /// \return A pointer to the scene xml element
-      private: TiXmlElement *ExportScene();
+      /// TODO
+      private: void ExportScene(TiXmlElement *_sceneXml);
 
       /// \brief scaling factor
       private: double meter;
 
-      /// \brief scaling factor
+      /// \brief mesh
       private: const Mesh *mesh;
+
+      /// \brief material count
+      private: unsigned int materialCount;
     };
     /// \}
   }

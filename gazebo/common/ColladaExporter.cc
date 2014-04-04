@@ -54,6 +54,7 @@ ColladaExporter::~ColladaExporter()
 void ColladaExporter::Export(const Mesh *_mesh)
 {
   this->mesh = _mesh;
+  this->materialCount = this->mesh->GetMaterialCount();
 
   // Mesh name
   std::string meshName = _mesh->GetName();
@@ -70,56 +71,67 @@ void ColladaExporter::Export(const Mesh *_mesh)
   TiXmlElement *colladaXml = new TiXmlElement( "COLLADA" );
   xmlDoc.LinkEndChild( colladaXml );
   colladaXml->SetAttribute("version", "1.4.1");
-  colladaXml->SetAttribute("xmlns", "http://www.collada.org/2005/11/COLLADASchema");
+  colladaXml->SetAttribute("xmlns",
+      "http://www.collada.org/2005/11/COLLADASchema");
 
   // Asset element
-  TiXmlElement *assetXml = this->ExportAsset();
+  TiXmlElement *assetXml = new TiXmlElement( "asset" );
+  this->ExportAsset(assetXml);
   colladaXml->LinkEndChild( assetXml );
 
   // Library geometries element
-  TiXmlElement *library_geometriesXml = this->ExportGeometries();
+  TiXmlElement *library_geometriesXml = new TiXmlElement( "library_geometries" );
+  this->ExportGeometries(library_geometriesXml);
   colladaXml->LinkEndChild( library_geometriesXml );
 
-  // Library images element
-  TiXmlElement *library_imagesXml = this->ExportImages();
-  colladaXml->LinkEndChild( library_imagesXml );
+  if(this->materialCount != 0)
+  {
+    // Library images element
+    TiXmlElement *library_imagesXml = new TiXmlElement( "library_images" );
+    int imageCount = this->ExportImages(library_imagesXml);
+    if(imageCount)
+    {
+      colladaXml->LinkEndChild( library_imagesXml );
+    }
 
-  // Library materials element
-  TiXmlElement *library_materialsXml = this->ExportMaterials();
-  colladaXml->LinkEndChild( library_materialsXml );
+    // Library materials element
+    TiXmlElement *library_materialsXml = new TiXmlElement( "library_materials" );
+    this->ExportMaterials(library_materialsXml);
+    colladaXml->LinkEndChild( library_materialsXml );
 
-  // Library effects element
-  TiXmlElement *library_effectsXml = this->ExportEffects();
-  colladaXml->LinkEndChild( library_effectsXml );
+    // Library effects element
+    TiXmlElement *library_effectsXml = new TiXmlElement( "library_effects" );
+    this->ExportEffects(library_effectsXml);
+    colladaXml->LinkEndChild( library_effectsXml );
+  }
 
   // Library visual scenes element
-  TiXmlElement *library_visual_scenesXml = this->ExportVisualScenes();
+  TiXmlElement *library_visual_scenesXml =
+      new TiXmlElement( "library_visual_scenes" );
+  this->ExportVisualScenes(library_visual_scenesXml);
   colladaXml->LinkEndChild( library_visual_scenesXml );
 
   // Scene element
-  TiXmlElement *sceneXml = this->ExportScene();
+  TiXmlElement *sceneXml = new TiXmlElement( "scene" );
+  this->ExportScene(sceneXml);
   colladaXml->LinkEndChild( sceneXml );
 
   xmlDoc.SaveFile( meshName+"_exported.dae" );
 }
 
 ///////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportAsset()
+void ColladaExporter::ExportAsset(TiXmlElement *_assetXml)
 {
-  TiXmlElement *assetXml = new TiXmlElement( "asset" );
-
   // unit
   TiXmlElement * unitXml = new TiXmlElement( "unit" );
   unitXml->SetAttribute("meter", "1");
   unitXml->SetAttribute("name", "meter");
-  assetXml->LinkEndChild( unitXml );
+  _assetXml->LinkEndChild( unitXml );
 
   // up_axis
   TiXmlElement * up_axisXml = new TiXmlElement( "up_axis" );
   up_axisXml->LinkEndChild( new TiXmlText( "Z_UP" ));
-  assetXml->LinkEndChild( up_axisXml );
-
-  return assetXml;
+  _assetXml->LinkEndChild( up_axisXml );
 }
 
 //////////////////////////////////////////////////
@@ -266,10 +278,8 @@ void ColladaExporter::FillTextureSource(
 }
 
 ///////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportGeometries()
+void ColladaExporter::ExportGeometries(TiXmlElement *_library_geometriesXml)
 {
-  TiXmlElement *library_geometriesXml = new TiXmlElement( "library_geometries" );
-
   unsigned int meshCount = this->mesh->GetSubMeshCount();
 
   for(unsigned int i = 0; i < meshCount; i++)
@@ -280,7 +290,7 @@ TiXmlElement *ColladaExporter::ExportGeometries()
 
     TiXmlElement *geometry = new TiXmlElement( "geometry" );
     geometry->SetAttribute("id", meshId);
-    library_geometriesXml->LinkEndChild( geometry );
+    _library_geometriesXml->LinkEndChild( geometry );
 
     TiXmlElement *Mesh = new TiXmlElement( "mesh" );
     geometry->LinkEndChild( Mesh );
@@ -367,24 +377,13 @@ TiXmlElement *ColladaExporter::ExportGeometries()
     triangles->LinkEndChild( p );
     p->LinkEndChild( new TiXmlText( fillData.str().c_str() ));
   }
-
-  return library_geometriesXml;
 }
 
 ///////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportImages()
+int ColladaExporter::ExportImages(TiXmlElement *_library_imagesXml)
 {
-  unsigned int materialCount = this->mesh->GetMaterialCount();
-
-  if(materialCount == 0)
-  {
-    return NULL;
-  }
-
-  TiXmlElement *library_imagesXml = new TiXmlElement( "library_images" );
-
   int imageCount = 0;
-  for(unsigned int i = 0; i < materialCount; i++)
+  for(unsigned int i = 0; i < this->materialCount; i++)
   {
     const gazebo::common::Material * material = this->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
@@ -396,7 +395,7 @@ TiXmlElement *ColladaExporter::ExportImages()
 
       TiXmlElement *image = new TiXmlElement( "image" );
       image->SetAttribute("id", id);
-      library_imagesXml->LinkEndChild( image );
+      _library_imagesXml->LinkEndChild( image );
 
       TiXmlElement *init_from = new TiXmlElement( "init_from" );
       init_from->LinkEndChild( new TiXmlText(
@@ -407,66 +406,39 @@ TiXmlElement *ColladaExporter::ExportImages()
     }
   }
 
-  if(imageCount != 0)
-  {
-    return library_imagesXml;
-  }
-  else
-  {
-    return NULL;
-  }
+  return imageCount;
 }
 
 //////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportMaterials()
+void ColladaExporter::ExportMaterials(TiXmlElement *_library_materialsXml)
 {
-  unsigned int materialCount = this->mesh->GetMaterialCount();
-
-  if(materialCount == 0)
-  {
-    return NULL;
-  }
-
-  TiXmlElement *library_materialsXml = new TiXmlElement( "library_materials" );
-
-  for(unsigned int i = 0; i < materialCount; i++)
+  for(unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
     sprintf(id,"material_%d", i);
 
     TiXmlElement *material = new TiXmlElement( "material" );
     material->SetAttribute("id", id);
-    library_materialsXml->LinkEndChild( material );
+    _library_materialsXml->LinkEndChild( material );
 
     sprintf(id,"#material_%d_fx", i);
     TiXmlElement *instance_effect = new TiXmlElement( "instance_effect" );
     instance_effect->SetAttribute("url",id);
     material->LinkEndChild( instance_effect );
   }
-
-  return library_materialsXml;
 }
 
 //////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportEffects()
+void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
 {
-  unsigned int materialCount = this->mesh->GetMaterialCount();
-
-  if(materialCount == 0)
-  {
-    return NULL;
-  }
-
-  TiXmlElement *library_effectsXml = new TiXmlElement( "library_effects" );
-
-  for(unsigned int i = 0; i < materialCount; i++)
+  for(unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
     sprintf(id,"material_%d_fx", i);
 
     TiXmlElement *effect = new TiXmlElement( "effect" );
     effect->SetAttribute("id", id);
-    library_effectsXml->LinkEndChild( effect );
+    _library_effectsXml->LinkEndChild( effect );
 
     TiXmlElement *profile_COMMON = new TiXmlElement( "profile_COMMON" );
     effect->LinkEndChild( profile_COMMON );
@@ -617,19 +589,13 @@ TiXmlElement *ColladaExporter::ExportEffects()
     shininess->LinkEndChild( color );
 
   }
-
-  return library_effectsXml;
-
 }
 
 //////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportVisualScenes()
+void ColladaExporter::ExportVisualScenes(TiXmlElement *_library_visual_scenesXml)
 {
-  TiXmlElement *library_visual_scenesXml =
-      new TiXmlElement( "library_visual_scenes" );
-
   TiXmlElement *visual_scene = new TiXmlElement( "visual_scene" );
-  library_visual_scenesXml->LinkEndChild( visual_scene );
+  _library_visual_scenesXml->LinkEndChild( visual_scene );
   visual_scene->SetAttribute("name", "Scene");
   visual_scene->SetAttribute("id", "Scene");
 
@@ -678,19 +644,13 @@ TiXmlElement *ColladaExporter::ExportVisualScenes()
       }
     }
   }
-
-  return library_visual_scenesXml;
 }
 
 //////////////////////////////////////////////////
-TiXmlElement *ColladaExporter::ExportScene()
+void ColladaExporter::ExportScene(TiXmlElement *_sceneXml)
 {
-  TiXmlElement *sceneXml = new TiXmlElement( "scene" );
-
   TiXmlElement *instance_visual_scene =
       new TiXmlElement( "instance_visual_scene" );
-  sceneXml->LinkEndChild( instance_visual_scene );
+  _sceneXml->LinkEndChild( instance_visual_scene );
   instance_visual_scene->SetAttribute("url", "#Scene");
-
-  return sceneXml;
 }
