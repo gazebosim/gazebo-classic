@@ -19,6 +19,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 
 #include "OVR_DeviceConstants.h"
 
+#include <gazebo/util/system.hh>
+
 namespace OVR {
 
 class DeviceBase;
@@ -40,14 +42,14 @@ class DeviceEnumerationArgs;
 // is available, it can be created by calling CreateDevice.
 //
 
-class DeviceHandle
-{    
+class GAZEBO_VISIBLE DeviceHandle
+{
 	friend class DeviceManager;
 	friend class DeviceManagerImpl;
     template<class B> friend class HIDDeviceImpl;
 
 public:
-	DeviceHandle() : pImpl(0) { }    
+	DeviceHandle() : pImpl(0) { }
 	DeviceHandle(const DeviceHandle& src);
 	~DeviceHandle();
 
@@ -59,7 +61,7 @@ public:
 	// operator bool() returns true if Handle/Enumerator points to a valid device.
 	operator bool () const   { return GetType() != Device_None; }
 
-    // Returns existing device, or NULL if !IsCreated. The returned ptr is 
+    // Returns existing device, or NULL if !IsCreated. The returned ptr is
     // addref-ed.
     DeviceBase* GetDevice_AddRef() const;
 	DeviceType  GetType() const;

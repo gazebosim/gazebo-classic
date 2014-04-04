@@ -19,6 +19,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 
 #include "../OVR_Device.h"
 
+#include <gazebo/util/system.hh>
+
 namespace OVR { namespace Util { namespace Render {
 
 
@@ -41,7 +43,7 @@ enum StereoEye
 {
     StereoEye_Center,
     StereoEye_Left,
-    StereoEye_Right    
+    StereoEye_Right
 };
 
 
@@ -69,10 +71,10 @@ struct Viewport
 
 // DistortionConfig Provides controls for the distortion shader.
 //  - K[0] - K[3] are coefficients for the distortion function.
-//  - XCenterOffset is the offset of lens distortion center from the 
+//  - XCenterOffset is the offset of lens distortion center from the
 //    center of one-eye screen half. [-1, 1] Range.
 //  - Scale is a factor of how much larger will the input image be,
-//    with a factor of 1.0f being no scaling. An inverse of this 
+//    with a factor of 1.0f being no scaling. An inverse of this
 //    value is applied to sampled UV coordinates (1/Scale).
 //  - ChromaticAberration is an array of parameters for controlling
 //    additional Red and Blue scaling in order to reduce chromatic aberration
@@ -82,7 +84,7 @@ class DistortionConfig
 public:
     DistortionConfig(float k0 = 1.0f, float k1 = 0.0f, float k2 = 0.0f, float k3 = 0.0f)
         : XCenterOffset(0), YCenterOffset(0), Scale(1.0f)
-    { 
+    {
         SetCoefficients(k0, k1, k2, k3);
         SetChromaticAberration();
     }
@@ -97,7 +99,7 @@ public:
     // DistortionFn applies distortion equation to the argument. The returned
     // value should match distortion equation used in shader.
     float  DistortionFn(float r) const
-    {        
+    {
         float rsq   = r * r;
         float scale = r * (K[0] + K[1] * rsq + K[2] * rsq * rsq + K[3] * rsq * rsq * rsq);
         return scale;
@@ -122,12 +124,12 @@ public:
 // ***** StereoEyeParams
 
 // StereoEyeParams describes RenderDevice configuration needed to render
-// the scene for one eye. 
+// the scene for one eye.
 class StereoEyeParams
 {
 public:
     StereoEye                Eye;
-    Viewport                 VP;               // Viewport that we are rendering to        
+    Viewport                 VP;               // Viewport that we are rendering to
     const DistortionConfig*  pDistortion;
 
     Matrix4f                 ViewAdjust;       // Translation to be applied to view matrix.
@@ -143,7 +145,7 @@ public:
         ViewAdjust             = Matrix4f::Translation(Vector3f(vofs,0,0));
         Projection             = proj;
         OrthoProjection        = orthoProj;
-        pDistortion            = distortion;        
+        pDistortion            = distortion;
     }
 };
 
@@ -164,13 +166,13 @@ public:
 // that is properly adjusted during rendering through SterepRenderParams::Adjust2D.
 // Genreally speaking, text outside [-1,1] coordinate range will not be readable.
 
-class StereoConfig
+class GAZEBO_VISIBLE StereoConfig
 {
 public:
 
     StereoConfig(StereoMode mode = Stereo_LeftRight_Multipass,
                  const Viewport& fullViewport = Viewport(0,0, 1280,800));
- 
+
 
     // *** Modifiable State Access
 
@@ -192,7 +194,7 @@ public:
     void        SetIPD(float ipd)               { InterpupillaryDistance = ipd; IPDOverride = DirtyFlag = true; }
     float       GetIPD() const                  { return InterpupillaryDistance; }
 
-    // Set full render target viewport; for HMD this includes both eyes. 
+    // Set full render target viewport; for HMD this includes both eyes.
     void        SetFullViewport(const Viewport& vp);
     const Viewport& GetFullViewport() const     { return FullView; }
 
@@ -201,14 +203,14 @@ public:
     void        SetAspectMultiplier(float m)    { AspectMultiplier = m; DirtyFlag = true; }
     float       GetAspectMultiplier() const     { return AspectMultiplier; }
 
-    
+
     // For the distorted image to fill rendered viewport, input texture render target needs to be
     // scaled by DistortionScale before sampling. The scale factor is computed by fitting a point
     // on of specified radius from a distortion center, more easily specified as a coordinate.
     // SetDistortionFitPointVP sets the (x,y) coordinate of the point that scale will be "fit" to,
     // assuming [-1,1] coordinate range for full left-eye viewport. A fit point is a location
     // where source (pre-distortion) and target (post-distortion) image match each other.
-    // For the right eye, the interpretation of 'u' will be inverted.  
+    // For the right eye, the interpretation of 'u' will be inverted.
     void       SetDistortionFitPointVP(float x, float y);
     // SetDistortionFitPointPixels sets the (x,y) coordinate of the point that scale will be "fit" to,
     // specified in pixeld for full left-eye texture.
@@ -217,7 +219,7 @@ public:
     // Changes all distortion settings.
     // Note that setting HMDInfo also changes Distortion coefficients.
     void        SetDistortionConfig(const DistortionConfig& d) { Distortion = d; DirtyFlag = true; }
-    
+
     // Modify distortion coefficients; useful for adjustment tweaking.
     void        SetDistortionK(int i, float k)  { Distortion.K[i] = k; DirtyFlag = true; }
     float       GetDistortionK(int i) const     { return Distortion.K[i]; }
@@ -230,17 +232,17 @@ public:
 
     // Return current aspect ratio.
     float      GetAspect()                      { updateIfDirty(); return Aspect; }
-    
+
     // Return computed vertical FOV in radians/degrees.
     float      GetYFOVRadians()                 { updateIfDirty(); return YFov; }
     float      GetYFOVDegrees()                 { return RadToDegree(GetYFOVRadians()); }
 
     // Query horizontal projection center offset as a distance away from the
     // one-eye [-1,1] unit viewport.
-    // Positive return value should be used for left eye, negative for right eye. 
+    // Positive return value should be used for left eye, negative for right eye.
     float      GetProjectionCenterOffset()      { updateIfDirty(); return ProjectionCenterOffset; }
 
-    // GetDistortionConfig isn't const because XCenterOffset bay need to be recomputed.  
+    // GetDistortionConfig isn't const because XCenterOffset bay need to be recomputed.
     const DistortionConfig& GetDistortionConfig() { updateIfDirty(); return Distortion; }
 
     // Returns DistortionScale factor by which input texture size is increased to make
@@ -252,8 +254,8 @@ public:
 
     // Returns full set of Stereo rendering parameters for the specified eye.
     const StereoEyeParams& GetEyeRenderParams(StereoEye eye);
-   
-private:    
+
+private:
 
     void updateIfDirty()   { if (DirtyFlag) updateComputedState(); }
     void updateComputedState();
@@ -275,20 +277,20 @@ private:
     Viewport           FullView;                       // Entire window viewport.
 
     float              Area2DFov;                      // FOV range mapping to [-1, 1] 2D area.
- 
+
     // *** Computed State
- 
+
     bool               DirtyFlag;   // Set when any if the modifiable state changed.
-    bool               IPDOverride; // True after SetIPD was called.    
+    bool               IPDOverride; // True after SetIPD was called.
     float              YFov;        // Vertical FOV.
     float              Aspect;      // Aspect ratio: (w/h)*AspectMultiplier.
     float              ProjectionCenterOffset;
     StereoEyeParams    EyeRenderParams[2];
 
-  
+
     // ** 2D Rendering
 
-    // Number of 2D pixels in the FOV. This defines [-1,1] coordinate range for 2D.  
+    // Number of 2D pixels in the FOV. This defines [-1,1] coordinate range for 2D.
     float              FovPixels;
     Matrix4f           OrthoCenter;
     float              OrthoPixelOffset;

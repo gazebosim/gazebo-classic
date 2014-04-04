@@ -4,7 +4,7 @@ PublicHeader:   OVR.h
 Filename    :   OVR_Allocator.h
 Content     :   Installable memory allocator
 Created     :   September 19, 2012
-Notes       : 
+Notes       :
 
 Copyright   :   Copyright 2012 Oculus VR, Inc. All Rights reserved.
 
@@ -18,6 +18,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 #define OVR_Allocator_h
 
 #include "OVR_Types.h"
+
+#include <gazebo/util/system.hh>
 
 //-----------------------------------------------------------------------------------
 
@@ -67,7 +69,7 @@ otherwise accompanies this software in either electronic or hard copy form.
     void    operator delete(void *p)                                                    \
     { check_delete(class_name, p); OVR_FREE(p); }                                       \
     void    operator delete(void *p, const char*, int)                                  \
-    { check_delete(class_name, p); OVR_FREE(p); }                          
+    { check_delete(class_name, p); OVR_FREE(p); }
 
 #define OVR_MEMORY_DEFINE_PLACEMENT_NEW                                                 \
     void*   operator new        (UPInt n, void *ptr)    { OVR_UNUSED(n); return ptr; }  \
@@ -144,7 +146,7 @@ OVR_FORCE_INLINE void Destruct(T *pobj)
 
 template <class T>
 OVR_FORCE_INLINE void DestructArray(T *pobj, UPInt count)
-{   
+{
     for (UPInt i=0; i<count; ++i, ++pobj)
         pobj->~T();
 }
@@ -156,14 +158,14 @@ OVR_FORCE_INLINE void DestructArray(T *pobj, UPInt count)
 // Allocator defines a memory allocation interface that developers can override
 // to to provide memory for OVR; an instance of this class is typically created on
 // application startup and passed into System or OVR::System constructor.
-// 
+//
 //
 // Users implementing this interface must provide three functions: Alloc, Free,
 // and Realloc. Implementations of these functions must honor the requested alignment.
 // Although arbitrary alignment requests are possible, requested alignment will
 // typically be small, such as 16 bytes or less.
 
-class Allocator
+class GAZEBO_VISIBLE Allocator
 {
     friend class System;
 public:
@@ -196,10 +198,10 @@ public:
     // Allocate memory of specified alignment.
     // Memory allocated with AllocAligned MUST be freed with FreeAligned.
     // Default implementation will delegate to Alloc/Free after doing rounding.
-    virtual void*   AllocAligned(UPInt size, UPInt align);    
+    virtual void*   AllocAligned(UPInt size, UPInt align);
     // Frees memory allocated with AllocAligned.
     virtual void    FreeAligned(void* p);
-    
+
     // Returns the pointer to the current globally installed Allocator instance.
     // This pointer is used for most of the memory allocations.
     static Allocator* GetInstance() { return pInstance; }
@@ -211,7 +213,7 @@ protected:
     virtual void    onSystemShutdown() { }
 
 public:
-    static  void    setInstance(Allocator* palloc)    
+    static  void    setInstance(Allocator* palloc)
     {
         OVR_ASSERT((pInstance == 0) || (palloc == 0));
         pInstance = palloc;
@@ -238,7 +240,7 @@ template<class D>
 class Allocator_SingletonSupport : public Allocator
 {
     struct AllocContainer
-    {        
+    {
         UPInt Data[(sizeof(D) + sizeof(UPInt)-1) / sizeof(UPInt)];
         bool  Initialized;
         AllocContainer() : Initialized(0) { }
@@ -281,7 +283,7 @@ protected:
 // This allocator is created and used if no other allocator is installed.
 // Default allocator delegates to system malloc.
 
-class DefaultAllocator : public Allocator_SingletonSupport<DefaultAllocator>
+class GAZEBO_VISIBLE DefaultAllocator : public Allocator_SingletonSupport<DefaultAllocator>
 {
 public:
     virtual void*   Alloc(UPInt size);

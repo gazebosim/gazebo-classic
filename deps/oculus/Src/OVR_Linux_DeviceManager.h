@@ -2,8 +2,8 @@
 
 Filename    :   OVR_Linux_DeviceManager.h
 Content     :   Linux-specific DeviceManager header.
-Created     :   
-Authors     :   
+Created     :
+Authors     :
 
 Copyright   :   Copyright 2012 Oculus VR, Inc. All Rights reserved.
 
@@ -21,6 +21,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include <unistd.h>
 #include <sys/poll.h>
 
+#include <gazebo/util/system.hh>
+
 
 namespace OVR { namespace Linux {
 
@@ -29,7 +31,7 @@ class DeviceManagerThread;
 //-------------------------------------------------------------------------------------
 // ***** Linux DeviceManager
 
-class DeviceManager : public DeviceManagerImpl
+class GAZEBO_VISIBLE DeviceManager : public DeviceManagerImpl
 {
 public:
     DeviceManager();
@@ -42,7 +44,7 @@ public:
     virtual ThreadCommandQueue* GetThreadQueue();
     virtual ThreadId GetThreadId() const;
 
-    virtual DeviceEnumerator<> EnumerateDevicesEx(const DeviceEnumerationArgs& args);    
+    virtual DeviceEnumerator<> EnumerateDevicesEx(const DeviceEnumerationArgs& args);
 
     virtual bool  GetDeviceInfo(DeviceInfo* info) const;
 
@@ -91,7 +93,7 @@ public:
     bool RemoveTicksNotifier(Notifier* notify);
 
 private:
-    
+
     bool threadInitialized() { return CommandFd[0] != 0; }
 
     // pipe used to signal commands

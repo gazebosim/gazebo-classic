@@ -21,6 +21,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include "OVR_SensorFilter.h"
 #include <time.h>
 
+#include <gazebo/util/system.hh>
+
 namespace OVR {
 
 //-------------------------------------------------------------------------------------
@@ -34,17 +36,17 @@ namespace OVR {
 // rotation matrix or Euler angles.
 //
 // The class can operate in two ways:
-//  - By user manually passing MessageBodyFrame messages to the OnMessage() function. 
+//  - By user manually passing MessageBodyFrame messages to the OnMessage() function.
 //  - By attaching SensorFusion to a SensorDevice, in which case it will
 //    automatically handle notifications from that device.
 
 
-class SensorFusion : public NewOverrideBase
+class GAZEBO_VISIBLE SensorFusion : public NewOverrideBase
 {
     enum
     {
         MagMaxReferences = 1000
-    };        
+    };
 
 public:
     SensorFusion(SensorDevice* sensor = 0);
@@ -52,7 +54,7 @@ public:
 
 
     // *** Setup
-    
+
     // Attaches this SensorFusion to a sensor device, from which it will receive
     // notification messages. If a sensor is attached, manual message notification
     // is not necessary. Calling this function also resets SensorFusion state.
@@ -79,7 +81,7 @@ public:
     Vector3f    GetAngularVelocity() const  { return lockedGet(&AngV); }
 
     // Obtain the last raw magnetometer reading, in Gauss
-    Vector3f    GetMagnetometer() const     { return lockedGet(&RawMag); }   
+    Vector3f    GetMagnetometer() const     { return lockedGet(&RawMag); }
     // Obtain the calibrated magnetometer reading (direction and field strength)
     Vector3f    GetCalibratedMagnetometer() const  { OVR_ASSERT(MagCalibrated); return lockedGet(&CalMag); }
 
@@ -104,14 +106,14 @@ public:
     // predicted orientation.
     float       GetPredictionDelta() const                  { return PredictionDT; }
     void        SetPrediction(float dt, bool enable = true) { PredictionDT = dt; EnablePrediction = enable; }
-    void		SetPredictionEnabled(bool enable = true)    { EnablePrediction = enable; }    
+    void		SetPredictionEnabled(bool enable = true)    { EnablePrediction = enable; }
     bool		IsPredictionEnabled()                       { return EnablePrediction; }
 
 
     // *** Accelerometer/Gravity Correction Control
 
     // Enables/disables gravity correction (on by default).
-    void        SetGravityEnabled(bool enableGravity)       { EnableGravity = enableGravity; }   
+    void        SetGravityEnabled(bool enableGravity)       { EnableGravity = enableGravity; }
     bool        IsGravityEnabled() const                    { return EnableGravity;}
 
     // Gain used to correct gyro with accel. Default value is appropriate for typical use.
@@ -148,7 +150,7 @@ public:
     time_t      GetMagCalibrationTime() const    { return MagCalibrationTime; }
 
     // True only if the mag has calibration values stored
-    bool        HasMagCalibration() const        { return MagCalibrated;}  
+    bool        HasMagCalibration() const        { return MagCalibrated;}
     // Force the mag into the uncalibrated state
     void        ClearMagCalibration()            { MagCalibrated = false; }
 
@@ -205,13 +207,13 @@ private:
 
         virtual void OnMessage(const Message& msg);
         virtual bool SupportsMessageType(MessageType type) const;
-    };   
+    };
 
     SensorInfo        CachedSensorInfo;
-    
+
     Quatf             Q;
 	Quatf			  QUncorrected;
-    Vector3f          A;    
+    Vector3f          A;
     Vector3f          AngV;
     Vector3f          CalMag;
     Vector3f          RawMag;
@@ -237,7 +239,7 @@ private:
     bool              EnableYawCorrection;
     bool              MagCalibrated;
     Matrix4f          MagCalibrationMatrix;
-    time_t            MagCalibrationTime;    
+    time_t            MagCalibrationTime;
     int               MagNumReferences;
     Vector3f          MagRefsInBodyFrame[MagMaxReferences];
     Vector3f          MagRefsInWorldFrame[MagMaxReferences];

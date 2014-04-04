@@ -5,7 +5,7 @@ Filename    :   OVR_System.h
 Content     :   General kernel initialization/cleanup, including that
                 of the memory allocator.
 Created     :   September 19, 2012
-Notes       : 
+Notes       :
 
 Copyright   :   Copyright 2012 Oculus VR, Inc. All Rights reserved.
 
@@ -21,6 +21,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include "OVR_Allocator.h"
 #include "OVR_Log.h"
 
+#include <gazebo/util/system.hh>
+
 namespace OVR {
 
 // ***** System Core Initialization class
@@ -33,7 +35,7 @@ namespace OVR {
 
 // TBD: Require additional System class for Oculus Rift API?
 
-class System
+class GAZEBO_VISIBLE System
 {
 public:
 
@@ -59,7 +61,7 @@ public:
 
     // De-initializes System more, finalizing the threading system and destroying
     // the global memory allocator.
-    static void OVR_CDECL Destroy();    
+    static void OVR_CDECL Destroy();
 };
 
 } // OVR

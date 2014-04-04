@@ -4,7 +4,7 @@ PublicHeader:   OVR
 Filename    :   OVR_Log.h
 Content     :   Logging support
 Created     :   September 19, 2012
-Notes       : 
+Notes       :
 
 Copyright   :   Copyright 2012 Oculus VR, Inc. All Rights reserved.
 
@@ -19,6 +19,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 
 #include "OVR_Types.h"
 #include <stdarg.h>
+
+#include <gazebo/util/system.hh>
 
 namespace OVR {
 
@@ -62,11 +64,11 @@ enum LogMaskConstants
 //                    source code. Generated though OVR_ASSERT_MSG(c, "Text").
 
 enum LogMessageType
-{    
+{
     // General Logging
-    Log_Text        = LogMask_Regular | 0,    
+    Log_Text        = LogMask_Regular | 0,
     Log_Error       = LogMask_Regular | 1, // "Error: %s\n".
-    
+
     // Debug-only messages (not generated in release build)
     Log_DebugText   = LogMask_Debug | 0,
     Log_Debug       = LogMask_Debug | 1,   // "Debug: %s\n".
@@ -89,10 +91,10 @@ enum LogMessageType
 // debug and runtime messages.
 // Debug logging can be overridden by calling Log::SetGlobalLog.
 
-class Log
+class GAZEBO_VISIBLE Log
 {
     friend class System;
-public: 
+public:
     Log(unsigned logMask = LogMask_Debug) : LoggingMask(logMask) { }
     virtual ~Log();
 
@@ -119,7 +121,7 @@ public:
 
     // Default log output implementation used by by LogMessageVarg.
     // Debug flag may be used to re-direct output on some platforms, but doesn't
-    // necessarily disable it in release builds; that is the job of the called.    
+    // necessarily disable it in release builds; that is the job of the called.
     static void     DefaultLogOutput(const char* textBuffer, bool debug);
 
     // Determines if the specified message type is for debugging only.
@@ -188,6 +190,6 @@ void LogError(const char* fmt, ...) OVR_LOG_VAARG_ATTRIBUTE(1,2);
 
 #endif
 
-} // OVR 
+} // OVR
 
 #endif

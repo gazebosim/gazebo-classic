@@ -145,9 +145,7 @@ target_link_libraries(gazebo_rendering
 if (HAVE_LIBUDEV AND HAVE_XINERAMA)
   MESSAGE ("Libudev and xinerama")
   target_link_libraries(gazebo_rendering
-    Xinerama
     gazebo_ovr
-    udev
   )
 endif()
 

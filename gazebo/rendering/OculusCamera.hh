@@ -61,7 +61,7 @@ namespace gazebo
 
     /// \class OculusCamera OculusCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class OculusCamera : public Camera
+    class GAZEBO_VISIBLE OculusCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.

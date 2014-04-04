@@ -26,6 +26,8 @@ otherwise accompanies this software in either electronic or hard copy form.
 #include "Kernel/OVR_RefCount.h"
 #include "Kernel/OVR_String.h"
 
+#include <gazebo/util/system.hh>
+
 namespace OVR {
 
 // Declared externally
@@ -65,9 +67,9 @@ public:
     // Determines if handler supports a specific message type. Can
     // be used to filter out entire message groups. The result
     // returned by this function shouldn't change after handler creation.
-    virtual bool SupportsMessageType(MessageType) const { return true; }    
+    virtual bool SupportsMessageType(MessageType) const { return true; }
 
-private:    
+private:
     UPInt Internal[4];
 };
 
@@ -86,8 +88,8 @@ private:
 //     may survive longer if referenced.
 
 class DeviceBase : public NewOverrideBase
-{    
-    friend class DeviceHandle;  
+{
+    friend class DeviceHandle;
     friend class DeviceManagerImpl;
 public:
 
@@ -97,9 +99,9 @@ public:
     virtual ~DeviceBase() { }
     virtual void            AddRef();
     virtual void            Release();
-    
+
     virtual DeviceBase*     GetParent() const;
-    virtual DeviceManager*  GetManager() const;  
+    virtual DeviceManager*  GetManager() const;
 
     virtual void            SetMessageHandler(MessageHandler* handler);
     virtual MessageHandler* GetMessageHandler() const;
@@ -130,7 +132,7 @@ public:
     {  ProductName[0] = Manufacturer[0] = 0; }
 
     enum { MaxNameLength = 32 };
-    
+
     // Type of device for which DeviceInfo is intended.
     // This will be set to Device_HMD for HMDInfo structure, note that this may be
     // different form the actual device type since (Device_None) is valid.
@@ -139,10 +141,10 @@ public:
     // InfoClassType != Device_None.
     DeviceType       Type;
     // Name string describing the product: "Oculus Rift DK1", etc.
-    char             ProductName[MaxNameLength];    
+    char             ProductName[MaxNameLength];
     char             Manufacturer[MaxNameLength];
     unsigned         Version;
-    
+
 protected:
     DeviceInfo(DeviceType type) : InfoClassType(type), Type(type), Version(0)
     { ProductName[0] = Manufacturer[0] = 0; }
@@ -166,7 +168,7 @@ public:
                 (available || !AvailableOnly);
     }
 
-protected:    
+protected:
     DeviceType   EnumType;
     bool         AvailableOnly;
 };
@@ -224,10 +226,10 @@ protected:
 //  if (manager) manager->Release();
 
 
-class DeviceManager : public DeviceBase
+class GAZEBO_VISIBLE DeviceManager : public DeviceBase
 {
 public:
-  
+
     DeviceManager()
     { }
 
@@ -236,7 +238,7 @@ public:
     virtual DeviceManager*  GetManager() const  { return const_cast<DeviceManager*>(this); }
 
     // Every DeviceManager has an associated profile manager, which us used to store
-    // user settings that may affect device behavior. 
+    // user settings that may affect device behavior.
     virtual ProfileManager* GetProfileManager() const = 0;
 
 
@@ -244,7 +246,7 @@ public:
     // returning an enumerator that references the first device. An empty enumerator is
     // returned if no devices are available. The following APIs are exposed through
     // DeviceEnumerator:
-    //   DeviceEnumerator::GetType()        - Check device type. Returns Device_None 
+    //   DeviceEnumerator::GetType()        - Check device type. Returns Device_None
     //                                        if no device was found/pointed to.
     //   DeviceEnumerator::GetDeviceInfo()  - Get more information on device.
     //   DeviceEnumerator::CreateDevice()   - Create an instance of device.
@@ -256,7 +258,7 @@ public:
         DeviceEnumerator<> e = EnumerateDevicesEx(DeviceEnumerationArgs((DeviceType)D::EnumDeviceType, availableOnly));
         return *reinterpret_cast<DeviceEnumerator<D>*>(&e);
     }
-  
+
     // EnumerateDevicesEx provides internal implementation for device enumeration, enumerating
     // devices based on dynamically specified DeviceType in DeviceEnumerationArgs.
     // End users should call DeumerateDevices<>() instead.
@@ -270,7 +272,7 @@ public:
 
 
 
-    // Adds a device (DeviceCreateDesc*) into Devices. Returns NULL, 
+    // Adds a device (DeviceCreateDesc*) into Devices. Returns NULL,
     // if unsuccessful or device is already in the list.
     virtual Ptr<DeviceCreateDesc> AddDevice_NeedsLock(const DeviceCreateDesc& createDesc) = 0;
 
@@ -284,7 +286,7 @@ protected:
 
 
 //-------------------------------------------------------------------------------------
-// ***** HMDInfo 
+// ***** HMDInfo
 
 // This structure describes various aspects of the HMD allowing us to configure rendering.
 //
@@ -297,7 +299,7 @@ protected:
 // TBD:
 //  - Power on/ off?
 //  - Sensor rates and capabilities
-//  - Distortion radius/variables    
+//  - Distortion radius/variables
 //  - Screen update frequency
 //  - Distortion needed flag
 //  - Update modes:
@@ -308,7 +310,7 @@ class HMDInfo : public DeviceInfo
 {
 public:
     // Size of the entire screen, in pixels.
-    unsigned  HResolution, VResolution; 
+    unsigned  HResolution, VResolution;
     // Physical dimensions of the active screen in meters. Can be used to calculate
     // projection center while considering IPD.
     float     HScreenSize, VScreenSize;
@@ -322,10 +324,10 @@ public:
     float     LensSeparationDistance;
     // Configured distance between the user's eye centers, in meters. Defaults to 0.064.
     float     InterpupillaryDistance;
-    
+
     // Radial distortion correction coefficients.
     // The distortion assumes that the input texture coordinates will be scaled
-    // by the following equation:    
+    // by the following equation:
     //   uvResult = uvInput * (K0 + K1 * uvLength^2 + K2 * uvLength^4)
     // Where uvInput is the UV vector from the center of distortion in direction
     // of the mapped pixel, uvLength is the magnitude of that vector, and uvResult
@@ -336,17 +338,17 @@ public:
 
     // Desktop coordinate position of the screen (can be negative; may not be present on all platforms)
     int       DesktopX, DesktopY;
-    
+
     // Windows:
     // "\\\\.\\DISPLAY3", etc. Can be used in EnumDisplaySettings/CreateDC.
     char      DisplayDeviceName[32];
-    
+
     // MacOS:
     long      DisplayId;
 
 
     HMDInfo()
-        : DeviceInfo(Device_HMD),          
+        : DeviceInfo(Device_HMD),
           HResolution(0), VResolution(0), HScreenSize(0), VScreenSize(0),
           VScreenCenter(0), EyeToScreenDistance(0),
           LensSeparationDistance(0), InterpupillaryDistance(0),
@@ -361,7 +363,7 @@ public:
 
     // Operator = copies local fields only (base class must be correct already)
     void operator = (const HMDInfo& src)
-    {        
+    {
         HResolution             = src.HResolution;
         VResolution             = src.VResolution;
         HScreenSize             = src.HScreenSize;
@@ -387,7 +389,7 @@ public:
     bool IsSameDisplay(const HMDInfo& o) const
     {
         return DisplayId == o.DisplayId &&
-               String::CompareNoCase(DisplayDeviceName, 
+               String::CompareNoCase(DisplayDeviceName,
                                      o.DisplayDeviceName) == 0;
     }
 
@@ -396,7 +398,7 @@ public:
 
 // HMDDevice represents an Oculus HMD device unit. An instance of this class
 // is typically created from the DeviceManager.
-//  After HMD device is created, we its sensor data can be obtained by 
+//  After HMD device is created, we its sensor data can be obtained by
 //  first creating a Sensor object and then.
 
 //  TBD:
@@ -412,17 +414,17 @@ public:
     // Static constant for this device type, used in template cast type checks.
     enum { EnumDeviceType = Device_HMD };
 
-    virtual DeviceType      GetType() const   { return Device_HMD; }  
+    virtual DeviceType      GetType() const   { return Device_HMD; }
 
     // Creates a sensor associated with this HMD.
     virtual SensorDevice*   GetSensor() = 0;
 
 
     // Requests the currently used profile. This profile affects the
-    // settings reported by HMDInfo. 
+    // settings reported by HMDInfo.
     virtual Profile*    GetProfile() const = 0;
     // Obtains the currently used profile name. This is initialized to the default
-    // profile name, if any; it can then be changed per-device by SetProfileName.    
+    // profile name, if any; it can then be changed per-device by SetProfileName.
     virtual const char* GetProfileName() const = 0;
     // Sets the profile user name, changing the data returned by GetProfileInfo.
     virtual bool        SetProfileName(const char* name) = 0;
@@ -431,8 +433,8 @@ public:
     // Disconnects from real HMD device. This HMDDevice remains as 'fake' HMD.
     // SensorDevice ptr is used to restore the 'fake' HMD (can be NULL).
     HMDDevice*  Disconnect(SensorDevice*);
-    
-    // Returns 'true' if HMD device is a 'fake' HMD (was created this way or 
+
+    // Returns 'true' if HMD device is a 'fake' HMD (was created this way or
     // 'Disconnect' method was called).
     bool        IsDisconnected() const;
 };
@@ -457,7 +459,7 @@ struct SensorRange
     // Maximum detected acceleration in m/s^2. Up to 8*G equivalent support guaranteed,
     // where G is ~9.81 m/s^2.
     // Oculus DK1 HW has thresholds near: 2, 4 (default), 8, 16 G.
-    float   MaxAcceleration;  
+    float   MaxAcceleration;
     // Maximum detected angular velocity in rad/s. Up to 8*Pi support guaranteed.
     // Oculus DK1 HW thresholds near: 1, 2, 4, 8 Pi (default).
     float   MaxRotationRate;
@@ -500,7 +502,7 @@ private:
 class SensorDevice : public HIDDeviceBase, public DeviceBase
 {
 public:
-    SensorDevice() 
+    SensorDevice()
     { }
 
     // Static constant for this device type, used in template cast type checks.
@@ -508,7 +510,7 @@ public:
 
     virtual DeviceType GetType() const   { return Device_Sensor; }
 
-    
+
     // CoordinateFrame defines whether messages come in the coordinate frame
     // of the sensor device or HMD, which has a different internal sensor.
     // Sensors obtained form the HMD will automatically use HMD coordinates.
@@ -521,9 +523,9 @@ public:
     virtual void            SetCoordinateFrame(CoordinateFrame coordframe) = 0;
     virtual CoordinateFrame GetCoordinateFrame() const = 0;
 
-    // Sets report rate (in Hz) of MessageBodyFrame messages (delivered through MessageHandler::OnMessage call). 
-    // Currently supported maximum rate is 1000Hz. If the rate is set to 500 or 333 Hz then OnMessage will be 
-    // called twice or thrice at the same 'tick'. 
+    // Sets report rate (in Hz) of MessageBodyFrame messages (delivered through MessageHandler::OnMessage call).
+    // Currently supported maximum rate is 1000Hz. If the rate is set to 500 or 333 Hz then OnMessage will be
+    // called twice or thrice at the same 'tick'.
     // If the rate is  < 333 then the OnMessage / MessageBodyFrame will be called three
     // times for each 'tick': the first call will contain averaged values, the second
     // and third calls will provide with most recent two recorded samples.
@@ -533,7 +535,7 @@ public:
     // value will contain the actual rate.
     virtual unsigned    GetReportRate() const = 0;
 
-    // Sets maximum range settings for the sensor described by SensorRange.    
+    // Sets maximum range settings for the sensor described by SensorRange.
     // The function will fail if you try to pass values outside Maximum supported
     // by the HW, as described by SensorInfo.
     // Pass waitFlag == true to wait for command completion. For waitFlag == true,
@@ -552,7 +554,7 @@ public:
 struct LatencyTestConfiguration
 {
     LatencyTestConfiguration(const Color& threshold, bool sendSamples = false)
-        : Threshold(threshold), SendSamples(sendSamples) 
+        : Threshold(threshold), SendSamples(sendSamples)
     {
     }
 
@@ -604,7 +606,7 @@ public:
     // when power is removed from the device.
     virtual bool SetCalibrate(const Color& calibrationColor, bool waitFlag = false) = 0;
 
-    // Triggers the start of a measurement. This starts the millisecond timer on the device and 
+    // Triggers the start of a measurement. This starts the millisecond timer on the device and
     // causes it to respond with the 'MessageLatencyTestStarted' message.
     virtual bool SetStartTest(const Color& targetColor, bool waitFlag = false) = 0;
 
