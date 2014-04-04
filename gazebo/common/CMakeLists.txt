@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
