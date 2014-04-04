@@ -449,8 +449,6 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
-
 
   Ogre::TransformKeyFrame *key;
 
@@ -458,23 +456,9 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
   key->setRotation(this->sceneNode->getOrientation());
 
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
-
-  /*key = strack->createNodeKeyFrame(time * 0.5);
-  key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
-  key->setRotation(yawFinal);
-
-  key = ptrack->createNodeKeyFrame(time * 0.5);
-  key->setRotation(pitchFinal);
-  */
-
   key = strack->createNodeKeyFrame(time);
   key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
   key->setRotation(yawFinal);
-
-  key = ptrack->createNodeKeyFrame(time);
-  key->setRotation(pitchFinal);
 
   this->animState =
     this->scene->GetManager()->createAnimationState("cameratrack");
