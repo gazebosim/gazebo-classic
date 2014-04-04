@@ -347,8 +347,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
-  math::Pose oldLinkWorldPose = this->worldPose;
-
   this->worldPose = _pose;
   this->worldPose.Correct();
 
