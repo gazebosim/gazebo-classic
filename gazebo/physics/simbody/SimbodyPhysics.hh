@@ -28,6 +28,7 @@
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 
 #include "gazebo/physics/simbody/simbody_inc.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody physics engine
-    class SimbodyPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE SimbodyPhysics : public PhysicsEngine
     {
       /// \brief Constructor
       public: SimbodyPhysics(WorldPtr _world);
@@ -216,6 +217,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
+
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
 
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;

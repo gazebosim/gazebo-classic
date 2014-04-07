@@ -74,6 +74,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->modelTreeWidget = new QTreeWidget();
+  this->modelTreeWidget->setObjectName("modelTreeWidget");
   this->modelTreeWidget->setColumnCount(1);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
@@ -91,6 +92,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 
   this->variantManager = new QtVariantPropertyManager();
   this->propTreeBrowser = new QtTreePropertyBrowser();
+  this->propTreeBrowser->setObjectName("propTreeBrowser");
   this->variantFactory = new QtVariantEditorFactory();
   this->propTreeBrowser->setFactoryForManager(this->variantManager,
                                               this->variantFactory);
@@ -145,6 +147,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 ModelListWidget::~ModelListWidget()
 {
+  this->connections.clear();
   delete this->propMutex;
   delete this->receiveMutex;
 }
@@ -320,6 +323,8 @@ void ModelListWidget::ProcessModelMsgs()
 
           linkItem->setData(0, Qt::UserRole, QVariant(linkName.c_str()));
           linkItem->setData(1, Qt::UserRole, QVariant((*iter).name().c_str()));
+          linkItem->setData(2, Qt::UserRole, QVariant((*iter).id()));
+          linkItem->setData(3, Qt::UserRole, QVariant("Link"));
           this->modelTreeWidget->addTopLevelItem(linkItem);
         }
 
@@ -336,6 +341,7 @@ void ModelListWidget::ProcessModelMsgs()
                   QString::fromStdString(jointNameShort))));
 
           jointItem->setData(0, Qt::UserRole, QVariant(jointName.c_str()));
+          jointItem->setData(3, Qt::UserRole, QVariant("Joint"));
           this->modelTreeWidget->addTopLevelItem(jointItem);
         }
       }
@@ -520,19 +526,21 @@ void ModelListWidget::OnPropertyChanged(QtProperty *_item)
     return;
 
   if (this->selectedProperty != _item || this->fillingPropertyTree)
-  {
     return;
-  }
 
-  if (this->modelsItem->indexOfChild(
-        this->modelTreeWidget->currentItem()) != -1)
+  QTreeWidgetItem *currentItem = this->modelTreeWidget->currentItem();
+
+  if (!currentItem)
+    return;
+
+  if (this->modelsItem->indexOfChild(currentItem) != -1 ||
+      this->modelsItem->indexOfChild(currentItem->parent()) != -1)
     this->ModelPropertyChanged(_item);
-  else if (this->lightsItem->indexOfChild(
-        this->modelTreeWidget->currentItem()) != -1)
+  else if (this->lightsItem->indexOfChild(currentItem) != -1)
     this->LightPropertyChanged(_item);
-  else if (this->modelTreeWidget->currentItem() == this->sceneItem)
+  else if (currentItem == this->sceneItem)
     this->ScenePropertyChanged(_item);
-  else if (this->modelTreeWidget->currentItem() == this->physicsItem)
+  else if (currentItem == this->physicsItem)
     this->PhysicsPropertyChanged(_item);
 }
 
@@ -612,94 +620,21 @@ void ModelListWidget::PhysicsPropertyChanged(QtProperty * /*_item*/)
       msg.set_enable_physics(this->variantManager->value((*iter)).toBool());
     else if ((*iter)->propertyName().toStdString() == "solver")
     {
-      if (this->physicsType == msgs::Physics::ODE)
-      {
-        msg.mutable_ode()->set_inertia_ratio_reduction(
-          this->variantManager->value(
-              this->GetChildItem((*iter), "inertia ratio reduction")).toBool());
-        msg.mutable_ode()->set_friction_iters(this->variantManager->value(
-              this->GetChildItem((*iter), "extra friction iters")).toInt());
-        msg.mutable_ode()->set_warm_start_factor(this->variantManager->value(
-              this->GetChildItem((*iter), "warm start factor")).toDouble());
-        msg.mutable_ode()->set_reorder(this->variantManager->value(
-              this->GetChildItem((*iter), "pgs row reorder")).toBool());
-        msg.mutable_ode()->set_contact_residual_smoothing(
-              this->variantManager->value(
-              this->GetChildItem((*iter), "contact smoothing")).toDouble());
-        msg.mutable_ode()->set_iters(this->variantManager->value(
-              this->GetChildItem((*iter), "iterations")).toInt());
-        msg.mutable_ode()->set_sor(this->variantManager->value(
-              this->GetChildItem((*iter), "SOR")).toDouble());
-      }
-      else if (this->physicsType == msgs::Physics::BULLET)
-      {
-        msg.mutable_bullet()->set_iters(this->variantManager->value(
-              this->GetChildItem((*iter), "iterations")).toInt());
-        msg.mutable_bullet()->set_sor(this->variantManager->value(
-              this->GetChildItem((*iter), "SOR")).toDouble());
-      }
-      else if (this->physicsType == msgs::Physics::DART)
-      {
-        /// \TODO
-      }
-      else if (this->physicsType == msgs::Physics::SIMBODY)
-      {
-        msg.mutable_simbody()->set_accuracy(
-          this->variantManager->value(
-          this->GetChildItem((*iter), "accuracy")).toDouble());
-        msg.mutable_simbody()->set_max_transient_velocity(
-          this->variantManager->value(
-          this->GetChildItem((*iter), "max transient velocity")).toDouble());
-      }
-      else
-      {
-        // custom physics engine?
-      }
+      msg.set_iters(this->variantManager->value(
+            this->GetChildItem((*iter), "iterations")).toInt());
+      msg.set_sor(this->variantManager->value(
+            this->GetChildItem((*iter), "SOR")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "constraints")
     {
-      if (this->physicsType == msgs::Physics::ODE)
-      {
-        msg.mutable_ode()->set_cfm(this->variantManager->value(
-              this->GetChildItem((*iter), "CFM")).toDouble());
-        msg.mutable_ode()->set_erp(this->variantManager->value(
-              this->GetChildItem((*iter), "ERP")).toDouble());
-        msg.mutable_ode()->set_contact_max_correcting_vel(
-              this->variantManager->value(
-              this->GetChildItem((*iter), "max velocity")).toDouble());
-        msg.mutable_ode()->set_contact_surface_layer(
-              this->variantManager->value(
-              this->GetChildItem((*iter), "surface layer")).toDouble());
-      }
-      else if (this->physicsType == msgs::Physics::BULLET)
-      {
-        msg.mutable_bullet()->set_cfm(this->variantManager->value(
-              this->GetChildItem((*iter), "CFM")).toDouble());
-        msg.mutable_bullet()->set_erp(this->variantManager->value(
-              this->GetChildItem((*iter), "ERP")).toDouble());
-        msg.mutable_bullet()->set_contact_surface_layer(
-              this->variantManager->value(
-              this->GetChildItem((*iter), "surface layer")).toDouble());
-        msg.mutable_bullet()->set_split_impulse(
-              this->variantManager->value(
-              this->GetChildItem((*iter), "split impulse")).toBool());
-        msg.mutable_bullet()->set_split_impulse_penetration_threshold(
-              this->variantManager->value(
-              this->GetChildItem((*iter),
-              "split impulse penetration threshold")).toDouble());
-      }
-      else if (this->physicsType == msgs::Physics::DART)
-      {
-        /// \TODO
-      }
-      else if (this->physicsType == msgs::Physics::SIMBODY)
-      {
-        /// \TODO
-      }
-      else
-      {
-        // custom physics engine?
-      }
+      msg.set_cfm(this->variantManager->value(
+            this->GetChildItem((*iter), "CFM")).toDouble());
+      msg.set_erp(this->variantManager->value(
+            this->GetChildItem((*iter), "ERP")).toDouble());
+      msg.set_contact_max_correcting_vel(this->variantManager->value(
+            this->GetChildItem((*iter), "max velocity")).toDouble());
+      msg.set_contact_surface_layer(this->variantManager->value(
+            this->GetChildItem((*iter), "surface layer")).toDouble());
     }
     else if ((*iter)->propertyName().toStdString() == "real time update rate")
     {
@@ -742,11 +677,36 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
 {
   msgs::Model msg;
 
-  msg.set_id(this->modelMsg.id());
-  msg.set_name(this->modelMsg.name());
+  google::protobuf::Message *fillMsg = &msg;
 
-  const google::protobuf::Descriptor *descriptor = msg.GetDescriptor();
-  const google::protobuf::Reflection *reflection = msg.GetReflection();
+  QTreeWidgetItem *currentItem = this->modelTreeWidget->currentItem();
+
+  // check if it's a link
+  if (currentItem->data(3, Qt::UserRole).toString().toStdString() == "Link")
+  {
+    // this->modelMsg may not have been set
+    // so get the model name from the current item
+    msg.set_name(currentItem->data(1, Qt::UserRole).toString().toStdString());
+    msg.set_id(currentItem->data(2, Qt::UserRole).toInt());
+
+    // set link id and strip link name.
+    msgs::Link *linkMsg = msg.add_link();
+    linkMsg->set_id(this->linkMsg.id());
+    std::string linkName = this->linkMsg.name();
+    size_t index = linkName.find_last_of("::");
+    if (index != std::string::npos)
+      linkName = linkName.substr(index+1);
+    linkMsg->set_name(linkName);
+    fillMsg = linkMsg;
+  }
+  else
+  {
+    msg.set_id(this->modelMsg.id());
+    msg.set_name(this->modelMsg.name());
+  }
+
+  const google::protobuf::Descriptor *descriptor = fillMsg->GetDescriptor();
+  const google::protobuf::Reflection *reflection = fillMsg->GetReflection();
 
   QList<QtProperty*> properties = this->propTreeBrowser->properties();
   for (QList<QtProperty*>::iterator iter = properties.begin();
@@ -765,19 +725,19 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     {
       if (field->is_repeated())
       {
-        this->FillMsg((*iter), reflection->AddMessage(&msg, field),
+        this->FillMsg((*iter), reflection->AddMessage(fillMsg, field),
             field->message_type(), _item);
       }
       else
       {
         this->FillMsg((*iter),
-            reflection->MutableMessage(&msg, field),
+            reflection->MutableMessage(fillMsg, field),
             field->message_type(), _item);
       }
     }
     else if (field)
     {
-      this->FillMsgField((*iter), &msg, reflection, field);
+      this->FillMsgField((*iter), fillMsg, reflection, field);
     }
     else
     {
@@ -786,10 +746,7 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     }
   }
 
-  // \todo Renable when modifying a model is fixed.
-  // this->modelPub->Publish(msg);
-  gzwarn << "Model modification is currently disabled. "
-         << "Look for this feature in Gazebo 2.0\n";
+  this->modelPub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
@@ -1065,16 +1022,18 @@ void ModelListWidget::FillMsg(QtProperty *_item,
   if (_item->propertyName().toStdString() == "link")
   {
     QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtVariantProperty *idItem =
+        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Link*)(_message))->set_name(nameItem->valueText().toStdString());
-    ((msgs::Link*)(_message))->set_id(
-      gui::get_entity_id(nameItem->valueText().toStdString()));
+    ((msgs::Link*)(_message))->set_id(idItem->value().toInt());
   }
   else if (_item->propertyName().toStdString() == "collision")
   {
     QtProperty *nameItem = this->GetChildItem(_item, "name");
+    QtVariantProperty *idItem =
+        dynamic_cast<QtVariantProperty *>(this->GetChildItem(_item, "id"));
     ((msgs::Collision*)_message)->set_name(nameItem->valueText().toStdString());
-    ((msgs::Collision*)_message)->set_id(
-      gui::get_entity_id(nameItem->valueText().toStdString()));
+    ((msgs::Collision*)(_message))->set_id(idItem->value().toInt());
   }
 
   if (_item->propertyName().toStdString() == "geometry" &&
@@ -1410,6 +1369,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
 
   // Pose value
   topItem = this->variantManager->addProperty(
@@ -1418,6 +1378,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
     _parent->addSubProperty(topItem);
   else
     this->propTreeBrowser->addProperty(topItem);
+  topItem->setEnabled(false);
+
   this->FillPoseProperty(_msg.pose(), topItem);
 
   // Angle
@@ -1431,53 +1393,82 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
       _parent->addSubProperty(item);
     else
       this->propTreeBrowser->addProperty(item);
+    item->setEnabled(false);
   }
 
-  if (_msg.has_axis1())
+  // Add joint axes if present
+  for (int i = 0; i < 2; ++i)
   {
-    // Axis shape value
-    topItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("axis"));
-    if (_parent)
-      _parent->addSubProperty(topItem);
-    else
-      this->propTreeBrowser->addProperty(topItem);
+    const msgs::Axis *axis = NULL;
+    std::string axisName;
 
-    /// XYZ of the axis
-    QtProperty *xyzItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("xyz"));
-    topItem->addSubProperty(xyzItem);
-    this->FillVector3dProperty(_msg.axis1().xyz(), xyzItem);
+    if (i == 0 && _msg.has_axis1())
+    {
+      axis = &(_msg.axis1());
+      axisName = "axis1";
+    }
+    else if (i == 1 && _msg.has_axis2())
+    {
+      axis = &(_msg.axis2());
+      axisName = "axis2";
+    }
 
-    // lower limit
-    item = this->variantManager->addProperty(QVariant::Double, tr("lower"));
-    item->setValue(_msg.axis1().limit_lower());
-    topItem->addSubProperty(item);
+    if (axis)
+    {
+      // Axis shape value
+      topItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr(axisName.c_str()));
+      if (_parent)
+        _parent->addSubProperty(topItem);
+      else
+        this->propTreeBrowser->addProperty(topItem);
+      topItem->setEnabled(false);
 
-    // upper limit
-    item = this->variantManager->addProperty(QVariant::Double, tr("upper"));
-    item->setValue(_msg.axis1().limit_upper());
-    topItem->addSubProperty(item);
+      /// XYZ of the axis
+      QtProperty *xyzItem = this->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("xyz"));
+      topItem->addSubProperty(xyzItem);
+      xyzItem->setEnabled(false);
+      this->FillVector3dProperty(axis->xyz(), xyzItem);
 
-    // limit effort
-    item = this->variantManager->addProperty(QVariant::Double, tr("effort"));
-    item->setValue(_msg.axis1().limit_effort());
-    topItem->addSubProperty(item);
+      // lower limit
+      item = this->variantManager->addProperty(QVariant::Double, tr("lower"));
+      item->setValue(axis->limit_lower());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // limit velocity
-    item = this->variantManager->addProperty(QVariant::Double, tr("velocity"));
-    item->setValue(_msg.axis1().limit_velocity());
-    topItem->addSubProperty(item);
+      // upper limit
+      item = this->variantManager->addProperty(QVariant::Double, tr("upper"));
+      item->setValue(axis->limit_upper());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // damping
-    item = this->variantManager->addProperty(QVariant::Double, tr("damping"));
-    item->setValue(_msg.axis1().damping());
-    topItem->addSubProperty(item);
+      // limit effort
+      item = this->variantManager->addProperty(QVariant::Double, tr("effort"));
+      item->setValue(axis->limit_effort());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
 
-    // friction
-    item = this->variantManager->addProperty(QVariant::Double, tr("friction"));
-    item->setValue(_msg.axis1().friction());
-    topItem->addSubProperty(item);
+      // limit velocity
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("velocity"));
+      item->setValue(axis->limit_velocity());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // damping
+      item = this->variantManager->addProperty(QVariant::Double, tr("damping"));
+      item->setValue(axis->damping());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+
+      // friction
+      item = this->variantManager->addProperty(QVariant::Double,
+                                               tr("friction"));
+      item->setValue(axis->friction());
+      topItem->addSubProperty(item);
+      item->setEnabled(false);
+    }
   }
 }
 
@@ -1489,12 +1480,26 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   QtProperty *inertialItem = NULL;
   QtVariantProperty *item = NULL;
 
+  // id, store it but but make it hidden
+  QtBrowserItem *browserItem = NULL;
+  item = this->variantManager->addProperty(QVariant::String, tr("id"));
+  item->setValue(_msg.id());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  browserItem = this->propTreeBrowser->items(item)[0];
+  this->propTreeBrowser->setItemVisible(browserItem, false);
+
+  // name
   item = this->variantManager->addProperty(QVariant::String, tr("name"));
   item->setValue(_msg.name().c_str());
   if (_parent)
     _parent->addSubProperty(item);
   else
     this->propTreeBrowser->addProperty(item);
+  // TODO: setting link name currently causes problems
+  item->setEnabled(false);
 
   // Self-collide
   item = this->variantManager->addProperty(QVariant::Bool, tr("self_collide"));
@@ -1532,6 +1537,19 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
   else
     this->propTreeBrowser->addProperty(item);
 
+  // canonical
+  item = this->variantManager->addProperty(QVariant::Bool, tr("canonical"));
+  if (_msg.has_canonical())
+    item->setValue(_msg.canonical());
+  else
+    item->setValue(false);
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
+
+  // pose
   topItem = this->variantManager->addProperty(
       QtVariantPropertyManager::groupTypeId(), tr("pose"));
   if (_parent)
@@ -1540,6 +1558,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     this->propTreeBrowser->addProperty(topItem);
 
   this->FillPoseProperty(_msg.pose(), topItem);
+  if (_msg.has_canonical() && _msg.canonical())
+    topItem->setEnabled(false);
 
   // Inertial
   inertialItem = this->variantManager->addProperty(
@@ -1548,6 +1568,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
     _parent->addSubProperty(inertialItem);
   else
     this->propTreeBrowser->addProperty(inertialItem);
+
+  // TODO: disable setting inertial properties until there are tests
+  // in place to verify the functionality
+  inertialItem->setEnabled(false);
 
   // Inertial::Mass
   item = this->variantManager->addProperty(QVariant::Double, tr("mass"));
@@ -1640,6 +1664,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
       this->propTreeBrowser->addProperty(prop);
 
     this->FillPropertyTree(_msg.collision(i), prop);
+
+    // TODO: disable setting collision properties until there are tests
+    // in place to verify the functionality
+    prop->setEnabled(false);
   }
 
   for (int i = 0; i < _msg.visual_size(); i++)
@@ -1654,6 +1682,10 @@ void ModelListWidget::FillPropertyTree(const msgs::Link &_msg,
       this->propTreeBrowser->addProperty(prop);
 
     this->FillPropertyTree(_msg.visual(i), prop);
+
+    // TODO: disable setting visual properties until there are tests
+    // in place to verify the functionality
+    prop->setEnabled(false);
   }
 
   for (int i = 0; i < _msg.sensor_size(); i++)
@@ -1678,6 +1710,18 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
+  // id, store it but but make it hidden
+  QtBrowserItem *browserItem = NULL;
+  item = this->variantManager->addProperty(QVariant::String, tr("id"));
+  item->setValue(_msg.id());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  browserItem = this->propTreeBrowser->items(item)[0];
+  this->propTreeBrowser->setItemVisible(browserItem, false);
+
+  // name
   item = this->variantManager->addProperty(QVariant::String,
                                            tr("name"));
   item->setValue(_msg.name().c_str());
@@ -2017,6 +2061,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
                                            tr("name"));
   item->setValue(_msg.name().c_str());
   this->propTreeBrowser->addProperty(item);
+  // TODO: setting model name currently causes problems
+  item->setEnabled(false);
 
   item = this->variantManager->addProperty(QVariant::Bool,
                                            tr("is_static"));
@@ -2024,6 +2070,8 @@ void ModelListWidget::FillPropertyTree(const msgs::Model &_msg,
     item->setValue(_msg.is_static());
   else
     item->setValue(false);
+  /// \todo Dynamically setting a model static doesn't currently work.
+  item->setEnabled(false);
   this->propTreeBrowser->addProperty(item);
 
   topItem = this->variantManager->addProperty(
@@ -2455,186 +2503,57 @@ void ModelListWidget::FillPropertyTree(const msgs::Physics &_msg,
       QtVariantPropertyManager::groupTypeId(), tr("solver"));
   this->propTreeBrowser->addProperty(solverItem);
 
-  /// switch options below based on physics engine type.
-  if (this->physicsType == msgs::Physics::ODE)
-  {
-    item = this->variantManager->addProperty(QVariant::Bool,
-      tr("inertia ratio reduction"));
-    if (_msg.has_ode() && _msg.ode().has_inertia_ratio_reduction())
-      item->setValue(_msg.ode().iters());
-    solverItem->addSubProperty(item);
+  item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
+  if (_msg.has_iters())
+    item->setValue(_msg.iters());
+  solverItem->addSubProperty(item);
 
-    item = this->variantManager->addProperty(QVariant::Int,
-      tr("extra friction iters"));
-    if (_msg.has_ode() && _msg.ode().has_friction_iters())
-      item->setValue(_msg.ode().friction_iters());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("warm start factor"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_warm_start_factor())
-      item->setValue(_msg.ode().warm_start_factor());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Bool,
-      tr("pgs row reorder"));
-    if (_msg.has_ode() && _msg.ode().has_reorder())
-      item->setValue(_msg.ode().iters());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("contact smoothing"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_contact_residual_smoothing())
-      item->setValue(_msg.ode().contact_residual_smoothing());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
-    if (_msg.has_ode() && _msg.ode().has_iters())
-      item->setValue(_msg.ode().iters());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double, tr("SOR"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_sor())
-      item->setValue(_msg.ode().sor());
-    solverItem->addSubProperty(item);
+  item = this->variantManager->addProperty(QVariant::Double, tr("SOR"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_sor())
+    item->setValue(_msg.sor());
+  solverItem->addSubProperty(item);
 
 
-    QtProperty *constraintsItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("constraints"));
-    this->propTreeBrowser->addProperty(constraintsItem);
+  QtProperty *constraintsItem = this->variantManager->addProperty(
+      QtVariantPropertyManager::groupTypeId(), tr("constraints"));
+  this->propTreeBrowser->addProperty(constraintsItem);
 
-    item = this->variantManager->addProperty(QVariant::Double, tr("CFM"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_cfm())
-      item->setValue(_msg.ode().cfm());
-    constraintsItem->addSubProperty(item);
+  item = this->variantManager->addProperty(QVariant::Double, tr("CFM"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_cfm())
+    item->setValue(_msg.cfm());
+  constraintsItem->addSubProperty(item);
 
-    item = this->variantManager->addProperty(QVariant::Double, tr("ERP"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_erp())
-      item->setValue(_msg.ode().erp());
-    constraintsItem->addSubProperty(item);
+  item = this->variantManager->addProperty(QVariant::Double, tr("ERP"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_erp())
+    item->setValue(_msg.erp());
+  constraintsItem->addSubProperty(item);
 
-    item = this->variantManager->addProperty(QVariant::Double,
-                                             tr("max velocity"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_contact_max_correcting_vel())
-      item->setValue(_msg.ode().contact_max_correcting_vel());
-    constraintsItem->addSubProperty(item);
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("max velocity"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_contact_max_correcting_vel())
+    item->setValue(_msg.contact_max_correcting_vel());
+  constraintsItem->addSubProperty(item);
 
-    item = this->variantManager->addProperty(QVariant::Double,
-                                             tr("surface layer"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_ode() && _msg.ode().has_contact_surface_layer())
-      item->setValue(_msg.ode().contact_surface_layer());
-    constraintsItem->addSubProperty(item);
-  }
-  else if (this->physicsType == msgs::Physics::BULLET)
-  {
-    item = this->variantManager->addProperty(QVariant::Int, tr("iterations"));
-    if (_msg.has_bullet() && _msg.bullet().has_iters())
-      item->setValue(_msg.bullet().iters());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double, tr("SOR"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_bullet() && _msg.bullet().has_sor())
-      item->setValue(_msg.bullet().sor());
-    solverItem->addSubProperty(item);
-
-
-    QtProperty *constraintsItem = this->variantManager->addProperty(
-        QtVariantPropertyManager::groupTypeId(), tr("constraints"));
-    this->propTreeBrowser->addProperty(constraintsItem);
-
-    item = this->variantManager->addProperty(QVariant::Double, tr("CFM"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_bullet() && _msg.bullet().has_cfm())
-      item->setValue(_msg.bullet().cfm());
-    constraintsItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double, tr("ERP"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_bullet() && _msg.bullet().has_erp())
-      item->setValue(_msg.bullet().erp());
-    constraintsItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("surface layer"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_bullet() && _msg.bullet().has_contact_surface_layer())
-      item->setValue(_msg.bullet().contact_surface_layer());
-    constraintsItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Bool,
-      tr("split impulse"));
-    if (_msg.has_bullet() && _msg.bullet().has_split_impulse())
-      item->setValue(_msg.bullet().split_impulse());
-    constraintsItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("split impulse penetration threshold"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_bullet() &&
-      _msg.bullet().has_split_impulse_penetration_threshold())
-      item->setValue(_msg.bullet().split_impulse_penetration_threshold());
-    constraintsItem->addSubProperty(item);
-  }
-  else if (this->physicsType == msgs::Physics::DART)
-  {
-    /// \TODO
-  }
-  else if (this->physicsType == msgs::Physics::SIMBODY)
-  {
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("accuracy"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_simbody() && _msg.simbody().has_accuracy())
-      item->setValue(_msg.simbody().accuracy());
-    solverItem->addSubProperty(item);
-
-    item = this->variantManager->addProperty(QVariant::Double,
-      tr("max transient velocity"));
-    static_cast<QtVariantPropertyManager*>
-      (this->variantFactory->propertyManager(item))->setAttribute(
-          item, "decimals", 6);
-    if (_msg.has_simbody() && _msg.simbody().has_max_transient_velocity())
-      item->setValue(_msg.simbody().max_transient_velocity());
-    solverItem->addSubProperty(item);
-  }
-  else
-  {
-    // custom physics engine?
-  }
+  item = this->variantManager->addProperty(QVariant::Double,
+                                           tr("surface layer"));
+  static_cast<QtVariantPropertyManager*>
+    (this->variantFactory->propertyManager(item))->setAttribute(
+        item, "decimals", 6);
+  if (_msg.has_contact_surface_layer())
+    item->setValue(_msg.contact_surface_layer());
+  constraintsItem->addSubProperty(item);
 }
 
 /////////////////////////////////////////////////

@@ -30,13 +30,13 @@
 
 #include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/Filters.hh"
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/physics/LinkState.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -58,7 +58,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class Link : public Entity
+    class GAZEBO_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.
@@ -290,12 +290,15 @@ namespace gazebo
       public: void SetInertial(const InertialPtr &_inertial);
 
       /// \brief Get the world pose of the link inertia (cog position
-      /// and Moment of Inertia frame).
+      /// and Moment of Inertia frame). This differs from GetWorldCoGPose(),
+      /// which returns the cog position in the link frame
+      /// (not the Moment of Inertia frame).
       /// \return Inertial pose in world frame.
       public: math::Pose GetWorldInertialPose() const;
 
       /// \brief Get the inertia matrix in the world frame.
-      /// \return Inertia matrix in world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
       public: math::Matrix3 GetWorldInertiaMatrix() const;
 
       /// \cond
@@ -468,31 +471,18 @@ namespace gazebo
       /// \brief Returns this link's potential energy,
       /// based on position in world frame and gravity.
       /// \return this link's potential energy,
-      public: double GetWorldEnergyPotential();
+      public: double GetWorldEnergyPotential() const;
 
       /// \brief Returns this link's kinetic energy
+      /// computed using link's CoG velocity in the inertial (world) frame.
       /// \return this link's kinetic energy
-      public: double GetWorldEnergyKinetic();
+      public: double GetWorldEnergyKinetic() const;
 
-      /// \brief Returns this link's total energy
+      /// \brief Returns this link's total energy, or
+      /// sum of Link::GetWorldEnergyPotential() and
+      /// Link::GetWorldEnergyKinetic().
       /// \return this link's total energy
-      public: double GetWorldEnergy();
-
-      /// \brief Returns this link's kinetic energy filtered
-      /// by moving window average.
-      /// \return this link's kinetic energy filtered by moving window average.
-      public: double GetWorldEnergyKineticFiltered();
-
-      /// \brief Returns this link's total energy with kinetic energy filtered
-      /// by moving window average.
-      /// \return this link's filtered total energy.
-      public: double GetWorldEnergyFiltered();
-
-      /// \brief Returns this link's kinetic vibrational
-      /// "thermal" energy.  Where this is basically
-      ///   GetWorldEnergyKinetic() - GetWorldEnergyKineticFilterd()
-      /// \return this link's kinetic vibrational energy
-      public: double GetWorldEnergyKineticVibrational();
+      public: double GetWorldEnergy() const;
 
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
@@ -574,12 +564,6 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
-
-      /// \brief For moving window average of kinetic energy
-      private: filters::MovingWindowFilter<math::Vector3> linVelFil;
-
-      /// \brief For moving window average of kinetic energy
-      private: filters::MovingWindowFilter<math::Vector3> angVelFil;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

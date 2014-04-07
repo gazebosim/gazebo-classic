@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -68,6 +70,17 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
       tracker(system), contact(system, tracker),  integ(NULL)
+      , contactMaterialStiffness(0.0)
+      , contactMaterialDissipation(0.0)
+      , contactMaterialPlasticCoefRestitution(0.0)
+      , contactMaterialPlasticImpactVelocity(0.0)
+      , contactMaterialStaticFriction(0.0)
+      , contactMaterialDynamicFriction(0.0)
+      , contactMaterialViscousFriction(0.0)
+      , contactImpactCaptureVelocity(0.0)
+      , contactStictionTransitionVelocity(0.0)
+      , dynamicsWorld(NULL)
+      , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
   // Instantiate the Simbody Matter Subsystem
@@ -106,11 +119,11 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   /// \TODO: get from sdf for simbody physics
   this->integratorType = "semi_explicit_euler";
 
-  if (this->integratorType == "")
+  if (this->integratorType == "rk_merson")
     this->integ = new SimTK::RungeKuttaMersonIntegrator(system);
-  else if (this->integratorType == "")
+  else if (this->integratorType == "rk3")
     this->integ = new SimTK::RungeKutta3Integrator(system);
-  else if (this->integratorType == "")
+  else if (this->integratorType == "rk2")
     this->integ = new SimTK::RungeKutta2Integrator(system);
   else if (this->integratorType == "semi_explicit_euler")
     this->integ = new SimTK::SemiExplicitEuler2Integrator(system);
@@ -174,11 +187,6 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
-    physicsMsg.mutable_simbody()->set_accuracy(
-      static_cast<double>(this->integ->getAccuracyInUse()));
-    physicsMsg.mutable_simbody()->set_max_transient_velocity(
-      static_cast<double>(this->contact.getTransitionVelocity()));
-
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -193,15 +201,6 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  // Set integrator accuracy (measured with Richardson Extrapolation)
-  if (_msg->has_simbody() && _msg->simbody().has_accuracy())
-    this->integ->setAccuracy(_msg->simbody().accuracy());
-
-  // Set stiction max slip velocity to make it less stiff.
-  if (_msg->has_simbody() && _msg->simbody().has_max_transient_velocity())
-    this->contact.setTransitionVelocity(
-    _msg->simbody().max_transient_velocity());
-
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
@@ -212,17 +211,31 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetTargetRealTimeFactor(_msg->real_time_factor());
 
   if (_msg->has_real_time_update_rate())
-  {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-  }
 
   if (_msg->has_max_step_size())
-  {
     this->SetMaxStepSize(_msg->max_step_size());
+
+  /* below will set accuracy for simbody if the messages exist
+  // Set integrator accuracy (measured with Richardson Extrapolation)
+  if (_msg->has_accuracy())
+  {
+    this->integ->setAccuracy(_msg->simbody().accuracy());
   }
+
+  // Set stiction max slip velocity to make it less stiff.
+  if (_msg->has_max_transient_velocity())
+  {
+    this->contact.setTransitionVelocity(
+    _msg->simbody().max_transient_velocity());
+  }
+  */
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
+
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -553,7 +566,7 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    if (this->simbodyPhysicsInitialized)
+    if (this->simbodyPhysicsInitialized && this->world->GetModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
     else
@@ -786,6 +799,59 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         freeJoint.setDefaultTransform(defX_FM);
         mobod = freeJoint;
       }
+      else if (type == "screw")
+      {
+        UnitVec3 axis(
+          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+
+        double pitch =
+          dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
+
+        if (math::equal(pitch, 0.0))
+        {
+          gzerr << "thread pitch should not be zero (joint is a slider?)"
+                << " using pitch = 1.0e6\n";
+          pitch = 1.0e6;
+        }
+
+        // Simbody's screw joint axis (both rotation and translation) is along Z
+        Rotation R_JZ(axis, ZAxis);
+        Transform X_IF(X_IF0.R()*R_JZ, X_IF0.p());
+        Transform X_OM(X_OM0.R()*R_JZ, X_OM0.p());
+        MobilizedBody::Screw screwJoint(
+            parentMobod,      X_IF,
+            massProps,        X_OM,
+            -1.0/pitch,
+            direction);
+        mobod = screwJoint;
+
+        gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
+
+        double low = gzJoint->GetLowerLimit(0u).Radian();
+        double high = gzJoint->GetUpperLimit(0u).Radian();
+
+        // initialize stop stiffness and dissipation from joint parameters
+        gzJoint->limitForce[0] =
+          Force::MobilityLinearStop(this->forces, mobod,
+          SimTK::MobilizerQIndex(0), gzJoint->GetStopStiffness(0),
+          gzJoint->GetStopDissipation(0), low, high);
+
+        // gzdbg << "SimbodyPhysics SetDamping ("
+        //       << gzJoint->GetDampingCoefficient()
+        //       << ")\n";
+        // Create a damper for every joint even if damping coefficient
+        // is zero.  This will allow user to change damping coefficients
+        // on the fly.
+        gzJoint->damper[0] =
+          Force::MobilityLinearDamper(this->forces, mobod, 0,
+                                   gzJoint->GetDamping(0));
+
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
+      }
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
@@ -831,6 +897,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           gzJoint->damper[nj] =
             Force::MobilityLinearDamper(this->forces, mobod, nj,
                                      gzJoint->GetDamping(nj));
+          // add spring (stiffness proportional to mass)
+          gzJoint->spring[nj] =
+            Force::MobilityLinearSpring(this->forces, mobod, nj,
+              gzJoint->GetStiffness(nj),
+              gzJoint->GetSpringReferencePosition(nj));
         }
       }
       else if (type == "revolute")
@@ -867,11 +938,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "prismatic")
       {
@@ -904,11 +975,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           Force::MobilityLinearDamper(this->forces, mobod, 0,
                                    gzJoint->GetDamping(0));
 
-        #ifdef ADD_JOINT_SPRINGS
-        // KLUDGE add spring (stiffness proportional to mass)
-        Force::MobilityLinearSpring(this->forces, mobod, 0,
-                                    30*massProps.getMass(), 0);
-        #endif
+        // add spring (stiffness proportional to mass)
+        gzJoint->spring[0] =
+          Force::MobilityLinearSpring(this->forces, mobod, 0,
+            gzJoint->GetStiffness(0),
+            gzJoint->GetSpringReferencePosition(0));
       }
       else if (type == "ball")
       {
@@ -1246,17 +1317,29 @@ std::string SimbodyPhysics::GetTypeString(unsigned int _type)
 boost::any SimbodyPhysics::GetParam(const std::string &_key) const
 {
   if (_key == "type")
-    return this->GetType();
-  // else if (_key == "rms_error")
-  //   return dWorldGetQuickStepRMSError(this->worldId);
-  // else if (_key == "constraint_residual")
-  //   return dWorldGetQuickStepConstraintResidual(this->worldId);
-  // else if (_key == "bilateral_residual")
-  //   return dWorldGetQuickStepBilateralResidual(this->worldId);
-  // else if (_key == "contact_residual")
-  //   return dWorldGetQuickStepContactResidual(this->worldId);
-  // else if (_key == "num_contacts")
-  //   return dWorldGetQuickStepNumContacts(this->worldId);
+  {
+    gzwarn << "Please use keyword `solver_typ` in the future.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
+  {
+    return "Spatial Algebra and Elastic Foundation";
+  }
+  else if (_key == "integrator_type")
+  {
+    return this->integratorType;
+  }
+  else if (_key == "accuracy")
+  {
+    if (this->integ)
+      return this->integ->getAccuracyInUse();
+    else
+      return 0.0f;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    return this->contact.getTransitionVelocity();
+  }
   else
   {
     gzwarn << "key [" << _key
@@ -1265,3 +1348,63 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   }
 }
 
+//////////////////////////////////////////////////
+bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1116
+  if (_key == "accuracy")
+  {
+    int value;
+    try
+    {
+      value = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_transient_velocity")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in Simbody to [" << value
+          << "] not yet supported.\n";
+    return false;
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in Simbody" << std::endl;
+    return false;
+  }
+  // should never get here
+  return false;
+}

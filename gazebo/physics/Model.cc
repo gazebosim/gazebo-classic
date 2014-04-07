@@ -1051,65 +1051,39 @@ size_t Model::GetGripperCount() const
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergyPotential()
+double Model::GetWorldEnergyPotential() const
 {
   double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
+  for (Link_V::const_iterator iter = this->links.begin();
     iter != this->links.end(); ++iter)
+  {
     e += (*iter)->GetWorldEnergyPotential();
-  for (Joint_V::iterator iter = this->joints.begin();
+  }
+  for (Joint_V::const_iterator iter = this->joints.begin();
     iter != this->joints.end(); ++iter)
+  {
     for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    {
       e += (*iter)->GetWorldEnergyPotentialSpring(j);
+    }
+  }
   return e;
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergyKinetic()
+double Model::GetWorldEnergyKinetic() const
 {
   double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
+  for (Link_V::const_iterator iter = this->links.begin();
     iter != this->links.end(); ++iter)
+  {
     e += (*iter)->GetWorldEnergyKinetic();
+  }
   return e;
 }
 
 /////////////////////////////////////////////////
-double Model::GetWorldEnergy()
+double Model::GetWorldEnergy() const
 {
-  double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
-    e += (*iter)->GetWorldEnergy();
-  return e;
-}
-
-/////////////////////////////////////////////////
-double Model::GetWorldEnergyKineticFiltered()
-{
-  double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
-    e += (*iter)->GetWorldEnergyKineticFiltered();
-  return e;
-}
-
-/////////////////////////////////////////////////
-double Model::GetWorldEnergyFiltered()
-{
-  double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
-    e += (*iter)->GetWorldEnergyFiltered();
-  return e;
-}
-
-/////////////////////////////////////////////////
-double Model::GetWorldEnergyKineticVibrational()
-{
-  double e = 0;
-  for (Link_V::iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
-    e += (*iter)->GetWorldEnergyKineticVibrational();
-  return e;
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }

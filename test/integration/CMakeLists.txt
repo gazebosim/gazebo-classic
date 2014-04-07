@@ -27,15 +27,25 @@ if(HAVE_DART)
 endif()
 
 set(tests
+  aero_plugin.cc
   bandwidth.cc
+  concave_mesh.cc
   contact_sensor.cc
   dem.cc
   factory.cc
   file_handling.cc
   gripper.cc
+  gz_joint.cc
+  gz_log.cc
+  gz_model.cc
+  gz_physics.cc
+  gz_world.cc
   imu.cc
+  joint_controller.cc
   joint_force_torque.cc
+  joint_gearbox.cc
   joint_revolute.cc
+  joint_screw.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
@@ -43,7 +53,6 @@ set(tests
   model_database.cc
   noise.cc
   nondefault_world.cc
-  pgs_tests.cc
   physics.cc
   physics_friction.cc
   physics_link.cc
@@ -58,6 +67,7 @@ set(tests
   transceiver.cc
   transport.cc
   world.cc
+  world_entity_below_point.cc
   worlds_installed.cc
   )
 
@@ -81,11 +91,12 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  camera.cc
   camera_sensor.cc
-  multicamera_sensor.cc
   gpu_laser.cc
-  camera_follow.cc
+  gz_camera.cc
   heightmap.cc
+  multicamera_sensor.cc
   ogre_log.cc
   pr2.cc
   projector.cc

@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class Matrix3 Matrix3hh math/gzmath.hh
     /// \brief A 3x3 matrix class
-    class Matrix3
+    class GAZEBO_VISIBLE Matrix3
     {
       /// \brief Constructor
       public: Matrix3();
@@ -186,6 +187,12 @@ namespace gazebo
 
               return _out;
             }
+
+      /// \brief Identity matrix
+      public: static const Matrix3 IDENTITY;
+
+      /// \brief Zero matrix
+      public: static const Matrix3 ZERO;
 
       /// \brief the 3x3 matrix
       protected: double m[3][3];

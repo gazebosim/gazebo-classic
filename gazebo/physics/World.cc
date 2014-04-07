@@ -669,15 +669,6 @@ void World::Update()
     // This must be called directly after PhysicsEngine::UpdateCollision.
     this->physicsEngine->UpdatePhysics();
 
-    /* debug rms_error, using sphere_stack.world
-    double *rmsError = boost::any_cast<double*>(
-      this->physicsEngine->GetParam("rms_error"));
-    gzerr << "rms [" << rmsError[0]
-          << ", " << rmsError[1]
-          << ", " << rmsError[2]
-          << "]\n";
-    */
-
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
     // do this after physics update as
@@ -787,7 +778,10 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(_name);
+  if (this->rootElement)
+    return this->rootElement->GetByName(_name);
+  else
+    return BasePtr();
 }
 
 /////////////////////////////////////////////////

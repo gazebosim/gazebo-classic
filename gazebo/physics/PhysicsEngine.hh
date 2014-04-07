@@ -28,6 +28,7 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -40,7 +41,7 @@ namespace gazebo
 
     /// \class PhysicsEngine PhysicsEngine.hh physics/physics.hh
     /// \brief Base class for a physics engine.
-    class PhysicsEngine
+    class GAZEBO_VISIBLE PhysicsEngine
     {
       /// \brief Default constructor.
       /// \param[in] _world Pointer to the world.
@@ -170,19 +171,21 @@ namespace gazebo
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSPreconIters(unsigned int _iters);
+      public: virtual void SetSORPGSPreconIters(unsigned int _iters)
+              GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _iter Number of iterations.
-      public: virtual void SetSORPGSIters(unsigned int _iters);
+      public: virtual void SetSORPGSIters(unsigned int _iters)
+              GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief Access functions to set ODE parameters.
       /// \param[in] _w SORPGSW value.
-      public: virtual void SetSORPGSW(double _w);
+      public: virtual void SetSORPGSW(double _w) GAZEBO_DEPRECATED(3.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -224,19 +227,22 @@ namespace gazebo
       /// property map
       /// \brief access functions to set ODE parameters.
       /// \return SORPGS precondition iterations.
-      public: virtual int GetSORPGSPreconIters() {return 0;}
+      public: virtual int GetSORPGSPreconIters() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
       /// \brief access functions to set ODE parameters.
       /// \return SORPGS iterations.
-      public: virtual int GetSORPGSIters() {return 0;}
+      public: virtual int GetSORPGSIters() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
       /// \brief access functions to set ODE parameters
       /// \return SORPGSW value.
-      public: virtual double GetSORPGSW() {return 0;}
+      public: virtual double GetSORPGSW() GAZEBO_DEPRECATED(3.0)
+              {return 0;}
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map.
@@ -256,88 +262,44 @@ namespace gazebo
       /// \return Maximum number of allows contacts.
       public: virtual unsigned int GetMaxContacts() {return 0;}
 
-      /// \brief Set a parameter of the physics engine
+      /// \brief Set a parameter of the physics engine.
+      /// See SetParam documentation for descriptions of duplicate parameters.
       /// \param[in] _key String key
       /// Below is a list of _key parameter definitions:
-      ///   - ode
-      ///       -# "type" - returns "ode"
-      ///       -# "cfm" - global CFM
-      ///       -# "erp" - global ERP
-      ///       -# "precon_iters" - precondition iterations (experimental).
-      ///       -# "iters" - number of LCP iterations.
-      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" - truncates correction
-      ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
-      ///          depths below this value.
-      ///       -# "max_contacts" - max number of contact constratins between
-      ///          pairs of collision bodies.
-      ///       -# "min_step_size" - physics step size
-      ///       -# "rms_error_tolerance" - threshold for stopping PGS.
-      ///          if total RMS error < this value, stop PGS iterations.
-      ///       -# "inertia_ratio_reduction" -
-      ///          turn on/off quickstep inertia reduction  (experimental).
-      ///       -# "contact_residual_smoothing" -
-      ///          option to smooth friction residuals (experimental).
-      ///       -# "experimental_row_reordering"
-      ///          if true, reorder constraint rows with the following order:
-      ///          bilateral constrains, contact normal constraints
-      ///          and lastly frictional constraints (experimental).
-      ///       -# "warm_start_factor" -
-      ///          relaxation factor for warm starting bilateral constraints
-      ///          from last time step's value (experimental).
-      ///       -# "extra_friction_iterations" -
-      ///          extra PGS iterations on only the frictional constraints
+      ///       -# "solver_type" (string) - returns solver used by engine, e.g.
+      ///          "sequential_impulse' for Bullet, "quick" for ODE
+      ///          "Featherstone and Lemkes" for DART and
+      ///          "Spatial Algebra and Elastic Foundation" for Simbody.
+      ///       -# "type" (string) - deprecated, use keyword "solver_type".
+      ///       -# "cfm" (double) - global CFM
+      ///       -# "erp" (double) - global ERP
+      ///       -# "precon_iters" (bool) - precondition iterations
       ///          (experimental).
+      ///       -# "iters" (int) - number of LCP PGS iterations. If
+      ///          sor_lcp_tolerance is negative, full iteration count is
+      ///          executed.  Otherwise, PGS may stop iteration early if
+      ///          sor_lcp_tolerance is satisfied by the total RMS residual.
+      ///       -# "sor" (double) - relaxation parameter for Projected
+      ///          Gauss-Seidel (PGS) updates.
+      ///       -# "contact_max_correcting_vel" (double) - truncates correction
+      ///          impulses from ERP by this value.
+      ///       -# "contact_surface_layer" (double) - ERP is 0 for
+      ///          interpenetration depths below this value.
+      ///       -# "max_contacts" (int) - max number of contact constraints
+      ///          between any pair of collision bodies.
+      ///       -# "min_step_size" (double) - minimum internal step size.
+      ///          (defined but not used in ode).
+      ///       -# "max_step_size" (double) - maximum physics step size when
+      ///          physics update step must return.
       ///
       /// \param[in] _value The value to set to
-      public: virtual void SetParam(const std::string &_key,
+      /// \return true if SetParam is successful, false if operation fails.
+      public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
       /// \brief Get an parameter of the physics engine
       /// \param[in] _attr String key
-      /// Below is a list of _key parameter definitions:
-      ///   - ode
-      ///       -# "type" - returns "ode"
-      ///       -# "cfm" - global CFM
-      ///       -# "erp" - global ERP
-      ///       -# "precon_iters" - precondition iterations (experimental).
-      ///       -# "iters" - number of LCP iterations.
-      ///       -# "sor" - relaxation parameter for Gauss-Seidel updates.
-      ///       -# "contact_max_correcting_vel" - truncates correction
-      ///          impulses from ERP by this value.
-      ///       -# "contact_surface_layer" - ERP is 0 for interpenetration
-      ///          depths below this value.
-      ///       -# "max_contacts" - max number of contact constratins between
-      ///          pairs of collision bodies.
-      ///       -# "min_step_size" - physics step size
-      ///       -# "rms_error_tolerance" - threshold for stopping PGS.
-      ///       -# "rms_error" - RMS of dlambda at the end of time step
-      ///          error[0]: bilateral constraints
-      ///          error[1]: contact normal constraints
-      ///          error[2]: friciton constraints
-      ///          error[3]: all constraints
-      ///       -# "constraint_residual" - RMS of residuals: Jv
-      ///          residual[0]: bilateral constraints
-      ///          residual[1]: contact normal constraints
-      ///          residual[2]: friciton constraints
-      ///          residual[3]: all constraints
-      ///       -# "num_contacts"
-      ///       -# "inertia_ratio_reduction"
-      ///          turn on/off quickstep inertia reduction  (experimental).
-      ///       -# "contact_residual_smoothing"
-      ///          option to smooth friction residuals (experimental).
-      ///       -# "experimental_row_reordering"
-      ///          true if reorder constraint rows with the following order:
-      ///          bilateral constrains, contact normal constraints
-      ///          and lastly frictional constraints (experimental).
-      ///       -# "warm_start_factor"
-      ///          relaxation factor for warm starting bilateral constraints
-      ///          from last time step's value (experimental).
-      ///       -# "extra_friction_iterations"
-      ///          extra PGS iterations on only the frictional constraints
-      ///          (experimental).
-      ///
+      /// \sa SetParam
       /// \return The value of the parameter
       public: virtual boost::any GetParam(const std::string &_key) const;
 

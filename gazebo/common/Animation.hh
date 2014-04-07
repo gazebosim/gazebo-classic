@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +44,7 @@ namespace gazebo
     /// \class Animation Animation.hh common/common.hh
     /// \brief Manages an animation, which is a collection of keyframes and
     /// the ability to interpolate between the keyframes
-    class Animation
+    class GAZEBO_VISIBLE Animation
     {
       /// \brief Constructor
       /// \param[in] _name Name of the animation, should be unique
@@ -121,7 +122,7 @@ namespace gazebo
     /// \{
 
     /// \brief A pose animation.
-    class PoseAnimation : public Animation
+    class GAZEBO_VISIBLE PoseAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.
@@ -163,7 +164,7 @@ namespace gazebo
     /// \{
 
     /// \brief A numeric animation.
-    class NumericAnimation : public Animation
+    class GAZEBO_VISIBLE NumericAnimation : public Animation
     {
       /// \brief Constructor
       /// \param[in] _name String name of the animation. This should be unique.

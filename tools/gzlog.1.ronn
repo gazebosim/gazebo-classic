@@ -1,4 +1,4 @@
-gzlog -- Tool to instrospect Gazebo log files
+gzlog -- DEPRECATED(see 'gz help log')
 =============================================
 
 ## SYNOPSIS

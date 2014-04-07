@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _JOINT_HH_
-#define _JOINT_HH_
+#ifndef _GAZEBO_JOINT_HH_
+#define _GAZEBO_JOINT_HH_
 
 #include <string>
 #include <vector>
@@ -36,6 +31,7 @@
 #include "gazebo/physics/JointState.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/util/system.hh"
 
 /// \brief maximum number of axis per joint anticipated.
 /// Currently, this is 2 as 3-axis joints (e.g. ball)
@@ -51,7 +47,7 @@ namespace gazebo
 
     /// \class Joint Joint.hh physics/physics.hh
     /// \brief Base class for all joints
-    class Joint : public Base
+    class GAZEBO_VISIBLE Joint : public Base
     {
       /// \enum Attribute
       /// \brief Joint attribute types.
@@ -111,6 +107,9 @@ namespace gazebo
 
       /// \brief Initialize a joint.
       public: virtual void Init();
+
+      /// \brief Finialize the object
+      public: virtual void Fini();
 
       /// \brief Update the joint.
       public: void Update();
@@ -172,11 +171,12 @@ namespace gazebo
       public: double GetDamping(unsigned int _index);
 
       /// \brief Callback to apply damping force to joint.
-      /// Deprecated by ApplyStiffnessDamping.
+      /// Deprecated by ApplySpringStiffnessDamping.
       public: virtual void ApplyDamping() GAZEBO_DEPRECATED(3.0);
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
+      /// \TODO: rename to ApplySpringStiffnessDamping()
       public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the joint spring stiffness.
@@ -184,6 +184,7 @@ namespace gazebo
       ///                   implemented.
       /// \param[in] _stiffness Stiffness value for the axis.
       /// \param[in] _reference Spring zero load reference position.
+      /// \TODO: rename to SetSpringStiffnessDamping()
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0) = 0;
 
@@ -191,6 +192,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _stiffness Spring stiffness value for the axis.
+      /// \TODO: rename to SetSpringStiffness()
       public: virtual void SetStiffness(unsigned int _index,
                                         double _stiffness) = 0;
 
@@ -198,7 +200,14 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
+      /// \TODO: rename to GetSpringStiffness()
       public: double GetStiffness(unsigned int _index);
+
+      /// \brief Get joint spring reference position.
+      /// \param[in] _index Index of the axis to get.
+      /// \return Joint spring reference position
+      /// (in radians for angular joints).
+      public: double GetSpringReferencePosition(unsigned int _index) const;
 
       /// \brief Connect a boost::slot the the joint update signal.
       /// \param[in] _subscriber Callback for the connection.
@@ -237,13 +246,13 @@ namespace gazebo
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                                        const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
@@ -392,16 +401,33 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value) = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// Deprecated by bool SetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value) = 0;
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index) = 0;
+
+      /// \brief Get a non-generic parameter for the joint.
+      /// Deprecated by GetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -415,21 +441,25 @@ namespace gazebo
       /// \param[out] _msg Message to fill with this joint's properties.
       public: void FillMsg(msgs::Joint &_msg);
 
-      /// \brief Computes MOI inertia across joint DOF axis given index.
-      /// The inertia ratio for each joint across joint axis
-      /// gives a sense of how sensitive the joint being controlled
-      /// is to joint actuation torques.
+      /// \brief Computes moment of inertia (MOI) across a specified joint axis.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The inertia ratio for each joint axis indicates the sensitivity
+      /// of the joint to actuation torques.
       /// \param[in] _index axis number about which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(unsigned int _index) const;
+      public: double GetInertiaRatio(const unsigned int _index) const;
 
-      /// \brief Computes MOI inertia across an arbitrary axis.
-      /// The inertia ratio for each joint across constrained direction
-      /// gives a sense of how well this model will perform using PGS-type
+      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
+      /// specified in the world frame.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The moment of inertia ratio along constrained directions of a joint
+      /// has an impact on the performance of Projected Gauss Seidel (PGS)
       /// iterative LCP methods.
-      /// \param[in] _axis axis about which MOI ratio is computed.
+      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(math::Vector3 _axis) const;
+      public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
@@ -519,13 +549,9 @@ namespace gazebo
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
-      /// \brief Get spring reference (neutral) position
-      /// \param[in] _index joint axis index.
-      /// \return reference position
-      public: double GetSpringReferencePosition(unsigned int _index) const;
-
       /// \brief Returns this joint's spring potential energy,
-      /// based on reference position.
+      /// based on the reference position of the spring.
+      /// If using metric system, the unit of energy will be Joules.
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
 

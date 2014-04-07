@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -146,9 +141,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[0] = limitElem->Get<double>("upper");
+      this->lowerLimit[0] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[0] = limitElem->Get<double>("stiffness");
       this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[0] = limitElem->Get<double>("effort");
+      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
   if (_sdf->HasElement("axis2"))
@@ -165,9 +166,15 @@ void Joint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
+      // store upper and lower joint limits
+      this->upperLimit[1] = limitElem->Get<double>("upper");
+      this->lowerLimit[1] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
       this->stopStiffness[1] = limitElem->Get<double>("stiffness");
       this->stopDissipation[1] = limitElem->Get<double>("dissipation");
+      // store joint effort and velocity limits
+      this->effortLimit[1] = limitElem->Get<double>("effort");
+      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -275,19 +282,12 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->Get<double>("upper");
-      this->lowerLimit[0] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(0, this->upperLimit[0].Radian());
       this->SetLowStop(0, this->lowerLimit[0].Radian());
       this->SetHighStop(0, this->upperLimit[0].Radian());
-
-      this->effortLimit[0] = limitElem->Get<double>("effort");
-      this->velocityLimit[0] = limitElem->Get<double>("velocity");
     }
   }
 
@@ -299,25 +299,31 @@ void Joint::Init()
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
-      // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->Get<double>("upper");
-      this->lowerLimit[1] = limitElem->Get<double>("lower");
-
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
       this->SetHighStop(1, this->upperLimit[1].Radian());
       this->SetLowStop(1, this->lowerLimit[1].Radian());
       this->SetHighStop(1, this->upperLimit[1].Radian());
-
-      this->effortLimit[1] = limitElem->Get<double>("effort");
-      this->velocityLimit[1] = limitElem->Get<double>("velocity");
     }
   }
 
   // Set parent name: if parentLink is NULL, it's name be the world
   if (!this->parentLink)
     this->sdf->GetElement("parent")->Set("world");
+}
+
+//////////////////////////////////////////////////
+void Joint::Fini()
+{
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
+
+  Base::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -432,13 +438,10 @@ void Joint::FillMsg(msgs::Joint &_msg)
   if (this->HasType(Base::HINGE_JOINT))
   {
     _msg.set_type(msgs::Joint::REVOLUTE);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::HINGE2_JOINT))
   {
     _msg.set_type(msgs::Joint::REVOLUTE2);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
   else if (this->HasType(Base::BALL_JOINT))
   {
@@ -447,33 +450,39 @@ void Joint::FillMsg(msgs::Joint &_msg)
   else if (this->HasType(Base::SLIDER_JOINT))
   {
     _msg.set_type(msgs::Joint::PRISMATIC);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::SCREW_JOINT))
   {
     _msg.set_type(msgs::Joint::SCREW);
-    _msg.add_angle(this->GetAngle(0).Radian());
   }
   else if (this->HasType(Base::GEARBOX_JOINT))
   {
     _msg.set_type(msgs::Joint::GEARBOX);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
   else if (this->HasType(Base::UNIVERSAL_JOINT))
   {
     _msg.set_type(msgs::Joint::UNIVERSAL);
-    _msg.add_angle(this->GetAngle(0).Radian());
-    _msg.add_angle(this->GetAngle(1).Radian());
   }
 
-  msgs::Set(_msg.mutable_axis1()->mutable_xyz(), this->GetLocalAxis(0));
-  _msg.mutable_axis1()->set_limit_lower(0);
-  _msg.mutable_axis1()->set_limit_upper(0);
-  _msg.mutable_axis1()->set_limit_effort(0);
-  _msg.mutable_axis1()->set_limit_velocity(0);
-  _msg.mutable_axis1()->set_damping(0);
-  _msg.mutable_axis1()->set_friction(0);
+  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    _msg.add_angle(this->GetAngle(i).Radian());
+    msgs::Axis *axis;
+    if (i == 0)
+      axis = _msg.mutable_axis1();
+    else if (i == 1)
+      axis = _msg.mutable_axis2();
+    else
+      break;
+
+    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i));
+    axis->set_limit_lower(this->GetLowStop(i).Radian());
+    axis->set_limit_upper(this->GetHighStop(i).Radian());
+    axis->set_limit_effort(this->GetEffortLimit(i));
+    axis->set_limit_velocity(this->GetVelocityLimit(i));
+    axis->set_damping(this->GetDamping(i));
+    axis->set_friction(0);
+  }
 
   if (this->GetParent())
   {
@@ -523,15 +532,21 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
+  // switch below to return this->SetUpperLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle);
+  // switch below to return this->SetLowerLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -611,7 +626,7 @@ void Joint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(math::Vector3 _axis) const
+double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
@@ -619,14 +634,21 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
     math::Matrix3 cm = this->childLink->GetWorldInertiaMatrix();
 
     // matrix times axis
-    // \todo: add operator in Matrix3 class so we can do Matrix3 * Vector3
     math::Vector3 pia = pm * _axis;
     math::Vector3 cia = cm * _axis;
     double piam = pia.GetLength();
     double ciam = cia.GetLength();
 
     // return ratio of child MOI to parent MOI.
-    return ciam/piam;
+    if (!math::equal(piam, 0.0))
+    {
+      return ciam/piam;
+    }
+    else
+    {
+      gzerr << "Parent MOI is zero, ratio is not well defined.\n";
+      return 0;
+    }
   }
   else
   {
@@ -637,18 +659,14 @@ double Joint::GetInertiaRatio(math::Vector3 _axis) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetInertiaRatio(unsigned int _index) const
+double Joint::GetInertiaRatio(const unsigned int _index) const
 {
   if (this->parentLink && this->childLink)
   {
     if (_index < this->GetAngleCount())
     {
-      // get parent model pose
-      math::Pose pose = this->model->GetWorldPose();
-
-      // rotate joint axis in local frame into global frame
-      math::Vector3 axis = this->GetLocalAxis(_index);
-      axis = pose.rot.RotateVectorReverse(axis);
+      // joint axis in global frame
+      math::Vector3 axis = this->GetGlobalAxis(_index);
 
       // compute ratio about axis
       return this->GetInertiaRatio(axis);
@@ -694,6 +712,21 @@ double Joint::GetStiffness(unsigned int _index)
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get stiffness coefficient.\n";
+    return 0;
+  }
+}
+
+//////////////////////////////////////////////////
+double Joint::GetSpringReferencePosition(unsigned int _index) const
+{
+  if (_index < this->GetAngleCount())
+  {
+    return this->springReferencePosition[_index];
+  }
+  else
+  {
+    gzerr << "Invalid joint index [" << _index
+          << "] when trying to get spring reference position.\n";
     return 0;
   }
 }
@@ -909,18 +942,6 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double Joint::GetSpringReferencePosition(unsigned int _index) const
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Get spring potential error, _index[" << _index
-          << "] out of range" << std::endl;
-    return 0;
-  }
-  return this->springReferencePosition[_index];
-}
-
-//////////////////////////////////////////////////
 double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
@@ -931,7 +952,9 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   }
 
   // compute potential energy due to spring compression
-  return this->stiffnessCoefficient[_index] *
-    fabs(this->GetAngle(_index).Radian() -
-    this->springReferencePosition[_index]);
+  // 1/2 k x^2
+  double k = this->stiffnessCoefficient[_index];
+  double x = this->GetAngle(_index).Radian() -
+    this->springReferencePosition[_index];
+  return 0.5 * k * x * x;
 }

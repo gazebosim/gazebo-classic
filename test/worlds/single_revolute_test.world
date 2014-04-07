@@ -1,0 +1,72 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <model name="model">
+      <pose>0.0 0.0 10.1 0 0.0 0.0</pose>
+      <link name="link_1">
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>10.0</mass>
+        </inertial>
+        <visual name="visual_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 -5.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>10.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Red</script>
+          </material>
+        </visual>
+        <collision name="collision_sphere">
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+      </link>
+
+      <joint name="joint" type="revolute">
+        <parent>world</parent>
+        <child>link_1</child>
+        <axis>
+          <xyz>1.0 0.0 0.0</xyz>
+        </axis>
+      </joint>
+    </model>
+  </world>
+</sdf>
