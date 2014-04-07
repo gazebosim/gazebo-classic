@@ -31,6 +31,24 @@
     + ***Deprecation*** virtual double GetSORPGSW()
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
 
+1. **gazebo/physics/bullet/BulletPhysics.hh**
+    + ***Deprecation*** virtual bool SetParam(BulletParam _param, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+    ---
+    + ***Deprecation*** virtual boost::any GetParam(BulletParam _param) const
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+
+1. **gazebo/physics/ode/ODEPhysics.hh**
+    + ***Deprecation*** virtual bool SetParam(ODEParam _param, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
+    ---
+    + ***Deprecation*** virtual boost::any GetParam(ODEParam _param) const
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + ***Deprecation*** virtual boost::any GetParam(DARTParam _param) const
+    + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
+
 ### Modifications
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
@@ -116,6 +134,7 @@
     + void RemoveFilter(const std::string &_name);
 
 1. **gazebo/physics/Joint.hh**
+    + virtual void Fini()
     + math::Pose GetAnchorErrorPose() const
     + math::Quaternion GetAxisFrame(unsigned int _index) const
     + double GetWorldEnergyPotentialSpring(unsigned int _index) const
@@ -131,19 +150,13 @@
 
 1. **gazebo/physics/Link.hh**
     + double GetWorldEnergy() const
-    + double GetWorldEnergyFiltered() const
     + double GetWorldEnergyKinetic() const
-    + double GetWorldEnergyKineticFiltered() const
-    + double GetWorldEnergyKineticVibrational() const
     + double GetWorldEnergyPotential() const
     + bool initialized
 
 1. **gazebo/physics/Model.hh**
     + double GetWorldEnergy() const
-    + double GetWorldEnergyFiltered() const
     + double GetWorldEnergyKinetic() const
-    + double GetWorldEnergyKineticFiltered() const
-    + double GetWorldEnergyKineticVibrational() const
     + double GetWorldEnergyPotential() const
 
 1. **gazebo/physics/SurfaceParams.hh**
