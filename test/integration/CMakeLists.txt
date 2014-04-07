@@ -54,6 +54,7 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_basic_controller_response.cc
   physics_friction.cc
   physics_link.cc
   physics_msgs.cc
