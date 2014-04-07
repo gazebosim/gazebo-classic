@@ -1,0 +1,16 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PhysicsBullet
+/// \brief A message containing description of the physics parameters for Bullet
+
+message PhysicsBullet
+{
+  optional int32 iters                                = 1;
+  optional double sor                                 = 2;
+  optional double cfm                                 = 3;
+  optional double erp                                 = 4;
+  optional double contact_surface_layer               = 5;
+  optional bool split_impulse                         = 6;
+  optional double split_impulse_penetration_threshold = 7;
+}
