@@ -48,6 +48,20 @@ void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+math::Vector3 DARTScrewJoint::GetAnchor(unsigned int /*index*/) const
+{
+  gzerr << "DARTScrewJoint::GetAnchor not implemented, return 0 vector.\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void DARTScrewJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &/*_anchor*/)
+{
+  gzerr << "DARTScrewJoint::SetAnchor not implemented.\n";
+}
+
+//////////////////////////////////////////////////
 void DARTScrewJoint::Init()
 {
   ScrewJoint<DARTJoint>::Init();
@@ -129,6 +143,12 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 }
 
 //////////////////////////////////////////////////
+void DARTScrewJoint::SetThreadPitch(double _threadPitch)
+{
+  this->SetThreadPitch(0, _threadPitch);
+}
+
+//////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
   double result = 0.0;
@@ -139,6 +159,12 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
 
   return result;
+}
+
+//////////////////////////////////////////////////
+double DARTScrewJoint::GetThreadPitch()
+{
+  return this->GetThreadPitch(0);
 }
 
 //////////////////////////////////////////////////

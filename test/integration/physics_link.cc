@@ -134,6 +134,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   math::Vector3 pos = link->GetWorldPose().pos;
   if (_physicsEngine.compare("bullet") == 0)
   {
+    /// \TODO skipping bullet, see issue #1081
     gzerr << "Bullet seems to be off by one time step (#1081)"
           << std::endl;
     time -= dt;

@@ -8,9 +8,21 @@
     ---
     + ***Deprecation*** double GetDampingCoefficient() const
     + ***Replacement*** double GetDamping(int _index)
+
 1. **gazebo/physics/ode/ODEJoint.hh**
     + ***Deprecation*** void CFMDamping()
     + ***Replacement*** void ApplyImplicitStiffnessDamping()
+
+1. **gazebo/physics/ScrewJoint.hh**
+    + ***Deprecation*** virtual void SetThreadPitch(unsigned int _index, double _threadPitch) = 0
+    + ***Replacement*** virtual void SetThreadPitch(double _threadPitch) = 0
+    ---
+    + ***Deprecation*** virtual void GetThreadPitch(unsigned int _index) = 0
+    + ***Replacement*** virtual void GetThreadPitch() = 0
+
+1. **gazebo/physics/bullet/BulletScrewJoint.hh**
+    + ***Deprecation*** protected: virtual void Load(sdf::ElementPtr _sdf)
+    + ***Replacement*** public: virtual void Load(sdf::ElementPtr _sdf)
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation*** virtual void SetSORPGSPreconIters(unsigned int _iters)
@@ -49,7 +61,79 @@
     + ***Deprecation*** virtual boost::any GetParam(DARTParam _param) const
     + ***Replacement*** virtual boost::any GetParam(const std::string &_key) const
 
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index) = 0
+    + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index) = 0;
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/bullet/BulletScrewJoint.hh**
+    + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
+ 
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/ode/ODEScrewJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
+    + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value) = 0
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value) = 0
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEScrewJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + ***Deprecation*** virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
+    + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
+
 ### Modifications
+1. **gazebo/physics/Box.hh**
+    + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
+    + ***Replacement:***  bool operator==(const Box &_b) const
+
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -71,7 +155,7 @@
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **gazebo/transport/TransportIface.hh**
     + ***Removed:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0) `ABI change`
-    + ***Replacement:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0, uint32_t _timeoutIterations = 30);
+    + ***Replacement:*** bool init(const std::string &_masterHost = "", unsigned int _masterPort = 0, uint32_t _timeoutIterations = 30)
     + ***Note:*** No changes to downstream code required. A third parameter has been added that specifies the number of timeout iterations. This parameter has a default value of 30.
 1. **gazebo/transport/Publication.hh**
     + ***Removed:*** void Publish(MessagePtr _msg, boost::function<void(uint32_t)> _cb, uint32_t _id) `ABI change`
@@ -121,7 +205,120 @@
     + ***Removed*** virtual void SetParam(const std::string &_key, const boost::any &_value)
     + ***Replacement*** virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
+1. **gazebo/physics/BallJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
+ 
+1. **gazebo/physics/Joint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletBallJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+ 
+1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletHingeJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletScrewJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletSliderJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/bullet/BulletUniversalJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/ode/ODEJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/ode/ODEUniversalJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/simbody/SimbodyJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    ---
+    + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+
 ### Additions
+
+1. **gazebo/physics/JointController.hh**
+      + common::Time GetLastUpdateTime() const
+      + std::map<std::string, JointPtr> GetJoints() const
+      + bool SetPositionTarget(const std::string &_jointName, double _target)
+      + bool SetVelocityTarget(const std::string &_jointName, double _target)
+      + std::map<std::string, common::PID> GetPositionPIDs() const
+      + std::map<std::string, common::PID> GetVelocityPIDs() const
+      + std::map<std::string, double> GetForces() const
+      + std::map<std::string, double> GetPositions() const
+      + std::map<std::string, double> GetVelocities() const
+
+
+1. **gazebo/common/PID.hh**
+      + double GetPGain() const
+      + double GetIGain() const
+      + double GetDGain() const
+      + double GetIMax() const
+      + double GetIMin() const
+      + double GetCmdMax() const
+      + double GetCmdMin() const
+
 
 1. **gazebo/transport/TransportIface.hh**
     +  transport::ConnectionPtr connectToMaster()
@@ -130,8 +327,8 @@
     +  msgs::Scene GetSceneMsg() const
 1. **gazebo/physics/ContactManager.hh**
     + unsigned int GetFilterCount()
-    + bool HasFilter(const std::string &_name);
-    + void RemoveFilter(const std::string &_name);
+    + bool HasFilter(const std::string &_name)
+    + void RemoveFilter(const std::string &_name)
 
 1. **gazebo/physics/Joint.hh**
     + virtual void Fini()
@@ -216,6 +413,22 @@
     + virtual void SetAttribute(const std::string &_key, unsigned int _index, const boost::any &_value)
     + virtual double GetAttribute(const std::string &_key, unsigned int _index)
 
+1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
+    + virtual void SetThreadPitch(double _threadPitch)
+    + virtual void GetThreadPitch() 
+
+1. **gazebo/physics/ode/ODEScrewJoint.hh**
+    + virtual void SetThreadPitch(double _threadPitch)
+    + virtual void GetThreadPitch() 
+
+1. **gazebo/physics/ScrewJoint.hh**
+    + virtual math::Vector3 GetAnchor(unsigned int _index) const
+    + virtual void SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
+
+1. **gazebo/physics/bullet/BulletJoint.hh**
+    + virtual math::Angle GetHighStop(unsigned int _index)
+    + virtual math::Angle GetLowStop(unsigned int _index)
+
 1. **gazebo/physics/simbody/SimbodyPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
@@ -223,10 +436,6 @@
 1. **gazebo/physics/dart/DARTPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
-
-1. **gazebo/physics/Link.hh**
-    + common::MovingWindowFilter<math::Vector3> *GetLinVelFil() const
-    + common::MovingWindowFilter<math::Vector3> *GetAngVelFil() const
 
 ### Deletions
 

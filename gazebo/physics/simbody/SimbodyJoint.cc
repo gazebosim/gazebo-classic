@@ -15,6 +15,8 @@
  *
 */
 
+#include <string>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Model.hh"
@@ -381,7 +383,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
-  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+  gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
@@ -449,21 +451,21 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return math::Vector3();
 }
 
@@ -471,26 +473,39 @@ math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
     double /*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
+void SimbodyJoint::SetAttribute(const std::string &_key,
+    unsigned int _index, const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
+  return false;
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
+double SimbodyJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
+}
+//////////////////////////////////////////////////
+double SimbodyJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  gzerr << "Not implement in Simbody\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
@@ -505,14 +520,19 @@ void SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     else
     {
       gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetHighStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
@@ -528,10 +548,15 @@ void SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
     else
     {
       gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+      return false;
     }
   }
   else
+  {
     gzerr << "SetLowStop: index out of bounds.\n";
+    return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
