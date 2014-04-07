@@ -148,13 +148,27 @@ void SimbodyPhysics::Load(sdf::ElementPtr _sdf)
   // use max_transient_velocity for max friction transition velocity
   this->integ->setDefaultFrictionTransitionVelocity(
     simbodyElem->Get<double>("max_transient_velocity"));
-  // use accuracy for tolerance tolerance
+
+  // \TODO: Ultimately, we should create a new <constraint_tolerance>
+  // parameter in sdf.  For now, use max transition velocity.
   this->integ->setConstraintTolerance(
-    simbodyElem->Get<double>("accuracy"));
+    simbodyElem->Get<double>("max_transient_velocity"));
+  // Debug: Try accuracy for this.
+  // this->integ->setConstraintTolerance(
+  //   simbodyElem->Get<double>("accuracy"));
 
   // Set integrator accuracy (measured with Richardson Extrapolation)
   this->integ->setAccuracy(
     simbodyElem->Get<double>("accuracy"));
+
+  /* debug
+  printf("Using acc=%g consTol=%g, captureVel=%g, minCORvel=%g, stickVel=%g\n",
+      this->integ->getAccuracyInUse(),
+      this->integ->getConstraintToleranceInUse(),
+      this->integ->getDefaultImpactCaptureVelocityInUse(),
+      this->integ->getDefaultImpactMinCORVelocityInUse(),
+      this->integ->getDefaultFrictionTransitionVelocityInUse());
+  */
 
   // Set stiction max slip velocity to make it less stiff.
   this->contact.setTransitionVelocity(
