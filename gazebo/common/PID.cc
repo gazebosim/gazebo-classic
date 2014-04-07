@@ -175,3 +175,45 @@ void PID::GetErrors(double &_pe, double &_ie, double &_de)
   _ie = this->iErr;
   _de = this->dErr;
 }
+
+/////////////////////////////////////////////////
+double PID::GetPGain() const
+{
+  return this->pGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIGain() const
+{
+  return this->iGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetDGain() const
+{
+  return this->dGain;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIMax() const
+{
+  return this->iMax;
+}
+
+/////////////////////////////////////////////////
+double PID::GetIMin() const
+{
+  return this->iMin;
+}
+
+/////////////////////////////////////////////////
+double PID::GetCmdMax() const
+{
+  return this->cmdMax;
+}
+
+/////////////////////////////////////////////////
+double PID::GetCmdMin() const
+{
+  return this->cmdMin;
+}
