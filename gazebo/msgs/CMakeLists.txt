@@ -50,6 +50,10 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  physics_bullet.proto
+  physics_dart.proto
+  physics_ode.proto
+  physics_simbody.proto
   planegeom.proto
   pid.proto
   plugin.proto

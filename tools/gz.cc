@@ -289,6 +289,12 @@ PhysicsCommand::PhysicsCommand()
      "eg: -g 0,0,-9.8")
     ("step-size,s", po::value<double>(), "Maximum step size (seconds).")
     ("iters,i", po::value<double>(), "Number of iterations.")
+    ("simbody-accuracy,i", po::value<double>(),
+     "Simbody physics engine accuracy. This option does nothing if not"
+     " using Simbody physics engine.")
+    ("simbody-max-transient-velocity,i", po::value<double>(),
+     "Simbody maximum transient velocity at contacts This option"
+     " does nothing if not using Simbody physics engine.")
     ("update-rate,u", po::value<double>(), "Target real-time update rate.");
 }
 
@@ -329,7 +335,23 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("iters"))
   {
-    msg.set_iters(this->vm["iters"].as<double>());
+    msg.mutable_ode()->set_iters(this->vm["iters"].as<double>());
+    msg.mutable_bullet()->set_iters(this->vm["iters"].as<double>());
+    msg.mutable_dart()->set_iters(this->vm["iters"].as<double>());
+    good = true;
+  }
+
+  if (this->vm.count("simbody-accuracy"))
+  {
+    msg.mutable_simbody()->set_accuracy(
+      this->vm["simbody-accuracy"].as<double>());
+    good = true;
+  }
+
+  if (this->vm.count("simbody-max-transient-velocity"))
+  {
+    msg.mutable_simbody()->set_max_transient_velocity(
+      this->vm["simbody-max-transient-velocity"].as<double>());
     good = true;
   }
 
