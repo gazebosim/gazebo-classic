@@ -322,12 +322,33 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     if (msgODE->has_erp())
       this->SetWorldERP(msgODE->erp());
 
-
     if (msgODE->has_contact_max_correcting_vel())
       this->SetContactMaxCorrectingVel(msgODE->contact_max_correcting_vel());
 
     if (msgODE->has_contact_surface_layer())
       this->SetContactSurfaceLayer(msgODE->contact_surface_layer());
+
+    if (msgODE->has_inertia_ratio_reduction())
+      this->SetParam("inertia_ratio_reduction",
+        msgODE->inertia_ratio_reduction());
+
+    if (msgODE->has_friction_iters())
+      this->SetParam("extra_friction_iterations",
+        msgODE->friction_iters());
+
+    if (msgODE->has_warm_start_factor())
+      this->SetParam("warm_start_factor", msgODE->warm_start_factor());
+
+    if (msgODE->has_reorder())
+      this->SetParam("experimental_row_reordering",
+        msgODE->reorder());
+
+    if (msgODE->has_contact_residual_smoothing())
+      this->SetParam("contact_residual_smoothing",
+        msgODE->contact_residual_smoothing());
+
+    if (msgODE->has_sor_lcp_tolerance())
+      this->SetParam("sor_lcp_tolerance", msgODE->sor_lcp_tolerance());
   }
 
   /// Make sure all models get at least on update cycle.
