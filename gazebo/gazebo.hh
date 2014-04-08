@@ -19,6 +19,7 @@
 
 #include <gazebo/gazebo_core.hh>
 #include <string>
+#include <vector>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -82,6 +83,13 @@ namespace gazebo
   /// \return True on success
   GAZEBO_VISIBLE
   bool setupServer(int _argc = 0, char **_argv = 0);
+
+  /// \brief Start a gazebo server. This starts transportation, and makes it
+  /// possible to create worlds.
+  /// \param[in] _args Vector of arguments for the system plugins.
+  /// \return True on success
+  GAZEBO_VISIBLE
+  bool setupServer(const std::vector<std::string> &_args);
 
   /// \brief Start a gazebo client. This starts transportation, and makes it
   /// possible to connect to a running simulation

@@ -194,6 +194,26 @@ bool gazebo::setupServer(int _argc, char **_argv)
   return true;
 }
 
+
+
+/////////////////////////////////////////////////
+struct c_str
+{
+  char* operator ()(const std::string& s)
+  {
+    return strdup(s.c_str());
+  }
+};
+
+bool setupServer(const std::vector<std::string> &_args)
+{
+
+  std::vector<char*> pointers;
+  std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
+  pointers.push_back(0);
+  return gazebo::setupServer(_args.size(), &pointers[0]);
+}
+
 /////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
