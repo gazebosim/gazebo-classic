@@ -215,6 +215,13 @@ namespace gazebo
 
       public: bool simbodyPhysicsStepped;
 
+      // Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;
 
@@ -254,6 +261,17 @@ namespace gazebo
       private: common::Time lastUpdateTime;
 
       private: double stepTimeDouble;
+
+      /// \brief The type of the solver.
+      /// Not used, just getting ready for optional pgs rigid contacts.
+      private: std::string solverType;
+
+      /// \brief The type of integrator:
+      ///   SimTK::RungeKuttaMersonIntegrator(system)
+      ///   SimTK::RungeKutta3Integrator(system)
+      ///   SimTK::RungeKutta2Integrator(system)
+      ///   SimTK::SemiExplicitEuler2Integrator(system)
+      private: std::string integratorType;
     };
   /// \}
   }

@@ -206,7 +206,7 @@ void Road2d::OnRoadMsg(ConstRoadPtr &_msg)
 void Road2d::Segment::Load(msgs::Road _msg)
 {
   this->width = _msg.width();
- 
+
   for (int i = 0; i < _msg.point_size(); ++i)
   {
     this->points.push_back(msgs::Convert(_msg.point(i)));

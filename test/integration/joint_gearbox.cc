@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/physics/ode/ODEGearboxJoint.hh"
 #include "test/ServerFixture.hh"
 
 #define TOL 1e-6
@@ -26,7 +25,7 @@ using namespace gazebo;
 class ODEGearboxJoint_TEST : public ServerFixture
 {
   public: void GearboxTest(const std::string &_physicsEngine);
-  public: void SetGearRatio(const std::string &_physicsEngine);
+  public: void SetGearboxRatio(const std::string &_physicsEngine);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -45,15 +44,13 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
 
-  physics::JointPtr gearboxPtr = model->GetJoint("joint_13");
-  ASSERT_TRUE(gearboxPtr != NULL);
-  ASSERT_TRUE(gearboxPtr->HasType(physics::Base::GEARBOX_JOINT));
-  boost::shared_ptr<physics::ODEGearboxJoint> gearbox =
-    boost::dynamic_pointer_cast<physics::ODEGearboxJoint>(gearboxPtr);
-  double gearRatio = gearbox->GetGearRatio();
-  EXPECT_NEAR(gearRatio, -1.5, TOL);
+  physics::JointPtr gearboxJoint = model->GetJoint("joint_13");
+  ASSERT_TRUE(gearboxJoint != NULL);
+  ASSERT_TRUE(gearboxJoint->HasType(physics::Base::GEARBOX_JOINT));
+  double gearboxRatio = gearboxJoint->GetParam("gearbox_ratio", 0);
+  EXPECT_NEAR(gearboxRatio, -1.5, TOL);
   double force3 = 1.0;
-  double force1 = force3 * gearRatio;
+  double force1 = force3 * gearboxRatio;
 
   int steps = 10000;
   for (int i = 0; i < steps; ++i)
@@ -91,8 +88,9 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
     EXPECT_GT(joint3->GetVelocity(0), 0);
     EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
     EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-    EXPECT_NEAR(joint1->GetVelocity(0)*gearRatio, -joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearRatio,
+    EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
+      TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
                -joint3->GetAngle(0).Radian(), TOL);
   }
 }
@@ -103,11 +101,11 @@ TEST_F(ODEGearboxJoint_TEST, GearboxTestODE)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// SetGearRatio:
+// SetGearboxRatio:
 // start gearbox.world, set a new gear ratio,
 // apply balancing forces across geared members, and check for equilibrium.
 ////////////////////////////////////////////////////////////////////////
-void ODEGearboxJoint_TEST::SetGearRatio(const std::string &_physicsEngine)
+void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
 {
   // load gearbox world
   Load("worlds/gearbox.world", true, _physicsEngine);
@@ -118,16 +116,15 @@ void ODEGearboxJoint_TEST::SetGearRatio(const std::string &_physicsEngine)
   physics::JointPtr joint1 = model->GetJoint("joint_12");
   physics::JointPtr joint3 = model->GetJoint("joint_23");
 
-  physics::JointPtr gearboxPtr = model->GetJoint("joint_13");
-  ASSERT_TRUE(gearboxPtr != NULL);
-  ASSERT_TRUE(gearboxPtr->HasType(physics::Base::GEARBOX_JOINT));
-  boost::shared_ptr<physics::ODEGearboxJoint> gearbox =
-    boost::dynamic_pointer_cast<physics::ODEGearboxJoint>(gearboxPtr);
-  double gearRatio = -2.5;
-  gearbox->SetGearRatio(gearRatio);
-  EXPECT_NEAR(gearRatio, gearbox->GetGearRatio(), TOL);
+  physics::JointPtr gearboxJoint = model->GetJoint("joint_13");
+  ASSERT_TRUE(gearboxJoint != NULL);
+  ASSERT_TRUE(gearboxJoint->HasType(physics::Base::GEARBOX_JOINT));
+  double gearboxRatio = -2.5;
+  gearboxJoint->SetParam("gearbox_ratio", 0, gearboxRatio);
+  EXPECT_NEAR(gearboxRatio,
+    gearboxJoint->GetParam("gearbox_ratio", 0), TOL);
   double force3 = 1.0;
-  double force1 = force3 * gearRatio;
+  double force1 = force3 * gearboxRatio;
 
   int steps = 10000;
   for (int i = 0; i < steps; ++i)
@@ -165,15 +162,16 @@ void ODEGearboxJoint_TEST::SetGearRatio(const std::string &_physicsEngine)
     EXPECT_GT(joint3->GetVelocity(0), 0);
     EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
     EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
-    EXPECT_NEAR(joint1->GetVelocity(0)*gearRatio, -joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearRatio,
+    EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
+      TOL);
+    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
                -joint3->GetAngle(0).Radian(), TOL);
   }
 }
 
-TEST_F(ODEGearboxJoint_TEST, SetGearRatioODE)
+TEST_F(ODEGearboxJoint_TEST, SetGearboxRatioODE)
 {
-  SetGearRatio("ode");
+  SetGearboxRatio("ode");
 }
 
 int main(int argc, char **argv)
