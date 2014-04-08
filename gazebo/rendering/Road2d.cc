@@ -389,6 +389,10 @@ void Road2d::Segment::Load(msgs::Road _msg)
     {
       this->setMaterial("Gazebo/Secondary");
     }
+    else if (this->texture == "steps")
+    {
+      this->setMaterial("Gazebo/Steps");
+    }
     else
     {
       gzerr << "Unknown texture value. Setting to default value\n";

@@ -24,6 +24,7 @@ set (files
   road1.jpg
   secondary.jpg
   sidewalk.jpg
+  steps.jpg
   stereo_projection_pattern_high_res.png
   stereo_projection_pattern_high_res_red.png
   terrain_detail.jpg
