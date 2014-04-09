@@ -162,12 +162,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void MeshManager::Export(const Mesh *_mesh)
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename)
 {
-  MeshExporter *exporter = NULL;
-  exporter = this->colladaExporter;
-
-  exporter->Export(_mesh);
+  std::string extension;
+  extension = _filename.substr(_filename.rfind(".")+1, _filename.size());
+  if (extension == "dae")
+  {
+    MeshExporter *exporter = NULL;
+    exporter = this->colladaExporter;
+    exporter->Export(_mesh, _filename);
+  }
+  else
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////

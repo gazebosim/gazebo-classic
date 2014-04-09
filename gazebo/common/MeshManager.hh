@@ -62,7 +62,7 @@ namespace gazebo
 
       /// \brief Export a mesh to a file
       /// \param[in] _mesh the mesh
-      public: void Export(const Mesh *_mesh);
+      public: void Export(const Mesh *_mesh, const std::string &_filename);
 
       /// \brief Checks a path extension against the list of valid extensions.
       /// \return true if the file extension is loadable

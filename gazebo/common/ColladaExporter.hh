@@ -49,7 +49,9 @@ namespace gazebo
 
       /// \brief Export a mesh
       /// \param[in] _mesh Gazebo mesh to export
-      public: virtual void Export(const Mesh *_mesh);
+      /// \param[in] _filename File name includig extension
+      public: virtual void Export(const Mesh *_mesh,
+          const std::string &_filename);
 
       /// \brief Export asset element
       /// \param[in] _assetXml Pointer to the asset XML instance

@@ -20,6 +20,7 @@
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaExporter.hh"
+#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -36,14 +37,18 @@ ColladaExporter::~ColladaExporter()
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::Export(const Mesh *_mesh)
+void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
 {
   this->mesh = _mesh;
   this->materialCount = this->mesh->GetMaterialCount();
 
-  // Mesh name
-  std::string meshName = _mesh->GetName();
-  meshName = meshName.substr(0, meshName.find(".dae"));
+  // File name
+  std::string path = _mesh->GetName();
+  path = path.substr(0, path.rfind("/")+1);
+  if (_filename.find(".dae") == std::string::npos)
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
 
   // Collada file
   TiXmlDocument xmlDoc;
@@ -101,7 +106,7 @@ void ColladaExporter::Export(const Mesh *_mesh)
   this->ExportScene(sceneXml);
   colladaXml->LinkEndChild(sceneXml);
 
-  xmlDoc.SaveFile(meshName+"_exported.dae");
+  xmlDoc.SaveFile(path+_filename);
 }
 
 //////////////////////////////////////////////////

@@ -44,7 +44,8 @@ namespace gazebo
       /// \brief Export a 3D mesh
       /// \param[in] _filename the path to the mesh
       /// \return a pointer to the created mesh
-      public: virtual void Export(const Mesh *_mesh) = 0;
+      public: virtual void Export(const Mesh *_mesh,
+          const std::string &_filename) = 0;
     };
     /// \}
   }
