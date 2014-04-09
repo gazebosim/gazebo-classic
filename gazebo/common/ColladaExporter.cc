@@ -74,7 +74,7 @@ void ColladaExporter::Export(const Mesh *_mesh)
     // Library images element
     TiXmlElement *libraryImagesXml = new TiXmlElement("library_images");
     int imageCount = this->ExportImages(libraryImagesXml);
-    if (imageCount)
+    if (imageCount != 0)
     {
       colladaXml->LinkEndChild(libraryImagesXml);
     }
@@ -122,9 +122,7 @@ void ColladaExporter::FillSource(
     const gazebo::common::SubMesh *_subMesh,
     TiXmlElement *_meshXml, int _type, const char *_meshID)
 {
-  std::ostringstream sourceID;
-  std::ostringstream sourceArrayID;
-  std::ostringstream sourceArrayIdSelector;
+  char sourceId[100], sourceArrayId[100];
   std::ostringstream fillData;
   fillData.precision(5);
   fillData << std::fixed;
@@ -133,7 +131,7 @@ void ColladaExporter::FillSource(
 
   if (_type == 1)
   {
-    sourceID << _meshID << "-Positions";
+    snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 3;
     gazebo::math::Vector3 vertex;
@@ -145,7 +143,7 @@ void ColladaExporter::FillSource(
   }
   if (_type == 2)
   {
-    sourceID << _meshID << "-Normals";
+    snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->GetNormalCount();
     stride = 3;
     gazebo::math::Vector3 normal;
@@ -157,7 +155,7 @@ void ColladaExporter::FillSource(
   }
   if (_type == 3)
   {
-    sourceID << _meshID << "-UVMap";
+    snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 2;
     gazebo::math::Vector2d inTexCoord;
@@ -167,26 +165,25 @@ void ColladaExporter::FillSource(
       fillData << inTexCoord.x << " " << 1-inTexCoord.y << " ";
     }
   }
-  sourceArrayID << sourceID.str() << "-array";
-  sourceArrayIdSelector << "#" << sourceArrayID.str();
-
   TiXmlElement *sourceXml = new TiXmlElement("source");
   _meshXml->LinkEndChild(sourceXml);
-  sourceXml->SetAttribute("id", sourceID.str().c_str());
-  sourceXml->SetAttribute("name", sourceID.str().c_str());
+  sourceXml->SetAttribute("id", sourceId);
+  sourceXml->SetAttribute("name", sourceId);
 
+  snprintf(sourceArrayId, sizeof(sourceArrayId), "%s-array", sourceId);
   TiXmlElement *floatArrayXml = new TiXmlElement("float_array");
   floatArrayXml->SetAttribute("count", count *stride);
-  floatArrayXml->SetAttribute("id", sourceArrayID.str().c_str());
+  floatArrayXml->SetAttribute("id", sourceArrayId);
   floatArrayXml->LinkEndChild(new TiXmlText(fillData.str().c_str()));
   sourceXml->LinkEndChild(floatArrayXml);
 
   TiXmlElement *techniqueCommonXml = new TiXmlElement("technique_common");
   sourceXml->LinkEndChild(techniqueCommonXml);
 
+  snprintf(sourceArrayId, sizeof(sourceArrayId), "#%s-array", sourceId);
   TiXmlElement *accessorXml = new TiXmlElement("accessor");
   accessorXml->SetAttribute("count", count);
-  accessorXml->SetAttribute("source", sourceArrayIdSelector.str().c_str());
+  accessorXml->SetAttribute("source", sourceArrayId);
   accessorXml->SetAttribute("stride", stride);
   techniqueCommonXml->LinkEndChild(accessorXml);
 

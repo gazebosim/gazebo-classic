@@ -212,7 +212,7 @@ namespace gazebo
       /// \brief 3D mesh loader for COLLADA files
       private: ColladaLoader *colladaLoader;
 
-      /// \brief 3D mesh loader for COLLADA files
+      /// \brief 3D mesh exporter for COLLADA files
       private: ColladaExporter *colladaExporter;
 
       /// \brief 3D mesh loader for STL files
