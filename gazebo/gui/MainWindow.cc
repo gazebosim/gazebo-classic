@@ -20,7 +20,6 @@
 
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
-#include "gazebo/gui/OculusWindow.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/TopicView.hh"
 #include "gazebo/gui/viewers/ImageView.hh"
@@ -52,6 +51,10 @@
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
+#endif
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
 #endif
 
 
@@ -188,9 +191,10 @@ void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 
+#ifdef HAVE_OCULUS
   int oculusX = getINIProperty<int>("oculus.x", 0);
   int oculusY = getINIProperty<int>("oculus.y", 0);
-  std::string visual = getINIProperty<std::string>("oculus.visual", ""); 
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
 
   if (!visual.empty())
   {
@@ -198,6 +202,7 @@ void MainWindow::Load()
         oculusX, oculusY, visual);
     oculusWindow->show();
   }
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -794,11 +799,13 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_OCULUS
 void MainWindow::ViewOculus()
 {
   gui::OculusWindow *oculusWindow = new gui::OculusWindow(0, 0, "");
   oculusWindow->show();
 }
+#endif
 
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
@@ -1073,9 +1080,11 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+#ifdef HAVE_OCULUS
   g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
   g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
   connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
+#endif
 
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
@@ -1174,7 +1183,10 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
+
+#ifdef HAVE_OCULUS
   windowMenu->addAction(g_viewOculusAct);
+#endif
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);

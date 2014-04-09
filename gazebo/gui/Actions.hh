@@ -82,7 +82,9 @@ namespace gazebo
 
     extern QAction *g_viewWireframeAct;
 
+#ifdef HAVE_OCULUS
     extern QAction *g_viewOculusAct;
+#endif
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.

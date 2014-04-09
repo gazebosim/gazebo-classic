@@ -41,7 +41,6 @@ set (sources
   ModelMaker.cc
   ModelRightMenu.cc
   MouseEventHandler.cc
-  OculusWindow.cc
   SaveDialog.cc
   SphereMaker.cc
   TimePanel.cc
@@ -60,7 +59,6 @@ set (qt_headers
   ModelListWidget.hh
   ModelEditWidget.hh
   ModelRightMenu.hh
-  OculusWindow.hh
   RenderWidget.hh
   SaveDialog.hh
   TimePanel.hh
@@ -84,6 +82,15 @@ set (headers
   ModelMaker.hh
   SphereMaker.hh
 )
+
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusWindow.cc
+  )
+  set (qt_headers ${qt_headers}
+    OculusWindow.hh
+  )
+endif ()
 
 #if (HAVE_QWT)
 #  set (sources ${sources}

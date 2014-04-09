@@ -162,10 +162,13 @@ namespace gazebo
       /// \return Pointer to the new camera.
       public: CameraPtr CreateCamera(const std::string &_name,
                                      bool _autoRender = true);
+
+#ifdef HAVE_OCULUS
       /// \brief Create an oculus rift camera
       /// \param[in] _name Name of the new camera.
       /// \return Pointer to the new camera.
       public: OculusCameraPtr CreateOculusCamera(const std::string &_name);
+#endif
 
       /// \brief Create depth camera
       /// \param[in] _name Name of the new camera.
@@ -592,8 +595,10 @@ namespace gazebo
       /// \brief All the user cameras.
       private: std::vector<UserCameraPtr> userCameras;
 
+#ifdef HAVE_OCULUS
       /// \brief All the oculus cameras.
       private: std::vector<OculusCameraPtr> oculusCameras;
+#endif
 
       /// \brief The ogre scene manager.
       private: Ogre::SceneManager *manager;

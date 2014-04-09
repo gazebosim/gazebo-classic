@@ -41,7 +41,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/rendering/OculusCamera.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/DepthCamera.hh"
 #include "gazebo/rendering/GpuLaser.hh"
@@ -65,6 +64,10 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/rendering/Scene.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/rendering/OculusCamera.hh"
+#endif
 
 using namespace gazebo;
 using namespace rendering;
@@ -565,6 +568,7 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
+#ifdef HAVE_OCULUS
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
@@ -574,6 +578,7 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 
   return camera;
 }
+#endif
 
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
@@ -2535,16 +2540,9 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
     vclouds->setWheater(wheater.x,
                         math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
-  
-  
-  // added for oculus demo
-  this->skyx->setStarfieldEnabled(false);
-  this->skyxController->setEastDirection(Ogre::Vector2(1, 0));
-  this->skyx->getMoonManager()->setMoonSize(1.0);
-
 
   this->skyx->update(0);
-  
+
   // TODO remove me
   //Ogre::Root::getSingletonPtr()->removeFrameListener(this->skyx);
 }

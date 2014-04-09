@@ -37,7 +37,6 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
-  OculusCamera.cc
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
@@ -81,7 +80,6 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
-  OculusCamera.hh
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
@@ -104,6 +102,15 @@ set (headers
   ogre_gazebo.h
   cegui.h
 )
+
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusCamera.cc
+  )
+  set (headers ${headers}
+    OculusCamera.hh
+  )
+endif ()
 
 set (gtest_sources
 )

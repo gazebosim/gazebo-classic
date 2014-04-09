@@ -73,22 +73,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
 
-  pkg_check_modules(libudev libudev)
-  if (NOT libudev_FOUND)
-    BUILD_ERROR ("Missing: libudev. Required for usb peripherals.")
-    set(HAVE_LIBUDEV False)
-  else()
-    set(HAVE_LIBUDEV True)
-  endif()
-
-  pkg_check_modules(xinerama xinerama)
-  if (NOT xinerama_FOUND)
-    BUILD_WARNING ("Missing: xinerama. Required for Oculus Rift")
-    set(HAVE_XINERAMA False)
-  else()
-    set(HAVE_XINERAMA True)
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -456,6 +440,33 @@ else ()
   message (STATUS "Looking for libgdal - found")
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
+
+#################################################
+# Find Oculus SDK.
+find_path (oculus_INCLUDE_DIRS OVR.h)
+find_library(oculus_LIBRARIES ovr)
+set (OCULUS_FOUND True)
+
+if (NOT oculus_INCLUDE_DIRS)
+  message (STATUS "Looking for OVR.h - not found")
+  set (OCULUS_FOUND False)
+else ()
+  message (STATUS "Looking for ovr.h - found")
+  include_directories(${oculus_INCLUDE_DIRS})
+endif ()
+if (NOT oculus_LIBRARIES)
+  message (STATUS "Looking for libovr.a - not found")
+  set (OCULUS_FOUND False)
+else ()
+  message (STATUS "Looking for libovr.a - found")
+endif ()
+
+if (OCULUS_FOUND)
+  set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
+else ()
+  BUILD_WARNING ("ovr not found, Oculus support will be disabled.")
+  set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
+endif()
 
 ########################################
 # Include man pages stuff
