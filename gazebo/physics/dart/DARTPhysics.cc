@@ -457,7 +457,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
-
   boost::any value = 0;
   switch (_param)
   {

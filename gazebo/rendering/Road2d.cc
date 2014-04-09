@@ -358,10 +358,9 @@ void Road2d::Segment::Load(msgs::Road _msg)
   if (_msg.has_texture())
   {
     this->texture = _msg.texture();
-    
     if ((this->texture == "footway") ||
         (this->texture == "pedestrian"))
-    { 
+    {
         this->setMaterial("Gazebo/Sidewalk");
     }
     else if ((this->texture == "motorway") ||
@@ -371,7 +370,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
     }
     else if ((this->texture == "trunk") ||
              (this->texture == "lanes_4"))
-    { 
+    {
       this->setMaterial("Gazebo/Trunk");
     }
     else if ((this->texture == "primary") ||
@@ -381,7 +380,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
     }
     else if ((this->texture == "tertiary") ||
              (this->texture == "residential"))
-    {  
+    {
       this->setMaterial("Gazebo/Residential");
     }
     else if ((this->texture == "secondary") ||

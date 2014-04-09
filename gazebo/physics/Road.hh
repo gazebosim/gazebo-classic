@@ -53,7 +53,7 @@ namespace gazebo
 
       /// \brief Width of the road.
       private: double width;
-      
+
       /// \brief Points that makes up the mid-line of the road.
       private: std::vector<math::Vector3> points;
 

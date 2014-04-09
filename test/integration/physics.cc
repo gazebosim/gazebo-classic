@@ -48,6 +48,7 @@ class PhysicsTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
 {
+  std::cout << _physicsEngine << std::endl;
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
