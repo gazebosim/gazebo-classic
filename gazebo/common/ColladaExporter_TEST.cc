@@ -35,11 +35,13 @@ TEST_F(ColladaExporter, ExportBox)
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) + "/test/data/box_exported.dae");
+  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) + "/test/data/box_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box_exported.dae"));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -62,10 +64,12 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
   EXPECT_EQ(meshOriginal->GetMin(), meshReloaded->GetMin());
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
-  EXPECT_EQ(meshOriginal->GetMaterialCount(), meshReloaded->GetMaterialCount());
+  EXPECT_EQ(meshOriginal->GetMaterialCount(),
+      meshReloaded->GetMaterialCount());
   EXPECT_EQ(meshOriginal->GetVertexCount(), meshReloaded->GetVertexCount());
   EXPECT_EQ(meshOriginal->GetNormalCount(), meshReloaded->GetNormalCount());
-  EXPECT_EQ(meshOriginal->GetTexCoordCount(), meshReloaded->GetTexCoordCount());
+  EXPECT_EQ(meshOriginal->GetTexCoordCount(),
+      meshReloaded->GetTexCoordCount());
   EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
 }
 
@@ -77,11 +81,13 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
       std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill.dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill_exported.dae");
+  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill_exported.dae"));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -98,16 +104,19 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 
   // Reload mesh and compare
   const common::Mesh *meshReloaded = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill_exported.dae");
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
   EXPECT_EQ(meshOriginal->GetMin(), meshReloaded->GetMin());
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
-  EXPECT_EQ(meshOriginal->GetMaterialCount(), meshReloaded->GetMaterialCount());
+  EXPECT_EQ(meshOriginal->GetMaterialCount(),
+      meshReloaded->GetMaterialCount());
   EXPECT_EQ(meshOriginal->GetVertexCount(), meshReloaded->GetVertexCount());
   EXPECT_EQ(meshOriginal->GetNormalCount(), meshReloaded->GetNormalCount());
-  EXPECT_EQ(meshOriginal->GetTexCoordCount(), meshReloaded->GetTexCoordCount());
+  EXPECT_EQ(meshOriginal->GetTexCoordCount(),
+      meshReloaded->GetTexCoordCount());
   EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
 }
 
