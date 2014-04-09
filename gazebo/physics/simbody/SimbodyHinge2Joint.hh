@@ -47,9 +47,6 @@ namespace gazebo
       protected: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
-
-      // Documentation inherited.
       public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.

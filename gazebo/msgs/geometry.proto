@@ -29,7 +29,7 @@ message Geometry
     TRIANGLE_FAN = 8;
     LINE_STRIP   = 9;
     POLYLINE     = 10;
-    EMPTY        = 11; 
+    EMPTY        = 11;
   }
 
   optional Type type                = 1;
@@ -42,6 +42,5 @@ message Geometry
   optional MeshGeom      mesh       = 8;
 
   repeated Vector3d points          = 9;
-  optional Polyline polyline   = 10;
-
+  optional Polyline polyline        = 10;
 }

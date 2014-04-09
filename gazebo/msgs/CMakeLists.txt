@@ -54,13 +54,13 @@ set (msgs
   pid.proto
   plugin.proto
   pointcloud.proto
+  polylinegeom.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto
   pose_trajectory.proto
   pose_v.proto
   poses_stamped.proto
-  polylinegeom.proto
   projector.proto
   propagation_particle.proto
   propagation_grid.proto
