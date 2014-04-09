@@ -228,8 +228,8 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
   for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
   {
     char meshId[100], materialId[100];
-    snprintf(meshId, sizeof(meshId), "mesh_%d", i);
-    snprintf(materialId, sizeof(materialId), "material_%d", i);
+    snprintf(meshId, sizeof(meshId), "mesh_%u", i);
+    snprintf(materialId, sizeof(materialId), "material_%u", i);
 
     TiXmlElement *geometryXml = new TiXmlElement("geometry");
     geometryXml->SetAttribute("id", meshId);
@@ -326,7 +326,7 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
     if (imageString.find("meshes/") != std::string::npos)
     {
       char id[100];
-      snprintf(id, sizeof(id), "image_%d", i);
+      snprintf(id, sizeof(id), "image_%u", i);
 
       TiXmlElement *imageXml = new TiXmlElement("image");
       imageXml->SetAttribute("id", id);
@@ -350,13 +350,13 @@ void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
   for (unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
-    snprintf(id, sizeof(id), "material_%d", i);
+    snprintf(id, sizeof(id), "material_%u", i);
 
     TiXmlElement *materialXml = new TiXmlElement("material");
     materialXml->SetAttribute("id", id);
     _libraryMaterialsXml->LinkEndChild(materialXml);
 
-    snprintf(id, sizeof(id), "#material_%d_fx", i);
+    snprintf(id, sizeof(id), "#material_%u_fx", i);
     TiXmlElement *instanceEffectXml = new TiXmlElement("instance_effect");
     instanceEffectXml->SetAttribute("url", id);
     materialXml->LinkEndChild(instanceEffectXml);
@@ -369,7 +369,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
   for (unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
-    snprintf(id, sizeof(id), "material_%d_fx", i);
+    snprintf(id, sizeof(id), "material_%u_fx", i);
 
     TiXmlElement *effectXml = new TiXmlElement("effect");
     effectXml->SetAttribute("id", id);
@@ -385,7 +385,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     if (imageString.find("meshes/") != std::string::npos)
     {
       TiXmlElement *newParamXml = new TiXmlElement("newparam");
-      snprintf(id, sizeof(id), "image_%d_surface", i);
+      snprintf(id, sizeof(id), "image_%u_surface", i);
       newParamXml->SetAttribute("sid", id);
       profileCommonXml->LinkEndChild(newParamXml);
 
@@ -394,12 +394,12 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
       newParamXml->LinkEndChild(surfaceXml);
 
       TiXmlElement *initFromXml = new TiXmlElement("init_from");
-      snprintf(id, sizeof(id), "image_%d", i);
+      snprintf(id, sizeof(id), "image_%u", i);
       initFromXml->LinkEndChild(new TiXmlText(id));
       surfaceXml->LinkEndChild(initFromXml);
 
       newParamXml = new TiXmlElement("newparam");
-      snprintf(id, sizeof(id), "image_%d_sampler", i);
+      snprintf(id, sizeof(id), "image_%u_sampler", i);
       newParamXml->SetAttribute("sid", id);
       profileCommonXml->LinkEndChild(newParamXml);
 
@@ -407,7 +407,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
       newParamXml->LinkEndChild(sampler2dXml);
 
       TiXmlElement *sourceXml = new TiXmlElement("source");
-      snprintf(id, sizeof(id), "image_%d_surface", i);
+      snprintf(id, sizeof(id), "image_%u_surface", i);
       sourceXml->LinkEndChild(new TiXmlText(id));
       sampler2dXml->LinkEndChild(sourceXml);
 
@@ -467,7 +467,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     if (imageString.find("meshes/") != std::string::npos)
     {
       TiXmlElement *textureXml = new TiXmlElement("texture");
-      snprintf(id, sizeof(id), "image_%d", i);
+      snprintf(id, sizeof(id), "image_%u", i);
       textureXml->SetAttribute("texture", id);
       textureXml->SetAttribute("texcoord", "UVSET0");
       diffuseXml->LinkEndChild(textureXml);
@@ -542,8 +542,8 @@ void ColladaExporter::ExportVisualScenes(
   for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
   {
     char meshId[100], materialId[100], attributeValue[100];
-    snprintf(meshId, sizeof(meshId), "mesh_%d", i);
-    snprintf(materialId, sizeof(materialId), "material_%d", i);
+    snprintf(meshId, sizeof(meshId), "mesh_%u", i);
+    snprintf(materialId, sizeof(materialId), "material_%u", i);
 
     TiXmlElement *instanceGeometryXml = new TiXmlElement("instance_geometry");
     nodeXml->LinkEndChild(instanceGeometryXml);
