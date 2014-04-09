@@ -16,32 +16,17 @@
  */
 
 #include <tinyxml.h>
-//#include <math.h>
-//#include <sstream>
-//#include <boost/algorithm/string.hpp>
-//#include <boost/lexical_cast.hpp>
 
-//#include "gazebo/math/Helpers.hh"
-//#include "gazebo/math/Angle.hh"
-//#include "gazebo/math/Vector2d.hh"
-//#include "gazebo/math/Vector3.hh"
-//#include "gazebo/math/Matrix4.hh"
-//#include "gazebo/math/Quaternion.hh"
-//#include "gazebo/common/Console.hh"
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
-//#include "gazebo/common/Skeleton.hh"
-//#include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/ColladaExporter.hh"
-//#include "gazebo/common/SystemPaths.hh"
-//#include "gazebo/common/Exception.hh"
 
 using namespace gazebo;
 using namespace common;
 
 //////////////////////////////////////////////////
-  ColladaExporter::ColladaExporter()
-: MeshExporter(), meter(1.0)
+ColladaExporter::ColladaExporter()
+: MeshExporter()
 {
 }
 
@@ -50,7 +35,7 @@ ColladaExporter::~ColladaExporter()
 {
 }
 
-////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh)
 {
   this->mesh = _mesh;
@@ -58,308 +43,256 @@ void ColladaExporter::Export(const Mesh *_mesh)
 
   // Mesh name
   std::string meshName = _mesh->GetName();
-  meshName = meshName.substr(0,meshName.find(".dae"));
+  meshName = meshName.substr(0, meshName.find(".dae"));
 
   // Collada file
   TiXmlDocument xmlDoc;
 
   // XML declaration
-  TiXmlDeclaration* declaration = new TiXmlDeclaration( "1.0", "utf-8", "" );
-  xmlDoc.LinkEndChild( declaration );
+  TiXmlDeclaration *declarationXml = new TiXmlDeclaration("1.0", "utf-8", "");
+  xmlDoc.LinkEndChild(declarationXml);
 
   // Collada element
-  TiXmlElement *colladaXml = new TiXmlElement( "COLLADA" );
-  xmlDoc.LinkEndChild( colladaXml );
+  TiXmlElement *colladaXml = new TiXmlElement("COLLADA");
+  xmlDoc.LinkEndChild(colladaXml);
   colladaXml->SetAttribute("version", "1.4.1");
   colladaXml->SetAttribute("xmlns",
       "http://www.collada.org/2005/11/COLLADASchema");
 
   // Asset element
-  TiXmlElement *assetXml = new TiXmlElement( "asset" );
+  TiXmlElement *assetXml = new TiXmlElement("asset");
   this->ExportAsset(assetXml);
-  colladaXml->LinkEndChild( assetXml );
+  colladaXml->LinkEndChild(assetXml);
 
   // Library geometries element
-  TiXmlElement *library_geometriesXml = new TiXmlElement( "library_geometries" );
-  this->ExportGeometries(library_geometriesXml);
-  colladaXml->LinkEndChild( library_geometriesXml );
+  TiXmlElement *libraryGeometriesXml = new TiXmlElement("library_geometries");
+  this->ExportGeometries(libraryGeometriesXml);
+  colladaXml->LinkEndChild(libraryGeometriesXml);
 
-  if(this->materialCount != 0)
+  if (this->materialCount != 0)
   {
     // Library images element
-    TiXmlElement *library_imagesXml = new TiXmlElement( "library_images" );
-    int imageCount = this->ExportImages(library_imagesXml);
-    if(imageCount)
+    TiXmlElement *libraryImagesXml = new TiXmlElement("library_images");
+    int imageCount = this->ExportImages(libraryImagesXml);
+    if (imageCount)
     {
-      colladaXml->LinkEndChild( library_imagesXml );
+      colladaXml->LinkEndChild(libraryImagesXml);
     }
 
     // Library materials element
-    TiXmlElement *library_materialsXml = new TiXmlElement( "library_materials" );
-    this->ExportMaterials(library_materialsXml);
-    colladaXml->LinkEndChild( library_materialsXml );
+    TiXmlElement *libraryMaterialsXml = new TiXmlElement("library_materials");
+    this->ExportMaterials(libraryMaterialsXml);
+    colladaXml->LinkEndChild(libraryMaterialsXml);
 
     // Library effects element
-    TiXmlElement *library_effectsXml = new TiXmlElement( "library_effects" );
-    this->ExportEffects(library_effectsXml);
-    colladaXml->LinkEndChild( library_effectsXml );
+    TiXmlElement *libraryEffectsXml = new TiXmlElement("library_effects");
+    this->ExportEffects(libraryEffectsXml);
+    colladaXml->LinkEndChild(libraryEffectsXml);
   }
 
   // Library visual scenes element
-  TiXmlElement *library_visual_scenesXml =
-      new TiXmlElement( "library_visual_scenes" );
-  this->ExportVisualScenes(library_visual_scenesXml);
-  colladaXml->LinkEndChild( library_visual_scenesXml );
+  TiXmlElement *libraryVisualScenesXml =
+      new TiXmlElement("library_visual_scenes");
+  this->ExportVisualScenes(libraryVisualScenesXml);
+  colladaXml->LinkEndChild(libraryVisualScenesXml);
 
   // Scene element
-  TiXmlElement *sceneXml = new TiXmlElement( "scene" );
+  TiXmlElement *sceneXml = new TiXmlElement("scene");
   this->ExportScene(sceneXml);
-  colladaXml->LinkEndChild( sceneXml );
+  colladaXml->LinkEndChild(sceneXml);
 
-  xmlDoc.SaveFile( meshName+"_exported.dae" );
-}
-
-///////////////////////////////////////////////////
-void ColladaExporter::ExportAsset(TiXmlElement *_assetXml)
-{
-  // unit
-  TiXmlElement * unitXml = new TiXmlElement( "unit" );
-  unitXml->SetAttribute("meter", "1");
-  unitXml->SetAttribute("name", "meter");
-  _assetXml->LinkEndChild( unitXml );
-
-  // up_axis
-  TiXmlElement * up_axisXml = new TiXmlElement( "up_axis" );
-  up_axisXml->LinkEndChild( new TiXmlText( "Z_UP" ));
-  _assetXml->LinkEndChild( up_axisXml );
+  xmlDoc.SaveFile(meshName+"_exported.dae");
 }
 
 //////////////////////////////////////////////////
-// TODO: clean
-void ColladaExporter::FillGeometrySources(
-    const gazebo::common::SubMesh *_subMesh,
-    TiXmlElement *Mesh, int type, const char *meshID)
+void ColladaExporter::ExportAsset(TiXmlElement *_assetXml)
 {
+  TiXmlElement *unitXml = new TiXmlElement("unit");
+  unitXml->SetAttribute("meter", "1");
+  unitXml->SetAttribute("name", "meter");
+  _assetXml->LinkEndChild(unitXml);
 
+  TiXmlElement *upAxisXml = new TiXmlElement("up_axis");
+  upAxisXml->LinkEndChild(new TiXmlText("Z_UP"));
+  _assetXml->LinkEndChild(upAxisXml);
+}
+
+//////////////////////////////////////////////////
+void ColladaExporter::FillSource(
+    const gazebo::common::SubMesh *_subMesh,
+    TiXmlElement *_meshXml, int _type, const char *_meshID)
+{
   std::ostringstream sourceID;
   std::ostringstream sourceArrayID;
   std::ostringstream sourceArrayIdSelector;
   std::ostringstream fillData;
   fillData.precision(5);
-  fillData<<std::fixed;
+  fillData << std::fixed;
   int stride;
   unsigned int count = 0;
 
-  if (type == 1)
+  if (_type == 1)
   {
-    sourceID << meshID << "-Positions";
+    sourceID << _meshID << "-Positions";
     count = _subMesh->GetVertexCount();
     stride = 3;
     gazebo::math::Vector3 vertex;
-    for(unsigned int i = 0; i < count; ++i)
+    for (unsigned int i = 0; i < count; ++i)
     {
       vertex = _subMesh->GetVertex(i);
       fillData << vertex.x << " " << vertex.y << " " << vertex.z << " ";
     }
   }
-  if (type == 2)
+  if (_type == 2)
   {
-    sourceID << meshID << "-Normals";
+    sourceID << _meshID << "-Normals";
     count = _subMesh->GetNormalCount();
     stride = 3;
     gazebo::math::Vector3 normal;
-    for(unsigned int i = 0; i < count; ++i)
+    for (unsigned int i = 0; i < count; ++i)
     {
       normal = _subMesh->GetNormal(i);
       fillData << normal.x << " " << normal.y << " " << normal.z << " ";
     }
   }
+  if (_type == 3)
+  {
+    sourceID << _meshID << "-UVMap";
+    count = _subMesh->GetVertexCount();
+    stride = 2;
+    gazebo::math::Vector2d inTexCoord;
+    for (unsigned int i = 0; i < count; ++i)
+    {
+      inTexCoord = _subMesh->GetTexCoord(i);
+      fillData << inTexCoord.x << " " << 1-inTexCoord.y << " ";
+    }
+  }
   sourceArrayID << sourceID.str() << "-array";
   sourceArrayIdSelector << "#" << sourceArrayID.str();
 
-  TiXmlElement *source = new TiXmlElement( "source" );
-  Mesh->LinkEndChild( source );
-  source->SetAttribute("id", sourceID.str().c_str());
-  source->SetAttribute("name", sourceID.str().c_str());
+  TiXmlElement *sourceXml = new TiXmlElement("source");
+  _meshXml->LinkEndChild(sourceXml);
+  sourceXml->SetAttribute("id", sourceID.str().c_str());
+  sourceXml->SetAttribute("name", sourceID.str().c_str());
 
-  TiXmlElement *float_array = new TiXmlElement( "float_array" );
-  float_array->SetAttribute("count", count*stride);
-  float_array->SetAttribute("id", sourceArrayID.str().c_str());
-  float_array->LinkEndChild( new TiXmlText( fillData.str().c_str() ));
-  source->LinkEndChild( float_array );
+  TiXmlElement *floatArrayXml = new TiXmlElement("float_array");
+  floatArrayXml->SetAttribute("count", count *stride);
+  floatArrayXml->SetAttribute("id", sourceArrayID.str().c_str());
+  floatArrayXml->LinkEndChild(new TiXmlText(fillData.str().c_str()));
+  sourceXml->LinkEndChild(floatArrayXml);
 
-  TiXmlElement *technique_common = new TiXmlElement( "technique_common" );
-  source->LinkEndChild( technique_common );
+  TiXmlElement *techniqueCommonXml = new TiXmlElement("technique_common");
+  sourceXml->LinkEndChild(techniqueCommonXml);
 
-  TiXmlElement *accessor = new TiXmlElement( "accessor" );
-  accessor->SetAttribute("count", count);
-  accessor->SetAttribute("source", sourceArrayIdSelector.str().c_str());
-  accessor->SetAttribute("stride", stride);
-  technique_common->LinkEndChild( accessor );
+  TiXmlElement *accessorXml = new TiXmlElement("accessor");
+  accessorXml->SetAttribute("count", count);
+  accessorXml->SetAttribute("source", sourceArrayIdSelector.str().c_str());
+  accessorXml->SetAttribute("stride", stride);
+  techniqueCommonXml->LinkEndChild(accessorXml);
 
-  TiXmlElement *param = new TiXmlElement( "param" );
-
-  if (type == 1 || type == 2)
+  TiXmlElement *paramXml = new TiXmlElement("param");
+  if (_type == 1 || _type == 2)
   {
-    param->SetAttribute("type", "float");
-    param->SetAttribute("name", "X");
-    accessor->LinkEndChild( param );
+    paramXml->SetAttribute("type", "float");
+    paramXml->SetAttribute("name", "X");
+    accessorXml->LinkEndChild(paramXml);
 
-    param = new TiXmlElement( "param" );
-    param->SetAttribute("type", "float");
-    param->SetAttribute("name", "Y");
-    accessor->LinkEndChild( param );
+    paramXml = new TiXmlElement("param");
+    paramXml->SetAttribute("type", "float");
+    paramXml->SetAttribute("name", "Y");
+    accessorXml->LinkEndChild(paramXml);
 
-    param = new TiXmlElement( "param" );
-    param->SetAttribute("type", "float");
-    param->SetAttribute("name", "Z");
-    accessor->LinkEndChild( param );
+    paramXml = new TiXmlElement("param");
+    paramXml->SetAttribute("type", "float");
+    paramXml->SetAttribute("name", "Z");
+    accessorXml->LinkEndChild(paramXml);
+  }
+  if (_type == 3)
+  {
+    paramXml->SetAttribute("type", "float");
+    paramXml->SetAttribute("name", "U");
+    accessorXml->LinkEndChild(paramXml);
+
+    paramXml = new TiXmlElement("param");
+    paramXml->SetAttribute("type", "float");
+    paramXml->SetAttribute("name", "V");
+    accessorXml->LinkEndChild(paramXml);
   }
 }
 
 //////////////////////////////////////////////////
-// TODO: clean
-void ColladaExporter::FillTextureSource(
-    const gazebo::common::SubMesh *_subMesh,
-    TiXmlElement *Mesh,
-    const char *meshID)
+void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 {
-  // For collada
-  std::ostringstream sourceID;
-  std::ostringstream sourceArrayID;
-  std::ostringstream sourceArrayIdSelector;
-  unsigned int outCount = _subMesh->GetVertexCount();
-  int stride = 2;
-  std::ostringstream fillData;
-  fillData.precision(5);
-  fillData<<std::fixed;
-
-  gazebo::math::Vector2d inTexCoord;
-  for(long unsigned int i = 0; i < outCount; ++i)
-  {
-    inTexCoord = _subMesh->GetTexCoord(i);
-    fillData << inTexCoord.x << " " << 1-inTexCoord.y << " ";
-  }
-
-  sourceID << meshID << "-UVMap";
-  sourceArrayID << sourceID.str() << "-array";
-  sourceArrayIdSelector << "#" << sourceArrayID.str();
-
-  TiXmlElement *source = new TiXmlElement( "source" );
-  Mesh->LinkEndChild( source );
-  source->SetAttribute("id", sourceID.str().c_str());
-  source->SetAttribute("name", sourceID.str().c_str());
-
-  TiXmlElement *float_array = new TiXmlElement( "float_array" );
-  float_array->SetAttribute("count", outCount*stride);
-  float_array->SetAttribute("id", sourceArrayID.str().c_str());
-  float_array->LinkEndChild( new TiXmlText( fillData.str().c_str() ));
-  source->LinkEndChild( float_array );
-
-  TiXmlElement *technique_common = new TiXmlElement( "technique_common" );
-  source->LinkEndChild( technique_common );
-
-  TiXmlElement *accessor = new TiXmlElement( "accessor" );
-  accessor->SetAttribute("count", outCount);
-  accessor->SetAttribute("source", sourceArrayIdSelector.str().c_str());
-  accessor->SetAttribute("stride", stride);
-  technique_common->LinkEndChild( accessor );
-
-  TiXmlElement *param = new TiXmlElement( "param" );
-
-  param->SetAttribute("type", "float");
-  param->SetAttribute("name", "U");
-  accessor->LinkEndChild( param );
-
-  param = new TiXmlElement( "param" );
-  param->SetAttribute("type", "float");
-  param->SetAttribute("name", "V");
-  accessor->LinkEndChild( param );
-}
-
-///////////////////////////////////////////////////
-void ColladaExporter::ExportGeometries(TiXmlElement *_library_geometriesXml)
-{
-  unsigned int meshCount = this->mesh->GetSubMeshCount();
-
-  for(unsigned int i = 0; i < meshCount; i++)
+  for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
   {
     char meshId[100], materialId[100];
-    sprintf(meshId,"mesh_%d", i);
-    sprintf(materialId,"material_%d", i);
+    snprintf(meshId, sizeof(meshId), "mesh_%d", i);
+    snprintf(materialId, sizeof(materialId), "material_%d", i);
 
-    TiXmlElement *geometry = new TiXmlElement( "geometry" );
-    geometry->SetAttribute("id", meshId);
-    _library_geometriesXml->LinkEndChild( geometry );
+    TiXmlElement *geometryXml = new TiXmlElement("geometry");
+    geometryXml->SetAttribute("id", meshId);
+    _libraryGeometriesXml->LinkEndChild(geometryXml);
 
-    TiXmlElement *Mesh = new TiXmlElement( "mesh" );
-    geometry->LinkEndChild( Mesh );
+    TiXmlElement *meshXml = new TiXmlElement("mesh");
+    geometryXml->LinkEndChild(meshXml);
 
     const gazebo::common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
 
     // Position
-    FillGeometrySources(subMesh, Mesh, 1, meshId);
+    FillSource(subMesh, meshXml, 1, meshId);
     // Normals
-    FillGeometrySources(subMesh, Mesh, 2, meshId);
+    FillSource(subMesh, meshXml, 2, meshId);
+    // Texture coordinates
     if (subMesh->GetTexCoordCount() != 0)
     {
-      FillTextureSource(subMesh, Mesh, meshId);
+      FillSource(subMesh, meshXml, 3, meshId);
     }
 
     // Vertices
     char attributeValue[100];
 
-    TiXmlElement *vertices = new TiXmlElement( "vertices" );
-    Mesh->LinkEndChild( vertices );
-    strcpy(attributeValue,meshId);
-    strcat(attributeValue,"-Vertex");
-    vertices->SetAttribute("id", attributeValue);
-    vertices->SetAttribute("name", attributeValue);
+    TiXmlElement *verticesXml = new TiXmlElement("vertices");
+    meshXml->LinkEndChild(verticesXml);
+    snprintf(attributeValue, sizeof(attributeValue), "%s-Vertex", meshId);
+    verticesXml->SetAttribute("id", attributeValue);
+    verticesXml->SetAttribute("name", attributeValue);
 
-    TiXmlElement *input = new TiXmlElement( "input" );
-    vertices->LinkEndChild( input );
-    input->SetAttribute("semantic", "POSITION");
-    strcpy(attributeValue,"#");
-    strcat(attributeValue,meshId);
-    strcat(attributeValue,"-Positions");
-    input->SetAttribute("source", attributeValue);
+    TiXmlElement *inputXml = new TiXmlElement("input");
+    verticesXml->LinkEndChild(inputXml);
+    inputXml->SetAttribute("semantic", "POSITION");
+    snprintf(attributeValue, sizeof(attributeValue), "#%s-Positions", meshId);
+    inputXml->SetAttribute("source", attributeValue);
 
     // Triangles
     unsigned int indexCount = subMesh->GetIndexCount();
 
-    TiXmlElement *triangles = new TiXmlElement( "triangles" );
-    Mesh->LinkEndChild( triangles );
-    triangles->SetAttribute("count", indexCount/3);
-    triangles->SetAttribute("material", materialId);
+    TiXmlElement *trianglesXml = new TiXmlElement("triangles");
+    meshXml->LinkEndChild(trianglesXml);
+    trianglesXml->SetAttribute("count", indexCount/3);
+    trianglesXml->SetAttribute("material", materialId);
 
-    input = new TiXmlElement( "input" );
-    triangles->LinkEndChild( input );
-    input->SetAttribute("offset", 0);
-    input->SetAttribute("semantic", "VERTEX");
-    strcpy(attributeValue,"#");
-    strcat(attributeValue,meshId);
-    strcat(attributeValue,"-Vertex");
-    input->SetAttribute("source", attributeValue);
+    inputXml = new TiXmlElement("input");
+    trianglesXml->LinkEndChild(inputXml);
+    inputXml->SetAttribute("offset", 0);
+    inputXml->SetAttribute("semantic", "VERTEX");
+    snprintf(attributeValue, sizeof(attributeValue), "#%s-Vertex", meshId);
+    inputXml->SetAttribute("source", attributeValue);
 
-    input = new TiXmlElement( "input" );
-    triangles->LinkEndChild( input );
-    input->SetAttribute("offset", 1);
-    input->SetAttribute("semantic", "NORMAL");
-    strcpy(attributeValue,"#");
-    strcat(attributeValue,meshId);
-    strcat(attributeValue,"-Normals");
-    input->SetAttribute("source", attributeValue);
+    inputXml = new TiXmlElement("input");
+    trianglesXml->LinkEndChild(inputXml);
+    inputXml->SetAttribute("offset", 1);
+    inputXml->SetAttribute("semantic", "NORMAL");
+    snprintf(attributeValue, sizeof(attributeValue), "#%s-Normals", meshId);
+    inputXml->SetAttribute("source", attributeValue);
 
     if (subMesh->GetTexCoordCount() != 0)
     {
-      input = new TiXmlElement( "input" );
-      triangles->LinkEndChild( input );
-      input->SetAttribute("offset", 2);
-      input->SetAttribute("semantic", "TEXCOORD");
-      strcpy(attributeValue,"#");
-      strcat(attributeValue,meshId);
-      strcat(attributeValue,"-UVMap");
-      input->SetAttribute("source", attributeValue);
+      inputXml = new TiXmlElement("input");
+      trianglesXml->LinkEndChild(inputXml);
+      inputXml->SetAttribute("offset", 2);
+      inputXml->SetAttribute("semantic", "TEXCOORD");
+      snprintf(attributeValue, sizeof(attributeValue), "#%s-UVMap", meshId);
+      inputXml->SetAttribute("source", attributeValue);
     }
 
     std::ostringstream fillData;
@@ -373,34 +306,34 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_library_geometriesXml)
       }
     }
 
-    TiXmlElement *p = new TiXmlElement( "p" );
-    triangles->LinkEndChild( p );
-    p->LinkEndChild( new TiXmlText( fillData.str().c_str() ));
+    TiXmlElement *pXml = new TiXmlElement("p");
+    trianglesXml->LinkEndChild(pXml);
+    pXml->LinkEndChild(new TiXmlText(fillData.str().c_str()));
   }
 }
 
-///////////////////////////////////////////////////
-int ColladaExporter::ExportImages(TiXmlElement *_library_imagesXml)
+//////////////////////////////////////////////////
+int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 {
   int imageCount = 0;
-  for(unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; i++)
   {
-    const gazebo::common::Material * material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
 
     if (imageString.find("meshes/") != std::string::npos)
     {
       char id[100];
-      sprintf(id,"image_%d", i);
+      snprintf(id, sizeof(id), "image_%d", i);
 
-      TiXmlElement *image = new TiXmlElement( "image" );
-      image->SetAttribute("id", id);
-      _library_imagesXml->LinkEndChild( image );
+      TiXmlElement *imageXml = new TiXmlElement("image");
+      imageXml->SetAttribute("id", id);
+      _libraryImagesXml->LinkEndChild(imageXml);
 
-      TiXmlElement *init_from = new TiXmlElement( "init_from" );
-      init_from->LinkEndChild( new TiXmlText(
-        imageString.substr(imageString.find("meshes/")+7) ));
-      image->LinkEndChild( init_from );
+      TiXmlElement *initFromXml = new TiXmlElement("init_from");
+      initFromXml->LinkEndChild(new TiXmlText(
+        imageString.substr(imageString.find("meshes/")+7)));
+      imageXml->LinkEndChild(initFromXml);
 
       imageCount++;
     }
@@ -410,90 +343,90 @@ int ColladaExporter::ExportImages(TiXmlElement *_library_imagesXml)
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::ExportMaterials(TiXmlElement *_library_materialsXml)
+void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
 {
-  for(unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
-    sprintf(id,"material_%d", i);
+    snprintf(id, sizeof(id), "material_%d", i);
 
-    TiXmlElement *material = new TiXmlElement( "material" );
-    material->SetAttribute("id", id);
-    _library_materialsXml->LinkEndChild( material );
+    TiXmlElement *materialXml = new TiXmlElement("material");
+    materialXml->SetAttribute("id", id);
+    _libraryMaterialsXml->LinkEndChild(materialXml);
 
-    sprintf(id,"#material_%d_fx", i);
-    TiXmlElement *instance_effect = new TiXmlElement( "instance_effect" );
-    instance_effect->SetAttribute("url",id);
-    material->LinkEndChild( instance_effect );
+    snprintf(id, sizeof(id), "#material_%d_fx", i);
+    TiXmlElement *instanceEffectXml = new TiXmlElement("instance_effect");
+    instanceEffectXml->SetAttribute("url", id);
+    materialXml->LinkEndChild(instanceEffectXml);
   }
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
+void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
 {
-  for(unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; i++)
   {
     char id[100];
-    sprintf(id,"material_%d_fx", i);
+    snprintf(id, sizeof(id), "material_%d_fx", i);
 
-    TiXmlElement *effect = new TiXmlElement( "effect" );
-    effect->SetAttribute("id", id);
-    _library_effectsXml->LinkEndChild( effect );
+    TiXmlElement *effectXml = new TiXmlElement("effect");
+    effectXml->SetAttribute("id", id);
+    _libraryEffectsXml->LinkEndChild(effectXml);
 
-    TiXmlElement *profile_COMMON = new TiXmlElement( "profile_COMMON" );
-    effect->LinkEndChild( profile_COMMON );
+    TiXmlElement *profileCommonXml = new TiXmlElement("profile_COMMON");
+    effectXml->LinkEndChild(profileCommonXml);
 
     // Image
-    const gazebo::common::Material * material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
 
     if (imageString.find("meshes/") != std::string::npos)
     {
-      TiXmlElement *newparam = new TiXmlElement( "newparam" );
-      sprintf(id,"image_%d_surface", i);
-      newparam->SetAttribute("sid", id);
-      profile_COMMON->LinkEndChild( newparam );
+      TiXmlElement *newParamXml = new TiXmlElement("newparam");
+      snprintf(id, sizeof(id), "image_%d_surface", i);
+      newParamXml->SetAttribute("sid", id);
+      profileCommonXml->LinkEndChild(newParamXml);
 
-      TiXmlElement *surface = new TiXmlElement( "surface" );
-      surface->SetAttribute("type", "2D");
-      newparam->LinkEndChild( surface );
+      TiXmlElement *surfaceXml = new TiXmlElement("surface");
+      surfaceXml->SetAttribute("type", "2D");
+      newParamXml->LinkEndChild(surfaceXml);
 
-      TiXmlElement *init_from = new TiXmlElement( "init_from" );
-      sprintf(id,"image_%d", i);
-      init_from->LinkEndChild( new TiXmlText(id) );
-      surface->LinkEndChild( init_from );
+      TiXmlElement *initFromXml = new TiXmlElement("init_from");
+      snprintf(id, sizeof(id), "image_%d", i);
+      initFromXml->LinkEndChild(new TiXmlText(id));
+      surfaceXml->LinkEndChild(initFromXml);
 
-      newparam = new TiXmlElement( "newparam" );
-      sprintf(id,"image_%d_sampler", i);
-      newparam->SetAttribute("sid", id);
-      profile_COMMON->LinkEndChild( newparam );
+      newParamXml = new TiXmlElement("newparam");
+      snprintf(id, sizeof(id), "image_%d_sampler", i);
+      newParamXml->SetAttribute("sid", id);
+      profileCommonXml->LinkEndChild(newParamXml);
 
-      TiXmlElement *sampler2D = new TiXmlElement( "sampler2D" );
-      newparam->LinkEndChild( sampler2D );
+      TiXmlElement *sampler2dXml = new TiXmlElement("sampler2D");
+      newParamXml->LinkEndChild(sampler2dXml);
 
-      TiXmlElement *source = new TiXmlElement( "source" );
-      sprintf(id,"image_%d_surface", i);
-      source->LinkEndChild( new TiXmlText(id) );
-      sampler2D->LinkEndChild( source );
+      TiXmlElement *sourceXml = new TiXmlElement("source");
+      snprintf(id, sizeof(id), "image_%d_surface", i);
+      sourceXml->LinkEndChild(new TiXmlText(id));
+      sampler2dXml->LinkEndChild(sourceXml);
 
-      TiXmlElement *minfilter = new TiXmlElement( "minfilter" );
-      minfilter->LinkEndChild( new TiXmlText("LINEAR") );
-      sampler2D->LinkEndChild( minfilter );
+      TiXmlElement *minFilterXml = new TiXmlElement("minfilter");
+      minFilterXml->LinkEndChild(new TiXmlText("LINEAR"));
+      sampler2dXml->LinkEndChild(minFilterXml);
 
-      TiXmlElement *magfilter = new TiXmlElement( "magfilter" );
-      magfilter->LinkEndChild( new TiXmlText("LINEAR") );
-      sampler2D->LinkEndChild( magfilter );
+      TiXmlElement *magFilterXml = new TiXmlElement("magfilter");
+      magFilterXml->LinkEndChild(new TiXmlText("LINEAR"));
+      sampler2dXml->LinkEndChild(magFilterXml);
     }
 
-    TiXmlElement *technique = new TiXmlElement( "technique" );
-    technique->SetAttribute("sid", "COMMON");
-    profile_COMMON->LinkEndChild( technique );
+    TiXmlElement *techniqueXml = new TiXmlElement("technique");
+    techniqueXml->SetAttribute("sid", "COMMON");
+    profileCommonXml->LinkEndChild(techniqueXml);
 
-    //gazebo::common::Material::ShadeMode shadeMode = material->GetShadeMode();
+    // gazebo::common::Material::ShadeMode shadeMode = material->GetShadeMode();
 
-    // Using blinn for now
-    TiXmlElement *blinn = new TiXmlElement( "blinn" );
-    technique->LinkEndChild( blinn );
+    // Using phong for now
+    TiXmlElement *phongXml = new TiXmlElement("phong");
+    techniqueXml->LinkEndChild(phongXml);
 
     // ambient
     unsigned int RGBAcolor = material->GetAmbient().GetAsRGBA();
@@ -502,13 +435,13 @@ void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
     float b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
     float a = (RGBAcolor & 0xFF) / 255.0f;
 
-    TiXmlElement *ambient = new TiXmlElement( "ambient" );
-    blinn->LinkEndChild( ambient );
+    TiXmlElement *ambientXml = new TiXmlElement("ambient");
+    phongXml->LinkEndChild(ambientXml);
 
-    TiXmlElement *color = new TiXmlElement( "color" );
-    sprintf(id,"%f %f %f %f", r,g,b,a);
-    color->LinkEndChild( new TiXmlText( id ));
-    ambient->LinkEndChild( color );
+    TiXmlElement *colorXml = new TiXmlElement("color");
+    snprintf(id, sizeof(id), "%f %f %f %f", r, g, b, a);
+    colorXml->LinkEndChild(new TiXmlText(id));
+    ambientXml->LinkEndChild(colorXml);
 
     // emission
     RGBAcolor = material->GetEmissive().GetAsRGBA();
@@ -517,25 +450,25 @@ void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
     a = (RGBAcolor & 0xFF) / 255.0f;
 
-    TiXmlElement *emission = new TiXmlElement( "emission" );
-    blinn->LinkEndChild( emission );
+    TiXmlElement *emissionXml = new TiXmlElement("emission");
+    phongXml->LinkEndChild(emissionXml);
 
-    color = new TiXmlElement( "color" );
-    sprintf(id,"%f %f %f %f", r,g,b,a);
-    color->LinkEndChild( new TiXmlText( id ));
-    emission->LinkEndChild( color );
+    colorXml = new TiXmlElement("color");
+    snprintf(id, sizeof(id), "%f %f %f %f", r, g, b, a);
+    colorXml->LinkEndChild(new TiXmlText(id));
+    emissionXml->LinkEndChild(colorXml);
 
     // diffuse
-    TiXmlElement *diffuse = new TiXmlElement( "diffuse" );
-    blinn->LinkEndChild( diffuse );
+    TiXmlElement *diffuseXml = new TiXmlElement("diffuse");
+    phongXml->LinkEndChild(diffuseXml);
 
     if (imageString.find("meshes/") != std::string::npos)
     {
-      TiXmlElement *texture = new TiXmlElement( "texture" );
-      sprintf(id,"image_%d", i);
-      texture->SetAttribute("texture",id);
-      texture->SetAttribute("texcoord","UVSET0");
-      diffuse->LinkEndChild( texture );
+      TiXmlElement *textureXml = new TiXmlElement("texture");
+      snprintf(id, sizeof(id), "image_%d", i);
+      textureXml->SetAttribute("texture", id);
+      textureXml->SetAttribute("texcoord", "UVSET0");
+      diffuseXml->LinkEndChild(textureXml);
     }
     else
     {
@@ -545,10 +478,10 @@ void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
       b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
       a = (RGBAcolor & 0xFF) / 255.0f;
 
-      color = new TiXmlElement( "color" );
-      sprintf(id,"%f %f %f %f", r,g,b,a);
-      color->LinkEndChild( new TiXmlText( id ));
-      diffuse->LinkEndChild( color );
+      colorXml = new TiXmlElement("color");
+      snprintf(id, sizeof(id), "%f %f %f %f", r, g, b, a);
+      colorXml->LinkEndChild(new TiXmlText(id));
+      diffuseXml->LinkEndChild(colorXml);
     }
 
     // specular
@@ -558,89 +491,88 @@ void ColladaExporter::ExportEffects(TiXmlElement *_library_effectsXml)
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
     a = (RGBAcolor & 0xFF) / 255.0f;
 
-    TiXmlElement *specular = new TiXmlElement( "specular" );
-    blinn->LinkEndChild( specular );
+    TiXmlElement *specularXml = new TiXmlElement("specular");
+    phongXml->LinkEndChild(specularXml);
 
-    color = new TiXmlElement( "color" );
-    sprintf(id,"%f %f %f %f", r,g,b,a);
-    color->LinkEndChild( new TiXmlText( id ));
-    specular->LinkEndChild( color );
+    colorXml = new TiXmlElement("color");
+    snprintf(id, sizeof(id), "%f %f %f %f", r, g, b, a);
+    colorXml->LinkEndChild(new TiXmlText(id));
+    specularXml->LinkEndChild(colorXml);
 
     // transparency
     double transp = material->GetTransparency();
 
-    TiXmlElement *transparency = new TiXmlElement( "transparency" );
-    blinn->LinkEndChild( transparency );
+    TiXmlElement *transparencyXml = new TiXmlElement("transparency");
+    phongXml->LinkEndChild(transparencyXml);
 
-    TiXmlElement * Float = new TiXmlElement( "float" );
-    sprintf(id,"%f", transp);
-    Float->LinkEndChild( new TiXmlText( id ));
-    transparency->LinkEndChild( Float );
+    TiXmlElement *floatXml = new TiXmlElement("float");
+    snprintf(id, sizeof(id), "%f", transp);
+    floatXml->LinkEndChild(new TiXmlText(id));
+    transparencyXml->LinkEndChild(floatXml);
 
     // shininess
     double shine = material->GetShininess();
 
-    TiXmlElement *shininess = new TiXmlElement( "shininess" );
-    blinn->LinkEndChild( shininess );
+    TiXmlElement *shininessXml = new TiXmlElement("shininess");
+    phongXml->LinkEndChild(shininessXml);
 
-    color = new TiXmlElement( "color" );
-    sprintf(id,"%f", shine);
-    color->LinkEndChild( new TiXmlText( id ));
-    shininess->LinkEndChild( color );
-
+    colorXml = new TiXmlElement("color");
+    snprintf(id, sizeof(id), "%f", shine);
+    colorXml->LinkEndChild(new TiXmlText(id));
+    shininessXml->LinkEndChild(colorXml);
   }
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::ExportVisualScenes(TiXmlElement *_library_visual_scenesXml)
+void ColladaExporter::ExportVisualScenes(
+    TiXmlElement *_libraryVisualScenesXml)
 {
-  TiXmlElement *visual_scene = new TiXmlElement( "visual_scene" );
-  _library_visual_scenesXml->LinkEndChild( visual_scene );
-  visual_scene->SetAttribute("name", "Scene");
-  visual_scene->SetAttribute("id", "Scene");
+  TiXmlElement *visualSceneXml = new TiXmlElement("visual_scene");
+  _libraryVisualScenesXml->LinkEndChild(visualSceneXml);
+  visualSceneXml->SetAttribute("name", "Scene");
+  visualSceneXml->SetAttribute("id", "Scene");
 
-  TiXmlElement *node = new TiXmlElement( "node" );
-  visual_scene->LinkEndChild( node );
-  node->SetAttribute("name", "node");
-  node->SetAttribute("id", "node");
+  TiXmlElement *nodeXml = new TiXmlElement("node");
+  visualSceneXml->LinkEndChild(nodeXml);
+  nodeXml->SetAttribute("name", "node");
+  nodeXml->SetAttribute("id", "node");
 
-  for(unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
+  for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
   {
     char meshId[100], materialId[100], attributeValue[100];
-    sprintf(meshId,"mesh_%d", i);
-    sprintf(materialId,"material_%d", i);
+    snprintf(meshId, sizeof(meshId), "mesh_%d", i);
+    snprintf(materialId, sizeof(materialId), "material_%d", i);
 
-    TiXmlElement *instance_geometry = new TiXmlElement( "instance_geometry" );
-    node->LinkEndChild( instance_geometry );
-    strcpy(attributeValue,"#");
-    strcat(attributeValue,meshId);
-    instance_geometry->SetAttribute("url", attributeValue);
+    TiXmlElement *instanceGeometryXml = new TiXmlElement("instance_geometry");
+    nodeXml->LinkEndChild(instanceGeometryXml);
+    snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
+    instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    const gazebo::common::Material * material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
 
-    if(material)
+    if (material)
     {
-      TiXmlElement *bind_material = new TiXmlElement( "bind_material" );
-      instance_geometry->LinkEndChild( bind_material );
+      TiXmlElement *bindMaterialXml = new TiXmlElement("bind_material");
+      instanceGeometryXml->LinkEndChild(bindMaterialXml);
 
-      TiXmlElement *techniqueCommon = new TiXmlElement( "technique_common" );
-      bind_material->LinkEndChild( techniqueCommon );
+      TiXmlElement *techniqueCommonXml = new TiXmlElement("technique_common");
+      bindMaterialXml->LinkEndChild(techniqueCommonXml);
 
-      TiXmlElement *instanceMaterial = new TiXmlElement( "instance_material" );
-      techniqueCommon->LinkEndChild( instanceMaterial );
-      instanceMaterial->SetAttribute("symbol", materialId);
-      strcpy(attributeValue,"#");
-      strcat(attributeValue,materialId);
-      instanceMaterial->SetAttribute("target", attributeValue);
+      TiXmlElement *instanceMaterialXml = new TiXmlElement("instance_material");
+      techniqueCommonXml->LinkEndChild(instanceMaterialXml);
+      instanceMaterialXml->SetAttribute("symbol", materialId);
+      snprintf(attributeValue, sizeof(attributeValue), "#%s", materialId);
+      instanceMaterialXml->SetAttribute("target", attributeValue);
 
       std::string imageString = material->GetTextureImage();
 
       if (imageString.find("meshes/") != std::string::npos)
       {
-        TiXmlElement *bindVertexInput = new TiXmlElement( "bind_vertex_input" );
-        instanceMaterial->LinkEndChild( bindVertexInput );
-        bindVertexInput->SetAttribute("semantic", "UVSET0");
-        bindVertexInput->SetAttribute("input_semantic", "TEXCOORD");
+        TiXmlElement *bindVertexInputXml =
+            new TiXmlElement("bind_vertex_input");
+        instanceMaterialXml->LinkEndChild(bindVertexInputXml);
+        bindVertexInputXml->SetAttribute("semantic", "UVSET0");
+        bindVertexInputXml->SetAttribute("input_semantic", "TEXCOORD");
       }
     }
   }
@@ -649,8 +581,8 @@ void ColladaExporter::ExportVisualScenes(TiXmlElement *_library_visual_scenesXml
 //////////////////////////////////////////////////
 void ColladaExporter::ExportScene(TiXmlElement *_sceneXml)
 {
-  TiXmlElement *instance_visual_scene =
-      new TiXmlElement( "instance_visual_scene" );
-  _sceneXml->LinkEndChild( instance_visual_scene );
-  instance_visual_scene->SetAttribute("url", "#Scene");
+  TiXmlElement *instanceVisualSceneXml =
+      new TiXmlElement("instance_visual_scene");
+  _sceneXml->LinkEndChild(instanceVisualSceneXml);
+  instanceVisualSceneXml->SetAttribute("url", "#Scene");
 }

@@ -52,53 +52,51 @@ namespace gazebo
       public: virtual void Export(const Mesh *_mesh);
 
       /// \brief Export asset element
-      /// \return A pointer to the asset xml element
+      /// \param[in] _assetXml Pointer to the asset XML instance
       private: void ExportAsset(TiXmlElement *_assetXml);
 
       /// \brief Export geometry source
-      /// TODO
-      private: void FillGeometrySources(
+      /// \param[in] _subMesh Gazebo submesh
+      /// \param[in] _meshXml Pointer to the mesh XML instance
+      /// \param[in] _type 1 for positions, 2 for normals
+      /// \param[in] _meshID
+      private: void FillSource(
           const gazebo::common::SubMesh *_subMesh,
-          TiXmlElement *Mesh, int type, const char *meshID);
-
-      /// \brief Export geometry source
-      /// TODO
-      private: void FillTextureSource(
-          const gazebo::common::SubMesh *_subMesh,
-          TiXmlElement *Mesh,
-          const char *meshID);
+          TiXmlElement *_meshXml, int _type, const char *_meshID);
 
       /// \brief Export library geometries element
-      /// TODO
-      private: void ExportGeometries(TiXmlElement *_library_geometriesXml);
+      /// \param[in] libraryGeometriesXml Pointer to the library geometries
+      /// XML instance
+      private: void ExportGeometries(TiXmlElement *_libraryGeometriesXml);
 
       /// \brief Export library images element
-      /// TODO
-      private: int ExportImages(TiXmlElement *_library_imagesXml);
+      /// \param[in] _libraryImagesXml Pointer to the library images XML
+      /// instance
+      private: int ExportImages(TiXmlElement *_libraryImagesXml);
 
       /// \brief Export library materials element
-      /// TODO
-      private: void ExportMaterials(TiXmlElement *_library_materialsXml);
+      /// \param[in] _libraryMaterialsXml Pointer to the library materials XML
+      /// instance
+      private: void ExportMaterials(TiXmlElement *_libraryMaterialsXml);
 
       /// \brief Export library effects element
-      /// TODO
-      private: void ExportEffects(TiXmlElement *_library_effectsXml);
+      /// \param[in] _libraryEffectsXml Pointer to the library effects XML
+      /// instance
+      private: void ExportEffects(TiXmlElement *_libraryEffectsXml);
 
       /// \brief Export library visual scenes element
-      /// TODO
-      private: void ExportVisualScenes(TiXmlElement *_library_visual_scenesXml);
+      /// \param[in] _libraryVisualScenesXml Pointer to the library visual
+      /// scenes XML instance
+      private: void ExportVisualScenes(TiXmlElement *_libraryVisualScenesXml);
 
       /// \brief Export scene element
-      /// TODO
+      /// \param[in] _sceneXml Pointer to the scene XML instance
       private: void ExportScene(TiXmlElement *_sceneXml);
 
-      /// \brief scaling factor
-      private: double meter;
-
-      /// \brief mesh
+      /// \brief Gazebo mesh
       private: const Mesh *mesh;
 
-      /// \brief material count
+      /// \brief Material count
       private: unsigned int materialCount;
     };
     /// \}

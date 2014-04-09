@@ -162,7 +162,7 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void MeshManager::Export( const Mesh *_mesh)
+void MeshManager::Export(const Mesh *_mesh)
 {
   MeshExporter *exporter = NULL;
   exporter = this->colladaExporter;
