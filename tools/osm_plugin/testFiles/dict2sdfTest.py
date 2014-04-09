@@ -54,7 +54,7 @@ class GetSDFTest(unittest.TestCase):
 
         #Include the roads in the map in sdf file
         for road in roadPointWidthMap.keys():
-            sdfFile.addRoad(road)
+            sdfFile.addRoad(road, road[road]['texture'])
             sdfFile.setRoadWidth(roadPointWidthMap[road]['width'], road)
             points = roadPointWidthMap[road]['points']
             for point in range(len(points[0, :])):
