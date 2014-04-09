@@ -133,7 +133,9 @@
 1. **gazebo/physics/Entity.hh**
     + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
     + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
-
+1. **gazebo/physics/Box.hh**
+    + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
+    + ***Replacement:***  bool operator==(const Box &_b) const
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
