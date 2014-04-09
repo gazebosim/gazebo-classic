@@ -42,6 +42,7 @@ set (sources
   PhysicsEngine.cc
   PhysicsFactory.cc
   PlaneShape.cc
+  PolyLineShape.cc
   RayShape.cc
   Road.cc
   Shape.cc
@@ -85,6 +86,7 @@ set (headers
   PhysicsFactory.hh
   PhysicsTypes.hh
   PlaneShape.hh
+  PolyLineShape.hh
   RayShape.hh
   Road.hh
   Shape.hh

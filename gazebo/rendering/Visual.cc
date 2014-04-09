@@ -300,7 +300,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_geometry())
   {
-   if (_msg->geometry().type() == msgs::Geometry::BOX)
+    if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
       sdf::ElementPtr elem = geomElem->AddElement("box");
       elem->GetElement("size")->Set(
@@ -328,12 +328,11 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
      sdf::ElementPtr elem = geomElem->AddElement("polyline");
      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
-     for(int i =0; i < _msg->geometry().polyline().point_size(); i++)
+     for (int i = 0; i < _msg->geometry().polyline().point_size(); i++)
      {
-        elem->AddElement("point")->Set(msgs::Convert(_msg->geometry().polyline().point(i)));
-  
+        elem->AddElement("point")->Set(msgs::Convert(_msg->geometry()
+                                                     .polyline().point(i)));
      }
-
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
@@ -533,7 +532,7 @@ void Visual::Load()
     }
 //    else if (geomElem->HasElement("polyline"))
 //    {
-//      this->dataPtr->scale = 
+//      this->dataPtr->scale =
 //          geomElem->GetElement("polyline")->Get<math::Vector3>("scale");
 //    }
   }
@@ -2325,7 +2324,28 @@ std::string Visual::GetMeshName() const
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
     else if (geomElem->HasElement("polyline"))
-      return "polyline";
+    {
+      std::string polyLineName = this->GetName();
+      common::MeshManager *meshManager = common::MeshManager::Instance();
+
+      if (!meshManager->IsValidFilename(polyLineName))
+      {
+        std::vector<math::Vector2d> vertices;
+        sdf::ElementPtr pointElem = geomElem->GetElement("polyline")
+                                            ->GetElement("point");
+        while (pointElem)
+        {
+          math::Vector2d point = pointElem->Get<math::Vector2d>();
+          pointElem = pointElem->GetNextElement("point");
+          vertices.push_back(point);
+        }
+        meshManager->CreateExtrudedPolyline(polyLineName, vertices,
+                                            geomElem->GetElement("polyline")
+                                            ->Get<double>("height"),
+                                            math::Vector2d(1, 1));
+       }
+      return polyLineName;
+    }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");

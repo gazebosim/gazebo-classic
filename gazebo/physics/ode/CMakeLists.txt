@@ -42,6 +42,7 @@ SET (headers
   ODEMultiRayShape.hh
   ODEPhysics.hh
   ODEPlaneShape.hh
+#  ODEPolyLineShape.hh
   ODERayShape.hh
   ODEScrewJoint.hh
   ODESliderJoint.hh

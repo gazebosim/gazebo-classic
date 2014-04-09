@@ -17,7 +17,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <vector>
-
+#include <stdio.h>
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
@@ -60,20 +60,11 @@ MeshManager::MeshManager()
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
-  
+
   this->CreateCylinder("axis_shaft", 0.01, 0.2, 1, 16);
   this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
 
   this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
-
-  std::vector<math::Vector2d> vertices;
-  vertices.push_back(math::Vector2d(0, 2));
-  vertices.push_back(math::Vector2d(1, 1));
-  vertices.push_back(math::Vector2d(1, -1));
-  vertices.push_back(math::Vector2d(0, -2));
-  vertices.push_back(math::Vector2d(-1, -1));
-  vertices.push_back(math::Vector2d(-1, 1));
-  this->CreateExtrudedPolyline("polyline", vertices , 1, math::Vector2d(0, 0));
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -503,29 +494,34 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
   };
 
   float **v = new float *[numSides*2];
-  for(i=0;i<numSides*2;i++)
-    v[i]= new float[3];    
+  for (i = 0; i < numSides*2; i++)
+    v[i]= new float[3];
+
+  float x, angle = 2 * M_PI / numSides;
+  i = 0;
 
   float **n = new float *[numSides*2];
-  for(i=0;i<numSides*2;i++)
+  for (i = 0; i < numSides*2; i++)
     n[i]= new float[3];
 
-  for (i=0; i<numSides*2; i++)
+  float d;
+
+  for (i = 0; i < numSides*2; i++)
   {
-       n[i][0] = 0.577350;
-       n[i][1] = 0.577350;
-       n[i][2] = 0.577350;
+    n[i][0] = 0.577350;
+    n[i][1] = 0.577350;
+    n[i][2] = 0.577350;
   }
 
   // Compute the vertices
-  for (i=0, k=0; i<numSides*2; i++, k++)
+  for (i = 0, k = 0; i < numSides*2; i++, k++)
   {
     v[i][0] = vertices[k].x;
     v[i][1] = vertices[k].y;
     v[i][2] = 0.0;
     subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
     subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
-    subMesh->AddTexCoord(t[k%4][0], t[k%4][1]);
+    subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
     i++;
 
     v[i][0] = vertices[k].x;
@@ -533,7 +529,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
     v[i][2] = height;
     subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
     subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
-    subMesh->AddTexCoord(t[k%4][0], t[k%4][1]);
+    subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
   }
 
   // Euler's Formula: numFaces = numEdges - numVertices + 2
@@ -542,10 +538,41 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
   //                = numFaces - 2
   //                = numSides
 
-  //for each sideface
-  for (i=0; i<numSides; i++)
+  int startVert = 0;
+  int endVert = numSides*2-2;
+  // for upper and lower face
+  for (k = 0; k < 2; k++)
   {
-    if (i!=(numSides - 1))
+    subMesh->AddIndex(startVert);
+    startVert +=2;
+    subMesh->AddIndex(startVert);
+    subMesh->AddIndex(endVert);
+
+    for (i = 1; i < numSides-2; i++)
+    {
+      if (i%2)
+      {
+        subMesh->AddIndex(startVert);
+        startVert +=2;
+        subMesh->AddIndex(endVert);
+        subMesh->AddIndex(startVert);
+      }
+      else
+      {
+        subMesh->AddIndex(endVert);
+        endVert -=2;
+        subMesh->AddIndex(startVert);
+        subMesh->AddIndex(endVert);
+      }
+    }
+    startVert = 1;
+    endVert = numSides*2-1;
+  }
+
+  // for each sideface
+  for (i = 0; i < numSides; i++)
+  {
+    if (i != (numSides - 1))
     {
       subMesh->AddIndex(i*2);
       subMesh->AddIndex(i*2+1);
@@ -567,38 +594,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &name,
     }
   }
 
-  int startVert = 0;
-  int endVert = numSides*2-2;
-  //for upper and lower face
-  for (k=0; k<2; k++)
-  {
-    subMesh->AddIndex(startVert);
-    startVert +=2;
-    subMesh->AddIndex(startVert);
-    subMesh->AddIndex(endVert);
-
-    for (i=0; i<numSides-3; i++)
-    {
-      if (i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert +=2;
-        subMesh->AddIndex(endVert);
-        subMesh->AddIndex(startVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -=2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
-    }
-    startVert = 1;
-    endVert = numSides*2-1;
-  }
-
-  subMesh->RecalculateNormals();
+subMesh->RecalculateNormals();
 }
 
 //////////////////////////////////////////////////

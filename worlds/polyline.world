@@ -11,14 +11,15 @@
               <point>0 0</point>
               <point>0 1</point>
               <point>1 0</point>
-              <point>2 1</point>
-              <point>1 2</point>
-              <height>1</height>
+              <height>0.2</height>
             </polyline>
-          </geometry>
+        <!-->
+            <box><size>1 1 1</size></box>
+         --> </geometry>
         </visual>  
       <pose>1 1 0 0 0 0</pose>
       </link>
+    
     </model>
   </world>
 </sdf>

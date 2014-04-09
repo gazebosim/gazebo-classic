@@ -512,7 +512,7 @@ namespace gazebo
            math::Vector2d point = pointElem->Get<math::Vector2d>();
            pointElem = pointElem->GetNextElement("point");
            msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
-           msgs::Set( ptMsg, point);
+           msgs::Set(ptMsg, point);
         }
       }
       else if (geomElem->GetName() == "image")

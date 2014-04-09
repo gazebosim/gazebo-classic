@@ -116,10 +116,11 @@ namespace gazebo
       /// \param[in] _height the height of the polyline
       /// \param[in] _uvCoords the texture coordinates
       public: void CreateExtrudedPolyline(const std::string &_name,
-                                          const std::vector<math::Vector2d> &_vertices,
-                                          const double &_height,                                    
+                                          const std::vector<math::Vector2d>
+                                          &_vertices,
+                                          const double &_height,
                                           const math::Vector2d &_uvCoords);
-      
+
       /// \brief Create a cylinder mesh
       /// \param[in] _name the name of the new mesh
       /// \param[in] _radius the radius of the cylinder in the x y plane

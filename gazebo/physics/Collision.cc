@@ -33,6 +33,7 @@
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/CylinderShape.hh"
+#include "gazebo/physics/PolyLineShape.hh"
 #include "gazebo/physics/MeshShape.hh"
 #include "gazebo/physics/SphereShape.hh"
 #include "gazebo/physics/HeightmapShape.hh"
