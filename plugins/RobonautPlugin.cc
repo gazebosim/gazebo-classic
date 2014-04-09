@@ -300,8 +300,6 @@ void RobonautPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->jointController->SetPositionPID(
       "r2::/r2/left_arm/hand/thumb/joint2",
       common::PID(0.5, 0.0, 0.1));
- 
-
 
   this->rightBumper = false;
   this->leftBumper = false;

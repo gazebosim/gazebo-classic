@@ -12,6 +12,7 @@ set (files
   noise.compositor
   warp.material
   glsl120.program
+  oculus.compositor
   perpixel.program
   picker.material
   ShadowCaster.material
