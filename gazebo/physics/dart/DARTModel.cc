@@ -202,7 +202,8 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTModel::GetDARTWorld(void) const
+dart::simulation::SoftWorld *DARTModel::GetDARTWorld(void) const
 {
-  return GetDARTPhysics()->GetDARTWorld();
+  return dynamic_cast<dart::simulation::SoftWorld*>(
+    GetDARTPhysics()->GetDARTWorld());
 }
