@@ -39,6 +39,18 @@
 using namespace gazebo;
 using namespace common;
 
+namespace gazebo {
+namespace common {
+class InputValue
+{
+  public: int vertexIndex;
+  public: int normalIndex;
+  public: int texcoordIndex;
+  public: int mappedIndex;
+};
+}
+}
+
 //////////////////////////////////////////////////
   ColladaLoader::ColladaLoader()
 : MeshLoader(), meter(1.0)
@@ -1353,8 +1365,11 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   std::vector<math::Vector3> norms;
   std::vector<math::Vector2d> texcoords;
 
-  // A list of all the input values.
-  std::list<std::pair<std::string, int> > inputs;
+  const unsigned int VERTEX = 0;
+  const unsigned int NORMAL = 1;
+  const unsigned int TEXCOORD = 2;
+
+  std::map<const unsigned int, int> inputs;
   while (trianglesInputXml)
   {
     std::string semantic = trianglesInputXml->Attribute("semantic");
@@ -1366,16 +1381,22 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       this->LoadVertices(source, _transform, verts, norms);
       if (norms.size() > count)
         combinedVertNorms = true;
+      inputs[VERTEX] = math::parseInt(offset);
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms);
       combinedVertNorms = false;
+      inputs[NORMAL] = math::parseInt(offset);
     }
     else if (semantic == "TEXCOORD")
+    {
       this->LoadTexCoords(source, texcoords);
+      inputs[TEXCOORD] = math::parseInt(offset);
+    }
 
-    inputs.push_back(std::make_pair(semantic, math::parseInt(offset)));
+    //inputs.push_back(std::make_pair(semantic, math::parseInt(offset)));
+
 
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
   }
@@ -1389,40 +1410,155 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
   std::string pStr = pXml->GetText();
 
-  std::vector<math::Vector3> vertNorms(verts.size());
-  std::vector<int> vertNormsCounts(verts.size());
-  std::fill(vertNormsCounts.begin(), vertNormsCounts.end(), 0);
+  bool hasVertices = inputs.find(VERTEX) != inputs.end();
+  bool hasNormals = inputs.find(NORMAL) != inputs.end();
+  bool hasTexcoords = inputs.find(TEXCOORD) != inputs.end();
 
+  std::map<unsigned int, std::vector<InputValue> > inputValueMap;
   int *values = new int[inputs.size()];
-  std::list<std::pair<std::string, int> >::iterator end = inputs.end();
-  std::list<std::pair<std::string, int> >::iterator iter;
-  math::Vector2d vec;
-
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
 
+  //std::cerr << "offsets " << inputs[VERTEX] << " "  << inputs[NORMAL] << " " <<
+  //    inputs[TEXCOORD] << std::endl;
+  //std::cerr << "has* " << hasVertices << " " << hasNormals << " " <<
+  //    hasTexcoords << std::endl;
+
+
+  /// TODO remove me
+  int d = 0;
+  int r = 0;
+
   for (unsigned int j = 0; j < strs.size(); j += inputs.size())
   {
-    for (unsigned int i = 0; i < inputs.size(); i++)
+    for (unsigned int i = 0; i < inputs.size(); ++i)
       values[i] = math::parseInt(strs[j+i]);
 
-    bool already = false;
-    for (iter = inputs.begin(); iter != end; ++iter)
+    if (hasVertices)
     {
-      if ((*iter).first == "VERTEX")
+      int daeVertIndex = values[inputs[VERTEX]];
+
+      // if the vertex index has not been previously added then just add it.
+      if (inputValueMap.find(daeVertIndex) == inputValueMap.end())
       {
-        subMesh->AddVertex(verts[values[(*iter).second]]);
+        InputValue input;
+        subMesh->AddVertex(verts[daeVertIndex]);
+        unsigned int newVertIndex = subMesh->GetVertexCount()-1;
+        subMesh->AddIndex(newVertIndex);
+        if (combinedVertNorms)
+          subMesh->AddNormal(norms[daeVertIndex]);
+        if (hasNormals)
+        {
+          subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
+          input.normalIndex = values[inputs[NORMAL]];
+        }
+        if (hasTexcoords)
+        {
+          subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
+              texcoords[values[inputs[TEXCOORD]]].y);
+          input.texcoordIndex = values[inputs[TEXCOORD]];
+        }
+
+        input.vertexIndex = daeVertIndex;
+        input.mappedIndex = newVertIndex;
+        std::vector<InputValue> inputValues;
+        inputValues.push_back(input);
+        inputValueMap[daeVertIndex] = inputValues;
+      }
+      else
+      {
+        // if the vertex index was previously added, look at the corresponding
+        // normal and texcoord index values to see if they match.
+
+        bool duplicate = true;
+        unsigned int reuseIndex = 0;
+        std::vector<InputValue> inputValues = inputValueMap[daeVertIndex];
+
+        /*std::cerr << "current values " <<
+            values[inputs[VERTEX]] << " " << values[inputs[NORMAL]] << " " <<
+            values[inputs[TEXCOORD]] << std::endl;*/
+        for (unsigned int i = 0; i < inputValues.size(); ++i)
+        {
+          InputValue iv = inputValues[i];
+
+          /*std::cerr << " comparisons " << iv.normalIndex << " " <<
+              iv.texcoordIndex << " " << std::endl;*/
+
+          bool normEqual = false;
+          bool texEqual = false;
+          if (hasNormals && iv.normalIndex == values[inputs[NORMAL]])
+          {
+            normEqual = true;
+          }
+          if (hasTexcoords && iv.texcoordIndex == values[inputs[TEXCOORD]])
+          {
+            texEqual = true;
+          }
+
+          if ((!hasNormals || normEqual) && (!hasTexcoords || texEqual))
+          {
+            // found a resuable vertex!
+            duplicate = false;
+            reuseIndex = iv.mappedIndex;
+            break;
+          }
+        }
+
+        if (!duplicate)
+        {
+          /// TODO remove me
+          r++;
+
+          subMesh->AddIndex(reuseIndex);
+        }
+        else
+        {
+          /// TODO remove me
+          d++;
+
+          InputValue input;
+          subMesh->AddVertex(verts[daeVertIndex]);
+          unsigned int newVertIndex = subMesh->GetVertexCount()-1;
+          subMesh->AddIndex(newVertIndex);
+          if (combinedVertNorms)
+            subMesh->AddNormal(norms[daeVertIndex]);
+          if (hasNormals)
+          {
+            subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
+            input.normalIndex = values[inputs[NORMAL]];
+          }
+          if (hasTexcoords)
+          {
+            subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
+                texcoords[values[inputs[TEXCOORD]]].y);
+            input.texcoordIndex = values[inputs[TEXCOORD]];
+          }
+          input.vertexIndex = daeVertIndex;
+          input.mappedIndex = newVertIndex;
+          inputValues.push_back(input);
+        }
+      }
+    }
+
+  /*
+    bool already = false;
+    for (std::map<const unsigned int, int>::iterator iter = inputs.begin();
+      iter != inputs.end(); ++iter)
+    {
+      if (iter->first == VERTEX)
+      {
+        subMesh->AddVertex(verts[values[iter->second]]);
         subMesh->AddIndex(subMesh->GetVertexCount()-1);
         if (combinedVertNorms)
-          subMesh->AddNormal(norms[values[(*iter).second]]);
+          subMesh->AddNormal(norms[values[iter->second]]);
         if (_mesh->HasSkeleton())
         {
           Skeleton *skel = _mesh->GetSkeleton();
           for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(values[(*iter).second]); i++)
+                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
           {
             std::pair<std::string, double> node_weight =
-              skel->GetVertNodeWeight(values[(*iter).second], i);
+              skel->GetVertNodeWeight(values[iter->second], i);
             SkeletonNode *node =
                 _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
@@ -1430,20 +1566,28 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           }
         }
       }
-      else if ((*iter).first == "NORMAL")
+      else if (iter->first == NORMAL)
       {
-        subMesh->AddNormal(norms[values[(*iter).second]]);
+        subMesh->AddNormal(norms[values[iter->second]]);
       }
-      else if ((*iter).first == "TEXCOORD" && !already)
+      else if (iter->first == TEXCOORD && !already)
       {
         already = true;
-        subMesh->AddTexCoord(texcoords[values[(*iter).second]].x,
-            texcoords[values[(*iter).second]].y);
+        subMesh->AddTexCoord(texcoords[values[iter->second]].x,
+            texcoords[values[iter->second]].y);
       }
       // else
       // gzerr << "Unhandled semantic[" << (*iter).first << "]\n";
-    }
+    }*/
+
   }
+
+  std::cerr << "vertices: " << subMesh->GetVertexCount() << std::endl;
+  std::cerr << "normals: " << subMesh->GetNormalCount() << std::endl;
+  std::cerr << "texcoords: " << subMesh->GetTexCoordCount() << std::endl;
+  std::cerr << "indices: " << subMesh->GetIndexCount() << std::endl;
+  std::cerr << "duplicates: " << d << std::endl;
+  std::cerr << "reused: " << r << std::endl;
   delete [] values;
 
   _mesh->AddSubMesh(subMesh);
