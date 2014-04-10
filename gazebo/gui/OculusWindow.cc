@@ -50,6 +50,7 @@ OculusWindow::~OculusWindow()
 {
   this->attachCameraThread->join();
   delete this->attachCameraThread;
+  this->oculusCamera.reset();
 }
 
 /////////////////////////////////////////////////
@@ -93,30 +94,31 @@ void OculusWindow::AttachCameraToVisual()
   {
     common::Time::MSleep(100);
   }
- 
-  this->oculusCamera->AttachToVisual(this->visualName, true); 
-  
-  math::Vector3 camPos(0.1, 0, 0);  
+
+  this->oculusCamera->AttachToVisual(this->visualName, true);
+
+  math::Vector3 camPos(0.1, 0, 0);
   math::Vector3 lookAt(0, 0, 0);
   math::Vector3 delta = lookAt - camPos;
 
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  
+
   this->oculusCamera->SetWorldPose(math::Pose(
-        camPos, math::Vector3(0, pitch, yaw)));  
+        camPos, math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
 void OculusWindow::showEvent(QShowEvent *_event)
 {
+  std::cout << "showEvent" << std::endl;
   this->scene = rendering::get_scene();
-  
+
   if (!this->oculusCamera)
   {
     this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
-  
+
     this->attachCameraThread = new boost::thread(
         boost::bind(&OculusWindow::AttachCameraToVisual, this));
   }
@@ -128,7 +130,7 @@ void OculusWindow::showEvent(QShowEvent *_event)
       CreateWindow(this->GetOgreHandle(), this->width(), this->height());
     if (this->oculusCamera)
       rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-          this->windowId, this->oculusCamera);      
+          this->windowId, this->oculusCamera);
   }
 
   QWidget::showEvent(_event);
