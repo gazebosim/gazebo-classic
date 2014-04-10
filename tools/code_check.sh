@@ -68,13 +68,8 @@ echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
-# The follow suppression is useful when checking for missing includes.
-# It's disable for now because checking for missing includes is very
-# time consuming. See CPPCHECK_CMD3.
-echo "missingIncludeSystem" >> $SUPPRESS
-
 #cppcheck
-CPPCHECK_BASE="cppcheck -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
