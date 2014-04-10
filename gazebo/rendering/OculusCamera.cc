@@ -15,6 +15,7 @@
  *
 */
 
+#include <OVR.h>
 #include <sstream>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -38,7 +39,6 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/OculusCamera.hh"
 
-#include "OVR.h"
 
 using namespace gazebo;
 using namespace rendering;

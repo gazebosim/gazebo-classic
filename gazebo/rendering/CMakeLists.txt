@@ -5,7 +5,6 @@ include_directories(SYSTEM
   ${CEGUI_INCLUDE_DIRS}
   skyx
   skyx/include
-  ${CMAKE_SOURCE_DIR}/deps/oculus/include
 )
 
 if (${OGRE_VERSION} GREATER 1.7.4)
@@ -149,10 +148,9 @@ target_link_libraries(gazebo_rendering
   ${CEGUI_LIBRARIES}
 )
 
-if (HAVE_LIBUDEV AND HAVE_XINERAMA)
-  MESSAGE ("Libudev and xinerama")
+if (HAVE_OCULUS)
   target_link_libraries(gazebo_rendering
-    gazebo_ovr
+    OculusVR
   )
 endif()
 

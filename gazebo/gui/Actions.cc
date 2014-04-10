@@ -15,6 +15,7 @@
  *
  */
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/util/system.hh"
 

@@ -17,10 +17,10 @@
 #ifndef _SCENE_HH_
 #define _SCENE_HH_
 
-#include <vector>
+#include <list>
 #include <map>
 #include <string>
-#include <list>
+#include <vector>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
@@ -28,14 +28,13 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/rendering/RenderTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/math/Vector2i.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace SkyX

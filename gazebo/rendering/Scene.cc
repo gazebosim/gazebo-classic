@@ -24,7 +24,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/gazebo_config.h"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"

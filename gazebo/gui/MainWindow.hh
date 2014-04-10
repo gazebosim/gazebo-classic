@@ -22,6 +22,7 @@
 #include <vector>
 #include <list>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"

@@ -18,6 +18,7 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL

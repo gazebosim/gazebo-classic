@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
