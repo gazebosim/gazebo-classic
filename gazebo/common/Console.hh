@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <boost/thread.hpp>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -49,12 +50,14 @@ namespace gazebo
     #define gzlog (gazebo::common::Console::log())
 
     /// \brief Initialize log file with filename given by _str.
+    /// If called twice, it will close currently in use and open a new
+    /// log file.
     /// \param[in] _str Name of log file for gzlog messages.
     #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
-    class FileLogger : public std::ostream
+    class GAZEBO_VISIBLE FileLogger : public std::ostream
     {
       /// \brief Constructor.
       /// \param[in] _filename Filename to write into. If empty,
@@ -104,7 +107,7 @@ namespace gazebo
 
     /// \class Logger Logger.hh common/common.hh
     /// \brief Terminal logger.
-    class Logger : public std::ostream
+    class GAZEBO_VISIBLE Logger : public std::ostream
     {
       /// \enum LogType.
       /// \brief Output destination type.
@@ -173,7 +176,7 @@ namespace gazebo
     /// \class Console Console.hh common/common.hh
     /// \brief Container for loggers, and global logging options
     /// (such as verbose vs. quiet output).
-    class Console
+    class GAZEBO_VISIBLE Console
     {
       /// \brief Set quiet output.
       /// \param[in] q True to prevent warning.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,8 @@ BulletMotionState::~BulletMotionState()
 //////////////////////////////////////////////////
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
-  _cogWorldTrans = BulletTypes::ConvertPose(this->link->GetWorldCoGPose());
+  _cogWorldTrans =
+    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
 }
 
 //////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -346,7 +346,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   msgs::Contacts contacts;
 
   physics->SetContactMaxCorrectingVel(0);
-  physics->SetSORPGSIters(100);
+  physics->SetParam("iters", 100);
 
   world->Step(1);
 

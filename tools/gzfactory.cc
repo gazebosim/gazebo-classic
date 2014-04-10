@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ namespace po = boost::program_options;
 /////////////////////////////////////////////////
 void help(po::options_description &_options)
 {
-  std::cerr << "gzfactory -- Tool to spawn or delete models from "
-    << " simulation\n\n";
+  std::cerr << "gzfactory -- DEPRECATED(see 'gz help model')\n\n";
 
   std::cerr << "`gzfactory` <spawn|delete> [options]\n\n";
 

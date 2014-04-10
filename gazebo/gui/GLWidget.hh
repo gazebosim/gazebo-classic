@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,18 +41,24 @@
 #include "gazebo/gui/MeshMaker.hh"
 #include "gazebo/gui/ModelMaker.hh"
 #include "gazebo/gui/LightMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class GLWidget : public QWidget
+    class GAZEBO_VISIBLE GLWidget : public QWidget
     {
       Q_OBJECT
 
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      /// \brief View a scene in this widget.
+      /// This will use the scene's UserCamera to visualize the scene.
+      /// If a UserCamera does not exist, one is created with the
+      /// name "gzclient_camera".
+      /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;

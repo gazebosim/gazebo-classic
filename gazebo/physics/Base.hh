@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -69,7 +70,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class Base : public boost::enable_shared_from_this<Base>
+    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.

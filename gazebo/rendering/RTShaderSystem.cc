@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- */
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -378,7 +375,10 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
           // Get the tmp dir
           tmpdir = getenv("TMP");
           if (!tmpdir)
-            tmpdir = const_cast<char*>("/tmp");
+          {
+            common::SystemPaths *paths = common::SystemPaths::Instance();
+            tmpdir = const_cast<char*>(paths->GetTmpPath().c_str());
+          }
           // Get the user
           user = getenv("USER");
           if (!user)

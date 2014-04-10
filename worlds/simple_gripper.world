@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://simple_arm</uri>
+    </include>
+    <model name="cylinder">
+      <pose>1.0 1.0 0 0 0 0</pose>
+      <link name="base">
+        <visual name="cylinder_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.25</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="cylinder_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.25</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    <include>
+      <pose>0.35 0.35 0.5 0 0 0.7071</pose>
+      <uri>model://camera</uri>
+    </include>
+
+    <include>
+      <pose>0.45 0.45 0.3 0 0 0.7071</pose>
+      <uri>model://hokuyo</uri>
+    </include>
+  </world>
+</sdf>

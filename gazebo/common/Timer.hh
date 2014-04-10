@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class Timer Timer.hh common/common.hh
     /// \brief A timer class, used to time things in real world walltime
-    class Timer
+    class GAZEBO_VISIBLE Timer
     {
       /// \brief Constructor
       public: Timer();

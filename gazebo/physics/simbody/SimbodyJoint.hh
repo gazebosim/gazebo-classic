@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class SimbodyJoint : public Joint
+    class GAZEBO_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
       public: SimbodyJoint(BasePtr _parent);
@@ -86,13 +87,23 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
                   unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                  unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Save current Simbody State
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
@@ -149,19 +160,25 @@ namespace gazebo
       /// \brief default mobilizer pose
       public: SimTK::Transform defxAB;
 
+      /// \brief: Spring force element for enforcing joint stiffness.
+      /// The element is assigned when constructing Simbody model in
+      /// SimbodyPhysics::AddDynamicModelToSimbodySystem.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom springs for special joints like ball joints.
+      public: SimTK::Force::MobilityLinearSpring spring[MAX_JOINT_AXIS];
+
       /// \brief: for enforcing joint damping forces.
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearDamper damper;
+      public: SimTK::Force::MobilityLinearDamper damper[MAX_JOINT_AXIS];
 
       /// \brief: for enforcing joint stops
       /// Set when we build the Simbody model.
-      /// \TODO: Make these arrays for multi-axis joints.
       /// \TODO: Also, consider moving this into individual joint type subclass
       /// so we can specify custom dampers for special joints like ball joints.
-      public: SimTK::Force::MobilityLinearStop limitForce;
+      /// Assuming this is not used for BallJoints it's ok here for now.
+      public: SimTK::Force::MobilityLinearStop limitForce[MAX_JOINT_AXIS];
 
       /// \brief Use isValid() if we used a mobilizer
       /// Set when we build the Simbody model.
@@ -184,6 +201,20 @@ namespace gazebo
       // Keeps track if simbody physics has been initialized
       public: bool physicsInitialized;
 
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;
 
@@ -195,6 +226,9 @@ namespace gazebo
       /// equivalent of simulated force torque sensor reading
       /// Allocate a 2 vector in case hinge2 joint is used.
       /// This is used by Bullet to store external force applied by the user.
+      /// \TODO: Also, consider moving this into individual joint type subclass
+      /// so we can specify custom dampers for special joints like ball joints.
+      /// Assuming this is not used for BallJoints it's ok here for now.
       private: double forceApplied[MAX_JOINT_AXIS];
 
       /// \brief Save time at which force is applied by user

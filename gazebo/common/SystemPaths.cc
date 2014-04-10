@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,7 @@
  * limitations under the License.
  *
  */
-/* Desc: Local Gazebo configuration
- * Author: Nate Koenig, Jordi Polo
- * Date: 3 May 2008
- */
 
-#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -31,10 +26,10 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -48,10 +43,27 @@ SystemPaths::SystemPaths()
   this->pluginPaths.clear();
   this->modelPaths.clear();
 
+  try
+  {
+    // Get a path suitable for temporary files
+    this->tmpPath = boost::filesystem::temp_directory_path();
+
+    // Get a unique path suitable for temporary files. If there are multiple
+    // gazebo instances on the same machine, each one will have its own
+    // temporary directory
+    this->tmpInstancePath = boost::filesystem::unique_path("gazebo-%%%%%%");
+  }
+  catch(const boost::system::error_code &_ex)
+  {
+    gzerr << "Failed creating temp directory. Reason: "
+          << _ex.message() << "\n";
+    return;
+  }
+
   char *homePath = getenv("HOME");
   std::string home;
   if (!homePath)
-    home = "/tmp/gazebo";
+    home = this->GetTmpPath() + "/gazebo";
   else
     home = homePath;
 
@@ -63,7 +75,7 @@ SystemPaths::SystemPaths()
   std::string fullPath;
   if (!path)
   {
-    if (home != "/tmp/gazebo")
+    if (home != this->GetTmpPath() + "/gazebo")
       fullPath = home + "/.gazebo";
     else
       fullPath = home;
@@ -134,6 +146,24 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
   if (this->ogrePathsFromEnv)
     this->UpdateOgrePaths();
   return this->ogrePaths;
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpPath()
+{
+  return this->tmpPath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetTmpInstancePath()
+{
+  return this->tmpInstancePath.string();
+}
+
+/////////////////////////////////////////////////
+std::string SystemPaths::GetDefaultTestPath()
+{
+  return this->GetTmpInstancePath() + "/gazebo_test";
 }
 
 /////////////////////////////////////////////////

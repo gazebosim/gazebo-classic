@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,106 +110,6 @@ void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
-}
-
-//////////////////////////////////////////////////
-void SimbodySliderJoint::SetHighStop(unsigned int _index,
-                                   const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetHighStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce.setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->limitForce.getLowerBound(
-          this->simbodyPhysics->integ->updAdvancedState()),
-        _angle.Radian());
-    }
-    else
-    {
-      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetHighStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodySliderJoint::SetLowStop(unsigned int _index,
-                                  const math::Angle &_angle)
-{
-  if (_index < this->GetAngleCount())
-  {
-    Joint::SetLowStop(_index, _angle);
-    if (this->physicsInitialized)
-    {
-      this->limitForce.setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->limitForce.getUpperBound(
-          this->simbodyPhysics->integ->updAdvancedState()));
-    }
-    else
-    {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-    }
-  }
-  else
-    gzerr << "SetLowStop: index out of bounds.\n";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetHighStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get high stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-  else if (_index == 0)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else if (_index == 1)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
-  }
-  else
-  {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetLowStop(unsigned int _index)
-{
-  if (_index >= this->GetAngleCount())
-  {
-    gzerr << "Invalid joint index [" << _index
-          << "] when trying to get low stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
-  else if (_index == 0)
-  {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else if (_index == 1)
-  {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
-  }
-  else
-  {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
-  }
 }
 
 //////////////////////////////////////////////////

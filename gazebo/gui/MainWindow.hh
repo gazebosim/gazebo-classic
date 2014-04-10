@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     class ModelListWidget;
     class Editor;
 
-    class MainWindow : public QMainWindow
+    class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
       Q_OBJECT
 
@@ -81,6 +82,10 @@ namespace gazebo
       private slots: void Import();
       private slots: void Save();
       private slots: void SaveAs();
+
+      /// \brief Save GUI configuration to INI file.
+      private slots: void SaveINI();
+
       private slots: void About();
       private slots: void Step();
       private slots: void NewModel();

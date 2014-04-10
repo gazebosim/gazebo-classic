@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,7 +236,12 @@ Scene::~Scene()
     delete this->grids[i];
   this->grids.clear();
 
+  for (unsigned int i = 0; i < this->cameras.size(); ++i)
+    this->cameras[i].reset();
   this->cameras.clear();
+
+  for (unsigned int i = 0; i < this->userCameras.size(); ++i)
+    this->userCameras[i].reset();
   this->userCameras.clear();
 
   if (this->manager)
@@ -300,7 +305,14 @@ void Scene::Init()
 
   // Create Sky. This initializes SkyX, and makes it invisible. A Sky
   // message must be received (via a scene message or on the ~/sky topic).
-  this->SetSky();
+  try
+  {
+    this->SetSky();
+  }
+  catch(...)
+  {
+    gzerr << "Failed to create the sky\n";
+  }
 
   // Create Fog
   if (this->sdf->HasElement("fog"))
@@ -1486,15 +1498,18 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     {
       boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
-      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
-      if (iter != this->poseMsgs.end())
-        iter->second.CopyFrom(_msg.link(j).pose());
-      else
-        this->poseMsgs.insert(
-            std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
+      if (_msg.link(j).has_pose())
+      {
+        PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
+        if (iter != this->poseMsgs.end())
+          iter->second.CopyFrom(_msg.link(j).pose());
+        else
+          this->poseMsgs.insert(
+              std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
 
-      this->poseMsgs[_msg.link(j).id()].set_name(linkName);
-      this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+        this->poseMsgs[_msg.link(j).id()].set_name(linkName);
+        this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+      }
     }
 
     if (_msg.link(j).has_inertial())

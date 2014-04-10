@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -52,7 +53,7 @@ namespace gazebo
 
     /// \class Entity Entity.hh physics/physics.hh
     /// \brief Base class for all physics objects in Gazebo.
-    class Entity : public Base
+    class GAZEBO_VISIBLE Entity : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the entity.

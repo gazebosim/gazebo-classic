@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class DoorItem DoorItem.hh
     /// \brief 2D representation of a door
-    class DoorItem : public RectItem, public BuildingItem
+    class GAZEBO_VISIBLE DoorItem : public RectItem, public BuildingItem
     {
       Q_OBJECT
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -34,7 +35,7 @@ namespace gazebo
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
-    class ModelRightMenu : public QObject
+    class GAZEBO_VISIBLE ModelRightMenu : public QObject
     {
       Q_OBJECT
 
@@ -99,12 +100,17 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
+
+      /// \todo In gazebo 3.0 move this function to the correct section.
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh
     /// \brief A class for managing view visualization states.
     /// Used by ModelRightMenu.
-    class ViewState : public QObject
+    class GAZEBO_VISIBLE ViewState : public QObject
     {
       Q_OBJECT
 

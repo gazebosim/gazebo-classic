@@ -68,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.10)
+  pkg_check_modules(SDF sdformat>=2.0.0)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -148,33 +148,50 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
-  find_path (tinyxml_include_dir tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
-  if (NOT tinyxml_include_dir)
+  # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
+  pkg_check_modules(tinyxml tinyxml)
+  if (NOT tinyxml_FOUND)
+      find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
+      find_library(tinyxml_LIBRARIES NAMES tinyxml)
+      set (tinyxml_FAIL False) 
+      if (NOT tinyxml_INCLUDE_DIRS)
+        message (STATUS "Looking for tinyxml headers - not found")
+        set (tinyxml_FAIL True) 
+      endif()
+      if (NOT tinyxml_LIBRARIES)
+        message (STATUS "Looking for tinyxml library - not found")
+        set (tinyxml_FAIL True) 
+      endif()
+  endif()
+        
+  if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
-  else ()
-    message (STATUS "Looking for tinyxml.h - found")
-    set (tinyxml_include_dirs ${tinyxml_include_dir} CACHE STRING
-      "tinyxml include paths. Use this to override automatic detection.")
-    set (tinyxml_libraries "tinyxml" CACHE INTERNAL "tinyxml libraries")
-  endif ()
+  endif()
 
   #################################################
   # Find libtar.
-  find_path (libtar_include_dir libtar.h /usr/include /usr/local/include ENV CPATH)
-  if (NOT libtar_include_dir)
+  find_path (libtar_INCLUDE_DIRS libtar.h)
+  find_library(libtar_LIBRARIES tar)
+  set (LIBTAR_FOUND True)
+
+  if (NOT libtar_INCLUDE_DIRS)
     message (STATUS "Looking for libtar.h - not found")
-    BUILD_ERROR("Missing: libtar")
+    set (LIBTAR_FOUND False)
   else ()
     message (STATUS "Looking for libtar.h - found")
-    set (libtar_libraries "tar" CACHE INTERNAL "tinyxml libraries")
+    include_directories(${libtar_INCLUDE_DIRS})
+  endif ()
+  if (NOT libtar_LIBRARIES)
+    message (STATUS "Looking for libtar.so - not found")
+    set (LIBTAR_FOUND False)
+  else ()
+    message (STATUS "Looking for libtar.so - found")
   endif ()
 
-  #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
+  if (NOT LIBTAR_FOUND)
+     BUILD_ERROR("Missing: libtar")
+  endif()
 
   #################################################
   # Find TBB
@@ -263,6 +280,15 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   ########################################
+  # Check and find libccd (if needed)
+  pkg_check_modules(CCD ccd>=1.4)
+  if (NOT CCD_FOUND)
+    message(STATUS "Using internal copy of libccd")
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
+  endif()
+
+  ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
   # if (NOT OAL_FOUND)
@@ -277,6 +303,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libswscale libswscale)
   if (NOT libswscale_FOUND)
     BUILD_WARNING ("libswscale not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libswscale_INCLUDE_DIRS})
+    link_directories(${libswscale_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -284,6 +313,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavformat libavformat)
   if (NOT libavformat_FOUND)
     BUILD_WARNING ("libavformat not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavformat_INCLUDE_DIRS})
+    link_directories(${libavformat_LIBRARY_DIRS})
   endif ()
 
   ########################################
@@ -291,9 +323,20 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(libavcodec libavcodec)
   if (NOT libavcodec_FOUND)
     BUILD_WARNING ("libavcodec not found. Audio-video capabilities will be disabled.")
+  else()
+    include_directories(${libavcodec_INCLUDE_DIRS})
+    link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -301,7 +344,7 @@ if (PKG_CONFIG_FOUND)
 
   ########################################
   # Find Player
-  pkg_check_modules(PLAYER playercore>=3.0 playerc++)
+  pkg_check_modules(PLAYER playercore>=3.0 playerc++ playerwkb)
   if (NOT PLAYER_FOUND)
     set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player")
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")
@@ -342,6 +385,7 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
+    BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
 
 else (PKG_CONFIG_FOUND)
@@ -364,66 +408,6 @@ if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
-########################################
-# Find avformat and avcodec
-IF (HAVE_FFMPEG)
-  SET (libavformat_search_path
-    /usr/include /usr/include/libavformat /usr/local/include
-    /usr/local/include/libavformat /usr/include/ffmpeg
-  )
-
-  SET (libavcodec_search_path
-    /usr/include /usr/include/libavcodec /usr/local/include
-    /usr/local/include/libavcodec /usr/include/ffmpeg
-  )
-
-  FIND_PATH(LIBAVFORMAT_PATH avformat.h ${libavformat_search_path})
-  IF (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - not found")
-    BUILD_WARNING ("avformat.h not found. audio/video will not be built")
-    SET (LIBAVFORMAT_PATH /usr/include)
-  ELSE (NOT LIBAVFORMAT_PATH)
-    MESSAGE (STATUS "Looking for avformat.h - found")
-  ENDIF (NOT LIBAVFORMAT_PATH)
-
-  FIND_PATH(LIBAVCODEC_PATH avcodec.h ${libavcodec_search_path})
-  IF (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - not found")
-    BUILD_WARNING ("avcodec.h not found. audio/video will not be built")
-    SET (LIBAVCODEC_PATH /usr/include)
-  ELSE (NOT LIBAVCODEC_PATH)
-    MESSAGE (STATUS "Looking for avcodec.h - found")
-  ENDIF (NOT LIBAVCODEC_PATH)
-
-ELSE (HAVE_FFMPEG)
-  SET (LIBAVFORMAT_PATH /usr/include)
-  SET (LIBAVCODEC_PATH /usr/include)
-ENDIF (HAVE_FFMPEG)
-
-########################################
-# Find libtool
-find_path(libtool_include_dir ltdl.h /usr/include /usr/local/include)
-if (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - not found")
-  BUILD_WARNING ("ltdl.h not found")
-  set (libtool_include_dir /usr/include)
-else (NOT libtool_include_dir)
-  message (STATUS "Looking for ltdl.h - found")
-endif (NOT libtool_include_dir)
-
-find_library(libtool_library ltdl /usr/lib /usr/local/lib)
-if (NOT libtool_library)
-  message (STATUS "Looking for libltdl - not found")
-else (NOT libtool_library)
-  message (STATUS "Looking for libltdl - found")
-endif (NOT libtool_library)
-
-if (libtool_library AND libtool_include_dir)
-  set (HAVE_LTDL TRUE)
-else ()
-  set (HAVE_LTDL FALSE)
-  set (libtool_library "" CACHE STRING "" FORCE)
-endif ()
 
 
 ########################################
@@ -431,7 +415,7 @@ endif ()
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
 if (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - not found")
-  BUILD_WARNING ("dlfcn.h not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
   set (libdl_include_dir /usr/include)
 else (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - found")
@@ -440,15 +424,9 @@ endif ()
 find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
-  BUILD_WARNING ("libdl not found, plugins will not be supported.")
+  BUILD_ERROR ("Missing libdl: Required for plugins.")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
-endif ()
-
-if (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL TRUE)
-else (libdl_library AND libdl_include_dir)
-  SET (HAVE_DL FALSE)
 endif ()
 
 ########################################
@@ -466,6 +444,7 @@ endif ()
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################
