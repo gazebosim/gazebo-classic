@@ -38,7 +38,6 @@ DARTJoint::DARTJoint(BasePtr _parent)
 {
   this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
-  this->stiffnessDampingInitialized = false;
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
 }
@@ -281,7 +280,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     bool childStatic =
         this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-    if (!this->stiffnessDampingInitialized)
+    if (!this->applyDamping)
     {
       if (!parentStatic && !childStatic)
       {
@@ -292,8 +291,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
         this->dtJoint->setDampingCoefficient(
               static_cast<int>(_index), _damping);
         this->applyDamping = physics::Joint::ConnectJointUpdate(
-          boost::bind(&DARTJoint::ApplyStiffnessDamping, this));
-        this->stiffnessDampingInitialized = true;
+          boost::bind(&DARTJoint::ApplyDamping, this));
       }
       else
       {
@@ -631,7 +629,7 @@ unsigned int DARTJoint::GetAngleCount() const
 }
 
 /////////////////////////////////////////////////
-void DARTJoint::ApplyStiffnessDamping()
+void DARTJoint::ApplyDamping()
 {
   // DART applies stiffness and damping force implicitly itself by setting
   // the stiffness coefficient and the damping coefficient using

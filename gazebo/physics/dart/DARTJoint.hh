@@ -129,7 +129,9 @@ namespace gazebo
       public: virtual unsigned int GetAngleCount() const;
 
       // Documentation inherited.
-      public: virtual void ApplyStiffnessDamping();
+      public: virtual void ApplyDamping();
+      // change ApplyDamping to ApplyStiffnessDamping in gazebo 4.0.
+      // public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
@@ -154,10 +156,6 @@ namespace gazebo
       /// \brief Get DART joint pointer.
       /// \return A pointer to the DART joint.
       public: dart::dynamics::Joint *GetDARTJoint();
-
-      /// \brief internal variable to keep track if ConnectJointUpdate
-      /// has been called on a damping method
-      private: bool stiffnessDampingInitialized;
 
       /// \brief Save force applied by user
       /// This plus the joint feedback (joint contstraint forces) is the
