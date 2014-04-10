@@ -1446,9 +1446,11 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 {
   QIcon icon = _act->icon();
   QPixmap pixmap(_pixmap.c_str());
-  QPainter p(&pixmap);
-  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
-  icon.addPixmap(pixmap, QIcon::Disabled);
+  QPixmap disabledPixmap(pixmap.size());
+  disabledPixmap.fill(Qt::transparent);
+  QPainter p(&disabledPixmap);
+  p.setOpacity(0.4);
+  p.drawPixmap(0, 0, pixmap);
+  icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
 }
