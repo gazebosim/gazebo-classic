@@ -19,7 +19,7 @@
 #include "test/integration/helper_physics_generator.hh"
 
 #define TOL_GRAVITY 1e-4
-#define TOL_FORCES 2.0
+#define TOL_FORCES 1.0
 #define TOL_TORQUES 2.0
 
 using namespace gazebo;
@@ -60,7 +60,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Make sure that the sensor are correctly simulated
-  world->Step(20);
+  world->Step(100);
 
   // Assume gravity on z axis
   Vector3 grav = physics->GetGravity();
