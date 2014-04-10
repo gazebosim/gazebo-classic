@@ -73,6 +73,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
 
+# find_package(CURL REQUIRED)
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -126,7 +127,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
@@ -153,17 +154,17 @@ if (PKG_CONFIG_FOUND)
   if (NOT tinyxml_FOUND)
       find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
       find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False) 
+      set (tinyxml_FAIL False)
       if (NOT tinyxml_INCLUDE_DIRS)
         message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
       if (NOT tinyxml_LIBRARIES)
         message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
   endif()
-        
+
   if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
@@ -230,7 +231,7 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9. 
+  # There are some runtime problems to solve with ogre-1.9.
   # Please read gazebo issues: 994, 995, 996
   pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
   if (NOT OGRE_FOUND)
@@ -371,8 +372,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -431,15 +432,15 @@ endif ()
 
 ########################################
 # Find gdal
-include (FindGDAL)
-if (NOT GDAL_FOUND)
+# include (FindGDAL)
+# if (GDAL_FOUND)
   message (STATUS "Looking for libgdal - not found")
   BUILD_WARNING ("GDAL not found, Digital elevation terrains support will be disabled.")
   set (HAVE_GDAL OFF CACHE BOOL "HAVE GDAL" FORCE)
-else ()
-  message (STATUS "Looking for libgdal - found")
-  set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
-endif ()
+# else ()
+#   message (STATUS "Looking for libgdal - found")
+#   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
+# endif ()
 
 ########################################
 # Include man pages stuff
@@ -452,16 +453,16 @@ add_manpage_target()
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)

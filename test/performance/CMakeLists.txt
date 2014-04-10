@@ -18,14 +18,15 @@ if (HAVE_BULLET)
 endif()
 
 # Per issue #802, these tests are not yet portable
-if (NOT APPLE)
+# if (NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
     factory_stress.cc
     gz_stress.cc
     sensor_stress.cc
     transport_stress.cc
+    image_convert_stress.cc
   )
-  
+
   gz_build_tests(${tests})
-endif()
+# endif()
