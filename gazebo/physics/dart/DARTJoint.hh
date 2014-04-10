@@ -130,8 +130,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void ApplyDamping();
-      // change ApplyDamping to ApplyStiffnessDamping in gazebo 4.0.
-      // public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
