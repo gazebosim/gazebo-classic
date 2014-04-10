@@ -41,6 +41,9 @@ using namespace common;
 
 namespace gazebo {
 namespace common {
+
+/// A convenient data structure used when loading geometry and uv data
+/// into gazebo
 class InputValue
 {
   public: int vertexIndex;
@@ -1368,6 +1371,9 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
   const unsigned int TEXCOORD = 2;
+  bool hasVertices = false;
+  bool hasNormals = false;
+  bool hasTexcoords = false;
 
   std::map<const unsigned int, int> inputs;
   while (trianglesInputXml)
@@ -1382,22 +1388,21 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       if (norms.size() > count)
         combinedVertNorms = true;
       inputs[VERTEX] = math::parseInt(offset);
+      hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms);
       combinedVertNorms = false;
       inputs[NORMAL] = math::parseInt(offset);
+      hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords);
       inputs[TEXCOORD] = math::parseInt(offset);
+      hasTexcoords = true;
     }
-
-    //inputs.push_back(std::make_pair(semantic, math::parseInt(offset)));
-
-
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
   }
 
@@ -1410,10 +1415,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
   std::string pStr = pXml->GetText();
 
-  bool hasVertices = inputs.find(VERTEX) != inputs.end();
-  bool hasNormals = inputs.find(NORMAL) != inputs.end();
-  bool hasTexcoords = inputs.find(TEXCOORD) != inputs.end();
-
   std::map<unsigned int, std::vector<InputValue> > inputValueMap;
   int *values = new int[inputs.size()];
   std::vector<std::string> strs;
@@ -1423,7 +1424,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   //    inputs[TEXCOORD] << std::endl;
   //std::cerr << "has* " << hasVertices << " " << hasNormals << " " <<
   //    hasTexcoords << std::endl;
-
 
   /// TODO remove me
   int d = 0;
@@ -1447,6 +1447,20 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         subMesh->AddIndex(newVertIndex);
         if (combinedVertNorms)
           subMesh->AddNormal(norms[daeVertIndex]);
+        if (_mesh->HasSkeleton())
+        {
+          Skeleton *skel = _mesh->GetSkeleton();
+          for (unsigned int i = 0;
+              i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+          {
+            std::pair<std::string, double> node_weight =
+              skel->GetVertNodeWeight(values[daeVertIndex], i);
+            SkeletonNode *node =
+                _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+            subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                            node->GetHandle(), node_weight.second);
+          }
+        }
         if (hasNormals)
         {
           subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
@@ -1522,6 +1536,20 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           subMesh->AddIndex(newVertIndex);
           if (combinedVertNorms)
             subMesh->AddNormal(norms[daeVertIndex]);
+          if (_mesh->HasSkeleton())
+          {
+            Skeleton *skel = _mesh->GetSkeleton();
+            for (unsigned int i = 0;
+                i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+            {
+              std::pair<std::string, double> node_weight =
+                skel->GetVertNodeWeight(values[daeVertIndex], i);
+              SkeletonNode *node =
+                  _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+              subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                              node->GetHandle(), node_weight.second);
+            }
+          }
           if (hasNormals)
           {
             subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
