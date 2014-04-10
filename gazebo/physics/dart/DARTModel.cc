@@ -119,7 +119,9 @@ void DARTModel::Init()
   {
     this->dtSkeleton->enableSelfCollision();
 
-    dart::simulation::SoftWorld *dtWorld = this->GetDARTPhysics()->GetDARTWorld();
+    dart::simulation::SoftWorld *dtWorld =
+      dynamic_cast<dart::simulation::SoftWorld*>(
+      this->GetDARTPhysics()->GetDARTWorld());
     dart::collision::CollisionDetector *dtCollDet =
         dtWorld->getConstraintHandler()->getCollisionDetector();
 
@@ -200,7 +202,7 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::SoftWorld *DARTModel::GetDARTWorld(void) const
+dart::simulation::World *DARTModel::GetDARTWorld(void) const
 {
   return GetDARTPhysics()->GetDARTWorld();
 }

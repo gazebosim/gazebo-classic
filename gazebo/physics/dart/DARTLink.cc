@@ -460,7 +460,9 @@ void DARTLink::SetSelfCollide(bool _collide)
   if (dtBodyNode->getSkeleton() == NULL)
     return;
 
-  dart::simulation::SoftWorld *dtWorld = this->dartPhysics->GetDARTWorld();
+  dart::simulation::SoftWorld *dtWorld =
+    dynamic_cast<dart::simulation::SoftWorld*>(
+    this->dartPhysics->GetDARTWorld());
   dart::dynamics::Skeleton *dtSkeleton = this->dtBodyNode->getSkeleton();
   dart::collision::CollisionDetector *dtCollDet =
       dtWorld->getConstraintHandler()->getCollisionDetector();
@@ -654,7 +656,7 @@ DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::SoftWorld *DARTLink::GetDARTWorld(void) const
+dart::simulation::World *DARTLink::GetDARTWorld(void) const
 {
   return GetDARTPhysics()->GetDARTWorld();
 }

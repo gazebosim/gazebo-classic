@@ -68,7 +68,7 @@ namespace gazebo
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief
-      public: dart::simulation::SoftWorld *GetDARTWorld(void) const;
+      public: dart::simulation::World *GetDARTWorld(void) const;
 
       /// \brief
       protected: dart::dynamics::SoftSkeleton *dtSkeleton;
