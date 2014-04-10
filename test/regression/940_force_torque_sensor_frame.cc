@@ -39,13 +39,6 @@ class Issue940Test : public ServerFixture,
 // \brief Compare force and torque measures with analytical solutions
 void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
 {
-  /*
-  if (_physicsEngine != "ode")
-  {
-      std::cout << _physicsEngine << " physics engine not supported" << std::endl;
-      return;
-  }*/
-
   bool worldPaused = true;
   Load("worlds/force_torque_frame_test.world", worldPaused, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -60,7 +53,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Make sure that the sensor are correctly simulated
-  world->Step(100);
+  world->Step(20);
 
   // Assume gravity on z axis
   Vector3 grav = physics->GetGravity();
@@ -80,17 +73,17 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   // For details on the expected answers, check force_torque_frame_test.world
   // measure_direction tag currently missing in SDF
   // ExpectForceTorqueMeasure("force_torque_01_parent_and_parent_to_child",
-  //              Vector3(0, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+  //   Vector3(0, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_parent_and_child_to_parent",
     Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   // measure_direction tag currently missing in SDF
   // ExpectForceTorqueMeasure("force_torque_01_child_and_parent_to_child",
-  //              Vector3(2, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
+  //   Vector3(2, 0, -g*mAll), Vector3(-g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_01_child_and_child_to_parent",
     Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   // measure_direction tag currently missing in SDF
   // ExpectForceTorqueMeasure("force_torque_12_parent_and_parent_to_child",
-  //               Vector3(0, 0, -g*m1), Vector3(-g*m1*cog_y_1, 0, 0), mgr);
+  //   Vector3(0, 0, -g*m1), Vector3(-g*m1*cog_y_1, 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_child_to_parent",
     Vector3(0, 0, g*m1), Vector3(g*m1*cog_y_1, 0, 0), mgr);
   // ExpectForceTorqueMeasure("force_torque_12_child_and_parent_to_child",
@@ -116,9 +109,9 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string & sensorName,
   Vector3 mesForce = sensor->GetForce();
   Vector3 mesTorque = sensor->GetTorque();
 
-
-  gzdbg << "mesForce : " << mesForce << std::endl;
-  gzdbg << "expForce : " << expForce << std::endl;
+  gzdbg << "sensorName: " << sensorName << std::endl;
+  gzdbg << "mesForce :  " << mesForce << std::endl;
+  gzdbg << "expForce :  " << expForce << std::endl;
   gzdbg << "mesTorque : " << mesTorque << std::endl;
   gzdbg << "expTorque : " << expTorque << std::endl;
 
