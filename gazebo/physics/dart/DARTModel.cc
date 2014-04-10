@@ -43,7 +43,8 @@ DARTModel::~DARTModel()
 void DARTModel::Load(sdf::ElementPtr _sdf)
 {
   // create skeletonDynamics of DART
-  this->dtSkeleton = new dart::dynamics::SoftSkeleton();
+  this->dtSkeleton = dynamic_cast<dart::dynamics::Skeleton*>(
+    new dart::dynamics::SoftSkeleton());
 
   Model::Load(_sdf);
 }
@@ -189,7 +190,7 @@ void DARTModel::RestoreState()
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::SoftSkeleton *DARTModel::GetDARTSkeleton()
+dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
 {
   return dtSkeleton;
 }
@@ -202,8 +203,7 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::SoftWorld *DARTModel::GetDARTWorld(void) const
+dart::simulation::World *DARTModel::GetDARTWorld(void) const
 {
-  return dynamic_cast<dart::simulation::SoftWorld*>(
-    GetDARTPhysics()->GetDARTWorld());
+  return GetDARTPhysics()->GetDARTWorld();
 }
