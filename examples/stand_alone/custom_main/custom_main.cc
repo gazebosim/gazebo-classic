@@ -27,8 +27,7 @@ int main(int _argc, char **_argv)
   v.push_back("arg2");
 
   // Initialize gazebo.
-  gazebo::setupServer(v);
-  //gazebo::setupServer(_argc, _argv);
+  gazebo::setupServer(_argc, _argv);
 
   // Load a world
   gazebo::physics::WorldPtr world = gazebo::loadWorld("worlds/empty.world");
