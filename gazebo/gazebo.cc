@@ -249,7 +249,7 @@ bool gazebo::setupClient(const std::vector<std::string> &_args)
   std::vector<char*> pointers;
   std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
   pointers.push_back(0);
-  return gazebo::setupServer(_args.size(), &pointers[0]);
+  return gazebo::setupClient(_args.size(), &pointers[0]);
 }
 
 /////////////////////////////////////////////////
