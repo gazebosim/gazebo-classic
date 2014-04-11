@@ -158,8 +158,6 @@ void gazebo::fini()
 /////////////////////////////////////////////////
 bool gazebo::setupServer(int _argc, char **_argv)
 {
-  std::cout << "Arguments: " << _argc << std::endl;
-
   std::string host = "";
   unsigned int port = 0;
 
