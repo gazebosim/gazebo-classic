@@ -1,25 +1,68 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
-    <model name="pentagon">
+    <model name="triangle">
     <static>true</static>
     <pose>0 0 0 0 0 0</pose>
-      <link name="polyLine">
-        <visual name="polyLineGeom">
+      <link name="polyLine2">
+        <visual name="triangle">
+          <geometry>
+            <polyline>
+              <point>4 4</point>
+              <point>7 4</point>
+              <point>4 7</point>
+              <height>2</height>
+            </polyline>
+          </geometry>
+          <material>
+          <script>Gazebo/Red</script>
+          </material>
+        </visual>  
+      <pose>1 0 0 0 0 0</pose>
+      </link>
+    </model>
+   <model name="pentagon">
+    <static>true</static>
+    <pose>0 2 5 0 0 0</pose>
+      <link name="polyLine2">
+        <visual name="polyLineGeom2">
+          <geometry>
+            <polyline>
+              <point>-3 5</point>
+              <point>3 3</point>
+              <point>3 -3</point>
+              <point>-3 -5</point>
+              <point>-5 0</point>
+              <height>4</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>  
+      <pose>1 1 0 0 0 0</pose>
+      </link>
+    </model>
+    <model name="cube">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+      <link name="polyLine2">
+        <visual name="polyLineGeom2">
           <geometry>
             <polyline>
               <point>0 0</point>
               <point>0 1</point>
-              <point>1 0</point>
-              <height>0.2</height>
+              <point>1 1</point>
+              <point>1 0 </point>
+              <height>1</height>
             </polyline>
-        <!-->
-            <box><size>1 1 1</size></box>
-         --> </geometry>
+          </geometry>
+          <material>
+            <script>Gazebo/Yellow</script>
+          </material>
         </visual>  
       <pose>1 1 0 0 0 0</pose>
       </link>
-    
     </model>
   </world>
 </sdf>

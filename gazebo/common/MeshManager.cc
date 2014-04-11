@@ -468,7 +468,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
                                          const std::vector<math::Vector2d>
                                                &_vertices,
-                                         double _height,
+                                         const double &_height,
                                          const math::Vector2d &_uvCoords)
 {
   int i, k;
@@ -532,69 +532,83 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
   }
 
+  //Re-enter the first two vertices
+  subMesh->AddVertex(v[0][0], v[0][1], v[0][2]);
+  subMesh->AddNormal(n[0][0], n[0][1], n[0][2]);
+  subMesh->AddTexCoord(t[0%4][0], t[i%4][1]);
+  subMesh->AddVertex(v[1][0], v[1][1], v[1][2]);
+  subMesh->AddNormal(n[1][0], n[1][1], n[1][2]);
+  subMesh->AddTexCoord(t[1%4][0], t[1%4][1]);
+     
   // Euler's Formula: numFaces = numEdges - numVertices + 2
   //                           = numSides + 2
   // # of SideFaces = numFaces - (upper face + lower face)
   //                = numFaces - 2
   //                = numSides
 
+  // for lower face
   int startVert = 0;
   int endVert = numSides*2-2;
-  // for upper and lower face
-  for (k = 0; k < 2; k++)
+  subMesh->AddIndex(startVert);
+  startVert +=2;
+  subMesh->AddIndex(startVert);
+  subMesh->AddIndex(endVert);
+  for (i = 1; i < numSides-2; i++)
   {
-    subMesh->AddIndex(startVert);
-    startVert +=2;
-    subMesh->AddIndex(startVert);
-    subMesh->AddIndex(endVert);
-
-    for (i = 1; i < numSides-2; i++)
+    if (i%2)
     {
-      if (i%2)
-      {
-        subMesh->AddIndex(startVert);
-        startVert +=2;
-        subMesh->AddIndex(endVert);
-        subMesh->AddIndex(startVert);
-      }
-      else
-      {
-        subMesh->AddIndex(endVert);
-        endVert -=2;
-        subMesh->AddIndex(startVert);
-        subMesh->AddIndex(endVert);
-      }
+      subMesh->AddIndex(startVert);
+      startVert +=2;
+      subMesh->AddIndex(startVert);
+      subMesh->AddIndex(endVert);
     }
-    startVert = 1;
-    endVert = numSides*2-1;
+    else
+    {
+      subMesh->AddIndex(endVert);
+      endVert -=2;
+      subMesh->AddIndex(startVert);
+      subMesh->AddIndex(endVert);
+    }
+  }
+
+  // for upper face
+  startVert = 1;
+  endVert = numSides*2-1;
+  subMesh->AddIndex(startVert);
+  startVert +=2;
+  subMesh->AddIndex(endVert);
+  subMesh->AddIndex(startVert);
+  for (i = 1; i < numSides-2; i++)
+  {
+    if (!i%2)
+    {
+      subMesh->AddIndex(startVert);
+      startVert +=2;
+      subMesh->AddIndex(startVert);
+      subMesh->AddIndex(endVert);
+    }
+    else
+    {
+      subMesh->AddIndex(endVert);
+      endVert -=2;
+      subMesh->AddIndex(endVert);
+      subMesh->AddIndex(startVert);
+    }
   }
 
   // for each sideface
   for (i = 0; i < numSides; i++)
   {
-    if (i != (numSides - 1))
-    {
-      subMesh->AddIndex(i*2);
-      subMesh->AddIndex(i*2+1);
-      subMesh->AddIndex(i*2+2);
+    subMesh->AddIndex(i*2);
+    subMesh->AddIndex(i*2+1);
+    subMesh->AddIndex(i*2+2);
 
-      subMesh->AddIndex(i*2+1);
-      subMesh->AddIndex(i*2+2);
-      subMesh->AddIndex(i*2+3);
-    }
-    else
-    {
-      subMesh->AddIndex(i*2);
-      subMesh->AddIndex(i*2+1);
-      subMesh->AddIndex(0);
-
-      subMesh->AddIndex(i*2+1);
-      subMesh->AddIndex(0);
-      subMesh->AddIndex(1);
-    }
+    subMesh->AddIndex(i*2+2);
+    subMesh->AddIndex(i*2+1);
+    subMesh->AddIndex(i*2+3);
   }
 
-subMesh->RecalculateNormals();
+  subMesh->RecalculateNormals();
 }
 
 //////////////////////////////////////////////////
@@ -1115,3 +1129,4 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
+

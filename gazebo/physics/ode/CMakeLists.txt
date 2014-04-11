@@ -19,6 +19,7 @@ set (sources
   ODEMeshShape.cc
   ODEMultiRayShape.cc
   ODEPhysics.cc
+#  ODEPolyLineShape.cc
   ODERayShape.cc
   ODEScrewJoint.cc
   ODESliderJoint.cc
@@ -42,7 +43,7 @@ SET (headers
   ODEMultiRayShape.hh
   ODEPhysics.hh
   ODEPlaneShape.hh
-#  ODEPolyLineShape.hh
+#  ODEPolyLineShape_new.hh
   ODERayShape.hh
   ODEScrewJoint.hh
   ODESliderJoint.hh
