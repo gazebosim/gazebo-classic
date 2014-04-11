@@ -532,14 +532,14 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
   }
 
-  //Re-enter the first two vertices
+  // Re-enter the first two vertices
   subMesh->AddVertex(v[0][0], v[0][1], v[0][2]);
   subMesh->AddNormal(n[0][0], n[0][1], n[0][2]);
   subMesh->AddTexCoord(t[0%4][0], t[i%4][1]);
   subMesh->AddVertex(v[1][0], v[1][1], v[1][2]);
   subMesh->AddNormal(n[1][0], n[1][1], n[1][2]);
   subMesh->AddTexCoord(t[1%4][0], t[1%4][1]);
-     
+
   // Euler's Formula: numFaces = numEdges - numVertices + 2
   //                           = numSides + 2
   // # of SideFaces = numFaces - (upper face + lower face)
