@@ -22,10 +22,6 @@
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  std::vector<std::string> v;
-  v.push_back("arg1");
-  v.push_back("arg2");
-
   // Initialize gazebo.
   gazebo::setupServer(_argc, _argv);
 
