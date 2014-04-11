@@ -194,8 +194,6 @@ bool gazebo::setupServer(int _argc, char **_argv)
   return true;
 }
 
-
-
 /////////////////////////////////////////////////
 struct c_str
 {
