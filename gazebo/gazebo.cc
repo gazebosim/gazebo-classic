@@ -158,6 +158,8 @@ void gazebo::fini()
 /////////////////////////////////////////////////
 bool gazebo::setupServer(int _argc, char **_argv)
 {
+  std::cout << "Arguments: " << _argc << std::endl;
+
   std::string host = "";
   unsigned int port = 0;
 
@@ -207,10 +209,12 @@ struct c_str
 
 bool gazebo::setupServer(const std::vector<std::string> &_args)
 {
-
-  std::vector<char*> pointers;
+  std::vector<char*> pointers(_args.size());
   std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
   pointers.push_back(0);
+
+  std::cout << "Before setupServer()" << std::endl;
+
   return gazebo::setupServer(_args.size(), &pointers[0]);
 }
 
@@ -246,7 +250,7 @@ bool gazebo::setupClient(int _argc, char **_argv)
 bool gazebo::setupClient(const std::vector<std::string> &_args)
 {
 
-  std::vector<char*> pointers;
+  std::vector<char*> pointers(_args.size());
   std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
   pointers.push_back(0);
   return gazebo::setupClient(_args.size(), &pointers[0]);
