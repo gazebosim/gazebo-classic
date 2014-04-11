@@ -92,12 +92,19 @@ namespace gazebo
   bool setupServer(const std::vector<std::string> &_args);
 
   /// \brief Start a gazebo client. This starts transportation, and makes it
-  /// possible to connect to a running simulation
+  /// possible to connect to a running simulation.
   /// \param[in] _argc Number of commandline arguments.
   /// \param[in] _argv The commandline arguments.
-  /// \return True on success
+  /// \return True on success.
   GAZEBO_VISIBLE
   bool setupClient(int _argc = 0, char **_argv = 0);
+
+  /// \brief Start a gazebo client. This starts transportation, and makes it
+  /// possible to connect to a running simulation.
+  /// \param[in] _argc _args Vector of arguments for the system plugins.
+  /// \return True on success.
+  GAZEBO_VISIBLE
+  bool setupClient(const std::vector<std::string> &_args);
 
   /// \brief Create and load a new world from an SDF world file.
   /// \param[in] _worldFile The world file to load from.
