@@ -30,18 +30,18 @@ class ColladaExporter : public gazebo::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportBox)
 {
+  std::string path = std::string(PROJECT_SOURCE_PATH) + "/test/data/";
+
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
+      path + "box.dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/box_exported.dae");
+  exporter.Export(meshOriginal, path + "box_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/box_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(path + "box_exported.dae"));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -76,18 +76,20 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
+  std::string path = std::string(PROJECT_SOURCE_PATH) + "/test/data/";
+
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill.dae");
+      path + "cordless_drill/meshes/cordless_drill.dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill_exported.dae");
+  exporter.Export(meshOriginal, path +
+      "cordless_drill/meshes/cordless_drill_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(path +
+      "cordless_drill/meshes/cordless_drill_exported.dae"));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -105,7 +107,7 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   // Reload mesh and compare
   const common::Mesh *meshReloaded = loader.Load(
       std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill_exported.dae");
+      "/test/data/cordless_drill/meshes/cordless_drill_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
