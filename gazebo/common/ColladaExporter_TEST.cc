@@ -75,7 +75,8 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  std::string filename = std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill/meshes/cordless_drill";
+  std::string filename = std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill/meshes/cordless_drill";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
@@ -94,7 +95,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
 
   for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); i++)
   {
-    unsigned int countMeshInt = meshOriginal->GetSubMesh(i)->GetVertexCount()*3;
+    unsigned int countMeshInt = meshOriginal->GetSubMesh(i)->
+        GetVertexCount()*3;
     char countMesh[100];
     snprintf(countMesh, sizeof(countMesh), "%u", countMeshInt);
 
