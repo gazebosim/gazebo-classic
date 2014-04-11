@@ -30,18 +30,18 @@ class ColladaExporter : public gazebo::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportBox)
 {
-  std::string path = std::string(PROJECT_SOURCE_PATH) + "/test/data/";
+  std::string filename = std::string(PROJECT_SOURCE_PATH) + "/test/data/box";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
-      path + "box.dae");
+      filename + ".dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, path + "box_exported.dae");
+  exporter.Export(meshOriginal, filename + "_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(path + "box_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(filename + "_exported.dae"));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -57,8 +57,7 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_STREQ(countDae, countMesh);
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) + "/test/data/box_exported.dae");
+  const common::Mesh *meshReloaded = loader.Load(filename + "_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
@@ -76,38 +75,42 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  std::string path = std::string(PROJECT_SOURCE_PATH) + "/test/data/";
+  std::string filename = std::string(PROJECT_SOURCE_PATH) + "/test/data/cordless_drill/meshes/cordless_drill";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
-      path + "cordless_drill/meshes/cordless_drill.dae");
+      filename + ".dae");
 
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, path +
-      "cordless_drill/meshes/cordless_drill_exported.dae");
+  exporter.Export(meshOriginal, filename + "_exported.dae");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(path +
-      "cordless_drill/meshes/cordless_drill_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(filename + "_exported.dae"));
 
-  const char *countDae = xmlDoc.FirstChildElement("COLLADA")
-                               ->FirstChildElement("library_geometries")
-                               ->FirstChildElement("geometry")
-                               ->FirstChildElement("mesh")
-                               ->FirstChildElement("source")
-                               ->FirstChildElement("float_array")
-                               ->Attribute("count");
-  unsigned int countMeshInt = meshOriginal->GetSubMesh(0)->GetVertexCount()*3;
-  char countMesh[100];
-  snprintf(countMesh, sizeof(countMesh), "%u", countMeshInt);
+  TiXmlElement *geometryXml = xmlDoc.FirstChildElement("COLLADA")
+      ->FirstChildElement("library_geometries")
+      ->FirstChildElement("geometry");
 
-  EXPECT_STREQ(countDae, countMesh);
+  for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); i++)
+  {
+    unsigned int countMeshInt = meshOriginal->GetSubMesh(i)->GetVertexCount()*3;
+    char countMesh[100];
+    snprintf(countMesh, sizeof(countMesh), "%u", countMeshInt);
+
+    const char *countDae = geometryXml
+        ->FirstChildElement("mesh")
+        ->FirstChildElement("source")
+        ->FirstChildElement("float_array")
+        ->Attribute("count");
+
+    EXPECT_STREQ(countDae, countMesh);
+
+    geometryXml = geometryXml->NextSiblingElement("geometry");
+  }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(
-      std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill/meshes/cordless_drill_exported.dae");
+  const common::Mesh *meshReloaded = loader.Load(filename + "_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());

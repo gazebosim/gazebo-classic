@@ -39,15 +39,21 @@ ColladaExporter::~ColladaExporter()
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
 {
-  this->mesh = _mesh;
-  this->materialCount = this->mesh->GetMaterialCount();
-
-  // File name
   std::string path = _mesh->GetName();
   path = path.substr(0, path.rfind("/")+1);
   if (_filename.find(".dae") == std::string::npos)
   {
     gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
+
+  this->mesh = _mesh;
+  this->materialCount = this->mesh->GetMaterialCount();
+  this->subMeshCount = this->mesh->GetSubMeshCount();
+
+  if (this->materialCount != 0 && this->materialCount != this->subMeshCount)
+  {
+    gzwarn << "Material count [" << this->materialCount <<
+        "] different from submesh count [" << this->subMeshCount << "]\n";
   }
 
   // Collada file
@@ -225,7 +231,7 @@ void ColladaExporter::FillSource(
 //////////////////////////////////////////////////
 void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 {
-  for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
+  for (unsigned int i = 0; i < this->subMeshCount; i++)
   {
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -271,7 +277,10 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
     TiXmlElement *trianglesXml = new TiXmlElement("triangles");
     meshXml->LinkEndChild(trianglesXml);
     trianglesXml->SetAttribute("count", indexCount/3);
-    trianglesXml->SetAttribute("material", materialId);
+    if (this->materialCount != 0)
+    {
+      trianglesXml->SetAttribute("material", materialId);
+    }
 
     inputXml = new TiXmlElement("input");
     trianglesXml->LinkEndChild(inputXml);
@@ -539,7 +548,7 @@ void ColladaExporter::ExportVisualScenes(
   nodeXml->SetAttribute("name", "node");
   nodeXml->SetAttribute("id", "node");
 
-  for (unsigned int i = 0; i < this->mesh->GetSubMeshCount(); i++)
+  for (unsigned int i = 0; i < this->subMeshCount; i++)
   {
     char meshId[100], materialId[100], attributeValue[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);

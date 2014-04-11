@@ -100,6 +100,9 @@ namespace gazebo
 
       /// \brief Material count
       private: unsigned int materialCount;
+
+      /// \brief SubMesh count
+      private: unsigned int subMeshCount;
     };
     /// \}
   }
