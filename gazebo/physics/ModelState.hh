@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A model state
- * Author: Nate Koenig
- */
 
 #ifndef _MODELSTATE_HH_
 #define _MODELSTATE_HH_
@@ -40,10 +37,8 @@ namespace gazebo
 
     /// \class ModelState ModelState.hh physics/physics.hh
     /// \brief Store state information of a physics::Model object
-    ///
     /// This class captures the entire state of a Model at one
     /// specific time during a simulation run.
-    ///
     /// State of a Model includes the state of all its child Links and
     /// Joints.
     class ModelState : public State
@@ -52,7 +47,6 @@ namespace gazebo
       public: ModelState();
 
       /// \brief Constructor.
-      ///
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
@@ -62,23 +56,26 @@ namespace gazebo
                   const common::Time &_simTime);
 
       /// \brief Constructor.
-      ///
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
       public: explicit ModelState(const ModelPtr _model);
 
       /// \brief Constructor
-      ///
       /// Build a ModelState from SDF data
       /// \param[in] _sdf SDF data to load a model state from.
-      public: explicit ModelState(const sdf::ElementPtr _sdf);
+      public: explicit ModelState(const sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Constructor
+      /// Build a ModelState from SDF data
+      /// \param[in] _sdf SDF data to load a model state from.
+      public: explicit ModelState(const rml::State::Model &_rml);
 
       /// \brief Destructor.
       public: virtual ~ModelState();
 
       /// \brief Load state from Model pointer.
-      ///
       /// Build a ModelState from an existing Model.
       /// \param[in] _model Pointer to the model from which to gather state
       /// info.
@@ -88,10 +85,16 @@ namespace gazebo
                   const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
-      ///
       /// Load ModelState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load state from RML values.
+      /// Load ModelState information from stored data in an
+      /// rml::State::Model object.
+      /// \param[in] _rml Model state info.
+      public: virtual void Load(const rml::State::Model &_rml);
 
       /// \brief Get the stored model pose.
       /// \return The math::Pose of the Model.
@@ -138,13 +141,11 @@ namespace gazebo
       public: const LinkState_M &GetLinkStates() const;
 
       /// \brief Get the number of joint states.
-      ///
       /// Returns the number of JointStates recorded.
       /// \return Number of JointStates.
       public: unsigned int GetJointStateCount() const;
 
       /// \brief Get a Joint state.
-      ///
       /// Return a JointState based on a index, where index is between
       /// 0...ModelState::GetJointStateCount().
       /// \param[in] _index Index of a JointState.
@@ -153,7 +154,6 @@ namespace gazebo
       public: JointState GetJointState(unsigned int _index) const;
 
       /// \brief Get a Joint state by Joint name.
-      ///
       /// Searches through all JointStates. Returns the JointState with the
       /// matching name, if any.
       /// \param[in] _jointName Name of the JointState.

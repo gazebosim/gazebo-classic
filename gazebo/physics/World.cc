@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- */
 
 #include <time.h>
 
@@ -89,14 +86,9 @@ class ModelUpdate_TBB
 World::World(const std::string &_name)
 {
   g_clearModels = false;
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("world.sdf", this->sdf);
 
   this->factorySDF.reset(new sdf::SDF);
   sdf::initFile("root.sdf", this->factorySDF);
-
-  this->logPlayStateSDF.reset(new sdf::Element);
-  sdf::initFile("state.sdf", this->logPlayStateSDF);
 
   this->receiveMutex = new boost::recursive_mutex();
   this->loadModelMutex = new boost::mutex();
@@ -154,7 +146,6 @@ World::~World()
   this->connections.clear();
   this->Fini();
 
-  this->sdf->Reset();
   this->rootElement.reset();
   this->node.reset();
 
@@ -162,7 +153,7 @@ World::~World()
 }
 
 //////////////////////////////////////////////////
-void World::Load(rml::World _world)
+void World::Load(const rml::World &_world)
 {
   this->loaded = false;
   // DELETE?: this->sdf = _sdf;
@@ -263,8 +254,8 @@ void World::Load(rml::World _world)
     // Set the state of the entities
     if (_world.has_state())
     {
-      for (std::vector<rml::State>::const_iter iter = _world.state().begin();
-           iter != _world.state().end(); ++iter)
+      for (std::vector<rml::State>::const_iterator iter =
+          _world.state().begin(); iter != _world.state().end(); ++iter)
       {
         WorldState myState;
         myState.Load(*iter);
@@ -296,135 +287,9 @@ void World::Load(rml::World _world)
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  this->loaded = false;
-  this->sdf = _sdf;
-
-  if (this->sdf->Get<std::string>("name").empty())
-    gzwarn << "create_world(world_name =["
-           << this->name << "]) overwrites sdf world name\n!";
-  else
-    this->name = this->sdf->Get<std::string>("name");
-
-#ifdef HAVE_OPENAL
-  util::OpenAL::Instance()->Load(this->sdf->GetElement("audio"));
-#endif
-
-  this->sceneMsg.CopyFrom(msgs::SceneFromSDF(this->sdf->GetElement("scene")));
-  this->sceneMsg.set_name(this->GetName());
-
-  // The period at which messages are processed
-  this->processMsgsPeriod = common::Time(0, 200000000);
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->GetName());
-
-  // pose pub for server side, mainly used for updating and timestamping
-  // Scene, which in turn will be used by rendering sensors.
-  // TODO: replace local communication with shared memory for efficiency.
-  this->poseLocalPub = this->node->Advertise<robot_msgs::PosesStamped>(
-    "~/pose/local/info", 10);
-
-  // pose pub for client with a cap on publishing rate to reduce traffic
-  // overhead
-  this->posePub = this->node->Advertise<robot_msgs::PosesStamped>(
-    "~/pose/info", 10, 60);
-
-  this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
-  if (this->sdf->HasElement("gui"))
-    this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
-
-  this->factorySub = this->node->Subscribe("~/factory",
-                                           &World::OnFactoryMsg, this);
-  this->controlSub = this->node->Subscribe("~/world_control",
-                                           &World::OnControl, this);
-
-  this->requestSub = this->node->Subscribe("~/request",
-                                           &World::OnRequest, this, true);
-  this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
-  this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
-      &World::OnModelMsg, this);
-
-  this->responsePub = this->node->Advertise<msgs::Response>("~/response");
-  this->statPub =
-    this->node->Advertise<msgs::WorldStatistics>("~/world_stats", 100, 5);
-  this->selectionPub = this->node->Advertise<msgs::Selection>("~/selection", 1);
-  this->modelPub = this->node->Advertise<msgs::Model>("~/model/info");
-  this->lightPub = this->node->Advertise<msgs::Light>("~/light");
-
-  std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
-  this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
-      shared_from_this());
-
-  if (this->physicsEngine == NULL)
-    gzthrow("Unable to create physics engine\n");
-
-  // This should come before loading of entities
-  this->physicsEngine->Load(this->sdf->GetElement("physics"));
-
-  // This should also come before loading of entities
-  {
-    sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
-    common::SphericalCoordinates::SurfaceType surfaceType =
-      common::SphericalCoordinates::Convert(
-        spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
-    double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
-
-    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
-      surfaceType, latitude, longitude, elevation, heading));
-  }
-
-  if (this->sphericalCoordinates == NULL)
-    gzthrow("Unable to create spherical coordinates data structure\n");
-
-  this->rootElement.reset(new Base(BasePtr()));
-  this->rootElement->SetName(this->GetName());
-  this->rootElement->SetWorld(shared_from_this());
-
-  // A special order is necessary when loading a world that contains state
-  // information. The joints must be created last, otherwise they get
-  // initialized improperly.
-  {
-    // Create all the entities
-    this->LoadEntities(this->sdf, this->rootElement);
-
-    // Set the state of the entities
-    if (this->sdf->HasElement("state"))
-    {
-      sdf::ElementPtr childElem = this->sdf->GetElement("state");
-
-      while (childElem)
-      {
-        WorldState myState;
-        myState.Load(childElem);
-        this->SetState(myState);
-
-        childElem = childElem->GetNextElement("state");
-
-        // TODO: We currently load just the first state data. Need to
-        // implement a better mechanism for handling multiple states
-        break;
-      }
-    }
-
-    for (unsigned int i = 0; i < this->GetModelCount(); ++i)
-      this->GetModel(i)->LoadJoints();
-  }
-
-  // TODO: Performance test to see if TBB model updating is necessary
-  // Choose threaded or unthreaded model updating depending on the number of
-  // models in the scene
-  // if (this->GetModelCount() < 20)
-  this->modelUpdateFunc = &World::ModelUpdateSingleLoop;
-  // else
-  // this->modelUpdateFunc = &World::ModelUpdateTBB;
-
-  event::Events::worldCreated(this->GetName());
-
-  this->loaded = true;
+  rml::World rmlWorld;
+  rmlWorld.SetFromXML(_sdf);
+  this->Load(rmlWorld);
 }
 
 //////////////////////////////////////////////////
@@ -435,7 +300,7 @@ void World::Save(const std::string &_filename)
   data = "<?xml version ='1.0'?>\n";
   data += "<sdf version='" +
           boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
-  data += this->sdf->ToString("");
+  // FIX ME: data += this->sdf->ToString("");
   data += "</sdf>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
@@ -570,45 +435,37 @@ void World::LogStep()
     }
     else
     {
-      this->logPlayStateSDF->ClearElements();
-      sdf::readString(data, this->logPlayStateSDF);
-
-      this->logPlayState.Load(this->logPlayStateSDF);
+      /* FIX ME rml::State rmlState;
+      rmlState.SetFromXML(data);
+      this->logPlayState.Load(rmlState);
 
       // Process insertions
-      if (this->logPlayStateSDF->HasElement("insertions"))
+      if (rmlState.has_insertions())
       {
-        sdf::ElementPtr modelElem =
-          this->logPlayStateSDF->GetElement("insertions")->GetElement("model");
-
-        while (modelElem)
+        for (std::vector<rml::Model>::const_iterator iter =
+            rmlState.insertions().model().begin();
+            iter != rmlState.insertions().model().end(); ++iter)
         {
-          ModelPtr model = this->LoadModel(modelElem, this->rootElement);
+          ModelPtr model = this->LoadModel(*iter, this->rootElement);
           model->Init();
-
-          // Disabling plugins on playback
-          // model->LoadPlugins();
-
-          modelElem = modelElem->GetNextElement("model");
         }
       }
 
       // Process deletions
-      if (this->logPlayStateSDF->HasElement("deletions"))
+      if (rmlState.has_deletions())
       {
-        sdf::ElementPtr nameElem =
-          this->logPlayStateSDF->GetElement("deletions")->GetElement("name");
-        while (nameElem)
+        for (std::vector<std::string>::const_iterator iter =
+            rmlState.deletions().name().begin();
+            iter != rmlState.deletions().name().end(); ++iter)
         {
-          transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->Get<std::string>());
-          nameElem = nameElem->GetNextElement("name");
+          transport::requestNoReply(this->GetName(), "entity_delete", *iter);
         }
       }
 
       this->SetState(this->logPlayState);
       this->Update();
       this->iterations++;
+      */
     }
 
     if (this->stepInc > 0)
@@ -927,7 +784,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   rml::Model modelRML;
   modelRML.SetFromXML(_sdf);
-  this->LoadModel(_sdf);
+  return this->LoadModel(modelRML, _parent);
 }
 
 //////////////////////////////////////////////////
@@ -958,7 +815,7 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   rml::Actor actorRML;
   actorRML.SetFromXML(_sdf);
-  this->LoadActor(actorRML);
+  return this->LoadActor(actorRML, _parent);
 }
 
 //////////////////////////////////////////////////
@@ -982,7 +839,7 @@ RoadPtr World::LoadRoad(sdf::ElementPtr _sdf, BasePtr _parent)
 {
   rml::Road roadRML;
   roadRML.SetFromXML(_sdf);
-  this->LoadRoad(roadRML);
+  return this->LoadRoad(roadRML, _parent);
 }
 
 //////////////////////////////////////////////////
@@ -1360,13 +1217,12 @@ void World::ModelUpdateSingleLoop()
 void World::LoadPlugins()
 {
   // Load the plugins
-  if (this->sdf->HasElement("plugin"))
+  if (this->rml.has_plugin())
   {
-    sdf::ElementPtr pluginElem = this->sdf->GetElement("plugin");
-    while (pluginElem)
+    for (std::vector<rml::Plugin>::const_iterator iter =
+        this->rml.plugin().begin(); iter != this->rml.plugin().end(); ++iter)
     {
-      this->LoadPlugin(pluginElem);
-      pluginElem = pluginElem->GetNextElement("plugin");
+      this->LoadPlugin(*iter);
     }
   }
 
@@ -1393,6 +1249,17 @@ void World::LoadPlugin(const std::string &_filename,
                        const std::string &_name,
                        sdf::ElementPtr _sdf)
 {
+  rml::Plugin rmlPlugin;
+  rmlPlugin.SetFromXML(_sdf);
+  this->LoadPlugin(_filename, _name, rmlPlugin);
+}
+
+//////////////////////////////////////////////////
+void World::LoadPlugin(const std::string &_filename,
+                       const std::string &_name,
+                       const rml::Plugin &_rml)
+
+{
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
                                                               _name);
 
@@ -1405,7 +1272,9 @@ void World::LoadPlugin(const std::string &_filename,
             << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
       return;
     }
-    plugin->Load(shared_from_this(), _sdf);
+
+    plugin->Load(shared_from_this(), _rml);
+
     this->plugins.push_back(plugin);
 
     if (this->initialized)
@@ -1430,9 +1299,15 @@ void World::RemovePlugin(const std::string &_name)
 //////////////////////////////////////////////////
 void World::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string pluginName = _sdf->Get<std::string>("name");
-  std::string filename = _sdf->Get<std::string>("filename");
-  this->LoadPlugin(filename, pluginName, _sdf);
+  rml::Plugin rmlPlugin;
+  rmlPlugin.SetFromXML(_sdf);
+  this->LoadPlugin(rmlPlugin);
+}
+
+//////////////////////////////////////////////////
+void World::LoadPlugin(const rml::Plugin &_rml)
+{
+  this->LoadPlugin(_rml.filename(), _rml.name(), _rml);
 }
 
 //////////////////////////////////////////////////
@@ -1457,13 +1332,17 @@ void World::ProcessEntityMsgs()
         ++iter2;
     }
 
-    if (this->sdf->HasElement("model"))
+    if (this->rml.has_model())
     {
-      sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->Get<std::string>("name") != (*iter))
-        childElem = childElem->GetNextElement("model");
-      if (childElem)
-        this->sdf->RemoveChild(childElem);
+      for (std::vector<rml::Model>::iterator miter =
+          this->rml.mutable_model()->begin();
+          miter != this->rml.mutable_model()->end();)
+      {
+        if ((*miter).name() == *iter)
+          this->rml.mutable_model()->erase(miter++);
+        else
+          ++miter;
+      }
     }
 
     this->rootElement->RemoveChild((*iter));
@@ -1576,7 +1455,7 @@ void World::ProcessRequestMsgs()
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
              << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->sdf->ToString("")
+             // FIX ME << this->sdf->ToString("")
              << "</sdf>";
 
       msg.set_data(stream.str());
@@ -1775,7 +1654,7 @@ void World::ProcessFactoryMsgs()
           continue;
         }
 
-        elem->SetParent(this->sdf);
+        // FIX ME elem->SetParent(this->sdf);
         elem->GetParent()->InsertElement(elem);
         if ((*iter).has_pose())
           elem->GetElement("pose")->Set(msgs::Convert((*iter).pose()));
@@ -1808,7 +1687,9 @@ void World::ProcessFactoryMsgs()
   {
     try
     {
-      ModelPtr model = this->LoadModel(*iter2, this->rootElement);
+      rml::Model rmlModel;
+      rmlModel.SetFromXML(*iter2);
+      ModelPtr model = this->LoadModel(rmlModel, this->rootElement);
       model->Init();
       model->LoadPlugins();
     }
@@ -1926,12 +1807,13 @@ void World::DisableAllModels()
 //////////////////////////////////////////////////
 void World::UpdateStateSDF()
 {
-  this->sdf->Update();
+  /* FIX ME this->sdf->Update();
   sdf::ElementPtr stateElem = this->sdf->GetElement("state");
   stateElem->ClearElements();
 
   WorldState currentState(shared_from_this());
   currentState.FillSDF(stateElem);
+  */
 }
 
 //////////////////////////////////////////////////
@@ -1945,7 +1827,7 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->sdf->ToString("");
+    // FIX ME _stream << this->sdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->states[bufferIndex].size() >= 1)

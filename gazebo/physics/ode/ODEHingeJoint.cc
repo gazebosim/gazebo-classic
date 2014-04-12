@@ -53,11 +53,13 @@ void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::Load(const rml::Joint &_rml)
+bool ODEHingeJoint::Load(const rml::Joint &_rml)
 {
-  HingeJoint<ODEJoint>::Load(_rml);
+  bool result = HingeJoint<ODEJoint>::Load(_rml);
 
   this->SetParam(dParamFMax, 0);
+
+  return result;
 }
 
 //////////////////////////////////////////////////

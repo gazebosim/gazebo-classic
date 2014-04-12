@@ -40,7 +40,7 @@ namespace gazebo
       public: virtual ~ODECollision();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual bool Load(const rml::Collision &_rml);

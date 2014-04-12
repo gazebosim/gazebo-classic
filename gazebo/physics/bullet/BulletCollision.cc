@@ -46,13 +46,23 @@ BulletCollision::~BulletCollision()
 //////////////////////////////////////////////////
 void BulletCollision::Load(sdf::ElementPtr _sdf)
 {
-  Collision::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
+
+//////////////////////////////////////////////////
+bool BulletCollision::Load(const rml::Collision &_rml)
+{
+  bool result = Collision::Load(_rml);
 
   if (this->IsStatic())
   {
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
+
+  return result;
 }
 
 //////////////////////////////////////////////////

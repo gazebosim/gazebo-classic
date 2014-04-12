@@ -53,7 +53,11 @@ namespace gazebo
 
       /// \brief Load the map.
       /// \param[in] _sdf Load the map from SDF values.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load the map.
+      /// \param[in] _rml Load the map from RML values.
+      public: virtual bool Load(const rml::Collision &_rml);
 
       /// \brief Init the map.
       public: virtual void Init();

@@ -63,9 +63,9 @@ void Road::Init()
   msg.set_width(this->width);
 
   for (std::vector<sdf::Vector3>::const_iterator iter =
-      this->rml.point().begin(); iter != this->rml.point.end(); ++iter)
+      this->rml.point().begin(); iter != this->rml.point().end(); ++iter)
   {
-    math::Vector3 point = msgs::Convert(*iter);
+    math::Vector3 point(*iter);
 
     robot_msgs::Vector3d *ptMsg = msg.add_point();
     msgs::Set(ptMsg, point);

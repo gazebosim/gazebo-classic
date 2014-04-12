@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
@@ -82,6 +77,8 @@ Sensor::~Sensor()
 //////////////////////////////////////////////////
 void Sensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
+  this->rml.SetFromXML(_sdf);
+
   this->sdf->Copy(_sdf);
   this->Load(_worldName);
 }

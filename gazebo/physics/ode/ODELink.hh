@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Link class
- * Author: Nate Koenig
- */
 
 #ifndef _ODELINK_HH_
 #define _ODELINK_HH_
@@ -41,6 +38,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Link &_rml);
 
       // Documentation inherited
       public: virtual void Init();

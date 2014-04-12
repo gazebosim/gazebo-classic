@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: ODECollision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <sstream>
 
 #include "gazebo/common/Assert.hh"

@@ -45,9 +45,9 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::Load(const rml::Joint &_rml)
+bool SimbodyUniversalJoint::Load(const rml::Joint &_rml)
 {
-  UniversalJoint<SimbodyJoint>::Load(_rml);
+  return UniversalJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

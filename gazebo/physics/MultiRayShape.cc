@@ -54,29 +54,25 @@ void MultiRayShape::Init()
 
   double minRange, maxRange;
 
-  this->rayElem = this->sdf->GetElement("ray");
-  this->scanElem = this->rayElem->GetElement("scan");
-  this->horzElem = this->scanElem->GetElement("horizontal");
-  this->rangeElem = this->rayElem->GetElement("range");
-
-  if (this->scanElem->HasElement("vertical"))
+  if (this->rml.geometry().ray().scan().has_vertical())
   {
-    this->vertElem = this->scanElem->GetElement("vertical");
-    vertMinAngle = this->vertElem->Get<double>("min_angle");
-    vertMaxAngle = this->vertElem->Get<double>("max_angle");
-    vertSamples = this->vertElem->Get<unsigned int>("samples");
-    // vertResolution = this->vertElem->Get<double>("resolution");
+    vertMinAngle = this->rml.geometry().ray().scan().vertical().min_angle();
+    vertMaxAngle = this->rml.geometry().ray().scan().vertical().max_angle();
+    vertSamples = this->rml.geometry().ray().scan().vertical().samples();
+    // vertResolution =
+    // this->rml.geometry().ray().scan().vertical().resolution();
     pDiff = vertMaxAngle - vertMinAngle;
   }
 
-  horzMinAngle = this->horzElem->Get<double>("min_angle");
-  horzMaxAngle = this->horzElem->Get<double>("max_angle");
-  horzSamples = this->horzElem->Get<unsigned int>("samples");
-  // horzResolution = this->horzElem->Get<double>("resolution");
+  horzMinAngle = this->rml.geometry().ray().scan().horizontal().min_angle();
+  horzMaxAngle = this->rml.geometry().ray().scan().horizontal().max_angle();
+  horzSamples = this->rml.geometry().ray().scan().horizontal().samples();
+  // horzResolution =
+  // this->rml.geometry().ray().scan().horizontal().resolution();
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = this->rangeElem->Get<double>("min");
-  maxRange = this->rangeElem->Get<double>("max");
+  minRange = this->rml.geometry().ray().range().min();
+  maxRange = this->rml.geometry().ray().range().max();
 
   this->offset = this->collisionParent->GetRelativePose();
 
@@ -201,50 +197,50 @@ void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
 //////////////////////////////////////////////////
 double MultiRayShape::GetMinRange() const
 {
-  return this->rangeElem->Get<double>("min");
+  return this->rml.geometry().ray().range().min();
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
-  return this->rangeElem->Get<double>("max");
+  return this->rml.geometry().ray().range().max();
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetResRange() const
 {
-  return this->rangeElem->Get<double>("resolution");
+  return this->rml.geometry().ray().range().resolution();
 }
 
 //////////////////////////////////////////////////
 int MultiRayShape::GetSampleCount() const
 {
-  return this->horzElem->Get<unsigned int>("samples");
+  return this->rml.geometry().ray().scan().horizontal().samples();
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetScanResolution() const
 {
-  return this->horzElem->Get<double>("resolution");
+  return this->rml.geometry().ray().scan().horizontal().resolution();
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMinAngle() const
 {
-  return this->horzElem->Get<double>("min_angle");
+  return this->rml.geometry().ray().scan().horizontal().min_angle();
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMaxAngle() const
 {
-  return this->horzElem->Get<double>("max_angle");
+  return this->rml.geometry().ray().scan().horizontal().max_angle();
 }
 
 //////////////////////////////////////////////////
 int MultiRayShape::GetVerticalSampleCount() const
 {
-  if (this->vertElem)
-    return this->vertElem->Get<unsigned int>("samples");
+  if (this->rml.geometry().ray().scan().has_vertical())
+    return this->rml.geometry().ray().scan().vertical().samples();
   else
     return 1;
 }
@@ -252,8 +248,8 @@ int MultiRayShape::GetVerticalSampleCount() const
 //////////////////////////////////////////////////
 double MultiRayShape::GetVerticalScanResolution() const
 {
-  if (this->vertElem)
-    return this->vertElem->Get<double>("resolution");
+  if (this->rml.geometry().ray().scan().has_vertical())
+    return this->rml.geometry().ray().scan().vertical().resolution();
   else
     return 1;
 }
@@ -261,8 +257,8 @@ double MultiRayShape::GetVerticalScanResolution() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
-  if (this->vertElem)
-    return this->vertElem->Get<double>("min_angle");
+  if (this->rml.geometry().ray().scan().has_vertical())
+    return this->rml.geometry().ray().scan().vertical().min_angle();
   else
     return math::Angle(0);
 }
@@ -270,8 +266,8 @@ math::Angle MultiRayShape::GetVerticalMinAngle() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
-  if (this->vertElem)
-    return this->vertElem->Get<double>("max_angle");
+  if (this->rml.geometry().ray().scan().has_vertical())
+    return this->rml.geometry().ray().scan().vertical().max_angle();
   else
     return math::Angle(0);
 }

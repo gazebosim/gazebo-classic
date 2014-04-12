@@ -63,10 +63,11 @@ void ODEGearboxJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::Load(const rml::Joint &_rml)
+bool ODEGearboxJoint::Load(const rml::Joint &_rml)
 {
-  GearboxJoint<ODEJoint>::Load(_rml);
+  bool result = GearboxJoint<ODEJoint>::Load(_rml);
   this->SetGearRatio(this->gearRatio);
+  return result;
 }
 
 //////////////////////////////////////////////////

@@ -49,13 +49,17 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::Load(const rml::Joint &_rml)
+bool SimbodyJoint::Load(const rml::Joint &_rml)
 {
+  if (!Joint::Load(_rml))
+  {
+    gzerr << "Unable to load simbody joint[" << _rml.name() << "]\n";
+    return false;
+  }
+
   // store a pointer to the simbody physics engine for convenience
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
     this->model->GetWorld()->GetPhysicsEngine());
-
-  Joint::Load(_rml);
 
   // read must_be_loop_joint
   // \TODO: clean up
@@ -167,6 +171,8 @@ void SimbodyJoint::Load(const rml::Joint &_rml)
     // i.e., A spatially coincident with B
     this->xPA = X_PC*this->xCB;
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

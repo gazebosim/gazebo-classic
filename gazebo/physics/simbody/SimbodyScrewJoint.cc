@@ -48,10 +48,12 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::Load(const rml::Joint &_rml)
+bool SimbodyScrewJoint::Load(const rml::Joint &_rml)
 {
-  ScrewJoint<SimbodyJoint>::Load(_rml);
+  bool result = ScrewJoint<SimbodyJoint>::Load(_rml);
   this->SetThreadPitch(0, this->threadPitch);
+
+  return result;
 }
 
 //////////////////////////////////////////////////

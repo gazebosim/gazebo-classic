@@ -44,7 +44,15 @@ BulletMeshShape::~BulletMeshShape()
 //////////////////////////////////////////////////
 void BulletMeshShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Load(_sdf);
+  rml::Collision rmlCollision;
+  rmlCollision.SetFromXML(_sdf);
+  this->Load(rmlCollision);
+}
+
+//////////////////////////////////////////////////
+bool BulletMeshShape::Load(const rml::Collision &_rml)
+{
+  return MeshShape::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -70,11 +78,11 @@ void BulletMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     vertices[j*3+0] = vertices[j*3+0] *
-      this->sdf->Get<math::Vector3>("scale").x;
+      this->rml.geometry().mesh_shape().scale().x;
     vertices[j*3+1] = vertices[j*3+1] *
-      this->sdf->Get<math::Vector3>("scale").y;
+      this->rml.geometry().mesh_shape().scale().y;
     vertices[j*3+2] = vertices[j*3+2] *
-      this->sdf->Get<math::Vector3>("scale").z;
+      this->rml.geometry().mesh_shape().scale().z;
   }
 
   // Create the Bullet trimesh

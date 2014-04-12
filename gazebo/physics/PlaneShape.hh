@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
 #ifndef _PLANESHAPE_HH_
 #define _PLANESHAPE_HH_

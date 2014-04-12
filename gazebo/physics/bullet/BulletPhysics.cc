@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
-
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -298,9 +293,15 @@ BulletPhysics::~BulletPhysics()
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::Load(const rml::Physics &_rml)
+bool BulletPhysics::Load(const rml::Physics &_rml)
 {
-  PhysicsEngine::Load(_rml);
+  bool result = true;
+
+  if (!PhysicsEngine::Load(_rml))
+  {
+    gzerr << "Unable to load physics engine\n";
+    result = false;
+  }
 
   math::Vector3 g = this->rml.gravity();
 
@@ -310,7 +311,7 @@ void BulletPhysics::Load(const rml::Physics &_rml)
 
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
-  btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
+  btContactSolverInfo &info = this->dynamicsWorld->getSolverInfo();
 
   // Split impulse feature. This reduces large bounces from deep penetrations,
   // but can lead to improper stacking of objects, see
@@ -351,6 +352,8 @@ void BulletPhysics::Load(const rml::Physics &_rml)
   // info.m_globalCfm = 0.0;
   // info.m_splitImpulse = 0;
   // info.m_splitImpulsePenetrationThreshold = 0.0;
+
+  return result;
 }
 
 //////////////////////////////////////////////////

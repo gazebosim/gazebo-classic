@@ -49,9 +49,9 @@ void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodySliderJoint::Load(const rml::Joint &_rml)
+bool SimbodySliderJoint::Load(const rml::Joint &_rml)
 {
-  SliderJoint<SimbodyJoint>::Load(_rml);
+  return SliderJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

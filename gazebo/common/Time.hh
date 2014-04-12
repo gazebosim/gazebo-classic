@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
 #ifndef _TIME_HH_
 #define _TIME_HH_
 
@@ -26,6 +21,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+#include <sdf/sdf.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 
@@ -128,6 +124,11 @@ namespace gazebo
       /// \param[in] _time the new time
       /// \return a reference to this instance
       public: Time &operator =(const Time &_time);
+
+      /// \brief Assignment operator
+      /// \param[in] _time Set from an SDF time
+      /// \return a reference to this instance
+      public: Time &operator =(const sdf::Time &_time);
 
       /// \brief Addition operators
       /// \param[in] _tv the time to add

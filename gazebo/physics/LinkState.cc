@@ -71,7 +71,16 @@ LinkState::LinkState(const LinkPtr _link)
 LinkState::LinkState(const sdf::ElementPtr _sdf)
   : State()
 {
-  this->Load(_sdf);
+  rml::State::Model::Link rmlLink;
+  rmlLink.SetFromXML(_sdf);
+  this->Load(rmlLink);
+}
+
+/////////////////////////////////////////////////
+LinkState::LinkState(const rml::State::Model::Link &_rml)
+  : State()
+{
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -99,30 +108,38 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
 /////////////////////////////////////////////////
 void LinkState::Load(const sdf::ElementPtr _elem)
 {
+  rml::State::Model::Link rmlLink;
+  rmlLink.SetFromXML(_elem);
+  this->Load(rmlLink);
+}
+
+/////////////////////////////////////////////////
+void LinkState::Load(const rml::State::Model::Link &_rml)
+{
   // Set the name
-  this->name = _elem->Get<std::string>("name");
+  this->name = _rml.name();
 
   // Set the link name
-  if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+  if (_rml.has_pose())
+    this->pose = _rml.pose();
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link velocity
-  if (_elem->HasElement("velocity"))
-    this->velocity = _elem->Get<math::Pose>("velocity");
+  if (_rml.has_velocity())
+    this->velocity = _rml.velocity();
   else
     this->velocity.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link acceleration
-  if (_elem->HasElement("acceleration"))
-    this->acceleration = _elem->Get<math::Pose>("acceleration");
+  if (_rml.has_acceleration())
+    this->acceleration = _rml.acceleration();
   else
     this->acceleration.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link wrench
-  if (_elem->HasElement("wrench"))
-    this->wrench = _elem->Get<math::Pose>("wrench");
+  if (_rml.has_wrench())
+    this->wrench = _rml.wrench();
   else
     this->wrench.Set(0, 0, 0, 0, 0, 0);
 }

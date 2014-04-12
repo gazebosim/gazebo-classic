@@ -54,8 +54,10 @@ JointState::JointState(JointPtr _joint)
 JointState::JointState(const sdf::ElementPtr _sdf)
   : State()
 {
-  // Load the state from SDF
-  this->Load(_sdf);
+  // Load the state from RML
+  rml::State::Model::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
 }
 
 /////////////////////////////////////////////////
@@ -80,21 +82,29 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
 /////////////////////////////////////////////////
 void JointState::Load(const sdf::ElementPtr _elem)
 {
+  // Load the state from RML
+  rml::State::Model::Joint rmlJoint;
+  rmlJoint.SetFromXML(_elem);
+  this->Load(rmlJoint);
+}
+
+/////////////////////////////////////////////////
+void JointState::Load(const rml::State::Model::Joint &_rml)
+{
   // Set the name
-  this->name = _elem->Get<std::string>("name");
+  this->name = _rml.name();
 
   // Set the angles
   this->angles.clear();
-  if (_elem->HasElement("angle"))
+  if (_rml.has_angle())
   {
-    sdf::ElementPtr childElem = _elem->GetElement("angle");
-    while (childElem)
+    for (std::vector<rml::State::Model::Joint::Angle>::const_iterator iter =
+        _rml.angle().begin(); iter != _rml.angle().end(); ++iter)
     {
-      unsigned int axis = childElem->Get<unsigned int>("axis");
+      unsigned int axis = (*iter).axis();
       if (axis+1 > this->angles.size())
         this->angles.resize(axis+1, math::Angle(0.0));
-      this->angles[axis] = childElem->Get<double>();
-      childElem = childElem->GetNextElement("angle");
+      this->angles[axis] = (*iter).radians();
     }
   }
 }

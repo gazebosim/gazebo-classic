@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
@@ -46,6 +41,9 @@ namespace gazebo
 
       /// \brief Load the BulletScrewJoint
       protected: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

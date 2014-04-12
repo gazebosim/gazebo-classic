@@ -14,9 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A world state
- * Author: Nate Koenig
- */
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -53,7 +50,16 @@ WorldState::WorldState(const WorldPtr _world)
 WorldState::WorldState(const sdf::ElementPtr _sdf)
   : State()
 {
-  this->Load(_sdf);
+  rml::State rmlState;
+  rmlState.SetFromXML(_sdf);
+  this->Load(rmlState);
+}
+
+/////////////////////////////////////////////////
+WorldState::WorldState(const rml::State &_rml)
+  : State()
+{
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -96,27 +102,33 @@ void WorldState::Load(const WorldPtr _world)
 /////////////////////////////////////////////////
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
+  rml::State rmlState;
+  rmlState.SetFromXML(_elem);
+  this->Load(rmlState);
+}
+
+/////////////////////////////////////////////////
+void WorldState::Load(const rml::State &_rml)
+{
   // Copy the name
-  this->name = _elem->Get<std::string>("world_name");
+  this->name = _rml.world_name();
 
   // Add the model states
   this->modelStates.clear();
-  if (_elem->HasElement("model"))
+  if (_rml.has_model())
   {
-    sdf::ElementPtr childElem = _elem->GetElement("model");
-
-    while (childElem)
+    for (std::vector<rml::State::Model>::const_iterator iter =
+        _rml.model().begin(); iter != _rml.model().end(); ++iter)
     {
       this->modelStates.insert(std::make_pair(
-            childElem->Get<std::string>("name"), ModelState(childElem)));
-      childElem = childElem->GetNextElement("model");
+            (*iter).name(), ModelState(*iter)));
     }
   }
 
   // Copy the name and time information
-  this->simTime = _elem->Get<common::Time>("sim_time");
-  this->wallTime = _elem->Get<common::Time>("wall_time");
-  this->realTime = _elem->Get<common::Time>("real_time");
+  this->simTime = _rml.sim_time();
+  this->wallTime = _rml.wall_time();
+  this->realTime = _rml.real_time();
 }
 
 /////////////////////////////////////////////////

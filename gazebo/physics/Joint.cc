@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -111,11 +106,16 @@ void Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(const rml::Joint &_rml)
+bool Joint::Load(const rml::Joint &_rml)
 {
+  bool result = true;
   this->rml = _rml;
 
-  Base::Load(this->rml.name());
+  if (!Base::Load(this->rml.name()))
+  {
+    gzerr << "Unable to load joint with name[" << this->rml.name() << "]\n";
+    result = false;
+  }
 
   // Joint force and torque feedback
   if (this->rml.has_physics())
@@ -143,8 +143,24 @@ void Joint::Load(const rml::Joint &_rml)
     }
   }
 
+  this->anchorPose = math::Pose(this->rml.pose());
+
   GZ_ASSERT(this->rml.has_parent(), "Joint parent not set.");
   GZ_ASSERT(this->rml.has_child(), "Joint child not set");
+
+  if (!this->rml.has_parent())
+  {
+    gzerr << "Joint parent is not set for joint[" << this->rml.name() << "]\n";
+    result = false;
+    return result;
+  }
+
+  if (!this->rml.has_child())
+  {
+    gzerr << "Joint child is not set for joint[" << this->rml.name() << "]\n";
+    result = false;
+    return result;
+  }
 
   std::string parentName = this->rml.parent();
   std::string childName = this->rml.child();
@@ -164,13 +180,22 @@ void Joint::Load(const rml::Joint &_rml)
   }
 
   if (!this->parentLink && parentName != std::string("world"))
-    gzthrow("Couldn't Find Parent Link[" + parentName + "]");
+  {
+    gzerr << "Couldn't find parent link[" <<  parentName << "]\n";
+    result = false;
+  }
 
   if (!this->childLink && childName != std::string("world"))
-    gzthrow("Couldn't Find Child Link[" + childName  + "]");
+  {
+    gzerr << "Couldn't find child link[" << childName  << "]\n";
+    result = false;
+  }
 
-  this->anchorPose = math::Pose(this->rml.pose());
-  this->LoadImpl(this->anchorPose);
+
+  if (result)
+    this->LoadImpl(this->anchorPose);
+
+  return result;
 }
 
 /////////////////////////////////////////////////

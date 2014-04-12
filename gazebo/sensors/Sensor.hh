@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #ifndef _SENSOR_HH_
 #define _SENSOR_HH_
 
@@ -28,6 +23,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -215,6 +211,9 @@ namespace gazebo
 
       /// \brief Pointer the the SDF element for the sensor.
       protected: sdf::ElementPtr sdf;
+
+      /// \brief RML values for the sensor.
+      protected: rml::Sensor rml;
 
       /// \brief Pose of the sensor.
       protected: math::Pose pose;

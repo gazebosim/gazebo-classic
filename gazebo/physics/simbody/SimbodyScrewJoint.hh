@@ -42,10 +42,10 @@ namespace gazebo
       public: virtual ~SimbodyScrewJoint();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
-      public: virtual void Load(const rml::Joint &_rml);
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

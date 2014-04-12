@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
 
 #ifndef _PHYSICSENGINE_HH_
 #define _PHYSICSENGINE_HH_
@@ -51,7 +48,7 @@ namespace gazebo
 
       /// \brief Load the physics engine.
       /// \param[in] _sdf Pointer to the SDF parameters.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       /// \brief Load the physics engine.
       /// \param[in] _rml RML physics parameters.

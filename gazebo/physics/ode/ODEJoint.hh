@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
-
 #ifndef _ODEJOINT_HH_
 #define _ODEJOINT_HH_
 
@@ -54,10 +49,10 @@ namespace gazebo
       public: virtual ~ODEJoint();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
-      public: virtual void Load(const rml::Joint &_rml);
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Reset();

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #ifndef _BULLET_COLLISION_HH_
 #define _BULLET_COLLISION_HH_
 
@@ -56,7 +51,10 @@ namespace gazebo
       public: virtual ~BulletCollision();
 
       /// \brief Load the collision
-      public: virtual void Load(sdf::ElementPtr _ptr);
+      public: virtual void Load(sdf::ElementPtr _ptr) GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Collision &_rml);
 
       /// \brief On pose change
       public: virtual void OnPoseChange();

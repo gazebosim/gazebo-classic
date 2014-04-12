@@ -49,9 +49,9 @@ void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::Load(const rml::Joint &_rml)
+bool SimbodyHingeJoint::Load(const rml::Joint &_rml)
 {
-  HingeJoint<SimbodyJoint>::Load(_rml);
+  return HingeJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

@@ -59,7 +59,7 @@ namespace gazebo
       /// \brief Load the OpenAL server.
       /// \return True on success.
       public: bool Load(sdf::ElementPtr _sdf =
-                  sdf::ElementPtr()) GAZEBO_DEPRECATED(2.0);
+                  sdf::ElementPtr()) GAZEBO_DEPRECATED(3.0);
 
       /// \brief Load the OpenAL server.
       /// \return True on success.
@@ -71,13 +71,26 @@ namespace gazebo
       /// \brief Create an OpenALSource object.
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return A pointer to an OpenALSource object.
-      public: OpenALSourcePtr CreateSource(sdf::ElementPtr _sdf);
+      public: OpenALSourcePtr CreateSource(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Create an OpenALSource object.
+      /// \param[in] _rml RML parameters for an audio_source.
+      /// \return A pointer to an OpenALSource object.
+      public: OpenALSourcePtr CreateSource(const rml::Audio_Source &_rml);
 
       /// \brief Create an audio listener. Currenly, only one listener may be
       /// created.
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return A pointer to an OpenALSink object.
-      public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf);
+      public: OpenALSinkPtr CreateSink(sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Create an audio listener. Currenly, only one listener may be
+      /// created.
+      /// \param[in] _rml RML parameters for an audio_source.
+      /// \return A pointer to an OpenALSink object.
+      public: OpenALSinkPtr CreateSink(const rml::Audio_Sink &_rml);
 
       /// \brief OpenAL audio context pointer.
       private: ALCcontext_struct *context;
@@ -126,7 +139,12 @@ namespace gazebo
       /// \brief Load the source from sdf.
       /// \param[in] _sdf SDF element parameters for an audio_source.
       /// \return True on success.
-      public: bool Load(sdf::ElementPtr _sdf);
+      public: bool Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load the source from RML.
+      /// \param[in] _rml RML parameters for an audio_source.
+      /// \return True on success.
+      public: bool Load(const rml::Audio_Source &_rml);
 
       /// \brief Set the position of the source.
       /// \param[in] _pose New pose of the source.

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh collision
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
 #ifndef _BULLETMESHSHAPE_HH_
 #define _BULLETMESHSHAPE_HH_
 
@@ -44,6 +39,10 @@ namespace gazebo
       /// \brief Load the trimesh
       public: virtual void Load(sdf::ElementPtr _sdf);
 
+      // Documentation inherited
+      public: virtual bool Load(const rml::Collision &_rml);
+
+      // Documentation inherited
       protected: virtual void Init();
     };
 

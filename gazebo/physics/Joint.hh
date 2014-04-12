@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _JOINT_HH_
 #define _JOINT_HH_
 
@@ -109,11 +104,12 @@ namespace gazebo
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       /// \brief Load physics::Joint from a rml::Joint object.
       /// \param[in] _rml RML values to load from.
-      public: virtual void Load(const rml::Joint &_rml);
+      /// \return True on success
+      public: virtual bool Load(const rml::Joint &_rml);
 
       /// \brief Initialize a joint.
       public: virtual void Init();

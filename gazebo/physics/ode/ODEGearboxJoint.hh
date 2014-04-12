@@ -44,7 +44,7 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: void Load(const rml::Joint &_rml);
+      public: bool Load(const rml::Joint &_rml);
 
       // Documentation inherited
       public: virtual void Init();

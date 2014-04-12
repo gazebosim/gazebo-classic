@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A link state
- * Author: Nate Koenig
- */
 
 #ifndef _LINKSTATE_HH_
 #define _LINKSTATE_HH_
@@ -25,6 +22,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
@@ -38,11 +36,9 @@ namespace gazebo
     /// \{
 
     /// \class LinkState LinkState.hh physics/physics.hh
-    /// \brief Store state information of a physics::Link object
-    ///
+    /// \brief Store state information of a physics::Link object.
     /// This class captures the entire state of a Link at one
     /// specific time during a simulation run.
-    ///
     /// State of a Link includes the state of itself all its child Collision
     /// entities.
     class LinkState : public State
@@ -50,8 +46,7 @@ namespace gazebo
       /// \brief Default constructor
       public: LinkState();
 
-      /// \brief Constructor
-      ///
+      /// \brief Constructor.
       /// Build a LinkState from an existing Link.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
@@ -60,24 +55,26 @@ namespace gazebo
       public: LinkState(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime);
 
-      /// \brief Constructor
-      ///
+      /// \brief Constructor.
       /// Build a LinkState from an existing Link.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
       public: explicit LinkState(const LinkPtr _link);
 
-      /// \brief Constructor
-      ///
+      /// \brief Constructor.
       /// Build a LinkState from SDF data
       /// \param[in] _sdf SDF data to load a link state from.
       public: explicit LinkState(const sdf::ElementPtr _sdf);
+
+      /// \brief Constructor.
+      /// Build a LinkState from SDF data
+      /// \param[in] _sdf SDF data to load a link state from.
+      public: explicit LinkState(const rml::State::Model::Link &_rml);
 
       /// \brief Destructor.
       public: virtual ~LinkState();
 
       /// \brief Load a LinkState from a Link pointer.
-      ///
       /// Build a LinkState from an existing Link.
       /// \param[in] _model Pointer to the Link from which to gather state
       /// info.
@@ -87,10 +84,16 @@ namespace gazebo
                   const common::Time &_simTime);
 
       /// \brief Load state from SDF element.
-      ///
       /// Load LinkState information from stored data in and SDF::Element.
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load state from RML values.
+      /// Load LinkState information from stored data in an
+      /// rml::State::Model::Link object.
+      /// \param[in] _rml Link state information.
+      public: virtual void Load(const rml::State::Model::Link &_rml);
 
       /// \brief Get the link pose.
       /// \return The math::Pose of the Link.
@@ -109,13 +112,11 @@ namespace gazebo
       public: const math::Pose &GetWrench() const;
 
       /// \brief Get the number of link states.
-      ///
       /// This returns the number of Collisions recorded.
       /// \return Number of CollisionState recorded.
       public: unsigned int GetCollisionStateCount() const;
 
       /// \brief Get a collision state.
-      ///
       /// Get a Collision State based on an index, where index is in the
       /// range of  0...LinkState::GetCollisionStateCount.
       /// \param[in] _index Index of the CollisionState.
@@ -124,7 +125,6 @@ namespace gazebo
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
       /// \brief Get a link state by link name.
-      ///
       /// Searches through all CollisionStates.
       /// Returns the CollisionState with the matching name, if any.
       /// \param[in] _collisionName Name of the CollisionState

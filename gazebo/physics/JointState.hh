@@ -14,15 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A joint state
- * Author: Nate Koenig
- */
 
 #ifndef _JOINTSTATE_HH_
 #define _JOINTSTATE_HH_
 
 #include <vector>
 #include <string>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
@@ -70,7 +68,12 @@ namespace gazebo
 
       /// \brief Load state from SDF element.
       /// \param[in] _elem SDf values to load from.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load state from SDF element.
+      /// \param[in] _elem SDf values to load from.
+      public: virtual void Load(const rml::State::Model::Joint &_rml);
 
       /// \brief Get the number of angles.
       /// \return The number of angles.

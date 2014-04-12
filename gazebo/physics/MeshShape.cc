@@ -45,14 +45,14 @@ MeshShape::~MeshShape()
 //////////////////////////////////////////////////
 void MeshShape::Init()
 {
-  std::string meshStr = this->rml.uri();
+  std::string meshStr = this->rml.geometry().mesh_shape().uri();
 
   common::MeshManager *meshManager = common::MeshManager::Instance();
   this->mesh = meshManager->GetMesh(meshStr);
 
   if (!this->mesh)
   {
-    meshStr = common::find_file(this->rml.uri());
+    meshStr = common::find_file(this->rml.geometry().mesh_shape().uri());
 
     if (meshStr == "__default__" || meshStr.empty())
     {
@@ -68,17 +68,19 @@ void MeshShape::Init()
     delete this->submesh;
   this->submesh = NULL;
 
-  if (this->rml.submesh())
+  if (this->rml.geometry().mesh_shape().has_submesh())
   {
     this->submesh = new common::SubMesh(
-      this->mesh->GetSubMesh(this->rml.submesh().name()));
+      this->mesh->GetSubMesh(
+        this->rml.geometry().mesh_shape().submesh().name()));
 
     if (!this->submesh)
       gzthrow("Unable to get submesh with name[" +
-          this->rml.submesh().name() + "]");
+          this->rml.geometry().mesh_shape().submesh().name() + "]");
 
     // Center the submesh if specified in SDF.
-    if (this->rml.submesh().has_center() && this->rml.submesh().center())
+    if (this->rml.geometry().mesh_shape().submesh().has_center() &&
+        this->rml.geometry().mesh_shape().submesh().center())
     {
       this->submesh->Center();
     }
@@ -88,20 +90,23 @@ void MeshShape::Init()
 //////////////////////////////////////////////////
 void MeshShape::SetScale(const math::Vector3 &_scale)
 {
-  this->rml.set_scale(_scale);
+  this->rml.mutable_geometry()->mutable_mesh_shape()->set_scale(
+      sdf::Vector3(_scale.x, _scale.y, _scale.z));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 MeshShape::GetSize() const
 {
-  return math::Vector3(this->rml.scale().x, this->rml.scale().y,
-      this->rml.scale().z);
+  return math::Vector3(
+      this->rml.geometry().mesh_shape().scale().x,
+      this->rml.geometry().mesh_shape().scale().y,
+      this->rml.geometry().mesh_shape().scale().z);
 }
 
 //////////////////////////////////////////////////
 std::string MeshShape::GetMeshURI() const
 {
-  return this->rml.uri();
+  return this->rml.geometry().mesh_shape().uri();
 }
 
 //////////////////////////////////////////////////
@@ -109,12 +114,14 @@ void MeshShape::SetMesh(const std::string &_uri,
                            const std::string &_submesh,
                            bool _center)
 {
-  this->rml.set_uri(_uri);
+  this->rml.mutable_geometry()->mutable_mesh_shape()->set_uri(_uri);
 
   if (!_submesh.empty())
   {
-    this->rml.submesh().set_name(_submesh);
-    this->rml.submesh().set_center(_center);
+    this->rml.mutable_geometry()->mutable_mesh_shape()->submesh().set_name(
+        _submesh);
+    this->rml.mutable_geometry()->mutable_mesh_shape()->submesh().set_center(
+        _center);
   }
 
   this->Init();
@@ -124,7 +131,8 @@ void MeshShape::SetMesh(const std::string &_uri,
 void MeshShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::MESH);
-  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromRML(this->rml));
+  _msg.mutable_mesh()->CopyFrom(msgs::MeshFromRML(
+        this->rml.geometry().mesh_shape()));
 }
 
 //////////////////////////////////////////////////

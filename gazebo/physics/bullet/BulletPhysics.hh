@@ -85,7 +85,7 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
 
       // Documentation inherited
-      public: virtual void Load(const rml::Physics &_rml);
+      public: virtual bool Load(const rml::Physics &_rml);
 
       // Documentation inherited
       public: virtual void Init();

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
@@ -47,6 +42,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _ODESLIDERJOINT_HH_
 #define _ODESLIDERJOINT_HH_
 
@@ -41,10 +36,10 @@ namespace gazebo
       public: virtual ~ODESliderJoint();
 
       // Documentation inherited
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited
-      public: virtual void Load(const rml::Joint &_rml);
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited
       public: virtual math::Vector3 GetGlobalAxis(int _index) const;

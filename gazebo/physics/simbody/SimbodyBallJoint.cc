@@ -48,9 +48,9 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::Load(const rml::Joint &_rml)
+bool SimbodyBallJoint::Load(const rml::Joint &_rml)
 {
-  BallJoint<SimbodyJoint>::Load(_rml);
+  return BallJoint<SimbodyJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

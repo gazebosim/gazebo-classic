@@ -14,10 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
+
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
@@ -54,9 +51,9 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::Load(const rml::Joint &_rml)
+bool ODESliderJoint::Load(const rml::Joint &_rml)
 {
-  SliderJoint<ODEJoint>::Load(_rml);
+  return SliderJoint<ODEJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

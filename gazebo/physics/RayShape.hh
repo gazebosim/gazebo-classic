@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 14 Oct 2009
-*/
-
 #ifndef _RAYSHAPE_HH_
 #define _RAYSHAPE_HH_
 

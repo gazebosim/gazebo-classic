@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet Link class
- * Author: Nate Koenig
- * Date: 15 May 2009
- */
-
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
@@ -49,7 +44,10 @@ namespace gazebo
       public: virtual ~BulletLink();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _ptr);
+      public: virtual void Load(sdf::ElementPtr _ptr) GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited
+      public: virtual bool Load(const rml::Link &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

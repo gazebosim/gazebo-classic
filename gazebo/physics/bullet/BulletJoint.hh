@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base Bullet joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETJOINT_HH_
 #define _BULLETJOINT_HH_
 
@@ -45,8 +40,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletJoint();
 
-      /// \brief Load a BulletJoint
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Joint &_rml);
 
       /// \brief Reset the joint
       public: virtual void Reset();

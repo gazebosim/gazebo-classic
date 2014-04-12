@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A BulletHingeJoint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -48,7 +44,16 @@ BulletHingeJoint::~BulletHingeJoint()
 //////////////////////////////////////////////////
 void BulletHingeJoint::Load(sdf::ElementPtr _sdf)
 {
-  HingeJoint<BulletJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+
+  HingeJoint<BulletJoint>::Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+bool BulletHingeJoint::Load(const rml::Joint &_rml)
+{
+  return HingeJoint<BulletJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////
@@ -152,12 +157,9 @@ void BulletHingeJoint::Init()
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  sdf::ElementPtr limitElem;
-  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
-    this->angleOffset + limitElem->Get<double>("lower"),
-    this->angleOffset + limitElem->Get<double>("upper"));
+    this->angleOffset + this->rml.axis().limit().lower(),
+    this->angleOffset + this->rml.axis().limit().upper());
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #ifndef _MODEL_HH_
 #define _MODEL_HH_

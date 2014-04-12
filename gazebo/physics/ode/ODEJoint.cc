@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The ODE base joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 12 Oct 2009
- */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Assert.hh"
@@ -77,9 +72,13 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::Load(const rml::Joint &_rml)
+bool ODEJoint::Load(const rml::Joint &_rml)
 {
-  Joint::Load(_rml);
+  if (!Joint::Load(_rml))
+  {
+    gzerr << "Unable to load ODE joint[" << _rml.name() << "]\n";
+    return false;
+  }
 
   if (this->rml.has_physics() && this->rml.physics().has_ode())
   {
@@ -156,6 +155,8 @@ void ODEJoint::Load(const rml::Joint &_rml)
         gzlog << "joint friction not implemented\n";
     }
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

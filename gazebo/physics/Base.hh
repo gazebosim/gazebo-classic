@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 

@@ -58,43 +58,9 @@ OpenAL::~OpenAL()
 /////////////////////////////////////////////////
 bool OpenAL::Load(sdf::ElementPtr _sdf)
 {
-  std::string deviceName = "default";
-
-  if (_sdf && _sdf->HasElement("device"))
-    deviceName = _sdf->Get<std::string>("device");
-
-  // Open the default audio device
-  if (deviceName == "default")
-    this->audioDevice = alcOpenDevice(NULL);
-  else
-    this->audioDevice = alcOpenDevice(deviceName.c_str());
-
-  // Make sure that we could open the audio device
-  if (this->audioDevice == NULL)
-  {
-    gzerr << "Unable to open audio device["
-      << deviceName << "]\n Audio will be disabled.\n";
-    return false;
-  }
-
-  // Create the audio context
-  this->context = alcCreateContext(this->audioDevice, NULL);
-
-  if (this->context == NULL)
-  {
-    gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
-    return false;
-  }
-
-  // Make the context current
-  alcMakeContextCurrent(this->context);
-
-  // Clear error code
-  alGetError();
-
-  alDistanceModel(AL_EXPONENT_DISTANCE);
-
-  return true;
+  rml::World::Audio rmlAudio;
+  rmlAudio.SetFromXML(_sdf);
+  return this->Load(rmlAudio);
 }
 
 /////////////////////////////////////////////////
@@ -162,6 +128,13 @@ void OpenAL::Fini()
 /////////////////////////////////////////////////
 OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
 {
+  rml::Audio_Sink rmlSink;
+  return this->CreateSink(rmlSink);
+}
+
+/////////////////////////////////////////////////
+OpenALSinkPtr OpenAL::CreateSink(const rml::Audio_Sink & /*_rml*/)
+{
   OpenALSinkPtr result;
 
   if (this->sink == NULL)
@@ -179,6 +152,14 @@ OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
 /////////////////////////////////////////////////
 OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
 {
+  rml::Audio_Source rmlAudio;
+  rmlAudio.SetFromXML(_sdf);
+  return this->CreateSource(rmlAudio);
+}
+
+/////////////////////////////////////////////////
+OpenALSourcePtr OpenAL::CreateSource(const rml::Audio_Source &_rml)
+{
   OpenALSourcePtr source;
 
   // Make sure the audio device has been opened
@@ -192,7 +173,7 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
   source.reset(new OpenALSource());
 
   // Load the source
-  if (!source->Load(_sdf))
+  if (!source->Load(_rml))
   {
     gzerr << "Unable to load OpenAL source from SDF\n";
     source.reset();
@@ -304,8 +285,16 @@ OpenALSource::~OpenALSource()
 /////////////////////////////////////////////////
 bool OpenALSource::Load(sdf::ElementPtr _sdf)
 {
-  if (_sdf && _sdf->HasElement("uri"))
-    this->FillBufferFromFile(_sdf->Get<std::string>("uri"));
+  rml::Audio_Source rmlAudio;
+  rmlAudio.SetFromXML(_sdf);
+  return this->Load(rmlAudio);
+}
+
+/////////////////////////////////////////////////
+bool OpenALSource::Load(const rml::Audio_Source &_rml)
+{
+  if (_rml.has_uri())
+    this->FillBufferFromFile(_rml.uri());
   else
   {
     gzerr << "<audio_source> is missing <uri>...</uri> element\n";
@@ -314,24 +303,22 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 
   bool result = true;
 
-  if (_sdf->HasElement("pitch"))
-    result = result && this->SetPitch(_sdf->Get<double>("pitch"));
+  if (_rml.has_pitch())
+    result = result && this->SetPitch(_rml.pitch());
 
-  if (_sdf->HasElement("gain"))
-    result = result && this->SetGain(_sdf->Get<double>("gain"));
+  if (_rml.has_gain())
+    result = result && this->SetGain(_rml.gain());
 
-  if (_sdf->HasElement("loop"))
-    result = result && this->SetLoop(_sdf->Get<bool>("loop"));
+  if (_rml.has_loop())
+    result = result && this->SetLoop(_rml.loop());
 
-  if (_sdf->HasElement("contact"))
+  if (_rml.has_contact())
   {
-    sdf::ElementPtr collisionElem =
-      _sdf->GetElement("contact")->GetElement("collision");
-
-    while (collisionElem)
+    for (std::vector<std::string>::const_iterator iter = 
+        _rml.contact().collision().begin();
+        iter != _rml.contact().collision().end(); ++iter)
     {
-      this->collisionNames.push_back(collisionElem->Get<std::string>());
-      collisionElem = collisionElem->GetNextElement("collision");
+      this->collisionNames.push_back(*iter);
     }
 
     result = result && !this->collisionNames.empty();

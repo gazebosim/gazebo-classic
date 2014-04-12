@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ODE hinge joint
- * Author: Nate Koenig
- * Date: 21 May 2003
- */
-
 #ifndef _ODEHINGEJOINT_HH_
 #define _ODEHINGEJOINT_HH_
 
@@ -47,7 +42,7 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0);
 
       // Documentation inherited
-      public: virtual void Load(const rml::Joint &_rml);
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited
       public: virtual math::Vector3 GetAnchor(int _index) const;

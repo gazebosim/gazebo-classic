@@ -47,8 +47,20 @@ BulletScrewJoint::~BulletScrewJoint()
 //////////////////////////////////////////////////
 void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 {
-  ScrewJoint<BulletJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+
+  ScrewJoint<BulletJoint>::Load(rmlJoint);
+
   this->SetThreadPitch(0, this->threadPitch);
+}
+
+//////////////////////////////////////////////////
+bool BulletScrewJoint::Load(const rml::Joint &_rml)
+{
+  bool result = ScrewJoint<BulletJoint>::Load(_rml);
+  this->SetThreadPitch(0, this->threadPitch);
+  return result;
 }
 
 //////////////////////////////////////////////////

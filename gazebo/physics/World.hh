@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
@@ -82,7 +77,7 @@ namespace gazebo
       ///
       /// Load a world from RML object.
       /// \param[in] _world RML World object.
-      public: void Load(rml::World _world);
+      public: void Load(const rml::World &_world);
 
       /// \brief Save a world to a file.
       ///
@@ -297,7 +292,15 @@ namespace gazebo
       /// \param[in] _sdf The SDF to pass into the plugin.
       public: void LoadPlugin(const std::string &_filename,
                               const std::string &_name,
-                              sdf::ElementPtr _sdf);
+                              sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load a plugin
+      /// \param[in] _filename The filename of the plugin.
+      /// \param[in] _name A unique name for the plugin.
+      /// \param[in] _rml The RML values to pass into the plugin.
+      public: void LoadPlugin(const std::string &_filename,
+                              const std::string &_name,
+                              const rml::Plugin &_rml);
 
       /// \brief Remove a running plugin.
       /// \param[in] _name The unique name of the plugin to remove.
@@ -355,19 +358,19 @@ namespace gazebo
       /// \param[in] _sdf SDF element.
       /// \param[in] _parent Parent of the model to load.
       private: void LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
-               GAZEBO_DEPRECATED(2.0);
+               GAZEBO_DEPRECATED(3.0);
 
       /// \brief Create and load all entities.
       /// \param[in] _rml RML element.
       /// \param[in] _parent Parent of the model to load.
-      private: void LoadEntities(const rml::World _rml, BasePtr _parent);
+      private: void LoadEntities(const rml::World &_rml, BasePtr _parent);
 
       /// \brief Load a model.
       /// \param[in] _sdf SDF element containing the Model description.
       /// \param[in] _parent Parent of the model.
       /// \return Pointer to the newly created Model.
       private: ModelPtr LoadModel(sdf::ElementPtr _sdf, BasePtr _parent)
-               GAZEBO_DEPRECATED(2.0);
+               GAZEBO_DEPRECATED(3.0);
 
       /// \brief Load a model.
       /// \param[in] _rml RML element containing the Model description.
@@ -385,13 +388,19 @@ namespace gazebo
       /// \param[in] _rml RML element containing the Actor description.
       /// \param[in] _parent Parent of the Actor.
       /// \return Pointer to the newly created Actor.
-      private: ActorPtr LoadActor(const rml::Actor _rml, BasePtr _parent);
+      private: ActorPtr LoadActor(const rml::Actor &_rml, BasePtr _parent);
 
       /// \brief Load a road.
       /// \param[in] _sdf SDF element containing the Road description.
       /// \param[in] _parent Parent of the Road.
       /// \return Pointer to the newly created Road.
       private: RoadPtr LoadRoad(sdf::ElementPtr _sdf, BasePtr _parent);
+
+      /// \brief Load a road.
+      /// \param[in] _rml RML element containing the Road description.
+      /// \param[in] _parent Parent of the Road.
+      /// \return Pointer to the newly created Road.
+      private: RoadPtr LoadRoad(const rml::Road &_rml, BasePtr _parent);
 
       /// \brief Function to run physics. Used by physicsThread.
       private: void RunLoop();
@@ -450,7 +459,11 @@ namespace gazebo
 
       /// \brief Helper function to load a plugin from SDF.
       /// \param[in] _sdf SDF plugin description.
-      private: void LoadPlugin(sdf::ElementPtr _sdf);
+      private: void LoadPlugin(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Helper function to load a plugin from RML.
+      /// \param[in] _rml RML plugin description.
+      private: void LoadPlugin(const rml::Plugin &_rml);
 
       /// \brief Fills a model message with data from a model
       /// \param[out] _msg Model message to fill.
@@ -619,8 +632,8 @@ namespace gazebo
       /// World::SetPaused to assign world::pause
       private: boost::recursive_mutex *worldUpdateMutex;
 
-      /// \brief THe world's SDF values.
-      private: sdf::ElementPtr sdf;
+      /// \brief The world's RML values.
+      private: rml::World rml;
 
       /// \brief All the plugins.
       private: std::vector<WorldPluginPtr> plugins;
@@ -687,7 +700,6 @@ namespace gazebo
       private: WorldState prevStates[2];
       private: int stateToggle;
 
-      private: sdf::ElementPtr logPlayStateSDF;
       private: WorldState logPlayState;
 
       /// \brief Store a factory SDF object to improve speed at which

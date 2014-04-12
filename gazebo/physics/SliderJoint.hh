@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _SLIDERJOINT_HH_
 #define _SLIDERJOINT_HH_
 
@@ -47,7 +42,7 @@ namespace gazebo
 
       /// \brief Load a SliderJoint.
       /// \param[in] _sdf SDF values to load from
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0)
               {
                 rml::Joint rmlJoint;
                 rmlJoint.SetFromXML(_sdf);
@@ -55,9 +50,10 @@ namespace gazebo
               }
 
       /// \brief Load a SliderJoint.
-      /// \param[in] _rml RML values to load from
-      public: virtual void Load(const rml::Joint &_rml)
-              {T::Load(_rml);}
+      /// \param[in] _rml RML values to load from.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Joint &_rml)
+              {return T::Load(_rml);}
 
       // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const

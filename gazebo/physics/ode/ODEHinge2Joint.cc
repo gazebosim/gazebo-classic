@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -54,9 +50,9 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::Load(const rml::Joint &_rml)
+bool ODEHinge2Joint::Load(const rml::Joint &_rml)
 {
-  Hinge2Joint<ODEJoint>::Load(_rml);
+  return Hinge2Joint<ODEJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

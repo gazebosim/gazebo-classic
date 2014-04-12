@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Ray proximity sensor
- * Author: Carle Cote
- * Date: 23 february 2004
-*/
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
@@ -96,28 +92,24 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
 
-  this->laserShape->Load(this->sdf);
   this->laserShape->Init();
 
   // Handle noise model settings.
   this->noiseActive = false;
-  sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
-  if (rayElem->HasElement("noise"))
+  if (this->rml.ray().has_noise())
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
+    if (this->rml.ray().noise().type() == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
+      this->noiseMean = this->rml.ray().noise().mean();
+      this->noiseStdDev = this->rml.ray().noise().stddev();
       this->noiseActive = true;
       gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
         " and stddev " << this->noiseStdDev << std::endl;
     }
     else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+      gzwarn << "ignoring unknown noise model type ["
+        << this->rml.ray().noise().type() << "]" << std::endl;
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);

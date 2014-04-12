@@ -50,10 +50,12 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::Load(const rml::Joint &_rml)
+bool ODEScrewJoint::Load(const rml::Joint &_rml)
 {
-  ScrewJoint<ODEJoint>::Load(_rml);
+  bool result = ScrewJoint<ODEJoint>::Load(_rml);
   this->SetThreadPitch(0, this->threadPitch);
+  
+  return result;
 }
 
 //////////////////////////////////////////////////

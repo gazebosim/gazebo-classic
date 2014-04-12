@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A slider or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETSLIDERJOINT_HH_
 #define _BULLETSLIDERJOINT_HH_
 #include "gazebo/math/Angle.hh"
@@ -46,8 +41,11 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletSliderJoint();
 
-      /// \brief Load the BulletSliderJoint
+      // Documentation inherited
       protected: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      protected: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       protected: virtual void Init();

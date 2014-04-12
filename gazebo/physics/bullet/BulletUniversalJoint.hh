@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETUNIVERSALJOINT_HH_
 #define _BULLETUNIVERSALJOINT_HH_
 
@@ -47,6 +42,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

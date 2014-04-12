@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base Bullet joint class
- * Author: Nate Koenig, Andrew Howard
- * Date: 15 May 2009
- */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -52,45 +47,45 @@ BulletJoint::~BulletJoint()
 //////////////////////////////////////////////////
 void BulletJoint::Load(sdf::ElementPtr _sdf)
 {
-  Joint::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+  this->Load(rmlJoint);
+}
 
-  if (this->sdf->HasElement("axis"))
+//////////////////////////////////////////////////
+bool BulletJoint::Load(const rml::Joint &_rml)
+{
+  if (!Joint::Load(_rml))
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+    gzerr << "Unable to load bullet joint[" << _rml.name() << "]\n";
+    return false;
+  }
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+  if (this->rml.has_axis())
+  {
+    if (this->rml.axis().has_dynamics())
+    {
+      if (this->rml.axis().dynamics().has_damping())
+        this->SetDamping(0, this->rml.axis().dynamics().damping());
+
+      if (this->rml.axis().dynamics().has_friction())
         gzlog << "joint friction not implemented\n";
-      }
     }
   }
 
-  if (this->sdf->HasElement("axis2"))
+  if (this->rml.has_axis2())
   {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
+    if (this->rml.axis2().has_dynamics())
     {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (this->rml.axis2().dynamics().has_damping())
+        this->SetDamping(1, this->rml.axis2().dynamics().damping());
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+      if (this->rml.axis2().dynamics().has_friction())
         gzlog << "joint friction not implemented\n";
-      }
     }
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////

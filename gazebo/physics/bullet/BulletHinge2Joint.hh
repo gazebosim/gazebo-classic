@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
@@ -49,6 +44,9 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual bool Load(const rml::Joint &_rml);
 
       // Documentation inherited.
       public: virtual void Init();

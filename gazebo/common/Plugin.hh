@@ -32,6 +32,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -258,7 +259,16 @@ namespace gazebo
     /// \param[in] _world Pointer the World
     /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(physics::WorldPtr _world,
-                              sdf::ElementPtr _sdf) = 0;
+                sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0) = 0;
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _world Pointer the World
+    /// \param[in] _rml The RML parameters for the plugin.
+    public: virtual void Load(physics::WorldPtr _world,
+                const rml::Plugin &_rml) = 0;
 
     public: virtual void Init() {}
     public: virtual void Reset() {}
@@ -283,7 +293,16 @@ namespace gazebo
     /// \param[in] _model Pointer to the Model
     /// \param[in] _sdf Pointer to the SDF element of the plugin.
     public: virtual void Load(physics::ModelPtr _model,
-                              sdf::ElementPtr _sdf) = 0;
+                sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0) = 0;
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _model Pointer to the Model
+    /// \param[in] _rml The RML parameters for the plugin.
+    public: virtual void Load(physics::ModelPtr _model,
+                const rml::Plugin &_rml) = 0;
 
     /// \brief Override this method for custom plugin initialization behavior.
     public: virtual void Init() {}
@@ -313,6 +332,15 @@ namespace gazebo
     /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(sensors::SensorPtr _sensor,
                               sdf::ElementPtr _sdf) = 0;
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _sensor Pointer the Sensor.
+    /// \param[in] _rml The RML parameters for the plugin.
+    public: virtual void Load(sensors::SensorPtr _model,
+                const rml::Plugin &_rml) = 0;
 
     /// \brief Override this method for custom plugin initialization behavior.
     public: virtual void Init() {}
@@ -366,6 +394,15 @@ namespace gazebo
     /// \param[in] _sdf Pointer the the SDF element of the plugin.
     public: virtual void Load(rendering::VisualPtr _visual,
                               sdf::ElementPtr _sdf) = 0;
+
+    /// \brief Load function
+    ///
+    /// Called when a Plugin is first created, and after the World has been
+    /// loaded. This function should not be blocking.
+    /// \param[in] _visual Pointer the Visual Object.
+    /// \param[in] _rml The RML parameters for the plugin.
+    public: virtual void Load(rendering::VisualPtr _model,
+                const rml::Plugin &_rml) = 0;
 
     /// \brief Initialize the plugin
     ///

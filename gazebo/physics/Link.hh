@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- */
 
 #ifndef _LINK_HH_
 #define _LINK_HH_

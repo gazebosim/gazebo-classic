@@ -152,18 +152,6 @@ namespace gazebo
       /// \brief Pose offset of all the rays.
       protected: math::Pose offset;
 
-      /// \brief Ray SDF element pointer.
-      protected: sdf::ElementPtr rayElem;
-
-      /// \brief Scan SDF element pointer.
-      protected: sdf::ElementPtr scanElem;
-
-      /// \brief Horizontal SDF element pointer.
-      protected: sdf::ElementPtr horzElem;
-
-      /// \brief Vertical SDF element pointer.
-      protected: sdf::ElementPtr vertElem;
-
       /// \brief Range SDF element pointer.
       protected: sdf::ElementPtr rangeElem;
 

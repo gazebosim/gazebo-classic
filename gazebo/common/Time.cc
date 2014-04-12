@@ -248,6 +248,14 @@ Time &Time::operator =(const Time &_time)
 }
 
 /////////////////////////////////////////////////
+Time &Time::operator =(const sdf::Time &_time)
+{
+  this->sec = _time.sec;
+  this->nsec = _time.nsec;
+  return *this;
+}
+
+/////////////////////////////////////////////////
 Time Time::operator +(const struct timeval &_tv) const
 {
   Time t(this->sec + _tv.tv_sec, this->nsec + _tv.tv_usec*1000);

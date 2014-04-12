@@ -84,7 +84,16 @@ ModelState::ModelState(const ModelPtr _model)
 ModelState::ModelState(const sdf::ElementPtr _sdf)
   : State()
 {
-  this->Load(_sdf);
+  rml::State::Model rmlModel;
+  rmlModel.SetFromXML(_sdf);
+  this->Load(rmlModel);
+}
+
+/////////////////////////////////////////////////
+ModelState::ModelState(const rml::State::Model &_rml)
+  : State()
+{
+  this->Load(_rml);
 }
 
 /////////////////////////////////////////////////
@@ -143,42 +152,46 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
 /////////////////////////////////////////////////
 void ModelState::Load(const sdf::ElementPtr _elem)
 {
+  rml::State::Model rmlModel;
+  rmlModel.SetFromXML(_elem);
+  this->Load(rmlModel);
+}
+
+/////////////////////////////////////////////////
+void ModelState::Load(const rml::State::Model &_rml)
+{
   // Set the name
-  this->name = _elem->Get<std::string>("name");
+  this->name = _rml.name();
 
   // Set the model pose
-  if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+  if (_rml.has_pose())
+    this->pose = _rml.pose();
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set all the links
   this->linkStates.clear();
-  if (_elem->HasElement("link"))
+  if (_rml.has_link())
   {
-    sdf::ElementPtr childElem = _elem->GetElement("link");
-
-    while (childElem)
+    for (std::vector<rml::State::Model::Link>::const_iterator iter =
+        _rml.link().begin(); iter != _rml.link().end(); ++iter)
     {
-      this->linkStates.insert(std::make_pair(
-            childElem->Get<std::string>("name"), LinkState(childElem)));
-      childElem = childElem->GetNextElement("link");
+      this->linkStates.insert(std::make_pair((*iter).name(),
+            LinkState(*iter)));
     }
   }
 
   // Set all the joints
-  /*this->jointStates.clear();
-  if (_elem->HasElement("joint"))
-  {
-    sdf::ElementPtr childElem = _elem->GetElement("joint");
-
-    while (childElem)
-    {
-      this->jointStates.insert(std::make_pair(childElem->Get<std::string>("name"),
-            JointState(childElem)));
-      childElem = childElem->GetNextElement("joint");
-    }
-  }*/
+  // this->jointStates.clear();
+  // if (_rml.has_joint())
+  // {
+  //   for (std::vector<rml::State::Model::Joint>::const_iterator iter =
+  //       _rml.joint().begin(); iter != _rml.joint().end(); ++iter)
+  //   {
+  //     this->jointStates.insert(std::make_pair((*iter).name(),
+  //           JointState(*iter)));
+  //   }
+  // }
 }
 
 /////////////////////////////////////////////////

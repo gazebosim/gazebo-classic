@@ -47,7 +47,16 @@ BulletBallJoint::~BulletBallJoint()
 //////////////////////////////////////////////////
 void BulletBallJoint::Load(sdf::ElementPtr _sdf)
 {
-  BallJoint<BulletJoint>::Load(_sdf);
+  rml::Joint rmlJoint;
+  rmlJoint.SetFromXML(_sdf);
+
+  BallJoint<BulletJoint>::Load(rmlJoint);
+}
+
+//////////////////////////////////////////////////
+bool BulletBallJoint::Load(const rml::Joint &_rml)
+{
+  return BallJoint<BulletJoint>::Load(_rml);
 }
 
 //////////////////////////////////////////////////

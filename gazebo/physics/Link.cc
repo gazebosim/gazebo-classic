@@ -174,7 +174,8 @@ bool Link::Load(const rml::Link &_rml)
     std::vector<std::string> collisionNames;
 
     for (std::vector<rml::Audio_Source>::const_iterator iter =
-        this->rml.audio_source().begin(); this->rml.audio_source.end(); ++iter)
+        this->rml.audio_source().begin();
+        iter != this->rml.audio_source().end(); ++iter)
     {
       util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
           *iter);
@@ -206,14 +207,17 @@ bool Link::Load(const rml::Link &_rml)
   if (this->rml.has_audio_sink())
   {
     needUpdate = true;
+    // This currently only creates one audio sink.
     this->audioSink = util::OpenAL::Instance()->CreateSink(
-        this->rml.audio_sink());
+        this->rml.audio_sink(0));
   }
 #endif
 
   if (needUpdate)
     this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           boost::bind(&Link::Update, this, _1)));
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -226,7 +230,7 @@ void Link::Init()
 
   // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->rml.pose());
-  this->SetInitialRelativePose(this->.pose());
+  this->SetInitialRelativePose(this->rml.pose());
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -300,7 +304,7 @@ void Link::ResetPhysicsStates()
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateParameters(sdf::ElementPtr _sdf)
+void Link::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
   /* RE-IMPLEMENT ME
   Entity::UpdateParameters(_sdf);
@@ -505,19 +509,19 @@ void Link::LoadCollision(const rml::Collision &_rml)
   std::string geomType;
 
   // Use of reflection would be nice here.
-  if (_rml.has_heightmap())
+  if (_rml.geometry().has_heightmap_shape())
     geomType = "heightmap";
-  else if (_rml.has_box())
+  else if (_rml.geometry().has_box_shape())
     geomType = "box";
-  else if (_rml.has_sphere())
+  else if (_rml.geometry().has_sphere_shape())
     geomType = "sphere";
-  else if (_rml.has_cylinder())
+  else if (_rml.geometry().has_cylinder_shape())
     geomType = "cylinder";
-  else if (_rml.has_mesh())
+  else if (_rml.geometry().has_mesh_shape())
     geomType = "mesh";
-  else if (_rml.has_image())
+  else if (_rml.geometry().has_image_shape())
     geomType = "image";
-  else if (_rml.has_plane())
+  else if (_rml.geometry().has_plane_shape())
     geomType = "plane";
 
   if (geomType == "heightmap" || geomType == "map")
@@ -782,12 +786,13 @@ void Link::FillMsg(msgs::Link &_msg)
   if (this->rml.has_projector())
   {
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + this->rml.projector().name());
-    proj->set_texture(this->rml.projector().texture());
-    proj->set_fov(this->rml.projector().fov());
-    proj->set_near_clip(this->rml.projector().near_clip());
-    proj->set_far_clip(this->rml.projector().far_clip());
-    msgs::Set(proj->mutable_pose(), this->rml.projector().pose());
+    proj->set_name(this->GetScopedName() + "::" +
+        this->rml.projector(0).name());
+    proj->set_texture(this->rml.projector(0).texture());
+    proj->set_fov(this->rml.projector(0).fov());
+    proj->set_near_clip(this->rml.projector(0).near_clip());
+    proj->set_far_clip(this->rml.projector(0).far_clip());
+    msgs::Set(proj->mutable_pose(), this->rml.projector(0).pose());
   }
 }
 
@@ -1010,10 +1015,10 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 void Link::ParseVisuals()
 {
   // TODO: this shouldn't be in the physics sim
-  for(std::vector<rml::Visual>const_iterator iter = this->rml.visual().begin();
-      iter != this->rml.visual().end(); ++iter)
+  for(std::vector<rml::Visual>::const_iterator iter =
+      this->rml.visual().begin(); iter != this->rml.visual().end(); ++iter)
   {
-    msgs::Visual msg = msgs::VisualFromSDF(iter);
+    msgs::Visual msg = msgs::VisualFromRML(*iter);
 
     std::string visName = this->GetScopedName() + "::" + msg.name();
     msg.set_name(visName);
@@ -1024,11 +1029,10 @@ void Link::ParseVisuals()
 
     this->visPub->Publish(msg);
 
-    Visuals_M::iterator iter = this->visuals.find(msg.id());
-    if (iter != this->visuals.end())
-      gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
-
-    this->visuals[msg.id()] = msg;
+    if (this->visuals.find(msg.id()) != this->visuals.end())
+      gzerr << "Duplicate visual name[" << msg.name() << "]\n";
+    else
+      this->visuals[msg.id()] = msg;
   }
 }
 

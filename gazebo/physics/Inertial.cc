@@ -83,12 +83,12 @@ void Inertial::UpdateParameters(const rml::Inertial &_rml)
   // Otherwise SetUpdateFunc won't get called.
   {
     this->SetInertiaMatrix(
-        this->rml.inertia().Get<double>("ixx"),
-        this->rml.inertia().Get<double>("iyy"),
-        this->rml.inertia().Get<double>("izz"),
-        this->rml.inertia().Get<double>("ixy"),
-        this->rml.inertia().Get<double>("ixz"),
-        this->rml.inertia().Get<double>("iyz"));
+        this->rml.inertia().ixx(),
+        this->rml.inertia().iyy(),
+        this->rml.inertia().izz(),
+        this->rml.inertia().ixy(),
+        this->rml.inertia().ixz(),
+        this->rml.inertia().iyz());
   }
 
   this->SetMass(this->rml.mass());

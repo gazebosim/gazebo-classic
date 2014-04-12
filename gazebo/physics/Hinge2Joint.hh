@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _HINGE2JOINT_HH_
 #define _HINGE2JOINT_HH_
 
@@ -55,7 +50,7 @@ namespace gazebo
 
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0)
               {
                 rml::Joint rmlJoint;
                 rmlJoint.SetFromXML(_sdf);
@@ -70,10 +65,11 @@ namespace gazebo
 
       /// \brief Load the joint.
       /// \param[in] _rml RML values to load from.
-      public: virtual void Load(const rml::Joint &_rml)
+      /// \return True on success
+      public: virtual bool Load(const rml::Joint &_rml)
               {
-                T::Load(_rml);
-
+                bool result = T::Load(_rml);
+                
                 this->SetAxis(0, math::Vector3(
                     _rml.axis().xyz().x,
                     _rml.axis().xyz().y,
@@ -83,6 +79,8 @@ namespace gazebo
                     _rml.axis2().xyz().x,
                     _rml.axis2().xyz().y,
                     _rml.axis2().xyz().z));
+
+                return result;
               }
     };
     /// \}

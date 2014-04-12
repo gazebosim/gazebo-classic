@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
-
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"

@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
 
 #include <sdf/sdf.hh>
 
@@ -71,24 +68,21 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
 //////////////////////////////////////////////////
 void PhysicsEngine::Load(sdf::ElementPtr _sdf)
 {
-  this->sdf->Copy(_sdf);
-
-  this->realTimeUpdateRate =
-      this->sdf->GetElement("real_time_update_rate")->Get<double>();
-  this->targetRealTimeFactor =
-      this->sdf->GetElement("real_time_factor")->Get<double>();
-  this->maxStepSize =
-      this->sdf->GetElement("max_step_size")->Get<double>();
+  rml::Physics rmlPhysics;
+  rmlPhysics.SetFromXML(_sdf);
+  this->Load(rmlPhysics);
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::Load(const rml::Physics &_rml)
+bool PhysicsEngine::Load(const rml::Physics &_rml)
 {
   this->rml = _rml;
 
   this->realTimeUpdateRate = this->rml.real_time_update_rate();
   this->targetRealTimeFactor = this->rml.real_time_factor();
   this->maxStepSize = this->rml.max_step_size();
+
+  return true;
 }
 
 //////////////////////////////////////////////////

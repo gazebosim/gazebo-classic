@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <math.h>
 #include <sstream>
 
@@ -55,13 +50,24 @@ ODELink::~ODELink()
 //////////////////////////////////////////////////
 void ODELink::Load(sdf::ElementPtr _sdf)
 {
+  rml::Link rmlLink;
+  rmlLink.SetFromXML(_sdf);
+  this->Load(rmlLink);
+}
+
+//////////////////////////////////////////////////
+bool ODELink::Load(const rml::Link &_rml)
+{
   this->odePhysics = boost::dynamic_pointer_cast<ODEPhysics>(
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->odePhysics == NULL)
-    gzthrow("Not using the ode physics engine");
+  {
+    gzerr << "Unable to load the ODE physics engine.\n";
+    return false;
+  }
 
-  Link::Load(_sdf);
+  return Link::Load(_rml);
 }
 
 //////////////////////////////////////////////////

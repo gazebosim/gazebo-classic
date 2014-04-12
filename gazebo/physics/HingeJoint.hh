@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _HINGEJOINT_HH_
 #define _HINGEJOINT_HH_
 
@@ -51,17 +46,18 @@ namespace gazebo
 
       /// \brief Load joint
       /// \param[in] _sdf Pointer to SDF element
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0)
               {
                 rml::Joint rmlJoint;
                 rmlJoint.SetFromXML(_sdf);
                 T::Load(rmlJoint);
               }
 
-      /// \brief Load joint
-      /// \param[in] _rml RML values to load from
-      public: virtual void Load(const rml::Joint &_rml)
-              {T::Load(_rml);}
+      /// \brief Load joint.
+      /// \param[in] _rml RML values to load from.
+      /// \return True on success.
+      public: virtual bool Load(const rml::Joint &_rml)
+              { return T::Load(_rml); }
 
       /// \brief Initialize joint
       protected: virtual void Init()

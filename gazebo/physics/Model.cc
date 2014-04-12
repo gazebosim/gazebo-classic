@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -102,7 +98,7 @@ void Model::LoadLinks()
 
   // Load the bodies
   bool canonicalLinkInitialized = false;
-  for (std::vector<rml::Link>::iterator iter = this->rml.link().begin();
+  for (std::vector<rml::Link>::const_iterator iter = this->rml.link().begin();
       iter != this->rml.link().end(); ++iter)
   {
     // Create a new link
@@ -127,10 +123,10 @@ void Model::LoadLinks()
 }
 
 //////////////////////////////////////////////////
-void Model::LoadJoints()
+bool Model::LoadJoints()
 {
   // Load the joints
-  for(std::vector<rml::Joint>::iterator iter = this->rml.joint().begin();
+  for(std::vector<rml::Joint>::const_iterator iter = this->rml.joint().begin();
       iter != this->rml.joint().end(); ++iter)
   {
     try
@@ -140,14 +136,17 @@ void Model::LoadJoints()
     catch(...)
     {
       gzerr << "LoadJoint Failed\n";
+      return false;
     }
   }
 
-  for(std::vector<rml::Gripper>::iterator iter = this->rml.gripper().begin();
-      iter != this->rml.gripper().end(); ++iter)
+  for(std::vector<rml::Gripper>::const_iterator iter =
+      this->rml.gripper().begin(); iter != this->rml.gripper().end(); ++iter)
   {
     this->LoadGripper(*iter);
   }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -328,8 +327,9 @@ void Model::Fini()
 }
 
 //////////////////////////////////////////////////
-void Model::UpdateParameters(sdf::ElementPtr _sdf)
+void Model::UpdateParameters(sdf::ElementPtr /*_sdf*/)
 {
+  /* REIMPLEMENT
   Entity::UpdateParameters(_sdf);
 
   if (_sdf->HasElement("link"))
@@ -343,7 +343,6 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
       linkElem = linkElem->GetNextElement("link");
     }
   }
-  /*
 
   if (_sdf->HasElement("joint"))
   {
@@ -365,7 +364,7 @@ const sdf::ElementPtr Model::GetSDF()
 }
 
 //////////////////////////////////////////////////
-const rml::Model Model::GetRML()
+const rml::Model &Model::GetRML()
 {
   return this->rml;
 }
@@ -690,11 +689,10 @@ void Model::LoadPlugins()
     if (iterations < 50)
     {
       // Load the plugins
-      for (std::vector<rml::Plugin>::iterator iter = this->rml.plugin().begin();
-           iter != this->rml.plugin.end(); ++iter)
+      for (std::vector<rml::Plugin>::const_iterator iter =
+           this->rml.plugin().begin(); iter != this->rml.plugin().end(); ++iter)
       {
         this->LoadPlugin(*iter);
-        pluginElem = pluginElem->GetNextElement("plugin");
       }
     }
     else
@@ -728,7 +726,7 @@ unsigned int Model::GetSensorCount() const
 }
 
 //////////////////////////////////////////////////
-void Model::LoadPlugin(const rml::Plugin _rml)
+void Model::LoadPlugin(const rml::Plugin &_rml)
 {
   std::string pluginName = _rml.name();
   std::string filename = _rml.filename();

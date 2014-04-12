@@ -48,7 +48,7 @@ namespace gazebo
 
       /// \brief Load a ScrewJoint.
       /// \param[in] _sdf SDF value to load from
-      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(2.0)
+      public: virtual void Load(sdf::ElementPtr _sdf) GAZEBO_DEPRECATED(3.0)
                  {
                    rml::Joint rmlJoint;
                    rmlJoint.SetFromXML(_sdf);
@@ -57,9 +57,9 @@ namespace gazebo
 
       /// \brief Load a ScrewJoint.
       /// \param[in] _rml RML value to load from
-      public: virtual void Load(const rml::Joint &_rml)
+      public: virtual bool Load(const rml::Joint &_rml)
                  {
-                   T::Load(_rml);
+                   bool result = T::Load(_rml);
 
                    if (_rml.has_thread_pitch())
                      this->threadPitch = _rml.thread_pitch();
@@ -86,6 +86,8 @@ namespace gazebo
                        this->SetHighStop(0, _rml.axis().limit().upper());
                      }
                    }
+
+                   return result;
                  }
 
       /// \brief Set the anchor.

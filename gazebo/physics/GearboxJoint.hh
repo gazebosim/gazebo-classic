@@ -79,9 +79,9 @@ namespace gazebo
 
       /// \brief Load joint.
       /// \param[in] _rml RML values to load from.
-      public: virtual void Load(const rml::Joint &_rml)
+      public: virtual bool Load(const rml::Joint &_rml)
               {
-                T::Load(_rml);
+                bool result = T::Load(_rml);
 
                 if (_rml.has_gearbox_ratio())
                   this->gearRatio = _rml.gearbox_ratio();
@@ -97,6 +97,8 @@ namespace gazebo
                 {
                   gzerr << "Gearbox joint missing reference body.\n";
                 }
+
+                return result;
               }
 
       /// \brief Initialize joint

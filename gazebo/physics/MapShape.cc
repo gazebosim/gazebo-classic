@@ -61,30 +61,35 @@ void MapShape::Load(sdf::ElementPtr _sdf)
 {
   rml::Collision rmlCollision;
   rmlCollision.SetFromXML(_sdf);
-  this->Load(rmlCollision)
+  this->Load(rmlCollision);
 }
 
 //////////////////////////////////////////////////
-void MapShape::Load(const rml::Collision &_rml)
+bool MapShape::Load(const rml::Collision &_rml)
 {
   Base::Load(_rml.name());
 
-  std::string imageFilename = _rml.geometry().map_shape().uri();
+  std::string imageFilename = _rml.geometry().image_shape().uri();
 
   // Make sure they are ok
-  if (this->rml.geometry().map_shape().scale() <= 0)
-    this->rml.mutable_geometry()->mutable_map_shape()->set_scale(0.1);
-  if (this->rml.geometry().map_shape().threshold() <= 0)
-    this->rml.mutable_geometry()->mutable_map_shape()->set_threshold(200);
-  if (this->rml.geometry().height() <= 0)
-    this->rml.mutable_geometry()->mutable_map_shape()->set_height(1.0);
+  if (this->rml.geometry().image_shape().scale() <= 0)
+    this->rml.mutable_geometry()->mutable_image_shape()->set_scale(0.1);
+  if (this->rml.geometry().image_shape().threshold() <= 0)
+    this->rml.mutable_geometry()->mutable_image_shape()->set_threshold(200);
+  if (this->rml.geometry().image_shape().height() <= 0)
+    this->rml.mutable_geometry()->mutable_image_shape()->set_height(1.0);
 
   // Load the image
   this->mapImage = new common::Image();
   this->mapImage->Load(imageFilename);
 
   if (!this->mapImage->Valid())
-    gzthrow(std::string("Unable to open image file[") + imageFilename + "]");
+  {
+    gzerr << "Unable to open image file[" << imageFilename << "]\n";
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -123,7 +128,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
 {
-  return this->rml.geometrt().map_shape().uri();
+  return this->rml.geometry().image_shape().uri();
 }
 
 //////////////////////////////////////////////////
@@ -134,7 +139,7 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 
   this->scale = _scale;
 
-  this->rml.mutable_geometry()->mutable_map_shape()->set_scale((_scale);
+  this->rml.mutable_geometry()->mutable_image_shape()->set_scale(_scale.x);
 
   /// TODO MapShape::SetScale not yet implemented.
 }
@@ -142,26 +147,26 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MapShape::GetScale() const
 {
-  double mapScale = this->rml.geometry().map_shape().scale();
+  double mapScale = this->rml.geometry().image_shape().scale();
   return math::Vector3(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetThreshold() const
 {
-  return this->rml.geometry().map_shape().threshold();
+  return this->rml.geometry().image_shape().threshold();
 }
 
 //////////////////////////////////////////////////
 double MapShape::GetHeight() const
 {
-  return this->rml.geometry().map_shape().height();
+  return this->rml.geometry().image_shape().height();
 }
 
 //////////////////////////////////////////////////
 int MapShape::GetGranularity() const
 {
-  return this->rml.geometry().map_shape().granularity();
+  return this->rml.geometry().image_shape().granularity();
 }
 
 //////////////////////////////////////////////////
@@ -340,7 +345,7 @@ void MapShape::BuildTree(QuadNode *_node)
   // int diff = labs(freePixels - occPixels);
 
   if (static_cast<int>(_node->width*_node->height) >
-      this->rml.geometry().map_shape().granularity))
+      this->rml.geometry().image_shape().granularity())
   {
     float newX, newY;
     float newW, newH;
@@ -423,7 +428,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
       v = (unsigned char)(255 *
           ((pixColor.r + pixColor.g + pixColor.b) / 3.0));
 
-      if (v > this->rml.geometry().map_shape().threshold())
+      if (v > this->rml.geometry().image_shape().threshold())
         freePixels++;
       else
         occPixels++;

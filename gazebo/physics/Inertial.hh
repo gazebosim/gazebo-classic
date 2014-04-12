@@ -271,7 +271,7 @@ namespace gazebo
       private: math::Vector3 products;
 
       /// \brief Our RML values.
-      private: sdf::ElementPtr rml;
+      private: rml::Inertial rml;
     };
     /// \}
   }

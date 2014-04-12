@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BALLJOINT_HH_
 #define _BALLJOINT_HH_
 
@@ -61,8 +56,9 @@ namespace gazebo
 
       /// \brief Load the joint.
       /// \param[in] _rml RML values to load from.
-      public: virtual void Load(const rml::Joint &_rml)
-              {T::Load(_rml);}
+      /// \return True on success.
+      public: virtual bool Load(const rml::Joint &_rml)
+              { return T::Load(_rml); }
 
       /// \internal
       /// \brief Set the axis of rotation. This is not used for ball joints.

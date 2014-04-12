@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A world state
- * Author: Nate Koenig
- */
 
 #ifndef _WORLDSTATE_HH_
 #define _WORLDSTATE_HH_
@@ -25,6 +22,7 @@
 #include <vector>
 
 #include <sdf/sdf.hh>
+#include <rml/rml.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/ModelState.hh"
@@ -48,31 +46,39 @@ namespace gazebo
       public: WorldState();
 
       /// \brief Constructor.
-      ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
       public: explicit WorldState(const WorldPtr _world);
 
       /// \brief Constructor
-      ///
       /// Build a WorldState from SDF data
       /// \param[in] _sdf SDF data to load a world state from.
-      public: explicit WorldState(const sdf::ElementPtr _sdf);
+      public: explicit WorldState(const sdf::ElementPtr _sdf)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Constructor
+      /// Build a WorldState from RML data
+      /// \param[in] _rml RML data to load a world state from.
+      public: explicit WorldState(const rml::State &_rml);
 
       /// \brief Destructor.
       public: virtual ~WorldState();
 
       /// \brief Load from a World pointer.
-      ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
       public: void Load(const WorldPtr _world);
 
       /// \brief Load state from SDF element.
-      ///
       /// Set a WorldState from an SDF element containing WorldState info.
       /// \param[in] _elem Pointer to the WorldState SDF element.
-      public: virtual void Load(const sdf::ElementPtr _elem);
+      public: virtual void Load(const sdf::ElementPtr _elem)
+              GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Load state from SDF element.
+      /// Set a WorldState from an RML object containing WorldState info.
+      /// \param[in] _rml RML with WorldState info.
+      public: virtual void Load(const rml::State &_rml);
 
       /// \brief Set the world.
       /// \param[in] _world Pointer to the world.
