@@ -36,6 +36,7 @@
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
+#include "gazebo/physics/PhysicsPlugin.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
@@ -450,6 +451,8 @@ namespace gazebo
       /// \brief Callback when a light message is received.
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
+
+      private: PhysicsPlugin *CreatePhysicsPlugin(const std::string &_filename);
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
