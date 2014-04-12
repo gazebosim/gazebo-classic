@@ -33,6 +33,7 @@ namespace gazebo
   namespace common
   {
     class Material;
+    class ColladaLoaderPrivate;
 
     /// \addtogroup gazebo_common Common
     /// \{
@@ -198,23 +199,9 @@ namespace gazebo
       /// \param[out] _mat Material to hold the transparent properties
       private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
 
-      /// \brief scaling factor
-      private: double meter;
-
-      /// \brief COLLADA file name
-      private: std::string filename;
-
-      /// \brief material dictionary indexed by name
-      private: std::map<std::string, std::string> materialMap;
-
-      /// \brief root xml element of COLLADA data
-      private: TiXmlElement *colladaXml;
-
-      /// \brief directory of COLLADA file name
-      private: std::string path;
-
-      /// \brief Name of the current node.
-      private: std::string currentNodeName;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ColladaLoaderPrivate *dataPtr;
     };
     /// \}
   }
