@@ -47,6 +47,36 @@ TEST_F(ColladaLoader, LoadBox)
 }
 
 /////////////////////////////////////////////////
+TEST_F(ColladaLoader, ShareVertices)
+{
+  common::ColladaLoader loader;
+  common::Mesh *mesh = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
+
+  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  {
+    const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+    ASSERT_GT(subMesh->GetVertexCount(), 0u);
+    ASSERT_GT(subMesh->GetNormalCount(), 0u);
+
+    for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+    {
+      math::Vector3 v = subMesh->GetVertex(j);
+      math::Vector3 n = subMesh->GetNormal(j);
+
+      // Verify there is no other vertex with the same position AND normal
+      for (unsigned int k = j+1; k < subMesh->GetVertexCount(); ++k)
+      {
+        if (v == subMesh->GetVertex(k))
+        {
+          EXPECT_TRUE(n != subMesh->GetNormal(k));
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

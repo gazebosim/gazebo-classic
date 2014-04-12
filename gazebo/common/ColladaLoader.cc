@@ -61,6 +61,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   this->dataPtr->positionIds.clear();
   this->dataPtr->normalIds.clear();
   this->dataPtr->texcoordIds.clear();
+  this->dataPtr->materialIds.clear();
 
   // reset scale
   this->dataPtr->meter = 1.0;
@@ -1033,6 +1034,11 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
+  if (this->dataPtr->materialIds.find(_name) != this->dataPtr->materialIds.end())
+  {
+    return this->dataPtr->materialIds[_name];
+  }
+
   TiXmlElement *matXml = this->GetElementId("material", _name);
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
     return NULL;
@@ -1114,6 +1120,9 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
   TiXmlElement *cgXml = effectXml->FirstChildElement("profile_CG");
   if (cgXml)
     gzerr << "profile_CG unsupported\n";
+
+  this->dataPtr->materialIds[_name] = mat;
+
   return mat;
 }
 
@@ -1471,7 +1480,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       {
         // if the vertex index was previously added, look at the corresponding
         // normal and texcoord index values to see if they match.
-        bool duplicate = true;
+        bool toDuplicate = true;
         unsigned int reuseIndex = 0;
         std::vector<GeometryIndices> inputValues = inputValueMap[daeVertIndex];
 
@@ -1492,13 +1501,13 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           if ((!hasNormals || normEqual) && (!hasTexcoords || texEqual))
           {
             // found a resuable vertex!
-            duplicate = false;
+            toDuplicate = false;
             reuseIndex = iv.mappedIndex;
             break;
           }
         }
 
-        if (!duplicate)
+        if (!toDuplicate)
         {
           /// TODO remove me
           r++;

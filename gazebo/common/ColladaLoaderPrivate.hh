@@ -30,6 +30,8 @@ namespace gazebo
 {
   namespace common
   {
+    class Material;
+
     /// \brief Private data for the ColladaLoader class
     class  ColladaLoaderPrivate
     {
@@ -51,14 +53,17 @@ namespace gazebo
       /// \brief Name of the current node.
       public: std::string currentNodeName;
 
-      /// \brief Unique POSITION ids in the collada file
+      /// \brief Map of collada POSITION ids to list of vectors.
       public: std::map<std::string, std::vector<math::Vector3> > positionIds;
 
-      /// \brief Unique NORMAL ids in the collada file
+      /// \brief Map of collada NORMAL ids to list of normals.
       public: std::map<std::string, std::vector<math::Vector3> > normalIds;
 
-      /// \brief Unique TEXCOORD ids in the collada file
+      /// \brief Map of collada TEXCOORD ids to list texture coordinates.
       public: std::map<std::string, std::vector<math::Vector2d> >texcoordIds;
+
+      /// \brief Map of collada  Material ids to Gazebo materials.
+      public: std::map<std::string, Material *> materialIds;
     };
 
     /// \brief Helper data structure for loading collada geometries.
