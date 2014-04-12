@@ -11,8 +11,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 
 ## OPTIONS
 
-* -q, --quiet :
- Reduce output to stdout.
+* -v, --version :
+ Output version information.
 * -h, --help :
  Produce this help message.
 * -u, --pause :
@@ -32,7 +32,9 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * --iters arg :
  Number of iterations to simulate.
 * --minimal_comms :
- Reduce the messages output by gzserver
+ Reduce the TCP/IP traffic output by gzserver
+* --verbose :
+ Increase the messages written to the terminal
 * -s, --server-plugin arg :
  Load a plugin.
 

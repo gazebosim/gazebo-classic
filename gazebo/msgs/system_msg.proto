@@ -1,0 +1,24 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SystemMsg
+/// \brief A system message
+
+import "time.proto";
+
+message SystemMsg
+{
+  enum Type
+  {
+    INFO = 0;
+    WARN = 1;
+    ERROR = 2;
+    FATAL = 3;
+    DEBUG = 4;
+  }
+  required Type type         = 1; 
+  required string origin     = 2;
+  required string msg        = 3;
+  required Time wall_time    = 4;
+  required Time sim_time     = 5;
+}

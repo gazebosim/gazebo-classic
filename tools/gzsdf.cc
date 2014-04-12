@@ -66,7 +66,7 @@ int main(int argc, char** argv)
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gazebo::common::Console::Instance()->Init("gzsdf.log");
+    gzLogInit("gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {

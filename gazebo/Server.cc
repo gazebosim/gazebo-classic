@@ -90,7 +90,8 @@ bool Server::ParseArgs(int argc, char **argv)
 
   po::options_description v_desc("Options");
   v_desc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+    ("version,v", "Output the version number of Gazebo")
+    ("verbose", "Output informational messages to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
@@ -138,6 +139,13 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
+  if (this->vm.count("version"))
+  {
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
+    return false;
+  }
+
+
   if (this->vm.count("help"))
   {
     this->PrintUsage();
@@ -145,10 +153,11 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
-  if (this->vm.count("quiet"))
-    gazebo::common::Console::Instance()->SetQuiet(true);
-  else
+  if (this->vm.count("verbose"))
+  {
     gazebo::print_version();
+    gazebo::common::Console::SetQuiet(false);
+  }
 
   if (this->vm.count("minimal_comms"))
     gazebo::transport::setMinimalComms(true);

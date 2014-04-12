@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 */
 #ifndef _CONNECTION_MANAGER_HH_
 #define _CONNECTION_MANAGER_HH_
-
 
 #include <boost/shared_ptr.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>

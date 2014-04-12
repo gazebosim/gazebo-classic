@@ -9,5 +9,3 @@ message GzString
 {
   required string data = 1;
 }
-
-

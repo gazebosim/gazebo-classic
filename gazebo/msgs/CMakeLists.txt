@@ -67,6 +67,7 @@ set (msgs
   quaternion.proto
   sonar.proto
   sonar_stamped.proto
+  system_msg.proto
   raysensor.proto
   request.proto
   response.proto

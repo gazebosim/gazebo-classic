@@ -75,7 +75,8 @@ bool parse_args(int _argc, char **_argv)
 
   po::options_description v_desc("Options");
   v_desc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+    ("version,v", "Output the version number of Gazebo")
+    ("verbose", "Output informational messages to the terminal.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
@@ -93,6 +94,12 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
+  if (vm.count("version"))
+  {
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
+    return false;
+  }
+
   if (vm.count("help"))
   {
     print_usage();
@@ -100,10 +107,11 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  if (!vm.count("quiet"))
+  if (vm.count("verbose"))
+  {
     gazebo::print_version();
-  else
-    gazebo::common::Console::Instance()->SetQuiet(true);
+    gazebo::common::Console::SetQuiet(false);
+  }
 
 
   /// Load all the plugins specified on the command line
@@ -188,7 +196,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gazebo::common::Console::Instance()->Init("gzclient.log");
+  gzLogInit("gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
