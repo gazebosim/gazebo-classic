@@ -14,21 +14,9 @@
  * limitations under the License.
  *
 */
-/**
- * File: MovableText.cpp
- *
- * description: This create create a billboarding object that display a text.
- *
- * @author  2003 by cTh see gavocanov@rambler.ru
- * @update  2006 by barraq see nospam@barraquand.com
- * @update  2007 by independentCreations see independentCreations@gmail.com
- */
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "gazebo/common/common.hh"
-#include "gazebo/common/Assert.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
@@ -70,7 +58,7 @@ void MovableText::Load(const std::string &name_,
                         const std::string &text_,
                         const std::string &fontName_,
                         float charHeight_,
-                        const common::Color &color_)
+                        const ignition::common::Color &color_)
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -170,7 +158,7 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
-void MovableText::SetColor(const common::Color &newColor)
+void MovableText::SetColor(const ignition::common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
@@ -186,7 +174,7 @@ void MovableText::SetCharHeight(float _height)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->charHeight, _height))
+  if (!ignition::math::equal(this->charHeight, _height))
   {
     this->charHeight = _height;
     this->needUpdate = true;
@@ -198,7 +186,7 @@ void MovableText::SetSpaceWidth(float _width)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->spaceWidth, _width))
+  if (!ignition::math::equal(this->spaceWidth, _width))
   {
     this->spaceWidth = _width;
     this->needUpdate = true;
@@ -226,7 +214,7 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (!math::equal(this->baseline, _base))
+  if (!ignition::math::equal(this->baseline, _base))
   {
     this->baseline = _base;
     this->needUpdate = true;
@@ -255,14 +243,14 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+ignition::math::Box MovableText::GetAABB(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
-      math::Vector3(this->aabb->getMinimum().x,
+  return ignition::math::Box(
+     ignition::math::Vector3(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),
-      math::Vector3(this->aabb->getMaximum().x,
+     ignition::math::Vector3(this->aabb->getMaximum().x,
                     this->aabb->getMaximum().y,
                     this->aabb->getMaximum().z));
 }
@@ -272,8 +260,8 @@ void MovableText::_setupGeometry()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  GZ_ASSERT(this->font, "font class member is null");
-  GZ_ASSERT(!this->material.isNull(), "material class member is null");
+  IGN_ASSERT(this->font, "font class member is null");
+  IGN_ASSERT(!this->material.isNull(), "material class member is null");
 
   Ogre::VertexDeclaration *decl = NULL;
   Ogre::VertexBufferBinding *bind = NULL;
@@ -355,7 +343,7 @@ void MovableText::_setupGeometry()
   pVert = static_cast<float*>(ptbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Derive space width from a capital A
-  if (math::equal(this->spaceWidth, 0.0f))
+  if (ignition::math::equal(this->spaceWidth, 0.0f))
     this->spaceWidth =
       this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 
@@ -607,8 +595,8 @@ void MovableText::_updateColors(void)
   Ogre::RGBA *pDest = NULL;
   unsigned int i;
 
-  GZ_ASSERT(this->font, "font class member is null");
-  GZ_ASSERT(!this->material.isNull(), "material class member is null");
+  IGN_ASSERT(this->font, "font class member is null");
+  IGN_ASSERT(!this->material.isNull(), "material class member is null");
 
   // Convert to system-specific
   Ogre::ColourValue cv(this->color.r, this->color.g,
@@ -634,7 +622,7 @@ void MovableText::_updateColors(void)
 const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  GZ_ASSERT(this->camera, "camera class member is null");
+  IGN_ASSERT(this->camera, "camera class member is null");
   return const_cast<Ogre::Quaternion&>(this->camera->getDerivedOrientation());
   // return mParentNode->_getDerivedOrientation();
 }
@@ -643,7 +631,7 @@ const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
 const Ogre::Vector3 & MovableText::getWorldPosition(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  GZ_ASSERT(mParentNode, "mParentNode class member is null");
+  IGN_ASSERT(mParentNode, "mParentNode class member is null");
   return mParentNode->_getDerivedPosition();
 }
 
@@ -722,7 +710,7 @@ void MovableText::getRenderOperation(Ogre::RenderOperation & op)
 const Ogre::MaterialPtr &MovableText::getMaterial(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  GZ_ASSERT(!this->material.isNull(), "material class member is null");
+  IGN_ASSERT(!this->material.isNull(), "material class member is null");
   return this->material;
 }
 

@@ -20,13 +20,13 @@
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string, std::string)> Events::createEntity;
-event::EventT<void (bool)> Events::moveMode;
-event::EventT<void (std::string)> Events::manipMode;
-event::EventT<void (bool)> Events::fullScreen;
-event::EventT<void ()> Events::fps;
-event::EventT<void ()> Events::orbit;
-event::EventT<void (std::string)> Events::keyPress;
-event::EventT<void (const msgs::Model &)> Events::modelUpdate;
-event::EventT<void (int)> Events::inputStepSize;
-event::EventT<void (const std::string &)> Events::follow;
+ignition::common::EventT<void (std::string, std::string)> Events::createEntity;
+ignition::common::EventT<void (bool)> Events::moveMode;
+ignition::common::EventT<void (std::string)> Events::manipMode;
+ignition::common::EventT<void (bool)> Events::fullScreen;
+ignition::common::EventT<void ()> Events::fps;
+ignition::common::EventT<void ()> Events::orbit;
+ignition::common::EventT<void (std::string)> Events::keyPress;
+ignition::common::EventT<void (const msgs::Model &)> Events::modelUpdate;
+ignition::common::EventT<void (int)> Events::inputStepSize;
+ignition::common::EventT<void (const std::string &)> Events::follow;

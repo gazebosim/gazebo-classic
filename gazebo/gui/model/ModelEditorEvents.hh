@@ -18,7 +18,7 @@
 #define _MODEL_EDITOR_EVENTS_HH_
 
 #include <string>
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 
 namespace gazebo
 {
@@ -32,18 +32,18 @@ namespace gazebo
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr
+            static ignition::common::ConnectionPtr
             ConnectFinishModel(T _subscriber)
           { return finishModel.Connect(_subscriber); }
 
         /// \brief Disconnect a boost::slot to the finish model signal
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectFinishModel(
-            event::ConnectionPtr _subscriber)
+            ignition::common::ConnectionPtr _subscriber)
           { finishModel.Disconnect(_subscriber); }
 
         /// \brief A model has been completed and uploaded onto the server.
-        public: static event::EventT<void ()> finishModel;
+        public: static ignition::common::EventT<void ()> finishModel;
       };
     }
   }

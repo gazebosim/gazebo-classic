@@ -25,7 +25,7 @@
 #include <sstream>
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
 using namespace gazebo;
@@ -60,8 +60,8 @@ const Ogre::String &DynamicLines::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(const math::Vector3 &_pt,
-                            const common::Color &_color)
+void DynamicLines::AddPoint(const ignition::math::Vector3 &_pt,
+                            const ignition::common::Color &_color)
 {
   this->points.push_back(_pt);
   this->colors.push_back(_color);
@@ -70,20 +70,21 @@ void DynamicLines::AddPoint(const math::Vector3 &_pt,
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(double _x, double _y, double _z,
-                            const common::Color &_color)
+                            const ignition::common::Color &_color)
 {
-  this->AddPoint(math::Vector3(_x, _y, _z), _color);
+  this->AddPoint(ignition::math::Vector3(_x, _y, _z), _color);
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
+void DynamicLines::SetPoint(unsigned int index,
+    const ignition::math::Vector3 &value)
 {
   if (index >= this->points.size())
   {
     std::ostringstream stream;
     stream << "Point index[" << index << "] is out of bounds[0-"
            << this->points.size()-1 << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   this->points[index] = value;
@@ -92,18 +93,19 @@ void DynamicLines::SetPoint(unsigned int index, const math::Vector3 &value)
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
+void DynamicLines::SetColor(unsigned int _index,
+    const ignition::common::Color &_color)
 {
   this->colors[_index] = _color;
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
-const math::Vector3& DynamicLines::GetPoint(unsigned int index) const
+const ignition::math::Vector3& DynamicLines::GetPoint(unsigned int index) const
 {
   if (index >= this->points.size())
   {
-    gzthrow("Point index is out of bounds");
+    ignthrow("Point index is out of bounds");
   }
 
   return this->points[index];

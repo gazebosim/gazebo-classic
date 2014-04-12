@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "test/util.hh"
 
@@ -31,14 +31,14 @@ TEST_F(DiagnosticsTest, Diagnostics)
   util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
 
-  common::Time prev = common::Time::GetWallTime();
+  ignition::common::Time prev = ignition::common::Time::GetWallTime();
   {
     mgr->StartTimer("test");
     mgr->StopTimer("test");
     EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
     EXPECT_EQ(1, mgr->GetTimerCount());
   }
-  common::Time after = common::Time::GetWallTime();
+  ignition::common::Time after = ignition::common::Time::GetWallTime();
 
   EXPECT_TRUE(mgr->GetTime(0) == mgr->GetTime("test"));
   EXPECT_TRUE(mgr->GetTime(0) <= after - prev);

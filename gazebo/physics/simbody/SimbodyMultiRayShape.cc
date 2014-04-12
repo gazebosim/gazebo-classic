@@ -51,8 +51,8 @@ void SimbodyMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void SimbodyMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void SimbodyMultiRayShape::AddRay(const ignition::math::Vector3 &_start,
+    const ignition::math::Vector3 &_end)
 {
   MultiRayShape::AddRay(_start, _end);
   SimbodyRayShapePtr ray(new SimbodyRayShape(this->physicsEngine));

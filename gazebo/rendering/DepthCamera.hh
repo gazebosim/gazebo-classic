@@ -25,12 +25,12 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/Time.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector2i.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/math/Vector2i.hh"
 
 #include "gazebo/rendering/Camera.hh"
 
@@ -97,24 +97,27 @@ namespace gazebo
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
-              event::ConnectionPtr ConnectNewDepthFrame(T _subscriber)
+              ignition::common::ConnectionPtr
+                ConnectNewDepthFrame(T _subscriber)
               { return newDepthFrame.Connect(_subscriber); }
 
       /// \brief Disconnect from an depth image singal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
+      public: void DisconnectNewDepthFrame(ignition::common::ConnectionPtr &_c)
               { newDepthFrame.Disconnect(_c); }
 
       /// \brief Connect a to the new rgb point cloud signal
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: template<typename T>
-              event::ConnectionPtr ConnectNewRGBPointCloud(T _subscriber)
+              ignition::common::ConnectionPtr
+                ConnectNewRGBPointCloud(T _subscriber)
               { return newRGBPointCloud.Connect(_subscriber); }
 
       /// \brief Disconnect from an rgb point cloud singal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &c)
+      public: void DisconnectNewRGBPointCloud(
+                  ignition::common::ConnectionPtr &c)
               { newRGBPointCloud.Disconnect(c); }
 
 
@@ -163,11 +166,13 @@ namespace gazebo
       private: Ogre::RenderTarget *pcdTarget;
 
       /// \brief Event used to signal rgb point cloud data
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
+      private: ignition::common::EventT<
+               void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newRGBPointCloud;
 
       /// \brief Event used to signal depth data
-      private: event::EventT<void(const float *, unsigned int, unsigned int,
+      private: ignition::common::EventT<
+               void(const float *, unsigned int, unsigned int,
                    unsigned int, const std::string &)> newDepthFrame;
     };
     /// \}

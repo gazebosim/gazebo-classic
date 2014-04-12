@@ -32,10 +32,10 @@
 #endif
 #endif
 
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/AudioDecoder.hh"
+#include "ignition/common/CommonIface.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/AudioDecoder.hh"
 #include "gazebo/util/OpenAL.hh"
 
 using namespace gazebo;
@@ -72,7 +72,7 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
   // Make sure that we could open the audio device
   if (this->audioDevice == NULL)
   {
-    gzerr << "Unable to open audio device["
+    ignerr << "Unable to open audio device["
       << deviceName << "]\n Audio will be disabled.\n";
     return false;
   }
@@ -82,7 +82,7 @@ bool OpenAL::Load(sdf::ElementPtr _sdf)
 
   if (this->context == NULL)
   {
-    gzerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
+    ignerr << "Unable to create OpenAL Context.\nAudio will be disabled.\n";
     return false;
   }
 
@@ -128,7 +128,7 @@ OpenALSinkPtr OpenAL::CreateSink(sdf::ElementPtr /*_sdf*/)
     result  = this->sink;
   }
   else
-    gzerr << "An OpenALSink has already been created."
+    ignerr << "An OpenALSink has already been created."
      << "Only one is allowed.\n";
 
   return result;
@@ -142,7 +142,7 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
   // Make sure the audio device has been opened
   if (!this->audioDevice)
   {
-    gzerr << "Audio device not open\n";
+    ignerr << "Audio device not open\n";
     return source;
   }
 
@@ -152,7 +152,7 @@ OpenALSourcePtr OpenAL::CreateSource(sdf::ElementPtr _sdf)
   // Load the source
   if (!source->Load(_sdf))
   {
-    gzerr << "Unable to load OpenAL source from SDF\n";
+    ignerr << "Unable to load OpenAL source from SDF\n";
     source.reset();
   }
 
@@ -177,7 +177,7 @@ OpenALSink::~OpenALSink()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool OpenALSink::SetPose(const math::Pose &_pose)
+bool OpenALSink::SetPose(const ignition::math::Pose &_pose)
 {
   ALenum error;
 
@@ -188,11 +188,11 @@ bool OpenALSink::SetPose(const math::Pose &_pose)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set pose. Error code[" <<  error << "]\n";
+    ignerr << " Unable to set pose. Error code[" <<  error << "]\n";
     return false;
   }
 
-  math::Matrix3 rot = _pose.rot.GetAsMatrix3();
+  ignition::math::Matrix3 rot = _pose.rot.GetAsMatrix3();
 
   // The first three values are the direction vector values.
   // The second three value are the up vector values.
@@ -210,7 +210,7 @@ bool OpenALSink::SetPose(const math::Pose &_pose)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set pose. Error code[" <<  error << "]\n";
+    ignerr << " Unable to set pose. Error code[" <<  error << "]\n";
     return false;
   }
 
@@ -218,7 +218,7 @@ bool OpenALSink::SetPose(const math::Pose &_pose)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool OpenALSink::SetVelocity(const math::Vector3 &_vel)
+bool OpenALSink::SetVelocity(const ignition::math::Vector3 &_vel)
 {
   ALenum error;
 
@@ -228,7 +228,7 @@ bool OpenALSink::SetVelocity(const math::Vector3 &_vel)
   alListener3f(AL_VELOCITY, _vel.x, _vel.y, _vel.z);
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set velocity. Error code[" <<  error << "]\n";
+    ignerr << " Unable to set velocity. Error code[" <<  error << "]\n";
     return false;
   }
 
@@ -266,7 +266,7 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
     this->FillBufferFromFile(_sdf->Get<std::string>("uri"));
   else
   {
-    gzerr << "<audio_source> is missing <uri>...</uri> element\n";
+    ignerr << "<audio_source> is missing <uri>...</uri> element\n";
     return false;
   }
 
@@ -301,7 +301,7 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-bool OpenALSource::SetPose(const math::Pose &_pose)
+bool OpenALSource::SetPose(const ignition::math::Pose &_pose)
 {
   ALfloat p[3] = {static_cast<float>(_pose.pos.x),
     static_cast<float>(_pose.pos.y), static_cast<float>(_pose.pos.z)};
@@ -314,7 +314,7 @@ bool OpenALSource::SetPose(const math::Pose &_pose)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set position. Error code[" << error << "]\n";
+    ignerr << " Unable to set position. Error code[" << error << "]\n";
     return false;
   }
 
@@ -322,7 +322,7 @@ bool OpenALSource::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
-bool OpenALSource::SetVelocity(const math::Vector3 &_vel)
+bool OpenALSource::SetVelocity(const ignition::math::Vector3 &_vel)
 {
   ALenum error;
   ALfloat v[3] = {static_cast<float>(_vel.x),
@@ -335,7 +335,7 @@ bool OpenALSource::SetVelocity(const math::Vector3 &_vel)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set velocity. Error code[" << error << "]\n";
+    ignerr << " Unable to set velocity. Error code[" << error << "]\n";
     return false;
   }
 
@@ -354,7 +354,7 @@ bool OpenALSource::SetPitch(float _pitch)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set pitch. Error code[" << error << "]\n";
+    ignerr << " Unable to set pitch. Error code[" << error << "]\n";
     return false;
   }
 
@@ -373,7 +373,7 @@ bool OpenALSource::SetGain(float _gain)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set gain. Error code[" << error << "]\n";
+    ignerr << " Unable to set gain. Error code[" << error << "]\n";
     return false;
   }
 
@@ -393,7 +393,7 @@ bool OpenALSource::SetLoop(bool _state)
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
-    gzerr << " Unable to set loop. Error code[" << error << "]\n";
+    ignerr << " Unable to set loop. Error code[" << error << "]\n";
     return false;
   }
 
@@ -478,7 +478,7 @@ bool OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
 
   if (alGetError() != AL_NO_ERROR)
   {
-    gzerr << "Unable to copy audio data into openAL buffer.\n";
+    ignerr << "Unable to copy audio data into openAL buffer.\n";
     return false;
   }
 
@@ -488,7 +488,7 @@ bool OpenALSource::FillBufferFromPCM(uint8_t *_pcmData,
 /////////////////////////////////////////////////
 void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 {
-  std::string fullPathAudioFile = common::find_file(_audioFile);
+  std::string fullPathAudioFile = ignition::common::find_file(_audioFile);
 
   // Try to open the audio file in the current directory
   FILE *testFile = fopen(fullPathAudioFile.c_str(), "r");
@@ -496,7 +496,7 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
   // If the audio file couldn't be opened, try the gazebo paths
   if (testFile == NULL)
   {
-    gzerr << "Unable to open audio file[" << _audioFile << "]\n";
+    ignerr << "Unable to open audio file[" << _audioFile << "]\n";
   }
 
   uint8_t *dataBuffer = NULL;
@@ -504,7 +504,7 @@ void OpenALSource::FillBufferFromFile(const std::string &_audioFile)
 #ifdef HAVE_FFMPEG
   unsigned int dataBufferSize;
   // Create an audio decoder
-  common::AudioDecoder audioDecoder;
+  ignition::common::AudioDecoder audioDecoder;
 
   // Set the audio file to decode
   audioDecoder.SetFile(fullPathAudioFile);

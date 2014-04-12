@@ -306,7 +306,7 @@ void TopicManager::ConnectSubscribers(const std::string &_topic)
   else
   {
     // TODO: Properly handle this error
-    gzerr << "Shouldn't get here topic[" << _topic << "]\n";
+    ignerr << "Shouldn't get here topic[" << _topic << "]\n";
   }
 }
 
@@ -365,7 +365,7 @@ PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
   if (pub)
   {
     if (_msgType != pub->GetMsgType())
-      gzthrow("Attempting to advertise on an existing topic with"
+      ignthrow("Attempting to advertise on an existing topic with"
               " a conflicting message type\n");
   }
   else
@@ -397,7 +397,7 @@ void TopicManager::Unadvertise(const std::string &_topic)
 //////////////////////////////////////////////////
 void TopicManager::Unadvertise(PublisherPtr _pub)
 {
-  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+  IGN_ASSERT(_pub, "Unadvertising a NULL Publisher");
 
   if (_pub)
   {

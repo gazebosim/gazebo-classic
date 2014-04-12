@@ -15,6 +15,8 @@
  *
 */
 #include <google/protobuf/descriptor.h>
+#include <ignition/common.hh>
+
 #include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
@@ -46,7 +48,7 @@ void Master::Init(uint16_t _port)
   }
   catch(std::exception &_e)
   {
-    gzthrow("Unable to start server[" << _e.what() << "]. "
+    ignthrow("Unable to start server[" << _e.what() << "]. "
             "There is probably another Gazebo process running.");
   }
 }
@@ -121,7 +123,7 @@ void Master::OnRead(const unsigned int _connectionIndex,
   }
   else
   {
-    gzlog << "Master got empty data message from["
+    ignlog << "Master got empty data message from["
           << conn->GetRemotePort() << "]. This is most likely fine, since"
           << "the remote side probably terminated.\n";
   }
@@ -283,7 +285,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     }
     else
     {
-      gzerr << "Unknown request[" << req.request() << "]\n";
+      ignerr << "Unknown request[" << req.request() << "]\n";
     }
   }
   else
@@ -297,7 +299,7 @@ void Master::Run()
   while (!this->stop)
   {
     this->RunOnce();
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
   }
 }
 

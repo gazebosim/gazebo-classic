@@ -166,7 +166,7 @@ void IRInterface::Subscribe()
     // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo IR Interface\n"
       << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

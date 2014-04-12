@@ -276,7 +276,7 @@ void DataLogger::OnRecord(bool _toggle)
 void DataLogger::OnStatus(ConstLogStatusPtr &_msg)
 {
   // A new log status message has arrived, let's display the contents.
-  common::Time time = msgs::Convert(_msg->sim_time());
+  ignition::common::Time time = msgs::Convert(_msg->sim_time());
   std::ostringstream stream;
 
   // Compute the hours, minutes, seconds, and milliseconds that logging has

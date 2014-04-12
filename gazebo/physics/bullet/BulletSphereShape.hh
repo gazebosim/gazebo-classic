@@ -49,15 +49,15 @@ namespace gazebo
               {
                 if (_radius < 0)
                 {
-                  gzerr << "Sphere shape does not support negative radius\n";
+                  ignerr << "Sphere shape does not support negative radius\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
-                  gzwarn << "Setting sphere shape's radius to zero \n";
+                  ignwarn << "Setting sphere shape's radius to zero \n";
                   _radius = 1e-4;
                 }
 
@@ -69,7 +69,8 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = math::Vector3(_radius, _radius, _radius);
+                  this->initialSize = ignition::math::Vector3(
+                      _radius, _radius, _radius);
                   bParent->SetCollisionShape(new btSphereShape(_radius));
                 }
                 else
@@ -96,7 +97,7 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
+                    ignition::math::Pose relativePose =
                         this->collisionParent->GetRelativePose();
                     relativePose.pos -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
@@ -106,7 +107,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of sphere.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3 initialSize;
     };
     /// \}
   }

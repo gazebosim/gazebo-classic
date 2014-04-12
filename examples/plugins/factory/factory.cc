@@ -76,7 +76,8 @@ namespace gazebo
 
         // Pose to initialize the model to
         msgs::Set(msg.mutable_pose(),
-            math::Pose(math::Vector3(1, -2, 0), math::Quaternion(0, 0, 0)));
+           ignition::math::Pose(ignition::math::Vector3(1, -2, 0),
+             ignition::math::Quaternion(0, 0, 0)));
 
         // Send the message
         factoryPub->Publish(msg);

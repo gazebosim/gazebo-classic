@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -188,8 +188,8 @@ bool WallItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
       angle = -range*increment;
       double lineLength = lineToPoint.length();
 
-      newScenePos.setX(startScenePoint.x() + cos(GZ_DTOR(angle))*lineLength);
-      newScenePos.setY(startScenePoint.y() + sin(GZ_DTOR(angle))*lineLength);
+      newScenePos.setX(startScenePoint.x() + cos(IGN_DTOR(angle))*lineLength);
+      newScenePos.setY(startScenePoint.y() + sin(IGN_DTOR(angle))*lineLength);
     }
 
     this->SetVertexPosition(grabberIndex, newScenePos);
@@ -387,7 +387,7 @@ void WallItem::OnApply()
 void WallItem::SetSegmentSelected(unsigned int _index, bool _selected)
 {
   if (_index >= this->segments.size())
-    gzthrow("Index too large")
+    ignthrow("Index too large")
 
   if (_selected && this->selectedSegment)
   {

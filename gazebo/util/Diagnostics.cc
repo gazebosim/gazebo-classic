@@ -20,7 +20,7 @@
  */
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/util/Diagnostics.hh"
@@ -34,7 +34,7 @@ DiagnosticManager::DiagnosticManager()
   // Get the base of the time logging path
   if (!getenv("HOME"))
   {
-    gzwarn << "HOME environment variable missing. Diagnostic timing "
+    ignwarn << "HOME environment variable missing. Diagnostic timing "
       << "information will be logged to /tmp/gazebo.\n";
     this->logPath = "/tmp/gazebo";
   }
@@ -45,7 +45,7 @@ DiagnosticManager::DiagnosticManager()
   }
 
   this->logPath = this->logPath / "diagnostics" /
-    common::Time::GetWallTimeAsISOString();
+    ignition::common::Time::GetWallTimeAsISOString();
 
   // Make sure the path exists.
   if (!boost::filesystem::exists(this->logPath))
@@ -55,7 +55,7 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  common::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 //////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void DiagnosticManager::Init(const std::string &_worldName)
 
   this->pub = this->node->Advertise<msgs::Diagnostics>("~/diagnostics");
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = common::Events::ConnectWorldUpdateBegin(
       boost::bind(&DiagnosticManager::Update, this, _1));
 }
 
@@ -80,7 +80,7 @@ boost::filesystem::path DiagnosticManager::GetLogPath() const
 //////////////////////////////////////////////////
 void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
-  if (_info.realTime > common::Time::Zero)
+  if (_info.realTime > ignition::common::Time::Zero)
     this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
   else
     this->msg.set_real_time_factor(0.0);
@@ -96,7 +96,7 @@ void DiagnosticManager::Update(const common::UpdateInfo &_info)
 
 //////////////////////////////////////////////////
 void DiagnosticManager::AddTime(const std::string &_name,
-    common::Time &_wallTime, common::Time &_elapsedTime)
+    ignition::common::Time &_wallTime, ignition::common::Time &_elapsedTime)
 {
   msgs::Diagnostics::DiagTime *time = this->msg.add_time();
   time->set_name(_name);
@@ -110,7 +110,7 @@ void DiagnosticManager::StartTimer(const std::string &_name)
   TimerMap::iterator iter = this->timers.find(_name);
   if (iter != this->timers.end())
   {
-    GZ_ASSERT(iter->second != NULL, "DiagnosticTimerPtr is NULL");
+    IGN_ASSERT(iter->second != NULL, "DiagnosticTimerPtr is NULL");
     iter->second->Start();
   }
   else
@@ -125,11 +125,11 @@ void DiagnosticManager::StopTimer(const std::string &_name)
   TimerMap::iterator iter = this->timers.find(_name);
   if (iter != this->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    IGN_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     iter->second->Stop();
   }
   else
-    gzerr << "Unable to find timer[" << _name << "]\n";
+    ignerr << "Unable to find timer[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -140,10 +140,10 @@ void DiagnosticManager::Lap(const std::string &_name,
   iter = this->timers.find(_name);
 
   if (iter == this->timers.end())
-    gzerr << "Unable to find timer with name[" << _name << "]\n";
+    ignerr << "Unable to find timer with name[" << _name << "]\n";
   else
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    IGN_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
 
     iter->second->Lap(_prefix);
   }
@@ -156,13 +156,13 @@ int DiagnosticManager::GetTimerCount() const
 }
 
 //////////////////////////////////////////////////
-common::Time DiagnosticManager::GetTime(int _index) const
+ignition::common::Time DiagnosticManager::GetTime(int _index) const
 {
   if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
   {
-    gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
+    ignerr << "Invalid index of[" << _index << "]. Must be between 0 and "
       << this->timers.size()-1 << ", inclusive.\n";
-    return common::Time();
+    return ignition::common::Time();
   }
 
   TimerMap::const_iterator iter;
@@ -172,13 +172,13 @@ common::Time DiagnosticManager::GetTime(int _index) const
 
   if (iter != this->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    IGN_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     return iter->second->GetElapsed();
   }
   else
-    gzerr << "Error getting time\n";
+    ignerr << "Error getting time\n";
 
-  return common::Time();
+  return ignition::common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -186,7 +186,7 @@ std::string DiagnosticManager::GetLabel(int _index) const
 {
   if (_index < 0 || static_cast<size_t>(_index) > this->timers.size())
   {
-    gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
+    ignerr << "Invalid index of[" << _index << "]. Must be between 0 and "
       << this->timers.size()-1 << ", inclusive.\n";
     return std::string();
   }
@@ -198,26 +198,27 @@ std::string DiagnosticManager::GetLabel(int _index) const
   if (iter != this->timers.end())
     return iter->first;
   else
-    gzerr << "Erorr getting label\n";
+    ignerr << "Erorr getting label\n";
 
   return "null";
 }
 
 //////////////////////////////////////////////////
-common::Time DiagnosticManager::GetTime(const std::string &_label) const
+ignition::common::Time DiagnosticManager::GetTime(
+    const std::string &_label) const
 {
   TimerMap::const_iterator iter;
   iter = this->timers.find(_label);
 
   if (iter != this->timers.end())
   {
-    GZ_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
+    IGN_ASSERT(iter->second, "DiagnosticTimerPtr is NULL");
     return iter->second->GetElapsed();
   }
   else
-    gzerr << "Error getting time\n";
+    ignerr << "Error getting time\n";
 
-  return common::Time();
+  return ignition::common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -262,8 +263,8 @@ void DiagnosticTimer::Stop()
     // Stop the timer
     Timer::Stop();
 
-    common::Time elapsed = this->GetElapsed();
-    common::Time currTime = common::Time::GetWallTime();
+    ignition::common::Time elapsed = this->GetElapsed();
+    ignition::common::Time currTime = ignition::common::Time::GetWallTime();
 
     // Write out the total elapsed time.
     this->log << this->name << " " << currTime << " "
@@ -281,9 +282,9 @@ void DiagnosticTimer::Stop()
 void DiagnosticTimer::Lap(const std::string &_prefix)
 {
   // Get the current elapsed time.
-  common::Time elapsed = this->GetElapsed();
-  common::Time delta = elapsed - this->prevLap;
-  common::Time currTime = common::Time::GetWallTime();
+  ignition::common::Time elapsed = this->GetElapsed();
+  ignition::common::Time delta = elapsed - this->prevLap;
+  ignition::common::Time currTime = ignition::common::Time::GetWallTime();
 
   // Write out the delta time.
   this->log << this->name << ":" << _prefix << " " <<

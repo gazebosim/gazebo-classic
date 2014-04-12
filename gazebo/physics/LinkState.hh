@@ -28,7 +28,7 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 
 namespace gazebo
 {
@@ -57,8 +57,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp
-      public: LinkState(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: LinkState(const LinkPtr _link,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Constructor
       ///
@@ -83,8 +84,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp
-      public: void Load(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: void Load(const LinkPtr _link,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       ///
@@ -93,20 +95,20 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the link pose.
-      /// \return The math::Pose of the Link.
-      public: const math::Pose &GetPose() const;
+      /// \return The ignition::math::Pose of the Link.
+      public: const ignition::math::Pose &GetPose() const;
 
       /// \brief Get the link velocity.
-      /// \return The velocity represented as a math::Pose.
-      public: const math::Pose &GetVelocity() const;
+      /// \return The velocity represented as a ignition::math::Pose.
+      public: const ignition::math::Pose &GetVelocity() const;
 
       /// \brief Get the link acceleration.
-      /// \return The acceleration represented as a math::Pose.
-      public: const math::Pose &GetAcceleration() const;
+      /// \return The acceleration represented as a ignition::math::Pose.
+      public: const ignition::math::Pose &GetAcceleration() const;
 
       /// \brief Get the force applied to the Link.
       /// \return Magnitude of the force.
-      public: const math::Pose &GetWrench() const;
+      public: const ignition::math::Pose &GetWrench() const;
 
       /// \brief Get the number of link states.
       ///
@@ -120,7 +122,7 @@ namespace gazebo
       /// range of  0...LinkState::GetCollisionStateCount.
       /// \param[in] _index Index of the CollisionState.
       /// \return State of the Collision.
-      /// \throws common::Exception When _index is invalid.
+      /// \throws ignition::common::Exception When _index is invalid.
       public: CollisionState GetCollisionState(unsigned int _index) const;
 
       /// \brief Get a link state by link name.
@@ -129,7 +131,7 @@ namespace gazebo
       /// Returns the CollisionState with the matching name, if any.
       /// \param[in] _collisionName Name of the CollisionState
       /// \return State of the Collision.
-      /// \throws common::Exception When _collisionName is invalid
+      /// \throws ignition::common::Exception When _collisionName is invalid
       public: CollisionState GetCollisionState(
                   const std::string &_collisionName) const;
 
@@ -148,15 +150,15 @@ namespace gazebo
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
-      public: virtual void SetWallTime(const common::Time &_time);
+      public: virtual void SetWallTime(const ignition::common::Time &_time);
 
       /// \brief Set the real time when this state was generated
       /// \param[in] _time Clock time since simulation was stated.
-      public: virtual void SetRealTime(const common::Time &_time);
+      public: virtual void SetRealTime(const ignition::common::Time &_time);
 
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
-      public: virtual void SetSimTime(const common::Time &_time);
+      public: virtual void SetSimTime(const ignition::common::Time &_time);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -180,7 +182,7 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::LinkState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        ignition::math::Vector3 q(_state.pose.rot.GetAsEuler());
         _out << std::fixed <<std::setprecision(5)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
@@ -220,16 +222,16 @@ namespace gazebo
       }
 
       /// \brief 3D pose of the link relative to the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose pose;
 
       /// \brief Velocity of the link (linear and angular).
-      private: math::Pose velocity;
+      private: ignition::math::Pose velocity;
 
       /// \brief Acceleration of the link (linear and angular).
-      private: math::Pose acceleration;
+      private: ignition::math::Pose acceleration;
 
       /// \brief Force on the link(linear and angular).
-      private: math::Pose wrench;
+      private: ignition::math::Pose wrench;
 
       /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;

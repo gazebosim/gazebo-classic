@@ -144,7 +144,7 @@ void Graphics3dInterface::Subscribe()
     // std::ostringstream stream;
     std::cout << "Error Subscribing to Gazebo Graphics3d Interface\n"
       << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

@@ -27,11 +27,11 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Base64.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 
@@ -54,17 +54,17 @@ void LogPlay::Open(const std::string &_logFile)
 {
   boost::filesystem::path path(_logFile);
   if (!boost::filesystem::exists(path))
-    gzthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
+    ignthrow("Invalid logfile[" + _logFile + "]. Does not exist.");
 
   // Parse the log file
   if (!this->xmlDoc.LoadFile(_logFile))
-    gzthrow("Unable to parse log file[" << _logFile << "]");
+    ignthrow("Unable to parse log file[" << _logFile << "]");
 
   // Get the gazebo_log element
   this->logStartXml = this->xmlDoc.FirstChildElement("gazebo_log");
 
   if (!this->logStartXml)
-    gzthrow("Log file is missing the <gazebo_log> element");
+    ignthrow("Log file is missing the <gazebo_log> element");
 
   // Store the filename for future use.
   this->filename = _logFile;
@@ -94,7 +94,7 @@ std::string LogPlay::GetHeader() const
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
-  this->randSeed = math::Rand::GetSeed();
+  this->randSeed = ignition::math::Rand::GetSeed();
   TiXmlElement *headerXml, *childXml;
 
   this->logVersion.clear();
@@ -103,37 +103,37 @@ void LogPlay::ReadHeader()
   // Get the header element
   headerXml = this->logStartXml->FirstChildElement("header");
   if (!headerXml)
-    gzthrow("Log file has no header");
+    ignthrow("Log file has no header");
 
   // Get the log format version
   childXml = headerXml->FirstChildElement("log_version");
   if (!childXml)
-    gzerr << "Log file header is missing the log version.\n";
+    ignerr << "Log file header is missing the log version.\n";
   else
     this->logVersion = childXml->GetText();
 
   // Get the gazebo version
   childXml = headerXml->FirstChildElement("gazebo_version");
   if (!childXml)
-    gzerr << "Log file header is missing the gazebo version.\n";
+    ignerr << "Log file header is missing the gazebo version.\n";
   else
     this->gazeboVersion = childXml->GetText();
 
   // Get the random number seed.
   childXml = headerXml->FirstChildElement("rand_seed");
   if (!childXml)
-    gzerr << "Log file header is missing the random number seed.\n";
+    ignerr << "Log file header is missing the random number seed.\n";
   else
     this->randSeed = boost::lexical_cast<uint32_t>(childXml->GetText());
 
   if (this->logVersion != GZ_LOG_VERSION)
-    gzwarn << "Log version[" << this->logVersion << "] in file["
+    ignwarn << "Log version[" << this->logVersion << "] in file["
            << this->filename
            << "] does not match Gazebo's log version["
            << GZ_LOG_VERSION << "]\n";
 
   /// Set the random number seed for simulation
-  math::Rand::SetSeed(this->randSeed);
+  ignition::math::Rand::SetSeed(this->randSeed);
 }
 
 /////////////////////////////////////////////////
@@ -187,7 +187,7 @@ bool LogPlay::Step(std::string &_data)
 
     if (!this->GetChunkData(this->logCurrXml, this->currentChunk))
     {
-      gzerr << "Unable to decode log file\n";
+      ignerr << "Unable to decode log file\n";
       return false;
     }
 
@@ -232,7 +232,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
 
   // Make sure there is an encoding value.
   if (this->encoding.empty())
-    gzthrow("Enconding missing for a chunk in log file[" +
+    ignthrow("Enconding missing for a chunk in log file[" +
         this->filename + "]");
 
   if (this->encoding == "txt")
@@ -277,7 +277,7 @@ bool LogPlay::GetChunkData(TiXmlElement *_xml, std::string &_data)
   }
   else
   {
-    gzerr << "Inavlid encoding[" << this->encoding << "] in log file["
+    ignerr << "Inavlid encoding[" << this->encoding << "] in log file["
       << this->filename << "]\n";
     return false;
   }

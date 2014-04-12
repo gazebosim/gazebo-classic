@@ -34,7 +34,7 @@ void GpuRayPlugin::Load(sensors::SensorPtr _sensor,
 
   if (!this->parentSensor)
   {
-    gzerr << "GpuRayPlugin not attached to a GpuLaser sensor\n";
+    ignerr << "GpuRayPlugin not attached to a GpuLaser sensor\n";
     return;
   }
 

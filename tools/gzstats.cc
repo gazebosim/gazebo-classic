@@ -18,20 +18,18 @@
 #include <signal.h>
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
+#include <ignition/common.hh>
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
-
-#include "gazebo/common/Animation.hh"
-#include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/gazebo_config.h"
 
 namespace po = boost::program_options;
 using namespace gazebo;
 
-std::list<common::Time> simTimes, realTimes;
+std::list<ignition::common::Time> simTimes, realTimes;
 
 boost::mutex mutex;
 boost::condition_variable condition;
@@ -43,8 +41,8 @@ void cb(ConstWorldStatisticsPtr &_msg)
 {
   double percent = 0;
   char paused;
-  common::Time simTime  = msgs::Convert(_msg->sim_time());
-  common::Time realTime = msgs::Convert(_msg->real_time());
+  ignition::common::Time simTime  = msgs::Convert(_msg->sim_time());
+  ignition::common::Time realTime = msgs::Convert(_msg->real_time());
 
   simTimes.push_back(msgs::Convert(_msg->sim_time()));
   if (simTimes.size() > 20)
@@ -54,8 +52,8 @@ void cb(ConstWorldStatisticsPtr &_msg)
   if (realTimes.size() > 20)
     realTimes.pop_front();
 
-  common::Time simAvg, realAvg;
-  std::list<common::Time>::iterator simIter, realIter;
+  ignition::common::Time simAvg, realAvg;
+  std::list<ignition::common::Time>::iterator simIter, realIter;
   simIter = ++(simTimes.begin());
   realIter = ++(realTimes.begin());
   while (simIter != simTimes.end() && realIter != realTimes.end())

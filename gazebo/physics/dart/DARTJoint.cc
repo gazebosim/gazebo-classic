@@ -15,9 +15,9 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/World.hh"
@@ -82,7 +82,7 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
   // if (theChildLink != NULL)
-  GZ_ASSERT(dartChildLink.get() != NULL, "dartChildLink pointer is NULL");
+  IGN_ASSERT(dartChildLink.get() != NULL, "dartChildLink pointer is NULL");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->GetWorldPose());
@@ -126,7 +126,7 @@ void DARTJoint::Init()
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
+        ignlog << "joint friction not implemented in DART.\n";
       }
     }
   }
@@ -145,7 +145,7 @@ void DARTJoint::Init()
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented in DART.\n";
+        ignlog << "joint friction not implemented in DART.\n";
       }
     }
   }
@@ -206,7 +206,7 @@ void DARTJoint::Attach(LinkPtr _parent, LinkPtr _child)
   if (this->AreConnected(_parent, _child))
     return;
 
-  gzerr << "DART does not support joint attaching.\n";
+  ignerr << "DART does not support joint attaching.\n";
 }
 
 //////////////////////////////////////////////////
@@ -218,14 +218,14 @@ void DARTJoint::Detach()
   this->childLink.reset();
   this->parentLink.reset();
 
-  gzerr << "DART does not support joint dettaching.\n";
+  ignerr << "DART does not support joint dettaching.\n";
 
   Joint::Detach();
 }
 
 //////////////////////////////////////////////////
 void DARTJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 &/*_anchor*/)
+    const ignition::math::Vector3 &/*_anchor*/)
 {
   // nothing to do here for DART.
 }
@@ -237,7 +237,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
 
   if (this->GetAngleCount() > 2)
   {
-     gzerr << "Incompatible joint type, GetAngleCount() = "
+     ignerr << "Incompatible joint type, GetAngleCount() = "
            << this->GetAngleCount() << " > 2\n";
      return;
   }
@@ -265,7 +265,7 @@ void DARTJoint::SetStiffness(unsigned int _index, const double _stiffness)
   }
   else
   {
-     gzerr << "DARTJoint::SetStiffness: index[" << _index
+     ignerr << "DARTJoint::SetStiffness: index[" << _index
            << "] is out of bounds (GetAngleCount() = "
            << this->GetAngleCount() << ").\n";
      return;
@@ -295,15 +295,16 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     }
 
     /// \TODO: add spring force element
-    gzdbg << "Joint [" << this->GetName()
+    igndbg << "Joint [" << this->GetName()
            << "] stiffness not implement in DART\n";
   }
   else
-    gzerr << "SetStiffnessDamping _index " << _index << " is too large.\n";
+    ignerr << "SetStiffnessDamping _index " << _index << " is too large.\n";
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+void DARTJoint::SetHighStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   switch (_index)
   {
@@ -313,13 +314,14 @@ void DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
       this->dtJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
       break;
     default:
-      gzerr << "Invalid index[" << _index << "]\n";
+      ignerr << "Invalid index[" << _index << "]\n";
       break;
   };
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+void DARTJoint::SetLowStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   switch (_index)
   {
@@ -329,12 +331,12 @@ void DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
     this->dtJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
     break;
   default:
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   };
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle DARTJoint::GetHighStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -343,14 +345,14 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
   case 2:
     return this->dtJoint->getGenCoord(_index)->get_qMax();
   default:
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   };
 
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle DARTJoint::GetLowStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -359,20 +361,20 @@ math::Angle DARTJoint::GetLowStop(unsigned int _index)
   case 2:
     return this->dtJoint->getGenCoord(_index)->get_qMin();
   default:
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   };
 
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
+ignition::math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3 result;
 
   if (!this->dtJoint)
   {
-    gzerr << "DART joint is invalid\n";
+    ignerr << "DART joint is invalid\n";
     return result;
   }
 
@@ -392,7 +394,7 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
+    IGN_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }
@@ -411,13 +413,13 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
+ignition::math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3 result;
 
   if (!this->dtJoint)
   {
-    gzerr << "DART joint is invalid\n";
+    ignerr << "DART joint is invalid\n";
     return result;
   }
 
@@ -435,7 +437,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
+    IGN_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(
       dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
   }
@@ -465,7 +467,7 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
     }
     catch(boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      ignerr << "boost any_cast error:" << e.what() << "\n";
     }
   }
   else if (_key == "lo_stop")
@@ -476,18 +478,18 @@ void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
     }
     catch(boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      ignerr << "boost any_cast error:" << e.what() << "\n";
     }
   }
   else
   {
     try
     {
-      gzerr << "Unable to handle joint attribute[" << _key << "]\n";
+      ignerr << "Unable to handle joint attribute[" << _key << "]\n";
     }
     catch(boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      ignerr << "boost any_cast error:" << e.what() << "\n";
     }
   }
 }
@@ -502,9 +504,9 @@ double DARTJoint::GetAttribute(const std::string& _key,
     {
       return this->GetHighStop(_index).Radian();
     }
-    catch(common::Exception &e)
+    catch(ignition::common::Exception &e)
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      ignerr << "GetParam error:" << e.GetErrorStr() << "\n";
       return 0;
     }
   }
@@ -514,15 +516,15 @@ double DARTJoint::GetAttribute(const std::string& _key,
     {
       return this->GetLowStop(_index).Radian();
     }
-    catch(common::Exception &e)
+    catch(ignition::common::Exception &e)
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      ignerr << "GetParam error:" << e.GetErrorStr() << "\n";
       return 0;
     }
   }
   else
   {
-    gzerr << "Unable to get joint attribute[" << _key << "]\n";
+    ignerr << "Unable to get joint attribute[" << _key << "]\n";
     return 0;
   }
 }
@@ -548,7 +550,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   if (theChildLink != NULL)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
-    GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
+    IGN_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
     F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }
@@ -591,7 +593,7 @@ double DARTJoint::GetForce(unsigned int _index)
   }
   else
   {
-    gzerr << "Invalid joint index [" << _index
+    ignerr << "Invalid joint index [" << _index
           << "] when trying to get force\n";
     return 0;
   }
@@ -642,7 +644,7 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
     this->forceApplied[_index] += _force;
   }
   else
-    gzerr << "Something's wrong, joint [" << this->GetName()
+    ignerr << "Something's wrong, joint [" << this->GetName()
           << "] index [" << _index
           << "] out of range.\n";
 }

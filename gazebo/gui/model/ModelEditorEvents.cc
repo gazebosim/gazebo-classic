@@ -20,4 +20,4 @@
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void ()> model::Events::finishModel;
+ignition::common::EventT<void ()> model::Events::finishModel;

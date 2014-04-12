@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet ray sensor
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
 #ifndef BULLETRAYSENSOR_HH
 #define BULLETRAYSENSOR_HH
 
@@ -45,15 +40,16 @@ namespace gazebo
       public: virtual ~BulletRaySensor();
 
       /// \brief Add a ray to the sensor
-      public: void AddRay(math::Vector3 start, math::Vector3 end,
+      public: void AddRay(
+                  ignition::math::Vector3 start, ignition::math::Vector3 end,
                   double minRange, double maxRange, bool display);
 
       /// \brief Get the number of rays
       public: int GetCount() const;
 
       /// \brief Get the relative starting and ending points of a ray
-      public: void GetRelativePoints(int index, math::Vector3 &a,
-                                     math::Vector3 &b);
+      public: void GetRelativePoints(int index, ignition::math::Vector3 &a,
+                                     ignition::math::Vector3 &b);
 
       /// \brief Get the range of a ray
       public: double GetRange(int index) const;

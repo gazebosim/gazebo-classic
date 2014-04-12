@@ -63,7 +63,7 @@ bool transport::get_master_uri(std::string &_masterHost,
 
   if (lastColon == std::string::npos)
   {
-    gzerr << "Port missing in master URI[" << masterURI
+    ignerr << "Port missing in master URI[" << masterURI
           << "]. Using default value of " << GAZEBO_DEFAULT_MASTER_PORT
           << ".\n";
     _masterPort = GAZEBO_DEFAULT_MASTER_PORT;
@@ -77,7 +77,7 @@ bool transport::get_master_uri(std::string &_masterHost,
     }
     catch(...)
     {
-      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+      ignerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
         << "Using the default port number of 11345.\n";
     }
   }
@@ -123,14 +123,14 @@ void transport::run()
     if (namespaces.empty())
     {
       // 25 seconds max wait time
-      common::Time::MSleep(500);
+      ignition::common::Time::MSleep(500);
     }
 
     trys++;
   }
 
   if (trys >= limit)
-    gzerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
+    ignerr << "Unable to get topic namespaces in [" << trys << "] tries.\n";
 }
 
 /////////////////////////////////////////////////

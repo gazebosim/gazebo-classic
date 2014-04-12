@@ -56,15 +56,15 @@ void SpringTestPlugin::Init()
   this->jointImplicit->SetStiffnessDamping(0, this->kpImplicit,
     this->kdImplicit);
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = gazebo::common::Events::ConnectWorldUpdateBegin(
           boost::bind(&SpringTestPlugin::ExplicitUpdate, this));
 }
 
 /////////////////////////////////////////////////
 void SpringTestPlugin::ExplicitUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
+  ignition::common::Time currTime = this->model->GetWorld()->GetSimTime();
+  ignition::common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
   double pos = this->jointExplicit->GetAngle(0).Radian();

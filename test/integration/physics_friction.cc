@@ -21,6 +21,8 @@
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 
+#include "gazebo/gazebo_config.h"
+
 #ifdef HAVE_BULLET
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -94,14 +96,14 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test since there's an issue with simbody's friction"
+    ignerr << "Aborting test since there's an issue with simbody's friction"
           << " parameters (#989)"
           << std::endl;
     return;
   }
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test since there's an issue with dart's friction"
+    ignerr << "Aborting test since there's an issue with dart's friction"
           << " parameters (#1000)"
           << std::endl;
     return;
@@ -115,7 +117,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3 g = physics->GetGravity();
 
   // Custom gravity vector for this demo world.
   EXPECT_DOUBLE_EQ(g.x, 0);
@@ -138,7 +140,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
     ASSERT_GT(box->friction, 0.0);
   }
 
-  common::Time t = world->GetSimTime();
+  ignition::common::Time t = world->GetSimTime();
   while (t.sec < 10)
   {
     world->Step(500);
@@ -146,7 +148,7 @@ void PhysicsFrictionTest::ColoumbFriction(const std::string &_physicsEngine)
 
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
-      math::Vector3 vel = box->model->GetWorldLinearVel();
+      ignition::math::Vector3 vel = box->model->GetWorldLinearVel();
       EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
       EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
 

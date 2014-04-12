@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 #define _GAZEBO_MODEL_TRAJECTORY_TEST_PLUGIN_HH_
 
+#include "ignition/common.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -37,11 +38,11 @@ namespace gazebo
     private: transport::NodePtr node;
     private: transport::SubscriberPtr trajSub;
 
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
 
-    private: common::Time prevUpdateTime;
+    private: ignition::common::Time prevUpdateTime;
   };
 }
 #endif

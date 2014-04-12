@@ -44,25 +44,25 @@ namespace gazebo
               {
                 if (_radius < 0)
                 {
-                  gzerr << "Cylinder shape does not support negative radius\n";
+                  ignerr << "Cylinder shape does not support negative radius\n";
                   return;
                 }
                 if (_length < 0)
                 {
-                  gzerr << "Cylinder shape does not support negative length\n";
+                  ignerr << "Cylinder shape does not support negative length\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
-                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  ignwarn << "Setting cylinder shape's radius to zero \n";
                   _radius = 1e-4;
                 }
-                if (math::equal(_length, 0.0))
+                if (ignition::math::equal(_length, 0.0))
                 {
-                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  ignwarn << "Setting cylinder shape's length to zero \n";
                   _length = 1e-4;
                 }
 

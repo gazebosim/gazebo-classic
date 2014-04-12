@@ -58,27 +58,27 @@ namespace gazebo
       /// \internal
       /// \brief Set the axis of rotation. This is not used for ball joints.
       public: virtual void SetAxis(unsigned int /*_index*/,
-                                   const math::Vector3 &/*_axis*/) {}
+                                   const ignition::math::Vector3 &/*_axis*/) {}
 
       /// \internal
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int /*_index*/,
-                                       math::Angle /*_angle*/) {}
+                                       ignition::math::Angle /*_angle*/) {}
 
       /// \internal
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int /*_index*/,
-                  math::Angle /*_angle*/) {}
+                  ignition::math::Angle /*_angle*/) {}
 
       /// \internal
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(unsigned int /*_index*/)
-              {return math::Angle();}
+      public: virtual ignition::math::Angle GetHighStop(unsigned int /*_index*/)
+              {return ignition::math::Angle();}
 
       /// \internal
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(unsigned int /*_index*/)
-              {return math::Angle();}
+      public: virtual ignition::math::Angle GetLowStop(unsigned int /*_index*/)
+              {return ignition::math::Angle();}
 
       /// \internal
       public: virtual unsigned int GetAngleCount() const

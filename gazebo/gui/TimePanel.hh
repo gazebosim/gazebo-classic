@@ -24,8 +24,8 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/Time.hh"
 
 class QLineEdit;
 class QLabel;
@@ -100,13 +100,13 @@ namespace gazebo
       private: transport::PublisherPtr worldControlPub;
 
       /// \brief Event based connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief List of simulation times used to compute averages.
-      private: std::list<common::Time> simTimes;
+      private: std::list<ignition::common::Time> simTimes;
 
       /// \brief List of real times used to compute averages.
-      private: std::list<common::Time> realTimes;
+      private: std::list<ignition::common::Time> realTimes;
 
       /// \brief Mutex to protect the memeber variables.
       private: boost::mutex mutex;

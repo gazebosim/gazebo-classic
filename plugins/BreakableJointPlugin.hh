@@ -50,7 +50,7 @@ namespace gazebo
     private: physics::JointPtr parentJoint;
 
     /// \brief Pointer to the world update event connection
-    private: event::ConnectionPtr worldConnection;
+    private: ignition::common::ConnectionPtr worldConnection;
 
     /// \brief Breaking force threshold (N).
     private: double breakingForce;

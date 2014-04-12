@@ -51,7 +51,8 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Set the axis of motion
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index,
+                  const ignition::math::Vector3 &_axis);
 
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -62,17 +63,17 @@ namespace gazebo
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Get the rate of change
       public: virtual double GetVelocity(unsigned int _index) const;
@@ -87,10 +88,12 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       /// \brief Set the screw force
       protected: virtual void SetForceImpl(unsigned int _index, double _force);

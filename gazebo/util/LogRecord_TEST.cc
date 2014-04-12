@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Time.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "test/util.hh"
 
@@ -65,7 +65,7 @@ TEST_F(LogRecord_TEST, StartErrors)
   // Invalid encoding
   {
     EXPECT_TRUE(recorder->Init("test"));
-    EXPECT_THROW(recorder->Start("garbage"), gazebo::common::Exception);
+    EXPECT_THROW(recorder->Start("garbage"), ignition::common::Exception);
   }
 
   // Double start
@@ -81,15 +81,15 @@ TEST_F(LogRecord_TEST, StartErrors)
   // Make sure everything has reset.
   EXPECT_FALSE(recorder->GetRunning());
   EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->GetRunTime(), ignition::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
   while (!recorder->IsReadyToStart())
   {
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     if ((++i % 50) == 0)
-      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+      igndbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
 }
 
@@ -115,7 +115,7 @@ TEST_F(LogRecord_TEST, Start_bzip2)
   EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
 
   // Run time should be zero since no update has been triggered.
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->GetRunTime(), ignition::common::Time());
 
   // Stop recording.
   recorder->Stop();
@@ -123,15 +123,15 @@ TEST_F(LogRecord_TEST, Start_bzip2)
   // Make sure everything has reset.
   EXPECT_FALSE(recorder->GetRunning());
   EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->GetRunTime(), ignition::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
   while (!recorder->IsReadyToStart())
   {
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     if ((++i % 50) == 0)
-      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+      igndbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
 }
 
@@ -157,7 +157,7 @@ TEST_F(LogRecord_TEST, Start_zlib)
   EXPECT_TRUE(boost::filesystem::is_directory(recorder->GetBasePath()));
 
   // Run time should be zero since no update has been triggered.
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->GetRunTime(), ignition::common::Time());
 
   // Stop recording.
   recorder->Stop();
@@ -165,15 +165,15 @@ TEST_F(LogRecord_TEST, Start_zlib)
   // Make sure everything has reset.
   EXPECT_FALSE(recorder->GetRunning());
   EXPECT_FALSE(recorder->GetPaused());
-  EXPECT_EQ(recorder->GetRunTime(), gazebo::common::Time());
+  EXPECT_EQ(recorder->GetRunTime(), ignition::common::Time());
 
   // Logger may still be writing so make sure we exit cleanly
   int i = 0;
   while (!recorder->IsReadyToStart())
   {
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     if ((++i % 50) == 0)
-      gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
+      igndbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
 }
 

@@ -53,33 +53,34 @@ void EntityMaker::SetSnapToGrid(bool _snap)
 
 
 //////////////////////////////////////////////////
-void EntityMaker::OnMousePush(const common::MouseEvent &/*event*/)
+void EntityMaker::OnMousePush(const ignition::common::MouseEvent &/*event*/)
 {
 }
 
 //////////////////////////////////////////////////
-void EntityMaker::OnMouseRelease(const common::MouseEvent &/*event*/)
+void EntityMaker::OnMouseRelease(const ignition::common::MouseEvent &/*event*/)
 {
 }
 
 //////////////////////////////////////////////////
-void EntityMaker::OnMouseDrag(const common::MouseEvent &/*event*/)
+void EntityMaker::OnMouseDrag(const ignition::common::MouseEvent &/*event*/)
 {
 }
 
 //////////////////////////////////////////////////
-void EntityMaker::OnMouseMove(const common::MouseEvent &/*_event*/)
+void EntityMaker::OnMouseMove(const ignition::common::MouseEvent &/*_event*/)
 {
 }
 
 //////////////////////////////////////////////////
-math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
+ignition::math::Vector3 EntityMaker::GetSnappedPoint(
+    ignition::math::Vector3 _p)
 {
-  math::Vector3 result = _p;
+  ignition::math::Vector3 result = _p;
 
   if (this->snapToGrid)
   {
-    math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
+    ignition::math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
       this->snapGridSize;
     if (fabs(_p.x - rounded.x) < this->snapDistance)
       result.x = rounded.x;

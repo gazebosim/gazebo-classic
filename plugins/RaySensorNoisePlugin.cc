@@ -41,7 +41,7 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
 {
   if (!_parent)
   {
-    gzerr << "RaySensorNoisePlugin requires a ray sensor as its parent.\n";
+    ignerr << "RaySensorNoisePlugin requires a ray sensor as its parent.\n";
     return;
   }
 
@@ -54,7 +54,7 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
   }
   else
   {
-    gzwarn << "No noise found. Please add noise element to you ray sensor sdf "
+    ignwarn << "No noise found. Please add noise element to you ray sensor sdf "
         << "and set noise type to \"custom\"" << std::endl;
   }
 }
@@ -63,7 +63,8 @@ void RaySensorNoisePlugin::Load(sensors::SensorPtr _parent,
 double RaySensorNoisePlugin::OnApplyNoise(double _in)
 {
   // Apply alternating random noise.
-  double randNoise = math::Rand::GetDblUniform(0, this->fixedNoiseRate);
+  double randNoise = ignition::math::Rand::GetDblUniform(0,
+      this->fixedNoiseRate);
   this->sign *= -1;
   return _in + this->sign*randNoise*_in;
 }

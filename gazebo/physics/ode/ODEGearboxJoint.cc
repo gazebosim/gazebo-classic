@@ -18,7 +18,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -48,7 +48,7 @@ void ODEGearboxJoint::Init()
   if (link)
     this->SetReferenceBody(link);
   else
-    gzerr << "reference Link has not been set yet.\n";
+    ignerr << "reference Link has not been set yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -65,7 +65,7 @@ void ODEGearboxJoint::SetReferenceBody(LinkPtr _body)
   ODELinkPtr odelink = boost::dynamic_pointer_cast<ODELink>(_body);
 
   if (odelink == NULL)
-    gzwarn << "Reference body not valid, using inertial frame.\n";
+    ignwarn << "Reference body not valid, using inertial frame.\n";
   else
     dJointSetGearboxReferenceBody(this->jointId, odelink->GetODEId());
 }
@@ -78,7 +78,7 @@ void ODEGearboxJoint::SetGearRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int _index) const
 {
   dVector3 result;
 
@@ -87,14 +87,14 @@ math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int _index) const
   else if (_index == 1)
     dJointGetGearboxAxis2(this->jointId, result);
   else
-    gzerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
+    ignerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetAnchor(unsigned int _index,
-                                const math::Vector3 &_anchor)
+                                const ignition::math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -106,12 +106,13 @@ void ODEGearboxJoint::SetAnchor(unsigned int _index,
   else if (_index == 1)
     dJointSetGearboxAxis2(this->jointId, _anchor.x, _anchor.y, _anchor.z);
   else
-    gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
+    ignerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
 }
 
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 ODEGearboxJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   dVector3 result;
 
@@ -120,13 +121,14 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else if (_index == 1)
     dJointGetGearboxAxis2(this->jointId, result);
   else
-    gzerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
+    ignerr << "requesting GetAnchor axis [" << _index << "] out of range\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEGearboxJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -137,7 +139,7 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3 globalAxis = _axis;
   if (this->parentLink)
     globalAxis =
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
@@ -149,41 +151,42 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
       globalAxis.z);
   else
-    gzerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
+    ignerr << "requesting SetAnchor axis [" << _index << "] out of range\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEGearboxJoint::GetAngleImpl(unsigned int /*index*/) const
+ignition::math::Angle ODEGearboxJoint::GetAngleImpl(
+    unsigned int /*index*/) const
 {
-  gzlog << "GetAngle not implemented for gearbox\n";
-  return math::Angle(0);
+  ignlog << "GetAngle not implemented for gearbox\n";
+  return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetVelocity(unsigned int /*index*/) const
 {
-  gzlog << "GetVelocity not implemented for gearbox\n";
+  ignlog << "GetVelocity not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetVelocity(unsigned int /*index*/, double /*_angle*/)
 {
-  gzlog << "SetVelocity not implemented for gearbox\n";
+  ignlog << "SetVelocity not implemented for gearbox\n";
   return;
 }
 
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetMaxForce(unsigned int /*index*/, double /*_t*/)
 {
-  gzlog << "SetMaxForce not implemented for gearbox\n";
+  ignlog << "SetMaxForce not implemented for gearbox\n";
   return;
 }
 
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetMaxForce(unsigned int /*index*/)
 {
-  gzlog << "GetMaxForce not implemented for gearbox\n";
+  ignlog << "GetMaxForce not implemented for gearbox\n";
   return 0;
 }
 
@@ -191,21 +194,21 @@ double ODEGearboxJoint::GetMaxForce(unsigned int /*index*/)
 void ODEGearboxJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 {
   if (this->jointId)
-    gzlog << "SetForce not implemented for gearbox\n";
+    ignlog << "SetForce not implemented for gearbox\n";
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 double ODEGearboxJoint::GetParam(unsigned int /*_parameter*/) const
 {
-  gzlog << "GetParam not implemented for gearbox\n";
+  ignlog << "GetParam not implemented for gearbox\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 {
-  gzlog << "SetParam not implemented for gearbox\n";
+  ignlog << "SetParam not implemented for gearbox\n";
   return;
 }

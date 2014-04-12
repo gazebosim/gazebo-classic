@@ -138,7 +138,7 @@ TEST_F(TransportTest, DirectPublish)
   int timeout = 1000;
   while (not g_sceneMsg)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
     timeout--;
     if (timeout == 0)
@@ -182,7 +182,7 @@ TEST_F(TransportTest, ThreadedSinglePubSub)
   boost::thread *thread = new boost::thread(boost::bind(&SinglePub));
 
   for (int i = 0; i < 10 && !g_stringMsg; ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   EXPECT_TRUE(g_stringMsg);
 
@@ -212,7 +212,7 @@ TEST_F(TransportTest, ThreadedMultiSubSinglePub)
   boost::thread *thread = new boost::thread(boost::bind(&SinglePub));
 
   for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   EXPECT_TRUE(g_stringMsg);
 
@@ -257,7 +257,7 @@ TEST_F(TransportTest, ThreadedMultiPubSub)
   boost::thread *thread = new boost::thread(boost::bind(&MultiPub));
 
   for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   EXPECT_TRUE(g_stringMsg);
 
@@ -289,7 +289,7 @@ void MultiPubSub()
 
   int i = 0;
   for (; i < 10 && (!g_stringMsg3 && !g_stringMsg4); ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   EXPECT_TRUE(g_stringMsg3);
   EXPECT_TRUE(g_stringMsg4);
@@ -327,7 +327,7 @@ TEST_F(TransportTest, ThreadedMultiPubSubBidirectional)
   boost::thread *thread = new boost::thread(boost::bind(&MultiPubSub));
 
   for (int i = 0; i < 10 && !g_stringMsg && !g_stringMsg2; ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   EXPECT_TRUE(g_stringMsg);
   EXPECT_TRUE(g_stringMsg2);
@@ -424,12 +424,12 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
   // This generates a warning message
-  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  // EXPECT_THROW(testNode->Advertise<ignition::math::Vector3>("~/scene"),
   //             common::Exception);
 
   scenePub = testNode->Advertise<msgs::Scene>("~/scene");
   EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
-               common::Exception);
+               ignition::common::Exception);
   EXPECT_TRUE(scenePub->GetPrevMsg().empty());
 
   transport::PublisherPtr factoryPub =
@@ -454,7 +454,7 @@ TEST_F(TransportTest, Errors)
   int i = 0;
   while (!g_worldStatsMsg && !g_sceneMsg && !g_worldStatsDebugMsg && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
   EXPECT_LT(i, 20);

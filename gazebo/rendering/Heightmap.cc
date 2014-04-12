@@ -14,19 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
-
 #include <string.h>
 #include <math.h>
+#include <ignition/common.hh>
+#include <ignition/math.hh>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -95,9 +88,9 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
 
   for (int i = 0; i < _msg->geometry().heightmap().texture_size(); ++i)
   {
-    this->diffuseTextures.push_back(common::find_file(
+    this->diffuseTextures.push_back(ignition::common::find_file(
         _msg->geometry().heightmap().texture(i).diffuse()));
-    this->normalTextures.push_back(common::find_file(
+    this->normalTextures.push_back(ignition::common::find_file(
         _msg->geometry().heightmap().texture(i).normal()));
     this->worldSizes.push_back(
         _msg->geometry().heightmap().texture(i).size());
@@ -126,9 +119,9 @@ Ogre::TerrainGroup *Heightmap::GetOgreTerrain() const
 }
 
 //////////////////////////////////////////////////
-common::Image Heightmap::GetImage() const
+ignition::common::Image Heightmap::GetImage() const
 {
-  common::Image result;
+  ignition::common::Image result;
 
   double height = 0.0;
   unsigned char *imageData = NULL;
@@ -136,7 +129,7 @@ common::Image Heightmap::GetImage() const
   /// \todo Support multiple terrain objects
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
 
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  IGN_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
 
   double minHeight = terrain->getMinHeight();
   double maxHeight = terrain->getMaxHeight() - minHeight;
@@ -155,8 +148,8 @@ common::Image Heightmap::GetImage() const
       // Normalize height value
       height = (terrain->getHeightAtPoint(x, y) - minHeight) / maxHeight;
 
-      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
-      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
+      IGN_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
+      IGN_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
       imageData[(size - y - 1)*size+x] =
@@ -164,7 +157,7 @@ common::Image Heightmap::GetImage() const
     }
   }
 
-  result.SetFromData(imageData, size, size, common::Image::L_INT8);
+  result.SetFromData(imageData, size, size, ignition::common::Image::L_INT8);
 
   delete [] imageData;
   return result;
@@ -175,7 +168,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
     std::vector<std::vector<float> > &_v)
 {
   // We support splitting the terrain in 4 or 16 pieces
-  GZ_ASSERT(_n == 4 || _n == 16,
+  IGN_ASSERT(_n == 4 || _n == 16,
       "Invalid number of terrain divisions (it should be 4 or 16)");
 
   int count = 0;
@@ -241,7 +234,7 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
   }
   else
   {
-    gzerr << "Unable to open file for creating a terrain hash: [" +
+    ignerr << "Unable to open file for creating a terrain hash: [" +
         terrainHashFullPath.string() + "]\n";
   }
 }
@@ -255,7 +248,8 @@ bool Heightmap::PrepareTerrainPaging(
   bool updateHash = true;
 
   // Compute the original heightmap's image.
-  heightmapHash = common::get_sha1<std::vector<float> >(this->heights);
+  heightmapHash = ignition::common::get_sha1<std::vector<float> >(
+      this->heights);
 
   // Check if the terrain hash exists
   terrainHashFullPath = _terrainDirPath / this->hashFilename;
@@ -272,7 +266,7 @@ bool Heightmap::PrepareTerrainPaging(
     }
     catch(std::ifstream::failure &e)
     {
-      gzerr << "Terrain paging error: Unable to read terrain hash\n";
+      ignerr << "Terrain paging error: Unable to read terrain hash\n";
     }
   }
 
@@ -344,8 +338,8 @@ void Heightmap::Load()
     }
   }
 
-  if (!math::isPowerOfTwo(this->dataSize - 1))
-    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
+  if (!ignition::math::isPowerOfTwo(this->dataSize - 1))
+    ignthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
   // If the paging is enabled we modify the number of subterrains
   if (this->useTerrainPaging)
@@ -376,7 +370,7 @@ void Heightmap::Load()
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
-  math::Vector3 origin(
+  ignition::math::Vector3 origin(
       orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
       orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
       orig.z);
@@ -396,15 +390,16 @@ void Heightmap::Load()
       double h = *std::max_element(
         &this->heights[0], &this->heights[0] + this->heights.size());
 
-      math::Vector3 camPos(5, -5, h + 200);
-      math::Vector3 lookAt(0, 0, h);
-      math::Vector3 delta = lookAt - camPos;
+      ignition::math::Vector3 camPos(5, -5, h + 200);
+      ignition::math::Vector3 lookAt(0, 0, h);
+      ignition::math::Vector3 delta = lookAt - camPos;
 
       double yaw = atan2(delta.y, delta.x);
       double pitch = atan2(-delta.z,
                            sqrt(delta.x * delta.x + delta.y * delta.y));
 
-      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+      userCam->SetWorldPose(ignition::math::Pose(camPos,
+            ignition::math::Vector3(0, pitch, yaw)));
     }
   }
 
@@ -555,7 +550,7 @@ void Heightmap::ConfigureTerrainDefaults()
 void Heightmap::SetWireframe(bool _show)
 {
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
-  GZ_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
+  IGN_ASSERT(terrain != NULL, "Unable to get a valid terrain pointer");
 
   Ogre::Material *material = terrain->getMaterial().get();
 
@@ -657,7 +652,7 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
 /////////////////////////////////////////////////
 double Heightmap::GetHeight(double _x, double _y, double _z)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+  IGN_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
 
   Ogre::TerrainGroup::RayResult result = this->terrainGroup->rayIntersects(
       Ogre::Ray(Ogre::Vector3(_x, _y, _z), Ogre::Vector3(0, 0, -1)));
@@ -672,7 +667,7 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 
 /////////////////////////////////////////////////
 Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
-    math::Vector2i _mousePos)
+    ignition::math::Vector2i _mousePos)
 {
   Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
       static_cast<float>(_mousePos.x) /
@@ -685,7 +680,7 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Smooth(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
@@ -700,7 +695,7 @@ bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Flatten(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
@@ -715,7 +710,7 @@ bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Raise(CameraPtr _camera, ignition::math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
@@ -730,7 +725,7 @@ bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Lower(CameraPtr _camera, ignition::math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
@@ -747,12 +742,12 @@ bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
 /////////////////////////////////////////////////
 double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+  IGN_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
   {
-    gzerr << "Invalid heightmap position [" << _pos << "]\n";
+    ignerr << "Invalid heightmap position [" << _pos << "]\n";
     return 0.0;
   }
 
@@ -790,12 +785,12 @@ double Heightmap::GetAvgHeight(Ogre::Vector3 _pos, double _radius)
 void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
     double _insideRadius, double _weight, const std::string &_op)
 {
-  GZ_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
+  IGN_ASSERT(this->terrainGroup, "TerrainGroup pointer is NULL");
   Ogre::Terrain *terrain = this->terrainGroup->getTerrain(0, 0);
 
   if (!terrain)
   {
-    gzerr << "Invalid heightmap position [" << _pos << "]\n";
+    ignerr << "Invalid heightmap position [" << _pos << "]\n";
     return;
   }
 
@@ -832,7 +827,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
 
       if (dist > _insideRadius)
       {
-        weight = math::clamp(dist / _outsideRadius, 0.0, 1.0);
+        weight =ignition::math::clamp(dist / _outsideRadius, 0.0, 1.0);
         weight = 1.0 - (weight * weight);
       }
 
@@ -858,7 +853,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
           newHeight -= addedHeight;
       }
       else
-        gzerr << "Unknown terrain operation[" << _op << "]\n";
+        ignerr << "Unknown terrain operation[" << _op << "]\n";
 
       terrain->setHeightAtPoint(x, y, newHeight);
     }
@@ -885,7 +880,7 @@ void Heightmap::SetupShadows(bool _enableShadows)
   matProfile = static_cast<GzTerrainMatGen::SM2Profile*>(
       matGen->getActiveProfile());
   if (!matProfile)
-    gzerr << "Invalid mat profile\n";
+    ignerr << "Invalid mat profile\n";
 
   matProfile->setLayerParallaxMappingEnabled(false);
 
@@ -979,7 +974,7 @@ void GzTerrainMatGen::SM2Profile::addTechnique(
     }
     else
     {
-      gzthrow("No supported shader languages");
+      ignthrow("No supported shader languages");
     }
 
     // Uncomment this to use cg shaders. I'm keeping the CG
@@ -1565,7 +1560,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpHeader(
         _outStream << "  worldPos.x += uv1.x * toMorph * lodMorph.x;\n";
         break;
       default:
-        gzerr << "Invalid alignment\n";
+        ignerr << "Invalid alignment\n";
     };
   }
 
@@ -1922,7 +1917,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
           _outStream << "  vec3 tangent = vec3(0.0, 0.0, -1.0);\n";
           break;
         default:
-          gzerr << "Inavlid terrain alignment\n";
+          ignerr << "Inavlid terrain alignment\n";
           break;
       };
 
@@ -2728,7 +2723,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateVpHeader(
         _outStream << "  worldPos.x += delta.x * toMorph * lodMorph.x;\n";
         break;
       default:
-        gzerr << "Invalid alignment\n";
+        ignerr << "Invalid alignment\n";
     };
   }
 

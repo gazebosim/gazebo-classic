@@ -18,9 +18,9 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 21 May 2003
  */
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -34,7 +34,7 @@ using namespace physics;
 BulletHingeJoint::BulletHingeJoint(btDynamicsWorld *_world, BasePtr _parent)
     : HingeJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  IGN_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
   this->bulletHinge = NULL;
   this->angleOffset = 0;
@@ -63,17 +63,17 @@ void BulletHingeJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3 axis = this->initialWorldAxis;
+  if (axis == ignition::math::Vector3::Zero)
   {
-    gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+    ignerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
   }
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose pose;
 
   // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
@@ -137,11 +137,11 @@ void BulletHingeJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    ignthrow("joint without links\n");
   }
 
   if (!this->bulletHinge)
-    gzthrow("unable to create bullet hinge constraint\n");
+    ignthrow("unable to create bullet hinge constraint\n");
 
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletHinge;
@@ -152,7 +152,7 @@ void BulletHingeJoint::Init()
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  IGN_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
@@ -160,7 +160,7 @@ void BulletHingeJoint::Init()
     this->angleOffset + limitElem->Get<double>("upper"));
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  IGN_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->bulletHinge, true);
 
   // Allows access to impulse
@@ -171,18 +171,19 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 BulletHingeJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   btTransform trans = this->bulletHinge->getAFrame();
   trans.getOrigin() +=
     this->bulletHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(),
+  return ignition::math::Vector3(trans.getOrigin().getX(),
       trans.getOrigin().getY(), trans.getOrigin().getZ());
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+    const ignition::math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -201,7 +202,7 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "SetAxis for existing joint is not implemented\n";
+    ignerr << "SetAxis for existing joint is not implemented\n";
   }
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
@@ -212,13 +213,14 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletHingeJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getHingeAngle() - this->angleOffset;
   else
-    gzwarn << "bulletHinge does not exist, returning default angle\n";
+    ignwarn << "bulletHinge does not exist, returning default angle\n";
   return result;
 }
 
@@ -231,7 +233,7 @@ void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 
   // TODO: Should prescribe the linear velocity of the child link if there is an
   // offset between the child's CG and the joint anchor.
-  math::Vector3 desiredVel;
+  ignition::math::Vector3 desiredVel;
   if (this->parentLink)
     desiredVel = this->parentLink->GetWorldAngularVel();
   desiredVel += _angle * this->GetGlobalAxis(_index);
@@ -243,7 +245,7 @@ void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3 globalAxis = this->GetGlobalAxis(0);
   if (this->childLink)
     result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
   if (this->parentLink)
@@ -291,7 +293,7 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &_angle)
+                      const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
   if (this->bulletHinge)
@@ -306,7 +308,7 @@ void BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &_angle)
+                     const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
   if (this->bulletHinge)
@@ -320,34 +322,35 @@ void BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
+ignition::math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
+    ignerr << "Joint must be created before getting high stop\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
+ignition::math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
-    gzerr << "Joint must be created before getting low stop\n";
+    ignerr << "Joint must be created before getting low stop\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 BulletHingeJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3 result;
   if (this->bulletHinge)
   {
     // I have not verified the following math, though I based it on internal
@@ -358,6 +361,6 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
     result = BulletTypes::ConvertVector3(vec);
   }
   else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+    ignwarn << "bulletHinge does not exist, returning fake axis\n";
   return result;
 }

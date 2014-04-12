@@ -19,7 +19,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Collision.hh"
@@ -73,7 +73,7 @@ void ContactManager::Init(WorldPtr _world)
 /////////////////////////////////////////////////
 Contact *ContactManager::NewContact(Collision *_collision1,
                                     Collision *_collision2,
-                                    const common::Time &_time)
+                                    const ignition::common::Time &_time)
 {
   Contact *result = NULL;
 
@@ -202,7 +202,7 @@ void ContactManager::PublishContacts()
 
   if (!this->contactPub)
   {
-    gzerr << "ContactManager has not been initialized. "
+    ignerr << "ContactManager has not been initialized. "
           << "Unable to publish contacts.\n";
     return;
   }
@@ -268,7 +268,7 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   if (this->customContactPublishers.find(name) !=
     this->customContactPublishers.end())
   {
-    gzerr << "Filter with the same name already exists! Aborting" << std::endl;
+    ignerr << "Filter with the same name already exists! Aborting" << std::endl;
     return "";
   }
 
@@ -325,7 +325,7 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   // The filter should be created in the last call.
   std::string name = _name;
   boost::replace_all(name, "::", "/");
-  GZ_ASSERT(this->customContactPublishers.count(name) > 0,
+  IGN_ASSERT(this->customContactPublishers.count(name) > 0,
       "Failed to create a custom filter");
 
   // Let it know about collisions not yet found.

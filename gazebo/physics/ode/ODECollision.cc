@@ -21,9 +21,9 @@
 
 #include <sstream>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/math/Box.hh"
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -113,7 +113,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
+    IGN_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
   }
 
   if (this->collisionId && this->placeable)
@@ -169,9 +169,9 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-math::Box ODECollision::GetBoundingBox() const
+ignition::math::Box ODECollision::GetBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -209,10 +209,10 @@ void ODECollision::OnPoseChangeGlobal()
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
-  math::Pose localPose = this->GetWorldPose();
+  ignition::math::Pose localPose = this->GetWorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  ignition::math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;
@@ -230,10 +230,10 @@ void ODECollision::OnPoseChangeRelative()
 {
   dQuaternion q;
   // Transform into CoM relative Pose
-  math::Pose localPose = this->GetRelativePose();
+  ignition::math::Pose localPose = this->GetRelativePose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
+  ignition::math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
   localPose.pos = localPose.pos - cog_vec;
 
   q[0] = localPose.rot.w;

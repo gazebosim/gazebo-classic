@@ -19,7 +19,7 @@
  * Date: 14 Dec 2007
  */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/Conversions.hh"
@@ -43,7 +43,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->laserScanSub = this->node->Subscribe(_topicName,
       &LaserVisual::OnScan, this);
 
-  this->connection = event::Events::ConnectPreRender(
+  this->connection = common::Events::ConnectPreRender(
         boost::bind(&LaserVisual::Update, this));
 }
 
@@ -87,15 +87,15 @@ void LaserVisual::Update()
   double angle = this->laserMsg->scan().angle_min();
   double verticalAngle = this->laserMsg->scan().vertical_angle_min();
   double r;
-  math::Vector3 pt;
-  math::Pose offset = msgs::Convert(this->laserMsg->scan().world_pose()) -
-                      this->GetWorldPose();
+  ignition::math::Vector3 pt;
+  ignition::math::Pose offset =
+    msgs::Convert(this->laserMsg->scan().world_pose()) - this->GetWorldPose();
 
   unsigned int vertCount = this->laserMsg->scan().has_vertical_count() ?
       this->laserMsg->scan().vertical_count() : 1u;
 
-  math::Quaternion ray;
-  math::Vector3 axis;
+  ignition::math::Quaternion ray;
+  ignition::math::Vector3 axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     if (j+1 > this->rayFans.size())
@@ -103,7 +103,7 @@ void LaserVisual::Update()
       this->rayFans.push_back(
         this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       this->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      this->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      this->rayFans[j]->AddPoint(ignition::math::Vector3(0, 0, 0));
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     this->rayFans[j]->SetPoint(0, offset.pos);
@@ -113,8 +113,8 @@ void LaserVisual::Update()
     for (unsigned int i = 0; i < count; ++i)
     {
       r = this->laserMsg->scan().ranges(j*count + i);
-      ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
-      axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ray.SetFromEuler(ignition::math::Vector3(0.0, -verticalAngle, angle));
+      axis = offset.rot * ray *ignition::math::Vector3(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.pos;
 
       if (i+1 >= this->rayFans[j]->GetPointCount())
@@ -129,6 +129,6 @@ void LaserVisual::Update()
 }
 
 /////////////////////////////////////////////////
-void LaserVisual::SetEmissive(const common::Color &/*_color*/)
+void LaserVisual::SetEmissive(const ignition::common::Color &/*_color*/)
 {
 }

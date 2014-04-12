@@ -65,6 +65,22 @@ else ()
 endif ()
 
 ########################################
+find_package(IgnitionMath)
+if (NOT IgnitionMath_FOUND)
+  BUILD_ERROR ("Missing: Ignition math library.")
+else()
+  message(STATUS "Looking for ignition_math - found")
+endif()
+
+########################################
+find_package(IgnitionCommon)
+if (NOT IgnitionCommon_FOUND)
+  BUILD_ERROR ("Missing: Ignition common library.")
+else()
+  message(STATUS "Looking for ignition_common - found")
+endif()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
 

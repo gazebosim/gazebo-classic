@@ -27,7 +27,7 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 
 namespace gazebo
 {
@@ -75,11 +75,11 @@ namespace gazebo
 
       /// \brief Set the pose in the world coordinate frame.
       /// \param[in] _pose New pose of the camera.
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      public: virtual void SetWorldPose(const ignition::math::Pose &_pose);
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
-      public: void HandleMouseEvent(const common::MouseEvent &_evt);
+      public: void HandleMouseEvent(const ignition::common::MouseEvent &_evt);
 
       /// \brief Handle a key press.
       /// \param[in] _key The key pressed.
@@ -97,7 +97,7 @@ namespace gazebo
       /// \param[in] _type The type of view controller: "orbit", "fps"
       /// \param[in] _pos The initial pose of the camera.
       public: void SetViewController(const std::string &_type,
-                                     const math::Vector3 &_pos);
+                                     const ignition::math::Vector3 &_pos);
 
       /// \brief Get current view controller type.
       /// \return Type of the current view controller: "orbit", "fps"
@@ -129,7 +129,7 @@ namespace gazebo
       public: void MoveToVisual(VisualPtr _visual);
 
       // Doxygen automatically pulls in the correct documentation.
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
+      public: virtual bool MoveToPosition(const ignition::math::Pose &_pose,
                                           double _time);
 
       /// \brief Move the camera to focus on a visual.
@@ -160,16 +160,17 @@ namespace gazebo
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos,
+      public: VisualPtr GetVisual(const ignition::math::Vector2i &_mousePos,
                                   std::string &_mod);
 
       /// \brief Get a visual at a mouse position
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const;
+      public: VisualPtr GetVisual(
+                  const ignition::math::Vector2i &_mousePos) const;
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      public: void SetFocalPoint(const math::Vector3 &_pt);
+      public: void SetFocalPoint(const ignition::math::Vector3 &_pt);
 
       // Documentation inherited
       public: virtual unsigned int GetImageWidth() const;

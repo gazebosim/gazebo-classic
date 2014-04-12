@@ -21,9 +21,7 @@
 #include <map>
 #include <utility>
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include <ignition/common.hh>
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"
@@ -44,7 +42,7 @@ namespace gazebo
     /// \class ModelDatabase ModelDatabase.hh common/common.hh
     /// \brief Connects to model database, and has utility functions to find
     /// models.
-    class ModelDatabase : public SingletonT<ModelDatabase>
+    class ModelDatabase : public ignition::common::SingletonT<ModelDatabase>
     {
       /// \brief Constructor. This will update the model cache
       private: ModelDatabase();
@@ -78,7 +76,7 @@ namespace gazebo
       /// models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: event::ConnectionPtr  GetModels(boost::function<
+      public: ignition::common::ConnectionPtr  GetModels(boost::function<
                   void (const std::map<std::string, std::string> &)> _func);
 
       /// \brief Get the name of a model based on a URI.

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
-*/
-
 #ifndef _ODEUNIVERSALJOINT_HH_
 #define _ODEUNIVERSALJOINT_HH_
 
@@ -41,21 +36,24 @@ namespace gazebo
       public: virtual ~ODEUniversalJoint();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
+                  const ignition::math::Vector3 &_anchor);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index) const;

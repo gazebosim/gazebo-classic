@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Image.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Image.hh"
 
 #include "gazebo/physics/World.hh"
 
@@ -43,7 +43,7 @@ MultiCameraSensor::MultiCameraSensor()
 {
   this->rendered = false;
   this->connections.push_back(
-      event::Events::ConnectRender(
+      common::Events::ConnectRender(
         boost::bind(&MultiCameraSensor::Render, this)));
 }
 
@@ -84,7 +84,7 @@ void MultiCameraSensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create MultiCameraSensor. Rendering is disabled.\n";
+    ignerr << "Unable to create MultiCameraSensor. Rendering is disabled.\n";
     return;
   }
 
@@ -92,7 +92,7 @@ void MultiCameraSensor::Init()
 
   if (worldName.empty())
   {
-    gzerr << "No world name\n";
+    ignerr << "No world name\n";
     return;
   }
 
@@ -105,7 +105,7 @@ void MultiCameraSensor::Init()
     // This usually means rendering is not available
     if (!this->scene)
     {
-      gzerr << "Unable to create MultiCameraSensor.\n";
+      ignerr << "Unable to create MultiCameraSensor.\n";
       return;
     }
   }
@@ -119,7 +119,7 @@ void MultiCameraSensor::Init()
 
     if (!camera)
     {
-      gzthrow("Unable to create multicamera sensor[" +
+      ignthrow("Unable to create multicamera sensor[" +
               cameraSdf->Get<std::string>("name"));
       return;
     }
@@ -129,14 +129,14 @@ void MultiCameraSensor::Init()
 
     // Do some sanity checks
     if (camera->GetImageWidth() == 0 || camera->GetImageHeight() == 0)
-      gzthrow("Image has zero size");
+      ignthrow("Image has zero size");
 
     camera->Init();
     camera->CreateRenderTexture(camera->GetName() + "_RttTex");
 
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
 
@@ -162,7 +162,7 @@ void MultiCameraSensor::Init()
     msgs::Image *image = this->msg.add_image();
     image->set_width(camera->GetImageWidth());
     image->set_height(camera->GetImageHeight());
-    image->set_pixel_format(common::Image::ConvertPixelFormat(
+    image->set_pixel_format(ignition::common::Image::ConvertPixelFormat(
           camera->GetImageFormat()));
     image->set_step(camera->GetImageWidth() * camera->GetImageDepth());
 
@@ -203,7 +203,7 @@ rendering::CameraPtr MultiCameraSensor::GetCamera(unsigned int _index) const
   if (_index < this->cameras.size())
     return this->cameras[_index];
   else
-    gzthrow("camera index out of range. Valid range[0.." +
+    ignthrow("camera index out of range. Valid range[0.." +
         boost::lexical_cast<std::string>(this->cameras.size()-1));
 }
 
@@ -290,7 +290,7 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
   boost::mutex::scoped_lock lock(this->cameraMutex);
   if (_filenames.size() != this->cameras.size())
   {
-    gzerr << "Filename count[" << _filenames.size() << "] does not match "
+    ignerr << "Filename count[" << _filenames.size() << "] does not match "
           << "camera count[" << this->cameras.size() << "]\n";
     return false;
   }

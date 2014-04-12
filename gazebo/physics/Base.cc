@@ -21,9 +21,9 @@
  */
 
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
@@ -77,7 +77,7 @@ void Base::Load(sdf::ElementPtr _sdf)
   if (_sdf)
     this->sdf = _sdf;
 
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  IGN_ASSERT(this->sdf != NULL, "this->sdf is NULL");
 
   if (this->sdf->HasAttribute("name"))
     this->name = this->sdf->Get<std::string>("name");
@@ -96,8 +96,8 @@ void Base::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Base::UpdateParameters(sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  IGN_ASSERT(_sdf != NULL, "_sdf parameter is NULL");
+  IGN_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Copy(_sdf);
 }
 
@@ -137,8 +137,9 @@ void Base::Reset(Base::EntityType _resetType)
 //////////////////////////////////////////////////
 void Base::SetName(const std::string &_name)
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
-  GZ_ASSERT(this->sdf->GetAttribute("name"), "Base sdf missing name attribute");
+  IGN_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  IGN_ASSERT(this->sdf->GetAttribute("name"),
+      "Base sdf missing name attribute");
   this->sdf->GetAttribute("name")->Set(_name);
   this->name = _name;
   this->ComputeScopedName();
@@ -190,7 +191,7 @@ BasePtr Base::GetParent() const
 void Base::AddChild(BasePtr _child)
 {
   if (_child == NULL)
-    gzthrow("Cannot add a null _child to an entity");
+    ignthrow("Cannot add a null _child to an entity");
 
   // Add this _child to our list
   this->children.push_back(_child);
@@ -333,7 +334,7 @@ unsigned int Base::GetType() const
 void Base::Print(const std::string &_prefix)
 {
   Base_V::iterator iter;
-  gzmsg << _prefix << this->GetName() << "\n";
+  ignmsg << _prefix << this->GetName() << "\n";
 
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     (*iter)->Print(_prefix + "  ");
@@ -384,7 +385,7 @@ const WorldPtr &Base::GetWorld() const
 //////////////////////////////////////////////////
 const sdf::ElementPtr Base::GetSDF()
 {
-  GZ_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
+  IGN_ASSERT(this->sdf != NULL, "Base sdf member is NULL");
   this->sdf->Update();
   return this->sdf;
 }

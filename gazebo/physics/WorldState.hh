@@ -97,7 +97,7 @@ namespace gazebo
       /// \brief Get a model state by model name.
       /// \param[in] _modelName Name of the model state to get.
       /// \return The model state.
-      /// \throws common::Exception When the _modelName doesn't exist.
+      /// \throws ignition::common::Exception When the _modelName doesn't exist.
       public: ModelState GetModelState(const std::string &_modelName) const;
 
       /// \brief Return true if WorldState has a ModelState with the given
@@ -119,15 +119,15 @@ namespace gazebo
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
-      public: virtual void SetWallTime(const common::Time &_time);
+      public: virtual void SetWallTime(const ignition::common::Time &_time);
 
       /// \brief Set the real time when this state was generated
       /// \param[in] _time Clock time since simulation was stated.
-      public: virtual void SetRealTime(const common::Time &_time);
+      public: virtual void SetRealTime(const ignition::common::Time &_time);
 
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
-      public: virtual void SetSimTime(const common::Time &_time);
+      public: virtual void SetSimTime(const ignition::common::Time &_time);
 
       /// \brief Assignment operator
       /// \param[in] _state State value

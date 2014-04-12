@@ -14,16 +14,11 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _ODEHINGE2JOINT_HH_
 #define _ODEHINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Vector3.hh"
 
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
@@ -48,20 +43,23 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAnchor(unsigned int _index,
-                                     const math::Vector3 &_anchor);
+                                     const ignition::math::Vector3 &_anchor);
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+                                   const ignition::math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

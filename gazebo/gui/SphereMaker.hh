@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gazebo/math/Vector2i.hh"
+#include "ignition/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
@@ -41,9 +41,12 @@ namespace gazebo
       public: virtual void Stop();
       public: virtual bool IsActive() const;
 
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      public: virtual void OnMousePush(
+                  const ignition::common::MouseEvent &_event);
+      public: virtual void OnMouseRelease(
+                  const ignition::common::MouseEvent &_event);
+      public: virtual void OnMouseDrag(
+                  const ignition::common::MouseEvent &_event);
 
       /// \brief Get the SDF information for the sphere.
       /// \return The SDF as a string.
@@ -53,7 +56,7 @@ namespace gazebo
 
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos;
+      private: ignition::math::Vector2i mousePushPos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

@@ -22,17 +22,15 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo.hh"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Events.hh"
 
+#include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
@@ -148,7 +146,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   if (this->vm.count("verbose"))
   {
     gazebo::print_version();
-    gazebo::common::Console::SetQuiet(false);
+    ignition::common::Console::SetQuiet(false);
   }
 
   if (this->vm.count("minimal_comms"))
@@ -161,11 +159,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-      math::Rand::SetSeed(this->vm["seed"].as<double>());
+      ignition::math::Rand::SetSeed(this->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
     {
-      gzerr << "Unable to set random number seed. Must supply a number.\n";
+      ignerr << "Unable to set random number seed. Must supply a number.\n";
     }
   }
 
@@ -200,7 +198,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     catch(...)
     {
       this->params["iterations"] = "0";
-      gzerr << "Unable to set iterations of [" <<
+      ignerr << "Unable to set iterations of [" <<
         this->vm["iters"].as<unsigned int>() << "]\n";
     }
   }
@@ -212,7 +210,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
   if (!this->PreLoad())
   {
-    gzerr << "Unable to load gazebo\n";
+    ignerr << "Unable to load gazebo\n";
     return false;
   }
 
@@ -227,7 +225,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the log file
     util::LogPlay::Instance()->Open(this->vm["play"].as<std::string>());
 
-    gzmsg << "\nLog playback:\n"
+    ignmsg << "\nLog playback:\n"
       << "  Log Version: "
       << util::LogPlay::Instance()->GetLogVersion() << "\n"
       << "  Gazebo Version: "
@@ -279,10 +277,10 @@ bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
   // Quick test for a valid file
-  FILE *test = fopen(common::find_file(_filename).c_str(), "r");
+  FILE *test = fopen(ignition::common::find_file(_filename).c_str(), "r");
   if (!test)
   {
-    gzerr << "Could not open file[" << _filename << "]\n";
+    ignerr << "Could not open file[" << _filename << "]\n";
     return false;
   }
   fclose(test);
@@ -291,13 +289,13 @@ bool Server::LoadFile(const std::string &_filename,
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    ignerr << "Unable to initialize sdf\n";
     return false;
   }
 
-  if (!sdf::readFile(common::find_file(_filename), sdf))
+  if (!sdf::readFile(ignition::common::find_file(_filename), sdf))
   {
-    gzerr << "Unable to read sdf file[" << _filename << "]\n";
+    ignerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 
@@ -311,13 +309,13 @@ bool Server::LoadString(const std::string &_sdfString)
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    ignerr << "Unable to initialize sdf\n";
     return false;
   }
 
   if (!sdf::readString(_sdfString, sdf))
   {
-    gzerr << "Unable to read SDF string[" << _sdfString << "]\n";
+    ignerr << "Unable to read SDF string[" << _sdfString << "]\n";
     return false;
   }
 
@@ -357,7 +355,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     // This must be done after physics::load();
     if (!physics::PhysicsFactory::IsRegistered(_physics))
     {
-      gzerr << "Unregistered physics engine [" << _physics
+      ignerr << "Unregistered physics engine [" << _physics
             << "], the default will be used instead.\n";
     }
     // Try inserting physics engine name if one is given
@@ -369,7 +367,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     }
     else
     {
-      gzerr << "Cannot set physics engine: <world> does not have <physics>\n";
+      ignerr << "Cannot set physics engine: <world> does not have <physics>\n";
     }
   }
 
@@ -383,9 +381,9 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     {
       physics::load_world(world, worldElem);
     }
-    catch(common::Exception &e)
+    catch(ignition::common::Exception &e)
     {
-      gzthrow("Failed to load the World\n"  << e);
+      ignthrow("Failed to load the World\n"  << e);
     }
   }
 
@@ -423,7 +421,7 @@ void Server::SigInt(int)
   stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
-  event::Events::sigInt();
+  common::Events::sigInt();
 }
 
 /////////////////////////////////////////////////
@@ -473,7 +471,7 @@ void Server::Run()
   sensors::run_threads();
 
   unsigned int iterations = 0;
-  common::StrStr_M::iterator piter = this->params.find("iterations");
+  ignition::common::StrStr_M::iterator piter = this->params.find("iterations");
   if (piter != this->params.end())
   {
     try
@@ -483,7 +481,7 @@ void Server::Run()
     catch(...)
     {
       iterations = 0;
-      gzerr << "Unable to cast iterations[" << piter->second << "] "
+      ignerr << "Unable to cast iterations[" << piter->second << "] "
         << "to unsigned integer\n";
     }
   }
@@ -496,7 +494,7 @@ void Server::Run()
   {
     this->ProcessControlMsgs();
     sensors::run_once();
-    common::Time::MSleep(1);
+    ignition::common::Time::MSleep(1);
   }
 
   // Stop all the worlds
@@ -514,7 +512,7 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
-  common::StrStr_M::const_iterator iter;
+  ignition::common::StrStr_M::const_iterator iter;
   for (iter = this->params.begin(); iter != this->params.end(); ++iter)
   {
     if (iter->first == "pause")
@@ -535,7 +533,7 @@ void Server::ProcessParams()
         else if (str == "false")
           p = false;
         else
-          gzerr << "Invalid param value[" << iter->first << ":"
+          ignerr << "Invalid param value[" << iter->first << ":"
                 << iter->second << "]\n";
       }
 
@@ -550,9 +548,9 @@ void Server::ProcessParams()
 }
 
 /////////////////////////////////////////////////
-void Server::SetParams(const common::StrStr_M &_params)
+void Server::SetParams(const ignition::common::StrStr_M &_params)
 {
-  common::StrStr_M::const_iterator iter;
+  ignition::common::StrStr_M::const_iterator iter;
   for (iter = _params.begin(); iter != _params.end(); ++iter)
     this->params[iter->first] = iter->second;
 }
@@ -577,7 +575,7 @@ void Server::ProcessControlMsgs()
       if ((*iter).has_save_filename())
         world->Save((*iter).save_filename());
       else
-        gzerr << "No filename specified.\n";
+        ignerr << "No filename specified.\n";
     }
     else if ((*iter).has_new_world() && (*iter).new_world())
     {
@@ -598,19 +596,19 @@ void Server::ProcessControlMsgs()
 /////////////////////////////////////////////////
 bool Server::OpenWorld(const std::string & /*_filename*/)
 {
-  gzerr << "Open World is not implemented\n";
+  ignerr << "Open World is not implemented\n";
   return false;
 /*
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    ignerr << "Unable to initialize sdf\n";
     return false;
   }
 
   if (!sdf::readFile(_filename, sdf))
   {
-    gzerr << "Unable to read sdf file[" << _filename << "]\n";
+    ignerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
   }
 

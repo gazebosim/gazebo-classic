@@ -17,7 +17,8 @@
 #ifndef _GAZEBO_CART_DEMO_PLUGIN_HH_
 #define _GAZEBO_CART_DEMO_PLUGIN_HH_
 
-#include "gazebo/common/common.hh"
+#include "ignition/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
@@ -41,17 +42,17 @@ namespace gazebo
 
     private: transport::NodePtr node;
 
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
 
     private: physics::JointPtr joints[NUM_JOINTS];
-    private: common::PID jointPIDs[NUM_JOINTS];
+    private: ignition::common::PID jointPIDs[NUM_JOINTS];
     private: double jointPositions[NUM_JOINTS];
     private: double jointVelocities[NUM_JOINTS];
     private: double jointMaxEfforts[NUM_JOINTS];
 
-    private: common::Time prevUpdateTime;
+    private: ignition::common::Time prevUpdateTime;
   };
 }
 #endif

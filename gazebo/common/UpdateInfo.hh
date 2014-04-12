@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _UPDATEINFO_HH_
-#define _UPDATEINFO_HH_
+#ifndef _GAZEBO_UPDATEINFO_HH_
+#define _GAZEBO_UPDATEINFO_HH_
 
 #include <string>
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 
 namespace gazebo
 {
@@ -32,10 +32,10 @@ namespace gazebo
       public: std::string worldName;
 
       /// \brief Current simulation time.
-      public: common::Time simTime;
+      public: ignition::common::Time simTime;
 
       /// \brief Current real time.
-      public: common::Time realTime;
+      public: ignition::common::Time realTime;
     };
   }
 }

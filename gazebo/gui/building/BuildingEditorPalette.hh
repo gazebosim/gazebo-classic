@@ -98,7 +98,7 @@ namespace gazebo
       private: std::string saveLocation;
 
       /// \brief A list of gui editor events connected to this palette.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
     };
     /// \}
   }

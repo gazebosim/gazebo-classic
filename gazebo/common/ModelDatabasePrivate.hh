@@ -24,7 +24,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/common/Event.hh"
+#include "ignition/common.hh"
 
 namespace gazebo
 {
@@ -67,8 +67,8 @@ namespace gazebo
 
       /// \brief Triggered when the model data has been updated after
       /// calling ModelDatabase::GetModels()
-      public: event::EventT<
-               void (std::map<std::string, std::string>)> modelDBUpdated;
+      public: ignition::common::EventT
+              <void (std::map<std::string, std::string>)> modelDBUpdated;
     };
   }
 }

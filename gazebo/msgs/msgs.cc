@@ -18,16 +18,16 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/math/Quaternion.hh"
+#include "ignition/math/Plane.hh"
+#include "ignition/math/Rand.hh"
 
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Image.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/CommonIface.hh"
+#include "ignition/common/Image.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
@@ -42,7 +42,7 @@ namespace gazebo
 
       request->set_request(_request);
       request->set_data(_data);
-      request->set_id(math::Rand::GetIntUniform(1, 10000));
+      request->set_id(ignition::math::Rand::GetIntUniform(1, 10000));
 
       return request;
     }
@@ -90,7 +90,7 @@ namespace gazebo
 
     void Stamp(msgs::Time *_time)
     {
-      common::Time tm = common::Time::GetWallTime();
+      ignition::common::Time tm = ignition::common::Time::GetWallTime();
 
       _time->set_sec(tm.sec);
       _time->set_nsec(tm.nsec);
@@ -107,32 +107,32 @@ namespace gazebo
 
       std::string *serialized_data = pkg.mutable_serialized_data();
       if (!message.IsInitialized())
-        gzthrow("Can't serialize message of type[" + message.GetTypeName() +
+        ignthrow("Can't serialize message of type[" + message.GetTypeName() +
             "] because it is missing required fields");
 
       if (!message.SerializeToString(serialized_data))
-        gzthrow("Failed to serialized message");
+        ignthrow("Failed to serialized message");
 
       if (!pkg.SerializeToString(&data))
-        gzthrow("Failed to serialized message");
+        ignthrow("Failed to serialized message");
 
       return data;
     }
 
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3 &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
       _pt->set_z(_v.z);
     }
 
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v)
     {
       _pt->set_x(_v.x);
       _pt->set_y(_v.y);
     }
 
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaternion &_v)
     {
       _q->set_x(_v.x);
       _q->set_y(_v.y);
@@ -140,13 +140,13 @@ namespace gazebo
       _q->set_w(_v.w);
     }
 
-    void Set(msgs::Pose *_p, const math::Pose &_v)
+    void Set(msgs::Pose *_p, const ignition::math::Pose &_v)
     {
       Set(_p->mutable_position(), _v.pos);
       Set(_p->mutable_orientation(), _v.rot);
     }
 
-    void Set(msgs::Color *_c, const common::Color &_v)
+    void Set(msgs::Color *_c, const ignition::common::Color &_v)
     {
       _c->set_r(_v.r);
       _c->set_g(_v.g);
@@ -154,7 +154,7 @@ namespace gazebo
       _c->set_a(_v.a);
     }
 
-    void Set(msgs::Time *_t, const common::Time &_v)
+    void Set(msgs::Time *_t, const ignition::common::Time &_v)
     {
       _t->set_sec(_v.sec);
       _t->set_nsec(_v.nsec);
@@ -162,7 +162,7 @@ namespace gazebo
 
 
     /////////////////////////////////////////////////
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Plane &_v)
     {
       Set(_p->mutable_normal(), _v.normal);
       _p->mutable_size()->set_x(_v.size.x);
@@ -171,17 +171,17 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void Set(common::Image &_img, const msgs::Image &_msg)
+    void Set(ignition::common::Image &_img, const msgs::Image &_msg)
     {
       _img.SetFromData(
           (const unsigned char*)_msg.data().data(),
           _msg.width(),
           _msg.height(),
-          (common::Image::PixelFormat)(_msg.pixel_format()));
+          (ignition::common::Image::PixelFormat)(_msg.pixel_format()));
     }
 
     /////////////////////////////////////////////////
-    void Set(msgs::Image *_msg, const common::Image &_i)
+    void Set(msgs::Image *_msg, const ignition::common::Image &_i)
     {
       _msg->set_width(_i.GetWidth());
       _msg->set_height(_i.GetHeight());
@@ -195,7 +195,7 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
+    msgs::Vector3d Convert(const ignition::math::Vector3 &_v)
     {
       msgs::Vector3d result;
       result.set_x(_v.x);
@@ -204,7 +204,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::Quaternion Convert(const math::Quaternion &_q)
+    msgs::Quaternion Convert(const ignition::math::Quaternion &_q)
     {
       msgs::Quaternion result;
       result.set_x(_q.x);
@@ -214,7 +214,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::Pose Convert(const math::Pose &_p)
+    msgs::Pose Convert(const ignition::math::Pose &_p)
     {
       msgs::Pose result;
       result.mutable_position()->CopyFrom(Convert(_p.pos));
@@ -222,7 +222,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::Color Convert(const common::Color &_c)
+    msgs::Color Convert(const ignition::common::Color &_c)
     {
       msgs::Color result;
       result.set_r(_c.r);
@@ -232,7 +232,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::Time Convert(const common::Time &_t)
+    msgs::Time Convert(const ignition::common::Time &_t)
     {
       msgs::Time result;
       result.set_sec(_t.sec);
@@ -240,7 +240,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::PlaneGeom Convert(const math::Plane &_p)
+    msgs::PlaneGeom Convert(const ignition::math::Plane &_p)
     {
       msgs::PlaneGeom result;
       result.mutable_normal()->CopyFrom(Convert(_p.normal));
@@ -250,36 +250,36 @@ namespace gazebo
       return result;
     }
 
-    math::Vector3 Convert(const msgs::Vector3d &_v)
+    ignition::math::Vector3 Convert(const msgs::Vector3d &_v)
     {
-      return math::Vector3(_v.x(), _v.y(), _v.z());
+      return ignition::math::Vector3(_v.x(), _v.y(), _v.z());
     }
 
-    math::Quaternion Convert(const msgs::Quaternion &_q)
+    ignition::math::Quaternion Convert(const msgs::Quaternion &_q)
     {
-      return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
+      return ignition::math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
-    math::Pose Convert(const msgs::Pose &_p)
+    ignition::math::Pose Convert(const msgs::Pose &_p)
     {
-      return math::Pose(Convert(_p.position()),
+      return ignition::math::Pose(Convert(_p.position()),
           Convert(_p.orientation()));
     }
 
-    common::Color Convert(const msgs::Color &_c)
+    ignition::common::Color Convert(const msgs::Color &_c)
     {
-      return common::Color(_c.r(), _c.g(), _c.b(), _c.a());
+      return ignition::common::Color(_c.r(), _c.g(), _c.b(), _c.a());
     }
 
-    common::Time Convert(const msgs::Time &_t)
+    ignition::common::Time Convert(const msgs::Time &_t)
     {
-      return common::Time(_t.sec(), _t.nsec());
+      return ignition::common::Time(_t.sec(), _t.nsec());
     }
 
-    math::Plane Convert(const msgs::PlaneGeom &_p)
+    ignition::math::Plane Convert(const msgs::PlaneGeom &_p)
     {
-      return math::Plane(Convert(_p.normal()),
-          math::Vector2d(_p.size().x(), _p.size().y()),
+      return ignition::math::Plane(Convert(_p.normal()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
     }
 
@@ -299,7 +299,8 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(),
+              camSDF->Get<ignition::math::Pose>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -356,19 +357,20 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
+        result.mutable_pose()->CopyFrom(Convert(
+              _sdf->Get<ignition::math::Pose>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
       {
         result.mutable_diffuse()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("diffuse")));
+            Convert(_sdf->Get<ignition::common::Color>("diffuse")));
       }
 
       if (_sdf->HasElement("specular"))
       {
         result.mutable_specular()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("specular")));
+            Convert(_sdf->Get<ignition::common::Color>("specular")));
       }
 
       if (_sdf->HasElement("attenuation"))
@@ -383,7 +385,7 @@ namespace gazebo
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->Get<math::Vector3>("direction")));
+            Convert(_sdf->Get<ignition::math::Vector3>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -404,12 +406,13 @@ namespace gazebo
 
       if (_sdf->GetName() != "mesh")
       {
-        gzerr << "Cannot create a mesh message from an "
+        ignerr << "Cannot create a mesh message from an "
           << _sdf->GetName() << " SDF element.\n";
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
+        msgs::Set(result.mutable_scale(),
+            _sdf->Get<ignition::math::Vector3>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 
@@ -437,7 +440,7 @@ namespace gazebo
 
       if (_sdf->GetName() != "geometry")
       {
-        gzerr << "Cannot create a geometry message from an "
+        ignerr << "Cannot create a geometry message from an "
           << _sdf->GetName() << " SDF element.\n";
         return result;
       }
@@ -445,13 +448,13 @@ namespace gazebo
       // Load the geometry
       sdf::ElementPtr geomElem = _sdf->GetFirstElement();
       if (!geomElem)
-        gzthrow("Invalid geometry element");
+        ignthrow("Invalid geometry element");
 
       if (geomElem->GetName() == "box")
       {
         result.set_type(msgs::Geometry::BOX);
         msgs::Set(result.mutable_box()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3>("size"));
       }
       else if (geomElem->GetName() == "cylinder")
       {
@@ -471,9 +474,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::PLANE);
         msgs::Set(result.mutable_plane()->mutable_normal(),
-            geomElem->Get<math::Vector3>("normal"));
+            geomElem->Get<ignition::math::Vector3>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
-            geomElem->Get<math::Vector2d>("size"));
+            geomElem->Get<ignition::math::Vector2d>("size"));
       }
       else if (geomElem->GetName() == "image")
       {
@@ -489,9 +492,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
         msgs::Set(result.mutable_heightmap()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3>("size"));
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
-            geomElem->Get<math::Vector3>("pos"));
+            geomElem->Get<ignition::math::Vector3>("pos"));
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         msgs::HeightmapGeom::Texture *tex;
@@ -530,7 +533,7 @@ namespace gazebo
         result.set_type(msgs::Geometry::EMPTY);
       }
       else
-        gzthrow("Unknown geometry type\n");
+        ignthrow("Unknown geometry type\n");
 
       return result;
     }
@@ -598,7 +601,7 @@ namespace gazebo
               "normal_map_tangent_space")
             matMsg->set_shader_type(msgs::Material::NORMAL_MAP_TANGENT_SPACE);
           else
-            gzthrow(std::string("Unknown shader type[") +
+            ignthrow(std::string("Unknown shader type[") +
                 shaderElem->Get<std::string>("type") + "]");
 
           if (shaderElem->HasElement("normal_map"))
@@ -608,22 +611,23 @@ namespace gazebo
 
         if (elem->HasElement("ambient"))
           msgs::Set(matMsg->mutable_ambient(),
-              elem->Get<common::Color>("ambient"));
+              elem->Get<ignition::common::Color>("ambient"));
         if (elem->HasElement("diffuse"))
           msgs::Set(matMsg->mutable_diffuse(),
-              elem->Get<common::Color>("diffuse"));
+              elem->Get<ignition::common::Color>("diffuse"));
         if (elem->HasElement("specular"))
           msgs::Set(matMsg->mutable_specular(),
-              elem->Get<common::Color>("specular"));
+              elem->Get<ignition::common::Color>("specular"));
         if (elem->HasElement("emissive"))
           msgs::Set(matMsg->mutable_emissive(),
-              elem->Get<common::Color>("emissive"));
+              elem->Get<ignition::common::Color>("emissive"));
       }
 
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose>("pose"));
       }
 
       // Set plugins of the visual
@@ -663,10 +667,10 @@ namespace gazebo
       else if (type == "none")
         result.set_type(msgs::Fog::NONE);
       else
-        gzthrow(std::string("Unknown fog type[") + type + "]");
+        ignthrow(std::string("Unknown fog type[") + type + "]");
 
       result.mutable_color()->CopyFrom(
-          Convert(_sdf->Get<common::Color>("color")));
+          Convert(_sdf->Get<ignition::common::Color>("color")));
 
       result.set_density(_sdf->Get<double>("density"));
       result.set_start(_sdf->Get<double>("start"));
@@ -687,12 +691,12 @@ namespace gazebo
 
       if (_sdf->HasElement("ambient"))
         result.mutable_ambient()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("ambient")));
+            Convert(_sdf->Get<ignition::common::Color>("ambient")));
 
       if (_sdf->HasElement("background"))
       {
         result.mutable_background()->CopyFrom(
-            Convert(_sdf->Get<common::Color>("background")));
+            Convert(_sdf->Get<ignition::common::Color>("background")));
       }
 
       if (_sdf->HasElement("sky"))
@@ -711,7 +715,7 @@ namespace gazebo
           skyMsg->set_humidity(cloudsElem->Get<double>("humidity"));
           skyMsg->set_mean_cloud_size(cloudsElem->Get<double>("mean_size"));
           msgs::Set(skyMsg->mutable_cloud_ambient(),
-                    cloudsElem->Get<common::Color>("ambient"));
+                    cloudsElem->Get<ignition::common::Color>("ambient"));
         }
       }
 

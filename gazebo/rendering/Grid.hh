@@ -26,7 +26,7 @@
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Color.hh"
+#include "ignition/common/Color.hh"
 
 namespace Ogre
 {
@@ -59,7 +59,7 @@ namespace gazebo
       /// \param[in] _lineWidth The width of the lines to use
       /// \param[in] _color The color of the grid
       public: Grid(Scene *_scene, uint32_t _cellCount, float _cellLength,
-                   float _lineWidth, const common::Color &_color);
+                   float _lineWidth, const ignition::common::Color &_color);
 
       /// \brief Destructor
       public: ~Grid();
@@ -83,11 +83,11 @@ namespace gazebo
 
       /// \brief Sets the color of the grid
       /// \param[in] _color The grid color
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::common::Color &_color);
 
       /// \brief Return the grid color
       /// \return The grid color
-      public: common::Color GetColor() const {return this->color;}
+      public: ignition::common::Color GetColor() const {return this->color;}
 
       /// \brief Set the number of cells
       /// \param[in] _count The number of cells
@@ -130,7 +130,7 @@ namespace gazebo
       private: unsigned int cellCount;
       private: float cellLength;
       private: float lineWidth;
-      private: common::Color color;
+      private: ignition::common::Color color;
       private: float heightOffset;
 
       private: std::string name;

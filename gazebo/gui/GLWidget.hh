@@ -27,11 +27,11 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/MouseEvent.hh"
+#include "ignition/common/KeyEvent.hh"
+#include "ignition/common/Event.hh"
 
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -82,7 +82,7 @@ namespace gazebo
       /// \brief Callback for a mouse move event.
       /// \param[in] _event The mouse move event
       /// \return True if handled by this function.
-      private: bool OnMouseMove(const common::MouseEvent &_event);
+      private: bool OnMouseMove(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a normal mouse move event.
       private: void OnMouseMoveNormal();
@@ -93,7 +93,7 @@ namespace gazebo
       /// \brief Callback for a mouse release event.
       /// \param[in] _event The mouse release event
       /// \return True if handled by this function.
-      private: bool OnMouseRelease(const common::MouseEvent &_event);
+      private: bool OnMouseRelease(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a normal mouse release event.
       private: void OnMouseReleaseNormal();
@@ -104,7 +104,7 @@ namespace gazebo
       /// \brief Callback for a mouse press event.
       /// \param[in] _event The mouse press event
       /// \return True if handled by this function.
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMousePress(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a normal mouse press event.
       private: void OnMousePressNormal();
@@ -115,7 +115,8 @@ namespace gazebo
       /// \brief Callback for a mouse double click event.
       /// \param[in] _event The mouse double click event
       /// \return True if handled by this function.
-      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
+      private: bool OnMouseDoubleClick(
+                   const ignition::common::MouseEvent &_event);
 
       private: void OnRequest(ConstRequestPtr &_msg);
       private: void OnCreateScene(const std::string &_name);
@@ -141,7 +142,7 @@ namespace gazebo
       private: void Paste(const std::string &_object);
 
       private: void PushHistory(const std::string &_visName,
-                                const math::Pose &_pose);
+                                const ignition::math::Pose &_pose);
       private: void PopHistory();
 
       /// \brief Set the selected visual, which will highlight the
@@ -153,12 +154,12 @@ namespace gazebo
       private: rendering::UserCameraPtr userCamera;
       private: rendering::ScenePtr scene;
       private: QFrame *renderFrame;
-      private: common::MouseEvent mouseEvent;
+      private: ignition::common::MouseEvent mouseEvent;
 
       /// \brief The most recent keyboard event.
-      private: common::KeyEvent keyEvent;
+      private: ignition::common::KeyEvent keyEvent;
 
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       private: EntityMaker *entityMaker;
       private: BoxMaker boxMaker;
@@ -184,7 +185,8 @@ namespace gazebo
 
       private: std::string state;
 
-      private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+      private: std::list<std::pair<std::string, ignition::math::Pose> >
+               moveHistory;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene

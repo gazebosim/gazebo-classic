@@ -155,7 +155,7 @@ void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
     this->joints.push_back(j);
   }
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = common::Events::ConnectWorldUpdateBegin(
           boost::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
 }
 
@@ -167,12 +167,12 @@ void SphereAtlasDemoPlugin::Init()
 /////////////////////////////////////////////////
 void SphereAtlasDemoPlugin::Reset()
 {
-  gzlog << "SphereAtlasDemoPlugin: \n"
+  ignlog << "SphereAtlasDemoPlugin: \n"
         << "  This is not a typical usage of plugin Reset function,\n"
         << "  we are doing this just for testing purposes.\n";
   if (this->updateConnection)
   {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+    common::Events::DisconnectWorldUpdateBegin(this->updateConnection);
     this->updateConnection.reset();
   }
 }
@@ -180,8 +180,8 @@ void SphereAtlasDemoPlugin::Reset()
 /////////////////////////////////////////////////
 void SphereAtlasDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
+  ignition::common::Time currTime = this->model->GetWorld()->GetSimTime();
+  ignition::common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
   double dt = stepTime.Double();
 

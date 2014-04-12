@@ -18,7 +18,7 @@
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
+#include "ignition/common.hh"
 #include "scans_cmp.h"
 #include "helper_physics_generator.hh"
 
@@ -55,7 +55,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    ignerr << "Aborting test for Simbody, see issue #865.\n";
     return;
   }
 
@@ -71,17 +71,17 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   std::string modelName01 = "contactModel01";
   std::string contactSensorName01 = "contactSensor01";
-  math::Pose modelPose01(0, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose modelPose01(0, 0, 0.5, 0, 0, 0);
 
   std::string modelName02 = "contactModel02";
   std::string contactSensorName02 = "contactSensor02";
-  math::Pose modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
 
   std::string sphereName01 = "sphere01";
-  math::Pose spherePose01(0, 0, 1.5, 0, 0, 0);
+  ignition::math::Pose spherePose01(0, 0, 1.5, 0, 0, 0);
 
   std::string sphereName02 = "sphere02";
-  math::Pose spherePose02(0, 2, 1.5, 0, 0, 0);
+  ignition::math::Pose spherePose02(0, 2, 1.5, 0, 0, 0);
 
   // spawn two contact sensors
   SpawnUnitContactSensor(modelName01, contactSensorName01,
@@ -132,7 +132,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   models.push_back(contactModel02);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3(0, 0, gravityZ));
 
   msgs::Contacts contacts01;
   msgs::Contacts contacts02;
@@ -154,8 +154,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   contacts.push_back(contacts01);
   contacts.push_back(contacts02);
 
-  math::Vector3 expectedForce;
-  math::Vector3 expectedTorque;
+  ignition::math::Vector3 expectedForce;
+  ignition::math::Vector3 expectedTorque;
 
   // double tolPercentage = 0.1;
   // double tol = 1e-2;
@@ -166,8 +166,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   {
     double mass = models[k]->GetLink()->GetInertial()->GetMass();
     expectedForce = models[k]->GetLink()->GetWorldCoGPose().rot.GetInverse()
-        * math::Vector3(0, 0, (gravityZ * mass));
-    expectedTorque = math::Vector3(0, 0, 0);
+        * ignition::math::Vector3(0, 0, (gravityZ * mass));
+    expectedTorque = ignition::math::Vector3(0, 0, 0);
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
@@ -193,15 +193,15 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         FAIL();
       }
 
-      math::Vector3 actualForce;
-      math::Vector3 actualTorque;
+      ignition::math::Vector3 actualForce;
+      ignition::math::Vector3 actualTorque;
 
       // loop through all contact points between the two collisions
       for (int j = 0; j < contacts[k].contact(i).position_size(); ++j)
       {
         // Contact between the sphere and the contact sensor occurs at z=1.0
         // Skip other contact points with the ground plane
-        if (!math::equal(contacts[k].contact(i).position(j).z(), 1.0))
+        if (!ignition::math::equal(contacts[k].contact(i).position(j).z(), 1.0))
           continue;
 
         EXPECT_NEAR(contacts[k].contact(i).position(j).x(),
@@ -293,7 +293,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #865.\n";
+    ignerr << "Aborting test for Simbody, see issue #865.\n";
     return;
   }
 
@@ -309,10 +309,10 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";
-  math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+  ignition::math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
 
   std::string cylinderName = "cylinder";
-  math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
 
   SpawnUnitContactSensor(modelName, contactSensorName,
       "cylinder", modelPose.pos, modelPose.rot.GetAsEuler());
@@ -341,7 +341,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(contactModel);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3(0, 0, gravityZ));
 
   msgs::Contacts contacts;
 
@@ -379,7 +379,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
     {
       FAIL();
     }
-    math::Vector3 actualTorque;
+    ignition::math::Vector3 actualTorque;
 
     // loop through all contact points between the two collisions
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)

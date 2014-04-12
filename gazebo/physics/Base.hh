@@ -28,7 +28,7 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
@@ -261,7 +261,7 @@ namespace gazebo
       /// \return The scoped name.
       public: std::string GetScopedName() const;
 
-      /// \brief Print this object to screen via gzmsg.
+      /// \brief Print this object to screen via ignmsg.
       /// \param[in] _prefix Usually a set of spaces.
       public: void Print(const std::string &_prefix);
 

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
@@ -52,10 +47,11 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Get joint's anchor point
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      public: ignition::math::Vector3 GetAnchor(unsigned int _index) const;
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAxis(
+                  unsigned int _index) const;
 
       /// \brief Set the velocity of an axis(index).
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -71,17 +67,19 @@ namespace gazebo
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

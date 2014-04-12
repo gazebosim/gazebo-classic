@@ -16,9 +16,9 @@
 */
 #include <math.h>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/math.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -104,7 +104,7 @@ GLWidget::GLWidget(QWidget *_parent)
         boost::bind(&GLWidget::OnManipMode, this, _1)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
+     common::Events::ConnectSetSelectedEntity(
        boost::bind(&GLWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->renderFrame->setMouseTracking(true);
@@ -206,12 +206,12 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   rendering::UserCameraPtr cam = gui::get_active_camera();
   if (cam && cam->GetInitialized())
   {
-    event::Events::preRender();
+    common::Events::preRender();
 
     // Tell all the cameras to render
-    event::Events::render();
+    common::Events::render();
 
-    event::Events::postRender();
+    common::Events::postRender();
   }
 
   _e->accept();
@@ -259,7 +259,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (_event->key() == Qt::Key_Escape)
   {
-    event::Events::setSelectedEntity("", "normal");
+    common::Events::setSelectedEntity("", "normal");
     if (this->state == "make_entity")
     {
       if (this->entityMaker)
@@ -340,21 +340,21 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
 
   /// Set the button which cause the press event
   if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
+    this->mouseEvent.button = ignition::common::MouseEvent::LEFT;
   else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
+    this->mouseEvent.button = ignition::common::MouseEvent::RIGHT;
   else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+    this->mouseEvent.button = ignition::common::MouseEvent::MIDDLE;
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::PRESS;
+  this->mouseEvent.buttons = ignition::common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = ignition::common::MouseEvent::PRESS;
 
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
+    ignition::common::MouseEvent::LEFT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
+    ignition::common::MouseEvent::RIGHT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+    ignition::common::MouseEvent::MIDDLE : 0x0;
 
   this->mouseEvent.dragging = false;
 
@@ -373,21 +373,21 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 
   /// Set the button which cause the press event
   if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
+    this->mouseEvent.button = ignition::common::MouseEvent::LEFT;
   else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
+    this->mouseEvent.button = ignition::common::MouseEvent::RIGHT;
   else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+    this->mouseEvent.button = ignition::common::MouseEvent::MIDDLE;
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::PRESS;
+  this->mouseEvent.buttons = ignition::common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = ignition::common::MouseEvent::PRESS;
 
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
+    ignition::common::MouseEvent::LEFT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
+    ignition::common::MouseEvent::RIGHT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+    ignition::common::MouseEvent::MIDDLE : 0x0;
 
   this->mouseEvent.dragging = false;
 
@@ -396,7 +396,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
+bool GLWidget::OnMousePress(const ignition::common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMousePressMakeEntity();
@@ -410,7 +410,7 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
 }
 
 /////////////////////////////////////////////////
-bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
+bool GLWidget::OnMouseRelease(const ignition::common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMouseReleaseMakeEntity();
@@ -424,7 +424,7 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 }
 
 /////////////////////////////////////////////////
-bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
+bool GLWidget::OnMouseMove(const ignition::common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
   if (this->state == "make_entity")
@@ -439,20 +439,21 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 }
 
 /////////////////////////////////////////////////
-bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
+bool GLWidget::OnMouseDoubleClick(
+    const ignition::common::MouseEvent & /*_event*/)
 {
   rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
   if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
   {
     if (vis->IsPlane())
     {
-      math::Pose pose, camPose;
+     ignition::math::Pose pose, camPose;
       camPose = this->userCamera->GetWorldPose();
       if (this->scene->GetFirstContact(this->userCamera,
                                    this->mouseEvent.pos, pose.pos))
       {
         this->userCamera->SetFocalPoint(pose.pos);
-        math::Vector3 dir = pose.pos - camPose.pos;
+       ignition::math::Vector3 dir = pose.pos - camPose.pos;
         pose.pos = camPose.pos + (dir * 0.8);
         pose.rot = this->userCamera->GetWorldRotation();
         this->userCamera->MoveToPosition(pose, 0.5);
@@ -494,13 +495,13 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
     return;
 
   this->mouseEvent.scroll.y = _event->delta() > 0 ? -1 : 1;
-  this->mouseEvent.type = common::MouseEvent::SCROLL;
+  this->mouseEvent.type = ignition::common::MouseEvent::SCROLL;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
+    ignition::common::MouseEvent::LEFT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
+    ignition::common::MouseEvent::RIGHT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+    ignition::common::MouseEvent::MIDDLE : 0x0;
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -514,13 +515,13 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
   this->setFocus(Qt::MouseFocusReason);
 
   this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
-  this->mouseEvent.type = common::MouseEvent::MOVE;
+  this->mouseEvent.type = ignition::common::MouseEvent::MOVE;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
+    ignition::common::MouseEvent::LEFT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
+    ignition::common::MouseEvent::RIGHT : 0x0;
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+    ignition::common::MouseEvent::MIDDLE : 0x0;
 
   if (_event->buttons())
     this->mouseEvent.dragging = true;
@@ -571,23 +572,23 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (_event->button() == Qt::LeftButton)
-    this->mouseEvent.button = common::MouseEvent::LEFT;
+    this->mouseEvent.button = ignition::common::MouseEvent::LEFT;
   else if (_event->button() == Qt::RightButton)
-    this->mouseEvent.button = common::MouseEvent::RIGHT;
+    this->mouseEvent.button = ignition::common::MouseEvent::RIGHT;
   else if (_event->button() == Qt::MidButton)
-    this->mouseEvent.button = common::MouseEvent::MIDDLE;
+    this->mouseEvent.button = ignition::common::MouseEvent::MIDDLE;
 
-  this->mouseEvent.buttons = common::MouseEvent::NO_BUTTON;
-  this->mouseEvent.type = common::MouseEvent::RELEASE;
+  this->mouseEvent.buttons = ignition::common::MouseEvent::NO_BUTTON;
+  this->mouseEvent.type = ignition::common::MouseEvent::RELEASE;
 
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
-    common::MouseEvent::LEFT : 0x0;
+    ignition::common::MouseEvent::LEFT : 0x0;
 
   this->mouseEvent.buttons |= _event->buttons() & Qt::RightButton ?
-    common::MouseEvent::RIGHT : 0x0;
+    ignition::common::MouseEvent::RIGHT : 0x0;
 
   this->mouseEvent.buttons |= _event->buttons() & Qt::MidButton ?
-    common::MouseEvent::MIDDLE : 0x0;
+    ignition::common::MouseEvent::MIDDLE : 0x0;
 
   // Process Mouse Events
   MouseEventHandler::Instance()->HandleRelease(this->mouseEvent);
@@ -614,15 +615,15 @@ void GLWidget::OnMouseReleaseNormal()
       this->userCamera->GetVisual(this->mouseEvent.pos);
     if (vis)
     {
-      if (this->mouseEvent.button == common::MouseEvent::RIGHT)
+      if (this->mouseEvent.button == ignition::common::MouseEvent::RIGHT)
       {
         g_modelRightMenu->Run(vis->GetName(), QCursor::pos());
       }
-      else if (this->mouseEvent.button == common::MouseEvent::LEFT)
+      else if (this->mouseEvent.button == ignition::common::MouseEvent::LEFT)
       {
         vis = vis->GetRootVisual();
         this->SetSelectedVisual(vis);
-        event::Events::setSelectedEntity(vis->GetName(), "normal");
+        common::Events::setSelectedEntity(vis->GetName(), "normal");
       }
     }
     else
@@ -643,15 +644,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3 camPos(5, -5, 2);
+  ignition::math::Vector3 lookAt(0, 0, 0);
+  ignition::math::Vector3 delta = lookAt - camPos;
 
   double yaw = atan2(delta.y, delta.x);
 
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->userCamera->SetWorldPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
+  this->userCamera->SetWorldPose(ignition::math::Pose(camPos,
+       ignition::math::Vector3(0, pitch, yaw)));
 
   if (this->windowId >= 0)
   {
@@ -700,7 +701,7 @@ std::string GLWidget::GetOgreHandle() const
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint32_t>(info.screen()));
   ogreHandle += ":";
-  GZ_ASSERT(q_parent, "q_parent is null");
+  IGN_ASSERT(q_parent, "q_parent is null");
   ogreHandle += boost::lexical_cast<std::string>(
       static_cast<uint64_t>(q_parent->winId()));
 #endif
@@ -877,7 +878,7 @@ void GLWidget::ClearSelection()
 {
   if (this->hoverVis)
   {
-    this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+    this->hoverVis->SetEmissive(ignition::common::Color(0, 0, 0));
     this->hoverVis.reset();
   }
 
@@ -909,7 +910,8 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
+void GLWidget::PushHistory(const std::string &_visName,
+    const ignition::math::Pose &_pose)
 {
   if (this->moveHistory.empty() ||
       this->moveHistory.back().first != _visName ||

@@ -17,7 +17,9 @@
 #include <string>
 
 // Include Rand.hh first to avoid osx compilation errors
-#include "gazebo/math/Rand.hh"
+#include <ignition/math.hh>
+
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/gazebo.hh"
 
@@ -42,7 +44,7 @@ namespace gazebo
     private: void Update();
 
     /// \brief The connections.
-    private: event::ConnectionPtr updateConn;
+    private: ignition::common::ConnectionPtr updateConn;
 
     /// \brief Node for communication.
     private: transport::NodePtr node;

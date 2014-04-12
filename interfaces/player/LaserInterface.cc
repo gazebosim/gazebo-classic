@@ -22,7 +22,7 @@
 #include <math.h>
 #include <iostream>
 
-#include "gazebo/math/gzmath.hh"
+#include "ignition/math.hh"
 #include "gazebo/transport/transport.hh"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"
@@ -168,7 +168,7 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
   int i;
 
   // TODO: fix the time to get the time the laser scan was generated
-  this->datatime = gazebo::common::Time::GetWallTime().Double();
+  this->datatime = ignition::common::Time::GetWallTime().Double();
 
   double oldCount = this->data.scan.ranges_count;
 
@@ -180,7 +180,7 @@ void LaserInterface::OnScan(ConstLaserScanPtr &_msg)
     this->data.scan.intensity_count = _msg->ranges_size();
   this->data.scan.id = this->scanId++;
 
-  if (!gazebo::math::equal(oldCount,
+  if (!ignition::math::equal(oldCount,
         static_cast<double>(this->data.scan.ranges_count)))
   {
     delete [] this->data.scan.ranges;

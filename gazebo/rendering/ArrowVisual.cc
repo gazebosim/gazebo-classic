@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Scene.hh"
@@ -74,7 +74,7 @@ void ArrowVisual::Load()
 /////////////////////////////////////////////////
 void ArrowVisual::ShowRotation()
 {
-  common::MeshManager::Instance()->CreateTube("rotation_tube",
+  ignition::common::MeshManager::Instance()->CreateTube("rotation_tube",
       0.035, 0.04, 0.01, 1, 32);
   this->InsertMesh("rotation_tube");
 

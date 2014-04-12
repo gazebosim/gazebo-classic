@@ -14,26 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
-
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
 #include <float.h>
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
+#include <ignition/common.hh>
 
 #include "gazebo/util/OpenAL.hh"
-#include "gazebo/common/KeyFrame.hh"
-#include "gazebo/common/Animation.hh"
-#include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Plugin.hh"
 
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/physics/Joint.hh"
@@ -135,7 +127,7 @@ void Model::LoadJoints()
       }
       catch(...)
       {
-        gzerr << "LoadJoint Failed\n";
+        ignerr << "LoadJoint Failed\n";
       }
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -170,7 +162,7 @@ void Model::Init()
       if (link)
         link->Init();
       else
-        gzerr << "Child [" << (*iter)->GetName()
+        ignerr << "Child [" << (*iter)->GetName()
               << "] has type Base::LINK, but cannot be dynamically casted\n";
     }
     else if ((*iter)->HasType(Base::MODEL))
@@ -187,7 +179,7 @@ void Model::Init()
     }
     catch(...)
     {
-      gzerr << "Init joint failed" << std::endl;
+      ignerr << "Init joint failed" << std::endl;
       return;
     }
     // The following message used to be filled and sent in Model::LoadJoint
@@ -222,9 +214,9 @@ void Model::Update()
 
   if (!this->jointAnimations.empty())
   {
-    common::NumericKeyFrame kf(0);
+    ignition::common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
-    std::map<std::string, common::NumericAnimationPtr>::iterator iter;
+    std::map<std::string, ignition::common::NumericAnimationPtr>::iterator iter;
     iter = this->jointAnimations.begin();
     while (iter != this->jointAnimations.end())
     {
@@ -392,7 +384,7 @@ void Model::Reset()
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearVel(const math::Vector3 &_vel)
+void Model::SetLinearVel(const ignition::math::Vector3 &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
@@ -406,7 +398,7 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetAngularVel(const math::Vector3 &_vel)
+void Model::SetAngularVel(const ignition::math::Vector3 &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
@@ -420,7 +412,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearAccel(const math::Vector3 &_accel)
+void Model::SetLinearAccel(const ignition::math::Vector3 &_accel)
 {
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
@@ -434,7 +426,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetAngularAccel(const math::Vector3 &_accel)
+void Model::SetAngularAccel(const ignition::math::Vector3 &_accel)
 {
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
@@ -448,82 +440,82 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeLinearVel() const
+ignition::math::Vector3 Model::GetRelativeLinearVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetWorldLinearVel() const
+ignition::math::Vector3 Model::GetWorldLinearVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeAngularVel() const
+ignition::math::Vector3 Model::GetRelativeAngularVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetWorldAngularVel() const
+ignition::math::Vector3 Model::GetWorldAngularVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeLinearAccel() const
+ignition::math::Vector3 Model::GetRelativeLinearAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeLinearAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetWorldLinearAccel() const
+ignition::math::Vector3 Model::GetWorldLinearAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldLinearAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeAngularAccel() const
+ignition::math::Vector3 Model::GetRelativeAngularAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetRelativeAngularAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetWorldAngularAccel() const
+ignition::math::Vector3 Model::GetWorldAngularAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->GetWorldAngularAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
-math::Box Model::GetBoundingBox() const
+ignition::math::Box Model::GetBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
@@ -533,7 +525,7 @@ math::Box Model::GetBoundingBox() const
   {
     if (*iter)
     {
-      math::Box linkBox;
+     ignition::math::Box linkBox;
       linkBox = (*iter)->GetBoundingBox();
       box += linkBox;
     }
@@ -572,7 +564,7 @@ JointPtr Model::GetJoint(const std::string &_name)
     {
       // check again without scoped names, deprecated, warn
       result = (*iter);
-      gzwarn << "Calling Model::GetJoint(" << _name
+      ignwarn << "Calling Model::GetJoint(" << _name
              << ") with un-scoped joint name is deprecated, please scope\n";
       break;
     }
@@ -629,8 +621,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
      boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
   {
-    gzerr << "Unable to create joint of type[" << stype << "]\n";
-    // gzthrow("Unable to create joint of type[" + stype + "]\n");
+    ignerr << "Unable to create joint of type[" << stype << "]\n";
+    // ignthrow("Unable to create joint of type[" + stype + "]\n");
     return;
   }
 
@@ -641,8 +633,8 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
   {
-    gzerr << "can't have two joint with the same name\n";
-    gzthrow("can't have two joints with the same name ["+
+    ignerr << "can't have two joint with the same name\n";
+    ignthrow("can't have two joints with the same name ["+
       joint->GetScopedName() + "]\n");
   }
 
@@ -677,7 +669,7 @@ void Model::LoadPlugins()
         !sensors::SensorManager::Instance()->SensorsInitialized() &&
         iterations < 50)
     {
-      common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
       iterations++;
     }
 
@@ -695,7 +687,7 @@ void Model::LoadPlugins()
     }
     else
     {
-      gzerr << "Sensors failed to initialize when loading model["
+      ignerr << "Sensors failed to initialize when loading model["
         << this->GetName() << "] via the factory mechanism."
         << "Plugins for the model will not be loaded.\n";
     }
@@ -741,23 +733,21 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
-  gazebo::ModelPluginPtr plugin =
-    gazebo::ModelPlugin::Create(filename, pluginName);
+  ModelPluginPtr plugin =
+    ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
-    if (plugin->GetType() != MODEL_PLUGIN)
-    {
-      gzerr << "Model[" << this->GetName() << "] is attempting to load "
-            << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name["
-            << pluginName << "]\n";
-      return;
-    }
-
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
+  }
+  else
+  {
+    ignerr << "Model[" << this->GetName() << "] is attempting to load "
+      << "a plugin, but detected an incorrect plugin type. "
+      << "Plugin filename[" << filename << "] name["
+      << pluginName << "]\n";
   }
 }
 
@@ -830,13 +820,13 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 {
   if (_msg.has_id() && _msg.id() != this->GetId())
   {
-    gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
+    ignerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
   }
   else if ((_msg.has_id() && _msg.id() != this->GetId()) &&
             _msg.name() != this->GetScopedName())
   {
-    gzerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
+    ignerr << "Incorrect name[" << _msg.name() << " != " << this->GetName()
       << "]\n";
     return;
   }
@@ -860,11 +850,13 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, ignition::common::NumericAnimationPtr> _anims,
     boost::function<void()> _onComplete)
 {
   boost::recursive_mutex::scoped_lock lock(this->updateMutex);
-  std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
+  std::map<std::string,
+           ignition::common::NumericAnimationPtr>::const_iterator iter;
+
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
     this->jointAnimations[iter->first] = iter->second;
@@ -883,11 +875,11 @@ void Model::StopAnimation()
 }
 
 //////////////////////////////////////////////////
-void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
+void Model::AttachStaticModel(ModelPtr &_model, ignition::math::Pose _offset)
 {
   if (!_model->IsStatic())
   {
-    gzerr << "AttachStaticModel requires a static model\n";
+    ignerr << "AttachStaticModel requires a static model\n";
     return;
   }
 
@@ -912,7 +904,7 @@ void Model::DetachStaticModel(const std::string &_modelName)
 //////////////////////////////////////////////////
 void Model::OnPoseChange()
 {
-  math::Pose p;
+  ignition::math::Pose p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
@@ -934,7 +926,7 @@ void Model::SetState(const ModelState &_state)
     if (link)
       link->SetState(iter->second);
     else
-      gzerr << "Unable to find link[" << iter->first << "]\n";
+      ignerr << "Unable to find link[" << iter->first << "]\n";
   }
 
   // For now we don't use the joint state values to set the state of
@@ -948,7 +940,7 @@ void Model::SetState(const ModelState &_state)
 }
 
 /////////////////////////////////////////////////
-void Model::SetScale(const math::Vector3 &_scale)
+void Model::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -977,24 +969,26 @@ void Model::SetEnabled(bool _enabled)
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
+void Model::SetLinkWorldPose(const ignition::math::Pose &_pose,
+    std::string _linkName)
 {
   // look for link matching link name
   LinkPtr link = this->GetLink(_linkName);
   if (link)
     this->SetLinkWorldPose(_pose, link);
   else
-    gzerr << "Setting Model Pose by specifying Link failed:"
+    ignerr << "Setting Model Pose by specifying Link failed:"
           << " Link[" << _linkName << "] not found.\n";
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
+void Model::SetLinkWorldPose(const ignition::math::Pose &_pose,
+    const LinkPtr &_link)
 {
-  math::Pose linkPose = _link->GetWorldPose();
-  math::Pose currentModelPose = this->GetWorldPose();
-  math::Pose linkRelPose = currentModelPose - linkPose;
-  math::Pose targetModelPose =  linkRelPose * _pose;
+  ignition::math::Pose linkPose = _link->GetWorldPose();
+  ignition::math::Pose currentModelPose = this->GetWorldPose();
+  ignition::math::Pose linkRelPose = currentModelPose - linkPose;
+  ignition::math::Pose targetModelPose =  linkRelPose * _pose;
   this->SetWorldPose(targetModelPose);
 }
 

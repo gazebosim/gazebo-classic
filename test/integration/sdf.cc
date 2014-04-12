@@ -30,10 +30,13 @@ TEST_F(PR2Test, Param)
   sdf::ParamT<int> intP("i", 1, 0);
   sdf::ParamT<unsigned int> uintP("ui", 1, 0);
   sdf::ParamT<std::string> stringP("s", "default", 0);
-  sdf::ParamT<common::Color> colorP("c", common::Color(.1, .2, .3, 1), 0);
-  sdf::ParamT<math::Vector3> vec3P("v3", math::Vector3(1, 2, 3), 0);
-  sdf::ParamT<math::Pose> poseP("v3", math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(0, 0, M_PI)), 0);
+  sdf::ParamT<ignition::common::Color> colorP("c",
+      ignition::common::Color(.1, .2, .3, 1), 0);
+  sdf::ParamT<ignition::math::Vector3> vec3P("v3",
+      ignition::math::Vector3(1, 2, 3), 0);
+  sdf::ParamT<ignition::math::Pose> poseP("v3",
+      ignition::math::Pose(ignition::math::Vector3(1, 2, 3),
+        ignition::math::Quaternion(0, 0, M_PI)), 0);
 
   EXPECT_TRUE(boolP.IsBool());
   EXPECT_TRUE(intP.IsInt());

@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -53,8 +53,8 @@ void BulletMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void BulletMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void BulletMultiRayShape::AddRay(const ignition::math::Vector3 &_start,
+    const ignition::math::Vector3 &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

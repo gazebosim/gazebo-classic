@@ -50,5 +50,9 @@ target_link_libraries(gazebo_util
   gazebo_msgs
 )
 
+if (HAVE_OPENAL)
+  target_link_libraries(gazebo_util ${OPENAL_LIBRARY})
+endif()
+
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

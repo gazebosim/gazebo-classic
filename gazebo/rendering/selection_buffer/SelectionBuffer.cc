@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/selection_buffer/SelectionRenderListener.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
@@ -99,7 +99,7 @@ void SelectionBuffer::CreateRTTBuffer()
   catch(...)
   {
     this->renderTexture = NULL;
-    gzerr << "Unable to create selection buffer.\n";
+    ignerr << "Unable to create selection buffer.\n";
     return;
   }
 
@@ -153,9 +153,9 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
   this->Update();
   size_t posInStream = (this->pixelBox->getWidth() * _y) * 4;
   posInStream += _x * 4;
-  common::Color::BGRA color(0);
+  ignition::common::Color::BGRA color(0);
   memcpy(static_cast<void *>(&color), this->buffer + posInStream, 4);
-  common::Color cv;
+  ignition::common::Color cv;
   cv.SetFromARGB(color);
 
   cv.a = 1.0;
@@ -202,7 +202,7 @@ void SelectionBuffer::CreateRTTOverlays()
   }
   else
   {
-    gzlog << "Unable to create selection buffer overlay. "
+    ignlog << "Unable to create selection buffer overlay. "
       "This will not effect Gazebo unless you're trying to debug "
       "the selection buffer.\n";
   }

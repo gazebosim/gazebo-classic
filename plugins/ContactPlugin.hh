@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact Plugin
- * Author: Nate Koenig mod by John Hsu
- */
 #ifndef _GAZEBO_CONTACT_PLUGIN_HH_
 #define _GAZEBO_CONTACT_PLUGIN_HH_
 
 #include <string>
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
 
 namespace gazebo
@@ -53,7 +50,7 @@ namespace gazebo
 
     /// \brief Connection that maintains a link between the contact sensor's
     /// updated signal and the OnUpdate callback.
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
   };
 }
 #endif

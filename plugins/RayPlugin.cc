@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact plugin
- * Author: Nate Koenig mod by John Hsu
- */
-
 #include "gazebo/physics/physics.hh"
 #include "RayPlugin.hh"
 
@@ -51,7 +46,7 @@ void RayPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
     boost::dynamic_pointer_cast<sensors::RaySensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("RayPlugin requires a Ray Sensor as its parent");
+    ignthrow("RayPlugin requires a Ray Sensor as its parent");
 
   this->world = physics::get_world(this->parentSensor->GetWorldName());
 

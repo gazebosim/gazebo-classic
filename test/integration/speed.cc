@@ -30,22 +30,22 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
   Load("worlds/empty.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100);
-  common::Time::MSleep(2000);
+    ignition::common::Time::MSleep(100);
+  ignition::common::Time::MSleep(2000);
   emptySpeed = GetPercentRealTime();
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3 pos(0, 0, 5);
 
   for (int i = 0; i < 500; ++i)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3(0, 0, 0), i == 499);
   }
 
-  common::Time::MSleep(2000);
+  ignition::common::Time::MSleep(2000);
   double loadedSpeed = GetPercentRealTime();
 
   double speedRatio = loadedSpeed / emptySpeed;
@@ -70,20 +70,20 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   Load("worlds/shapes.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100);
-  common::Time::MSleep(2000);
+    ignition::common::Time::MSleep(100);
+  ignition::common::Time::MSleep(2000);
   emptySpeed = GetPercentRealTime();
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3 pos(0, 0, 5);
   for (int i = 0; i < 500; ++i)
   {
     pos.z += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3(0, 0, 0), i == 499);
   }
-  common::Time::MSleep(2000);
+  ignition::common::Time::MSleep(2000);
 
   double loadedSpeed = GetPercentRealTime();
   double speedRatio = loadedSpeed / emptySpeed;

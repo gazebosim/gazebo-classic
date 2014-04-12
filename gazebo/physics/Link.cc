@@ -25,10 +25,10 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Assert.hh"
+#include "ignition/math/Quaternion.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/Sensor.hh"
@@ -149,7 +149,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       /// a force torque sensor. We should make this more generic.
       if (sensorElem->Get<std::string>("type") == "force_torque")
       {
-        gzerr << "A link cannot load a [" <<
+        ignerr << "A link cannot load a [" <<
           sensorElem->Get<std::string>("type") << "] sensor.\n";
       }
       else if (sensorElem->Get<std::string>("type") != "__default__")
@@ -214,7 +214,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 #endif
 
   if (needUpdate)
-    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+    this->connections.push_back(common::Events::ConnectWorldUpdateBegin(
           boost::bind(&Link::Update, this, _1)));
 }
 
@@ -227,8 +227,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<ignition::math::Pose>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -295,12 +295,12 @@ void Link::Reset()
 //////////////////////////////////////////////////
 void Link::ResetPhysicsStates()
 {
-  this->SetAngularVel(math::Vector3(0, 0, 0));
-  this->SetLinearVel(math::Vector3(0, 0, 0));
-  this->SetAngularAccel(math::Vector3(0, 0, 0));
-  this->SetLinearAccel(math::Vector3(0, 0, 0));
-  this->SetForce(math::Vector3(0, 0, 0));
-  this->SetTorque(math::Vector3(0, 0, 0));
+  this->SetAngularVel(ignition::math::Vector3(0, 0, 0));
+  this->SetLinearVel(ignition::math::Vector3(0, 0, 0));
+  this->SetAngularAccel(ignition::math::Vector3(0, 0, 0));
+  this->SetLinearAccel(ignition::math::Vector3(0, 0, 0));
+  this->SetForce(ignition::math::Vector3(0, 0, 0));
+  this->SetTorque(ignition::math::Vector3(0, 0, 0));
 }
 
 //////////////////////////////////////////////////
@@ -394,7 +394,7 @@ void Link::SetCollideMode(const std::string &_mode)
   }
   else
   {
-    gzerr << "Unknown collide mode[" << _mode << "]\n";
+    ignerr << "Unknown collide mode[" << _mode << "]\n";
     return;
   }
 
@@ -412,7 +412,7 @@ void Link::SetCollideMode(const std::string &_mode)
 //////////////////////////////////////////////////
 bool Link::GetSelfCollide() const
 {
-  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
+  IGN_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
   if (this->sdf->HasElement("self_collide"))
     return this->sdf->Get<bool>("self_collide");
   else
@@ -516,7 +516,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
       boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
-    gzthrow("Unknown Collisionetry Type[" + geomType + "]");
+    ignthrow("Unknown Collisionetry Type[" + geomType + "]");
 
   collision->Load(_sdf);
 }
@@ -557,79 +557,79 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
   if (_index <= this->GetChildCount())
     collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
   else
-    gzerr << "Index is out of range\n";
+    ignerr << "Index is out of range\n";
 
   return collision;
 }
 
 //////////////////////////////////////////////////
-void Link::SetLinearAccel(const math::Vector3 &_accel)
+void Link::SetLinearAccel(const ignition::math::Vector3 &_accel)
 {
   this->SetEnabled(true);
   this->linearAccel = _accel;
 }
 
 //////////////////////////////////////////////////
-void Link::SetAngularAccel(const math::Vector3 &_accel)
+void Link::SetAngularAccel(const ignition::math::Vector3 &_accel)
 {
   this->SetEnabled(true);
   this->angularAccel = _accel * this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
-math::Pose Link::GetWorldCoGPose() const
+ignition::math::Pose Link::GetWorldCoGPose() const
 {
-  math::Pose pose = this->GetWorldPose();
+  ignition::math::Pose pose = this->GetWorldPose();
   pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
   return pose;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeLinearVel() const
+ignition::math::Vector3 Link::GetRelativeLinearVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
       this->GetWorldLinearVel());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeAngularVel() const
+ignition::math::Vector3 Link::GetRelativeAngularVel() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(
          this->GetWorldAngularVel());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeLinearAccel() const
+ignition::math::Vector3 Link::GetRelativeLinearAccel() const
 {
   return this->GetRelativeForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetWorldLinearAccel() const
+ignition::math::Vector3 Link::GetWorldLinearAccel() const
 {
   return this->GetWorldForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeAngularAccel() const
+ignition::math::Vector3 Link::GetRelativeAngularAccel() const
 {
   return this->GetRelativeTorque() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetWorldAngularAccel() const
+ignition::math::Vector3 Link::GetWorldAngularAccel() const
 {
   return this->GetWorldTorque() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeForce() const
+ignition::math::Vector3 Link::GetRelativeForce() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Link::GetRelativeTorque() const
+ignition::math::Vector3 Link::GetRelativeTorque() const
 {
   return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
 }
@@ -641,11 +641,11 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Link::GetBoundingBox() const
+ignition::math::Box Link::GetBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
+  box.min.Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
   box.max.Set(0, 0, 0);
 
   for (Collision_V::const_iterator iter = this->collisions.begin();
@@ -671,7 +671,7 @@ bool Link::SetSelected(bool _s)
 //////////////////////////////////////////////////
 void Link::SetInertial(const InertialPtr &/*_inertial*/)
 {
-  gzwarn << "Link::SetMass is empty\n";
+  ignwarn << "Link::SetMass is empty\n";
 }
 
 //////////////////////////////////////////////////
@@ -721,7 +721,7 @@ void Link::RemoveChildJoint(const std::string &_jointName)
 //////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
-  math::Pose relPose = this->GetRelativePose();
+  ignition::math::Pose relPose = this->GetRelativePose();
 
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
@@ -779,7 +779,7 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_fov(elem->Get<double>("fov"));
     proj->set_near_clip(elem->Get<double>("near_clip"));
     proj->set_far_clip(elem->Get<double>("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
+    msgs::Set(proj->mutable_pose(), elem->Get<ignition::math::Pose>("pose"));
   }
 }
 
@@ -845,11 +845,12 @@ std::string Link::GetSensorName(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void Link::AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
+void Link::AttachStaticModel(ModelPtr &_model,
+    const ignition::math::Pose &_offset)
 {
   if (!_model->IsStatic())
   {
-    gzerr << "AttachStaticModel requires a static model\n";
+    ignerr << "AttachStaticModel requires a static model\n";
     return;
   }
 
@@ -881,7 +882,7 @@ void Link::DetachAllStaticModels()
 //////////////////////////////////////////////////
 void Link::OnPoseChange()
 {
-  math::Pose p;
+  ignition::math::Pose p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
@@ -905,7 +906,7 @@ void Link::SetState(const LinkState &_state)
     if (collision)
       collision->SetState(collisionState);
     else
-      gzerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
+      ignerr << "Unable to find collision[" << collisionState.GetName() << "]\n";
   }*/
 }
 
@@ -947,7 +948,7 @@ void Link::SetPublishData(bool _enable)
     std::string topic = "~/" + this->GetScopedName();
     this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
     this->connections.push_back(
-      event::Events::ConnectWorldUpdateEnd(
+      common::Events::ConnectWorldUpdateEnd(
         boost::bind(&Link::PublishData, this)));
   }
   else
@@ -986,8 +987,8 @@ void Link::OnCollision(ConstContactsPtr &_msg)
     pos1 = collisionName1.rfind("::");
     pos2 = collisionName2.rfind("::");
 
-    GZ_ASSERT(pos1 != std::string::npos, "Invalid collision name");
-    GZ_ASSERT(pos2 != std::string::npos, "Invalid collision name");
+    IGN_ASSERT(pos1 != std::string::npos, "Invalid collision name");
+    IGN_ASSERT(pos2 != std::string::npos, "Invalid collision name");
 
     collisionName1 = collisionName1.substr(pos1+2);
     collisionName2 = collisionName2.substr(pos2+2);
@@ -1026,7 +1027,7 @@ void Link::ParseVisuals()
 
       Visuals_M::iterator iter = this->visuals.find(msg.id());
       if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+        ignthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
 
       this->visuals[msg.id()] = msg;
 
@@ -1063,7 +1064,7 @@ void Link::RemoveCollision(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void Link::SetScale(const math::Vector3 &_scale)
+void Link::SetScale(const ignition::math::Vector3 &_scale)
 {
   Base_V::const_iterator biter;
   for (biter = this->children.begin(); biter != this->children.end(); ++biter)

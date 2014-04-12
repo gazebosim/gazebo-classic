@@ -21,13 +21,13 @@
 #endif  // __MACH__
 
 #include <unistd.h>
+#include <ignition/common.hh>
 
 #include "gazebo/physics/PhysicsIface.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
 
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Console.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -46,7 +46,7 @@ void QTestFixture::initTestCase()
 {
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gzLogInit("test.log");
+  ignLogInit("test.log");
 
   // Initialize the data logger. This will log state information.
   gazebo::util::LogRecord::Instance()->Init("test");
@@ -87,7 +87,7 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
   int waitCount = 0, maxWaitCount = 3000;
   while ((!this->server || !this->server->GetInitialized()) &&
       ++waitCount < maxWaitCount)
-    gazebo::common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   if (_clientScene)
     gazebo::rendering::create_scene(
@@ -193,13 +193,13 @@ void QTestFixture::GetMemInfo(double &_resident, double &_share)
                                 (task_info_t)&t_info,
                                 &t_info_count))
   {
-    gzerr << "failure calling task_info\n";
+    ignerr << "failure calling task_info\n";
     return;
   }
   _resident = static_cast<double>(t_info.resident_size/1024);
   _share = static_cast<double>(t_info.virtual_size/1024);
 #else
-  gzerr << "Unsupported architecture\n";
+  ignerr << "Unsupported architecture\n";
   return;
 #endif
 }

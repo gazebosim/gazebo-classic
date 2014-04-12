@@ -14,19 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: A generic physics state
- * Author: Nate Koenig
- */
-
-#ifndef _STATE_HH_
-#define _STATE_HH_
+#ifndef _GAZEBO_STATE_HH_
+#define _GAZEBO_STATE_HH_
 
 #include <string>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 
 namespace gazebo
 {
@@ -52,8 +48,8 @@ namespace gazebo
       /// \pararm _realTime Clock time since simulation started.
       /// \param _simTime Simulation time associated with this State info.
       public: State(const std::string &_name,
-                    const common::Time &_realTime,
-                    const common::Time &_simTime);
+                    const ignition::common::Time &_realTime,
+                    const ignition::common::Time &_simTime);
 
       /// \brief Destructor
       public: virtual ~State();
@@ -86,34 +82,34 @@ namespace gazebo
 
       /// \brief Get the wall time when this state was generated
       /// \return The absolute clock time when the State data was recorded.
-      public: common::Time GetWallTime() const;
+      public: ignition::common::Time GetWallTime() const;
 
       /// \brief Get the real time when this state was generated
       /// \return Clock time since simulation was stated.
-      public: common::Time GetRealTime() const;
+      public: ignition::common::Time GetRealTime() const;
 
       /// \brief Get the sim time when this state was generated
       /// \return Simulation time when the data was recorded.
-      public: common::Time GetSimTime() const;
+      public: ignition::common::Time GetSimTime() const;
 
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
-      public: virtual void SetWallTime(const common::Time &_time);
+      public: virtual void SetWallTime(const ignition::common::Time &_time);
 
       /// \brief Set the real time when this state was generated
       /// \param[in] _time Clock time since simulation was stated.
-      public: virtual void SetRealTime(const common::Time &_time);
+      public: virtual void SetRealTime(const ignition::common::Time &_time);
 
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
-      public: virtual void SetSimTime(const common::Time &_time);
+      public: virtual void SetSimTime(const ignition::common::Time &_time);
 
       /// Name associated with this State
       protected: std::string name;
 
       /// Times for the state data
-      protected: common::Time wallTime, realTime, simTime;
+      protected: ignition::common::Time wallTime, realTime, simTime;
     };
     /// \}
   }

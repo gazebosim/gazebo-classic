@@ -17,8 +17,8 @@
 
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
+#include <ignition/common.hh>
 
-#include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/ContactSensor.hh"
@@ -40,28 +40,28 @@ MudPlugin::MudPlugin()
 void MudPlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
-  GZ_ASSERT(_model, "MudPlugin _model pointer is NULL");
+  IGN_ASSERT(_model, "MudPlugin _model pointer is NULL");
   this->model = _model;
   this->modelName = _model->GetName();
   this->sdf = _sdf;
 
   this->world = this->model->GetWorld();
-  GZ_ASSERT(this->world, "MudPlugin world pointer is NULL");
+  IGN_ASSERT(this->world, "MudPlugin world pointer is NULL");
 
   this->physics = this->world->GetPhysicsEngine();
-  GZ_ASSERT(this->physics, "MudPlugin physics pointer is NULL");
+  IGN_ASSERT(this->physics, "MudPlugin physics pointer is NULL");
 
   this->link = _model->GetLink();
-  GZ_ASSERT(this->link, "MudPlugin link pointer is NULL");
+  IGN_ASSERT(this->link, "MudPlugin link pointer is NULL");
 
-  GZ_ASSERT(_sdf, "MudPlugin _sdf pointer is NULL");
+  IGN_ASSERT(_sdf, "MudPlugin _sdf pointer is NULL");
   if (_sdf->HasElement("contact_sensor_name"))
   {
     this->contactSensorName = _sdf->Get<std::string>("contact_sensor_name");
   }
   else
   {
-    gzerr << "contactSensorName not supplied, ignoring contacts\n";
+    ignerr << "contactSensorName not supplied, ignoring contacts\n";
   }
 
   if (_sdf->HasElement("stiffness"))
@@ -87,9 +87,9 @@ void MudPlugin::Load(physics::ModelPtr _model,
       elem = elem->GetNextElement("link_name");
     }
   }
-  GZ_ASSERT(allowedLinks.size() == links.size(),
+  IGN_ASSERT(allowedLinks.size() == links.size(),
     "Length of links data structure doesn't match allowedLinks");
-  GZ_ASSERT(allowedLinks.size() == joints.size(),
+  IGN_ASSERT(allowedLinks.size() == joints.size(),
     "Length of joints data structure doesn't match allowedLinks");
 }
 
@@ -135,7 +135,7 @@ void MudPlugin::Init()
       }
       else
       {
-        gzerr << "Unable to GetSensor, ignoring contact_surface_bitmask\n";
+        ignerr << "Unable to GetSensor, ignoring contact_surface_bitmask\n";
       }
     }
   }
@@ -157,7 +157,7 @@ void MudPlugin::Init()
     }
   }
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = common::Events::ConnectWorldUpdateBegin(
           boost::bind(&MudPlugin::OnUpdate, this));
 }
 
@@ -189,7 +189,7 @@ void MudPlugin::OnUpdate()
       // Starting with last contact message, iterate backwards
       // checking each contact with a timestamp matching the last contact
       // Add each link name to contactLinkNames
-      common::Time latestContactTime =
+      ignition::common::Time latestContactTime =
         msgs::Convert(this->newestContactsMsg.contact(nc-1).time());
       std::string targetCollName, tmpLinkName;
 
@@ -218,7 +218,7 @@ void MudPlugin::OnUpdate()
     std::vector<physics::LinkPtr>::iterator iterLink = this->links.begin();
     std::vector<physics::JointPtr>::iterator iterJoint = this->joints.begin();
     unsigned int countIters = 0;
-    // Only check the length of the first iterator since we used a GZ_ASSERT
+    // Only check the length of the first iterator since we used a IGN_ASSERT
     // in the Load function to confirm the vectors have the same length
     while (iterLinkName != this->allowedLinks.end())
     {
@@ -226,7 +226,7 @@ void MudPlugin::OnUpdate()
       if (contactLinkNames.end() != contactLinkNames.find(*iterLinkName))
       {
         // Compute the average contact point position
-        math::Vector3 contactPositionAverage;
+        ignition::math::Vector3 contactPositionAverage;
         {
           // Find the index to the correct contact data structure
           unsigned int i = linkNameIndices[*iterLinkName];
@@ -245,7 +245,7 @@ void MudPlugin::OnUpdate()
           }
           else
           {
-            gzerr << "Error in linkNameIndices\n";
+            ignerr << "Error in linkNameIndices\n";
           }
         }
 
@@ -273,14 +273,15 @@ void MudPlugin::OnUpdate()
           if (*iterLink)
           {
             // Create the joint
-            // gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
+            // igndbg << "Creating a mud joint with " << *iterLinkName << '\n';
             (*iterLink)->SetAutoDisable(false);
             *iterJoint = this->physics->CreateJoint("revolute", this->model);
 
             (*iterJoint)->Attach(this->link, *iterLink);
 
             (*iterJoint)->Load(this->link, *iterLink,
-              math::Pose(contactPositionAverage, math::Quaternion()));
+                ignition::math::Pose(contactPositionAverage,
+                  ignition::math::Quaternion()));
             // Joint names must be unique
             // name as mud_joint_0, mud_joint_1, etc.
             {
@@ -312,7 +313,7 @@ void MudPlugin::OnUpdate()
         // then delete the joint
         if (*iterJoint)
         {
-          // gzdbg << "Destroying mud joint\n";
+          // igndbg << "Destroying mud joint\n";
 
           // reenable collision between the link pair
           physics::LinkPtr parent = (*iterJoint)->GetParent();
@@ -339,7 +340,7 @@ void MudPlugin::OnUpdate()
   }
   else if (++this->newMsgWait > floor(1.0 / dt))
   {
-    gzlog << "MudPlugin attached to " << this->modelName
+    ignlog << "MudPlugin attached to " << this->modelName
           << " waited 1.0 s without contact messages\n";
     this->newMsgWait = 0;
   }

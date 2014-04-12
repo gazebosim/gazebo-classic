@@ -198,7 +198,7 @@ void PTZInterface::Subscribe()
   {
     // std::ostringstream stream;
     std::cout << "Error subscribing to Gazebo PTZ Interface\n" << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

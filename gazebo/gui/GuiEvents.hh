@@ -18,7 +18,7 @@
 #define _GUI_EVENTS_HH_
 
 #include <string>
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 #include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
@@ -30,105 +30,122 @@ namespace gazebo
       /////////////////////////////////////////////////
       /// \brief Connect a boost::slot the add entity signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectCreateEntity(T _subscriber)
               { return createEntity.Connect(_subscriber); }
       public: static void DisconnectCreateEntity(
-                  event::ConnectionPtr _subscriber)
+                  ignition::common::ConnectionPtr _subscriber)
               { createEntity.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the move mode signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectMoveMode(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectMoveMode(T _subscriber)
               { return moveMode.Connect(_subscriber); }
-      public: static void DisconnectMoveMode(event::ConnectionPtr _subscriber)
+      public: static void DisconnectMoveMode(
+                  ignition::common::ConnectionPtr _subscriber)
               { moveMode.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the manip mode signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectManipMode(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectManipMode(T _subscriber)
               {return manipMode.Connect(_subscriber);}
-      public: static void DisconnectManipMode(event::ConnectionPtr _subscriber)
+      public: static void DisconnectManipMode(
+                  ignition::common::ConnectionPtr _subscriber)
               {manipMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the fullscreen signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectFullScreen(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectFullScreen(T _subscriber)
               { return fullScreen.Connect(_subscriber); }
-      public: static void DisconnectFullScreen(event::ConnectionPtr _subscriber)
+      public: static void DisconnectFullScreen(
+                  ignition::common::ConnectionPtr _subscriber)
               { fullScreen.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the view FPS signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectFPS(T _subscriber)
+              static ignition::common::ConnectionPtr ConnectFPS(T _subscriber)
               { return fps.Connect(_subscriber); }
-      public: static void DisconnectFPS(event::ConnectionPtr _subscriber)
+      public: static void DisconnectFPS(
+                  ignition::common::ConnectionPtr _subscriber)
               { fps.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the view Orbit signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectOrbit(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectOrbit(T _subscriber)
               { return orbit.Connect(_subscriber); }
-      public: static void DisconnectOrbit(event::ConnectionPtr _subscriber)
+      public: static void DisconnectOrbit(
+                  ignition::common::ConnectionPtr _subscriber)
               { orbit.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the view KeyPress signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectKeyPress(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectKeyPress(T _subscriber)
               { return keyPress.Connect(_subscriber); }
-      public: static void DisconnectKeyPress(event::ConnectionPtr _subscriber)
+      public: static void DisconnectKeyPress(
+                  ignition::common::ConnectionPtr _subscriber)
               { keyPress.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       public: template<typename T>
-              static event::ConnectionPtr ConnectModelUpdate(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectModelUpdate(T _subscriber)
               { return modelUpdate.Connect(_subscriber); }
       public: static void DisconnectModelUpdate(
-                  event::ConnectionPtr _subscriber)
+                  ignition::common::ConnectionPtr _subscriber)
               { modelUpdate.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the input step size signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectInputStepSize(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectInputStepSize(T _subscriber)
               { return inputStepSize.Connect(_subscriber); }
       public: static void DisconnectInputStepSize(
-              event::ConnectionPtr _subscriber)
+              ignition::common::ConnectionPtr _subscriber)
               { inputStepSize.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the follow signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectFollow(T _subscriber)
+              static ignition::common::ConnectionPtr
+                ConnectFollow(T _subscriber)
               { return follow.Connect(_subscriber); }
       public: static void DisconnectFollow(
-              event::ConnectionPtr _subscriber)
+              ignition::common::ConnectionPtr _subscriber)
               { follow.Disconnect(_subscriber); }
 
       ///  that indicates the user is moving the camera
-      public: static event::EventT<void (bool)>  moveMode;
+      public: static ignition::common::EventT<void (bool)>  moveMode;
 
       ///  that indicates the user is manipulating an object
-      public: static event::EventT<void (std::string)>  manipMode;
+      public: static ignition::common::EventT<void (std::string)>  manipMode;
 
-      public: static event::EventT<void (std::string,
+      public: static ignition::common::EventT<void (std::string,
                                          std::string)> createEntity;
 
-      public: static event::EventT<void (const msgs::Model &)> modelUpdate;
-      public: static event::EventT<void (bool)> fullScreen;
-      public: static event::EventT<void ()> fps;
-      public: static event::EventT<void ()> orbit;
+      public: static ignition::common::EventT<void (const msgs::Model &)>
+              modelUpdate;
+      public: static ignition::common::EventT<void (bool)> fullScreen;
+      public: static ignition::common::EventT<void ()> fps;
+      public: static ignition::common::EventT<void ()> orbit;
 
       /// \brief Event triggered when the user follows a model. The model
       /// name is given as the function parameter.
-      public: static event::EventT<void (const std::string &)> follow;
+      public: static ignition::common::EventT<void (const std::string &)>
+              follow;
 
-      public: static event::EventT<void (std::string)> keyPress;
+      public: static ignition::common::EventT<void (std::string)> keyPress;
 
       /// \brief Step size changed event
-      public: static event::EventT<void (int)> inputStepSize;
+      public: static ignition::common::EventT<void (int)> inputStepSize;
     };
   }
 }

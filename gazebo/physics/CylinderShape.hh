@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Set scale of cylinder.
       /// \param[in] _scale Scale to set the cylinder to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

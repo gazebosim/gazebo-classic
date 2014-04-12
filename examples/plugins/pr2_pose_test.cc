@@ -20,7 +20,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 
 namespace gazebo
 {
@@ -40,13 +40,13 @@ namespace gazebo
 
       // Error message if the model couldn't be found
       if (!this->model)
-        gzerr << "Unable to get parent model\n";
+        ignerr << "Unable to get parent model\n";
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&PR2PoseTest::OnUpdate, this));
-      gzdbg << "plugin model name: " << modelName << "\n";
+      igndbg << "plugin model name: " << modelName << "\n";
 
 
       this->node = transport::NodePtr(new transport::Node());
@@ -60,10 +60,11 @@ namespace gazebo
     {
       this->simTime  = this->world->GetSimTime();
 
-      math::Pose orig_pose = this->model->GetWorldPose();
-      math::Pose pose = orig_pose;
+     ignition::math::Pose orig_pose = this->model->GetWorldPose();
+     ignition::math::Pose pose = orig_pose;
       pose.pos.x = 5.0*sin(0.1*this->simTime.Double());
-      pose.rot.SetFromEuler(math::Vector3(0, 0, 2.0*this->simTime.Double()));
+      pose.rot.SetFromEuler(
+          ignition::math::Vector3(0, 0, 2.0*this->simTime.Double()));
 
       if (this->simTime.Double() > 10.0 && this->simTime.Double() < 300.0)
       {
@@ -74,8 +75,8 @@ namespace gazebo
             pose.rot.z, pose.rot.w, orig_pose.pos.x);
 
         if (this->simTime.Double() > 20.0)
-          this->model->SetWorldTwist(math::Vector3(0, 0, 0),
-                                     math::Vector3(0, 0, 0), true);
+          this->model->SetWorldTwist(ignition::math::Vector3(0, 0, 0),
+                                    ignition::math::Vector3(0, 0, 0), true);
       }
     }
 
@@ -85,10 +86,10 @@ namespace gazebo
       static double fake_time = 0;
       fake_time = fake_time + 0.2;
 
-      math::Pose orig_pose = this->model->GetWorldPose();
-      math::Pose pose = orig_pose;
+     ignition::math::Pose orig_pose = this->model->GetWorldPose();
+     ignition::math::Pose pose = orig_pose;
       pose.pos.x = 0.5*sin(0.1*fake_time);
-      pose.rot.SetFromEuler(math::Vector3(0, 0, fake_time));
+      pose.rot.SetFromEuler(ignition::math::Vector3(0, 0, fake_time));
 
       if (this->world->GetSimTime().Double() < 10.0)
       {

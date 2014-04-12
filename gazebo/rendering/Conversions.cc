@@ -21,39 +21,39 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-Ogre::ColourValue Conversions::Convert(const common::Color &_color)
+Ogre::ColourValue Conversions::Convert(const ignition::common::Color &_color)
 {
   return Ogre::ColourValue(_color.r, _color.g, _color.b, _color.a);
 }
 
 //////////////////////////////////////////////////
-common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
+ignition::common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 {
-  return common::Color(_clr.r, _clr.g, _clr.b, _clr.a);
+  return ignition::common::Color(_clr.r, _clr.g, _clr.b, _clr.a);
 }
 
 //////////////////////////////////////////////////
-Ogre::Vector3 Conversions::Convert(const math::Vector3 &v)
+Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3 &v)
 {
   return Ogre::Vector3(v.x, v.y, v.z);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
+ignition::math::Vector3 Conversions::Convert(const Ogre::Vector3 &v)
 {
-  return math::Vector3(v.x, v.y, v.z);
+  return ignition::math::Vector3(v.x, v.y, v.z);
 }
 
 //////////////////////////////////////////////////
-Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
+Ogre::Quaternion Conversions::Convert(const ignition::math::Quaternion &_v)
 {
   return Ogre::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
+ignition::math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
 {
-  return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
+  return ignition::math::Quaternion(_v.w, _v.x, _v.y, _v.z);
 }
 
 

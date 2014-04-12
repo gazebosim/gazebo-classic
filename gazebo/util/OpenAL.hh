@@ -21,9 +21,9 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/common/SingletonT.hh"
 #include "gazebo/util/UtilTypes.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -46,7 +46,7 @@ namespace gazebo
 
     /// \class OpenAL OpenAL.hh util/util.hh
     /// \brief 3D audio setup and playback.
-    class OpenAL : public SingletonT<OpenAL>
+    class OpenAL : public ignition::common::SingletonT<OpenAL>
     {
       /// \brief Constructor
       private: OpenAL();
@@ -98,12 +98,12 @@ namespace gazebo
       /// \brief Set the position of the sink.
       /// \param[in] _pose New pose of the sink.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose &_pose);
 
       /// \brief Set the velocity of the sink
       /// \param[in] _vel Velocity of the sink.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3 &_vel);
     };
 
     /// \class OpenALSource OpenALSource.hh util/util.hh
@@ -124,12 +124,12 @@ namespace gazebo
       /// \brief Set the position of the source.
       /// \param[in] _pose New pose of the source.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose &_pose);
 
       /// \brief Set the velocity of the source.
       /// \param[in] _vel New velocity of the source.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3 &_vel);
 
       /// \brief Set the pitch of the source.
       /// \param[in] _p Pitch value.

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 
@@ -38,9 +38,9 @@ MultiRayShape::~MultiRayShape()
 //////////////////////////////////////////////////
 void MultiRayShape::Init()
 {
-  math::Vector3 start, end, axis;
+  ignition::math::Vector3 start, end, axis;
   double yawAngle, pitchAngle;
-  math::Quaternion ray;
+  ignition::math::Quaternion ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
@@ -93,8 +93,8 @@ void MultiRayShape::Init()
 
       // since we're rotating a unit x vector, a pitch rotation will now be
       // around the negative y axis
-      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ray.SetFromEuler(ignition::math::Vector3(0.0, -pitchAngle, yawAngle));
+      axis = this->offset.rot * ray *ignition::math::Vector3(1.0, 0.0, 0.0);
 
       start = (axis * minRange) + this->offset.pos;
       end = (axis * maxRange) + this->offset.pos;
@@ -105,7 +105,7 @@ void MultiRayShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::SetScale(const math::Vector3 &_scale)
+void MultiRayShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -126,7 +126,7 @@ double MultiRayShape::GetRange(unsigned int _index)
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
       << this->rays.size() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   // Add min range, because we measured from min range.
@@ -141,7 +141,7 @@ double MultiRayShape::GetRetro(unsigned int _index)
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
       << this->rays.size() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   return this->rays[_index]->GetRetro();
@@ -155,7 +155,7 @@ int MultiRayShape::GetFiducial(unsigned int _index)
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
       << this->rays.size() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   return this->rays[_index]->GetFiducial();
@@ -187,8 +187,8 @@ void MultiRayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
-                           const math::Vector3 &/*_end*/)
+void MultiRayShape::AddRay(const ignition::math::Vector3 &/*_start*/,
+                           const ignition::math::Vector3 &/*_end*/)
 {
   // msgs::Vector3d *pt = NULL;
 
@@ -229,13 +229,13 @@ double MultiRayShape::GetScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMinAngle() const
+ignition::math::Angle MultiRayShape::GetMinAngle() const
 {
   return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMaxAngle() const
+ignition::math::Angle MultiRayShape::GetMaxAngle() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -259,21 +259,21 @@ double MultiRayShape::GetVerticalScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMinAngle() const
+ignition::math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMaxAngle() const
+ignition::math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
   if (this->vertElem)
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////

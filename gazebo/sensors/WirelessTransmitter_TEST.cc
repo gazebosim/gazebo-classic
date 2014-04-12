@@ -63,7 +63,8 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  math::Pose txPose(math::Vector3(0.0, 0.0, 0.055), math::Quaternion(0, 0, 0));
+  ignition::math::Pose txPose(ignition::math::Vector3(0.0, 0.0, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn a wireless transmitter with sensor visualization
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
@@ -139,9 +140,11 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 {
   int samples = 100;
   double signStrengthAvg = 0.0;
-  math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
-  math::Pose txPoseOccluded(math::Vector3(-3.0, -3.0, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose txPose(ignition::math::Vector3(3.0, 3.0, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
+  ignition::math::Pose txPoseOccluded(
+      ignition::math::Vector3(-3.0, -3.0, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Take some samples and get the average signal strength
   for (int i = 0; i < samples; ++i)
@@ -181,7 +184,7 @@ void WirelessTransmitter_TEST::TestUpdateImpl()
   for (int i = 0; i < 10; ++i)
   {
     this->tx->Update(true);
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
 
   boost::mutex::scoped_lock lock(this->mutex);
@@ -199,7 +202,8 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  math::Pose txPose(math::Vector3(3.0, 3.0, 0.055), math::Quaternion(0, 0, 0));
+  ignition::math::Pose txPose(ignition::math::Vector3(3.0, 3.0, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn a wireless transmitter without sensor visualization
   SpawnWirelessTransmitterSensor(txModelName + "NoVisual",
@@ -222,7 +226,7 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   for (int i = 0; i < 10; ++i)
   {
     txNoVisual->Update(true);
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
 
   boost::mutex::scoped_lock lock(this->mutex);

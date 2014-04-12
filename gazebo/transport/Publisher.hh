@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Handles pushing messages out on a named topic
- * Author: Nate Koenig
- */
-
 #ifndef _PUBLISHER_HH_
 #define _PUBLISHER_HH_
 
@@ -27,7 +23,7 @@
 #include <list>
 #include <map>
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
@@ -66,7 +62,8 @@ namespace gazebo
       /// \param[in] _timeout Maxiumum time to wait. Use a negative time
       /// value to wait forever.
       /// \return True if a connection was established.
-      public: bool WaitForConnection(const common::Time &_timeout) const;
+      public: bool WaitForConnection(
+                  const ignition::common::Time &_timeout) const;
 
       /// \brief Set the publication object for a particular publication
       /// \param[in] _publication Pointer to the publication object to be set
@@ -161,8 +158,8 @@ namespace gazebo
       /// \brief Pointer to our containing node.
       private: NodePtr node;
 
-      private: common::Time currentTime;
-      private: common::Time prevPublishTime;
+      private: ignition::common::Time currentTime;
+      private: ignition::common::Time prevPublishTime;
 
       /// \brief Current id of the sent message.
       private: uint32_t pubId;

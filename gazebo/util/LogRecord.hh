@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A class to log data
- * Author: Nate Koenig
- * Date: 1 Jun 2010
- */
-
-#ifndef _LOGRECORD_HH_
-#define _LOGRECORD_HH_
+#ifndef _GAZEBO_LOGRECORD_HH_
+#define _GAZEBO_LOGRECORD_HH_
 
 #include <fstream>
 #include <string>
@@ -34,9 +29,9 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/UpdateInfo.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/UpdateInfo.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/SingletonT.hh"
 
 #define GZ_LOG_VERSION "1.0"
 
@@ -64,7 +59,7 @@ namespace gazebo
     /// guarantees that all data is stored.
     ///
     /// \sa Logplay, State
-    class LogRecord : public SingletonT<LogRecord>
+    class LogRecord : public ignition::common::SingletonT<LogRecord>
     {
       /// \brief Constructor
       private: LogRecord();
@@ -162,7 +157,7 @@ namespace gazebo
 
       /// \brief Get the run time in sim time.
       /// \return Run sim time.
-      public: common::Time GetRunTime() const;
+      public: ignition::common::Time GetRunTime() const;
 
       /// \brief Finialize, and shutdown.
       public: void Fini();
@@ -351,10 +346,10 @@ namespace gazebo
       private: bool stopThread;
 
       /// \brief Start simulation time.
-      private: common::Time startTime;
+      private: ignition::common::Time startTime;
 
       /// \brief Current simulation time.
-      private: common::Time currTime;
+      private: ignition::common::Time currTime;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
@@ -366,7 +361,7 @@ namespace gazebo
       private: transport::PublisherPtr logStatusPub;
 
       /// \brief All the event connections.
-      private: event::Connection_V connections;
+      private: ignition::common::Connection_V connections;
 
       /// \brief Simulation pause state.
       private: bool pauseState;

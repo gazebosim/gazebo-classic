@@ -19,7 +19,7 @@
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/Joint.hh"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -58,7 +58,7 @@ std::string ForceTorqueSensor::GetTopic() const
 void ForceTorqueSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->world != NULL,
+  IGN_ASSERT(this->world != NULL,
       "SonarSensor did not get a valid World pointer");
 
   this->parentJoint = boost::dynamic_pointer_cast<physics::Joint>(
@@ -66,7 +66,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName)
 
   if (!this->parentJoint)
   {
-    gzerr << "Parent of a force torque sensor[" << this->GetName()
+    ignerr << "Parent of a force torque sensor[" << this->GetName()
           << "] Must be a joint\n";
     return;
   }
@@ -96,13 +96,13 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetForce() const
+ignition::math::Vector3 ForceTorqueSensor::GetForce() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().force());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetTorque() const
+ignition::math::Vector3 ForceTorqueSensor::GetTorque() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().torque());
 }

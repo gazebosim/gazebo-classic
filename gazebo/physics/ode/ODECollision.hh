@@ -24,7 +24,7 @@
 
 #include "ode/ode.h"
 
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -73,7 +73,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int bits);
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box GetBoundingBox() const;
 
       /// \brief Get the collision's space ID
       /// \return The collision's space ID

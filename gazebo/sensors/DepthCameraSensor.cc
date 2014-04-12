@@ -24,7 +24,7 @@
 #include "gazebo/physics/World.hh"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -47,7 +47,7 @@ DepthCameraSensor::DepthCameraSensor()
 {
   this->rendered = false;
   this->connections.push_back(
-      event::Events::ConnectRender(
+      common::Events::ConnectRender(
         boost::bind(&DepthCameraSensor::Render, this)));
 }
 
@@ -75,7 +75,7 @@ void DepthCameraSensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
+    ignerr << "Unable to create DepthCameraSensor. Rendering is disabled.\n";
     return;
   }
 
@@ -93,7 +93,7 @@ void DepthCameraSensor::Init()
 
     if (!this->camera)
     {
-      gzerr << "Unable to create depth camera sensor\n";
+      ignerr << "Unable to create depth camera sensor\n";
       return;
     }
     this->camera->SetCaptureData(true);
@@ -105,7 +105,7 @@ void DepthCameraSensor::Init()
     if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
-      gzthrow("image has zero size");
+      ignthrow("image has zero size");
     }
 
     this->camera->Init();
@@ -115,7 +115,7 @@ void DepthCameraSensor::Init()
     this->camera->AttachToVisual(this->parentId, true);
   }
   else
-    gzerr << "No world name\n";
+    ignerr << "No world name\n";
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance

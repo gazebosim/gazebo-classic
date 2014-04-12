@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
@@ -70,7 +70,7 @@ void ODEMultiRayShape::UpdateRays()
       this->GetWorld()->GetPhysicsEngine());
 
   if (ode == NULL)
-    gzthrow("Invalid physics engine. Must use ODE.");
+    ignthrow("Invalid physics engine. Must use ODE.");
 
   // Do we need to lock the physics engine here? YES!
   // especially when spawning models with sensors
@@ -127,8 +127,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
     }
 
-    GZ_ASSERT(collision1, "collision1 is null");
-    GZ_ASSERT(collision2, "collision2 is null");
+    IGN_ASSERT(collision1, "collision1 is null");
+    IGN_ASSERT(collision2, "collision2 is null");
 
     ODECollision *rayCollision = NULL;
     ODECollision *hitCollision = NULL;
@@ -144,7 +144,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
     else if (dGeomGetClass(_o2) == dRayClass)
     {
-      GZ_ASSERT(rayCollision == NULL, "rayCollision is not null");
+      IGN_ASSERT(rayCollision == NULL, "rayCollision is not null");
       rayCollision = static_cast<ODECollision*>(collision2);
       hitCollision = static_cast<ODECollision*>(collision1);
       dGeomRaySetParams(_o2, 0, 0);
@@ -162,7 +162,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
             rayCollision->GetShape());
         if (contact.depth < shape->GetLength())
         {
-          // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
+          // ignerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
           //      << " position[" << contact.pos[0]
           //        << ", " << contact.pos[1]
@@ -182,8 +182,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 }
 
 //////////////////////////////////////////////////
-void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void ODEMultiRayShape::AddRay(const ignition::math::Vector3 &_start,
+    const ignition::math::Vector3 &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

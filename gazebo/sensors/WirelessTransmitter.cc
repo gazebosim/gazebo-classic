@@ -15,7 +15,8 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -64,14 +65,14 @@ void WirelessTransmitter::Load(const std::string &_worldName)
 
   if (this->freq < 0)
   {
-    gzthrow("Wireless transmitter frequency must be > 0. Current value is ["
+    ignthrow("Wireless transmitter frequency must be > 0. Current value is ["
       << this->freq << "]");
     return;
   }
 
   this->pub = this->node->Advertise<msgs::PropagationGrid>(this->GetTopic(),
         30);
-  GZ_ASSERT(this->pub != NULL,
+  IGN_ASSERT(this->pub != NULL,
       "wirelessTransmitterSensor did not get a valid publisher pointer");
 }
 
@@ -95,8 +96,8 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
   if (this->visualize)
   {
     msgs::PropagationGrid msg;
-    math::Pose pos;
-    math::Pose worldPose;
+    ignition::math::Pose pos;
+    ignition::math::Pose worldPose;
     double strength;
     msgs::PropagationParticle *p;
 
@@ -143,13 +144,13 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
-    const double rxGain)
+double WirelessTransmitter::GetSignalStrength(
+    const ignition::math::Pose &_receiver, const double rxGain)
 {
   std::string entityName;
   double dist;
-  math::Vector3 end = _receiver.pos;
-  math::Vector3 start = this->referencePose.pos;
+  ignition::math::Vector3 end = _receiver.pos;
+  ignition::math::Vector3 start = this->referencePose.pos;
 
   // Avoid computing the intersection of coincident points
   // This prevents an assertion in bullet (issue #849)
@@ -177,8 +178,9 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
 
   double distance = std::max(1.0,
       this->referencePose.pos.Distance(_receiver.pos));
-  double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
-  double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
+  double x = abs(ignition::math::Rand::GetDblNormal(0.0, ModelStdDesv));
+  double wavelength = ignition::common::SpeedOfLight /
+    (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
   double rxPower = this->GetPower() + this->GetGain() + rxGain - x +

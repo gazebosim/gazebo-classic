@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Pressure Sensor Plugin
- * Author: Steve Peters
- */
 #ifndef _GAZEBO_PRESSURE_PLUGIN_HH_
 #define _GAZEBO_PRESSURE_PLUGIN_HH_
 
@@ -25,6 +21,7 @@
 #include <boost/unordered_map.hpp>
 
 #include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 
@@ -58,7 +55,7 @@ namespace gazebo
 
     /// \brief Connection that maintains a link between the contact sensor's
     /// updated signal and the OnUpdate callback.
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     /// \brief Transport node used for publishing tactile messages.
     private: transport::NodePtr node;

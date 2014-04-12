@@ -51,7 +51,7 @@ namespace gazebo
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
-                  gzthrow("Subscribe requires a google protobuf type");
+                  ignthrow("Subscribe requires a google protobuf type");
 
                 this->node = _node;
                 this->topic = _topic;

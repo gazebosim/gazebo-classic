@@ -22,7 +22,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -53,26 +53,27 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 ODEScrewJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
 
   if (this->jointId)
     dJointGetScrewAxis(this->jointId, result);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle ODEScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->jointId)
     result = dJointGetScrewPosition(this->jointId);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -85,7 +86,7 @@ double ODEScrewJoint::GetVelocity(unsigned int /*index*/) const
   if (this->jointId)
     result = dJointGetScrewPositionRate(this->jointId);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -97,7 +98,8 @@ void ODEScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/,
+    const ignition::math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -108,7 +110,7 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3 globalAxis = _axis;
   if (this->parentLink)
     globalAxis =
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
@@ -116,7 +118,7 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
   if (this->jointId)
     dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -125,13 +127,13 @@ void ODEScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
   if (this->jointId)
     dJointSetScrewThreadPitch(this->jointId, _threadPitch);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "not yet implemented\n";
+  ignerr << "not yet implemented\n";
   return 0;
 }
 
@@ -144,7 +146,7 @@ void ODEScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
     dJointAddScrewTorque(this->jointId, _effort);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -154,7 +156,7 @@ void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
   if (this->jointId)
     dJointSetScrewParam(this->jointId, _parameter, _value);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -165,7 +167,7 @@ double ODEScrewJoint::GetParam(unsigned int _parameter) const
   if (this->jointId)
     result = dJointGetScrewParam(this->jointId, _parameter);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }

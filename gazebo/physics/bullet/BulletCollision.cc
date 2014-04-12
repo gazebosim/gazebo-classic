@@ -60,7 +60,7 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
+  ignition::math::Pose pose = this->GetRelativePose();
   BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
@@ -98,9 +98,9 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-math::Box BulletCollision::GetBoundingBox() const
+ignition::math::Box BulletCollision::GetBoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;

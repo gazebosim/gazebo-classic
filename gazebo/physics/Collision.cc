@@ -21,7 +21,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/transport/Publisher.hh"
@@ -91,14 +91,14 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
   if (this->shape)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
-    gzwarn << "No shape has been specified. Error!!!\n";
+    ignwarn << "No shape has been specified. Error!!!\n";
 
   if (!this->shape->HasType(Base::MULTIRAY_SHAPE) &&
       !this->shape->HasType(Base::RAY_SHAPE))
@@ -113,7 +113,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->Get<math::Pose>("pose"));
+    this->sdf->Get<ignition::math::Pose>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -185,7 +185,7 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
-void Collision::SetScale(const math::Vector3 &_scale)
+void Collision::SetScale(const ignition::math::Vector3 &_scale)
 {
   this->shape->SetScale(_scale);
 }
@@ -207,75 +207,75 @@ void Collision::AddContact(const Contact & /*_contact*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearVel() const
+ignition::math::Vector3 Collision::GetRelativeLinearVel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearVel() const
+ignition::math::Vector3 Collision::GetWorldLinearVel() const
 {
   if (this->link)
     return this->link->GetWorldLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularVel() const
+ignition::math::Vector3 Collision::GetRelativeAngularVel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularVel() const
+ignition::math::Vector3 Collision::GetWorldAngularVel() const
 {
   if (this->link)
     return this->link->GetWorldAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearAccel() const
+ignition::math::Vector3 Collision::GetRelativeLinearAccel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearAccel() const
+ignition::math::Vector3 Collision::GetWorldLinearAccel() const
 {
   if (this->link)
     return this->link->GetWorldLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularAccel() const
+ignition::math::Vector3 Collision::GetRelativeAngularAccel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularAccel() const
+ignition::math::Vector3 Collision::GetWorldAngularAccel() const
 {
   if (this->link)
     return this->link->GetWorldAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -305,7 +305,7 @@ void Collision::ProcessMsg(const msgs::Collision &_msg)
 {
   if (_msg.id() != this->GetId())
   {
-    gzerr << "Incorrect ID\n";
+    ignerr << "Incorrect ID\n";
     return;
   }
 

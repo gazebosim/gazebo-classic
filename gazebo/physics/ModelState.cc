@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
@@ -31,8 +31,9 @@ ModelState::ModelState()
 }
 
 /////////////////////////////////////////////////
-ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
+ModelState::ModelState(const ModelPtr _model,
+    const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
 : State(_model->GetName(), _realTime, _simTime)
 {
   this->pose = _model->GetWorldPose();
@@ -93,11 +94,12 @@ ModelState::~ModelState()
 }
 
 /////////////////////////////////////////////////
-void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
-    const common::Time &_simTime)
+void ModelState::Load(const ModelPtr _model,
+    const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
 {
   this->name = _model->GetName();
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = ignition::common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->pose = _model->GetWorldPose();
@@ -148,7 +150,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -182,7 +184,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose &ModelState::GetPose() const
+const ignition::math::Pose &ModelState::GetPose() const
 {
   return this->pose;
 }
@@ -204,7 +206,7 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero;
+  return result && this->pose ==ignition::math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -253,7 +255,7 @@ LinkState ModelState::GetLinkState(const std::string &_linkName) const
   if (iter != this->linkStates.end())
     return iter->second;
 
-  gzthrow("Invalid link name[" + _linkName + "]");
+  ignthrow("Invalid link name[" + _linkName + "]");
   return LinkState();
 }
 
@@ -290,7 +292,7 @@ JointState ModelState::GetJointState(unsigned int _index) const
     return iter->second;
   }
 
-  gzthrow("Index is out of range");
+  ignthrow("Index is out of range");
   return JointState();
 }
 
@@ -301,7 +303,7 @@ JointState ModelState::GetJointState(const std::string &_jointName) const
   if (iter != this->jointStates.end())
     return iter->second;
 
-  gzthrow("Invalid joint name[" + _jointName + "]");
+  ignthrow("Invalid joint name[" + _jointName + "]");
   return JointState();
 }
 
@@ -374,7 +376,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
           result.linkStates.insert(std::make_pair(state.GetName(), state));
       }
     }
-    catch(common::Exception &)
+    catch(ignition::common::Exception &)
     {
       // Ignore exception, which is just the fact that a link state may not
       // have been recorded.
@@ -395,7 +397,7 @@ ModelState ModelState::operator-(const ModelState &_state) const
           result.jointStates.insert(std::make_pair(state.GetName(), state));
       }
     }
-    catch(common::Exception &)
+    catch(ignition::common::Exception &)
     {
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
@@ -427,7 +429,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
         result.linkStates.insert(std::make_pair(state.GetName(), state));
       }
     }
-    catch(common::Exception &)
+    catch(ignition::common::Exception &)
     {
       // Ignore exception, which is just the fact that a link state may not
       // have been recorded.
@@ -447,7 +449,7 @@ ModelState ModelState::operator+(const ModelState &_state) const
         result.jointStates.insert(std::make_pair(state.GetName(), state));
       }
     }
-    catch(common::Exception &)
+    catch(ignition::common::Exception &)
     {
       // Ignore exception, which is just the fact that a joint state may not
       // have been recorded.
@@ -481,7 +483,7 @@ void ModelState::FillSDF(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void ModelState::SetWallTime(const common::Time &_time)
+void ModelState::SetWallTime(const ignition::common::Time &_time)
 {
   State::SetWallTime(_time);
 
@@ -499,7 +501,7 @@ void ModelState::SetWallTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void ModelState::SetRealTime(const common::Time &_time)
+void ModelState::SetRealTime(const ignition::common::Time &_time)
 {
   State::SetRealTime(_time);
 
@@ -517,7 +519,7 @@ void ModelState::SetRealTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void ModelState::SetSimTime(const common::Time &_time)
+void ModelState::SetSimTime(const ignition::common::Time &_time)
 {
   State::SetSimTime(_time);
 

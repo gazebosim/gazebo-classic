@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 
@@ -51,7 +51,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       this->GetWorld()->GetPhysicsEngine());
 
   if (this->dartPhysics == NULL)
-    gzthrow("Not using the dart physics engine");
+    ignthrow("Not using the dart physics engine");
 
   Link::Load(_sdf);
 }
@@ -82,7 +82,7 @@ void DARTLink::Init()
   this->visuals;
 
   // COG offset
-  math::Vector3 cog = this->inertial->GetCoG();
+  ignition::math::Vector3 cog = this->inertial->GetCoG();
   this->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
 
   // Gravity mode
@@ -133,7 +133,7 @@ void DARTLink::OnPoseChange()
   }
   else
   {
-    gzdbg << "DARTLink::OnPoseChange() doesn't make sense unless the link has "
+    igndbg << "DARTLink::OnPoseChange() doesn't make sense unless the link has "
           << "free joint.\n";
   }
 }
@@ -152,19 +152,19 @@ bool DARTLink::GetEnabled() const
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetLinearVel(const math::Vector3 &/*_vel*/)
+void DARTLink::SetLinearVel(const ignition::math::Vector3 &/*_vel*/)
 {
-  gzdbg << "DARTLink::SetLinearVel() doesn't make sense in dart.\n";
+  igndbg << "DARTLink::SetLinearVel() doesn't make sense in dart.\n";
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void DARTLink::SetAngularVel(const ignition::math::Vector3 &/*_vel*/)
 {
-  gzdbg << "DARTLink::SetAngularVel() doesn't make sense in dart.\n";
+  igndbg << "DARTLink::SetAngularVel() doesn't make sense in dart.\n";
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetForce(const math::Vector3 &_force)
+void DARTLink::SetForce(const ignition::math::Vector3 &_force)
 {
   // DART assume that _force is external force.
   this->dtBodyNode->setExtForce(Eigen::Vector3d::Zero(),
@@ -172,21 +172,21 @@ void DARTLink::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetTorque(const math::Vector3 &_torque)
+void DARTLink::SetTorque(const ignition::math::Vector3 &_torque)
 {
   // DART assume that _torque is external torque.
   this->dtBodyNode->setExtTorque(DARTTypes::ConvVec3(_torque));
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddForce(const math::Vector3 &_force)
+void DARTLink::AddForce(const ignition::math::Vector3 &_force)
 {
   this->dtBodyNode->addExtForce(Eigen::Vector3d::Zero(),
                                 DARTTypes::ConvVec3(_force));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeForce(const math::Vector3 &_force)
+void DARTLink::AddRelativeForce(const ignition::math::Vector3 &_force)
 {
   this->dtBodyNode->addExtForce(Eigen::Vector3d::Zero(),
                                 DARTTypes::ConvVec3(_force),
@@ -194,8 +194,8 @@ void DARTLink::AddRelativeForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
-                                        const math::Vector3 &_pos)
+void DARTLink::AddForceAtWorldPosition(const ignition::math::Vector3 &_force,
+                                        const ignition::math::Vector3 &_pos)
 {
   this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_pos),
                                 DARTTypes::ConvVec3(_force),
@@ -203,8 +203,9 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
-                                          const math::Vector3 &_relpos)
+void DARTLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3 &_force,
+    const ignition::math::Vector3 &_relpos)
 {
   this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_relpos),
                                 DARTTypes::ConvVec3(_force),
@@ -212,20 +213,20 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddTorque(const math::Vector3 &_torque)
+void DARTLink::AddTorque(const ignition::math::Vector3 &_torque)
 {
   this->dtBodyNode->addExtTorque(DARTTypes::ConvVec3(_torque));
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeTorque(const math::Vector3 &_torque)
+void DARTLink::AddRelativeTorque(const ignition::math::Vector3 &_torque)
 {
   this->dtBodyNode->addExtTorque(DARTTypes::ConvVec3(_torque), true);
 }
 
 //////////////////////////////////////////////////
-gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
-    const math::Vector3 &_offset) const
+ignition::math::Vector3 DARTLink::GetWorldLinearVel(
+    const ignition::math::Vector3 &_offset) const
 {
   const Eigen::Vector3d &linVel =
       this->dtBodyNode->getWorldVelocity(
@@ -235,9 +236,9 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldLinearVel(
-    const gazebo::math::Vector3 &_offset,
-    const gazebo::math::Quaternion &_q) const
+ignition::math::Vector3 DARTLink::GetWorldLinearVel(
+    const ignition::math::Vector3 &_offset,
+    const ignition::math::Quaternion &_q) const
 {
   Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);
@@ -248,7 +249,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldCoGLinearVel() const
+ignition::math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
   Eigen::Vector3d worldCOM = this->dtBodyNode->getWorldCOM();
   Eigen::Vector3d linVel
@@ -258,7 +259,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldAngularVel() const
+ignition::math::Vector3 DARTLink::GetWorldAngularVel() const
 {
   const Eigen::Vector3d &angVel
     = this->dtBodyNode->getWorldVelocity().head<3>();
@@ -267,17 +268,17 @@ math::Vector3 DARTLink::GetWorldAngularVel() const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldForce() const
+ignition::math::Vector3 DARTLink::GetWorldForce() const
 {
   Eigen::Vector6d F = this->dtBodyNode->getExternalForceGlobal();
   return DARTTypes::ConvVec3(F.tail<3>());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldTorque() const
+ignition::math::Vector3 DARTLink::GetWorldTorque() const
 {
   // TODO: Need verification
-  math::Vector3 torque;
+  ignition::math::Vector3 torque;
 
   Eigen::Isometry3d W = this->dtBodyNode->getWorldTransform();
   Eigen::Matrix6d G   = this->dtBodyNode->getInertia();
@@ -416,14 +417,14 @@ void DARTLink::SetSelfCollide(bool _collide)
 void DARTLink::SetLinearDamping(double /*_damping*/)
 {
   // see: https://github.com/dartsim/dart/issues/85
-  gzwarn << "DART does not support DARTLink::SetLinearDamping() yet.\n";
+  ignwarn << "DART does not support DARTLink::SetLinearDamping() yet.\n";
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularDamping(double /*_damping*/)
 {
   // see: https://github.com/dartsim/dart/issues/85
-  gzwarn << "DART does not support DARTLink::SetAngularDamping() yet.\n";
+  ignwarn << "DART does not support DARTLink::SetAngularDamping() yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -431,7 +432,7 @@ void DARTLink::SetKinematic(const bool& _state)
 {
   this->sdf->GetElement("kinematic")->Set(_state);
 
-  gzwarn << "DART does not support DARTLink::SetKinematic() yet.\n";
+  ignwarn << "DART does not support DARTLink::SetKinematic() yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -444,7 +445,7 @@ bool DARTLink::GetKinematic() const
 //////////////////////////////////////////////////
 void DARTLink::SetAutoDisable(bool /*_disable*/)
 {
-  gzwarn << "DART does not support DARTLink::SetAutoDisable() yet.\n";
+  ignwarn << "DART does not support DARTLink::SetAutoDisable() yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -465,7 +466,7 @@ void DARTLink::SetLinkStatic(bool /*_static*/)
 
 //  }
 
-  gzwarn << "DART does not support DARTLink::SetLinkStatic() yet.\n";
+  ignwarn << "DART does not support DARTLink::SetLinkStatic() yet.\n";
 }
 
 //////////////////////////////////////////////////
@@ -473,7 +474,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 {
   // Step 1: get dart body's transformation
   // Step 2: set gazebo link's pose using the transformation
-  math::Pose newPose = DARTTypes::ConvPose(
+  ignition::math::Pose newPose = DARTTypes::ConvPose(
                          this->dtBodyNode->getWorldTransform());
 
   // Set the new pose to this link

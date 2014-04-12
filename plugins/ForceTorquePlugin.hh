@@ -46,7 +46,7 @@ namespace gazebo
     protected: sensors::ForceTorqueSensorPtr parentSensor;
 
     /// \brief Pointer to the update event connection
-    private: event::ConnectionPtr connection;
+    private: ignition::common::ConnectionPtr connection;
   };
 }
 #endif

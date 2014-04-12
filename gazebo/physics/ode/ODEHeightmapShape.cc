@@ -19,7 +19,7 @@
  * Date: 12 Nov 2009
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
@@ -77,12 +77,12 @@ void ODEHeightmapShape::Init()
   oParent->SetStatic(true);
 
   // Rotate so Z is up, not Y (which is the default orientation)
-  math::Quaternion quat;
-  math::Pose pose = oParent->GetWorldPose();
+  ignition::math::Quaternion quat;
+  ignition::math::Pose pose = oParent->GetWorldPose();
 
   // TODO: FIXME:  double check this, if Y is up,
   // rotating by roll of 90 deg will put Z-down.
-  quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
+  quat.SetFromEuler(ignition::math::Vector3(IGN_DTOR(90), 0, 0));
 
   pose.rot = pose.rot * quat;
   // this->body->SetPose(pose);

@@ -20,8 +20,8 @@
 
 #include <string>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Vector3.hh"
 
 namespace gazebo
 {
@@ -59,7 +59,7 @@ namespace gazebo
                 }
                 else
                 {
-                  gzerr << "should not see this\n";
+                  ignerr << "should not see this\n";
                   this->gearRatio = 1.0;
                 }
 
@@ -70,7 +70,7 @@ namespace gazebo
                 }
                 else
                 {
-                  gzerr << "Gearbox joint missing reference body.\n";
+                  ignerr << "Gearbox joint missing reference body.\n";
                 }
               }
 

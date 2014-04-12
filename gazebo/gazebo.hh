@@ -17,8 +17,17 @@
 #ifndef _GAZEBO_HH_
 #define _GAZEBO_HH_
 
-#include <gazebo/gazebo_core.hh>
 #include <string>
+
+#include <ignition/common.hh>
+#include <ignition/math.hh>
+
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/transport/transport.hh>
+#include <gazebo/Server.hh>
+#include <gazebo/Master.hh>
+#include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_config.h>
 
 namespace gazebo
 {

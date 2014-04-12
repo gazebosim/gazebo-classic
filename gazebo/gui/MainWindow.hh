@@ -23,7 +23,7 @@
 #include <list>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -203,7 +203,7 @@ namespace gazebo
 
       private: QDockWidget *toolsDock;
 
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       // A map that associates physics_id's with entity names
       private: std::map<std::string, unsigned int> entities;

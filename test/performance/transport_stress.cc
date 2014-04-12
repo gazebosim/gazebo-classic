@@ -30,14 +30,14 @@ boost::mutex g_mutex;
 unsigned int g_localPublishMessageCount = 0;
 unsigned int g_localPublishCount = 0;
 unsigned int g_totalExpectedMsgCount = 0;
-common::Time g_localPublishEndTime;
+ignition::common::Time g_localPublishEndTime;
 
 void LocalPublishCB(ConstImagePtr & /*_msg*/)
 {
   boost::mutex::scoped_lock lock(g_mutex);
 
   if (g_localPublishCount+1 >= g_totalExpectedMsgCount)
-    g_localPublishEndTime = common::Time::GetWallTime();
+    g_localPublishEndTime = ignition::common::Time::GetWallTime();
   g_localPublishCount++;
 }
 
@@ -80,25 +80,25 @@ TEST_F(TransportStressTest, LocalPublish)
   fakeMsg.set_data(fakeData, width*height);
 
   // Get the start time
-  common::Time startTime = common::Time::GetWallTime();
+  ignition::common::Time startTime = ignition::common::Time::GetWallTime();
 
   // Publish the messages many times
   for (unsigned int i = 0; i < g_localPublishMessageCount; ++i)
   {
     pub->Publish(fakeMsg);
   }
-  gzmsg << "Publish Complete" << std::endl;
+  ignmsg << "Publish Complete" << std::endl;
 
   // Wait for all the messages
   int waitCount = 0;
   while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 50)
   {
-    common::Time::MSleep(1000);
+    ignition::common::Time::MSleep(1000);
     waitCount++;
   }
 
   // Time it took to publish the messages.
-  common::Time diff = g_localPublishEndTime - startTime;
+  ignition::common::Time diff = g_localPublishEndTime - startTime;
 
   EXPECT_LT(waitCount, 50);
 
@@ -109,7 +109,7 @@ TEST_F(TransportStressTest, LocalPublish)
   EXPECT_LT(diff.sec, g_localPublishMessageCount * 0.0008);
 
   // Out time time for human testing purposes
-  gzmsg << "Time to publish " << g_localPublishCount  << " messages = "
+  ignmsg << "Time to publish " << g_localPublishCount  << " messages = "
     << diff << "\n";
 
   delete [] fakeData;
@@ -141,7 +141,7 @@ TEST_F(TransportStressTest, ManyNodes)
   // Check if there is enough memory available
   if (!gazebo::test::memory::IsMemoryAvailable(requiredMB))
   {
-    gzdbg << "Skipped test since " << requiredMB <<
+    igndbg << "Skipped test since " << requiredMB <<
               "Mb of RAM were not available \n";
     SUCCEED();
     return;
@@ -183,7 +183,7 @@ TEST_F(TransportStressTest, ManyNodes)
   fakeMsg.set_data(fakeData, width*height);
 
   // Get the start time
-  common::Time startTime = common::Time::GetWallTime();
+  ignition::common::Time startTime = ignition::common::Time::GetWallTime();
 
   // Publish the messages many times
   for (unsigned int i = 0; i < g_localPublishMessageCount; ++i)
@@ -194,22 +194,22 @@ TEST_F(TransportStressTest, ManyNodes)
       (*iter)->Publish(fakeMsg);
     }
   }
-  common::Time publishTime = common::Time::GetWallTime();
-  gzmsg << "Publish complete" << std::endl;
+  ignition::common::Time publishTime = ignition::common::Time::GetWallTime();
+  ignmsg << "Publish complete" << std::endl;
 
   // Wait for all the messages
   int waitCount = 0;
   while (g_localPublishCount < g_totalExpectedMsgCount && waitCount < 100)
   {
-    common::Time::MSleep(1000);
+    ignition::common::Time::MSleep(1000);
     waitCount++;
   }
 
   // Time it took to publish the messages.
-  common::Time pubDiff = publishTime - startTime;
+  ignition::common::Time pubDiff = publishTime - startTime;
 
   // Time it took to received the messages.
-  common::Time receiveDiff = g_localPublishEndTime - startTime;
+  ignition::common::Time receiveDiff = g_localPublishEndTime - startTime;
 
   EXPECT_LT(waitCount, 100);
 
@@ -227,10 +227,10 @@ TEST_F(TransportStressTest, ManyNodes)
   EXPECT_LT(receiveDiff.sec, g_localPublishCount * 1e-5);
 
   // Out time time for human testing purposes
-  gzmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()
+  ignmsg << "Time to publish " << g_localPublishMessageCount * nodes.size()
     << " = " << pubDiff << std::endl;
 
-  gzmsg << "Time to receive " << g_localPublishCount << " = "
+  ignmsg << "Time to receive " << g_localPublishCount << " = "
     << receiveDiff << std::endl;
 
   delete [] fakeData;

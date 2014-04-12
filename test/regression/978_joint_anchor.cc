@@ -34,7 +34,7 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
   // Abort test for simbody, since SimbodyJoint::GetAnchor isn't implemented
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #979.\n";
+    ignerr << "Aborting test for Simbody, see issue #979.\n";
     return;
   }
 
@@ -50,13 +50,13 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
 
   std::string _jointType = "revolute";
   {
-    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
+    igndbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     SpawnJointOptions opt;
     opt.type = _jointType;
     opt.worldChild = false;
     opt.worldParent = false;
     opt.noLinkPose = true;
-    opt.modelPose = math::Pose(1, 2, 3, 0, 0, 0);
+    opt.modelPose = ignition::math::Pose(1, 2, 3, 0, 0, 0);
 
     physics::JointPtr joint = SpawnJoint(opt);
     ASSERT_TRUE(joint != NULL);

@@ -24,7 +24,7 @@
 
 #include "player.h"
 
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -50,7 +50,7 @@ class GazeboTime : public PlayerTime
 
   private: gazebo::transport::NodePtr node;
   private: gazebo::transport::SubscriberPtr statsSub;
-  private: gazebo::common::Time simTime;
+  private: ignition::common::Time simTime;
 };
 
 /// \}

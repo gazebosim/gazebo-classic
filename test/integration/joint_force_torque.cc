@@ -70,7 +70,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -79,11 +79,11 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  gzlog << "dt : " << dt << "\n";
+  ignlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
   EXPECT_DOUBLE_EQ(t, dt);
-  gzlog << "t after one step : " << t << "\n";
+  ignlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
   physics::ModelPtr model_1 = world->GetModel("model_1");
@@ -92,7 +92,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
-  gzlog << "-------------------Test 1-------------------\n";
+  ignlog << "-------------------Test 1-------------------\n";
   for (unsigned int i = 0; i < 10; ++i)
   {
     world->Step(1);
@@ -112,13 +112,13 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_01.body2Torque.y, -wrench_01.body1Torque.y);
     EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z, -wrench_01.body1Torque.z);
 
-    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+    ignlog << "link_1 pose [" << link_1->GetWorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
           << "]\n";
-    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+    ignlog << "link_2 pose [" << link_2->GetWorldPose()
           << "] velocity [" << link_2->GetWorldLinearVel()
           << "]\n";
-    gzlog << "joint_01 force torque : "
+    ignlog << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
           << " / 0 0 1000"
           << "] torque1 [" << wrench_01.body1Torque
@@ -145,13 +145,13 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_12.body2Torque.y, -wrench_12.body1Torque.y);
     EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z, -wrench_12.body1Torque.z);
 
-    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+    ignlog << "link_1 pose [" << link_1->GetWorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
           << "]\n";
-    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+    ignlog << "link_2 pose [" << link_2->GetWorldPose()
           << "] velocity [" << link_2->GetWorldLinearVel()
           << "]\n";
-    gzlog << "joint_12 force torque : "
+    ignlog << "joint_12 force torque : "
           << "force1 [" << wrench_12.body1Force
           << " / 0 0 500"
           << "] torque1 [" << wrench_12.body1Torque
@@ -179,7 +179,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -188,11 +188,11 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  gzlog << "dt : " << dt << "\n";
+  ignlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
   EXPECT_DOUBLE_EQ(t, dt);
-  gzlog << "t after one step : " << t << "\n";
+  ignlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
   physics::ModelPtr model_1 = world->GetModel("model_1");
@@ -202,14 +202,14 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
   // perturbe joints so top link topples over, then remeasure
-  physics->SetGravity(math::Vector3(-30, 10, -50));
+  physics->SetGravity(ignition::math::Vector3(-30, 10, -50));
   // tune joint stop properties
   joint_01->SetAttribute("stop_erp", 0, 0.02);
   joint_12->SetAttribute("stop_erp", 0, 0.02);
   // wait for dynamics to stabilize
   world->Step(2000);
   // check force torques in new system
-  gzlog << "\n-------------------Test 2-------------------\n";
+  ignlog << "\n-------------------Test 2-------------------\n";
   for (unsigned int i = 0; i < 5; ++i)
   {
     world->Step(1);
@@ -249,7 +249,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
     EXPECT_NEAR(wrench_01.body2Torque.y, -450.0,  4.5);
     EXPECT_NEAR(wrench_01.body2Torque.z,    0.0,  0.1);
 
-    gzlog << "joint_01 force torque : "
+    ignlog << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
           << " / 600 -200 1000"
           << "] torque1 [" << wrench_01.body1Torque
@@ -260,7 +260,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
           << " / -750 -450 0"
           << "]\n";
 
-    gzlog << "joint angle1[" << std::setprecision(17) << joint_01->GetAngle(0)
+    ignlog << "joint angle1[" << std::setprecision(17) << joint_01->GetAngle(0)
           << "] angle2[" << joint_12->GetAngle(0) << "]\n";
 
     // test joint_12 wrench
@@ -290,7 +290,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
     EXPECT_NEAR(wrench_12.body2Torque.y, -wrench_12.body1Torque.y, 1e-1);
     EXPECT_NEAR(wrench_12.body2Torque.z, -wrench_12.body1Torque.z, 1e-1);
 
-    gzlog << "joint_12 force torque : "
+    ignlog << "joint_12 force torque : "
           << "force1 [" << wrench_12.body1Force
           << " / 300 -500 -100"
           << "] torque1 [" << wrench_12.body1Torque
@@ -307,7 +307,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   world->Step(steps);
   t = world->GetSimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
-  gzdbg << "t after 20 steps : " << t << "\n";
+  igndbg << "t after 20 steps : " << t << "\n";
 }
 
 /////////////////////////////////////////////////
@@ -317,7 +317,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   // Explicit joint damping in bullet is causing this test to fail.
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Aborting test for bullet, see issue #619.\n";
+    ignerr << "Aborting test for bullet, see issue #619.\n";
     return;
   }
 
@@ -333,7 +333,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -342,18 +342,18 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  gzlog << "dt : " << dt << "\n";
+  ignlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
   EXPECT_GT(t, 0);
-  gzlog << "t after one step : " << t << "\n";
+  ignlog << "t after one step : " << t << "\n";
 
   // get joint and get force torque
   physics::ModelPtr model_1 = world->GetModel("boxes");
   physics::JointPtr joint_01 = model_1->GetJoint("joint1");
   physics::JointPtr joint_12 = model_1->GetJoint("joint2");
 
-  gzlog << "------------------- PD CONTROL -------------------\n";
+  ignlog << "------------------- PD CONTROL -------------------\n";
   static const double kp1 = 50000.0;
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
@@ -390,7 +390,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_01.body2Torque.y, -wrench_01.body1Torque.y, TOL_CONT);
       EXPECT_NEAR(wrench_01.body2Torque.z, -wrench_01.body1Torque.z, TOL_CONT);
 
-      gzlog << "joint_01 force torque : "
+      ignlog << "joint_01 force torque : "
             << "step [" << i
             << "] GetForce [" << joint_01->GetForce(0u)
             << "] command [" << effort1
@@ -419,7 +419,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_12.body2Torque.y,    0.000, TOL_CONT);
       EXPECT_NEAR(wrench_12.body2Torque.z,   17.678, TOL_CONT);
 
-      gzlog << "joint_12 force torque : "
+      ignlog << "joint_12 force torque : "
             << "step [" << i
             << "] GetForce [" << joint_12->GetForce(0u)
             << "] command [" << effort2
@@ -429,7 +429,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
             << "] torque2 [" << wrench_12.body2Torque
             << "]\n";
     }
-    gzlog << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
+    ignlog << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
           << "] 2[" << joint_12->GetAngle(0)
           << "]\n";
   }
@@ -470,7 +470,7 @@ void JointForceTorqueTest::JointTorqueTest(const std::string &_physicsEngine)
       world->Step(1);
       double curV = joint->GetVelocity(0);
       double accel = (curV - lastV) / dt;
-      gzdbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
+      igndbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
       lastV = curV;
       EXPECT_NEAR(accel, torque / link->GetInertial()->GetIXX(), TOL);
     }
@@ -493,7 +493,7 @@ void JointForceTorqueTest::JointTorqueTest(const std::string &_physicsEngine)
       world->Step(1);
       double curV = joint->GetVelocity(0);
       double accel = (curV - lastV) / dt;
-      gzdbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
+      igndbg << i << " : " << curV << " : " << (curV - lastV) / dt << "\n";
       lastV = curV;
       EXPECT_NEAR(accel, torque / link->GetInertial()->GetIZZ(), TOL);
     }

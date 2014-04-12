@@ -15,11 +15,11 @@
  *
 */
 #include <sdf/sdf.hh>
-#include "gazebo/math/Pose.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Material.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/MeshManager.hh"
+#include "ignition/common/Mesh.hh"
+#include "ignition/common/Material.hh"
 
 std::vector<std::string> params;
 
@@ -72,11 +72,11 @@ bool parse(int argc, char **argv)
   return true;
 }
 
-gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
+ignition::math::Vector3 Convert(const ignition::math::Vector3 &_vec)
 {
-  gazebo::math::Vector3 result;
-  gazebo::math::Quaternion rot1(0, M_PI*.5, 0);
-  gazebo::math::Quaternion rot2(0, -M_PI*.5, 0);
+  ignition::math::Vector3 result;
+  ignition::math::Quaternion rot1(0, M_PI*.5, 0);
+  ignition::math::Quaternion rot2(0, -M_PI*.5, 0);
 
   result = rot1.RotateVector(_vec);
   result = rot2.RotateVector(result);
@@ -84,25 +84,25 @@ gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
   return result;
 }
 
-void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
+void ProcessMesh(sdf::ElementPtr _elem, const ignition::math::Pose _pose)
 {
-  const gazebo::common::Mesh *mesh;
+  const ignition::commonMesh *mesh;
 
-  mesh = gazebo::common::MeshManager::Instance()->Load(
+  mesh = ignition::commonMeshManager::Instance()->Load(
       _elem->GetValueString("filename"));
 
-  const_cast<gazebo::common::Mesh*>(mesh)->RecalculateNormals();
+  const_cast<ignition::commonMesh*>(mesh)->RecalculateNormals();
 
 
   for (unsigned int i = 0; i < mesh->GetSubMeshCount(); i++)
   {
-    const gazebo::common::SubMesh *subMesh = mesh->GetSubMesh(i);
+    const ignition::commonSubMesh *subMesh = mesh->GetSubMesh(i);
     printf("mesh2 {\n");
     printf("  vertex_vectors {\n");
     printf("    %d, \n    ", subMesh->GetVertexCount());
     for (unsigned int v = 0; v < subMesh->GetVertexCount(); v++)
     {
-      gazebo::math::Vector3 vert = subMesh->GetVertex(v);
+      ignition::math::Vector3 vert = subMesh->GetVertex(v);
       // vert = _pose.CoordPositionAdd(vert);
       printf("<%f, %f, %f>, ", vert.x, vert.y, vert.z);
     }
@@ -112,7 +112,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("    %d, \n    ", subMesh->GetNormalCount());
     for (unsigned int n = 0; n < subMesh->GetNormalCount(); n++)
     {
-      gazebo::math::Vector3 norm = subMesh->GetNormal(n);
+      ignition::math::Vector3 norm = subMesh->GetNormal(n);
       printf("<%f, %f, %f>, ", norm.x, norm.y, norm.z);
     }
     printf("  }\n");
@@ -126,7 +126,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     }
     printf("  }\n");
 
-    const gazebo::common::Material *mat = mesh->GetMaterial(
+    const ignition::commonMaterial *mat = mesh->GetMaterial(
         subMesh->GetMaterialIndex());
     if (mat)
     {
@@ -191,7 +191,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
     printf("  }\n");
     */
 
-    gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+    ignition::math::Vector3 rpy = _pose.rot.GetAsEuler();
     printf("  translate <%f, %f, %f>\n", _pose.pos.x, _pose.pos.y, _pose.pos.z);
     printf("  rotate <%f, %f, %f>\n", RTOD(rpy.x), RTOD(rpy.y), RTOD(rpy.z));
 
@@ -201,8 +201,8 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose _pose)
 
 void ProcessLight(sdf::ElementPtr _elem)
 {
-  gazebo::math::Pose pose;
-  gazebo::common::Color diffuse, specular;
+  ignition::math::Pose pose;
+  ignition::common::Color diffuse, specular;
 
   pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
   diffuse = _elem->GetValueColor("diffuse");
@@ -243,9 +243,9 @@ void ProcessLight(sdf::ElementPtr _elem)
 
   if (_elem->HasElement("direction"))
   {
-    gazebo::math::Vector3 dir =
+    ignition::math::Vector3 dir =
       _elem->GetElement("direction")->GetValueVector3("xyz");
-    gazebo::math::Plane plane(gazebo::math::Vector3(0, 0, 1));
+    ignition::math::Plane plane(ignition::math::Vector3(0, 0, 1));
 
     double d = plane.Distance(pose.pos, dir);
     double t;
@@ -261,7 +261,7 @@ void ProcessLight(sdf::ElementPtr _elem)
 
 void ProcessScene(sdf::ElementPtr _elem)
 {
-  gazebo::common::Color color;
+  ignition::common::Color color;
   if (_elem->HasElement("background"))
   {
     color = _elem->GetValueColor("background");
@@ -293,12 +293,12 @@ void ProcessScene(sdf::ElementPtr _elem)
   printf("} }\n");
 }
 
-void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
+void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose &_pose)
 {
   if (_elem->HasElement("plane"))
   {
     sdf::ElementPtr planeElem = _elem->GetElement("plane");
-    gazebo::math::Vector3 normal = planeElem->GetValueVector3("normal");
+    ignition::math::Vector3 normal = planeElem->GetValueVector3("normal");
     printf("plane {\n");
     printf("  <%f, %f, %f>, 0\n", normal.x, normal.y, normal.z);
     printf("  texture {pigment { color Yellow } }\n");
@@ -307,10 +307,10 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
   else if (_elem->HasElement("box"))
   {
     sdf::ElementPtr boxElem = _elem->GetElement("box");
-    gazebo::math::Vector3 size = boxElem->GetValueVector3("size");
+    ignition::math::Vector3 size = boxElem->GetValueVector3("size");
     printf("box {\n");
-    gazebo::math::Vector3 corner1 = _pose.pos - (size/2.0);
-    gazebo::math::Vector3 corner2 = _pose.pos + (size/2.0);
+    ignition::math::Vector3 corner1 = _pose.pos - (size/2.0);
+    ignition::math::Vector3 corner2 = _pose.pos + (size/2.0);
     corner1 = _pose.rot.RotateVector(corner1);
     corner2 = _pose.rot.RotateVector(corner2);
     printf(" <%f, %f, %f, >, <%f, %f, %f>\n", corner1.x, corner1.y, corner1.z,
@@ -322,7 +322,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
     sdf::ElementPtr cylinderElem = _elem->GetElement("cylinder");
     double radius = cylinderElem->GetValueDouble("radius");
     double length = cylinderElem->GetValueDouble("length");
-    gazebo::math::Vector3 capPoint = _pose.pos;
+    ignition::math::Vector3 capPoint = _pose.pos;
     capPoint.z += length;
     capPoint = _pose.rot.RotateVector(capPoint);
     printf("cylinder {\n");
@@ -357,13 +357,13 @@ int main(int argc, char **argv)
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
   {
-    gzerr << "Unable to initialize sdf\n";
+    ignerr << "Unable to initialize sdf\n";
     return false;
   }
 
   if (!sdf::readFile(params[0], sdf))
   {
-    gzerr << "Unable to read sdf file[" << params[0] << "]\n";
+    ignerr << "Unable to read sdf file[" << params[0] << "]\n";
     return false;
   }
 
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
 
   sdf::ElementPtr root = sdf->root;
 
-  gazebo::math::Pose modelPose, linkPose, visualPose;
+  ignition::math::Pose modelPose, linkPose, visualPose;
 
   sdf::ElementPtr worldElem = root->GetElement("world");
   while (worldElem)

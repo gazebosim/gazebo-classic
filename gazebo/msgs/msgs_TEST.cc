@@ -17,14 +17,14 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
 
 class MsgsTest : public gazebo::testing::AutoLogFixture { };
 
-void TimeTest(const common::Time &_t, const msgs::Time &_msg)
+void TimeTest(const ignition::common::Time &_t, const msgs::Time &_msg)
 {
   EXPECT_LE(_t.sec, _msg.sec());
   if (_t.sec == _msg.sec())
@@ -33,7 +33,7 @@ void TimeTest(const common::Time &_t, const msgs::Time &_msg)
 
 TEST_F(MsgsTest, Msg)
 {
-  common::Time t = common::Time::GetWallTime();
+  ignition::common::Time t = ignition::common::Time::GetWallTime();
 
   msgs::Test msg, msg2;
   msgs::Init(msg, "_test_");
@@ -66,7 +66,7 @@ TEST_F(MsgsTest, Request)
 
 TEST_F(MsgsTest, Time)
 {
-  common::Time t = common::Time::GetWallTime();
+  ignition::common::Time t = ignition::common::Time::GetWallTime();
   msgs::Time msg;
   msgs::Stamp(&msg);
   TimeTest(t, msg);
@@ -75,7 +75,7 @@ TEST_F(MsgsTest, Time)
 
 TEST_F(MsgsTest, TimeFromHeader)
 {
-  common::Time t = common::Time::GetWallTime();
+  ignition::common::Time t = ignition::common::Time::GetWallTime();
   msgs::Header msg;
   msgs::Stamp(&msg);
   TimeTest(t, msg.stamp());
@@ -99,12 +99,12 @@ TEST_F(MsgsTest, Packet)
 TEST_F(MsgsTest, BadPackage)
 {
   msgs::GzString msg;
-  EXPECT_THROW(msgs::Package("test_type", msg), common::Exception);
+  EXPECT_THROW(msgs::Package("test_type", msg), ignition::common::Exception);
 }
 
 TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -112,8 +112,8 @@ TEST_F(MsgsTest, CovertMathVector3ToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 {
-  msgs::Vector3d msg = msgs::Convert(math::Vector3(1, 2, 3));
-  math::Vector3 v    = msgs::Convert(msg);
+  msgs::Vector3d msg = msgs::Convert(ignition::math::Vector3(1, 2, 3));
+  ignition::math::Vector3 v    = msgs::Convert(msg);
   EXPECT_DOUBLE_EQ(1, v.x);
   EXPECT_DOUBLE_EQ(2, v.y);
   EXPECT_DOUBLE_EQ(3, v.z);
@@ -122,93 +122,100 @@ TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+    msgs::Convert(ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
 
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  EXPECT_TRUE(ignition::math::equal(msg.x(), -0.65328148243818818));
+  EXPECT_TRUE(ignition::math::equal(msg.y(), 0.27059805007309856));
+  EXPECT_TRUE(ignition::math::equal(msg.z(), 0.65328148243818829));
+  EXPECT_TRUE(ignition::math::equal(msg.w(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
-  math::Quaternion v = msgs::Convert(msg);
+    msgs::Convert(ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+  ignition::math::Quaternion v = msgs::Convert(msg);
 
-  // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
-  EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.w, 0.27059805007309851));
+  // TODO: to real unit test move ignition::math::equal to EXPECT_DOUBLE_EQ
+  EXPECT_TRUE(ignition::math::equal(v.x, -0.65328148243818818));
+  EXPECT_TRUE(ignition::math::equal(v.y, 0.27059805007309856));
+  EXPECT_TRUE(ignition::math::equal(v.z, 0.65328148243818829));
+  EXPECT_TRUE(ignition::math::equal(v.w, 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Pose msg = msgs::Convert(
+      ignition::math::Pose(ignition::math::Vector3(1, 2, 3),
+        ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().x(), -0.65328148243818818));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().y(), 0.27059805007309856));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().z(), 0.65328148243818829));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().w(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
-  msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
-  math::Pose v = msgs::Convert(msg);
+  msgs::Pose msg = msgs::Convert(
+      ignition::math::Pose(ignition::math::Vector3(1, 2, 3),
+        ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  ignition::math::Pose v = msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(1, v.pos.x);
   EXPECT_DOUBLE_EQ(2, v.pos.y);
   EXPECT_DOUBLE_EQ(3, v.pos.z);
-  EXPECT_TRUE(math::equal(v.rot.x, -0.65328148243818818));
-  EXPECT_TRUE(math::equal(v.rot.y, 0.27059805007309856));
-  EXPECT_TRUE(math::equal(v.rot.z, 0.65328148243818829));
-  EXPECT_TRUE(math::equal(v.rot.w, 0.27059805007309851));
+  EXPECT_TRUE(ignition::math::equal(v.rot.x, -0.65328148243818818));
+  EXPECT_TRUE(ignition::math::equal(v.rot.y, 0.27059805007309856));
+  EXPECT_TRUE(ignition::math::equal(v.rot.z, 0.65328148243818829));
+  EXPECT_TRUE(ignition::math::equal(v.rot.w, 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
+  msgs::Color msg = msgs::Convert(ignition::common::Color(.1, .2, .3, 1.0));
 
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  EXPECT_TRUE(ignition::math::equal(0.1f, msg.r()));
+  EXPECT_TRUE(ignition::math::equal(0.2f, msg.g()));
+  EXPECT_TRUE(ignition::math::equal(0.3f, msg.b()));
+  EXPECT_TRUE(ignition::math::equal(1.0f, msg.a()));
 }
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
-  common::Color v = msgs::Convert(msg);
+  msgs::Color msg = msgs::Convert(ignition::common::Color(.1, .2, .3, 1.0));
+  ignition::common::Color v = msgs::Convert(msg);
 
-  EXPECT_TRUE(math::equal(0.1f, v.r));
-  EXPECT_TRUE(math::equal(0.2f, v.g));
-  EXPECT_TRUE(math::equal(0.3f, v.b));
-  EXPECT_TRUE(math::equal(1.0f, v.a));
+  EXPECT_TRUE(ignition::math::equal(0.1f, v.r));
+  EXPECT_TRUE(ignition::math::equal(0.2f, v.g));
+  EXPECT_TRUE(ignition::math::equal(0.3f, v.b));
+  EXPECT_TRUE(ignition::math::equal(1.0f, v.a));
 }
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
 {
-  msgs::Time msg = msgs::Convert(common::Time(2, 123));
+  msgs::Time msg = msgs::Convert(ignition::common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
 
-  common::Time v = msgs::Convert(msg);
+  ignition::common::Time v = msgs::Convert(msg);
   EXPECT_EQ(2, v.sec);
   EXPECT_EQ(123, v.nsec);
 }
 
 TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Plane(ignition::math::Vector3(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -220,9 +227,10 @@ TEST_F(MsgsTest, ConvertMathPlaneToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 {
-  msgs::PlaneGeom msg = msgs::Convert(math::Plane(math::Vector3(0, 0, 1),
-        math::Vector2d(123, 456), 1.0));
-  math::Plane v = msgs::Convert(msg);
+  msgs::PlaneGeom msg = msgs::Convert(
+      ignition::math::Plane(ignition::math::Vector3(0, 0, 1),
+        ignition::math::Vector2d(123, 456), 1.0));
+  ignition::math::Plane v = msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(0, v.normal.x);
   EXPECT_DOUBLE_EQ(0, v.normal.y);
@@ -231,13 +239,13 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_DOUBLE_EQ(123, v.size.x);
   EXPECT_DOUBLE_EQ(456, v.size.y);
 
-  EXPECT_TRUE(math::equal(1.0, v.d));
+  EXPECT_TRUE(ignition::math::equal(1.0, v.d));
 }
 
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
-  msgs::Set(&msg, math::Vector3(1, 2, 3));
+  msgs::Set(&msg, ignition::math::Vector3(1, 2, 3));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
   EXPECT_DOUBLE_EQ(3, msg.z());
@@ -246,7 +254,7 @@ TEST_F(MsgsTest, SetVector3)
 TEST_F(MsgsTest, SetVector2d)
 {
   msgs::Vector2d msg;
-  msgs::Set(&msg, math::Vector2d(1, 2));
+  msgs::Set(&msg, ignition::math::Vector2d(1, 2));
   EXPECT_DOUBLE_EQ(1, msg.x());
   EXPECT_DOUBLE_EQ(2, msg.y());
 }
@@ -254,43 +262,47 @@ TEST_F(MsgsTest, SetVector2d)
 TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
-  msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
-  EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.w(), 0.27059805007309851));
+  msgs::Set(&msg, ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+  EXPECT_TRUE(ignition::math::equal(msg.x(), -0.65328148243818818));
+  EXPECT_TRUE(ignition::math::equal(msg.y(), 0.27059805007309856));
+  EXPECT_TRUE(ignition::math::equal(msg.z(), 0.65328148243818829));
+  EXPECT_TRUE(ignition::math::equal(msg.w(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, SetPose)
 {
   msgs::Pose msg;
-  msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+  msgs::Set(&msg, ignition::math::Pose(ignition::math::Vector3(1, 2, 3),
+        ignition::math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
   EXPECT_DOUBLE_EQ(3, msg.position().z());
 
-  EXPECT_TRUE(math::equal(msg.orientation().x(), -0.65328148243818818));
-  EXPECT_TRUE(math::equal(msg.orientation().y(), 0.27059805007309856));
-  EXPECT_TRUE(math::equal(msg.orientation().z(), 0.65328148243818829));
-  EXPECT_TRUE(math::equal(msg.orientation().w(), 0.27059805007309851));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().x(), -0.65328148243818818));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().y(), 0.27059805007309856));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().z(), 0.65328148243818829));
+  EXPECT_TRUE(
+      ignition::math::equal(msg.orientation().w(), 0.27059805007309851));
 }
 
 TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
-  msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
-  EXPECT_TRUE(math::equal(0.1f, msg.r()));
-  EXPECT_TRUE(math::equal(0.2f, msg.g()));
-  EXPECT_TRUE(math::equal(0.3f, msg.b()));
-  EXPECT_TRUE(math::equal(1.0f, msg.a()));
+  msgs::Set(&msg, ignition::common::Color(.1, .2, .3, 1.0));
+  EXPECT_TRUE(ignition::math::equal(0.1f, msg.r()));
+  EXPECT_TRUE(ignition::math::equal(0.2f, msg.g()));
+  EXPECT_TRUE(ignition::math::equal(0.3f, msg.b()));
+  EXPECT_TRUE(ignition::math::equal(1.0f, msg.a()));
 }
 
 TEST_F(MsgsTest, SetTime)
 {
   msgs::Time msg;
-  msgs::Set(&msg, common::Time(2, 123));
+  msgs::Set(&msg, ignition::common::Time(2, 123));
   EXPECT_EQ(2, msg.sec());
   EXPECT_EQ(123, msg.nsec());
 }
@@ -298,8 +310,8 @@ TEST_F(MsgsTest, SetTime)
 TEST_F(MsgsTest, SetPlane)
 {
   msgs::PlaneGeom msg;
-  msgs::Set(&msg, math::Plane(math::Vector3(0, 0, 1),
-                              math::Vector2d(123, 456), 1.0));
+  msgs::Set(&msg, ignition::math::Plane(ignition::math::Vector3(0, 0, 1),
+                              ignition::math::Vector2d(123, 456), 1.0));
 
   EXPECT_DOUBLE_EQ(0, msg.normal().x());
   EXPECT_DOUBLE_EQ(0, msg.normal().y());
@@ -308,7 +320,7 @@ TEST_F(MsgsTest, SetPlane)
   EXPECT_DOUBLE_EQ(123, msg.size().x());
   EXPECT_DOUBLE_EQ(456, msg.size().y());
 
-  EXPECT_TRUE(math::equal(1.0, msg.d()));
+  EXPECT_TRUE(ignition::math::equal(1.0, msg.d()));
 }
 
 TEST_F(MsgsTest, Initialization)
@@ -641,7 +653,7 @@ TEST_F(MsgsTest, VisualFromSDF_NoGeometry)
          </visual>\
       </gazebo>", sdf);
   EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-      common::Exception);
+      ignition::common::Exception);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_ShaderTypeThrow)
@@ -682,7 +694,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryVisual)
          </visual>\
       </gazebo>", sdf);
   EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-               common::Exception);
+               ignition::common::Exception);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
@@ -712,7 +724,7 @@ TEST_F(MsgsTest, VisualFromSDF_BadGeometryType)
   badElement->SetName("bad_type");
   sdf->GetElement("geometry")->InsertElement(badElement);
   EXPECT_THROW(msgs::Visual msg = msgs::VisualFromSDF(sdf),
-      common::Exception);
+      ignition::common::Exception);
 }
 
 TEST_F(MsgsTest, VisualFromSDF_BadFogType)
@@ -730,7 +742,8 @@ TEST_F(MsgsTest, VisualFromSDF_BadFogType)
            <grid>false</grid>\
          </scene>\
       </gazebo>", sdf);
-  EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf), common::Exception);
+  EXPECT_THROW(msgs::Scene msg = msgs::SceneFromSDF(sdf),
+      ignition::common::Exception);
 }
 
 TEST_F(MsgsTest, VisualSceneFromSDF_A)

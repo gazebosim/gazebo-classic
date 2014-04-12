@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
-
 #ifndef _SENSORMANAGER_HH_
 #define _SENSORMANAGER_HH_
 
@@ -29,10 +23,10 @@
 #include <list>
 
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
 
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 
 namespace gazebo
@@ -46,7 +40,7 @@ namespace gazebo
     class SimTimeEvent
     {
       /// \brief The time at which to trigger the condition.
-      public: common::Time time;
+      public: ignition::common::Time time;
 
       /// \brief The condition to notify.
       public: boost::condition_variable *condition;
@@ -67,7 +61,7 @@ namespace gazebo
       /// be add to this time.
       /// \param[in] _var Condition to notify when the time has been
       /// reached.
-      public: void AddRelativeEvent(const common::Time &_time,
+      public: void AddRelativeEvent(const ignition::common::Time &_time,
                   boost::condition_variable *_var);
 
       /// \brief Called when the world is updated.
@@ -81,7 +75,7 @@ namespace gazebo
       private: std::list<SimTimeEvent*> events;
 
       /// \brief Connect to the World::UpdateBegin event.
-      private: event::ConnectionPtr updateConnection;
+      private: ignition::common::ConnectionPtr updateConnection;
     };
     /// \endcond
 
@@ -89,7 +83,7 @@ namespace gazebo
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
-    class SensorManager : public SingletonT<SensorManager>
+    class SensorManager : public ignition::common::SingletonT<SensorManager>
     {
       /// \brief This is a singletone class. Use SensorManager::Instance()
       /// to get a pointer to this class.
@@ -125,7 +119,7 @@ namespace gazebo
       /// \brief Deprecated.
       public: std::string CreateSensor(sdf::ElementPtr _elem,
                   const std::string &_worldName,
-                  const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
+                  const std::string &_parentName) IGN_DEPRECATED(2.0);
 
       /// \brief Add a sensor from an SDF element. This function will also Load
       /// and Init the sensor.

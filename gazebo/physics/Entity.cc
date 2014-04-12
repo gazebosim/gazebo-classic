@@ -23,11 +23,11 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Animation.hh"
-#include "gazebo/common/KeyFrame.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Animation.hh"
+#include "ignition/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -65,7 +65,7 @@ Entity::Entity(BasePtr _parent)
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -98,12 +98,12 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
+      this->worldPose = this->sdf->Get<ignition::math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+      this->worldPose = this->sdf->Get<ignition::math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
+    this->initialRelativePose = this->sdf->Get<ignition::math::Pose>("pose");
   }
 
   if (this->parent)
@@ -158,21 +158,22 @@ bool Entity::IsStatic() const
 }
 
 //////////////////////////////////////////////////
-void Entity::SetInitialRelativePose(const math::Pose &_p)
+void Entity::SetInitialRelativePose(const ignition::math::Pose &_p)
 {
   this->initialRelativePose = _p;
 }
 
 //////////////////////////////////////////////////
-math::Pose Entity::GetInitialRelativePose() const
+ignition::math::Pose Entity::GetInitialRelativePose() const
 {
   return this->initialRelativePose;
 }
 
 //////////////////////////////////////////////////
-math::Box Entity::GetBoundingBox() const
+ignition::math::Box Entity::GetBoundingBox() const
 {
-  return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
+  return ignition::math::Box(ignition::math::Vector3(0, 0, 0),
+      ignition::math::Vector3(1, 1, 1));
 }
 
 //////////////////////////////////////////////////
@@ -182,19 +183,19 @@ void Entity::SetCanonicalLink(bool _value)
 }
 
 //////////////////////////////////////////////////
-void Entity::SetAnimation(common::PoseAnimationPtr _anim)
+void Entity::SetAnimation(ignition::common::PoseAnimationPtr _anim)
 {
   this->animationStartPose = this->worldPose;
 
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete.clear();
-  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+  this->animationConnection = common::Events::ConnectWorldUpdateBegin(
       boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
 //////////////////////////////////////////////////
-void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
+void Entity::SetAnimation(const ignition::common::PoseAnimationPtr &_anim,
                           boost::function<void()> _onComplete)
 {
   this->animationStartPose = this->worldPose;
@@ -202,7 +203,7 @@ void Entity::SetAnimation(const common::PoseAnimationPtr &_anim,
   this->prevAnimationTime = this->world->GetSimTime();
   this->animation = _anim;
   this->onAnimationComplete = _onComplete;
-  this->animationConnection = event::Events::ConnectWorldUpdateBegin(
+  this->animationConnection = common::Events::ConnectWorldUpdateBegin(
       boost::bind(&Entity::UpdateAnimation, this, _1));
 }
 
@@ -213,7 +214,7 @@ void Entity::StopAnimation()
   this->onAnimationComplete.clear();
   if (this->animationConnection)
   {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
+    common::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
   }
 }
@@ -221,14 +222,14 @@ void Entity::StopAnimation()
 //////////////////////////////////////////////////
 void Entity::PublishPose()
 {
-  GZ_ASSERT(this->GetParentModel() != NULL,
+  IGN_ASSERT(this->GetParentModel() != NULL,
       "An entity without a parent model should not happen");
 
   this->world->PublishModelPose(this->GetParentModel());
 }
 
 //////////////////////////////////////////////////
-math::Pose Entity::GetRelativePose() const
+ignition::math::Pose Entity::GetRelativePose() const
 {
   // We return the initialRelativePose for COLLISION objects because they
   // cannot move relative to their parent link.
@@ -249,7 +250,7 @@ math::Pose Entity::GetRelativePose() const
 }
 
 //////////////////////////////////////////////////
-void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
+void Entity::SetRelativePose(const ignition::math::Pose &_pose, bool _notify,
         bool _publish)
 {
   if (this->parent && this->parentEntity)
@@ -260,8 +261,8 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldTwist(const math::Vector3 &_linear,
-    const math::Vector3 &_angular, bool _updateChildren)
+void Entity::SetWorldTwist(const ignition::math::Vector3 &_linear,
+    const ignition::math::Vector3 &_angular, bool _updateChildren)
 {
   if (this->HasType(LINK) || this->HasType(MODEL))
   {
@@ -288,10 +289,10 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
+void Entity::SetWorldPoseModel(const ignition::math::Pose &_pose, bool _notify,
         bool _publish)
 {
-  math::Pose oldModelWorldPose = this->worldPose;
+  ignition::math::Pose oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
   this->worldPose = _pose;
@@ -331,8 +332,8 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
-        bool _publish)
+void Entity::SetWorldPoseCanonicalLink(const ignition::math::Pose &_pose,
+    bool _notify, bool _publish)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -356,13 +357,13 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
       this->parentEntity->PublishPose();
   }
   else
-    gzerr << "SWP for CB[" << this->GetName() << "] but parent["
+    ignerr << "SWP for CB[" << this->GetName() << "] but parent["
       << this->parentEntity->GetName() << "] is not a MODEL!\n";
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-        bool /*_publish*/)
+void Entity::SetWorldPoseDefault(const ignition::math::Pose &_pose,
+    bool _notify, bool /*_publish*/)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -370,7 +371,6 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
   if (_notify)
     this->UpdatePhysicsPose(true);
 }
-
 
 //////////////////////////////////////////////////
 //   The entity stores an initialRelativePose and dynamic worldPose
@@ -402,7 +402,8 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+void Entity::SetWorldPose(const ignition::math::Pose &_pose,
+    bool _notify, bool _publish)
 {
   {
     boost::mutex::scoped_lock lock(*this->GetWorld()->GetSetWorldPoseMutex());
@@ -466,7 +467,7 @@ ModelPtr Entity::GetParentModel()
     return boost::dynamic_pointer_cast<Model>(shared_from_this());
 
   p = this->parent;
-  GZ_ASSERT(p, "Parent of an entity is NULL");
+  IGN_ASSERT(p, "Parent of an entity is NULL");
 
   while (p->GetParent() && p->GetParent()->HasType(MODEL))
     p = p->GetParent();
@@ -499,7 +500,7 @@ void Entity::OnPoseMsg(ConstPosePtr &_msg)
 {
   if (_msg->name() == this->GetScopedName())
   {
-    math::Pose p = msgs::Convert(*_msg);
+    ignition::math::Pose p = msgs::Convert(*_msg);
     this->SetWorldPose(p);
   }
 }
@@ -535,11 +536,11 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 
-  math::Pose parentPose;
+  ignition::math::Pose parentPose;
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose newPose = _sdf->Get<ignition::math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);
@@ -549,12 +550,12 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 {
-  common::PoseKeyFrame kf(0);
+  ignition::common::PoseKeyFrame kf(0);
 
   this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
-  math::Pose offset;
+  ignition::math::Pose offset;
   offset.pos = kf.GetTranslation();
   offset.rot = kf.GetRotation();
 
@@ -563,7 +564,7 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 
   if (this->animation->GetLength() <= this->animation->GetTime())
   {
-    event::Events::DisconnectWorldUpdateBegin(this->animationConnection);
+    common::Events::DisconnectWorldUpdateBegin(this->animationConnection);
     this->animationConnection.reset();
     if (this->onAnimationComplete)
     {
@@ -573,15 +574,15 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 }
 
 //////////////////////////////////////////////////
-const math::Pose &Entity::GetDirtyPose() const
+const ignition::math::Pose &Entity::GetDirtyPose() const
 {
   return this->dirtyPose;
 }
 
 //////////////////////////////////////////////////
-math::Box Entity::GetCollisionBoundingBox() const
+ignition::math::Box Entity::GetCollisionBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
   for (Base_V::const_iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
@@ -592,12 +593,12 @@ math::Box Entity::GetCollisionBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
+ignition::math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
     return boost::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
 
-  math::Box box;
+  ignition::math::Box box;
 
   for (unsigned int i = 0; i < _base->GetChildCount(); i++)
   {
@@ -611,10 +612,10 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
   EntityPtr onEntity = this->GetWorld()->GetEntity(_entityName);
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Box onBox = onEntity->GetCollisionBoundingBox();
+  ignition::math::Box box = this->GetCollisionBoundingBox();
+  ignition::math::Box onBox = onEntity->GetCollisionBoundingBox();
 
-  math::Pose p = onEntity->GetWorldPose();
+  ignition::math::Pose p = onEntity->GetWorldPose();
   p.pos.z = onBox.max.z + box.GetZLength()*0.5;
   this->SetWorldPose(p);
 }
@@ -627,9 +628,9 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->GetPhysicsEngine()->CreateShape("ray", CollisionPtr()));
 
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Vector3 start = this->GetWorldPose().pos;
-  math::Vector3 end = start;
+  ignition::math::Box box = this->GetCollisionBoundingBox();
+  ignition::math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3 end = start;
   start.z = box.min.z - 0.00001;
   end.z -= 1000;
   rayShape->SetPoints(start, end);
@@ -645,7 +646,7 @@ void Entity::PlaceOnNearestEntityBelow()
   this->GetNearestEntityBelow(dist, entityName);
   if (dist > 0.0)
   {
-    math::Pose p = this->GetWorldPose();
+    ignition::math::Pose p = this->GetWorldPose();
     p.pos.z -= dist;
     this->SetWorldPose(p);
   }

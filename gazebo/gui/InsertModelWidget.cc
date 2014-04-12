@@ -20,7 +20,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
@@ -225,7 +224,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       {
         if (dIter->filename() != "database.config")
         {
-          gzlog << "Invalid filename or directory[" << fullPath
+          ignlog << "Invalid filename or directory[" << fullPath
             << "] in GAZEBO_MODEL_PATH. It's not a good idea to put extra "
             << "files in a GAZEBO_MODEL_PATH because the file structure may"
             << " be modified by Gazebo.\n";
@@ -238,13 +237,13 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
         manifest /= GZ_MODEL_MANIFEST_FILENAME;
       else if (boost::filesystem::exists(manifest / "manifest.xml"))
       {
-        gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
+        ignerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME << " for model "
           << (*dIter) << "\n";
       }
 
       if (!boost::filesystem::exists(manifest) || manifest == fullPath)
       {
-        gzlog << "model.config file is missing in directory["
+        ignlog << "model.config file is missing in directory["
               << fullPath << "]\n";
         continue;
       }
@@ -254,7 +253,7 @@ void InsertModelWidget::UpdateLocalPath(const std::string &_path)
       {
         TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
         if (!modelXML || !modelXML->FirstChildElement("name"))
-          gzerr << "No model name in manifest[" << manifest << "]\n";
+          ignerr << "No model name in manifest[" << manifest << "]\n";
         else
           modelName = modelXML->FirstChildElement("name")->GetText();
 

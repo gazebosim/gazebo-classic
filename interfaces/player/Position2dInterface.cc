@@ -36,7 +36,7 @@
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/gzmath.hh"
+#include "ignition/math.hh"
 #include "GazeboDriver.hh"
 #include "Position2dInterface.hh"
 
@@ -77,9 +77,9 @@ int Position2dInterface::ProcessMessage(QueuePointer &_respQueue,
 
     gazebo::msgs::Pose msg;
     gazebo::msgs::Set(msg.mutable_position(),
-                      gazebo::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
+                      ignition::math::Vector3(cmd->vel.px, cmd->vel.py, 0));
     gazebo::msgs::Set(msg.mutable_orientation(),
-                      gazebo::math::Quaternion(0, 0, cmd->vel.pa));
+                      ignition::math::Quaternion(0, 0, cmd->vel.pa));
     this->velPub->Publish(msg);
 
     result = 0;
@@ -233,7 +233,7 @@ void Position2dInterface::OnPoseMsg(ConstPose_VPtr &_msg)
     player_position2d_data_t data;
     memset(&data, 0, sizeof(data));
 
-    this->datatime = gazebo::common::Time::GetWallTime().Double();
+    this->datatime = ignition::common::Time::GetWallTime().Double();
     data.pos.px = _msg->pose(i).position().x();
     data.pos.py = _msg->pose(i).position().y();
     data.pos.pa = _msg->pose(i).position().z();

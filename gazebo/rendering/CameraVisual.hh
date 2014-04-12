@@ -22,6 +22,7 @@
 #define CAMERAVISUAL_HH
 
 #include <string>
+#include <vector>
 
 #include "gazebo/rendering/Visual.hh"
 
@@ -59,7 +60,7 @@ namespace gazebo
       private: void Update();
 
       /// \brief Event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Pointer to the camera.
       private: CameraPtr camera;

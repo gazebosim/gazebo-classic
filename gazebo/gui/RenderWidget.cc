@@ -177,13 +177,13 @@ void RenderWidget::update()
 
   if (!cam || !cam->GetInitialized())
   {
-    event::Events::preRender();
+    common::Events::preRender();
     return;
   }
 
   // float fps = cam->GetAvgFPS();
   // int triangleCount = cam->GetTriangleCount();
-  // math::Pose pose = cam->GetWorldPose();
+  // ignition::math::Pose pose = cam->GetWorldPose();
 
   // std::ostringstream stream;
 
@@ -200,17 +200,17 @@ void RenderWidget::update()
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().x);
+  //        << IGN_RTOD(pose.rot.GetAsEuler().x);
   // this->rollEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().y);
+  //        << IGN_RTOD(pose.rot.GetAsEuler().y);
   // this->pitchEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << GZ_RTOD(pose.rot.GetAsEuler().z);
+  //        << IGN_RTOD(pose.rot.GetAsEuler().z);
   // this->yawEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 

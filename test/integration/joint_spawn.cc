@@ -67,7 +67,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   if (_physicsEngine == "simbody")  // &&
   //    _jointType != "revolute" && _jointType != "prismatic")
   {
-    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
+    ignerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
   }
 
@@ -82,7 +82,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   {
-    gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
+    igndbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, false);
     ASSERT_TRUE(joint != NULL);
     // Check child and parent links
@@ -97,7 +97,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   }
 
   {
-    gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
+    igndbg << "SpawnJoint " << _jointType << " child world" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, true);
     ASSERT_TRUE(joint != NULL);
     // Check child link
@@ -114,7 +114,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     // DART assumes that: (i) every link has its parent joint (ii) root link
     // is the only link that doesn't have parent link.
     // Child world link breaks dart for now. Do we need to support it?
-    gzerr << "Skip tests for child world link cases "
+    ignerr << "Skip tests for child world link cases "
           << "since DART does not allow joint with world as child. "
           << "Please see issue #914. "
           << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
@@ -122,7 +122,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   }
 
   {
-    gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
+    igndbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
     ASSERT_TRUE(joint != NULL);
     // Check parent link
@@ -144,7 +144,7 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody" && _jointType != "revolute")
   {
-    gzerr << "Aborting test for Simbody, see issue #859.\n";
+    ignerr << "Aborting test for Simbody, see issue #859.\n";
     return;
   }
 
@@ -158,7 +158,7 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  gzdbg << "SpawnJoint " << _jointType << std::endl;
+  igndbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
   ASSERT_TRUE(joint != NULL);
 
@@ -168,20 +168,20 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   ASSERT_TRUE(child != NULL);
   ASSERT_TRUE(parent != NULL);
 
-  math::Vector3 pos(10, 10, 10);
-  math::Vector3 vel(10, 10, 10);
-  parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+  ignition::math::Vector3 pos(10, 10, 10);
+  ignition::math::Vector3 vel(10, 10, 10);
+  parent->SetWorldPose(ignition::math::Pose(pos, ignition::math::Quaternion()));
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);
     world->Step(10);
   }
   world->Step(50);
-  math::Pose childPose = child->GetWorldPose();
-  math::Pose parentPose = parent->GetWorldPose();
+  ignition::math::Pose childPose = child->GetWorldPose();
+  ignition::math::Pose parentPose = parent->GetWorldPose();
   EXPECT_TRUE(parentPose.pos != pos);
-  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
+  EXPECT_TRUE(parentPose.pos != ignition::math::Vector3::Zero);
+  EXPECT_TRUE(childPose.pos != ignition::math::Vector3::Zero);
   EXPECT_TRUE(childPose.pos == parentPose.pos);
 }
 
@@ -195,7 +195,7 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody")  // && _jointType != "revolute")
   {
-    gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
+    ignerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
   }
 
@@ -217,7 +217,7 @@ void JointSpawningTest::SpawnJointRotationalWorld(
       // DART assumes that: (i) every link has its parent joint (ii) root link
       // is the only link that doesn't have parent link.
       // Child world link breaks dart for now. Do we need to support it?
-      gzerr << "Skip tests for child world link cases "
+      ignerr << "Skip tests for child world link cases "
             << "since DART does not allow joint with world as child. "
             << "Please see issue #914. "
             << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
@@ -227,7 +227,7 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     bool worldParent = (i == 1);
     std::string child = worldChild ? "world" : "child";
     std::string parent = worldParent ? "world" : "parent";
-    gzdbg << "SpawnJoint " << _jointType << " "
+    igndbg << "SpawnJoint " << _jointType << " "
           << child << " "
           << parent << std::endl;
     joint = SpawnJoint(_jointType, worldChild, worldParent);
@@ -240,9 +240,9 @@ void JointSpawningTest::SpawnJointRotationalWorld(
       link = joint->GetParent();
     EXPECT_TRUE(link != NULL);
 
-    math::Pose initialPose = link->GetWorldPose();
+    ignition::math::Pose initialPose = link->GetWorldPose();
     world->Step(100);
-    math::Pose afterPose = link->GetWorldPose();
+    ignition::math::Pose afterPose = link->GetWorldPose();
     EXPECT_TRUE(initialPose.pos == afterPose.pos);
   }
 }

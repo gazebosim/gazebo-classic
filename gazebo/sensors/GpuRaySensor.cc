@@ -23,10 +23,10 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -51,7 +51,7 @@ GpuRaySensor::GpuRaySensor()
   this->rendered = false;
   this->active = false;
   this->connections.push_back(
-      event::Events::ConnectRender(
+      common::Events::ConnectRender(
         boost::bind(&GpuRaySensor::Render, this)));
 }
 
@@ -97,7 +97,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
 
   if (this->horzRayCount == 0 || this->vertRayCount == 0)
   {
-    gzthrow("GpuRaySensor: Image has 0 size!");
+    ignthrow("GpuRaySensor: Image has 0 size!");
   }
 
   this->horzRangeCount = this->GetRangeCount();
@@ -113,7 +113,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
 
   this->parentEntity = this->world->GetEntity(this->parentName);
 
-  GZ_ASSERT(this->parentEntity != NULL,
+  IGN_ASSERT(this->parentEntity != NULL,
       "Unable to get the parent entity.");
 }
 
@@ -123,7 +123,7 @@ void GpuRaySensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create GpuRaySensor. Rendering is disabled.\n";
+    ignerr << "Unable to create GpuRaySensor. Rendering is disabled.\n";
     return;
   }
 
@@ -141,7 +141,7 @@ void GpuRaySensor::Init()
 
     if (!this->laserCam)
     {
-      gzerr << "Unable to create gpu laser sensor\n";
+      ignerr << "Unable to create gpu laser sensor\n";
       return;
     }
     this->laserCam->SetCaptureData(true);
@@ -189,7 +189,7 @@ void GpuRaySensor::Init()
 
     if (this->GetVertFOV() > M_PI / 2)
     {
-      gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
+      ignwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
       this->laserCam->SetVertFOV(M_PI / 2);
       this->SetVerticalAngleMin(this->laserCam->GetVertHalfAngle() -
                                 (this->GetVertFOV() / 2));
@@ -282,7 +282,7 @@ void GpuRaySensor::Init()
     this->laserMsg.mutable_scan()->set_frame(this->parentName);
   }
   else
-    gzerr << "No world name\n";
+    ignerr << "No world name\n";
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
@@ -303,7 +303,7 @@ void GpuRaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
+ignition::common::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
   boost::function<void(const float *, unsigned int, unsigned int, unsigned int,
   const std::string &)> _subscriber)
 {
@@ -311,7 +311,8 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
+void GpuRaySensor::DisconnectNewLaserFrame(
+    ignition::common::ConnectionPtr &_conn)
 {
   this->laserCam->DisconnectNewLaserFrame(_conn);
 }
@@ -377,7 +378,7 @@ double GpuRaySensor::GetRangeCountRatio() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMin() const
+ignition::math::Angle GpuRaySensor::GetAngleMin() const
 {
   return this->horzElem->Get<double>("min_angle");
 }
@@ -389,7 +390,7 @@ void GpuRaySensor::SetAngleMin(double _angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMax() const
+ignition::math::Angle GpuRaySensor::GetAngleMax() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -464,12 +465,12 @@ int GpuRaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMin() const
+ignition::math::Angle GpuRaySensor::GetVerticalAngleMin() const
 {
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -480,12 +481,12 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMax() const
+ignition::math::Angle GpuRaySensor::GetVerticalAngleMax() const
 {
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -518,12 +519,12 @@ double GpuRaySensor::GetRange(int _index)
   boost::mutex::scoped_lock lock(this->mutex);
   if (this->laserMsg.scan().ranges_size() == 0)
   {
-    gzwarn << "ranges not constructed yet (zero sized)\n";
+    ignwarn << "ranges not constructed yet (zero sized)\n";
     return 0.0;
   }
   if (_index < 0 || _index > this->laserMsg.scan().ranges_size())
   {
-    gzerr << "Invalid range index[" << _index << "]\n";
+    ignerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
   }
 
@@ -597,7 +598,8 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       if (!this->noises.empty())
       {
         range = this->noises[0]->Apply(range);
-        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range, this->GetRangeMin(),
+            this->GetRangeMax());
       }
 
       if (add)

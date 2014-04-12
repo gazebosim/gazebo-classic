@@ -23,7 +23,7 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/gazebo_config.h"
 
 void RegisterODEPhysics();
@@ -82,7 +82,7 @@ PhysicsEnginePtr PhysicsFactory::NewPhysicsEngine(const std::string &_classname,
   if (iter != engines.end())
     result = (iter->second)(_world);
   else
-    gzerr << "Invalid Physics Type[" << _classname << "]\n";
+    ignerr << "Invalid Physics Type[" << _classname << "]\n";
 
   return result;
 }

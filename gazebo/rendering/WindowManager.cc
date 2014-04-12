@@ -23,9 +23,9 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Color.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -109,14 +109,14 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
     }
     catch(...)
     {
-      gzerr << " Unable to create the rendering window\n";
+      ignerr << " Unable to create the rendering window\n";
       window = NULL;
     }
   }
 
   if (attempts >= 10)
   {
-    gzthrow("Unable to create the rendering window\n");
+    ignthrow("Unable to create the rendering window\n");
   }
 
   if (window)
@@ -136,7 +136,7 @@ void WindowManager::Resize(uint32_t _id, int _width, int _height)
 {
   if (_id >= this->windows.size())
   {
-    gzerr << "Invalid window id[" << _id << "]\n";
+    ignerr << "Invalid window id[" << _id << "]\n";
   }
   else
   {
@@ -150,7 +150,7 @@ void WindowManager::Moved(uint32_t _id)
 {
   if (_id >= this->windows.size())
   {
-    gzerr << "Invalid window id[" << _id << "]\n";
+    ignerr << "Invalid window id[" << _id << "]\n";
   }
   else
   {

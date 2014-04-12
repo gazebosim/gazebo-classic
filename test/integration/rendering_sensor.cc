@@ -23,30 +23,30 @@ class RenderingSensorTest : public ServerFixture
 };
 
 
-common::Time lastTimestamp;
-std::vector<common::Time> gpuRayTimeStamps;
-std::vector<common::Time> cam1TimeStamps;
-std::vector<common::Time> cam2TimeStamps;
+ignition::common::Time lastTimestamp;
+std::vector<ignition::common::Time> gpuRayTimeStamps;
+std::vector<ignition::common::Time> cam1TimeStamps;
+std::vector<ignition::common::Time> cam2TimeStamps;
 
 // Collects gpu ray sensor's data timestamps for the TimeStamp test
 void OnReceiveGpuRayMsg(ConstLaserScanStampedPtr &_msg)
 {
   gpuRayTimeStamps.push_back(
-      common::Time(_msg->time().sec(), _msg->time().nsec()));
+      ignition::common::Time(_msg->time().sec(), _msg->time().nsec()));
 }
 
 // Collects camera sensor's data timestamps for the TimeStamp test
 void OnReceiveCamera1Msg(ConstImageStampedPtr &_msg)
 {
   cam1TimeStamps.push_back(
-      common::Time(_msg->time().sec(), _msg->time().nsec()));
+      ignition::common::Time(_msg->time().sec(), _msg->time().nsec()));
 }
 
 // Collects camera sensor2's data timestamps for the TimeStamp test
 void OnReceiveCamera2Msg(ConstImageStampedPtr &_msg)
 {
   cam2TimeStamps.push_back(
-      common::Time(_msg->time().sec(), _msg->time().nsec()));
+      ignition::common::Time(_msg->time().sec(), _msg->time().nsec()));
 }
 
 /////////////////////////////////////////////////
@@ -60,7 +60,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -75,8 +75,9 @@ TEST_F(RenderingSensorTest, Timestamp)
   unsigned int width  = 800;
   unsigned int height = 800;
   double updateRate = 30;
-  math::Pose camPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose camPose(
+      ignition::math::Vector3(-5, 0, 5),
+      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, camPose.pos,
       camPose.rot.GetAsEuler(), width, height, updateRate);
 
@@ -89,8 +90,9 @@ TEST_F(RenderingSensorTest, Timestamp)
 
   std::string modelName2 = "camera_model2";
   std::string cameraName2 = "camera_sensor2";
-  math::Pose camPose2(
-      math::Vector3(5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose camPose2(
+      ignition::math::Vector3(5, 0, 5),
+      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName2, cameraName2, camPose2.pos,
       camPose2.rot.GetAsEuler(), width, height, updateRate);
 
@@ -110,8 +112,8 @@ TEST_F(RenderingSensorTest, Timestamp)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 640;
-  math::Pose testPose(math::Vector3(0, 0, 0.1),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose testPose(ignition::math::Vector3(0, 0, 0.1),
+      ignition::math::Quaternion(0, 0, 0));
 
   SpawnGpuRaySensor(modelName3, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
@@ -148,7 +150,7 @@ TEST_F(RenderingSensorTest, Timestamp)
       cam1TimeStamps.size() < numTimestamps ||
       cam2TimeStamps.size() < numTimestamps) && i < 500)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     i++;
   }
   ASSERT_LT(i, 500);

@@ -17,8 +17,8 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 
-#include "gazebo/common/common.hh"
-#include "gazebo/math/gzmath.hh"
+#include "ignition/common.hh"
+#include "ignition/math.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/transport/transport.hh"
@@ -119,7 +119,8 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
     // Measure position and apply noise
     {
       // Get postion in Cartesian gazebo frame
-      math::Pose gpsPose = this->pose + this->parentLink->GetWorldPose();
+      ignition::math::Pose gpsPose = this->pose +
+        this->parentLink->GetWorldPose();
 
       // Apply position noise before converting to global frame
       gpsPose.pos.x = this->horizontalPositionNoise->Apply(gpsPose.pos.x);
@@ -127,7 +128,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
       gpsPose.pos.z = this->verticalPositionNoise->Apply(gpsPose.pos.z);
 
       // Convert to global frames
-      math::Vector3 spherical = this->sphericalCoordinates->
+      ignition::math::Vector3 spherical = this->sphericalCoordinates->
         SphericalFromLocal(gpsPose.pos);
       this->lastGpsMsg.set_latitude_deg(spherical.x);
       this->lastGpsMsg.set_longitude_deg(spherical.y);
@@ -136,7 +137,7 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 
     // Measure velocity and apply noise
     {
-      math::Vector3 gpsVelocity =
+      ignition::math::Vector3 gpsVelocity =
         this->parentLink->GetWorldLinearVel(this->pose.pos);
 
       // Convert to global frame
@@ -162,17 +163,17 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLongitude() const
+ignition::math::Angle GpsSensor::GetLongitude() const
 {
-  math::Angle angle;
+  ignition::math::Angle angle;
   angle.SetFromDegree(this->lastGpsMsg.longitude_deg());
   return angle;
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLatitude() const
+ignition::math::Angle GpsSensor::GetLatitude() const
 {
-  math::Angle angle;
+  ignition::math::Angle angle;
   angle.SetFromDegree(this->lastGpsMsg.latitude_deg());
   return angle;
 }

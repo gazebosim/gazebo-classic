@@ -16,8 +16,8 @@
 */
 
 #include <boost/thread/mutex.hpp>
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
@@ -58,7 +58,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   if (_name.empty())
   {
     if (g_worlds.empty())
-      gzerr << "no worlds\n";
+      ignerr << "no worlds\n";
     else
       return *(g_worlds.begin());
   }
@@ -72,9 +72,9 @@ physics::WorldPtr physics::get_world(const std::string &_name)
     }
   }
 
-  gzerr << "Unable to find world by name in physics::get_world["
+  ignerr << "Unable to find world by name in physics::get_world["
     << _name.c_str() << "]\n";
-  gzthrow("Unable to find world by name in physics::get_world(world_name)");
+  ignthrow("Unable to find world by name in physics::get_world(world_name)");
 }
 
 /////////////////////////////////////////////////

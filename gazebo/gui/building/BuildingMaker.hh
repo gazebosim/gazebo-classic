@@ -23,7 +23,7 @@
 #include <map>
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
@@ -143,7 +143,8 @@ namespace gazebo
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
       /// \return Size in metric units.
-      public: static math::Vector3 ConvertSize(const QVector3D &_size);
+      public: static ignition::math::Vector3 ConvertSize(
+                  const QVector3D &_size);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -151,15 +152,15 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height in pixels.
       /// \return Size in metric units.
-      public: static math::Vector3 ConvertSize(double _width, double _depth,
-          double _height);
+      public: static ignition::math::Vector3 ConvertSize(
+                  double _width, double _depth, double _height);
 
       /// \brief Helper method to convert pose from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _pos Position in pixels.
       /// \param[in] _rot Rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
-      public: static math::Pose ConvertPose(const QVector3D &_pos,
+      public: static ignition::math::Pose ConvertPose(const QVector3D &_pos,
           const QVector3D &_rot);
 
       /// \brief Helper method to convert pose from editor coordinate system
@@ -171,8 +172,9 @@ namespace gazebo
       /// \param[in] _pitch Pitch rotation in degrees.
       /// \param[in] _yaw Yaw rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
-      public: static math::Pose ConvertPose(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
+      public: static ignition::math::Pose ConvertPose(
+                  double _x, double _y, double _z,
+                  double _roll, double _pitch, double _yaw);
 
       /// \param[in] _value Convert a value from pixels to metric units
       /// \param[in] _value Value in pixels.
@@ -273,7 +275,7 @@ namespace gazebo
       private: rendering::VisualPtr modelVisual;
 
       /// \brief The pose of the building model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose modelPose;
 
       /// \brief Counter for the number of walls in the model.
       private: int wallCounter;
@@ -297,7 +299,7 @@ namespace gazebo
       private: std::string saveLocation;
 
       /// \brief A list of gui editor events connected to the building maker.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Default name of building model
       private: std::string buildingDefaultName;

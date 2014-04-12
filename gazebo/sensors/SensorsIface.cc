@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/transport/TransportIface.hh"
 
@@ -52,7 +52,7 @@ bool sensors::init()
   // The rendering engine will run headless
   if (!gazebo::rendering::init())
   {
-    gzthrow("Unable to intialize the rendering engine");
+    ignthrow("Unable to intialize the rendering engine");
     return false;
   }
 
@@ -81,7 +81,7 @@ std::string sensors::create_sensor(sdf::ElementPtr _elem,
     return "";
 
   SensorPtr parentSensor = get_sensor(_parentName);
-  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
+  IGN_ASSERT(parentSensor, "Unable to get parent sensor");
 
   return create_sensor(_elem, _worldName, _parentName, parentSensor->GetId());
 }

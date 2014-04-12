@@ -18,7 +18,7 @@
 #define _VIEWCONTROLLER_HH_
 
 #include <string>
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
@@ -44,7 +44,7 @@ namespace gazebo
 
       /// \brief Initialize with a focus point.
       /// \param[in] _focalPoint The point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      public: virtual void Init(const ignition::math::Vector3 &_focalPoint);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.
@@ -57,7 +57,7 @@ namespace gazebo
       /// \brief Handle a mouse event.
       /// \param[in] _event The mouse position.
       public: virtual void HandleMouseEvent(
-                  const common::MouseEvent &_event) = 0;
+                  const ignition::common::MouseEvent &_event) = 0;
 
       /// \brief Handle a key release event.
       /// \param[in] _key The key that was released.

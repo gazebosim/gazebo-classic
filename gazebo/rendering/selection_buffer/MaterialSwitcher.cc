@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/rendering/selection_buffer/MaterialSwitcher.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -26,7 +26,7 @@ using namespace rendering;
 MaterialSwitcher::MaterialSwitcher()
 : lastTechnique(NULL)
 {
-  this->currentColor = common::Color(0.0, 0.0, 0.1);
+  this->currentColor = ignition::common::Color(0.0, 0.0, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -106,19 +106,19 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       return this->lastTechnique;
     }
     // else
-    //    gzerr << "Object is not a SubEntity["
+    //    ignerr << "Object is not a SubEntity["
     //          << _rend->getMaterial()->getName() << "] Type[" <<
     //          typeid(*_rend).name() << "]\n";
   }
   // else
-  //  gzerr << "Rendering scheme without a Renderable: " << _schemeName
+  //  ignerr << "Rendering scheme without a Renderable: " << _schemeName
   //        << ", " + _originalMaterial->getName() << std::endl;
   return NULL;
 }
 
 /////////////////////////////////////////////////
 const std::string &MaterialSwitcher::GetEntityName(
-    const common::Color &_color) const
+    const ignition::common::Color &_color) const
 {
   ColorMapConstIter iter = this->colorDict.find(_color.GetAsRGBA());
 
@@ -131,7 +131,7 @@ const std::string &MaterialSwitcher::GetEntityName(
 /////////////////////////////////////////////////
 void MaterialSwitcher::GetNextColor()
 {
-  common::Color::ARGB color = this->currentColor.GetAsARGB();
+  ignition::common::Color::ARGB color = this->currentColor.GetAsARGB();
   color++;
   this->currentColor.SetFromARGB(color);
 }
@@ -139,7 +139,7 @@ void MaterialSwitcher::GetNextColor()
 /////////////////////////////////////////////////
 void MaterialSwitcher::Reset()
 {
-  this->currentColor = common::Color(0.0, 0.0, 0.1);
+  this->currentColor = ignition::common::Color(0.0, 0.0, 0.1);
   this->lastEntity.clear();
   this->colorDict.clear();
 }

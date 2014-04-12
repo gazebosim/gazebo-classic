@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 
@@ -106,13 +106,13 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose childPose = _sdf->Get<ignition::math::Pose>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+    childPose = _sdf->GetElement("child")->Get<ignition::math::Pose>("pose");
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
-  math::Pose parentPose;
+  ignition::math::Pose parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
     this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
@@ -209,12 +209,12 @@ void SimbodyJoint::CacheForceTorque()
   SimTK::Vec3 reactionForceOnParentBody =
     ~R_GP * spatialForceOnParentBodyInGround[1];
 
-  // gzerr << "parent[" << this->GetName()
+  // ignerr << "parent[" << this->GetName()
   //       << "]: t[" << reactionTorqueOnParentBody
   //       << "] f[" << reactionForceOnParentBody
   //       << "]\n";
 
-  // gzerr << "child[" << this->GetName()
+  // ignerr << "child[" << this->GetName()
   //       << "]: t[" << reactionTorqueOnChildBody
   //       << "] f[" << reactionForceOnChildBody
   //       << "]\n";
@@ -266,9 +266,10 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
+void SimbodyJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &/*_axis*/)
 {
-  math::Pose parentModelPose;
+  ignition::math::Pose parentModelPose;
   if (this->parentLink)
     parentModelPose = this->parentLink->GetModel()->GetWorldPose();
 
@@ -276,15 +277,15 @@ void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+  ignition::math::Vector3 axis = parentModelPose.rot.RotateVector(
+      this->sdf->GetElement("axis")->Get<ignition::math::Vector3>("xyz"));
 
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
   else if (_index == 1)
     this->sdf->GetElement("axis2")->GetElement("xyz")->Set(axis);
   else
-    gzerr << "SetAxis index [" << _index << "] out of bounds\n";
+    ignerr << "SetAxis index [" << _index << "] out of bounds\n";
 }
 
 //////////////////////////////////////////////////
@@ -314,7 +315,7 @@ double SimbodyJoint::GetForce(unsigned int _index)
   }
   else
   {
-    gzerr << "Invalid joint index [" << _index
+    ignerr << "Invalid joint index [" << _index
           << "] when trying to get force\n";
     return 0;
   }
@@ -337,7 +338,7 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
     this->forceApplied[_index] += _force;
   }
   else
-    gzerr << "Something's wrong, joint [" << this->GetName()
+    ignerr << "Something's wrong, joint [" << this->GetName()
           << "] index [" << _index
           << "] out of range.\n";
 }
@@ -356,9 +357,9 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+    const ignition::math::Vector3 & /*_anchor*/)
 {
-  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+  igndbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
@@ -372,7 +373,7 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
   }
   else
   {
-     gzerr << "SimbodyJoint::SetDamping: index[" << _index
+     ignerr << "SimbodyJoint::SetDamping: index[" << _index
            << "] is out of bounds (GetAngleCount() = "
            << this->GetAngleCount() << ").\n";
      return;
@@ -389,7 +390,7 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
   }
   else
   {
-     gzerr << "SimbodyJoint::SetStiffness: index[" << _index
+     ignerr << "SimbodyJoint::SetStiffness: index[" << _index
            << "] is out of bounds (GetAngleCount() = "
            << this->GetAngleCount() << ").\n";
      return;
@@ -412,52 +413,54 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
       _damping);
 
     /// \TODO: add spring force element
-    gzdbg << "Joint [" << this->GetName()
+    igndbg << "Joint [" << this->GetName()
            << "] stiffness not implement in Simbody\n";
   }
   else
-    gzerr << "SetStiffnessDamping _index too large.\n";
+    ignerr << "SetStiffnessDamping _index too large.\n";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
-  return math::Vector3();
+  igndbg << "Not implement in Simbody\n";
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyJoint::GetLinkForce(
+    unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
-  return math::Vector3();
+  igndbg << "Not implement in Simbody\n";
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyJoint::GetLinkTorque(
+    unsigned int /*_index*/) const
 {
-  gzdbg << "Not implement in Simbody\n";
-  return math::Vector3();
+  igndbg << "Not implement in Simbody\n";
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
     double /*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  igndbg << "Not implement in Simbody\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAttribute(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  igndbg << "Not implement in Simbody\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyJoint::GetAttribute(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
-  gzdbg << "Not implement in Simbody\n";
+  igndbg << "Not implement in Simbody\n";
   return 0;
 }

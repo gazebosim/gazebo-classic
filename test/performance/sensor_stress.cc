@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/PhysicsIface.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -59,7 +59,7 @@ TEST_F(SensorStress_TEST, ResetWorldStressTest)
   // set update rate to unlimited
   double updateRate = 0.0;
   sensor->SetUpdateRate(updateRate);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
+  igndbg << sensor->GetScopedName() << " loaded with update rate of "
         << sensor->GetUpdateRate() << " Hz\n";
 
   g_hokuyoMsgCount = 0;
@@ -75,7 +75,7 @@ TEST_F(SensorStress_TEST, ResetWorldStressTest)
     boost::mutex countMutex;
     boost::mutex::scoped_lock lock(countMutex);
     g_countCondition.wait(lock);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
+    igndbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
   }
 
   EXPECT_GT(g_hokuyoMsgCount, 19u);
@@ -89,14 +89,14 @@ TEST_F(SensorStress_TEST, ResetWorldStressTest)
   msg.mutable_reset()->set_all(true);
   worldControlPub->Publish(msg);
 
-  common::Time::MSleep(300);
+  ignition::common::Time::MSleep(300);
 
   int i;
   for (i = 0; i < 20; ++i)
   {
     worldControlPub->Publish(msg);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
-    common::Time::MSleep(200);
+    igndbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
+    ignition::common::Time::MSleep(200);
   }
 }
 

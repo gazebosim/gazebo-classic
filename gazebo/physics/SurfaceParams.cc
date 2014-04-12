@@ -19,7 +19,7 @@
  * Date: 30 July 2003
  */
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -41,12 +41,12 @@ SurfaceParams::~SurfaceParams()
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    ignerr << "Surface _sdf is NULL" << std::endl;
   else
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
     if (!contactElem)
-      gzerr << "Surface contact sdf member is NULL" << std::endl;
+      ignerr << "Surface contact sdf member is NULL" << std::endl;
     else
     {
       this->collideWithoutContact =

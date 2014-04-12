@@ -30,28 +30,28 @@ class BandwidthTest : public ServerFixture,
 
 boost::mutex g_mutex;
 std::vector<int> g_bwBytes;
-std::vector<common::Time> g_bwTime;
+std::vector<ignition::common::Time> g_bwTime;
 
 
 void BandwidthMsg(const std::string &_msg)
 {
   boost::mutex::scoped_lock lock(g_mutex);
   g_bwBytes.push_back(_msg.size());
-  g_bwTime.push_back(common::Time::GetWallTime());
+  g_bwTime.push_back(ignition::common::Time::GetWallTime());
 }
 
 void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+    ignerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
     return;
   }
 
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support closed loops in PR2, "
+    ignerr << "Abort test since dart does not support closed loops in PR2, "
           << "Please see issue #913. "
           << "(https://bitbucket.org/osrf/gazebo/issue/913)\n";
     return;
@@ -68,7 +68,7 @@ void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 
   while (true)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     {
       boost::mutex::scoped_lock lock(g_mutex);
       if (g_bwBytes.size() >= 100)
@@ -77,7 +77,7 @@ void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 
         float sumSize = 0;
         unsigned int count = g_bwBytes.size();
-        common::Time dt = g_bwTime[count - 1] - g_bwTime[0];
+        ignition::common::Time dt = g_bwTime[count - 1] - g_bwTime[0];
 
         for (unsigned int i = 0; i < count; ++i)
           sumSize += g_bwBytes[i];

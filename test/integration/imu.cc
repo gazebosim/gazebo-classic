@@ -15,9 +15,10 @@
  *
 */
 
+#include <ignition/common.hh>
+#include <gazebo/common/common.hh>
 #include "ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
 #include "helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
@@ -30,14 +31,16 @@ class ImuTest : public ServerFixture,
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);
   public: void Stationary_EmptyWorld_Bias(const std::string &_physicsEngine);
-  private: void GetGravity(const math::Quaternion& _rot, math::Vector3 &_g);
+  private: void GetGravity(const ignition::math::Quaternion& _rot,
+               ignition::math::Vector3 &_g);
   private: void GetImuData(sensors::ImuSensorPtr _imu, unsigned int _cnt,
-                           math::Vector3 &_rateMean,
-                           math::Vector3 &_accelMean,
-                           math::Quaternion &_orientation);
+                           ignition::math::Vector3 &_rateMean,
+                           ignition::math::Vector3 &_accelMean,
+                           ignition::math::Quaternion &_orientation);
 };
 
-void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
+void ImuTest::GetGravity(const ignition::math::Quaternion &_rot,
+    ignition::math::Vector3 &_g)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
@@ -49,24 +52,24 @@ void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 
 void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
                          unsigned int _cnt,
-                         math::Vector3 &_rateMean,
-                         math::Vector3 &_accelMean,
-                         math::Quaternion& _orientation)
+                         ignition::math::Vector3 &_rateMean,
+                         ignition::math::Vector3 &_accelMean,
+                         ignition::math::Quaternion& _orientation)
 {
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
   // Collect a number of samples and return the average rate and accel values
-  math::Vector3 rateSum, accelSum;
+  ignition::math::Vector3 rateSum, accelSum;
   for (unsigned int i = 0; i < _cnt; ++i)
   {
     world->Step(1);
 
     int j = 0;
-    while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&
+    while (_imu->GetLastMeasurementTime() == ignition::common::Time::Zero &&
         j < 100)
     {
       _imu->Update(true);
-      gazebo::common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
       ++j;
     }
 
@@ -85,7 +88,7 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   // static models not fully working in simbody yet
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #860.\n";
+    ignerr << "Aborting test for Simbody, see issue #860.\n";
     return;
   }
 
@@ -93,8 +96,8 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";
-  math::Pose testPose(math::Vector3(0, 0, 0.05),
-      math::Quaternion(0.5, -1.0, 0.2));
+  ignition::math::Pose testPose(ignition::math::Vector3(0, 0, 0.05),
+      ignition::math::Quaternion(0.5, -1.0, 0.2));
 
   SpawnImuSensor(modelName, imuSensorName, testPose.pos,
       testPose.rot.GetAsEuler());
@@ -105,15 +108,15 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3 rateMean, accelMean;
+  ignition::math::Quaternion orientation;
   this->GetImuData(imu, 1, rateMean, accelMean, orientation);
 
   EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
   EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
   EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
 
-  math::Vector3 g;
+  ignition::math::Vector3 g;
   this->GetGravity(testPose.rot, g);
   EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
   EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
@@ -137,7 +140,7 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   // static models not fully working in simbody yet
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #860.\n";
+    ignerr << "Aborting test for Simbody, see issue #860.\n";
     return;
   }
 
@@ -145,8 +148,8 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";
-  math::Pose testPose(math::Vector3(0, 0, 0.05),
-      math::Quaternion(0.3, -1.4, 2.0));
+  ignition::math::Pose testPose(ignition::math::Vector3(0, 0, 0.05),
+      ignition::math::Quaternion(0.3, -1.4, 2.0));
 
   double rateNoiseMean = 1.0;
   double rateNoiseStddev = 0.1;
@@ -169,8 +172,8 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3 rateMean, accelMean;
+  ignition::math::Quaternion orientation;
   this->GetImuData(imu, 1000, rateMean, accelMean, orientation);
 
   double d1, d2;
@@ -189,7 +192,7 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
-  math::Vector3 g;
+  ignition::math::Vector3 g;
   this->GetGravity(testPose.rot, g);
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
@@ -224,7 +227,7 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   // static models not fully working in simbody yet
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #860.\n";
+    ignerr << "Aborting test for Simbody, see issue #860.\n";
     return;
   }
 
@@ -232,8 +235,8 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";
-  math::Pose testPose(math::Vector3(0, 0, 0.05),
-      math::Quaternion(-0.3, 0.5, 1.0));
+  ignition::math::Pose testPose(ignition::math::Vector3(0, 0, 0.05),
+      ignition::math::Quaternion(-0.3, 0.5, 1.0));
 
   double rateNoiseMean = 0.0;
   double rateNoiseStddev = 0.0;
@@ -256,8 +259,8 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
 
   ASSERT_TRUE(imu);
   imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
+  ignition::math::Vector3 rateMean, accelMean;
+  ignition::math::Quaternion orientation;
   this->GetImuData(imu, 1000, rateMean, accelMean, orientation);
 
   double d1, d2;
@@ -276,7 +279,7 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
   EXPECT_NEAR(0.0, std::min(d1, d2),
               3*rateNoiseStddev + 3*rateBiasStddev);
 
-  math::Vector3 g;
+  ignition::math::Vector3 g;
   this->GetGravity(testPose.rot, g);
   // Have to account for the fact that the bias might be sampled as positive
   // or negative
@@ -312,7 +315,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

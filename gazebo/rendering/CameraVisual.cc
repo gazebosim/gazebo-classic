@@ -84,17 +84,17 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3(dist, width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3(dist, -width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3(dist, -width*0.5, -height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3(dist, width*0.5, -height*0.5));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -108,13 +108,13 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
     this->parent->AttachVisual(shared_from_this());
 
   this->connections.push_back(
-      event::Events::ConnectRender(
+      common::Events::ConnectRender(
       boost::bind(&CameraVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
 void CameraVisual::Update()
-{ 
+{
   if (!this->camera)
     return;
 

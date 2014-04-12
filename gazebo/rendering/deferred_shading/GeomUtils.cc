@@ -19,7 +19,7 @@
 #include <OgreSubMesh.h>
 #include <OgreHardwareBufferManager.h>
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/rendering/deferred_shading/GeomUtils.hh"
 
 using namespace gazebo;
@@ -58,7 +58,7 @@ void GeomUtils::CreateSphere(Ogre::VertexData *&_vertexData,
 {
   if (!_vertexData || !_indexData)
   {
-    gzerr << "Invalid vertex or index data\n";
+    ignerr << "Invalid vertex or index data\n";
     return;
   }
 
@@ -166,7 +166,7 @@ void GeomUtils::CreateQuad(Ogre::VertexData *&_vertexData)
 {
   if (!_vertexData)
   {
-    gzerr << "Invalid vertex data\n";
+    ignerr << "Invalid vertex data\n";
     return;
   }
 
@@ -233,7 +233,7 @@ void GeomUtils::CreateCone(Ogre::VertexData *&_vertexData,
 {
   if (!_vertexData || !_indexData)
   {
-    gzerr << "Inavlid vertex or index data\n";
+    ignerr << "Inavlid vertex or index data\n";
     return;
   }
 

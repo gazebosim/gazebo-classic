@@ -404,7 +404,7 @@ void Publication::RemovePublisher(PublisherPtr _pub)
 {
   boost::mutex::scoped_lock lock(this->callbackMutex);
 
-  GZ_ASSERT(_pub, "Received a NULL PublisherPtr");
+  IGN_ASSERT(_pub, "Received a NULL PublisherPtr");
 
   // Find the publiser
   std::vector<PublisherPtr>::iterator iter = std::find(

@@ -28,12 +28,12 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Image.hh"
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/gzmath.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Image.hh"
+#include "ignition/common/CommonIface.hh"
+#include "ignition/common/SphericalCoordinates.hh"
+#include "ignition/math.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/transport/transport.hh"
@@ -82,12 +82,13 @@ int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
 {
   if (this->img.Load(_filename) != 0)
   {
-    gzerr << "Unable to load an image as a terrain [" << _filename << "]\n";
+    ignerr << "Unable to load an image as a terrain [" << _filename << "]\n";
     return -1;
   }
 
-  this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  this->heightmapData = static_cast<ignition::common::HeightmapData*>(
+      &this->img);
+  this->heightmapSize = this->sdf->Get<ignition::math::Vector3>("size");
 
   return 0;
 }
@@ -98,13 +99,13 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 {
   if (this->dem.Load(_filename) != 0)
   {
-    gzerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
+    ignerr << "Unable to load a DEM file as a terrain [" << _filename << "]\n";
     return -1;
   }
 
   if (this->sdf->HasElement("size"))
   {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    this->heightmapSize = this->sdf->Get<ignition::math::Vector3>("size");
   }
   else
   {
@@ -123,7 +124,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (sphericalCoordinates)
   {
-    math::Angle latitude, longitude;
+    ignition::math::Angle latitude, longitude;
     double elevation;
 
     this->dem.GetGeoReferenceOrigin(latitude, longitude);
@@ -135,7 +136,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
     sphericalCoordinates.reset();
   }
   else
-    gzerr << "Unable to get a valid SphericalCoordinates pointer\n";
+    ignerr << "Unable to get a valid SphericalCoordinates pointer\n";
 
   return 0;
 }
@@ -151,7 +152,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
 
   if (!poDataset)
   {
-    gzerr << "Unrecognized terrain format in file [" << _filename << "]\n";
+    ignerr << "Unrecognized terrain format in file [" << _filename << "]\n";
     return -1;
   }
 
@@ -183,25 +184,26 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 {
   Base::Load(_sdf);
 
-  std::string filename = common::find_file(this->sdf->Get<std::string>("uri"));
+  std::string filename = ignition::common::find_file(
+      this->sdf->Get<std::string>("uri"));
   if (filename.empty())
   {
-    gzerr << "Unable to find heightmap[" +
+    ignerr << "Unable to find heightmap[" +
              this->sdf->Get<std::string>("uri") + "]\n";
     return;
   }
 
   if (LoadTerrainFile(filename) != 0)
   {
-    gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
+    ignerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
   }
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
-    gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
+    ignerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
   }
 }
@@ -224,14 +226,14 @@ void HeightmapShape::Init()
 
   this->subSampling = 2;
 
-  math::Vector3 terrainSize = this->GetSize();
+  ignition::math::Vector3 terrainSize = this->GetSize();
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
   this->scale.x = terrainSize.x / this->vertSize;
   this->scale.y = terrainSize.y / this->vertSize;
 
-  if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
+  if (ignition::math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
     this->scale.z = fabs(terrainSize.z);
   else
     this->scale.z = fabs(terrainSize.z) /
@@ -243,7 +245,7 @@ void HeightmapShape::Init()
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::SetScale(const math::Vector3 &_scale)
+void HeightmapShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -258,15 +260,15 @@ std::string HeightmapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetSize() const
+ignition::math::Vector3 HeightmapShape::GetSize() const
 {
   return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetPos() const
+ignition::math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->sdf->Get<ignition::math::Vector3>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -294,13 +296,13 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
-  gzerr << "TODO: not implement yet.";
+  ignerr << "TODO: not implement yet.";
 }
 
 //////////////////////////////////////////////////
-math::Vector2i HeightmapShape::GetVertexCount() const
+ignition::math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->vertSize, this->vertSize);
+  return ignition::math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////
@@ -315,7 +317,7 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
-  float max = GZ_FLT_MIN;
+  float max = IGN_FLT_MIN;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -328,7 +330,7 @@ float HeightmapShape::GetMaxHeight() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMinHeight() const
 {
-  float min = GZ_FLT_MAX;
+  float min = IGN_FLT_MAX;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)
@@ -339,7 +341,7 @@ float HeightmapShape::GetMinHeight() const
 }
 
 //////////////////////////////////////////////////
-common::Image HeightmapShape::GetImage() const
+ignition::common::Image HeightmapShape::GetImage() const
 {
   double height = 0.0;
   unsigned char *imageData = NULL;
@@ -369,16 +371,16 @@ common::Image HeightmapShape::GetImage() const
       // Normalize height value
       height = (this->GetHeight(sx, sy) - minHeight) / maxHeight;
 
-      GZ_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
-      GZ_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
+      IGN_ASSERT(height <= 1.0, "Normalized terrain height > 1.0");
+      IGN_ASSERT(height >= 0.0, "Normalized terrain height < 0.0");
 
       // Scale height to a value between 0 and 255
       imageData[y * size + x] = static_cast<unsigned char>(height * 255.0);
     }
   }
 
-  common::Image result;
-  result.SetFromData(imageData, size, size, common::Image::L_INT8);
+  ignition::common::Image result;
+  result.SetFromData(imageData, size, size, ignition::common::Image::L_INT8);
 
   delete [] imageData;
   return result;

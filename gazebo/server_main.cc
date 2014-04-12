@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/Server.hh"
 
 //////////////////////////////////////////////////
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
   {
     // Initialize the informational logger. This will log warnings, and
     // errors.
-    gzLogInit("gzserver.log");
+    ignLogInit("gzserver.log");
 
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     delete server;
   }
-  catch(gazebo::common::Exception &_e)
+  catch(ignition::common::Exception &_e)
   {
     _e.Print();
 

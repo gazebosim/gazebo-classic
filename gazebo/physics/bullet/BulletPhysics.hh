@@ -139,7 +139,7 @@ namespace gazebo
                                        InertialPtr _inertial);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3 &_gravity);
 
       // Documentation inherited
       public: virtual void SetWorldCFM(double _cfm);
@@ -183,7 +183,7 @@ namespace gazebo
       private: btSequentialImpulseConstraintSolver *solver;
       private: btDiscreteDynamicsWorld *dynamicsWorld;
 
-      private: common::Time lastUpdateTime;
+      private: ignition::common::Time lastUpdateTime;
 
       /// \brief The type of the solver.
       private: std::string solverType;

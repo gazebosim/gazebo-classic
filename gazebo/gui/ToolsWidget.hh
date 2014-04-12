@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -58,7 +58,7 @@ namespace gazebo
       private: JointControlWidget *jointControlWidget;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
     };
     /// \}
   }

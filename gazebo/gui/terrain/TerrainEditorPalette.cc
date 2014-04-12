@@ -262,7 +262,7 @@ void TerrainEditorPalette::OnSave()
 
   // Get a pointer to the heightmap, if the scen is valid.
   rendering::Heightmap *heightmap = scene ? scene->GetHeightmap() : NULL;
-  common::Image img = heightmap->GetImage();
+  ignition::common::Image img = heightmap->GetImage();
 
   // Get a filename to save to.
   std::string filename = QFileDialog::getSaveFileName(this,
@@ -277,9 +277,10 @@ void TerrainEditorPalette::OnSave()
 }
 
 /////////////////////////////////////////////////
-bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
+bool TerrainEditorPalette::OnMousePress(
+    const ignition::common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != ignition::common::MouseEvent::LEFT)
     return false;
 
   bool handled = false;
@@ -305,9 +306,10 @@ bool TerrainEditorPalette::OnMousePress(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
+bool TerrainEditorPalette::OnMouseMove(
+    const ignition::common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != ignition::common::MouseEvent::LEFT)
     return false;
 
   bool handled = false;
@@ -332,7 +334,7 @@ bool TerrainEditorPalette::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool TerrainEditorPalette::Apply(const common::MouseEvent &_event,
+bool TerrainEditorPalette::Apply(const ignition::common::MouseEvent &_event,
     rendering::CameraPtr _camera, rendering::Heightmap *_heightmap)
 {
   bool handled = false;

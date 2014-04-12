@@ -113,7 +113,7 @@ void TextView::OnText(const std::string &_msg)
   boost::mutex::scoped_lock lock(this->mutex);
 
   // Update the Hz and Bandwidth info.
-  this->OnMsg(common::Time::GetWallTime(), _msg.size());
+  this->OnMsg(ignition::common::Time::GetWallTime(), _msg.size());
 
   // Convert the raw data to a message.
   this->msg->ParseFromString(_msg);

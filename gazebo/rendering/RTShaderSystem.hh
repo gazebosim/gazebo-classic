@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- * Date: 27 Jan 2010
- */
-
-#ifndef _RTSHADERSYSTEM_HH_
-#define _RTSHADERSYSTEM_HH_
+#ifndef _GAZEBO_RTSHADERSYSTEM_HH_
+#define _GAZEBO_RTSHADERSYSTEM_HH_
 
 #include <list>
 #include <string>
@@ -30,7 +25,7 @@
 #include "gazebo/gazebo_config.h"
 
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -47,7 +42,7 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class RTShaderSystem : public SingletonT<RTShaderSystem>
+    class RTShaderSystem : public ignition::common::SingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.

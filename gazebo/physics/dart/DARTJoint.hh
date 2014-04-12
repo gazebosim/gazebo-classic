@@ -21,7 +21,7 @@
 #include <boost/any.hpp>
 #include <string>
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(unsigned int /*_index*/,
-                                     const gazebo::math::Vector3 &/*_anchor*/);
+                  const ignition::math::Vector3 &/*_anchor*/);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
@@ -78,23 +78,25 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkForce(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkTorque(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key,
@@ -153,7 +155,7 @@ namespace gazebo
 
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
+      private: ignition::common::Time forceAppliedTime;
 
       /// \brief DARTPhysics engine pointer
       protected: DARTPhysicsPtr dartPhysicsEngine;

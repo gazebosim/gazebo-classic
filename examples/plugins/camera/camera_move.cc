@@ -38,13 +38,13 @@ namespace gazebo
     // Called by the world update start event
     public: void OnUpdate()
     {
-      math::Vector3 v(0.03, 0, 0);
-      math::Pose pose = this->model->GetWorldPose();
+     ignition::math::Vector3 v(0.03, 0, 0);
+     ignition::math::Pose pose = this->model->GetWorldPose();
       v = pose.rot * v;
 
       // Apply a small linear velocity to the model.
       this->model->SetLinearVel(v);
-      this->model->SetAngularVel(math::Vector3(0, 0, 0.01));
+      this->model->SetAngularVel(ignition::math::Vector3(0, 0, 0.01));
     }
 
     // Pointer to the model

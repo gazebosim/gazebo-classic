@@ -251,7 +251,7 @@ void Position3dInterface::Subscribe()
     // std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Position3d Interface\n"
       << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

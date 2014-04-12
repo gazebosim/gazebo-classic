@@ -21,8 +21,8 @@
 #include <string>
 #include <list>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 
@@ -91,12 +91,12 @@ namespace gazebo
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
       public: template<typename T>
-              event::ConnectionPtr ConnectUpdate(T _subscriber)
+              ignition::common::ConnectionPtr ConnectUpdate(T _subscriber)
               {return update.Connect(_subscriber);}
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
+      public: void DisconnectUpdate(ignition::common::ConnectionPtr &_conn)
               {update.Disconnect(_conn);}
 
       /// \brief Callback for contact messages from the physics engine.
@@ -130,7 +130,7 @@ namespace gazebo
       private: ContactMsgs_L incomingContacts;
 
       /// \brief Pose of the sonar shape's midpoint.
-      private: math::Pose sonarMidPose;
+      private: ignition::math::Pose sonarMidPose;
 
       /// \brief Minimum range
       private: double rangeMin;
@@ -142,7 +142,7 @@ namespace gazebo
       private: double radius;
 
       /// \brief Update event.
-      protected: event::EventT<void(msgs::SonarStamped)> update;
+      protected: ignition::common::EventT<void(msgs::SonarStamped)> update;
     };
     /// \}
   }

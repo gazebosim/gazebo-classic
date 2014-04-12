@@ -17,32 +17,30 @@
 #include "gazebo/common/Events.hh"
 
 using namespace gazebo;
-using namespace event;
+using namespace common;
 
-EventT<void (bool)> Events::pause;
-EventT<void ()> Events::step;
-EventT<void ()> Events::stop;
-EventT<void ()> Events::sigInt;
-
-EventT<void (std::string)> Events::worldCreated;
-EventT<void (std::string)> Events::entityCreated;
-EventT<void (std::string, std::string)> Events::setSelectedEntity;
-EventT<void (std::string)> Events::addEntity;
-EventT<void (std::string)> Events::deleteEntity;
-
-EventT<void (const common::UpdateInfo &)> Events::worldUpdateBegin;
-
-EventT<void ()> Events::worldUpdateEnd;
-
-EventT<void ()> Events::preRender;
-EventT<void ()> Events::render;
-EventT<void ()> Events::postRender;
-
-EventT<void (std::string)> Events::diagTimerStart;
-EventT<void (std::string)> Events::diagTimerStop;
+ignition::common::EventT<void (bool)> Events::pause;
+ignition::common::EventT<void ()> Events::step;
+ignition::common::EventT<void ()> Events::stop;
+ignition::common::EventT<void ()> Events::sigInt;
+ignition::common::EventT<void (std::string)> Events::worldCreated;
+ignition::common::EventT<void (std::string)> Events::entityCreated;
+ignition::common::EventT<
+void(std::string, std::string)> Events::setSelectedEntity;
+ignition::common::EventT<void (std::string)> Events::addEntity;
+ignition::common::EventT<void (std::string)> Events::deleteEntity;
+ignition::common::EventT<
+void(const gazebo::common::UpdateInfo &)> Events::worldUpdateBegin;
+ignition::common::EventT<void ()> Events::worldUpdateEnd;
+ignition::common::EventT<void ()> Events::preRender;
+ignition::common::EventT<void ()> Events::render;
+ignition::common::EventT<void ()> Events::postRender;
+ignition::common::EventT<void (std::string)> Events::diagTimerStart;
+ignition::common::EventT<void (std::string)> Events::diagTimerStop;
 
 /////////////////////////////////////////////////
-void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
+void Events::DisconnectWorldUpdateBegin(
+    ignition::common::ConnectionPtr _subscriber)
 {
   worldUpdateBegin.Disconnect(_subscriber);
 }

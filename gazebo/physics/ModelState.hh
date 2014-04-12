@@ -25,7 +25,7 @@
 #include <string>
 #include <boost/regex.hpp>
 
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
@@ -58,8 +58,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
-      public: ModelState(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: ModelState(const ModelPtr _model,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Constructor.
       ///
@@ -84,8 +85,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
-      public: void Load(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: void Load(const ModelPtr _model,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       ///
@@ -94,8 +96,8 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The math::Pose of the Model.
-      public: const math::Pose &GetPose() const;
+      /// \return The ignition::math::Pose of the Model.
+      public: const ignition::math::Pose &GetPose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -125,7 +127,7 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _linkName Name of the LinkState
       /// \return State of the Link.
-      /// \throws common::Exception When _linkName is invalid.
+      /// \throws ignition::common::Exception When _linkName is invalid.
       public: LinkState GetLinkState(const std::string &_linkName) const;
 
       /// \brief Return true if there is a link with the specified name.
@@ -149,7 +151,7 @@ namespace gazebo
       /// 0...ModelState::GetJointStateCount().
       /// \param[in] _index Index of a JointState.
       /// \return State of a Joint.
-      /// \throws common::Exception When _index is out of range.
+      /// \throws ignition::common::Exception When _index is out of range.
       public: JointState GetJointState(unsigned int _index) const;
 
       /// \brief Get a Joint state by Joint name.
@@ -158,7 +160,7 @@ namespace gazebo
       /// matching name, if any.
       /// \param[in] _jointName Name of the JointState.
       /// \return State of the Joint.
-      /// \throws common::Exception When _jointName is invalid.
+      /// \throws ignition::common::Exception When _jointName is invalid.
       public: JointState GetJointState(const std::string &_jointName) const;
 
       /// \brief Get the joint states.
@@ -177,15 +179,15 @@ namespace gazebo
       /// \brief Set the wall time when this state was generated
       /// \param[in] _time The absolute clock time when the State
       /// data was recorded.
-      public: virtual void SetWallTime(const common::Time &_time);
+      public: virtual void SetWallTime(const ignition::common::Time &_time);
 
       /// \brief Set the real time when this state was generated
       /// \param[in] _time Clock time since simulation was stated.
-      public: virtual void SetRealTime(const common::Time &_time);
+      public: virtual void SetRealTime(const ignition::common::Time &_time);
 
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
-      public: virtual void SetSimTime(const common::Time &_time);
+      public: virtual void SetSimTime(const ignition::common::Time &_time);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -209,7 +211,7 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::ModelState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        ignition::math::Vector3 q(_state.pose.rot.GetAsEuler());
         _out << std::fixed <<std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
@@ -242,7 +244,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose pose;
 
       /// \brief All the link states.
       private: LinkState_M linkStates;

@@ -17,7 +17,7 @@
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
 
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Vector3.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
@@ -42,7 +42,7 @@ namespace gazebo
       public: virtual ~ODEBoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
+      public: virtual void SetSize(const ignition::math::Vector3 &_size)
       {
         BoxShape::SetSize(_size);
 

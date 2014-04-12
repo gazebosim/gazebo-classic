@@ -15,8 +15,8 @@
  *
  */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/simbody/SimbodyLink.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -49,96 +49,98 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::Init()
 {
-  gzerr << "Not implemented in simbody\n";
+  ignerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented in simbody\n";
+  ignerr << "Not implemented in simbody\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "Not implemented in simbody\n";
+  ignerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented in simbody\n";
+  ignerr << "Not implemented in simbody\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetThreadPitch(unsigned int /*_index*/,
     double /*_threadPitch*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetHighStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
+  const ignition::math::Angle &/*_angle*/)
 {
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetLowStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
+  const ignition::math::Angle &/*_angle*/)
 {
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(unsigned int /*_index*/)
+ignition::math::Angle SimbodyScrewJoint::GetHighStop(unsigned int /*_index*/)
 {
-  return math::Angle();
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(unsigned int /*_index*/)
+ignition::math::Angle SimbodyScrewJoint::GetLowStop(unsigned int /*_index*/)
 {
-  return math::Angle();
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetMaxForce(unsigned int /*_index*/, double /*_force*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyScrewJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyScrewJoint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  ignerr << "SimbodyScrewJoint::GetGlobalAxis not implemented\n";
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyScrewJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  ignerr << "SimbodyScrewJoint::GetAngleImpl not implemented\n";
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "Not implemented in Simbody\n";
+  ignerr << "Not implemented in Simbody\n";
   return 0;
 }

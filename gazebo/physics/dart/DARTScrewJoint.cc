@@ -18,7 +18,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTScrewJoint.hh"
@@ -54,7 +54,8 @@ void DARTScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 DARTScrewJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -67,7 +68,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   // TODO: Issue #494
@@ -77,7 +78,8 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTScrewJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &_axis)
 {
   if (_index == 0)
   {
@@ -93,7 +95,7 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 }
 
@@ -105,7 +107,7 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
   if (_index == 0)
     result = this->dtJoint->getGenCoord(0)->get_dq();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -116,7 +118,7 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_dq(_vel);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -125,7 +127,7 @@ void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
   if (_index == 0)
     this->dartScrewJoint->setPitch(_threadPitch);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -136,15 +138,15 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
   if (_index == 0)
     result = this->dartScrewJoint->getPitch();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (_index == 0)
   {
@@ -153,7 +155,7 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   return result;
@@ -165,7 +167,7 @@ void DARTScrewJoint::SetMaxForce(unsigned int _index, double _force)
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tauMax(_force);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -176,7 +178,7 @@ double DARTScrewJoint::GetMaxForce(unsigned int _index)
   if (_index == 0)
     result = this->dtJoint->getGenCoord(0)->get_tauMax();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -187,5 +189,5 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tau(_effort);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }

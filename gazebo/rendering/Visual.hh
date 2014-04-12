@@ -31,15 +31,16 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/math/Box.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/math/Quaternion.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Vector2d.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 
 namespace Ogre
 {
@@ -168,11 +169,11 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
-      public: math::Vector3 GetScale();
+      public: ignition::math::Vector3 GetScale();
 
       /// \brief Set whether or not to enable or disable lighting.
       /// \param[in] _lighting True to enable lighting.
@@ -188,15 +189,15 @@ namespace gazebo
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
-      public: void SetAmbient(const common::Color &_color);
+      public: void SetAmbient(const ignition::common::Color &_color);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
-      public: void SetDiffuse(const common::Color &_color);
+      public: void SetDiffuse(const ignition::common::Color &_color);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
-      public: void SetSpecular(const common::Color &_color);
+      public: void SetSpecular(const ignition::common::Color &_color);
 
       /// \brief Attach visualization axes
       public: void AttachAxes();
@@ -226,7 +227,7 @@ namespace gazebo
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
-      public: virtual void SetEmissive(const common::Color &_color);
+      public: virtual void SetEmissive(const ignition::common::Color &_color);
 
       /// \brief Set whether the visual should cast shadows.
       /// \param[in] _shadows True to enable shadows.
@@ -246,43 +247,43 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      public: void SetPosition(const math::Vector3 &_pos);
+      public: void SetPosition(const ignition::math::Vector3 &_pos);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
-      public: void SetRotation(const math::Quaternion &_rot);
+      public: void SetRotation(const ignition::math::Quaternion &_rot);
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      public: void SetPose(const math::Pose &_pose);
+      public: void SetPose(const ignition::math::Pose &_pose);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
-      public: math::Vector3 GetPosition() const;
+      public: ignition::math::Vector3 GetPosition() const;
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      public: math::Quaternion GetRotation() const;
+      public: ignition::math::Quaternion GetRotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
-      public: math::Pose GetPose() const;
+      public: ignition::math::Pose GetPose() const;
 
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
-      public: math::Pose GetWorldPose() const;
+      public: ignition::math::Pose GetWorldPose() const;
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const ignition::math::Pose _pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      public: void SetWorldPosition(const ignition::math::Vector3 &_pos);
 
       /// \brief Set the world orientation of the visual
       /// \param[in] _rot Rotation in the world coordinate frame.
-      public: void SetWorldRotation(const math::Quaternion &_rot);
+      public: void SetWorldRotation(const ignition::math::Quaternion &_rot);
 
       /// \brief Return the scene Node of this visual entity.
       /// \return The Ogre scene node.
@@ -315,12 +316,12 @@ namespace gazebo
       /// \param[in] _initialColor The initial color of the ribbon trail.
       /// \param[in] _changeColor Color to change too as the trail grows.
       public: void SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor);
+                  const ignition::common::Color &_initialColor,
+                  const ignition::common::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
-      public: math::Box GetBoundingBox() const;
+      public: ignition::math::Box GetBoundingBox() const;
 
       /// \brief Add a line to the visual.
       /// \param[in] _type The type of line to make.
@@ -354,7 +355,7 @@ namespace gazebo
       /// \param[in] _mesh Pointer to the mesh to insert.
       /// \param[in] _subMesh Name of the mesh within _meshName to insert.
       /// \param[in] _centerSubmesh True to center the submesh.
-      public: static void InsertMesh(const common::Mesh *_mesh,
+      public: static void InsertMesh(const ignition::common::Mesh *_mesh,
                   const std::string &_subMesh = "",
                   bool _centerSubmesh = false);
 
@@ -388,15 +389,17 @@ namespace gazebo
       /// \brief Move to a pose and over a given time.
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
-      public: void MoveToPosition(const math::Pose &_pose, double _time);
+      public: void MoveToPosition(
+                  const ignition::math::Pose &_pose, double _time);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.
       /// \param[in] _time Time it takes the visual to move to the pose.
       /// \param[in] _onComplete Callback used when the move is complete.
-      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time,
-                                   boost::function<void()> _onComplete = NULL);
+      public: void MoveToPositions(
+                  const std::vector<ignition::math::Pose> &_pts,
+                  double _time,
+                  boost::function<void()> _onComplete = NULL);
 
       /// \brief Set visibility flags for this visual and all children.
       /// \param[in] _flags The visiblity flags.
@@ -475,7 +478,7 @@ namespace gazebo
       /// \param[in] _node Pointer to the Ogre Node to process.
       /// \param[in] _box Current bounding box information.
       private: void GetBoundsHelper(Ogre::SceneNode *_node,
-                                    math::Box &_box) const;
+                                    ignition::math::Box &_box) const;
 
       /// \brief The name of the mesh set in the visual's SDF.
       /// \return Name of the mesh.
@@ -537,7 +540,7 @@ namespace gazebo
       private: Ogre::SkeletonInstance *skeleton;
 
       /// \brief Connection for the pre render event.
-      private: event::ConnectionPtr preRenderConnection;
+      private: ignition::common::ConnectionPtr preRenderConnection;
 
       /// \brief List of all the lines created.
       private: std::list<DynamicLines*> lines;
@@ -555,7 +558,7 @@ namespace gazebo
       private: Ogre::AnimationState *animState;
 
       /// \brief Time of the previous animation step.
-      private: common::Time prevAnimTime;
+      private: ignition::common::Time prevAnimTime;
 
       /// \brief Callback for the animation complete event.
       private: boost::function<void()> onAnimationComplete;
@@ -576,7 +579,7 @@ namespace gazebo
       private: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
-      private: math::Vector3 scale;
+      private: ignition::math::Vector3 scale;
 
       /// \brief True if lighting will be applied to this visual.
       private: bool lighting;

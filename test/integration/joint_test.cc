@@ -33,19 +33,19 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   /// bullet collision parameters needs tweaking
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Aborting test for bullet, see issue #590.\n";
+    ignerr << "Aborting test for bullet, see issue #590.\n";
     return;
   }
   /// \TODO: simbody not complete for this test
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for Simbody, see issue #862.\n";
+    ignerr << "Aborting test for Simbody, see issue #862.\n";
     return;
   }
   /// \TODO: dart not complete for this test
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for DART, see issue #903.\n";
+    ignerr << "Aborting test for DART, see issue #903.\n";
     return;
   }
 
@@ -70,8 +70,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
+  ignition::math::Pose anchor;
+  ignition::math::Vector3 axis(1, 0, 0);
   double upper = M_PI;
   double lower = -M_PI;
 
@@ -138,7 +138,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       EXPECT_LE(residentCur, residentLast);
       EXPECT_LE(shareCur, shareLast);
     }
-    // gzdbg << "memory res[" << residentCur
+    // igndbg << "memory res[" << residentCur
     //       << "] shr[" << shareCur
     //       << "] res[" << residentLast
     //       << "] shr[" << shareLast
@@ -154,19 +154,19 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   /// SpringDamper implemented not yet released for dart
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #975.\n";
+    ignerr << "Aborting test for dart, see issue #975.\n";
     return;
   }
   /// SpringDamper unimplemented for simbody
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Aborting test for simbody, see issue #886.\n";
+    ignerr << "Aborting test for simbody, see issue #886.\n";
     return;
   }
   /// bullet collision parameters needs tweaking
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Aborting test for bullet, see issue #887.\n";
+    ignerr << "Aborting test for bullet, see issue #887.\n";
     return;
   }
 
@@ -283,12 +283,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       velContact = -1.0;
     }
 
-    // gzdbg << i << "\n";
-    // gzdbg << cyclesPrismatic << " : "
+    // igndbg << i << "\n";
+    // igndbg << cyclesPrismatic << " : "
     //       << linkPrismatic->GetWorldLinearVel() << "\n";
-    // gzdbg << cyclesRevolute << " : "
+    // igndbg << cyclesRevolute << " : "
     //       << linkRevolute->GetRelativeAngularVel() << "\n";
-    // gzdbg << cyclesContact << " : "
+    // igndbg << cyclesContact << " : "
     //       << linkContact->GetWorldLinearVel() << "\n";
   }
   EXPECT_EQ(cyclesPrismatic,      17);
@@ -312,12 +312,12 @@ TEST_F(JointTest, joint_SDF14)
   int i = 0;
   while (!this->HasEntity("joint14_model") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get joint14_model");
+    ignthrow("Unable to get joint14_model");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
   EXPECT_TRUE(physicsEngine);

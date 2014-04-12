@@ -20,7 +20,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 
 namespace gazebo
 {
@@ -40,13 +40,13 @@ namespace gazebo
 
       // Error message if the model couldn't be found
       if (!this->model)
-        gzerr << "Unable to get parent model\n";
+        ignerr << "Unable to get parent model\n";
 
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&RayTest::OnUpdate, this));
-      gzdbg << "plugin model name: " << modelName << "\n";
+      igndbg << "plugin model name: " << modelName << "\n";
 
 
       this->node = transport::NodePtr(new transport::Node());
@@ -59,7 +59,7 @@ namespace gazebo
     public: void OnUpdate()
     {
       // do something on update
-      // gzdbg << "plugin update\n";
+      // igndbg << "plugin update\n";
     }
 
     public: void OnStats(
@@ -67,14 +67,14 @@ namespace gazebo
     {
       this->simTime  = msgs::Convert(_msg->sim_time());
 
-      math::Pose pose;
+     ignition::math::Pose pose;
       pose.pos.x = 0.5*sin(0.01*this->simTime.Double());
-      math::Pose orig_pose = this->model->GetWorldPose();
+     ignition::math::Pose orig_pose = this->model->GetWorldPose();
 
       if (this->simTime.Double() > 20.0)
         this->model->SetWorldPose(pose);
 
-      gzdbg << "plugin simTime [" << this->simTime.Double()
+      igndbg << "plugin simTime [" << this->simTime.Double()
             << "] update pose [" << pose.pos.x << "] orig pose ["
             << orig_pose << "]\n";
     }

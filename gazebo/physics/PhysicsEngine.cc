@@ -21,14 +21,14 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
@@ -103,9 +103,9 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 PhysicsEngine::GetGravity() const
+ignition::math::Vector3 PhysicsEngine::GetGravity() const
 {
-  return this->sdf->Get<math::Vector3>("gravity");
+  return this->sdf->Get<ignition::math::Vector3>("gravity");
 }
 
 //////////////////////////////////////////////////
@@ -117,7 +117,7 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
     boost::dynamic_pointer_cast<Link>(this->world->GetEntity(_linkName));
 
   if (!link)
-    gzerr << "Unable to find link[" << _linkName << "]\n";
+    ignerr << "Unable to find link[" << _linkName << "]\n";
   else
     result = this->CreateCollision(_shapeType, link);
 

@@ -43,10 +43,10 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
       this->model->GetName() + "/vel_cmd", &DiffDrivePlugin::OnVelMsg, this);
 
   if (!_sdf->HasElement("left_joint"))
-    gzerr << "DiffDrive plugin missing <left_joint> element\n";
+    ignerr << "DiffDrive plugin missing <left_joint> element\n";
 
   if (!_sdf->HasElement("right_joint"))
-    gzerr << "DiffDrive plugin missing <right_joint> element\n";
+    ignerr << "DiffDrive plugin missing <right_joint> element\n";
 
   this->leftJoint = _model->GetJoint(
       _sdf->GetElement("left_joint")->Get<std::string>());
@@ -57,18 +57,18 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
     this->torque = _sdf->GetElement("torque")->Get<double>();
   else
   {
-    gzwarn << "No torque value set for the DiffDrive plugin.\n";
+    ignwarn << "No torque value set for the DiffDrive plugin.\n";
     this->torque = 5.0;
   }
 
   if (!this->leftJoint)
-    gzerr << "Unable to find left joint["
+    ignerr << "Unable to find left joint["
           << _sdf->GetElement("left_joint")->Get<std::string>() << "]\n";
   if (!this->rightJoint)
-    gzerr << "Unable to find right joint["
+    ignerr << "Unable to find right joint["
           << _sdf->GetElement("right_joint")->Get<std::string>() << "]\n";
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = common::Events::ConnectWorldUpdateBegin(
           boost::bind(&DiffDrivePlugin::OnUpdate, this));
 }
 
@@ -81,7 +81,7 @@ void DiffDrivePlugin::Init()
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
-  math::Box bb = parent->GetBoundingBox();
+  ignition::math::Box bb = parent->GetBoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 }
@@ -112,8 +112,8 @@ void DiffDrivePlugin::OnUpdate()
 
   dr = (d1 + d2) / 2;
   da = (d1 - d2) / this->wheelSeparation;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
+  ignition::common::Time currTime = this->model->GetWorld()->GetSimTime();
+  ignition::common::Time stepTime = currTime - this->prevUpdateTime;
   */
 
   double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);

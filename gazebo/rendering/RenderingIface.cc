@@ -15,8 +15,7 @@
  *
 */
 #include <boost/thread.hpp>
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include <ignition/common.hh>
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RenderingIface.hh"
@@ -32,10 +31,10 @@ bool rendering::load()
   {
     rendering::RenderEngine::Instance()->Load();
   }
-  catch(common::Exception &e)
+  catch(ignition::common::Exception &_e)
   {
     result = false;
-    gzerr << "Failed to load the Rendering engine subsystem\n" << e;
+    ignerr << "Failed to load the Rendering engine subsystem\n" << _e;
   }
 
   return result;
@@ -51,10 +50,10 @@ bool rendering::init()
   {
     rendering::RenderEngine::Instance()->Init();
   }
-  catch(common::Exception &e)
+  catch(ignition::common::Exception &_e)
   {
     result = false;
-    gzerr << "Failed to Initialize the Rendering engine subsystem\n" << e;
+    ignerr << "Failed to Initialize the Rendering engine subsystem\n" << _e;
   }
 
   return result;
@@ -88,9 +87,9 @@ rendering::ScenePtr rendering::create_scene(const std::string &_name,
       scene = rendering::RenderEngine::Instance()->CreateScene(_name,
           _enableVisualizations, _isServer);
     }
-    catch(common::Exception &e)
+    catch(ignition::common::Exception &_e)
     {
-      gzerr << "Failed to create a scene in the Rendering engine" << e;
+      ignerr << "Failed to create a scene in the Rendering engine" << _e;
     }
   }
 

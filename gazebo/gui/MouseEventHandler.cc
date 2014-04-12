@@ -83,25 +83,27 @@ void MouseEventHandler::RemoveDoubleClickFilter(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::HandlePress(const common::MouseEvent &_event)
+void MouseEventHandler::HandlePress(const ignition::common::MouseEvent &_event)
 {
   this->Handle(_event, this->pressFilters);
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::HandleRelease(const common::MouseEvent &_event)
+void MouseEventHandler::HandleRelease(
+    const ignition::common::MouseEvent &_event)
 {
   this->Handle(_event, this->releaseFilters);
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::HandleMove(const common::MouseEvent &_event)
+void MouseEventHandler::HandleMove(const ignition::common::MouseEvent &_event)
 {
   this->Handle(_event, this->moveFilters);
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::HandleDoubleClick(const common::MouseEvent &_event)
+void MouseEventHandler::HandleDoubleClick(
+    const ignition::common::MouseEvent &_event)
 {
   this->Handle(_event, this->doubleClickFilters);
 }
@@ -125,7 +127,7 @@ void MouseEventHandler::Remove(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void MouseEventHandler::Handle(const common::MouseEvent &_event,
+void MouseEventHandler::Handle(const ignition::common::MouseEvent &_event,
     std::list<Filter> &_list)
 {
   for (std::list<Filter>::iterator iter = _list.begin();

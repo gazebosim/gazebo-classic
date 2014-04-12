@@ -14,29 +14,21 @@
  * limitations under the License.
  *
  */
-#ifndef _GZ_PLUGIN_HH_
-#define _GZ_PLUGIN_HH_
+#ifndef _GAZEBO_PLUGIN_HH_
+#define _GAZEBO_PLUGIN_HH_
 
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <gazebo/gazebo_config.h>
-#ifdef HAVE_DL
 #include <dlfcn.h>
-#elif HAVE_LTDL
-#include <ltdl.h>
-#endif
 
 #include <list>
 #include <string>
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include <ignition/common.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
@@ -44,220 +36,18 @@
 
 namespace gazebo
 {
-  class Event;
-
   /// \addtogroup gazebo_common Common
   /// \{
-
-  /// \enum PluginType
-  /// \brief Used to specify the type of plugin.
-  enum PluginType
-  {
-    /// \brief A World plugin
-    WORLD_PLUGIN,
-    /// \brief A Model plugin
-    MODEL_PLUGIN,
-    /// \brief A Sensor plugin
-    SENSOR_PLUGIN,
-    /// \brief A System plugin
-    SYSTEM_PLUGIN,
-    /// \brief A Visual plugin
-    VISUAL_PLUGIN
-  };
-
-
-  /// \class PluginT Plugin.hh common/common.hh
-  /// \brief A class which all plugins must inherit from
-  template<class T>
-  class PluginT
-  {
-    /// \brief plugin pointer type definition
-    public: typedef boost::shared_ptr<T> TPtr;
-
-    /// \brief Constructor
-    public: PluginT()
-            {
-              this->dlHandle = NULL;
-            }
-
-    /// \brief Destructor
-    public: virtual ~PluginT()
-            {
-#ifdef HAVE_DL
-              dlclose(this->dlHandle);
-#endif
-            }
-
-    /// \brief Get the name of the handler
-    public: std::string GetFilename() const
-            {
-              return this->filename;
-            }
-
-    /// \brief Get the short name of the handler
-    public: std::string GetHandle() const
-            {
-              return this->handle;
-            }
-
-    /// \brief a class method that creates a plugin from a file name.
-    /// It locates the shared library and loads it dynamically.
-    /// \param[in] _filename the path to the shared library.
-    /// \param[in] _handle short name of the handler
-    /// \return Shared Pointer to this class type
-    public: static TPtr Create(const std::string &_filename,
-                const std::string &_handle)
-            {
-              TPtr result;
-              // PluginPtr result;
-              struct stat st;
-              bool found = false;
-              std::string fullname, filename(_filename);
-              std::list<std::string>::iterator iter;
-              std::list<std::string> pluginPaths =
-                common::SystemPaths::Instance()->GetPluginPaths();
-
-#ifdef __APPLE__
-              // This is a hack to work around issue #800,
-              // error loading plugin libraries with different extensions
-              {
-                size_t soSuffix = filename.rfind(".so");
-                const std::string macSuffix(".dylib");
-                if (soSuffix != std::string::npos)
-                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
-              }
-#endif  // ifdef __APPLE__
-
-              for (iter = pluginPaths.begin();
-                   iter!= pluginPaths.end(); ++iter)
-              {
-                fullname = (*iter)+std::string("/")+filename;
-                if (stat(fullname.c_str(), &st) == 0)
-                {
-                  found = true;
-                  break;
-                }
-              }
-
-              if (!found)
-                fullname = filename;
-
-#ifdef HAVE_DL
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
-              if (!dlHandle)
-              {
-                gzerr << "Failed to load plugin " << fullname << ": "
-                  << dlerror() << "\n";
-                return result;
-              }
-
-              registerFunc.ptr = dlsym(dlHandle, registerName.c_str());
-
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName
-                      << ": " << dlerror();
-                return result;
-              }
-
-              // Register the new controller.
-              result.reset(registerFunc.func());
-              result->dlHandle = dlHandle;
-
-#elif HAVE_LTDL
-              gzerr << "LTDL is deprecated as of Gazebo 2.0\n";
-              fptr_union_t registerFunc;
-              std::string registerName = "RegisterPlugin";
-
-              static bool init_done = false;
-
-              if (!init_done)
-              {
-                int errors = lt_dlinit();
-                if (errors)
-                {
-                  gzerr << "Error(s) initializing dynamic loader ("
-                    << errors << ", " << lt_dlerror() << ")";
-                  return NULL;
-                }
-                else
-                  init_done = true;
-              }
-
-              lt_dlhandle handle = lt_dlopenext(fullname.c_str());
-
-              if (!handle)
-              {
-                gzerr << "Failed to load " << fullname
-                      << ": " << lt_dlerror();
-                return NULL;
-              }
-
-              T *(*registerFunc)() =
-                (T *(*)())lt_dlsym(handle, registerName.c_str());
-              resigsterFunc.ptr = lt_dlsym(handle, registerName.c_str());
-              if (!registerFunc.ptr)
-              {
-                gzerr << "Failed to resolve " << registerName << ": "
-                      << lt_dlerror();
-                return NULL;
-              }
-
-              // Register the new controller.
-              result.result(registerFunc.func());
-              result->dlHandle = NULL;
-
-#else  // HAVE_LTDL
-
-              gzthrow("Cannot load plugins as libtool is not installed.");
-
-#endif  // HAVE_LTDL
-
-              result->handle = _handle;
-              result->filename = filename;
-
-              return result;
-            }
-
-    /// \brief Returns the type of the plugin
-    /// \return type of the plugin
-    public: PluginType GetType() const
-            {
-              return this->type;
-            }
-
-    /// \brief Type of plugin
-    protected: PluginType type;
-
-    /// \brief Path to the shared library file
-    protected: std::string filename;
-
-    /// \brief Short name
-    protected: std::string handle;
-
-    /// \brief Pointer to shared library registration function definition
-    private: typedef union
-             {
-               T *(*func)();
-               void *ptr;
-             } fptr_union_t;
-
-    /// \brief Handle used for closing the dynamic library.
-    private: void *dlHandle;
-  };
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class WorldPlugin : public PluginT<WorldPlugin>
+  class WorldPlugin : public ignition::common::PluginT<WorldPlugin>
   {
     /// \brief Constructor
     public: WorldPlugin()
-             {this->type = WORLD_PLUGIN;}
+             {}
 
     /// \brief Destructor
     public: virtual ~WorldPlugin() {}
@@ -278,11 +68,11 @@ namespace gazebo
   /// \brief A plugin with access to physics::Model.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class ModelPlugin : public PluginT<ModelPlugin>
+  class ModelPlugin : public ignition::common::PluginT<ModelPlugin>
   {
     /// \brief Constructor
     public: ModelPlugin()
-             {this->type = MODEL_PLUGIN;}
+             {}
 
     /// \brief Destructor
     public: virtual ~ModelPlugin() {}
@@ -307,11 +97,11 @@ namespace gazebo
   /// \brief A plugin with access to physics::Sensor.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class SensorPlugin : public PluginT<SensorPlugin>
+  class SensorPlugin : public ignition::common::PluginT<SensorPlugin>
   {
     /// \brief Constructor
     public: SensorPlugin()
-             {this->type = SENSOR_PLUGIN;}
+             {}
 
     /// \brief Destructor
     public: virtual ~SensorPlugin() {}
@@ -336,11 +126,11 @@ namespace gazebo
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  class SystemPlugin : public PluginT<SystemPlugin>
+  class SystemPlugin : public ignition::common::PluginT<SystemPlugin>
   {
     /// \brief Constructor
     public: SystemPlugin()
-             {this->type = SYSTEM_PLUGIN;}
+             {}
 
     /// \brief Destructor
     public: virtual ~SystemPlugin() {}
@@ -364,10 +154,10 @@ namespace gazebo
   /// \brief A plugin loaded within the gzserver on startup.  See
   ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
   ///        reference</a>.
-  class VisualPlugin : public PluginT<VisualPlugin>
+  class VisualPlugin : public ignition::common::PluginT<VisualPlugin>
   {
     public: VisualPlugin()
-             {this->type = VISUAL_PLUGIN;}
+             {}
 
     /// \brief Load function
     ///

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #ifndef _SENSOR_HH_
 #define _SENSOR_HH_
 
@@ -28,15 +23,15 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
@@ -93,7 +88,7 @@ namespace gazebo
       /// \brief Set the parent of the sensor.
       /// \param[in] _name Name of the parent.
       public: virtual void SetParent(const std::string &_name)
-              GAZEBO_DEPRECATED(2.0);
+              IGN_DEPRECATED(2.0);
 
       /// \brief Set the sensor's parent.
       /// \param[in] _name The sensor's parent's name.
@@ -138,7 +133,7 @@ namespace gazebo
 
       /// \brief Get the current pose.
       /// \return Current pose of the sensor.
-      public: virtual math::Pose GetPose() const;
+      public: virtual ignition::math::Pose GetPose() const;
 
       /// \brief Set whether the sensor is active or not.
       /// \param[in] _value True if active, false if not.
@@ -154,14 +149,14 @@ namespace gazebo
 
       /// \brief Return last update time.
       /// \return Time of last update.
-      public: common::Time GetLastUpdateTime();
+      public: ignition::common::Time GetLastUpdateTime();
 
       /// \brief Return last measurement time.
       /// \return Time of last measurement.
-      public: common::Time GetLastMeasurementTime();
+      public: ignition::common::Time GetLastMeasurementTime();
 
       /// \brief Return true if user requests the sensor to be visualized
-      ///        via tag:  <visualize>true</visualize> in SDF.
+      /// via tag:  <visualize>true</visualize> in SDF.
       /// \return True if visualized, false if not.
       public: bool GetVisualize() const;
 
@@ -183,13 +178,13 @@ namespace gazebo
       /// \return A pointer to the connection. This must be kept in scope.
       /// \sa Sensor::DisconnectUpdated
       public: template<typename T>
-              event::ConnectionPtr ConnectUpdated(T _subscriber)
+              ignition::common::ConnectionPtr ConnectUpdated(T _subscriber)
               {return this->updated.Connect(_subscriber);}
 
       /// \brief Disconnect from a the updated signal.
       /// \param[in] _c The connection to disconnect
       /// \sa Sensor::ConnectUpdated
-      public: void DisconnectUpdated(event::ConnectionPtr &_c)
+      public: void DisconnectUpdated(ignition::common::ConnectionPtr &_c)
               {this->updated.Disconnect(_c);}
 
       /// \brief Get the category of the sensor.
@@ -229,10 +224,10 @@ namespace gazebo
       protected: sdf::ElementPtr sdf;
 
       /// \brief Pose of the sensor.
-      protected: math::Pose pose;
+      protected: ignition::math::Pose pose;
 
       /// \brief All event connections.
-      protected: std::vector<event::ConnectionPtr> connections;
+      protected: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Node for communication.
       protected: transport::NodePtr node;
@@ -257,14 +252,14 @@ namespace gazebo
 
       /// \brief Desired time between updates, set indirectly by
       ///        Sensor::SetUpdateRate.
-      protected: common::Time updatePeriod;
+      protected: ignition::common::Time updatePeriod;
 
       /// \brief Time of the last update.
-      protected: common::Time lastUpdateTime;
+      protected: ignition::common::Time lastUpdateTime;
 
       /// \brief Stores last time that a sensor measurement was generated;
       ///        this value must be updated within each sensor's UpdateImpl
-      protected: common::Time lastMeasurementTime;
+      protected: ignition::common::Time lastMeasurementTime;
 
       /// \brief Noise added to sensor data
       protected: std::vector<NoisePtr> noises;
@@ -273,7 +268,7 @@ namespace gazebo
       private: boost::mutex mutexLastUpdateTime;
 
       /// \brief Event triggered when a sensor is updated.
-      private: event::EventT<void()> updated;
+      private: ignition::common::EventT<void()> updated;
 
       /// \brief Subscribe to control message.
       private: transport::SubscriberPtr controlSub;
@@ -285,7 +280,7 @@ namespace gazebo
       private: SensorCategory category;
 
       /// \brief Keep track how much the update has been delayed.
-      private: common::Time updateDelay;
+      private: ignition::common::Time updateDelay;
 
       /// \brief The sensors unique ID.
       private: uint32_t id;

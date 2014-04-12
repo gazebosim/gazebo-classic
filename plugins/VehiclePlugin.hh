@@ -43,7 +43,7 @@ namespace gazebo
 
     private: void OnVelMsg(ConstPosePtr &_msg);
 
-    private: std::vector<event::ConnectionPtr> connections;
+    private: std::vector<ignition::common::ConnectionPtr> connections;
 
     private: physics::ModelPtr model;
     private: physics::LinkPtr chassis;
@@ -51,7 +51,7 @@ namespace gazebo
     private: physics::JointPtr gasJoint, brakeJoint;
     private: physics::JointPtr steeringJoint;
 
-    private: math::Vector3 velocity;
+    private: ignition::math::Vector3 velocity;
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;

@@ -29,7 +29,7 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 Grid::Grid(Scene *_scene, unsigned int _cellCount, float _cellLength,
-           float _lineWidth, const common::Color& _color)
+           float _lineWidth, const ignition::common::Color& _color)
 : scene(_scene)
 {
   this->height = 0;
@@ -81,7 +81,7 @@ void Grid::SetLineWidth(float _width)
 }
 
 //////////////////////////////////////////////////
-void Grid::SetColor(const common::Color &_color)
+void Grid::SetColor(const ignition::common::Color &_color)
 {
   this->color = _color;
 

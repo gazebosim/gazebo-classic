@@ -45,7 +45,7 @@ namespace gazebo
     protected: sensors::CameraSensorPtr parentSensor;
     protected: rendering::CameraPtr camera;
 
-    private: event::ConnectionPtr newFrameConnection;
+    private: ignition::common::ConnectionPtr newFrameConnection;
   };
 }
 #endif

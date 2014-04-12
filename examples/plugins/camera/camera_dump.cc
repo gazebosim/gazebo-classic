@@ -42,7 +42,7 @@ namespace gazebo
       {
         this->parentSensor->GetCamera()->SaveFrame(
             _image, _width, _height, _depth, _format, tmp);
-        gzmsg << "Saving frame [" << this->saveCount
+        ignmsg << "Saving frame [" << this->saveCount
               << "] as [" << tmp << "]\n";
         this->saveCount++;
       }

@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 
 #include "gazebo/gui/GuiIface.hh"
 
@@ -82,7 +82,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
   }
   this->parent = _vis;
   this->parent->AttachVisual(shared_from_this());
-  this->SetPosition(math::Vector3(0, 0, 0));
+  this->SetPosition(ignition::math::Vector3(0, 0, 0));
 
   this->UpdateSize();
 }
@@ -90,7 +90,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void SelectionObj::UpdateSize()
 {
-  math::Vector3 bboxSize = this->parent->GetBoundingBox().GetSize()
+  ignition::math::Vector3 bboxSize = this->parent->GetBoundingBox().GetSize()
       * this->parent->GetScale();
   double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
 
@@ -98,7 +98,7 @@ void SelectionObj::UpdateSize()
 
   // Handle special case for rotation visuals. Only set the visuals to be
   // overlays for big objects.
-  if (math::equal(max, this->maxScale))
+  if (ignition::math::equal(max, this->maxScale))
   {
     this->rotXVisual->SetMaterial(this->xAxisMatOverlay, false);
     this->rotYVisual->SetMaterial(this->yAxisMatOverlay, false);
@@ -110,7 +110,7 @@ void SelectionObj::UpdateSize()
     this->rotYVisual->SetMaterial(this->yAxisMat, false);
     this->rotZVisual->SetMaterial(this->zAxisMat, false);
   }
-  this->SetScale(math::Vector3(max, max, max));
+  this->SetScale(ignition::math::Vector3(max, max, max));
 }
 
 /////////////////////////////////////////////////
@@ -360,16 +360,16 @@ void SelectionObj::CreateTranslateVisual()
   shaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  this->transXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  this->transYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  this->transXVisual->SetRotation(ignition::math::Quaternion(
+        ignition::math::Vector3(0, 1, 0), IGN_DTOR(90)));
+  this->transYVisual->SetRotation(ignition::math::Quaternion(
+        ignition::math::Vector3(1, 0, 0), IGN_DTOR(-90)));
 
   this->transXVisual->SetMaterial(this->xAxisMatOverlay);
   this->transYVisual->SetMaterial(this->yAxisMatOverlay);
   this->transZVisual->SetMaterial(this->zAxisMatOverlay);
 
-  this->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  this->transVisual->SetScale(ignition::math::Vector3(5.0, 5.0, 5.0));
 
   this->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -438,10 +438,10 @@ void SelectionObj::CreateRotateVisual()
   this->rotYVisual->Load();
   this->rotZVisual->Load();
 
-  this->rotXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  this->rotYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  this->rotXVisual->SetRotation(ignition::math::Quaternion(
+        ignition::math::Vector3(0, 1, 0), IGN_DTOR(90)));
+  this->rotYVisual->SetRotation(ignition::math::Quaternion(
+        ignition::math::Vector3(1, 0, 0), IGN_DTOR(-90)));
 
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
@@ -450,7 +450,7 @@ void SelectionObj::CreateRotateVisual()
   this->rotYVisual->SetMaterial(this->yAxisMat);
   this->rotZVisual->SetMaterial(this->zAxisMat);
 
-  this->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  this->rotVisual->SetScale(ignition::math::Vector3(1.0, 1.0, 1.0));
 
   this->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -558,16 +558,16 @@ void SelectionObj::CreateScaleVisual()
   scaleShaftZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
-  this->scaleXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
-  this->scaleYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  this->scaleXVisual->SetRotation(ignition::math::Quaternion(
+        ignition::math::Vector3(0, 1, 0), IGN_DTOR(90)));
+  this->scaleYVisual->SetRotation(ignition::math::Quaternion(
+       ignition::math::Vector3(1, 0, 0), IGN_DTOR(-90)));
 
   this->scaleXVisual->SetMaterial(this->xAxisMatOverlay);
   this->scaleYVisual->SetMaterial(this->yAxisMatOverlay);
   this->scaleZVisual->SetMaterial(this->zAxisMatOverlay);
 
-  this->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  this->scaleVisual->SetScale(ignition::math::Vector3(5.0, 5.0, 5.0));
 
   this->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);

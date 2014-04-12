@@ -16,15 +16,16 @@
 */
 
 #include <boost/foreach.hpp>
+#include <ignition/common.hh>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
 
 using namespace gazebo;
 
 class TransceiverTest : public ServerFixture,
-                        public testing::WithParamInterface<const char*>
+  public testing::WithParamInterface<const char*>
 {
   public: TransceiverTest();
   public: void TxRxEmptySpace(const std::string &_physicsEngine);
@@ -41,7 +42,7 @@ class TransceiverTest : public ServerFixture,
 
   private: boost::mutex mutex;
   private: std::vector<int> num_msgs;
-  private: std::vector<common::Time> elapsed_time;
+  private: std::vector<ignition::common::Time> elapsed_time;
   private: boost::shared_ptr<msgs::WirelessNodes const> nodesMsg;
   private: bool receivedMsg;
 };
@@ -77,19 +78,21 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = math::Rand::GetIntUniform(1, 10);
+  int nTransmitters = ignition::math::Rand::GetIntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
+    double txFreq = ignition::math::Rand::GetDblUniform(
+        this->MinFreq, this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
+    double x = ignition::math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    double y = ignition::math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+    ignition::math::Pose txPose(ignition::math::Vector3(x, y, 0.055),
+        ignition::math::Quaternion(0, 0, 0));
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
         txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
@@ -107,8 +110,8 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
-  math::Pose rxPose(math::Vector3(0, 2, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose rxPose(ignition::math::Vector3(0, 2, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn rx
   SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
@@ -142,7 +145,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     // Update the receiver sensor
     rx->Update(true);
 
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)
@@ -177,9 +180,10 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string tx2ModelName = "tx2";
   std::string tx2SensorName = "wirelessTransmitter2";
   std::string txEssid = "osrf";
-  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
+  double x = ignition::math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  double y = ignition::math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
+  ignition::math::Pose txPose(ignition::math::Vector3(x, y, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,
       txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
@@ -203,8 +207,8 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
-  math::Pose rxPose(math::Vector3(0, 2, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose rxPose(ignition::math::Vector3(0, 2, 0.055),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn rx
   SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
@@ -234,7 +238,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
     tx2->Update(true);
     rx->Update(true);
 
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
   }
 
@@ -246,7 +250,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since this test frequently fails with dart, "
+    ignerr << "Abort test since this test frequently fails with dart, "
           << " see (issue #916)" << std::endl;
     return;
   }
@@ -260,8 +264,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Transmitter - tx
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTx";
-  math::Pose txPose(math::Vector3(0, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose txPose(ignition::math::Vector3(0, 0, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn tx
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
@@ -276,8 +280,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx1
   std::string rx1ModelName = "rx1";
   std::string rx1SensorName = "wirelessRx1";
-  math::Pose rx1Pose(math::Vector3(3, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose rx1Pose(ignition::math::Vector3(3, 0, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn rx1
   SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.pos,
@@ -293,7 +297,8 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-3, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose rx2Pose(ignition::math::Vector3(-3, 0, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
@@ -307,8 +312,9 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.5),
-      math::Vector3(0, 0, 0), true);
+  SpawnBox("Box", ignition::math::Vector3(1, 1, 1),
+      ignition::math::Vector3(-1.5, 0, 0.5),
+      ignition::math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -328,7 +334,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     tx->Update(true);
     rx1->Update(true);
 
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)
@@ -364,7 +370,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
     tx->Update(true);
     rx2->Update(true);
 
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     boost::mutex::scoped_lock lock(this->mutex);
 
     if (this->nodesMsg && this->receivedMsg)

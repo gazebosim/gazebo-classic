@@ -16,7 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
 
@@ -65,7 +65,7 @@ void DataLogger_TEST::RecordButton()
       // The following line tell QT to process its events. This is vital for
       // all tests, but it must be run in the main thread.
       QCoreApplication::processEvents();
-      gazebo::common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
     }
 
     std::string txt;
@@ -147,7 +147,8 @@ void DataLogger_TEST::StressTest()
       recordButton->toggle();
 
       // Sleep for random times
-      gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 500));
+      ignition::common::Time::MSleep(
+          ignition::math::Rand::GetIntUniform(10, 500));
     }
 
     // There should be (count * 0.5) log directories in /tmp/gazebo_test

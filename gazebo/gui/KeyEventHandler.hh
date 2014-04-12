@@ -21,8 +21,8 @@
 #include <string>
 #include <list>
 
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/KeyEvent.hh"
+#include "ignition/common/SingletonT.hh"
+#include "ignition/common/KeyEvent.hh"
 
 namespace gazebo
 {
@@ -30,11 +30,12 @@ namespace gazebo
   {
     /// \class KeyEventHandler KeyEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters keyboard events.
-    class KeyEventHandler : public SingletonT<KeyEventHandler>
+    class KeyEventHandler : public ignition::common::SingletonT<KeyEventHandler>
     {
       /// \def KeyEventFilter
       /// \brief Key event function pointer.
-      public: typedef boost::function<bool (const common::KeyEvent &_event)>
+      public: typedef boost::function
+              <bool (const ignition::common::KeyEvent &_event)>
               KeyEventFilter;
 
       /// \cond
@@ -99,11 +100,11 @@ namespace gazebo
 
       /// \brief Process a key press event.
       /// \param[in] _event The key event.
-      public: void HandlePress(const common::KeyEvent &_event);
+      public: void HandlePress(const ignition::common::KeyEvent &_event);
 
       /// \brief Process a key release event.
       /// \param[in] _event The key event.
-      public: void HandleRelease(const common::KeyEvent &_event);
+      public: void HandleRelease(const ignition::common::KeyEvent &_event);
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
@@ -120,7 +121,7 @@ namespace gazebo
       /// \brief Helper function to process a filters in an event list.
       /// \param[in] _event Key event to process.
       /// \param[in] _list List which contains the filters to process.
-      private: void Handle(const common::KeyEvent &_event,
+      private: void Handle(const ignition::common::KeyEvent &_event,
                    std::list<Filter> &_list);
 
       /// \brief List of key press filters.

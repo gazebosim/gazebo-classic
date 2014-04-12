@@ -22,16 +22,16 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/date_time.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/transport/transport.hh"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Base64.hh"
+#include "ignition/common/Time.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Base64.hh"
 #include "gazebo/util/LogRecord.hh"
 
 #include "gazebo/gazebo_config.h"
@@ -54,7 +54,7 @@ LogRecord::LogRecord()
   // \todo getenv is not portable, and there is no generic cross-platform
   // method. Must check OS and choose a method
   char *homePath = getenv("HOME");
-  GZ_ASSERT(homePath, "HOME environment variable is missing");
+  IGN_ASSERT(homePath, "HOME environment variable is missing");
 
   if (!homePath)
     this->logBasePath = boost::filesystem::path("/tmp/gazebo");
@@ -66,7 +66,7 @@ LogRecord::LogRecord()
   this->logsEnd = this->logs.end();
 
   this->connections.push_back(
-     event::Events::ConnectPause(
+     common::Events::ConnectPause(
        boost::bind(&LogRecord::OnPause, this, _1)));
 }
 
@@ -88,7 +88,7 @@ bool LogRecord::Init(const std::string &_subdir)
 {
   if (_subdir.empty())
   {
-    gzerr << "LogRecord initialization directory is empty." << std::endl;
+    ignerr << "LogRecord initialization directory is empty." << std::endl;
     return false;
   }
 
@@ -114,20 +114,20 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   // Make sure ::Init has been called.
   if (!this->initialized)
   {
-    gzerr << "LogRecord has not been initialized." << std::endl;
+    ignerr << "LogRecord has not been initialized." << std::endl;
     return false;
   }
 
   // Check to see if the logger is already started.
   if (this->running)
   {
-    /// \TODO replace this with gzlog
-    gzerr << "LogRecord has already been started" << std::endl;
+    /// \TODO replace this with ignlog
+    ignerr << "LogRecord has already been started" << std::endl;
     return false;
   }
 
   // Get the current time as an ISO string.
-  std::string logTimeDir = common::Time::GetWallTimeAsISOString();
+  std::string logTimeDir = ignition::common::Time::GetWallTimeAsISOString();
 
   // Override the default path settings if the _path parameter is set.
   if (!_path.empty())
@@ -143,7 +143,7 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
     boost::filesystem::create_directories(logCompletePath);
 
   if (_encoding != "bz2" && _encoding != "txt" && _encoding != "zlib")
-    gzthrow("Invalid log encoding[" + _encoding +
+    ignthrow("Invalid log encoding[" + _encoding +
             "]. Must be one of [bz2, zlib, txt]");
 
   this->encoding = _encoding;
@@ -164,7 +164,7 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
   this->stopThread = false;
   this->readyToStart = false;
 
-  this->startTime = this->currTime = common::Time();
+  this->startTime = this->currTime = ignition::common::Time();
 
   // Create a thread to cleanup recording.
   this->cleanupThread = boost::thread(boost::bind(&LogRecord::Cleanup, this));
@@ -272,11 +272,11 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   // Check to see if the log has already been added.
   if (this->logs.find(_name) != this->logs.end())
   {
-    GZ_ASSERT(this->logs.find(_name)->second != NULL, "Unable to find log");
+    IGN_ASSERT(this->logs.find(_name)->second != NULL, "Unable to find log");
 
     if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
     {
-      gzthrow(std::string("Attempting to add a duplicate log object named[")
+      ignthrow(std::string("Attempting to add a duplicate log object named[")
           + _name + "] with a filename of [" + _filename + "]\n");
     }
     else
@@ -294,7 +294,7 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
   }
   catch(...)
   {
-    gzthrow("Unable to create log. File permissions are probably bad.");
+    ignthrow("Unable to create log. File permissions are probably bad.");
   }
 
   if (this->running)
@@ -349,7 +349,7 @@ std::string LogRecord::GetFilename(const std::string &_name) const
   Log_M::const_iterator iter = this->logs.find(_name);
   if (iter != this->logs.end())
   {
-    GZ_ASSERT(iter->second, "Invalid log");
+    IGN_ASSERT(iter->second, "Invalid log");
     result = iter->second->GetCompleteFilename();
   }
   else
@@ -382,7 +382,7 @@ unsigned int LogRecord::GetFileSize(const std::string &_name) const
 
     if (iter != this->logs.end())
     {
-      GZ_ASSERT(iter->second, "Log object is NULL");
+      IGN_ASSERT(iter->second, "Log object is NULL");
       result += iter->second->GetBufferSize();
     }
   }
@@ -400,7 +400,7 @@ void LogRecord::SetBasePath(const std::string &_path)
   // Make sure we have a directory
   if (!boost::filesystem::is_directory(_path))
   {
-    gzerr << "Path " << _path << " is not a directory. Please only specify a "
+    ignerr << "Path " << _path << " is not a directory. Please only specify a "
            << "directory for data logging.\n";
     return;
   }
@@ -409,7 +409,7 @@ void LogRecord::SetBasePath(const std::string &_path)
   // Note: This is not cross-platform compatible.
   if (access(_path.c_str(), W_OK) != 0)
   {
-    gzerr << "You do no have permission to write into " << _path << "\n";
+    ignerr << "You do no have permission to write into " << _path << "\n";
     return;
   }
 
@@ -473,14 +473,14 @@ void LogRecord::Update()
     if (this->firstUpdate)
     {
       this->firstUpdate = false;
-      this->startTime = common::Time::GetWallTime();
+      this->startTime = ignition::common::Time::GetWallTime();
     }
 
     // Signal that new data is available.
     if (size > 0)
       this->dataAvailableCondition.notify_one();
 
-    this->currTime = common::Time::GetWallTime();
+    this->currTime = ignition::common::Time::GetWallTime();
 
     // Output the new log status
     this->PublishLogStatus();
@@ -517,7 +517,7 @@ void LogRecord::Write(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-common::Time LogRecord::GetRunTime() const
+ignition::common::Time LogRecord::GetRunTime() const
 {
   return this->currTime - this->startTime;
 }
@@ -590,7 +590,7 @@ unsigned int LogRecord::Log::Update()
       else if (encodingLocal == "txt")
         this->buffer.append(data);
       else
-        gzerr << "Unknown log file encoding[" << encodingLocal << "]\n";
+        ignerr << "Unknown log file encoding[" << encodingLocal << "]\n";
       this->buffer.append("]]>\n");
 
       this->buffer.append("</chunk>\n");
@@ -649,7 +649,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
 
   // Make sure the file does not exist
   if (boost::filesystem::exists(this->completePath))
-    gzlog << "Filename[" + this->completePath.string() + "], already exists."
+    ignlog << "Filename[" + this->completePath.string() + "], already exists."
       << " The log file will be overwritten.\n";
 
   std::ostringstream stream;
@@ -658,7 +658,7 @@ void LogRecord::Log::Start(const boost::filesystem::path &_path)
          << "<header>\n"
          << "<log_version>" << GZ_LOG_VERSION << "</log_version>\n"
          << "<gazebo_version>" << GAZEBO_VERSION_FULL << "</gazebo_version>\n"
-         << "<rand_seed>" << math::Rand::GetSeed() << "</rand_seed>\n"
+         << "<rand_seed>" << ignition::math::Rand::GetSeed() << "</rand_seed>\n"
          << "</header>\n";
 
   this->buffer.append(stream.str());
@@ -676,7 +676,7 @@ void LogRecord::Log::Write()
 
     // Throw an error if we couldn't open the file for writing.
     if (!this->logFile.is_open())
-      gzthrow("Unable to open file for logging:" +
+      ignthrow("Unable to open file for logging:" +
               this->completePath.string() + "]");
   }
 
@@ -684,7 +684,7 @@ void LogRecord::Log::Write()
   // case when someone deletes a log file while recording.
   if (!boost::filesystem::exists(this->completePath.string().c_str()))
   {
-    gzerr << "Log file[" << this->completePath << "] no longer exists. "
+    ignerr << "Log file[" << this->completePath << "] no longer exists. "
           << "Unable to write log data.\n";
 
     // We have to clear the buffer, or else it may grow indefinitely.
@@ -785,7 +785,7 @@ void LogRecord::Cleanup()
   this->cleanupCondition.wait(lock);
 
   bool currentPauseState = this->pauseState;
-  event::Events::pause(true);
+  common::Events::pause(true);
 
   // Reset the flags
   this->paused = false;
@@ -831,12 +831,12 @@ void LogRecord::Cleanup()
   }
 
   // Reset the times
-  this->startTime = this->currTime = common::Time();
+  this->startTime = this->currTime = ignition::common::Time();
 
   // Output the new log status
   this->PublishLogStatus();
 
-  event::Events::pause(currentPauseState);
+  common::Events::pause(currentPauseState);
   this->readyToStart = true;
 }
 

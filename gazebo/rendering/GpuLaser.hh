@@ -31,12 +31,12 @@
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/Time.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector2i.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/math/Vector2i.hh"
 
 namespace Ogre
 {
@@ -103,13 +103,13 @@ namespace gazebo
       /// \param[in] _subscriber Callback that is called when a new image is
       /// generated
       /// \return A pointer to the connection. This must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectNewLaserFrame(T _subscriber)
+      public: template<typename T> ignition::common::ConnectionPtr
+              ConnectNewLaserFrame(T _subscriber)
               { return newLaserFrame.Connect(_subscriber); }
 
       /// \brief Disconnect from a laser frame signal
       /// \param[in] _c The connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c)
+      public: void DisconnectNewLaserFrame(ignition::common::ConnectionPtr &_c)
               { newLaserFrame.Disconnect(_c); }
 
       /// \brief Set the number of laser samples in the width and height
@@ -294,7 +294,8 @@ namespace gazebo
       /// \param[in] _height Height of frame.
       /// \param[in] _depth Depth of frame.
       /// \param[in] _format Format of frame.
-      private: event::EventT<void(const float *_frame, unsigned int _width,
+      private: ignition::common::EventT<
+               void(const float *_frame, unsigned int _width,
                    unsigned int _height, unsigned int _depth,
                    const std::string &_format)> newLaserFrame;
 
@@ -349,7 +350,7 @@ namespace gazebo
 
       /// \brief Ogre mesh used to create a canvas for undistorting range values
       /// in the second rendering pass.
-      private: common::Mesh *undistMesh;
+      private: ignition::common::Mesh *undistMesh;
 
       /// \brief Ogre movable object created from the canvas mesh.
       private: Ogre::MovableObject *object;

@@ -24,10 +24,10 @@
 #include <vector>
 #include <boost/unordered/unordered_set.hpp>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/SingletonT.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/SubscribeOptions.hh"
@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class TopicManager : public SingletonT<TopicManager>
+    class TopicManager : public ignition::common::SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();
@@ -108,7 +108,7 @@ namespace gazebo
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
-                  gzthrow("Advertise requires a google protobuf type");
+                  ignthrow("Advertise requires a google protobuf type");
 
                 this->UpdatePublications(_topic, msg->GetTypeName());
 
@@ -122,7 +122,8 @@ namespace gazebo
                 msgTypename = msg->GetTypeName();
 
                 publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+                IGN_ASSERT(publication != NULL,
+                    "FindPublication returned NULL");
 
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())

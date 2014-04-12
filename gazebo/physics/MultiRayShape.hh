@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-#ifndef _MULTIRAYSHAPE_HH_
-#define _MULTIRAYSHAPE_HH_
+#ifndef _GAZEBO_MULTIRAYSHAPE_HH_
+#define _GAZEBO_MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
+#include <ignition/math.hh>
+#include <ignition/common.hh>
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -90,11 +90,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      public: ignition::math::Angle GetMinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      public: ignition::math::Angle GetMaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -106,11 +106,11 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      public: ignition::math::Angle GetVerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      public: ignition::math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();
@@ -129,12 +129,14 @@ namespace gazebo
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
       public: template<typename T>
-              event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
+              ignition::common::ConnectionPtr ConnectNewLaserScans(
+                  T _subscriber)
               {return this->newLaserScans.Connect(_subscriber);}
 
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
+      public: void DisconnectNewLaserScans(
+                  ignition::common::ConnectionPtr &_conn)
               {this->newLaserScans.Disconnect(_conn);}
 
       /// \brief Physics engine specific method for updating the rays.
@@ -143,14 +145,14 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                                     const math::Vector3 &_end);
+      protected: virtual void AddRay(const ignition::math::Vector3 &_start,
+                                     const ignition::math::Vector3 &_end);
 
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
 
       /// \brief Pose offset of all the rays.
-      protected: math::Pose offset;
+      protected: ignition::math::Pose offset;
 
       /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;
@@ -168,7 +170,7 @@ namespace gazebo
       protected: sdf::ElementPtr rangeElem;
 
       /// \brief New laser scans event.
-      protected: event::EventT<void()> newLaserScans;
+      protected: ignition::common::EventT<void()> newLaserScans;
     };
     /// \}
   }

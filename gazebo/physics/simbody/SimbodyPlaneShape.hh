@@ -38,7 +38,7 @@ namespace gazebo
       public: virtual ~SimbodyPlaneShape();
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      public: virtual void SetAltitude(const ignition::math::Vector3 &_pos);
 
       // Documentation inherited
       public: virtual void CreatePlane();

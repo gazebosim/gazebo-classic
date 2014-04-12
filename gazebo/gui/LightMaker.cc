@@ -20,7 +20,7 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/common/MouseEvent.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -39,8 +39,10 @@ LightMaker::LightMaker() : EntityMaker()
 
   this->state = 0;
 
-  msgs::Set(this->msg.mutable_diffuse(), common::Color(0.5, 0.5, 0.5, 1));
-  msgs::Set(this->msg.mutable_specular(), common::Color(0.1, 0.1, 0.1, 1));
+  msgs::Set(this->msg.mutable_diffuse(),
+      ignition::common::Color(0.5, 0.5, 0.5, 1));
+  msgs::Set(this->msg.mutable_specular(),
+      ignition::common::Color(0.1, 0.1, 0.1, 1));
 
   this->msg.set_attenuation_constant(0.5);
   this->msg.set_attenuation_linear(0.01);
@@ -57,9 +59,9 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
   this->light->Load();
 
   this->light->SetLightType(this->lightTypename);
-  this->light->SetPosition(math::Vector3(0, 0, 1));
+  this->light->SetPosition(ignition::math::Vector3(0, 0, 1));
   if (this->lightTypename == "directional")
-    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
+    this->light->SetDirection(ignition::math::Vector3(.1, .1, -0.9));
 
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
@@ -84,7 +86,7 @@ bool LightMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void LightMaker::OnMousePush(const common::MouseEvent &/*_event*/)
+void LightMaker::OnMousePush(const ignition::common::MouseEvent &/*_event*/)
 {
 }
 
@@ -94,15 +96,15 @@ void LightMaker::CreateTheEntity()
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
             this->light->GetPosition());
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+           ignition::math::Quaternion());
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }
 
 /////////////////////////////////////////////////
-void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
+void LightMaker::OnMouseRelease(const ignition::common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == ignition::common::MouseEvent::LEFT && !_event.dragging)
   {
     this->CreateTheEntity();
     this->Stop();
@@ -112,16 +114,16 @@ void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 // \TODO: This was copied from ModelMaker. Figure out a better way to
 // prevent code duplication.
-void LightMaker::OnMouseMove(const common::MouseEvent &_event)
+void LightMaker::OnMouseMove(const ignition::common::MouseEvent &_event)
 {
-  math::Vector3 origin1, dir1, p1;
+  ignition::math::Vector3 origin1, dir1, p1;
 
   // Cast two rays from the camera into the world
   this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  ignition::math::Plane plane(ignition::math::Vector3(0, 0, 1), 0);
 
   double dist1 = plane.Distance(origin1, dir1);
 

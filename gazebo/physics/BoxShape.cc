@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
@@ -35,23 +35,23 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(this->sdf->Get<ignition::math::Vector3>("size"));
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetSize(const math::Vector3 &_size)
+void BoxShape::SetSize(const ignition::math::Vector3 &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BoxShape::GetSize() const
+ignition::math::Vector3 BoxShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->sdf->Get<ignition::math::Vector3>("size");
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetScale(const math::Vector3 &_scale)
+void BoxShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
     return;

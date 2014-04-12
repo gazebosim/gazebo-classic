@@ -57,13 +57,13 @@ void KeyEventHandler::RemoveReleaseFilter(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void KeyEventHandler::HandlePress(const common::KeyEvent &_event)
+void KeyEventHandler::HandlePress(const ignition::common::KeyEvent &_event)
 {
   this->Handle(_event, this->pressFilters);
 }
 
 /////////////////////////////////////////////////
-void KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
+void KeyEventHandler::HandleRelease(const ignition::common::KeyEvent &_event)
 {
   this->Handle(_event, this->releaseFilters);
 }
@@ -87,7 +87,7 @@ void KeyEventHandler::Remove(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void KeyEventHandler::Handle(const common::KeyEvent &_event,
+void KeyEventHandler::Handle(const ignition::common::KeyEvent &_event,
     std::list<Filter> &_list)
 {
   for (std::list<Filter>::iterator iter = _list.begin();

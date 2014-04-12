@@ -18,15 +18,15 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/MouseEvent.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
+#include "ignition/math/Quaternion.hh"
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -71,7 +71,7 @@ ModelMaker::~ModelMaker()
 //
 //   if (!this->modelVisual)
 //   {
-//     gzerr << "Unable to clone\n";
+//     ignerr << "Unable to clone\n";
 //     return false;
 //   }
 //
@@ -98,7 +98,7 @@ bool ModelMaker::InitFromSDFString(const std::string &_data)
 
   if (!sdf::readString(_data, this->modelSDF))
   {
-    gzerr << "Unable to load SDF from data\n";
+    ignerr << "Unable to load SDF from data\n";
     return false;
   }
 
@@ -124,7 +124,7 @@ bool ModelMaker::InitFromFile(const std::string &_filename)
 
   if (!sdf::readFile(_filename, this->modelSDF))
   {
-    gzerr << "Unable to load file[" << _filename << "]\n";
+    ignerr << "Unable to load file[" << _filename << "]\n";
     return false;
   }
 
@@ -138,7 +138,7 @@ bool ModelMaker::Init()
 
   // Load the world file
   std::string modelName;
-  math::Pose modelPose, linkPose, visualPose;
+  ignition::math::Pose modelPose, linkPose, visualPose;
   sdf::ElementPtr modelElem;
 
   if (this->modelSDF->root->HasElement("model"))
@@ -147,12 +147,12 @@ bool ModelMaker::Init()
     modelElem = this->modelSDF->root->GetElement("light");
   else
   {
-    gzerr << "No model or light in SDF\n";
+    ignerr << "No model or light in SDF\n";
     return false;
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->Get<math::Pose>("pose");
+    modelPose = modelElem->Get<ignition::math::Pose>("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
     modelElem->Get<std::string>("name");
@@ -177,7 +177,7 @@ bool ModelMaker::Init()
       {
         std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->Get<math::Pose>("pose");
+          linkPose = linkElem->Get<ignition::math::Pose>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -196,7 +196,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->Get<math::Pose>("pose");
+            visualPose = visualElem->Get<ignition::math::Pose>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -216,7 +216,7 @@ bool ModelMaker::Init()
         linkElem = linkElem->GetNextElement("link");
       }
     }
-    catch(common::Exception &_e)
+    catch(ignition::common::Exception &_e)
     {
       this->visuals.clear();
       return false;
@@ -262,14 +262,14 @@ bool ModelMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
+void ModelMaker::OnMousePush(const ignition::common::MouseEvent &/*_event*/)
 {
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
+void ModelMaker::OnMouseRelease(const ignition::common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT)
+  if (_event.button == ignition::common::MouseEvent::LEFT)
   {
     // Place if not dragging, or if dragged for less than 50 pixels.
     // The 50 pixels is used to account for accidental mouse movement
@@ -283,9 +283,9 @@ void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
+void ModelMaker::OnMouseMove(const ignition::common::MouseEvent &_event)
 {
-  math::Pose pose = this->modelVisual->GetWorldPose();
+  ignition::math::Pose pose = this->modelVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
 
   if (!_event.shift)
@@ -298,7 +298,7 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
+void ModelMaker::OnMouseDrag(const ignition::common::MouseEvent &/*_event*/)
 {
 }
 

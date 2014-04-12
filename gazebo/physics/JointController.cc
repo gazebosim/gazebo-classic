@@ -60,8 +60,8 @@ void JointController::Reset()
 /////////////////////////////////////////////////
 void JointController::Update()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
+  ignition::common::Time currTime = this->model->GetWorld()->GetSimTime();
+  ignition::common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
   // Skip the update step if SimTime appears to have gone backward.
@@ -175,7 +175,7 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
     }
   }
   else
-    gzerr << "Unable to find joint[" << _msg->name() << "]\n";
+    ignerr << "Unable to find joint[" << _msg->name() << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -186,7 +186,7 @@ void JointController::SetJointPosition(const std::string &_name,
   if (jiter != this->joints.end())
     this->SetJointPosition(jiter->second, _position, _index);
   else
-    gzwarn << "SetJointPosition [" << _name << "] not found\n";
+    ignwarn << "SetJointPosition [" << _name << "] not found\n";
 }
 
 //////////////////////////////////////////////////
@@ -245,12 +245,12 @@ void JointController::SetJointPosition(
       // along axis
       double dposition = _position - _joint->GetAngle(_index).Radian();
 
-      math::Vector3 anchor;
-      math::Vector3 axis;
+     ignition::math::Vector3 anchor;
+     ignition::math::Vector3 axis;
 
       if (this->model->IsStatic())
       {
-        math::Pose linkWorldPose = childLink->GetWorldPose();
+       ignition::math::Pose linkWorldPose = childLink->GetWorldPose();
         /// \TODO: we want to get axis in global frame, but GetGlobalAxis
         /// not implemented for static models yet.
         axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(_index));
@@ -278,7 +278,8 @@ void JointController::SetJointPosition(
 
 //////////////////////////////////////////////////
 void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
-    const math::Vector3 &_anchor, const math::Vector3 &_axis,
+    const ignition::math::Vector3 &_anchor,
+    const ignition::math::Vector3 &_axis,
     double _dposition, bool _updateChildren)
 {
   if (!this->ContainsLink(this->updatedLinks, _link))
@@ -286,21 +287,22 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
     if (_joint->HasType(Base::HINGE_JOINT) ||
         _joint->HasType(Base::UNIVERSAL_JOINT))
     {
-      math::Pose linkWorldPose = _link->GetWorldPose();
+     ignition::math::Pose linkWorldPose = _link->GetWorldPose();
 
       // relative to anchor point
-      math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+     ignition::math::Pose relativePose(linkWorldPose.pos - _anchor,
+         linkWorldPose.rot);
 
       // take axis rotation and turn it int a quaternion
-      math::Quaternion rotation(_axis, _dposition);
+     ignition::math::Quaternion rotation(_axis, _dposition);
 
       // rotate relative pose by rotation
-      math::Pose newRelativePose;
+     ignition::math::Pose newRelativePose;
 
       newRelativePose.pos = rotation.RotateVector(relativePose.pos);
       newRelativePose.rot = rotation * relativePose.rot;
 
-      math::Pose newWorldPose(newRelativePose.pos + _anchor,
+     ignition::math::Pose newWorldPose(newRelativePose.pos + _anchor,
                               newRelativePose.rot);
 
       _link->SetWorldPose(newWorldPose);
@@ -315,17 +317,18 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
     }
     else if (_joint->HasType(Base::SLIDER_JOINT))
     {
-      math::Pose linkWorldPose = _link->GetWorldPose();
+     ignition::math::Pose linkWorldPose = _link->GetWorldPose();
 
       // relative to anchor point
-      math::Pose relativePose(linkWorldPose.pos - _anchor, linkWorldPose.rot);
+     ignition::math::Pose relativePose(linkWorldPose.pos - _anchor,
+         linkWorldPose.rot);
 
       // slide relative pose by dposition along axis
-      math::Pose newRelativePose;
+     ignition::math::Pose newRelativePose;
       newRelativePose.pos = relativePose.pos + _axis * _dposition;
       newRelativePose.rot = relativePose.rot;
 
-      math::Pose newWorldPose(newRelativePose.pos + _anchor,
+     ignition::math::Pose newWorldPose(newRelativePose.pos + _anchor,
                               newRelativePose.rot);
 
       _link->SetWorldPose(newWorldPose);
@@ -339,7 +342,7 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
       this->updatedLinks.push_back(_link);
     }
     else
-      gzerr << "should not be here\n";
+      ignerr << "should not be here\n";
   }
 
 
@@ -359,21 +362,22 @@ void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
 
 //////////////////////////////////////////////////
 void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
-     const math::Pose &_old, const math::Pose &_new, double _dt)
+    const ignition::math::Pose &_old,
+    const ignition::math::Pose &_new, double _dt)
 {
-    math::Vector3 linear_vel(0, 0, 0);
-    math::Vector3 angular_vel(0, 0, 0);
-    if (math::equal(_dt, 0.0))
-    {
-      gzwarn << "dt is 0, unable to compute velocity, set to 0s\n";
-    }
-    else
-    {
-      linear_vel = (_new.pos - _old.pos) / _dt;
-      angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
-    }
-    _link->SetLinearVel(linear_vel);
-    _link->SetAngularVel(angular_vel);
+  ignition::math::Vector3 linear_vel(0, 0, 0);
+  ignition::math::Vector3 angular_vel(0, 0, 0);
+  if (ignition::math::equal(_dt, 0.0))
+  {
+    ignwarn << "dt is 0, unable to compute velocity, set to 0s\n";
+  }
+  else
+  {
+    linear_vel = (_new.pos - _old.pos) / _dt;
+    angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
+  }
+  _link->SetLinearVel(linear_vel);
+  _link->SetAngularVel(angular_vel);
 }
 
 //////////////////////////////////////////////////

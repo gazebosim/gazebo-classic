@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/SingletonT.hh"
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Connection.hh"
@@ -39,7 +39,8 @@ namespace gazebo
 
     /// \class ConnectionManager ConnectionManager.hh transport/transport.hh
     /// \brief Manager of connections
-    class ConnectionManager : public SingletonT<ConnectionManager>
+    class ConnectionManager :
+      public ignition::common::SingletonT<ConnectionManager>
     {
       /// \brief Constructor
       private: ConnectionManager();
@@ -165,7 +166,7 @@ namespace gazebo
       private: Connection *serverConn;
 
       private: std::list<ConnectionPtr> connections;
-      protected: std::vector<event::ConnectionPtr> eventConnections;
+      protected: std::vector<ignition::common::ConnectionPtr> eventConnections;
 
       private: bool initialized;
       private: bool stop, stopped;

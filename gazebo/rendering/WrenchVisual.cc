@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/Conversions.hh"
@@ -57,32 +57,32 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
-  math::Quaternion q;
+  ignition::math::Quaternion q;
 
   this->coneXNode =
     this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
   this->coneXNode->attachObject(coneXObj);
-  q.SetFromAxis(0, 1, 0, GZ_DTOR(-90));
+  q.SetFromAxis(0, 1, 0, IGN_DTOR(-90));
   this->coneXNode->setOrientation(q.w, q.x, q.y, q.z);
   this->coneXNode->setScale(0.02, 0.02, 0.02);
 
   this->coneYNode =
     this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
   this->coneYNode->attachObject(coneYObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(90));
+  q.SetFromAxis(1, 0, 0, IGN_DTOR(90));
   this->coneYNode->setOrientation(q.w, q.x, q.y, q.z);
   this->coneYNode->setScale(0.02, 0.02, 0.02);
 
   this->coneZNode =
     this->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
   this->coneZNode->attachObject(coneZObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(180));
+  q.SetFromAxis(1, 0, 0, IGN_DTOR(180));
   this->coneZNode->setOrientation(q.w, q.x, q.y, q.z);
   this->coneZNode->setScale(0.02, 0.02, 0.02);
 
   this->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  this->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  this->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  this->forceLine->AddPoint(ignition::math::Vector3(0, 0, 0));
+  this->forceLine->AddPoint(ignition::math::Vector3(0, 0, 0));
   this->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   this->forceNode = this->sceneNode->createChildSceneNode(this->GetName() +
@@ -92,7 +92,7 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      common::Events::ConnectPreRender(
         boost::bind(&WrenchVisual::Update, this)));
 }
 
@@ -142,7 +142,8 @@ void WrenchVisual::Update()
       exp(-this->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(this->wrenchMsg->wrench().force());
+  ignition::math::Vector3 force =
+    msgs::Convert(this->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
       exp(force.GetSquaredLength() / magScale)) - offset;
 

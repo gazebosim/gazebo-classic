@@ -14,22 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all sensors
- * Author: Nathan Koenig
- * Date: 25 May 2007
- */
-
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
 
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
-
-#include "gazebo/common/Timer.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Plugin.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -61,8 +53,8 @@ Sensor::Sensor(SensorCategory _cat)
 
   this->node = transport::NodePtr(new transport::Node());
 
-  this->updateDelay = common::Time(0.0);
-  this->updatePeriod = common::Time(0.0);
+  this->updateDelay = ignition::common::Time(0.0);
+  this->updatePeriod = ignition::common::Time(0.0);
 
   this->id = physics::getUniqueId();
 }
@@ -95,7 +87,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<ignition::math::Pose>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -107,7 +99,7 @@ void Sensor::Load(const std::string &_worldName)
     this->scene = rendering::get_scene(_worldName);
 
   // loaded, but not updated
-  this->lastUpdateTime = common::Time(0.0);
+  this->lastUpdateTime = ignition::common::Time(0.0);
 
   this->node->Init(this->world->GetName());
   this->sensorPub = this->node->Advertise<msgs::Sensor>("~/sensor");
@@ -171,7 +163,7 @@ bool Sensor::NeedsUpdate()
   // Adjust time-to-update period to compensate for delays caused by another
   // sensor's update in the same thread.
 
-  common::Time simTime;
+  ignition::common::Time simTime;
   if (this->category == IMAGE && this->scene)
     simTime = this->scene->GetSimTime();
   else
@@ -189,7 +181,7 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    common::Time simTime;
+    ignition::common::Time simTime;
     if (this->category == IMAGE && this->scene)
       simTime = this->scene->GetSimTime();
     else
@@ -205,13 +197,13 @@ void Sensor::Update(bool _force)
       // sensor's update in the same thread.
       // NOTE: If you change this equation, also change the matching equation in
       // Sensor::NeedsUpdate
-      common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+      ignition::common::Time adjustedElapsed = simTime - this->lastUpdateTime +
         this->updateDelay;
 
       if (adjustedElapsed < this->updatePeriod && !_force)
         return;
 
-      this->updateDelay = std::max(common::Time::Zero,
+      this->updateDelay = std::max(ignition::common::Time::Zero,
           adjustedElapsed - this->updatePeriod);
 
       // if delay is more than a full update period, then give up trying
@@ -219,7 +211,7 @@ void Sensor::Update(bool _force)
       // an inactive to an active state, or the sensor just cannot hit its
       // target update rate (worst case).
       if (this->updateDelay >= this->updatePeriod)
-        this->updateDelay = common::Time::Zero;
+        this->updateDelay = ignition::common::Time::Zero;
     }
 
     if (this->UpdateImpl(_force))
@@ -259,22 +251,20 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 {
   std::string name = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
-  gazebo::SensorPluginPtr plugin = gazebo::SensorPlugin::Create(filename, name);
+  SensorPluginPtr plugin = SensorPlugin::Create(filename, name);
 
   if (plugin)
   {
-    if (plugin->GetType() != SENSOR_PLUGIN)
-    {
-      gzerr << "Sensor[" << this->GetName() << "] is attempting to load "
-            << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << name << "]\n";
-      return;
-    }
-
     SensorPtr myself = shared_from_this();
     plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
+  }
+  else
+  {
+    ignerr << "Sensor[" << this->GetName() << "] is attempting to load "
+      << "a plugin, but detected an incorrect plugin type. "
+      << "Plugin filename[" << filename << "] name[" << name << "]\n";
   }
 }
 
@@ -291,7 +281,7 @@ bool Sensor::IsActive()
 }
 
 //////////////////////////////////////////////////
-math::Pose Sensor::GetPose() const
+ignition::math::Pose Sensor::GetPose() const
 {
   return this->pose;
 }
@@ -315,13 +305,13 @@ void Sensor::SetUpdateRate(double _hz)
 }
 
 //////////////////////////////////////////////////
-common::Time Sensor::GetLastUpdateTime()
+ignition::common::Time Sensor::GetLastUpdateTime()
 {
   return this->lastUpdateTime;
 }
 
 //////////////////////////////////////////////////
-common::Time Sensor::GetLastMeasurementTime()
+ignition::common::Time Sensor::GetLastMeasurementTime()
 {
   return this->lastMeasurementTime;
 }
@@ -387,7 +377,7 @@ NoisePtr Sensor::GetNoise(unsigned int _index) const
 {
   if (_index >= this->noises.size())
   {
-    gzerr << "Get noise index out of range" << std::endl;
+    ignerr << "Get noise index out of range" << std::endl;
     return NoisePtr();
   }
   return this->noises[_index];

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include <time.h>
 
@@ -25,9 +25,13 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
+
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/ModelDatabase.hh"
 
 #include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -35,14 +39,6 @@
 #include "gazebo/transport/Subscriber.hh"
 
 #include "gazebo/util/LogPlay.hh"
-
-#include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Plugin.hh"
-
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
@@ -55,7 +51,6 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Actor.hh"
 #include "gazebo/physics/World.hh"
-#include "gazebo/common/SphericalCoordinates.hh"
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -71,12 +66,12 @@ class ModelUpdate_TBB
 {
   public: ModelUpdate_TBB(Model_V *_models) : models(_models) {}
   public: void operator() (const tbb::blocked_range<size_t> &_r) const
-  {
-    for (size_t i = _r.begin(); i != _r.end(); i++)
-    {
-      (*models)[i]->Update();
-    }
-  }
+          {
+            for (size_t i = _r.begin(); i != _r.end(); i++)
+            {
+              (*models)[i]->Update();
+            }
+          }
 
   private: Model_V *models;
 };
@@ -120,19 +115,19 @@ World::World(const std::string &_name)
   this->setWorldPoseMutex = new boost::mutex();
   this->worldUpdateMutex = new boost::recursive_mutex();
 
-  this->sleepOffset = common::Time(0);
+  this->sleepOffset = ignition::common::Time(0);
 
-  this->prevStatTime = common::Time::GetWallTime();
-  this->prevProcessMsgsTime = common::Time::GetWallTime();
+  this->prevStatTime = ignition::common::Time::GetWallTime();
+  this->prevProcessMsgsTime = ignition::common::Time::GetWallTime();
 
   this->connections.push_back(
-     event::Events::ConnectStep(boost::bind(&World::OnStep, this)));
+      common::Events::ConnectStep(boost::bind(&World::OnStep, this)));
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
-       boost::bind(&World::SetSelectedEntityCB, this, _1)));
+      common::Events::ConnectSetSelectedEntity(
+        boost::bind(&World::SetSelectedEntityCB, this, _1)));
   this->connections.push_back(
-     event::Events::ConnectPause(
-       boost::bind(&World::SetPaused, this, _1)));
+      common::Events::ConnectPause(
+        boost::bind(&World::SetPaused, this, _1)));
 }
 
 //////////////////////////////////////////////////
@@ -164,8 +159,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   if (this->sdf->Get<std::string>("name").empty())
-    gzwarn << "create_world(world_name =["
-           << this->name << "]) overwrites sdf world name\n!";
+    ignwarn << "create_world(world_name =["
+      << this->name << "]) overwrites sdf world name\n!";
   else
     this->name = this->sdf->Get<std::string>("name");
 
@@ -177,7 +172,7 @@ void World::Load(sdf::ElementPtr _sdf)
   this->sceneMsg.set_name(this->GetName());
 
   // The period at which messages are processed
-  this->processMsgsPeriod = common::Time(0, 200000000);
+  this->processMsgsPeriod = ignition::common::Time(0, 200000000);
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->GetName());
@@ -186,24 +181,24 @@ void World::Load(sdf::ElementPtr _sdf)
   // Scene, which in turn will be used by rendering sensors.
   // TODO: replace local communication with shared memory for efficiency.
   this->poseLocalPub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/local/info", 10);
+      "~/pose/local/info", 10);
 
   // pose pub for client with a cap on publishing rate to reduce traffic
   // overhead
   this->posePub = this->node->Advertise<msgs::PosesStamped>(
-    "~/pose/info", 10, 60);
+      "~/pose/info", 10, 60);
 
   this->guiPub = this->node->Advertise<msgs::GUI>("~/gui", 5);
   if (this->sdf->HasElement("gui"))
     this->guiPub->Publish(msgs::GUIFromSDF(this->sdf->GetElement("gui")));
 
   this->factorySub = this->node->Subscribe("~/factory",
-                                           &World::OnFactoryMsg, this);
+      &World::OnFactoryMsg, this);
   this->controlSub = this->node->Subscribe("~/world_control",
-                                           &World::OnControl, this);
+      &World::OnControl, this);
 
   this->requestSub = this->node->Subscribe("~/request",
-                                           &World::OnRequest, this, true);
+      &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
@@ -220,7 +215,7 @@ void World::Load(sdf::ElementPtr _sdf)
       shared_from_this());
 
   if (this->physicsEngine == NULL)
-    gzthrow("Unable to create physics engine\n");
+    ignthrow("Unable to create physics engine\n");
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
@@ -228,21 +223,22 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
-    common::SphericalCoordinates::SurfaceType surfaceType =
-      common::SphericalCoordinates::Convert(
-        spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::common::SphericalCoordinates::SurfaceType surfaceType =
+      ignition::common::SphericalCoordinates::Convert(
+          spherical->Get<std::string>("surface_model"));
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
     latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
     longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
     heading.SetFromDegree(spherical->Get<double>("heading_deg"));
 
-    this->sphericalCoordinates.reset(new common::SphericalCoordinates(
-      surfaceType, latitude, longitude, elevation, heading));
+    this->sphericalCoordinates.reset(
+        new ignition::common::SphericalCoordinates(
+          surfaceType, latitude, longitude, elevation, heading));
   }
 
   if (this->sphericalCoordinates == NULL)
-    gzthrow("Unable to create spherical coordinates data structure\n");
+    ignthrow("Unable to create spherical coordinates data structure\n");
 
   this->rootElement.reset(new Base(BasePtr()));
   this->rootElement->SetName(this->GetName());
@@ -286,7 +282,7 @@ void World::Load(sdf::ElementPtr _sdf)
   // else
   // this->modelUpdateFunc = &World::ModelUpdateTBB;
 
-  event::Events::worldCreated(this->GetName());
+  common::Events::worldCreated(this->GetName());
 
   this->loaded = true;
 }
@@ -298,13 +294,13 @@ void World::Save(const std::string &_filename)
   std::string data;
   data = "<?xml version ='1.0'?>\n";
   data += "<sdf version='" +
-          boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
+    boost::lexical_cast<std::string>(SDF_VERSION) + "'>\n";
   data += this->sdf->ToString("");
   data += "</sdf>\n";
 
   std::ofstream out(_filename.c_str(), std::ios::out);
   if (!out)
-    gzerr << "Unable to open file[" << _filename << "]\n";
+    ignerr << "Unable to open file[" << _filename << "]\n";
   else
     out << data;
 
@@ -341,7 +337,7 @@ void World::Init()
   this->logPrevIteration = 0;
 
   // Mark the world initialization
-  gzlog << "World::Init" << std::endl;
+  ignlog << "World::Init" << std::endl;
 
   util::DiagnosticManager::Instance()->Init(this->GetName());
 }
@@ -379,13 +375,13 @@ void World::RunLoop()
 {
   this->physicsEngine->InitForThread();
 
-  this->startTime = common::Time::GetWallTime();
+  this->startTime = ignition::common::Time::GetWallTime();
 
   // This fixes a minor issue when the world is paused before it's started
   if (this->IsPaused())
     this->pauseStartTime = this->startTime;
 
-  this->prevStepWallTime = common::Time::GetWallTime();
+  this->prevStepWallTime = ignition::common::Time::GetWallTime();
 
   this->logThread = new boost::thread(boost::bind(&World::LogWorker, this));
 
@@ -465,7 +461,7 @@ void World::LogStep()
         while (nameElem)
         {
           transport::requestNoReply(this->GetName(), "entity_delete",
-                                    nameElem->Get<std::string>());
+              nameElem->Get<std::string>());
           nameElem = nameElem->GetNextElement("name");
         }
       }
@@ -509,35 +505,36 @@ void World::Step()
 
   double updatePeriod = this->physicsEngine->GetUpdatePeriod();
   // sleep here to get the correct update rate
-  common::Time tmpTime = common::Time::GetWallTime();
-  common::Time sleepTime = this->prevStepWallTime +
-    common::Time(updatePeriod) - tmpTime - this->sleepOffset;
+  ignition::common::Time tmpTime = ignition::common::Time::GetWallTime();
+  ignition::common::Time sleepTime = this->prevStepWallTime +
+    ignition::common::Time(updatePeriod) - tmpTime - this->sleepOffset;
 
-  common::Time actualSleep = 0;
+  ignition::common::Time actualSleep = 0;
   if (sleepTime > 0)
   {
-    common::Time::Sleep(sleepTime);
-    actualSleep = common::Time::GetWallTime() - tmpTime;
+    ignition::common::Time::Sleep(sleepTime);
+    actualSleep = ignition::common::Time::GetWallTime() - tmpTime;
   }
   else
     sleepTime = 0;
 
   // exponentially avg out
   this->sleepOffset = (actualSleep - sleepTime) * 0.01 +
-                      this->sleepOffset * 0.99;
+    this->sleepOffset * 0.99;
 
   DIAG_TIMER_LAP("World::Step", "sleepOffset");
 
   // throttling update rate, with sleepOffset as tolerance
   // the tolerance is needed as the sleep time is not exact
-  if (common::Time::GetWallTime() - this->prevStepWallTime + this->sleepOffset
-         >= common::Time(updatePeriod))
+  if (ignition::common::Time::GetWallTime() -
+      this->prevStepWallTime + this->sleepOffset
+      >= ignition::common::Time(updatePeriod))
   {
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
 
     DIAG_TIMER_LAP("World::Step", "worldUpdateMutex");
 
-    this->prevStepWallTime = common::Time::GetWallTime();
+    this->prevStepWallTime = ignition::common::Time::GetWallTime();
 
     double stepTime = this->physicsEngine->GetMaxStepSize();
     if (!this->IsPaused() || this->stepInc > 0)
@@ -580,7 +577,7 @@ void World::Step(unsigned int _steps)
 {
   if (!this->IsPaused())
   {
-    gzwarn << "Calling World::Step(steps) while world is not paused\n";
+    ignwarn << "Calling World::Step(steps) while world is not paused\n";
     this->SetPaused(true);
   }
 
@@ -593,7 +590,7 @@ void World::Step(unsigned int _steps)
   bool wait = true;
   while (wait)
   {
-    common::Time::MSleep(1);
+    ignition::common::Time::MSleep(1);
     boost::recursive_mutex::scoped_lock lock(*this->worldUpdateMutex);
     if (this->stepInc == 0 || this->stop)
       wait = false;
@@ -620,7 +617,7 @@ void World::Update()
 
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
-  event::Events::worldUpdateBegin(this->updateInfo);
+  common::Events::worldUpdateBegin(this->updateInfo);
 
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
@@ -681,7 +678,7 @@ void World::Update()
 
   DIAG_TIMER_LAP("World::Update", "ContactManager::PublishContacts");
 
-  event::Events::worldUpdateEnd();
+  common::Events::worldUpdateEnd();
 
   DIAG_TIMER_STOP("World::Update");
 }
@@ -734,7 +731,7 @@ void World::ClearModels()
 
   // Remove all models
   for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); ++iter)
+      iter != this->models.end(); ++iter)
   {
     this->rootElement->RemoveChild((*iter)->GetId());
   }
@@ -756,7 +753,7 @@ PhysicsEnginePtr World::GetPhysicsEngine() const
 }
 
 //////////////////////////////////////////////////
-common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
+ignition::common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 {
   return this->sphericalCoordinates;
 }
@@ -798,7 +795,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
-    event::Events::addEntity(model->GetScopedName());
+    common::Events::addEntity(model->GetScopedName());
 
     msgs::Model msg;
     model->FillMsg(msg);
@@ -808,7 +805,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
   }
   else
   {
-    gzerr << "SDF is missing the <model> tag:\n";
+    ignerr << "SDF is missing the <model> tag:\n";
   }
 
   this->PublishModelPose(model);
@@ -823,7 +820,7 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
   actor->SetWorld(shared_from_this());
   actor->Load(_sdf);
 
-  event::Events::addEntity(actor->GetScopedName());
+  common::Events::addEntity(actor->GetScopedName());
 
   msgs::Model msg;
   actor->FillMsg(msg);
@@ -904,8 +901,8 @@ ModelPtr World::GetModel(unsigned int _index) const
 {
   if (_index >= this->models.size())
   {
-    gzerr << "Given model index[" << _index << "] is out of range[0.."
-          << this->models.size() << "]\n";
+    ignerr << "Given model index[" << _index << "] is out of range[0.."
+      << this->models.size() << "]\n";
     return ModelPtr();
   }
 
@@ -921,10 +918,10 @@ Model_V World::GetModels() const
 //////////////////////////////////////////////////
 void World::ResetTime()
 {
-  this->simTime = common::Time(0);
-  this->pauseTime = common::Time(0);
-  this->startTime = common::Time::GetWallTime();
-  this->realTimeOffset = common::Time(0);
+  this->simTime = ignition::common::Time(0);
+  this->pauseTime = ignition::common::Time(0);
+  this->startTime = ignition::common::Time::GetWallTime();
+  this->realTimeOffset = ignition::common::Time(0);
   this->iterations = 0;
   sensors::SensorManager::Instance()->ResetLastUpdateTimes();
 }
@@ -944,8 +941,8 @@ void World::Reset()
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
 
-    math::Rand::SetSeed(math::Rand::GetSeed());
-    this->physicsEngine->SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::SetSeed(ignition::math::Rand::GetSeed());
+    this->physicsEngine->SetSeed(ignition::math::Rand::GetSeed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
@@ -1014,38 +1011,38 @@ void World::PrintEntityTree()
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetSimTime() const
+ignition::common::Time World::GetSimTime() const
 {
   return this->simTime;
 }
 
 //////////////////////////////////////////////////
-void World::SetSimTime(const common::Time &_t)
+void World::SetSimTime(const ignition::common::Time &_t)
 {
   this->simTime = _t;
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetPauseTime() const
+ignition::common::Time World::GetPauseTime() const
 {
   return this->pauseTime;
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetStartTime() const
+ignition::common::Time World::GetStartTime() const
 {
   return this->startTime;
 }
 
 //////////////////////////////////////////////////
-common::Time World::GetRealTime() const
+ignition::common::Time World::GetRealTime() const
 {
   if (!util::LogPlay::Instance()->IsOpen())
   {
     if (this->pause)
       return (this->pauseStartTime - this->startTime) - this->realTimeOffset;
     else
-      return (common::Time::GetWallTime() - this->startTime) -
+      return (ignition::common::Time::GetWallTime() - this->startTime) -
         this->realTimeOffset;
   }
   else
@@ -1074,12 +1071,13 @@ void World::SetPaused(bool _p)
     // This is also a good time to clear out the logging buffer.
     util::LogRecord::Instance()->Notify();
 
-    this->pauseStartTime = common::Time::GetWallTime();
+    this->pauseStartTime = ignition::common::Time::GetWallTime();
   }
   else
-    this->realTimeOffset += common::Time::GetWallTime() - this->pauseStartTime;
+    this->realTimeOffset += ignition::common::Time::GetWallTime() -
+      this->pauseStartTime;
 
-  event::Events::pause(_p);
+  common::Events::pause(_p);
 }
 
 //////////////////////////////////////////////////
@@ -1109,7 +1107,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_seed())
   {
-    math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::SetSeed(_data->seed());
     this->physicsEngine->SetSeed(_data->seed());
   }
 
@@ -1190,10 +1188,10 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 
 //////////////////////////////////////////////////
 /*void World::ModelUpdateTBB()
-{
+  {
   tbb::parallel_for (tbb::blocked_range<size_t>(0, this->models.size(), 10),
-      ModelUpdate_TBB(&this->models));
-}*/
+  ModelUpdate_TBB(&this->models));
+  }*/
 
 //////////////////////////////////////////////////
 void World::ModelUpdateSingleLoop()
@@ -1230,7 +1228,7 @@ void World::LoadPlugins()
   }
 
   for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
+      iter != this->plugins.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -1238,26 +1236,25 @@ void World::LoadPlugins()
 
 //////////////////////////////////////////////////
 void World::LoadPlugin(const std::string &_filename,
-                       const std::string &_name,
-                       sdf::ElementPtr _sdf)
+    const std::string &_name,
+    sdf::ElementPtr _sdf)
 {
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
-                                                              _name);
+      _name);
 
   if (plugin)
   {
-    if (plugin->GetType() != WORLD_PLUGIN)
-    {
-      gzerr << "World[" << this->GetName() << "] is attempting to load "
-            << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
-      return;
-    }
     plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
 
     if (this->initialized)
       plugin->Init();
+  }
+  else
+  {
+    ignerr << "World[" << this->GetName() << "] is attempting to load "
+      << "a plugin, but detected an incorrect plugin type. "
+      << "Plugin filename[" << _filename << "] name[" << _name << "]\n";
   }
 }
 
@@ -1290,11 +1287,11 @@ void World::ProcessEntityMsgs()
 
   std::list<std::string>::iterator iter;
   for (iter = this->deleteEntity.begin();
-       iter != this->deleteEntity.end(); ++iter)
+      iter != this->deleteEntity.end(); ++iter)
   {
     // Remove all the dirty poses from the delete entity.
     for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
-         iter2 != this->dirtyPoses.end();)
+        iter2 != this->dirtyPoses.end();)
     {
       if ((*iter2)->GetName() == *iter ||
           (*iter2)->GetParent()->GetName() == *iter)
@@ -1333,7 +1330,7 @@ void World::ProcessRequestMsgs()
 
   std::list<msgs::Request>::iterator iter;
   for (iter = this->requestMsgs.begin();
-       iter != this->requestMsgs.end(); ++iter)
+      iter != this->requestMsgs.end(); ++iter)
   {
     bool send = true;
     response.set_id((*iter).id());
@@ -1423,9 +1420,9 @@ void World::ProcessRequestMsgs()
       this->UpdateStateSDF();
       std::ostringstream stream;
       stream << "<?xml version='1.0'?>\n"
-             << "<sdf version='" << SDF_VERSION << "'>\n"
-             << this->sdf->ToString("")
-             << "</sdf>";
+        << "<sdf version='" << SDF_VERSION << "'>\n"
+        << this->sdf->ToString("")
+        << "</sdf>";
 
       msg.set_data(stream.str());
 
@@ -1468,8 +1465,8 @@ void World::ProcessModelMsgs()
       model = this->GetModel((*iter).name());
 
     if (!model)
-      gzerr << "Unable to find model["
-            << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
+      ignerr << "Unable to find model["
+        << (*iter).name() << "] Id[" << (*iter).id() << "]\n";
     else
     {
       model->ProcessMsg(*iter);
@@ -1523,7 +1520,7 @@ void World::ProcessFactoryMsgs()
         // SDF Parsing happens here
         if (!sdf::readString((*iter).sdf(), factorySDF))
         {
-          gzerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
+          ignerr << "Unable to read sdf string[" << (*iter).sdf() << "]\n";
           continue;
         }
       }
@@ -1534,7 +1531,7 @@ void World::ProcessFactoryMsgs()
 
         if (!sdf::readFile(filename, factorySDF))
         {
-          gzerr << "Unable to read sdf file.\n";
+          ignerr << "Unable to read sdf file.\n";
           continue;
         }
       }
@@ -1543,7 +1540,7 @@ void World::ProcessFactoryMsgs()
         ModelPtr model = this->GetModel((*iter).clone_model_name());
         if (!model)
         {
-          gzerr << "Unable to clone model[" << (*iter).clone_model_name()
+          ignerr << "Unable to clone model[" << (*iter).clone_model_name()
             << "]. Model not found.\n";
           continue;
         }
@@ -1564,7 +1561,7 @@ void World::ProcessFactoryMsgs()
       }
       else
       {
-        gzerr << "Unable to load sdf from factory message."
+        ignerr << "Unable to load sdf from factory message."
           << "No SDF or SDF filename specified.\n";
         continue;
       }
@@ -1611,14 +1608,14 @@ void World::ProcessFactoryMsgs()
         }
         else
         {
-          gzerr << "Unable to find a model, light, or actor in:\n";
+          ignerr << "Unable to find a model, light, or actor in:\n";
           factorySDF->root->PrintValues("");
           continue;
         }
 
         if (!elem)
         {
-          gzerr << "Invalid SDF:";
+          ignerr << "Invalid SDF:";
           factorySDF->root->PrintValues("");
           continue;
         }
@@ -1652,7 +1649,7 @@ void World::ProcessFactoryMsgs()
   }
 
   for (std::list<sdf::ElementPtr>::iterator iter2 = modelsToLoad.begin();
-       iter2 != modelsToLoad.end(); ++iter2)
+      iter2 != modelsToLoad.end(); ++iter2)
   {
     try
     {
@@ -1662,13 +1659,13 @@ void World::ProcessFactoryMsgs()
     }
     catch(...)
     {
-      gzerr << "Loading model from factory message failed\n";
+      ignerr << "Loading model from factory message failed\n";
     }
   }
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
+ModelPtr World::GetModelBelowPoint(const ignition::math::Vector3 &_pt)
 {
   ModelPtr model;
   EntityPtr entity = this->GetEntityBelowPoint(_pt);
@@ -1676,17 +1673,17 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
   if (entity)
     model = entity->GetParentModel();
   else
-    gzerr << "Unable to find entity below point[" << _pt << "]\n";
+    ignerr << "Unable to find entity below point[" << _pt << "]\n";
 
   return model;
 }
 
 //////////////////////////////////////////////////
-EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
+EntityPtr World::GetEntityBelowPoint(const ignition::math::Vector3 &_pt)
 {
   std::string entityName;
   double dist;
-  math::Vector3 end;
+  ignition::math::Vector3 end;
 
   end = _pt;
   end.z -= 1000;
@@ -1705,13 +1702,13 @@ void World::SetState(const WorldState &_state)
 
   const ModelState_M modelStates = _state.GetModelStates();
   for (ModelState_M::const_iterator iter = modelStates.begin();
-       iter != modelStates.end(); ++iter)
+      iter != modelStates.end(); ++iter)
   {
     ModelPtr model = this->GetModel(iter->second.GetName());
     if (model)
       model->SetState(iter->second);
     else
-      gzerr << "Unable to find model[" << iter->second.GetName() << "]\n";
+      ignerr << "Unable to find model[" << iter->second.GetName() << "]\n";
   }
 }
 
@@ -1755,7 +1752,7 @@ std::string World::StripWorldName(const std::string &_name) const
 void World::EnableAllModels()
 {
   for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); ++iter)
+      iter != this->models.end(); ++iter)
   {
     (*iter)->SetEnabled(true);
   }
@@ -1765,7 +1762,7 @@ void World::EnableAllModels()
 void World::DisableAllModels()
 {
   for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); ++iter)
+      iter != this->models.end(); ++iter)
   {
     (*iter)->SetEnabled(false);
   }
@@ -1894,14 +1891,14 @@ void World::ProcessMessages()
     this->publishModelPoses.clear();
   }
 
-  if (common::Time::GetWallTime() - this->prevProcessMsgsTime >
+  if (ignition::common::Time::GetWallTime() - this->prevProcessMsgsTime >
       this->processMsgsPeriod)
   {
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
     this->ProcessModelMsgs();
-    this->prevProcessMsgsTime = common::Time::GetWallTime();
+    this->prevProcessMsgsTime = ignition::common::Time::GetWallTime();
   }
 }
 
@@ -1916,7 +1913,7 @@ void World::PublishWorldStats()
 
   if (this->statPub && this->statPub->HasConnections())
     this->statPub->Publish(this->worldStatsMsg);
-  this->prevStatTime = common::Time::GetWallTime();
+  this->prevStatTime = ignition::common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -1942,7 +1939,7 @@ void World::LogWorker()
   WorldPtr self = shared_from_this();
   this->logPrevIteration = this->iterations;
 
-  GZ_ASSERT(self, "Self pointer to World is invalid");
+  IGN_ASSERT(self, "Self pointer to World is invalid");
 
   while (!this->stop)
   {
@@ -1988,7 +1985,7 @@ uint32_t World::GetIterations() const
 void World::RemoveModel(const std::string &_name)
 {
   for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); ++iter)
+      iter != this->models.end(); ++iter)
   {
     if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
     {

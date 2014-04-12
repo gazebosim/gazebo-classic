@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -84,7 +84,7 @@ namespace gazebo
       private: std::string msgType;
 
       /// \brief Previous update time.
-      private: common::Time prevTime;
+      private: ignition::common::Time prevTime;
     };
     /// \}
   }

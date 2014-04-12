@@ -46,7 +46,8 @@ namespace gazebo
       visualMsg.mutable_material()->set_script("Gazebo/RedGlow");
 
       /// Set the pose of the visual relative to its parent
-      msgs::Set(visualMsg.mutable_pose(), math::Pose(0, 0, 0.6, 0, 0, 0));
+      msgs::Set(visualMsg.mutable_pose(),
+          ignition::math::Pose(0, 0, 0.6, 0, 0, 0));
 
       // Don't cast shadows
       visualMsg.set_cast_shadows(false);

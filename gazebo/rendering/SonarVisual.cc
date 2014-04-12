@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/Conversions.hh"
@@ -57,7 +57,7 @@ SonarVisual::SonarVisual(const std::string &_name, VisualPtr _vis,
   this->coneNode->setPosition(0, 0, 0);
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      common::Events::ConnectPreRender(
         boost::bind(&SonarVisual::Update, this)));
 }
 
@@ -100,28 +100,31 @@ void SonarVisual::Update()
     return;
   }
 
-  float rangeDelta = this->sonarMsg->sonar().range_max()
-      - this->sonarMsg->sonar().range_min();
+  float rangeDelta = this->sonarMsg->sonar().range_max() -
+    this->sonarMsg->sonar().range_min();
   float radiusScale = this->sonarMsg->sonar().radius()*2.0;
 
-  if (!math::equal(this->coneNode->getScale().z, rangeDelta) ||
-      !math::equal(this->coneNode->getScale().x, radiusScale))
+  if (!ignition::math::equal(this->coneNode->getScale().z, rangeDelta) ||
+      !ignition::math::equal(this->coneNode->getScale().x, radiusScale))
   {
     this->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
-    this->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
+    this->sonarRay->SetPoint(0,
+        ignition::math::Vector3(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(this->sonarMsg->sonar().world_pose());
+  ignition::math::Pose pose =
+    msgs::Convert(this->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (this->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(this->sonarMsg->sonar().contact());
+    ignition::math::Vector3 pos =
+      msgs::Convert(this->sonarMsg->sonar().contact());
     this->sonarRay->SetPoint(1, pos);
   }
   else
   {
-    this->sonarRay->SetPoint(1, math::Vector3(0, 0,
+    this->sonarRay->SetPoint(1, ignition::math::Vector3(0, 0,
           (rangeDelta * 0.5) - this->sonarMsg->sonar().range()));
   }
   this->receivedMsg = false;

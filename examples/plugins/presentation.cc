@@ -32,12 +32,12 @@ namespace gazebo
   class State
   {
     public: State(const std::string &_slide,
-                  const math::Vector3 _offset,
+                  const ignition::math::Vector3 _offset,
                   double _pitch, double _yaw, double _duration)
             : slide(_slide), offset(_offset),
               pitch(_pitch), yaw(_yaw), duration(_duration) {}
     public: std::string slide;
-    public: math::Vector3 offset;
+    public:ignition::math::Vector3 offset;
     public: double pitch;
     public: double yaw;
     public: double duration;
@@ -55,56 +55,56 @@ namespace gazebo
             boost::bind(&Presentation::KeyPress, this, _1)));
 
       this->states.push_back(new State("default::slide1",
-            math::Vector3(0, 0, 3.6), M_PI*0.5, 0, 0.6));
+           ignition::math::Vector3(0, 0, 3.6), M_PI*0.5, 0, 0.6));
       this->states.push_back(new State("default::slide1",
-            math::Vector3(0, 0, 3.6), M_PI*0.5, 0, 0.6));
+           ignition::math::Vector3(0, 0, 3.6), M_PI*0.5, 0, 0.6));
       this->states.push_back(new State("default::slide2",
-            math::Vector3(0, 0, 0.03), M_PI*0.5, 0, 0.6));
+           ignition::math::Vector3(0, 0, 0.03), M_PI*0.5, 0, 0.6));
       this->states.push_back(new State("default::slide3",
-            math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
       this->states.push_back(new State("default::slide4",
-            math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
       this->states.push_back(new State("default::slide5",
-            math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 0.03), M_PI*0.5, -M_PI*0.5, 0.5));
       this->states.push_back(new State("default::slide6",
-            math::Vector3(0, 0, 0.035), M_PI*0.5, -M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 0.035), M_PI*0.5, -M_PI*0.5, 0.5));
       this->states.push_back(new State("default::slide7",
-            math::Vector3(0, 0, 0.035), M_PI*0.5, -M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 0.035), M_PI*0.5, -M_PI*0.5, 0.5));
 
       this->states.push_back(new State("default::slide8",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0));
 
       this->states.push_back(new State("default::slide9",
-            math::Vector3(0, 0, .037), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, .037), M_PI*0.5, 0, 0.5));
       this->states.push_back(new State("default::slide10",
-            math::Vector3(0, 0, .037), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, .037), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide8",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide11",
-            math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide8",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide12",
-            math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide8",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide13",
-            math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 0.037), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide8",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, 0, 0.5));
 
       this->states.push_back(new State("default::slide14",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, M_PI*0.5, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, M_PI*0.5, 0.5));
 
       this->states.push_back(new State("default::slide15",
-            math::Vector3(0, 0, 3.5), M_PI*0.5, M_PI, 0.5));
+           ignition::math::Vector3(0, 0, 3.5), M_PI*0.5, M_PI, 0.5));
 
 
 
@@ -135,8 +135,8 @@ namespace gazebo
                rendering::Scene *scene = userCam->GetScene();
                rendering::VisualPtr visual =
                  scene->GetVisual((*this->iter)->slide);
-               math::Pose pose = visual->GetWorldPose();
-               math::Vector3 p = pose.pos +  (*this->iter)->offset;
+              ignition::math::Pose pose = visual->GetWorldPose();
+              ignition::math::Vector3 p = pose.pos +  (*this->iter)->offset;
 
                if ((*this->iter)->duration >0)
                {
@@ -148,7 +148,7 @@ namespace gazebo
                {
                  pose.pos = p;
                  pose.rot.SetFromEuler(
-                     math::Vector3(0, (*this->iter)->pitch,
+                    ignition::math::Vector3(0, (*this->iter)->pitch,
                                    (*this->iter)->yaw));
                  userCam->SetWorldPose(pose);
                }

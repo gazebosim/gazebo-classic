@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/PhysicsIface.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -61,7 +61,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // set update rate to 30 Hz
   updateRate = 30.0;
   sensor->SetUpdateRate(updateRate);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
+  igndbg << sensor->GetScopedName() << " loaded with update rate of "
         << sensor->GetUpdateRate() << " Hz\n";
 
   g_hokuyoMsgCount = 0;
@@ -82,7 +82,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  igndbg << "counted " << hokuyoMsgCount << " messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
@@ -91,12 +91,12 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   // Wait another 1.5 seconds
   for (i = 0; i < 15; ++i)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double();
 
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  igndbg << "counted " << hokuyoMsgCount << " messages in "
         << now << " seconds\n";
 
   // Expect at least 50% of specified update rate
@@ -112,21 +112,21 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
     msg.mutable_reset()->set_all(true);
     worldControlPub->Publish(msg);
   }
-  gzdbg << "sent reset world message\n";
-  common::Time::MSleep(100);
+  igndbg << "sent reset world message\n";
+  ignition::common::Time::MSleep(100);
   now = world->GetSimTime().Double();
-  gzdbg << "world time is now " << now << '\n';
+  igndbg << "world time is now " << now << '\n';
   EXPECT_LT(now, 0.12);
 
   // Count messages again for 2 second
   g_hokuyoMsgCount = 0;
   for (i = 0; i < 20; ++i)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double() - now;
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  igndbg << "counted " << hokuyoMsgCount << " messages in "
         << now << " seconds. Expected[" << updateRate * now * 0.5 << "]\n";
 
   // Expect at least 50% of specified update rate
@@ -139,11 +139,11 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   g_hokuyoMsgCount = 0;
   for (i = 0; i < 20; ++i)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   now = world->GetSimTime().Double();
-  gzdbg << "counted " << hokuyoMsgCount << " messages in "
+  igndbg << "counted " << hokuyoMsgCount << " messages in "
         << now - then << " seconds\n";
 
   // Expect at least 50% of specified update rate

@@ -28,9 +28,9 @@
 #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 
-#include "gazebo/math/Helpers.hh"
+#include "ignition/math/Helpers.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 
 using namespace gazebo;
@@ -151,12 +151,12 @@ void IncrementalPlot::Add(const QString &_label,
   else
     curve = iter->second;
 
-  GZ_ASSERT(curve != NULL, "Curve is NULL");
+  IGN_ASSERT(curve != NULL, "Curve is NULL");
 
   // Get the  curve data
   CurveData *curveData = static_cast<CurveData *>(curve->data());
 
-  GZ_ASSERT(curveData != NULL, "Curve data is NULL");
+  IGN_ASSERT(curveData != NULL, "Curve data is NULL");
 
   // Add all the points
   for (std::list<QPointF>::const_iterator ptIter = _pts.begin();
@@ -183,12 +183,12 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
   else
     curve = iter->second;
 
-  GZ_ASSERT(curve != NULL, "Curve is NULL");
+  IGN_ASSERT(curve != NULL, "Curve is NULL");
 
   // Get the curve data
   CurveData *curveData = static_cast<CurveData *>(curve->data());
 
-  GZ_ASSERT(curveData != NULL, "Curve data is NULL");
+  IGN_ASSERT(curveData != NULL, "Curve data is NULL");
 
   // Add a point
   curveData->Add(_pt);
@@ -197,7 +197,7 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 /////////////////////////////////////////////////
 void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
 {
-  GZ_ASSERT(_curve != NULL, "Curve is NULL");
+  IGN_ASSERT(_curve != NULL, "Curve is NULL");
 
   CurveData *curveData = static_cast<CurveData *>(_curve->data());
   const QPointF &lastPoint = curveData->samples().back();

@@ -34,7 +34,7 @@ class BulletTypes : public gazebo::testing::AutoLogFixture { };
 TEST_F(BulletTypes, ConvertVector3)
 {
   {
-    math::Vector3 vec, vec2;
+    ignition::math::Vector3 vec, vec2;
     btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
     EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
@@ -44,7 +44,7 @@ TEST_F(BulletTypes, ConvertVector3)
   }
 
   {
-    math::Vector3 vec(100.5, -2.314, 42), vec2;
+    ignition::math::Vector3 vec(100.5, -2.314, 42), vec2;
     btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
     EXPECT_NEAR(bt.getX(), vec.x, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), vec.y, NEAR_TOL);
@@ -59,7 +59,7 @@ TEST_F(BulletTypes, ConvertVector3)
 TEST_F(BulletTypes, ConvertVector4)
 {
   {
-    math::Vector4 vec, vec2;
+    ignition::math::Vector4 vec, vec2;
     btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
     EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
@@ -70,7 +70,7 @@ TEST_F(BulletTypes, ConvertVector4)
   }
 
   {
-    math::Vector4 vec(100.5, -2.314, 42, 848.8), vec2;
+    ignition::math::Vector4 vec(100.5, -2.314, 42, 848.8), vec2;
     btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
     EXPECT_NEAR(bt.getX(), vec.x, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), vec.y, NEAR_TOL);
@@ -86,7 +86,7 @@ TEST_F(BulletTypes, ConvertVector4)
 TEST_F(BulletTypes, ConvertPose)
 {
   {
-    math::Pose pose, pose2;
+    ignition::math::Pose pose, pose2;
     btTransform bt = physics::BulletTypes::ConvertPose(pose);
     EXPECT_NEAR(bt.getOrigin().getX(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getOrigin().getY(), 0, NEAR_TOL);
@@ -104,7 +104,8 @@ TEST_F(BulletTypes, ConvertPose)
   }
 
   {
-    math::Pose pose(105.4, 3.1, -0.34, 3.14/8, 3.14/16, -3.14/2), pose2;
+    ignition::math::Pose pose(
+        105.4, 3.1, -0.34, 3.14/8, 3.14/16, -3.14/2), pose2;
     btTransform bt = physics::BulletTypes::ConvertPose(pose);
     EXPECT_NEAR(bt.getOrigin().getX(), pose.pos.x, NEAR_TOL);
     EXPECT_NEAR(bt.getOrigin().getY(), pose.pos.y, NEAR_TOL);

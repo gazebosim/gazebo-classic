@@ -21,7 +21,7 @@
 #include <boost/bind.hpp>
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -52,25 +52,27 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 ODESliderJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
     dJointGetSliderAxis(this->jointId, result);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle ODESliderJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->jointId)
     result = dJointGetSliderPosition(this->jointId);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -82,7 +84,7 @@ double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
   if (this->jointId)
     result = dJointGetSliderPositionRate(this->jointId);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -94,7 +96,8 @@ void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
+void ODESliderJoint::SetAxis(unsigned int /*index*/,
+    const ignition::math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -105,7 +108,7 @@ void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3 globalAxis = _axis;
   if (this->parentLink)
     globalAxis =
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
@@ -116,7 +119,7 @@ void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
                         globalAxis.x, globalAxis.y, globalAxis.z);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -125,7 +128,7 @@ void ODESliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
   if (this->jointId)
     dJointAddSliderForce(this->jointId, _effort);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -143,7 +146,7 @@ double ODESliderJoint::GetParam(unsigned int _parameter) const
   if (this->jointId)
     result = dJointGetSliderParam(this->jointId, _parameter);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }

@@ -52,10 +52,10 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
 {
   if (this->parentJoint)
   {
-    math::Vector3 force = msgs::Convert(_msg.wrench().force());
+    ignition::math::Vector3 force = msgs::Convert(_msg.wrench().force());
     if (force.GetLength() > this->breakingForce)
     {
-      this->worldConnection = event::Events::ConnectWorldUpdateBegin(
+      this->worldConnection = common::Events::ConnectWorldUpdateBegin(
         boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));
     }
   }
@@ -67,5 +67,5 @@ void BreakableJointPlugin::OnWorldUpdate()
   this->parentSensor->SetActive(false);
   this->parentJoint->Detach();
   this->parentJoint->SetProvideFeedback(false);
-  event::Events::DisconnectWorldUpdateBegin(this->worldConnection);
+  common::Events::DisconnectWorldUpdateBegin(this->worldConnection);
 }

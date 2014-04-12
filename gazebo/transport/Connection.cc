@@ -25,7 +25,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/IOManager.hh"
@@ -146,13 +146,13 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
     // Make sure we didn't run off the end of the list.
     if (endpointIter == end)
     {
-      gzerr << "Unable to resolve uri[" << _host << ":" << _port << "]\n";
+      ignerr << "Unable to resolve uri[" << _host << ":" << _port << "]\n";
       return false;
     }
   }
   catch(...)
   {
-    gzerr << "Unable to resolve uri[" << host << ":" << _port << "]\n";
+    ignerr << "Unable to resolve uri[" << host << ":" << _port << "]\n";
     return false;
   }
 
@@ -170,7 +170,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   if (!this->connectCondition.timed_wait(lock,
         boost::posix_time::milliseconds(60000)) || this->connectError)
   {
-    gzlog << "Failed to create connection to remote host["
+    ignlog << "Failed to create connection to remote host["
           << host << ":" << _port << "]\n";
     this->socket->close();
     return false;
@@ -178,7 +178,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   if (this->remoteURI.empty())
   {
-    gzerr << "Unable to connect to host[" << host << ":" << _port << "]\n";
+    ignerr << "Unable to connect to host[" << host << ":" << _port << "]\n";
     return false;
   }
 
@@ -225,7 +225,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
         this->ipWhiteList.find("," +
           this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
     {
-      gzlog << "Rejected connection from["
+      ignlog << "Rejected connection from["
         << this->acceptConn->GetRemoteHostname() << "], not in white list["
         << this->ipWhiteList << "]\n";
     }
@@ -246,14 +246,14 @@ void Connection::OnAccept(const boost::system::error_code &e)
     // Probably the connection was closed. No need to report an error since
     // this can happen duing a shutdown.
     if (e.value() != ECANCELED)
-      gzerr << e.message() << "Value[" << e.value() << "]" << std::endl;
+      ignerr << e.message() << "Value[" << e.value() << "]" << std::endl;
   }
 }
 
 //////////////////////////////////////////////////
 void Connection::StartRead(const ReadCallback & /*_cb*/)
 {
-  gzerr << "\n\n\n\n DONT USE \n\n\n\n";
+  ignerr << "\n\n\n\n DONT USE \n\n\n\n";
 }
 
 //////////////////////////////////////////////////
@@ -434,7 +434,7 @@ void Connection::Close()
     catch(boost::system::system_error &e)
     {
       // This warning message is unnecessary...
-      // gzwarn << "Error closing socket[" << this->id << "] ["
+      // ignwarn << "Error closing socket[" << this->id << "] ["
              // << e.what() << "]\n";
     }
 
@@ -450,7 +450,7 @@ void Connection::Close()
     }
     catch(boost::system::system_error &e)
     {
-      gzwarn <<"Error closing acceptor[" << this->id << "]\n";
+      ignwarn <<"Error closing acceptor[" << this->id << "]\n";
     }
 
     delete this->acceptor;
@@ -473,7 +473,7 @@ void Connection::Cancel()
     }
     catch(boost::system::system_error &e)
     {
-      gzwarn << "Connection::Cancel Error[" << e.what() << "]\n";
+      ignwarn << "Connection::Cancel Error[" << e.what() << "]\n";
       // Left empty on purpose
     }
     delete this->acceptor;
@@ -513,7 +513,7 @@ bool Connection::Read(std::string &data)
 
   if (error)
   {
-    gzerr << "Connection[" << this->id << "] Closed during Read\n";
+    ignerr << "Connection[" << this->id << "] Closed during Read\n";
     throw boost::system::system_error(error);
   }
 
@@ -533,7 +533,7 @@ bool Connection::Read(std::string &data)
 
     if (len != incoming_size)
     {
-      gzerr << "Did not read everying. Read[" << len
+      ignerr << "Did not read everying. Read[" << len
         << "] Needed[" << incoming_size << "]\n";
     }
 
@@ -630,7 +630,7 @@ void Connection::ReadLoop(const ReadCallback &cb)
       }
       else
       {
-        common::Time::MSleep(10);
+        ignition::common::Time::MSleep(10);
         continue;
       }
     }
@@ -679,7 +679,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Complain if GAZEBO_HOSTNAME was set, but we were not able to get
     // a valid address.
     if (addressIsUnspecified(address))
-      gzerr << "GAZEBO_HOSTNAME[" << hostname << "] is invalid. "
+      ignerr << "GAZEBO_HOSTNAME[" << hostname << "] is invalid. "
             << "We will fallback onto GAZEBO_IP.";
   }
 
@@ -689,7 +689,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   {
     if (!ValidateIP(ip))
     {
-      gzerr << "GAZEBO_IP environment variable with value[" << ip
+      ignerr << "GAZEBO_IP environment variable with value[" << ip
             << "] is invalid. We will still try to use it, be warned.\n";
     }
 
@@ -709,7 +709,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     if (getifaddrs(&ifaddr) == -1)
     {
       perror("getifaddres");
-      gzthrow("Unable to get local interface addresses");
+      ignthrow("Unable to get local interface addresses");
     }
 
     char host[NI_MAXHOST];
@@ -732,7 +732,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
             host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
 
         if (s != 0)
-          gzthrow(std::string("getnameinfo() failed[") +
+          ignthrow(std::string("getnameinfo() failed[") +
                   gai_strerror(s) + "]\n");
 
         // Validate the IP address to make sure it's a valid dotted quad.
@@ -750,7 +750,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Use a loopback interface as a fallback.
     if (addressIsUnspecified(address))
     {
-      gzwarn << "Unable to find a non-loopback interface. You will "
+      ignwarn << "Unable to find a non-loopback interface. You will "
              << "not be able to connect to remote server.\n";
 
       address = address.loopback();
@@ -761,7 +761,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
 
   // Complain if we were unable to find a valid address
   if (addressIsUnspecified(address))
-    gzthrow("Unable to get IP address for the local machine."
+    ignthrow("Unable to get IP address for the local machine."
             "Please check your network configuration.");
 
   return boost::asio::ip::tcp::endpoint(address, 0);
@@ -784,7 +784,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
     boost::system::error_code ec;
     ep = this->socket->remote_endpoint(ec);
     if (ec)
-      gzerr << "Getting remote endpoint failed" << std::endl;
+      ignerr << "Getting remote endpoint failed" << std::endl;
   }
   return ep;
 }
@@ -851,7 +851,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
     else
     {
       this->connectError = true;
-      gzerr << "Invalid socket connection\n";
+      ignerr << "Invalid socket connection\n";
     }
 
     // Notify the condition that it may proceed.

@@ -155,7 +155,7 @@ void Diagnostics::OnMsg(ConstDiagnosticsPtr &_msg)
 
   boost::mutex::scoped_lock lock(this->mutex);
 
-  common::Time wallTime, elapsedTime;
+  ignition::common::Time wallTime, elapsedTime;
 
   wallTime = msgs::Convert(_msg->real_time());
 

@@ -15,9 +15,9 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyLink.hh"
@@ -46,7 +46,8 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyBallJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -54,67 +55,69 @@ math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
 /////////////////////////////////////////////////
 void SimbodyBallJoint::Init()
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
 void SimbodyBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
 double SimbodyBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
 double SimbodyBallJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
 void SimbodyBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
   return;
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 SimbodyBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
-  return math::Vector3();
+  ignerr << "Not implemented\n";
+  return ignition::math::Vector3();
 }
 
 /////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyBallJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
-  return math::Angle();
+  ignerr << "Not implemented\n";
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
 void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  ignerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
 void SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+                                   const ignition::math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+                                  const ignition::math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 

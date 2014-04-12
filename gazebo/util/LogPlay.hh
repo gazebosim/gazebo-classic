@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _LOGPLAY_HH_
-#define _LOGPLAY_HH_
+#ifndef _GAZEBO_LOGPLAY_HH_
+#define _GAZEBO_LOGPLAY_HH_
 
 #include <tinyxml.h>
 
@@ -24,7 +24,7 @@
 #include <string>
 #include <fstream>
 
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -43,7 +43,7 @@ namespace gazebo
     /// state information to a World.
     ///
     /// \sa LogRecord, State
-    class LogPlay : public SingletonT<LogPlay>
+    class LogPlay : public ignition::common::SingletonT<LogPlay>
     {
       /// \brief Constructor
       private: LogPlay();
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Get the random number seed of the open log file.
       /// \return The random number seed the open log file. The current
-      /// random number seed, as defined in math::Rand::GetSeed.
+      /// random number seed, as defined in ignition::math::Rand::GetSeed.
       public: uint32_t GetRandSeed() const;
 
       /// \brief Step through the open log file.

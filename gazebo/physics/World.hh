@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
@@ -30,6 +25,8 @@
 #include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+#include <ignition/common.hh>
+#include <ignition/math.hh>
 
 #include <sdf/sdf.hh>
 
@@ -39,7 +36,6 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
-#include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -126,7 +122,8 @@ namespace gazebo
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
-      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
+      public: ignition::common::SphericalCoordinatesPtr
+              GetSphericalCoordinates() const;
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
@@ -169,25 +166,25 @@ namespace gazebo
       public: void PrintEntityTree();
 
       /// \brief Get the world simulation time, note if you want the PC
-      /// wall clock call common::Time::GetWallTime.
+      /// wall clock call ignition::common::Time::GetWallTime.
       /// \return The current simulation time
-      public: common::Time GetSimTime() const;
+      public: ignition::common::Time GetSimTime() const;
 
       /// \brief Set the sim time.
       /// \param[in] _t The new simulation time
-      public: void SetSimTime(const common::Time &_t);
+      public: void SetSimTime(const ignition::common::Time &_t);
 
       /// \brief Get the amount of time simulation has been paused.
       /// \return The pause time.
-      public: common::Time GetPauseTime() const;
+      public: ignition::common::Time GetPauseTime() const;
 
       /// \brief Get the wall time simulation was started..
       /// \return The start time.
-      public: common::Time GetStartTime() const;
+      public: ignition::common::Time GetStartTime() const;
 
       /// \brief Get the real time (elapsed time).
       /// \return The real time.
-      public: common::Time GetRealTime() const;
+      public: ignition::common::Time GetRealTime() const;
 
       /// \brief Returns the state of the simulation true if paused.
       /// \return True if paused.
@@ -226,7 +223,7 @@ namespace gazebo
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
-      public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
+      public: ModelPtr GetModelBelowPoint(const ignition::math::Vector3 &_pt);
 
       /// \brief Get the nearest entity below a point.
       ///
@@ -234,7 +231,7 @@ namespace gazebo
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Entity, NULL if none is found.
-      public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
+      public: EntityPtr GetEntityBelowPoint(const ignition::math::Vector3 &_pt);
 
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.
@@ -278,7 +275,7 @@ namespace gazebo
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
       /// \note Deprecated. Please use World::Step
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+      public: void StepWorld(int _steps) IGN_DEPRECATED(3.0);
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
@@ -469,13 +466,13 @@ namespace gazebo
       public: void ClearModels();
 
       /// \brief For keeping track of time step throttling.
-      private: common::Time prevStepWallTime;
+      private: ignition::common::Time prevStepWallTime;
 
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
 
       /// \brief Pointer the spherical coordinates data.
-      private: common::SphericalCoordinatesPtr sphericalCoordinates;
+      private: ignition::common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
@@ -493,13 +490,13 @@ namespace gazebo
       private: std::string name;
 
       /// \brief Current simulation time.
-      private: common::Time simTime;
+      private: ignition::common::Time simTime;
 
       /// \brief Amount of time simulation has been paused.
-      private: common::Time pauseTime;
+      private: ignition::common::Time pauseTime;
 
       /// \brief Clock time when simulation was started.
-      private: common::Time startTime;
+      private: ignition::common::Time startTime;
 
       /// \brief True if simulation is paused.
       private: bool pause;
@@ -508,7 +505,7 @@ namespace gazebo
       private: int stepInc;
 
       /// \brief All the event connections.
-      private: event::Connection_V connections;
+      private: ignition::common::Connection_V connections;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
@@ -565,13 +562,13 @@ namespace gazebo
       private: void (World::*modelUpdateFunc)();
 
       /// \brief Last time a world statistics message was sent.
-      private: common::Time prevStatTime;
+      private: ignition::common::Time prevStatTime;
 
       /// \brief Time at which pause started.
-      private: common::Time pauseStartTime;
+      private: ignition::common::Time pauseStartTime;
 
       /// \brief Used to compute a more accurate real time value.
-      private: common::Time realTimeOffset;
+      private: ignition::common::Time realTimeOffset;
 
       /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
@@ -644,13 +641,13 @@ namespace gazebo
       private: bool pluginsLoaded;
 
       /// \brief sleep timing error offset due to clock wake up latency
-      private: common::Time sleepOffset;
+      private: ignition::common::Time sleepOffset;
 
       /// \brief Last time incoming messages were processed.
-      private: common::Time prevProcessMsgsTime;
+      private: ignition::common::Time prevProcessMsgsTime;
 
       /// \brief Period over which messages should be processed.
-      private: common::Time processMsgsPeriod;
+      private: ignition::common::Time processMsgsPeriod;
 
       /// \brief Alternating buffer of states.
       private: std::deque<WorldState> states[2];
@@ -691,7 +688,7 @@ namespace gazebo
       private: uint64_t logPrevIteration;
 
       /// \brief Real time value set from a log file.
-      private: common::Time logRealTime;
+      private: ignition::common::Time logRealTime;
 
       /// \brief Mutex to protect the log worker thread.
       private: boost::mutex logMutex;

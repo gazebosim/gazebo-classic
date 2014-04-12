@@ -14,9 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Console.hh"
 #include "gazebo/rendering/Material.hh"
 
 using namespace gazebo;
@@ -139,7 +137,7 @@ void Material::CreateMaterials()
 }
 
 //////////////////////////////////////////////////
-void Material::Update(const gazebo::common::Material *_mat)
+void Material::Update(const ignition::common::Material *_mat)
 {
   Ogre::MaterialPtr matPtr;
 
@@ -153,10 +151,10 @@ void Material::Update(const gazebo::common::Material *_mat)
   matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
-  common::Color ambient =  _mat->GetAmbient();
-  common::Color diffuse =  _mat->GetDiffuse();
-  common::Color specular = _mat->GetSpecular();
-  common::Color emissive = _mat->GetEmissive();
+  ignition::common::Color ambient =  _mat->GetAmbient();
+  ignition::common::Color diffuse =  _mat->GetDiffuse();
+  ignition::common::Color specular = _mat->GetSpecular();
+  ignition::common::Color emissive = _mat->GetEmissive();
 
   pass->setLightingEnabled(_mat->GetLighting());
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);

@@ -22,14 +22,14 @@
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Collision.hh"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SonarSensor.hh"
@@ -71,7 +71,7 @@ void SonarSensor::Load(const std::string &_worldName)
   sdf::ElementPtr sonarElem = this->sdf->GetElement("sonar");
   if (!sonarElem)
   {
-    gzerr << "Sonar sensor is missing <sonar> SDF element";
+    ignerr << "Sonar sensor is missing <sonar> SDF element";
     return;
   }
 
@@ -82,37 +82,37 @@ void SonarSensor::Load(const std::string &_worldName)
 
   if (this->radius < 0)
   {
-    gzerr << "Sonar radius must be > 0. Current value is["
+    ignerr << "Sonar radius must be > 0. Current value is["
       << this->radius << "]\n";
     return;
   }
 
   if (this->rangeMin < 0)
   {
-    gzerr << "Min sonar range must be >= 0. Current value is["
+    ignerr << "Min sonar range must be >= 0. Current value is["
       << this->rangeMin << "]\n";
     return;
   }
 
   if (this->rangeMin > this->rangeMax)
   {
-    gzerr << "Min sonar range of [" << this->rangeMin << "] must be less than"
+    ignerr << "Min sonar range of [" << this->rangeMin << "] must be less than"
       << "the max sonar range of[" << this->rangeMax << "]\n";
     return;
   }
 
   Sensor::Load(_worldName);
-  GZ_ASSERT(this->world != NULL,
+  IGN_ASSERT(this->world != NULL,
       "SonarSensor did not get a valid World pointer");
 
   this->parentEntity = this->world->GetEntity(this->parentName);
 
-  GZ_ASSERT(this->parentEntity != NULL,
+  IGN_ASSERT(this->parentEntity != NULL,
       "Unable to get the parent entity.");
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
 
-  GZ_ASSERT(physicsEngine != NULL,
+  IGN_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
 
   /// \todo: Change the collision shape to a cone. Needs a collision shape
@@ -120,7 +120,7 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarCollision = physicsEngine->CreateCollision("mesh",
       this->parentName);
 
-  GZ_ASSERT(this->sonarCollision != NULL,
+  IGN_ASSERT(this->sonarCollision != NULL,
       "Unable to create a cylinder collision using the physics engine.");
 
   this->sonarCollision->SetName(this->GetScopedName() + "sensor_collision");
@@ -134,17 +134,17 @@ void SonarSensor::Load(const std::string &_worldName)
   this->sonarShape = boost::dynamic_pointer_cast<physics::MeshShape>(
       this->sonarCollision->GetShape());
 
-  GZ_ASSERT(this->sonarShape != NULL,
+  IGN_ASSERT(this->sonarShape != NULL,
       "Unable to get the sonar shape from the sonar collision.");
 
   // Use a scaled cone mesh for the sonar collision shape.
   this->sonarShape->SetMesh("unit_cone");
-  this->sonarShape->SetScale(math::Vector3(this->radius*2.0,
+  this->sonarShape->SetScale(ignition::math::Vector3(this->radius*2.0,
         this->radius*2.0, range));
 
   // Position the collision shape properly. Without this, the shape will be
   // centered at the start of the sonar.
-  math::Vector3 offset(0, 0, range * 0.5);
+  ignition::math::Vector3 offset(0, 0, range * 0.5);
   offset = this->pose.rot.RotateVector(offset);
   this->sonarMidPose.Set(this->pose.pos - offset, this->pose.rot);
 
@@ -240,8 +240,9 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
   msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
   this->sonarMsg.mutable_sonar()->set_range(0);
 
-  math::Pose referencePose = this->pose + this->parentEntity->GetWorldPose();
-  math::Vector3 pos;
+  ignition::math::Pose referencePose = this->pose +
+    this->parentEntity->GetWorldPose();
+  ignition::math::Vector3 pos;
 
   this->sonarMsg.mutable_sonar()->set_range(this->rangeMax);
 
@@ -259,7 +260,7 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
       for (int j = 0; j < (*iter)->contact(i).position_size(); ++j)
       {
         pos = msgs::Convert((*iter)->contact(i).position(j));
-        math::Vector3 relPos = pos - referencePose.pos;
+       ignition::math::Vector3 relPos = pos - referencePose.pos;
         double len = pos.Distance(referencePose.pos);
 
         // Debug output:

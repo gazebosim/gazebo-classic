@@ -27,7 +27,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 
 namespace boost
 {
@@ -38,7 +38,7 @@ namespace gazebo
 {
   class Master;
 
-  /// \class Master Master.hh gazebo_core.hh
+  /// \class Master Master.hh gazebo.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
   class Server
@@ -88,7 +88,7 @@ namespace gazebo
 
     /// \brief Set the parameters.
     /// \param[in] _params Map of string parameters
-    public: void SetParams(const common::StrStr_M &_params);
+    public: void SetParams(const ignition::common::StrStr_M &_params);
 
     /// \brief Get whether the Server has been initialized.
     /// \return True if initialized.
@@ -141,7 +141,7 @@ namespace gazebo
     private: std::list<msgs::ServerControl> controlMsgs;
 
     /// \brief Command line params that are passed to various Gazebo objects.
-    private: gazebo::common::StrStr_M params;
+    private: ignition::common::StrStr_M params;
 
     /// \brief Boost program options variable map.
     private: boost::program_options::variables_map vm;

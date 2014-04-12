@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/ConnectionManager.hh"
@@ -66,7 +66,7 @@ ConnectionManager::ConnectionManager()
   this->serverConn = NULL;
 
   this->eventConnections.push_back(
-      event::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
+      common::Events::ConnectStop(boost::bind(&ConnectionManager::Stop, this)));
 }
 
 //////////////////////////////////////////////////
@@ -93,7 +93,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->serverConn->Listen(0,
       boost::bind(&ConnectionManager::OnAccept, this, _1));
 
-  gzmsg << "Waiting for master." << std::endl;
+  ignmsg << "Waiting for master." << std::endl;
   uint32_t timeoutCount = 0;
   uint32_t waitDurationMS = 1000;
 
@@ -103,13 +103,13 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     ++timeoutCount;
 
     if (timeoutCount < _timeoutIterations)
-      common::Time::MSleep(waitDurationMS);
+      ignition::common::Time::MSleep(waitDurationMS);
   }
 
 
   if (timeoutCount >= _timeoutIterations)
   {
-    gzerr << "Failed to connect to master in "
+    ignerr << "Failed to connect to master in "
           << (timeoutCount * waitDurationMS) / 1000.0 << " seconds."
           << std::endl;
     return false;
@@ -117,7 +117,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 
   if (!this->IsRunning())
   {
-    gzerr << "Connection Manager is not running" << std::endl;
+    ignerr << "Connection Manager is not running" << std::endl;
     return false;
   }
 
@@ -131,7 +131,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   }
   catch(...)
   {
-    gzerr << "Unable to read from master" << std::endl;
+    ignerr << "Unable to read from master" << std::endl;
     return false;
   }
 
@@ -145,17 +145,17 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     if (msg.data() == std::string("gazebo ") + GAZEBO_VERSION)
     {
       // TODO: set some flag.. maybe start "serverConn" when initialized
-      gzmsg << "Connected to gazebo master @ "
+      ignmsg << "Connected to gazebo master @ "
             << this->masterConn->GetRemoteURI() << std::endl;
     }
     else
     {
       // TODO: MAke this a proper error
-      gzerr << "Conflicting gazebo versions" << std::endl;
+      ignerr << "Conflicting gazebo versions" << std::endl;
     }
   }
   else
-    gzerr << "Didn't receive an init from the master" << std::endl;
+    ignerr << "Didn't receive an init from the master" << std::endl;
 
   packet.ParseFromString(namespacesData);
   if (packet.type() == "topic_namepaces_init")
@@ -171,7 +171,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     this->namespaceCondition.notify_all();
   }
   else
-    gzerr << "Did not get topic_namespaces_init msg from master" << std::endl;
+    ignerr << "Did not get topic_namespaces_init msg from master" << std::endl;
 
   packet.ParseFromString(publishersData);
   if (packet.type() == "publishers_init")
@@ -187,7 +187,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
     }
   }
   else
-    gzerr << "Did not get publishers_init msg from master" << std::endl;
+    ignerr << "Did not get publishers_init msg from master" << std::endl;
 
   this->masterConn->AsyncRead(
       boost::bind(&ConnectionManager::OnMasterRead, this, _1));
@@ -195,7 +195,7 @@ bool ConnectionManager::Init(const std::string &_masterHost,
   this->initialized = true;
 
   // Tell the user what address will be publicized to other nodes.
-  gzmsg << "Publicized address: "
+  ignmsg << "Publicized address: "
         << this->masterConn->GetLocalHostname() << std::endl;
 
   return true;
@@ -240,7 +240,7 @@ void ConnectionManager::Stop()
   this->updateCondition.notify_all();
   if (this->initialized)
     while (this->stopped == false)
-      common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
 }
 
 //////////////////////////////////////////////////
@@ -334,7 +334,7 @@ void ConnectionManager::OnMasterRead(const std::string &_data)
     this->masterMessages.push_back(std::string(_data));
   }
   else
-    gzerr << "ConnectionManager::OnMasterRead empty data\n";
+    ignerr << "ConnectionManager::OnMasterRead empty data\n";
 
   // Tell the ourself that we need an update
   this->TriggerUpdate();
@@ -437,7 +437,7 @@ void ConnectionManager::ProcessMessage(const std::string &_data)
   }
   else
   {
-    gzerr << "ConnectionManager::OnMasterRead unknown type["
+    ignerr << "ConnectionManager::OnMasterRead unknown type["
           << packet.type() << "][" << packet.serialized_data()
           << "] Data[" << _data << "]\n";
   }
@@ -460,7 +460,7 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
 {
   if (_data.empty())
   {
-    gzerr << "Data was empty, try again\n";
+    ignerr << "Data was empty, try again\n";
     _connection->AsyncRead(
         boost::bind(&ConnectionManager::OnRead, this, _connection, _1));
     return;
@@ -484,7 +484,7 @@ void ConnectionManager::OnRead(ConnectionPtr _connection,
     TopicManager::Instance()->ConnectPubToSub(sub.topic(), subLink);
   }
   else
-    gzerr << "Error est here\n";
+    ignerr << "Error est here\n";
 }
 
 //////////////////////////////////////////////////
@@ -559,7 +559,7 @@ void ConnectionManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
     if (!this->namespaceCondition.timed_wait(lock,
           boost::posix_time::milliseconds(60000)))
     {
-      gzerr << "Unable to get namespaces from master\n";
+      ignerr << "Unable to get namespaces from master\n";
     }
   }
 
@@ -601,7 +601,7 @@ void ConnectionManager::Subscribe(const std::string &_topic,
 {
   if (!this->initialized)
   {
-    gzerr << "ConnectionManager is not initialized\n";
+    ignerr << "ConnectionManager is not initialized\n";
     return;
   }
 

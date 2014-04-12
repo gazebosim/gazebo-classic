@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #ifdef  __APPLE__
 # include <QtCore/qglobal.h>
 #endif
@@ -35,6 +30,7 @@
 #include <iostream>
 
 #include <boost/filesystem.hpp>
+#include <ignition/common.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -44,11 +40,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 #include "gazebo/rendering/Material.hh"
@@ -89,17 +81,17 @@ void RenderEngine::Load()
 {
   if (!this->CreateContext())
   {
-    gzwarn << "Unable to create X window. Rendering will be disabled\n";
+    ignwarn << "Unable to create X window. Rendering will be disabled\n";
     return;
   }
 
   if (!this->root)
   {
-    this->connections.push_back(event::Events::ConnectPreRender(
+    this->connections.push_back(common::Events::ConnectPreRender(
           boost::bind(&RenderEngine::PreRender, this)));
-    this->connections.push_back(event::Events::ConnectRender(
+    this->connections.push_back(common::Events::ConnectRender(
           boost::bind(&RenderEngine::Render, this)));
-    this->connections.push_back(event::Events::ConnectPostRender(
+    this->connections.push_back(common::Events::ConnectPostRender(
           boost::bind(&RenderEngine::PostRender, this)));
 
     // Create a new log manager and prevent output from going to stdout
@@ -117,7 +109,7 @@ void RenderEngine::Load()
     }
     catch(Ogre::Exception &e)
     {
-      gzthrow("Unable to create an Ogre rendering environment, no Root ");
+      ignthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
 #if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
@@ -161,7 +153,7 @@ ScenePtr RenderEngine::CreateScene(const std::string &_name,
   if (this->initialized)
     scene->Init();
   else
-    gzerr << "RenderEngine is not initialized\n";
+    ignerr << "RenderEngine is not initialized\n";
 
   rendering::Events::createScene(_name);
 
@@ -213,7 +205,7 @@ ScenePtr RenderEngine::GetScene(unsigned int index)
     return this->scenes[index];
   else
   {
-    gzerr << "Invalid Scene Index[" << index << "]\n";
+    ignerr << "Invalid Scene Index[" << index << "]\n";
     return ScenePtr();
   }
 }
@@ -397,7 +389,7 @@ void RenderEngine::LoadPlugins()
         {
           if ((*piter).find("RenderSystem") != std::string::npos)
           {
-            gzerr << "Unable to load Ogre Plugin[" << *piter
+            ignerr << "Unable to load Ogre Plugin[" << *piter
                   << "]. Rendering will not be possible."
                   << "Make sure you have installed OGRE and Gazebo properly.\n";
           }
@@ -413,11 +405,11 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
   if (_uri == "__default__" || _uri.empty())
     return;
 
-  std::string path = common::find_file_path(_uri);
+  std::string path = ignition::common::find_file_path(_uri);
 
   if (path.empty())
   {
-    gzerr << "URI doesn't exist[" << _uri << "]\n";
+    ignerr << "URI doesn't exist[" << _uri << "]\n";
     return;
   }
 
@@ -473,7 +465,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
             }
             catch(Ogre::Exception& e)
             {
-              gzerr << "Unable to parse material file[" << fullPath << "]\n";
+              ignerr << "Unable to parse material file[" << fullPath << "]\n";
             }
             stream->close();
           }
@@ -483,7 +475,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
   }
   catch(Ogre::Exception &/*_e*/)
   {
-    gzthrow("Unable to load Ogre Resources.\nMake sure the"
+    ignthrow("Unable to load Ogre Resources.\nMake sure the"
         "resources path in the world file is set correctly.");
   }
 }
@@ -563,7 +555,7 @@ void RenderEngine::SetupResources()
       }
       catch(Ogre::Exception &/*_e*/)
       {
-        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+        ignthrow("Unable to load Ogre Resources. Make sure the resources path "
             "in the world file is set correctly.");
       }
     }
@@ -600,7 +592,7 @@ void RenderEngine::SetupRenderSystem()
 
   if (renderSys == NULL)
   {
-    gzthrow("unable to find OpenGL rendering system. OGRE is probably "
+    ignthrow("unable to find OpenGL rendering system. OGRE is probably "
             "installed incorrectly. Double check the OGRE cmake output, "
             "and make sure OpenGL is enabled.");
   }
@@ -633,7 +625,7 @@ bool RenderEngine::CreateContext()
     this->dummyDisplay = XOpenDisplay(0);
     if (!this->dummyDisplay)
     {
-      gzerr << "Can't open display: " << XDisplayName(0) << "\n";
+      ignerr << "Can't open display: " << XDisplayName(0) << "\n";
       return false;
     }
 
@@ -648,7 +640,7 @@ bool RenderEngine::CreateContext()
 
     if (!dummyVisual)
     {
-      gzerr << "Unable to create glx visual\n";
+      ignerr << "Unable to create glx visual\n";
       return false;
     }
 
@@ -663,7 +655,7 @@ bool RenderEngine::CreateContext()
 
     if (!this->dummyContext)
     {
-      gzerr << "Unable to create glx context\n";
+      ignerr << "Unable to create glx context\n";
       return false;
     }
 
@@ -710,15 +702,15 @@ void RenderEngine::CheckSystemCapabilities()
     std::find(profiles.begin(), profiles.end(), "glsl") != profiles.end();
 
   if (!hasFragmentPrograms || !hasVertexPrograms)
-    gzwarn << "Vertex and fragment shaders are missing. "
+    ignwarn << "Vertex and fragment shaders are missing. "
            << "Fixed function rendering will be used.\n";
 
   if (!hasGLSL)
-    gzwarn << "GLSL is missing."
+    ignwarn << "GLSL is missing."
            << "Fixed function rendering will be used.\n";
 
   if (!hasFBO)
-    gzwarn << "Frame Buffer Objects (FBO) is missing. "
+    ignwarn << "Frame Buffer Objects (FBO) is missing. "
            << "Rendering will be disabled.\n";
 
   this->renderPathType = RenderEngine::NONE;

@@ -14,22 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: indepedentCreations@gmail.com
- * Date: 13 Feb 2006
- */
-
-#ifndef _MOVABLETEXT_HH_
-#define _MOVABLETEXT_HH_
+#ifndef _GAZEBO_MOVABLETEXT_HH_
+#define _GAZEBO_MOVABLETEXT_HH_
 
 #include <string>
+#include <ignition/common.hh>
+#include <ignition/math.hh>
 
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
-
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Color.hh"
-#include "gazebo/math/MathTypes.hh"
 
 namespace boost
 {
@@ -81,7 +74,8 @@ namespace gazebo
                         const std::string &_text,
                         const std::string &_fontName = "Arial",
                         float _charHeight = 1.0,
-                        const common::Color &_color = common::Color::White);
+                        const ignition::common::Color &_color =
+                        ignition::common::Color::White);
 
       /// \brief Set the font
       /// \param[in] _font Name of the font
@@ -101,11 +95,11 @@ namespace gazebo
 
       /// \brief Set the text color.
       /// \param[in] _color Text color.
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::common::Color &_color);
 
       /// \brief Get the text color.
       /// \return Texture color.
-      public: const common::Color &GetColor() const;
+      public: const ignition::common::Color &GetColor() const;
 
       /// \brief Set the height of a character.
       /// \param[in] _height Height of the characters.
@@ -148,7 +142,7 @@ namespace gazebo
 
       /// \brief Get the axis aligned bounding box of the text.
       /// \return The axis aligned bounding box.
-      public: math::Box GetAABB();
+      public: ignition::math::Box GetAABB();
 
       /// \brief Update the text.
       public: void Update();
@@ -211,7 +205,7 @@ namespace gazebo
       private: std::string fontName;
       private: std::string text;
 
-      private: common::Color color;
+      private: ignition::common::Color color;
       private: Ogre::RenderOperation renderOp;
       private: Ogre::AxisAlignedBox *aabb;
       private: Ogre::LightList lightList;

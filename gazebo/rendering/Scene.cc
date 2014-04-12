@@ -21,9 +21,9 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
@@ -87,7 +87,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->contactVisId = GZ_UINT32_MAX;
+  this->contactVisId = IGN_UINT32_MAX;
 
   this->initialized = false;
   this->showCOMs = false;
@@ -111,7 +111,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->receiveMutex = new boost::mutex();
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
+      common::Events::ConnectPreRender(boost::bind(&Scene::PreRender, this)));
 
   this->sensorSub = this->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
@@ -159,8 +159,8 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
   this->terrain = NULL;
   this->selectedVis.reset();
 
-  this->sceneSimTimePosesApplied = common::Time();
-  this->sceneSimTimePosesReceived = common::Time();
+  this->sceneSimTimePosesApplied = ignition::common::Time();
+  this->sceneSimTimePosesReceived = ignition::common::Time();
 }
 
 //////////////////////////////////////////////////
@@ -307,7 +307,7 @@ void Scene::Init()
   {
     boost::shared_ptr<sdf::Element> fogElem = this->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
-                 fogElem->Get<common::Color>("color"),
+                 fogElem->Get<ignition::common::Color>("color"),
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -409,7 +409,7 @@ std::string Scene::GetName() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &_color)
+void Scene::SetAmbientColor(const ignition::common::Color &_color)
 {
   this->sdf->GetElement("ambient")->Set(_color);
 
@@ -422,13 +422,13 @@ void Scene::SetAmbientColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::GetAmbientColor() const
+ignition::common::Color Scene::GetAmbientColor() const
 {
-  return this->sdf->Get<common::Color>("ambient");
+  return this->sdf->Get<ignition::common::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &_color)
+void Scene::SetBackgroundColor(const ignition::common::Color &_color)
 {
   this->sdf->GetElement("background")->Set(_color);
   Ogre::ColourValue clr = Conversions::Convert(_color);
@@ -454,14 +454,14 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::GetBackgroundColor() const
+ignition::common::Color Scene::GetBackgroundColor() const
 {
-  return this->sdf->Get<common::Color>("background");
+  return this->sdf->Get<ignition::common::Color>("background");
 }
 
 //////////////////////////////////////////////////
 void Scene::CreateGrid(uint32_t cell_count, float cell_length,
-                       float line_width, const common::Color &color)
+                       float line_width, const ignition::common::Color &color)
 {
   Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
 
@@ -476,7 +476,7 @@ Grid *Scene::GetGrid(uint32_t index) const
 {
   if (index >= this->grids.size())
   {
-    gzerr << "Scene::GetGrid() Invalid index\n";
+    ignerr << "Scene::GetGrid() Invalid index\n";
     return NULL;
   }
 
@@ -624,7 +624,7 @@ LightPtr Scene::GetLight(uint32_t _index) const
   }
   else
   {
-    gzerr << "Error: light index(" << _index << ") larger than light count("
+    ignerr << "Error: light index(" << _index << ") larger than light count("
           << this->lights.size() << "\n";
   }
 
@@ -687,7 +687,7 @@ VisualPtr Scene::GetSelectedVisual() const
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr _camera,
-                             const math::Vector2i &_mousePos,
+                             const ignition::math::Vector2i &_mousePos,
                              std::string &_mod)
 {
   VisualPtr visual;
@@ -707,7 +707,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
       }
       catch(boost::bad_any_cast &e)
       {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
+        ignerr << "boost any_cast error:" << e.what() << "\n";
       }
     }
 
@@ -718,7 +718,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     }
     catch(boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      ignerr << "boost any_cast error:" << e.what() << "\n";
     }
   }
 
@@ -727,7 +727,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetModelVisualAt(CameraPtr _camera,
-                                  const math::Vector2i &_mousePos)
+                                  const ignition::math::Vector2i &_mousePos)
 {
   VisualPtr vis = this->GetVisualAt(_camera, _mousePos);
   if (vis)
@@ -744,7 +744,7 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
 
   if (vis && visBelow)
   {
-    math::Vector3 pos = vis->GetWorldPose().pos;
+    ignition::math::Vector3 pos = vis->GetWorldPose().pos;
     double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
     pos.z -= dz;
     vis->SetWorldPosition(pos);
@@ -779,7 +779,7 @@ VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
 }
 
 //////////////////////////////////////////////////
-double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
+double Scene::GetHeightBelowPoint(const ignition::math::Vector3 &_pt)
 {
   double height = 0;
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
@@ -823,7 +823,7 @@ double Scene::GetHeightBelowPoint(const math::Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
+void Scene::GetVisualsBelowPoint(const ignition::math::Vector3 &_pt,
                                  std::vector<VisualPtr> &_visuals)
 {
   Ogre::Ray ray(Conversions::Convert(_pt), Ogre::Vector3(0, 0, -1));
@@ -864,7 +864,7 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
         }
         catch(boost::bad_any_cast &e)
         {
-          gzerr << "boost any_cast error:" << e.what() << "\n";
+          ignerr << "boost any_cast error:" << e.what() << "\n";
         }
       }
     }
@@ -873,7 +873,7 @@ void Scene::GetVisualsBelowPoint(const math::Vector3 &_pt,
 
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisualAt(CameraPtr _camera,
-                             const math::Vector2i &_mousePos)
+                             const ignition::math::Vector2i &_mousePos)
 {
   VisualPtr visual;
 
@@ -888,7 +888,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
     }
     catch(boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      ignerr << "boost any_cast error:" << e.what() << "\n";
     }
   }
 
@@ -897,7 +897,7 @@ VisualPtr Scene::GetVisualAt(CameraPtr _camera,
 
 /////////////////////////////////////////////////
 Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
-                                     const math::Vector2i &_mousePos,
+                                     const ignition::math::Vector2i &_mousePos,
                                      bool _ignoreSelectionObj)
 {
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
@@ -986,13 +986,13 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
 //////////////////////////////////////////////////
 bool Scene::GetFirstContact(CameraPtr _camera,
-                            const math::Vector2i &_mousePos,
-                            math::Vector3 &_position)
+                            const ignition::math::Vector2i &_mousePos,
+                           ignition::math::Vector3 &_position)
 {
   bool valid = false;
   Ogre::Camera *ogreCam = _camera->GetOgreCamera();
 
-  _position = math::Vector3::Zero;
+  _position =ignition::math::Vector3::Zero;
 
   // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
@@ -1081,7 +1081,7 @@ bool Scene::GetFirstContact(CameraPtr _camera,
 
   // Compute the interesection point using the mouse ray and a distance
   // value.
-  if (_position == math::Vector3::Zero && distance > 0.0)
+  if (_position ==ignition::math::Vector3::Zero && distance > 0.0)
   {
     _position = Conversions::Convert(mouseRay.getPoint(distance));
     valid = true;
@@ -1111,7 +1111,7 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
   }
   else
   {
-    gzerr << "Invalid SceneNode\n";
+    ignerr << "Invalid SceneNode\n";
     return;
   }
 
@@ -1140,8 +1140,8 @@ void Scene::PrintSceneGraphHelper(const std::string &prefix_, Ogre::Node *node_)
 }
 
 //////////////////////////////////////////////////
-void Scene::DrawLine(const math::Vector3 &start_,
-                     const math::Vector3 &end_,
+void Scene::DrawLine(const ignition::math::Vector3 &start_,
+                     const ignition::math::Vector3 &end_,
                      const std::string &name_)
 {
   Ogre::SceneNode *sceneNode = NULL;
@@ -1174,8 +1174,9 @@ void Scene::DrawLine(const math::Vector3 &start_,
 }
 
 //////////////////////////////////////////////////
-void Scene::SetFog(const std::string &_type, const common::Color &_color,
-                    double _density, double _start, double _end)
+void Scene::SetFog(const std::string &_type,
+    const ignition::common::Color &_color,
+    double _density, double _start, double _end)
 {
   Ogre::FogMode fogType = Ogre::FOG_NONE;
 
@@ -1429,7 +1430,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     }
 
     this->SetFog(elem->Get<std::string>("type"),
-                 elem->Get<common::Color>("color"),
+                 elem->Get<ignition::common::Color>("color"),
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
@@ -1761,8 +1762,8 @@ void Scene::PreRender()
         if (!this->selectedVis || this->selectionMode != "move" ||
             iter->first != this->selectedVis->GetId())
         {
-          math::Pose pose = msgs::Convert(pIter->second);
-          GZ_ASSERT(iter->second, "Visual pointer is NULL");
+         ignition::math::Pose pose = msgs::Convert(pIter->second);
+          IGN_ASSERT(iter->second, "Visual pointer is NULL");
           iter->second->SetPose(pose);
           PoseMsgs_M::iterator prev = pIter++;
           this->poseMsgs.erase(prev);
@@ -1789,7 +1790,7 @@ void Scene::PreRender()
           if (!this->selectedVis || this->selectionMode != "move" ||
               iter->first != this->selectedVis->GetId())
           {
-            math::Pose pose = msgs::Convert(pose_msg);
+           ignition::math::Pose pose = msgs::Convert(pose_msg);
             iter2->second->SetPose(pose);
           }
         }
@@ -1981,7 +1982,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 
   if (!linkVis)
   {
-    gzerr << "No link visual with id[" << _msg->id() << "] and name["
+    ignerr << "No link visual with id[" << _msg->id() << "] and name["
       << _msg->name() << "]\n";
     return false;
   }
@@ -2131,7 +2132,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       if (vis)
         vis->ShowCollision(true);
       else
-        gzerr << "Unable to find visual[" << _msg->data() << "]\n";
+        ignerr << "Unable to find visual[" << _msg->data() << "]\n";
     }
   }
   else if (_msg->request() == "hide_collision")
@@ -2155,7 +2156,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       if (vis)
         vis->ShowJoints(true);
       else
-        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+        ignerr << "Unable to find joint visual[" << _msg->data() << "]\n";
     }
   }
   else if (_msg->request() == "hide_joints")
@@ -2179,7 +2180,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
       if (vis)
         vis->ShowCOM(true);
       else
-        gzerr << "Unable to find joint visual[" << _msg->data() << "]\n";
+        ignerr << "Unable to find joint visual[" << _msg->data() << "]\n";
     }
   }
   else if (_msg->request() == "hide_com")
@@ -2240,7 +2241,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   else if (_msg->request() == "show_skeleton")
   {
     VisualPtr vis = this->GetVisual(_msg->data());
-    bool show = (math::equal(_msg->dbl_data(), 1.0)) ? true : false;
+    bool show = (ignition::math::equal(_msg->dbl_data(), 1.0)) ? true : false;
       if (vis)
         vis->ShowSkeleton(show);
   }
@@ -2293,7 +2294,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
             this->terrain->LoadFromMsg(_msg);
           }
           else
-            gzerr << "Only one Heightmap can be created per Scene\n";
+            ignerr << "Only one Heightmap can be created per Scene\n";
         } catch(...)
         {
           return false;
@@ -2314,7 +2315,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
       }
 
       if (iter != this->visuals.end())
-        gzerr << "Visual already exists. This shouldn't happen.\n";
+        ignerr << "Visual already exists. This shouldn't happen.\n";
 
       // Make sure the parent visual exists before trying to add a child
       // visual
@@ -2360,7 +2361,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-common::Time Scene::GetSimTime() const
+ignition::common::Time Scene::GetSimTime() const
 {
   boost::mutex::scoped_lock lock(*this->receiveMutex);
   return this->sceneSimTimePosesApplied;
@@ -2371,7 +2372,7 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
   this->sceneSimTimePosesReceived =
-    common::Time(_msg->time().sec(), _msg->time().nsec());
+    ignition::common::Time(_msg->time().sec(), _msg->time().nsec());
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
@@ -2462,21 +2463,21 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_time())
   {
     Ogre::Vector3 t = this->skyxController->getTime();
-    t.x = math::clamp(_msg->time(), 0.0, 24.0);
+    t.x =ignition::math::clamp(_msg->time(), 0.0, 24.0);
     this->skyxController->setTime(t);
   }
 
   if (_msg->has_sunrise())
   {
     Ogre::Vector3 t = this->skyxController->getTime();
-    t.y = math::clamp(_msg->sunrise(), 0.0, 24.0);
+    t.y =ignition::math::clamp(_msg->sunrise(), 0.0, 24.0);
     this->skyxController->setTime(t);
   }
 
   if (_msg->has_sunset())
   {
     Ogre::Vector3 t = this->skyxController->getTime();
-    t.z = math::clamp(_msg->sunset(), 0.0, 24.0);
+    t.z =ignition::math::clamp(_msg->sunset(), 0.0, 24.0);
     this->skyxController->setTime(t);
   }
 
@@ -2498,7 +2499,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   if (_msg->has_humidity())
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
-    vclouds->setWheater(math::clamp(_msg->humidity(), 0.0, 1.0),
+    vclouds->setWheater(ignition::math::clamp(_msg->humidity(), 0.0, 1.0),
                         wheater.y, true);
   }
 
@@ -2506,7 +2507,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   {
     Ogre::Vector2 wheater = vclouds->getWheater();
     vclouds->setWheater(wheater.x,
-                        math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
+        ignition::math::clamp(_msg->mean_cloud_size(), 0.0, 1.0), true);
   }
 
   this->skyx->update(0);
@@ -2651,7 +2652,7 @@ bool Scene::GetShadowsEnabled() const
 void Scene::AddVisual(VisualPtr _vis)
 {
   if (this->visuals.find(_vis->GetId()) != this->visuals.end())
-    gzerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+    ignerr << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
 
   this->visuals[_vis->GetId()] = _vis;
 }
@@ -2696,11 +2697,13 @@ void Scene::SetGrid(bool _enabled)
 {
   if (_enabled && this->grids.empty())
   {
-    Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
+    Grid *grid = new Grid(this, 20, 1, 10,
+        ignition::common::Color(0.3, 0.3, 0.3, 0.5));
     grid->Init();
     this->grids.push_back(grid);
 
-    grid = new Grid(this, 4, 5, 20, common::Color(0.8, 0.8, 0.8, 0.5));
+    grid = new Grid(this, 4, 5, 20,
+        ignition::common::Color(0.8, 0.8, 0.8, 0.5));
     grid->Init();
     this->grids.push_back(grid);
   }
@@ -2747,13 +2750,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->Load(_elem);
   comVis->SetVisible(false);
   this->visuals[comVis->GetId()] = comVis;
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
 }
 
 /////////////////////////////////////////////////
@@ -2819,7 +2815,7 @@ void Scene::ShowContacts(bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->contactVisId == IGN_UINT32_MAX && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->worldVisual, "~/physics/contacts"));
@@ -2834,7 +2830,10 @@ void Scene::ShowContacts(bool _show)
   if (vis)
     vis->SetEnabled(_show);
   else
-    gzerr << "Unable to get contact visualization. This should never happen.\n";
+  {
+    ignerr << "Unable to get contact visualization."
+      << " This should never happen.\n";
+    }
 }
 
 /////////////////////////////////////////////////

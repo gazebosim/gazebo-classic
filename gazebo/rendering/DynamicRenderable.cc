@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/rendering/DynamicRenderable.hh"
 
 using namespace gazebo;
@@ -83,10 +83,10 @@ void DynamicRenderable::SetOperationType(RenderOpType opType)
       this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_FAN;
       break;
     case RENDERING_MESH_RESOURCE:
-      gzwarn << "RENDERING_MESH_RESOURCE not handled\n";
+      ignwarn << "RENDERING_MESH_RESOURCE not handled\n";
       break;
     default:
-      gzerr << "Unknown render operation type[" << opType << "]\n";
+      ignerr << "Unknown render operation type[" << opType << "]\n";
       break;
   }
 }

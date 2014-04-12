@@ -15,8 +15,8 @@
  *
 */
 
+#include <ignition/common.hh>
 #include "ServerFixture.hh"
-#include "gazebo/common/common.hh"
 
 using namespace gazebo;
 class FileHandling : public ServerFixture
@@ -59,7 +59,7 @@ TEST_F(FileHandling, Save)
   while (i < 10 && (file = fopen(filename.str().c_str(), "r")) == NULL)
   {
     i++;
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
   fclose(file);
 

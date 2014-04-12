@@ -22,7 +22,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 #include "gazebo/rendering/RFIDTagVisual.hh"
 
 using namespace gazebo;
@@ -39,7 +39,8 @@ RFIDTagVisual::RFIDTagVisual(const std::string &_name, VisualPtr _vis,
   this->rfidSub = this->node->Subscribe(_topicName,
       &RFIDTagVisual::OnScan, this);
 
-  common::MeshManager::Instance()->CreateSphere("contact_sphere", .2, 10, 10);
+  ignition::common::MeshManager::Instance()->CreateSphere(
+      "contact_sphere", .2, 10, 10);
 
   this->AttachMesh("contact_sphere");
   this->SetMaterial("Gazebo/OrangeTransparent");
@@ -53,6 +54,6 @@ RFIDTagVisual::~RFIDTagVisual()
 /////////////////////////////////////////////////
 void RFIDTagVisual::OnScan(ConstPosePtr &/*_msg*/)
 {
-  // math::Vector3 pt = msgs::Convert(_msg->position());
+  // ignition::math::Vector3 pt = msgs::Convert(_msg->position());
   // this->sceneNode->setPosition(Conversions::Convert(pt));
 }

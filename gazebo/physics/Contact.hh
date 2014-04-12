@@ -28,8 +28,8 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/common/Time.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/physics/JointWrench.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
@@ -95,10 +95,10 @@ namespace gazebo
       public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
-      public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3 positions[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force normals.
-      public: math::Vector3 normals[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3 normals[MAX_CONTACT_JOINTS];
 
       /// \brief Array of contact depths
       public: double depths[MAX_CONTACT_JOINTS];
@@ -107,7 +107,7 @@ namespace gazebo
       public: int count;
 
       /// \brief Time at which the contact occurred.
-      public: common::Time time;
+      public: ignition::common::Time time;
 
       /// \brief World in which the contact occurred
       public: WorldPtr world;

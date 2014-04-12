@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 /* Desc: The Bullet physics engine wrapper
  * Author: Nate Koenig
  * Date: 11 June 2007
@@ -51,11 +51,11 @@
 #include "gazebo/physics/MapShape.hh"
 #include "gazebo/physics/ContactManager.hh"
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -74,40 +74,40 @@ struct CollisionFilter : public btOverlapFilterCallback
   // return true when pairs need collision
   virtual bool needBroadphaseCollision(btBroadphaseProxy *_proxy0,
       btBroadphaseProxy *_proxy1) const
-    {
-      GZ_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
-          "Bullet broadphase overlapping pair proxies are NULL");
+  {
+    IGN_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
+        "Bullet broadphase overlapping pair proxies are NULL");
 
-      bool collide = (_proxy0->m_collisionFilterGroup
-          & _proxy1->m_collisionFilterMask) != 0;
-      collide = collide && (_proxy1->m_collisionFilterGroup
-          & _proxy0->m_collisionFilterMask);
+    bool collide = (_proxy0->m_collisionFilterGroup
+        & _proxy1->m_collisionFilterMask) != 0;
+    collide = collide && (_proxy1->m_collisionFilterGroup
+        & _proxy0->m_collisionFilterMask);
 
-      btRigidBody *rb0 = btRigidBody::upcast(
-              static_cast<btCollisionObject *>(_proxy0->m_clientObject));
-      if (!rb0)
-        return collide;
-
-      btRigidBody *rb1 = btRigidBody::upcast(
-              static_cast<btCollisionObject *>(_proxy1->m_clientObject));
-      if (!rb1)
-         return collide;
-
-      BulletLink *link0 = static_cast<BulletLink *>(
-          rb0->getUserPointer());
-      GZ_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
-
-      BulletLink *link1 = static_cast<BulletLink *>(
-          rb1->getUserPointer());
-      GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
-
-      if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
-      {
-        if (link0->GetModel() == link1->GetModel())
-          collide = false;
-      }
+    btRigidBody *rb0 = btRigidBody::upcast(
+        static_cast<btCollisionObject *>(_proxy0->m_clientObject));
+    if (!rb0)
       return collide;
+
+    btRigidBody *rb1 = btRigidBody::upcast(
+        static_cast<btCollisionObject *>(_proxy1->m_clientObject));
+    if (!rb1)
+      return collide;
+
+    BulletLink *link0 = static_cast<BulletLink *>(
+        rb0->getUserPointer());
+    IGN_ASSERT(link0 != NULL, "Link0 in collision pair is NULL");
+
+    BulletLink *link1 = static_cast<BulletLink *>(
+        rb1->getUserPointer());
+    IGN_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+
+    if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
+    {
+      if (link0->GetModel() == link1->GetModel())
+        collide = false;
     }
+    return collide;
+  }
 };
 
 //////////////////////////////////////////////////
@@ -117,22 +117,22 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
   for (int i = 0; i < numManifolds; ++i)
   {
     btPersistentManifold *contactManifold =
-        _world->getDispatcher()->getManifoldByIndexInternal(i);
+      _world->getDispatcher()->getManifoldByIndexInternal(i);
     const btCollisionObject *obA =
-        static_cast<const btCollisionObject *>(contactManifold->getBody0());
+      static_cast<const btCollisionObject *>(contactManifold->getBody0());
     const btCollisionObject *obB =
-        static_cast<const btCollisionObject *>(contactManifold->getBody1());
+      static_cast<const btCollisionObject *>(contactManifold->getBody1());
 
     const btRigidBody *rbA = btRigidBody::upcast(obA);
     const btRigidBody *rbB = btRigidBody::upcast(obB);
 
     BulletLink *link1 = static_cast<BulletLink *>(
         obA->getUserPointer());
-    GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+    IGN_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
 
     BulletLink *link2 = static_cast<BulletLink *>(
         obB->getUserPointer());
-    GZ_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
+    IGN_ASSERT(link2 != NULL, "Link2 in collision pair is NULL");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = link1->GetCollision(colIndex);
@@ -143,7 +143,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     PhysicsEnginePtr engine = collisionPtr1->GetWorld()->GetPhysicsEngine();
     BulletPhysicsPtr bulletPhysics =
-          boost::static_pointer_cast<BulletPhysics>(engine);
+      boost::static_pointer_cast<BulletPhysics>(engine);
 
     // Add a new contact to the manager. This will return NULL if no one is
     // listening for contact information.
@@ -154,14 +154,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->GetWorldPose();
-    math::Pose body2Pose = link2->GetWorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    ignition::math::Pose body1Pose = link1->GetWorldPose();
+    ignition::math::Pose body2Pose = link2->GetWorldPose();
+    ignition::math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
+    ignition::math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
+    ignition::math::Vector3 localForce1;
+    ignition::math::Vector3 localForce2;
+    ignition::math::Vector3 localTorque1;
+    ignition::math::Vector3 localTorque2;
 
     int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
@@ -215,7 +215,7 @@ bool ContactCallback(btManifoldPoint &_cp,
     const btCollisionObjectWrapper *_obj1, int /*_partId1*/, int /*_index1*/)
 {
   _cp.m_combinedFriction = std::min(_obj1->m_collisionObject->getFriction(),
-    _obj0->m_collisionObject->getFriction());
+      _obj0->m_collisionObject->getFriction());
 
   // this return value is currently ignored, but to be on the safe side:
   //  return false if you don't calculate friction
@@ -224,14 +224,14 @@ bool ContactCallback(btManifoldPoint &_cp,
 
 //////////////////////////////////////////////////
 bool ContactProcessed(btManifoldPoint &/*_cp*/, void * /*_body0*/,
-                      void * /*_body1*/)
+    void * /*_body1*/)
 {
   return true;
 }
 
 //////////////////////////////////////////////////
-BulletPhysics::BulletPhysics(WorldPtr _world)
-    : PhysicsEngine(_world)
+  BulletPhysics::BulletPhysics(WorldPtr _world)
+: PhysicsEngine(_world)
 {
   // This function currently follows the pattern of bullet/Demos/HelloWorld
 
@@ -265,7 +265,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   btOverlapFilterCallback *filterCallback = new CollisionFilter();
   btOverlappingPairCache* pairCache = this->dynamicsWorld->getPairCache();
-  GZ_ASSERT(pairCache != NULL,
+  IGN_ASSERT(pairCache != NULL,
       "Bullet broadphase overlapping pair cache is NULL");
   pairCache->setOverlapFilterCallback(filterCallback);
 
@@ -278,7 +278,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::GetSeed());
 }
 
 //////////////////////////////////////////////////
@@ -305,10 +305,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  ignition::math::Vector3 g =
+    this->sdf->Get<ignition::math::Vector3>("gravity");
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
-    gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
+  if (g ==ignition::math::Vector3(0, 0, 0))
+    ignwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
@@ -332,18 +333,18 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetParam(PGS_ITERS));
+    boost::any_cast<int>(this->GetParam(PGS_ITERS));
   info.m_sor =
-      boost::any_cast<double>(this->GetParam(SOR));
+    boost::any_cast<double>(this->GetParam(SOR));
 
-  gzlog << " debug physics: "
-        << " iters[" << info.m_numIterations
-        << "] sor[" << info.m_sor
-        << "] erp[" << info.m_erp
-        << "] cfm[" << info.m_globalCfm
-        << "] split[" << info.m_splitImpulse
-        << "] split tol[" << info.m_splitImpulsePenetrationThreshold
-        << "]\n";
+  ignlog << " debug physics: "
+    << " iters[" << info.m_numIterations
+    << "] sor[" << info.m_sor
+    << "] erp[" << info.m_erp
+    << "] cfm[" << info.m_globalCfm
+    << "] split[" << info.m_splitImpulse
+    << "] split tol[" << info.m_splitImpulsePenetrationThreshold
+    << "]\n";
 
   // debugging
   // info.m_numIterations = 1000;
@@ -463,7 +464,7 @@ void BulletPhysics::UpdatePhysics()
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
   this->dynamicsWorld->stepSimulation(
-    this->maxStepSize, 1, this->maxStepSize);
+      this->maxStepSize, 1, this->maxStepSize);
 }
 
 //////////////////////////////////////////////////
@@ -503,150 +504,151 @@ void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
     return;
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
+  IGN_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
   switch (_param)
   {
     case SOLVER_TYPE:
-    {
-      std::string value;
-      try
       {
-        value = boost::any_cast<std::string>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      if (value == "sequential_impulse")
-      {
-        bulletElem->GetElement("solver")->GetElement("type")->Set(value);
-        this->solverType = value;
-      }
-      else
-        gzwarn << "Currently only 'sequential_impulse' solver is supported"
+        std::string value;
+        try
+        {
+          value = boost::any_cast<std::string>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        if (value == "sequential_impulse")
+        {
+          bulletElem->GetElement("solver")->GetElement("type")->Set(value);
+          this->solverType = value;
+        }
+        else
+          ignwarn << "Currently only 'sequential_impulse' solver is supported"
             << std::endl;
-      break;
-    }
+        break;
+      }
     case GLOBAL_CFM:
-    {
-      double value;
-      try
       {
-        value = boost::any_cast<double>(_value);
+        double value;
+        try
+        {
+          value = boost::any_cast<double>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+        info.m_globalCfm = value;
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
-      info.m_globalCfm = value;
-      break;
-    }
     case GLOBAL_ERP:
-    {
-      double value;
-      try
       {
-        value = boost::any_cast<double>(_value);
+        double value;
+        try
+        {
+          value = boost::any_cast<double>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
+        info.m_erp = value;
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
-      info.m_erp = value;
-      break;
-    }
     case PGS_ITERS:
-    {
-      int value;
-      try
       {
-        value = boost::any_cast<int>(_value);
+        int value;
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
+        bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
+        info.m_numIterations = value;
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-      bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
-      info.m_numIterations = value;
-      break;
-    }
     case SOR:
-    {
-      double value;
-      try
       {
-        value = boost::any_cast<double>(_value);
+        double value;
+        try
+        {
+          value = boost::any_cast<double>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
+        info.m_sor = value;
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
-      info.m_sor = value;
-      break;
-    }
     case CONTACT_SURFACE_LAYER:
-    {
-      /// TODO: Implement contact surface layer param
-      double value;
-      try
       {
-        value = boost::any_cast<double>(_value);
+        /// TODO: Implement contact surface layer param
+        double value;
+        try
+        {
+          value = boost::any_cast<double>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        bulletElem->GetElement("constraints")->GetElement(
+            "contact_surface_layer")->Set(value);
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement(
-          "contact_surface_layer")->Set(value);
-      break;
-    }
     case MAX_CONTACTS:
-    {
-      /// TODO: Implement max contacts param
-      int value;
-      try
       {
-        value = boost::any_cast<int>(_value);
+        /// TODO: Implement max contacts param
+        int value;
+        try
+        {
+          value = boost::any_cast<int>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          value = boost::any_cast<unsigned int>(_value);
+        }
+        bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-      bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
-      break;
-    }
     case MIN_STEP_SIZE:
-    {
-      /// TODO: Implement min step size param
-      double value;
-      try
       {
-        value = boost::any_cast<double>(_value);
+        /// TODO: Implement min step size param
+        double value;
+        try
+        {
+          value = boost::any_cast<double>(_value);
+        }
+        catch(boost::bad_any_cast &e)
+        {
+          ignerr << "boost any_cast error:" << e.what() << "\n";
+          return;
+        }
+        bulletElem->GetElement("solver")->GetElement(
+            "min_step_size")->Set(value);
+        break;
       }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
-      break;
-    }
     default:
-    {
-      gzwarn << "Param not supported in bullet" << std::endl;
-      break;
-    }
+      {
+        ignwarn << "Param not supported in bullet" << std::endl;
+        break;
+      }
   }
 }
 
@@ -673,7 +675,7 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MIN_STEP_SIZE;
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
+    ignwarn << _key << " is not supported in bullet" << std::endl;
     return;
   }
 
@@ -684,57 +686,57 @@ void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
 boost::any BulletPhysics::GetParam(BulletParam _param) const
 {
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
+  IGN_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   boost::any value = 0;
   switch (_param)
   {
     case SOLVER_TYPE:
-    {
-      value = bulletElem->GetElement("solver")->Get<std::string>("type");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("solver")->Get<std::string>("type");
+        break;
+      }
     case GLOBAL_CFM:
-    {
-      value = bulletElem->GetElement("constraints")->Get<double>("cfm");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("constraints")->Get<double>("cfm");
+        break;
+      }
     case GLOBAL_ERP:
-    {
-      value = bulletElem->GetElement("constraints")->Get<double>("erp");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("constraints")->Get<double>("erp");
+        break;
+      }
     case PGS_ITERS:
-    {
-      value = bulletElem->GetElement("solver")->Get<int>("iters");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("solver")->Get<int>("iters");
+        break;
+      }
     case SOR:
-    {
-      value = bulletElem->GetElement("solver")->Get<double>("sor");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("solver")->Get<double>("sor");
+        break;
+      }
     case CONTACT_SURFACE_LAYER:
-    {
-      value = bulletElem->GetElement("constraints")->Get<double>(
-          "contact_surface_layer");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("constraints")->Get<double>(
+            "contact_surface_layer");
+        break;
+      }
     case MAX_CONTACTS:
-    {
-      value = bulletElem->GetElement("max_contacts")->Get<int>();
-      break;
-    }
+      {
+        value = bulletElem->GetElement("max_contacts")->Get<int>();
+        break;
+      }
     case MIN_STEP_SIZE:
-    {
-      value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
-      break;
-    }
+      {
+        value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
+        break;
+      }
     default:
-    {
-      gzwarn << "Param not supported in bullet" << std::endl;
-      break;
-    }
+      {
+        ignwarn << "Param not supported in bullet" << std::endl;
+        break;
+      }
   }
   return value;
 }
@@ -762,7 +764,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
     param = MIN_STEP_SIZE;
   else
   {
-    gzwarn << _key << " is not supported in bullet" << std::endl;
+    ignwarn << _key << " is not supported in bullet" << std::endl;
     return 0;
   }
   return this->GetParam(param);
@@ -772,7 +774,7 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
 LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
-    gzthrow("Link must have a parent\n");
+    ignthrow("Link must have a parent\n");
 
   BulletLinkPtr link(new BulletLink(_parent));
   link->SetWorld(_parent->GetWorld());
@@ -782,7 +784,7 @@ LinkPtr BulletPhysics::CreateLink(ModelPtr _parent)
 
 //////////////////////////////////////////////////
 CollisionPtr BulletPhysics::CreateCollision(const std::string &_type,
-                                            LinkPtr _parent)
+    LinkPtr _parent)
 {
   BulletCollisionPtr collision(new BulletCollision(_parent));
   ShapePtr shape = this->CreateShape(_type, collision);
@@ -793,7 +795,7 @@ CollisionPtr BulletPhysics::CreateCollision(const std::string &_type,
 
 //////////////////////////////////////////////////
 ShapePtr BulletPhysics::CreateShape(const std::string &_type,
-                                    CollisionPtr _collision)
+    CollisionPtr _collision)
 {
   ShapePtr shape;
   BulletCollisionPtr collision =
@@ -819,12 +821,12 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     else
       shape.reset(new BulletRayShape(this->world->GetPhysicsEngine()));
   else
-    gzerr << "Unable to create collision of type[" << _type << "]\n";
+    ignerr << "Unable to create collision of type[" << _type << "]\n";
 
   /*
-  else if (_type == "map" || _type == "image")
-    shape.reset(new MapShape(collision));
-    */
+     else if (_type == "map" || _type == "image")
+     shape.reset(new MapShape(collision));
+     */
   return shape;
 }
 
@@ -846,20 +848,20 @@ JointPtr BulletPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   else if (_type == "screw")
     joint.reset(new BulletScrewJoint(this->dynamicsWorld, _parent));
   else
-    gzthrow("Unable to create joint of type[" << _type << "]");
+    ignthrow("Unable to create joint of type[" << _type << "]");
 
   return joint;
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::ConvertMass(InertialPtr /*_inertial*/,
-                                void * /*_engineMass*/)
+    void * /*_engineMass*/)
 {
 }
 
 //////////////////////////////////////////////////
 void BulletPhysics::ConvertMass(void * /*_engineMass*/,
-                                const InertialPtr /*_inertial*/)
+    const InertialPtr /*_inertial*/)
 {
 }
 
@@ -883,11 +885,11 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void BulletPhysics::SetGravity(const ignition::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dynamicsWorld->setGravity(
-    BulletTypes::ConvertVector3(_gravity));
+      BulletTypes::ConvertVector3(_gravity));
 }
 
 //////////////////////////////////////////////////

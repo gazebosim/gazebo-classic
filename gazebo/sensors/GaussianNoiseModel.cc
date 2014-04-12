@@ -17,10 +17,10 @@
 
 #include <boost/math/special_functions/round.hpp>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/math/Rand.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/math/Helpers.hh"
+#include "ignition/math/Rand.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"
@@ -42,27 +42,27 @@ namespace gazebo
     public: virtual void notifyMaterialRender(unsigned int _passId,
                                               Ogre::MaterialPtr &_mat)
     {
-      GZ_ASSERT(!_mat.isNull(), "Null OGRE material");
+      IGN_ASSERT(!_mat.isNull(), "Null OGRE material");
       // modify material here (wont alter the base material!), called for
       // every drawn geometry instance (i.e. compositor render_quad)
 
       // Sample three values within the range [0,1.0] and set them for use in
       // the fragment shader, which will interpret them as offsets from (0,0)
       // to use when computing pseudo-random values.
-      Ogre::Vector3 offsets(math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0),
-                            math::Rand::GetDblUniform(0.0, 1.0));
+      Ogre::Vector3 offsets(ignition::math::Rand::GetDblUniform(0.0, 1.0),
+                           ignition::math::Rand::GetDblUniform(0.0, 1.0),
+                           ignition::math::Rand::GetDblUniform(0.0, 1.0));
       // These calls are setting parameters that are declared in two places:
       // 1. media/materials/scripts/gazebo.material, in
       //    fragment_program Gazebo/GaussianCameraNoiseFS
       // 2. media/materials/scripts/camera_noise_gaussian_fs.glsl
       Ogre::Technique *technique = _mat->getTechnique(0);
-      GZ_ASSERT(technique, "Null OGRE material technique");
+      IGN_ASSERT(technique, "Null OGRE material technique");
       Ogre::Pass *pass = technique->getPass(_passId);
-      GZ_ASSERT(pass, "Null OGRE material pass");
+      IGN_ASSERT(pass, "Null OGRE material pass");
       Ogre::GpuProgramParametersSharedPtr params =
           pass->getFragmentProgramParameters();
-      GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
+      IGN_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
 
       params->setNamedConstant("offsets", offsets);
       params->setNamedConstant("mean", static_cast<Ogre::Real>(this->mean));
@@ -110,22 +110,23 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
     biasMean = _sdf->Get<double>("bias_mean");
   if (_sdf->HasElement("bias_stddev"))
     biasStdDev = _sdf->Get<double>("bias_stddev");
-  this->bias = math::Rand::GetDblNormal(biasMean, biasStdDev);
+  this->bias =ignition::math::Rand::GetDblNormal(biasMean, biasStdDev);
   // With equal probability, we pick a negative bias (by convention,
   // rateBiasMean should be positive, though it would work fine if
   // negative).
-  if (math::Rand::GetDblUniform() < 0.5)
+  if (ignition::math::Rand::GetDblUniform() < 0.5)
     this->bias = -this->bias;
-  gzlog << "applying Gaussian noise model with mean " << this->mean
+  ignlog << "applying Gaussian noise model with mean " << this->mean
     << ", stddev " << this->stdDev
     << ", bias " << this->bias << std::endl;
 
   if (_sdf->HasElement("precision"))
   {
     this->precision = _sdf->Get<double>("precision");
-    if (math::equal(this->precision, 0.0, 1e-6) || this->precision < 0)
+    if (ignition::math::equal(this->precision, 0.0, 1e-6) ||
+        this->precision < 0)
     {
-      gzerr << "Noise precision cannot be less or equal to 0" << std::endl;
+      ignerr << "Noise precision cannot be less or equal to 0" << std::endl;
     }
     else
     {
@@ -144,12 +145,13 @@ void GaussianNoiseModel::Fini()
 double GaussianNoiseModel::ApplyImpl(double _in)
 {
   // Add independent (uncorrelated) Gaussian noise to each input value.
-  double whiteNoise = math::Rand::GetDblNormal(this->mean, this->stdDev);
+  double whiteNoise = ignition::math::Rand::GetDblNormal(this->mean,
+      this->stdDev);
   double output = _in + this->bias + whiteNoise;
   if (this->quantized)
   {
     // Apply this->precision
-    if (!math::equal(this->precision, 0.0, 1e-6))
+    if (!ignition::math::equal(this->precision, 0.0, 1e-6))
     {
       output = boost::math::round(output / this->precision) * this->precision;
     }
@@ -195,7 +197,7 @@ void ImageGaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 {
-  GZ_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
+  IGN_ASSERT(_camera, "Unable to apply gaussian noise, camera is NULL");
 
   this->gaussianNoiseCompositorListener.reset(new
         GaussianNoiseCompositorListener(this->mean, this->stdDev));

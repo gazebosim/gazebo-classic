@@ -58,7 +58,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAnchor(unsigned int _index,
-                  const gazebo::math::Vector3 &_anchor);
+                  const ignition::math::Vector3 &_anchor);
 
       // Documentation inherited.
       public: virtual void SetDamping(unsigned int _index,
@@ -73,13 +73,16 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkForce(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkTorque(
+                  unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, unsigned int _index,
@@ -108,7 +111,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+                                   const ignition::math::Vector3 &_axis);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
@@ -201,7 +204,7 @@ namespace gazebo
 
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
+      private: ignition::common::Time forceAppliedTime;
     };
     /// \}
   }

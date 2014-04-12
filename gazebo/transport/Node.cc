@@ -75,7 +75,7 @@ void Node::Init(const std::string &_space)
   // Don't initialize twice.
   if (this->initialized)
   {
-    gzerr << "Node is already initialized, skipping Init."
+    ignerr << "Node is already initialized, skipping Init."
           << "This shouldn't happen...so fix it.\n";
     return;
   }
@@ -89,7 +89,7 @@ void Node::Init(const std::string &_space)
     TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
     if (namespaces.empty())
-      gzerr << "No namespace found\n";
+      ignerr << "No namespace found\n";
     else
       this->topicNamespace = namespaces.front();
   }

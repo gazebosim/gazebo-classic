@@ -33,9 +33,9 @@
 #include <deque>
 #include <utility>
 
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #define HEADER_LENGTH 8
 
@@ -204,7 +204,7 @@ namespace gazebo
               {
                 if (!this->IsOpen())
                 {
-                  gzerr << "AsyncRead on a closed socket\n";
+                  ignerr << "AsyncRead on a closed socket\n";
                   return;
                 }
 
@@ -261,7 +261,7 @@ namespace gazebo
                   }
                   else
                   {
-                    gzerr << "Header is empty\n";
+                    ignerr << "Header is empty\n";
                     boost::get<0>(_handler)("");
                     // This code tries to read the header again. We should
                     // never get here.
@@ -302,7 +302,7 @@ namespace gazebo
                 this->inboundData.clear();
 
                 if (data.empty())
-                  gzerr << "OnReadData got empty data!!!\n";
+                  ignerr << "OnReadData got empty data!!!\n";
 
                 if (!_e && !transport::is_stopped())
                 {
@@ -318,14 +318,15 @@ namespace gazebo
       /// \brief Register a function to be called when the connection is shut
       /// down \param[in] _subscriber Function to be called \return Handle
       /// that can be used to unregister the function
-      public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
-                 _subscriber)
+      public: ignition::common::ConnectionPtr ConnectToShutdown(
+                  boost::function<void()> _subscriber)
               { return this->shutdown.Connect(_subscriber); }
 
       /// \brief Unregister a function to be called when the connection is
       /// shut down \param[in] _subscriber Handle previously returned by
       /// ConnectToShutdown()
-      public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
+      public: void DisconnectShutdown(
+                  ignition::common::ConnectionPtr _subscriber)
               {this->shutdown.Disconnect(_subscriber);}
 
       /// \brief Handle on-write callbacks
@@ -431,7 +432,7 @@ namespace gazebo
       private: ConnectionPtr acceptConn;
 
       /// \brief Shutdown event
-      private: event::EventT<void()> shutdown;
+      private: ignition::common::EventT<void()> shutdown;
 
       /// \brief Pointer to the IO manager
       private: static IOManager *iomanager;

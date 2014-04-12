@@ -20,7 +20,7 @@
  */
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -51,7 +51,7 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
 {
   dVector3 result;
 
@@ -63,14 +63,14 @@ math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
       dJointGetHinge2Anchor2(this->jointId, result);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -80,11 +80,12 @@ void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
   if (this->jointId)
     dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEHinge2Joint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -95,7 +96,7 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3 globalAxis = _axis;
   if (this->parentLink)
     globalAxis =
       this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
@@ -110,11 +111,11 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
         globalAxis.x, globalAxis.y, globalAxis.z);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -123,13 +124,13 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
   else
     dJointGetHinge2Axis2(this->jointId, result);
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (this->jointId)
   {
@@ -137,7 +138,7 @@ math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
       result = dJointGetHinge2Angle1(this->jointId);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -155,7 +156,7 @@ double ODEHinge2Joint::GetVelocity(unsigned int _index) const
       result = dJointGetHinge2Angle2Rate(this->jointId);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -200,7 +201,7 @@ void ODEHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
       dJointAddHinge2Torques(this->jointId, 0, _effort);
   }
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
@@ -211,7 +212,7 @@ double ODEHinge2Joint::GetParam(unsigned int _parameter) const
   if (this->jointId)
     result = dJointGetHinge2Param(this->jointId, _parameter);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
   return result;
 }
@@ -223,5 +224,5 @@ void ODEHinge2Joint::SetParam(unsigned int _parameter, double _value)
   if (this->jointId)
     dJointSetHinge2Param(this->jointId, _parameter, _value);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }

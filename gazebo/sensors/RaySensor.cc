@@ -26,15 +26,15 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Collision.hh"
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
@@ -73,18 +73,18 @@ void RaySensor::Load(const std::string &_worldName)
   this->scanPub = this->node->Advertise<msgs::LaserScanStamped>(
       this->GetTopic(), 50);
 
-  GZ_ASSERT(this->world != NULL,
+  IGN_ASSERT(this->world != NULL,
       "RaySensor did not get a valid World pointer");
 
   physics::PhysicsEnginePtr physicsEngine = this->world->GetPhysicsEngine();
 
-  GZ_ASSERT(physicsEngine != NULL,
+  IGN_ASSERT(physicsEngine != NULL,
       "Unable to get a pointer to the physics engine");
 
   this->laserCollision = physicsEngine->CreateCollision("multiray",
       this->parentName);
 
-  GZ_ASSERT(this->laserCollision != NULL,
+  IGN_ASSERT(this->laserCollision != NULL,
       "Unable to create a multiray collision using the physics engine.");
 
   this->laserCollision->SetName("ray_sensor_collision");
@@ -94,7 +94,7 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserShape = boost::dynamic_pointer_cast<physics::MultiRayShape>(
                      this->laserCollision->GetShape());
 
-  GZ_ASSERT(this->laserShape != NULL,
+  IGN_ASSERT(this->laserShape != NULL,
       "Unable to get the laser shape from the multi-ray collision.");
 
   this->laserShape->Load(this->sdf);
@@ -111,7 +111,7 @@ void RaySensor::Load(const std::string &_worldName)
 
   this->parentEntity = this->world->GetEntity(this->parentName);
 
-  GZ_ASSERT(this->parentEntity != NULL,
+  IGN_ASSERT(this->parentEntity != NULL,
       "Unable to get the parent entity.");
 }
 
@@ -143,7 +143,7 @@ void RaySensor::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMin() const
+ignition::math::Angle RaySensor::GetAngleMin() const
 {
   if (this->laserShape)
     return this->laserShape->GetMinAngle();
@@ -152,7 +152,7 @@ math::Angle RaySensor::GetAngleMin() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetAngleMax() const
+ignition::math::Angle RaySensor::GetAngleMax() const
 {
   if (this->laserShape)
     return this->laserShape->GetMaxAngle();
@@ -235,7 +235,7 @@ int RaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMin() const
+ignition::math::Angle RaySensor::GetVerticalAngleMin() const
 {
   if (this->laserShape)
     return this->laserShape->GetVerticalMinAngle();
@@ -244,7 +244,7 @@ math::Angle RaySensor::GetVerticalAngleMin() const
 }
 
 //////////////////////////////////////////////////
-math::Angle RaySensor::GetVerticalAngleMax() const
+ignition::math::Angle RaySensor::GetVerticalAngleMax() const
 {
   if (this->laserShape)
     return this->laserShape->GetVerticalMaxAngle();
@@ -276,12 +276,12 @@ double RaySensor::GetRange(unsigned int _index)
 
   if (this->laserMsg.scan().ranges_size() == 0)
   {
-    gzwarn << "ranges not constructed yet (zero sized)\n";
+    ignwarn << "ranges not constructed yet (zero sized)\n";
     return 0.0;
   }
   if (static_cast<int>(_index) >= this->laserMsg.scan().ranges_size())
   {
-    gzerr << "Invalid range index[" << _index << "]\n";
+    ignerr << "Invalid range index[" << _index << "]\n";
     return 0.0;
   }
 
@@ -295,12 +295,12 @@ double RaySensor::GetRetro(unsigned int _index)
 
   if (this->laserMsg.scan().intensities_size() == 0)
   {
-    gzwarn << "Intensities not constructed yet (zero size)\n";
+    ignwarn << "Intensities not constructed yet (zero size)\n";
     return 0.0;
   }
   if (static_cast<int>(_index) >= this->laserMsg.scan().intensities_size())
   {
-    gzerr << "Invalid intensity index[" << _index << "]\n";
+    ignerr << "Invalid intensity index[" << _index << "]\n";
     return 0.0;
   }
 
@@ -324,7 +324,7 @@ int RaySensor::GetFiducial(unsigned int _index)
 
   if (idx >=  this->GetRayCount() * this->GetVerticalRayCount())
   {
-    gzerr << "Invalid fiducial index[" << _index << "]\n";
+    ignerr << "Invalid fiducial index[" << _index << "]\n";
     return 0.0;
   }
   return this->laserShape->GetFiducial(idx);
@@ -415,9 +415,9 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       vjb = std::min(vja + 1, verticalRayCount - 1);
       vb = vb - floor(vb);
 
-      GZ_ASSERT(vja < verticalRayCount,
+      IGN_ASSERT(vja < verticalRayCount,
           "Invalid vertical ray index used for interpolation");
-      GZ_ASSERT(vjb < verticalRayCount,
+      IGN_ASSERT(vjb < verticalRayCount,
           "Invalid vertical ray index used for interpolation");
     }
     // interpolate in horizontal direction
@@ -432,9 +432,9 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         hjb = std::min(hja + 1, rayCount - 1);
         hb = hb - floor(hb);
 
-        GZ_ASSERT(hja < rayCount,
+        IGN_ASSERT(hja < rayCount,
             "Invalid horizontal ray index used for interpolation");
-        GZ_ASSERT(hjb < rayCount,
+        IGN_ASSERT(hjb < rayCount,
             "Invalid horizontal ray index used for interpolation");
 
         // indices of 4 corners
@@ -467,7 +467,8 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       {
         // currently supports only one noise model per laser sensor
         range = this->noises[0]->Apply(range);
-        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range,
+            this->GetRangeMin(), this->GetRangeMax());
       }
 
       scan->add_ranges(range);

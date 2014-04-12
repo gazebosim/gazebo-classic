@@ -30,9 +30,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabasePrivate.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
@@ -140,7 +137,7 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
   // Make sure there is a URI separator
   if (uriSeparator == std::string::npos)
   {
-    gzerr << "No URI separator \"://\" in [" << _modelURI << "]\n";
+    ignerr << "No URI separator \"://\" in [" << _modelURI << "]\n";
     return false;
   }
 
@@ -206,7 +203,7 @@ std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
     CURLcode success = curl_easy_perform(curl);
     if (success != CURLE_OK)
     {
-      gzwarn << "Unable to connect to model database using [" << _uri
+      ignwarn << "Unable to connect to model database using [" << _uri
         << "]. Only locally installed models will be available.\n";
     }
 
@@ -229,7 +226,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
     TiXmlElement *databaseElem = xmlDoc.FirstChildElement("database");
     if (!databaseElem)
     {
-      gzerr << "No <database> tag in the model database "
+      ignerr << "No <database> tag in the model database "
             << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
             << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
@@ -238,7 +235,7 @@ bool ModelDatabase::UpdateModelCacheImpl()
     TiXmlElement *modelsElem = databaseElem->FirstChildElement("models");
     if (!modelsElem)
     {
-      gzerr << "No <models> tag in the model database "
+      ignerr << "No <models> tag in the model database "
         << GZ_MODEL_DB_MANIFEST_FILENAME << " found"
         << " here[" << ModelDatabase::GetURI() << "]\n";
       return false;
@@ -288,7 +285,7 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
 
     // Update the model cache.
     if (!this->UpdateModelCacheImpl())
-      gzerr << "Unable to download model manifests\n";
+      ignerr << "Unable to download model manifests\n";
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
@@ -329,7 +326,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
       boost::mutex::scoped_try_lock lock(this->dataPtr->updateMutex);
       if (!lock)
       {
-        gzmsg << "Waiting for model database update to complete...\n";
+        ignmsg << "Waiting for model database update to complete...\n";
         boost::mutex::scoped_lock lock2(this->dataPtr->updateMutex);
       }
     }
@@ -341,7 +338,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
     return this->dataPtr->modelCache;
   else
   {
-    gzwarn << "Getting models from[" << GetURI()
+    ignwarn << "Getting models from[" << GetURI()
            << "]. This may take a few seconds.\n";
 
     boost::mutex::scoped_lock lock(this->dataPtr->updateMutex);
@@ -357,7 +354,7 @@ std::map<std::string, std::string> ModelDatabase::GetModels()
 }
 
 /////////////////////////////////////////////////
-event::ConnectionPtr ModelDatabase::GetModels(
+ignition::common::ConnectionPtr ModelDatabase::GetModels(
     boost::function<void (const std::map<std::string, std::string> &)> _func)
 {
   boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
@@ -383,19 +380,19 @@ std::string ModelDatabase::GetModelName(const std::string &_uri)
         if (nameElem)
           result = nameElem->GetText();
         else
-          gzerr << "No <name> element in " << GZ_MODEL_MANIFEST_FILENAME
+          ignerr << "No <name> element in " << GZ_MODEL_MANIFEST_FILENAME
                 << " for model[" << _uri << "]\n";
       }
       else
-        gzerr << "No <model> element in " << GZ_MODEL_MANIFEST_FILENAME
+        ignerr << "No <model> element in " << GZ_MODEL_MANIFEST_FILENAME
               << " for model[" << _uri << "]\n";
     }
     else
-      gzerr << "Unable to parse " << GZ_MODEL_MANIFEST_FILENAME
+      ignerr << "Unable to parse " << GZ_MODEL_MANIFEST_FILENAME
             << " for model[" << _uri << "]\n";
   }
   else
-    gzerr << "Unable to get model name[" << _uri << "]\n";
+    ignerr << "Unable to get model name[" << _uri << "]\n";
 
   return result;
 }
@@ -407,7 +404,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   std::string path, suffix;
 
   if (!_forceDownload)
-    path = SystemPaths::Instance()->FindFileURI(_uri);
+    path = ignition::common::find_file(_uri);
 
   struct stat st;
 
@@ -415,7 +412,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   {
     if (!ModelDatabase::HasModel(_uri))
     {
-      gzerr << "Unable to download model[" << _uri << "]\n";
+      ignerr << "Unable to download model[" << _uri << "]\n";
       return std::string();
     }
 
@@ -426,7 +423,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     size_t startIndex = _uri.find_first_of("://");
     if (startIndex == std::string::npos)
     {
-      gzerr << "URI[" << _uri << "] is missing ://\n";
+      ignerr << "URI[" << _uri << "] is missing ://\n";
       return std::string();
     }
 
@@ -453,7 +450,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     CURL *curl = curl_easy_init();
     if (!curl)
     {
-      gzerr << "Unable to initialize libcurl\n";
+      ignerr << "Unable to initialize libcurl\n";
       return std::string();
     }
 
@@ -472,7 +469,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       FILE *fp = fopen(tgzfilename.c_str(), "wb");
       if (!fp)
       {
-        gzerr << "Could not download model[" << _uri << "] because we were"
+        ignerr << "Could not download model[" << _uri << "] because we were"
           << "unable to write to file[" << tgzfilename << "]."
           << "Please fix file permissions.";
         return std::string();
@@ -484,7 +481,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
 
       if (success != CURLE_OK)
       {
-        gzwarn << "Unable to connect to model database using ["
+        ignwarn << "Unable to connect to model database using ["
                << _uri << "]\n";
         retry = true;
         continue;
@@ -506,7 +503,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       }
       catch(...)
       {
-        gzerr << "Failed to unzip model tarball. Trying again...\n";
+        ignerr << "Failed to unzip model tarball. Trying again...\n";
         retry = true;
         continue;
       }
@@ -527,7 +524,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     curl_easy_cleanup(curl);
     if (retry)
     {
-      gzerr << "Could not download model[" << _uri << "]."
+      ignerr << "Could not download model[" << _uri << "]."
         << "The model may be corrupt.\n";
       path.clear();
     }
@@ -540,7 +537,7 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
     }
     catch(...)
     {
-      gzwarn << "Failed to remove temporary model files after download.";
+      ignwarn << "Failed to remove temporary model files after download.";
     }
   }
 
@@ -557,7 +554,7 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
+    ignerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << _path << "\n";
   }
 
@@ -567,7 +564,7 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (!modelXML)
     {
-      gzerr << "No <model> element in manifest file[" << _path << "]\n";
+      ignerr << "No <model> element in manifest file[" << _path << "]\n";
       return;
     }
 
@@ -586,13 +583,13 @@ void ModelDatabase::DownloadDependencies(const std::string &_path)
       }
       else
       {
-        gzerr << "Model depend is missing <uri> in manifest["
+        ignerr << "Model depend is missing <uri> in manifest["
               << manifestPath << "]\n";
       }
     }
   }
   else
-    gzerr << "Unable to load manifest file[" << manifestPath << "]\n";
+    ignerr << "Unable to load manifest file[" << manifestPath << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -610,7 +607,7 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
     manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
   else
   {
-    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
+    ignerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
       << " for model " << manifestPath << "\n";
   }
 
@@ -642,19 +639,19 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       }
       else
       {
-        gzerr << "Manifest[" << manifestPath << "] doesn't have "
+        ignerr << "Manifest[" << manifestPath << "] doesn't have "
               << "<model><sdf>...</sdf></model> element.\n";
       }
     }
     else
     {
-      gzerr << "Manifest[" << manifestPath
+      ignerr << "Manifest[" << manifestPath
             << "] doesn't have a <model> element\n";
     }
   }
   else
   {
-    gzerr << "Invalid model manifest file[" << manifestPath << "]\n";
+    ignerr << "Invalid model manifest file[" << manifestPath << "]\n";
   }
 
   return result;

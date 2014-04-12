@@ -19,9 +19,9 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/math/Quaternion.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/MouseEvent.hh"
+#include "ignition/math/Quaternion.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 
@@ -45,7 +45,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+           ignition::math::Quaternion());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -80,7 +80,7 @@ bool CylinderMaker::IsActive() const
   return this->state > 0;
 }
 
-void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
+void CylinderMaker::OnMousePush(const ignition::common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
@@ -88,7 +88,7 @@ void CylinderMaker::OnMousePush(const common::MouseEvent &_event)
   this->mousePushPos = _event.pressPos;
 }
 
-void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
+void CylinderMaker::OnMouseRelease(const ignition::common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
@@ -104,19 +104,19 @@ void CylinderMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
+void CylinderMaker::OnMouseMove(const ignition::common::MouseEvent &_event)
 {
   if (this->state < 2)
     return;
 
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
+  ignition::math::Vector3 norm;
+  ignition::math::Vector3 p1, p2;
 
   norm.Set(1, 0, 0);
 
-  math::Vector3 p(this->visualMsg->pose().position().x(),
-                  this->visualMsg->pose().position().y(),
-                  this->visualMsg->pose().position().z());
+  ignition::math::Vector3 p(this->visualMsg->pose().position().x(),
+      this->visualMsg->pose().position().y(),
+      this->visualMsg->pose().position().z());
 
   double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
   if (!_event.shift)
@@ -131,30 +131,30 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
+void CylinderMaker::OnMouseDrag(const ignition::common::MouseEvent &_event)
 {
   if (this->state == 0)
     return;
 
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
+  ignition::math::Vector3 norm;
+  ignition::math::Vector3 p1, p2;
 
   norm.Set(0, 0, 1);
 
   if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
                                           this->mousePushPos.y,
-                                          math::Plane(norm), p1))
+                                          ignition::math::Plane(norm), p1))
   {
-    gzerr << "Invalid mouse point\n";
+    ignerr << "Invalid mouse point\n";
     return;
   }
 
   p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.pos.x, _event.pos.y, ignition::math::Plane(norm), p2))
   {
-    gzerr << "Invalid mouse point\n";
+    ignerr << "Invalid mouse point\n";
     return;
   }
 
@@ -163,9 +163,9 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   if (this->state == 1)
     msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
-  math::Vector3 p(this->visualMsg->pose().position().x(),
-                  this->visualMsg->pose().position().y(),
-                  this->visualMsg->pose().position().z());
+  ignition::math::Vector3 p(this->visualMsg->pose().position().x(),
+      this->visualMsg->pose().position().y(),
+      this->visualMsg->pose().position().z());
 
   if (this->state == 1)
   {

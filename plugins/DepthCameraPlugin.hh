@@ -19,6 +19,7 @@
 #define _GAZEBO_DEPTH_CAMERA_PLUGIN_HH_
 
 #include <string>
+#include <ignition/common.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/DepthCameraSensor.hh"
@@ -57,9 +58,9 @@ namespace gazebo
     protected: sensors::DepthCameraSensorPtr parentSensor;
     protected: rendering::DepthCameraPtr depthCamera;
 
-    private: event::ConnectionPtr newDepthFrameConnection;
-    private: event::ConnectionPtr newRGBPointCloudConnection;
-    private: event::ConnectionPtr newImageFrameConnection;
+    private: ignition::common::ConnectionPtr newDepthFrameConnection;
+    private: ignition::common::ConnectionPtr newRGBPointCloudConnection;
+    private: ignition::common::ConnectionPtr newImageFrameConnection;
   };
 }
 #endif

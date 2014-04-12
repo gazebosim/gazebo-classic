@@ -47,7 +47,7 @@ void TimePanel_TEST::ValidTimes()
     // Wait a little bit so that time increases.
     for (unsigned int i = 0; i < 10; ++i)
     {
-      gazebo::common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
       QCoreApplication::processEvents();
     }
 

@@ -15,8 +15,9 @@
  *
 */
 
+#include <ignition/common.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Video.hh"
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/common/Events.hh"
 
@@ -27,7 +28,7 @@ using namespace rendering;
 VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
   : Visual(_name, _parent)
 {
-  this->video = new common::Video();
+  this->video = new ignition::common::Video();
   this->video->Load("/home/nkoenig/Videos/pr2_risotto/risotto_robot.mp4");
 
   this->width = this->video->GetWidth();
@@ -36,7 +37,7 @@ VideoVisual::VideoVisual(const std::string &_name, VisualPtr _parent)
 
   this->imageBuffer = new unsigned char[this->height * this->width * 3];
 
-  this->connections.push_back(event::Events::ConnectPreRender(
+  this->connections.push_back(common::Events::ConnectPreRender(
         boost::bind(&VideoVisual::PreRender, this)));
 
   // Create the texture

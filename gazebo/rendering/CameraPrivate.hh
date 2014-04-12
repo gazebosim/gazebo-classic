@@ -57,19 +57,20 @@ namespace gazebo
       public: Ogre::CompositorInstance *ssaoInstance;
 
       /// \brief Queue of move positions.
-      public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+      public: std::deque<
+              std::pair<ignition::math::Pose, double> > moveToPositionQueue;
 
       /// \brief Render period.
-      public: common::Time renderPeriod;
+      public: ignition::common::Time renderPeriod;
 
       /// \brief Position PID used to track a visual smoothly.
-      public: common::PID trackVisualPID;
+      public: ignition::common::PID trackVisualPID;
 
       /// \brief Pitch PID used to track a visual smoothly.
-      public: common::PID trackVisualPitchPID;
+      public: ignition::common::PID trackVisualPitchPID;
 
       /// \brief Yaw PID used to track a visual smoothly.
-      public: common::PID trackVisualYawPID;
+      public: ignition::common::PID trackVisualYawPID;
 
       /// \brief Communication Node
       public: transport::NodePtr node;

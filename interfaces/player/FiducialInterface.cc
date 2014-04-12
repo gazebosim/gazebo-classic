@@ -227,7 +227,7 @@ void FiducialInterface::Subscribe()
     // std::ostringstream stream;
     std::cerr << "Error Subscribing to Gazebo Fiducial Interface\n"
       << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

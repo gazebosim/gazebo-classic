@@ -57,13 +57,13 @@ void CollisionState::Load(const sdf::ElementPtr _elem)
 
   // Set the pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-const math::Pose &CollisionState::GetPose() const
+const ignition::math::Pose &CollisionState::GetPose() const
 {
   return this->pose;
 }
@@ -71,7 +71,7 @@ const math::Pose &CollisionState::GetPose() const
 /////////////////////////////////////////////////
 bool CollisionState::IsZero() const
 {
-  return this->pose == math::Pose::Zero;
+  return this->pose ==ignition::math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////

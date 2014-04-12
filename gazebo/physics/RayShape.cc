@@ -29,10 +29,10 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/math/Helpers.hh"
+#include "ignition/math/Helpers.hh"
 
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/CommonTypes.hh"
+#include "ignition/common/Event.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -48,7 +48,7 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = IGN_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -60,7 +60,7 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = IGN_DBL_MAX;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
@@ -74,10 +74,10 @@ RayShape::~RayShape()
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetPoints(const math::Vector3 &_posStart,
-                         const math::Vector3 &_posEnd)
+void RayShape::SetPoints(const ignition::math::Vector3 &_posStart,
+                         const ignition::math::Vector3 &_posEnd)
 {
-  math::Vector3 dir;
+  ignition::math::Vector3 dir;
 
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
@@ -103,14 +103,16 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
+void RayShape::GetRelativePoints(ignition::math::Vector3 &_posA,
+    ignition::math::Vector3 &_posB)
 {
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+void RayShape::GetGlobalPoints(ignition::math::Vector3 &_posA,
+    ignition::math::Vector3 &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;
@@ -121,14 +123,14 @@ void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
 
-  math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  ignition::math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetScale(const math::Vector3 &_scale)
+void RayShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (this->scale == _scale)
     return;

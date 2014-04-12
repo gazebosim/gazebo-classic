@@ -17,7 +17,8 @@
 #ifndef _GAZEBO_DIFFDRIVE_PLUGIN_HH_
 #define _GAZEBO_DIFFDRIVE_PLUGIN_HH_
 
-#include "gazebo/common/common.hh"
+#include <ignition/common.hh>
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
@@ -39,12 +40,12 @@ namespace gazebo
 
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
     private: double wheelSpeed[2];
     private: double torque;
     private: double wheelSeparation;
     private: double wheelRadius;
-    private: common::Time prevUpdateTime;
+    private: ignition::common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
 

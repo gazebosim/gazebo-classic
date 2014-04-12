@@ -53,7 +53,7 @@ namespace gazebo
       public: virtual ~LaserVisual();
 
       /// Documentation inherited from parent.
-      public: virtual void SetEmissive(const common::Color &_color);
+      public: virtual void SetEmissive(const ignition::common::Color &_color);
 
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);
@@ -80,7 +80,7 @@ namespace gazebo
       private: boost::shared_ptr<msgs::LaserScanStamped const> laserMsg;
 
       /// \brief Pre render connection.
-      private: event::ConnectionPtr connection;
+      private: ignition::common::ConnectionPtr connection;
     };
     /// \}
   }

@@ -16,7 +16,7 @@
 */
 #include <map>
 #include "gazebo/gazebo.hh"
-#include "gazebo/common/common.hh"
+#include "ignition/common/common.hh"
 #include "gazebo/physics/physics.hh"
 
 namespace gazebo

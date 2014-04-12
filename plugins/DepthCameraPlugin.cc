@@ -41,7 +41,7 @@ void DepthCameraPlugin::Load(sensors::SensorPtr _sensor,
 
   if (!this->parentSensor)
   {
-    gzerr << "DepthCameraPlugin not attached to a depthCamera sensor\n";
+    ignerr << "DepthCameraPlugin not attached to a depthCamera sensor\n";
     return;
   }
 

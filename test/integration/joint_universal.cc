@@ -32,12 +32,12 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
+    ignerr << "Bullet Universal Joint is not yet working.  See issue #992.\n";
     return;
   }
   if (_physicsEngine == "dart")
   {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
+    ignerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
     return;
   }
 
@@ -53,7 +53,7 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -62,11 +62,11 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  gzlog << "dt : " << dt << "\n";
+  ignlog << "dt : " << dt << "\n";
 
   // verify that time moves forward
   EXPECT_DOUBLE_EQ(t, dt);
-  gzlog << "t after one step : " << t << "\n";
+  ignlog << "t after one step : " << t << "\n";
 
   // get model, joint and links
   physics::ModelPtr model_1 = world->GetModel("model_1");
@@ -80,50 +80,50 @@ void JointTestUniversal::UniversalJoint1(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(1), 0);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose(0, 0, 2, 0, 0, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3(0, 1, 0));
+  igndbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about x
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
+    ignition::math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
+  igndbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about y
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
+  link_00->SetWorldPose(ignition::math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0);
   EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3(0, 1, 0));
+  igndbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 90deg about both x and "rotated y axis" (z)
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
+  link_00->SetWorldPose(ignition::math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
   EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0.5*M_PI);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
+    ignition::math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+  igndbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)

@@ -30,7 +30,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/physics/WorldState.hh>
-#include <gazebo/common/Time.hh>
+#include <ignition/common/Time.hh>
 #include <gazebo/util/util.hh>
 #include <gazebo/gazebo_config.h>
 
@@ -73,7 +73,7 @@ class FilterBase
   /// \param[in] _xmlName Name of the xml tag.
   /// \param[in] _filter The filter string [x,y,z,r,p,a].
   /// \param[in] _state Current state.
-  public: std::string FilterPose(const gazebo::math::Pose &_pose,
+  public: std::string FilterPose(const ignition::math::Pose &_pose,
               const std::string &_xmlName,
               std::string _filter,
               const gazebo::physics::State &_state)
@@ -93,7 +93,7 @@ class FilterBase
             }
 
             // Get the euler angles.
-            gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+            ignition::math::Vector3 rpy = _pose.rot.GetAsEuler();
 
             // If the filter is empty, then output the whole pose.
             if (!_filter.empty())
@@ -139,7 +139,7 @@ class FilterBase
                     this->Out(result, _state) << std::fixed << rpy.z << " ";
                     break;
                   default:
-                    gzerr << "Invalid pose value[" << *elemIter << "]\n";
+                    ignerr << "Invalid pose value[" << *elemIter << "]\n";
                     break;
                 }
               }
@@ -227,7 +227,7 @@ class JointFilter : public FilterBase
                   if (axis >= _state.GetAngleCount())
                     continue;
 
-                  gazebo::math::Angle angle = _state.GetAngle(axis);
+                  ignition::math::Angle angle = _state.GetAngle(axis);
 
                   if (this->xmlOutput)
                   {
@@ -239,7 +239,7 @@ class JointFilter : public FilterBase
                 }
                 catch(...)
                 {
-                  gzerr << "Inavlid axis value[" << *elemIter << "]\n";
+                  ignerr << "Inavlid axis value[" << *elemIter << "]\n";
                 }
               }
             }
@@ -493,7 +493,7 @@ class ModelFilter : public FilterBase
             if (*_partIter == "pose")
             {
               // Get the model state pose
-              gazebo::math::Pose pose = _state.GetPose();
+              ignition::math::Pose pose = _state.GetPose();
               ++_partIter;
 
               // Get the elements to filter pose by.
@@ -505,7 +505,7 @@ class ModelFilter : public FilterBase
               result << this->FilterPose(pose, "pose", elemParts, _state);
             }
             else
-              gzerr << "Invalid model state component["
+              ignerr << "Invalid model state component["
                 << *_partIter << "]\n";
 
             return result.str();
@@ -611,7 +611,8 @@ class StateFilter : public FilterBase
 
             std::ostringstream result;
 
-            if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
+            if (this->hz > 0.0 &&
+                this->prevTime != ignition::common::Time::Zero)
             {
               if ((state.GetSimTime() - this->prevTime).Double() <
                   1.0 / this->hz)
@@ -645,7 +646,7 @@ class StateFilter : public FilterBase
   private: double hz;
 
   /// \brief Previous time a state was output.
-  private: gazebo::common::Time prevTime;
+  private: ignition::common::Time prevTime;
 };
 
 
@@ -653,9 +654,9 @@ class StateFilter : public FilterBase
 /// \brief Print general help
 void help(po::options_description &_options)
 {
-  std::cerr << "gzlog -- Tool to instrospect Gazebo log files\n\n";
+  std::cerr << "ignlog -- Tool to instrospect Gazebo log files\n\n";
 
-  std::cerr << "`gzlog` [command] <options> [log file]\n\n";
+  std::cerr << "`ignlog` [command] <options> [log file]\n\n";
 
   std::cerr << "Introspect Gazebo log files through different commands.\n\n";
 
@@ -701,7 +702,7 @@ bool load_log_from_file(const std::string &_filename)
 {
   if (_filename.empty())
   {
-    gzerr << "Log filename is empty.\n";
+    ignerr << "Log filename is empty.\n";
     return false;
   }
 
@@ -709,9 +710,9 @@ bool load_log_from_file(const std::string &_filename)
   {
     gazebo::util::LogPlay::Instance()->Open(_filename);
   }
-  catch(gazebo::common::Exception &_e)
+  catch(ignition::common::Exception &_e)
   {
-    gzerr << "Unable to open log file[" << _filename << "]\n";
+    ignerr << "Unable to open log file[" << _filename << "]\n";
     return false;
   }
 
@@ -730,7 +731,7 @@ std::string get_file_size_str(const std::string &_filename)
   std::ifstream ifs(_filename.c_str());
   if (!ifs)
   {
-    gzerr << "Unable to open file[" << _filename << "]\n";
+    ignerr << "Unable to open file[" << _filename << "]\n";
     return std::string();
   }
 
@@ -771,8 +772,8 @@ void info(const std::string &_filename)
 
   // unsigned int modelCount = 0;
 
-  gazebo::common::Time endTime(0, 0);
-  gazebo::common::Time startTime(0, 0);
+  ignition::common::Time endTime(0, 0);
+  ignition::common::Time startTime(0, 0);
 
   if (sdf)
   {
@@ -828,7 +829,7 @@ void info(const std::string &_filename)
   std::cout.imbue(std::locale(std::locale::classic(), facet));
 
   // Compute the duration
-  gazebo::common::Time deltaTime = endTime - startTime;
+  ignition::common::Time deltaTime = endTime - startTime;
   // int hours = deltaTime.sec / 3600;
   // int minutes = (deltaTime.sec - hours * 3600) / 60;
   // int seconds = (deltaTime.sec - hours * 3600 - minutes * 60);
@@ -964,9 +965,9 @@ void record(bool _start)
   gazebo::transport::PublisherPtr pub =
     node->Advertise<gazebo::msgs::LogControl>("~/log/control");
 
-  if (!pub->WaitForConnection(gazebo::common::Time(10, 0)))
+  if (!pub->WaitForConnection(ignition::common::Time(10, 0)))
   {
-    gzerr << "Unable to create a connection to topic ~/log/control.\n";
+    ignerr << "Unable to create a connection to topic ~/log/control.\n";
     return;
   }
 
@@ -1048,7 +1049,7 @@ int main(int argc, char **argv)
       filename = vm["file"].as<std::string>();
     else
     {
-      gzerr << "No log file specified\n";
+      ignerr << "No log file specified\n";
       return -1;
     }
 

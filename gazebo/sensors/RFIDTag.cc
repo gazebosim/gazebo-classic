@@ -19,7 +19,7 @@
  * Date: 6th December 2011
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"

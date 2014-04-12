@@ -14,27 +14,21 @@
  * limitations under the License.
  *
 */
-/* Desc: A diagnostic class
- * Author: Nate Koenig
- * Date: 2 Feb 2011
- */
-
-#ifndef _DIAGNOSTICMANAGER_HH_
-#define _DIAGNOSTICMANAGER_HH_
+#ifndef _GAZEBO_DIAGNOSTICMANAGER_HH_
+#define _GAZEBO_DIAGNOSTICMANAGER_HH_
 
 #include <boost/unordered_map.hpp>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <ignition/common.hh>
 
 #include "gazebo/gazebo_config.h"
+#include "gazebo/common/UpdateInfo.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/UpdateInfo.hh"
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/Timer.hh"
 
 #include "gazebo/util/UtilTypes.hh"
 
@@ -72,7 +66,8 @@ namespace gazebo
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
     /// \brief A diagnostic manager class
-    class DiagnosticManager : public SingletonT<DiagnosticManager>
+    class DiagnosticManager :
+      public ignition::common::SingletonT<DiagnosticManager>
     {
       /// \brief Constructor
       private: DiagnosticManager();
@@ -107,12 +102,12 @@ namespace gazebo
       /// \brief Get the time of a timer instance
       /// \param[in] _index The index of a timer instance
       /// \return Time of the specified timer
-      public: common::Time GetTime(int _index) const;
+      public: ignition::common::Time GetTime(int _index) const;
 
       /// \brief Get a time based on a label
       /// \param[in] _label Name of the timer instance
       /// \return Time of the specified timer
-      public: common::Time GetTime(const std::string &_label) const;
+      public: ignition::common::Time GetTime(const std::string &_label) const;
 
       /// \brief Get a label for a timer
       /// \param[in] _index Index of a timer instance
@@ -132,8 +127,9 @@ namespace gazebo
       /// \param[in] _wallTime Wall clock time stamp.
       /// \param[in] _elapsedTime Elapsed time, this is the time
       /// measurement.
-      private: void AddTime(const std::string &_name, common::Time &_wallTime,
-                   common::Time &_elapsedtime);
+      private: void AddTime(const std::string &_name,
+                   ignition::common::Time &_wallTime,
+                   ignition::common::Time &_elapsedtime);
 
       /// \brief Map of all the active timers.
       private: typedef boost::unordered_map<std::string, DiagnosticTimerPtr>
@@ -155,7 +151,7 @@ namespace gazebo
       private: msgs::Diagnostics msg;
 
       /// \brief Pointer to the update event connection
-      private: event::ConnectionPtr updateConnection;
+      private: ignition::common::ConnectionPtr updateConnection;
 
       // Singleton implementation
       private: friend class SingletonT<DiagnosticManager>;
@@ -166,7 +162,7 @@ namespace gazebo
 
     /// \class DiagnosticTimer Diagnostics.hh util/util.hh
     /// \brief A timer designed for diagnostics
-    class DiagnosticTimer : public common::Timer
+    class DiagnosticTimer : public ignition::common::Timer
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer
@@ -197,7 +193,7 @@ namespace gazebo
       private: std::ofstream log;
 
       /// \brief Time of the previous lap.
-      private: common::Time prevLap;
+      private: ignition::common::Time prevLap;
     };
     /// \}
   }

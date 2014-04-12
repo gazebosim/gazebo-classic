@@ -23,10 +23,10 @@
 #include <vector>
 
 #include "gazebo/rendering/cegui.h"
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/common/MouseEvent.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/math/MathTypes.hh"
+#include "ignition/math/MathTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -91,14 +91,14 @@ namespace gazebo
       public: void CreateWindow(const std::string &_type,
                                 const std::string &_name,
                                 const std::string &_parent,
-                                const math::Vector2d &_position,
-                                const math::Vector2d &_size,
+                                const ignition::math::Vector2d &_position,
+                                const ignition::math::Vector2d &_size,
                                 const std::string &_text);
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
       /// \return True if the mouse event was handled.
-      public: bool HandleMouseEvent(const common::MouseEvent &_evt);
+      public: bool HandleMouseEvent(const ignition::common::MouseEvent &_evt);
 
       /// \brief Handle a key press event.
       /// \param[in] _key The key pressed.
@@ -187,7 +187,7 @@ namespace gazebo
 #endif
 
       /// \brief All the connections
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief The layout file used to create gui elements
       private: std::string layoutFilename;

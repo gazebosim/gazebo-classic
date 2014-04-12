@@ -22,7 +22,7 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
+WireBox::WireBox(VisualPtr _parent, const ignition::math::Box &_box)
 {
   this->parent = _parent;
   this->lines = new DynamicLines(RENDERING_LINE_LIST);
@@ -40,10 +40,10 @@ WireBox::~WireBox()
 }
 
 /////////////////////////////////////////////////
-void WireBox::Init(const math::Box &_box)
+void WireBox::Init(const ignition::math::Box &_box)
 {
-  math::Vector3 max = _box.max;
-  math::Vector3 min = _box.min;
+  ignition::math::Vector3 max = _box.max;
+  ignition::math::Vector3 min = _box.min;
 
   this->lines->Clear();
 

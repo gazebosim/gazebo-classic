@@ -16,7 +16,7 @@
 */
 
 #include <float.h>
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
@@ -41,12 +41,12 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
   SurfaceParams::Load(_sdf);
 
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    ignerr << "Surface _sdf is NULL" << std::endl;
   else
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
     if (!frictionElem)
-      gzerr << "Surface friction sdf member is NULL" << std::endl;
+      ignerr << "Surface friction sdf member is NULL" << std::endl;
     {
       // Note this should not be looking in the "ode" block
       // Update this when sdformat has bullet friction parameters
@@ -54,7 +54,7 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
       // https://bitbucket.org/osrf/sdformat/issue/31
       sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
       if (!frictionOdeElem)
-        gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+        ignerr << "Surface friction ode sdf member is NULL" << std::endl;
       else
       {
         this->mu1 = frictionOdeElem->Get<double>("mu");

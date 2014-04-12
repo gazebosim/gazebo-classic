@@ -50,8 +50,8 @@ namespace gazebo
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
       // Documentation inherited
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+      public: virtual void SetPoints(const ignition::math::Vector3 &_posStart,
+                                     const ignition::math::Vector3 &_posEnd);
 
       /// \brief Pointer to the physics engine.
       private: SimbodyPhysicsPtr physicsEngine;

@@ -77,7 +77,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   // use default pose (identity) if not specified in sdf
-  math::Pose pose = this->sdf->Get<math::Pose>("pose");
+  ignition::math::Pose pose = this->sdf->Get<ignition::math::Pose>("pose");
   this->SetCoG(pose);
 
   // if (this->sdf->HasElement("inertia"))
@@ -113,7 +113,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
+Inertial Inertial::GetInertial(const ignition::math::Pose &_frameOffset) const
 {
   // make a copy of the current Inertial
   Inertial result(*this);
@@ -163,7 +163,7 @@ void Inertial::SetCoG(double _cx, double _cy, double _cz)
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Vector3 &_c)
+void Inertial::SetCoG(const ignition::math::Vector3 &_c)
 {
   this->cog.pos = _c;
 }
@@ -176,7 +176,7 @@ void Inertial::SetCoG(double _cx, double _cy, double _cz,
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Pose &_c)
+void Inertial::SetCoG(const ignition::math::Pose &_c)
 {
   this->cog = _c;
 }
@@ -191,19 +191,19 @@ void Inertial::SetInertiaMatrix(double ixx, double iyy, double izz,
 
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetPrincipalMoments() const
+ignition::math::Vector3 Inertial::GetPrincipalMoments() const
 {
   return this->principals;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetProductsofInertia() const
+ignition::math::Vector3 Inertial::GetProductsofInertia() const
 {
   return this->products;
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetMOI(const math::Matrix3 &_moi)
+void Inertial::SetMOI(const ignition::math::Matrix3 &_moi)
 {
   /// \TODO: check symmetry of incoming _moi matrix
   this->principals.Set(_moi[0][0], _moi[1][1], _moi[2][2]);
@@ -211,16 +211,16 @@ void Inertial::SetMOI(const math::Matrix3 &_moi)
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI() const
+ignition::math::Matrix3 Inertial::GetMOI() const
 {
-  return math::Matrix3(
+  return ignition::math::Matrix3(
     this->principals.x, this->products.x,   this->products.y,
     this->products.x,   this->principals.y, this->products.z,
     this->products.y,   this->products.z,   this->principals.z);
 }
 
 //////////////////////////////////////////////////
-void Inertial::Rotate(const math::Quaternion &_rot)
+void Inertial::Rotate(const ignition::math::Quaternion &_rot)
 {
   /// \TODO: double check what this does, if needed
   this->cog.pos = _rot.RotateVector(this->cog.pos);
@@ -252,13 +252,13 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
     result.mass;
 
   // make a decision on the new orientation, set it to identity
-  result.cog.rot = math::Quaternion(1, 0, 0, 0);
+  result.cog.rot =ignition::math::Quaternion(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
-  math::Matrix3 Ithis = this->GetMOI(result.cog);
+  ignition::math::Matrix3 Ithis = this->GetMOI(result.cog);
 
   // compute equivalent I for _inertial at the new CoG
-  math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
+  ignition::math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
 
   // sum up principals and products now they are at the same location
   result.SetMOI(Ithis + Iparam);
@@ -267,13 +267,14 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
+ignition::math::Matrix3 Inertial::GetMOI(
+    const ignition::math::Pose &_pose) const
 {
   // get MOI as a Matrix3
-  math::Matrix3 moi = this->GetMOI();
+  ignition::math::Matrix3 moi = this->GetMOI();
 
   // transform from new _pose to old this->cog, specified in new _pose frame
-  math::Pose new2Old = this->cog - _pose;
+  ignition::math::Pose new2Old = this->cog - _pose;
 
   // rotate moi into new cog frame
   moi = new2Old.rot.GetAsMatrix3() * moi *
@@ -281,7 +282,7 @@ math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
 
   // parallel axis theorem to get MOI at the new cog location
   // integrating point mass at some offset
-  math::Vector3 offset = new2Old.pos;
+  ignition::math::Vector3 offset = new2Old.pos;
   moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
   moi[0][1] -= (offset.x * offset.y) * this->mass;
   moi[0][2] -= (offset.x * offset.z) * this->mass;

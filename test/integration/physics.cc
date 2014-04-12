@@ -93,7 +93,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
   EXPECT_EQ(g.y, 0);
@@ -105,29 +105,31 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   // spawn some simple shapes and check to see that they start falling
   double z0 = 3;
-  std::map<std::string, math::Vector3> modelPos;
-  modelPos["test_box"] = math::Vector3(0, 0, z0);
-  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
-  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
-  modelPos["test_empty"] = math::Vector3(12, 0, z0);
-  modelPos["link_offset_box"] = math::Vector3(0, 0, z0);
+  std::map<std::string, ignition::math::Vector3> modelPos;
+  modelPos["test_box"] = ignition::math::Vector3(0, 0, z0);
+  modelPos["test_sphere"] = ignition::math::Vector3(4, 0, z0);
+  modelPos["test_cylinder"] = ignition::math::Vector3(8, 0, z0);
+  modelPos["test_empty"] = ignition::math::Vector3(12, 0, z0);
+  modelPos["link_offset_box"] = ignition::math::Vector3(0, 0, z0);
 
   // FIXME Trimesh drop test passes in bullet but fails in ode because
   // the mesh bounces to the side when it hits the ground.
   // See issue #513. Uncomment test when issue is resolved.
-  // modelPos["test_trimesh"] = math::Vector3(16, 0, z0);
+  // modelPos["test_trimesh"] = ignition::math::Vector3(16, 0, z0);
 
-  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnBox("test_box", ignition::math::Vector3(1, 1, 1), modelPos["test_box"],
+      ignition::math::Vector3::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"],
+      ignition::math::Vector3::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
-      math::Vector3::Zero);
-  SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+      ignition::math::Vector3::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"],
+      ignition::math::Vector3::Zero);
 
   std::ostringstream linkOffsetStream;
-  math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
-  math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
-  math::Vector3 linkOffsetSize(1, 1, 1);
+  ignition::math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
+  ignition::math::Pose linkOffsetPose2(1000, 1000, 0, 0, 0, 0);
+  ignition::math::Vector3 linkOffsetSize(1, 1, 1);
   linkOffsetStream << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='link_offset_box'>"
     << "<pose>" << linkOffsetPose1 << "</pose>"
@@ -163,26 +165,27 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   // std::string trimeshPath =
   //    "file://media/models/cube_20k/meshes/cube_20k.stl";
-  // SpawnTrimesh("test_trimesh", trimeshPath, math::Vector3(0.5, 0.5, 0.5),
-  //    modelPos["test_trimesh"], math::Vector3::Zero);
+  // SpawnTrimesh("test_trimesh", trimeshPath,
+  // ignition::math::Vector3(0.5, 0.5, 0.5),
+  //    modelPos["test_trimesh"], ignition::math::Vector3::Zero);
 
   int steps = 2;
   physics::ModelPtr model;
-  math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Pose pose1, pose2;
+  ignition::math::Vector3 vel1, vel2;
 
   double t, x0 = 0;
   // This loop steps the world forward and makes sure that each model falls,
   // expecting downward z velocity and decreasing z position.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check freefall of model " << name << '\n';
+      igndbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
@@ -206,18 +209,18 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
       // if (physics->GetType()  == "bullet")
       // {
-      //   gzerr << "m[" << model->GetName()
+      //   ignerr << "m[" << model->GetName()
       //         << "] p[" << model->GetWorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
-      //   gzerr << "wait: ";
+      //   ignerr << "wait: ";
       //   getchar();
       // }
     }
     else
     {
-      gzerr << "Error loading model " << name << '\n';
+      ignerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -239,7 +242,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   //   if (physics->GetType()  == "bullet")
   //   {
   //     model = world->GetModel("link_offset_box");
-  //     gzerr << "m[" << model->GetName()
+  //     ignerr << "m[" << model->GetName()
   //           << "] i[" << i << "/" << steps
   //           << "] pm[" << model->GetWorldPose()
   //           << "] pb[" << model->GetLink("body")->GetWorldPose()
@@ -248,7 +251,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
   //     if (model->GetWorldPose().pos.z < 0.6)
   //     {
-  //       gzerr << "wait: ";
+  //       ignerr << "wait: ";
   //       getchar();
   //     }
   //   }
@@ -257,15 +260,15 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The velocity is expected
   // to be small, and the pose is expected to be underneath the initial pose.
-  for (std::map<std::string, math::Vector3>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
     model = world->GetModel(name);
     if (model != NULL)
     {
-      gzdbg << "Check ground contact of model " << name << '\n';
+      igndbg << "Check ground contact of model " << name << '\n';
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
@@ -291,12 +294,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // debug
       // if (physics->GetType()  == "bullet")
       // {
-      //   gzerr << "m[" << model->GetName()
+      //   ignerr << "m[" << model->GetName()
       //         << "] p[" << model->GetWorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
-      //   gzerr << "wait: ";
+      //   ignerr << "wait: ";
       //   getchar();
       // }
 
@@ -310,13 +313,13 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << name << '\n';
+      ignerr << "Error loading model " << name << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
 
   // Compute and check link pose of link_offset_box
-  gzdbg << "Check link pose of link_offset_box\n";
+  igndbg << "Check link pose of link_offset_box\n";
   model = world->GetModel("link_offset_box");
   ASSERT_TRUE(model);
   physics::LinkPtr link = model->GetLink();
@@ -365,7 +368,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3 g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
   EXPECT_EQ(g.x, 0);
   EXPECT_EQ(g.y, 0);
@@ -378,15 +381,15 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   // spawn some spheres and check to see that they start falling
   double z0 = 3;
   double r1 = 0.5, r2 = 1.5;
-  math::Vector3 v30 = math::Vector3::Zero;
-  math::Vector3 cog;
-  math::Angle angle;
+  ignition::math::Vector3 v30 = ignition::math::Vector3::Zero;
+  ignition::math::Vector3 cog;
+  ignition::math::Angle angle;
 
   std::vector<std::string> modelNames;
   std::vector<double> x0s;
   std::vector<double> y0s;
   std::vector<double> radii;
-  std::vector<math::Vector3> cogs;
+  std::vector<ignition::math::Vector3> cogs;
 
   // sphere1 and sphere2 have c.g. at center of sphere, different sizes
   modelNames.push_back("small_centered_sphere");
@@ -406,28 +409,28 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   x0s.push_back(8);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, 0, -r1));
+  cogs.push_back(ignition::math::Vector3(0, 0, -r1));
 
   // sphere4 has c.g. above the center
   modelNames.push_back("raised_cog_sphere");
   x0s.push_back(-4);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, 0, r1));
+  cogs.push_back(ignition::math::Vector3(0, 0, r1));
 
   // sphere5 has c.g. to the side along y axis; it will roll
   modelNames.push_back("cog_y_offset_sphere");
   x0s.push_back(-8);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, r1, 0));
+  cogs.push_back(ignition::math::Vector3(0, r1, 0));
 
   // sphere6 has c.g. to the side along x axis; it will roll
   modelNames.push_back("cog_x_offset_sphere");
   x0s.push_back(15);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(r1, 0, 0));
+  cogs.push_back(ignition::math::Vector3(r1, 0, 0));
 
   // sphere7 has c.g. to the side diagonally; it will roll
   modelNames.push_back("cog_xy_45deg_offset_sphere");
@@ -435,7 +438,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   y0s.push_back(8);
   radii.push_back(r2);
   angle.SetFromDegree(45);
-  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+  cogs.push_back(ignition::math::Vector3(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
   // sphere8 has c.g. to the side diagonally; it will roll
@@ -444,20 +447,21 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   y0s.push_back(-8);
   radii.push_back(r2);
   angle.SetFromDegree(-30);
-  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+  cogs.push_back(ignition::math::Vector3(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
   unsigned int i;
   for (i = 0; i < modelNames.size(); ++i)
   {
-    SpawnSphere(modelNames[i], math::Vector3(x0s[i], y0s[i], z0+radii[i]),
-                v30, cogs[i], radii[i]);
+    SpawnSphere(modelNames[i],
+        ignition::math::Vector3(x0s[i], y0s[i], z0+radii[i]),
+        v30, cogs[i], radii[i]);
   }
 
   int steps = 2;
   physics::ModelPtr model;
-  math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Pose pose1, pose2;
+  ignition::math::Vector3 vel1, vel2;
 
   double t, x0 = 0, y0 = 0, radius;
   // This loop steps the world forward and makes sure that each model falls,
@@ -471,7 +475,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
     radius = radii[i];
     if (model != NULL)
     {
-      gzdbg << "Check freefall of model " << modelNames[i] << '\n';
+      igndbg << "Check freefall of model " << modelNames[i] << '\n';
       // Step once and check downward z velocity
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
@@ -496,7 +500,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << modelNames[i] << '\n';
+      ignerr << "Error loading model " << modelNames[i] << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -524,7 +528,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
     cog = cogs[i];
     if (model != NULL)
     {
-      gzdbg << "Check ground contact and roll without slip of model "
+      igndbg << "Check ground contact and roll without slip of model "
             << modelNames[i] << '\n';
 
       // Check that velocity is small
@@ -565,14 +569,16 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
-      math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0));
+      ignition::math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
+          ignition::math::Vector3(0, 0, -radius),
+          ignition::math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
-      math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0));
+      ignition::math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
+          ignition::math::Vector3(0, 0, radius),
+          ignition::math::Quaternion(0, 0, 0));
       EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
       EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
@@ -605,7 +611,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << modelNames[i] << '\n';
+      ignerr << "Error loading model " << modelNames[i] << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -624,7 +630,7 @@ TEST_P(PhysicsTest, SpawnDropCoGOffset)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 {
-  math::Rand::SetSeed(0);
+  ignition::math::Rand::SetSeed(0);
   // Load world
   Load("worlds/revolute_joint_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -648,15 +654,15 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 
   // Global axis
   double sqrt1_2 = sqrt(2.0) / 2.0;
-  std::vector<math::Vector3> globalAxes;
-  globalAxes.push_back(math::Vector3(1, 0, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, 1, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(-1, 0, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, -1, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
+  std::vector<ignition::math::Vector3> globalAxes;
+  globalAxes.push_back(ignition::math::Vector3(1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3(sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3(0, 1, 0));
+  globalAxes.push_back(ignition::math::Vector3(-sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3(-1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3(-sqrt1_2, -sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3(0, -1, 0));
+  globalAxes.push_back(ignition::math::Vector3(sqrt1_2, -sqrt1_2, 0));
 
   // Link names
   std::vector<std::string> linkNames;
@@ -674,7 +680,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   physics::JointPtr joint;
 
   // Check global axes before simulation starts
-  std::vector<math::Vector3>::iterator axisIter;
+  std::vector<ignition::math::Vector3>::iterator axisIter;
   axisIter = globalAxes.begin();
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
@@ -682,7 +688,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     model = world->GetModel(*modelIter);
     if (model)
     {
-      gzdbg << "Check global axes of model " << *modelIter << '\n';
+      igndbg << "Check global axes of model " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
@@ -690,14 +696,14 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          ignition::math::Vector3 axis = joint->GetGlobalAxis(0);
           EXPECT_NEAR(axis.x, (*axisIter).x, PHYSICS_TOL);
           EXPECT_NEAR(axis.y, (*axisIter).y, PHYSICS_TOL);
           EXPECT_NEAR(axis.z, (*axisIter).z, PHYSICS_TOL);
         }
         else
         {
-          gzerr << "Error loading joint " << *jointIter
+          ignerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
         }
@@ -705,7 +711,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
     ++axisIter;
@@ -718,14 +724,14 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
   world->Step(steps);
 
   // Get global angular velocity of each link
-  math::Vector3 angVel;
+  ignition::math::Vector3 angVel;
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
     model = world->GetModel(*modelIter);
     if (model)
     {
-      gzdbg << "Check angular velocity of model " << *modelIter << '\n';
+      igndbg << "Check angular velocity of model " << *modelIter << '\n';
       link = model->GetLink("base");
       if (link)
       {
@@ -737,7 +743,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       }
       else
       {
-        gzerr << "Error loading base link of model " << *modelIter << '\n';
+        ignerr << "Error loading base link of model " << *modelIter << '\n';
         EXPECT_TRUE(link != NULL);
       }
 
@@ -757,7 +763,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         }
         else
         {
-          gzerr << "Error loading link " << *linkIter
+          ignerr << "Error loading link " << *linkIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(link != NULL);
         }
@@ -765,7 +771,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -781,7 +787,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       double jointVel1, jointVel2;
       double angle1, angle2, angle3;
 
-      gzdbg << "Check angle measurement for " << *modelIter << '\n';
+      igndbg << "Check angle measurement for " << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
            jointIter != jointNames.end(); ++jointIter)
@@ -801,8 +807,8 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
 
           // Expect angle change in direction of joint velocity
           angle2 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle2 - angle1) * math::clamp(jointVel1*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT((angle2 - angle1) *
+              ignition::math::clamp(jointVel1*1e4, -1.0, 1.0) , 0);
 
           jointVel2 = joint->GetVelocity(0);
           EXPECT_GT(fabs(jointVel2), 1e-1);
@@ -810,12 +816,12 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           // Take 1 step and measure the last angle, expect decrease
           world->Step(1);
           angle3 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle3 - angle2) * math::clamp(jointVel2*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT((angle3 - angle2) *
+              ignition::math::clamp(jointVel2*1e4, -1.0, 1.0) , 0);
         }
         else
         {
-          gzerr << "Error loading joint " << *jointIter
+          ignerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
         }
@@ -823,7 +829,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -845,12 +851,12 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          joint->SetLowStop(0, math::Angle(-0.1));
-          joint->SetHighStop(0, math::Angle(0.1));
+          joint->SetLowStop(0, ignition::math::Angle(-0.1));
+          joint->SetHighStop(0, ignition::math::Angle(0.1));
         }
         else
         {
-          gzerr << "Error loading joint " << *jointIter
+          ignerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
         }
@@ -858,7 +864,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -872,7 +878,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     model = world->GetModel(*modelIter);
     if (model)
     {
-      gzdbg << "Check angle limits and velocity of joints of model "
+      igndbg << "Check angle limits and velocity of joints of model "
             << *modelIter << '\n';
       std::vector<std::string>::iterator jointIter;
       for (jointIter  = jointNames.begin();
@@ -885,7 +891,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         }
         else
         {
-          gzerr << "Error loading joint " << *jointIter
+          ignerr << "Error loading joint " << *jointIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(joint != NULL);
         }
@@ -893,7 +899,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -907,7 +913,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
     model = world->GetModel(*modelIter);
     if (model)
     {
-      gzdbg << "Check SetForce for model " << *modelIter << '\n';
+      igndbg << "Check SetForce for model " << *modelIter << '\n';
       std::vector<std::string>::iterator linkIter;
       for (linkIter  = linkNames.begin();
            linkIter != linkNames.end(); ++linkIter)
@@ -920,7 +926,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         }
         else
         {
-          gzerr << "Error loading link " << *linkIter
+          ignerr << "Error loading link " << *linkIter
                 << " of model " << *modelIter << '\n';
           EXPECT_TRUE(link != NULL);
         }
@@ -932,20 +938,20 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
         if (_physicsEngine == "simbody" ||
             _physicsEngine == "dart")
         {
-          gzerr << "Skipping joint detachment per #862 / #903" << std::endl;
+          ignerr << "Skipping joint detachment per #862 / #903" << std::endl;
           continue;
         }
         // Detach upper_joint.
         joint->Detach();
         // Simbody and DART will not easily detach joints,
         // consider freezing joint limit instead
-        // math::Angle curAngle = joint->GetAngle(0u);
+        // ignition::math::Angle curAngle = joint->GetAngle(0u);
         // joint->SetLowStop(0, curAngle);
         // joint->SetHighStop(0, curAngle);
       }
       else
       {
-        gzerr << "Error loading upper_joint "
+        ignerr << "Error loading upper_joint "
               << " of model " << *modelIter << '\n';
         EXPECT_TRUE(joint != NULL);
       }
@@ -971,7 +977,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->Step(1);
           newVel = joint->GetVelocity(0);
 
-          // gzdbg << "model " << *modelIter
+          // igndbg << "model " << *modelIter
           //       << "  i " << i
           //       << "  oldVel " << oldVel
           //       << "  newVel " << newVel
@@ -990,7 +996,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          ignition::math::Vector3 axis = joint->GetGlobalAxis(0);
           angVel  = joint->GetChild()->GetWorldAngularVel();
           angVel -= joint->GetParent()->GetWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
@@ -1007,7 +1013,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           world->Step(1);
           newVel = joint->GetVelocity(0);
 
-          // gzdbg << "model " << *modelIter
+          // igndbg << "model " << *modelIter
           //       << "  i " << i
           //       << "  oldVel " << oldVel
           //       << "  newVel " << newVel
@@ -1025,7 +1031,7 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          ignition::math::Vector3 axis = joint->GetGlobalAxis(0);
           angVel  = joint->GetChild()->GetWorldAngularVel();
           angVel -= joint->GetParent()->GetWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), PHYSICS_TOL);
@@ -1033,14 +1039,14 @@ void PhysicsTest::RevoluteJoint(const std::string &_physicsEngine)
       }
       else
       {
-        gzerr << "Error loading lower_joint "
+        ignerr << "Error loading lower_joint "
               << " of model " << *modelIter << '\n';
         EXPECT_TRUE(joint != NULL);
       }
     }
     else
     {
-      gzerr << "Error loading model " << *modelIter << '\n';
+      ignerr << "Error loading model " << *modelIter << '\n';
       EXPECT_TRUE(model != NULL);
     }
   }
@@ -1064,7 +1070,7 @@ TEST_P(PhysicsTest, RevoluteJoint)
   physics::LinkState linkState = modelState.GetLinkState(0);
   physics::CollisionState collisionState = linkState.GetCollisionState(0);
 
-  math::Pose pose;
+  ignition::math::Pose pose;
   EXPECT_EQ(1u, worldState.GetModelStateCount());
   EXPECT_EQ(1u, modelState.GetLinkStateCount());
   EXPECT_EQ(1u, linkState.GetCollisionStateCount());
@@ -1082,32 +1088,32 @@ TEST_P(PhysicsTest, RevoluteJoint)
   {
     modelState = worldState.GetModelState(i);
     if (modelState.GetName() == "plane")
-      pose.Set(math::Vector3(0, 0, 0), math::Quaternion(0, 0, 0));
+      pose.Set(ignition::math::Vector3(0, 0, 0), ignition::math::Quaternion(0, 0, 0));
     else if (modelState.GetName() == "box")
-      pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+      pose.Set(ignition::math::Vector3(0, 0, 0.5), ignition::math::Quaternion(0, 0, 0));
     else if (modelState.GetName() == "sphere")
-      pose.Set(math::Vector3(0, 1.5, 0.5), math::Quaternion(0, 0, 0));
+      pose.Set(ignition::math::Vector3(0, 1.5, 0.5), ignition::math::Quaternion(0, 0, 0));
     else if (modelState.GetName() == "cylinder")
-      pose.Set(math::Vector3(0, -1.5, 0.5), math::Quaternion(0, 0, 0));
+      pose.Set(ignition::math::Vector3(0, -1.5, 0.5), ignition::math::Quaternion(0, 0, 0));
 
     EXPECT_TRUE(pose == modelState.GetPose());
   }
 
   // Move the box
   world->GetModel("box")->SetWorldPose(
-      math::Pose(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose(ignition::math::Vector3(1, 2, 0.5), ignition::math::Quaternion(0, 0, 0)));
 
-  gazebo::common::Time::MSleep(10);
+  ignition::common::Time::MSleep(10);
 
   // Make sure the box has been moved
   physics::ModelState modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(1, 2, 0.5), math::Quaternion(0, 0, 0));
+  pose.Set(ignition::math::Vector3(1, 2, 0.5), ignition::math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
 
   // Reset world state, and check for correctness
   world->SetState(worldState);
   modelState2 = world->GetState().GetModelState("box");
-  pose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+  pose.Set(ignition::math::Vector3(0, 0, 0.5), ignition::math::Quaternion(0, 0, 0));
   EXPECT_TRUE(pose == modelState2.GetPose());
   Unload();
   */
@@ -1116,7 +1122,7 @@ TEST_P(PhysicsTest, RevoluteJoint)
 void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 {
   // Random seed is set to prevent brittle failures (gazebo issue #479)
-  math::Rand::SetSeed(18420503);
+  ignition::math::Rand::SetSeed(18420503);
   Load("worlds/damp_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -1124,12 +1130,12 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
   int i = 0;
   while (!this->HasEntity("model_4_mass_1_ixx_1_damping_10") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
+    ignthrow("Unable to get model_4_mass_1_ixx_1_damping_10");
 
   physics::ModelPtr model = world->GetModel("model_4_mass_1_ixx_1_damping_10");
   EXPECT_TRUE(model != NULL);
@@ -1143,7 +1149,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
     for (int i = 0; i < steps; ++i)
     {
       world->Step(1);  // theoretical contact, but
-      // gzdbg << "box time [" << world->GetSimTime().Double()
+      // igndbg << "box time [" << world->GetSimTime().Double()
       //       << "] vel [" << model->GetWorldLinearVel()
       //       << "] pose [" << model->GetWorldPose()
       //       << "]\n";
@@ -1152,8 +1158,8 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
     EXPECT_EQ(world->GetSimTime().Double(), 1.5);
 
     // This test expects a linear velocity at the CoG
-    math::Vector3 vel = model->GetLink()->GetWorldCoGLinearVel();
-    math::Pose pose = model->GetWorldPose();
+    ignition::math::Vector3 vel = model->GetLink()->GetWorldCoGLinearVel();
+    ignition::math::Pose pose = model->GetWorldPose();
 
     EXPECT_EQ(vel.x, 0.0);
 
@@ -1193,12 +1199,12 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
   int i = 0;
   while (!this->HasEntity("cylinder") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get cylinder");
+    ignthrow("Unable to get cylinder");
 
   {
     // todo: get parameters from drop_test.world
@@ -1225,9 +1231,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         physics::ModelPtr box_model = world->GetModel("box");
         if (box_model)
         {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
-          // gzdbg << "box time [" << world->GetSimTime().Double()
+          ignition::math::Vector3 vel = box_model->GetWorldLinearVel();
+          ignition::math::Pose pose = box_model->GetWorldPose();
+          // igndbg << "box time [" << world->GetSimTime().Double()
           //      << "] sim z [" << pose.pos.z
           //      << "] exact z [" << z
           //      << "] sim vz [" << vel.z
@@ -1257,9 +1263,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         physics::ModelPtr sphere_model = world->GetModel("sphere");
         if (sphere_model)
         {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          ignition::math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          ignition::math::Pose pose = sphere_model->GetWorldPose();
+          // igndbg << "sphere time [" << world->GetSimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.z
@@ -1290,9 +1296,9 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         physics::ModelPtr cylinder_model = world->GetModel("cylinder");
         if (cylinder_model)
         {
-          math::Vector3 vel = cylinder_model->GetWorldLinearVel();
-          math::Pose pose = cylinder_model->GetWorldPose();
-          // gzdbg << "cylinder time [" << world->GetSimTime().Double()
+          ignition::math::Vector3 vel = cylinder_model->GetWorldLinearVel();
+          ignition::math::Pose pose = cylinder_model->GetWorldPose();
+          // igndbg << "cylinder time [" << world->GetSimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.z
@@ -1347,12 +1353,12 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get sphere");
+    ignthrow("Unable to get sphere");
 
   {
     // todo: get parameters from drop_test.world
@@ -1376,10 +1382,10 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       {
         if (box_model)
         {
-          math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
+          ignition::math::Vector3 vel = box_model->GetWorldLinearVel();
+          ignition::math::Pose pose = box_model->GetWorldPose();
 
-          // gzdbg << "box time [" << t
+          // igndbg << "box time [" << t
           //      << "] sim x [" << pose.pos.x
           //      << "] ideal x [" << x
           //      << "] sim vx [" << vel.x
@@ -1388,9 +1394,10 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 
           if (i == 0)
           {
-            box_model->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+            box_model->GetLink("link")->SetForce(
+                ignition::math::Vector3(f, 0, 0));
             EXPECT_TRUE(box_model->GetLink("link")->GetWorldForce() ==
-              math::Vector3(f, 0, 0));
+              ignition::math::Vector3(f, 0, 0));
           }
 
           if (t > 1.000 && t < 1.01)
@@ -1408,9 +1415,9 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
         physics::ModelPtr sphere_model = world->GetModel("sphere");
         if (sphere_model)
         {
-          math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
-          // gzdbg << "sphere time [" << world->GetSimTime().Double()
+          ignition::math::Vector3 vel = sphere_model->GetWorldLinearVel();
+          ignition::math::Pose pose = sphere_model->GetWorldPose();
+          // igndbg << "sphere time [" << world->GetSimTime().Double()
           //      << "] sim x [" << pose.pos.x
           //      << "] ideal x [" << x
           //      << "] sim vx [" << vel.x
@@ -1472,12 +1479,12 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
   int i = 0;
   while (!this->HasEntity("model_1") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get model_1");
+    ignthrow("Unable to get model_1");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
   EXPECT_TRUE(physicsEngine);
@@ -1494,12 +1501,12 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
 
   {
     // check velocity / energy
-    math::Vector3 vel = link->GetWorldLinearVel();
-    math::Pose pos = link->GetWorldPose();
+    ignition::math::Vector3 vel = link->GetWorldLinearVel();
+    ignition::math::Pose pos = link->GetWorldPose();
     double pe = 9.81 * m * pos.pos.z;
     double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
     e_start = pe + ke;
-    // gzdbg << "total energy [" << e_start
+    // igndbg << "total energy [" << e_start
     //       << "] pe[" << pe
     //       << "] ke[" << ke
     //       << "] p[" << pos.pos.z
@@ -1519,14 +1526,14 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
+        ignition::math::Vector3 vel = link->GetWorldLinearVel();
+        ignition::math::Pose pos = link->GetWorldPose();
         double pe = 9.81 * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        // gzdbg << "total energy [" << e
+        // igndbg << "total energy [" << e
         //       << "] pe[" << pe
         //       << "] ke[" << ke
         //       << "] p[" << pos.pos.z
@@ -1545,7 +1552,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        // igndbg << "time [" << world->GetSimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
         //       << "] pose [" << model->GetWorldPose()
@@ -1569,14 +1576,14 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->GetWorldPose();
+        ignition::math::Vector3 vel = link->GetWorldLinearVel();
+        ignition::math::Pose pos = link->GetWorldPose();
         double pe = 9.81 * m * pos.pos.z;
         double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
-        // gzdbg << "total energy [" << e
+        // igndbg << "total energy [" << e
         //       << "] pe[" << pe
         //       << "] ke[" << ke
         //       << "] p[" << pos.pos.z
@@ -1595,7 +1602,7 @@ void PhysicsTest::SimplePendulum(const std::string &_physicsEngine)
           PendulumAngle(g, l, 1.57079633, 0.0, world->GetSimTime().Double(),
           0.000001) - 1.5707963);
         double actual_theta = joint->GetAngle(0).Radian();
-        // gzdbg << "time [" << world->GetSimTime().Double()
+        // igndbg << "time [" << world->GetSimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
         //       << "] pose [" << model->GetWorldPose()
@@ -1625,7 +1632,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 {
   if (_physicsEngine != "ode")
   {
-    gzerr << "Skipping SphereAtlasLargeError for physics engine ["
+    ignerr << "Skipping SphereAtlasLargeError for physics engine ["
           << _physicsEngine
           << "] as this test only works for ODE for now.\n";
     return;
@@ -1639,17 +1646,17 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3(0, 0, 0));
 
   int i = 0;
   while (!this->HasEntity("sphere_atlas") && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i > 20)
-    gzthrow("Unable to get sphere_atlas");
+    ignthrow("Unable to get sphere_atlas");
 
   physics::ModelPtr model = world->GetModel("sphere_atlas");
   EXPECT_TRUE(model);
@@ -1657,10 +1664,10 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   EXPECT_TRUE(head);
 
   {
-    gzdbg << "Testing large perturbation with PID controller active.\n";
+    igndbg << "Testing large perturbation with PID controller active.\n";
     // Test:  With Robot PID controller active, introduce a large
     //        constraint error by breaking some model joints to the world
-    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+    model->SetWorldPose(ignition::math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
     world->Step(1000);
@@ -1672,43 +1679,45 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        ignition::math::Pose childInWorld = links[i]->GetWorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
         {
           // anchor position in world frame
-          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+          ignition::math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
 
           // anchor pose in child link frame
-          math::Pose anchorInChild =
-            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+          ignition::math::Pose anchorInChild =
+            ignition::math::Pose(anchorPos,
+                ignition::math::Quaternion()) - childInWorld;
 
           // initial anchor pose in child link frame
-          math::Pose anchorInitialInChild =
+          ignition::math::Pose anchorInitialInChild =
             parentJoints[j]->GetInitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)
           {
             // compare everything in the parent frame
-            math::Pose childInitialInParent =
+            ignition::math::Pose childInitialInParent =
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
-            math::Pose childInParent = childInWorld - parentInWorld;
-            math::Pose anchorInParent = anchorInChild + childInParent;
-            math::Pose anchorInitialInParent =
+            ignition::math::Pose parentInWorld = parent->GetWorldPose();
+            ignition::math::Pose childInParent = childInWorld - parentInWorld;
+            ignition::math::Pose anchorInParent = anchorInChild + childInParent;
+            ignition::math::Pose anchorInitialInParent =
               anchorInitialInChild + childInitialInParent;
-            math::Pose jointError = anchorInParent - anchorInitialInParent;
+            ignition::math::Pose jointError = anchorInParent -
+              anchorInitialInParent;
 
             // joint constraint violation must be less than...
             EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
 
             // debug
             if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
-              gzdbg << "i [" << n
+              igndbg << "i [" << n
                     << "] link [" << links[i]->GetName()
                     // << "] parent[" << parent->GetName()
                     << "] error[" << jointError.pos.GetSquaredLength()
@@ -1726,7 +1735,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   }
 
   {
-    gzdbg << "Testing large perturbation with PID controller disabled.\n";
+    igndbg << "Testing large perturbation with PID controller disabled.\n";
     // Test:  Turn off Robot PID controller, then introduce a large
     //        constraint error by breaking some model joints to the world
 
@@ -1735,7 +1744,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
     world->Reset();
     world->Step(1);
 
-    model->SetWorldPose(math::Pose(1000, 0, 0, 0, 0, 0));
+    model->SetWorldPose(ignition::math::Pose(1000, 0, 0, 0, 0, 0));
 
     // let model settle
     world->Step(1000);
@@ -1747,43 +1756,45 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        ignition::math::Pose childInWorld = links[i]->GetWorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
         {
           // anchor position in world frame
-          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+          ignition::math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
 
           // anchor pose in child link frame
-          math::Pose anchorInChild =
-            math::Pose(anchorPos, math::Quaternion()) - childInWorld;
+          ignition::math::Pose anchorInChild =
+            ignition::math::Pose(anchorPos,
+                ignition::math::Quaternion()) - childInWorld;
 
           // initial anchor pose in child link frame
-          math::Pose anchorInitialInChild =
+          ignition::math::Pose anchorInitialInChild =
             parentJoints[j]->GetInitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)
           {
             // compare everything in the parent frame
-            math::Pose childInitialInParent =
+            ignition::math::Pose childInitialInParent =
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
-            math::Pose childInParent = childInWorld - parentInWorld;
-            math::Pose anchorInParent = anchorInChild + childInParent;
-            math::Pose anchorInitialInParent =
+            ignition::math::Pose parentInWorld = parent->GetWorldPose();
+            ignition::math::Pose childInParent = childInWorld - parentInWorld;
+            ignition::math::Pose anchorInParent = anchorInChild + childInParent;
+            ignition::math::Pose anchorInitialInParent =
               anchorInitialInChild + childInitialInParent;
-            math::Pose jointError = anchorInParent - anchorInitialInParent;
+            ignition::math::Pose jointError = anchorInParent -
+              anchorInitialInParent;
 
             // joint constraint violation must be less than...
             EXPECT_LT(jointError.pos.GetSquaredLength(), PHYSICS_TOL);
 
             // debug
             if (jointError.pos.GetSquaredLength() >= PHYSICS_TOL)
-              gzdbg << "i [" << n
+              igndbg << "i [" << n
                     << "] link [" << links[i]->GetName()
                     // << "] parent[" << parent->GetName()
                     << "] error[" << jointError.pos.GetSquaredLength()
@@ -1822,9 +1833,9 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   std::stringstream newModelStr;
 
   std::string modelName = "multiLinkModel";
-  math::Pose modelPose(0, 0, 2, 0, 0, 0);
-  math::Pose link01Pose(0, 0.1, 0, 0, 0, 0);
-  math::Pose link02Pose(0, -0.1, 0, 0, 0, 0);
+  ignition::math::Pose modelPose(0, 0, 2, 0, 0, 0);
+  ignition::math::Pose link01Pose(0, 0.1, 0, 0, 0, 0);
+  ignition::math::Pose link02Pose(0, -0.1, 0, 0, 0, 0);
 
   // A model composed of two overlapping links at fixed y offset from origin
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1880,16 +1891,16 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   int i = 0;
   while (!this->HasEntity(modelName) && i < 20)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
   if (i > 20)
-    gzthrow("Unable to spawn model");
+    ignthrow("Unable to spawn model");
 
   world->Step(5);
   physics::ModelPtr model = world->GetModel(modelName);
 
-  math::Vector3 vel;
+  ignition::math::Vector3 vel;
 
   physics::Link_V links = model->GetLinks();
   EXPECT_EQ(links.size(), 2u);

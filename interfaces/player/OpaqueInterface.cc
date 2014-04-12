@@ -145,7 +145,7 @@ void OpaqueInterface::Subscribe()
     // std::ostringstream stream;
     std::cout <<"Error Subscribing to Gazebo Opaque Interface\n"
       << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

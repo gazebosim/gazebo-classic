@@ -30,13 +30,13 @@ void PR2Test::Load(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+    ignerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
     return;
   }
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+    ignerr << "Abort test since dart does not support ray sensor in PR2, "
           << "Please see issue #911.\n";
     return;
   }
@@ -50,7 +50,7 @@ void PR2Test::Load(std::string _physicsEngine)
 
   int i;
   for (i = 0; i < 1000 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(1000);
+    ignition::common::Time::MSleep(1000);
   EXPECT_LT(i, 1000);
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -67,16 +67,16 @@ void PR2Test::Load(std::string _physicsEngine)
   EXPECT_TRUE(camSensor);
 
   while (!camSensor->SaveFrame("/tmp/gazebo_test/frame_10.jpg"))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
-      math::Vector3(-0.5, 0, -0.1));
+      ignition::math::Vector3(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
     filename << "/tmp/gazebo_test/frame_" << i << ".jpg";
     camSensor->SaveFrame(filename.str());
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
 
   // Cleanup test directory.
@@ -98,13 +98,13 @@ void PR2Test::StaticPR2(std::string _physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+    ignerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
     return;
   }
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+    ignerr << "Abort test since dart does not support ray sensor in PR2, "
           << "Please see issue #911.\n";
     return;
   }

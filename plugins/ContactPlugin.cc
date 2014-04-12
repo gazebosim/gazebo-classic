@@ -41,7 +41,7 @@ void ContactPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
   {
-    gzerr << "ContactPlugin requires a ContactSensor.\n";
+    ignerr << "ContactPlugin requires a ContactSensor.\n";
     return;
   }
 

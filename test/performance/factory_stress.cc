@@ -37,7 +37,7 @@ TEST_F(FactoryStressTest, Bookshelf)
   for (int i = 0; i < 100; ++i)
   {
     SpawnModel("model://bookshelf");
-    gazebo::common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
     RemoveModel("bookshelf");
   }
 

@@ -19,14 +19,14 @@
 
 #include <string>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/KeyEvent.hh"
+#include "ignition/common/MouseEvent.hh"
+#include "ignition/common/KeyEvent.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 
-#include "gazebo/common/SingletonT.hh"
+#include "ignition/common/SingletonT.hh"
 
 namespace gazebo
 {
@@ -35,7 +35,8 @@ namespace gazebo
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class ModelManipulator :
+      public ignition::common::SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();
@@ -55,30 +56,32 @@ namespace gazebo
 
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.
-      public: void OnMousePressEvent(const common::MouseEvent &_event);
+      public: void OnMousePressEvent(
+                  const ignition::common::MouseEvent &_event);
 
       /// \brief Process an object translate mouse move event.
       /// \param[in] _event Mouse event.
-      public: void OnMouseMoveEvent(const common::MouseEvent &_event);
+      public: void OnMouseMoveEvent(const ignition::common::MouseEvent &_event);
 
       /// \brief Process an object translate mouse release event.
       /// \param[in] _event Mouse event.
-      public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
+      public: void OnMouseReleaseEvent(
+                  const ignition::common::MouseEvent &_event);
 
       /// \brief Process a key press event.
       /// \param[in] _event Key event.
-      public: void OnKeyPressEvent(const common::KeyEvent &_event);
+      public: void OnKeyPressEvent(const ignition::common::KeyEvent &_event);
 
       /// \brief Process a key release event.
       /// \param[in] _event Key event.
-      public: void OnKeyReleaseEvent(const common::KeyEvent &_event);
+      public: void OnKeyReleaseEvent(const ignition::common::KeyEvent &_event);
 
       /// \brief Rotate entity.
       /// \param[in] _vis Visual representing the entity.
       /// \param[in] _axis Axis of rotation.
       /// \param[in] _local True to apply rotation in local frame.
       public: void RotateEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3 &_axis,
           bool _local = false);
 
       /// \brief Translate entity.
@@ -86,7 +89,7 @@ namespace gazebo
       /// \param[in] _axis Axis of translation.
       /// \param[in] _local True to apply translation in local frame.
       public: void TranslateEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3 &_axis,
           bool _local = false);
 
       /// \brief Scale entity.
@@ -94,7 +97,7 @@ namespace gazebo
       /// \param[in] _axis Scaling axis.
       /// \param[in] _local True to apply scaling in local frame.
       public: void ScaleEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3 &_axis,
           bool _local = false);
 
       /// \brief Snap a point at intervals of a fixed distance. Currently used
@@ -105,17 +108,18 @@ namespace gazebo
       /// \param[in] _sensitivity Sensitivity of point snapping, in terms of a
       /// percentage of the interval.
       /// \return Snapped 3D point.
-      public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
-          double _interval = 1.0, double _sensitivity = 0.4);
+      public: static ignition::math::Vector3 SnapPoint(
+                  const ignition::math::Vector3 &_point,
+                  double _interval = 1.0, double _sensitivity = 0.4);
 
       /// \brief Helper function to get the 3D position of mouse on ground
       /// plane.
       /// param[in] _camera Pointer to user camera.
       /// param[in] _event Mouse event.
       /// return Point of mouse-plane intersection in world coordinates.
-      public: static math::Vector3 GetMousePositionOnPlane(
+      public: static ignition::math::Vector3 GetMousePositionOnPlane(
           rendering::CameraPtr _camera,
-          const common::MouseEvent &_event);
+          const ignition::common::MouseEvent &_event);
 
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _camera Pointer to user camera.
@@ -123,10 +127,12 @@ namespace gazebo
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
-      public: static math::Vector3 GetMouseMoveDistance(
+      public: static ignition::math::Vector3 GetMouseMoveDistance(
           rendering::CameraPtr _camera,
-          const math::Vector2i &_start, const math::Vector2i &_end,
-          const math::Pose &_pose, const math::Vector3 &_axis,
+          const ignition::math::Vector2i &_start,
+          const ignition::math::Vector2i &_end,
+          const ignition::math::Pose &_pose,
+          const ignition::math::Vector3 &_axis,
           bool _local);
 
       /// \brief Helper function to get the distance moved by the mouse.
@@ -134,8 +140,9 @@ namespace gazebo
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
-      private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
-          const math::Vector3 &_axis, bool _local) const;
+      private: ignition::math::Vector3 GetMouseMoveDistance(
+                   const ignition::math::Pose &_pose,
+                   const ignition::math::Vector3 &_axis, bool _local) const;
 
       /// \brief Set the visual being moved by the mouse.
       /// \param[in] _vis Pointer to visual moved by mouse.
@@ -157,10 +164,10 @@ namespace gazebo
       private: std::string manipMode;
 
       /// \brief Keep track of the mouse start pose before a move action.
-      private: math::Pose mouseMoveVisStartPose;
+      private: ignition::math::Pose mouseMoveVisStartPose;
 
       /// \brief Keep track of the mouse start screen position.
-      private: math::Vector2i mouseStart;
+      private: ignition::math::Vector2i mouseStart;
 
       /// \brief The current selected visual.
       private: rendering::VisualPtr selectedVis;
@@ -184,19 +191,19 @@ namespace gazebo
       private: rendering::ScenePtr scene;
 
       /// \brief Current mouse event.
-      private: common::MouseEvent mouseEvent;
+      private: ignition::common::MouseEvent mouseEvent;
 
       /// \brief Current key event.
-      private: common::KeyEvent keyEvent;
+      private: ignition::common::KeyEvent keyEvent;
 
       /// \brief True if the model manipulator is initialized.
       private: bool initialized;
 
       /// \brief Scale of the visual attached to the mouse.
-      private: math::Vector3 mouseVisualScale;
+      private: ignition::math::Vector3 mouseVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      private: math::Box mouseVisualBbox;
+      private: ignition::math::Box mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
       private: bool globalManip;

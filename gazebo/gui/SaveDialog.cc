@@ -16,7 +16,7 @@
 */
 
 #include <boost/filesystem.hpp>
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
 using namespace gazebo;
@@ -161,7 +161,7 @@ void SaveDialog::OnSave()
   }
   catch(const boost::filesystem::filesystem_error &ex)
   {
-    gzerr << ex.what() << std::endl;
+    ignerr << ex.what() << std::endl;
   }
 }
 

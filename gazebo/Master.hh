@@ -29,7 +29,7 @@
 
 namespace gazebo
 {
-  /// \class Master Master.hh gazebo_core.hh
+  /// \class Master Master.hh gazebo.hh
   /// \brief A ROS Master-like manager that directs gztopic connections, enables
   ///        each gazebo network client to locate one another for peer-to-peer
   ///        communication.

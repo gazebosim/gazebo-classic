@@ -27,7 +27,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/gzmath.hh"
+#include "ignition/math.hh"
 #include "gazebo/physics/physics.hh"
 
 namespace gazebo
@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetTagPose() const
+      public: ignition::math::Pose GetTagPose() const
               {return entity->GetWorldPose();}
 
       /// \brief Pointer the entity that has the RFID tag.

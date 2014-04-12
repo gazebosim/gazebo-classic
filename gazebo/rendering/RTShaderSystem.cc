@@ -21,8 +21,8 @@
 #include <sys/stat.h>
 #include <boost/bind.hpp>
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -79,7 +79,7 @@ void RTShaderSystem::Init()
     this->shaderGenerator->setTargetLanguage("glsl");
   }
   else
-    gzerr << "RT Shader system failed to initialize\n";
+    ignerr << "RT Shader system failed to initialize\n";
 
 #endif
 }
@@ -247,7 +247,7 @@ void RTShaderSystem::GenerateShaders(Visual *vis)
         }
         catch(Ogre::Exception &e)
         {
-          gzerr << "Unable to create shader technique for material["
+          ignerr << "Unable to create shader technique for material["
             << curMaterialName << "]\n";
           success = false;
         }
@@ -410,7 +410,7 @@ bool RTShaderSystem::GetPaths(std::string &coreLibsPath, std::string &cachePath)
   // Core shader lib not found -> shader generating will fail.
   if (coreLibsPath.empty())
   {
-    gzerr << "Unable to find shader lib. Shader generating will fail.";
+    ignerr << "Unable to find shader lib. Shader generating will fail.";
     return false;
   }
 

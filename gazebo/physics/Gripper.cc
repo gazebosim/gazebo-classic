@@ -46,7 +46,8 @@ Gripper::Gripper(ModelPtr _model)
 
   this->attached = false;
 
-  this->updateRate = common::Time(0, common::Time::SecToNano(0.75));
+  this->updateRate = ignition::common::Time(0,
+      ignition::common::Time::SecToNano(0.75));
 
   this->node = transport::NodePtr(new transport::Node());
 }
@@ -76,7 +77,7 @@ void Gripper::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr palmLinkElem = _sdf->GetElement("palm_link");
   this->palmLink = this->model->GetLink(palmLinkElem->Get<std::string>());
   if (!this->palmLink)
-    gzerr << "palm link [" << palmLinkElem->Get<std::string>()
+    ignerr << "palm link [" << palmLinkElem->Get<std::string>()
           << "] not found!\n";
 
   sdf::ElementPtr gripperLinkElem = _sdf->GetElement("gripper_link");
@@ -111,14 +112,14 @@ void Gripper::Load(sdf::ElementPtr _sdf)
           &Gripper::OnContacts, this);
     }
   }
-  this->connections.push_back(event::Events::ConnectWorldUpdateEnd(
+  this->connections.push_back(common::Events::ConnectWorldUpdateEnd(
           boost::bind(&Gripper::OnUpdate, this)));
 }
 
 /////////////////////////////////////////////////
 void Gripper::Init()
 {
-  this->prevUpdateTime = common::Time::GetWallTime();
+  this->prevUpdateTime = ignition::common::Time::GetWallTime();
   this->zeroCount = 0;
   this->posCount = 0;
   this->attached = false;
@@ -127,8 +128,11 @@ void Gripper::Init()
 /////////////////////////////////////////////////
 void Gripper::OnUpdate()
 {
-  if (common::Time::GetWallTime() - this->prevUpdateTime < this->updateRate)
+  if (ignition::common::Time::GetWallTime() - this->prevUpdateTime <
+      this->updateRate)
+  {
     return;
+  }
 
   // @todo: should package the decision into a function
   if (this->contacts.size() >= this->minContactCount)
@@ -148,7 +152,7 @@ void Gripper::OnUpdate()
     this->HandleDetach();
 
   this->contacts.clear();
-  this->prevUpdateTime = common::Time::GetWallTime();
+  this->prevUpdateTime = ignition::common::Time::GetWallTime();
 }
 
 /////////////////////////////////////////////////
@@ -156,7 +160,7 @@ void Gripper::HandleAttach()
 {
   if (!this->palmLink)
   {
-    gzwarn << "palm link not found, not enforcing grasp hack!\n";
+    ignwarn << "palm link not found, not enforcing grasp hack!\n";
     return;
   }
 
@@ -193,7 +197,7 @@ void Gripper::HandleAttach()
     {
       if (!this->attached && cc[iter->first])
       {
-        math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
+        ignition::math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
           this->palmLink->GetWorldPose();
 
         double dd = (diff - this->prevDiff).pos.GetSquaredLength();
@@ -201,15 +205,15 @@ void Gripper::HandleAttach()
         this->prevDiff = diff;
 
         this->diffs[this->diffIndex] = dd;
-        double var = math::variance<double>(this->diffs);
-        double max = math::max<double>(this->diffs);
+        double var = ignition::math::variance<double>(this->diffs);
+        double max = ignition::math::max<double>(this->diffs);
 
         if (var < 1e-5 && max < 1e-5)
         {
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose());
+              cc[iter->first]->GetLink(), ignition::math::Pose());
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);
@@ -251,7 +255,7 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
 void Gripper::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
-    this->diffs[i] = GZ_DBL_MAX;
+    this->diffs[i] = IGN_DBL_MAX;
 }
 
 /////////////////////////////////////////////////

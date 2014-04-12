@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTHinge2Joint.hh"
@@ -51,7 +51,8 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 DARTHinge2Joint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -61,7 +62,8 @@ math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTHinge2Joint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &_axis)
 {
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
@@ -87,12 +89,13 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 DARTHinge2Joint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -115,7 +118,7 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   // TODO: Issue #494
@@ -125,9 +128,9 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (_index == 0)
   {
@@ -141,7 +144,7 @@ math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   return result;
@@ -157,7 +160,7 @@ double DARTHinge2Joint::GetVelocity(unsigned int _index) const
   else if (_index == 1)
     result = this->dtJoint->getGenCoord(1)->get_dq();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -170,7 +173,7 @@ void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_dq(_vel);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -183,7 +186,7 @@ double DARTHinge2Joint::GetMaxForce(unsigned int _index)
   else if (_index == 1)
     result = this->dtJoint->getGenCoord(1)->get_tauMax();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -196,7 +199,7 @@ void DARTHinge2Joint::SetMaxForce(unsigned int _index, double _force)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_tauMax(_force);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -207,5 +210,5 @@ void DARTHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_tau(_effort);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }

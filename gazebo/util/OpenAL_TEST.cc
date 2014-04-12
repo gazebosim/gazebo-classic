@@ -20,7 +20,7 @@
 #include <sdf/sdf.hh>
 
 #include "test_config.h"
-#include "gazebo/common/CommonIface.hh"
+#include "ignition/common/CommonIface.hh"
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/gazebo_config.h"
 #include "test/util.hh"
@@ -33,7 +33,7 @@ class OpenAL : public gazebo::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(OpenAL, SourceInvalid)
 {
-  common::load();
+  ignition::common::load();
   util::OpenALSourcePtr source;
   EXPECT_EQ(util::OpenAL::Instance()->CreateSource(sdf::ElementPtr()), source);
 
@@ -42,7 +42,7 @@ TEST_F(OpenAL, SourceInvalid)
 /////////////////////////////////////////////////
 TEST_F(OpenAL, DefaultDevice)
 {
-  common::load();
+  ignition::common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("world.sdf", sdf->root);
@@ -64,7 +64,7 @@ TEST_F(OpenAL, DefaultDevice)
 /////////////////////////////////////////////////
 TEST_F(OpenAL, NonDefaultDevice)
 {
-  common::load();
+  ignition::common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("world.sdf", sdf->root);
@@ -85,7 +85,7 @@ TEST_F(OpenAL, NonDefaultDevice)
 /////////////////////////////////////////////////
 TEST_F(OpenAL, BadSDF)
 {
-  common::load();
+  ignition::common::load();
   util::OpenALSourcePtr source;
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -102,7 +102,7 @@ TEST_F(OpenAL, BadSDF)
 /////////////////////////////////////////////////
 TEST_F(OpenAL, BadValues)
 {
-  common::load();
+  ignition::common::load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -138,7 +138,7 @@ TEST_F(OpenAL, BadValues)
 TEST_F(OpenAL, SourcePlay)
 {
   util::OpenALSourcePtr source;
-  common::load();
+  ignition::common::load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -203,7 +203,7 @@ TEST_F(OpenAL, SourcePlay)
 TEST_F(OpenAL, SourceVelPose)
 {
   util::OpenALSourcePtr source;
-  common::load();
+  ignition::common::load();
 
   sdf::SDFPtr sdf(new sdf::SDF);
   sdf::initFile("audio_source.sdf", sdf->root);
@@ -224,14 +224,14 @@ TEST_F(OpenAL, SourceVelPose)
   EXPECT_TRUE(source != NULL);
 
   EXPECT_FALSE(source->GetOnContact());
-  EXPECT_TRUE(source->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(source->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(source->SetVelocity(ignition::math::Vector3(1, 1, 1)));
+  EXPECT_TRUE(source->SetPose(ignition::math::Pose(1, 1, 1, 0, 0, 0)));
 }
 
 /////////////////////////////////////////////////
 TEST_F(OpenAL, Sourcevalid)
 {
-  common::load();
+  ignition::common::load();
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
 
@@ -282,7 +282,7 @@ TEST_F(OpenAL, SinkCreate)
 {
   util::OpenALSinkPtr sink1;
   util::OpenALSinkPtr sink2;
-  common::load();
+  ignition::common::load();
 
   sink1 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   sink2 = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
@@ -298,17 +298,17 @@ TEST_F(OpenAL, SinkCreate)
 TEST_F(OpenAL, SinkVelPose)
 {
   util::OpenALSinkPtr sink;
-  common::load();
+  ignition::common::load();
 
   sink = util::OpenAL::Instance()->CreateSink(sdf::ElementPtr());
   EXPECT_TRUE(sink != NULL);
 
-  EXPECT_FALSE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_FALSE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_FALSE(sink->SetVelocity(ignition::math::Vector3(1, 1, 1)));
+  EXPECT_FALSE(sink->SetPose(ignition::math::Pose(1, 1, 1, 0, 0, 0)));
 
   EXPECT_TRUE(util::OpenAL::Instance()->Load());
-  EXPECT_TRUE(sink->SetVelocity(math::Vector3(1, 1, 1)));
-  EXPECT_TRUE(sink->SetPose(math::Pose(1, 1, 1, 0, 0, 0)));
+  EXPECT_TRUE(sink->SetVelocity(ignition::math::Vector3(1, 1, 1)));
+  EXPECT_TRUE(sink->SetPose(ignition::math::Pose(1, 1, 1, 0, 0, 0)));
 }
 #endif
 

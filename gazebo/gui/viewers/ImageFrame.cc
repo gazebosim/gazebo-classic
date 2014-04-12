@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Image.hh"
+#include "ignition/common/Image.hh"
 #include "gazebo/gui/viewers/ImageFramePrivate.hh"
 #include "gazebo/gui/viewers/ImageFrame.hh"
 
@@ -65,11 +65,11 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   unsigned int rgbDataSize = 0;
 
   // Convert the image data to RGB
-  common::Image img;
+  ignition::common::Image img;
   img.SetFromData(
       (unsigned char *)(_msg.data().c_str()),
       _msg.width(), _msg.height(),
-      (common::Image::PixelFormat)(_msg.pixel_format()));
+      (ignition::common::Image::PixelFormat)(_msg.pixel_format()));
 
   img.GetRGBData(&rgbData, rgbDataSize);
 

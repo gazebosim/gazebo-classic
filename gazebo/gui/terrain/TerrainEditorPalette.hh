@@ -21,8 +21,8 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -53,19 +53,19 @@ namespace gazebo
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMousePress(const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the brush was applied
-      private: bool OnMouseMove(const common::MouseEvent &_event);
+      private: bool OnMouseMove(const ignition::common::MouseEvent &_event);
 
       /// \brief Apply a brush
       /// \param[in] _event The mouse event.
       /// \param[in] _camera Active camera.
       /// \param[in] _heightmap Heightmap on which to apply the modification.
       /// \return True if the brush was applied
-      private: bool Apply(const common::MouseEvent &_event,
+      private: bool Apply(const ignition::common::MouseEvent &_event,
                    rendering::CameraPtr _camera,
                    rendering::Heightmap *_heightmap);
 

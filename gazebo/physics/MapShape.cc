@@ -21,9 +21,9 @@
 #include <string.h>
 #include <math.h>
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Image.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Image.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -75,11 +75,11 @@ void MapShape::Load(sdf::ElementPtr _sdf)
     _sdf->GetElement("height")->Set(1.0);
 
   // Load the image
-  this->mapImage = new common::Image();
+  this->mapImage = new ignition::common::Image();
   this->mapImage->Load(imageFilename);
 
   if (!this->mapImage->Valid())
-    gzthrow(std::string("Unable to open image file[") + imageFilename + "]");
+    ignthrow(std::string("Unable to open image file[") + imageFilename + "]");
 }
 
 //////////////////////////////////////////////////
@@ -122,7 +122,7 @@ std::string MapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-void MapShape::SetScale(const math::Vector3 &_scale)
+void MapShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -135,10 +135,10 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MapShape::GetScale() const
+ignition::math::Vector3 MapShape::GetScale() const
 {
   double mapScale = this->sdf->Get<double>("scale");
-  return math::Vector3(mapScale, mapScale, mapScale);
+  return ignition::math::Vector3(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////
@@ -403,7 +403,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
                                  unsigned int &freePixels,
                                  unsigned int &occPixels)
 {
-  common::Color pixColor;
+  ignition::common::Color pixColor;
   unsigned char v;
   unsigned int x, y;
 
@@ -431,5 +431,5 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
 //////////////////////////////////////////////////
 void MapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
-  gzerr << "TODO: not implement yet.";
+  ignerr << "TODO: not implement yet.";
 }

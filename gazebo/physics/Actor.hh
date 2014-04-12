@@ -14,26 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _ACTOR_HH_
-#define _ACTOR_HH_
+#ifndef _GAZEBO_ACTOR_HH_
+#define _GAZEBO_ACTOR_HH_
 
 #include <string>
 #include <map>
 #include <vector>
+#include <ignition/common.hh>
 
 #include "gazebo/physics/Model.hh"
-#include "gazebo/common/Time.hh"
-#include "gazebo/common/Skeleton.hh"
-#include "gazebo/common/Animation.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Mesh;
-    class Color;
-  }
-
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
@@ -112,7 +104,7 @@ namespace gazebo
       /// \param[in] _mass Mass of the inertia.
       /// \param[in] _radiau Radius of the sphere.
       private: void AddSphereInertia(sdf::ElementPtr _linkSdf,
-                                     const math::Pose &_pose,
+                                     const ignition::math::Pose &_pose,
                                      double _mass, double _radius);
 
       /// \brief Add a spherical collision object.
@@ -122,7 +114,7 @@ namespace gazebo
       /// \param[in] _radius Radius of the collision object.
       private: void AddSphereCollision(sdf::ElementPtr _linkSdf,
                                        const std::string &_name,
-                                       const math::Pose &_pose,
+                                       const ignition::math::Pose &_pose,
                                        double _radius);
 
       /// \brief Add a spherical visual object.
@@ -134,10 +126,10 @@ namespace gazebo
       /// \param[in] _ambient Ambient color.
       private: void AddSphereVisual(sdf::ElementPtr _linkSdf,
                                     const std::string &_name,
-                                    const math::Pose &_pose,
+                                    const ignition::math::Pose &_pose,
                                     double _radius,
                                     const std::string &_material,
-                                    const common::Color &_ambient);
+                                    const ignition::common::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -148,10 +140,10 @@ namespace gazebo
       /// \param[in] _ambient Ambient color.
       private: void AddBoxVisual(sdf::ElementPtr _linkSdf,
                                  const std::string &_name,
-                                 const math::Pose &_pose,
-                                 const math::Vector3 &_size,
+                                 const ignition::math::Pose &_pose,
+                                 const ignition::math::Vector3 &_size,
                                  const std::string &_material,
-                                 const common::Color &_ambient);
+                                 const ignition::common::Color &_ambient);
 
       /// \brief Add an actor visual to a link.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -159,7 +151,7 @@ namespace gazebo
       /// \param[in] _pose Pose of the visual.
       private: void AddActorVisual(sdf::ElementPtr _linkSdf,
                                    const std::string &_name,
-                                   const math::Pose &_pose);
+                                   const ignition::math::Pose &_pose);
 
       /// \brief Load an animation from SDF.
       /// \param[in] _sdf SDF element containing the animation.
@@ -173,14 +165,15 @@ namespace gazebo
       /// \param[in] _frame Each frame name and transform.
       /// \param[in] _skelMap Map of bone relationships.
       /// \param[in] _time Time over which to animate the set pose.
-      private: void SetPose(std::map<std::string, math::Matrix4> _frame,
-                     std::map<std::string, std::string> _skelMap, double _time);
+      private: void SetPose(
+                   std::map<std::string, ignition::math::Matrix4> _frame,
+                   std::map<std::string, std::string> _skelMap, double _time);
 
       /// \brief Pointer to the actor's mesh.
-      protected: const common::Mesh *mesh;
+      protected: const ignition::common::Mesh *mesh;
 
       /// \brief The actor's skeleton.
-      protected: common::Skeleton *skeleton;
+      protected: ignition::common::Skeleton *skeleton;
 
       /// \brief Filename for the skin.
       protected: std::string skinFile;
@@ -210,30 +203,31 @@ namespace gazebo
       protected: LinkPtr mainLink;
 
       /// \brief Time of the previous frame.
-      protected: common::Time prevFrameTime;
+      protected: ignition::common::Time prevFrameTime;
 
       /// \brief Time when the animation was started.
-      protected: common::Time playStartTime;
+      protected: ignition::common::Time playStartTime;
 
       /// \brief All the trajectories.
-      protected: std::map<unsigned int, common::PoseAnimation*> trajectories;
+      protected: std::map<unsigned int,
+                 ignition::common::PoseAnimation*> trajectories;
 
       /// \brief Trajectory information
       protected: std::vector<TrajectoryInfo> trajInfo;
 
       /// \brief Skeleton animations
-      protected: std::map<std::string, common::SkeletonAnimation*>
-                                                            skelAnimation;
+      protected: std::map<std::string, ignition::common::SkeletonAnimation*>
+                 skelAnimation;
 
       /// \brief Skeleton to naode map
       protected: std::map<std::string, std::map<std::string, std::string> >
-                                                            skelNodesMap;
+                 skelNodesMap;
 
       /// \brief True to interpolate along x direction.
       protected: std::map<std::string, bool> interpolateX;
 
       /// \brief Last position of the actor
-      protected: math::Vector3 lastPos;
+      protected: ignition::math::Vector3 lastPos;
 
       /// \brief Length of the actor's path.
       protected: double pathLength;

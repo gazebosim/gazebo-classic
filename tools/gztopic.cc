@@ -23,7 +23,7 @@
 #include <gazebo/gui/viewers/ViewFactory.hh>
 #include <gazebo/gazebo.hh>
 
-#include <gazebo/common/Time.hh>
+#include <ignition/common/Time.hh>
 #include <gazebo/transport/TransportIface.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
@@ -42,11 +42,11 @@ using namespace gazebo;
 // transport::ConnectionPtr connection(new transport::Connection());
 std::vector<std::string> params;
 
-common::Time hz_prev_time;
-common::Time bw_prev_time;
+ignition::common::Time hz_prev_time;
+ignition::common::Time bw_prev_time;
 
 std::vector<int> bwBytes;
-std::vector<common::Time> bwTime;
+std::vector<ignition::common::Time> bwTime;
 
 boost::mutex mutex;
 
@@ -178,7 +178,7 @@ transport::ConnectionPtr connect_to_master()
     }
     catch(...)
     {
-      gzerr << "Unable to read from master\n";
+      ignerr << "Unable to read from master\n";
       return transport::ConnectionPtr();
     }
 
@@ -217,7 +217,7 @@ void list()
     }
     catch(...)
     {
-      gzerr << "An active gzserver is probably not present.\n";
+      ignerr << "An active gzserver is probably not present.\n";
       connection.reset();
       return;
     }
@@ -260,15 +260,15 @@ void bwCB(const std::string &_data)
   boost::mutex::scoped_lock lock(mutex);
 
   bwBytes.push_back(_data.size());
-  bwTime.push_back(common::Time::GetWallTime());
+  bwTime.push_back(ignition::common::Time::GetWallTime());
 }
 
 /////////////////////////////////////////////////
 void hzCB(const std::string &/*_data*/)
 {
-  common::Time cur_time = common::Time::GetWallTime();
+  ignition::common::Time cur_time = ignition::common::Time::GetWallTime();
 
-  if (hz_prev_time != common::Time(0, 0))
+  if (hz_prev_time != ignition::common::Time(0, 0))
   {
     std::cout << "Hz: " << std::setw(6) << std::fixed << std::setprecision(2)
               << 1.0 / (cur_time - hz_prev_time).Double() << std::endl;
@@ -350,7 +350,7 @@ void echo()
 
   if (msgTypeName.empty())
   {
-    gzerr << "Unable to get message type for topic[" << topic << "]\n";
+    ignerr << "Unable to get message type for topic[" << topic << "]\n";
     transport::fini();
     return;
   }
@@ -359,7 +359,7 @@ void echo()
 
   if (!g_echoMsg)
   {
-    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    ignerr << "Unable to create message of type[" << msgTypeName << "]\n";
     transport::fini();
     return;
   }
@@ -370,7 +370,7 @@ void echo()
   transport::run();
 
   while (true)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   transport::fini();
 }
@@ -399,7 +399,7 @@ void bw()
 
   while (true)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     {
       boost::mutex::scoped_lock lock(mutex);
       if (bwBytes.size() >= 10)
@@ -408,7 +408,7 @@ void bw()
 
         float sumSize = 0;
         unsigned int count = bwBytes.size();
-        common::Time dt = bwTime[count - 1] - bwTime[0];
+        ignition::common::Time dt = bwTime[count - 1] - bwTime[0];
 
         for (unsigned int i = 0; i < count; ++i)
         {
@@ -491,7 +491,7 @@ void hz()
   transport::run();
 
   while (true)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   transport::fini();
 }
@@ -540,12 +540,12 @@ void view(int _argc, char **_argv)
     if (view)
       view->show();
     else
-      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+      ignerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 
   if (!gazebo::init())
   {
-    gzerr << "Unable to initialize Gazebo\n";
+    ignerr << "Unable to initialize Gazebo\n";
     return;
   }
 

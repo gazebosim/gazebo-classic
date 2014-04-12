@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -73,7 +73,7 @@ void BulletHeightmapShape::Init()
   BulletCollisionPtr bParent;
   bParent = boost::dynamic_pointer_cast<BulletCollision>(this->collisionParent);
 
-  GZ_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
+  IGN_ASSERT(bParent != NULL, "Bullet collision parent of a heightmap is NULL");
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
@@ -83,11 +83,11 @@ void BulletHeightmapShape::Init()
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 
-  GZ_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
+  IGN_ASSERT(bLink != NULL, "Bullet heightmap does not have a link.");
 
   BulletMotionStatePtr motionState = bLink->motionState;
 
-  GZ_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
+  IGN_ASSERT(motionState != NULL, "Invalid motion state for heightmap.");
 
   btTransform tr;
   tr.setIdentity();

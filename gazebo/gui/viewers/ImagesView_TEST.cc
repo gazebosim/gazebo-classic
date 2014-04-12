@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 #include "gazebo/gui/viewers/ImagesView_TEST.hh"
 
 /////////////////////////////////////////////////
@@ -85,7 +85,7 @@ void ImagesView_TEST::Switch()
     for (unsigned int i = 0; i < 25; ++i)
     {
       // Get a random topic index.
-      int index = gazebo::math::Rand::GetIntUniform(1, 7);
+      int index = ignition::math::Rand::GetIntUniform(1, 7);
 
       // Switch the topic
       view->SetTopic(topicMap[index]);
@@ -93,7 +93,8 @@ void ImagesView_TEST::Switch()
       // Sping the QT update loop for a while to process events.
       for (int j = 0; j < 50; ++j)
       {
-        gazebo::common::Time::MSleep(gazebo::math::Rand::GetIntUniform(10, 50));
+        ignition::common::Time::MSleep(
+            ignition::math::Rand::GetIntUniform(10, 50));
         QCoreApplication::processEvents();
       }
     }
@@ -117,7 +118,7 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
 
     for (i = 0; frame->children().size() != 1 && i < 1000; ++i)
     {
-      gazebo::common::Time::MSleep(10);
+      ignition::common::Time::MSleep(10);
       QCoreApplication::processEvents();
     }
 
@@ -128,7 +129,7 @@ void ImagesView_TEST::SetTopic(gazebo::gui::ImagesView *_view,
     // This is done for visual confirmation that the test works.
     for (i = 0; i < 100; ++i)
     {
-      gazebo::common::Time::MSleep(10);
+      ignition::common::Time::MSleep(10);
       QCoreApplication::processEvents();
     }
 

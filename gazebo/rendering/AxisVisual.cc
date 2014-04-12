@@ -14,11 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: Axis Visualization Class
- * Author: Nate Koenig
- */
-
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Scene.hh"
@@ -62,29 +58,29 @@ void AxisVisual::Load()
   this->zAxis->Load();
   this->zAxis->SetMaterial("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
-  this->xAxis->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+  this->xAxis->SetRotation(ignition::math::Quaternion(
+       ignition::math::Vector3(0, 1, 0), IGN_DTOR(90)));
 
-  this->yAxis->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+  this->yAxis->SetRotation(ignition::math::Quaternion(
+       ignition::math::Vector3(1, 0, 0), IGN_DTOR(-90)));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ScaleXAxis(const math::Vector3 &_scale)
+void AxisVisual::ScaleXAxis(const ignition::math::Vector3 &_scale)
 {
   this->xAxis->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ScaleYAxis(const math::Vector3 &_scale)
+void AxisVisual::ScaleYAxis(const ignition::math::Vector3 &_scale)
 {
   this->yAxis->SetScale(_scale);
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ScaleZAxis(const math::Vector3 &_scale)
+void AxisVisual::ScaleZAxis(const ignition::math::Vector3 &_scale)
 {
   this->zAxis->SetScale(_scale);
 }
@@ -105,7 +101,7 @@ void AxisVisual::SetAxisMaterial(unsigned int _axis,
       this->zAxis->SetMaterial(_material);
       break;
     default:
-      gzerr << "Invlid axis index[" << _axis << "]\n";
+      ignerr << "Invlid axis index[" << _axis << "]\n";
       break;
   };
 }
@@ -125,7 +121,7 @@ void AxisVisual::ShowRotation(unsigned int _axis)
       this->zAxis->ShowRotation();
       break;
     default:
-      gzerr << "Invlid axis index[" << _axis << "]\n";
+      ignerr << "Invlid axis index[" << _axis << "]\n";
       break;
   };
 }

@@ -25,9 +25,9 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/KeyEvent.hh"
+#include "ignition/common/KeyEvent.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
@@ -84,22 +84,22 @@ namespace gazebo
       public: std::string GetModelName() const;
 
       /// \brief Finish the model and create the entity on the gzserver.
-       public: void FinishModel();
+      public: void FinishModel();
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
       /// \param[in] _pose Pose of the box.
       /// \return Name of the box that has been added.
       public: std::string AddBox(
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3 &_size = ignition::math::Vector3::One,
+          const ignition::math::Pose &_pose = ignition::math::Pose::Zero);
 
       /// \brief Add a sphere to the model.
       /// \param[in] _radius Radius of the sphere.
       /// \param[in] _pose Pose of the sphere.
       /// \return Name of the sphere that has been added.
       public: std::string AddSphere(double _radius = 0.5,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Pose &_pose = ignition::math::Pose::Zero);
 
       /// \brief Add a cylinder to the model.
       /// \param[in] _radius Radius of the cylinder.
@@ -107,7 +107,8 @@ namespace gazebo
       /// \param[in] _pose Pose of the cylinder.
       /// \return Name of the cylinder that has been added.
       public: std::string AddCylinder(double _radius = 0.5,
-          double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
+          double _length = 1.0,
+          const ignition::math::Pose &_pose = ignition::math::Pose::Zero);
 
       /// \brief Add a custom part to the model
       /// \param[in] _name Name of the custom part.
@@ -115,8 +116,8 @@ namespace gazebo
       /// \param[in] _pose Pose of the custom part.
       /// \return Name of the custom that has been added.
       public: std::string AddCustom(const std::string &_name,
-          const math::Vector3 &_scale = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3 &_scale = ignition::math::Vector3::One,
+          const ignition::math::Pose &_pose = ignition::math::Pose::Zero);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
@@ -159,22 +160,24 @@ namespace gazebo
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseMovePart(const common::MouseEvent &_event);
+      private: bool OnMouseMovePart(const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseReleasePart(const common::MouseEvent &_event);
+      private: bool OnMouseReleasePart(
+                   const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is double clicked.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
+      private: bool OnMouseDoubleClickPart(
+                   const ignition::common::MouseEvent &_event);
 
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
       /// \return True if the event was handled
-      private: bool OnKeyPressPart(const common::KeyEvent &_event);
+      private: bool OnKeyPressPart(const ignition::common::KeyEvent &_event);
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
@@ -217,7 +220,7 @@ namespace gazebo
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose modelPose;
 
       /// \brief True to create a static model.
       private: bool isStatic;
@@ -226,7 +229,7 @@ namespace gazebo
       private: bool autoDisable;
 
       /// \brief A list of gui editor events connected to the model creator.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Counter for the number of boxes in the model.
       private: int boxCounter;
@@ -264,7 +267,7 @@ namespace gazebo
       private: JointMaker *jointMaker;
 
       /// \brief origin of the model.
-      private: math::Pose origin;
+      private: ignition::math::Pose origin;
 
       /// \brief Selected partv visual;
       private: rendering::VisualPtr selectedVis;
@@ -282,7 +285,7 @@ namespace gazebo
       public: std::string type;
 
       /// \brief Pose of sensor.
-      public: math::Vector3 pose;
+      public: ignition::math::Vector3 pose;
 
       /// \brief True to visualize sensor.
       public: bool visualize;
@@ -316,7 +319,7 @@ namespace gazebo
       public: bool kinematic;
 
       /// \brief Pose of part.
-      public: math::Pose pose;
+      public: ignition::math::Pose pose;
 
       /// \brief Name of part.
       public: physics::Inertial *inertial;

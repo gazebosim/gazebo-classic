@@ -25,8 +25,8 @@
 #include "gazebo/gui/viewers/ImageView.hh"
 
 #include "gazebo/gazebo.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -157,7 +157,7 @@ MainWindow::MainWindow()
         boost::bind(&MainWindow::OnManipMode, this, _1)));
 
   this->connections.push_back(
-     event::Events::ConnectSetSelectedEntity(
+     common::Events::ConnectSetSelectedEntity(
        boost::bind(&MainWindow::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
@@ -280,7 +280,7 @@ void MainWindow::SelectTopic()
     if (view)
       view->show();
     else
-      gzerr << "Unable to create viewer for message type[" << msgType << "]\n";
+      ignerr << "Unable to create viewer for message type[" << msgType << "]\n";
   }
 }
 
@@ -313,7 +313,7 @@ void MainWindow::Import()
       gui::Events::createEntity("mesh", filename);
     }
     else
-      gzerr << "Unable to import mesh[" << filename << "]\n";
+      ignerr << "Unable to import mesh[" << filename << "]\n";
   }
 }
 
@@ -323,7 +323,7 @@ void MainWindow::SaveINI()
   char *home = getenv("HOME");
   if (!home)
   {
-    gzerr << "HOME environment variable not found. "
+    ignerr << "HOME environment variable not found. "
       "Unable to save configuration file\n";
     return;
   }
@@ -398,7 +398,7 @@ void MainWindow::Save()
     else
     {
       msgData = msg.data();
-      gzerr << "Unable to parse world file to add user camera settings.\n";
+      ignerr << "Unable to parse world file to add user camera settings.\n";
     }
 
     // Open the file
@@ -676,13 +676,14 @@ void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = camPos - lookAt;
+  ignition::math::Vector3 camPos(5, -5, 2);
+  ignition::math::Vector3 lookAt(0, 0, 0);
+  ignition::math::Vector3 delta = camPos - lookAt;
 
   double yaw = atan2(delta.x, delta.y);
   double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+  cam->SetWorldPose(ignition::math::Pose(camPos,
+        ignition::math::Vector3(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -1211,18 +1212,18 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       const msgs::Pose &msg_pose = _msg->camera().pose();
 
-      math::Vector3 cam_pose_pos = math::Vector3(
+     ignition::math::Vector3 cam_pose_pos =ignition::math::Vector3(
         msg_pose.position().x(),
         msg_pose.position().y(),
         msg_pose.position().z());
 
-      math::Quaternion cam_pose_rot = math::Quaternion(
+     ignition::math::Quaternion cam_pose_rot =ignition::math::Quaternion(
         msg_pose.orientation().w(),
         msg_pose.orientation().x(),
         msg_pose.orientation().y(),
         msg_pose.orientation().z());
 
-      math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
+     ignition::math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
       cam->SetUseSDFPose(true);
@@ -1417,7 +1418,7 @@ void MainWindow::ShowLeftColumnWidget(const std::string &_name)
   if (iter != this->leftColumnStack.end())
     this->leftColumn->setCurrentIndex(iter->second);
   else
-    gzerr << "Widget with name[" << _name << "] has not been added to the left"
+    ignerr << "Widget with name[" << _name << "] has not been added to the left"
       << " column stack.\n";
 }
 

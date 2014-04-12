@@ -36,7 +36,7 @@ BulletRaySensor::BulletRaySensor(Link *_body)
   this->body = dynamic_cast<BulletLink*>(_body);
 
   if (this->body == NULL)
-    gzthrow("BulletRaySensor requires an BulletLink");
+    ignthrow("BulletRaySensor requires an BulletLink");
 }
 
 //////////////////////////////////////////////////
@@ -52,7 +52,8 @@ BulletRaySensor::~BulletRaySensor()
 }
 
 //////////////////////////////////////////////////
-void BulletRaySensor::AddRay(math::Vector3 start, math::Vector3 end,
+void BulletRaySensor::AddRay(ignition::math::Vector3 start,
+    ignition::math::Vector3 end,
     double minRange, double maxRange, bool display)
 {
   BulletRayCollision *rayCollision;
@@ -75,14 +76,14 @@ int BulletRaySensor::GetCount() const
 
 //////////////////////////////////////////////////
 void BulletRaySensor::GetRelativePoints(int _index,
-    math::Vector3 &_a, math::Vector3 &_b)
+    ignition::math::Vector3 &_a, ignition::math::Vector3 &_b)
 {
   if (_index <0 || _index >= static_cast<int>(this->rays.size()))
   {
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   this->rays[_index]->GetRelativePoints(_a, _b);
@@ -96,7 +97,7 @@ double BulletRaySensor::GetRange(int _index) const
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   return this->rays[_index]->GetLength();
@@ -110,7 +111,7 @@ double BulletRaySensor::GetRetro(int _index) const
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   return this->rays[_index]->GetRetro();
@@ -124,7 +125,7 @@ double BulletRaySensor::GetFiducial(int _index) const
     std::ostringstream stream;
     stream << "_index[" << _index << "] is out of range[0-"
            << this->GetCount() << "]";
-    gzthrow(stream.str());
+    ignthrow(stream.str());
   }
 
   return this->rays[_index]->GetFiducial();

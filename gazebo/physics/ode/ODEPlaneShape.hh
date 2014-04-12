@@ -42,9 +42,9 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-        math::Pose pose = oParent->GetWorldPose();
+        ignition::math::Pose pose = oParent->GetWorldPose();
         double altitude = pose.pos.z;
-        math::Vector3 n = this->GetNormal();
+        ignition::math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
                 n.x, n.y, n.z, altitude), false);
@@ -54,7 +54,7 @@ namespace gazebo
       }
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos)
+      public: virtual void SetAltitude(const ignition::math::Vector3 &_pos)
       {
         PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;

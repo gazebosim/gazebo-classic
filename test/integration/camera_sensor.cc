@@ -17,8 +17,8 @@
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
-#include "gazebo/common/Timer.hh"
+#include "ignition/common.hh"
+#include "ignition/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
@@ -56,7 +56,7 @@ TEST_F(CameraSensor, CheckThrottle)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -66,8 +66,9 @@ TEST_F(CameraSensor, CheckThrottle)
   unsigned int width  = 320;
   unsigned int height = 240;  // 106 fps
   double updateRate = 10;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose setPose, testPose(
+      ignition::math::Vector3(-5, 0, 5),
+      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -75,21 +76,21 @@ TEST_F(CameraSensor, CheckThrottle)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  common::Timer timer;
+  ignition::common::Timer timer;
   timer.Start();
 
   // time how long it takes to get 50 images @ 10Hz
   int total_images = 50;
 
   while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
+    ignition::common::Time::MSleep(10);
+  ignition::common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+  igndbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   EXPECT_GT(rate, 7.0);
   EXPECT_LT(rate, 11.0);
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
@@ -104,7 +105,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -116,8 +117,9 @@ TEST_F(CameraSensor, UnlimitedTest)
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 0;
-  math::Pose setPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose setPose(
+      ignition::math::Vector3(-5, 0, 5),
+      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -125,19 +127,19 @@ TEST_F(CameraSensor, UnlimitedTest)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  common::Timer timer;
+  ignition::common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
   while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
+    ignition::common::Time::MSleep(10);
+  ignition::common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+  igndbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 30.0);
 
@@ -156,7 +158,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -168,8 +170,8 @@ TEST_F(CameraSensor, MultiSenseHigh)
   unsigned int width  = 2048;
   unsigned int height = 1088;
   double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose setPose, testPose(
+      ignition::math::Vector3(-5, 0, 5), ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -177,19 +179,19 @@ TEST_F(CameraSensor, MultiSenseHigh)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  common::Timer timer;
+  ignition::common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
   while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
+    ignition::common::Time::MSleep(10);
+  ignition::common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+  igndbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
@@ -210,7 +212,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -222,8 +224,8 @@ TEST_F(CameraSensor, MultiSenseLow)
   unsigned int width  = 1024;
   unsigned int height = 544;
   double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose setPose, testPose(
+      ignition::math::Vector3(-5, 0, 5), ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -231,19 +233,19 @@ TEST_F(CameraSensor, MultiSenseLow)
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   imageCount = 0;
   img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  common::Timer timer;
+  ignition::common::Timer timer;
   timer.Start();
   // time how long it takes to get N images
   int total_images = 500;
   while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
+    ignition::common::Time::MSleep(10);
+  ignition::common::Time dt = timer.GetElapsed();
   double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+  igndbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
   EXPECT_GT(rate, 24.0);
   EXPECT_LT(rate, 25.0);
@@ -261,7 +263,7 @@ TEST_F(CameraSensor, CheckNoise)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -275,8 +277,9 @@ TEST_F(CameraSensor, CheckNoise)
   double updateRate = 10;
   double noiseMean = 0.1;
   double noiseStdDev = 0.01;
-  math::Pose setPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  ignition::math::Pose setPose(
+      ignition::math::Vector3(-5, 0, 5),
+      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   SpawnCamera(modelNameNoisy, cameraNameNoisy, setPose.pos,
@@ -293,18 +296,18 @@ TEST_F(CameraSensor, CheckNoise)
   imageCount2 = 0;
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  event::ConnectionPtr c2 =
+  ignition::common::ConnectionPtr c2 =
     camSensorNoisy->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 
   // Get some images
   while (imageCount < 10 || imageCount2 < 10)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;
@@ -323,7 +326,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::SetSeed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
@@ -339,7 +342,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -352,18 +355,18 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   unsigned int height = 240;
   double updateRate = 10;
 
-  math::Pose testPose(
-      math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-  math::Pose testPose2(
-      math::Vector3(0, 2, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose testPose(
+      ignition::math::Vector3(0, 0, 0.5), ignition::math::Quaternion(0, 0, 0));
+  ignition::math::Pose testPose2(
+      ignition::math::Vector3(0, 2, 0.5), ignition::math::Quaternion(0, 0, 0));
   SpawnCamera(modelName, cameraName, testPose.pos,
       testPose.rot.GetAsEuler(), width, height, updateRate);
   SpawnCamera(modelName2, cameraName2, testPose2.pos,
       testPose.rot.GetAsEuler(), width, height, updateRate);
 
   // Spawn a box in front of the cameras
-  SpawnBox("test_box", math::Vector3(1, 1, 1),
-      math::Vector3(4, 1, 0.5), math::Vector3(0, 0, 0));
+  SpawnBox("test_box", ignition::math::Vector3(1, 1, 1),
+      ignition::math::Vector3(4, 1, 0.5), ignition::math::Vector3(0, 0, 0));
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
@@ -378,17 +381,17 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   unsigned char *prevImg = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   unsigned char *prevImg2 = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount, img,
           _1, _2, _3, _4, _5));
-  event::ConnectionPtr c2 =
+  ignition::common::ConnectionPtr c2 =
     camSensor2->GetCamera()->ConnectNewImageFrame(
         boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
           _1, _2, _3, _4, _5));
 
   while (imageCount < 10 || imageCount2 < 10)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   memcpy(prevImg, img, width * height * 3);
   memcpy(prevImg2, img2, width * height * 3);
@@ -400,7 +403,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 
     // Get some images
     while (imageCount < 1 || imageCount2 < 1)
-      common::Time::MSleep(10);
+      ignition::common::Time::MSleep(10);
 
     unsigned int diffMax = 0, diffSum = 0;
     double diffAvg = 0.0;
@@ -431,7 +434,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     EXPECT_GT(diffAvg12, 0.0);
     EXPECT_GT(diffMax12, 0.0);
 
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
   delete[] img;
   delete[] img2;

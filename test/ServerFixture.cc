@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
@@ -55,9 +56,9 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
-  gazebo::common::Console::SetQuiet(false);
-  common::SystemPaths::Instance()->AddGazeboPaths(
+  ignLogInit("test.log");
+  ignition::common::Console::SetQuiet(false);
+  gazebo::common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
 
   // Add local search paths
@@ -94,7 +95,7 @@ void ServerFixture::TearDown()
 /////////////////////////////////////////////////
 void ServerFixture::Unload()
 {
-  gzdbg << "ServerFixture::Unload" << std::endl;
+  igndbg << "ServerFixture::Unload" << std::endl;
   this->serverRunning = false;
   if (this->node)
     this->node->Fini();
@@ -142,8 +143,8 @@ void ServerFixture::Load(const std::string &_worldFilename,
   int waitCount = 0, maxWaitCount = 6000;
   while ((!this->server || !this->server->GetInitialized()) &&
          ++waitCount < maxWaitCount)
-    common::Time::MSleep(100);
-  gzdbg << "ServerFixture load in "
+    ignition::common::Time::MSleep(100);
+  igndbg << "ServerFixture load in "
          << static_cast<double>(waitCount)/10.0
          << " seconds, timeout after "
          << static_cast<double>(maxWaitCount)/10.0
@@ -174,7 +175,7 @@ void ServerFixture::Load(const std::string &_worldFilename,
   while ((!physics::get_world() ||
            physics::get_world()->IsPaused() != _paused) &&
          ++waitCount < maxWaitCount)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   ASSERT_LT(waitCount, maxWaitCount);
 
   this->factoryPub->WaitForConnection();
@@ -196,13 +197,13 @@ rendering::ScenePtr ServerFixture::GetScene(
   int timeoutDS = 20;
   while (rendering::get_scene(_sceneName) == NULL && i < timeoutDS)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
   if (i >= timeoutDS)
   {
-    gzerr << "Unable to load the rendering scene.\n"
+    ignerr << "Unable to load the rendering scene.\n"
           << "Test will fail";
     this->launchTimeoutFailure(
         "while waiting to load rendering scene", i);
@@ -270,7 +271,7 @@ void ServerFixture::SetPause(bool _pause)
 double ServerFixture::GetPercentRealTime() const
 {
   while (!this->serverRunning)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   return this->percentRealTime;
 }
@@ -287,11 +288,11 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
+ignition::math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
 
-  std::map<std::string, math::Pose>::iterator iter;
+  std::map<std::string, ignition::math::Pose>::iterator iter;
   iter = this->poses.find(_name);
   EXPECT_TRUE(iter != this->poses.end());
   return iter->second;
@@ -301,7 +302,7 @@ math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 bool ServerFixture::HasEntity(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
-  std::map<std::string, math::Pose>::iterator iter;
+  std::map<std::string, ignition::math::Pose>::iterator iter;
   iter = this->poses.find(_name);
   return iter != this->poses.end();
 }
@@ -335,12 +336,12 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
   {
     if ((i+1) % 5 == 0)
-      printf("%13.10f,\n", math::precision(_scan[i], 10));
+      printf("%13.10f,\n", ignition::math::precision(_scan[i], 10));
     else
-      printf("%13.10f, ", math::precision(_scan[i], 10));
+      printf("%13.10f, ", ignition::math::precision(_scan[i], 10));
   }
   printf("%13.10f};\n",
-      math::precision(_scan[_sampleCount-1], 10));
+      ignition::math::precision(_scan[_sampleCount-1], 10));
   printf("static double *%s = __%s;\n", _name.c_str(),
       _name.c_str());
 }
@@ -356,8 +357,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -378,8 +379,8 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -449,13 +450,13 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
   this->imgData = _imgData;
 
   this->gotImage = 0;
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     camSensor->GetCamera()->ConnectNewImageFrame(
         boost::bind(&ServerFixture::OnNewFrame,
                     this, _1, _2, _3, _4, _5));
 
   while (this->gotImage < 20)
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
   camSensor->GetCamera()->DisconnectNewImageFrame(c);
 }
@@ -463,7 +464,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     unsigned int _width, unsigned int _height,
     double _rate,
     const std::string &_noiseType,
@@ -518,7 +519,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
@@ -591,7 +592,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
@@ -655,7 +656,7 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     const std::string &_imuSensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     const std::string &_noiseType,
     double _rateNoiseMean, double _rateNoiseStdDev,
     double _rateBiasMean, double _rateBiasStdDev,
@@ -729,8 +730,8 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     const std::string &_sensorName,
-    const std::string &_collisionType, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_collisionType, const ignition::math::Vector3 &_pos,
+    const ignition::math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -789,8 +790,8 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
 void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_topic, const ignition::math::Vector3 &_pos,
+    const ignition::math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -852,8 +853,8 @@ void ServerFixture::launchTimeoutFailure(const char *_logMsg,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos,
+    const ignition::math::Vector3 &_rpy,
     const std::string &_essid,
     double _freq,
     double _power,
@@ -894,8 +895,8 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos,
+    const ignition::math::Vector3 &_rpy,
     double _minFreq,
     double _maxFreq,
     double _power,
@@ -943,7 +944,7 @@ void ServerFixture::WaitUntilEntitySpawn(const std::string &_name,
   // Wait for the entity to spawn
   while (!this->HasEntity(_name) && i < _retries)
   {
-    common::Time::MSleep(_sleepEach);
+    ignition::common::Time::MSleep(_sleepEach);
     ++i;
   }
   EXPECT_LT(i, _retries);
@@ -963,7 +964,7 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
   // Wait for the sensor to spawn
   while (!sensors::get_sensor(_name) && i < _retries)
   {
-    common::Time::MSleep(_sleepEach);
+    ignition::common::Time::MSleep(_sleepEach);
     ++i;
   }
   EXPECT_LT(i, _retries);
@@ -976,7 +977,7 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1010,12 +1011,12 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1045,13 +1046,13 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
   // Wait for the entity to spawn
   while (_wait && !this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    const math::Vector3 &_cog, double _radius,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_cog, double _radius,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1084,13 +1085,13 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
   // Wait for the entity to spawn
   while (_wait && !this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnBox(const std::string &_name,
-    const math::Vector3 &_size, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const ignition::math::Vector3 &_size, const ignition::math::Vector3 &_pos,
+    const ignition::math::Vector3 &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1119,13 +1120,13 @@ void ServerFixture::SpawnBox(const std::string &_name,
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnTrimesh(const std::string &_name,
-    const std::string &_modelPath, const math::Vector3 &_scale,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const std::string &_modelPath, const ignition::math::Vector3 &_scale,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1158,12 +1159,12 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnEmptyLink(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3 &_pos, const ignition::math::Vector3 &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1183,7 +1184,7 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
 
   // Wait for the entity to spawn
   while (!this->HasEntity(_name))
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 /////////////////////////////////////////////////
@@ -1217,7 +1218,7 @@ void ServerFixture::SpawnSDF(const std::string &_sdf)
     sdf::ElementPtr model = sdfParsed.root->GetElement("model");
     std::string name = model->Get<std::string>("name");
     while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
-      common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
     ASSERT_LT(waitCount, maxWaitCount);
   }
 }
@@ -1281,13 +1282,13 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
                                 (task_info_t)&t_info,
                                 &t_info_count))
   {
-    gzerr << "failure calling task_info\n";
+    ignerr << "failure calling task_info\n";
     return;
   }
   _resident = static_cast<double>(t_info.resident_size/1024);
   _share = static_cast<double>(t_info.virtual_size/1024);
 #else
-  gzerr << "Unsupported architecture\n";
+  ignerr << "Unsupported architecture\n";
   return;
 #endif
 }

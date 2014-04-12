@@ -19,7 +19,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/common/Image.hh"
+#include "ignition/common/Image.hh"
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/ImagesViewPrivate.hh"

@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/Animation.hh"
-#include "gazebo/common/KeyFrame.hh"
+#include "ignition/common/CommonTypes.hh"
+#include "ignition/common/Animation.hh"
+#include "ignition/common/KeyFrame.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/gazebo.hh"
 
@@ -26,18 +26,18 @@ namespace gazebo
   {
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
     {
-      gazebo::common::PoseAnimationPtr anim(
-          new gazebo::common::PoseAnimation("test", 1000.0, true));
+      ignition::commonPoseAnimationPtr anim(
+          new ignition::commonPoseAnimation("test", 1000.0, true));
 
-      gazebo::common::PoseKeyFrame *key;
+      ignition::commonPoseKeyFrame *key;
 
       key = anim->CreateKeyFrame(0);
-      key->SetTranslation(math::Vector3(0, 0, 0));
-      key->SetRotation(math::Quaternion(0, 0, 0));
+      key->SetTranslation(ignition::math::Vector3(0, 0, 0));
+      key->SetRotation(ignition::math::Quaternion(0, 0, 0));
 
       key = anim->CreateKeyFrame(1000.0);
-      key->SetTranslation(math::Vector3(5, 0, 0));
-      key->SetRotation(math::Quaternion(0, 0, 1.5707));
+      key->SetTranslation(ignition::math::Vector3(5, 0, 0));
+      key->SetRotation(ignition::math::Quaternion(0, 0, 1.5707));
 
       _parent->SetAnimation(anim);
     }

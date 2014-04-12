@@ -15,10 +15,10 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -86,7 +86,8 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  ignition::math::Vector3 g =
+    this->sdf->Get<ignition::math::Vector3>("gravity");
   this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
@@ -123,7 +124,7 @@ void DARTPhysics::Reset()
   {
     dartModelIt =
       boost::dynamic_pointer_cast<DARTModel>(this->world->GetModel(i));
-    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is NULL");
+    IGN_ASSERT(dartModelIt.get(), "dartModelIt pointer is NULL");
 
     dartModelIt->RestoreState();
   }
@@ -157,8 +158,8 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
-    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
-    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
+    IGN_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
+    IGN_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
@@ -173,12 +174,12 @@ void DARTPhysics::UpdateCollision()
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = dartLink1->GetWorldPose();
-    math::Pose body2Pose = dartLink2->GetWorldPose();
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    ignition::math::Pose body1Pose = dartLink1->GetWorldPose();
+    ignition::math::Pose body2Pose = dartLink2->GetWorldPose();
+    ignition::math::Vector3 localForce1;
+    ignition::math::Vector3 localForce2;
+    ignition::math::Vector3 localTorque1;
+    ignition::math::Vector3 localTorque2;
 
     // calculate force in world frame
     Eigen::Vector3d force = dtContact.force;
@@ -227,7 +228,7 @@ void DARTPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  // common::Time currTime =  this->world->GetRealTime();
+  // ignition::common::Time currTime =  this->world->GetRealTime();
 
   this->dtWorld->setTimeStep(this->maxStepSize);
   this->dtWorld->step();
@@ -265,7 +266,7 @@ std::string DARTPhysics::GetType() const
 //////////////////////////////////////////////////
 void DARTPhysics::SetSeed(uint32_t /*_seed*/)
 {
-  gzwarn << "Not implemented yet in DART.\n";
+  ignwarn << "Not implemented yet in DART.\n";
 }
 
 //////////////////////////////////////////////////
@@ -281,7 +282,7 @@ LinkPtr DARTPhysics::CreateLink(ModelPtr _parent)
 {
   if (_parent == NULL)
   {
-    gzerr << "Link must have a parent in DART.\n";
+    ignerr << "Link must have a parent in DART.\n";
     return LinkPtr();
   }
 
@@ -332,7 +333,7 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     else
       shape.reset(new DARTRayShape(this->world->GetPhysicsEngine()));
   else
-    gzerr << "Unable to create collision of type[" << _type << "]\n";
+    ignerr << "Unable to create collision of type[" << _type << "]\n";
 
   return shape;
 }
@@ -355,13 +356,13 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
   else if (_type == "universal")
     joint.reset(new DARTUniversalJoint(_parent));
   else
-    gzerr << "Unable to create joint of type[" << _type << "]";
+    ignerr << "Unable to create joint of type[" << _type << "]";
 
   return joint;
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void DARTPhysics::SetGravity(const ignition::math::Vector3 &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dtWorld->setGravity(
@@ -371,7 +372,7 @@ void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 //////////////////////////////////////////////////
 void DARTPhysics::DebugPrint() const
 {
-  gzwarn << "Not implemented in DART.\n";
+  ignwarn << "Not implemented in DART.\n";
 }
 
 //////////////////////////////////////////////////
@@ -385,7 +386,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
     param = MIN_STEP_SIZE;
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
+    ignwarn << _key << " is not supported in ode" << std::endl;
     return 0;
   }
 
@@ -396,7 +397,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  IGN_ASSERT(dartElem != NULL, "DART SDF element does not exist");
 
   boost::any value = 0;
   switch (_param)
@@ -413,7 +414,7 @@ boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
     }
     default:
     {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
+      ignwarn << "Attribute not supported in bullet" << std::endl;
       break;
     }
   }

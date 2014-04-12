@@ -43,15 +43,15 @@ namespace gazebo
               {
                 if (_radius < 0)
                 {
-                  gzerr << "Sphere shape does not support negative radius\n";
+                  ignerr << "Sphere shape does not support negative radius\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
-                  gzwarn << "Setting sphere shape's radius to zero \n";
+                  ignwarn << "Setting sphere shape's radius to zero \n";
                   _radius = 1e-4;
                 }
 

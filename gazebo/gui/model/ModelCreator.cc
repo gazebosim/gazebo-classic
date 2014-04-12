@@ -18,14 +18,14 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/KeyEvent.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
+#include "ignition/math/Quaternion.hh"
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -100,8 +100,8 @@ void ModelCreator::AddJoint(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::AddBox(const math::Vector3 &_size,
-    const math::Pose &_pose)
+std::string ModelCreator::AddBox(const ignition::math::Vector3 &_size,
+    const ignition::math::Pose &_pose)
 {
   if (!this->modelVisual)
   {
@@ -132,9 +132,9 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose ==ignition::math::Pose::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    linkVisual->SetPosition(ignition::math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _size.z/2));
   }
 
@@ -147,7 +147,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddSphere(double _radius,
-    const math::Pose &_pose)
+    const ignition::math::Pose &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -176,9 +176,9 @@ std::string ModelCreator::AddSphere(double _radius,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose ==ignition::math::Pose::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    linkVisual->SetPosition(ignition::math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _radius));
   }
 
@@ -190,7 +190,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddCylinder(double _radius, double _length,
-    const math::Pose &_pose)
+    const ignition::math::Pose &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -221,9 +221,9 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose ==ignition::math::Pose::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    linkVisual->SetPosition(ignition::math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _length/2));
   }
 
@@ -235,7 +235,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddCustom(const std::string &_path,
-    const math::Vector3 &_scale, const math::Pose &_pose)
+    const ignition::math::Vector3 &_scale, const ignition::math::Pose &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -267,9 +267,9 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose ==ignition::math::Pose::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
+    linkVisual->SetPosition(ignition::math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _scale.z/2));
   }
 
@@ -370,7 +370,7 @@ void ModelCreator::Reset()
       scene->GetWorldVisual()));
 
   this->modelVisual->Load();
-  this->modelPose = math::Pose::Zero;
+  this->modelPose =ignition::math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
   scene->AddVisual(this->modelVisual);
 }
@@ -413,7 +413,7 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
   }
   else
   {
-    gzerr << "Unable to open file for writing: '" << path.string().c_str()
+    ignerr << "Unable to open file for writing: '" << path.string().c_str()
         << "'. Possibly a permission issue." << std::endl;
   }
 }
@@ -421,7 +421,7 @@ void ModelCreator::SaveToSDF(const std::string &_savePath)
 /////////////////////////////////////////////////
 void ModelCreator::FinishModel()
 {
-  event::Events::setSelectedEntity("", "normal");
+  common::Events::setSelectedEntity("", "normal");
   this->Reset();
   this->CreateTheEntity();
 }
@@ -491,7 +491,7 @@ void ModelCreator::AddPart(PartType _type)
       }
       default:
       {
-        gzwarn << "Unknown part type '" << _type << "'. " <<
+        ignwarn << "Unknown part type '" << _type << "'. " <<
             "Part not added" << std::endl;
         break;
       }
@@ -528,7 +528,7 @@ void ModelCreator::OnDelete(const std::string &_part)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
+bool ModelCreator::OnKeyPressPart(const ignition::common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
@@ -546,9 +546,10 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseReleasePart(
+    const ignition::common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != ignition::common::MouseEvent::LEFT)
     return false;
 
   if (this->mouseVisual)
@@ -573,7 +574,7 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
         if (this->selectedVis)
           this->selectedVis->SetHighlighted(false);
         else
-          event::Events::setSelectedEntity("", "normal");
+          common::Events::setSelectedEntity("", "normal");
 
         this->selectedVis = vis;
         this->selectedVis->SetHighlighted(true);
@@ -590,7 +591,7 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseMovePart(const ignition::common::MouseEvent &_event)
 {
   if (!this->mouseVisual)
     return false;
@@ -598,7 +599,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   if (!gui::get_active_camera())
     return false;
 
-  math::Pose pose = this->mouseVisual->GetWorldPose();
+  ignition::math::Pose pose = this->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
       gui::get_active_camera(), _event);
 
@@ -614,7 +615,8 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseDoubleClickPart(
+    const ignition::common::MouseEvent &_event)
 {
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
@@ -662,7 +664,7 @@ void ModelCreator::GenerateSDF()
   boost::unordered_map<std::string, PartData *>::iterator partsIt;
 
   // set center of all parts to be origin
-  math::Vector3 mid;
+  ignition::math::Vector3 mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
       ++partsIt)
   {
@@ -715,7 +717,7 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
     geomElem->ClearElements();
 
-    math::Vector3 scale = visual->GetScale();
+    ignition::math::Vector3 scale = visual->GetScale();
     if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
     {
       sdf::ElementPtr boxElem = geomElem->AddElement("box");

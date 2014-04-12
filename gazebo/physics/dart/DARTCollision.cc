@@ -17,8 +17,8 @@
 
 #include <sstream>
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/math/Box.hh"
 
 #include "gazebo/physics/SurfaceParams.hh"
 
@@ -74,7 +74,7 @@ void DARTCollision::Init()
 
     if (!planeShape)
     {
-      math::Pose relativePose = this->GetRelativePose();
+      ignition::math::Pose relativePose = this->GetRelativePose();
       this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
     }
   }
@@ -117,11 +117,11 @@ unsigned int DARTCollision::GetCollideBits() const
 }
 
 //////////////////////////////////////////////////
-gazebo::math::Box DARTCollision::GetBoundingBox() const
+ignition::math::Box DARTCollision::GetBoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
 
-  gzerr << "DART does not provide bounding box info.\n";
+  ignerr << "DART does not provide bounding box info.\n";
 
   return result;
 }

@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid collision
- * Author: Nate Koenig
-*/
-
-#ifndef _MAPSHAPE_HH_
-#define _MAPSHAPE_HH_
+#ifndef _IGNITION_MAPSHAPE_HH_
+#define _IGNITION_MAPSHAPE_HH_
 
 #include <deque>
 #include <string>
-
-#include "gazebo/common/CommonTypes.hh"
+#include <ignition/common.hh>
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -76,11 +71,11 @@ namespace gazebo
 
       /// \brief Set the scale of the map shape.
       /// \param[in] _scale Scale to set the map shape to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      public: virtual math::Vector3 GetScale() const;
+      public: virtual ignition::math::Vector3 GetScale() const;
 
       /// \brief Returns image threshold for this geometry.
       /// All regions in image with value larger than MapShape::scale
@@ -132,7 +127,7 @@ namespace gazebo
       private: void CreateBoxes(QuadNode *_node);
 
       /// \brief Image used to create the map.
-      private: common::Image *mapImage;
+      private: ignition::common::Image *mapImage;
 
       /// \brief Root of the quad tree.
       private: QuadNode *root;

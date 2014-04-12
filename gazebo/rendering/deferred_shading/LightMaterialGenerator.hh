@@ -29,7 +29,7 @@
 
 #include <string>
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/rendering/deferred_shading/TechniqueDefinitions.hh"
 #include "gazebo/rendering/deferred_shading/MaterialGenerator.hh"
 

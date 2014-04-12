@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/gui/model/JointInspector.hh"
 
@@ -187,22 +187,22 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
 {
-  return math::Vector3(this->anchorXSpinBox->value(),
+  return ignition::math::Vector3(this->anchorXSpinBox->value(),
       this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAxis(unsigned int _index) const
+ignition::math::Vector3 JointInspector::GetAxis(unsigned int _index) const
 {
   if (_index > this->axisXSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
-    return math::Vector3::Zero;
+    ignerr << "Axis index is out of range" << std::endl;
+    return ignition::math::Vector3::Zero;
   }
 
-  return math::Vector3(this->axisXSpinBoxes[_index]->value(),
+  return ignition::math::Vector3(this->axisXSpinBoxes[_index]->value(),
       this->axisYSpinBoxes[_index]->value(),
       this->axisZSpinBoxes[_index]->value());
 }
@@ -212,7 +212,7 @@ double JointInspector::GetLowerLimit(unsigned int _index) const
 {
   if (_index > this->lowerLimitSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
+    ignerr << "Axis index is out of range" << std::endl;
     return 0;
   }
 
@@ -224,7 +224,7 @@ double JointInspector::GetUpperLimit(unsigned int _index) const
 {
   if (_index > this->upperLimitSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
+    ignerr << "Axis index is out of range" << std::endl;
     return 0;
   }
 
@@ -244,7 +244,7 @@ void JointInspector::SetType(JointMaker::JointType _type)
 
   std::string jointTypeStr = JointMaker::GetTypeAsString(_type);
   int axisCount = JointMaker::GetJointAxisCount(_type);
-  GZ_ASSERT(axisCount >= 0, "Invalid axis count");
+  IGN_ASSERT(axisCount >= 0, "Invalid axis count");
 
   this->jointTypeLabel->setText(tr(jointTypeStr.c_str()));
 
@@ -266,7 +266,7 @@ void JointInspector::SetName(const std::string &_name)
 
 /////////////////////////////////////////////////
 void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3 &_anchor)
 {
   this->anchorXSpinBox->setValue(_anchor.x);
   this->anchorYSpinBox->setValue(_anchor.y);
@@ -274,11 +274,12 @@ void JointInspector::SetAnchor(unsigned int /*_index*/,
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void JointInspector::SetAxis(unsigned int _index,
+    const ignition::math::Vector3 &_axis)
 {
   if (_index > this->axisXSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
+    ignerr << "Axis index is out of range" << std::endl;
     return;
   }
 
@@ -292,7 +293,7 @@ void JointInspector::SetLowerLimit(unsigned int _index, double _lower)
 {
   if (_index > this->lowerLimitSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
+    ignerr << "Axis index is out of range" << std::endl;
     return;
   }
 
@@ -304,7 +305,7 @@ void JointInspector::SetUpperLimit(unsigned int _index, double _upper)
 {
   if (_index > this->upperLimitSpinBoxes.size())
   {
-    gzerr << "Axis index is out of range" << std::endl;
+    ignerr << "Axis index is out of range" << std::endl;
     return;
   }
 

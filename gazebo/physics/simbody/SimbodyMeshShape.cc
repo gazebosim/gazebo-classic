@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Mesh.hh"
+#include "ignition/common/Mesh.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"

@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
@@ -71,8 +71,8 @@ void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void DARTRayShape::SetPoints(const math::Vector3& _posStart,
-                             const math::Vector3& _posEnd)
+void DARTRayShape::SetPoints(const ignition::math::Vector3& _posStart,
+                             const ignition::math::Vector3& _posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 

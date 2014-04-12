@@ -21,7 +21,7 @@
 
 #include <sstream>
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/transport/Node.hh"
 
@@ -174,7 +174,7 @@ bool ContactSensor::UpdateImpl(bool /*_force*/)
             count != (*iter)->contact(i).wrench_size() ||
             count != (*iter)->contact(i).depth_size())
         {
-          gzerr << "Contact message has invalid array sizes\n";
+          ignerr << "Contact message has invalid array sizes\n";
           continue;
         }
 

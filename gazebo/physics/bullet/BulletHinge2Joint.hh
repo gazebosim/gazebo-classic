@@ -22,8 +22,8 @@
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -54,17 +54,19 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Get anchor point
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       /// \brief Set the first axis of rotation
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3 &_axis);
 
       /// \brief Get first axis of rotation
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAxis(
+                  unsigned int _index) const;
 
       /// \brief Get angle of rotation about first axis
-      public: math::Angle GetAngle(unsigned int _index) const;
+      public: ignition::math::Angle GetAngle(unsigned int _index) const;
 
       /// \brief Get rate of rotation about first axis
       public: double GetVelocity(unsigned int _index) const;
@@ -80,23 +82,25 @@ namespace gazebo
 
       /// \brief Set the high stop of an axis(index).
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       /// \brief Get the low stop of an axis(index).
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Get the axis of rotation
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       /// \brief Get the angle of rotation
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       /// \brief Set the torque
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

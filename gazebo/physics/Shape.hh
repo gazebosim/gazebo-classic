@@ -21,7 +21,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Inertial.hh"
@@ -50,11 +50,11 @@ namespace gazebo
 
       /// \brief Set the scale of the shape.
       /// \param[in] _scale Scale to set the shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale) = 0;
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale) = 0;
 
       /// \brief Get the scale of the shape.
       /// \return Scale of the shape.
-      public: virtual math::Vector3 GetScale() const;
+      public: virtual ignition::math::Vector3 GetScale() const;
 
       /// \brief Fill in the values for a geometry message.
       /// \param[out] _msg The geometry message to fill.
@@ -68,7 +68,7 @@ namespace gazebo
       protected: CollisionPtr collisionParent;
 
       /// \brief This shape's scale;
-      protected: math::Vector3 scale;
+      protected: ignition::math::Vector3 scale;
     };
     /// \}
   }

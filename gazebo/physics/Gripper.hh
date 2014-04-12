@@ -23,7 +23,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo
@@ -97,7 +97,7 @@ namespace gazebo
       private: physics::LinkPtr palmLink;
 
       /// \brief All our connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief The collisions for the links in the gripper.
       private: std::map<std::string, physics::CollisionPtr> collisions;
@@ -110,7 +110,7 @@ namespace gazebo
 
       /// \brief Previous difference between the palm link and grasped
       /// object.
-      private: math::Pose prevDiff;
+      private: ignition::math::Pose prevDiff;
 
       /// \brief Used to determine when to create the fixed joint.
       private: std::vector<double> diffs;
@@ -119,10 +119,10 @@ namespace gazebo
       private: int diffIndex;
 
       /// \brief Rate at which to update the gripper.
-      private: common::Time updateRate;
+      private: ignition::common::Time updateRate;
 
       /// \brief Previous time when the gripper was updated.
-      private: common::Time prevUpdateTime;
+      private: ignition::common::Time prevUpdateTime;
 
       /// \brief Number of iterations the gripper was contacting the same
       /// object.

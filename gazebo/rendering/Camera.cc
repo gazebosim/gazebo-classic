@@ -21,15 +21,15 @@
 #include <sdf/sdf.hh>
 
 // Moved to top to avoid osx compilation errors
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/math/Pose.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -88,18 +88,18 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
 
   // Connect to the render signal
   this->connections.push_back(
-      event::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
+      common::Events::ConnectPostRender(boost::bind(&Camera::Update, this)));
 
   if (_autoRender)
   {
-    this->connections.push_back(event::Events::ConnectRender(
+    this->connections.push_back(common::Events::ConnectRender(
           boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
-        event::Events::ConnectPostRender(
+        common::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
   }
 
-  this->lastRenderWallTime = common::Time::GetWallTime();
+  this->lastRenderWallTime = ignition::common::Time::GetWallTime();
 
   // Set default render rate to unlimited
   this->SetRenderRate(0.0);
@@ -155,7 +155,7 @@ void Camera::Load()
         imgElem->Get<std::string>("format"));
   }
   else
-    gzthrow("Camera has no <image> tag.");
+    ignthrow("Camera has no <image> tag.");
 
   // Create the directory to store frames
   if (this->sdf->HasElement("save") &&
@@ -166,7 +166,7 @@ void Camera::Load()
 
     command = "mkdir " + elem->Get<std::string>("path")+ " 2>>/dev/null";
     if (system(command.c_str()) < 0)
-      gzerr << "Error making directory\n";
+      ignerr << "Error making directory\n";
   }
 
   if (this->sdf->HasElement("horizontal_fov"))
@@ -175,7 +175,7 @@ void Camera::Load()
     double angle = elem->Get<double>();
     if (angle < 0.01 || angle > M_PI)
     {
-      gzthrow("Camera horizontal field of view invalid.");
+      ignthrow("Camera horizontal field of view invalid.");
     }
     this->SetHFOV(angle);
   }
@@ -274,7 +274,7 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       bool result = false;
 
-      if (msg.id() < GZ_UINT32_MAX)
+      if (msg.id() < IGN_UINT32_MAX)
         result = this->AttachToVisualImpl(msg.id(),
             msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
       else
@@ -295,8 +295,8 @@ void Camera::Update()
   if (this->animState)
   {
     this->animState->addTime(
-        (common::Time::GetWallTime() - this->prevAnimTime).Double());
-    this->prevAnimTime = common::Time::GetWallTime();
+        (ignition::common::Time::GetWallTime() - this->prevAnimTime).Double());
+    this->prevAnimTime = ignition::common::Time::GetWallTime();
 
     if (this->animState->hasEnded())
     {
@@ -325,8 +325,9 @@ void Camera::Update()
   }
   else if (this->dataPtr->trackedVisual)
   {
-    math::Vector3 direction = this->dataPtr->trackedVisual->GetWorldPose().pos -
-                              this->GetWorldPose().pos;
+    ignition::math::Vector3 direction =
+      this->dataPtr->trackedVisual->GetWorldPose().pos -
+      this->GetWorldPose().pos;
 
     double yaw = atan2(direction.y, direction.x);
     double pitch = atan2(-direction.z,
@@ -348,7 +349,7 @@ void Camera::Update()
     double yawAdj = this->dataPtr->trackVisualYawPID.Update(
         yawError, 0.01);
 
-    this->SetWorldRotation(math::Quaternion(0, currPitch + pitchAdj,
+    this->SetWorldRotation(ignition::math::Quaternion(0, currPitch + pitchAdj,
           currYaw + yawAdj));
 
     double origDistance = 8.0;
@@ -357,11 +358,11 @@ void Camera::Update()
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
 
-    math::Vector3 displacement = direction;
+    ignition::math::Vector3 displacement = direction;
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 pos = this->GetWorldPosition() + displacement;
+    ignition::math::Vector3 pos = this->GetWorldPosition() + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -377,7 +378,7 @@ void Camera::Render()
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
-       common::Time::GetWallTime() - this->lastRenderWallTime >=
+       ignition::common::Time::GetWallTime() - this->lastRenderWallTime >=
         this->dataPtr->renderPeriod))
   {
     this->newData = true;
@@ -464,7 +465,7 @@ void Camera::ReadPixelBuffer()
 }
 
 //////////////////////////////////////////////////
-common::Time Camera::GetLastRenderWallTime()
+ignition::common::Time Camera::GetLastRenderWallTime()
 {
   return this->lastRenderWallTime;
 }
@@ -474,7 +475,7 @@ void Camera::PostRender()
 {
   this->ReadPixelBuffer();
 
-  this->lastRenderWallTime = common::Time::GetWallTime();
+  this->lastRenderWallTime = ignition::common::Time::GetWallTime();
 
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
@@ -518,33 +519,34 @@ void Camera::PostRender()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Camera::GetWorldPosition() const
+ignition::math::Vector3 Camera::GetWorldPosition() const
 {
   return Conversions::Convert(this->sceneNode->_getDerivedPosition());
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Camera::GetWorldRotation() const
+ignition::math::Quaternion Camera::GetWorldRotation() const
 {
   Ogre::Quaternion rot = this->sceneNode->getOrientation();
-  return math::Quaternion(rot.w, rot.x, rot.y, rot.z);
+  return ignition::math::Quaternion(rot.w, rot.x, rot.y, rot.z);
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
+void Camera::SetWorldPose(const ignition::math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);
 }
 
 //////////////////////////////////////////////////
-math::Pose Camera::GetWorldPose() const
+ignition::math::Pose Camera::GetWorldPose() const
 {
-  return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
+  return ignition::math::Pose(
+      this->GetWorldPosition(), this->GetWorldRotation());
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldPosition(const math::Vector3 &_pos)
+void Camera::SetWorldPosition(const ignition::math::Vector3 &_pos)
 {
   if (this->animState)
     return;
@@ -554,15 +556,15 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldRotation(const math::Quaternion &_quant)
+void Camera::SetWorldRotation(const ignition::math::Quaternion &_quant)
 {
   if (this->animState)
     return;
 
-  math::Vector3 rpy = _quant.GetAsEuler();
+  ignition::math::Vector3 rpy = _quant.GetAsEuler();
 
   // Set the roll and yaw for sceneNode
-  math::Quaternion s(rpy.x, rpy.y, rpy.z);
+  ignition::math::Quaternion s(rpy.x, rpy.y, rpy.z);
 
   this->sceneNode->setOrientation(
       Ogre::Quaternion(s.w, s.x, s.y, s.z));
@@ -571,7 +573,7 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 }
 
 //////////////////////////////////////////////////
-void Camera::Translate(const math::Vector3 &direction)
+void Camera::Translate(const ignition::math::Vector3 &direction)
 {
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
@@ -580,13 +582,13 @@ void Camera::Translate(const math::Vector3 &direction)
 }
 
 //////////////////////////////////////////////////
-void Camera::RotateYaw(math::Angle _angle)
+void Camera::RotateYaw(ignition::math::Angle _angle)
 {
   this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////
-void Camera::RotatePitch(math::Angle _angle)
+void Camera::RotatePitch(ignition::math::Angle _angle)
 {
   this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
@@ -597,7 +599,7 @@ void Camera::SetClipDist()
 {
   sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
   if (!clipElem)
-    gzthrow("Camera has no <clip> tag.");
+    ignthrow("Camera has no <clip> tag.");
 
   if (this->camera)
   {
@@ -606,7 +608,7 @@ void Camera::SetClipDist()
     this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
-    gzerr << "Setting clip distances failed -- no camera yet\n";
+    ignerr << "Setting clip distances failed -- no camera yet\n";
 }
 
 //////////////////////////////////////////////////
@@ -621,21 +623,21 @@ void Camera::SetClipDist(float _near, float _far)
 }
 
 //////////////////////////////////////////////////
-void Camera::SetHFOV(math::Angle _angle)
+void Camera::SetHFOV(ignition::math::Angle _angle)
 {
   this->sdf->GetElement("horizontal_fov")->Set(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-math::Angle Camera::GetHFOV() const
+ignition::math::Angle Camera::GetHFOV() const
 {
-  return math::Angle(this->sdf->Get<double>("horizontal_fov"));
+  return ignition::math::Angle(this->sdf->Get<double>("horizontal_fov"));
 }
 
 //////////////////////////////////////////////////
-math::Angle Camera::GetVFOV() const
+ignition::math::Angle Camera::GetVFOV() const
 {
-  return math::Angle(this->camera->getFOVy().valueRadians());
+  return ignition::math::Angle(this->camera->getFOVy().valueRadians());
 }
 
 //////////////////////////////////////////////////
@@ -708,7 +710,7 @@ unsigned int Camera::GetImageDepth() const
     return 1;
   else
   {
-    gzerr << "Error parsing image format ("
+    ignerr << "Error parsing image format ("
           << imgFmt << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
@@ -778,7 +780,7 @@ int Camera::GetOgrePixelFormat(const std::string &_format)
   }
   else
   {
-    gzerr << "Error parsing image format (" << _format
+    ignerr << "Error parsing image format (" << _format
           << "), using default Ogre::PF_R8G8B8\n";
     result = static_cast<int>(Ogre::PF_R8G8B8);
   }
@@ -812,7 +814,7 @@ void Camera::SetSaveFramePathname(const std::string &_pathname)
     std::string command;
     command = "mkdir -p " + _pathname + " 2>>/dev/null";
     if (system(command.c_str()) <0)
-      gzerr << "Error making directory\n";
+      ignerr << "Error making directory\n";
   }
 }
 
@@ -881,17 +883,17 @@ float Camera::GetAspectRatio() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Camera::GetUp()
+ignition::math::Vector3 Camera::GetUp()
 {
   Ogre::Vector3 up = this->camera->getRealUp();
-  return math::Vector3(up.x, up.y, up.z);
+  return ignition::math::Vector3(up.x, up.y, up.z);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Camera::GetRight()
+ignition::math::Vector3 Camera::GetRight()
 {
   Ogre::Vector3 right = this->camera->getRealRight();
-  return math::Vector3(right.x, right.y, right.z);
+  return ignition::math::Vector3(right.x, right.y, right.z);
 }
 
 //////////////////////////////////////////////////
@@ -907,18 +909,10 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneNode *Camera::GetPitchNode() const
-{
-  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL."
-        << " Use GetSceneNode() instead.\n";
-  return NULL;
-}
-
-//////////////////////////////////////////////////
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
   if (_i != 0)
-    gzerr << "Camera index must be zero for cam";
+    ignerr << "Camera index must be zero for cam";
 
   // do last minute conversion if Bayer pattern is requested, go from R8G8B8
   if ((this->GetImageFormat() == "BAYER_RGGB8") ||
@@ -967,7 +961,7 @@ std::string Camera::GetFrameFilename()
   if (this->captureDataOnce)
   {
     pathToFile = this->screenshotPath;
-    std::string timestamp = common::Time::GetWallTimeAsISOString();
+    std::string timestamp = ignition::common::Time::GetWallTimeAsISOString();
     boost::replace_all(timestamp, ":", "_");
     pathToFile /= friendlyName + "-" + timestamp + ".jpg";
   }
@@ -1000,7 +994,7 @@ bool Camera::SaveFrame(const unsigned char *_image,
 {
   if (!_image)
   {
-    gzerr << "Can't save an empty image\n";
+    ignerr << "Can't save an empty image\n";
     return false;
   }
 
@@ -1074,8 +1068,8 @@ void Camera::ShowWireframe(bool s)
 
 //////////////////////////////////////////////////
 void Camera::GetCameraToViewportRay(int _screenx, int _screeny,
-                                    math::Vector3 &_origin,
-                                    math::Vector3 &_dir)
+                                   ignition::math::Vector3 &_origin,
+                                   ignition::math::Vector3 &_dir)
 {
   Ogre::Ray ray = this->camera->getCameraToViewportRay(
       static_cast<float>(_screenx) / this->GetViewportWidth(),
@@ -1245,10 +1239,10 @@ void Camera::CreateCamera()
 
 //////////////////////////////////////////////////
 bool Camera::GetWorldPointOnPlane(int _x, int _y,
-                                  const math::Plane &_plane,
-                                  math::Vector3 &_result)
+                                  const ignition::math::Plane &_plane,
+                                 ignition::math::Vector3 &_result)
 {
-  math::Vector3 origin, dir;
+  ignition::math::Vector3 origin, dir;
   double dist;
 
   // Cast two rays from the camera into the world
@@ -1258,7 +1252,7 @@ bool Camera::GetWorldPointOnPlane(int _x, int _y,
 
   _result = origin + dir * dist;
 
-  if (!math::equal(dist, -1.0))
+  if (!ignition::math::equal(dist, -1.0))
     return true;
   else
     return false;
@@ -1370,7 +1364,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
   if (visual)
     track.set_id(visual->GetId());
   else
-    track.set_id(GZ_UINT32_MAX);
+    track.set_id(IGN_UINT32_MAX);
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
@@ -1422,7 +1416,7 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
+    ignition::math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
     this->sceneNode->setInheritOrientation(_inheritOrientation);
     this->SetWorldPose(origPose);
@@ -1473,7 +1467,7 @@ Ogre::Texture *Camera::GetRenderTexture() const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 Camera::GetDirection() const
+ignition::math::Vector3 Camera::GetDirection() const
 {
   return Conversions::Convert(this->camera->getDerivedDirection());
 }
@@ -1483,7 +1477,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    math::Box bbox = _visual->GetBoundingBox();
+    ignition::math::Box bbox = _visual->GetBoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.min.x, bbox.min.y, bbox.min.z);
     box.setMaximum(bbox.max.x, bbox.max.y, bbox.max.z);
@@ -1507,7 +1501,7 @@ bool Camera::IsAnimating() const
 }
 
 /////////////////////////////////////////////////
-bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
+bool Camera::MoveToPosition(const ignition::math::Pose &_pose, double _time)
 {
   if (this->animState)
   {
@@ -1516,8 +1510,8 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   }
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3 start = this->GetWorldPose().pos;
 
   double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
 
@@ -1526,7 +1520,7 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   else if (dyaw < -M_PI)
     rpy.z -= 2*M_PI;
 
-  math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
+  ignition::math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
   Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
     pitchYawOnly.y, pitchYawOnly.z);
 
@@ -1560,13 +1554,13 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
-  this->prevAnimTime = common::Time::GetWallTime();
+  this->prevAnimTime = ignition::common::Time::GetWallTime();
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
+bool Camera::MoveToPositions(const std::vector<ignition::math::Pose> &_pts,
                              double _time, boost::function<void()> _onComplete)
 {
   if (this->animState)
@@ -1575,7 +1569,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->onAnimationComplete = _onComplete;
 
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3 start = this->GetWorldPose().pos;
 
   std::string trackName = "cameratrack";
   int i = 0;
@@ -1602,8 +1596,8 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   double prevYaw = this->GetWorldRotation().GetAsEuler().z;
   for (unsigned int j = 0; j < _pts.size(); j++)
   {
-    math::Vector3 pos = _pts[j].pos;
-    math::Vector3 rpy = _pts[j].rot.GetAsEuler();
+    ignition::math::Vector3 pos = _pts[j].pos;
+    ignition::math::Vector3 rpy = _pts[j].rot.GetAsEuler();
     double dyaw = prevYaw - rpy.z;
 
     if (dyaw > M_PI)
@@ -1613,7 +1607,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
 
     prevYaw = rpy.z;
 
-    math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
+    ignition::math::Quaternion pitchYawOnly(0, rpy.y, rpy.z);
     Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
       pitchYawOnly.y, pitchYawOnly.z);
 
@@ -1629,7 +1623,7 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
-  this->prevAnimTime = common::Time::GetWallTime();
+  this->prevAnimTime = ignition::common::Time::GetWallTime();
 
   return true;
 }

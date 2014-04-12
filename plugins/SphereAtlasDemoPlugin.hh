@@ -35,13 +35,13 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
     private: std::vector<std::string> jointNames;
     private: physics::Joint_V joints;
 
-    private: common::Time prevUpdateTime;
+    private: ignition::common::Time prevUpdateTime;
 
     private: std::vector<double> qp;
     private: std::vector<double> jointKp;

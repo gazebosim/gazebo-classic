@@ -16,7 +16,7 @@
 */
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
@@ -31,14 +31,14 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not handle pioneer2dx model yet, "
+    ignerr << "Abort test since simbody does not handle pioneer2dx model yet, "
           << "Please see issue #866.\n";
     return;
   }
 
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
+    ignerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
           << "Please see issue #912. "
           << "(https://bitbucket.org/osrf/gazebo/issue/912)\n";
     return;
@@ -50,31 +50,31 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   int i = 0;
   for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
   ASSERT_LT(i, 1000);
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
-      gazebo::math::Vector3(0.2, 0, 0));
+      ignition::math::Vector3(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),
-      gazebo::math::Quaternion(0, 0, 0));
+      ignition::math::Quaternion(0, 0, 0));
   velPub->Publish(msg);
 
-  math::Pose startPose, endPose;
+  ignition::math::Pose startPose, endPose;
   startPose = this->poses["pioneer2dx"];
 
-  common::Time startTime = this->simTime;
-  common::Time currTime = this->simTime;
+  ignition::common::Time startTime = this->simTime;
+  ignition::common::Time currTime = this->simTime;
 
   /*struct timespec interval;
   struct timespec remainder;
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
   */
-  while (currTime - startTime < common::Time(20, 0))
+  while (currTime - startTime < ignition::common::Time(20, 0))
   {
     // nanosleep(&interval, &remainder);
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     currTime = this->simTime;
   }
 

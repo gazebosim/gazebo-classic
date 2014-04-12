@@ -134,6 +134,7 @@ target_link_libraries(gazebo_gui
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
+  ${tinyxml_libraries}
   pthread
 )
 
@@ -152,6 +153,7 @@ target_link_libraries(gzclient
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
+  ${tinyxml_libraries}
   pthread
 )
 

@@ -15,9 +15,9 @@
  *
 */
 
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Mesh.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -40,7 +40,7 @@ DARTMeshShape::~DARTMeshShape()
 //////////////////////////////////////////////////
 void DARTMeshShape::Update()
 {
-  gzwarn << "Not implemented!\n";
+  ignwarn << "Not implemented!\n";
 }
 
 //////////////////////////////////////////////////
@@ -52,5 +52,5 @@ void DARTMeshShape::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTMeshShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  ignwarn << "Not implemented!\n";
 }

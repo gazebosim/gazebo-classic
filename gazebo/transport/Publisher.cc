@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -34,7 +34,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)
 {
-  if (!math::equal(_hzRate, 0.0))
+  if (!ignition::math::equal(_hzRate, 0.0))
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
@@ -59,20 +59,20 @@ bool Publisher::HasConnections() const
 void Publisher::WaitForConnection() const
 {
   while (!this->HasConnections())
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 }
 
 //////////////////////////////////////////////////
-bool Publisher::WaitForConnection(const common::Time &_timeout) const
+bool Publisher::WaitForConnection(const ignition::common::Time &_timeout) const
 {
-  common::Time start = common::Time::GetWallTime();
-  common::Time curr = common::Time::GetWallTime();
+  ignition::common::Time start = ignition::common::Time::GetWallTime();
+  ignition::common::Time curr = ignition::common::Time::GetWallTime();
 
   while (!this->HasConnections() &&
       (_timeout <= 0.0 || curr - start < _timeout))
   {
-    common::Time::MSleep(100);
-    curr = common::Time::GetWallTime();
+    ignition::common::Time::MSleep(100);
+    curr = ignition::common::Time::GetWallTime();
   }
 
   return this->HasConnections();
@@ -83,11 +83,11 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
                             bool _block)
 {
   if (_message.GetTypeName() != this->msgType)
-    gzthrow("Invalid message type\n");
+    ignthrow("Invalid message type\n");
 
   if (!_message.IsInitialized())
   {
-    gzerr << "Publishing an uninitialized message on topic[" <<
+    ignerr << "Publishing an uninitialized message on topic[" <<
       this->topic << "]. Required field [" <<
       _message.InitializationErrorString() << "] missing.\n";
     return;
@@ -97,10 +97,10 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   if (this->updatePeriod > 0)
   {
     // Get the current time
-    this->currentTime = common::Time::GetWallTime();
+    this->currentTime = ignition::common::Time::GetWallTime();
 
     // Skip publication if the time difference is less than the update period.
-    if (this->prevPublishTime != common::Time(0, 0) &&
+    if (this->prevPublishTime != ignition::common::Time(0, 0) &&
         (this->currentTime - this->prevPublishTime).Double() <
         this->updatePeriod)
     {
@@ -128,7 +128,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 
       if (!queueLimitWarned)
       {
-        gzwarn << "Queue limit reached for topic "
+        ignwarn << "Queue limit reached for topic "
           << this->topic
           << ", deleting message. "
           << "This warning is printed only once." << std::endl;
@@ -246,13 +246,13 @@ void Publisher::Fini()
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic);
 
-  common::Time slept;
+  ignition::common::Time slept;
 
   // Wait for the message to be published
-  while (!this->pubIds.empty() && slept < common::Time(1, 0))
+  while (!this->pubIds.empty() && slept < ignition::common::Time(1, 0))
   {
-    common::Time::MSleep(10);
-    slept += common::Time(0, 10000000);
+    ignition::common::Time::MSleep(10);
+    slept += ignition::common::Time(0, 10000000);
   }
 
   this->node.reset();

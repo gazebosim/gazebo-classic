@@ -22,7 +22,7 @@
 #ifndef _PLANESHAPE_HH_
 #define _PLANESHAPE_HH_
 
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "gazebo/physics/Shape.hh"
 
 namespace gazebo
@@ -54,27 +54,27 @@ namespace gazebo
 
       /// \brief Set the altitude of the plane.
       /// \param[in] _pos Position of the plane.
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      public: virtual void SetAltitude(const ignition::math::Vector3 &_pos);
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
-      public: void SetNormal(const math::Vector3 &_norm);
+      public: void SetNormal(const ignition::math::Vector3 &_norm);
 
       /// \brief Get the plane normal.
       /// \return The plane normal.
-      public: math::Vector3 GetNormal() const;
+      public: ignition::math::Vector3 GetNormal() const;
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.
-      public: void SetSize(const math::Vector2d &_size);
+      public: void SetSize(const ignition::math::Vector2d &_size);
 
       /// \brief Get the size.
       /// \return Size of the plane.
-      public: math::Vector2d GetSize() const;
+      public: ignition::math::Vector2d GetSize() const;
 
       /// \brief Set the scale of the plane.
       /// \return _scale Scale to set the plane to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.

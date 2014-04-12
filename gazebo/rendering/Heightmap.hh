@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
-
 #ifndef _HEIGHTMAP_HH_
 #define _HEIGHTMAP_HH_
 
@@ -27,9 +22,9 @@
 #include <boost/filesystem.hpp>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
+#include "ignition/common/Image.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Vector2d.hh"
 #include "gazebo/rendering/Scene.hh"
 
 namespace Ogre
@@ -116,9 +111,10 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Flatten(CameraPtr _camera, math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+      public: bool Flatten(CameraPtr _camera,
+                  ignition::math::Vector2i _mousePos,
+                  double _outsideRadius, double _insideRadius,
+                  double _weight = 0.1);
 
       /// \brief Smooth the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -129,7 +125,7 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+      public: bool Smooth(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight = 0.1);
 
@@ -142,7 +138,7 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Raise(CameraPtr _camera, math::Vector2i _mousePos,
+      public: bool Raise(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight = 0.1);
 
@@ -155,7 +151,7 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Lower(CameraPtr _camera, math::Vector2i _mousePos,
+      public: bool Lower(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight = 0.1);
 
@@ -174,7 +170,7 @@ namespace gazebo
 
       /// \brief Get the heightmap as an image
       /// \return An image that contains the terrain data.
-      public: common::Image GetImage() const;
+      public: ignition::common::Image GetImage() const;
 
       /// \brief Calculate a mouse ray hit on the terrain.
       /// \param[in] _camera Camera associated with the mouse press.
@@ -182,7 +178,7 @@ namespace gazebo
       /// coordinates.
       /// \return The result of the mouse ray hit.
       public: Ogre::TerrainGroup::RayResult GetMouseHit(CameraPtr _camera,
-                  math::Vector2i _mousePos);
+                  ignition::math::Vector2i _mousePos);
 
       /// \brief Split a terrain into subterrains
       /// \param[in] _heightmap Source vector of floats with the heights.
@@ -275,16 +271,16 @@ namespace gazebo
       private: ScenePtr scene;
 
       /// \brief Image used to generate the heightmap.
-      private: common::Image heightImage;
+      private: ignition::common::Image heightImage;
 
       /// \brief Size of the terrain.
-      private: math::Vector3 terrainSize;
+      private: ignition::math::Vector3 terrainSize;
 
       /// \brief Size of the heightmap data.
       private: unsigned int dataSize;
 
       /// \brief Origin of the terrain.
-      private: math::Vector3 terrainOrigin;
+      private: ignition::math::Vector3 terrainOrigin;
 
       /// \brief Global options.
       private: Ogre::TerrainGlobalOptions *terrainGlobals;

@@ -19,7 +19,7 @@
  * Date: 21 May 2009
  */
 
-#include "gazebo/common/Mesh.hh"
+#include "ignition/common/Mesh.hh"
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -70,11 +70,11 @@ void BulletMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     vertices[j*3+0] = vertices[j*3+0] *
-      this->sdf->Get<math::Vector3>("scale").x;
+      this->sdf->Get<ignition::math::Vector3>("scale").x;
     vertices[j*3+1] = vertices[j*3+1] *
-      this->sdf->Get<math::Vector3>("scale").y;
+      this->sdf->Get<ignition::math::Vector3>("scale").y;
     vertices[j*3+2] = vertices[j*3+2] *
-      this->sdf->Get<math::Vector3>("scale").z;
+      this->sdf->Get<ignition::math::Vector3>("scale").z;
   }
 
   // Create the Bullet trimesh

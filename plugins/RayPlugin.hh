@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Ray Plugin
- * Author: Nate Koenig mod by John Hsu
- */
-
 #ifndef _GAZEBO_RAY_PLUGIN_HH_
 #define _GAZEBO_RAY_PLUGIN_HH_
 
@@ -52,7 +47,7 @@ namespace gazebo
     private: sensors::RaySensorPtr parentSensor;
 
     /// \brief The connection tied to RayPlugin::OnNewLaserScans()
-    private: event::ConnectionPtr newLaserScansConnection;
+    private: ignition::common::ConnectionPtr newLaserScansConnection;
   };
 }
 #endif

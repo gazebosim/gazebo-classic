@@ -23,7 +23,7 @@
 
 #include "test/ServerFixture.hh"
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
@@ -52,7 +52,7 @@ class JointTest : public ServerFixture,
               ::testing::UnitTest::GetInstance()->current_test_info();
             if (test_info->value_param())
             {
-              gzdbg << "Params: " << test_info->value_param() << std::endl;
+              igndbg << "Params: " << test_info->value_param() << std::endl;
               this->physicsEngine = std::tr1::get<0>(GetParam());
               this->jointType = std::tr1::get<1>(GetParam());
             }
@@ -63,8 +63,8 @@ class JointTest : public ServerFixture,
   {
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0))
+              wait(ignition::common::Time(99, 0)),
+              noLinkPose(false), axis(ignition::math::Vector3(1, 0, 0))
             {
             }
 
@@ -84,25 +84,25 @@ class JointTest : public ServerFixture,
 
     /// \brief Length of time to wait for model to spawn in order to return
     ///        Joint pointer.
-    public: common::Time wait;
+    public: ignition::common::Time wait;
 
     /// \brief Model pose for spawned model.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose modelPose;
 
     /// \brief Child link pose for spawned model.
-    public: math::Pose childLinkPose;
+    public: ignition::math::Pose childLinkPose;
 
     /// \brief Parent link pose for spawned model.
-    public: math::Pose parentLinkPose;
+    public: ignition::math::Pose parentLinkPose;
 
     /// \brief Flag to disable including link pose per issue #978.
     public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
-    public: math::Pose jointPose;
+    public: ignition::math::Pose jointPose;
 
     /// \brief Axis value for spawned joint.
-    public: math::Vector3 axis;
+    public: ignition::math::Vector3 axis;
   };
 
   /// \brief Spawn a model with a joint connecting to the world. The function
@@ -116,9 +116,9 @@ class JointTest : public ServerFixture,
   /// \param[in] _wait Length of time to wait for model to spawn in order
   ///                  to return Joint pointer.
   public: physics::JointPtr SpawnJoint(const std::string &_type,
-                                       bool _worldChild = false,
-                                       bool _worldParent = false,
-                                   common::Time _wait = common::Time(99, 0))
+              bool _worldChild = false,
+              bool _worldParent = false,
+              ignition::common::Time _wait = ignition::common::Time(99, 0))
           {
             SpawnJointOptions opt;
             opt.type = _type;
@@ -186,22 +186,23 @@ class JointTest : public ServerFixture,
             this->factoryPub->Publish(msg);
 
             physics::JointPtr joint;
-            if (_opt.wait != common::Time::Zero)
+            if (_opt.wait != ignition::common::Time::Zero)
             {
-              common::Time wallStart = common::Time::GetWallTime();
+              ignition::common::Time wallStart =
+                ignition::common::Time::GetWallTime();
               unsigned int waitCount = 0;
-              while (_opt.wait > (common::Time::GetWallTime() - wallStart) &&
-                     !this->HasEntity(modelName.str()))
+              while (_opt.wait > (ignition::common::Time::GetWallTime() -
+                    wallStart) && !this->HasEntity(modelName.str()))
               {
-                common::Time::MSleep(100);
+                ignition::common::Time::MSleep(100);
                 if (++waitCount % 10 == 0)
                 {
-                  gzwarn << "Waiting " << waitCount / 10 << " seconds for "
+                  ignwarn << "Waiting " << waitCount / 10 << " seconds for "
                          << _opt.type << " joint to spawn." << std::endl;
                 }
               }
               if (this->HasEntity(modelName.str()) && waitCount >= 10)
-                gzwarn << _opt.type << " joint has spawned." << std::endl;
+                ignwarn << _opt.type << " joint has spawned." << std::endl;
 
               physics::WorldPtr world = physics::get_world("default");
               if (world != NULL)

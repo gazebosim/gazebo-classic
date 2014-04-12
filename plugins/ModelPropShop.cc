@@ -105,7 +105,7 @@ void ModelPropShop::Load(int _argc, char **_argv)
 /////////////////////////////////////////////
 void ModelPropShop::Init()
 {
-  this->updateConn = event::Events::ConnectWorldUpdateBegin(
+  this->updateConn = common::Events::ConnectWorldUpdateBegin(
         boost::bind(&ModelPropShop::Update, this));
 
   this->node = transport::NodePtr(new transport::Node());
@@ -142,14 +142,14 @@ void ModelPropShop::Update()
     this->camera->SetCaptureData(true);
     this->camera->Load(cameraSDF);
     this->camera->Init();
-    this->camera->SetHFOV(GZ_DTOR(60));
+    this->camera->SetHFOV(IGN_DTOR(60));
     this->camera->SetImageWidth(960);
     this->camera->SetImageHeight(540);
     this->camera->CreateRenderTexture("ModelPropShop_RttTex");
   }
 
   if (this->camera && this->scene)
-    event::Events::preRender();
+    common::Events::preRender();
 
   if (this->camera && this->scene->GetInitialized() &&
       this->camera->GetInitialized())
@@ -157,27 +157,29 @@ void ModelPropShop::Update()
     rendering::VisualPtr vis = this->scene->GetVisual(this->modelName);
     if (vis)
     {
-      math::Box bbox = vis->GetBoundingBox();
+      ignition::math::Box bbox = vis->GetBoundingBox();
 
       // Compute model scaling.
       double scaling = 1.0 / bbox.GetSize().GetMax();
 
       // Compute the model translation.
-      math::Vector3 trans = bbox.GetCenter();
+      ignition::math::Vector3 trans = bbox.GetCenter();
       trans *= -scaling;
 
       // Normalize the size of the visual
-      vis->SetScale(math::Vector3(scaling, scaling, scaling));
-      vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
+      vis->SetScale(
+          ignition::math::Vector3(scaling, scaling, scaling));
+      vis->SetWorldPose(
+          ignition::math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
 
       // Place the visual at the origin
       bbox = vis->GetBoundingBox();
 
-      math::Pose pose;
+      ignition::math::Pose pose;
 
       // Perspective view
       pose.pos.Set(1.6, -1.6, 1.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(30), GZ_DTOR(-225));
+      pose.rot.SetFromEuler(0, IGN_DTOR(30), IGN_DTOR(-225));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -187,7 +189,7 @@ void ModelPropShop::Update()
 
       // Top view
       pose.pos.Set(0, 0, 2.2);
-      pose.rot.SetFromEuler(0, GZ_DTOR(90), 0);
+      pose.rot.SetFromEuler(0, IGN_DTOR(90), 0);
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -196,7 +198,7 @@ void ModelPropShop::Update()
 
       // Front view
       pose.pos.Set(2.2, 0, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-180));
+      pose.rot.SetFromEuler(0, 0, IGN_DTOR(-180));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -205,7 +207,7 @@ void ModelPropShop::Update()
 
       // Side view
       pose.pos.Set(0, 2.2, 0);
-      pose.rot.SetFromEuler(0, 0, GZ_DTOR(-90));
+      pose.rot.SetFromEuler(0, 0, IGN_DTOR(-90));
       this->camera->SetWorldPose(pose);
       this->camera->Update();
       this->camera->Render(true);
@@ -222,7 +224,7 @@ void ModelPropShop::Update()
       this->camera->SaveFrame((this->savePath / "5.png").string());
 
 
-      event::Events::DisconnectWorldUpdateBegin(this->updateConn);
+      common::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
 
       // Clean up the camera.

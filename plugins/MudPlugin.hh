@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/common.hh>
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -52,7 +53,7 @@ namespace gazebo
     private: transport::SubscriberPtr contactSub;
 
     /// \brief Connection to World Update events.
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     /// \brief Pointer to world.
     private: physics::WorldPtr world;

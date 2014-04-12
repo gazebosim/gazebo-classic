@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/common/MouseEvent.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -53,7 +53,7 @@ JointMaker::JointMaker()
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      common::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
 
@@ -135,9 +135,9 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 
 
 /////////////////////////////////////////////////
-bool JointMaker::OnMousePress(const common::MouseEvent &_event)
+bool JointMaker::OnMousePress(const ignition::common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != ignition::common::MouseEvent::LEFT)
     return false;
 
   if (this->jointType != JointMaker::JOINT_NONE)
@@ -162,14 +162,14 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
+bool JointMaker::OnMouseRelease(const ignition::common::MouseEvent &_event)
 {
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
-  if (_event.button == common::MouseEvent::RIGHT)
+  if (_event.button == ignition::common::MouseEvent::RIGHT)
   {
     if (vis)
     {
@@ -184,7 +184,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     }
   }
 
-  if (_event.button != common::MouseEvent::LEFT)
+  if (_event.button != ignition::common::MouseEvent::LEFT)
     return false;
 
   if (this->hoverVis)
@@ -198,7 +198,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       if (this->mouseJoint)
         return false;
 
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->hoverVis->SetEmissive(ignition::common::Color(0, 0, 0));
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
 
@@ -209,8 +209,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      jointLine->AddPoint(math::Vector3(0, 0, 0));
-      jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+      jointLine->AddPoint(ignition::math::Vector3(0, 0, 0));
+      jointLine->AddPoint(ignition::math::Vector3(0, 0, 0.01));
       jointVis->GetSceneNode()->setInheritScale(false);
       jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -228,11 +228,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       int axisCount = JointMaker::GetJointAxisCount(jointData->type);
       for (int i = 0; i < axisCount; ++i)
       {
-        jointData->axis[i] = math::Vector3::UnitX;
+        jointData->axis[i] =ignition::math::Vector3::UnitX;
         jointData->lowerLimit[i] = -1e16;
         jointData->upperLimit[i] = 1e16;
       }
-      jointData->anchor = math::Vector3::Zero;
+      jointData->anchor =ignition::math::Vector3::Zero;
       this->mouseJoint = jointData;
       jointData->line->setMaterial(this->jointMaterials[jointData->type]);
     }
@@ -240,9 +240,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
     else if (this->selectedVis != this->hoverVis)
     {
       if (this->hoverVis)
-        this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+        this->hoverVis->SetEmissive(ignition::common::Color(0, 0, 0));
       if (this->selectedVis)
-        this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+        this->selectedVis->SetEmissive(ignition::common::Color(0, 0, 0));
       this->mouseJoint->child = this->hoverVis;
 
       // reset variables.
@@ -304,16 +304,16 @@ void JointMaker::Stop()
     }
     this->CreateJoint(JointMaker::JOINT_NONE);
     if (this->hoverVis)
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+      this->hoverVis->SetEmissive(ignition::common::Color(0, 0, 0));
     if (this->selectedVis)
-      this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+      this->selectedVis->SetEmissive(ignition::common::Color(0, 0, 0));
     this->selectedVis.reset();
     this->hoverVis.reset();
   }
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
+bool JointMaker::OnMouseMove(const ignition::common::MouseEvent &_event)
 {
   if (_event.dragging)
     return false;
@@ -328,7 +328,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (vis)
   {
     if (this->hoverVis && this->hoverVis != this->selectedVis)
-      this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
+      this->hoverVis->SetEmissive(ignition::common::Color(0.0, 0.0, 0.0));
 
     // only highlight editor parts
     rendering::VisualPtr rootVis = vis->GetRootVisual();
@@ -339,7 +339,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       this->hoverVis = vis;
       if (!this->selectedVis ||
            (this->selectedVis && this->hoverVis != this->selectedVis))
-        this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
+        this->hoverVis->SetEmissive(ignition::common::Color(0.5, 0.5, 0.5));
     }
   }
 
@@ -348,7 +348,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->selectedVis && this->hoverVis
       && this->mouseJoint && this->mouseJoint->line)
   {
-    math::Vector3 parentPos;
+    ignition::math::Vector3 parentPos;
     // Set end point to center of child part
     if (!this->hoverVis->IsPlane())
     {
@@ -360,9 +360,9 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     else
     {
       // Set end point to mouse plane intersection
-      math::Vector3 pt;
+     ignition::math::Vector3 pt;
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
-          math::Plane(math::Vector3(0, 0, 1)), pt);
+         ignition::math::Plane(ignition::math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
         parentPos = this->mouseJoint->parent->GetWorldPose().pos;
       this->mouseJoint->line->SetPoint(1,
@@ -398,7 +398,7 @@ void JointMaker::OpenInspector(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
+bool JointMaker::OnMouseDoubleClick(const ignition::common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
@@ -440,7 +440,7 @@ void JointMaker::CreateHotSpot()
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
-  hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
+  hotspotVisual->SetScale(ignition::math::Vector3(0.1, 0.1, 0.1));
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -505,7 +505,8 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetParent()->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
+    poseElem->Set(ignition::math::Pose(joint->anchor,
+          ignition::math::Vector3::Zero));
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {

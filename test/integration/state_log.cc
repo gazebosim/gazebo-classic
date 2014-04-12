@@ -95,8 +95,8 @@ TEST(StateLogTest, PR2PlaybackZipped)
   // Wait for messages to arrive
   while (g_msgCount < 120 && i < 100)
   {
-    gzdbg << "Pose Msg Count = " << g_msgCount  << std::endl;
-    gazebo::common::Time::MSleep(100);
+    igndbg << "Pose Msg Count = " << g_msgCount  << std::endl;
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 
@@ -129,7 +129,7 @@ TEST(StateLogTest, PR2PlaybackTxt)
   g_msgCount = 0;
 
   // Convert the zipped state to txt and set a Hz filter.
-  custom_exec("gzlog echo /tmp/gazebo_test/state.log -z 30 > "
+  custom_exec("ignlog echo /tmp/gazebo_test/state.log -z 30 > "
       "/tmp/gazebo_test/state_txt.log");
 
   // Run playback
@@ -163,8 +163,8 @@ TEST(StateLogTest, PR2PlaybackTxt)
   // Wait for messages to arrive
   while (g_msgCount < 120 && i < 100)
   {
-    gzdbg << "Pose Msg Count = " << g_msgCount  << std::endl;
-    gazebo::common::Time::MSleep(100);
+    igndbg << "Pose Msg Count = " << g_msgCount  << std::endl;
+    ignition::common::Time::MSleep(100);
     ++i;
   }
 

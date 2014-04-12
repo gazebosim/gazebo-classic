@@ -19,9 +19,9 @@
  * Date: 13 Oct 2009
  */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/bullet/bullet_inc.h"
@@ -36,7 +36,7 @@ using namespace physics;
 BulletSliderJoint::BulletSliderJoint(btDynamicsWorld *_world, BasePtr _parent)
     : SliderJoint<BulletJoint>(_parent)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  IGN_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
   this->bulletSlider = NULL;
 }
@@ -63,17 +63,17 @@ void BulletSliderJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3 axis = this->initialWorldAxis;
+  if (axis ==ignition::math::Vector3::Zero)
   {
-    gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
+    ignerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
   }
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose pose;
   btTransform frameParent, frameChild;
   btVector3 axis2, axis3;
 
@@ -146,11 +146,11 @@ void BulletSliderJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    ignthrow("joint without links\n");
   }
 
   if (!this->bulletSlider)
-    gzthrow("unable to create bullet slider joint\n");
+    ignthrow("unable to create bullet slider joint\n");
 
   // btSliderConstraint has 2 degrees-of-freedom (like a piston)
   // so disable the rotation.
@@ -159,7 +159,7 @@ void BulletSliderJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+  IGN_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
@@ -168,7 +168,7 @@ void BulletSliderJoint::Init()
   this->constraint = this->bulletSlider;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  IGN_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->bulletSlider, true);
 
   // Allows access to impulse
@@ -197,7 +197,7 @@ void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+    const ignition::math::Vector3 &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -216,7 +216,7 @@ void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "SetAxis for existing joint is not implemented\n";
+    ignerr << "SetAxis for existing joint is not implemented\n";
   }
 }
 
@@ -258,7 +258,7 @@ void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
-                                    const math::Angle &_angle)
+                                    const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
   if (this->bulletSlider)
@@ -267,7 +267,7 @@ void BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
-                                   const math::Angle &_angle)
+                                   const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
   if (this->bulletSlider)
@@ -275,24 +275,24 @@ void BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
+ignition::math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
+    ignerr << "Joint must be created before getting high stop\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
+ignition::math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzerr << "Joint must be created before getting low stop\n";
+    ignerr << "Joint must be created before getting low stop\n";
   return result;
 }
 
@@ -313,9 +313,10 @@ double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 BulletSliderJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3 result;
   if (this->bulletSlider)
   {
     // I have not verified the following math, though I based it on internal
@@ -326,17 +327,18 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
     result = BulletTypes::ConvertVector3(vec);
   }
   else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+    ignwarn << "bulletHinge does not exist, returning fake axis\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletSliderJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletSlider)
     result = this->bulletSlider->getLinearPos();
   else
-    gzwarn << "bulletSlider does not exist, returning default position\n";
+    ignwarn << "bulletSlider does not exist, returning default position\n";
   return result;
 }

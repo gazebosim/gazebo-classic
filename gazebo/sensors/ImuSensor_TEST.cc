@@ -67,9 +67,9 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  EXPECT_EQ(sensor->GetAngularVelocity(), math::Vector3::Zero);
-  EXPECT_EQ(sensor->GetLinearAcceleration(), math::Vector3::Zero);
-  EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+  EXPECT_EQ(sensor->GetAngularVelocity(), ignition::math::Vector3::Zero);
+  EXPECT_EQ(sensor->GetLinearAcceleration(), ignition::math::Vector3::Zero);
+  EXPECT_EQ(sensor->GetOrientation(), ignition::math::Quaternion(0, 0, 0, 0));
 }
 
 TEST_F(ImuSensor_TEST, BasicImuSensorCheckODE)
@@ -109,7 +109,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   std::string modelName = "imuModel";
   std::string imuSensorName = "imuSensor";
-  math::Pose modelPose(0, 0, z, 0, 0, 0);
+  ignition::math::Pose modelPose(0, 0, z, 0, 0, 0);
 
   std::string topic = "~/" + imuSensorName + "_" + _physicsEngine;
   // spawn imu sensor
@@ -125,9 +125,10 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   sensors::SensorManager::Instance()->Init();
   imuSensor->SetActive(true);
 
-  EXPECT_EQ(imuSensor->GetAngularVelocity(), math::Vector3::Zero);
-  EXPECT_EQ(imuSensor->GetLinearAcceleration(), math::Vector3::Zero);
-  EXPECT_EQ(imuSensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
+  EXPECT_EQ(imuSensor->GetAngularVelocity(), ignition::math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetLinearAcceleration(), ignition::math::Vector3::Zero);
+  EXPECT_EQ(imuSensor->GetOrientation(),
+      ignition::math::Quaternion(0, 0, 0, 0));
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->Step(200);

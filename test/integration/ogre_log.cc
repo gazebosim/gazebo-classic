@@ -17,6 +17,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "ServerFixture.hh"
 
 class OgreLog : public ServerFixture

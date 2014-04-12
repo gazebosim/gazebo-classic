@@ -24,9 +24,9 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/common/MouseEvent.hh"
+#include "ignition/common/CommonTypes.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
 
@@ -118,22 +118,23 @@ namespace gazebo
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMousePress(const common::MouseEvent &_event);
+      private: bool OnMousePress(const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse button is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseRelease(const common::MouseEvent &_event);
+      private: bool OnMouseRelease(const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is moved.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseMove(const common::MouseEvent &_event);
+      private: bool OnMouseMove(const ignition::common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is double clicked.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
+      private: bool OnMouseDoubleClick(
+                   const ignition::common::MouseEvent &_event);
 
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
@@ -170,7 +171,7 @@ namespace gazebo
       private: JointData *mouseJoint;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Flag set to true when a joint has been connected.
       private: bool newJointCreated;
@@ -216,7 +217,7 @@ namespace gazebo
       public: JointMaker::JointType type;
 
       /// \brief Joint axis direction.
-      public: math::Vector3 axis[2];
+      public: ignition::math::Vector3 axis[2];
 
       /// \brief Joint lower limit.
       public: double lowerLimit[2];
@@ -225,7 +226,7 @@ namespace gazebo
       public: double upperLimit[2];
 
       /// \brief Joint anchor point.
-      public: math::Vector3 anchor;
+      public: ignition::math::Vector3 anchor;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

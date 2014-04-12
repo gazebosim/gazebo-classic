@@ -60,7 +60,7 @@ ToolsWidget::ToolsWidget(QWidget *_parent)
 
   // Listen to entity selection events
   this->connections.push_back(
-      event::Events::ConnectSetSelectedEntity(
+      common::Events::ConnectSetSelectedEntity(
         boost::bind(&ToolsWidget::OnSetSelectedEntity, this, _1, _2)));
 }
 

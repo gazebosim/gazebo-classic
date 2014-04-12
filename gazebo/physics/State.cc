@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/State.hh"
 
 using namespace gazebo;
@@ -24,13 +24,14 @@ using namespace physics;
 /////////////////////////////////////////////////
 State::State()
 {
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = ignition::common::Time::GetWallTime();
 }
 
 /////////////////////////////////////////////////
-State::State(const std::string &_name, const common::Time &_realTime,
-             const common::Time &_simTime)
-: name(_name), wallTime(common::Time::GetWallTime()), realTime(_realTime),
+State::State(const std::string &_name, const ignition::common::Time &_realTime,
+             const ignition::common::Time &_simTime)
+: name(_name),
+  wallTime(ignition::common::Time::GetWallTime()), realTime(_realTime),
   simTime(_simTime)
 {
 }
@@ -58,19 +59,19 @@ void State::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetWallTime() const
+ignition::common::Time State::GetWallTime() const
 {
   return this->wallTime;
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetRealTime() const
+ignition::common::Time State::GetRealTime() const
 {
   return this->realTime;
 }
 
 /////////////////////////////////////////////////
-common::Time State::GetSimTime() const
+ignition::common::Time State::GetSimTime() const
 {
   return this->simTime;
 }
@@ -92,7 +93,7 @@ State State::operator-(const State &_state) const
   // Make sure the names match
   if (_state.name != this->name)
   {
-    gzthrow("Invalid state substraction operator this[" + this->name +
+    ignthrow("Invalid state substraction operator this[" + this->name +
             "] != [" + _state.name + "]\n");
   }
 
@@ -101,19 +102,19 @@ State State::operator-(const State &_state) const
 }
 
 /////////////////////////////////////////////////
-void State::SetWallTime(const common::Time &_time)
+void State::SetWallTime(const ignition::common::Time &_time)
 {
   this->wallTime = _time;
 }
 
 /////////////////////////////////////////////////
-void State::SetRealTime(const common::Time &_time)
+void State::SetRealTime(const ignition::common::Time &_time)
 {
   this->realTime = _time;
 }
 
 /////////////////////////////////////////////////
-void State::SetSimTime(const common::Time &_time)
+void State::SetSimTime(const ignition::common::Time &_time)
 {
   this->simTime = _time;
 }

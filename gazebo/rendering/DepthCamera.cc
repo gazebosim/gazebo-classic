@@ -27,9 +27,9 @@
 #include "gazebo/rendering/RTShaderSystem.hh"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -386,7 +386,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
 
     double hfov = this->GetHFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-    // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
+    // ignerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
   }

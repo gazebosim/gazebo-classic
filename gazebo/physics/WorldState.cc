@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/WorldState.hh"
@@ -68,7 +68,7 @@ void WorldState::Load(const WorldPtr _world)
 {
   this->world = _world;
   this->name = _world->GetName();
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = ignition::common::Time::GetWallTime();
   this->simTime = _world->GetSimTime();
   this->realTime = _world->GetRealTime();
 
@@ -114,9 +114,9 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   }
 
   // Copy the name and time information
-  this->simTime = _elem->Get<common::Time>("sim_time");
-  this->wallTime = _elem->Get<common::Time>("wall_time");
-  this->realTime = _elem->Get<common::Time>("real_time");
+  this->simTime = _elem->Get<ignition::common::Time>("sim_time");
+  this->wallTime = _elem->Get<ignition::common::Time>("wall_time");
+  this->realTime = _elem->Get<ignition::common::Time>("real_time");
 }
 
 /////////////////////////////////////////////////
@@ -162,7 +162,7 @@ ModelState WorldState::GetModelState(const std::string &_modelName) const
     return iter->second;
 
   // Throw exception if the model name doesn't exist.
-  gzthrow("Invalid model name[" + _modelName + "].");
+  ignthrow("Invalid model name[" + _modelName + "].");
   return ModelState();
 }
 
@@ -306,7 +306,7 @@ void WorldState::FillSDF(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void WorldState::SetWallTime(const common::Time &_time)
+void WorldState::SetWallTime(const ignition::common::Time &_time)
 {
   State::SetWallTime(_time);
 
@@ -318,7 +318,7 @@ void WorldState::SetWallTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void WorldState::SetRealTime(const common::Time &_time)
+void WorldState::SetRealTime(const ignition::common::Time &_time)
 {
   State::SetRealTime(_time);
 
@@ -330,7 +330,7 @@ void WorldState::SetRealTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void WorldState::SetSimTime(const common::Time &_time)
+void WorldState::SetSimTime(const ignition::common::Time &_time)
 {
   State::SetSimTime(_time);
 

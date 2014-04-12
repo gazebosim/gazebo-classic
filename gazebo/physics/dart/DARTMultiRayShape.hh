@@ -45,8 +45,8 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start location of the ray.
       /// \param[in] _end End location of the ray.
-      protected: void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+      protected: void AddRay(const ignition::math::Vector3 &_start,
+                             const ignition::math::Vector3 &_end);
 
       /// \brief Pointer to the DART physics engine.
       private: DARTPhysicsPtr physicsEngine;

@@ -316,7 +316,7 @@ void ActarrayInterface::Subscribe()
     // std::ostringstream stream;
     std::cout << "Error subscribing to Gazebo Actarray Interface\n"
               << e << "\n";
-    // gzthrow(stream.str());
+    // ignthrow(stream.str());
     exit(0);
   }
   */

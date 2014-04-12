@@ -19,11 +19,11 @@
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/math/Quaternion.hh"
+#include "ignition/common/MouseEvent.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -42,9 +42,9 @@ MeshMaker::MeshMaker()
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::MESH);
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+           ignition::math::Quaternion());
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(),
-            math::Vector3());
+           ignition::math::Vector3());
 }
 
 /////////////////////////////////////////////////
@@ -94,31 +94,31 @@ bool MeshMaker::IsActive() const
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMousePush(const common::MouseEvent &/*_event*/)
+void MeshMaker::OnMousePush(const ignition::common::MouseEvent &/*_event*/)
 {
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMouseRelease(const common::MouseEvent &/*_event*/)
+void MeshMaker::OnMouseRelease(const ignition::common::MouseEvent &/*_event*/)
 {
   this->CreateTheEntity();
   this->Stop();
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
+void MeshMaker::OnMouseMove(const ignition::common::MouseEvent &_event)
 {
-  math::Pose pose = msgs::Convert(this->visualMsg->pose());
+  ignition::math::Pose pose = msgs::Convert(this->visualMsg->pose());
 
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
+  ignition::math::Vector3 origin1, dir1, p1;
+  ignition::math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
   this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
+  ignition::math::Plane plane(ignition::math::Vector3(0, 0, 1), 0);
 
   double dist1 = plane.Distance(origin1, dir1);
 
@@ -150,7 +150,7 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void MeshMaker::OnMouseDrag(const common::MouseEvent &/*_event*/)
+void MeshMaker::OnMouseDrag(const ignition::common::MouseEvent &/*_event*/)
 {
   this->visPub->Publish(*this->visualMsg);
 }

@@ -28,13 +28,13 @@ void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
+    ignerr << "Abort test since simbody does not support screw joints in PR2, "
           << "Please see issue #857.\n";
     return;
   }
   if (_physicsEngine == "dart")
   {
-    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+    ignerr << "Abort test since dart does not support ray sensor in PR2, "
           << "Please see issue #911.\n";
     return;
   }
@@ -42,13 +42,13 @@ void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
   Load("worlds/empty.world", false, _physicsEngine);
   double emptySpeed;
   while ((emptySpeed = GetPercentRealTime()) == 0)
-    common::Time::MSleep(100);
-  common::Time::MSleep(2000);
+    ignition::common::Time::MSleep(100);
+  ignition::common::Time::MSleep(2000);
   emptySpeed = GetPercentRealTime();
 
   // Load the pr2into the world
   SpawnModel("model://pr2");
-  common::Time::MSleep(2000);
+  ignition::common::Time::MSleep(2000);
   double loadedSpeed = GetPercentRealTime();
 
   double speedRatio = loadedSpeed / emptySpeed;

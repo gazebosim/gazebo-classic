@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
@@ -31,8 +31,8 @@ JointState::JointState()
 }
 
 /////////////////////////////////////////////////
-JointState::JointState(JointPtr _joint, const common::Time &_realTime,
-    const common::Time &_simTime)
+JointState::JointState(JointPtr _joint, const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
 : State(_joint->GetName(), _realTime, _simTime)
 {
   // Set the joint angles.
@@ -64,13 +64,13 @@ JointState::~JointState()
 }
 
 /////////////////////////////////////////////////
-void JointState::Load(JointPtr _joint, const common::Time &_realTime,
-    const common::Time &_simTime)
+void JointState::Load(JointPtr _joint, const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
 {
   this->name = _joint->GetName();
   this->realTime = _realTime;
   this->simTime = _simTime;
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = ignition::common::Time::GetWallTime();
 
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
@@ -92,7 +92,7 @@ void JointState::Load(const sdf::ElementPtr _elem)
     {
       unsigned int axis = childElem->Get<unsigned int>("axis");
       if (axis+1 > this->angles.size())
-        this->angles.resize(axis+1, math::Angle(0.0));
+        this->angles.resize(axis+1, ignition::math::Angle(0.0));
       this->angles[axis] = childElem->Get<double>();
       childElem = childElem->GetNextElement("angle");
     }
@@ -106,18 +106,18 @@ unsigned int JointState::GetAngleCount() const
 }
 
 /////////////////////////////////////////////////
-math::Angle JointState::GetAngle(unsigned int _axis) const
+ignition::math::Angle JointState::GetAngle(unsigned int _axis) const
 {
   if (_axis < this->angles.size())
     return this->angles[_axis];
 
-  gzthrow("Index[" + boost::lexical_cast<std::string>(_axis) +
+  ignthrow("Index[" + boost::lexical_cast<std::string>(_axis) +
           "] is out of range.");
-  return math::Angle();
+  return ignition::math::Angle();
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Angle> &JointState::GetAngles() const
+const std::vector<ignition::math::Angle> &JointState::GetAngles() const
 {
   return this->angles;
 }
@@ -126,10 +126,10 @@ const std::vector<math::Angle> &JointState::GetAngles() const
 bool JointState::IsZero() const
 {
   bool result = true;
-  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end() && result; ++iter)
+  for (std::vector<ignition::math::Angle>::const_iterator
+      iter = this->angles.begin(); iter != this->angles.end() && result; ++iter)
   {
-    result = result && (*iter) == math::Angle::Zero;
+    result = result && (*iter) ==ignition::math::Angle::Zero;
   }
 
   return result;
@@ -144,8 +144,8 @@ JointState &JointState::operator=(const JointState &_state)
   this->angles.clear();
 
   // Copy the angles.
-  for (std::vector<math::Angle>::const_iterator iter = _state.angles.begin();
-       iter != _state.angles.end(); ++iter)
+  for (std::vector<ignition::math::Angle>::const_iterator
+       iter = _state.angles.begin(); iter != _state.angles.end(); ++iter)
   {
     this->angles.push_back(*iter);
   }
@@ -165,9 +165,10 @@ JointState JointState::operator-(const JointState &_state) const
   /// \TODO: this will produce incorrect results if _state doesn't have the
   /// same set of angles as *this.
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator
+       iterA = this->angles.begin(), iterB = _state.angles.begin();
+       iterA != this->angles.end() && iterB != _state.angles.end();
+       ++iterA, ++iterB, ++i)
   {
     result.angles.push_back((*iterA) - (*iterB));
   }
@@ -187,9 +188,10 @@ JointState JointState::operator+(const JointState &_state) const
   /// \TODO: this will produce incorrect results if _state doesn't have the
   /// same set of angles as *this.
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator
+      iterA = this->angles.begin(), iterB = _state.angles.begin();
+      iterA != this->angles.end() && iterB != _state.angles.end();
+      ++iterA, ++iterB, ++i)
   {
     result.angles.push_back((*iterA) + (*iterB));
   }
@@ -205,8 +207,8 @@ void JointState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetAttribute("name")->Set(this->name);
 
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end(); ++iter, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator iter =
+      this->angles.begin(); iter != this->angles.end(); ++iter, ++i)
   {
     sdf::ElementPtr elem = _sdf->AddElement("angle");
     elem->GetAttribute("axis")->Set(i);

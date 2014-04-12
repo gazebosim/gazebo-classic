@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/math/Angle.hh"
+#include "ignition/math/Angle.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -54,8 +54,8 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
 
   double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
                     sensor->GetRayCount();
-  EXPECT_EQ(sensor->GetAngleMin(), math::Angle(-1.396263));
-  EXPECT_EQ(sensor->GetAngleMax(), math::Angle(1.396263));
+  EXPECT_EQ(sensor->GetAngleMin(), ignition::math::Angle(-1.396263));
+  EXPECT_EQ(sensor->GetAngleMax(), ignition::math::Angle(1.396263));
   EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
   EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
   EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);
@@ -75,7 +75,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   float *scan = new float[sensor->GetRayCount()
       * sensor->GetVerticalRayCount() * 3];
   int scanCount = 0;
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     sensor->ConnectNewLaserFrame(
         boost::bind(&::OnNewLaserFrame, &scanCount, scan,
           _1, _2, _3, _4, _5));
@@ -84,7 +84,7 @@ TEST_F(GPURaySensor_TEST, CreateLaser)
   int i = 0;
   while (scanCount < 10 && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);

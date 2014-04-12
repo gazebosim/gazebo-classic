@@ -22,7 +22,7 @@
 #ifndef _UNIVERSALJOINT_HH_
 #define _UNIVERSALJOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
 
 namespace gazebo
@@ -68,9 +68,9 @@ namespace gazebo
 
                 /*
                 this->SetAxis(0,
-                    this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
+                    this->sdf->GetElement("axis")->Get<ignition::math::Vector3("xyz"));
                 this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    this->sdf->GetElement("axis2")->Get<ignition::math::Vector3>("xyz"));
                     */
               }
 

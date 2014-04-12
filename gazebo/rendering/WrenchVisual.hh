@@ -96,7 +96,7 @@ namespace gazebo
       private: boost::mutex mutex;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
     };
     /// \}
   }

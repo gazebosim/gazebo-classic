@@ -25,10 +25,10 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/ImageHeightmap.hh"
-#include "gazebo/common/HeightmapData.hh"
-#include "gazebo/common/Dem.hh"
-#include "gazebo/math/Vector3.hh"
+#include "ignition/common/ImageHeightmap.hh"
+#include "ignition/common/HeightmapData.hh"
+#include "ignition/common/Dem.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
@@ -62,7 +62,7 @@ namespace gazebo
 
       /// \brief Set the scale of the heightmap shape.
       /// \param[in] _scale Scale to set the heightmap shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
@@ -70,17 +70,17 @@ namespace gazebo
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
-      public: math::Vector3 GetSize() const;
+      public: ignition::math::Vector3 GetSize() const;
 
       /// \brief Get the origin in world coordinate frame.
       /// \return The origin in world coordinate frame.
-      public: math::Vector3 GetPos() const;
+      public: ignition::math::Vector3 GetPos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
-      /// \return math::Vector2i, result.x = width,
+      /// \return ignition::math::Vector2i, result.x = width,
       /// result.y = length/height.
-      public: math::Vector2i GetVertexCount() const;
+      public: ignition::math::Vector2i GetVertexCount() const;
 
       /// \brief Get a height at a position.
       /// \param[in] _x X position.
@@ -111,7 +111,7 @@ namespace gazebo
       /// \brief Return an image representation of the heightmap.
       /// \return Image where white pixels represents the highest locations,
       /// and black pixels the lowest.
-      public: common::Image GetImage() const;
+      public: ignition::common::Image GetImage() const;
 
       /// \brief Load a terrain file specified by _filename. The terrain file
       /// format might be an image or a DEM file. libgdal is required to enable
@@ -141,10 +141,10 @@ namespace gazebo
       protected: std::vector<float> heights;
 
       /// \brief Image used to generate the heights.
-      protected: common::ImageHeightmap img;
+      protected: ignition::common::ImageHeightmap img;
 
       /// \brief HeightmapData used to generate the heights.
-      protected: common::HeightmapData *heightmapData;
+      protected: ignition::common::HeightmapData *heightmapData;
 
       /// \brief Size of the height lookup table.
       protected: unsigned int vertSize;
@@ -168,7 +168,7 @@ namespace gazebo
       private: std::string fileFormat;
 
       /// \brief Terrain size
-      private: math::Vector3 heightmapSize;
+      private: ignition::math::Vector3 heightmapSize;
 
       #ifdef HAVE_GDAL
       /// \brief DEM used to generate the heights.

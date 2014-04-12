@@ -31,7 +31,7 @@ Road2d::Road2d()
   this->sub = this->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(boost::bind(&Road2d::PreRender, this)));
+      common::Events::ConnectPreRender(boost::bind(&Road2d::PreRender, this)));
 }
 
 /////////////////////////////////////////////////
@@ -47,12 +47,12 @@ void Road2d::Load(VisualPtr _parent)
 {
   this->parent = _parent;
 
-/*  this->points.push_back(math::Vector3(0, 0, 0.01));
-  this->points.push_back(math::Vector3(4, 4, 0.01));
-  this->points.push_back(math::Vector3(4, 8, 0.01));
-  this->points.push_back(math::Vector3(8, 8, 0.01));
-  this->points.push_back(math::Vector3(20, 0, 0.01));
-  this->points.push_back(math::Vector3(10, -20, 0.01));
+/*  this->points.push_back(ignition::math::Vector3(0, 0, 0.01));
+  this->points.push_back(ignition::math::Vector3(4, 4, 0.01));
+  this->points.push_back(ignition::math::Vector3(4, 8, 0.01));
+  this->points.push_back(ignition::math::Vector3(8, 8, 0.01));
+  this->points.push_back(ignition::math::Vector3(20, 0, 0.01));
+  this->points.push_back(ignition::math::Vector3(10, -20, 0.01));
 
   this->mRenderOp.vertexData = new Ogre::VertexData;
   this->mRenderOp.operationType = Ogre::RenderOperation::OT_TRIANGLE_STRIP;
@@ -89,13 +89,13 @@ void Road2d::Load(VisualPtr _parent)
   float *vertices = static_cast<float*>(
       vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-  math::Vector3 pA, pB, tangent;
+ ignition::math::Vector3 pA, pB, tangent;
   double factor = 1.0;
   double theta = 0.0;
 
-  math::Box bounds;
-  bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
+ ignition::math::Box bounds;
+  bounds.min.Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
+  bounds.max.Set(IGN_DBL_MIN, IGN_DBL_MIN, IGN_DBL_MIN);
 
   // Generate the triangles for the road
   for (unsigned int i = 0; i < this->points.size(); ++i)
@@ -112,8 +112,8 @@ void Road2d::Load(VisualPtr _parent)
     }
     else
     {
-      math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
-      math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
+     ignition::math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
+     ignition::math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
       tangent = (this->points[i+1] - this->points[i-1]).Normalize();
 
@@ -246,13 +246,13 @@ void Road2d::Segment::Load(msgs::Road _msg)
   float *vertices = static_cast<float*>(
       vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-  math::Vector3 pA, pB, tangent;
+  ignition::math::Vector3 pA, pB, tangent;
   double factor = 1.0;
   double theta = 0.0;
 
-  math::Box bounds;
-  bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
+  ignition::math::Box bounds;
+  bounds.min.Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
+  bounds.max.Set(IGN_DBL_MIN, IGN_DBL_MIN, IGN_DBL_MIN);
 
   float texCoord = 0.0;
 
@@ -292,8 +292,10 @@ void Road2d::Segment::Load(msgs::Road _msg)
     // Every other point in the road
     else
     {
-      math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
-      math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
+      ignition::math::Vector3 v1 =
+        (this->points[i+1] - this->points[i]).Normalize();
+      ignition::math::Vector3 v0 =
+        (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
       tangent = (this->points[i+1] - this->points[i-1]).Normalize();
 

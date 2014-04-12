@@ -20,9 +20,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <ignition/common.hh>
 
-#include "gazebo/common/PID.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -93,13 +92,15 @@ namespace gazebo
       /// \param[in] _dposition Rotation angle.
       /// \param[in] _updateChildren Update child joints.
       private: void MoveLinks(JointPtr _joint, LinkPtr _link,
-                   const math::Vector3 &_anchor, const math::Vector3 &_axis,
+                   const ignition::math::Vector3 &_anchor,
+                   const ignition::math::Vector3 &_axis,
                    double _dposition, bool _updateChildren = false);
 
       /// \internal
       /// \TODO: Set Link Velocity based on old and new poses and dt
       private: void ComputeAndSetLinkTwist(LinkPtr _link,
-                    const math::Pose &_old, const math::Pose &_new, double dt);
+                    const ignition::math::Pose &_old,
+                    const ignition::math::Pose &_new, double dt);
 
       /// \brief Helper for SetJointPositions
       /// \param[out] _linksOut All the connected links.
@@ -132,10 +133,10 @@ namespace gazebo
       private: std::map<std::string, JointPtr> joints;
 
       /// \brief Position PID controllers.
-      private: std::map<std::string, common::PID> posPids;
+      private: std::map<std::string, ignition::common::PID> posPids;
 
       /// \brief Velocity PID controllers.
-      private: std::map<std::string, common::PID> velPids;
+      private: std::map<std::string, ignition::common::PID> velPids;
 
       /// \brief Forces applied to joints.
       private: std::map<std::string, double> forces;
@@ -153,7 +154,7 @@ namespace gazebo
       private: transport::SubscriberPtr jointCmdSub;
 
       /// \brief Last time the controller was updated.
-      private: common::Time prevUpdateTime;
+      private: ignition::common::Time prevUpdateTime;
     };
     /// \}
   }

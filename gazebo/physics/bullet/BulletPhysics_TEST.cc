@@ -178,7 +178,7 @@ void BulletPhysics_TEST::PhysicsMsgParam()
 
   int waitCount = 0, maxWaitCount = 3000;
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
   ASSERT_LT(waitCount, maxWaitCount);
 
   EXPECT_DOUBLE_EQ(physicsResponseMsg.max_step_size(),

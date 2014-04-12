@@ -39,7 +39,7 @@ int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
   // Bounds checking on index
   if (_index < 0 or _index >= NUMBER_OF_WHEELS)
   {
-    gzerr << "Joint index " << _index <<  " out of bounds [0, "
+    ignerr << "Joint index " << _index <<  " out of bounds [0, "
           << NUMBER_OF_WHEELS << "] in model " << this->model->GetName()
           << "." << std::endl;
   }
@@ -48,7 +48,7 @@ int SkidSteerDrivePlugin::RegisterJoint(int _index, const std::string &_name)
   this->joints[_index] = this->model->GetJoint(_name);
   if (!this->joints[_index])
   {
-    gzerr << "Unable to find the " << _name
+    ignerr << "Unable to find the " << _name
           <<  " joint in model " << this->model->GetName() << "." << std::endl;
     return 1;
   }
@@ -79,7 +79,10 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("max_force"))
     this->maxForce = _sdf->GetElement("max_force")->Get<double>();
   else
-    gzwarn << "No MaxForce value set in the model sdf, default value is 5.0.\n";
+  {
+    ignwarn << "No MaxForce value set in the model sdf, "
+      << "default value is 5.0.\n";
+  }
 
   // This assumes that front and rear wheel spacing is identical
   this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(
@@ -91,21 +94,21 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
                                         this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {
-    math::Box bb = wheelLink->GetBoundingBox();
+    ignition::math::Box bb = wheelLink->GetBoundingBox();
     this->wheelRadius = bb.GetSize().GetMax() * 0.5;
   }
 
   // Validity checks...
   if (this->wheelSeparation <= 0)
   {
-    gzerr << "Unable to find the wheel separation distance." << std::endl
+    ignerr << "Unable to find the wheel separation distance." << std::endl
           << "  This could mean that the right_front link and the left_front "
           << "link are overlapping." << std::endl;
     return;
   }
   if (this->wheelRadius <= 0)
   {
-    gzerr << "Unable to find the wheel radius." << std::endl
+    ignerr << "Unable to find the wheel radius." << std::endl
           << "  This could mean that the sdf is missing a wheel link on "
           << "the right_front joint." << std::endl;
     return;
@@ -120,7 +123,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
-  // gzmsg << "cmd_vel: " << msg->position().x() << ", "
+  // ignmsg << "cmd_vel: " << msg->position().x() << ", "
   //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
 
   for (int i = 0; i < NUMBER_OF_WHEELS; i++)

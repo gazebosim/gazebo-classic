@@ -23,10 +23,10 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <ignition/common.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
 
@@ -58,7 +58,7 @@ namespace gazebo
     private: boost::mutex update_mutex;
 
     // Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
   };
 }
 #endif

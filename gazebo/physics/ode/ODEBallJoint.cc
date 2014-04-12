@@ -20,7 +20,7 @@
  */
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
 
 using namespace gazebo;
@@ -41,38 +41,39 @@ ODEBallJoint::~ODEBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
     dJointGetBallAnchor(jointId, result);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3(result[0], result[1], result[2]);
 }
 
 
 //////////////////////////////////////////////////
 void ODEBallJoint::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3 &_anchor)
 {
   if (this->jointId)
     dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
   else
-    gzerr << "ODE Joint ID is invalid\n";
+    ignerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
 void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  ignerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 ODEBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  return math::Vector3();
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -98,8 +99,8 @@ void ODEBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  return math::Angle(0);
+  return ignition::math::Angle(0);
 }
 

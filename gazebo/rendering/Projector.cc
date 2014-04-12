@@ -51,7 +51,7 @@ Projector::~Projector()
 
 /////////////////////////////////////////////////
 void Projector::Load(const std::string &_name,
-                     const math::Pose &_pose,
+                     const ignition::math::Pose &_pose,
                      const std::string &_textureName,
                      double _nearClip,
                      double _farClip,
@@ -78,8 +78,8 @@ void Projector::Load(const std::string &_name,
 
     if (!this->projector.initialized)
     {
-      gzwarn << "starting projector failed, retrying in 1 sec.\n";
-      common::Time::MSleep(1000);
+      ignwarn << "starting projector failed, retrying in 1 sec.\n";
+      ignition::common::Time::MSleep(1000);
       ++retryCount;
     }
   }
@@ -90,7 +90,7 @@ void Projector::Load(const std::string &_name,
   this->projector.SetEnabled(true);
 
   // Start projector
-  /*this->add_model_event_ = gazebo::event::Events::ConnectWorldUpdateStart(
+  /*this->add_model_event_ = gazebo::common::Events::ConnectWorldUpdateStart(
     boost::bind(&Projector::ToggleProjector, this, true));
     */
 }
@@ -98,14 +98,14 @@ void Projector::Load(const std::string &_name,
 /////////////////////////////////////////////////
 void Projector::Load(sdf::ElementPtr _sdf)
 {
-  math::Pose pose;
+  ignition::math::Pose pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->Get<math::Pose>("pose");
+    pose = _sdf->Get<ignition::math::Pose>("pose");
 
   if (_sdf->HasElement("texture_name"))
     textureName = _sdf->Get<std::string>("texture_name");
@@ -126,7 +126,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Projector::Load(const msgs::Projector &_msg)
 {
-  math::Pose pose;
+  ignition::math::Pose pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
@@ -171,7 +171,7 @@ void Projector::Toggle()
     this->projector.SetEnabled(!this->projector.enabled);
   }
   else
-    gzwarn << "could not start projector, toggle failed\n";
+    ignwarn << "could not start projector, toggle failed\n";
     */
 }
 
@@ -240,7 +240,7 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
 
   if (_textureName.empty())
   {
-    gzerr << "Projector is missing a texture\n";
+    ignerr << "Projector is missing a texture\n";
     return;
   }
 
@@ -327,7 +327,8 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 }
 
 /////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
+void Projector::ProjectorFrameListener::SetPose(
+    const ignition::math::Pose &_pose)
 {
   Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
   Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);

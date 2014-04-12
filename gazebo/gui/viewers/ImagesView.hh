@@ -23,7 +23,7 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"

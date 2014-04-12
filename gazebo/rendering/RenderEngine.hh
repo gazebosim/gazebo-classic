@@ -26,8 +26,8 @@
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/SingletonT.hh"
+#include "ignition/common/Event.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -51,7 +51,7 @@ namespace gazebo
     /// \brief Adaptor to Ogre3d
     ///
     /// Provides the interface to load, initialize the rendering engine.
-    class RenderEngine : public SingletonT<RenderEngine>
+    class RenderEngine : public ignition::common::SingletonT<RenderEngine>
     {
       /// \enum RenderPathType
       /// \brief The type of rendering path used by the rendering engine.
@@ -184,7 +184,7 @@ namespace gazebo
       private: bool initialized;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Node for communications.
       private: transport::NodePtr node;

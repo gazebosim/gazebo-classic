@@ -19,7 +19,7 @@
 #include <signal.h>
 #include <sys/types.h>
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/Server.hh"
 #include "gazebo/gui/GuiIface.hh"
 
@@ -87,16 +87,16 @@ void sig_handler(int /*signo*/)
     if (killed1 && killed2)
       break;
     // Sleep briefly
-    gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
+    ignition::common::Time::Sleep(ignition::common::Time(sleepSecs));
   }
   if (!killed1)
   {
-    gzwarn << "escalating to SIGKILL on server\n";
+    ignwarn << "escalating to SIGKILL on server\n";
     kill(pid1, SIGKILL);
   }
   if (!killed2)
   {
-    gzwarn << "escalating to SIGKILL on client\n";
+    ignwarn << "escalating to SIGKILL on client\n";
     kill(pid2, SIGKILL);
   }
 }
@@ -115,7 +115,7 @@ int main(int _argc, char **_argv)
   sigact.sa_handler = sig_handler;
   if (sigaction(SIGINT, &sigact, NULL))
   {
-    gzerr << "Stopping. Unable to catch SIGINT.\n"
+    ignerr << "Stopping. Unable to catch SIGINT.\n"
           << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }

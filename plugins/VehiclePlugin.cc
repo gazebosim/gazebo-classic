@@ -45,7 +45,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->joints[0] = this->model->GetJoint(_sdf->Get<std::string>("front_left"));
   if (!this->joints[0])
   {
-    gzerr << "Unable to find joint: front_left\n";
+    ignerr << "Unable to find joint: front_left\n";
     return;
   }
 
@@ -54,14 +54,14 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (!this->joints[1])
   {
-    gzerr << "Unable to find joint: front_right\n";
+    ignerr << "Unable to find joint: front_right\n";
     return;
   }
 
   this->joints[2] = this->model->GetJoint(_sdf->Get<std::string>("back_left"));
   if (!this->joints[2])
   {
-    gzerr << "Unable to find joint: back_left\n";
+    ignerr << "Unable to find joint: back_left\n";
     return;
   }
 
@@ -69,7 +69,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->joints[3] = this->model->GetJoint(_sdf->Get<std::string>("back_right"));
   if (!this->joints[3])
   {
-    gzerr << "Unable to find joint: back_right\n";
+    ignerr << "Unable to find joint: back_right\n";
     return;
   }
 
@@ -92,42 +92,42 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   if (!this->gasJoint)
   {
-    gzerr << "Unable to find gas joint["
+    ignerr << "Unable to find gas joint["
           << _sdf->Get<std::string>("gas") << "]\n";
     return;
   }
 
   if (!this->steeringJoint)
   {
-    gzerr << "Unable to find steering joint["
+    ignerr << "Unable to find steering joint["
           << _sdf->Get<std::string>("steering") << "]\n";
     return;
   }
 
   if (!this->joints[0])
   {
-    gzerr << "Unable to find front_left joint["
+    ignerr << "Unable to find front_left joint["
           << _sdf->GetElement("front_left") << "]\n";
     return;
   }
 
   if (!this->joints[1])
   {
-    gzerr << "Unable to find front_right joint["
+    ignerr << "Unable to find front_right joint["
           << _sdf->GetElement("front_right") << "]\n";
     return;
   }
 
   if (!this->joints[2])
   {
-    gzerr << "Unable to find back_left joint["
+    ignerr << "Unable to find back_left joint["
           << _sdf->GetElement("back_left") << "]\n";
     return;
   }
 
   if (!this->joints[3])
   {
-    gzerr << "Unable to find back_right joint["
+    ignerr << "Unable to find back_right joint["
           << _sdf->GetElement("back_right") << "]\n";
     return;
   }
@@ -138,7 +138,7 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->frontPower = _sdf->Get<double>("front_power");
   this->rearPower = _sdf->Get<double>("rear_power");
 
-  this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+  this->connections.push_back(common::Events::ConnectWorldUpdateBegin(
           boost::bind(&VehiclePlugin::OnUpdate, this)));
 
   this->node = transport::NodePtr(new transport::Node());
@@ -156,7 +156,7 @@ void VehiclePlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
-  math::Box bb = parent->GetBoundingBox();
+  ignition::math::Box bb = parent->GetBoundingBox();
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 
   // The total range the steering wheel can rotate
@@ -227,13 +227,13 @@ void VehiclePlugin::OnUpdate()
   this->velocity = this->chassis->GetWorldLinearVel();
 
   //  aerodynamics
-  this->chassis->AddForce(
-      math::Vector3(0, 0, this->aeroLoad * this->velocity.GetSquaredLength()));
+  this->chassis->AddForce(ignition::math::Vector3(0, 0,
+        this->aeroLoad * this->velocity.GetSquaredLength()));
 
   // Sway bars
-  math::Vector3 bodyPoint;
-  math::Vector3 hingePoint;
-  math::Vector3 axis;
+  ignition::math::Vector3 bodyPoint;
+  ignition::math::Vector3 hingePoint;
+  ignition::math::Vector3 axis;
 
   double displacement;
 
@@ -251,7 +251,7 @@ void VehiclePlugin::OnUpdate()
       if (amt > 15)
         amt = 15;
 
-      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();
+      ignition::math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
       this->chassis->AddForceAtWorldPosition(axis * amt, p.pos);
 

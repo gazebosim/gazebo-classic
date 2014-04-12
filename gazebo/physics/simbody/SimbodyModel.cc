@@ -86,7 +86,7 @@ void SimbodyModel::Init()
     }
     catch(...)
     {
-      gzerr << "Init joint failed" << std::endl;
+      ignerr << "Init joint failed" << std::endl;
       return;
     }
   }

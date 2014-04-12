@@ -51,7 +51,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    ignerr << "No rendering engine, unable to run gpu laser test\n";
     return;
   }
 
@@ -63,14 +63,14 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-  math::Pose testPose(math::Vector3(0, 0, 0.1),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose testPose(ignition::math::Vector3(0, 0, 0.1),
+      ignition::math::Quaternion(0, 0, 0));
 
   // Spawn another gpu ray sensor at 90 degree roll
   std::string modelName2 = "gpu_ray_model_roll";
   std::string raySensorName2 = "gpu_ray_sensor_roll";
-  math::Pose testPose2(math::Vector3(0, 0, 0.1),
-      math::Quaternion(M_PI/2.0, 0, 0));
+  ignition::math::Pose testPose2(ignition::math::Vector3(0, 0, 0.1),
+      ignition::math::Quaternion(M_PI/2.0, 0, 0));
 
   SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
       testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
@@ -86,23 +86,25 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose box01Pose(ignition::math::Vector3(1, 0, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
   // box on the right of ray sensor 1
-  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose box02Pose(ignition::math::Vector3(0, -1, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
   // box on the left of the ray sensor 1 but out of range
-  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose box03Pose(ignition::math::Vector3(0, maxRange + 1, 0.5),
+      ignition::math::Quaternion(0, 0, 0));
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
+  SpawnBox(box01, ignition::math::Vector3(1, 1, 1), box01Pose.pos,
       box01Pose.rot.GetAsEuler());
 
-  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
+  SpawnBox(box02, ignition::math::Vector3(1, 1, 1), box02Pose.pos,
       box02Pose.rot.GetAsEuler());
 
-  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
+  SpawnBox(box03, ignition::math::Vector3(1, 1, 1), box03Pose.pos,
       box03Pose.rot.GetAsEuler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
@@ -125,7 +127,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   float *scan = new float[raySensor->GetRayCount()
       * raySensor->GetVerticalRayCount() * 3];
   int scanCount = 0;
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
         boost::bind(&::OnNewLaserFrame, &scanCount, scan,
           _1, _2, _3, _4, _5));
@@ -134,7 +136,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   int i = 0;
   while (scanCount < 10 && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);
@@ -156,7 +158,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   float *scan2 = new float[raySensor2->GetRayCount()
       * raySensor2->GetVerticalRayCount() * 3];
   int scanCount2 = 0;
-  event::ConnectionPtr c2 =
+  ignition::common::ConnectionPtr c2 =
     raySensor->ConnectNewLaserFrame(
         boost::bind(&::OnNewLaserFrame, &scanCount2, scan2,
           _1, _2, _3, _4, _5));
@@ -166,7 +168,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   scanCount2 = 0;
   while (scanCount2 < 10 && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);
@@ -178,10 +180,11 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose(ignition::math::Vector3(maxRange + 1, 0, 0),
+        ignition::math::Quaternion(0, 0, 0)));
   world->GetModel(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+      ignition::math::Pose(ignition::math::Vector3(0, -(maxRange + 1), 0),
+      ignition::math::Quaternion(0, 0, 0)));
 
   // wait for a few more laser scans
   i = 0;
@@ -189,7 +192,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   scanCount2 = 0;
   while ((scanCount < 10 ||scanCount2 < 10) && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);
@@ -218,7 +221,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    ignerr << "No rendering engine, unable to run gpu laser test\n";
     return;
   }
 
@@ -227,7 +230,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   int t = 0;
   while (sensors::get_sensor(gpuLaserName) == NULL && t < 100)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++t;
   }
   ASSERT_LT(t, 100);
@@ -241,7 +244,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   float *scan = new float[raySensor->GetRayCount()
       * raySensor->GetVerticalRayCount() * 3];
   int scanCount = 0;
-  event::ConnectionPtr c =
+  ignition::common::ConnectionPtr c =
     raySensor->ConnectNewLaserFrame(
         boost::bind(&::OnNewLaserFrame, &scanCount, scan,
           _1, _2, _3, _4, _5));
@@ -250,7 +253,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   int i = 0;
   while (scanCount < 10 && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);
@@ -268,14 +271,15 @@ TEST_F(GPURaySensorTest, Heightmap)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   world->GetModel(gpuLaserModelName)->SetWorldPose(
-      math::Pose(math::Vector3(13.2, 0, 0.035), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose(ignition::math::Vector3(13.2, 0, 0.035),
+        ignition::math::Quaternion(0, 0, 0)));
 
   // wait for a few laser scans
   i = 0;
   scanCount = 0;
   while (scanCount < 10 && i < 300)
   {
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
     i++;
   }
   EXPECT_LT(i, 300);

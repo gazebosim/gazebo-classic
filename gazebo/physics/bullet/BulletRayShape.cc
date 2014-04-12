@@ -19,7 +19,7 @@
  * Date: 24 May 2009
  */
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -64,7 +64,7 @@ void BulletRayShape::Update()
         boost::static_pointer_cast<BulletCollision>(this->collisionParent);
 
     LinkPtr link = this->collisionParent->GetLink();
-    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+    IGN_ASSERT(link != NULL, "Bullet link is NULL");
 
     this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
           this->relativeStartPos);
@@ -90,7 +90,7 @@ void BulletRayShape::Update()
 
   if (rayCallback.hasHit())
   {
-    math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+    ignition::math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
                          rayCallback.m_hitPointWorld.getY(),
                          rayCallback.m_hitPointWorld.getZ());
     this->SetLength(this->globalStartPos.Distance(result));
@@ -117,22 +117,22 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         start, end, rayCallback);
     if (rayCallback.hasHit())
     {
-      math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
+      ignition::math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
                            rayCallback.m_hitPointWorld.getY(),
                            rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
 
       BulletLink *link = static_cast<BulletLink *>(
           rayCallback.m_collisionObject->getUserPointer());
-      GZ_ASSERT(link != NULL, "Bullet link is NULL");
+      IGN_ASSERT(link != NULL, "Bullet link is NULL");
       _entity = link->GetScopedName();
     }
   }
 }
 
 //////////////////////////////////////////////////
-void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
-                                   const math::Vector3 &_posEnd)
+void BulletRayShape::SetPoints(const ignition::math::Vector3 &_posStart,
+                                   const ignition::math::Vector3 &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 }

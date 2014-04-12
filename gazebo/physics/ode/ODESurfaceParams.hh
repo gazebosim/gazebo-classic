@@ -20,7 +20,7 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Vector3.hh"
+#include "ignition/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
@@ -127,7 +127,7 @@ namespace gazebo
       ///        If undefined, a vector consstrained to be perpendicular
       ///        to the contact normal in the global y-z plane is used.
       /// \sa    http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: math::Vector3 fdir1;
+      public: ignition::math::Vector3 fdir1;
     };
     /// \}
   }

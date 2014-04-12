@@ -14,17 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MESHSHAPE_HH_
-#define _MESHSHAPE_HH_
+#ifndef _GAZEBO_MESHSHAPE_HH_
+#define _GAZEBO_MESHSHAPE_HH_
 
 #include <string>
+#include <ignition/common.hh>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
 
@@ -54,7 +49,7 @@ namespace gazebo
 
       /// \brief Get the size of the triangle mesh.
       /// \return The size of the triangle mesh.
-      public: virtual math::Vector3 GetSize() const;
+      public: virtual ignition::math::Vector3 GetSize() const;
 
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
@@ -72,7 +67,7 @@ namespace gazebo
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3 &_scale);
 
       /// \brief Populate a msgs::Geometry message with data from this
       /// shape.
@@ -84,10 +79,10 @@ namespace gazebo
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
 
       /// \brief Pointer to the mesh data.
-      protected: const common::Mesh *mesh;
+      protected: const ignition::common::Mesh *mesh;
 
       /// \brief The submesh to use from within the parent mesh.
-      protected: common::SubMesh *submesh;
+      protected: ignition::common::SubMesh *submesh;
     };
     /// \}
   }

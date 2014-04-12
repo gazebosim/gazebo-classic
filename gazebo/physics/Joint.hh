@@ -24,13 +24,10 @@
 
 #include <string>
 #include <vector>
-
 #include <boost/any.hpp>
+#include <ignition/common.hh>
 
-#include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/physics/JointState.hh"
@@ -103,7 +100,7 @@ namespace gazebo
       /// \param[in] _child Child link.
       /// \param[in] _pose Pose containing Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Pose &_pose);
+                        const ignition::math::Pose &_pose);
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
@@ -157,7 +154,7 @@ namespace gazebo
       /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis) = 0;
+                  const ignition::math::Vector3 &_axis) = 0;
 
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
@@ -173,7 +170,7 @@ namespace gazebo
 
       /// \brief Callback to apply damping force to joint.
       /// Deprecated by ApplyStiffnessDamping.
-      public: virtual void ApplyDamping() GAZEBO_DEPRECATED(3.0);
+      public: virtual void ApplyDamping() IGN_DEPRECATED(3.0);
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
@@ -204,47 +201,49 @@ namespace gazebo
       /// \param[in] _subscriber Callback for the connection.
       /// \return Connection pointer, which must be kept in scope.
       public: template<typename T>
-              event::ConnectionPtr ConnectJointUpdate(T _subscriber)
+              ignition::common::ConnectionPtr ConnectJointUpdate(T _subscriber)
               {return jointUpdate.Connect(_subscriber);}
 
       /// \brief Disconnect a boost::slot the the joint update signal.
       /// \param[in] _conn Connection to disconnect.
-      public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
+      public: void DisconnectJointUpdate(
+                  ignition::common::ConnectionPtr &_conn)
               {jointUpdate.Disconnect(_conn);}
 
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
-      public: math::Vector3 GetLocalAxis(unsigned int _index) const;
+      public: ignition::math::Vector3 GetLocalAxis(unsigned int _index) const;
 
       /// \brief Get the axis of rotation in global cooridnate frame.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
-      public: virtual math::Vector3 GetGlobalAxis(
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
                   unsigned int _index) const = 0;
 
       /// \brief Set the anchor point.
       /// \param[in] _index Indx of the axis.
       /// \param[in] _anchor Anchor value.
       public: virtual void SetAnchor(unsigned int _index,
-                                     const math::Vector3 &_anchor) = 0;
+                  const ignition::math::Vector3 &_anchor) = 0;
 
       /// \brief Get the anchor point.
       /// \param[in] _index Index of the axis.
       /// \return Anchor value for the axis.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const = 0;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const = 0;
 
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
       public: virtual void SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+                                       const ignition::math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
       public: virtual void SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+                                      const ignition::math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
       /// This function is replaced by GetUpperLimit(unsigned int).
@@ -252,7 +251,8 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(unsigned int _index) = 0;
+      public: virtual ignition::math::Angle GetHighStop(
+                  unsigned int _index) = 0;
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -260,7 +260,7 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(unsigned int _index) = 0;
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index) = 0;
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -353,7 +353,7 @@ namespace gazebo
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      public: math::Angle GetAngle(unsigned int _index) const;
+      public: ignition::math::Angle GetAngle(unsigned int _index) const;
 
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.
@@ -368,7 +368,7 @@ namespace gazebo
       /// by calling JointController::SetJointPosition.
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(unsigned int _index, math::Angle _angle);
+      public: void SetAngle(unsigned int _index, ignition::math::Angle _angle);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -376,7 +376,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const = 0;
+      public: virtual ignition::math::Vector3 GetLinkForce(
+                  unsigned int _index) const = 0;
 
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -384,7 +385,7 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1)
       /// \return Torque applied to the link.
-      public: virtual math::Vector3 GetLinkTorque(
+      public: virtual ignition::math::Vector3 GetLinkTorque(
                   unsigned int _index) const = 0;
 
       /// \brief Set a non-generic parameter for the joint.
@@ -424,25 +425,27 @@ namespace gazebo
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Lower limit of the axis.
-      public: math::Angle GetLowerLimit(unsigned int _index) const;
+      public: ignition::math::Angle GetLowerLimit(unsigned int _index) const;
 
       /// \brief:  get the joint lower limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetUpperLimit(unsigned int _index) const;
+      public: ignition::math::Angle GetUpperLimit(unsigned int _index) const;
 
       /// \brief:  set the joint upper limit
       /// (replaces SetLowStop and SetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetLowerLimit(unsigned int _index, math::Angle _limit);
+      public: void SetLowerLimit(unsigned int _index,
+                  ignition::math::Angle _limit);
 
       /// \brief:  set the joint lower limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
-      public: void SetUpperLimit(unsigned int _index, math::Angle _limit);
+      public: void SetUpperLimit(unsigned int _index,
+                  ignition::math::Angle _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.
@@ -454,7 +457,7 @@ namespace gazebo
       /// \brief Get damping coefficient of this joint
       /// Depreated, use GetDamping(_index) instead.
       /// \return viscous joint damping coefficient
-      public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(3.0);
+      public: double GetDampingCoefficient() const IGN_DEPRECATED(3.0);
 
       /// \brief Set joint stop stiffness.
       /// \param[in] _index joint axis index.
@@ -479,17 +482,17 @@ namespace gazebo
       /// \brief Get initial Anchor Pose specified by model
       /// <joint><pose>...</pose></joint>
       /// \return Joint::anchorPose, initial joint anchor pose.
-      public: math::Pose GetInitialAnchorPose();
+      public: ignition::math::Pose GetInitialAnchorPose();
 
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      protected: virtual math::Angle GetAngleImpl(
+      protected: virtual ignition::math::Angle GetAngleImpl(
                      unsigned int _index) const = 0;
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose);
+      private: void LoadImpl(const ignition::math::Pose &_pose);
 
       /// \brief Computes inertiaRatio for this joint during Joint::Init
       /// The inertia ratio for each joint between [1, +inf] gives a sense
@@ -507,14 +510,14 @@ namespace gazebo
 
       /// \brief Anchor pose.  This is the xyz offset of the joint frame from
       /// child frame specified in the parent link frame
-      protected: math::Vector3 anchorPos;
+      protected: ignition::math::Vector3 anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.
       /// AnchorPose is the transform from child link frame to joint frame
       /// specified in the child link frame.
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
-      protected: math::Pose anchorPose;
+      protected: ignition::math::Pose anchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
@@ -534,7 +537,7 @@ namespace gazebo
       protected: double springReferencePosition[MAX_JOINT_AXIS];
 
       /// \brief apply damping for adding viscous damping forces on updates
-      protected: gazebo::event::ConnectionPtr applyDamping;
+      protected: ignition::common::ConnectionPtr applyDamping;
 
       /// \brief Store Joint effort limit as specified in SDF
       protected: double effortLimit[MAX_JOINT_AXIS];
@@ -547,10 +550,10 @@ namespace gazebo
       protected: double inertiaRatio[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
-      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
+      protected: ignition::math::Angle lowerLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position upper limit as specified in SDF
-      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+      protected: ignition::math::Angle upperLimit[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
@@ -572,10 +575,10 @@ namespace gazebo
       private: std::vector<std::string> sensors;
 
       /// \brief Joint update event.
-      private: event::EventT<void ()> jointUpdate;
+      private: ignition::common::EventT<void ()> jointUpdate;
 
       /// \brief Angle used when the joint is parent of a static model.
-      private: math::Angle staticAngle;
+      private: ignition::math::Angle staticAngle;
 
       /// \brief Joint stop stiffness
       private: double stopStiffness[MAX_JOINT_AXIS];

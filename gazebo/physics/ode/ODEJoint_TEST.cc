@@ -44,7 +44,7 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), "ode");
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -53,48 +53,48 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  gzdbg << "dt : " << dt << "\n";
+  igndbg << "dt : " << dt << "\n";
 
   // verify that time moves forward
   EXPECT_GT(t, 0);
-  gzdbg << "t after one step : " << t << "\n";
+  igndbg << "t after one step : " << t << "\n";
 
   // get joint and get force torque
   physics::ModelPtr model_1 = world->GetModel("model_1");
   physics::JointPtr joint_0 = model_1->GetJoint("joint_0");
   physics::JointPtr joint_1 = model_1->GetJoint("joint_1");
 
-  gzdbg << "-------------------Test 1 (y)-------------------\n";
-  physics->SetGravity(math::Vector3(0, 10, 0));
+  igndbg << "-------------------Test 1 (y)-------------------\n";
+  physics->SetGravity(ignition::math::Vector3(0, 10, 0));
   world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0048295899143964149, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), 0.0, 1e-6);
-  gzdbg << "time [" << world->GetSimTime().Double()
+  igndbg << "time [" << world->GetSimTime().Double()
         << "] j0 [" << joint_0->GetAngle(0).Radian()
         << "] j1(0) [" << joint_1->GetAngle(0).Radian()
         << "] j1(1) [" << joint_1->GetAngle(1).Radian()
         << "]\n";
 
-  gzdbg << "-------------------Test 2 (x)-------------------\n";
-  physics->SetGravity(math::Vector3(10, 0, 0));
+  igndbg << "-------------------Test 2 (x)-------------------\n";
+  physics->SetGravity(ignition::math::Vector3(10, 0, 0));
   world->Step(100);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0050046318305403403, 1e-5);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.0048293115636619532, 1e-5);
-  gzdbg << "time [" << world->GetSimTime().Double()
+  igndbg << "time [" << world->GetSimTime().Double()
         << "] j0 [" << joint_0->GetAngle(0).Radian()
         << "] j1(0) [" << joint_1->GetAngle(0).Radian()
         << "] j1(1) [" << joint_1->GetAngle(1).Radian()
         << "]\n";
 
-  gzdbg << "-------------------Test 3 (joint limit)-------------------\n";
-  physics->SetGravity(math::Vector3(1000, 1000, 0));
+  igndbg << "-------------------Test 3 (joint limit)-------------------\n";
+  physics->SetGravity(ignition::math::Vector3(1000, 1000, 0));
   world->Step(1000);
   EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.7, 0.001);
   EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.7, 0.001);
-  gzdbg << "time [" << world->GetSimTime().Double()
+  igndbg << "time [" << world->GetSimTime().Double()
         << "] j0 [" << joint_0->GetAngle(0).Radian()
         << "] j1(0) [" << joint_1->GetAngle(0).Radian()
         << "] j1(1) [" << joint_1->GetAngle(1).Radian()

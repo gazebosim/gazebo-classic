@@ -35,7 +35,7 @@ TransmitterVisual::TransmitterVisual(const std::string &_name, VisualPtr _vis,
       &TransmitterVisual::OnNewPropagationGrid, this);
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      common::Events::ConnectPreRender(
         boost::bind(&TransmitterVisual::Update, this)));
 
   this->points = this->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
@@ -92,7 +92,7 @@ void TransmitterVisual::Update()
   for (int i = 0; i < gridMsg->particle_size(); ++i)
   {
     p = gridMsg->particle(i);
-    this->points->SetPoint(i, math::Vector3(p.x(), p.y(), 0));
+    this->points->SetPoint(i, ignition::math::Vector3(p.x(), p.y(), 0));
 
     // Crop the signal strength between 0 and 255
     double strength = std::min(std::max(0.0, -p.signal_level()), 255.0);
@@ -100,7 +100,7 @@ void TransmitterVisual::Update()
     strength = 1.0 - (strength / 255.0);
 
     // Set the color in gray scale
-    common::Color color(strength, strength, strength);
+    ignition::common::Color color(strength, strength, strength);
     this->points->SetColor(i, color);
   }
 }

@@ -21,8 +21,8 @@
 #include <string>
 #include <list>
 
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/MouseEvent.hh"
+#include "ignition/common/SingletonT.hh"
+#include "ignition/common/MouseEvent.hh"
 
 namespace gazebo
 {
@@ -30,12 +30,14 @@ namespace gazebo
   {
     /// \class MouseEventHandler MouseEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters mouse events.
-    class MouseEventHandler : public SingletonT<MouseEventHandler>
+    class MouseEventHandler :
+      public ignition::common::SingletonT<MouseEventHandler>
     {
       /// \def MouseEventFilter
       /// \brief Mouse event function pointer.
-      public: typedef boost::function<bool (const common::MouseEvent &_event)>
-              MouseEventFilter;
+      public: typedef boost::function
+              <bool (const ignition::common::MouseEvent &_event)>
+                MouseEventFilter;
 
       /// \cond
       /// \brief a class used to store mouse filters.
@@ -119,19 +121,20 @@ namespace gazebo
 
       /// \brief Process a mouse press event.
       /// \param[in] _event The mouse event.
-      public: void HandlePress(const common::MouseEvent &_event);
+      public: void HandlePress(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a mouse release event.
       /// \param[in] _event The mouse event.
-      public: void HandleRelease(const common::MouseEvent &_event);
+      public: void HandleRelease(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a mouse move event.
       /// \param[in] _event The mouse event.
-      public: void HandleMove(const common::MouseEvent &_event);
+      public: void HandleMove(const ignition::common::MouseEvent &_event);
 
       /// \brief Process a mouse double click event.
       /// \param[in] _event The mouse event.
-      public: void HandleDoubleClick(const common::MouseEvent &_event);
+      public: void HandleDoubleClick(
+                  const ignition::common::MouseEvent &_event);
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
@@ -148,7 +151,7 @@ namespace gazebo
       /// \brief Helper function to process a filters in an event list.
       /// \param[in] _event Mouse event to process.
       /// \param[in] _list List which contains the filters to process.
-      private: void Handle(const common::MouseEvent &_event,
+      private: void Handle(const ignition::common::MouseEvent &_event,
                    std::list<Filter> &_list);
 
       /// \brief List of mouse press filters.

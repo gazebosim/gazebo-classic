@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: Local Gazebo configuration
- * Author: Nate Koenig, Jordi Polo
- * Date: 3 May 2008
- */
-
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -29,15 +24,13 @@
 #include <sstream>
 
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
 
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Console.hh"
 
 using namespace gazebo;
 using namespace common;
-
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -98,25 +91,11 @@ SystemPaths::SystemPaths()
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetLogPath() const
-{
-  return this->logPath;
-}
-
-/////////////////////////////////////////////////
 const std::list<std::string> &SystemPaths::GetGazeboPaths()
 {
   if (this->gazeboPathsFromEnv)
     this->UpdateGazeboPaths();
   return this->gazeboPaths;
-}
-
-/////////////////////////////////////////////////
-const std::list<std::string> &SystemPaths::GetPluginPaths()
-{
-  if (this->pluginPathsFromEnv)
-    this->UpdatePluginPaths();
-  return this->pluginPaths;
 }
 
 /////////////////////////////////////////////////
@@ -144,7 +123,7 @@ void SystemPaths::UpdateModelPaths()
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
+    // igndbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
     //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
     //  << "...or are you using SystemPlugins?\n";
     return;
@@ -250,7 +229,7 @@ std::string SystemPaths::GetWorldPathExtension()
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFileURI(const std::string &_uri)
+std::string SystemPaths::FindFileURIHelper(const std::string &_uri)
 {
   int index = _uri.find("://");
   std::string prefix = _uri.substr(0, index);
@@ -277,97 +256,47 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     if (filename.empty())
       filename = ModelDatabase::Instance()->GetModelPath(_uri, true);
   }
-  else if (prefix.empty() || prefix == "file")
-  {
-    // First try to find the file on the current system
-    filename = this->FindFile(suffix);
-  }
-  else if (prefix != "http" && prefix != "https")
-    gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
   return filename;
 }
 
 //////////////////////////////////////////////////
-std::string SystemPaths::FindFile(const std::string &_filename,
-                                  bool _searchLocalPath)
+std::string SystemPaths::FindFileHelper(const std::string &_filename)
 {
   boost::filesystem::path path;
+  bool found = false;
 
-  if (_filename.empty())
-    return path.string();
+  std::list<std::string> paths = this->GetGazeboPaths();
 
-  if (_filename.find("://") != std::string::npos)
+  for (std::list<std::string>::const_iterator iter = paths.begin();
+      iter != paths.end() && !found; ++iter)
   {
-    path = boost::filesystem::path(this->FindFileURI(_filename));
-  }
-  else if (_filename[0] == '/')
-  {
-    path = boost::filesystem::path(_filename);
-  }
-  else
-  {
-    bool found = false;
-
-    try
-    {
-      path = boost::filesystem::operator/(boost::filesystem::current_path(),
-          _filename);
-    }
-    catch(boost::filesystem::filesystem_error &_e)
-    {
-      gzerr << "Filesystem error[" << _e.what() << "]\n";
-      return std::string();
-    }
-
-    if (_searchLocalPath && boost::filesystem::exists(path))
+    path = boost::filesystem::path((*iter));
+    path = boost::filesystem::operator/(path, _filename);
+    if (boost::filesystem::exists(path))
     {
       found = true;
+      break;
     }
-    else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
-             && boost::filesystem::exists(boost::filesystem::path(_filename)))
-    {
-      path = boost::filesystem::path(_filename);
-      found = true;
-    }
-    else
-    {
-      std::list<std::string> paths = this->GetGazeboPaths();
 
-      for (std::list<std::string>::const_iterator iter = paths.begin();
-          iter != paths.end() && !found; ++iter)
+    std::list<std::string>::iterator suffixIter;
+    for (suffixIter = this->suffixPaths.begin();
+        suffixIter != this->suffixPaths.end(); ++suffixIter)
+    {
+      path = boost::filesystem::path(*iter);
+      path = boost::filesystem::operator/(path, *suffixIter);
+      path = boost::filesystem::operator/(path, _filename);
+      if (boost::filesystem::exists(path))
       {
-        path = boost::filesystem::path((*iter));
-        path = boost::filesystem::operator/(path, _filename);
-        if (boost::filesystem::exists(path))
-        {
-          found = true;
-          break;
-        }
-
-        std::list<std::string>::iterator suffixIter;
-        for (suffixIter = this->suffixPaths.begin();
-            suffixIter != this->suffixPaths.end(); ++suffixIter)
-        {
-          path = boost::filesystem::path(*iter);
-          path = boost::filesystem::operator/(path, *suffixIter);
-          path = boost::filesystem::operator/(path, _filename);
-          if (boost::filesystem::exists(path))
-          {
-            found = true;
-            break;
-          }
-        }
+        found = true;
+        break;
       }
     }
-
-    if (!found)
-      return std::string();
   }
 
   if (!boost::filesystem::exists(path))
   {
-    gzerr << "File or path does not exist[" << path << "]\n";
+    ignerr << "File or path does not exist[" << path << "]\n";
     return std::string();
   }
 
@@ -384,12 +313,6 @@ void SystemPaths::ClearGazeboPaths()
 void SystemPaths::ClearOgrePaths()
 {
   this->ogrePaths.clear();
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::ClearPluginPaths()
-{
-  this->pluginPaths.clear();
 }
 
 /////////////////////////////////////////////////
@@ -430,21 +353,6 @@ void SystemPaths::AddOgrePaths(const std::string &_path)
 }
 
 /////////////////////////////////////////////////
-void SystemPaths::AddPluginPaths(const std::string &_path)
-{
-  std::string delim(":");
-  size_t pos1 = 0;
-  size_t pos2 = _path.find(delim);
-  while (pos2 != std::string::npos)
-  {
-    this->InsertUnique(_path.substr(pos1, pos2-pos1), this->pluginPaths);
-    pos1 = pos2+1;
-    pos2 = _path.find(delim, pos2+1);
-  }
-  this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->pluginPaths);
-}
-
-/////////////////////////////////////////////////
 void SystemPaths::AddModelPaths(const std::string &_path)
 {
   std::string delim(":");
@@ -457,28 +365,4 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::InsertUnique(const std::string &_path,
-                               std::list<std::string> &_list)
-{
-  if (std::find(_list.begin(), _list.end(), _path) == _list.end())
-    _list.push_back(_path);
-}
-
-/////////////////////////////////////////////////
-void SystemPaths::AddSearchPathSuffix(const std::string &_suffix)
-{
-  std::string s;
-
-  if (_suffix[0] != '/')
-    s = std::string("/") + _suffix;
-  else
-    s = _suffix;
-
-  if (_suffix[_suffix.size()-1] != '/')
-    s += "/";
-
-  this->suffixPaths.push_back(s);
 }

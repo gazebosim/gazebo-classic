@@ -50,25 +50,25 @@ namespace gazebo
               {
                 if (_radius < 0)
                 {
-                  gzerr << "Cylinder shape does not support negative radius\n";
+                  ignerr << "Cylinder shape does not support negative radius\n";
                   return;
                 }
                 if (_length < 0)
                 {
-                  gzerr << "Cylinder shape does not support negative length\n";
+                  ignerr << "Cylinder shape does not support negative length\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
-                  gzwarn << "Setting cylinder shape's radius to zero \n";
+                  ignwarn << "Setting cylinder shape's radius to zero \n";
                   _radius = 1e-4;
                 }
-                if (math::equal(_length, 0.0))
+                if (ignition::math::equal(_length, 0.0))
                 {
-                  gzwarn << "Setting cylinder shape's length to zero \n";
+                  ignwarn << "Setting cylinder shape's length to zero \n";
                   _length = 1e-4;
                 }
 
@@ -80,7 +80,8 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = math::Vector3(_radius, _radius, _length);
+                  this->initialSize = ignition::math::Vector3(
+                      _radius, _radius, _length);
                   bParent->SetCollisionShape(new btCylinderShapeZ(
                       btVector3(_radius, _radius, _length * 0.5)));
                 }
@@ -108,7 +109,7 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
+                    ignition::math::Pose relativePose =
                         this->collisionParent->GetRelativePose();
                     relativePose.pos -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
@@ -118,7 +119,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of cylinder.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3 initialSize;
     };
     /// \}
   }

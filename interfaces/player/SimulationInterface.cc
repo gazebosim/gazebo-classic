@@ -106,9 +106,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
-        gazebo::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
-        gazebo::math::Quaternion(req->pose.proll, req->pose.ppitch,
+    ignition::math::Pose pose(
+        ignition::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
+        ignition::math::Quaternion(req->pose.proll, req->pose.ppitch,
                                  req->pose.pyaw));
 
     gazebo::msgs::Model msg;
@@ -129,9 +129,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
-        gazebo::math::Vector3(req->pose.px, req->pose.py, 0),
-        gazebo::math::Quaternion(0, 0, req->pose.pa));
+    ignition::math::Pose pose(
+        ignition::math::Vector3(req->pose.px, req->pose.py, 0),
+        ignition::math::Quaternion(0, 0, req->pose.pa));
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
@@ -151,7 +151,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    std::map<std::string, gazebo::math::Pose>::iterator iter;
+    std::map<std::string, ignition::math::Pose>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
@@ -182,7 +182,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
-    std::map<std::string, gazebo::math::Pose>::iterator iter;
+    std::map<std::string, ignition::math::Pose>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
@@ -253,7 +253,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
       }
       else
       {
-        gzerr << "The object [" << name
+        ignerr << "The object [" << name
           << "] does not have the property [" << prop << "].\n";
       }
     }

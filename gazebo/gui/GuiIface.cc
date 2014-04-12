@@ -19,13 +19,12 @@
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+#include <ignition/common.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -108,7 +107,7 @@ bool parse_args(int _argc, char **_argv)
   if (vm.count("verbose"))
   {
     gazebo::print_version();
-    gazebo::common::Console::SetQuiet(false);
+    ignition::common::Console::SetQuiet(false);
   }
 
   /// Load all the plugins specified on the command line
@@ -179,7 +178,7 @@ bool gui::loadINI(const boost::filesystem::path &_file)
   }
   catch(...)
   {
-    gzerr << "Unable to read configuration file " << _file << "\n";
+    ignerr << "Unable to read configuration file " << _file << "\n";
     result = false;
   }
 
@@ -202,7 +201,7 @@ bool gui::load()
   }
   else
   {
-    gzerr << "HOME environment variable not found. "
+    ignerr << "HOME environment variable not found. "
       "Unable to read ~/.gazebo/gui.ini file.\n";
     result = false;
   }
@@ -240,10 +239,10 @@ unsigned int gui::get_entity_id(const std::string &_name)
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit("gzclient.log");
+  ignLogInit("gzclient.log");
 
   // Make sure the model database has started
-  gazebo::common::ModelDatabase::Instance()->Start();
+  common::ModelDatabase::Instance()->Start();
 
   if (!parse_args(_argc, _argv))
     return false;
@@ -332,7 +331,7 @@ bool gui::saveINI(const boost::filesystem::path &_file)
   }
   catch(...)
   {
-    gzerr << "Unable to save INI file[" << _file << "]\n";
+    ignerr << "Unable to save INI file[" << _file << "]\n";
     result = false;
   }
   return result;

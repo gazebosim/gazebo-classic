@@ -21,7 +21,7 @@
 #include <list>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
@@ -98,7 +98,7 @@ namespace gazebo
       /// \param[in] _dataTime Time the data was created. This time should
       /// be the timestamp when data was generated on the server.
       /// \param[in] _size Size of the message in bytes.
-      protected: void OnMsg(const common::Time &_dataTime, int _size);
+      protected: void OnMsg(const ignition::common::Time &_dataTime, int _size);
 
       /// \brief Qt close event callback.
       /// \param[in] _event The close event info.
@@ -132,10 +132,10 @@ namespace gazebo
       private: TopicCombo *topicCombo;
 
       /// \brief Previous time a message was received.
-      private: common::Time prevTime;
+      private: ignition::common::Time prevTime;
 
       /// \brief Previous display update time.
-      private: common::Time prevDisplayTime;
+      private: ignition::common::Time prevDisplayTime;
 
       /// \brief Output for the hz info.
       private: QLineEdit *hzEdit;
@@ -150,10 +150,10 @@ namespace gazebo
       private: std::list<int> msgSizes;
 
       /// \brief A list of clock times that messages have been received.
-      private: std::list<common::Time> times;
+      private: std::list<ignition::common::Time> times;
 
       /// \brief A list of clock times that messages have been generated.
-      private: std::list<common::Time> dataTimes;
+      private: std::list<ignition::common::Time> dataTimes;
 
       /// \brief A mutex to protect the update cycle.
       private: boost::mutex updateMutex;

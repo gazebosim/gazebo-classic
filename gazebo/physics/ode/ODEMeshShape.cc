@@ -19,9 +19,9 @@
  * Date: 16 Oct 2009
  */
 
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Mesh.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -127,11 +127,11 @@ void ODEMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->Get<math::Vector3>("scale").x;
+      this->sdf->Get<ignition::math::Vector3>("scale").x;
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->Get<math::Vector3>("scale").y;
+      this->sdf->Get<ignition::math::Vector3>("scale").y;
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->Get<math::Vector3>("scale").z;
+      this->sdf->Get<ignition::math::Vector3>("scale").z;
   }
 
   // Build the ODE triangle mesh

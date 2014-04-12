@@ -46,11 +46,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      public: ignition::math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(unsigned int /*_index*/) const
-              {return math::Vector3();}
+      public: virtual ignition::math::Vector3 GetAxis(
+                  unsigned int /*_index*/) const
+              {return ignition::math::Vector3();}
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -66,17 +67,19 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

@@ -42,7 +42,8 @@ namespace gazebo
       physicsMsg.set_dt(0.01);
 
       // Change gravity
-      msgs::Set(physicsMsg.mutable_gravity(), math::Vector3(0.01, 0, 0.01));
+      msgs::Set(physicsMsg.mutable_gravity(),
+          ignition::math::Vector3(0.01, 0, 0.01));
       physicsPub->Publish(physicsMsg);
     }
   };

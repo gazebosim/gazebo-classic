@@ -26,8 +26,8 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Spline.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Spline.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
@@ -78,7 +78,7 @@ namespace gazebo
                  public: std::string name;
 
                  /// \brief Point that make up the middle of the road.
-                 public: std::vector<math::Vector3> points;
+                 public: std::vector<ignition::math::Vector3> points;
 
                  /// \brief Width of the road.
                  public: double width;
@@ -105,7 +105,7 @@ namespace gazebo
       private: transport::SubscriberPtr sub;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
     };
     /// \}
   }

@@ -21,7 +21,7 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/KeyEvent.hh"
+#include "ignition/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -68,7 +68,7 @@ namespace gazebo
       /// \brief Key release callback.
       /// \param[in] _event The key event.
       /// \return True if the key press was handled.
-      private: bool OnKeyRelease(const common::KeyEvent &_event);
+      private: bool OnKeyRelease(const ignition::common::KeyEvent &_event);
 
       /// \brief Request callback.
       /// \param[in] _msg Request message to process.

@@ -80,7 +80,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   int waitCount = 0, maxWaitCount = 3000;
   while (physicsResponseMsg.ByteSize() == 0 && ++waitCount < maxWaitCount)
-    common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   ASSERT_LT(waitCount, maxWaitCount);
 

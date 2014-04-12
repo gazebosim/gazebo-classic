@@ -110,15 +110,15 @@ void TopicView::Update()
   // Update the child class.
   this->UpdateImpl();
 
-  common::Time currTime = common::Time::GetWallTime();
+  ignition::common::Time currTime = ignition::common::Time::GetWallTime();
 
-  if (currTime - this->prevDisplayTime >= common::Time(0, 500000000))
+  if (currTime - this->prevDisplayTime >= ignition::common::Time(0, 500000000))
   {
     // Update the Hz output
     {
-      common::Time avg;
-      for (std::list<common::Time>::iterator iter = this->dataTimes.begin();
-          iter != this->dataTimes.end(); ++iter)
+      ignition::common::Time avg;
+      for (std::list<ignition::common::Time>::iterator
+          iter = this->dataTimes.begin(); iter != this->dataTimes.end(); ++iter)
       {
         avg += (*iter);
       }
@@ -145,10 +145,10 @@ void TopicView::Update()
       }
 
       // Compute the bandwidth
-      common::Time dt = this->times.back() - this->times.front();
+      ignition::common::Time dt = this->times.back() - this->times.front();
       double bandwidth = 0;
 
-      if (dt != common::Time(0, 0))
+      if (dt != ignition::common::Time(0, 0))
         bandwidth = sumBytes / dt.Double();
 
       // Format the bandwidth output
@@ -169,7 +169,7 @@ void TopicView::Update()
 }
 
 /////////////////////////////////////////////////
-void TopicView::OnMsg(const common::Time &_dataTime, int _size)
+void TopicView::OnMsg(const ignition::common::Time &_dataTime, int _size)
 {
   // Calculate the Hz value.
   if (_dataTime != this->prevTime)
@@ -184,7 +184,7 @@ void TopicView::OnMsg(const common::Time &_dataTime, int _size)
 
   // Store the message size and clock time that it was received.
   this->msgSizes.push_back(_size);
-  this->times.push_back(common::Time::GetWallTime());
+  this->times.push_back(ignition::common::Time::GetWallTime());
 
   // Maintain a buffer of only 100 data points.
   if (this->msgSizes.size() > 100)

@@ -20,8 +20,8 @@
  */
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Image.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Image.hh"
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -49,7 +49,7 @@ CameraSensor::CameraSensor()
 {
   this->rendered = false;
   this->connections.push_back(
-      event::Events::ConnectRender(
+      common::Events::ConnectRender(
         boost::bind(&CameraSensor::Render, this)));
 }
 
@@ -88,7 +88,7 @@ void CameraSensor::Init()
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "Unable to create CameraSensor. Rendering is disabled.\n";
+    ignerr << "Unable to create CameraSensor. Rendering is disabled.\n";
     return;
   }
 
@@ -104,7 +104,7 @@ void CameraSensor::Init()
       // This usually means rendering is not available
       if (!this->scene)
       {
-        gzerr << "Unable to create CameraSensor.\n";
+        ignerr << "Unable to create CameraSensor.\n";
         return;
       }
     }
@@ -114,7 +114,7 @@ void CameraSensor::Init()
 
     if (!this->camera)
     {
-      gzerr << "Unable to create camera sensor[mono_camera]\n";
+      ignerr << "Unable to create camera sensor[mono_camera]\n";
       return;
     }
     this->camera->SetCaptureData(true);
@@ -126,14 +126,14 @@ void CameraSensor::Init()
     if (this->camera->GetImageWidth() == 0 ||
         this->camera->GetImageHeight() == 0)
     {
-      gzthrow("image has zero size");
+      ignthrow("image has zero size");
     }
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);
@@ -148,7 +148,7 @@ void CameraSensor::Init()
     }
   }
   else
-    gzerr << "No world name\n";
+    ignerr << "No world name\n";
 
   // Disable clouds and moon on server side until fixed and also to improve
   // performance
@@ -201,7 +201,8 @@ bool CameraSensor::UpdateImpl(bool /*_force*/)
     msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
     msg.mutable_image()->set_width(this->camera->GetImageWidth());
     msg.mutable_image()->set_height(this->camera->GetImageHeight());
-    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+    msg.mutable_image()->set_pixel_format(
+        ignition::common::Image::ConvertPixelFormat(
           this->camera->GetImageFormat()));
 
     msg.mutable_image()->set_step(this->camera->GetImageWidth() *

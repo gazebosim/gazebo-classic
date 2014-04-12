@@ -36,23 +36,23 @@ CameraPlugin::~CameraPlugin()
 void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
-    gzerr << "Invalid sensor pointer.\n";
+    ignerr << "Invalid sensor pointer.\n";
 
   this->parentSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
   if (!this->parentSensor)
   {
-    gzerr << "CameraPlugin requires a CameraSensor.\n";
+    ignerr << "CameraPlugin requires a CameraSensor.\n";
     if (boost::dynamic_pointer_cast<sensors::DepthCameraSensor>(_sensor))
-      gzmsg << "It is a depth camera sensor\n";
+      ignmsg << "It is a depth camera sensor\n";
   }
 
   this->camera = this->parentSensor->GetCamera();
 
   if (!this->parentSensor)
   {
-    gzerr << "CameraPlugin not attached to a camera sensor\n";
+    ignerr << "CameraPlugin not attached to a camera sensor\n";
     return;
   }
 

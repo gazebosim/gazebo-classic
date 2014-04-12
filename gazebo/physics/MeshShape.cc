@@ -14,16 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
-
-#include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -52,21 +42,22 @@ void MeshShape::Init()
 {
   std::string meshStr = this->sdf->Get<std::string>("uri");
 
-  common::MeshManager *meshManager = common::MeshManager::Instance();
+  ignition::common::MeshManager *meshManager =
+    ignition::common::MeshManager::Instance();
   this->mesh = meshManager->GetMesh(meshStr);
 
   if (!this->mesh)
   {
-    meshStr = common::find_file(this->sdf->Get<std::string>("uri"));
+    meshStr = ignition::common::find_file(this->sdf->Get<std::string>("uri"));
 
     if (meshStr == "__default__" || meshStr.empty())
     {
-      gzerr << "No mesh specified\n";
+      ignerr << "No mesh specified\n";
       return;
     }
 
     if ((this->mesh = meshManager->Load(meshStr)) == NULL)
-      gzerr << "Unable to load mesh from file[" << meshStr << "]\n";
+      ignerr << "Unable to load mesh from file[" << meshStr << "]\n";
   }
 
   if (this->submesh)
@@ -76,11 +67,11 @@ void MeshShape::Init()
   if (this->sdf->HasElement("submesh"))
   {
     sdf::ElementPtr submeshElem = this->sdf->GetElement("submesh");
-    this->submesh = new common::SubMesh(
+    this->submesh = new ignition::common::SubMesh(
       this->mesh->GetSubMesh(submeshElem->Get<std::string>("name")));
 
     if (!this->submesh)
-      gzthrow("Unable to get submesh with name[" +
+      ignthrow("Unable to get submesh with name[" +
           submeshElem->Get<std::string>("name") + "]");
 
     // Center the submesh if specified in SDF.
@@ -93,15 +84,15 @@ void MeshShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MeshShape::SetScale(const math::Vector3 &_scale)
+void MeshShape::SetScale(const ignition::math::Vector3 &_scale)
 {
   this->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MeshShape::GetSize() const
+ignition::math::Vector3 MeshShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("scale");
+  return this->sdf->Get<ignition::math::Vector3>("scale");
 }
 
 //////////////////////////////////////////////////

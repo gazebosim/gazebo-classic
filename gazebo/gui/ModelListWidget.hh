@@ -211,7 +211,7 @@ namespace gazebo
 
       private: msgs::Request *requestMsg;
 
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       typedef std::list<msgs::Model> ModelMsgs_L;
       private: ModelMsgs_L modelMsgs;

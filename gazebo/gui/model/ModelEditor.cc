@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -61,7 +61,7 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
   }
-  event::Events::setSelectedEntity("", "normal");
+  common::Events::setSelectedEntity("", "normal");
   this->active = !this->active;
   g_editModelAct->setChecked(this->active);
 }

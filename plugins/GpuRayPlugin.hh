@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include <ignition/common.hh>
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -41,7 +42,7 @@ namespace gazebo
 
     protected: sensors::GpuRaySensorPtr parentSensor;
 
-    private: event::ConnectionPtr newLaserFrameConnection;
+    private: ignition::common::ConnectionPtr newLaserFrameConnection;
   };
 }
 #endif

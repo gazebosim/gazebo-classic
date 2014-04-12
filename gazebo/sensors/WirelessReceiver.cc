@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -55,7 +55,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
   WirelessTransceiver::Load(_worldName);
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(this->GetTopic(), 30);
-  GZ_ASSERT(this->pub != NULL,
+  IGN_ASSERT(this->pub != NULL,
       "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
@@ -66,26 +66,26 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   if (this->minFreq <= 0)
   {
-    gzthrow("Wireless receiver min. frequency must be > 0. Current value is ["
+    ignthrow("Wireless receiver min. frequency must be > 0. Current value is ["
       << this->minFreq << "]");
   }
 
   if (this->maxFreq <= 0)
   {
-    gzthrow("Wireless receiver max. frequency must be > 0. Current value is ["
+    ignthrow("Wireless receiver max. frequency must be > 0. Current value is ["
       << this->maxFreq << "]");
   }
 
   if (this->minFreq > this->maxFreq)
   {
-    gzthrow("Wireless receiver min. frequency must be less or equal than max. "
+    ignthrow("Wireless receiver min. frequency must be less or equal than max. "
         << "frequency. Current min. frequency is [" << this->minFreq <<
         "] and max frequency is [" << this->maxFreq << "]");
   }
 
   if (this->sensitivity >= 0)
   {
-    gzthrow("Wireless receiver sensitivity must be < 0. Current value is ["
+    ignthrow("Wireless receiver sensitivity must be < 0. Current value is ["
       << this->sensitivity << "]");
   }
 }
@@ -101,7 +101,7 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   this->referencePose =
       this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  math::Pose myPos = this->referencePose;
+  ignition::math::Pose myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {

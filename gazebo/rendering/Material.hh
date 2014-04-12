@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERING_MATERIAL_HH_
-#define _RENDERING_MATERIAL_HH_
+#ifndef _GAZEBO_RENDERING_MATERIAL_HH_
+#define _GAZEBO_RENDERING_MATERIAL_HH_
 
-#include "gazebo/common/Material.hh"
+#include <ignition/common.hh>
 
 /// \cond
 namespace gazebo
@@ -33,7 +33,7 @@ namespace gazebo
 
       /// \brief Update the Ogre materials from a Gazebo material.
       /// \param[in] _mat The Gazebo material to add to the Ogre system.
-      public: static void Update(const gazebo::common::Material *_mat);
+      public: static void Update(const ignition::common::Material *_mat);
     };
   }
 }

@@ -23,7 +23,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/common/CommonTypes.hh"
+#include "ignition/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -63,11 +63,11 @@ namespace gazebo
 
       /// \brief Accessor for current longitude angle
       /// \return Current longitude angle.
-      public: math::Angle GetLongitude() const;
+      public: ignition::math::Angle GetLongitude() const;
 
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.
-      public: math::Angle GetLatitude() const;
+      public: ignition::math::Angle GetLatitude() const;
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
@@ -95,7 +95,7 @@ namespace gazebo
       private: physics::LinkPtr parentLink;
 
       /// \brief Pointer to SphericalCoordinates converter.
-      private: common::SphericalCoordinatesPtr sphericalCoordinates;
+      private: ignition::common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief Stores most recent GPS sensor data.
       private: msgs::GPS lastGpsMsg;

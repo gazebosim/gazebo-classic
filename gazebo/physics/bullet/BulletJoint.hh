@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(unsigned int _index,
-                                     const gazebo::math::Vector3 &_anchor);
+                                     const ignition::math::Vector3 &_anchor);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
@@ -77,15 +77,18 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       /// \brief Get the anchor point
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkForce(
+                  unsigned int _index) const;
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkTorque(
+                  unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, unsigned int _index,
@@ -161,7 +164,7 @@ namespace gazebo
 
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
+      private: ignition::common::Time forceAppliedTime;
     };
     /// \}
   }

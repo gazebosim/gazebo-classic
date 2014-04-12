@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "ServerFixture.hh"
@@ -41,7 +42,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    ignerr << "Aborting test for dart, see issue #909" << std::endl;
     return;
   }
 
@@ -51,7 +52,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run heights test\n";
+    ignerr << "No rendering engine, unable to run heights test\n";
     return;
   }
 
@@ -68,11 +69,12 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3(129, 129, 10));
 
-  common::Image trueImage("media/materials/textures/heightmap_bowl.png");
-  common::Image testImage = shape->GetImage();
+  ignition::common::Image trueImage(
+      "media/materials/textures/heightmap_bowl.png");
+  ignition::common::Image testImage = shape->GetImage();
 
   testImage.SavePNG("/tmp/test_shape.png");
 
@@ -102,7 +104,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    ignerr << "Aborting test for dart, see issue #909" << std::endl;
     return;
   }
 
@@ -134,7 +136,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
+    ignerr << "Aborting test for dart, see issue #909" << std::endl;
     return;
   }
 
@@ -170,7 +172,7 @@ void HeightmapTest::NotSquareImage()
   this->server = new Server();
   this->server->PreLoad();
   // EXPECT_THROW(this->server->LoadFile("worlds/not_square_heightmap.world"),
-  //            common::Exception);
+  //            ignition::common::Exception);
 
   this->server->Fini();
   delete this->server;
@@ -185,7 +187,7 @@ void HeightmapTest::InvalidSizeImage()
   this->server = new Server();
   this->server->PreLoad();
   // EXPECT_THROW(this->server->LoadFile("worlds/invalid_size_heightmap.world"),
-  //             common::Exception);
+  //             ignition::common::Exception);
 
   this->server->Fini();
   delete this->server;
@@ -200,7 +202,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run heights test\n";
+    ignerr << "No rendering engine, unable to run heights test\n";
     return;
   }
 
@@ -215,12 +217,12 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
     int i = 0;
     while (i < 20 && (heightmap = scene->GetHeightmap()) == NULL)
     {
-      common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
       i++;
     }
 
     if (i >= 20)
-      gzthrow("Unable to get heightmap");
+      ignthrow("Unable to get heightmap");
   }
 
   physics::ModelPtr model = GetModel("heightmap");
@@ -235,8 +237,8 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == math::Vector3(129, 129, 10));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3(0, 0, 0));
+  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3(129, 129, 10));
 
   std::vector<float> physicsTest;
   std::vector<float> renderTest;

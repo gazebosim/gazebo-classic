@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "gazebo/physics/PhysicsIface.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Time.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -56,10 +56,10 @@ TEST_F(SensorManager_TEST, Data)
   int i = 0;
   while (sensors.size() != sensorCount && i < 100)
   {
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     sensors.clear();
     sensors = mgr->GetSensors();
-    gzdbg << "Sensor Count. Actual[" << sensors.size() << "] Expected["
+    igndbg << "Sensor Count. Actual[" << sensors.size() << "] Expected["
           << sensorCount << "]\n";
     ++i;
   }
@@ -68,12 +68,12 @@ TEST_F(SensorManager_TEST, Data)
   EXPECT_EQ(sensors.size(), sensorCount);
 
   // Get the current simulation time
-  common::Time time = physics::get_world()->GetSimTime();
+  ignition::common::Time time = physics::get_world()->GetSimTime();
 
   // Wait for 1 second
   for (unsigned int i = 0; i < 10; ++i)
   {
-    common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
   }
 
   // Get each sensor, and make sure that it has been updated
@@ -131,7 +131,7 @@ TEST_F(SensorManager_TEST, InitRemove)
     // Wait for a sensor manager update.
     while (mgr->GetSensors().size() > sensorCount)
     {
-      gazebo::common::Time::MSleep(100);
+      ignition::common::Time::MSleep(100);
       ++i;
     }
 
@@ -148,7 +148,7 @@ TEST_F(SensorManager_TEST, InitRemove)
   // Wait for a sensor manager update.
   while (mgr->GetSensors().size() > 0 && i < 100)
   {
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
     ++i;
   }
   EXPECT_LT(i, 100);

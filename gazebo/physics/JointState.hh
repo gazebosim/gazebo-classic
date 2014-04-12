@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A joint state
- * Author: Nate Koenig
- */
-
 #ifndef _JOINTSTATE_HH_
 #define _JOINTSTATE_HH_
 
@@ -25,7 +21,7 @@
 #include <string>
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/math/Pose.hh"
 
 namespace gazebo
 {
@@ -45,8 +41,9 @@ namespace gazebo
       /// \param[in] _joint Joint to get the state of.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
-      public: JointState(JointPtr _joint, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: JointState(JointPtr _joint,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Constructor.
       /// \param[in] _joint Joint to get the state of.
@@ -65,8 +62,9 @@ namespace gazebo
       /// \param[in] _joint Joint to get the state of.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
-      public: void Load(JointPtr _joint, const common::Time &_realTime,
-                  const common::Time &_simTime);
+      public: void Load(JointPtr _joint,
+                  const ignition::common::Time &_realTime,
+                  const ignition::common::Time &_simTime);
 
       /// \brief Load state from SDF element.
       /// \param[in] _elem SDf values to load from.
@@ -79,12 +77,12 @@ namespace gazebo
       /// \brief Get the joint angle.
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
-      /// \throw common::Exception When _axis is invalid.
-      public: math::Angle GetAngle(unsigned int _axis) const;
+      /// \throw ignition::common::Exception When _axis is invalid.
+      public: ignition::math::Angle GetAngle(unsigned int _axis) const;
 
       /// \brief Get the angles.
       /// \return Vector of angles.
-      public: const std::vector<math::Angle> &GetAngles() const;
+      public: const std::vector<ignition::math::Angle> &GetAngles() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -119,7 +117,7 @@ namespace gazebo
         _out << "<joint name='" << _state.GetName() << "'>";
 
         int i = 0;
-        for (std::vector<math::Angle>::const_iterator iter =
+        for (std::vector<ignition::math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
           _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
@@ -130,7 +128,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::vector<math::Angle> angles;
+      private: std::vector<ignition::math::Angle> angles;
     };
     /// \}
   }

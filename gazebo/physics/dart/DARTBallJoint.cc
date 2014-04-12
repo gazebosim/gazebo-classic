@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
 
@@ -50,7 +50,7 @@ void DARTBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -60,9 +60,10 @@ math::Vector3 DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 DARTBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  return math::Vector3();
+  return ignition::math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -88,13 +89,13 @@ void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  return math::Angle(0);
+  return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  ignerr << "Not implemented";
 }

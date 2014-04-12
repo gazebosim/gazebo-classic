@@ -68,7 +68,7 @@ TEST_F(GripperTest, Close)
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
   {
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
@@ -119,7 +119,7 @@ TEST_F(GripperTest, CloseOpen)
   int i = 0;
   while (!gripper->IsAttached() && i < 100)
   {
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);
@@ -139,7 +139,7 @@ TEST_F(GripperTest, CloseOpen)
   i = 0;
   while (gripper->IsAttached() && i < 100)
   {
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
     ++i;
   }
   EXPECT_LT(i, 100);

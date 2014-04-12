@@ -23,9 +23,9 @@
 #include <boost/thread/mutex.hpp>
 
 #include <sdf/sdf.hh>
-#include "gazebo/common/Image.hh"
-#include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Image.hh"
+#include "ignition/common/SystemPaths.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/Light.hh"
@@ -43,8 +43,8 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Helpers.hh"
+#include "ignition/math/Angle.hh"
+#include "ignition/math/Helpers.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -136,7 +136,7 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
         boost::bind(&ModelListWidget::OnRemoveScene, this, _1)));
 
   this->connections.push_back(
-      event::Events::ConnectSetSelectedEntity(
+      common::Events::ConnectSetSelectedEntity(
         boost::bind(&ModelListWidget::OnSetSelectedEntity, this, _1, _2)));
 
   QTimer::singleShot(500, this, SLOT(Update()));
@@ -179,7 +179,7 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
     else
     {
       this->propTreeBrowser->clear();
-      event::Events::setSelectedEntity(name, "normal");
+      common::Events::setSelectedEntity(name, "normal");
     }
   }
   else
@@ -533,7 +533,7 @@ void ModelListWidget::LightPropertyChanged(QtProperty * /*_item*/)
             (*iter)).toString().toStdString());
     else if ((*iter)->propertyName().toStdString() == "pose")
     {
-      math::Pose pose;
+     ignition::math::Pose pose;
       pose.Set(this->variantManager->value(
                  this->GetChildItem((*iter), "x")).toDouble(),
                this->variantManager->value(
@@ -691,14 +691,14 @@ void ModelListWidget::ModelPropertyChanged(QtProperty *_item)
     }
     else
     {
-      gzerr << "Unable to process["
+      ignerr << "Unable to process["
             << (*iter)->propertyName().toStdString() << "]\n";
     }
   }
 
   // \todo Renable when modifying a model is fixed.
   // this->modelPub->Publish(msg);
-  gzwarn << "Model modification is currently disabled. "
+  ignwarn << "Model modification is currently disabled. "
          << "Look for this feature in Gazebo 2.0\n";
 }
 
@@ -727,7 +727,7 @@ void ModelListWidget::FillMsgField(QtProperty *_item,
     _reflection->SetUInt32(_message, _field,
         this->variantManager->value(_item).toUInt());
   else
-    gzerr << "Unable to fill message field[" << _field->type() << "]\n";
+    ignerr << "Unable to fill message field[" << _field->type() << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -853,7 +853,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     msgs::HeightmapGeom *heightmapMessage = (msgs::HeightmapGeom*)(message);
 
     msgs::Set(heightmapMessage->mutable_image(),
-        common::Image(this->variantManager->value(
+        ignition::common::Image(this->variantManager->value(
             fileProp).toString().toStdString()));
 
     px = this->variantManager->value(
@@ -900,7 +900,7 @@ void ModelListWidget::FillGeometryMsg(QtProperty *_item,
     meshMessage->mutable_scale()->set_z(pz);
   }
   else
-    gzerr << "Unknown geom type[" << type << "]\n";
+    ignerr << "Unknown geom type[" << type << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -943,7 +943,7 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       this->GetChildItem(_item, "pitch")).toDouble();
   yaw = this->variantManager->value(
       this->GetChildItem(_item, "yaw")).toDouble();
-  math::Quaternion q(roll, pitch, yaw);
+  ignition::math::Quaternion q(roll, pitch, yaw);
 
   orientReflection->SetDouble(
       orientMessage,
@@ -1035,7 +1035,7 @@ void ModelListWidget::FillMsg(QtProperty *_item,
       }
       else
       {
-        gzerr << "Unable to process["
+        ignerr << "Unable to process["
           << (*iter)->propertyName().toStdString() << "]\n";
       }
     }
@@ -1897,7 +1897,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
     return;
 
   QtVariantProperty *item;
-  math::Vector3 value;
+  ignition::math::Vector3 value;
   value = msgs::Convert(_msg);
   value.Round(6);
 
@@ -1947,11 +1947,11 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
     return;
 
   QtVariantProperty *item;
-  math::Pose value;
+  ignition::math::Pose value;
   value = msgs::Convert(_msg);
   value.Round(6);
 
-  math::Vector3 rpy = value.rot.GetAsEuler();
+  ignition::math::Vector3 rpy = value.rot.GetAsEuler();
   rpy.Round(6);
 
   this->FillVector3dProperty(_msg.position(), _parent);
@@ -2364,7 +2364,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Light &_msg,
   if (_msg.has_pose())
     this->FillPoseProperty(_msg.pose(), topItem);
   else
-    this->FillPoseProperty(msgs::Convert(math::Pose()), topItem);
+    this->FillPoseProperty(msgs::Convert(ignition::math::Pose()), topItem);
 
   // Create and set the diffuse color property
   item = this->variantManager->addProperty(QVariant::Color, tr("diffuse"));

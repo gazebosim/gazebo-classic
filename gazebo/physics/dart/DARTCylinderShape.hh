@@ -18,7 +18,7 @@
 #ifndef _GAZEBO_DARTCYLINDERSHAPE_HH_
 #define _GAZEBO_DARTCYLINDERSHAPE_HH_
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/physics/CylinderShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -43,29 +43,29 @@ namespace gazebo
       {
         if (_radius < 0)
         {
-          gzerr << "Cylinder shape does not support negative radius\n";
+          ignerr << "Cylinder shape does not support negative radius\n";
           return;
         }
 
         if (_length < 0)
         {
-          gzerr << "Cylinder shape does not support negative length\n";
+          ignerr << "Cylinder shape does not support negative length\n";
           return;
         }
 
-        if (math::equal(_radius, 0.0))
+        if (ignition::math::equal(_radius, 0.0))
         {
           // Warn user, but still create shape with very small value
           // otherwise later resize operations using setLocalScaling
           // will not be possible
-          gzwarn << "Setting cylinder shape's radius to zero not supported "
+          ignwarn << "Setting cylinder shape's radius to zero not supported "
                  << "in DART, using 1e-4.\n";
           _radius = 1e-4;
         }
 
-        if (math::equal(_length, 0.0))
+        if (ignition::math::equal(_length, 0.0))
         {
-          gzwarn << "Setting cylinder shape's length to zero not supported "
+          ignwarn << "Setting cylinder shape's length to zero not supported "
                  << "in DART, using 1e-4.\n";
           _length = 1e-4;
         }

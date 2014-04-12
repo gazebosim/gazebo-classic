@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef __GAZEBO_SPRING_TEST_PLUGIN_HH__
-#define __GAZEBO_SPRING_TEST_PLUGIN_HH__
+#ifndef _GAZEBO_SPRING_TEST_PLUGIN_HH_
+#define _GAZEBO_SPRING_TEST_PLUGIN_HH_
 
 #include <string>
 
+#include "ignition/common.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/gazebo.hh"
@@ -33,11 +34,11 @@ namespace gazebo
 
     private: void ExplicitUpdate();
 
-    private: event::ConnectionPtr updateConnection;
+    private: ignition::common::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
 
-    private: common::Time prevUpdateTime;
+    private: ignition::common::Time prevUpdateTime;
 
     private: physics::JointPtr jointExplicit;
     private: std::string jointExplicitName;

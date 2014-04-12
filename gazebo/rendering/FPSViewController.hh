@@ -50,7 +50,8 @@ namespace gazebo
       public: static std::string GetTypeString();
 
       // Documentation inherited from parent
-      public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
+      public: virtual void HandleMouseEvent(
+                  const ignition::common::MouseEvent &_event);
 
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);

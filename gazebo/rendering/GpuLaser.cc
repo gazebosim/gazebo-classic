@@ -25,14 +25,14 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/common/Timer.hh"
-#include "gazebo/math/Pose.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
+#include "ignition/common/Mesh.hh"
+#include "ignition/common/MeshManager.hh"
+#include "ignition/common/Timer.hh"
+#include "ignition/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -187,10 +187,11 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
   {
     unsigned int texIndex = texCount++;
     Ogre::Technique *technique = this->matSecondPass->getTechnique(0);
-    GZ_ASSERT(technique, "GpuLaser material script error: technique not found");
+    IGN_ASSERT(technique,
+        "GpuLaser material script error: technique not found");
 
     Ogre::Pass *pass = technique->getPass(0);
-    GZ_ASSERT(pass, "GpuLaser material script error: pass not found");
+    IGN_ASSERT(pass, "GpuLaser material script error: pass not found");
 
     if (!pass->getTextureUnitState(this->firstPassTextures[i]->getName()))
     {
@@ -210,7 +211,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
-//  common::Timer postRenderT, blitT;
+//  ignition::common::Timer postRenderT, blitT;
 //  postRenderT.Start();
 //  double blitDur = 0.0;
 //  double postRenderDur = 0.0;
@@ -406,7 +407,7 @@ void GpuLaser::notifyRenderSingleObject(Ogre::Renderable *_rend,
 //////////////////////////////////////////////////
 void GpuLaser::RenderImpl()
 {
-  common::Timer firstPassTimer, secondPassTimer;
+  ignition::common::Timer firstPassTimer, secondPassTimer;
 
   firstPassTimer.Start();
 
@@ -577,13 +578,13 @@ void GpuLaser::CreateMesh()
 {
   std::string meshName = this->GetName() + "_undistortion_mesh";
 
-  common::Mesh *mesh = new common::Mesh();
+  ignition::common::Mesh *mesh = new ignition::common::Mesh();
   mesh->SetName(meshName);
 
-  common::SubMesh *submesh = new common::SubMesh();
+  ignition::common::SubMesh *submesh = new ignition::common::SubMesh();
 
   double dx, dy;
-  submesh->SetPrimitiveType(common::SubMesh::POINTS);
+  submesh->SetPrimitiveType(ignition::common::SubMesh::POINTS);
 
   double viewHeight = this->GetImageHeight()/10.0;
 
@@ -642,12 +643,14 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = ignition::math::equal(phi, 0.0) ?
+          -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = ignition::math::equal(theta, 0.0) ?
+          -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
       submesh->AddTexCoord(u, v);
     }
@@ -661,7 +664,7 @@ void GpuLaser::CreateMesh()
 
   this->undistMesh = mesh;
 
-  common::MeshManager::Instance()->AddMesh(this->undistMesh);
+  ignition::common::MeshManager::Instance()->AddMesh(this->undistMesh);
 }
 
 /////////////////////////////////////////////////
@@ -688,14 +691,14 @@ void GpuLaser::CreateCanvas()
   this->object->setVisibilityFlags(GZ_VISIBILITY_ALL
       & ~GZ_VISIBILITY_SELECTABLE);
 
-  math::Pose pose;
-  pose.pos = math::Vector3(0.01, 0, 0);
-  pose.rot.SetFromEuler(math::Vector3(0, 0, 0));
+  ignition::math::Pose pose;
+  pose.pos = ignition::math::Vector3(0.01, 0, 0);
+  pose.rot.SetFromEuler(ignition::math::Vector3(0, 0, 0));
 
   this->visual->SetPose(pose);
 
   this->visual->SetMaterial("Gazebo/Green");
-  this->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->visual->SetAmbient(ignition::common::Color(0, 1, 0, 1));
   this->visual->SetVisible(true);
   this->scene->AddVisual(this->visual);
 }

@@ -270,8 +270,8 @@ void TimePanel::Update()
 
   std::ostringstream percent;
 
-  common::Time simAvg, realAvg;
-  std::list<common::Time>::iterator simIter, realIter;
+  ignition::common::Time simAvg, realAvg;
+  std::list<ignition::common::Time>::iterator simIter, realIter;
 
   simIter = ++(this->simTimes.begin());
   realIter = ++(this->realTimes.begin());

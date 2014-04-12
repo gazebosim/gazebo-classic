@@ -38,15 +38,15 @@ void ServerFixtureTest::LoadPaused(const std::string &_physicsType)
   Load("worlds/empty.world", true, _physicsType);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gzdbg << "Check IsPaused with no delay\n";
+  igndbg << "Check IsPaused with no delay\n";
   EXPECT_TRUE(world->IsPaused());
 
-  common::Time::MSleep(100);
-  gzdbg << "Check IsPaused with 100 ms delay\n";
+  ignition::common::Time::MSleep(100);
+  igndbg << "Check IsPaused with 100 ms delay\n";
   EXPECT_TRUE(world->IsPaused());
 
-  common::Time::MSleep(900);
-  gzdbg << "Check IsPaused with 1000 ms delay\n";
+  ignition::common::Time::MSleep(900);
+  igndbg << "Check IsPaused with 1000 ms delay\n";
   EXPECT_TRUE(world->IsPaused());
 }
 
@@ -91,7 +91,7 @@ void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
   EXPECT_TRUE(world->IsPaused());
 
   std::stringstream sdfStr;
-  math::Pose pose(1, 2, 3, 0, 0, 0);
+  ignition::math::Pose pose(1, 2, 3, 0, 0, 0);
   sdfStr << "<sdf version='" << SDF_VERSION << "'>"
          << "<model name='box'>"
          << "  <pose>" << pose << "</pose>"

@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
@@ -37,5 +37,5 @@ DARTHeightmapShape::~DARTHeightmapShape()
 //////////////////////////////////////////////////
 void DARTHeightmapShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  ignwarn << "Not implemented!\n";
 }

@@ -34,8 +34,8 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
-#include "gazebo/math/Vector2i.hh"
+#include "ignition/common/Color.hh"
+#include "ignition/math/Vector2i.hh"
 
 namespace SkyX
 {
@@ -123,19 +123,19 @@ namespace gazebo
 
       /// \brief Set the ambient color.
       /// \param[in] _color The ambient color to use.
-      public: void SetAmbientColor(const common::Color &_color);
+      public: void SetAmbientColor(const ignition::common::Color &_color);
 
       /// \brief Get the ambient color.
       /// \return The scene's ambient color.
-      public: common::Color GetAmbientColor() const;
+      public: ignition::common::Color GetAmbientColor() const;
 
       /// \brief Set the background color.
       /// \param[in] _color The background color.
-      public: void SetBackgroundColor(const common::Color &_color);
+      public: void SetBackgroundColor(const ignition::common::Color &_color);
 
       /// \brief Get the background color.
       /// \return The background color.
-      public: common::Color GetBackgroundColor() const;
+      public: ignition::common::Color GetBackgroundColor() const;
 
       /// \brief Create a square grid of cells.
       /// \param[in] _cellCount Number of grid cells in one direction.
@@ -143,7 +143,7 @@ namespace gazebo
       /// \param[in] _lineWidth Width of the grid lines.
       /// \param[in] _color Color of the grid lines.
       public: void CreateGrid(uint32_t _cellCount, float _cellLength,
-                              float _lineWidth, const common::Color &_color);
+                  float _lineWidth, const ignition::common::Color &_color);
 
       /// \brief Get a grid based on an index. Index must be between 0 and
       /// Scene::GetGridCount.
@@ -253,7 +253,7 @@ namespace gazebo
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
       public: VisualPtr GetVisualAt(CameraPtr _camera,
-                                    const math::Vector2i &_mousePos,
+                                    const ignition::math::Vector2i &_mousePos,
                                     std::string &_mod);
 
       /// \brief Move the visual to be ontop of the nearest visual below it.
@@ -266,7 +266,7 @@ namespace gazebo
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
       /// \return Pointer to the visual, NULL if none found.
       public: VisualPtr GetVisualAt(CameraPtr _camera,
-                                    const math::Vector2i &_mousePos);
+                                    const ignition::math::Vector2i &_mousePos);
 
       /// \brief Get a model's visual at a mouse position.
       /// \param[in] _camera Pointer to the camera used to project the mouse
@@ -274,7 +274,7 @@ namespace gazebo
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
       /// \return Pointer to the visual, NULL if none found.
       public: VisualPtr GetModelVisualAt(CameraPtr _camera,
-                                         const math::Vector2i &_mousePos);
+                  const ignition::math::Vector2i &_mousePos);
 
 
       /// \brief Get the closest visual below a given visual.
@@ -286,7 +286,7 @@ namespace gazebo
       /// \param[in] _pt 3D point to get the visual below.
       /// \param[out] _visuals The visuals below the point order in
       /// proximity.
-      public: void GetVisualsBelowPoint(const math::Vector3 &_pt,
+      public: void GetVisualsBelowPoint(const ignition::math::Vector3 &_pt,
                                         std::vector<VisualPtr> &_visuals);
 
 
@@ -294,7 +294,7 @@ namespace gazebo
       /// \param[in] _pt Position to search below for a visual.
       /// \return The Z-value of the nearest visual below the point. Zero
       /// is returned if no visual is found.
-      public: double GetHeightBelowPoint(const math::Vector3 &_pt);
+      public: double GetHeightBelowPoint(const ignition::math::Vector3 &_pt);
 
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
@@ -302,8 +302,8 @@ namespace gazebo
       /// \param[out] _position 3D position of the first contact point.
       /// \return True if a valid object was hit by the raycast.
       public: bool GetFirstContact(CameraPtr _camera,
-                                   const math::Vector2i &_mousePos,
-                                   math::Vector3 &_position);
+                                   const ignition::math::Vector2i &_mousePos,
+                                   ignition::math::Vector3 &_position);
 
       /// \brief Print the scene graph to std_out.
       public: void PrintSceneGraph();
@@ -318,8 +318,8 @@ namespace gazebo
       /// \param[in] _start Start position of the line.
       /// \param[in] _end End position of the line.
       /// \param[in] _name Name of the line.
-      public: void DrawLine(const math::Vector3 &_start,
-                            const math::Vector3 &_end,
+      public: void DrawLine(const ignition::math::Vector3 &_start,
+                            const ignition::math::Vector3 &_end,
                             const std::string &_name);
 
       /// \brief Set the fog parameters.
@@ -330,7 +330,7 @@ namespace gazebo
       /// \param[in] _end Distance from camera at which the fog is at max
       /// density.
       public: void SetFog(const std::string &_type,
-                           const common::Color &_color,
+                           const ignition::common::Color &_color,
                            double _density, double _start, double _end);
 
       /// \brief Get the scene ID.
@@ -376,10 +376,6 @@ namespace gazebo
 
       /// \brief Clear rendering::Scene
       public: void Clear();
-
-      /// \brief Deprecated.
-      public: VisualPtr CloneVisual(const std::string &_visualName,
-                  const std::string &_newName) GAZEBO_DEPRECATED(2.0);
 
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if
@@ -433,7 +429,7 @@ namespace gazebo
       /// there is a lag between the time new poses are sent out by World
       /// and when they are received and applied by the Scene.
       /// \return The current simulation time in Scene
-      public: common::Time GetSimTime() const;
+      public: ignition::common::Time GetSimTime() const;
 
       /// \brief Get the number of visuals.
       /// \return The number of visuals in the Scene.
@@ -455,8 +451,8 @@ namespace gazebo
       /// which are GUI objects use to manipulate objects.
       /// \return Pointer to the Ogre::Entity, NULL if none.
       private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera,
-                                             const math::Vector2i &_mousePos,
-                                             bool _ignorSelectionObj);
+                   const ignition::math::Vector2i &_mousePos,
+                   bool _ignorSelectionObj);
 
       /// \brief Get the mesh information for the given mesh.
       /// \param[in] _mesh Mesh to get info about.
@@ -745,7 +741,7 @@ namespace gazebo
       private: transport::PublisherPtr requestPub;
 
       /// \brief Event connections
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief The top level in our tree of visuals
       private: VisualPtr worldVisual;
@@ -798,11 +794,11 @@ namespace gazebo
 
       /// \brief SimTime of this Scene, as we receive PosesStamped from
       /// the world, we update this time accordingly.
-      private: common::Time sceneSimTimePosesReceived;
+      private: ignition::common::Time sceneSimTimePosesReceived;
 
       /// \brief SimTime of this Scene, after applying PosesStamped to
       /// scene, we update this time accordingly.
-      private: common::Time sceneSimTimePosesApplied;
+      private: ignition::common::Time sceneSimTimePosesApplied;
 
       /// \brief Keeps track of the visual ID for contact visualization.
       private: uint32_t contactVisId;

@@ -53,11 +53,11 @@ namespace gazebo
 
       /// \brief Get the current joint torque.
       /// \return The latested measured torque.
-      public: math::Vector3 GetTorque() const;
+      public: ignition::math::Vector3 GetTorque() const;
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
-      public: math::Vector3 GetForce() const;
+      public: ignition::math::Vector3 GetForce() const;
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
@@ -70,12 +70,12 @@ namespace gazebo
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
       public: template<typename T>
-              event::ConnectionPtr ConnectUpdate(T _subscriber)
+              ignition::common::ConnectionPtr ConnectUpdate(T _subscriber)
               {return update.Connect(_subscriber);}
 
       /// \brief Disconnect from the update signal.
       /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
+      public: void DisconnectUpdate(ignition::common::ConnectionPtr &_conn)
               {update.Disconnect(_conn);}
 
       // Documentation inherited.
@@ -85,7 +85,7 @@ namespace gazebo
       protected: virtual void Fini();
 
       /// \brief Update event.
-      protected: event::EventT<void(msgs::WrenchStamped)> update;
+      protected: ignition::common::EventT<void(msgs::WrenchStamped)> update;
 
       /// \brief Parent joint, from which we get force torque info.
       private: physics::JointPtr parentJoint;

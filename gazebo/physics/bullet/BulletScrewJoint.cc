@@ -14,14 +14,9 @@
  * limitations under the License.
  *
  */
-/* Desc: A bullet screw or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
-
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -35,7 +30,7 @@ using namespace physics;
 BulletScrewJoint::BulletScrewJoint(btDynamicsWorld *_world, BasePtr _parent)
     : ScrewJoint<BulletJoint>(_parent), bulletScrew(NULL)
 {
-  GZ_ASSERT(_world, "bullet world pointer is NULL");
+  IGN_ASSERT(_world, "bullet world pointer is NULL");
   this->bulletWorld = _world;
 }
 
@@ -56,7 +51,7 @@ void BulletScrewJoint::Init()
 {
   ScrewJoint<BulletJoint>::Init();
 
-  gzwarn << "Screw joint constraints are currently not enforced" << "\n";
+  ignwarn << "Screw joint constraints are currently not enforced" << "\n";
 
   BulletLinkPtr bulletChildLink =
     boost::static_pointer_cast<BulletLink>(this->childLink);
@@ -68,8 +63,8 @@ void BulletScrewJoint::Init()
   frame1 = btTransform::getIdentity();
   frame2 = btTransform::getIdentity();
 
-  math::Vector3 pivotA, pivotB;
-  math::Pose pose;
+  ignition::math::Vector3 pivotA, pivotB;
+  ignition::math::Pose pose;
 
   pivotA = this->anchorPos;
   pivotB = this->anchorPos;
@@ -125,13 +120,13 @@ void BulletScrewJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    ignthrow("joint without links\n");
   }
 
   this->constraint = this->bulletScrew;
 
   // Add the joint to the world
-  GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
+  IGN_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
   this->bulletWorld->addConstraint(this->constraint);
 
   // Allows access to impulse
@@ -159,34 +154,34 @@ void BulletScrewJoint::SetVelocity(unsigned int /*_index*/, double _angle)
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented in bullet\n";
+  ignerr << "Not implemented in bullet\n";
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetThreadPitch(unsigned int /*_index*/,
     double /*_threadPitch*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 double BulletScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "Not implemented\n";
+  ignerr << "Not implemented\n";
   return 0;
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetForceImpl(unsigned int /*_index*/, double /*_force*/)
 {
-  gzlog << "Not implemented\n";
+  ignlog << "Not implemented\n";
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetHighStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+    const ignition::math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setUpperLinLimit(_angle.Radian());
@@ -194,25 +189,25 @@ void BulletScrewJoint::SetHighStop(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetLowStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+    const ignition::math::Angle &_angle)
 {
   if (this->bulletScrew)
     this->bulletScrew->setLowerLinLimit(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetHighStop(unsigned int /*_index*/)
+ignition::math::Angle BulletScrewJoint::GetHighStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletScrew)
     result = this->bulletScrew->getUpperLinLimit();
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetLowStop(unsigned int /*_index*/)
+ignition::math::Angle BulletScrewJoint::GetLowStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletScrew)
     result = this->bulletScrew->getLowerLinLimit();
   return result;
@@ -235,9 +230,10 @@ double BulletScrewJoint::GetMaxForce(unsigned int /*index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3 BulletScrewJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3 result;
   if (this->bulletScrew)
   {
     // I have not verified the following math, though I based it on internal
@@ -248,14 +244,15 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
     result = BulletTypes::ConvertVector3(vec);
   }
   else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+    ignwarn << "bulletHinge does not exist, returning fake axis\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletScrewJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletScrew)
     result = this->bulletScrew->getLinearPos();
   return result;

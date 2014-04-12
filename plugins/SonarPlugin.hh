@@ -47,7 +47,7 @@ namespace gazebo
     protected: sensors::SonarSensorPtr parentSensor;
 
     /// \brief The connection tied to SonarSensor's update event
-    private: event::ConnectionPtr connection;
+    private: ignition::common::ConnectionPtr connection;
   };
 }
 #endif

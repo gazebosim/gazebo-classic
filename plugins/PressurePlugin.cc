@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Pressure sensor plugin
- * Author: Steve Peters
- */
 #include <gazebo/physics/Base.hh>
 #include "PressurePlugin.hh"
 
@@ -44,7 +40,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
   // Make sure the parent sensor is valid.
   if (!this->parentSensor)
   {
-    gzerr << "PressurePlugin requires a ContactSensor.\n";
+    ignerr << "PressurePlugin requires a ContactSensor.\n";
     return;
   }
 
@@ -91,7 +87,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
               boost::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
-              math::Vector3 size = box->GetSize();
+              ignition::math::Vector3 size = box->GetSize();
               std::vector<double> sizeVector;
               sizeVector.push_back(size.x);
               sizeVector.push_back(size.y);
@@ -164,7 +160,7 @@ void PressurePlugin::OnUpdate()
   int nc = contacts.contact_size();
   if (nc > 0)
   {
-    common::Time currentContactTime;
+    ignition::common::Time currentContactTime;
     currentContactTime = msgs::Convert(contacts.contact(nc-1).time());
     msgs::Set(tactileMsg.mutable_time(), currentContactTime);
 

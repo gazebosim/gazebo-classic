@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 
 namespace gazebo
 {
@@ -58,7 +58,7 @@ namespace gazebo
       protected: MainWindow *mainWindow;
 
       /// \brief List of Event based connections.
-      protected: std::vector<event::ConnectionPtr> connections;
+      protected: std::vector<ignition::common::ConnectionPtr> connections;
     };
   }
 }

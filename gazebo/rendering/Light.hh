@@ -29,8 +29,8 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/Color.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/Color.hh"
 
 namespace Ogre
 {
@@ -89,11 +89,11 @@ namespace gazebo
 
       /// \brief Set the position of the light
       /// \param[in] _p New position for the light
-      public: void SetPosition(const math::Vector3 &_p);
+      public: void SetPosition(const ignition::math::Vector3 &_p);
 
       /// \brief Get the position of the light
       /// \return The position of the light
-      public: math::Vector3 GetPosition() const;
+      public: ignition::math::Vector3 GetPosition() const;
 
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
@@ -117,28 +117,28 @@ namespace gazebo
 
       /// \brief Set the diffuse color
       /// \param[in] _color Light diffuse color.
-      public: void SetDiffuseColor(const common::Color &_color);
+      public: void SetDiffuseColor(const ignition::common::Color &_color);
 
       /// \brief Get the diffuse color
       /// \return The light's diffuse color.
-      public: common::Color GetDiffuseColor() const;
+      public: ignition::common::Color GetDiffuseColor() const;
 
       /// \brief Set the specular color
       /// \param[in] _color The specular color
-      public: void SetSpecularColor(const common::Color &_color);
+      public: void SetSpecularColor(const ignition::common::Color &_color);
 
       /// \brief Get the specular color
       /// \return  The specular color
-      public: common::Color GetSpecularColor() const;
+      public: ignition::common::Color GetSpecularColor() const;
 
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
       /// directional lights.
-      public: void SetDirection(const math::Vector3 &_dir);
+      public: void SetDirection(const ignition::math::Vector3 &_dir);
 
       /// \brief Get the direction
       /// \return The light's direction.
-      public: math::Vector3 GetDirection() const;
+      public: ignition::math::Vector3 GetDirection() const;
 
       /// \brief Set the attenuation
       /// \param[in] _contant Constant attenuation
@@ -201,7 +201,7 @@ namespace gazebo
       private: sdf::ElementPtr sdf;
 
       /// \brief Event connection to toggle visualization on/off.
-      private: event::ConnectionPtr showLightsConnection;
+      private: ignition::common::ConnectionPtr showLightsConnection;
 
       /// \brief Counter used to generate unique light names.
       private: static unsigned int lightCounter;

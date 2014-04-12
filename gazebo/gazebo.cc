@@ -17,11 +17,14 @@
 #include <vector>
 #include <boost/thread/mutex.hpp>
 #include <sdf/sdf.hh>
+#include <ignition/common.hh>
+#include <ignition/math.hh>
 
 #include "gazebo/transport/transport.hh"
-#include "gazebo/common/common.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/math/gzmath.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo.hh"
 
@@ -44,28 +47,28 @@ void gazebo::add_plugin(const std::string &_filename)
 
   if (plugin)
   {
-    if (plugin->GetType() != SYSTEM_PLUGIN)
-    {
-      gzerr << "System is attempting to load "
-        << "a plugin, but detected an incorrect plugin type. "
-        << "Plugin filename[" << _filename << "].\n";
-      return;
-    }
     g_plugins.push_back(plugin);
+  }
+  else
+  {
+    ignerr << "System is attempting to load "
+      << "a plugin, but detected an incorrect plugin type. "
+      << "Plugin filename[" << _filename << "].\n";
   }
 }
 
 /////////////////////////////////////////////////
 bool gazebo::load(int _argc, char **_argv)
 {
-  gazebo::common::load();
+  ignition::common::load(ignition::common::SystemPathsPtr(
+      gazebo::common::SystemPaths::Instance()));
 
   // The SDF find file callback.
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+  // sdf::setFindCallback(boost::bind(&ignition::common::find_file, _1));
 
   // Initialize the informational logger. This will log warnings, and
   // errors.
-  gzLogInit("default.log");
+  ignLogInit("default.log");
 
   // Load all the plugins
   for (std::vector<gazebo::SystemPluginPtr>::iterator iter =

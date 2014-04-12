@@ -23,7 +23,7 @@
 #define _SCREWJOINT_HH_
 
 #include "gazebo/physics/Joint.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 
 namespace gazebo
 {
@@ -64,7 +64,7 @@ namespace gazebo
                    else
                    {
                      this->threadPitch = 1.0;
-                     gzwarn << "<thread_pitch> element not specified. "
+                     ignwarn << "<thread_pitch> element not specified. "
                             << "Using default value of "
                             << this->threadPitch
                             << ". \n";
@@ -73,7 +73,8 @@ namespace gazebo
                    if (_sdf->HasElement("axis"))
                    {
                      sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
+                     this->SetAxis(0,
+                         axisElem->Get<ignition::math::Vector3>("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
                        sdf::ElementPtr limitElem =
@@ -93,12 +94,13 @@ namespace gazebo
       /// \param[in] _index Index of the axis. Not Used.
       /// \param[in] _anchor Anchor value for the joint.
       public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
+                  const ignition::math::Vector3 &_anchor);
 
       /// \brief Get the anchor.
       /// \param[in] _index Index of the axis. Not Used.
       /// \return Anchor for the joint.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetAnchor(
+                  unsigned int _index) const;
 
       /// \brief Set screw joint thread pitch.
       ///
@@ -116,7 +118,7 @@ namespace gazebo
       public: virtual double GetThreadPitch(unsigned int _index) = 0;
 
       /// \brief The anchor value is not used internally.
-      protected: math::Vector3 fakeAnchor;
+      protected: ignition::math::Vector3 fakeAnchor;
 
       /// \brief Pitch of the thread.
       protected: double threadPitch;
@@ -125,11 +127,12 @@ namespace gazebo
 
     template<class T>
     void ScrewJoint<T>::SetAnchor(unsigned int /*_index*/,
-                                  const math::Vector3 &_anchor)
+                                  const ignition::math::Vector3 &_anchor)
     {this->fakeAnchor = _anchor;}
 
     template<class T>
-    math::Vector3 ScrewJoint<T>::GetAnchor(unsigned int /*_index*/) const
+    ignition::math::Vector3 ScrewJoint<T>::GetAnchor(
+        unsigned int /*_index*/) const
     {return this->fakeAnchor;}
   }
 }

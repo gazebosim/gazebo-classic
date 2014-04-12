@@ -135,7 +135,7 @@ TEST(ManTest, gzfactory)
 }
 
 /////////////////////////////////////////////////
-TEST(ManTest, gzlog)
+TEST(ManTest, ignlog)
 {
   toolTest(::testing::UnitTest::GetInstance()->current_test_info()->name());
 }

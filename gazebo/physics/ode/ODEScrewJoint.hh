@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _ODESCREWJOINT_HH_
 #define _ODESCREWJOINT_HH_
 
@@ -44,11 +39,12 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3 &_axis);
 
       // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -58,7 +54,8 @@ namespace gazebo
       public: virtual double GetThreadPitch(unsigned int _index);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index) const;

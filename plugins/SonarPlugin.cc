@@ -43,7 +43,7 @@ void SonarPlugin::Load(sensors::SensorPtr _parent, sdf::ElementPtr /*_sdf*/)
     boost::dynamic_pointer_cast<sensors::SonarSensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("SonarPlugin requires a sonar sensor as its parent.");
+    ignthrow("SonarPlugin requires a sonar sensor as its parent.");
 
   this->connection =
     this->parentSensor->ConnectUpdate(

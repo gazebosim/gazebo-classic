@@ -18,7 +18,7 @@
  * Author: Nate Koenig
  */
 
-#include "gazebo/common/MeshManager.hh"
+#include "ignition/common/MeshManager.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -46,19 +46,20 @@ ContactVisual::ContactVisual(const std::string &_name, VisualPtr _vis,
   this->contactsSub = this->node->Subscribe(this->topicName,
       &ContactVisual::OnContact, this);
 
-  common::MeshManager::Instance()->CreateSphere("contact_sphere", 0.02, 10, 10);
+  ignition::common::MeshManager::Instance()->CreateSphere(
+      "contact_sphere", 0.02, 10, 10);
 
   // Add the mesh into OGRE
   if (!this->sceneNode->getCreator()->hasEntity("contact_sphere") &&
-      common::MeshManager::Instance()->HasMesh("contact_sphere"))
+      ignition::common::MeshManager::Instance()->HasMesh("contact_sphere"))
   {
-    const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh("contact_sphere");
+    const ignition::common::Mesh *mesh =
+      ignition::common::MeshManager::Instance()->GetMesh("contact_sphere");
     this->InsertMesh(mesh);
   }
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      common::Events::ConnectPreRender(
         boost::bind(&ContactVisual::Update, this)));
 }
 
@@ -88,13 +89,13 @@ void ContactVisual::Update()
   {
     for (int j = 0; j < this->contactsMsg->contact(i).position_size(); j++)
     {
-      math::Vector3 pos = msgs::Convert(
+     ignition::math::Vector3 pos = msgs::Convert(
           this->contactsMsg->contact(i).position(j));
-      math::Vector3 normal = msgs::Convert(
+     ignition::math::Vector3 normal = msgs::Convert(
           this->contactsMsg->contact(i).normal(j));
       double depth = this->contactsMsg->contact(i).depth(j);
 
-      math::Vector3 force = msgs::Convert(
+     ignition::math::Vector3 force = msgs::Convert(
           this->contactsMsg->contact(i).wrench(j).body_1_wrench().force());
 
       // Scaling factor for the normal line.
@@ -178,11 +179,11 @@ void ContactVisual::CreateNewPoint()
   cp->normal = new DynamicLines(RENDERING_LINE_LIST);
   cp->depth = new DynamicLines(RENDERING_LINE_LIST);
 
-  cp->normal->AddPoint(math::Vector3(0, 0, 0));
-  cp->normal->AddPoint(math::Vector3(0, 0, 0.1));
+  cp->normal->AddPoint(ignition::math::Vector3(0, 0, 0));
+  cp->normal->AddPoint(ignition::math::Vector3(0, 0, 0.1));
 
-  cp->depth->AddPoint(math::Vector3(0, 0, 0));
-  cp->depth->AddPoint(math::Vector3(0, 0, -1));
+  cp->depth->AddPoint(ignition::math::Vector3(0, 0, 0));
+  cp->depth->AddPoint(ignition::math::Vector3(0, 0, -1));
 
   obj->setVisibilityFlags(GZ_VISIBILITY_GUI);
   cp->depth->setVisibilityFlags(GZ_VISIBILITY_GUI);

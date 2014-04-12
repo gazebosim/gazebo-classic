@@ -16,7 +16,7 @@
 */
 
 #include <float.h>
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 
 using namespace gazebo;
@@ -44,13 +44,13 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
   SurfaceParams::Load(_sdf);
 
   if (!_sdf)
-    gzerr << "Surface _sdf is NULL" << std::endl;
+    ignerr << "Surface _sdf is NULL" << std::endl;
   else
   {
     {
       sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
       if (!bounceElem)
-        gzerr << "Surface bounce sdf member is NULL" << std::endl;
+        ignerr << "Surface bounce sdf member is NULL" << std::endl;
       else
       {
         this->bounce = bounceElem->Get<double>("restitution_coefficient");
@@ -61,12 +61,12 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
       if (!frictionElem)
-        gzerr << "Surface friction sdf member is NULL" << std::endl;
+        ignerr << "Surface friction sdf member is NULL" << std::endl;
       else
       {
         sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
         if (!frictionOdeElem)
-          gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+          ignerr << "Surface friction ode sdf member is NULL" << std::endl;
         else
         {
           this->mu1 = frictionOdeElem->Get<double>("mu");
@@ -79,7 +79,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
 
           this->slip1 = frictionOdeElem->Get<double>("slip1");
           this->slip2 = frictionOdeElem->Get<double>("slip2");
-          this->fdir1 = frictionOdeElem->Get<math::Vector3>("fdir1");
+          this->fdir1 = frictionOdeElem->Get<ignition::math::Vector3>("fdir1");
         }
       }
     }
@@ -87,12 +87,12 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr contactElem = _sdf->GetElement("contact");
       if (!contactElem)
-        gzerr << "Surface contact sdf member is NULL" << std::endl;
+        ignerr << "Surface contact sdf member is NULL" << std::endl;
       else
       {
         sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
         if (!contactOdeElem)
-          gzerr << "Surface contact ode sdf member is NULL" << std::endl;
+          ignerr << "Surface contact ode sdf member is NULL" << std::endl;
         {
           this->kp = contactOdeElem->Get<double>("kp");
           this->kd = contactOdeElem->Get<double>("kd");

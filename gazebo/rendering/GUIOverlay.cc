@@ -15,14 +15,15 @@
  *
 */
 
-#include "gazebo/rendering/GUIOverlay.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common.hh"
+#include "ignition/math.hh"
 
+#include "gazebo/rendering/GUIOverlay.hh"
 #include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Events.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -40,7 +41,7 @@ GUIOverlay::GUIOverlay()
   this->guiRenderer = NULL;
 
   this->connections.push_back(
-      event::Events::ConnectPreRender(
+      gazebo::common::Events::ConnectPreRender(
         boost::bind(&GUIOverlay::PreRender, this)));
 #endif
   this->rttImageSetCount = 0;
@@ -64,7 +65,7 @@ void GUIOverlay::Init(Ogre::RenderTarget *_renderTarget)
 
   CEGUI::System::getSingletonPtr();
 
-  std::string logPath = common::SystemPaths::Instance()->GetLogPath();
+  std::string logPath = gazebo::common::SystemPaths::Instance()->GetLogPath();
   logPath += "/cegui.log";
 
   this->guiRenderer = &CEGUI::OgreRenderer::create(*_renderTarget);
@@ -136,8 +137,8 @@ void GUIOverlay::Update()
 void GUIOverlay::CreateWindow(const std::string &_type,
                                const std::string &_name,
                                const std::string &_parent,
-                               const math::Vector2d &_position,
-                               const math::Vector2d &_size,
+                               const ignition::math::Vector2d &_position,
+                               const ignition::math::Vector2d &_size,
                                const std::string &_text)
 {
   CEGUI::Window *parent =
@@ -158,8 +159,8 @@ void GUIOverlay::CreateWindow(const std::string &_type,
 void GUIOverlay::CreateWindow(const std::string &/*_type*/,
                                const std::string &/*_name*/,
                                const std::string &/*_parent*/,
-                               const math::Vector2d &/*_position*/,
-                               const math::Vector2d &/*_size*/,
+                               const ignition::math::Vector2d &/*_position*/,
+                               const ignition::math::Vector2d &/*_size*/,
                                const std::string &/*_text*/)
 {
 }
@@ -203,7 +204,7 @@ bool GUIOverlay::HandleKeyReleaseEvent(const std::string &/*_key*/)
 
 /////////////////////////////////////////////////
 #ifdef HAVE_CEGUI
-bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
+bool GUIOverlay::HandleMouseEvent(const ignition::common::MouseEvent &_evt)
 {
   bool result = false;
   bool press, release, pos, scroll;
@@ -215,27 +216,27 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
   pos = system->injectMousePosition(_evt.pos.x, _evt.pos.y);
 
-  if (_evt.type == common::MouseEvent::PRESS)
+  if (_evt.type == ignition::common::MouseEvent::PRESS)
   {
-    if (_evt.button == common::MouseEvent::LEFT)
+    if (_evt.button == ignition::common::MouseEvent::LEFT)
       press = system->injectMouseButtonDown(CEGUI::LeftButton);
-    if (_evt.button == common::MouseEvent::RIGHT)
+    if (_evt.button == ignition::common::MouseEvent::RIGHT)
       press = system->injectMouseButtonDown(CEGUI::RightButton);
-    if (_evt.button == common::MouseEvent::MIDDLE)
+    if (_evt.button == ignition::common::MouseEvent::MIDDLE)
       press = system->injectMouseButtonDown(CEGUI::MiddleButton);
   }
 
-  if (_evt.type == common::MouseEvent::RELEASE)
+  if (_evt.type == ignition::common::MouseEvent::RELEASE)
   {
-    if (_evt.button == common::MouseEvent::LEFT)
+    if (_evt.button == ignition::common::MouseEvent::LEFT)
       release = system->injectMouseButtonUp(CEGUI::LeftButton);
-    if (_evt.button == common::MouseEvent::RIGHT)
+    if (_evt.button == ignition::common::MouseEvent::RIGHT)
       release = system->injectMouseButtonUp(CEGUI::RightButton);
-    if (_evt.button == common::MouseEvent::MIDDLE)
+    if (_evt.button == ignition::common::MouseEvent::MIDDLE)
       release = system->injectMouseButtonUp(CEGUI::MiddleButton);
   }
 
-  if (_evt.type == common::MouseEvent::SCROLL)
+  if (_evt.type == ignition::common::MouseEvent::SCROLL)
     scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y);
 
   result = pos || release || press || scroll;
@@ -243,7 +244,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   return result;
 }
 #else
-bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &/*_evt*/)
+bool GUIOverlay::HandleMouseEvent(const ignition::common::MouseEvent &/*_evt*/)
 {
   return false;
 }
@@ -287,7 +288,7 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl(const std::string &_filename)
   CEGUI::WindowManager *windowManager = CEGUI::WindowManager::getSingletonPtr();
   if (!windowManager)
   {
-    gzerr << "Attempting to create a GUI overlay window before load\n";
+    ignerr << "Attempting to create a GUI overlay window before load\n";
     return window;
   }
 
@@ -301,7 +302,7 @@ CEGUI::Window *GUIOverlay::LoadLayoutImpl(const std::string &_filename)
   }
   else
   {
-    gzerr << "Attempting to create a GUI overlay window before load\n";
+    ignerr << "Attempting to create a GUI overlay window before load\n";
   }
 
   return window;
@@ -352,20 +353,20 @@ bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
 
   if (!windowManager)
   {
-    gzerr << "CEGUI system not initialized\n";
+    ignerr << "CEGUI system not initialized\n";
     return false;
   }
 
   window = windowManager->getWindow(_windowName);
   if (!window)
   {
-    gzerr << "Unable to find window[" << _windowName << "]\n";
+    ignerr << "Unable to find window[" << _windowName << "]\n";
     return false;
   }
 
   if (!_camera->GetRenderTexture())
   {
-    gzerr << "Camera does not have a render texture\n";
+    ignerr << "Camera does not have a render texture\n";
     return false;
   }
 

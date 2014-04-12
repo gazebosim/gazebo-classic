@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/World.hh"
@@ -31,16 +31,18 @@ LinkState::LinkState()
 }
 
 /////////////////////////////////////////////////
-LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
-                  const common::Time &_simTime)
+LinkState::LinkState(const LinkPtr _link,
+    const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
   : State(_link->GetName(), _realTime, _simTime)
 {
   this->pose = _link->GetWorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->velocity = ignition::math::Pose(_link->GetWorldLinearVel(),
+      ignition::math::Quaternion(_link->GetWorldAngularVel()));
+  this->acceleration = ignition::math::Pose(_link->GetWorldLinearAccel(),
+      ignition::math::Quaternion(_link->GetWorldAngularAccel()));
+  this->wrench = ignition::math::Pose(_link->GetWorldForce(),
+      ignition::math::Quaternion());
 }
 
 /////////////////////////////////////////////////
@@ -49,11 +51,12 @@ LinkState::LinkState(const LinkPtr _link)
           _link->GetWorld()->GetSimTime())
 {
   this->pose = _link->GetWorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->velocity = ignition::math::Pose(_link->GetWorldLinearVel(),
+      ignition::math::Quaternion(_link->GetWorldAngularVel()));
+  this->acceleration = ignition::math::Pose(_link->GetWorldLinearAccel(),
+      ignition::math::Quaternion(_link->GetWorldAngularAccel()));
+  this->wrench = ignition::math::Pose(_link->GetWorldForce(),
+      ignition::math::Quaternion());
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.
@@ -80,11 +83,12 @@ LinkState::~LinkState()
 }
 
 /////////////////////////////////////////////////
-void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
-    const common::Time &_simTime)
+void LinkState::Load(const LinkPtr _link,
+    const ignition::common::Time &_realTime,
+    const ignition::common::Time &_simTime)
 {
   this->name = _link->GetName();
-  this->wallTime = common::Time::GetWallTime();
+  this->wallTime = ignition::common::Time::GetWallTime();
   this->realTime = _realTime;
   this->simTime = _simTime;
 
@@ -93,7 +97,7 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
                      _link->GetWorldAngularVel());
   this->acceleration.Set(_link->GetWorldLinearAccel(),
                          _link->GetWorldAngularAccel());
-  this->wrench.Set(_link->GetWorldForce(), math::Quaternion());
+  this->wrench.Set(_link->GetWorldForce(), ignition::math::Quaternion());
 }
 
 /////////////////////////////////////////////////
@@ -104,49 +108,49 @@ void LinkState::Load(const sdf::ElementPtr _elem)
 
   // Set the link name
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link velocity
   if (_elem->HasElement("velocity"))
-    this->velocity = _elem->Get<math::Pose>("velocity");
+    this->velocity = _elem->Get<ignition::math::Pose>("velocity");
   else
     this->velocity.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link acceleration
   if (_elem->HasElement("acceleration"))
-    this->acceleration = _elem->Get<math::Pose>("acceleration");
+    this->acceleration = _elem->Get<ignition::math::Pose>("acceleration");
   else
     this->acceleration.Set(0, 0, 0, 0, 0, 0);
 
   // Set the link wrench
   if (_elem->HasElement("wrench"))
-    this->wrench = _elem->Get<math::Pose>("wrench");
+    this->wrench = _elem->Get<ignition::math::Pose>("wrench");
   else
     this->wrench.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetPose() const
+const ignition::math::Pose &LinkState::GetPose() const
 {
   return this->pose;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetVelocity() const
+const ignition::math::Pose &LinkState::GetVelocity() const
 {
   return this->velocity;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetAcceleration() const
+const ignition::math::Pose &LinkState::GetAcceleration() const
 {
   return this->acceleration;
 }
 
 /////////////////////////////////////////////////
-const math::Pose &LinkState::GetWrench() const
+const ignition::math::Pose &LinkState::GetWrench() const
 {
   return this->wrench;
 }
@@ -163,7 +167,7 @@ CollisionState LinkState::GetCollisionState(unsigned int _index) const
   if (_index < this->collisionStates.size())
     return this->collisionStates[_index];
 
-  gzthrow("Index is out of range");
+  ignthrow("Index is out of range");
   return CollisionState();
 }
 
@@ -179,7 +183,7 @@ CollisionState LinkState::GetCollisionState(
       return *iter;
   }
 
-  gzthrow("Invalid collision name[" + _collisionName + "]");
+  ignthrow("Invalid collision name[" + _collisionName + "]");
   return CollisionState();
 }
 
@@ -201,9 +205,9 @@ bool LinkState::IsZero() const
   //   result = result && (*iter).IsZero();
   // }
 
-  // return result && this->pose == math::Pose::Zero;
+  // return result && this->pose ==ignition::math::Pose::Zero;
 
-  return this->pose == math::Pose::Zero;
+  return this->pose ==ignition::math::Pose::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -316,7 +320,7 @@ void LinkState::FillSDF(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void LinkState::SetWallTime(const common::Time &_time)
+void LinkState::SetWallTime(const ignition::common::Time &_time)
 {
   State::SetWallTime(_time);
 
@@ -329,7 +333,7 @@ void LinkState::SetWallTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void LinkState::SetRealTime(const common::Time &_time)
+void LinkState::SetRealTime(const ignition::common::Time &_time)
 {
   State::SetRealTime(_time);
 
@@ -342,7 +346,7 @@ void LinkState::SetRealTime(const common::Time &_time)
 }
 
 /////////////////////////////////////////////////
-void LinkState::SetSimTime(const common::Time &_time)
+void LinkState::SetSimTime(const ignition::common::Time &_time)
 {
   State::SetSimTime(_time);
 

@@ -34,12 +34,13 @@ TEST_F(WorldTest, ClearEmptyWorld)
 
   // Wait some bit of time since World::Clear is not immediate.
   for (unsigned int i = 0; i < 20; ++i)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3(0, 0, 1),
+      ignition::math::Vector3(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
@@ -54,11 +55,12 @@ TEST_F(WorldTest, Clear)
 
   world->Clear();
   while (world->GetModelCount() > 0u)
-    common::Time::MSleep(1000);
+    ignition::common::Time::MSleep(1000);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3(0, 0, 1),
+      ignition::math::Vector3(0, 0, 0));
 
   EXPECT_EQ(world->GetModelCount(), 1u);
 }

@@ -16,7 +16,7 @@
 */
 
 #include <sstream>
-#include "gazebo/math/Rand.hh"
+#include "ignition/math/Rand.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -60,13 +60,13 @@ void WirelessTransceiver::Load(const std::string &_worldName)
   this->parentEntity = boost::dynamic_pointer_cast<physics::Link>(
     this->world->GetEntity(this->parentName));
 
-  GZ_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
+  IGN_ASSERT(this->parentEntity.lock() != NULL, "parentEntity is NULL");
 
   this->referencePose = this->pose + this->parentEntity.lock()->GetWorldPose();
 
   if (!this->sdf->HasElement("transceiver"))
   {
-    gzthrow("Transceiver sensor is missing <transceiver> SDF element");
+    ignthrow("Transceiver sensor is missing <transceiver> SDF element");
   }
 
   sdf::ElementPtr transceiverElem = this->sdf->GetElement("transceiver");
@@ -75,13 +75,13 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   if (this->gain < 0)
   {
-    gzthrow("Wireless transceiver gain must be > 0. Current value is [" <<
+    ignthrow("Wireless transceiver gain must be > 0. Current value is [" <<
         this->gain << "]");
   }
 
   if (this->power < 0)
   {
-    gzthrow("Wireless transceiver power must be > 0. Current value is [" <<
+    ignthrow("Wireless transceiver power must be > 0. Current value is [" <<
         this->power << "]");
   }
 }

@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
 
 #include "gazebo/sensors/GaussianNoiseModel.hh"
 #include "gazebo/sensors/Noise.hh"
@@ -28,8 +28,8 @@ using namespace sensors;
 NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     const std::string &_sensorType)
 {
-  GZ_ASSERT(_sdf != NULL, "noise sdf is NULL");
-  GZ_ASSERT(_sdf->GetName() == "noise", "Not a noise SDF element");
+  IGN_ASSERT(_sdf != NULL, "noise sdf is NULL");
+  IGN_ASSERT(_sdf->GetName() == "noise", "Not a noise SDF element");
 
   std::string typeString = _sdf->Get<std::string>("type");
 
@@ -45,19 +45,19 @@ NoisePtr NoiseFactory::NewNoiseModel(sdf::ElementPtr _sdf,
     else
       noise.reset(new GaussianNoiseModel());
 
-    GZ_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
+    IGN_ASSERT(noise->GetNoiseType() == Noise::GAUSSIAN ||
         noise->GetNoiseType() == Noise::GAUSSIAN_QUANTIZED,
         "Noise type should be 'gaussian' or 'gaussian_quantized'");
   }
   else if (typeString == "none" || typeString == "custom")
   {
     noise.reset(new Noise());
-    GZ_ASSERT(noise->GetNoiseType() == Noise::NONE,
+    IGN_ASSERT(noise->GetNoiseType() == Noise::NONE,
         "Noise type should be 'none'");
   }
   else
   {
-    gzerr << "Unrecognized noise type" << std::endl;
+    ignerr << "Unrecognized noise type" << std::endl;
     return NoisePtr();
   }
   noise->Load(_sdf);
@@ -81,7 +81,7 @@ Noise::~Noise()
 void Noise::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
-  GZ_ASSERT(this->sdf != NULL, "this->sdf is NULL");
+  IGN_ASSERT(this->sdf != NULL, "this->sdf is NULL");
   std::string typeString = this->sdf->Get<std::string>("type");
   if (typeString == "none")
     this->type = NONE;
@@ -93,7 +93,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
     this->type = CUSTOM;
   else
   {
-    gzerr << "Unrecognized noise type: [" << typeString << "]"
+    ignerr << "Unrecognized noise type: [" << typeString << "]"
           << ", using default [none]" << std::endl;
     this->type = NONE;
   }
@@ -102,7 +102,7 @@ void Noise::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Noise::SetCamera(rendering::CameraPtr /*_camera*/)
 {
-  gzerr << "Ignoring SetCamera: Not attached to an image sensor" << std::endl;
+  ignerr << "Ignoring SetCamera: Not attached to an image sensor" << std::endl;
 }
 
 //////////////////////////////////////////////////
@@ -116,7 +116,7 @@ double Noise::Apply(double _in)
       return this->customNoiseCallback(_in);
     else
     {
-      gzerr << "Custom noise callback function not set!"
+      ignerr << "Custom noise callback function not set!"
           << " Please call SetCustomNoiseCallback within a sensor plugin."
           << std::endl;
       return _in;

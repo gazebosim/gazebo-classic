@@ -16,6 +16,7 @@
 */
 
 #include <unistd.h>
+#include <ignition/common.hh>
 #include "gazebo/common/ModelDatabase.hh"
 #include "ServerFixture.hh"
 
@@ -25,9 +26,9 @@ int g_onModels = 0;
 int g_onModels1 = 0;
 int g_onModels2 = 0;
 
-event::ConnectionPtr g_Connection;
-event::ConnectionPtr g_Connection1;
-event::ConnectionPtr g_Connection2;
+ignition::common::ConnectionPtr g_Connection;
+ignition::common::ConnectionPtr g_Connection1;
+ignition::common::ConnectionPtr g_Connection2;
 
 class ModelDatabaseTest : public ServerFixture
 {
@@ -65,7 +66,7 @@ TEST_F(ModelDatabaseTest, GetModels)
         boost::bind(&OnModels1, _1));
 
   while (g_onModels == 0 || g_onModels1 == 0)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 1);
@@ -87,7 +88,7 @@ TEST_F(ModelDatabaseTest, GetModelsTwice)
         boost::bind(&OnModels1, _1));
 
   while (g_onModels == 0 || g_onModels1 == 0)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 1);
@@ -95,7 +96,7 @@ TEST_F(ModelDatabaseTest, GetModelsTwice)
   common::ModelDatabase::Instance()->GetModels(boost::bind(&OnModels, _1));
 
   while (g_onModels1 == 1)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 2);
@@ -122,7 +123,7 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
 
   while (g_onModels == 0 || g_onModels1 == 0 || g_onModels2 == 0)
   {
-    common::Time::MSleep(1000);
+    ignition::common::Time::MSleep(1000);
   }
 
   EXPECT_EQ(g_onModels, 1);
@@ -133,7 +134,7 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
       boost::bind(&OnModels, _1));
 
   while (g_onModels1 == 1 || g_onModels2 == 1)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 2);
@@ -146,7 +147,7 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
       boost::bind(&OnModels, _1));
 
   while (g_onModels2 == 2)
-    common::Time::MSleep(500);
+    ignition::common::Time::MSleep(500);
 
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 2);

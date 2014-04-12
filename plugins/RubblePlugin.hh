@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/gazebo.hh>
 
 namespace gazebo
@@ -38,29 +39,32 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
-    private: void MakeBox(const std::string &_name, math::Pose &_pose,
-                          math::Vector3 &_size, double _mass);
+    private: void MakeBox(const std::string &_name,
+                 ignition::math::Pose &_pose,
+                 ignition::math::Vector3 &_size, double _mass);
 
-    private: void MakeCinderBlock(const std::string &_name, math::Pose &_pose,
-                                  math::Vector3 &_size, double _mass);
+    private: void MakeCinderBlock(const std::string &_name,
+                 ignition::math::Pose &_pose,
+                 ignition::math::Vector3 &_size, double _mass);
 
-    private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                               math::Vector3 &_size, double _mass);
+    private: void MakeCylinder(const std::string &_name,
+                 ignition::math::Vector3 &_pos,
+                 ignition::math::Vector3 &_size, double _mass);
 
     private: class Obj
              {
-               public: math::Pose pose;
-               public: math::Vector3 size;
+               public: ignition::math::Pose pose;
+               public: ignition::math::Vector3 size;
                public: int type;
              };
 
     private: class CompoundObj
              {
                // center position
-               public: math::Vector3 pos;
+               public: ignition::math::Vector3 pos;
 
                // Total size
-               public: math::Vector3 size;
+               public: ignition::math::Vector3 size;
                public: std::vector<Obj> objects;
              };
 

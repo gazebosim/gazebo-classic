@@ -36,7 +36,7 @@ TEST_F(PhysicsTest, State)
     world->SetPaused(true);
     EXPECT_TRUE(world != NULL);
 
-    world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+    world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3(0, 0, 0));
 
     physics::WorldState worldState = world->GetState();
     physics::ModelState modelState = worldState.GetModelState(0);
@@ -48,8 +48,8 @@ TEST_F(PhysicsTest, State)
 
       std::ostringstream newModelStr;
 
-      math::Pose pose(0, 0, 3, 0, 0, 0);
-      math::Vector3 size(1.0, 0.1, 0.1);
+      ignition::math::Pose pose(0, 0, 3, 0, 0, 0);
+      ignition::math::Vector3 size(1.0, 0.1, 0.1);
       newModelStr
         << "<gazebo version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
@@ -551,7 +551,7 @@ TEST_F(PhysicsTest, State)
     while (!model)
     {
       model = world->GetModel("model_1");
-      gzdbg << "waiting for model_1 to spawn\n";
+      igndbg << "waiting for model_1 to spawn\n";
       sleep(1);
     }
     world->SetPaused(false);
@@ -610,8 +610,8 @@ TEST_F(PhysicsTest, State)
     start_wall_time = world->GetRealTime().Double();
     test_duration = 5;
     pub_rate = 1.0;
-    gzdbg << " -------------------------------------------------------------\n";
-    gzdbg << " Publishing Joint::SetAngle at ["
+    igndbg << " ------------------------------------------------------------\n";
+    igndbg << " Publishing Joint::SetAngle at ["
       << pub_rate << "] Hz in real time, to all joint, should diverge.\n";
     last_update_time = start_wall_time;
     while (world->GetRealTime().Double() < start_wall_time + test_duration)
@@ -627,37 +627,27 @@ TEST_F(PhysicsTest, State)
       }
     test_duration = world->GetSimTime().Double() - start_time;
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-    gzdbg << "  elapsed sim time [" << test_duration
+    igndbg << "  elapsed sim time [" << test_duration
       << "] elapsed wall time [" << elapsed_wall_time
       << "] sim performance [" << test_duration / elapsed_wall_time
       << "]\n";
 
-
-
-
-
-
-
-
-
     world->EnablePhysicsEngine(true);
-
 
     /* set all link velocities to 0
        std::vector<physics::LinkPtr> links = model->GetAllLinks();
        for (unsigned i = 0; i < links.size(); ++i)
        {
-       links[i]->SetLinearVel(math::Vector3(0, 0, 0));
-       links[i]->SetAngularVel(math::Vector3(0, 0, 0));
+       links[i]->SetLinearVel(ignition::math::Vector3(0, 0, 0));
+       links[i]->SetAngularVel(ignition::math::Vector3(0, 0, 0));
        } */
-
 
     start_time = world->GetSimTime().Double();
     start_wall_time = world->GetRealTime().Double();
     test_duration = 20;
     pub_rate = 0.5;
-    gzdbg << " -------------------------------------------------------------\n";
-    gzdbg << " Publishing Joint::SetAngle at ["
+    igndbg << " ------------------------------------------------------------\n";
+    igndbg << " Publishing Joint::SetAngle at ["
       << pub_rate << "] Hz to non-loop joints, should have no violation.\n";
     last_update_time = start_time;
     while (world->GetSimTime().Double() < start_time + test_duration)
@@ -673,7 +663,7 @@ TEST_F(PhysicsTest, State)
         // joint_2a2->SetAngle(0, a);
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-    gzdbg << "  elapsed sim time [" << test_duration
+    igndbg << "  elapsed sim time [" << test_duration
       << "] elapsed wall time [" << elapsed_wall_time
       << "] sim performance [" << test_duration / elapsed_wall_time
       << "]\n";

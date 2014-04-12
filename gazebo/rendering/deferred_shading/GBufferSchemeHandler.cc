@@ -16,7 +16,7 @@
 */
 #include <OgreTechnique.h>
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/rendering/deferred_shading/GBufferSchemeHandler.hh"
 
 using namespace gazebo;
@@ -193,7 +193,7 @@ MaterialGenerator::Perm GBufferSchemeHandler::GetPermutation(
       }
     default:
       {
-        gzthrow("Can not generate G-Buffer materials for '>3 regular-texture'\
+        ignthrow("Can not generate G-Buffer materials for '>3 regular-texture'\
             objects");
       }
   }

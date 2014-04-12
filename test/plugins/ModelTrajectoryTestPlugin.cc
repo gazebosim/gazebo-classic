@@ -41,7 +41,7 @@ void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
       this->model->GetName() + "/pose_trajectory",
       &ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg, this);
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->updateConnection = gazebo::common::Events::ConnectWorldUpdateBegin(
           boost::bind(&ModelTrajectoryTestPlugin::OnUpdate, this));
 }
 
@@ -59,13 +59,13 @@ void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(
 /////////////////////////////////////////////////
 void ModelTrajectoryTestPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
+  ignition::common::Time currTime = this->model->GetWorld()->GetSimTime();
+  ignition::common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
   {
     // ignore everything else, get position and force only
-    math::Pose pose;
+    ignition::math::Pose pose;
     this->model->SetWorldPose(pose);
   }
 }

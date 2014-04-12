@@ -18,7 +18,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/math/gzmath.hh>
+#include <ignition/math.hh>
 
 #include <iostream>
 
@@ -47,10 +47,10 @@ int main(int _argc, char **_argv)
   while (true)
   {
     // Throttle Publication
-    gazebo::common::Time::MSleep(100);
+    ignition::common::Time::MSleep(100);
 
     // Generate a pose
-    gazebo::math::Pose pose(1, 2, 3, 4, 5, 6);
+    ignition::math::Pose pose(1, 2, 3, 4, 5, 6);
 
     // Convert to a pose message
     gazebo::msgs::Pose msg;

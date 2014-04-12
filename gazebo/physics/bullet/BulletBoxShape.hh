@@ -44,30 +44,30 @@ namespace gazebo
       public: virtual ~BulletBoxShape() {}
 
       /// \brief Set the size of the box
-      public: void SetSize(const math::Vector3 &_size)
+      public: void SetSize(const ignition::math::Vector3 &_size)
               {
                 if (_size.x < 0 || _size.y < 0 || _size.z < 0)
                 {
-                  gzerr << "Box shape does not support negative size\n";
+                  ignerr << "Box shape does not support negative size\n";
                   return;
                 }
-                math::Vector3 size = _size;
-                if (math::equal(size.x, 0.0))
+                ignition::math::Vector3 size = _size;
+                if (ignition::math::equal(size.x, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
-                  gzwarn << "Setting box shape's x to zero \n";
+                  ignwarn << "Setting box shape's x to zero \n";
                   size.x = 1e-4;
                 }
-                if (math::equal(size.y, 0.0))
+                if (ignition::math::equal(size.y, 0.0))
                 {
-                  gzwarn << "Setting box shape's y to zero \n";
+                  ignwarn << "Setting box shape's y to zero \n";
                   size.y = 1e-4;
                 }
-                if (math::equal(size.z, 0.0))
+                if (ignition::math::equal(size.z, 0.0))
                 {
-                  gzwarn << "Setting box shape's z to zero \n";
+                  ignwarn << "Setting box shape's z to zero \n";
                   size.z = 1e-4;
                 }
 
@@ -108,7 +108,7 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
+                    ignition::math::Pose relativePose =
                         this->collisionParent->GetRelativePose();
                     relativePose.pos -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
@@ -118,7 +118,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of box.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3 initialSize;
     };
     /// \}
   }

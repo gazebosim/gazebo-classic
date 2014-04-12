@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/gazebo_config.h"
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
 
@@ -50,7 +50,8 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3 DARTUniversalJoint::GetAnchor(
+    unsigned int /*index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -60,7 +61,8 @@ math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 DARTUniversalJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -83,7 +85,7 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   // TODO: Issue #494
@@ -94,7 +96,7 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetAxis(unsigned int _index,
-    const math::Vector3 &_axis)
+    const ignition::math::Vector3 &_axis)
 {
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
 
@@ -122,14 +124,15 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTUniversalJoint::GetAngleImpl(
+    unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (_index == 0)
   {
@@ -143,7 +146,7 @@ math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
   }
 
   return result;
@@ -159,7 +162,7 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
   else if (_index == 1)
     result = this->dtJoint->getGenCoord(1)->get_dq();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -172,7 +175,7 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_dq(_vel);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -183,7 +186,7 @@ void DARTUniversalJoint::SetMaxForce(unsigned int _index, double _force)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_tauMax(_force);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -196,7 +199,7 @@ double DARTUniversalJoint::GetMaxForce(unsigned int _index)
   else if (_index == 1)
     result = this->dtJoint->getGenCoord(1)->get_tauMax();
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
@@ -209,5 +212,5 @@ void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
   else if (_index == 1)
     this->dtJoint->getGenCoord(1)->set_tau(_effort);
   else
-    gzerr << "Invalid index[" << _index << "]\n";
+    ignerr << "Invalid index[" << _index << "]\n";
 }

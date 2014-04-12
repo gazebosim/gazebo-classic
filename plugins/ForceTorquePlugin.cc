@@ -42,7 +42,7 @@ void ForceTorquePlugin::Load(sensors::SensorPtr _parent,
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
 
   if (!this->parentSensor)
-    gzthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
+    ignthrow("ForceTorquePlugin requires a force_torque sensor as its parent.");
 
   this->connection = this->parentSensor->ConnectUpdate(
         boost::bind(&ForceTorquePlugin::OnUpdate, this, _1));

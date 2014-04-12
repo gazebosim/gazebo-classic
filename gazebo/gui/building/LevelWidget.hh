@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 
 namespace gazebo
 {
@@ -65,7 +65,7 @@ namespace gazebo
       private: QComboBox *levelComboBox;
 
       /// \brief A list of gui editor events connected to this widget
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Counter for the total number of levels.
       private: int levelCounter;

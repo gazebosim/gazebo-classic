@@ -19,7 +19,7 @@
  * Date: 14 Oct 2009
  */
 
-#include "gazebo/common/Assert.hh"
+#include "ignition/common/Assert.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -49,7 +49,7 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
 ODERayShape::ODERayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
-  GZ_ASSERT(_parent, "Parent collision shape is NULL");
+  IGN_ASSERT(_parent, "Parent collision shape is NULL");
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
@@ -58,7 +58,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
   this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 
-  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
+  IGN_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
 
   // Create default ray with unit length
@@ -76,7 +76,7 @@ ODERayShape::~ODERayShape()
 //////////////////////////////////////////////////
 void ODERayShape::Update()
 {
-  math::Vector3 dir;
+  ignition::math::Vector3 dir;
 
   if (this->collisionParent)
   {
@@ -95,7 +95,7 @@ void ODERayShape::Update()
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
         this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
@@ -130,10 +130,10 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void ODERayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
+void ODERayShape::SetPoints(const ignition::math::Vector3 &_posStart,
+                            const ignition::math::Vector3 &_posEnd)
 {
-  math::Vector3 dir;
+  ignition::math::Vector3 dir;
   RayShape::SetPoints(_posStart, _posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;

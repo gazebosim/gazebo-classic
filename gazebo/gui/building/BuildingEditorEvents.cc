@@ -20,18 +20,21 @@
 using namespace gazebo;
 using namespace gui;
 
-event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
-event::EventT<void (std::string, std::string)>
+ignition::common::EventT<void (std::string)>
+editor::Events::createBuildingEditorItem;
+ignition::common::EventT<void (std::string, std::string)>
     editor::Events::saveBuildingModel;
-event::EventT<void ()> editor::Events::finishBuildingModel;
-event::EventT<void ()> editor::Events::discardBuildingModel;
-event::EventT<void (int)> editor::Events::changeBuildingLevel;
-event::EventT<void ()> editor::Events::addBuildingLevel;
-event::EventT<void (int)> editor::Events::deleteBuildingLevel;
-event::EventT<void (int, std::string)> editor::Events::changeBuildingLevelName;
-event::EventT<void (double)> editor::Events::changeBuildingEditorZoom;
+ignition::common::EventT<void ()> editor::Events::finishBuildingModel;
+ignition::common::EventT<void ()> editor::Events::discardBuildingModel;
+ignition::common::EventT<void (int)> editor::Events::changeBuildingLevel;
+ignition::common::EventT<void ()> editor::Events::addBuildingLevel;
+ignition::common::EventT<void (int)> editor::Events::deleteBuildingLevel;
+ignition::common::EventT<void (int, std::string)>
+editor::Events::changeBuildingLevelName;
+ignition::common::EventT<void (double)>
+editor::Events::changeBuildingEditorZoom;
 
-event::EventT<void ()> editor::Events::saveBuildingEditor;
-event::EventT<void ()> editor::Events::discardBuildingEditor;
-event::EventT<void ()> editor::Events::doneBuildingEditor;
-event::EventT<void ()> editor::Events::exitBuildingEditor;
+ignition::common::EventT<void ()> editor::Events::saveBuildingEditor;
+ignition::common::EventT<void ()> editor::Events::discardBuildingEditor;
+ignition::common::EventT<void ()> editor::Events::doneBuildingEditor;
+ignition::common::EventT<void ()> editor::Events::exitBuildingEditor;

@@ -120,7 +120,7 @@ namespace gazebo
 
       /// \brief simulating damping with CFM and meddling with Joint limits
       /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
-      public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
+      public: void CFMDamping() IGN_DEPRECATED(3.0);
 
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
@@ -193,23 +193,26 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(
+                  unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkForce(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3 GetLinkTorque(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
@@ -217,7 +220,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3 &_axis);
 
       // Documentation inherited.
       public: virtual void SetAttribute(const std::string &_key,
@@ -281,7 +284,7 @@ namespace gazebo
 
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
-      private: common::Time forceAppliedTime;
+      private: ignition::common::Time forceAppliedTime;
     };
   }
 }

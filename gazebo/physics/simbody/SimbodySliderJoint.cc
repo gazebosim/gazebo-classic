@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
@@ -48,11 +48,11 @@ void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
-  gzdbg << "SetAxis Not implemented...\n";
+  igndbg << "SetAxis Not implemented...\n";
 }
 
 //////////////////////////////////////////////////
@@ -63,7 +63,7 @@ void SimbodySliderJoint::SetVelocity(unsigned int _index, double _rate)
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
   else
-    gzerr << "SetVelocity _index too large.\n";
+    ignerr << "SetVelocity _index too large.\n";
 }
 
 //////////////////////////////////////////////////
@@ -77,7 +77,7 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
         SimTK::MobilizerUIndex(_index));
     else
     {
-      gzdbg << "Simbody::GetVelocity() simbody not yet initialized, "
+      igndbg << "Simbody::GetVelocity() simbody not yet initialized, "
             << "initial velocity should be zero until restart from "
             << "state has been implemented.\n";
       return 0.0;
@@ -85,7 +85,7 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
   }
   else
   {
-    gzerr << "Invalid index for joint, returning NaN\n";
+    ignerr << "Invalid index for joint, returning NaN\n";
     return SimTK::NaN;
   }
 }
@@ -93,13 +93,13 @@ double SimbodySliderJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
-  gzdbg << "SetMaxForce doesn't make sense in simbody...\n";
+  igndbg << "SetMaxForce doesn't make sense in simbody...\n";
 }
 
 //////////////////////////////////////////////////
 double SimbodySliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
-  gzdbg << "GetMaxForce doesn't make sense in simbody...\n";
+  igndbg << "GetMaxForce doesn't make sense in simbody...\n";
   return 0;
 }
 
@@ -114,7 +114,7 @@ void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetHighStop(unsigned int _index,
-                                   const math::Angle &_angle)
+                                   const ignition::math::Angle &_angle)
 {
   if (_index < this->GetAngleCount())
   {
@@ -129,16 +129,16 @@ void SimbodySliderJoint::SetHighStop(unsigned int _index,
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
+      ignerr << "SetHighStop: State not initialized, SetLowStop failed.\n";
     }
   }
   else
-    gzerr << "SetHighStop: index out of bounds.\n";
+    ignerr << "SetHighStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetLowStop(unsigned int _index,
-                                  const math::Angle &_angle)
+                                  const ignition::math::Angle &_angle)
 {
   if (_index < this->GetAngleCount())
   {
@@ -153,67 +153,71 @@ void SimbodySliderJoint::SetLowStop(unsigned int _index,
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
+      ignerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
     }
   }
   else
-    gzerr << "SetLowStop: index out of bounds.\n";
+    ignerr << "SetLowStop: index out of bounds.\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle SimbodySliderJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Invalid joint index [" << _index
+    ignerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    return ignition::math::Angle(0.0);  /// \TODO: should return NaN
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return ignition::math::Angle(this->sdf->GetElement(
+          "axis")->GetElement("limit")->Get<double>("upper"));
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis2")->GetElement(
+          "limit")->Get<double>("upper"));
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    ignerr << "Should not be here in code, GetAngleCount > 2?\n";
+    return ignition::math::Angle(0.0);  /// \TODO: should return NaN
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle SimbodySliderJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Invalid joint index [" << _index
+    ignerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    return ignition::math::Angle(0.0);  /// \TODO: should return NaN
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis")->GetElement(
+          "limit")->Get<double>("lower"));
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis2")->GetElement(
+          "limit")->Get<double>("lower"));
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    return math::Angle(0.0);  /// \TODO: should return NaN
+    ignerr << "Should not be here in code, GetAngleCount > 2?\n";
+    return ignition::math::Angle(0.0);  /// \TODO: should return NaN
   }
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3 SimbodySliderJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   if (this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
@@ -231,12 +235,12 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
   {
     if (_index >= this->GetAngleCount())
     {
-      gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      ignerr << "index out of bound\n";
+      return ignition::math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
-      gzdbg << "Simbody::GetGlobalAxis() sibmody physics"
+      igndbg << "Simbody::GetGlobalAxis() sibmody physics"
             << " engine not initialized yet, "
             << "use local axis and initial pose to compute "
             << "global axis.\n";
@@ -249,38 +253,39 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
       // if local axis specified in joint frame (Issue #494)
       // if (this->childLink)
       // {
-      //   math::Pose jointPose =
+      //  ignition::math::Pose jointPose =
       //    this->anchorPose + this->childLink->GetWorldPose();
       //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
       // }
       // else
       // {
-      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
-      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      //   ignerr << "Joint [" << this->GetName() << "] missing child link.\n";
+      //   return ignition::math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
       // }
     }
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodySliderJoint::GetAngleImpl(
+    unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
     if (this->simbodyPhysics->simbodyPhysicsInitialized)
-      return math::Angle(this->mobod.getOneQ(
+      return ignition::math::Angle(this->mobod.getOneQ(
         this->simbodyPhysics->integ->getState(), _index));
     else
     {
-      gzdbg << "Simbody::GetAngleImpl() simbody not yet initialized, "
+      igndbg << "Simbody::GetAngleImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return ignition::math::Angle(0.0);
     }
   }
   else
   {
-    gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    ignerr << "index out of bound\n";
+    return ignition::math::Angle(SimTK::NaN);
   }
 }

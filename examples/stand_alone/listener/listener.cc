@@ -46,7 +46,7 @@ int main(int _argc, char **_argv)
 
   // Busy wait loop...replace with your own code as needed.
   while (true)
-    gazebo::common::Time::MSleep(10);
+    ignition::common::Time::MSleep(10);
 
   // Make sure to shut everything down.
   gazebo::transport::fini();

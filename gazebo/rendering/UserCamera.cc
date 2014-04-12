@@ -23,9 +23,9 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Assert.hh"
+#include "ignition/common/Console.hh"
+#include "ignition/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
@@ -103,7 +103,7 @@ void UserCamera::Init()
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(IGN_DTOR(60));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -174,7 +174,7 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
+void UserCamera::SetWorldPose(const ignition::math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->viewController->Init();
@@ -208,7 +208,7 @@ void UserCamera::Fini()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::HandleMouseEvent(const common::MouseEvent &_evt)
+void UserCamera::HandleMouseEvent(const ignition::common::MouseEvent &_evt)
 {
   if (!this->gui || !this->gui->HandleMouseEvent(_evt))
   {
@@ -258,7 +258,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
+    ignition::math::Pose origPose = this->GetWorldPose();
     double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
@@ -274,8 +274,8 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
     this->RotateYaw(yaw);
     this->RotatePitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
+    ignition::math::Box bb = _visual->GetBoundingBox();
+    ignition::math::Vector3 pos = bb.GetCenter();
     pos.z = bb.max.z;
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
@@ -310,14 +310,14 @@ void UserCamera::SetViewController(const std::string &type)
   else if (type == FPSViewController::GetTypeString())
     this->viewController = this->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    ignthrow("Invalid view controller type: " + type);
 
   this->viewController->Init();
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &type,
-                                    const math::Vector3 &_pos)
+                                    const ignition::math::Vector3 &_pos)
 {
   if (this->viewController->GetTypeString() == type)
     return;
@@ -327,7 +327,7 @@ void UserCamera::SetViewController(const std::string &type,
   else if (type == FPSViewController::GetTypeString())
     this->viewController = this->fpsViewController;
   else
-    gzthrow("Invalid view controller type: " + type);
+    ignthrow("Invalid view controller type: " + type);
 
   this->viewController->Init(_pos);
 }
@@ -404,7 +404,7 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
+bool UserCamera::MoveToPosition(const ignition::math::Pose &_pose, double _time)
 {
   return Camera::MoveToPosition(_pose, _time);
 }
@@ -416,7 +416,7 @@ void UserCamera::MoveToVisual(const std::string &_name)
   if (visualPtr)
     this->MoveToVisual(visualPtr);
   else
-    gzerr << "MoveTo Unknown visual[" << _name << "]\n";
+    ignerr << "MoveTo Unknown visual[" << _name << "]\n";
 }
 
 //////////////////////////////////////////////////
@@ -430,21 +430,21 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
+  ignition::math::Box box = _visual->GetBoundingBox();
+  ignition::math::Vector3 size = box.GetSize();
   double maxSize = std::max(std::max(size.x, size.y), size.z);
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3 start = this->GetWorldPose().pos;
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  ignition::math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
   end.Correct();
-  math::Vector3 dir = end - start;
+  ignition::math::Vector3 dir = end - start;
   dir.Correct();
   dir.Normalize();
 
   double dist = start.Distance(end) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
+  ignition::math::Vector3 mid = start + dir*(dist*.5);
   mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
 
   dir = end - mid;
@@ -454,7 +454,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   double yawAngle = atan2(dir.y, dir.x);
   double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
+  ignition::math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
   Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
     pitchYawOnly.y, pitchYawOnly.z);
 
@@ -496,7 +496,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   this->animState->setTimePosition(0);
   this->animState->setEnabled(true);
   this->animState->setLoop(false);
-  this->prevAnimTime = common::Time::GetWallTime();
+  this->prevAnimTime = ignition::common::Time::GetWallTime();
 
   // this->orbitViewController->SetFocalPoint(_visual->GetWorldPose().pos);
   this->onAnimationComplete =
@@ -539,7 +539,7 @@ void UserCamera::EnableViewController(bool _value) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
+VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
@@ -567,8 +567,8 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
       }
       catch(Ogre::Exception &e)
       {
-        gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-        gzthrow("Unable to get visual " + _mod);
+        ignerr << "Ogre Error:" << e.getFullDescription() << "\n";
+        ignthrow("Unable to get visual " + _mod);
       }
     }
 
@@ -581,8 +581,8 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
       }
       catch(Ogre::Exception &e)
       {
-        gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-        gzthrow("Unable to get visual " + _mod);
+        ignerr << "Ogre Error:" << e.getFullDescription() << "\n";
+        ignthrow("Unable to get visual " + _mod);
       }
     }
   }
@@ -591,13 +591,13 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
+void UserCamera::SetFocalPoint(const ignition::math::Vector3 &_pt)
 {
   this->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
+VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
@@ -616,6 +616,6 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 //////////////////////////////////////////////////
 std::string UserCamera::GetViewControllerTypeString()
 {
-  GZ_ASSERT(this->viewController, "ViewController != NULL");
+  IGN_ASSERT(this->viewController, "ViewController != NULL");
   return this->viewController->GetTypeString();
 }

@@ -17,10 +17,11 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <ignition/common.hh>
+
 #include "ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
 
 using namespace gazebo;
 
@@ -49,7 +50,7 @@ TEST_P(SpawnModels, WirelessTransmitters)
          boost::lexical_cast<std::string>(j);
 
       SpawnWirelessTransmitterSensor(modelName, sensorName,
-          math::Vector3(i, j, 0.25), math::Vector3(0, 0, 0),
+          ignition::math::Vector3(i, j, 0.25), ignition::math::Vector3(0, 0, 0),
           "osrf", 2450.0, power, gain);
 
       sensors::WirelessTransmitterPtr tx =

@@ -15,10 +15,11 @@
  *
 */
 
+#include <ignition/common.hh>
+#include "gazebo/common/common.hh"
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
@@ -64,7 +65,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    ignerr << "No rendering engine, unable to run camera test\n";
     return;
   }
 
@@ -112,32 +113,32 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
 
   {
     // connect to camera image updates
-    event::ConnectionPtr c0Left =
+    ignition::common::ConnectionPtr c0Left =
       camSensorUnrotated->GetCamera(0)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount0Left, img0Left,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr ct =
+    ignition::common::ConnectionPtr ct =
       camSensorTranslated->GetCamera()->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCountt, imgt,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c1Left =
+    ignition::common::ConnectionPtr c1Left =
       camSensorRotated1->GetCamera(0)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount1Left, img1Left,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c2Left =
+    ignition::common::ConnectionPtr c2Left =
       camSensorRotated2->GetCamera(0)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount2Left, img2Left,
             _1, _2, _3, _4, _5));
 
-    event::ConnectionPtr c0Right =
+    ignition::common::ConnectionPtr c0Right =
       camSensorUnrotated->GetCamera(1)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount0Right, img0Right,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c1Right =
+    ignition::common::ConnectionPtr c1Right =
       camSensorRotated1->GetCamera(1)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount1Right, img1Right,
             _1, _2, _3, _4, _5));
-    event::ConnectionPtr c2Right =
+    ignition::common::ConnectionPtr c2Right =
       camSensorRotated2->GetCamera(1)->ConnectNewImageFrame(
           boost::bind(&::OnNewFrameTest, &imageCount2Right, img2Right,
             _1, _2, _3, _4, _5));
@@ -157,7 +158,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
     {
       // wait at most 10 seconds sim time.
       if (++waitCount >= 1000)
-        gzerr << "Err [" << imageCount0Left
+        ignerr << "Err [" << imageCount0Left
               << "/10, " << imageCountt
               << "/10, " << imageCount1Left
               << "/10, " << imageCount2Left
@@ -167,7 +168,7 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
               << "/10] images received from cameras\n";
       EXPECT_LT(waitCount, 1000);
 
-      common::Time::MSleep(10);
+      ignition::common::Time::MSleep(10);
     }
 
     // compare unrotated left against translated left, both should be
@@ -208,8 +209,9 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
                          diffMax, diffSum, diffAvg);
 
       // use below to construct test for rotated2 left camera offset
-      // math::Quaternion a(1.2, 1.3, 1.4);
-      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
+      // ignition::math::Quaternion a(1.2, 1.3, 1.4);
+      // ignerr << "test: " << a.RotateVector(
+      // ignition::math::Vector3(0, 1, 0)) << "\n";
 
       // We expect that there will be some non-zero difference between the two
       // images.

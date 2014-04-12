@@ -107,7 +107,7 @@ ModelRightMenu::ModelRightMenu()
 }
 
 /////////////////////////////////////////////////
-bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
+bool ModelRightMenu::OnKeyRelease(const ignition::common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
@@ -180,10 +180,10 @@ void ModelRightMenu::OnFollow()
 // {
 //   rendering::UserCameraPtr cam = gui::get_active_camera();
 //   if (!cam)
-//     gzerr << "Invalid user camera\n";
+//     ignerr << "Invalid user camera\n";
 //
 //   if (!cam->GetScene())
-//     gzerr << "Invalid user camera scene\n";
+//     ignerr << "Invalid user camera scene\n";
 //
 //   // cam->GetScene()->SnapVisualToNearestBelow(this->modelName);
 // }

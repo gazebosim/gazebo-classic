@@ -23,14 +23,14 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Box.hh"
+#include "ignition/math/MathTypes.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Pose.hh"
+#include "ignition/math/Plane.hh"
+#include "ignition/math/Box.hh"
 
-#include "gazebo/common/Color.hh"
-#include "gazebo/common/Time.hh"
+#include "ignition/common/Color.hh"
+#include "ignition/common/Time.hh"
 
 namespace gazebo
 {
@@ -67,110 +67,110 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
+    /// \brief Convert a ignition::math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
-    msgs::Vector3d      Convert(const math::Vector3 &_v);
+    msgs::Vector3d      Convert(const ignition::math::Vector3 &_v);
 
-    /// \brief Convert a math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
-    msgs::Quaternion Convert(const math::Quaternion &_q);
+    msgs::Quaternion Convert(const ignition::math::Quaternion &_q);
 
-    /// \brief Convert a math::Pose to a msgs::Pose
+    /// \brief Convert a ignition::math::Pose to a msgs::Pose
     /// \param[in] _p The pose to convert
     /// \return A msgs::Pose object
-    msgs::Pose       Convert(const math::Pose &_p);
+    msgs::Pose       Convert(const ignition::math::Pose &_p);
 
     /// \brief Convert a common::Color to a msgs::Color
     /// \param[in] _c The color to convert
     /// \return A msgs::Color object
-    msgs::Color      Convert(const common::Color &_c);
+    msgs::Color      Convert(const ignition::common::Color &_c);
 
-    /// \brief Convert a common::Time to a msgs::Time
+    /// \brief Convert an ignition::common::Time to a msgs::Time
     /// \param[in] _t The time to convert
     /// \return A msgs::Time object
-    msgs::Time       Convert(const common::Time &_t);
+    msgs::Time       Convert(const ignition::common::Time &_t);
 
-    /// \brief Convert a math::Plane to a msgs::PlaneGeom
+    /// \brief Convert a ignition::math::Plane to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
     /// \return A msgs::PlaneGeom object
-    msgs::PlaneGeom Convert(const math::Plane &_p);
+    msgs::PlaneGeom Convert(const ignition::math::Plane &_p);
 
-    /// \brief Convert a msgs::Vector3d to a math::Vector
+    /// \brief Convert a msgs::Vector3d to a ignition::math::Vector
     /// \param[in] _v The plane to convert
-    /// \return A math::Vector3 object
-    math::Vector3    Convert(const msgs::Vector3d &_v);
+    /// \return A ignition::math::Vector3 object
+    ignition::math::Vector3    Convert(const msgs::Vector3d &_v);
 
-    /// \brief Convert a msgs::Quaternion to a math::Quaternion
+    /// \brief Convert a msgs::Quaternion to a ignition::math::Quaternion
     /// \param[in] _q The quaternion to convert
-    /// \return A math::Quaternion object
-    math::Quaternion Convert(const msgs::Quaternion &_q);
+    /// \return A ignition::math::Quaternion object
+    ignition::math::Quaternion Convert(const msgs::Quaternion &_q);
 
-    /// \brief Convert a msgs::Pose to a math::Pose
+    /// \brief Convert a msgs::Pose to a ignition::math::Pose
     /// \param[in] _q The pose to convert
-    /// \return A math::Pose object
-    math::Pose       Convert(const msgs::Pose &_p);
+    /// \return A ignition::math::Pose object
+    ignition::math::Pose       Convert(const msgs::Pose &_p);
 
-    /// \brief Convert a msgs::Image to a common::Image
-    /// \param[out] _img The common::Image container
+    /// \brief Convert a msgs::Image to a ignition::common::Image
+    /// \param[out] _img The ignition::common::Image container
     /// \param[in] _msg The Image message to convert
-    void Set(common::Image &_img, const msgs::Image &_msg);
+    void Set(ignition::common::Image &_img, const msgs::Image &_msg);
 
     /// \brief Convert a msgs::Color to a common::Color
     /// \param[in] _c The color to convert
     /// \return A common::Color object
-    common::Color    Convert(const msgs::Color &_c);
+    ignition::common::Color    Convert(const msgs::Color &_c);
 
-    /// \brief Convert a msgs::Time to a common::Time
+    /// \brief Convert a msgs::Time to a ignition::common::Time
     /// \param[in] _t The time to convert
     /// \return A common::Time object
-    common::Time     Convert(const msgs::Time &_t);
+    ignition::common::Time     Convert(const msgs::Time &_t);
 
     /// \brief Convert a msgs::PlaneGeom to a common::Plane
     /// \param[in] _p The plane to convert
     /// \return A common::Plane object
-    math::Plane      Convert(const msgs::PlaneGeom &_p);
+    ignition::math::Plane      Convert(const msgs::PlaneGeom &_p);
 
-    /// \brief Set a msgs::Image from a common::Image
+    /// \brief Set a msgs::Image from a ignition::common::Image
     /// \param[out] _msg A msgs::Image pointer
-    /// \param[in] _i A common::Image reference
-    void Set(msgs::Image *_msg, const common::Image &_i);
+    /// \param[in] _i A ignition::common::Image reference
+    void Set(msgs::Image *_msg, const ignition::common::Image &_i);
 
-    /// \brief Set a msgs::Vector3d from a math::Vector3
+    /// \brief Set a msgs::Vector3d from a ignition::math::Vector3
     /// \param[out] _pt A msgs::Vector3d pointer
-    /// \param[in] _v A math::Vector3 reference
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v);
+    /// \param[in] _v A ignition::math::Vector3 reference
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3 &_v);
 
-    /// \brief Set a msgs::Vector2d from a math::Vector3
+    /// \brief Set a msgs::Vector2d from a ignition::math::Vector3
     /// \param[out] _pt A msgs::Vector2d pointer
-    /// \param[in] _v A math::Vector2d reference
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v);
+    /// \param[in] _v A ignition::math::Vector2d reference
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v);
 
-    /// \brief Set a msgs::Quaternion from a math::Quaternion
+    /// \brief Set a msgs::Quaternion from a ignition::math::Quaternion
     /// \param[out] _q A msgs::Quaternion pointer
-    /// \param[in] _v A math::Quaternion reference
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v);
+    /// \param[in] _v A ignition::math::Quaternion reference
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaternion &_v);
 
-    /// \brief Set a msgs::Pose from a math::Pose
+    /// \brief Set a msgs::Pose from a ignition::math::Pose
     /// \param[out] _p A msgs::Pose pointer
-    /// \param[in] _v A math::Pose reference
-    void Set(msgs::Pose *_p, const math::Pose &_v);
+    /// \param[in] _v A ignition::math::Pose reference
+    void Set(msgs::Pose *_p, const ignition::math::Pose &_v);
 
     /// \brief Set a msgs::Color from a common::Color
     /// \param[out] _p A msgs::Color pointer
     /// \param[in] _v A common::Color reference
-    void Set(msgs::Color *_c, const common::Color &_v);
+    void Set(msgs::Color *_c, const ignition::common::Color &_v);
 
-    /// \brief Set a msgs::Time from a common::Time
+    /// \brief Set a msgs::Time from a ignition::common::Time
     /// \param[out] _p A msgs::Time pointer
     /// \param[in] _v A common::Time reference
-    void Set(msgs::Time *_t, const common::Time &_v);
+    void Set(msgs::Time *_t, const ignition::common::Time &_v);
 
-    /// \brief Set a msgs::Plane from a math::Plane
+    /// \brief Set a msgs::Plane from a ignition::math::Plane
     /// \param[out] _p A msgs::Plane pointer
-    /// \param[in] _v A math::Plane reference
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
+    /// \param[in] _v A ignition::math::Plane reference
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Plane &_v);
 
     /// \brief Create a msgs::TrackVisual from a track visual SDF element
     /// \param[in] _sdf The sdf element

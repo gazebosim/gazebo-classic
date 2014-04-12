@@ -85,7 +85,7 @@ namespace gazebo
       private: boost::shared_ptr<msgs::Contacts const> contactsMsg;
 
       /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief A contact point visualization.
       private: class ContactPoint

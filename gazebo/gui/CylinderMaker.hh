@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gazebo/math/Vector2i.hh"
+#include "ignition/math/Vector2i.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
@@ -50,13 +50,17 @@ namespace gazebo
       public: virtual bool IsActive() const;
 
       /// Documentation inherited
-      public: virtual void OnMousePush(const common::MouseEvent &_event);
+      public: virtual void OnMousePush(
+                  const ignition::common::MouseEvent &_event);
       /// Documentation inherited
-      public: virtual void OnMouseRelease(const common::MouseEvent &_event);
+      public: virtual void OnMouseRelease(
+                  const ignition::common::MouseEvent &_event);
       /// Documentation inherited
-      public: virtual void OnMouseDrag(const common::MouseEvent &_event);
+      public: virtual void OnMouseDrag(
+                  const ignition::common::MouseEvent &_event);
       /// Documentation inherited
-      public: virtual void OnMouseMove(const common::MouseEvent &_event);
+      public: virtual void OnMouseMove(
+                  const ignition::common::MouseEvent &_event);
 
       /// \brief Get the SDF information for the cylinder.
       /// \return The SDF as a string.
@@ -66,7 +70,7 @@ namespace gazebo
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
+      private: ignition::math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

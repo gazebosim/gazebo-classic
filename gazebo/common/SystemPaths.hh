@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo configuration on this computer
- * Date: 3 May 2008
- */
 
 #ifndef _GAZEBO_SYSTEMPATHS_HH_
 #define _GAZEBO_SYSTEMPATHS_HH_
@@ -34,9 +31,7 @@
 
 #include <string>
 #include <list>
-
-#include "gazebo/common/CommonTypes.hh"
-#include "gazebo/common/SingletonT.hh"
+#include <ignition/common.hh>
 
 namespace gazebo
 {
@@ -54,14 +49,11 @@ namespace gazebo
     ///            Should point to Ogre RenderSystem_GL.so et. al.
     ///        \li SystemPaths#pluginPaths - plugin library paths
     ///            for common::WorldPlugin
-    class SystemPaths : public SingletonT<SystemPaths>
+    class SystemPaths : public ignition::common::SystemPaths,
+                        public ignition::common::SingletonT<SystemPaths>
     {
       /// Constructor for SystemPaths
       private: SystemPaths();
-
-      /// \brief Get the log path
-      /// \return the path
-      public: std::string GetLogPath() const;
 
       /// \brief Get the gazebo install paths
       /// \return a list of paths
@@ -71,10 +63,6 @@ namespace gazebo
       /// \return a list of paths
       public: const std::list<std::string> &GetOgrePaths();
 
-      /// \brief Get the plugin paths
-      /// \return a list of paths
-      public: const std::list<std::string> &GetPluginPaths();
-
       /// \brief Get the model paths
       /// \return a list of paths
       public: const std::list<std::string> &GetModelPaths();
@@ -82,19 +70,6 @@ namespace gazebo
       /// Returns the world path extension.
       /// \return Right now, it just returns "/worlds"
       public: std::string GetWorldPathExtension();
-
-      /// \brief Find a file or path using a URI
-      /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file
-      public: std::string FindFileURI(const std::string &_uri);
-
-      /// \brief Find a file in the gazebo paths
-      /// \param[in] _filename Name of the file to find.
-      /// \param[in] _searchLocalPath True to search in the current working
-      /// directory.
-      /// \return Returns full path name to file
-      public: std::string FindFile(const std::string &_filename,
-                                   bool _searchLocalPath = true);
 
       /// \brief Add colon delimited paths to Gazebo install
       /// \param[in] _path the directory to add
@@ -108,37 +83,38 @@ namespace gazebo
       /// \param[in] _path the directory to add
       public: void AddOgrePaths(const std::string &_path);
 
-      /// \brief Add colon delimited paths to plugins
-      /// \param[in] _path the directory to add
-      public: void AddPluginPaths(const std::string &_path);
-
       /// \brief clear out SystemPaths#gazeboPaths
       public: void ClearGazeboPaths();
+
       /// \brief clear out SystemPaths#modelPaths
       public: void ClearModelPaths();
+
       /// \brief clear out SystemPaths#ogrePaths
       public: void ClearOgrePaths();
-      /// \brief clear out SystemPaths#pluginPaths
-      public: void ClearPluginPaths();
 
-      /// \brief add _suffix to the list of path search suffixes
-      /// \param[in] _suffix The suffix to add
-      public: void AddSearchPathSuffix(const std::string &_suffix);
+      /// \brief Find a file or path using a URI
+      /// \param[in] _uri the uniform resource identifier
+      /// \return Returns full path name to file
+      protected: virtual std::string FindFileURIHelper(
+                     const std::string &_uri);
+
+      /// \brief Find a file in the gazebo paths
+      /// \param[in] _filename Name of the file to find.
+      /// \return Returns full path name to file
+      protected: virtual std::string FindFileHelper(
+                     const std::string &_filename);
+
+      // Documentation inherited
+      protected: virtual void UpdatePluginPaths();
 
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateModelPaths();
+
       /// \brief re-read SystemPaths#gazeboPaths from environment variable
       private: void UpdateGazeboPaths();
-      /// \brief re-read SystemPaths#pluginPaths from environment variable
-      private: void UpdatePluginPaths();
+
       /// \brief re-read SystemPaths#ogrePaths from environment variable
       private: void UpdateOgrePaths();
-
-      /// \brief adds a path to the list if not already present
-      /// \param[in]_path the path
-      /// \param[in]_list the list
-      private: void InsertUnique(const std::string &_path,
-                                 std::list<std::string> &_list);
 
       /// \brief Paths to installed gazebo media files
       private: std::list<std::string> gazeboPaths;
@@ -146,28 +122,18 @@ namespace gazebo
       /// \brief Paths to the ogre install
       private: std::list<std::string> ogrePaths;
 
-      /// \brief Paths to plugins
-      private: std::list<std::string> pluginPaths;
-
-      private: std::list<std::string> suffixPaths;
-
       private: std::list<std::string> modelPaths;
 
-      private: std::string logPath;
+      /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
+      private: bool modelPathsFromEnv;
 
       /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
-      public: bool modelPathsFromEnv;
-
-      /// \brief if true, call UpdateGazeboPaths() within GetGazeboPaths()
-      public: bool gazeboPathsFromEnv;
-
-      /// \brief if true, call UpdatePluginPaths() within GetPluginPaths()
-      public: bool pluginPathsFromEnv;
+      private: bool gazeboPathsFromEnv;
 
       /// \brief if true, call UpdateOgrePaths() within GetOgrePaths()
-      public: bool ogrePathsFromEnv;
+      private: bool ogrePathsFromEnv;
 
-      private: friend class SingletonT<SystemPaths>;
+      private: friend class ignition::common::SingletonT<SystemPaths>;
     };
     /// \}
   }

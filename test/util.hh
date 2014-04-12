@@ -21,9 +21,7 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
-#include "gazebo/common/Console.hh"
-
-using namespace gazebo;
+#include "ignition/common/Console.hh"
 
 namespace gazebo
 {
@@ -55,9 +53,9 @@ namespace gazebo
         this->logDirectory = logPath.string();
 
         // Initialize Console
-        gzLogInit((boost::filesystem::path("test_logs") /
+        ignLogInit((boost::filesystem::path("test_logs") /
              this->logFilename).string());
-        gazebo::common::Console::SetQuiet(false);
+        ignition::common::Console::SetQuiet(false);
       }
 
       /// \brief Get a string with the full log file path.

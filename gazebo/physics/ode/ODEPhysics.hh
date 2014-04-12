@@ -143,7 +143,7 @@ namespace gazebo
                                            ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3 &_gravity);
 
       // Documentation inherited
       public: virtual void SetWorldCFM(double cfm);

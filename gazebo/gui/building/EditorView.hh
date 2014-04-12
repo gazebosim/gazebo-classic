@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 
 namespace gazebo
 {
@@ -210,7 +210,7 @@ namespace gazebo
       private: std::map<EditorItem *, std::string> itemToVisualMap;
 
       /// \brief A list of gui editor events connected to this view.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Editor item currently attached to the mouse during a drawing
       /// operation.

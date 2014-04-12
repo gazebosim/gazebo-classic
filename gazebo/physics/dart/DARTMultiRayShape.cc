@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
@@ -54,8 +54,8 @@ void DARTMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void DARTMultiRayShape::AddRay(const math::Vector3& _start,
-                               const math::Vector3& _end)
+void DARTMultiRayShape::AddRay(const ignition::math::Vector3& _start,
+                               const ignition::math::Vector3& _end)
 {
   MultiRayShape::AddRay(_start, _end);
 

@@ -22,7 +22,7 @@
 #include <string>
 
 #include "gazebo/transport/Connection.hh"
-#include "gazebo/common/Event.hh"
+#include "ignition/common/Event.hh"
 
 namespace gazebo
 {

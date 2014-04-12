@@ -73,7 +73,7 @@ namespace gazebo
       private: std::vector<rendering::VisualPtr> vectorLink;
 
        /// \brief All the event connections.
-      private: std::vector<event::ConnectionPtr> connections;
+      private: std::vector<ignition::common::ConnectionPtr> connections;
 
       /// \brief Mutex to protect the contact message.
       private: boost::mutex mutex;

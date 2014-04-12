@@ -21,8 +21,8 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Event.hh"
-#include "gazebo/common/KeyEvent.hh"
+#include "ignition/common/Event.hh"
+#include "ignition/common/KeyEvent.hh"
 
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -58,7 +58,7 @@ namespace gazebo
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
       /// \return True if the event was handled
-      private: bool OnKeyPress(const common::KeyEvent &_event);
+      private: bool OnKeyPress(const ignition::common::KeyEvent &_event);
 
       /// \brief Received item selection user input.
       /// \param[in] _item Item selected.

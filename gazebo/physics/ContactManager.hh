@@ -89,7 +89,7 @@ namespace gazebo
       /// subscribers to the contact topic.
       public: Contact *NewContact(Collision *_collision1,
                                   Collision *_collision2,
-                                  const common::Time &_time);
+                                  const ignition::common::Time &_time);
 
       /// \brief Return the number of valid contacts.
       public: unsigned int GetContactCount() const;

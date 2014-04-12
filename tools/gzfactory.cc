@@ -18,7 +18,7 @@
 #include <fstream>
 #include <string>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/common/CommonIface.hh>
+#include <ignition/common/CommonIface.hh>
 
 using namespace gazebo;
 namespace po = boost::program_options;
@@ -90,7 +90,7 @@ void Spawn(po::variables_map &_vm)
 
   if (!modelElem)
   {
-    gzerr << "Unable to find <model> element.\n";
+    ignerr << "Unable to find <model> element.\n";
     return;
   }
 
@@ -100,8 +100,8 @@ void Spawn(po::variables_map &_vm)
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->Get<math::Pose>("pose");
-  math::Vector3 rpy = pose.rot.GetAsEuler();
+  ignition::math::Pose pose = modelElem->Get<ignition::math::Pose>("pose");
+  ignition::math::Vector3 rpy = pose.rot.GetAsEuler();
   if (_vm.count("pose-x"))
     pose.pos.x = _vm["pose-x"].as<double>();
   if (_vm.count("pose-y"))
@@ -218,7 +218,7 @@ int main(int argc, char **argv)
     return -1;
   }
 
-  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+  // sdf::setFindCallback(boost::bind(&ignition::commonfind_file, _1));
 
   if (vm.count("command"))
   {

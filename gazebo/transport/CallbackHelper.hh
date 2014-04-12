@@ -24,9 +24,9 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/common/Console.hh"
+#include "ignition/common/Console.hh"
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/Exception.hh"
+#include "ignition/common/Exception.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -119,7 +119,7 @@ namespace gazebo
                 google::protobuf::Message *m;
                 if ((m =dynamic_cast<google::protobuf::Message*>(&test))
                     == NULL)
-                  gzthrow("Message type must be a google::protobuf type\n");
+                  ignthrow("Message type must be a google::protobuf type\n");
                   */
               }
 
@@ -130,7 +130,7 @@ namespace gazebo
                 google::protobuf::Message *m;
                 if ((m = dynamic_cast<google::protobuf::Message*>(&test))
                     == NULL)
-                  gzthrow("Message type must be a google::protobuf type\n");
+                  ignthrow("Message type must be a google::protobuf type\n");
                 return m->GetTypeName();
               }
 

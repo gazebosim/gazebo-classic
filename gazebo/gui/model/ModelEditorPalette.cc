@@ -448,7 +448,7 @@ void ModelEditorPalette::OnDone()
 }
 
 /////////////////////////////////////////////////
-bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
+bool ModelEditorPalette::OnKeyPress(const ignition::common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {

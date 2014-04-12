@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo/gazebo_core.hh"
+#include "gazebo/gazebo.hh"
 #include "gazebo/physics/physics.hh"
 
 namespace gazebo

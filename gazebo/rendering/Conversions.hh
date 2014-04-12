@@ -19,9 +19,9 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Color.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
+#include "ignition/common/Color.hh"
+#include "ignition/math/Vector3.hh"
+#include "ignition/math/Quaternion.hh"
 
 namespace gazebo
 {
@@ -38,32 +38,36 @@ namespace gazebo
       /// \brief Return the equivalent ogre color
       /// \param[in] _clr Gazebo color to convert
       /// \return Ogre color value
-      public: static Ogre::ColourValue Convert(const common::Color &_clr);
+      public: static Ogre::ColourValue Convert(
+                  const ignition::common::Color &_clr);
 
       /// \brief Return the equivalent gazebo color
       /// \param[in] _clr Ogre color to convert
       /// \return Gazebo color value
-      public: static common::Color Convert(const Ogre::ColourValue &_clr);
+      public: static ignition::common::Color Convert(
+                  const Ogre::ColourValue &_clr);
 
       /// \brief return Ogre Vector from Gazebo Vector3
       /// \param[in] _v Gazebo vector
       /// \return Ogre vector
-      public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
+      public: static Ogre::Vector3 Convert(const ignition::math::Vector3 &_v);
 
       /// \brief return gazebo Vector from ogre Vector3
       /// \param[in] _v Ogre vector
       /// \return Gazebo vector
-      public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
+      public: static ignition::math::Vector3 Convert(const Ogre::Vector3 &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
       /// \return Ogre quaternion
-      public: static Ogre::Quaternion Convert(const math::Quaternion &_v);
+      public: static Ogre::Quaternion Convert(
+                  const ignition::math::Quaternion &_v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
       /// \param[in] _v Ogre quaternion
       /// return Gazebo quaternion
-      public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
+      public: static ignition::math::Quaternion Convert(
+                  const Ogre::Quaternion &_v);
     };
     /// \}
   }

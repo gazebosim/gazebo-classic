@@ -20,7 +20,7 @@
  */
 
 #include <math.h>
-#include "gazebo/common/common.hh"
+#include "ignition/common/common.hh"
 #include "gazebo/transport/transport.hh"
 
 #include "GazeboTime.hh"
