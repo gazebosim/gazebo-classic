@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/math/MathTypes.hh"
-
 class TiXmlElement;
 
 namespace gazebo

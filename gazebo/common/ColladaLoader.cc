@@ -108,7 +108,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 /////////////////////////////////////////////////
 void ColladaLoader::LoadScene(Mesh *_mesh)
 {
-  TiXmlElement *sceneXml = this->dataPtr->colladaXml->FirstChildElement("scene");
+  TiXmlElement *sceneXml =
+      this->dataPtr->colladaXml->FirstChildElement("scene");
   std::string sceneURL =
     sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
@@ -1421,7 +1422,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
             input.texcoordIndex = values[inputs[TEXCOORD]];
           }
 
-          // add the newly added gazebo submesh vertex index to the map
+          // add the new gazebo submesh vertex index to the map
           if (hasVertices)
           {
             std::vector<GeometryIndices> inputValues;
@@ -1632,7 +1633,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         input.texcoordIndex = values[inputs[TEXCOORD]];
       }
 
-      // add the newly added gazebo submesh vertex index to the map
+      // add the new gazebo submesh vertex index to the map
       if (hasVertices)
       {
         std::vector<GeometryIndices> inputValues;

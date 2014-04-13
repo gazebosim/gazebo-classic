@@ -18,7 +18,6 @@
 #ifndef _COLLADALOADER_HH_
 #define _COLLADALOADER_HH_
 
-#include <map>
 #include <string>
 #include <vector>
 
