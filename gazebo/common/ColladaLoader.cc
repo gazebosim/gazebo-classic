@@ -34,7 +34,6 @@
 #include "gazebo/common/SkeletonAnimation.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/ColladaLoaderPrivate.hh"
 #include "gazebo/common/ColladaLoader.hh"
 
@@ -98,11 +97,7 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   Mesh *mesh = new Mesh();
   mesh->SetPath(this->dataPtr->path);
 
-  std::cerr << " start loading mesh time " <<std::endl;
-  common::Time now = common::Time::GetWallTime();
   this->LoadScene(mesh);
-  std::cerr << " total load mesh time " <<
-      (common::Time::GetWallTime() - now).Double() << std::endl;
 
   // This will make the model the correct size.
   mesh->Scale(this->dataPtr->meter);
@@ -1269,8 +1264,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       inputs[TEXCOORD] = math::parseInt(offset);
       hasTexcoords = true;
     }
-    //inputs[semantic] = math::parseInt(offset);
-
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
 
@@ -1294,9 +1287,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   int *values = new int[inputs.size()];
-
-  /// TODO remove me
-  int r = 0;
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
@@ -1386,9 +1376,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
               }
             }
             addIndex = toDuplicate;
-
-            if (!toDuplicate)
-              r++;
           }
         }
 
@@ -1446,13 +1433,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     }
   }
   delete [] values;
-
-  std::cerr << "polylist: " << std::endl;
-  std::cerr << "vertices: " << subMesh->GetVertexCount() << std::endl;
-  std::cerr << "normals: " << subMesh->GetNormalCount() << std::endl;
-  std::cerr << "texcoords: " << subMesh->GetTexCoordCount() << std::endl;
-  std::cerr << "indices: " << subMesh->GetIndexCount() << std::endl;
-  std::cerr << "reused: " << r << std::endl;
 
   _mesh->AddSubMesh(subMesh);
 }
@@ -1555,9 +1535,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
   boost::split(strs, pStr, boost::is_any_of("   "));
 
-  /// TODO remove me
-  int r = 0;
-
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
@@ -1611,9 +1588,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           }
         }
         addIndex = toDuplicate;
-
-        if (!toDuplicate)
-          r++;
       }
     }
 
@@ -1667,12 +1641,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
     }
   }
-
-  std::cerr << "vertices: " << subMesh->GetVertexCount() << std::endl;
-  std::cerr << "normals: " << subMesh->GetNormalCount() << std::endl;
-  std::cerr << "texcoords: " << subMesh->GetTexCoordCount() << std::endl;
-  std::cerr << "indices: " << subMesh->GetIndexCount() << std::endl;
-  std::cerr << "reused: " << r << std::endl;
 
   delete [] values;
   _mesh->AddSubMesh(subMesh);

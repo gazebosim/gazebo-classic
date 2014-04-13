@@ -75,9 +75,6 @@ TEST_F(ColladaLoader, ShareVertices)
   for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
   {
     const common::SubMesh *subMesh = mesh->GetSubMesh(i);
-    ASSERT_GT(subMesh->GetVertexCount(), 0u);
-    ASSERT_GT(subMesh->GetNormalCount(), 0u);
-
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
       math::Vector3 v = subMesh->GetVertex(j);
