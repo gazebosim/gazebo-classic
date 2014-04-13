@@ -124,7 +124,7 @@ void DARTModel::Init()
       dynamic_cast<dart::simulation::SoftWorld*>(
       this->GetDARTPhysics()->GetDARTWorld());
     dart::collision::CollisionDetector *dtCollDet =
-        dtWorld->getConstraintHandler()->getCollisionDetector();
+        dtWorld->getConstraintSolver()->getCollisionDetector();
 
     for (size_t i = 0; i < linkList.size() - 1; ++i)
     {

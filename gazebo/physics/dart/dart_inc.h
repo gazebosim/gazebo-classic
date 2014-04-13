@@ -55,10 +55,9 @@
 #include <dart/dynamics/SoftSkeleton.h>
 
 #include <dart/constraint/Constraint.h>
-#include <dart/constraint/ConstraintDynamics.h>
-#include <dart/constraint/SoftConstraintDynamics.h>
-#include <dart/constraint/BallJointConstraint.h>
-#include <dart/constraint/RevoluteJointConstraint.h>
+#include <dart/constraint/ConstraintSolver.h>
+//#include <dart/constraint/SoftConstraintDynamics.h>
+#include <dart/constraint/WeldJointConstraint.h>
 
 #include <dart/simulation/SoftWorld.h>
 #include <dart/simulation/World.h>

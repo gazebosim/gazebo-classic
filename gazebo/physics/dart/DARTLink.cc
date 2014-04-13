@@ -35,8 +35,7 @@ DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent),
     dtBodyNode(NULL),
     staticLink(false),
-    ballConst(NULL),
-    revConst(NULL)
+    weldJointConst(NULL)
 {
 }
 
@@ -465,7 +464,7 @@ void DARTLink::SetSelfCollide(bool _collide)
     this->dartPhysics->GetDARTWorld());
   dart::dynamics::Skeleton *dtSkeleton = this->dtBodyNode->getSkeleton();
   dart::collision::CollisionDetector *dtCollDet =
-      dtWorld->getConstraintHandler()->getCollisionDetector();
+      dtWorld->getConstraintSolver()->getCollisionDetector();
 
   Link_V links = this->GetModel()->GetLinks();
 
@@ -607,26 +606,14 @@ void DARTLink::SetLinkStatic(bool _static)
     // that creating quasi-weld joint constraint by combining ball and revolute
     // joint contratint.
 
-    // Add ball joint constraint to DART
-    Eigen::Vector3d offset(0.0, 0.0, 0.0);
-    Eigen::Vector3d target = this->dtBodyNode->getWorldTransform() * offset;
-    this->ballConst = new dart::constraint::BallJointConstraint(
-          this->dtBodyNode, offset, target);
-    GetDARTWorld()->getConstraintHandler()->addConstraint(ballConst);
-
-    // Add revolute joint constraint to DART
-    Eigen::Vector3d axis1(0.0, 0.0, 1.0);
-    Eigen::Vector3d globalAxis1
-        = this->dtBodyNode->getWorldTransform() * axis1 - target;
-    this->revConst = new dart::constraint::RevoluteJointConstraint(
-          this->dtBodyNode, axis1, globalAxis1);
-    GetDARTWorld()->getConstraintHandler()->addConstraint(revConst);
+    // Add weld joint constraint to DART
+    weldJointConst = new dart::constraint::WeldJointConstraint(this->dtBodyNode);
+    GetDARTWorld()->getConstraintSolver()->addConstraint(weldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
-    GetDARTWorld()->getConstraintHandler()->deleteConstraint(ballConst);
-    GetDARTWorld()->getConstraintHandler()->deleteConstraint(revConst);
+    GetDARTWorld()->getConstraintSolver()->removeConstraint(weldJointConst);
   }
 
   staticLink = _static;
