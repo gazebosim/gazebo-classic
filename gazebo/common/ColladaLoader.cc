@@ -1229,12 +1229,19 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   std::vector<math::Vector3> norms;
   std::vector<math::Vector2d> texcoords;
 
+  const unsigned int VERTEX = 0;
+  const unsigned int NORMAL = 1;
+  const unsigned int TEXCOORD = 2;
+  bool hasVertices = false;
+  bool hasNormals = false;
+  bool hasTexcoords = false;
+
   math::Matrix4 bindShapeMat(math::Matrix4::IDENTITY);
   if (_mesh->HasSkeleton())
     bindShapeMat = _mesh->GetSkeleton()->GetBindShapeTransform();
 
   // read input elements
-  std::map<std::string, int> inputs;
+  std::map<const unsigned int, int> inputs;
   while (polylistInputXml)
   {
     std::string semantic = polylistInputXml->Attribute("semantic");
@@ -1246,16 +1253,23 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       this->LoadVertices(source, _transform, verts, norms);
       if (norms.size() > count)
         combinedVertNorms = true;
+      inputs[VERTEX] = math::parseInt(offset);
+      hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms);
       combinedVertNorms = false;
+      inputs[NORMAL] = math::parseInt(offset);
+      hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
+    {
       this->LoadTexCoords(source, texcoords);
-
-    inputs[semantic] = math::parseInt(offset);
+      inputs[TEXCOORD] = math::parseInt(offset);
+      hasTexcoords = true;
+    }
+    //inputs[semantic] = math::parseInt(offset);
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
@@ -1276,14 +1290,13 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   TiXmlElement *pXml = _polylistXml->FirstChildElement("p");
   std::string pStr = pXml->GetText();
 
-  std::vector<math::Vector3> vertNorms(verts.size());
-  std::vector<int> vertNormsCounts(verts.size());
-  std::fill(vertNormsCounts.begin(), vertNormsCounts.end(), 0);
-
+  // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
+  // indices, used for identifying vertices that can be shared.
+  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
   int *values = new int[inputs.size()];
-  std::map<std::string, int>::iterator end = inputs.end();
-  std::map<std::string, int>::iterator iter;
-  math::Vector2d vec;
+
+  /// TODO remove me
+  int r = 0;
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
@@ -1324,45 +1337,122 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         }
 
 
-        for (iter = inputs.begin(); iter != end; ++iter)
+        int daeVertIndex = 0;
+        bool addIndex = !hasVertices;
+
+        // find a set of vertex/normal/texcoord that can be reused
+        // only do this if the mesh has vertices
+        if (hasVertices)
         {
-          if (iter->first == "VERTEX")
+          daeVertIndex = values[inputs[VERTEX]];
+
+          // if the vertex index has not been previously added then just add it.
+          if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
           {
-            subMesh->AddVertex(bindShapeMat * verts[values[iter->second]]);
-            subMesh->AddIndex(subMesh->GetVertexCount()-1);
-            if (combinedVertNorms)
-              subMesh->AddNormal(norms[values[iter->second]]);
-            if (_mesh->HasSkeleton())
+            addIndex = true;
+          }
+          else
+          {
+            // if the vertex index was previously added, check to see if it has
+            // the same normal and texcoord index values
+            bool toDuplicate = true;
+            unsigned int reuseIndex = 0;
+            std::vector<GeometryIndices> inputValues =
+                vertexIndexMap[daeVertIndex];
+
+            for (unsigned int i = 0; i < inputValues.size(); ++i)
             {
-              Skeleton *skel = _mesh->GetSkeleton();
-              for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(values[iter->second]); i++)
+              GeometryIndices iv = inputValues[i];
+              bool normEqual = false;
+              bool texEqual = false;
+              if (hasNormals && iv.normalIndex == values[inputs[NORMAL]])
               {
-                std::pair<std::string, double> node_weight =
-                              skel->GetVertNodeWeight(values[iter->second], i);
-                SkeletonNode *node =
-                  _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
-                subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
-                            node->GetHandle(), node_weight.second);
+                normEqual = true;
+              }
+              if (hasTexcoords && iv.texcoordIndex == values[inputs[TEXCOORD]])
+              {
+                texEqual = true;
+              }
+
+              // if the vertex has matching normal and texcoord index values
+              // then the vertex can be reused.
+              if ((!hasNormals || normEqual) && (!hasTexcoords || texEqual))
+              {
+                // found a vertex that can be shared.
+                toDuplicate = false;
+                reuseIndex = iv.mappedIndex;
+                subMesh->AddIndex(reuseIndex);
+                break;
               }
             }
+            addIndex = toDuplicate;
+
+            if (!toDuplicate)
+              r++;
           }
-          else if (iter->first == "NORMAL")
+        }
+
+        // if the vertex index is new or can not be shared then add it
+        if (addIndex)
+        {
+          GeometryIndices input;
+          if (hasVertices)
           {
-            subMesh->AddNormal(norms[values[iter->second]]);
+            subMesh->AddVertex(verts[daeVertIndex]);
+            unsigned int newVertIndex = subMesh->GetVertexCount()-1;
+            subMesh->AddIndex(newVertIndex);
+            if (combinedVertNorms)
+              subMesh->AddNormal(norms[daeVertIndex]);
+            if (_mesh->HasSkeleton())
+            {
+              subMesh->SetVertex(newVertIndex, bindShapeMat *
+                  subMesh->GetVertex(newVertIndex));
+              Skeleton *skel = _mesh->GetSkeleton();
+              for (unsigned int i = 0;
+                  i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+              {
+                std::pair<std::string, double> node_weight =
+                  skel->GetVertNodeWeight(values[daeVertIndex], i);
+                SkeletonNode *node =
+                    _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
+                subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
+                                node->GetHandle(), node_weight.second);
+              }
+            }
+            input.vertexIndex = daeVertIndex;
+            input.mappedIndex = newVertIndex;
           }
-          else if (iter->first == "TEXCOORD")
+          if (hasNormals)
           {
-            subMesh->AddTexCoord(texcoords[values[iter->second]].x,
-                texcoords[values[iter->second]].y);
+            subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
+            input.normalIndex = values[inputs[NORMAL]];
           }
-          // else
-          // gzerr << "Unhandled semantic[" << iter->first << "]\n";
+          if (hasTexcoords)
+          {
+            subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
+                texcoords[values[inputs[TEXCOORD]]].y);
+            input.texcoordIndex = values[inputs[TEXCOORD]];
+          }
+
+          // add the newly added gazebo submesh vertex index to the map
+          if (hasVertices)
+          {
+            std::vector<GeometryIndices> inputValues;
+            inputValues.push_back(input);
+            vertexIndexMap[daeVertIndex] = inputValues;
+          }
         }
       }
     }
   }
   delete [] values;
+
+  std::cerr << "polylist: " << std::endl;
+  std::cerr << "vertices: " << subMesh->GetVertexCount() << std::endl;
+  std::cerr << "normals: " << subMesh->GetNormalCount() << std::endl;
+  std::cerr << "texcoords: " << subMesh->GetTexCoordCount() << std::endl;
+  std::cerr << "indices: " << subMesh->GetIndexCount() << std::endl;
+  std::cerr << "reused: " << r << std::endl;
 
   _mesh->AddSubMesh(subMesh);
 }
@@ -1407,7 +1497,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   bool hasVertices = false;
   bool hasNormals = false;
   bool hasTexcoords = false;
-
   unsigned int offsetSize = 0;
   std::map<const unsigned int, int> inputs;
   while (trianglesInputXml)
@@ -1451,14 +1540,22 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
   std::string pStr = pXml->GetText();
 
-  std::map<unsigned int, std::vector<GeometryIndices> > inputValueMap;
+  // Collada format allows normals and texcoords to have their own set of
+  // indices for more efficient storage of data but opengl only supports one
+  // index buffer. So we need to reorder normals/texcoord to match the vertex
+  // index and duplicate any vertices that has the same index but a different
+  // normal/texcoord.
+
+  // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
+  // indices, used for identifying vertices that can be shared.
+  std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
+
   int *values = new int[offsetSize];
   std::vector<std::string> strs;
 
   boost::split(strs, pStr, boost::is_any_of("   "));
 
   /// TODO remove me
-  int d = 0;
   int r = 0;
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
@@ -1466,23 +1563,27 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     for (unsigned int i = 0; i < offsetSize; ++i)
       values[i] = math::parseInt(strs[j+i]);
 
-    bool addVertex = false;
+    int daeVertIndex = 0;
+    bool addIndex = !hasVertices;
+
+    // find a set of vertex/normal/texcoord that can be reused
+    // only do this if the mesh has vertices
     if (hasVertices)
     {
-      int daeVertIndex = values[inputs[VERTEX]];
+      daeVertIndex = values[inputs[VERTEX]];
 
       // if the vertex index has not been previously added then just add it.
-      if (inputValueMap.find(daeVertIndex) == inputValueMap.end())
+      if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
       {
-        addVertex = true;
+        addIndex = true;
       }
       else
       {
-        // if the vertex index was previously added, look at the corresponding
-        // normal and texcoord index values to see if they match.
+        // if the vertex index was previously added, check to see if it has the
+        // same normal and texcoord index values
         bool toDuplicate = true;
         unsigned int reuseIndex = 0;
-        std::vector<GeometryIndices> inputValues = inputValueMap[daeVertIndex];
+        std::vector<GeometryIndices> inputValues = vertexIndexMap[daeVertIndex];
 
         for (unsigned int i = 0; i < inputValues.size(); ++i)
         {
@@ -1498,36 +1599,34 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             texEqual = true;
           }
 
+          // if the vertex has matching normal and texcoord index values then
+          // the vertex can be reused.
           if ((!hasNormals || normEqual) && (!hasTexcoords || texEqual))
           {
-            // found a resuable vertex!
+            // found a vertex that can be shared.
             toDuplicate = false;
             reuseIndex = iv.mappedIndex;
+            subMesh->AddIndex(reuseIndex);
             break;
           }
         }
+        addIndex = toDuplicate;
 
         if (!toDuplicate)
-        {
-          /// TODO remove me
           r++;
-
-          subMesh->AddIndex(reuseIndex);
-        }
-        else
-        {
-          /// TODO remove me
-          d++;
-          addVertex = true;
-        }
       }
+    }
 
-      if (addVertex)
+    // if the vertex index is new or can not be shared then add it
+    if (addIndex)
+    {
+      GeometryIndices input;
+      if (hasVertices)
       {
-        GeometryIndices input;
         subMesh->AddVertex(verts[daeVertIndex]);
         unsigned int newVertIndex = subMesh->GetVertexCount()-1;
         subMesh->AddIndex(newVertIndex);
+
         if (combinedVertNorms)
           subMesh->AddNormal(norms[daeVertIndex]);
         if (_mesh->HasSkeleton())
@@ -1544,23 +1643,27 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                             node->GetHandle(), node_weight.second);
           }
         }
-        if (hasNormals)
-        {
-          subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
-          input.normalIndex = values[inputs[NORMAL]];
-        }
-        if (hasTexcoords)
-        {
-          subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
-              texcoords[values[inputs[TEXCOORD]]].y);
-          input.texcoordIndex = values[inputs[TEXCOORD]];
-        }
-
         input.vertexIndex = daeVertIndex;
         input.mappedIndex = newVertIndex;
+      }
+      if (hasNormals)
+      {
+        subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
+        input.normalIndex = values[inputs[NORMAL]];
+      }
+      if (hasTexcoords)
+      {
+        subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
+            texcoords[values[inputs[TEXCOORD]]].y);
+        input.texcoordIndex = values[inputs[TEXCOORD]];
+      }
+
+      // add the newly added gazebo submesh vertex index to the map
+      if (hasVertices)
+      {
         std::vector<GeometryIndices> inputValues;
         inputValues.push_back(input);
-        inputValueMap[daeVertIndex] = inputValues;
+        vertexIndexMap[daeVertIndex] = inputValues;
       }
     }
   }
@@ -1569,7 +1672,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   std::cerr << "normals: " << subMesh->GetNormalCount() << std::endl;
   std::cerr << "texcoords: " << subMesh->GetTexCoordCount() << std::endl;
   std::cerr << "indices: " << subMesh->GetIndexCount() << std::endl;
-  std::cerr << "duplicates: " << d << std::endl;
   std::cerr << "reused: " << r << std::endl;
 
   delete [] values;

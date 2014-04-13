@@ -35,8 +35,9 @@ TEST_F(ColladaLoader, LoadBox)
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
   EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
   EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
-  EXPECT_EQ(36u, mesh->GetVertexCount());
-  EXPECT_EQ(36u, mesh->GetNormalCount());
+  // 36 vertices, 24 unique, 12 shared.
+  EXPECT_EQ(24u, mesh->GetVertexCount());
+  EXPECT_EQ(24u, mesh->GetNormalCount());
   EXPECT_EQ(36u, mesh->GetIndexCount());
   EXPECT_EQ(0u, mesh->GetTexCoordCount());
   EXPECT_EQ(1u, mesh->GetSubMeshCount());
@@ -53,6 +54,24 @@ TEST_F(ColladaLoader, ShareVertices)
   common::Mesh *mesh = loader.Load(
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
 
+  // check number of shared vertices
+  std::set<unsigned int> uniqueIndices;
+  int shared = 0;;
+  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  {
+    const common::SubMesh *subMesh = mesh->GetSubMesh(i);
+    for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
+    {
+      if (uniqueIndices.find(subMesh->GetIndex(j)) == uniqueIndices.end())
+        uniqueIndices.insert(subMesh->GetIndex(j));
+      else
+        shared++;
+    }
+  }
+  EXPECT_EQ(shared, 12);
+  EXPECT_EQ(uniqueIndices.size(), 24u);
+
+  // check all vertices are unique
   for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
   {
     const common::SubMesh *subMesh = mesh->GetSubMesh(i);
