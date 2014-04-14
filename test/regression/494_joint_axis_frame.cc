@@ -213,7 +213,7 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
         }
       }
     }
-    gzerr << _joint->GetName()
+    gzdbg << _joint->GetName()
           << " t [" << vel
           << "] v [" << _joint->GetVelocity(0)
           << "] a [" << _axis
