@@ -39,13 +39,6 @@ ColladaExporter::~ColladaExporter()
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
 {
-  std::string path = _mesh->GetName();
-  path = path.substr(0, path.rfind("/")+1);
-  if (_filename.find(".dae") == std::string::npos)
-  {
-    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
-  }
-
   this->mesh = _mesh;
   this->materialCount = this->mesh->GetMaterialCount();
   this->subMeshCount = this->mesh->GetSubMeshCount();
@@ -112,7 +105,18 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
   this->ExportScene(sceneXml);
   colladaXml->LinkEndChild(sceneXml);
 
-  xmlDoc.SaveFile(path+_filename);
+  // Save file
+  std::string path = _mesh->GetName();
+  path = path.substr(0, path.rfind("/")+1);
+
+  if (_filename.find(".dae") == std::string::npos)
+  {
+    xmlDoc.SaveFile(path + _filename + std::string(".dae"));
+  }
+  else
+  {
+    xmlDoc.SaveFile(path+_filename);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -131,7 +135,7 @@ void ColladaExporter::ExportAsset(TiXmlElement *_assetXml)
 //////////////////////////////////////////////////
 void ColladaExporter::FillSource(
     const gazebo::common::SubMesh *_subMesh,
-    TiXmlElement *_meshXml, int _type, const char *_meshID)
+    TiXmlElement *_meshXml, GeometryType _type, const char *_meshID)
 {
   char sourceId[100], sourceArrayId[100];
   std::ostringstream fillData;
@@ -140,7 +144,7 @@ void ColladaExporter::FillSource(
   int stride;
   unsigned int count = 0;
 
-  if (_type == 1)
+  if (_type == POSITION)
   {
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->GetVertexCount();
@@ -152,7 +156,7 @@ void ColladaExporter::FillSource(
       fillData << vertex.x << " " << vertex.y << " " << vertex.z << " ";
     }
   }
-  if (_type == 2)
+  if (_type == NORMAL)
   {
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->GetNormalCount();
@@ -164,7 +168,7 @@ void ColladaExporter::FillSource(
       fillData << normal.x << " " << normal.y << " " << normal.z << " ";
     }
   }
-  if (_type == 3)
+  if (_type == UVMAP)
   {
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->GetVertexCount();
@@ -199,7 +203,7 @@ void ColladaExporter::FillSource(
   techniqueCommonXml->LinkEndChild(accessorXml);
 
   TiXmlElement *paramXml = new TiXmlElement("param");
-  if (_type == 1 || _type == 2)
+  if (_type == POSITION || _type == NORMAL)
   {
     paramXml->SetAttribute("type", "float");
     paramXml->SetAttribute("name", "X");
@@ -215,7 +219,7 @@ void ColladaExporter::FillSource(
     paramXml->SetAttribute("name", "Z");
     accessorXml->LinkEndChild(paramXml);
   }
-  if (_type == 3)
+  if (_type == UVMAP)
   {
     paramXml->SetAttribute("type", "float");
     paramXml->SetAttribute("name", "U");
@@ -247,13 +251,13 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
     const gazebo::common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
 
     // Position
-    FillSource(subMesh, meshXml, 1, meshId);
+    FillSource(subMesh, meshXml, POSITION, meshId);
     // Normals
-    FillSource(subMesh, meshXml, 2, meshId);
+    FillSource(subMesh, meshXml, NORMAL, meshId);
     // Texture coordinates
     if (subMesh->GetTexCoordCount() != 0)
     {
-      FillSource(subMesh, meshXml, 3, meshId);
+      FillSource(subMesh, meshXml, UVMAP, meshId);
     }
 
     // Vertices

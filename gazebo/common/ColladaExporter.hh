@@ -41,6 +41,8 @@ namespace gazebo
     /// \brief Class used to export Collada mesh files
     class GAZEBO_VISIBLE ColladaExporter : public MeshExporter
     {
+      public: enum GeometryType {POSITION, NORMAL, UVMAP};
+
       /// \brief Constructor
       public: ColladaExporter();
 
@@ -64,7 +66,7 @@ namespace gazebo
       /// \param[in] _meshID
       private: void FillSource(
           const gazebo::common::SubMesh *_subMesh,
-          TiXmlElement *_meshXml, int _type, const char *_meshID);
+          TiXmlElement *_meshXml, GeometryType _type, const char *_meshID);
 
       /// \brief Export library geometries element
       /// \param[in] libraryGeometriesXml Pointer to the library geometries

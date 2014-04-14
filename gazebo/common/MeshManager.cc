@@ -169,17 +169,9 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename)
   {
     extension = _filename.substr(_filename.rfind(".")+1, _filename.size());
   }
-  MeshExporter *exporter = NULL;
-  if (extension == "dae")
+  if (extension == "dae" || extension == "")
   {
-    exporter = this->colladaExporter;
-    exporter->Export(_mesh, _filename);
-  }
-  else if (extension == "")
-  {
-    std::string filename = _filename + std::string(".dae");
-    exporter = this->colladaExporter;
-    exporter->Export(_mesh, filename);
+    this->colladaExporter->Export(_mesh, _filename);
   }
   else
   {

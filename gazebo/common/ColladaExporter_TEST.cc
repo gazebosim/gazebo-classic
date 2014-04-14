@@ -36,6 +36,7 @@ TEST_F(ColladaExporter, ExportBox)
   const common::Mesh *meshOriginal = loader.Load(
       filename + ".dae");
 
+  // Export with extension
   common::ColladaExporter exporter;
   exporter.Export(meshOriginal, filename + "_exported.dae");
 
@@ -82,8 +83,9 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   const common::Mesh *meshOriginal = loader.Load(
       filename + ".dae");
 
+  // Export without extension
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, filename + "_exported.dae");
+  exporter.Export(meshOriginal, filename + "_exported");
 
   // Check .dae file
   TiXmlDocument xmlDoc;
