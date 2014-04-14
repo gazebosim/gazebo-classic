@@ -43,7 +43,7 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
-  if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")))
+  if (_physicsEngine == "dart")
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine
           << "] with joint type [" << _jointType << "]"
@@ -110,10 +110,12 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
       if (opt.worldParent)
       {
+        gzerr << "worldParent\n";
         this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
       }
       else
       {
+        gzerr << "not worldParent\n";
         this->CheckJointProperties(jointUseParentModelFrame,
           math::Vector3(cos(Am), sin(Am), 0));
       }
@@ -127,11 +129,13 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
       if (opt.worldChild)
       {
+        gzerr << "worldChild\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Aj), sin(Aj), 0));
       }
       else
       {
+        gzerr << "not worldChild\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
@@ -209,6 +213,13 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
         }
       }
     }
+    gzerr << _joint->GetName()
+          << " t [" << vel
+          << "] v [" << _joint->GetVelocity(0)
+          << "] a [" << _axis
+          << "] c [" << childVelocity
+          << "] p [" << parentVelocity
+          << "]\n";
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
   }
 }
