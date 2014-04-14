@@ -401,6 +401,12 @@ namespace gazebo
                                     unsigned int _index,
                                     const boost::any &_value) = 0;
 
+      /// \brief Get a non-generic parameter for the joint.
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      public: virtual double GetParam(const std::string &_key,
+                                      unsigned int _index) = 0;
+
       /// \brief Get the child link
       /// \return Pointer to the child link.
       public: LinkPtr GetChild() const;
