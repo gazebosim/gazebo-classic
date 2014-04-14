@@ -91,7 +91,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
-  camera_follow.cc
+  camera.cc
   camera_sensor.cc
   gpu_laser.cc
   gz_camera.cc

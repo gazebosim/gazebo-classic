@@ -158,12 +158,12 @@ TEST_F(JointControllerTest, AddJoint)
   jointController->AddJoint(joint);
   std::map<std::string, physics::JointPtr> joints =
     jointController->GetJoints();
-  EXPECT_EQ(joints.size(), 1);
+  EXPECT_EQ(joints.size(), 1u);
 
   // Check the default position PID values
   std::map<std::string, common::PID> posPids =
     jointController->GetPositionPIDs();
-  EXPECT_EQ(posPids.size(), 1);
+  EXPECT_EQ(posPids.size(), 1u);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetPGain(), 1);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 0.1);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 0.01);
@@ -171,7 +171,7 @@ TEST_F(JointControllerTest, AddJoint)
   // Check the default velocity PID values
   std::map<std::string, common::PID> velPids =
     jointController->GetVelocityPIDs();
-  EXPECT_EQ(velPids.size(), 1);
+  EXPECT_EQ(velPids.size(), 1u);
   EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetPGain(), 1);
   EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetIGain(), 0.1);
   EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetDGain(), 0.01);
@@ -180,34 +180,34 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_TRUE(jointController->SetPositionTarget(
         joint->GetScopedName(), 12.3));
   std::map<std::string, double> positions = jointController->GetPositions();
-  EXPECT_EQ(positions.size(), 1);
+  EXPECT_EQ(positions.size(), 1u);
   EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
 
   // Set a joint velocity target
   EXPECT_TRUE(jointController->SetVelocityTarget(
         joint->GetScopedName(), 3.21));
   std::map<std::string, double> velocities = jointController->GetVelocities();
-  EXPECT_EQ(velocities.size(), 1);
+  EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
   // Try setting a position target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
-  EXPECT_EQ(positions.size(), 1);
+  EXPECT_EQ(positions.size(), 1u);
   EXPECT_DOUBLE_EQ(positions[joint->GetScopedName()], 12.3);
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
   velocities = jointController->GetVelocities();
-  EXPECT_EQ(velocities.size(), 1);
+  EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
   // Reset the controller
   jointController->Reset();
   positions = jointController->GetPositions();
   velocities = jointController->GetVelocities();
-  EXPECT_EQ(positions.size(), 0);
-  EXPECT_EQ(velocities.size(), 0);
+  EXPECT_EQ(positions.size(), 0u);
+  EXPECT_EQ(velocities.size(), 0u);
 }
 
 /////////////////////////////////////////////////
@@ -233,7 +233,7 @@ TEST_F(JointControllerTest, SetJointPositions)
   jointController->AddJoint(joint2);
   std::map<std::string, physics::JointPtr> joints =
     jointController->GetJoints();
-  EXPECT_EQ(joints.size(), 2);
+  EXPECT_EQ(joints.size(), 2u);
 
   // Set joint positions for the two joints, and expect no expections.
   std::map<std::string, double> positions;
