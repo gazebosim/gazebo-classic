@@ -160,11 +160,11 @@ void FileLogger::Init(const std::string &_filename)
     boost::system::error_code ec;
     boost::filesystem::rename(logPath, newPath, ec);
     if (ec == 0)
-      std::cerr << "Deprecated log directory [" << logPath
+      std::cerr << "Existing log directory [" << logPath
                 << "] renamed to [" << newPath << "]" << std::endl;
     else
     {
-      std::cerr << "Unable to rename deprecated log directory [" << logPath
+      std::cerr << "Unable to rename existing log directory [" << logPath
                 << "] to [" << newPath << "]. Reason: " << ec.message();
       return;
     }

@@ -541,14 +541,6 @@ void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(const std::string &_key,
-    unsigned int _index,
-    const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
@@ -566,13 +558,6 @@ double BulletJoint::GetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetAttribute(const std::string &_key,
-    unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
 math::Angle BulletJoint::GetHighStop(unsigned int _index)
 {
   return this->GetUpperLimit(_index);
@@ -583,4 +568,3 @@ math::Angle BulletJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
 }
-
