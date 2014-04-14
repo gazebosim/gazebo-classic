@@ -1030,7 +1030,8 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
 {
-  if (this->dataPtr->materialIds.find(_name) != this->dataPtr->materialIds.end())
+  if (this->dataPtr->materialIds.find(_name)
+      != this->dataPtr->materialIds.end())
   {
     return this->dataPtr->materialIds[_name];
   }
@@ -1524,7 +1525,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   // Collada format allows normals and texcoords to have their own set of
   // indices for more efficient storage of data but opengl only supports one
   // index buffer. So we need to reorder normals/texcoord to match the vertex
-  // index and duplicate any vertices that has the same index but a different
+  // index and duplicate any vertices that have the same index but different
   // normal/texcoord.
 
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex

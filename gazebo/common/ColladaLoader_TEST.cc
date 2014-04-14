@@ -56,7 +56,7 @@ TEST_F(ColladaLoader, ShareVertices)
 
   // check number of shared vertices
   std::set<unsigned int> uniqueIndices;
-  int shared = 0;;
+  int shared = 0;
   for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
   {
     const common::SubMesh *subMesh = mesh->GetSubMesh(i);

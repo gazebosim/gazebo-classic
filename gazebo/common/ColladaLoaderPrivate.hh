@@ -57,7 +57,7 @@ namespace gazebo
       /// \brief Map of collada NORMAL ids to list of normals.
       public: std::map<std::string, std::vector<math::Vector3> > normalIds;
 
-      /// \brief Map of collada TEXCOORD ids to list texture coordinates.
+      /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
       public: std::map<std::string, std::vector<math::Vector2d> >texcoordIds;
 
       /// \brief Map of collada  Material ids to Gazebo materials.
