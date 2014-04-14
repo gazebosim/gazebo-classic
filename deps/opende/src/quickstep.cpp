@@ -1563,6 +1563,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// abs sum of off-diagonals remains smaller than the diagonal
       /// for all rows.
       const dReal moi_ratio_tol = 10.0;  // increase moi_ratio_tol to skip checks and increase performance
+      const dReal gamma1 = 1.5;  // increase to add stability
+      const dReal gamma2 = 1.5;  // increase to add stability
       dReal m1_new, m2_new;
       if ((m1 > moi_ratio_tol * m2) || (m2 > moi_ratio_tol * m1))
       {
@@ -1632,8 +1634,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //       M2d_new  = M2d  + alpha1 * SSd
         //       M2od_new = M2od + alpha2 * SSod
         //     For DD, enforce:
-        //       M1d_new / M1od_new > 1  (eq 5)
-        //       M2d_new / M2od_new > 1  (eq 6)
+        //       M1d_new / M1od_new = gamma1 > 1  (eq 5)
+        //       M2d_new / M2od_new = gamma2 > 1  (eq 6)
         //     For simplicity, look at the case where m1 > m2:
         //       (for m2 > m1, one can infer the results.)
         //     To eliminate alpha1, find alpha1 as a function of moi_ratio:
@@ -1641,18 +1643,27 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //       moi_ratio = (m1 + alpha1) / (m2 - alpha1)
         //       alpha1 = (moi_ratio * m2 - m1) / (1 + moi_ratio) (eq 7)
         //     Substitute eq 4, 7 into eq 5 and do some algebra:
-        //       (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd) / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod) > 1 (eq 13)
+        //       (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd) / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod) = gamma1 > 1 (eq 13)
         //     Solve eq 13 for moi_ratio:
-        //       moi_ratio * (M1d - M1od + m2*(SSd - SSod)) > m1*(SSd - SSod) - (M1d - M1od) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M1d - M1od + m2*(SSd - SSod)) < m1*(SSd - SSod) - (M1d - M1od) (eq 14)
+        //       moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod)) > m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod)) < m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od) (eq 14)
         //     Similarly, substitute eq 4, 7 into eq 6:
-        //       (moi_ratio * (M2d + m2 * SSd) + M2d - m1*SSd) / (moi_ratio*(M2od + m2*SSod) + M2od - m1*SSod) > 1 (eq 15)
+        //       (moi_ratio * (M2d - m2 * SSd) + M2d + m1*SSd) / (moi_ratio*(M2od - m2*SSod) + M2od + m1*SSod) = gamma2 > 1 (eq 15)
         //     Solve eq 15 for moi_ratio:
-        //       moi_ratio * (M2d - M2od + m2*(SSd - SSod)) > m1*(SSd - SSod) - (M2d - M2od) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M2d - M2od + m2*(SSd - SSod)) < m1*(SSd - SSod) - (M2d - M2od) (eq 16)
-        //     Lastly, repeat for the case where m2 > m1.
-        //       Implementation below refers to equations numbers 13, 14, 15, 16 for m1 > m2.
-        //       And similarly, equation numbers 18, 19, 20, 21 are analogs of 13-16 for m2 > m1.
+        //       moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod)) > (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod)) < (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd) (eq 16)
+        //     Lastly, repeat for the case where m2 > m1.  Similarly, equation numbers 18, 19, 20, 21 are analogs of 13-16 for m2 > m1.
+        //       (moi_ratio * (M1d - m1 * SSd) + M1d + m2*SSd) / (moi_ratio*(M1od - m1*SSod) + M1od + m2*SSod) = gamma1 > 1 (eq 18)
+        //     Solve eq 13 for moi_ratio:
+        //       moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod)) > m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod)) < m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d) (eq 19)
+        //     Similarly, substitute eq 4, 7 into eq 6:
+        //       (moi_ratio * (M2d + m1 * SSd) + M2d - m2*SSd) / (moi_ratio*(M2od + m1*SSod) + M2od - m2*SSod) = gamma2 > 1 (eq 20)
+        //     Solve eq 15 for moi_ratio:
+        //       moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod)) > (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod) ,this is true if rhs is > 0, otherwise
+        //       moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod)) < (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod) (eq 21)
+        //
+        //     Implementation below refers to equations numbers 13, 14, 15, 16 for m1 > m2, otherwise for m2 > m1
         //     
         //   Goal:
         //     select initial moi_ratio (currently set to 10)
@@ -1720,8 +1731,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // check equations 13 and 14 (gamma1 > 1)
               dReal denom_13 = moi_ratio * ( M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
               // dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
-              dReal left_14 = M1d[row] - M1od[row] + m2*(SSd[row] - SSod[row]);
-              dReal right_14 = m1*(SSd[row] - SSod[row]) - (M1d[row] - M1od[row]);
+              dReal left_14 = M1d[row] - gamma1*M1od[row] + m2*(SSd[row] - gamma1*SSod[row]);
+              dReal right_14 = m1*(SSd[row] - gamma1*SSod[row]) - (M1d[row] - gamma1*M1od[row]);
               // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
               //   denom_13, nomin_13, left_14, right_14);
               if (denom_13 > 0)
@@ -1819,8 +1830,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // check equations 15 and 16 (gamma2 > 1)
               dReal denom_15 = moi_ratio * ( M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
               // dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
-              dReal left_16 = M2d[row] - M2od[row] - m2*(SSd[row] - SSod[row]);
-              dReal right_16 = m1*(SSod[row] - SSd[row]) - (M2d[row] - M2od[row]);
+              dReal left_16 = M2d[row] - gamma2*M2od[row] - m2*(SSd[row] - gamma2*SSod[row]);
+              dReal right_16 = (gamma2*M2od[row] - M2d[row]) + m1*(gamma2*SSod[row] - SSd[row]);
               // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
               //   denom_15, nomin_15, left_16, right_16);
               if (denom_15 > 0)
@@ -1921,8 +1932,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // check equations 18 and 19 (gamma1 > 1)
               dReal denom_18 = moi_ratio * ( M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
               // dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
-              dReal left_19 = M1d[row] - M1od[row] - m1*(SSd[row] - SSod[row]);
-              dReal right_19 = m2*(SSod[row] - SSd[row]) + (M1od[row] - M1d[row]);
+              dReal left_19 = M1d[row] - gamma1*M1od[row] - m1*(SSd[row] - gamma2*SSod[row]);
+              dReal right_19 = m2*(gamma1*SSod[row] - SSd[row]) + (gamma1*M1od[row] - M1d[row]);
               // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
               //   denom_18, nomin_18, left_19, right_19);
               if (denom_18 > 0)
@@ -2023,8 +2034,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               // check equations 20 and 21 (gamma2 > 1)
               dReal denom_20 = moi_ratio * ( M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
               // dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
-              dReal left_21 = M2d[row] - M2od[row] + m1*(SSd[row] - SSod[row]);
-              dReal right_21 = m2*(SSd[row] - SSod[row]) - (M2d[row] - M2od[row]);
+              dReal left_21 = M2d[row] - gamma2*M2od[row] + m1*(SSd[row] - gamma2*SSod[row]);
+              dReal right_21 = m2*(SSd[row] - gamma2*SSod[row]) - (M2d[row] - gamma2*M2od[row]);
               // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
               //   denom_20, nomin_20, left_21, right_21);
               if (denom_20 > 0)
