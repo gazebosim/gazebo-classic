@@ -95,7 +95,7 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
       ->FirstChildElement("library_geometries")
       ->FirstChildElement("geometry");
 
-  for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); i++)
+  for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); ++i)
   {
     unsigned int countMeshInt = meshOriginal->GetSubMesh(i)->
         GetVertexCount()*3;

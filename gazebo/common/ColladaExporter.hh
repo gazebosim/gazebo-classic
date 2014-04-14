@@ -76,6 +76,7 @@ namespace gazebo
       /// \brief Export library images element
       /// \param[in] _libraryImagesXml Pointer to the library images XML
       /// instance
+      /// \return integer, number of images
       private: int ExportImages(TiXmlElement *_libraryImagesXml);
 
       /// \brief Export library materials element

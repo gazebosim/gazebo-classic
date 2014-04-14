@@ -235,7 +235,7 @@ void ColladaExporter::FillSource(
 //////////////////////////////////////////////////
 void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 {
-  for (unsigned int i = 0; i < this->subMeshCount; i++)
+  for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -331,7 +331,7 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 {
   int imageCount = 0;
-  for (unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; ++i)
   {
     const gazebo::common::Material *material = this->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
@@ -360,7 +360,7 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 //////////////////////////////////////////////////
 void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
 {
-  for (unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; ++i)
   {
     char id[100];
     snprintf(id, sizeof(id), "material_%u", i);
@@ -379,7 +379,7 @@ void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
 //////////////////////////////////////////////////
 void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
 {
-  for (unsigned int i = 0; i < this->materialCount; i++)
+  for (unsigned int i = 0; i < this->materialCount; ++i)
   {
     char id[100];
     snprintf(id, sizeof(id), "material_%u_fx", i);
@@ -552,7 +552,7 @@ void ColladaExporter::ExportVisualScenes(
   nodeXml->SetAttribute("name", "node");
   nodeXml->SetAttribute("id", "node");
 
-  for (unsigned int i = 0; i < this->subMeshCount; i++)
+  for (unsigned int i = 0; i < this->subMeshCount; ++i)
   {
     char meshId[100], materialId[100], attributeValue[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
