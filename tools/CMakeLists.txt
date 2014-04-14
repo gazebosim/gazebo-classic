@@ -9,6 +9,7 @@ include_directories(
 
 link_directories( 
   ${SDF_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
