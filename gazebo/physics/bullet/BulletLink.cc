@@ -108,8 +108,8 @@ void BulletLink::Init()
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
-      hackMu1 = collision->GetBulletSurface()->mu1;
-      hackMu2 = collision->GetBulletSurface()->mu2;
+      hackMu1 = collision->GetBulletSurface()->frictionPyramid.GetMuPrimary();
+      hackMu2 = collision->GetBulletSurface()->frictionPyramid.GetMuSecondary();
       // gzerr << "link[" << this->GetName()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
@@ -184,10 +184,12 @@ void BulletLink::Init()
   bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
 
   // Only use auto disable if no joints and no sensors are present
+  this->rigidLink->setActivationState(DISABLE_DEACTIVATION);
   if (this->GetModel()->GetAutoDisable() &&
       this->GetModel()->GetJointCount() == 0 &&
       this->GetSensorCount() == 0)
   {
+    this->rigidLink->setActivationState(ACTIVE_TAG);
     this->rigidLink->setSleepingThresholds(0.1, 0.1);
     this->rigidLink->setDeactivationTime(1.0);
   }

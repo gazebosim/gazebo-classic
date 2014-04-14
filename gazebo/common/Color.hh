@@ -25,6 +25,7 @@
 #include <iostream>
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Color Color.hh common/common.hh
     /// \brief Defines a color
-    class Color
+    class GAZEBO_VISIBLE Color
     {
       /// \brief (1, 1, 1)
       public: static const Color White;

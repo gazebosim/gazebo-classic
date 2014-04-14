@@ -265,7 +265,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (this->TrackVisualImpl((*iter).data()))
+      if (!this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
     else if ((*iter).request() == "attach_visual")
@@ -1207,6 +1207,13 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
+  int fsaa = 4;
+
+  // Full-screen anti-aliasing only works correctly in 1.8 and above
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
+  fsaa = 0;
+#endif
+
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
       _textureName,
@@ -1219,7 +1226,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       Ogre::TU_RENDERTARGET,
       0,
       false,
-      4)).getPointer();
+      fsaa)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
 
@@ -1450,6 +1457,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   // if (this->sceneNode->getParent())
   //  this->sceneNode->getParent()->removeChild(this->sceneNode);
 
+  bool result = false;
   if (_visual)
   {
     this->dataPtr->trackVisualPID.Init(0.25, 0, 0, 0, 0, 1.0, 0.0);
@@ -1457,13 +1465,14 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->dataPtr->trackVisualYawPID.Init(0.05, 0, 0, 0, 0, 1.0, 0.0);
 
     this->dataPtr->trackedVisual = _visual;
+    result = true;
   }
   else
   {
     this->dataPtr->trackedVisual.reset();
   }
 
-  return true;
+  return result;
 }
 
 //////////////////////////////////////////////////

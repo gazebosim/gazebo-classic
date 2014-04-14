@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <scene>
       <ambient>0.1 0.1 0.1 1</ambient>
@@ -58,7 +58,7 @@
     <model name="slide1">
       <pose>0 0 0 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.1 0 0 0" />
+        <pose>0 0 0.1 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -93,7 +93,7 @@
     <model name="slide2">
       <pose>1 0 0.201 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -128,7 +128,7 @@
     <model name="slide3">
       <pose>0.95 -0.05 0.201 0 0 -1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -163,7 +163,7 @@
     <model name="slide4">
       <pose>0.95 -0.07 0.201 0 0 -1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -198,7 +198,7 @@
     <model name="slide5">
       <pose>0.95 -0.09 0.201 0 0 -1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -233,7 +233,7 @@
     <model name="slide6">
       <pose>0.95 -0.11 0.201 0 0 -1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -268,7 +268,7 @@
     <model name="slide7">
       <pose>0.91 -0.11 0.2011 0 0 -1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -303,7 +303,7 @@
     <model name="slide8">
       <pose>10 10 0 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -338,7 +338,7 @@
     <model name="slide9">
       <pose>10.2 9.78 0.005 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -373,7 +373,7 @@
     <model name="slide10">
       <pose>10.20 9.74 0.005 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -408,7 +408,7 @@
     <model name="slide11">
       <pose>9.93 9.07 0.005 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -443,7 +443,7 @@
     <model name="slide12">
       <pose>9.69 8.21 0.005 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -478,7 +478,7 @@
     <model name="slide13">
       <pose>9.43 8.93 0.005 0 0 0</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -513,7 +513,7 @@
     <model name="slide14">
       <pose>7 14 0.005 0 0 1.5707</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>
@@ -548,7 +548,7 @@
     <model name="slide15">
       <pose>3 10 0.005 0 0 3.1415</pose>
       <link name="link">
-        <pose pose="0 0 0.0005 0 0 0" />
+        <pose>0 0 0.0005 0 0 0</pose>
         <inertial>
           <inertia>
             <ixx>1</ixx>

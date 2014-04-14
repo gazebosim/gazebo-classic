@@ -38,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -47,6 +47,7 @@ then
 else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
+" ./test/examples ./test/plugins"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
@@ -63,14 +64,17 @@ echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:161" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:132" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
+# The follow suppression is useful when checking for missing includes.
+# It's disable for now because checking for missing includes is very
+# time consuming. See CPPCHECK_CMD3.
+echo "missingIncludeSystem" >> $SUPPRESS
+
 #cppcheck
-CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
@@ -85,8 +89,13 @@ CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
 # This command used to be part of the script but was removed since our API
 # provides many functions that Gazebo does not use internally
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
-CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-" $CPPCHECK_INCLUDES --check-config"
+
+# Checking for missing includes is very time consuming. This is disabled
+# for now
+# CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
+# " $CPPCHECK_INCLUDES"
+CPPCHECK_CMD3=""
+
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
   ($CPPCHECK_BASE --xml $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
@@ -115,7 +124,8 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
+        | grep -v 'use --check-config for details' \
+        | grep -v 'Include file: .*not found'
     fi
 
     # Undo changes to suppression file

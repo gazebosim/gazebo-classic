@@ -182,6 +182,7 @@ Visual::~Visual()
     this->dataPtr->sceneNode = NULL;
   }
 
+  this->dataPtr->scene.reset();
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
@@ -1577,7 +1578,7 @@ math::Pose Visual::GetPose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose _pose)
+void Visual::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
   this->SetWorldRotation(_pose.rot);

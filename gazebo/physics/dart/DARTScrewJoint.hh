@@ -20,13 +20,14 @@
 
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A screw joint.
-    class DARTScrewJoint : public ScrewJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTScrewJoint : public ScrewJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -37,6 +38,13 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+
+      // Documentation inherited
+      public: virtual void SetAnchor(unsigned int _index,
+                  const math::Vector3 &_anchor);
 
       // Documentation inherited.
       public: virtual void Init();
@@ -52,8 +60,14 @@ namespace gazebo
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 
+      ///  \copydoc ScrewJoint::SetThreadPitch
+      public: virtual void SetThreadPitch(double _threadPitch);
+
       // Documentation inherited
       public: virtual double GetThreadPitch(unsigned int _index);
+
+      ///  \copydoc ScrewJoint::GetThreadPitch
+      public: virtual double GetThreadPitch();
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
@@ -69,6 +83,12 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetMaxForce(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

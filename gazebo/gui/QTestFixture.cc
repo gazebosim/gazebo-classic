@@ -123,7 +123,7 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
-  // gazebo::rendering::fini();
+  gazebo::gui::stop();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);

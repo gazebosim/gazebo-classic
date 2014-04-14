@@ -32,6 +32,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/PartInspector.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -49,7 +50,7 @@ namespace gazebo
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a model with parts and joints.
-    class ModelCreator : public QObject
+    class GAZEBO_VISIBLE ModelCreator : public QObject
     {
       Q_OBJECT
 

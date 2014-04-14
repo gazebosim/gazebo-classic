@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 
 using namespace gazebo;
 
+const double g_tolerance = 1e-4;
+
 class JointSpawningTest : public JointTest
 {
   /// \brief Spawn model with each type of joint.
@@ -47,6 +49,12 @@ class JointSpawningTest : public JointTest
   /// \param[in] _jointType Type of joint to spawn and test.
   public: void SpawnJointRotationalWorld(const std::string &_physicsEngine,
                                          const std::string &_jointType);
+
+  /// \brief Check joint properties.
+  /// \param[in] _index Joint angle index.
+  /// \param[in] _joint Joint to check.
+  public: void CheckJointProperties(unsigned int _index,
+                                    physics::JointPtr _joint);
 };
 
 // Fixture for testing all joint types.
@@ -81,6 +89,9 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, false);
@@ -94,6 +105,18 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != NULL);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
+  }
+
+  if (_jointType == "gearbox")
+  {
+    gzerr << "Skip connect to world tests, since we aren't specifying "
+          << "the reference body."
+          << std::endl;
+    return;
   }
 
   {
@@ -107,6 +130,10 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
     EXPECT_TRUE(parent == NULL);
+    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
   }
 
   if (_physicsEngine == "dart")
@@ -132,6 +159,10 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != NULL);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
   }
 }
 
@@ -183,6 +214,8 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
   EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
   EXPECT_TRUE(childPose.pos == parentPose.pos);
+  EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
+  EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,11 +277,162 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     world->Step(100);
     math::Pose afterPose = link->GetWorldPose();
     EXPECT_TRUE(initialPose.pos == afterPose.pos);
+    EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
+    EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointSpawningTest::CheckJointProperties(unsigned int _index,
+                                        physics::JointPtr _joint)
+{
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  bool isOde = physics->GetType().compare("ode") == 0;
+  bool isBullet = physics->GetType().compare("bullet") == 0;
+  bool isDart = physics->GetType().compare("dart") == 0;
+  double dt = physics->GetMaxStepSize();
+
+  if (_joint->HasType(physics::Base::SCREW_JOINT) && isDart)
+  {
+    gzerr << "This portion of the test fails for DARTScrewJoint" << std::endl;
+    return;
+  }
+  if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
+      _joint->HasType(physics::Base::GEARBOX_JOINT) ||
+      _joint->HasType(physics::Base::SCREW_JOINT) ||
+      _joint->HasType(physics::Base::UNIVERSAL_JOINT))
+  {
+    gzerr << "This portion of the test fails for this joint type" << std::endl;
+    return;
+  }
+  if (!_joint->GetChild())
+  {
+    gzerr << "The rest of this test fails without a child link" << std::endl;
+    return;
+  }
+
+  double velocityMagnitude = 1.0;
+  double maxForce = velocityMagnitude / dt * 10.1;
+  std::vector<double> velocities;
+  velocities.push_back(velocityMagnitude);
+  velocities.push_back(0.0);
+  velocities.push_back(-velocityMagnitude);
+  for (std::vector<double>::iterator iter = velocities.begin();
+       iter != velocities.end(); ++iter)
+  {
+    // Use Joint::SetVelocity with different values
+    double vel = *iter;
+    _joint->SetVelocity(_index, vel);
+
+    // ODE requires maxForce to be non-zero for SetVelocity to work
+    // See issue #964 for discussion of consistent API
+    if (isOde)
+      _joint->SetMaxForce(_index, maxForce);
+
+    // Take a step and verify that Joint::GetVelocity returns the same value
+    world->Step(1);
+    EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
+
+    // Take more steps and verify that it keeps spinning at same speed
+    world->Step(50);
+    EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
+  }
+
+  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
+  {
+    gzerr << "BulletSliderJoint fails the SetForce and axis limit tests"
+          << std::endl;
+    return;
+  }
+
+  // Test SetForce with positive value
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    // set positive force
+    double angleStart = _joint->GetAngle(_index).Radian();
+    _joint->SetForce(_index, 5);
+    world->Step(1);
+    EXPECT_GT(_joint->GetVelocity(_index), 0.0);
+    world->Step(1);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), angleStart);
+  }
+
+  // Test SetForce with negative value
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    // set negative force
+    double angleStart = _joint->GetAngle(_index).Radian();
+    _joint->SetForce(_index, -5);
+    world->Step(1);
+    EXPECT_LT(_joint->GetVelocity(_index), 0.0);
+    world->Step(1);
+    EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+  }
+
+  if (isBullet && _joint->HasType(physics::Base::HINGE_JOINT))
+  {
+    gzerr << "BulletHingeJoint fails the joint limit tests" << std::endl;
+    return;
+  }
+
+  // SetHighStop
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    unsigned int steps = 100;
+    double vel = 1.0;
+    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    _joint->SetHighStop(_index, limit);
+    _joint->SetVelocity(_index, vel);
+    if (isOde)
+      _joint->SetMaxForce(_index, maxForce);
+    world->Step(steps);
+    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_EQ(_joint->GetHighStop(_index), limit);
+  }
+
+  // SetLowStop
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    unsigned int steps = 100;
+    double vel = -1.0;
+    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    _joint->SetLowStop(_index, limit);
+    _joint->SetVelocity(_index, vel);
+    if (isOde)
+      _joint->SetMaxForce(_index, maxForce);
+    world->Step(steps);
+    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_EQ(_joint->GetLowStop(_index), limit);
   }
 }
 
 TEST_P(JointSpawningTest_All, SpawnJointTypes)
 {
+  if (this->jointType == "gearbox" && this->physicsEngine != "ode")
+  {
+    gzerr << "Skip test, gearbox is only supported in ODE."
+          << std::endl;
+    return;
+  }
   SpawnJointTypes(this->physicsEngine, this->jointType);
 }
 
@@ -269,7 +453,8 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "screw"
                   , "universal"
                   , "ball"
-                  , "revolute2")));
+                  , "revolute2"
+                  , "gearbox")));
 
 // Skip prismatic, screw, and revolute2 because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,

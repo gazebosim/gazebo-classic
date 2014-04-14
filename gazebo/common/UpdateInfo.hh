@@ -19,6 +19,7 @@
 
 #include <string>
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -26,7 +27,7 @@ namespace gazebo
   {
     /// \class UpdateInfo UpdateInfo.hh common/common.hh
     /// \brief Information for use in an update event.
-    class UpdateInfo
+    class GAZEBO_VISIBLE UpdateInfo
     {
       /// \brief Name of the world.
       public: std::string worldName;

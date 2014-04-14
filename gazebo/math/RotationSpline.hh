@@ -19,6 +19,7 @@
 
 #include <vector>
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class RotationSpline RotationSpline.hh math/gzmath.hh
     /// \brief Spline for rotations
-    class  RotationSpline
+    class GAZEBO_VISIBLE  RotationSpline
     {
         /// \brief Constructor. Sets the autoCalc to true
         public: RotationSpline();

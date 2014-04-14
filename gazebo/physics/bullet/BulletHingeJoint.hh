@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A body that has a box shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETHINGEJOINT_HH_
 #define _BULLETHINGEJOINT_HH_
 
@@ -27,6 +22,7 @@
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/util/system.hh"
 
 class btHingeConstraint;
 
@@ -39,7 +35,7 @@ namespace gazebo
     /// \{
 
     /// \brief A single axis hinge joint
-    class BulletHingeJoint : public HingeJoint<BulletJoint>
+    class GAZEBO_VISIBLE BulletHingeJoint : public HingeJoint<BulletJoint>
     {
       ///  Constructor
       public: BulletHingeJoint(btDynamicsWorld *world, BasePtr _parent);
@@ -73,11 +69,11 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.

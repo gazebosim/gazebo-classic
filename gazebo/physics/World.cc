@@ -205,6 +205,8 @@ void World::Load(sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
                                            &World::OnRequest, this, true);
   this->jointSub = this->node->Subscribe("~/joint", &World::JointLog, this);
+  this->lightSub = this->node->Subscribe("~/light", &World::OnLightMsg, this);
+
   this->modelSub = this->node->Subscribe<msgs::Model>("~/model/modify",
       &World::OnModelMsg, this);
 
@@ -630,7 +632,6 @@ void World::Update()
   }
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
-
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
@@ -777,7 +778,10 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(_name);
+  if (this->rootElement)
+    return this->rootElement->GetByName(_name);
+  else
+    return BasePtr();
 }
 
 /////////////////////////////////////////////////
@@ -1455,6 +1459,15 @@ void World::ProcessRequestMsgs()
       this->sceneMsg.SerializeToString(serializedData);
       response.set_type(sceneMsg.GetTypeName());
     }
+    else if ((*iter).request() == "spherical_coordinates_info")
+    {
+      msgs::SphericalCoordinates sphereCoordMsg;
+      msgs::Set(&sphereCoordMsg, *(this->sphericalCoordinates));
+
+      std::string *serializedData = response.mutable_serialized_data();
+      sphereCoordMsg.SerializeToString(serializedData);
+      response.set_type(sphereCoordMsg.GetTypeName());
+    }
     else
       send = false;
 
@@ -1511,7 +1524,8 @@ void World::ProcessModelMsgs()
       this->modelPub->Publish(*iter);
     }
   }
-  if (this->modelMsgs.size())
+
+  if (!this->modelMsgs.empty())
   {
     this->EnableAllModels();
     this->modelMsgs.clear();
@@ -2009,4 +2023,35 @@ void World::RemoveModel(const std::string &_name)
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void World::OnLightMsg(ConstLightPtr &_msg)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+
+  bool lightExists = false;
+
+  // Find the light by name, and copy the new parameters.
+  for (int i = 0; i < this->sceneMsg.light_size(); ++i)
+  {
+    if (this->sceneMsg.light(i).name() == _msg->name())
+    {
+      lightExists = true;
+      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      break;
+    }
+  }
+
+  // Add a new light if the light doesn't exist.
+  if (!lightExists)
+  {
+    this->sceneMsg.add_light()->CopyFrom(*_msg);
+  }
+}
+
+/////////////////////////////////////////////////
+msgs::Scene World::GetSceneMsg() const
+{
+  return this->sceneMsg;
 }

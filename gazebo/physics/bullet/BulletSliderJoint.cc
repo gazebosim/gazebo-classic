@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A bullet slider or primastic joint
- * Author: Nate Koenig
- * Date: 13 Oct 2009
- */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -146,11 +141,15 @@ void BulletSliderJoint::Init()
   // Throw an error if no links are given.
   else
   {
-    gzthrow("joint without links\n");
+    gzerr << "joint without links\n";
+    return;
   }
 
   if (!this->bulletSlider)
-    gzthrow("unable to create bullet slider joint\n");
+  {
+    gzerr << "unable to create bullet slider joint\n";
+    return;
+  }
 
   // btSliderConstraint has 2 degrees-of-freedom (like a piston)
   // so disable the rotation.
@@ -204,15 +203,8 @@ void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-
-    /// \TODO: currently we assume joint axis is specified in model frame,
-    /// this is incorrect, and should be corrected to be
-    /// joint frame which is specified in child link frame.
-    if (this->parentLink)
-      this->initialWorldAxis =
-        this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
-    else
-      this->initialWorldAxis = _axis;
+    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -257,21 +249,37 @@ void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
+bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
                                     const math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
   if (this->bulletSlider)
+  {
     this->bulletSlider->setUpperLinLimit(_angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletSlider not yet created.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
+bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
                                    const math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
   if (this->bulletSlider)
+  {
     this->bulletSlider->setLowerLinLimit(_angle.Radian());
+    return true;
+  }
+  else
+  {
+    gzerr << "bulletSlider not yet created.\n";
+    return false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -315,18 +323,17 @@ double BulletSliderJoint::GetMaxForce(unsigned int /*_index*/)
 //////////////////////////////////////////////////
 math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result;
+  math::Vector3 result = this->initialWorldAxis;
+
   if (this->bulletSlider)
   {
-    // I have not verified the following math, though I based it on internal
-    // bullet code at line 250 of btHingeConstraint.cpp
+    // bullet uses x-axis for slider
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
-      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(2);
+      * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
     result = BulletTypes::ConvertVector3(vec);
   }
-  else
-    gzwarn << "bulletHinge does not exist, returning fake axis\n";
+
   return result;
 }
 

@@ -1,35 +1,47 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
-    <scene>
-      <grid>false</grid>
-      <background>1 1 1 1</background>
-      <ambient>0.5 0.5 0.5 1</ambient>
-    </scene>
-    <physics type="ode">
-      <gravity>0 0 -9.8</gravity>
-      <ode>
-        <solver>
-          <type>quick</type>
-          <iters>10</iters>
-          <sor>1.0</sor>
-        </solver>
-        <constraints>
-          <cfm>0.0</cfm>
-          <erp>0.01</erp>
-          <contact_max_correcting_vel>0.0</contact_max_correcting_vel>
-          <contact_surface_layer>0.001</contact_surface_layer>
-        </constraints>
-      </ode>
-      <max_step_size>0.001</max_step_size>
-    </physics>
-    <!-- A ground plane -->
-    <include filename="ground_plane.model" />
     <!-- A global light source -->
-    <include filename="sun.light" />
-    <include filename="simple_arm.model" />
-    <include filename="cylinder.model" model_pose="1.0 1.0 0 0 0 0" />
-    <include filename="camera.model" model_pose="-1.0 -1.0 0.5 0 0 0.7071" />
-    <include filename="hokuyo.model" model_pose="-1.0 -1.0 0.3 0 0 0.7071" />
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://simple_arm</uri>
+    </include>
+    <model name="cylinder">
+      <pose>1.0 1.0 0 0 0 0</pose>
+      <link name="base">
+        <visual name="cylinder_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.25</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="cylinder_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.15</radius>
+              <length>0.25</length>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+    <include>
+      <pose>0.35 0.35 0.5 0 0 0.7071</pose>
+      <uri>model://camera</uri>
+    </include>
+
+    <include>
+      <pose>0.45 0.45 0.3 0 0 0.7071</pose>
+      <uri>model://hokuyo</uri>
+    </include>
   </world>
 </sdf>

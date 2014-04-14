@@ -63,6 +63,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
   ImageHeightmap.hh
@@ -87,6 +88,7 @@ set (headers
   Timer.hh
   UpdateInfo.hh
   Video.hh
+  ffmpeg_inc.h
  )
 
 if (HAVE_GTS)
@@ -109,10 +111,11 @@ set (gtest_sources
   Dem_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
-  Material_TEST.cc
-  Mesh_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
+  Material_TEST.cc
+  Mesh_TEST.cc
+  MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
@@ -148,13 +151,14 @@ target_link_libraries(gazebo_common
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
-  ${freeimage_library}
-  ${tinyxml_libraries}
+  ${freeimage_LIBRARIES}
+  ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDF_LIBRARIES}
   pthread

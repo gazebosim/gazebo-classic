@@ -1,4 +1,4 @@
-gzfactory -- Tool to spawn or delete models from  simulation
+gzfactory -- DEPRECATED(see 'gz help model')
 =============================================
 
 ## SYNOPSIS
