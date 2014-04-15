@@ -32,12 +32,12 @@ function(setup_target_for_coverage _targetname _outputname)
 
 	# Setup target
 	add_custom_target(${_targetname}
+    COMMAND ${LCOV_PATH} --zerocounters --directory ${PROJECT_BINARY_PATH}/gazebo
 		# Capturing lcov counters and generating report
-    COMMAND ${LCOV_PATH} --directory ${PROJECT_BINARY_DIR}/gazebo
+    COMMAND ${LCOV_PATH} --no-checksum --directory ${PROJECT_BINARY_DIR}/gazebo
       --capture --output-file ${_outputname}.info
-      COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'include/sdformat*' 'include/SimTK*' 'include/simbody*' 'include/simmath*' 'deps/*' 'build/*' 'test/*' '/usr/*'
-      --output-file ${_outputname}.info.cleaned
-		COMMAND ${GENHTML_PATH} -o ${_outputname} ${_outputname}.info.cleaned
+    COMMAND ${LCOV_PATH} --remove ${_outputname}.info 'include/sdformat*' 'include/SimTK*' 'include/simbody*' 'include/simmath*' 'deps/*' 'build/*' 'test/*' '/usr/*' --output-file ${_outputname}.info.cleaned
+		COMMAND ${GENHTML_PATH} --legend -o ${_outputname} ${_outputname}.info.cleaned
 		COMMAND ${CMAKE_COMMAND} -E remove ${_outputname}.info
       ${_outputname}.info.cleaned
 		
@@ -48,8 +48,7 @@ function(setup_target_for_coverage _targetname _outputname)
 	
   # Show info where to find the report. And cleanup
 	add_custom_command(TARGET ${_targetname} POST_BUILD
-		command ${LCOV_PATH} --directory . --zerocounters;
-		COMMENT "Open ./${_outputname}/index.html in your browser to view"
-       "the coverage report.")
+    COMMAND ;
+    COMMENT "Open ./${_outputname}/index.html in your browser to view the coverage report.")
 
 endfunction() # SETUP_TARGET_FOR_COVERAGE
