@@ -45,8 +45,6 @@
 #define USE_TPROW
 #undef TIMING
 #undef DEBUG_CONVERGENCE_TOLERANCE
-#undef SHOW_CONVERGENCE
-#define SMOOTH_LAMBDA
 #undef USE_1NORM
 //#define LOCAL_STEPPING  // not yet implemented
 //#define PENETRATION_JVERROR_CORRECTION
@@ -488,7 +486,7 @@ static inline void sum6(dRealMutablePtr a, dReal delta, dRealPtr b)
 }
 
 static void ComputeRows(
-#ifdef SHOW_CONVERGENCE
+#ifdef DEBUG_CONVERGENCE_TOLERANCE
                 int thread_id,
 #else
                 int /*thread_id*/,
@@ -613,13 +611,12 @@ static void ComputeRows(
   int friction_iterations = qs->friction_iterations;
   dReal smooth_contacts = qs->smooth_contacts;
 
-#ifdef SHOW_CONVERGENCE
-    // show starting lambda
-    printf("lambda start: [");
-    for (int i=startRow; i<startRow+nRows; i++)
-      printf("%f, ", lambda[i]);
-    printf("]\n");
-#endif
+  /* debug: show starting lambda (lots of data)
+  printf("lambda start: [");
+  for (int i=startRow; i<startRow+nRows; i++)
+    printf("%f, ", lambda[i]);
+  printf("]\n");
+  */
 
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal Jvnew_final = 0;
@@ -988,7 +985,7 @@ static void ComputeRows(
 #endif
 
         // option to smooth lambda
-#ifdef SMOOTH_LAMBDA
+        if (smooth_contacts > 0.0)
         {
           // smooth delta lambda
           // equivalent to first order artificial dissipation on lambda update.
@@ -1015,7 +1012,6 @@ static void ComputeRows(
             //   + smooth_contacts*old_lambda_erp;
           }
         }
-#endif
 
         // update caccel
         {
@@ -1123,22 +1119,59 @@ static void ComputeRows(
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
     // since local convergence might produce errors in other nodes?
-    dReal dlambda_bilateral_mean        = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
-    dReal dlambda_contact_normal_mean   = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
-    dReal dlambda_contact_friction_mean = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
-    dReal dlambda_total_mean = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
-      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
+    dReal dlambda_bilateral_mean, dlambda_contact_normal_mean, dlambda_contact_friction_mean, dlambda_total_mean;
+    dReal residual_bilateral_mean, residual_contact_normal_mean, residual_contact_friction_mean, residual_total_mean;
+
+    if (m_rms_dlambda[0] > 0)
+    {
+      dlambda_bilateral_mean         = rms_dlambda[0]/(dReal)m_rms_dlambda[0];
+      residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
+    }
+    else
+    {
+      dlambda_bilateral_mean         = 0.0;
+      residual_bilateral_mean        = 0.0;
+    }
+
+    if (m_rms_dlambda[1] > 0)
+    {
+      dlambda_contact_normal_mean    = rms_dlambda[1]/(dReal)m_rms_dlambda[1];
+      residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
+    }
+    else
+    {
+      dlambda_contact_normal_mean    = 0.0;
+      residual_contact_normal_mean   = 0.0;
+    }
+
+    if (m_rms_dlambda[2] > 0)
+    {
+      dlambda_contact_friction_mean  = rms_dlambda[2]/(dReal)m_rms_dlambda[2];
+      residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
+    }
+    else
+    {
+      dlambda_contact_friction_mean  = 0.0;
+      residual_contact_friction_mean = 0.0;
+    }
+
+    if (m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2] > 0)
+    {
+      dlambda_total_mean  = (rms_dlambda[0] + rms_dlambda[1] + rms_dlambda[2])/
+        ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
+      residual_total_mean = (rms_error[0] + rms_error[1] + rms_error[2])/
+        ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
+    }
+    else
+    {
+      dlambda_total_mean  = 0.0;
+      residual_total_mean = 0.0;
+    }
 
     qs->rms_dlambda[0] = sqrt(dlambda_bilateral_mean);
     qs->rms_dlambda[1] = sqrt(dlambda_contact_normal_mean);
     qs->rms_dlambda[2] = sqrt(dlambda_contact_friction_mean);
     qs->rms_dlambda[3] = sqrt(dlambda_total_mean);
-
-    dReal residual_bilateral_mean        = rms_error[0]/(dReal)m_rms_dlambda[0];
-    dReal residual_contact_normal_mean   = rms_error[1]/(dReal)m_rms_dlambda[1];
-    dReal residual_contact_friction_mean = rms_error[2]/(dReal)m_rms_dlambda[2];
-    dReal residual_total_mean = (rms_error[0] + rms_error[1] + rms_error[2])/
-      ((dReal)(m_rms_dlambda[0] + m_rms_dlambda[1] + m_rms_dlambda[2]));
 
     qs->rms_constraint_residual[0] = sqrt(residual_bilateral_mean);
     qs->rms_constraint_residual[1] = sqrt(residual_contact_normal_mean);
@@ -1160,7 +1193,6 @@ static void ComputeRows(
     //    qs->rms_dlambda[0],qs->rms_dlambda[1],qs->rms_dlambda[2]);
     //}
 
-#ifdef SHOW_CONVERGENCE
     /* uncomment for convergence information per row sweep (LOTS OF DATA!)
     printf("MONITOR: thread(%d) iter(%d) rms(%20.18f %20.18f %20.18)f\n",
       thread_id, iteration,
@@ -1171,7 +1203,6 @@ static void ComputeRows(
       printf("%f, ", lambda[i]);
     printf("\n");
     */
-#endif
 
     // option to stop when tolerance has been met
     if (iteration >= precon_iterations &&
@@ -1201,8 +1232,7 @@ static void ComputeRows(
     }
   } // end of for loop on iterations
 
-#ifdef SHOW_CONVERGENCE
-  // show starting lambda
+  /* debug: show final lambda (lots of data)
   printf("final lambdas: [");
   for (int i=startRow; i<startRow+nRows; i++)
     printf("%f, ", lambda[i]);
@@ -1215,10 +1245,7 @@ static void ComputeRows(
     qs->rms_constraint_residual[0], qs->rms_constraint_residual[1],
     qs->rms_constraint_residual[2],
     sor_lcp_tolerance);
-#endif
-  //printf("vnew: ");
-  //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
-  //printf("\n");
+  */
 
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
@@ -1439,8 +1466,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
   }
 #endif
 
-#ifdef SHOW_CONVERGENCE
-    if (0)
+    /* debug lambda ordering
     {
       printf("-------------- saved labmdas -------------\n");
       // print current lambdas
@@ -1460,7 +1486,7 @@ static void SOR_LCP (dxWorldProcessContext *context,
       }
       printf("\n-------------- end of saved labmdas -------------\n");
     }
-#endif
+    */
 
 #ifdef REORDER_CONSTRAINTS
   // the lambda computed at the previous iteration.
