@@ -121,14 +121,26 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
       this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
   {
-    const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
-      this->simbodyPhysics->integ->getState());
+    if (!this->mobod.isEmptyHandle())
+    {
+      const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
+        this->simbodyPhysics->integ->getState());
 
-    // express Z-axis of X_OM in world frame
-    SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-      this->simbodyPhysics->integ->getState(), X_OM.z()));
+      // express Z-axis of X_OM in world frame
+      SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_OM.z()));
 
-    return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3(z_W);
+    }
+    else
+    {
+      gzerr << "Joint mobod not initialized correctly.  Returning"
+            << " initial axis vector in world frame (not valid if"
+            << " joint frame has moved). Please file"
+            << " a report on issue tracker.\n";
+      return this->GetAxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index));
+    }
   }
   else
   {
@@ -157,8 +169,19 @@ math::Angle SimbodyHingeJoint::GetAngleImpl(unsigned int _index) const
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
-      return math::Angle(this->mobod.getOneQ(
-        this->simbodyPhysics->integ->getState(), _index));
+    {
+      if (!this->mobod.isEmptyHandle())
+      {
+        return math::Angle(this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), _index));
+      }
+      else
+      {
+        gzerr << "Joint mobod not initialized correctly.  Please file"
+              << " a report on issue tracker.\n";
+        return math::Angle(0.0);
+      }
+    }
     else
     {
       gzdbg << "GetAngleImpl() simbody not yet initialized, "
