@@ -161,6 +161,21 @@ class JointTest : public ServerFixture,
                 modelStr << "    <pose>" << _opt.parentLinkPose << "</pose>";
               }
               modelStr << "  </link>";
+              // debug: fix parent link to world
+              if (1)
+                modelStr
+                  << "  <joint name='parent_world_joint' type='revolute'>"
+                  << "    <parent>world</parent>"
+                  << "    <child>parent</child>"
+                  << "    <axis>"
+                  << "      <xyz>0 0 1</xyz>"
+                  << "      <use_parent_model_frame>1</use_parent_model_frame>"
+                  << "      <limit>"
+                  << "        <upper>0</upper>"
+                  << "        <lower>0</lower>"
+                  << "      </limit>"
+                  << "    </axis>"
+                  << "  </joint>";
             }
             if (!_opt.worldChild)
             {

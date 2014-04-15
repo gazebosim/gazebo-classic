@@ -942,7 +942,7 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Joint::GetAxisFrameLocal(unsigned int _index) const
+math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
   {
@@ -958,7 +958,16 @@ math::Quaternion Joint::GetAxisFrameLocal(unsigned int _index) const
     // child link frame to model frame.
     if (this->childLink)
     {
-      return (-this->childLink->GetRelativePose()).rot;
+      if (this->parentLink)
+      {
+        // relative to parent model
+        return (-(this->anchorPose+this->childLink->GetRelativePose())).rot;
+      }
+      else
+      {
+        // relative to world since parent link is world
+        return (-(this->anchorPose+this->childLink->GetWorldPose())).rot;
+      }
     }
     else
     {

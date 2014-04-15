@@ -144,22 +144,8 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->model->GetWorldPose().rot.RotateVector(
+      return this->GetAxisFrame(_index).RotateVector(
         this->GetLocalAxis(_index));
-
-      // if local axis specified in joint frame (Issue #494)
-      // Remember to remove include of Model.hh when switching.
-      // if (this->childLink)
-      // {
-      //   math::Pose jointPose =
-      //    this->anchorPose + this->childLink->GetWorldPose();
-      //   return jointPose.rot.RotateVector(this->GetLocalAxis(_index));
-      // }
-      // else
-      // {
-      //   gzerr << "Joint [" << this->GetName() << "] missing child link.\n";
-      //   return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
-      // }
     }
   }
 }

@@ -438,7 +438,7 @@
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
 1. **gazebo/physics/Joint.hh**
-    + math::Quaternion GetAxisFrameLocal(unsigned int _index) const
+    + math::Quaternion GetAxisFrameOffset(unsigned int _index) const
 
 ### Deletions
 

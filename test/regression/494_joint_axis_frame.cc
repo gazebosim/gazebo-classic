@@ -74,9 +74,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   opt.jointPose.rot.SetFromEuler(0, 0, Aj);
   opt.axis.Set(1, 0, 0);
 
-  // i = 0: child parent
-  // i = 1: child world
-  // i = 2: world parent
+  // i = 0: joint between child link and parent link
+  // i = 1: joint between child link and world
+  // i = 2: joint between world and parent link
   for (int i = 0; i < 3; ++i)
   {
     gzdbg << "SpawnJoint " << _jointType;
@@ -102,40 +102,42 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
     std::cout << std::endl;
 
-    // parent model frame
+    // spawn joint using using parent model frame to define joint axis
     {
+      gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
       physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
       ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
       if (opt.worldParent)
       {
-        gzerr << "worldParent\n";
+        gzdbg << "  where parent is world.\n";
         this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
       }
       else
       {
-        gzerr << "not worldParent\n";
+        gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(jointUseParentModelFrame,
           math::Vector3(cos(Am), sin(Am), 0));
       }
     }
 
-    // joint frame
+    // spawn joint using using child link frame to define joint axis
     {
+      gzdbg << "test case with joint axis specified in child link frame.\n";
       opt.useParentModelFrame = false;
       physics::JointPtr joint = SpawnJoint(opt);
       ASSERT_TRUE(joint != NULL);
 
       if (opt.worldChild)
       {
-        gzerr << "worldChild\n";
+        gzdbg << "  where parent is world.\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Aj), sin(Aj), 0));
       }
       else
       {
-        gzerr << "not worldChild\n";
+        gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
@@ -219,8 +221,12 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
           << "] a [" << _axis
           << "] c [" << childVelocity
           << "] p [" << parentVelocity
+          << "] c-p [" << childVelocity - parentVelocity
+          << "] |c-p| [" << (childVelocity - parentVelocity).GetLength()
+          << "] a.(c-p) [" << _axis.Dot(childVelocity - parentVelocity)
           << "]\n";
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
+    getchar();
   }
 }
 
