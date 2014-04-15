@@ -24,10 +24,12 @@ set (CMAKE_C_FLAGS_PROFILE " -fno-omit-frame-pointer -g -pg ${CMAKE_C_FLAGS_ALL}
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
 set (CMAKE_C_FLAGS_COVERAGE " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code coverage" FORCE)
-set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_C_FLAGS_COVERAGE} -fno-elide-constructors")
+set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_C_FLAGS_COVERAGE}")
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # -fno-default-inline -fno-implicit-inline-templates cause errors in clang
-  set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -fno-default-inline -fno-implicit-inline-templates")
+  # -fno-default-inline -fno-implicit-inline-templates are unimplemented, cause errors in clang
+  # -fno-elide-constructors can cause seg-faults in clang 3.4 and earlier
+  # http://llvm.org/bugs/show_bug.cgi?id=12208
+  set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -fno-default-inline -fno-implicit-inline-templates -fno-elide-constructors")
 endif()
 
 #####################################
