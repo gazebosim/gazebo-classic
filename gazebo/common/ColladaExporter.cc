@@ -355,8 +355,7 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
       if (!boost::filesystem::exists(imageStringOut))
       {
         boost::filesystem::create_directories(boost::filesystem::path(
-            imageStringOut.substr(0, imageStringOut.find("tmp")+4) +
-            "materials/textures"));
+            this->path + "/../materials/textures"));
 
         std::ifstream  src(imageStringIn.c_str(), std::ios::binary);
         std::ofstream  dst(imageStringOut.c_str(),   std::ios::binary);
