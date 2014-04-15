@@ -17,7 +17,8 @@
 #include <sys/stat.h>
 #include <string>
 #include <vector>
-#include <stdio.h>
+#include <gts.h>
+
 #include "gazebo/math/Plane.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
@@ -463,6 +464,46 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
 
   subMesh->RecalculateNormals();
 }
+//////////////////////////////////////////////////
+static void FillVertex(GtsPoint *_p, gpointer *_data)
+{
+  // create a Gazebo vertex from GTS_POINT and add it to the submesh
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
+  GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
+  subMesh->AddVertex(GTS_POINT(_p)->x, GTS_POINT(_p)->y, GTS_POINT(_p)->z);
+  // fill the hash table which will later be used for adding indices to the
+  // submesh in the FillFace function.
+  g_hash_table_insert(vIndex, _p,
+      GUINT_TO_POINTER((*(reinterpret_cast<guint *>(_data[1])))++));
+}
+
+//////////////////////////////////////////////////
+static void FillFace(GtsTriangle *_t, gpointer *_data)
+{
+  SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
+  GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
+  int* x = reinterpret_cast<int *>(_data[3]);
+  GtsVertex * v1, * v2, * v3;
+  gts_triangle_vertices(_t, &v1, &v2, &v3);
+  if (*x == 0)
+  {
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1))+*x);
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3))+*x);
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2))+*x);
+  }
+  else
+  {
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v1))+*x);
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v2))+*x);
+    subMesh->AddIndex(GPOINTER_TO_UINT(g_hash_table_lookup(vIndex, v3))+*x);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+static void add_constraint(GtsConstraint * c, GtsSurface * s)
+{
+  g_assert(gts_delaunay_add_constraint(s, c) == NULL);
+}
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
@@ -485,60 +526,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
+
   int numSides = _vertices.size();
-
-  // Texture coords
-  double t[4][2] =
-  {
-    {_uvCoords.x, 0}, {0, 0}, {0, _uvCoords.y}, {_uvCoords.x, _uvCoords.y}
-  };
-
-  float **v = new float *[numSides*2];
-  for (i = 0; i < numSides*2; i++)
-    v[i]= new float[3];
-
-  float x, angle = 2 * M_PI / numSides;
-  i = 0;
-
-  float **n = new float *[numSides*2];
-  for (i = 0; i < numSides*2; i++)
-    n[i]= new float[3];
-
-  float d;
-
-  for (i = 0; i < numSides*2; i++)
-  {
-    n[i][0] = 0.577350;
-    n[i][1] = 0.577350;
-    n[i][2] = 0.577350;
-  }
-
-  // Compute the vertices
-  for (i = 0, k = 0; i < numSides*2; i++, k++)
-  {
-    v[i][0] = _vertices[k].x;
-    v[i][1] = _vertices[k].y;
-    v[i][2] = 0.0;
-    subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
-    subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
-    subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
-    i++;
-
-    v[i][0] = _vertices[k].x;
-    v[i][1] = _vertices[k].y;
-    v[i][2] = _height;
-    subMesh->AddVertex(v[i][0], v[i][1], v[i][2]);
-    subMesh->AddNormal(n[i][0], n[i][1], n[i][2]);
-    subMesh->AddTexCoord(t[i%4][0], t[i%4][1]);
-  }
-
-  // Re-enter the first two vertices
-  subMesh->AddVertex(v[0][0], v[0][1], v[0][2]);
-  subMesh->AddNormal(n[0][0], n[0][1], n[0][2]);
-  subMesh->AddTexCoord(t[0%4][0], t[i%4][1]);
-  subMesh->AddVertex(v[1][0], v[1][1], v[1][2]);
-  subMesh->AddNormal(n[1][0], n[1][1], n[1][2]);
-  subMesh->AddTexCoord(t[1%4][0], t[1%4][1]);
 
   // Euler's Formula: numFaces = numEdges - numVertices + 2
   //                           = numSides + 2
@@ -546,66 +535,119 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   //                = numFaces - 2
   //                = numSides
 
-  // for lower face
-  int startVert = 0;
-  int endVert = numSides*2-2;
-  subMesh->AddIndex(startVert);
-  startVert +=2;
-  subMesh->AddIndex(startVert);
-  subMesh->AddIndex(endVert);
-  for (i = 1; i < numSides-2; i++)
+  GSList * l, * verticesList = NULL;
+  GtsTriangle * tri;
+  double z;
+  for (k = 0; k < 2; k++)
   {
-    if (i%2)
-    {
-      subMesh->AddIndex(startVert);
-      startVert +=2;
-      subMesh->AddIndex(startVert);
-      subMesh->AddIndex(endVert);
-    }
+    GtsSurface * surface;
+    GtsVertex * v1, * v2, * v3;
+    GtsFifo * edgeList;
+    edgeList = gts_fifo_new();
+    verticesList = NULL;
+
+    if (k == 0)
+       z = 0.0;
     else
+       z = _height;
+
+    // List the vertices and edges
+    for (i = 0; i < numSides; i++)
     {
-      subMesh->AddIndex(endVert);
-      endVert -=2;
-      subMesh->AddIndex(startVert);
-      subMesh->AddIndex(endVert);
+      verticesList = g_slist_append(verticesList,
+                                    gts_vertex_new(gts_vertex_class(),
+                                    _vertices[i].x, _vertices[i].y, z));
+      if (i != 0)
+      {
+        gts_fifo_push(edgeList,
+                      gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
+                      reinterpret_cast<GtsVertex *>
+                                      (g_slist_nth_data(verticesList, i)),
+                      reinterpret_cast<GtsVertex *>
+                                      (g_slist_nth_data(verticesList, i-1))));
+      }
     }
+    gts_fifo_push(edgeList,
+                  gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
+                  reinterpret_cast<GtsVertex *>
+                                  (g_slist_nth_data(verticesList, i-1)),
+                  reinterpret_cast<GtsVertex *>
+                                  (g_slist_nth_data(verticesList, 0))));
+
+    tri = gts_triangle_enclosing(gts_triangle_class(), verticesList, 100.);
+    gts_triangle_vertices(tri, &v1, &v2, &v3);
+
+    surface = gts_surface_new(gts_surface_class(),
+                              gts_face_class(),
+                              gts_edge_class(),
+                              gts_vertex_class());
+
+    gts_surface_add_face(surface,
+                         gts_face_new(gts_face_class(),
+                                      tri->e1, tri->e2, tri->e3));
+
+    l = verticesList;
+    while (l)
+    {
+      GtsVertex *v_in = reinterpret_cast<GtsVertex *>(l->data);
+      GtsVertex *v_out = gts_delaunay_add_vertex(surface, v_in, NULL);
+      if (v_out != NULL)
+      {
+        gts_vertex_replace(v_in, v_out);
+      }
+      l = l->next;
+    }
+
+    // add constraints
+    gts_fifo_foreach(edgeList, (GtsFunc) add_constraint, surface);
+
+    // delete the enclosing triangle
+    gts_allow_floating_vertices = TRUE;
+    gts_object_destroy(GTS_OBJECT(v1));
+    gts_object_destroy(GTS_OBJECT(v2));
+    gts_object_destroy(GTS_OBJECT(v3));
+    gts_allow_floating_vertices = FALSE;
+
+    // Remove edges on the boundary which are not constraints
+    gts_delaunay_remove_hull(surface);
+
+    // fill the submesh with data generated by GTS
+    unsigned int n2 = 0, m = numSides*k;
+    gpointer data[4];
+    GHashTable *vIndex = g_hash_table_new(NULL, NULL);
+
+    data[0] = subMesh;
+    data[1] = &n2;
+    data[2] = vIndex;
+    data[3] = &m;
+    gts_surface_foreach_vertex(surface, (GtsFunc)FillVertex, data);
+    n2 = 0;
+    gts_surface_foreach_face(surface, (GtsFunc)FillFace, data);
+
+    g_hash_table_destroy(vIndex);
+    gts_object_destroy(GTS_OBJECT(surface));
+    gts_fifo_destroy(edgeList);
   }
 
-  // for upper face
-  startVert = 1;
-  endVert = numSides*2-1;
-  subMesh->AddIndex(startVert);
-  startVert +=2;
-  subMesh->AddIndex(endVert);
-  subMesh->AddIndex(startVert);
-  for (i = 1; i < numSides-2; i++)
+  // Add vertices to submesh for defining sidefaces
+  for (i = 0; i < numSides; i++)
   {
-    if (!i%2)
-    {
-      subMesh->AddIndex(startVert);
-      startVert +=2;
-      subMesh->AddIndex(startVert);
-      subMesh->AddIndex(endVert);
-    }
-    else
-    {
-      subMesh->AddIndex(endVert);
-      endVert -=2;
-      subMesh->AddIndex(endVert);
-      subMesh->AddIndex(startVert);
-    }
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
+    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
   }
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
+  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
 
   // for each sideface
   for (i = 0; i < numSides; i++)
   {
-    subMesh->AddIndex(i*2);
-    subMesh->AddIndex(i*2+1);
-    subMesh->AddIndex(i*2+2);
+    subMesh->AddIndex(i*2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+2+numSides*2);
 
-    subMesh->AddIndex(i*2+2);
-    subMesh->AddIndex(i*2+1);
-    subMesh->AddIndex(i*2+3);
+    subMesh->AddIndex(i*2+2+numSides*2);
+    subMesh->AddIndex(i*2+1+numSides*2);
+    subMesh->AddIndex(i*2+3+numSides*2);
   }
 
   subMesh->RecalculateNormals();

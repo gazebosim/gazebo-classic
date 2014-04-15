@@ -8,19 +8,25 @@
         <visual name="triangle">
           <geometry>
             <polyline>
-              <point>4 4</point>
-              <point>7 4</point>
-              <point>4 7</point>
-              <height>2</height>
+              <point>0 0</point>
+              <point>0 1</point>
+              <point>1 1</point>
+              <point>0.5 0.5</point>
+              <point>1 0</point>
+              <height>1</height>
             </polyline>
           </geometry>
           <material>
-          <script>Gazebo/Red</script>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
           </material>
         </visual>  
       <pose>1 0 0 0 0 0</pose>
       </link>
     </model>
+
    <model name="pentagon">
     <static>true</static>
     <pose>0 2 5 0 0 0</pose>
@@ -37,7 +43,10 @@
             </polyline>
           </geometry>
           <material>
-            <script>Gazebo/WoodPallet</script>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
           </material>
         </visual>  
       <pose>1 1 0 0 0 0</pose>
@@ -54,14 +63,17 @@
               <point>0 1</point>
               <point>1 1</point>
               <point>1 0 </point>
-              <height>1</height>
+              <height>1.5</height>
             </polyline>
           </geometry>
           <material>
-            <script>Gazebo/Yellow</script>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Yellow</name>
+            </script>
           </material>
         </visual>  
-      <pose>1 1 0 0 0 0</pose>
+      <pose>2 2 0 0 0 0</pose>
       </link>
     </model>
   </world>

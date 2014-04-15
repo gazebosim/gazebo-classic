@@ -31,8 +31,8 @@ using namespace physics;
 
 
 //////////////////////////////////////////////////
-ODEPolyLineShape::ODEPolyLineShape(CollisionPtr _parent) :
-                                  PolyLineShape(_parent)
+ODEPolyLineShape::
+      ODEPolyLineShape(CollisionPtr _parent) : PolyLineShape(_parent)
 {
   this->odeData = NULL;
   this->vertices = NULL;
