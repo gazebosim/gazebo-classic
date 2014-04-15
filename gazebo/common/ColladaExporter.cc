@@ -16,6 +16,7 @@
  */
 
 #include <tinyxml.h>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
@@ -42,6 +43,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
   this->mesh = _mesh;
   this->materialCount = this->mesh->GetMaterialCount();
   this->subMeshCount = this->mesh->GetSubMeshCount();
+  this->path = _filename.substr(0, _filename.rfind("/"));
 
   if (this->materialCount != 0 && this->materialCount != this->subMeshCount)
   {
@@ -106,16 +108,13 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
   colladaXml->LinkEndChild(sceneXml);
 
   // Save file
-  std::string path = _mesh->GetName();
-  path = path.substr(0, path.rfind("/")+1);
-
   if (_filename.find(".dae") == std::string::npos)
   {
-    xmlDoc.SaveFile(path + _filename + std::string(".dae"));
+    xmlDoc.SaveFile(_filename + std::string(".dae"));
   }
   else
   {
-    xmlDoc.SaveFile(path+_filename);
+    xmlDoc.SaveFile(_filename);
   }
 }
 
@@ -334,9 +333,9 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
   for (unsigned int i = 0; i < this->materialCount; ++i)
   {
     const gazebo::common::Material *material = this->mesh->GetMaterial(i);
-    std::string imageString = material->GetTextureImage();
+    std::string imageStringIn = material->GetTextureImage();
 
-    if (imageString.find("meshes/") != std::string::npos)
+    if (imageStringIn.find("meshes/") != std::string::npos)
     {
       char id[100];
       snprintf(id, sizeof(id), "image_%u", i);
@@ -347,8 +346,22 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 
       TiXmlElement *initFromXml = new TiXmlElement("init_from");
       initFromXml->LinkEndChild(new TiXmlText(
-        imageString.substr(imageString.find("meshes/")+7)));
+        imageStringIn.substr(imageStringIn.find("meshes/")+7)));
       imageXml->LinkEndChild(initFromXml);
+
+      // Copy texture image to correct folder
+      std::string imageStringOut = this->path +
+          imageStringIn.substr(imageStringIn.find("meshes")+6);
+      if (!boost::filesystem::exists(imageStringOut))
+      {
+        boost::filesystem::create_directories(boost::filesystem::path(
+            imageStringOut.substr(0, imageStringOut.find("tmp")+4) +
+            "materials/textures"));
+
+        std::ifstream  src(imageStringIn.c_str(), std::ios::binary);
+        std::ofstream  dst(imageStringOut.c_str(),   std::ios::binary);
+        dst << src.rdbuf();
+      }
 
       imageCount++;
     }

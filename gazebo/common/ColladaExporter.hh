@@ -106,6 +106,9 @@ namespace gazebo
 
       /// \brief SubMesh count
       private: unsigned int subMeshCount;
+
+      /// \brief file path
+      private: std::string path;
     };
     /// \}
   }

@@ -30,19 +30,26 @@ class ColladaExporter : public gazebo::testing::AutoLogFixture { };
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportBox)
 {
-  std::string filename = std::string(PROJECT_SOURCE_PATH) + "/test/data/box";
+  std::string filenameIn = std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/box.dae";
+
+  boost::filesystem::path pathOut(boost::filesystem::current_path());
+  boost::filesystem::create_directories(pathOut /
+      boost::filesystem::path("tmp/meshes"));
+  std::string filenameOut = pathOut.string() +
+      "/tmp/meshes/box_exported.dae";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
-      filename + ".dae");
+      filenameIn);
 
   // Export with extension
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, filename + "_exported.dae");
+  exporter.Export(meshOriginal, filenameOut);
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(filename + "_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(filenameOut));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
                                ->FirstChildElement("library_geometries")
@@ -58,7 +65,7 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_STREQ(countDae, countMesh);
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(filename + "_exported.dae");
+  const common::Mesh *meshReloaded = loader.Load(filenameOut);
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
@@ -71,25 +78,33 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_EQ(meshOriginal->GetTexCoordCount(),
       meshReloaded->GetTexCoordCount());
   EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
+
+  // Remove temp directory
+  boost::filesystem::remove_all(pathOut.string() + "/tmp");
 }
 
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  std::string filename = std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill/meshes/cordless_drill";
+  std::string filenameIn = std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill/meshes/cordless_drill.dae";
+
+  boost::filesystem::path pathOut(boost::filesystem::current_path());
+  boost::filesystem::create_directories(pathOut /
+      boost::filesystem::path("tmp/meshes"));
+  std::string filenameOut = pathOut.string() +
+      "/tmp/meshes/cordless_drill_exported";
 
   common::ColladaLoader loader;
-  const common::Mesh *meshOriginal = loader.Load(
-      filename + ".dae");
+  const common::Mesh *meshOriginal = loader.Load(filenameIn);
 
   // Export without extension
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, filename + "_exported");
+  exporter.Export(meshOriginal, filenameOut);
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(filename + "_exported.dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(filenameOut +".dae"));
 
   TiXmlElement *geometryXml = xmlDoc.FirstChildElement("COLLADA")
       ->FirstChildElement("library_geometries")
@@ -114,7 +129,7 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(filename + "_exported.dae");
+  const common::Mesh *meshReloaded = loader.Load(filenameOut +".dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());
@@ -127,6 +142,9 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   EXPECT_EQ(meshOriginal->GetTexCoordCount(),
       meshReloaded->GetTexCoordCount());
   EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
+
+  // Remove temp directory
+  boost::filesystem::remove_all(pathOut.string() + "/tmp");
 }
 
 /////////////////////////////////////////////////
