@@ -51,9 +51,11 @@ namespace gazebo
 
       /// \brief Export a mesh
       /// \param[in] _mesh Gazebo mesh to export
-      /// \param[in] _filename File name includig extension
+      /// \param[in] _filename exported file's path and name including extension
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,
-          const std::string &_filename);
+          const std::string &_filename, bool _exportTextures);
 
       /// \brief Export asset element
       /// \param[in] _assetXml Pointer to the asset XML instance
@@ -109,6 +111,12 @@ namespace gazebo
 
       /// \brief file path
       private: std::string path;
+
+      /// \brief file name
+      private: std::string filename;
+
+      /// \brief True to export texture images
+      private: bool exportTextures;
     };
     /// \}
   }

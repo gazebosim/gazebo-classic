@@ -35,9 +35,9 @@ TEST_F(ColladaExporter, ExportBox)
 
   boost::filesystem::path pathOut(boost::filesystem::current_path());
   boost::filesystem::create_directories(pathOut /
-      boost::filesystem::path("tmp/meshes"));
+      boost::filesystem::path("tmp"));
   std::string filenameOut = pathOut.string() +
-      "/tmp/meshes/box_exported.dae";
+      "/tmp/box_exported.dae";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
@@ -45,7 +45,7 @@ TEST_F(ColladaExporter, ExportBox)
 
   // Export with extension
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, filenameOut);
+  exporter.Export(meshOriginal, filenameOut, false);
 
   // Check .dae file
   TiXmlDocument xmlDoc;
@@ -86,25 +86,24 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  std::string filenameIn = std::string(PROJECT_SOURCE_PATH) +
-      "/test/data/cordless_drill/meshes/cordless_drill.dae";
-
   boost::filesystem::path pathOut(boost::filesystem::current_path());
   boost::filesystem::create_directories(pathOut /
-      boost::filesystem::path("tmp/meshes"));
-  std::string filenameOut = pathOut.string() +
-      "/tmp/meshes/cordless_drill_exported";
+      boost::filesystem::path("tmp"));
 
   common::ColladaLoader loader;
-  const common::Mesh *meshOriginal = loader.Load(filenameIn);
+  const common::Mesh *meshOriginal = loader.Load(
+      std::string(PROJECT_SOURCE_PATH) +
+      "/test/data/cordless_drill/meshes/cordless_drill.dae");
 
-  // Export without extension
+  // Export without extension or 'meshes' directory
   common::ColladaExporter exporter;
-  exporter.Export(meshOriginal, filenameOut);
+  exporter.Export(meshOriginal, pathOut.string() +
+      "/tmp/cordless_drill_exported", true);
 
   // Check .dae file
   TiXmlDocument xmlDoc;
-  EXPECT_TRUE(xmlDoc.LoadFile(filenameOut +".dae"));
+  EXPECT_TRUE(xmlDoc.LoadFile(pathOut.string() +
+      "/tmp/cordless_drill_exported/meshes/cordless_drill_exported.dae"));
 
   TiXmlElement *geometryXml = xmlDoc.FirstChildElement("COLLADA")
       ->FirstChildElement("library_geometries")
@@ -129,7 +128,8 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   }
 
   // Reload mesh and compare
-  const common::Mesh *meshReloaded = loader.Load(filenameOut +".dae");
+  const common::Mesh *meshReloaded = loader.Load(pathOut.string() +
+      "/tmp/cordless_drill_exported/meshes/cordless_drill_exported.dae");
 
   EXPECT_EQ(meshOriginal->GetName(), meshReloaded->GetName());
   EXPECT_EQ(meshOriginal->GetMax(), meshReloaded->GetMax());

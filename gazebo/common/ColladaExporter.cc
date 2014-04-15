@@ -38,12 +38,27 @@ ColladaExporter::~ColladaExporter()
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
+void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
+    bool _exportTextures)
 {
   this->mesh = _mesh;
   this->materialCount = this->mesh->GetMaterialCount();
   this->subMeshCount = this->mesh->GetSubMeshCount();
-  this->path = _filename.substr(0, _filename.rfind("/"));
+  this->exportTextures = _exportTextures;
+
+  // File name and path
+  unsigned int beginFilename = _filename.rfind("/")+1;
+  unsigned int endFilename;
+  if (_filename.find(".dae") == std::string::npos)
+  {
+    endFilename = _filename.length();
+  }
+  else
+  {
+    endFilename = _filename.find(".dae");
+  }
+  this->path = _filename.substr(0, beginFilename);
+  this->filename = _filename.substr(beginFilename, endFilename-beginFilename);
 
   if (this->materialCount != 0 && this->materialCount != this->subMeshCount)
   {
@@ -108,13 +123,17 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename)
   colladaXml->LinkEndChild(sceneXml);
 
   // Save file
-  if (_filename.find(".dae") == std::string::npos)
+  if (this->exportTextures)
   {
-    xmlDoc.SaveFile(_filename + std::string(".dae"));
+    boost::filesystem::create_directories(
+        boost::filesystem::path(this->path + this->filename +
+        std::string("/meshes/")));
+    xmlDoc.SaveFile(this->path + this->filename + std::string("/meshes/") +
+        this->filename + std::string(".dae"));
   }
   else
   {
-    xmlDoc.SaveFile(_filename);
+    xmlDoc.SaveFile(this->path + this->filename + std::string(".dae"));
   }
 }
 
@@ -333,9 +352,9 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
   for (unsigned int i = 0; i < this->materialCount; ++i)
   {
     const gazebo::common::Material *material = this->mesh->GetMaterial(i);
-    std::string imageStringIn = material->GetTextureImage();
+    std::string imageString = material->GetTextureImage();
 
-    if (imageStringIn.find("meshes/") != std::string::npos)
+    if (imageString.find("meshes/") != std::string::npos)
     {
       char id[100];
       snprintf(id, sizeof(id), "image_%u", i);
@@ -346,19 +365,19 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 
       TiXmlElement *initFromXml = new TiXmlElement("init_from");
       initFromXml->LinkEndChild(new TiXmlText(
-        imageStringIn.substr(imageStringIn.find("meshes/")+7)));
+        imageString.substr(imageString.find("meshes/")+7)));
       imageXml->LinkEndChild(initFromXml);
 
       // Copy texture image to correct folder
-      std::string imageStringOut = this->path +
-          imageStringIn.substr(imageStringIn.find("meshes")+6);
-      if (!boost::filesystem::exists(imageStringOut))
+      if (this->exportTextures)
       {
         boost::filesystem::create_directories(boost::filesystem::path(
-            this->path + "/../materials/textures"));
+            this->path + this->filename + "/materials/textures"));
 
-        std::ifstream  src(imageStringIn.c_str(), std::ios::binary);
-        std::ofstream  dst(imageStringOut.c_str(),   std::ios::binary);
+        std::ifstream  src(imageString.c_str(), std::ios::binary);
+        std::ofstream  dst((this->path + this->filename +
+            "/materials/textures" + imageString.substr(
+            imageString.find("textures")+8)).c_str(), std::ios::binary);
         dst << src.rdbuf();
       }
 

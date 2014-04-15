@@ -62,8 +62,11 @@ namespace gazebo
 
       /// \brief Export a mesh to a file
       /// \param[in] _mesh the mesh
-      /// \param[in] _filename exported file's name
-      public: void Export(const Mesh *_mesh, const std::string &_filename);
+      /// \param[in] _filename exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
+      public: void Export(const Mesh *_mesh, const std::string &_filename,
+          bool _exportTextures = false);
 
       /// \brief Checks a path extension against the list of valid extensions.
       /// \return true if the file extension is loadable

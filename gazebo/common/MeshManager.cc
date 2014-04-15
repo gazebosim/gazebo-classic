@@ -162,7 +162,8 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 }
 
 //////////////////////////////////////////////////
-void MeshManager::Export(const Mesh *_mesh, const std::string &_filename)
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
+    bool _exportTextures)
 {
   std::string extension;
   if (_filename.find(".") != std::string::npos)
@@ -171,7 +172,7 @@ void MeshManager::Export(const Mesh *_mesh, const std::string &_filename)
   }
   if (extension == "dae" || extension == "")
   {
-    this->colladaExporter->Export(_mesh, _filename);
+    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
   }
   else
   {

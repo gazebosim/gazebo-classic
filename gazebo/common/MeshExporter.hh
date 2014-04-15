@@ -43,9 +43,11 @@ namespace gazebo
 
       /// \brief Export a 3D mesh
       /// \param[in] _mesh a pointer to the mesh to be exported
-      /// \param[in] _filename the path to the mesh
+      /// \param[in] _filename exported file's path and name
+      /// \param[in] _exportTextures True to export texture images to
+      /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,
-          const std::string &_filename) = 0;
+          const std::string &_filename, bool _exportTextures = false) = 0;
     };
     /// \}
   }
