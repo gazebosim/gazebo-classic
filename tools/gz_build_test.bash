@@ -15,7 +15,7 @@ logfileSummary="/tmp/gazebo_test-$timestamp-summary.txt"
 logfileVerbose="/tmp/gazebo_test-$timestamp-verbose.txt"
 BUILD_ROOT=/tmp/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
-testCount=40
+testCount=33
 
 # Create working directory
 cd 
@@ -50,7 +50,7 @@ export GAZEBO_MASTER_URI=http://localhost:11342
 export DISPLAY=:0
 export PATH=$BUILD_ROOT/install/bin:$PATH
 export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$BUILD_ROOT/install/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=$BUILD_ROOT/install/lib/pkgconfig:$PKG_CONFIG_PATH
+export PKG_CONFIG_PATH=$BUILD_ROOT/install/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 ulimit -c unlimited
 
 # Process each branch from the command line
