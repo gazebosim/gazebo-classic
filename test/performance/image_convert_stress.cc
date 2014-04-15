@@ -14,19 +14,21 @@
  * limitations under the License.
  *
 */
-#include "ServerFixture.hh"
-#include "gazebo/msgs/msgs.hh"
-#include "gazebo/common/common.hh"
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 
+#include "ServerFixture.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/common/common.hh"
+
 using namespace std;
 using namespace gazebo;
+
 class ImageConvertStressTest : public ServerFixture
 {
-public:
   /////////////////////////////////////////////////
-  double virtMemory() {
+  public: double virtMemory()
+  {
     double resident, share;
     GetMemInfo(resident, share);
     return resident + share;
@@ -47,7 +49,6 @@ TEST_F(ImageConvertStressTest, ManyConversions)
     image.SetFromData(u.get(), 400, 400, common::Image::RGB_INT8);
 
     msgs::Set(&msg, image);
-
   }
 
   double memAfter = virtMemory();

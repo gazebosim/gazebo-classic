@@ -213,7 +213,8 @@ namespace gazebo
       unsigned int size;
       _i.GetData(&data, size);
       _msg->set_data(data, size);
-      if (data) {
+      if (data)
+      {
         delete[] data;
       }
     }
