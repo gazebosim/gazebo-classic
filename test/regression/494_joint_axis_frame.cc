@@ -226,7 +226,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
           << "] a.(c-p) [" << _axis.Dot(childVelocity - parentVelocity)
           << "]\n";
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
-    getchar();
   }
 }
 
