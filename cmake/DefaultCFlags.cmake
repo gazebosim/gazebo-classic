@@ -6,8 +6,8 @@ set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FOR
 set (CMAKE_LINK_FLAGS_COVERAGE " --coverage" CACHE INTERNAL "Link flags for static code coverage" FORCE)
 
 set (CMAKE_C_FLAGS_RELEASE "")
-if (NOT APPLE)
-  # -s doesn't work with default osx compiler clang, alternative:
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # -s doesn't work with clang, see alternative in link below:
   # http://stackoverflow.com/questions/6085491/gcc-vs-clang-symbol-strippingu
   set (CMAKE_C_FLAGS_RELEASE "-s")
 endif()
@@ -24,7 +24,11 @@ set (CMAKE_C_FLAGS_PROFILE " -fno-omit-frame-pointer -g -pg ${CMAKE_C_FLAGS_ALL}
 set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
 
 set (CMAKE_C_FLAGS_COVERAGE " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code coverage" FORCE)
-set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_C_FLAGS_COVERAGE} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
+set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_C_FLAGS_COVERAGE} -fno-elide-constructors")
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # -fno-default-inline -fno-implicit-inline-templates cause errors in clang
+  set (CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -fno-default-inline -fno-implicit-inline-templates")
+endif()
 
 #####################################
 # Set all the global build flags
