@@ -53,7 +53,8 @@ TEST_F(ImageConvertStressTest, ManyConversions)
 
   double memAfter = virtMemory();
 
-  EXPECT_LE(memAfter - memBefore, 1000);
+  // Without the fix in pull request #1057, the difference is over 470000
+  EXPECT_LE(memAfter - memBefore, 2000);
 }
 
 /////////////////////////////////////////////////
