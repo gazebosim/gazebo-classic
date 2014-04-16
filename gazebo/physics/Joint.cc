@@ -961,7 +961,14 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
       if (this->parentLink)
       {
         // relative to parent model
-        return (-(this->anchorPose+this->childLink->GetRelativePose())).rot;
+        math::Pose childModelToChildLink = this->childLink->GetRelativePose();
+        math::Pose childModelPose = this->childLink->GetModel()->GetWorldPose();
+        math::Pose parentModelPose =
+          this->parentLink->GetModel()->GetWorldPose();
+        math::Pose parentModelToChildModel = childModelPose - parentModelPose;
+        math::Pose parentModelToAxisFrame =
+          this->anchorPose + childModelToChildLink + parentModelToChildModel;
+        return (-parentModelToAxisFrame).rot;
       }
       else
       {
