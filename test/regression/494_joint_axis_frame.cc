@@ -66,9 +66,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
   SpawnJointOptions opt;
   opt.type = _jointType;
-  double Am = M_PI / 12;
+  double Am = M_PI / 11;
   double Al = M_PI / 12;
-  double Aj = M_PI / 12;
+  double Aj = M_PI / 13;
   opt.modelPose.rot.SetFromEuler(0, 0, Am);
   opt.childLinkPose.rot.SetFromEuler(0, 0, Al);
   opt.jointPose.rot.SetFromEuler(0, 0, Aj);
