@@ -444,7 +444,7 @@ endif ()
 #################################################
 # Find Oculus SDK.
 find_path (oculus_INCLUDE_DIRS OVR.h)
-find_library(oculus_LIBRARIES ovr)
+find_library(oculus_LIBRARIES OculusVR)
 set (OCULUS_FOUND True)
 
 if (NOT oculus_INCLUDE_DIRS)
@@ -464,7 +464,7 @@ endif ()
 if (OCULUS_FOUND)
   set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
 else ()
-  BUILD_WARNING ("ovr not found, Oculus support will be disabled.")
+  BUILD_WARNING ("OculusVR not found, Oculus support will be disabled.")
   set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
 endif()
 
