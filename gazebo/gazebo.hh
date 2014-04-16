@@ -86,7 +86,11 @@ namespace gazebo
 
   /// \brief Start a gazebo server. This starts transportation, and makes it
   /// possible to create worlds.
-  /// \param[in] _args Vector of arguments for the system plugins.
+  /// \param[in] _args Vector of arguments only parsed by the system plugins.
+  /// Note that when you run gazebo/gzserver, all the options (--version,
+  /// --server-plugin, etc.) are parsed but when using Gazebo as a library, the
+  /// arguments are only parsed by the system plugins.
+  /// \sa gazebo::SystemPlugin::Load()
   /// \return True on success.
   GAZEBO_VISIBLE
   bool setupServer(const std::vector<std::string> &_args);
@@ -101,7 +105,11 @@ namespace gazebo
 
   /// \brief Start a gazebo client. This starts transportation, and makes it
   /// possible to connect to a running simulation.
-  /// \param[in] _args Vector of arguments for the system plugins.
+  /// \param[in] _args Vector of arguments only parsed by the system plugins.
+  /// Note that when you run gazebo/gzserver, all the options (--version,
+  /// --server-plugin, etc.) are parsed but when using Gazebo as a library, the
+  /// arguments are only parsed by the system plugins.
+  /// \sa gazebo::SystemPlugin::Load()
   /// \return True on success.
   GAZEBO_VISIBLE
   bool setupClient(const std::vector<std::string> &_args);
