@@ -22,9 +22,15 @@ class BitbucketPullRequests
 
     def initialize(jsonHash)
       @id          = jsonHash["id"]
-      @source      = jsonHash["source"]["commit"]["hash"]
-      @destination = jsonHash["destination"]["commit"]["hash"]
-      @branch      = jsonHash["source"]["branch"]["name"]
+      @source      = " "*12
+      @destination = " "*12
+      @branch      = ""
+      source       = jsonHash["source"]["commit"]
+      destination  = jsonHash["destination"]["commit"]
+      branch       = jsonHash["source"]["branch"]
+      @source      = source["hash"]      if !source.nil?
+      @destination = destination["hash"] if !destination.nil?
+      @branch      = branch["name"]      if !branch.nil?
     end
 
     def to_s

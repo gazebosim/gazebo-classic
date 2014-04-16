@@ -105,6 +105,11 @@ namespace gazebo
       /// \brief The current contacts.
       private: std::vector<msgs::Contact> contacts;
 
+      /// \brief Mutex used to protect reading/writing the sonar message.
+      /// static has little sense here but it was used to keep ABI stable
+      /// new releases already have it defined as a non-static member.
+      private: static boost::mutex mutexContacts;
+
       /// \brief True if the gripper has an object.
       private: bool attached;
 
