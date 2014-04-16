@@ -209,7 +209,13 @@ bool gazebo::setupServer(const std::vector<std::string> &_args)
   std::vector<char *> pointers(_args.size());
   std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
   pointers.push_back(0);
-  return gazebo::setupServer(_args.size(), &pointers[0]);
+  bool result = gazebo::setupServer(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
 }
 
 /////////////////////////////////////////////////
@@ -247,7 +253,13 @@ bool gazebo::setupClient(const std::vector<std::string> &_args)
   std::vector<char *> pointers(_args.size());
   std::transform(_args.begin(), _args.end(), pointers.begin(), c_str());
   pointers.push_back(0);
-  return gazebo::setupClient(_args.size(), &pointers[0]);
+  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
 }
 
 /////////////////////////////////////////////////
