@@ -414,10 +414,7 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // wait for pr2
-  int i;
-  for (i = 0; i < 1000 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(1000);
-  EXPECT_LT(i, 1000);
+  ServerFixture::WaitUntilEntitySpawn("pr2", 1000, 1000);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
