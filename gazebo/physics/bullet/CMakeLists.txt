@@ -23,6 +23,7 @@ set (sources
   BulletSliderJoint.cc
   BulletSurfaceParams.cc
   BulletUniversalJoint.cc
+  gzBtUniversalConstraint.cc
 )
 
 set (headers
@@ -50,6 +51,7 @@ set (headers
   BulletSurfaceParams.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
+  gzBtUniversalConstraint.hh
 )
 
 set (gtest_sources

@@ -154,3 +154,18 @@ double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
 }
+
+//////////////////////////////////////////////////
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  dVector3 result;
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
+{
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
+}

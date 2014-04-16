@@ -21,13 +21,14 @@
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A DART sphere shape
-    class DARTSphereShape : public SphereShape
+    class GAZEBO_VISIBLE DARTSphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

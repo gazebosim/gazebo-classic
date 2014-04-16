@@ -68,7 +68,7 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
-  pkg_check_modules(SDF sdformat>=1.4.10)
+  pkg_check_modules(SDF sdformat>=2.0.0)
   if (NOT SDF_FOUND)
     BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
   endif()
@@ -194,12 +194,6 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   #################################################
-  # Use internal CCD (built as libgazebo_ccd.so)
-  #
-  set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
-  set(CCD_LIBRARIES gazebo_ccd)
-
-  #################################################
   # Find TBB
   pkg_check_modules(TBB tbb)
   if (NOT TBB_FOUND)
@@ -286,6 +280,15 @@ if (PKG_CONFIG_FOUND)
   endif()
 
   ########################################
+  # Check and find libccd (if needed)
+  pkg_check_modules(CCD ccd>=1.4)
+  if (NOT CCD_FOUND)
+    message(STATUS "Using internal copy of libccd")
+    set(CCD_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/libccd/include")
+    set(CCD_LIBRARIES gazebo_ccd)
+  endif()
+
+  ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
   # if (NOT OAL_FOUND)
@@ -325,7 +328,15 @@ if (PKG_CONFIG_FOUND)
     link_directories(${libavcodec_LIBRARY_DIRS})
   endif ()
 
-  if (libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
+  ########################################
+  # Find avutil
+  pkg_check_modules(libavutil libavutil)
+  if (NOT libavutil_FOUND)
+    BUILD_WARNING ("libavutil not found. Audio-video capabilities will be disabled.")
+  endif ()
+
+
+  if (libavutil_FOUND AND libavformat_FOUND AND libavcodec_FOUND AND libswscale_FOUND)
     set (HAVE_FFMPEG TRUE)
   else ()
     set (HAVE_FFMPEG FALSE)
@@ -374,6 +385,7 @@ if (PKG_CONFIG_FOUND)
   else()
     set (HAVE_BULLET FALSE)
     add_definitions( -DLIBBULLET_VERSION=0.0 )
+    BUILD_WARNING ("Bullet > 2.82 not found, for bullet physics engine option, please install libbullet2.82-dev.")
   endif()
 
 else (PKG_CONFIG_FOUND)
@@ -432,6 +444,7 @@ endif ()
 ########################################
 # Include man pages stuff
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
+include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################

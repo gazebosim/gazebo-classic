@@ -18,6 +18,7 @@
 #define _BULLETMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -28,7 +29,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet specific version of MultiRayShape
-    class BulletMultiRayShape : public MultiRayShape
+    class GAZEBO_VISIBLE BulletMultiRayShape : public MultiRayShape
     {
       /// \brief Constructor
       public: BulletMultiRayShape(CollisionPtr parent);

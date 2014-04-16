@@ -27,13 +27,14 @@
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE joint interface
-    class ODEJoint : public Joint
+    class GAZEBO_VISIBLE ODEJoint : public Joint
     {
       /// \brief internal variables used for implicit damping
       public:  enum CFMMode
@@ -122,6 +123,10 @@ namespace gazebo
       /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
       public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
 
+      /// \brief Get flag indicating whether implicit spring damper is enabled.
+      /// \return True if implicit spring damper is used.
+      public: bool UsesImplicitSpringDamper();
+
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
       public: void ApplyImplicitStiffnessDamping();
@@ -192,11 +197,11 @@ namespace gazebo
       private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                   const math::Angle &_angle);
 
       // Documentation inherited.
@@ -213,20 +218,30 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
-                                        double _value);
+                                        double _value) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
                   const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
                                                 unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual void SetProvideFeedback(bool _enable);

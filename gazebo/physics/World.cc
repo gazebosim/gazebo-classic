@@ -623,7 +623,6 @@ void World::Update()
   }
   DIAG_TIMER_LAP("World::Update", "needsReset");
 
-
   this->updateInfo.simTime = this->GetSimTime();
   this->updateInfo.realTime = this->GetRealTime();
   event::Events::worldUpdateBegin(this->updateInfo);
@@ -770,7 +769,10 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
-  return this->rootElement->GetByName(_name);
+  if (this->rootElement)
+    return this->rootElement->GetByName(_name);
+  else
+    return BasePtr();
 }
 
 /////////////////////////////////////////////////
