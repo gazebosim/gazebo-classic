@@ -41,9 +41,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~MeshExporter();
 
-      /// \brief Export a 3D mesh
-      /// \param[in] _mesh a pointer to the mesh to be exported
-      /// \param[in] _filename exported file's path and name
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
       /// \param[in] _exportTextures True to export texture images to
       /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,

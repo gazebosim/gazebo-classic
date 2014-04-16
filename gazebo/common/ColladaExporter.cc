@@ -151,7 +151,7 @@ void ColladaExporter::ExportAsset(TiXmlElement *_assetXml)
 }
 
 //////////////////////////////////////////////////
-void ColladaExporter::FillSource(
+void ColladaExporter::ExportGeometrySource(
     const gazebo::common::SubMesh *_subMesh,
     TiXmlElement *_meshXml, GeometryType _type, const char *_meshID)
 {
@@ -268,17 +268,13 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 
     const gazebo::common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
 
-    // Position
-    FillSource(subMesh, meshXml, POSITION, meshId);
-    // Normals
-    FillSource(subMesh, meshXml, NORMAL, meshId);
-    // Texture coordinates
+    ExportGeometrySource(subMesh, meshXml, POSITION, meshId);
+    ExportGeometrySource(subMesh, meshXml, NORMAL, meshId);
     if (subMesh->GetTexCoordCount() != 0)
     {
-      FillSource(subMesh, meshXml, UVMAP, meshId);
+      ExportGeometrySource(subMesh, meshXml, UVMAP, meshId);
     }
 
-    // Vertices
     char attributeValue[100];
 
     TiXmlElement *verticesXml = new TiXmlElement("vertices");
@@ -293,7 +289,6 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
     snprintf(attributeValue, sizeof(attributeValue), "#%s-Positions", meshId);
     inputXml->SetAttribute("source", attributeValue);
 
-    // Triangles
     unsigned int indexCount = subMesh->GetIndexCount();
 
     TiXmlElement *trianglesXml = new TiXmlElement("triangles");
@@ -368,7 +363,6 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
         imageString.substr(imageString.find("meshes/")+7)));
       imageXml->LinkEndChild(initFromXml);
 
-      // Copy texture image to correct folder
       if (this->exportTextures)
       {
         boost::filesystem::create_directories(boost::filesystem::path(
@@ -377,7 +371,7 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
         std::ifstream  src(imageString.c_str(), std::ios::binary);
         std::ofstream  dst((this->path + this->filename +
             "/materials/textures" + imageString.substr(
-            imageString.find("textures")+8)).c_str(), std::ios::binary);
+            imageString.rfind("/"))).c_str(), std::ios::binary);
         dst << src.rdbuf();
       }
 

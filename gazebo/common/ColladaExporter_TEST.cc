@@ -86,16 +86,16 @@ TEST_F(ColladaExporter, ExportBox)
 /////////////////////////////////////////////////
 TEST_F(ColladaExporter, ExportCordlessDrill)
 {
-  boost::filesystem::path pathOut(boost::filesystem::current_path());
-  boost::filesystem::create_directories(pathOut /
-      boost::filesystem::path("tmp"));
-
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
       std::string(PROJECT_SOURCE_PATH) +
       "/test/data/cordless_drill/meshes/cordless_drill.dae");
 
-  // Export without extension or 'meshes' directory
+  // Export without expliciting extension or 'meshes' directory
+  boost::filesystem::path pathOut(boost::filesystem::current_path());
+  boost::filesystem::create_directories(pathOut /
+      boost::filesystem::path("tmp"));
+
   common::ColladaExporter exporter;
   exporter.Export(meshOriginal, pathOut.string() +
       "/tmp/cordless_drill_exported", true);

@@ -61,8 +61,8 @@ namespace gazebo
       public: const Mesh *Load(const std::string &_filename);
 
       /// \brief Export a mesh to a file
-      /// \param[in] _mesh the mesh
-      /// \param[in] _filename exported file's path and name
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name
       /// \param[in] _exportTextures True to export texture images to
       /// '../materials/textures' folder
       public: void Export(const Mesh *_mesh, const std::string &_filename,

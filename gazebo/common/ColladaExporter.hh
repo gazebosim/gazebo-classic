@@ -41,6 +41,7 @@ namespace gazebo
     /// \brief Class used to export Collada mesh files
     class GAZEBO_VISIBLE ColladaExporter : public MeshExporter
     {
+      /// \brief Geometry types
       public: enum GeometryType {POSITION, NORMAL, UVMAP};
 
       /// \brief Constructor
@@ -49,9 +50,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~ColladaExporter();
 
-      /// \brief Export a mesh
-      /// \param[in] _mesh Gazebo mesh to export
-      /// \param[in] _filename exported file's path and name including extension
+      /// \brief Export a mesh to a file
+      /// \param[in] _mesh Pointer to the mesh to be exported
+      /// \param[in] _filename Exported file's path and name including extension
       /// \param[in] _exportTextures True to export texture images to
       /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,
@@ -62,11 +63,11 @@ namespace gazebo
       private: void ExportAsset(TiXmlElement *_assetXml);
 
       /// \brief Export geometry source
-      /// \param[in] _subMesh Gazebo submesh
+      /// \param[in] _subMesh Pointer to a submesh
       /// \param[in] _meshXml Pointer to the mesh XML instance
-      /// \param[in] _type 1 for positions, 2 for normals
-      /// \param[in] _meshID
-      private: void FillSource(
+      /// \param[in] _type POSITION, NORMAL or UVMAP
+      /// \param[in] _meshID Mesh ID (mesh_<number>)
+      private: void ExportGeometrySource(
           const gazebo::common::SubMesh *_subMesh,
           TiXmlElement *_meshXml, GeometryType _type, const char *_meshID);
 
@@ -109,13 +110,14 @@ namespace gazebo
       /// \brief SubMesh count
       private: unsigned int subMeshCount;
 
-      /// \brief file path
+      /// \brief File path
       private: std::string path;
 
-      /// \brief file name
+      /// \brief File name
       private: std::string filename;
 
-      /// \brief True to export texture images
+      /// \brief True to export texture images to '../materials/textures'
+      /// folder
       private: bool exportTextures;
     };
     /// \}
