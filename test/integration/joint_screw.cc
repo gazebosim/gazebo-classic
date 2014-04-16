@@ -36,6 +36,12 @@ class JointTestScrew : public ServerFixture,
   /// Apply force to screw joint links, check velocity.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void ScrewJointForce(const std::string &_physicsEngine);
+
+  /// \brief Test screw joint limits implementation with forces.
+  /// Apply force to screw joint links, check velocity.
+  /// Keep increasing force until something gives
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void ScrewJointLimitForce(const std::string &_physicsEngine);
 };
 
 //////////////////////////////////////////////////
@@ -381,6 +387,85 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 TEST_P(JointTestScrew, ScrewJointForce)
 {
   ScrewJointForce(GetParam());
+}
+
+//////////////////////////////////////////////////
+void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    /// \TODO skipping bullet, see issue #1081
+    gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "DART Screw Joint not yet implemented.\n";
+    return;
+  }
+
+  // Load our screw joint test world
+  ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
+  SpawnModel("model://pr2");
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // wait for pr2
+  int i;
+  for (i = 0; i < 1000 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(1000);
+  EXPECT_LT(i, 1000);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // simulate 1 step
+  world->Step(1);
+  double t = world->GetSimTime().Double();
+
+  // get time step size
+  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+  gzlog << "dt : " << dt << "\n";
+
+  // verify that time moves forward
+  EXPECT_GT(t, dt);
+  gzlog << "t after one step : " << t << "\n";
+
+  // get model, joints and get links
+  physics::ModelPtr model = world->GetModel("pr2");
+  physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
+
+  // drop from some height
+  model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
+  // +1sec: should have hit the ground
+  world->Step(1000);
+  // +4sec: should destabilize without patch for issue #1159
+  world->Step(4000);
+
+  for (int n = 0; n < 1000; ++n)
+  {
+    world->Step(1);
+    math::Vector3 vel_angular = link_00->GetWorldLinearVel();
+    math::Vector3 vel_linear = link_00->GetWorldAngularVel();
+
+    EXPECT_LT(vel_angular.GetLength(), 0.1);
+    EXPECT_LT(vel_linear.GetLength(), 0.1);
+
+    gzdbg << "] va [" << vel_angular
+          << "] vl [" << vel_linear
+          << "]\n";
+  }
+}
+
+TEST_P(JointTestScrew, ScrewJointLimitForce)
+{
+  ScrewJointLimitForce(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestScrew,
