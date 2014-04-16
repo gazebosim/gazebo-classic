@@ -39,6 +39,7 @@ JointMaker::JointMaker()
   this->newJointCreated = false;
   this->mouseJoint = NULL;
   this->modelSDF.reset();
+  this->jointType = JointMaker::JOINT_NONE;
   this->jointCounter = 0;
 
   this->jointMaterials[JOINT_FIXED] = "Gazebo/Red";
@@ -56,7 +57,6 @@ JointMaker::JointMaker()
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
-
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
@@ -72,14 +72,14 @@ JointMaker::~JointMaker()
 /////////////////////////////////////////////////
 void JointMaker::Reset()
 {
-  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
-    return;
+//  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
+//    return;
 
   this->newJointCreated = false;
-  if (mouseJoint)
+  if (this->mouseJoint)
   {
-    delete mouseJoint;
-    mouseJoint = NULL;
+    delete this->mouseJoint;
+    this->mouseJoint = NULL;
   }
 
   this->jointType = JointMaker::JOINT_NONE;
@@ -164,6 +164,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
+  std::cerr << " mouse pos " << _event.pos << std::endl;
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -274,6 +275,7 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   {
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 
     // Press event added only after a joint is created. Needs to be added here
     // instead of in the constructor otherwise GLWidget would get the event
@@ -431,16 +433,15 @@ void JointMaker::CreateHotSpot()
 
   joint->hotspot = hotspotVisual;
 
-  hotspotVisual->InsertMesh("unit_sphere");
+  hotspotVisual->InsertMesh("unit_cylinder");
 
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
-      "__HOTSPOT__" + joint->visual->GetName(), "unit_sphere"));
+      "__HOTSPOT__" + joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->setUserAny(Ogre::Any(hotSpotName));
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
-  hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -474,10 +475,28 @@ void JointMaker::Update()
             joint->child->GetWorldPose().pos -
             joint->parent->GetWorldPose().pos);
 
-        joint->hotspot->SetWorldPosition(
-          joint->parent->GetWorldPose().pos +
-          (joint->child->GetWorldPose().pos -
-          joint->parent->GetWorldPose().pos)/2.0);
+        math::Vector3 dPos = (joint->child->GetWorldPose().pos -
+            joint->parent->GetWorldPose().pos);
+        math::Vector3 center = dPos/2.0;
+
+
+        joint->hotspot->SetScale(math::Vector3(0.05, 0.05, dPos.GetLength()));
+
+        joint->hotspot->SetWorldPosition(joint->parent->GetWorldPose().pos
+            + center);
+
+        math::Vector3 u = dPos;
+        math::Vector3 v = math::Vector3::UnitZ;
+        u = u.Normalize();
+
+        double cosTheta = v.Dot(u);
+        double angle = acos(cosTheta);
+        math::Vector3 w = (v.Cross(u)).Normalize();
+        math::Quaternion q;
+        q.SetFromAxis(w, angle);
+
+        joint->hotspot->SetWorldRotation(q);
+
       }
     }
   }
