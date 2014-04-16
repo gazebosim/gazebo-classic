@@ -302,7 +302,6 @@
         </axis>
       </joint>
       <static>0</static>
-      <plugin name='trikey_controller_plugin' filename='libbasic_controller_plugin.so'/>
     </model>
   </world>
 </sdf>
