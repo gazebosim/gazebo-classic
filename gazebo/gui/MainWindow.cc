@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+#include <OVR.h>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo_config.h"
@@ -193,6 +194,17 @@ void MainWindow::Load()
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
 
 #ifdef HAVE_OCULUS
+  OVR::DeviceManager *deviceManager;
+  OVR::HMDDevice *hmd;
+  OVR::HMDInfo devinfo;
+
+  OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
+  std::cout << "Init" << std::endl;
+  deviceManager = OVR::DeviceManager::Create();
+  std::cout << "Create" << std::endl;
+  std::cout << deviceManager->EnumerateDevices<OVR::HMDDevice>() << std::endl;
+  std::cout << "Enumerate" << std::endl;
+
   int oculusX = getINIProperty<int>("oculus.x", 0);
   int oculusY = getINIProperty<int>("oculus.y", 0);
   std::string visual = getINIProperty<std::string>("oculus.visual", "");
@@ -200,7 +212,8 @@ void MainWindow::Load()
   if (!visual.empty())
   {
     gui::OculusWindow *oculusWindow = new gui::OculusWindow(
-        oculusX, oculusY, visual);
+          oculusX, oculusY, visual);
+
     oculusWindow->show();
   }
 #endif
