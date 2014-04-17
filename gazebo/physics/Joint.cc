@@ -954,8 +954,8 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
   // Legacy support for specifying axis in parent model frame (#494)
   if (this->axisParentModelFrame[_index])
   {
-    // axis is defined in model frame, so return the rotation from
-    // child link frame to model frame.
+    // axis is defined in parent model frame, so return the rotation
+    // from joint frame to model frame.
     if (this->childLink)
     {
       if (this->parentLink)
@@ -993,8 +993,8 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
     }
   }
 
-  // axis is defined in the child link frame, so
-  // return the rotation from child link frame to child link frame.
+  // axis is defined in the joint frame, so
+  // return the rotation from joint frame to joint frame.
   return math::Quaternion();
 }
 
