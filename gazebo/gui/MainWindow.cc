@@ -49,8 +49,6 @@
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
- #include <OVR.h>
-
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -193,13 +191,6 @@ MainWindow::~MainWindow()
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
-
-  OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
-  OVR::DeviceManager *deviceManager = OVR::DeviceManager::Create();
-  OVR::HMDDevice *hmd = deviceManager->EnumerateDevices<
-    OVR::HMDDevice>().CreateDevice();
-
-  std::cout << hmd << std::endl;
 
 #ifdef HAVE_OCULUS
   int oculusX = getINIProperty<int>("oculus.x", 0);
