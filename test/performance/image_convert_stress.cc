@@ -33,12 +33,17 @@ class ImageConvertStressTest : public ServerFixture
     GetMemInfo(resident, share);
     return resident + share;
   }
+
+  public: static void delete_many(unsigned char* ptr)
+  {
+    delete[] ptr;
+  }
 };
 
 /////////////////////////////////////////////////
 TEST_F(ImageConvertStressTest, ManyConversions)
 {
-  boost::shared_ptr<unsigned char[]> u(new unsigned char[400*400*3]);
+  boost::shared_ptr<unsigned char> u(new unsigned char[400*400*3], delete_many);
   double memBefore = virtMemory();
 
   for (int i = 0; i < 1000; i++)
