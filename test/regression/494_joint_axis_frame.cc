@@ -230,22 +230,27 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
           << "]\n";
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
 
-    // test rotating axis
-    // get axis specified locally (in joint frame or in parent model frame)
-    math::Vector3 axisLocalFrame = _joint->GetLocalAxis(0);
-    // rotate axis into global frame
-    math::Vector3 axisGlobalFrame =
-      _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
-    // rotate axis into joint frame
-    math::Vector3 axisJointFrame =
-      _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
-    // roate axis specified in global frame into joint frame
-    math::Vector3 axisJointFrame2 =
-      _joint->GetWorldPose().rot.RotateVectorReverse(axisGlobalFrame);
-    // exercise GetAxisFrame and GetAxisFrameLocal in this test
-    EXPECT_EQ(axisJointFrame, axisJointFrame2);
-    gzdbg << "2 ways to get axis in joint frame [" << axisJointFrame
-          << "] [" << axisJointFrame2 << "]\n";
+    {
+      // test rotating axis
+      // get axis specified locally (in joint frame or in parent model frame)
+      math::Vector3 axisLocalFrame = _joint->GetLocalAxis(0);
+      // rotate axis into global frame
+      math::Vector3 axisGlobalFrame =
+        _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
+      // Test GetAxisFrame: check that axis in global frame is
+      // computed correctly.
+      EXPECT_EQ(axisGlobalFrame, _axis);
+      // rotate axis into joint frame
+      math::Vector3 axisJointFrame =
+        _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
+      // roate axis specified in global frame into joint frame
+      math::Vector3 axisJointFrame2 =
+        _joint->GetWorldPose().rot.RotateVectorReverse(axisGlobalFrame);
+      // Test GetAxisFrameOffset:
+      EXPECT_EQ(axisJointFrame, axisJointFrame2);
+      gzdbg << "2 ways to get axis in joint frame [" << axisJointFrame
+            << "] [" << axisJointFrame2 << "]\n";
+    }
   }
 }
 
