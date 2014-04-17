@@ -26,6 +26,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~OculusWindow();
 
+      public: bool CreateCamera();
+
       protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
 

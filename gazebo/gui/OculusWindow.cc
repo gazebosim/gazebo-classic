@@ -110,19 +110,29 @@ void OculusWindow::AttachCameraToVisual()
 }
 
 /////////////////////////////////////////////////
+bool OculusWindow::CreateCamera()
+{
+  try
+  {
+    this->scene = rendering::get_scene();
+    this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+  }
+  catch(const common::Exception &_e)
+  {
+    gzlog << _e.GetErrorStr() << std::endl;
+    return false;
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
 void OculusWindow::showEvent(QShowEvent *_event)
 {
-  std::cout << "showEvent" << std::endl;
-  this->scene = rendering::get_scene();
-
-  if (!this->oculusCamera)
-  {
-    this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
-
+  if (this->oculusCamera)
     this->attachCameraThread = new boost::thread(
         boost::bind(&OculusWindow::AttachCameraToVisual, this));
-  }
-  //this->oculusCamera->AttachToVisual(this->visualName, true);
+
+  this->oculusCamera->AttachToVisual(this->visualName, true);
 
   if (this->windowId == -1)
   {
@@ -134,8 +144,6 @@ void OculusWindow::showEvent(QShowEvent *_event)
   }
 
   QWidget::showEvent(_event);
-
-
 
   this->setFocus();
 
