@@ -20,6 +20,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Road2d.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -355,48 +356,22 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
   vBuf->unlock();
 
-  if (_msg.has_texture())
+  if (_msg.has_material())
   {
-    this->texture = _msg.texture();
-    if ((this->texture == "footway") ||
-        (this->texture == "pedestrian"))
+    if (_msg.material().has_script())
     {
-        this->setMaterial("Gazebo/Sidewalk");
-    }
-    else if ((this->texture == "motorway") ||
-             (this->texture == "lanes_6"))
-    {
-      this->setMaterial("Gazebo/Motorway");
-    }
-    else if ((this->texture == "trunk") ||
-             (this->texture == "lanes_4"))
-    {
-      this->setMaterial("Gazebo/Trunk");
-    }
-    else if ((this->texture == "primary") ||
-             (this->texture == "lanes_2"))
-    {
-      this->setMaterial("Gazebo/Primary");
-    }
-    else if ((this->texture == "tertiary") ||
-             (this->texture == "residential"))
-    {
-      this->setMaterial("Gazebo/Residential");
-    }
-    else if ((this->texture == "secondary") ||
-             (this->texture == "lane_1"))
-    {
-      this->setMaterial("Gazebo/Secondary");
-    }
-    else if (this->texture == "steps")
-    {
-      this->setMaterial("Gazebo/Steps");
-    }
-    else
-    {
-      gzerr << "Unknown texture value. Setting to default value\n";
-      this->setMaterial("Gazebo/Road");
-    }
+      for (int i = 0; i < _msg.material().script().uri_size(); ++i)
+      {
+        std::string matUri = _msg.material().script().uri(i);
+        if (!matUri.empty())
+          RenderEngine::Instance()->AddResourcePath(matUri);
+      }
+
+      std::string matName = _msg.material().script().name();
+
+      if (!matName.empty())
+        this->setMaterial(matName);
+     }
   }
   else
   {

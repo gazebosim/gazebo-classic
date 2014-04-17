@@ -977,7 +977,46 @@ material Gazebo/Residential
     }
   }
 }
-material Gazebo/Sidewalk
+
+material Gazebo/Tertiary
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture residential.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Pedestrian
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture sidewalk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Footway
 {
   technique
   {
@@ -1015,7 +1054,45 @@ material Gazebo/Motorway
   }
 }
 
+material Gazebo/Lanes_6
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture motorway.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
 material Gazebo/Trunk
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture trunk.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lanes_4
 {
   technique
   {
@@ -1053,7 +1130,45 @@ material Gazebo/Primary
   }
 }
 
+material Gazebo/Lanes_2
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture primary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
 material Gazebo/Secondary
+{
+  technique
+  {
+    pass
+    {
+      ambient 0.1 0.1 0.1 1.0
+      diffuse 0.8 0.8 0.8 1.0
+      specular 0.01 0.01 0.01 1.0 2.0
+
+      texture_unit
+      {
+        texture secondary.jpg
+        filtering trilinear
+      }
+    }
+  }
+}
+
+material Gazebo/Lane_1
 {
   technique
   {
@@ -1084,7 +1199,7 @@ material Gazebo/Steps
 
       texture_unit
       {
-        texture steps.jpg
+        texture steps.jpeg
         filtering trilinear
       }
     }

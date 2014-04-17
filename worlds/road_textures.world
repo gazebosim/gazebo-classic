@@ -12,84 +12,149 @@
       <width>5</width>
       <point>38 -92 0</point>
       <point>-38 -92 0</point>
-      <texture>primary</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Primary</name>
+        </script>
+      </material>
     </road>
     <road name="my_road2">
       <width>5</width>
       <point>-38 -92 0</point>
       <point>-92 -38  0</point>
-      <texture>motorway</texture>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Motorway</name>
+            </script>
+          </material>
     </road>
     <road name="my_road3">
       <width>5</width>
       <point>-92 -38 0</point>
-      <point>-92 38 0</point>
-      <texture>tertiary</texture>
+      <point>-92 38 0</point> 
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Residential</name>
+            </script>
+          </material>     
     </road>
     <road name="my_road4">
       <width>5</width>
       <point>-92 38 0</point>
       <point>-38 92 0</point>
-      <texture>trunk</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Trunk</name>
+        </script>
+      </material>
     </road>
     <road name="my_road5">
       <width>5</width>
       <point>-38 92 0</point>
       <point>38 92 0</point>
-      <texture>residential</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Tertiary</name>
+        </script>
+      </material>
     </road>
     <road name="my_road6">
       <width>5</width>
       <point>38 92 0</point>
       <point>92 38 0</point>
-      <texture>secondary</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Secondary</name>
+        </script>
+      </material>
     </road>
     <road name="my_road7">
       <width>5</width>
       <point>92 38 0</point>
       <point>-92 38 0</point>
-      <texture>lane_1</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Lane_1</name>
+        </script>
+      </material>
     </road>
     <road name="my_road8">
       <width>5</width>
       <point>92 38 0</point>
       <point>92 -38 0</point>
-      <texture>lanes_2</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Lanes_2</name>
+        </script>
+      </material>
     </road>
     <road name="my_road9">
       <width>5</width>
       <point>92 -38 0</point>
       <point>38 -92 0</point>
-      <texture>lanes_4</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Lanes_4</name>
+        </script>
+      </material>
     </road>
     <road name="my_road10">
       <width>5</width>
       <point>38 -92 0</point>
       <point>-92 38 0</point>
-      <texture>lanes_6</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Lanes_6</name>
+        </script>
+      </material>
     </road>
     <road name="my_road11">
       <width>5</width>
       <point>-92 -38 0</point>
       <point>-38 -92 0</point>
-      <texture>footway</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Footway</name>
+        </script>
+      </material>
     </road>
     <road name="my_road12">
       <width>5</width>
       <point>38 92 0</point>
       <point>38 -92 0</point>
-      <texture>pedestrian</texture>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Pedestrian</name>
+        </script>
+      </material>
     </road>
     <road name="my_road13">
       <width>5</width>
       <point>38 92 0</point>
-      <point>-38 -92 0</point>
-      <texture>SomeInvalidValue</texture>
+      <point>38 -92 0</point>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Steps</name>
+        </script>
+      </material>
     </road>
     <road name="my_road14">
       <width>5</width>
-      <point>92 -38 0</point>
-      <point>-92 -38 0</point>
+      <point>38 92 0</point>
+      <point>-38 -92 0</point>
     </road>
 </world>
 </sdf>

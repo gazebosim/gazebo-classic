@@ -97,7 +97,6 @@ TEST_F(RoadTest, Texture)
   elem->GetElement("texture")->Set("Unknow_Value");
   ASSERT_TRUE(elem);
   road->Load(elem);
-
 }
 
 int main(int argc, char **argv)

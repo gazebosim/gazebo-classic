@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <scene>
+      <grid>false</grid>
+    </scene>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <road name="my_road1">
+      <width>5</width>
+      <point>38 -92 0</point>
+      <point>-38 -92 0</point>
+      <texture>primary</texture>
+    </road>
+    <road name="my_road2">
+      <width>5</width>
+      <point>-38 -92 0</point>
+      <point>-92 -38  0</point>
+      <texture>motorway</texture>
+    </road>
+    <road name="my_road3">
+      <width>5</width>
+      <point>-92 -38 0</point>
+      <point>-92 38 0</point>
+      <texture>tertiary</texture>
+    </road>
+    <road name="my_road4">
+      <width>5</width>
+      <point>-92 38 0</point>
+      <point>-38 92 0</point>
+      <texture>trunk</texture>
+    </road>
+    <road name="my_road5">
+      <width>5</width>
+      <point>-38 92 0</point>
+      <point>38 92 0</point>
+      <texture>residential</texture>
+    </road>
+    <road name="my_road6">
+      <width>5</width>
+      <point>38 92 0</point>
+      <point>92 38 0</point>
+      <texture>secondary</texture>
+    </road>
+    <road name="my_road7">
+      <width>5</width>
+      <point>92 38 0</point>
+      <point>-92 38 0</point>
+      <texture>lane_1</texture>
+    </road>
+    <road name="my_road8">
+      <width>5</width>
+      <point>92 38 0</point>
+      <point>92 -38 0</point>
+      <texture>lanes_2</texture>
+    </road>
+    <road name="my_road9">
+      <width>5</width>
+      <point>92 -38 0</point>
+      <point>38 -92 0</point>
+      <texture>lanes_4</texture>
+    </road>
+    <road name="my_road10">
+      <width>5</width>
+      <point>38 -92 0</point>
+      <point>-92 38 0</point>
+      <texture>lanes_6</texture>
+    </road>
+    <road name="my_road11">
+      <width>5</width>
+      <point>-92 -38 0</point>
+      <point>-38 -92 0</point>
+      <texture>footway</texture>
+    </road>
+    <road name="my_road12">
+      <width>5</width>
+      <point>38 92 0</point>
+      <point>38 -92 0</point>
+      <texture>pedestrian</texture>
+    </road>
+    <road name="my_road13">
+      <width>5</width>
+      <point>38 92 0</point>
+      <point>-38 -92 0</point>
+      <texture>SomeInvalidValue</texture>
+    </road>
+    <road name="my_road14">
+      <width>5</width>
+      <point>92 -38 0</point>
+      <point>-92 -38 0</point>
+    </road>
+</world>
+</sdf>
