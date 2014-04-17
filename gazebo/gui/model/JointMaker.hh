@@ -31,6 +31,11 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
+namespace Ogre
+{
+  class BillboardSet;
+}
+
 namespace gazebo
 {
   namespace gui
@@ -212,6 +217,10 @@ namespace gazebo
 
       /// \brief Visual line used to represent joint connecting parent and child
       public: rendering::DynamicLines *line;
+
+      /// \brief Visual handle used to represent joint parent / child
+      public: rendering::DynamicLines *handle;
+      public: Ogre::BillboardSet *handles;
 
       /// \brief Type of joint.
       public: JointMaker::JointType type;

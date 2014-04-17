@@ -108,6 +108,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     joint->child.reset();
     delete joint->line;
     delete joint->inspector;
+    scene->GetManager()->destroyBillboardSet(joint->handles);
     this->joints.erase(_jointName);
   }
 }
@@ -164,7 +165,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  std::cerr << " mouse pos " << _event.pos << std::endl;
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
@@ -441,7 +441,53 @@ void JointMaker::CreateHotSpot()
   hotspotObj->setUserAny(Ogre::Any(hotSpotName));
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
-  hotspotVisual->SetMaterial("Gazebo/RedTransparent");
+
+
+  hotspotVisual->SetMaterial(this->jointMaterials[joint->type]);
+  hotspotVisual->SetTransparency(0.5);
+
+
+  Ogre::BillboardSet *handleSet =
+      camera->GetScene()->GetManager()->createBillboardSet(2);
+  handleSet->setMaterialName("Gazebo/PointCloud");
+
+  Ogre::MaterialPtr mat =
+      Ogre::MaterialManager::getSingleton().getByName(
+      this->jointMaterials[joint->type]);
+  Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
+  color.a = 0.5;
+
+  handleSet->setDefaultDimensions(0.05, 0.05);
+  Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
+  parentHandle->setColour(color);
+  Ogre::Billboard *childHandle = handleSet->createBillboard(0, 0, 0);
+  childHandle->setColour(color);
+  Ogre::SceneNode *handleNode =
+      hotspotVisual->GetSceneNode()->createChildSceneNode();
+  handleNode->attachObject(handleSet);
+  handleNode->setInheritScale(false);
+  handleNode->setInheritOrientation(false);
+  joint->handles = handleSet;
+
+
+/*  rendering::DynamicLines *handle =
+     hotspotVisual->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
+
+  Ogre::SceneNode *handleNode =
+      hotspotVisual->GetSceneNode()->createChildSceneNode();
+  handle->getParentSceneNode()->detachObject(handle);
+  handleNode->attachObject(handle);
+  handleNode->setInheritScale(false);
+  handleNode->setInheritOrientation(false);
+
+  joint->handle = handle;
+  joint->handle->AddPoint(0, 0, 0);
+  joint->handle->SetColor(0, common::Color(1, 0, 0, 0.5));
+  joint->handle->AddPoint(0, 0, 0);
+  joint->handle->SetColor(1, common::Color(0, 1, 0, 0.5));
+  joint->handle->setMaterial("Gazebo/PointCloud");*/
+
+  //hotspotVisual->SetMaterial("Gazebo/RedTransparent");
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -478,25 +524,31 @@ void JointMaker::Update()
         math::Vector3 dPos = (joint->child->GetWorldPose().pos -
             joint->parent->GetWorldPose().pos);
         math::Vector3 center = dPos/2.0;
-
-
-        joint->hotspot->SetScale(math::Vector3(0.05, 0.05, dPos.GetLength()));
-
+        joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
         joint->hotspot->SetWorldPosition(joint->parent->GetWorldPose().pos
             + center);
-
-        math::Vector3 u = dPos;
+        // set orientation of hotspot
+        math::Vector3 u = dPos.Normalize();
         math::Vector3 v = math::Vector3::UnitZ;
-        u = u.Normalize();
-
         double cosTheta = v.Dot(u);
         double angle = acos(cosTheta);
         math::Vector3 w = (v.Cross(u)).Normalize();
         math::Quaternion q;
         q.SetFromAxis(w, angle);
-
         joint->hotspot->SetWorldRotation(q);
 
+        joint->handles->getBillboard(0)->setPosition(
+            rendering::Conversions::Convert(joint->child->GetWorldPose().pos -
+            joint->hotspot->GetWorldPose().pos));
+        joint->handles->getBillboard(1)->setPosition(
+            rendering::Conversions::Convert(joint->parent->GetWorldPose().pos -
+            joint->hotspot->GetWorldPose().pos));
+        joint->handles->_updateBounds();
+
+/*        joint->handle->SetPoint(0, (joint->child->GetWorldPose().pos -
+            joint->hotspot->GetWorldPose().pos));
+        joint->handle->SetPoint(1, (joint->parent->GetWorldPose().pos -
+            joint->hotspot->GetWorldPose().pos));*/
       }
     }
   }
