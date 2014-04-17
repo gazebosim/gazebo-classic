@@ -22,6 +22,7 @@ if (NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
     factory_stress.cc
+    image_convert_stress.cc
     transport_stress.cc
   )
   
