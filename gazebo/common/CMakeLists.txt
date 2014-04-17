@@ -94,10 +94,12 @@ set (headers
 if (HAVE_GTS)
 set (sources
   ${sources}
+  GTSMeshUtils.cc
   MeshCSG.cc
 )
 set (headers
   ${headers}
+  GTSMeshUtils.hh
   MeshCSG.hh
 )
 endif()

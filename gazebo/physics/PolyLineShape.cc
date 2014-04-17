@@ -104,7 +104,7 @@ void PolyLineShape::SetVertices(const msgs::Geometry &_msg)
 ////////////////////////////////////////////////////
 void PolyLineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
 {
-  int i;
+  unsigned int i;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   for (i = 0; i < _vertices.size(); i++)
   {
