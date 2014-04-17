@@ -53,6 +53,8 @@ const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
+  this->isDeviceReady = false;
+
   // Set default OculusCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
@@ -117,6 +119,8 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &OculusCamera::OnControl, this);
+
+  this->isDeviceReady = true;
 }
 
 //////////////////////////////////////////////////
@@ -219,6 +223,12 @@ void OculusCamera::Update()
 void OculusCamera::ResetSensor()
 {
   this->sensorFusion->Reset();
+}
+
+//////////////////////////////////////////////////
+bool OculusCamera::IsDeviceReady()
+{
+  return this->isDeviceReady;
 }
 
 //////////////////////////////////////////////////

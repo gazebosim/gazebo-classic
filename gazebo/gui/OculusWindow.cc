@@ -119,6 +119,8 @@ void OculusWindow::showEvent(QShowEvent *_event)
   {
     this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
 
+    std::cout << this->oculusCamera->IsDeviceReady() << std::endl;
+
     this->attachCameraThread = new boost::thread(
         boost::bind(&OculusWindow::AttachCameraToVisual, this));
   }
