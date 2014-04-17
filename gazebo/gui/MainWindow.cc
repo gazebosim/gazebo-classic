@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <OVR.h>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo_config.h"
