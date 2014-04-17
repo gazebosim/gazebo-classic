@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include <stdio.h>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/Road.hh"
 #include "gazebo/msgs/msgs.hh"

@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <gazebo/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
@@ -56,9 +57,6 @@ namespace gazebo
 
       /// \brief Points that makes up the mid-line of the road.
       private: std::vector<math::Vector3> points;
-
-      /// \brief Texture of the road
-      public: std::string texture;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
