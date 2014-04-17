@@ -193,8 +193,6 @@ namespace gazebo
       /// \brief Reset the Oculus Rift sensor orientation.
       public: void ResetSensor();
 
-      public: bool IsDeviceReady();
-
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -248,7 +246,6 @@ namespace gazebo
       private: OVR::SensorDevice *sensor;
       private: OVR::SensorFusion *sensorFusion;
       private: float centerOffset;
-      private: bool isDeviceReady;
 
       private: transport::NodePtr node;
       private: transport::SubscriberPtr controlSub;

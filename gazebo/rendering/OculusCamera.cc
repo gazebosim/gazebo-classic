@@ -53,8 +53,6 @@ const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
-  this->isDeviceReady = false;
-
   // Set default OculusCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
@@ -64,7 +62,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!this->deviceManager)
   {
     gzlog << "Oculus: Failed to create Device Manager\n";
-    return;
+    gzthrow("Oculus: Failed to create Device Manager\n");
   }
   gzlog << "Oculus: Created Device Manager\n";
 
@@ -72,7 +70,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!this->stereoConfig)
   {
     gzlog << "Oculus: Failed to create StereoConfig\n";
-    return;
+    gzthrow("Oculus: Failed to create StereoConfig\n");
   }
   gzlog << "Oculus: Created StereoConfig\n";
 
@@ -97,7 +95,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!this->sensor)
   {
     gzlog << "Oculus: Failed to create sensor\n";
-    return;
+    gzthrow("Oculus: Failed to create sensor\n");
   }
   gzlog << "Oculus: Created sensor\n";
 
@@ -119,8 +117,6 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &OculusCamera::OnControl, this);
-
-  this->isDeviceReady = true;
 }
 
 //////////////////////////////////////////////////
@@ -223,12 +219,6 @@ void OculusCamera::Update()
 void OculusCamera::ResetSensor()
 {
   this->sensorFusion->Reset();
-}
-
-//////////////////////////////////////////////////
-bool OculusCamera::IsDeviceReady()
-{
-  return this->isDeviceReady;
 }
 
 //////////////////////////////////////////////////
