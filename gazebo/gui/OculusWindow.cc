@@ -115,6 +115,8 @@ bool OculusWindow::CreateCamera()
   try
   {
     this->scene = rendering::get_scene();
+
+    // CreateCoulusCamera will throw an exception if Oculus is not connected.
     this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
   }
   catch(const common::Exception &_e)
