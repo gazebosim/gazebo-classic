@@ -981,15 +981,40 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
       }
       else
       {
-        // relative to world since parent link is world
+        // parent link is world, so T1 is world frame
         return (-(this->anchorPose+this->childLink->GetWorldPose())).rot;
       }
     }
     else
     {
-      // no child link... what's going on?
-      gzerr << "Joint has no child link.\n";
-      return math::Quaternion();
+      // child link, joint frame is defined in world frame.
+      if (this->parentLink)
+      {
+        // broken sdf defines axis relative to parent model frame, or
+        // world frame in absence of parent link.
+        // so anchorPose is specified from parentModel/world frame to
+        // joint frame.
+        // relevant transforms are:
+        // outdated sdf axis frame description in parent model frame
+        //   (or world frame if parent link is the world).
+        //   T1 = parentModelFrame/worldFrame.
+        // desired axis frame after issue #494 fix is in the joint frame.
+        //   T2 = anchorPose
+        // we want the transform from real axis frame (T2) to outdated axis
+        //   frame (T1), or T1 - T2
+
+        // relative to parent model
+        math::Pose T1 = this->parentLink->GetModel()->GetWorldPose();
+        math::Pose T2 = this->anchorPose;
+        return (T1-T2).rot;
+      }
+      else
+      {
+        // parent link is world, and child link is also world
+        gzerr << "not a useful joint, both parent and child links"
+              << " are null (world frames)!\n";
+        return (-this->anchorPose).rot;
+      }
     }
   }
 
