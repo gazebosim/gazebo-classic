@@ -1,10 +1,10 @@
 
-vertex_program oculus_rviz_plugins/glsl120/warp.vert glsl
+vertex_program oculus_gazebo_plugins/glsl120/warp.vert glsl
 {
   source warp.vert
 }
 
-fragment_program rviz/glsl120/warp.frag glsl
+fragment_program gazebo/glsl120/warp.frag glsl
 {
   source warp.frag
   default_params
@@ -18,7 +18,7 @@ fragment_program rviz/glsl120/warp.frag glsl
   }
 }
 
-fragment_program rviz/glsl120/warpWithChromeAb.frag glsl
+fragment_program gazebo/glsl120/warpWithChromeAb.frag glsl
 {
   source warpWithChromeAb.frag
   default_params
