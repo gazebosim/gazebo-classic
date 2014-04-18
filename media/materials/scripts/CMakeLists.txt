@@ -10,7 +10,6 @@ set (files
   grid.material
   kitchen.material
   noise.compositor
-  warp.material
   glsl120.program
   oculus.compositor
   perpixel.program
