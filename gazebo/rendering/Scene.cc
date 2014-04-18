@@ -2542,9 +2542,6 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   }
 
   this->skyx->update(0);
-
-  // TODO remove me
-  // Ogre::Root::getSingletonPtr()->removeFrameListener(this->skyx);
 }
 
 /////////////////////////////////////////////////
@@ -2569,12 +2566,11 @@ void Scene::SetSky()
       SkyX::AtmosphereManager::Options(
         9.77501f,   // Inner radius
         10.2963f,   // Outer radius
-        0.0f,      // Height position
+        0.01f,      // Height position
         0.0017f,    // RayleighMultiplier
         0.000675f,  // MieMultiplier
         30,         // Sun Intensity
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
-        // Ogre::Vector3(0.17f, 0.14f, 0.14f),  // Wavelength
         -0.991f, 2.5f, 4));
 
   this->skyx->getVCloudsManager()->setWindSpeed(0.6);
@@ -2597,7 +2593,7 @@ void Scene::SetSky()
   vclouds->setAmbientFactors(Ogre::Vector4(0.45, 0.3, 0.6, 0.1));
   vclouds->setWheater(.6, .6, false);
 
-  if (false)
+  if (true)
   {
     // Create VClouds
     if (!this->skyx->getVCloudsManager()->isCreated())

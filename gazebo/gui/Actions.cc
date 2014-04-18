@@ -101,6 +101,7 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
 
 #ifdef HAVE_OCULUS
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewOculusAct = 0;
 #endif
 
