@@ -29,14 +29,6 @@ set (files
   laser_2nd_pass.vert
   plain_color_vs.glsl
   plain_color_fs.glsl
-  StdQuad_Tex2a_vp.glsles
-  StdQuad_Tex2_vp.glsles
-  StdQuad_Tex3_vp.glsles
-  StdQuad_Tex4_vp.glsles
-  StdQuad_vp.cg
-  StdQuad_vp.glsl
-  StdQuad_vp.glsles
-  StdQuad_vp.hlsl
 
   warp.frag
   warp.vert
