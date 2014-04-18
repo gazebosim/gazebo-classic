@@ -53,6 +53,7 @@ const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
+  std::cout << "Creating an Oculus camera" << std::endl;
   // Set default OculusCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
