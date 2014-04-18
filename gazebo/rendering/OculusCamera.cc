@@ -123,7 +123,6 @@ OculusCamera::~OculusCamera()
 void OculusCamera::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
-
 }
 
 //////////////////////////////////////////////////
@@ -320,9 +319,9 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
   if (this->viewport)
   {
     this->viewport->setDimensions(0, 0, 0.5, 1);
-    this->rightViewport->setDimensions(0.5,0,0.5,1);
+    this->rightViewport->setDimensions(0.5, 0, 0.5, 1);
 
-    //double ratio = static_cast<double>(this->viewport->getActualWidth()) /
+    // double ratio = static_cast<double>(this->viewport->getActualWidth()) /
     //               static_cast<double>(this->viewport->getActualHeight());
 
     /*double hfov = 85.0;
@@ -598,7 +597,7 @@ void OculusCamera::Oculus()
       "Ogre/Compositor/Oculus/Right");
 
   Ogre::Camera *cam;
-  for(int i=0; i<2; ++i)
+  for (int i = 0; i < 2; ++i)
   {
     cam = i == 0 ? this->camera : this->rightCamera;
 
@@ -608,13 +607,13 @@ void OculusCamera::Oculus()
       // Setup cameras.
       cam->setNearClipDistance(this->stereoConfig->GetEyeToScreenDistance());
       cam->setFarClipDistance(g_defaultFarClip);
-      cam->setPosition(0,idx * this->stereoConfig->GetIPD() * 0.5f * -1.0, 0);
+      cam->setPosition(0, idx * this->stereoConfig->GetIPD() * 0.5f * -1.0, 0);
       cam->setAspectRatio(this->stereoConfig->GetAspect());
       cam->setFOVy(Ogre::Radian(this->stereoConfig->GetYFOVRadians()));
 
       // Oculus requires offset projection, create a custom projection matrix
       Ogre::Matrix4 proj = Ogre::Matrix4::IDENTITY;
-      proj.setTrans( Ogre::Vector3(
+      proj.setTrans(Ogre::Vector3(
             -this->stereoConfig->GetProjectionCenterOffset() * idx, 0, 0));
       cam->setCustomProjectionMatrix(true, proj * cam->getProjectionMatrix());
     }
@@ -648,7 +647,7 @@ void OculusCamera::Oculus()
 void OculusCamera::AdjustAspect(double _v)
 {
   Ogre::Camera *cam;
-  for(int i = 0; i < 2; ++i)
+  for (int i = 0; i < 2; ++i)
   {
     cam = i == 0 ? this->camera : this->rightCamera;
     cam->setAspectRatio(cam->getAspectRatio() + _v);

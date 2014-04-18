@@ -25,7 +25,6 @@
 #include "gazebo/gui/viewers/ImageView.hh"
 
 #include "gazebo/gazebo.hh"
-#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"

@@ -2544,7 +2544,7 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
   this->skyx->update(0);
 
   // TODO remove me
-  //Ogre::Root::getSingletonPtr()->removeFrameListener(this->skyx);
+  // Ogre::Root::getSingletonPtr()->removeFrameListener(this->skyx);
 }
 
 /////////////////////////////////////////////////
@@ -2574,7 +2574,7 @@ void Scene::SetSky()
         0.000675f,  // MieMultiplier
         30,         // Sun Intensity
         Ogre::Vector3(0.57f, 0.54f, 0.44f),  // Wavelength
-        //Ogre::Vector3(0.17f, 0.14f, 0.14f),  // Wavelength
+        // Ogre::Vector3(0.17f, 0.14f, 0.14f),  // Wavelength
         -0.991f, 2.5f, 4));
 
   this->skyx->getVCloudsManager()->setWindSpeed(0.6);

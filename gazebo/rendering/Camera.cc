@@ -1280,7 +1280,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
   {
     // Setup the viewport to use the texture
     // Oculus
-    //this->viewport = this->renderTarget->addViewport(this->camera);
+    // this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport = this->renderTarget->addViewport(this->camera,
         0, 0, 0, 0.5, 1.0);
     this->viewport->setClearEveryFrame(true);
