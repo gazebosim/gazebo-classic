@@ -30,7 +30,6 @@ set (files
   plain_color_vs.glsl
   plain_color_fs.glsl
 
-  warp.frag
   warp.vert
   warpWithChromeAb.frag
 )
