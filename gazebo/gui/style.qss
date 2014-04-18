@@ -7,7 +7,7 @@ QToolButton
 
 QToolButton::disabled
 {
-  color: #303030;  
+  color: #303030;
 }
 
 QLabel
@@ -259,7 +259,7 @@ QSpinBox
   color: #353535;
   background: #737373;
   border-radius: 4;
-  margin-right: 20px;  
+  margin-right: 20px;
 }
 
 QSpinBox::up-button
@@ -593,12 +593,6 @@ QWidget#toolsWidget > QFrame
 {
   padding: 4px;
   background-color: #808080;
-}
-
-QWidget#oculusWindow
-{
-width: 1280px;
-height: 800px;
 }
 
 QWidget#renderWidget > QWidget
