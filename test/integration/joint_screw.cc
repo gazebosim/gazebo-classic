@@ -392,47 +392,28 @@ TEST_P(JointTestScrew, ScrewJointForce)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "bullet")
-  {
-    /// \TODO skipping bullet, see issue #1081
-    gzerr << "BulletScrewJoint::GetAngle() is one step behind (issue #1081).\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "DART Screw Joint not yet implemented.\n";
     return;
   }
 
-  // Load our screw joint test world
-  ServerFixture::Load("worlds/empty.world", false, _physicsEngine);
-  SpawnModel("model://pr2");
+  // Load pr2 world
+  ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-
-  // wait for pr2
-  ServerFixture::WaitUntilEntitySpawn("pr2", 1000, 1000);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // simulate 1 step
-  world->Step(1);
-  double t = world->GetSimTime().Double();
-
   // get time step size
   double dt = world->GetPhysicsEngine()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
-
-  // verify that time moves forward
-  EXPECT_GT(t, dt);
-  gzlog << "t after one step : " << t << "\n";
 
   // get model, joints and get links
   physics::ModelPtr model = world->GetModel("pr2");
@@ -454,7 +435,7 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
     EXPECT_LT(vel_angular.GetLength(), 0.1);
     EXPECT_LT(vel_linear.GetLength(), 0.1);
 
-    gzdbg << "] va [" << vel_angular
+    gzlog <<   "va [" << vel_angular
           << "] vl [" << vel_linear
           << "]\n";
   }
