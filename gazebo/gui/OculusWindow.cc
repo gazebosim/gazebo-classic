@@ -106,9 +106,17 @@ void OculusWindow::AttachCameraToVisual()
     gzerr << "Scene is NULL!" << std::endl;
     return;
   }
-  while (!this->scene->GetVisual(this->visualName))
+  int tries = 0;
+  while (!this->scene->GetVisual(this->visualName) && tries < 50)
   {
     common::Time::MSleep(100);
+    tries++;
+  }
+
+  if (tries >= 50)
+  {
+    gzerr << "Oculus: visual link not found and Oculus is not attached."
+    return;
   }
 
   this->oculusCamera->AttachToVisual(this->visualName, true);
@@ -149,8 +157,6 @@ void OculusWindow::showEvent(QShowEvent *_event)
   if (this->oculusCamera)
     this->attachCameraThread = new boost::thread(
         boost::bind(&OculusWindow::AttachCameraToVisual, this));
-
-  this->oculusCamera->AttachToVisual(this->visualName, true);
 
   if (this->windowId == -1)
   {
