@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _GUITYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_gui
@@ -30,6 +31,7 @@ namespace gazebo
     class TopicView;
     class ImageView;
     class TextView;
+    class LaserView;
 
     /// \def TopicViewPtr
     /// \brief Boost shared pointer to a TopicView object
@@ -38,6 +40,10 @@ namespace gazebo
     /// \def ImageViewPtr
     /// \brief Boost shared pointer to a ImageView object
     typedef boost::shared_ptr<ImageView> ImageViewPtr;
+
+    /// \def LaserViewPtr
+    /// \brief Boost shared pointer to a LaserView object
+    typedef boost::shared_ptr<LaserView> LaserViewPtr;
 
     /// \def TextViewPtr
     /// \brief Boost shared pointer to a TextView object

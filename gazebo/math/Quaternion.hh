@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
   /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
-  class Quaternion
+  class GAZEBO_VISIBLE Quaternion
   {
     /// \brief Default Constructor
     public: Quaternion();
@@ -146,7 +147,8 @@ namespace gazebo
     /// \param[in] _z z
     public: void Set(double _u, double _x, double _y, double _z);
 
-    /// \brief Set the quaternion from Euler angles
+    /// \brief Set the quaternion from Euler angles. The order of operations
+    /// are roll, pitch, yaw.
     /// \param[in] vec  Euler angle
     public: void SetFromEuler(const Vector3 &_vec);
 
@@ -275,13 +277,13 @@ namespace gazebo
     /// \brief Correct any nan
     public: inline void Correct()
             {
-              if (!finite(this->x))
+              if (!std::isfinite(this->x))
                 this->x = 0;
-              if (!finite(this->y))
+              if (!std::isfinite(this->y))
                 this->y = 0;
-              if (!finite(this->z))
+              if (!std::isfinite(this->z))
                 this->z = 0;
-              if (!finite(this->w))
+              if (!std::isfinite(this->w))
                 this->w = 1;
 
               if (math::equal(this->w, 0.0) &&
@@ -377,13 +379,13 @@ namespace gazebo
     public: friend std::istream &operator>>(std::istream &_in,
                                              gazebo::math::Quaternion &_q)
     {
-      Angle r, p, y;
+      Angle roll, pitch, yaw;
 
       // Skip white spaces
       _in.setf(std::ios_base::skipws);
-      _in >> r >> p >> y;
+      _in >> roll >> pitch >> yaw;
 
-      _q.SetFromEuler(Vector3(*r, *p, *y));
+      _q.SetFromEuler(Vector3(*roll, *pitch, *yaw));
 
       return _in;
     }

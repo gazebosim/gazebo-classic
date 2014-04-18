@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "common/Common.hh"
-#include "common/BVHLoader.hh"
-#include "common/SystemPaths.hh"
-#include "common/Skeleton.hh"
-#include "common/SkeletonAnimation.hh"
-#include "common/Console.hh"
-#include "math/Matrix3.hh"
-#include "math/Angle.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/BVHLoader.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/SkeletonAnimation.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Matrix3.hh"
+#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -104,7 +104,8 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
           if (words[0] == "CHANNELS")
           {
             if (words.size() < 3 ||
-                  (math::parseInt(words[1]) + 2) > words.size())
+                static_cast<size_t>(math::parseInt(words[1]) + 2) >
+                 words.size())
             {
               file.close();
               return NULL;

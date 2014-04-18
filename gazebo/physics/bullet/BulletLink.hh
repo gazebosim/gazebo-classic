@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,10 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 class btRigidBody;
 
@@ -40,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class BulletLink : public Link
+    class GAZEBO_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);
@@ -48,110 +49,125 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BulletLink();
 
-      /// \brief Load the body based on an common::XMLConfig node
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _ptr);
 
-      /// \brief Initialize the body
+      // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Finalize the body
+      // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Update the body
-      public: virtual void Update();
-
-      /// \brief Called when the pose of the entity (or one of its parents) has
-      /// changed
+      // Documentation inherited.
       public: virtual void OnPoseChange();
 
-      /// \brief Set whether this body is enabled
-      public: virtual void SetEnabled(bool enable) const;
+      // Documentation inherited.
+      public: virtual void SetEnabled(bool _enable) const;
 
-      /// \brief Get whether this body is enabled in the physics engine
-      public: virtual bool GetEnabled() const {return true;}
+      // Documentation inherited.
+      public: virtual bool GetEnabled() const;
 
-      /// \brief Update the center of mass
-      public: virtual void UpdateCoM();
+      // Documentation inherited.
+      public: virtual void SetLinearVel(const math::Vector3 &_vel);
 
-      /// \brief Set the linear velocity of the body
-      public: virtual void SetLinearVel(const math::Vector3 &vel);
+      // Documentation inherited.
+      public: virtual void SetAngularVel(const math::Vector3 &_vel);
 
-      /// \brief Set the angular velocity of the body
-      public: virtual void SetAngularVel(const math::Vector3 &vel);
+      // Documentation inherited.
+      public: virtual void SetForce(const math::Vector3 &_force);
 
-      /// \brief Set the force applied to the body
-      public: virtual void SetForce(const math::Vector3 &force);
+      // Documentation inherited.
+      public: virtual void SetTorque(const math::Vector3 &_torque);
 
-      /// \brief Set the torque applied to the body
-      public: virtual void SetTorque(const math::Vector3 &force);
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset) const;
 
-      /// \brief Get the linear velocity of the body in the world frame
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const;
 
-      /// \brief Get the angular velocity of the body in the world frame
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldAngularVel() const;
 
-      /// \brief Get the force applied to the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldForce() const;
 
-      /// \brief Get the torque applied to the body in the world frame
+      // Documentation inherited.
       public: virtual math::Vector3 GetWorldTorque() const;
 
-      /// \brief Set whether gravity affects this body
-      public: virtual void SetGravityMode(bool mode);
+      // Documentation inherited.
+      public: virtual void SetGravityMode(bool _mode);
 
-      /// \brief Get the gravity mode
-      public: virtual bool GetGravityMode();
+      // Documentation inherited.
+      public: virtual bool GetGravityMode() const;
 
-      /// \brief Set whether this body will collide with others in the model
-      public: void SetSelfCollide(bool collide);
+      // Documentation inherited.
+      public: virtual void SetSelfCollide(bool _collide);
 
-      /// \brief Get the bullet rigid body
+      /// \brief Get the bullet rigid body.
+      /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
 
-      /// \brief Set the linear damping factor
-      public: virtual void SetLinearDamping(double damping);
+      /// \internal
+      /// \brief Clear bullet collision cache needed when the body is resized.
+      public: void ClearCollisionCache();
 
-      /// \brief Set the angular damping factor
-      public: virtual void SetAngularDamping(double damping);
+      // Documentation inherited.
+      public: virtual void SetLinearDamping(double _damping);
+
+      // Documentation inherited.
+      public: virtual void SetAngularDamping(double _damping);
 
       /// \brief Set the relative pose of a child collision.
       /*public: void SetCollisionRelativePose(BulletCollision *collision,
                                             const math::Pose &newPose);
                                             */
 
-      /// \brief Add a force to the body
+      // Documentation inherited.
       public: virtual void AddForce(const math::Vector3 &_force);
 
-      /// \brief Add a force to the body, components are relative to the
-      ///        body's own frame of reference.
+      // Documentation inherited.
       public: virtual void AddRelativeForce(const math::Vector3 &_force);
 
-      /// \brief Add a force to the body using a global position
+      // Documentation inherited.
       public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
                                                    const math::Vector3 &_pos);
 
-      /// \brief Add a force to the body at position expressed to the body's
-      ///        own frame of reference.
+      // Documentation inherited.
       public: virtual void AddForceAtRelativePosition(
                   const math::Vector3 &_force,
                   const math::Vector3 &_relpos);
 
-      /// \brief Add a torque to the body
+      // Documentation inherited.
       public: virtual void AddTorque(const math::Vector3 &_torque);
 
-      /// \brief Add a torque to the body, components are relative to the
-      ///        body's own frame of reference.
+      // Documentation inherited.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
-      /// \copydoc Link::SetAutoDisable(bool)
+      // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);
 
-      private: btCompoundShape *compoundShape;
-      private: BulletMotionState *motionState;
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
+      /// \brief Pointer to bullet compound shape, which is a container
+      ///        for other child shapes.
+      private: btCollisionShape *compoundShape;
+
+      /// \brief Pointer to bullet motion state, which manages updates to the
+      ///        world pose from bullet.
+      public: BulletMotionStatePtr motionState;
+
+      /// \brief Pointer to the bullet rigid body object.
       private: btRigidBody *rigidLink;
+
+      /// \brief Pointer to the bullet physics engine.
       private: BulletPhysicsPtr bulletPhysics;
-      protected: math::Pose pose;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,39 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 #include <string>
-#include "transport/transport.hh"
+#include <gazebo/transport/transport.hh>
+#include <gazebo/common/CommonIface.hh>
 
 using namespace gazebo;
 namespace po = boost::program_options;
 
 /////////////////////////////////////////////////
-void help()
+void help(po::options_description &_options)
 {
-  std::cerr << "This tool for spawning or deleting models into or from a "
-            << "running Gazebo simulation.\n\n"
-            << "  gzfactory <spawn|delete> [options]\n"
-            << "    spawn   : Spawn new model. Must specify a SDF model file.\n"
-            << "    delete  : Delete existing model. Must specify model name.\n"
-            << "\n\n";
+  std::cerr << "gzfactory -- DEPRECATED(see 'gz help model')\n\n";
+
+  std::cerr << "`gzfactory` <spawn|delete> [options]\n\n";
+
+  std::cerr << "Spawn or delete models into or from a "
+    << "running Gazebo simulation.\n\n";
+
+  std::cerr << "Commands:\n"
+    << "    spawn   Spawn new model. Must specify a SDF model file.\n"
+    << "    delete  Delete existing model. Must specify model name.\n\n";
+
+  std::cerr << _options << "\n\n";
+
+  std::cerr << "See also:\n"
+    << "Example and more information about gazebo gzfactory and "
+    << "other command line tools can be found at:"
+    << "http://gazebosim.org/user_guide/started__commandlinetools.html\n";
 }
 
 /////////////////////////////////////////////////
 void Spawn(po::variables_map &_vm)
 {
   std::string filename, modelName;
-  std::string worldName = "default";
+  std::string worldName;
 
   if (!_vm.count("sdf"))
   {
@@ -83,11 +95,11 @@ void Spawn(po::variables_map &_vm)
 
   // Get/Set the model name
   if (modelName.empty())
-    modelName = modelElem->GetValueString("name");
+    modelName = modelElem->Get<std::string>("name");
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->GetValuePose("pose");
+  math::Pose pose = modelElem->Get<math::Pose>("pose");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (_vm.count("pose-x"))
     pose.pos.x = _vm["pose-x"].as<double>();
@@ -103,14 +115,16 @@ void Spawn(po::variables_map &_vm)
     rpy.z = _vm["pose-Y"].as<double>();
   pose.rot.SetFromEuler(rpy);
 
-  std::cout << "Spawning " << modelName << " into "
-            << worldName  << " world.\n";
+  if (!transport::init())
+    return;
 
-  transport::init();
   transport::run();
 
   transport::NodePtr node(new transport::Node());
-  node->Init();
+  node->Init(worldName);
+
+  std::cout << "Spawning " << modelName << " into "
+            << node->GetTopicNamespace()  << " world.\n";
 
   transport::PublisherPtr pub = node->Advertise<msgs::Factory>("~/factory");
   pub->WaitForConnection();
@@ -142,7 +156,9 @@ void Delete(po::variables_map &vm)
 
   msgs::Request *msg = msgs::CreateRequest("entity_delete", modelName);
 
-  transport::init();
+  if (!transport::init())
+    return;
+
   transport::run();
 
   transport::NodePtr node(new transport::Node());
@@ -159,24 +175,24 @@ void Delete(po::variables_map &vm)
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
-    ("help,h", "produce this help message")
+    ("help,h", "Produce this help message.")
     ("sdf,f", po::value<std::string>(), "SDF model file.")
     ("world-name,w", po::value<std::string>(), "Name of Gazebo world.")
     ("model-name,m", po::value<std::string>(), "Model name.")
-    ("pose-x,x", po::value<double>(), "set model x position.")
-    ("pose-y,y", po::value<double>(), "set model y position.")
-    ("pose-z,z", po::value<double>(), "set model z positione.")
-    ("pose-R,R", po::value<double>(), "set model roll orientation in radians.")
-    ("pose-P,P", po::value<double>(), "set model pitch orientation in radians.")
-    ("pose-Y,Y", po::value<double>(), "set model yaw orientation in radians.");
+    ("pose-x,x", po::value<double>(), "Set model x position.")
+    ("pose-y,y", po::value<double>(), "Set model y position.")
+    ("pose-z,z", po::value<double>(), "Set model z positione.")
+    ("pose-R,R", po::value<double>(), "Set model roll orientation in radians.")
+    ("pose-P,P", po::value<double>(), "Set model pitch orientation in radians.")
+    ("pose-Y,Y", po::value<double>(), "Set model yaw orientation in radians.");
 
   po::options_description h_desc("Hidden options");
   h_desc.add_options()
     ("command", po::value<std::string>(), "<spawn|delete>");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc).add(h_desc);
 
   po::positional_options_description p_desc;
@@ -197,10 +213,11 @@ int main(int argc, char **argv)
 
   if (vm.count("help") || argc < 2)
   {
-    help();
-    std::cout << v_desc << "\n";
+    help(v_desc);
     return -1;
   }
+
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   if (vm.count("command"))
   {

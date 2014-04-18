@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,76 @@
  * limitations under the License.
  *
 */
-/* Desc: common::Parameters for contact joints
- * Author: Nate Koenig
- * Date: 30 July 2003
- */
 
-#include <float.h>
-#include "physics/SurfaceParams.hh"
+#include "gazebo/common/Assert.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
+FrictionPyramid::FrictionPyramid()
+{
+  this->mu[0] = 1.0;
+  this->mu[1] = 1.0;
+}
+
+//////////////////////////////////////////////////
+FrictionPyramid::~FrictionPyramid()
+{
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMuPrimary()
+{
+  return this->GetMu(0);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMuSecondary()
+{
+  return this->GetMu(1);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMuPrimary(double _mu)
+{
+  this->SetMu(0, _mu);
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMuSecondary(double _mu)
+{
+  this->SetMu(1, _mu);
+}
+
+//////////////////////////////////////////////////
+double FrictionPyramid::GetMu(unsigned int _index)
+{
+  GZ_ASSERT(_index < 2, "Invalid _index to GetMu");
+  return this->mu[_index];
+}
+
+//////////////////////////////////////////////////
+void FrictionPyramid::SetMu(unsigned int _index, double _mu)
+{
+  GZ_ASSERT(_index < 2, "Invalid _index to SetMu");
+  if (_mu < 0)
+  {
+    this->mu[_index] = GZ_FLT_MAX;
+  }
+  else
+  {
+    this->mu[_index] = _mu;
+  }
+}
+
+//////////////////////////////////////////////////
 SurfaceParams::SurfaceParams()
+  : collideWithoutContact(false),
+    collideWithoutContactBitmask(1)
 {
 }
 
@@ -38,40 +95,19 @@ SurfaceParams::~SurfaceParams()
 //////////////////////////////////////////////////
 void SurfaceParams::Load(sdf::ElementPtr _sdf)
 {
-  {
-    sdf::ElementPtr bounceElem = _sdf->GetElement("bounce");
-    this->bounce = bounceElem->GetValueDouble("restitution_coefficient");
-    this->bounceThreshold = bounceElem->GetValueDouble("threshold");
-  }
-
-  {
-    sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
-    {
-      sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      this->mu1 = frictionOdeElem->GetValueDouble("mu");
-      this->mu2 = frictionOdeElem->GetValueDouble("mu2");
-
-      if (this->mu1 < 0)
-        this->mu1 = FLT_MAX;
-      if (this->mu2 < 0)
-        this->mu2 = FLT_MAX;
-
-      this->slip1 = frictionOdeElem->GetValueDouble("slip1");
-      this->slip2 = frictionOdeElem->GetValueDouble("slip2");
-      this->fdir1 = frictionOdeElem->GetValueVector3("fdir1");
-    }
-  }
-
+  if (!_sdf)
+    gzerr << "Surface _sdf is NULL" << std::endl;
+  else
   {
     sdf::ElementPtr contactElem = _sdf->GetElement("contact");
+    if (!contactElem)
+      gzerr << "Surface contact sdf member is NULL" << std::endl;
+    else
     {
-      sdf::ElementPtr contactOdeElem = contactElem->GetElement("ode");
-      this->kp = contactOdeElem->GetValueDouble("kp");
-      this->kd = contactOdeElem->GetValueDouble("kd");
-      this->cfm = contactOdeElem->GetValueDouble("soft_cfm");
-      this->erp = contactOdeElem->GetValueDouble("soft_erp");
-      this->maxVel = contactOdeElem->GetValueDouble("max_vel");
-      this->minDepth = contactOdeElem->GetValueDouble("min_depth");
+      this->collideWithoutContact =
+        contactElem->Get<bool>("collide_without_contact");
+      this->collideWithoutContactBitmask =
+          contactElem->Get<unsigned int>("collide_without_contact_bitmask");
     }
   }
 }
@@ -79,61 +115,15 @@ void SurfaceParams::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void SurfaceParams::FillMsg(msgs::Surface &_msg)
 {
-  _msg.mutable_friction()->set_mu(this->mu1);
-  _msg.mutable_friction()->set_mu2(this->mu2);
-  _msg.mutable_friction()->set_slip1(this->slip1);
-  _msg.mutable_friction()->set_slip2(this->slip2);
-  msgs::Set(_msg.mutable_friction()->mutable_fdir1(), this->fdir1);
-
-  _msg.set_restitution_coefficient(this->bounce);
-  _msg.set_bounce_threshold(this->bounceThreshold);
-
-  _msg.set_soft_cfm(this->cfm);
-  _msg.set_soft_erp(this->erp);
-  _msg.set_kp(this->kp);
-  _msg.set_kd(this->kd);
-  _msg.set_max_vel(this->maxVel);
-  _msg.set_min_depth(this->minDepth);
+  _msg.set_collide_without_contact(this->collideWithoutContact);
+  _msg.set_collide_without_contact_bitmask(this->collideWithoutContactBitmask);
 }
 
 
 void SurfaceParams::ProcessMsg(const msgs::Surface &_msg)
 {
-  if (_msg.has_friction())
-  {
-    if (_msg.friction().has_mu())
-      this->mu1 = _msg.friction().mu();
-    if (_msg.friction().has_mu2())
-      this->mu2 = _msg.friction().mu2();
-    if (_msg.friction().has_slip1())
-      this->slip1 = _msg.friction().slip1();
-    if (_msg.friction().has_slip2())
-      this->slip2 = _msg.friction().slip2();
-    if (_msg.friction().has_fdir1())
-      this->fdir1 = msgs::Convert(_msg.friction().fdir1());
-
-    if (this->mu1 < 0)
-      this->mu1 = FLT_MAX;
-    if (this->mu2 < 0)
-      this->mu2 = FLT_MAX;
-  }
-
-  if (_msg.has_restitution_coefficient())
-    this->bounce = _msg.restitution_coefficient();
-  if (_msg.has_bounce_threshold())
-    this->bounceThreshold = _msg.bounce_threshold();
-  if (_msg.has_soft_cfm())
-    this->cfm = _msg.soft_cfm();
-  if (_msg.has_soft_erp())
-    this->erp = _msg.soft_erp();
-  if (_msg.has_kp())
-    this->kp = _msg.kp();
-  if (_msg.has_kd())
-    this->kd = _msg.kd();
-  if (_msg.has_max_vel())
-    this->maxVel = _msg.max_vel();
-  if (_msg.has_min_depth())
-    this->minDepth = _msg.min_depth();
+  if (_msg.has_collide_without_contact())
+    this->collideWithoutContact = _msg.collide_without_contact();
+  if (_msg.has_collide_without_contact_bitmask())
+    this->collideWithoutContactBitmask = _msg.collide_without_contact_bitmask();
 }
-
-

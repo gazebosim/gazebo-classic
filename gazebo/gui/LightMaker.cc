@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -58,6 +58,8 @@ void LightMaker::Start(const rendering::UserCameraPtr _camera)
 
   this->light->SetLightType(this->lightTypename);
   this->light->SetPosition(math::Vector3(0, 0, 1));
+  if (this->lightTypename == "directional")
+    this->light->SetDirection(math::Vector3(.1, .1, -0.9));
 
   std::ostringstream stream;
   stream << "user_" << this->lightTypename << "_light_" << counter++;
@@ -112,10 +114,7 @@ void LightMaker::OnMouseRelease(const common::MouseEvent &_event)
 // prevent code duplication.
 void LightMaker::OnMouseMove(const common::MouseEvent &_event)
 {
-  math::Vector3 pos = this->light->GetPosition();
-
   math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
   this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
@@ -129,21 +128,20 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   // Compute two points on the plane. The first point is the current
   // mouse position, the second is the previous mouse position
   p1 = origin1 + dir1 * dist1;
-  pos = p1;
 
   if (!_event.shift)
   {
-    if (ceil(pos.x) - pos.x <= .4)
-      pos.x = ceil(pos.x);
-    else if (pos.x - floor(pos.x) <= .4)
-      pos.x = floor(pos.x);
+    if (ceil(p1.x) - p1.x <= .4)
+      p1.x = ceil(p1.x);
+    else if (p1.x - floor(p1.x) <= .4)
+      p1.x = floor(p1.x);
 
-    if (ceil(pos.y) - pos.y <= .4)
-      pos.y = ceil(pos.y);
-    else if (pos.y - floor(pos.y) <= .4)
-      pos.y = floor(pos.y);
+    if (ceil(p1.y) - p1.y <= .4)
+      p1.y = ceil(p1.y);
+    else if (p1.y - floor(p1.y) <= .4)
+      p1.y = floor(p1.y);
   }
-  pos.z = this->light->GetPosition().z;
+  p1.z = this->light->GetPosition().z;
 
-  this->light->SetPosition(pos);
+  this->light->SetPosition(p1);
 }

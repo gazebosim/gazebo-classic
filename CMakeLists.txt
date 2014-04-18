@@ -7,10 +7,14 @@ endif(COMMAND CMAKE_POLICY)
 
 project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
+string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_VERSION_NAME "lithium")
-set (GAZEBO_MAJOR_VERSION 1)
-set (GAZEBO_MINOR_VERSION 4)
+set (GAZEBO_MAJOR_VERSION 3)
+set (GAZEBO_MINOR_VERSION 0)
+# The patch version may have been bumped for prerelease purposes; be sure to
+# check gazebo-release/ubuntu/debian/changelog@default to determine what the
+# next patch version should be for a regular release.
 set (GAZEBO_PATCH_VERSION 0)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
@@ -53,6 +57,9 @@ endif()
 
 enable_testing()
 
+# Use GNUInstallDirst to get canonical paths
+include(GNUInstallDirs)
+
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
@@ -80,40 +87,16 @@ if(LD_LIBRARY_PATH)
 endif()
 
 
-set (INCLUDE_INSTALL_DIR "include/gazebo-${GAZEBO_VERSION}/gazebo") 
-set (LIB_INSTALL_DIR "lib" CACHE STRING "Installation directory for libraries (relative to CMAKE_INSTALL_PREFIX)") 
-set (BIN_INSTALL_DIR "bin" CACHE STRING "Installation directory for binaries (relative to CMAKE_INSTALL_PREFIX)") 
-
-
-set (USE_FULL_RPATH OFF CACHE BOOL "Set to true to enable full rpath")
-
-if (USE_FULL_RPATH)
-  # use, i.e. don't skip the full RPATH for the build tree
-  set(CMAKE_SKIP_BUILD_RPATH  FALSE)
-  
-  # when building, don't use the install RPATH already
-  # (but later on when installing)
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-  
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  
-  # add the automatically determined parts of the RPATH
-  # which point to directories outside the build tree to the install RPATH
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-  
-  # the RPATH to be used when installing, but only if its not a system directory
-  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}" isSystemDir)
-  if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-  endif("${isSystemDir}" STREQUAL "-1")
-endif()
-
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}/gazebo-${GAZEBO_VERSION}/gazebo") 
+set (LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+set (BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
+    
 set (BUILD_GAZEBO ON CACHE INTERNAL "Build Gazebo" FORCE)
 set (build_errors "" CACHE INTERNAL "build errors" FORCE)
 set (build_warnings "" CACHE INTERNAL "build warnings" FORCE)
 
 
-set (MIN_OGRE_VERSION 1.7.1 CACHE INTERNAL "Ogre version requirement" FORCE)
+set (MIN_OGRE_VERSION 1.7.4 CACHE INTERNAL "Ogre version requirement" FORCE)
 set (MIN_BOOST_VERSION 1.40.0 CACHE INTERNAL "Boost min version requirement" FORCE)
 
 set (FREEIMAGE_MAJOR_VERSION 3 CACHE INTERNAL "FreeImage major version requirement" FORCE)
@@ -123,102 +106,103 @@ set (MIN_FREEIMAGE_VERSION ${FREEIMAGE_MAJOR_VERSION}.${FREEIMAGE_MINOR_VERSION}
 include (${gazebo_cmake_dir}/DissectVersion.cmake)
 
 #####################################
-# Build type cflags
-set (CMAKE_C_FLAGS_ALL " -Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic" CACHE INTERNAL "General C Flags")
+# Check for low memory version to use in some tests
+if(NOT DEFINED USE_LOW_MEMORY_TESTS)
+  set (USE_LOW_MEMORY_TESTS FALSE)
+  message (STATUS "High memory tests: enabled")
+else()
+  set (USE_LOW_MEMORY_TEST TRUE)
+  message (STATUS "High memory tests: disabled, low memory versions will be used")
+endif()
 
-
-#####################################
-# Build type link flags
-set (CMAKE_LINK_FLAGS_RELEASE " " CACHE INTERNAL "Link flags fro release" FORCE)
-set (CMAKE_LINK_FLAGS_RELWITHDEBINFO " " CACHE INTERNAL "Link flags for release with debug support" FORCE)
-set (CMAKE_LINK_FLAGS_DEBUG " " CACHE INTERNAL "Link flags for debug" FORCE)
-set (CMAKE_LINK_FLAGS_PROFILE " -pg" CACHE INTERNAL "Link flags for profile" FORCE)
-set (CMAKE_LINK_FLAGS_CHECK " --coverage" CACHE INTERNAL "Link flags for static code checking" FORCE)
+######################################
+# Enable screen tests by default
+if(NOT DEFINED ENABLE_SCREEN_TESTS)
+  set(ENABLE_SCREEN_TESTS TRUE)
+endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
-if (SSE2_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse -msse2 -mfpmath=sse")
-endif()
-if (SSE3_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse3")
-endif()
-if (SSSE3_FOUND)
-  set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -mssse3")
-endif()
+#####################################
+# Define some variables that are going to be used in two places:
+# 1. In CMake code to pass preprocessor definitions to certain source files
+# (especially in common/CMakeLists.txt).
+# 2. In the generation of cmake/setup.sh from cmake/setup.sh.in
+set(GAZEBO_DEFAULT_MASTER_HOST localhost)
+set(GAZEBO_DEFAULT_MASTER_PORT 11345)
+set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins)
+set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}:${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo_models)
+set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
+set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
+# Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
+# we pass it to the compiler later.
+string(REPLACE "\n" "" OGRE_RESOURCE_PATH ${OGRE_RESOURCE_PATH})
 
-if (ENABLE_SSE4)
-  message(STATUS "\nSSE4 will be enabled if system supports it.\n")
-  if (SSE4_1_FOUND)
-    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.1")
-  endif()
-  if (SSE4_2_FOUND)
-    set (CMAKE_C_FLAGS_ALL "${CMAKE_C_FLAGS_ALL} -msse4.2")
-  endif()
-else()
-  message(STATUS "\nSSE4 disabled.\n")
-endif()
 
-set (CMAKE_C_FLAGS_RELEASE " -s -O3 -DNDEBUG ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release" FORCE)
-set (CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
-
-set (CMAKE_C_FLAGS_RELWITHDEBINFO " -g -O2 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for release with debug support" FORCE)
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_C_FLAGS_RELWITHDEBINFO})
-
-set (CMAKE_C_FLAGS_DEBUG " -ggdb3 ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for debug" FORCE)
-set (CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-
-set (CMAKE_C_FLAGS_PROFILE " -fno-omit-frame-pointer -g -pg ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for profile" FORCE)
-set (CMAKE_CXX_FLAGS_PROFILE ${CMAKE_C_FLAGS_PROFILE})
-
-set (CMAKE_C_FLAGS_CHECK " -g -O0 -Wformat=2 --coverage -fno-inline ${CMAKE_C_FLAGS_ALL}" CACHE INTERNAL "C Flags for static code checking" FORCE)
-set (CMAKE_CXX_FLAGS_CHECK "${CMAKE_C_FLAGS_CHECK} -fno-elide-constructors -fno-default-inline -fno-implicit-inline-templates")
+# Check for DRI capable Display
+include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 
 #####################################
+MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE "RELWITHDEBINFO" CACHE STRING 
-    "Choose the type of build, options are: debug release relwithdebinfo profile check" FORCE)
+    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING 
+        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+# TODO: still convert to uppercase to keep backwards compatibility with 
+# uppercase old supported and deprecated modes
+string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPERCASE)
 
-#####################################
-# Set all the global build flags
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
-set (CMAKE_MODULE_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}}")
+set (BUILD_TYPE_PROFILE FALSE)
+set (BUILD_TYPE_RELEASE FALSE)
+set (BUILD_TYPE_RELWITHDEBINFO FALSE)
+set (BUILD_TYPE_DEBUG FALSE)
 
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "PROFILE")
+if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
   set (BUILD_TYPE_PROFILE TRUE)
-else()
-  set (BUILD_TYPE_PROFILE FALSE)
-endif()
-
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "RELEASE")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELEASE")
   set (BUILD_TYPE_RELEASE TRUE)
-else()
-  set (BUILD_TYPE_RELEASE FALSE)
-endif()
-
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "RELWITHDEBINFO")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
   set (BUILD_TYPE_RELWITHDEBINFO TRUE)
-else()
-  set (BUILD_TYPE_RELWITHDEBINFO FALSE)
-endif()
-
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "DEBUG")
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
   set (BUILD_TYPE_DEBUG TRUE)
 else()
-  set (BUILD_TYPE_DEBUG FALSE)
+  build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
 endif()
 
-message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
-add_subdirectory(deps)
-message (STATUS "----------------------------------------\n")
+#####################################
+# Handle CFlags
+unset (CMAKE_C_FLAGS_ALL CACHE)
+unset (CMAKE_CXX_FLAGS CACHE)
+
+# USE_HOST_CFLAGS (default TRUE)
+# Will check building host machine for proper cflags 
+if(NOT DEFINED USE_HOST_CFLAGS OR USE_HOST_CFLAGS)
+  message(STATUS "Enable host CFlags")
+  include (${gazebo_cmake_dir}/HostCFlags.cmake)
+endif()
+
+# USE_UPSTREAM_CFLAGS (default TRUE)
+# Will use predefined gazebo developers cflags
+if(NOT DEFINED USE_UPSTREAM_CFLAGS OR USE_UPSTREAM_CFLAGS)
+  message(STATUS "Enable upstream CFlags")
+  include(${gazebo_cmake_dir}/DefaultCFlags.cmake)
+endif()
+
+# Check if warning options are avaliable for the compiler and return WARNING_CXX_FLAGS variable
+filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value 
+                               -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow 
+			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+
+# Check and add visibility hidden by default. Only in UNIX
+# Windows and MacosX does not handled properly the hidden compilation
+if (UNIX AND NOT APPLE)
+  filter_valid_compiler_flags(-fvisibility=hidden -fvisibility-inlines-hidden)
+endif()
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VALID_CXX_FLAGS}")
 
 #################################################
 # OS Specific initialization
@@ -226,9 +210,20 @@ if (UNIX)
   gz_setup_unix()
 else (WIN32)
   gz_setup_windows()
-else (APPLE)
+endif()
+
+if(APPLE)
   gz_setup_apple()
 endif()
+
+# Main includes for compilation
+include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+
+#################################################
+# Configure 3rd Party Packages after OS Specific initialization
+message (STATUS "\n\n====== Configuring 3rd Party Packages ======")
+add_subdirectory(deps)
+message (STATUS "----------------------------------------\n")
 
 #################################################
 # Print warnings and errors
@@ -263,25 +258,28 @@ else (build_errors)
   gz_install_includes("" ${PROJECT_BINARY_DIR}/gazebo/gazebo_config.h)
 
   configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.sh.in ${PROJECT_BINARY_DIR}/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/)
-  configure_file(${CMAKE_SOURCE_DIR}/cmake/setup-unversioned.sh.in ${PROJECT_BINARY_DIR}/unversioned/setup.sh @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/unversioned/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo/)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_VERSION}/)
+  # Also install the setup.sh in an unversioned location
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
  
-  include_directories(${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
-  
-  message (STATUS "C Flags:${CMAKE_CXX_FLAGS}")
+
+  if (DEFINED CMAKE_CXX_FLAGS)
+    message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
+  else()
+    message (STATUS "Use default CFlags")
+  endif()
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  
-
   if (BUILD_GAZEBO)
+    set(TEST_TYPE "UNIT")
     add_subdirectory(gazebo)
-    add_subdirectory(sdf)
     add_subdirectory(media)
     add_subdirectory(test)
     add_subdirectory(tools)
     add_subdirectory(plugins)
     add_subdirectory(interfaces)
+    add_subdirectory(worlds)
   endif (BUILD_GAZEBO)
 
   ########################################
@@ -292,6 +290,53 @@ else (build_errors)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
   endforeach()
+
+  ########################################
+  # Make the cmake config files
+  set(PKG_NAME ${PROJECT_NAME_UPPER})
+  set(PKG_LIBRARIES
+    gazebo
+    gazebo_common
+    gazebo_gimpact
+    gazebo_gui
+    gazebo_gui_building
+    gazebo_gui_viewers
+    gazebo_math
+    gazebo_msgs
+    gazebo_ode
+    gazebo_opcode
+    gazebo_opende_ou
+    gazebo_physics
+    gazebo_physics_ode
+    gazebo_rendering
+    gazebo_selection_buffer
+    gazebo_sensors
+    gazebo_skyx
+    gazebo_transport
+    gazebo_util)
+    
+  if (NOT HAVE_CCD)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
+  endif()
+    
+  if (INCLUDE_PLAYER)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_player)
+  endif()
+
+  if (HAVE_BULLET)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
+  endif()
+  
+  if (${OGRE_VERSION} GREATER 1.7.4)
+    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  endif()
+    
+  set(PKG_DEPENDS Boost Protobuf SDFormat)
+
+  set(cmake_conf_file "cmake/gazebo-config.cmake")
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION 
+      ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/ COMPONENT cmake)
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,

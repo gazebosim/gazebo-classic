@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "gui/qt.h"
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -50,7 +51,7 @@ namespace gazebo
   {
     class ModelEditWidget;
 
-    class ModelListWidget : public QWidget
+    class GAZEBO_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT
       public: ModelListWidget(QWidget *_parent = 0);
@@ -160,6 +161,13 @@ namespace gazebo
       private: void FillPoseProperty(const msgs::Pose &_msg,
                                      QtProperty *_parent);
 
+      /// \brief Fill the property tree with spherical coordinates info.
+      /// \param[in] _msg The spherical coordinates message.
+      /// \param[in] _parent Pointer to the qtproperty which will receive
+      /// the message data.
+      private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
+                                     QtProperty *_parent);
+
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
       private: void ProcessRemoveEntity();
@@ -200,6 +208,7 @@ namespace gazebo
       private: QTreeWidgetItem *physicsItem;
       private: QTreeWidgetItem *modelsItem;
       private: QTreeWidgetItem *lightsItem;
+      private: QTreeWidgetItem *sphericalCoordItem;
 
       private: QtVariantPropertyManager *variantManager;
       private: QtVariantEditorFactory *variantFactory;
@@ -228,14 +237,18 @@ namespace gazebo
       private: msgs::Joint jointMsg;
       private: msgs::Physics physicsMsg;
       private: msgs::Light lightMsg;
+      private: msgs::SphericalCoordinates sphericalCoordMsg;
 
       private: bool fillPropertyTree;
       private: std::deque<std::string> fillTypes;
 
       private: msgs::Light::LightType lightType;
+
+      /// \brief Type of physics engine.
+      private: msgs::Physics_Type physicsType;
     };
 
-    class ModelListSheetDelegate: public QItemDelegate
+    class GAZEBO_VISIBLE ModelListSheetDelegate: public QItemDelegate
     {
       Q_OBJECT
       public: ModelListSheetDelegate(QTreeView *view, QWidget *parent);

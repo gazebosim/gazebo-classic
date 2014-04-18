@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@
  * Date: 25 May 2009
  */
 
-#include "physics/Link.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/Link.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletMotionState.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-BulletMotionState::BulletMotionState(Link *_link)
+BulletMotionState::BulletMotionState(LinkPtr _link)
   : btMotionState()
 {
   this->link = _link;
@@ -39,51 +40,43 @@ BulletMotionState::~BulletMotionState()
 }
 
 //////////////////////////////////////////////////
-math::Pose BulletMotionState::GetWorldPose() const
+void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
-  return this->worldPose;
+  _cogWorldTrans =
+    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
 }
 
 //////////////////////////////////////////////////
-void BulletMotionState::SetWorldPosition(const math::Vector3 &_pos)
+void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
 {
-  this->worldPose.pos = _pos;
-}
+  math::Pose pose = BulletTypes::ConvertPose(_cogWorldTrans);
 
-//////////////////////////////////////////////////
-void BulletMotionState::SetWorldRotation(const math::Quaternion &_rot)
-{
-  this->worldPose.rot = _rot;
-}
+  // transform pose from cg location to link location
+  // cg: pose of cg in link frame, so -cg is transform from cg to
+  //     link defined in cg frame.
+  // pose: transform from world origin to cg in inertial frame.
+  // -cg + pose:  transform from world origin to link frame in inertial frame.
+  math::Pose cg = this->link->GetInertial()->GetPose();
+  pose = -cg + pose;
 
-//////////////////////////////////////////////////
-void BulletMotionState::SetWorldPose(const math::Pose &_pose)
-{
-  this->worldPose = _pose;
-}
+  // The second argument is set to false to prevent Entity.cc from propagating
+  // the pose change all the way back to bullet.
+  // \TODO: consider using the dirtyPose mechanism employed by ODE.
+  this->link->SetWorldPose(pose, false);
 
-//////////////////////////////////////////////////
-void BulletMotionState::SetCoG(const math::Vector3 &_cog)
-{
-  this->cog = _cog;
-  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
-  this->worldPose.pos += cg;
-}
-
-//////////////////////////////////////////////////
-void BulletMotionState::getWorldTransform(btTransform &_worldTrans) const
-{
-  math::Pose result = this->worldPose;
-  _worldTrans = BulletPhysics::ConvertPose(result);
-}
-
-//////////////////////////////////////////////////
-void BulletMotionState::setWorldTransform(const btTransform &_worldTrans)
-{
-  this->worldPose = BulletPhysics::ConvertPose(_worldTrans);
-
-  math::Vector3 cg = this->worldPose.rot.RotateVector(this->cog);
-  this->worldPose.pos -= cg;
-
-  this->link->SetWorldPose(this->worldPose, false);
+  // below is inefficient as we end up double caching for some joints
+  // should consider adding a "dirty" flag.
+  // or trying doing this during BulletPhysics::InternalTickCallback(...)
+  Joint_V parentJoints = this->link->GetParentJoints();
+  for (unsigned int j = 0; j < parentJoints.size(); ++j)
+  {
+    JointPtr joint = parentJoints[j];
+    joint->CacheForceTorque();
+  }
+  Joint_V childJoints = this->link->GetChildJoints();
+  for (unsigned int j = 0; j < childJoints.size(); ++j)
+  {
+    JointPtr joint = childJoints[j];
+    joint->CacheForceTorque();
+  }
 }

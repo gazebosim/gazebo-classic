@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,8 @@
  *
  */
 #include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/JointControlWidget.hh"
 
 using namespace gazebo;
@@ -251,8 +252,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
     this->jointPub = this->node->Advertise<msgs::JointCmd>(
         std::string("~/") + _modelName + "/joint_cmd");
 
-    boost::shared_ptr<msgs::Response> response = transport::request("default",
-        "entity_info", _modelName);
+    boost::shared_ptr<msgs::Response> response = transport::request(
+        gui::get_world(), "entity_info", _modelName);
 
     if (response->response() != "error" &&
         response->type() == modelMsg.GetTypeName())

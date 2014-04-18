@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,57 +14,70 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
 
-#include <float.h>
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Events.hh"
-#include "math/Quaternion.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "sensors/Sensors.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/util/OpenAL.hh"
+#include "gazebo/common/Events.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 
-#include "physics/Model.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Link.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/sensors/Sensor.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Link.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent)
+    : Entity(_parent), initialized(false)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
   this->parentJoints.clear();
   this->childJoints.clear();
+  this->publishData = false;
+  this->publishDataMutex = new boost::recursive_mutex();
 }
 
 
 //////////////////////////////////////////////////
 Link::~Link()
 {
-  std::vector<Entity*>::iterator iter;
-
   this->attachedModels.clear();
 
-  for (unsigned int i = 0; i < this->visuals.size(); i++)
+  for (Visuals_M::iterator iter = this->visuals.begin();
+      iter != this->visuals.end(); ++iter)
   {
     msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
+    msg.set_name(iter->second.name());
+    msg.set_id(iter->second.id());
+    if (this->parent)
+    {
+      msg.set_parent_name(this->parent->GetScopedName());
+      msg.set_parent_id(this->parent->GetId());
+    }
+    else
+    {
+      msg.set_parent_name("");
+      msg.set_parent_id(0);
+    }
     msg.set_delete_me(true);
     this->visPub->Publish(msg);
   }
@@ -76,6 +89,10 @@ Link::~Link()
     {
       msgs::Visual msg;
       msg.set_name(this->cgVisuals[i]);
+      if (this->parent)
+        msg.set_parent_name(this->parent->GetScopedName());
+      else
+        msg.set_parent_name("");
       msg.set_delete_me(true);
       this->visPub->Publish(msg);
     }
@@ -84,44 +101,32 @@ Link::~Link()
 
   this->visPub.reset();
   this->sensors.clear();
+
+  this->requestPub.reset();
+  this->dataPub.reset();
+  this->connections.clear();
+
+  delete this->publishDataMutex;
+  this->publishDataMutex = NULL;
+
+  this->collisions.clear();
 }
 
 //////////////////////////////////////////////////
 void Link::Load(sdf::ElementPtr _sdf)
 {
+  bool needUpdate = false;
+
   Entity::Load(_sdf);
 
   // before loading child collsion, we have to figure out of selfCollide is true
   // and modify parent class Entity so this body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
   this->sdf->GetElement("self_collide")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetSelfCollide, this));
 
-  // TODO: this shouldn't be in the physics sim
-  if (this->sdf->HasElement("visual"))
-  {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
-
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
-      msg.set_parent_name(this->GetScopedName());
-      msg.set_is_static(this->IsStatic());
-
-      this->visPub->Publish(msg);
-
-      std::vector<std::string>::iterator iter;
-      iter = std::find(this->visuals.begin(), this->visuals.end(), msg.name());
-      if (iter != this->visuals.end())
-        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
-
-      this->visuals.push_back(msg.name());
-
-      visualElem = visualElem->GetNextElement("visual");
-    }
-  }
+  // Parse visuals from SDF
+  this->ParseVisuals();
 
   // Load the geometries
   if (this->sdf->HasElement("collision"))
@@ -140,10 +145,20 @@ void Link::Load(sdf::ElementPtr _sdf)
     sdf::ElementPtr sensorElem = this->sdf->GetElement("sensor");
     while (sensorElem)
     {
-      std::string sensorName =
-        sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-                               this->GetScopedName());
-      this->sensors.push_back(sensorName);
+      /// \todo This if statement is a hack to prevent Links from creating
+      /// a force torque sensor. We should make this more generic.
+      if (sensorElem->Get<std::string>("type") == "force_torque")
+      {
+        gzerr << "A link cannot load a [" <<
+          sensorElem->Get<std::string>("type") << "] sensor.\n";
+      }
+      else if (sensorElem->Get<std::string>("type") != "__default__")
+      {
+        std::string sensorName =
+          sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
+              this->GetScopedName(), this->GetId());
+        this->sensors.push_back(sensorName);
+      }
       sensorElem = sensorElem->GetNextElement("sensor");
     }
   }
@@ -152,113 +167,119 @@ void Link::Load(sdf::ElementPtr _sdf)
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
   }
+
+#ifdef HAVE_OPENAL
+  if (_sdf->HasElement("audio_source"))
+  {
+    // bool onContact = false;
+    sdf::ElementPtr audioElem = this->sdf->GetElement("audio_source");
+    std::vector<std::string> collisionNames;
+
+    while (audioElem)
+    {
+      util::OpenALSourcePtr source = util::OpenAL::Instance()->CreateSource(
+          audioElem);
+
+      std::vector<std::string> names = source->GetCollisionNames();
+      std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
+
+      audioElem = audioElem->GetNextElement("audio_source");
+      this->audioSources.push_back(source);
+    }
+
+    if (!collisionNames.empty())
+    {
+      for (std::vector<std::string>::iterator iter = collisionNames.begin();
+          iter != collisionNames.end(); ++iter)
+      {
+        (*iter) = this->GetScopedName() + "::" + (*iter);
+      }
+
+      std::string topic =
+        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+            this->GetScopedName() + "/audio_collision", collisionNames);
+      this->audioContactsSub = this->node->Subscribe(topic,
+          &Link::OnCollision, this);
+    }
+
+    needUpdate = true;
+  }
+
+  if (_sdf->HasElement("audio_sink"))
+  {
+    needUpdate = true;
+    this->audioSink = util::OpenAL::Instance()->CreateSink(
+        _sdf->GetElement("audio_sink"));
+  }
+#endif
+
+  if (needUpdate)
+    this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+          boost::bind(&Link::Update, this, _1)));
 }
 
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
-
-  this->SetLinearDamping(this->GetLinearDamping());
-  this->SetAngularDamping(this->GetAngularDamping());
-
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
-
-  /// Attach mesh for CG visualization
-  /// Add a renderable visual for CG, make visible in Update()
-  /// TODO: this shouldn't be in the physics sim
-  /*if (this->mass.GetAsDouble() > 0.0)
-  {
-    std::ostringstream visname;
-    visname << this->GetCompleteScopedName() + ":" + this->GetName() << "_CGVISUAL" ;
-
-    msgs::Visual msg;
-    msg.set_name(visname.str());
-    msg.set_parent_id(this->comEntity->GetCompleteScopedName());
-    msg.set_render_type(msgs::Visual::MESH_RESOURCE);
-    msg.set_mesh("unit_box");
-    msg.set_material("Gazebo/RedGlow");
-    msg.set_cast_shadows(false);
-    msg.set_attach_axes(true);
-    msg.set_visible(false);
-    msgs::Set(msg.mutable_scale(), math::Vector3(0.1, 0.1, 0.1));
-    this->vis_pub->Publish(msg);
-    this->cgVisuals.push_back(msg.header().str_id());
-
-    if (this->children.size() > 1)
-    {
-      msgs::Visual g_msg;
-      g_msg.set_name(visname.str() + "_connectors");
-
-      g_msg.set_parent_id(this->comEntity->GetCompleteScopedName());
-      g_msg.set_render_type(msgs::Visual::LINE_LIST);
-      g_msg.set_attach_axes(false);
-      g_msg.set_material("Gazebo/GreenGlow");
-      g_msg.set_visible(false);
-
-      // Create a line to each collision
-      for (Base_V::iterator giter = this->children.begin();
-           giter != this->children.end(); giter++)
-      {
-        EntityPtr e = boost::shared_dynamic_cast<Entity>(*giter);
-
-        msgs::Point *pt;
-        pt = g_msg.add_points();
-        pt->set_x(0);
-        pt->set_y(0);
-        pt->set_z(0);
-
-        pt = g_msg.add_points();
-        pt->set_x(e->GetRelativePose().pos.x);
-        pt->set_y(e->GetRelativePose().pos.y);
-        pt->set_z(e->GetRelativePose().pos.z);
-      }
-      this->vis_pub->Publish(msg);
-      this->cgVisuals.push_back(g_msg.header().str_id());
-    }
-  }*/
 
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->GetValuePose("pose"));
-  this->SetInitialRelativePose(this->sdf->GetValuePose("pose"));
+  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
   for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->Init();
+    {
+      CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
+      this->collisions.push_back(collision);
+      collision->Init();
+    }
   }
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
 void Link::Fini()
 {
-  std::vector<std::string>::iterator iter;
-
   this->parentJoints.clear();
   this->childJoints.clear();
+  this->collisions.clear();
   this->inertial.reset();
 
-  for (iter = this->sensors.begin(); iter != this->sensors.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+       iter != this->sensors.end(); ++iter)
+  {
     sensors::remove_sensor(*iter);
+  }
   this->sensors.clear();
 
-  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+  for (Visuals_M::iterator iter = this->visuals.begin();
+       iter != this->visuals.end(); ++iter)
+  {
+    msgs::Request *msg = msgs::CreateRequest("entity_delete",
+        boost::lexical_cast<std::string>(iter->second.id()));
+    this->requestPub->Publish(*msg, true);
+  }
+
+  for (std::vector<std::string>::iterator iter = this->cgVisuals.begin();
+       iter != this->cgVisuals.end(); ++iter)
   {
     msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
     this->requestPub->Publish(*msg, true);
   }
 
-  for (iter = this->cgVisuals.begin(); iter != this->cgVisuals.end(); ++iter)
-  {
-    msgs::Request *msg = msgs::CreateRequest("entity_delete", *iter);
-    this->requestPub->Publish(*msg, true);
-  }
+#ifdef HAVE_OPENAL
+  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+      this->GetScopedName() + "/audio_collision");
+  this->audioSink.reset();
+#endif
 
   Entity::Fini();
 }
@@ -266,7 +287,16 @@ void Link::Fini()
 //////////////////////////////////////////////////
 void Link::Reset()
 {
+  // resets pose
   Entity::Reset();
+
+  // resets velocity, acceleration, wrench
+  this->ResetPhysicsStates();
+}
+
+//////////////////////////////////////////////////
+void Link::ResetPhysicsStates()
+{
   this->SetAngularVel(math::Vector3(0, 0, 0));
   this->SetLinearVel(math::Vector3(0, 0, 0));
   this->SetAngularAccel(math::Vector3(0, 0, 0));
@@ -291,13 +321,13 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
       boost::bind(&Link::GetKinematic, this));
 
-  if (this->sdf->GetValueBool("gravity") != this->GetGravityMode())
-    this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
+    this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   // before loading child collsiion, we have to figure out if
   // selfCollide is true and modify parent class Entity so this
   // body has its own spaceId
-  this->SetSelfCollide(this->sdf->GetValueBool("self_collide"));
+  this->SetSelfCollide(this->sdf->Get<bool>("self_collide"));
 
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -323,8 +353,8 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr collisionElem = this->sdf->GetElement("collision");
     while (collisionElem)
     {
-      CollisionPtr collision = boost::shared_dynamic_cast<Collision>(
-          this->GetChild(collisionElem->GetValueString("name")));
+      CollisionPtr collision = boost::dynamic_pointer_cast<Collision>(
+          this->GetChild(collisionElem->Get<std::string>("name")));
 
       if (collision)
         collision->UpdateParameters(collisionElem);
@@ -370,43 +400,56 @@ void Link::SetCollideMode(const std::string &_mode)
     return;
   }
 
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
+    if ((*iter))
     {
-      physics::CollisionPtr pc =
-        boost::dynamic_pointer_cast<physics::Collision>(*iter);
-      if (pc)
-      {
-        pc->SetCategoryBits(categoryBits);
-        pc->SetCollideBits(collideBits);
-      }
+      (*iter)->SetCategoryBits(categoryBits);
+      (*iter)->SetCollideBits(collideBits);
     }
   }
 }
 
 //////////////////////////////////////////////////
-bool Link::GetSelfCollide()
+bool Link::GetSelfCollide() const
 {
-  return this->sdf->GetValueBool("self_collide");
+  GZ_ASSERT(this->sdf != NULL, "Link sdf member is NULL");
+  if (this->sdf->HasElement("self_collide"))
+    return this->sdf->Get<bool>("self_collide");
+  else
+    return false;
 }
 
 //////////////////////////////////////////////////
 void Link::SetLaserRetro(float _retro)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
-      boost::shared_static_cast<Collision>(*iter)->SetLaserRetro(_retro);
+    (*iter)->SetLaserRetro(_retro);
   }
 }
 
 //////////////////////////////////////////////////
-void Link::Update()
+void Link::Update(const common::UpdateInfo & /*_info*/)
 {
+#ifdef HAVE_OPENAL
+  if (this->audioSink)
+  {
+    this->audioSink->SetPose(this->GetWorldPose());
+    this->audioSink->SetVelocity(this->GetWorldLinearVel());
+  }
+
+  // Update all the audio sources
+  for (std::vector<util::OpenALSourcePtr>::iterator iter =
+      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+  {
+    (*iter)->SetPose(this->GetWorldPose());
+    (*iter)->SetVelocity(this->GetWorldLinearVel());
+  }
+#endif
+
   // Apply our linear accel
   // this->SetForce(this->linearAccel);
 
@@ -419,6 +462,18 @@ void Link::Update()
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
+}
+
+/////////////////////////////////////////////////
+Joint_V Link::GetParentJoints() const
+{
+  return this->parentJoints;
+}
+
+/////////////////////////////////////////////////
+Joint_V Link::GetChildJoints() const
+{
+  return this->childJoints;
 }
 
 /////////////////////////////////////////////////
@@ -460,7 +515,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
     this->SetStatic(true);
 
   collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
-      boost::shared_static_cast<Link>(shared_from_this()));
+      boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
     gzthrow("Unknown Collisionetry Type[" + geomType + "]");
@@ -471,7 +526,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 CollisionPtr Link::GetCollisionById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Collision>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Collision>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
@@ -483,7 +538,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
   {
     if ((*biter)->GetName() == _name)
     {
-      result = boost::shared_dynamic_cast<Collision>(*biter);
+      result = boost::dynamic_pointer_cast<Collision>(*biter);
       break;
     }
   }
@@ -494,17 +549,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 //////////////////////////////////////////////////
 Collision_V Link::GetCollisions() const
 {
-  Collision_V result;
-  Base_V::const_iterator biter;
-  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
-  {
-    if ((*biter)->HasType(Base::COLLISION))
-    {
-      result.push_back(boost::shared_static_cast<Collision>(*biter));
-    }
-  }
-
-  return result;
+  return this->collisions;
 }
 
 //////////////////////////////////////////////////
@@ -512,7 +557,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 {
   CollisionPtr collision;
   if (_index <= this->GetChildCount())
-    collision = boost::shared_static_cast<Collision>(this->GetChild(_index));
+    collision = boost::static_pointer_cast<Collision>(this->GetChild(_index));
   else
     gzerr << "Index is out of range\n";
 
@@ -531,6 +576,14 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 {
   this->SetEnabled(true);
   this->angularAccel = _accel * this->inertial->GetMass();
+}
+
+//////////////////////////////////////////////////
+math::Pose Link::GetWorldCoGPose() const
+{
+  math::Pose pose = this->GetWorldPose();
+  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+  return pose;
 }
 
 //////////////////////////////////////////////////
@@ -586,22 +639,21 @@ math::Vector3 Link::GetRelativeTorque() const
 //////////////////////////////////////////////////
 ModelPtr Link::GetModel() const
 {
-  return boost::shared_dynamic_cast<Model>(this->GetParent());
+  return boost::dynamic_pointer_cast<Model>(this->GetParent());
 }
 
 //////////////////////////////////////////////////
 math::Box Link::GetBoundingBox() const
 {
   math::Box box;
-  Base_V::const_iterator iter;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   box.max.Set(0, 0, 0);
 
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Collision_V::const_iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
   {
-    if ((*iter)->HasType(Base::COLLISION))
-      box += boost::shared_static_cast<Collision>(*iter)->GetBoundingBox();
+    box += (*iter)->GetBoundingBox();
   }
 
   return box;
@@ -625,6 +677,28 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 }
 
 //////////////////////////////////////////////////
+math::Pose Link::GetWorldInertialPose() const
+{
+  math::Pose inertialPose;
+  if (this->inertial)
+    inertialPose = this->inertial->GetPose();
+  return inertialPose + this->GetWorldPose();
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Link::GetWorldInertiaMatrix() const
+{
+  math::Matrix3 moi;
+  if (this->inertial)
+  {
+    math::Vector3 pos = this->inertial->GetPose().pos;
+    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
+    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+  }
+  return moi;
+}
+
+//////////////////////////////////////////////////
 void Link::AddParentJoint(JointPtr _joint)
 {
   this->parentJoints.push_back(_joint);
@@ -637,14 +711,14 @@ void Link::AddChildJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
-void Link::RemoveParentJoint(JointPtr _joint)
+void Link::RemoveParentJoint(const std::string &_jointName)
 {
   for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
                                        iter != this->parentJoints.end();
                                        ++iter)
   {
     /// @todo: can we assume there are no repeats?
-    if ((*iter)->GetName() == _joint->GetName())
+    if ((*iter)->GetName() == _jointName)
     {
       this->parentJoints.erase(iter);
       break;
@@ -653,14 +727,14 @@ void Link::RemoveParentJoint(JointPtr _joint)
 }
 
 //////////////////////////////////////////////////
-void Link::RemoveChildJoint(JointPtr _joint)
+void Link::RemoveChildJoint(const std::string &_jointName)
 {
   for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
                                        iter != this->childJoints.end();
                                        ++iter)
   {
     /// @todo: can we assume there are no repeats?
-    if ((*iter)->GetName() == _joint->GetName())
+    if ((*iter)->GetName() == _jointName)
     {
       this->childJoints.erase(iter);
       break;
@@ -671,15 +745,17 @@ void Link::RemoveChildJoint(JointPtr _joint)
 //////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
+  math::Pose relPose = this->GetRelativePose();
+
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_self_collide(this->GetSelfCollide());
   _msg.set_gravity(this->GetGravityMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose());
+  msgs::Set(_msg.mutable_pose(), relPose);
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
+  msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
   _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
@@ -691,36 +767,29 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
   msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->GetPose());
 
-  for (unsigned int j = 0; j < this->GetChildCount(); j++)
+  for (Collision_V::iterator iter = this->collisions.begin();
+      iter != this->collisions.end(); ++iter)
   {
-    if (this->GetChild(j)->HasType(Base::COLLISION))
-    {
-      CollisionPtr coll = boost::shared_dynamic_cast<Collision>(
-          this->GetChild(j));
-      coll->FillMsg(*_msg.add_collision());
-    }
+    (*iter)->FillMsg(*_msg.add_collision());
   }
 
   for (std::vector<std::string>::iterator iter = this->sensors.begin();
-       iter != this->sensors.end(); ++iter)
+      iter != this->sensors.end(); ++iter)
   {
     sensors::SensorPtr sensor = sensors::get_sensor(*iter);
     if (sensor)
       sensor->FillMsg(*_msg.add_sensor());
   }
 
-  if (this->sdf->HasElement("visual"))
-  {
-    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
-    while (visualElem)
-    {
-      msgs::Visual *vis = _msg.add_visual();
-      vis->CopyFrom(msgs::VisualFromSDF(visualElem));
-      vis->set_name(this->GetScopedName() + "::" + vis->name());
-      vis->set_parent_name(this->GetScopedName());
+  // Parse visuals from SDF
+  if (this->visuals.empty())
+    this->ParseVisuals();
 
-      visualElem = visualElem->GetNextElement("visual");
-    }
+  for (Visuals_M::iterator iter = this->visuals.begin();
+      iter != this->visuals.end(); ++iter)
+  {
+    msgs::Visual *vis = _msg.add_visual();
+    vis->CopyFrom(iter->second);
   }
 
   if (this->sdf->HasElement("projector"))
@@ -728,13 +797,17 @@ void Link::FillMsg(msgs::Link &_msg)
     sdf::ElementPtr elem = this->sdf->GetElement("projector");
 
     msgs::Projector *proj = _msg.add_projector();
-    proj->set_name(this->GetScopedName() + "::" + elem->GetValueString("name"));
-    proj->set_texture(elem->GetValueString("texture"));
-    proj->set_fov(elem->GetValueDouble("fov"));
-    proj->set_near_clip(elem->GetValueDouble("near_clip"));
-    proj->set_far_clip(elem->GetValueDouble("far_clip"));
-    msgs::Set(proj->mutable_pose(), elem->GetValuePose("pose"));
+    proj->set_name(
+        this->GetScopedName() + "::" + elem->Get<std::string>("name"));
+    proj->set_texture(elem->Get<std::string>("texture"));
+    proj->set_fov(elem->Get<double>("fov"));
+    proj->set_near_clip(elem->Get<double>("near_clip"));
+    proj->set_far_clip(elem->Get<double>("far_clip"));
+    msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
+
+  if (this->IsCanonicalLink())
+    _msg.set_canonical(true);
 }
 
 //////////////////////////////////////////////////
@@ -781,7 +854,6 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.collision_size()>0)
     this->UpdateSurface();
 }
-
 
 //////////////////////////////////////////////////
 unsigned int Link::GetSensorCount() const
@@ -847,9 +919,9 @@ void Link::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void Link::SetState(const LinkState & /*_state*/)
+void Link::SetState(const LinkState &_state)
 {
-  // this->SetRelativePose(_state.GetPose());
+  this->SetWorldPose(_state.GetPose());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
@@ -867,7 +939,7 @@ void Link::SetState(const LinkState & /*_state*/)
 double Link::GetLinearDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("linear");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("linear");
   else
     return 0.0;
 }
@@ -876,7 +948,7 @@ double Link::GetLinearDamping() const
 double Link::GetAngularDamping() const
 {
   if (this->sdf->HasElement("velocity_decay"))
-    return this->sdf->GetElement("velocity_decay")->GetValueDouble("angular");
+    return this->sdf->GetElement("velocity_decay")->Get<double>("angular");
   else
     return 0.0;
 }
@@ -884,4 +956,203 @@ double Link::GetAngularDamping() const
 /////////////////////////////////////////////////
 void Link::SetKinematic(const bool &/*_kinematic*/)
 {
+}
+
+/////////////////////////////////////////////////
+void Link::SetPublishData(bool _enable)
+{
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
+    if (this->publishData == _enable)
+      return;
+
+    this->publishData = _enable;
+  }
+  if (_enable)
+  {
+    std::string topic = "~/" + this->GetScopedName();
+    this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->connections.push_back(
+      event::Events::ConnectWorldUpdateEnd(
+        boost::bind(&Link::PublishData, this)));
+  }
+  else
+  {
+    this->dataPub.reset();
+    this->connections.clear();
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::PublishData()
+{
+  if (this->publishData && this->dataPub->HasConnections())
+  {
+    msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
+    linkDataMsg.set_name(this->GetScopedName());
+    msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
+        this->GetWorldLinearVel());
+    msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
+        this->GetWorldAngularVel());
+    this->dataPub->Publish(this->linkDataMsg);
+  }
+}
+
+//////////////////////////////////////////////////
+void Link::OnCollision(ConstContactsPtr &_msg)
+{
+  std::string collisionName1;
+  std::string collisionName2;
+  std::string::size_type pos1, pos2;
+
+  for (int i = 0; i < _msg->contact_size(); ++i)
+  {
+    collisionName1 = _msg->contact(i).collision1();
+    collisionName2 = _msg->contact(i).collision2();
+    pos1 = collisionName1.rfind("::");
+    pos2 = collisionName2.rfind("::");
+
+    GZ_ASSERT(pos1 != std::string::npos, "Invalid collision name");
+    GZ_ASSERT(pos2 != std::string::npos, "Invalid collision name");
+
+    collisionName1 = collisionName1.substr(pos1+2);
+    collisionName2 = collisionName2.substr(pos2+2);
+
+#ifdef HAVE_OPENAL
+    for (std::vector<util::OpenALSourcePtr>::iterator iter =
+        this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+    {
+      if ((*iter)->HasCollisionName(collisionName1) ||
+          (*iter)->HasCollisionName(collisionName2))
+        (*iter)->Play();
+    }
+#endif
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::ParseVisuals()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
+  {
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      msgs::Visual msg = msgs::VisualFromSDF(visualElem);
+
+      std::string visName = this->GetScopedName() + "::" + msg.name();
+      msg.set_name(visName);
+      msg.set_id(physics::getUniqueId());
+      msg.set_parent_name(this->GetScopedName());
+      msg.set_parent_id(this->GetId());
+      msg.set_is_static(this->IsStatic());
+
+      this->visPub->Publish(msg);
+
+      Visuals_M::iterator iter = this->visuals.find(msg.id());
+      if (iter != this->visuals.end())
+        gzthrow(std::string("Duplicate visual name[")+msg.name()+"]\n");
+
+      this->visuals[msg.id()] = msg;
+
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::RemoveChild(EntityPtr _child)
+{
+  if (_child->HasType(COLLISION))
+  {
+    this->RemoveCollision(_child->GetScopedName());
+  }
+
+  Entity::RemoveChild(_child->GetId());
+
+  this->SetEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void Link::RemoveCollision(const std::string &_name)
+{
+  for (Collision_V::iterator iter = this->collisions.begin();
+       iter != this->collisions.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->collisions.erase(iter);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void Link::SetScale(const math::Vector3 &_scale)
+{
+  Base_V::const_iterator biter;
+  for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+  {
+    if ((*biter)->HasType(Base::COLLISION))
+    {
+      boost::static_pointer_cast<Collision>(*biter)->SetScale(_scale);
+    }
+  }
+
+/*  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+  {
+    msgs::Visual msg;
+    msg.set_name(this->visuals[i]);
+    if (this->parent)
+      msg.set_parent_name(this->parent->GetScopedName());
+    else
+      msg.set_parent_name("");
+
+    msgs::Set(msg.mutable_scale(), _scale);
+
+    this->visPub->Publish(msg);
+  }*/
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyPotential() const
+{
+  // compute gravitational potential energy for link CG location
+  // use origin as reference position
+  // E = -m g^T z
+  double m = this->GetInertial()->GetMass();
+  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  math::Vector3 z = this->GetWorldCoGPose().pos;
+  return -m * g.Dot(z);
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyKinetic() const
+{
+  double energy = 0.0;
+
+  // compute linear kinetic energy
+  // E = 1/2 m v^T v
+  {
+    double m = this->GetInertial()->GetMass();
+    math::Vector3 v = this->GetWorldCoGLinearVel();
+    energy += 0.5 * m * v.Dot(v);
+  }
+
+  // compute angular kinetic energy
+  // E = 1/2 w^T I w
+  {
+    math::Vector3 w = this->GetWorldAngularVel();
+    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    energy += 0.5 * w.Dot(I * w);
+  }
+
+  return energy;
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }

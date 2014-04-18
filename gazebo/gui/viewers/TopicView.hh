@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,23 @@
 
 #include <string>
 #include <list>
+#include <boost/thread/mutex.hpp>
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class TopicCombo : public QComboBox
+    /// \cond
+    /// \brief A custom combobox that pull in a list of topics for user
+    /// selection.
+    class GAZEBO_VISIBLE TopicCombo : public QComboBox
     {
       /// \brief Constructor
       /// \param[in] _w Parent widget.
@@ -62,9 +67,13 @@ namespace gazebo
 
       /// \brief Tranport node pointer.
       private: transport::NodePtr node;
-    };
 
-    class TopicView : public QDialog
+      private: boost::mutex mutex;
+    };
+    /// \endcond
+
+    /// \brief Base class for widgets that display topic data.
+    class GAZEBO_VISIBLE TopicView : public QDialog
     {
       Q_OBJECT
 
@@ -73,8 +82,10 @@ namespace gazebo
       /// \param[in] _msgType Type of message that the viewer can display.
       /// \param[in] _parent Pointer to the parent widget.
       /// \param[in] _viewType The type of the viewer.
+      /// \param[in] _displayPeriod Milliseconds between display updates.
       public: TopicView(QWidget *_parent, const std::string &_msgType,
-                        const std::string &_viewType);
+                        const std::string &_viewType,
+                        unsigned int _displayPeriod = 500);
 
       /// \brief Destructor
       public: virtual ~TopicView();
@@ -89,6 +100,10 @@ namespace gazebo
       /// be the timestamp when data was generated on the server.
       /// \param[in] _size Size of the message in bytes.
       protected: void OnMsg(const common::Time &_dataTime, int _size);
+
+      /// \brief Qt close event callback.
+      /// \param[in] _event The close event info.
+      protected: virtual void closeEvent(QCloseEvent *_event);
 
       /// \brief Update the camera sensor widget.
       private slots: void Update();
@@ -120,6 +135,9 @@ namespace gazebo
       /// \brief Previous time a message was received.
       private: common::Time prevTime;
 
+      /// \brief Previous display update time.
+      private: common::Time prevDisplayTime;
+
       /// \brief Output for the hz info.
       private: QLineEdit *hzEdit;
 
@@ -134,6 +152,12 @@ namespace gazebo
 
       /// \brief A list of clock times that messages have been received.
       private: std::list<common::Time> times;
+
+      /// \brief A list of clock times that messages have been generated.
+      private: std::list<common::Time> dataTimes;
+
+      /// \brief A mutex to protect the update cycle.
+      private: boost::mutex updateMutex;
     };
   }
 }

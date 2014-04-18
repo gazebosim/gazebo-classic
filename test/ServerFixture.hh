@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,19 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_SERVER_FIXTURE_HH_
+#define _GAZEBO_SERVER_FIXTURE_HH_
 
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
+
+// The following is needed to enable the GetMemInfo function for OSX
+#ifdef __MACH__
+# include <mach/mach.h>
+#endif  // __MACH__
+
+#include <sdf/sdf.hh>
 
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
@@ -26,561 +35,497 @@
 #include <map>
 #include <string>
 
-#include "transport/transport.hh"
+#include "gazebo/transport/transport.hh"
 
-#include "common/SystemPaths.hh"
-#include "physics/World.hh"
-#include "physics/PhysicsTypes.hh"
-#include "physics/Physics.hh"
-#include "sensors/sensors.hh"
-#include "rendering/rendering.hh"
-#include "msgs/msgs.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/sensors/sensors.hh"
+#include "gazebo/rendering/rendering.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 
 #include "test_config.h"
 
 using namespace gazebo;
 
+std::string custom_exec(std::string _cmd);
+
 class ServerFixture : public testing::Test
 {
-  protected: ServerFixture()
-             {
-               this->server = NULL;
-               this->serverRunning = false;
-               this->paused = false;
-               this->percentRealTime = 0;
-               this->gotImage = 0;
-               this->imgData = NULL;
-               this->serverThread = NULL;
+  /// \brief Constructor
+  protected: ServerFixture();
 
-               common::SystemPaths::Instance()->AddGazeboPaths(
-                   TEST_REGRESSION_PATH);
+  /// \brief Tear down the test fixture. This gets called by gtest.
+  protected: virtual void TearDown();
 
-               // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
-               path += "/../..";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  /// \brief Unload the test fixture.
+  protected: virtual void Unload();
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../sdf";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  /// \brief Load a world based on a filename.
+  /// \param[in] _worldFilename Name of the world to load.
+  protected: virtual void Load(const std::string &_worldFilename);
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../gazebo";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+  /// \brief Load a world based on a filename and set simulation
+  /// paused/un-paused.
+  /// \param[in] _worldFilename Name of the world to load.
+  /// \param[in] _paused True to start the world paused.
+  protected: virtual void Load(const std::string &_worldFilename, bool _paused);
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../build/plugins";
-               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
-             }
+  /// \brief Load a world based on a filename and set simulation
+  /// paused/un-paused, and specify physics engine.
+  /// \param[in] _worldFilename Name of the world to load.
+  /// \param[in] _paused True to start the world paused.
+  /// \param[in] _physics Name of the physics engine.
+  protected: virtual void Load(const std::string &_worldFilename,
+                               bool _paused, const std::string &_physics);
 
-  protected: virtual void TearDown()
-             {
-               this->Unload();
-             }
+  /// \brief Run the server.
+  /// \param[in] _worldFilename Name of the world to run in simulation.
+  protected: void RunServer(const std::string &_worldFilename);
 
-  protected: virtual void Unload()
-             {
-               this->serverRunning = false;
-               if (this->node)
-                 this->node->Fini();
+  /// \brief Get a pointer to the rendering scene.
+  /// \param[in] _sceneName Name of the scene to get.
+  protected: rendering::ScenePtr GetScene(
+                 const std::string &_sceneName = "default");
 
-               if (this->server)
-               {
-                 this->server->Stop();
+  /// \brief Run the server, start paused/unpaused, and specify the physics
+  /// engine.
+  /// \param[in] _worldFilename Name of the world to load.
+  /// \param[in] _paused True to start the world paused.
+  /// \param[in] _physics Name of the physics engine.
+  protected: void RunServer(const std::string &_worldFilename, bool _paused,
+                            const std::string &_physics);
 
-                 if (this->serverThread)
-                 {
-                   this->serverThread->join();
-                 }
-               }
+  /// \brief Function that received world stastics messages.
+  /// \param[in] _msg World statistics message.
+  protected: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-               delete this->serverThread;
-               this->serverThread = NULL;
-             }
+  /// \brief Set a running simulation paused/unpaused.
+  protected: void SetPause(bool _pause);
 
-  protected: virtual void Load(const std::string &_worldFilename)
-             {
-               this->Load(_worldFilename, false);
-             }
+  /// \brief Get the real-time factor.
+  /// \return The percent real time simulation is running.
+  protected: double GetPercentRealTime() const;
 
-  protected: virtual void Load(const std::string &_worldFilename, bool _paused)
-             {
-               delete this->server;
-               this->server = NULL;
+  /// \brief Function that received poses messages from a running
+  /// simulation.
+  /// \param[in] _msg Pose message.
+  protected: void OnPose(ConstPosesStampedPtr &_msg);
 
-               // Create, load, and run the server in its own thread
-               this->serverThread = new boost::thread(
-                  boost::bind(&ServerFixture::RunServer, this, _worldFilename,
-                              _paused));
+  /// \brief Get the pose of an entity.
+  /// \param[in] _name Name of the entity.
+  /// \return Pose of the named entity.
+  protected: math::Pose GetEntityPose(const std::string &_name);
 
-               // Wait for the server to come up
-               while (!this->server || !this->server->GetInitialized())
-                 common::Time::MSleep(10);
+  /// \brief Return true if the named entity exists.
+  /// \param[in] _name Name of the entity to check for.
+  /// \return True if the entity exists.
+  protected: bool HasEntity(const std::string &_name);
 
-               this->node = transport::NodePtr(new transport::Node());
-               ASSERT_NO_THROW(this->node->Init());
-               this->poseSub = this->node->Subscribe("~/pose/info",
-                   &ServerFixture::OnPose, this);
-               this->statsSub = this->node->Subscribe("~/world_stats",
-                   &ServerFixture::OnStats, this);
-
-               this->factoryPub =
-                 this->node->Advertise<msgs::Factory>("~/factory");
-             }
-
-  protected: void RunServer(const std::string &_worldFilename)
-             {
-               this->RunServer(_worldFilename, false);
-             }
-
-  protected: void RunServer(const std::string &_worldFilename, bool _paused)
-             {
-               ASSERT_NO_THROW(this->server = new Server());
-               ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
-               ASSERT_NO_THROW(this->server->Init());
-
-               rendering::create_scene(
-                   gazebo::physics::get_world()->GetName(), false);
-
-               this->SetPause(_paused);
-
-               this->server->Run();
-
-               rendering::remove_scene(gazebo::physics::get_world()->GetName());
-
-               ASSERT_NO_THROW(this->server->Fini());
-               delete this->server;
-               this->server = NULL;
-             }
-
-  protected: void OnStats(ConstWorldStatisticsPtr &_msg)
-             {
-               this->simTime = msgs::Convert(_msg->sim_time());
-               this->realTime = msgs::Convert(_msg->real_time());
-               this->pauseTime = msgs::Convert(_msg->pause_time());
-               this->paused = _msg->paused();
-
-               if (this->realTime == 0)
-                 this->percentRealTime = 0;
-               else
-                 this->percentRealTime =
-                   (this->simTime / this->realTime).Double();
-
-               this->serverRunning = true;
-             }
-
-  protected: void SetPause(bool _pause)
-             {
-               physics::pause_worlds(_pause);
-             }
-
-  protected: double GetPercentRealTime() const
-             {
-               while (!this->serverRunning)
-                 common::Time::MSleep(100);
-
-               return this->percentRealTime;
-             }
-
-  protected: void OnPose(ConstPose_VPtr &_msg)
-             {
-               boost::mutex::scoped_lock lock(this->receiveMutex);
-               for (int i = 0; i < _msg->pose_size(); ++i)
-               {
-                 this->poses[_msg->pose(i).name()] =
-                   msgs::Convert(_msg->pose(i));
-               }
-             }
-
-  protected: math::Pose GetEntityPose(const std::string &_name)
-             {
-               boost::mutex::scoped_lock lock(this->receiveMutex);
-
-               std::map<std::string, math::Pose>::iterator iter;
-               iter = this->poses.find(_name);
-               EXPECT_TRUE(iter != this->poses.end());
-               return iter->second;
-             }
-
-  protected: bool HasEntity(const std::string &_name)
-             {
-               boost::mutex::scoped_lock lock(this->receiveMutex);
-               std::map<std::string, math::Pose>::iterator iter;
-               iter = this->poses.find(_name);
-               return iter != this->poses.end();
-             }
-
+  /// \brief Print image data to screen. This is used to generate test data.
+  /// \param[in] _name Name to associate with the printed data.
+  /// \param[in] _image The raw image data.
+  /// \param[in] _width Width of the image.
+  /// \param[in] _height Height of the image.
+  /// \param[in] _depth Pixel depth.
   protected: void PrintImage(const std::string &_name, unsigned char **_image,
-                 unsigned int _width, unsigned int _height, unsigned int _depth)
-             {
-               unsigned int count = _height * _width * _depth;
-               printf("\n");
-               printf("static unsigned char __%s[] = {", _name.c_str());
-               unsigned int i;
-               for (i = 0; i < count-1; i++)
-               {
-                 if (i % 10 == 0)
-                   printf("\n");
-                 else
-                   printf(" ");
-                 printf("%d,", (*_image)[i]);
-               }
-               printf(" %d};\n", (*_image)[i]);
-               printf("static unsigned char *%s = __%s;\n", _name.c_str(),
-                   _name.c_str());
-             }
+                unsigned int _width, unsigned int _height, unsigned int _depth);
 
+  /// \brief Print laser scan to screen. This is used to generate test data.
+  /// \param[in] _name Name to associate with the printed data.
+  /// \param[in] _scan The laser scan data.
+  /// \param[in] _sampleCount Number of samples in the scan data.
   protected: void PrintScan(const std::string &_name, double *_scan,
-                            unsigned int _sampleCount)
-             {
-               printf("static double __%s[] = {\n", _name.c_str());
-               for (unsigned int i = 0; i < _sampleCount-1; ++i)
-               {
-                 if ((i+1) % 5 == 0)
-                   printf("%13.10f,\n", math::precision(_scan[i], 10));
-                 else
-                   printf("%13.10f, ", math::precision(_scan[i], 10));
-               }
-               printf("%13.10f};\n",
-                   math::precision(_scan[_sampleCount-1], 10));
-               printf("static double *%s = __%s;\n", _name.c_str(),
-                   _name.c_str());
-             }
+                            unsigned int _sampleCount);
 
+  /// \brief Function to compare two float arrays (for example two laser
+  /// scans).
+  /// \param[in] _scanA First float array.
+  /// \param[in] _scanB Second float array.
+  /// \param[in] _sampleCount Number of samples in each float array.
+  /// \param[out] _diffMax Maximum difference between the two arrays.
+  /// \param[out] _diffSum Sum of the differences between the two arrays.
+  /// \param[out] _diffAvg Average difference between the two arrays.
   protected: void FloatCompare(float *_scanA, float *_scanB,
                  unsigned int _sampleCount, float &_diffMax,
-                 float &_diffSum, float &_diffAvg)
-             {
-               float diff;
-               _diffMax = 0;
-               _diffSum = 0;
-               _diffAvg = 0;
-               for (unsigned int i = 0; i < _sampleCount; ++i)
-               {
-                 diff = fabs(math::precision(_scanA[i], 10) -
-                             math::precision(_scanB[i], 10));
-                 _diffSum += diff;
-                 if (diff > _diffMax)
-                 {
-                   _diffMax = diff;
-                 }
-               }
-               _diffAvg = _diffSum / _sampleCount;
-             }
+                 float &_diffSum, float &_diffAvg);
 
+  /// \brief Function to compare two double arrays (for example two laser
+  /// scans).
+  /// \param[in] _scanA First double array.
+  /// \param[in] _scanB Second double array.
+  /// \param[in] _sampleCount Number of samples in each double array.
+  /// \param[out] _diffMax Maximum difference between the two arrays.
+  /// \param[out] _diffSum Sum of the differences between the two arrays.
+  /// \param[out] _diffAvg Average difference between the two arrays.
   protected: void DoubleCompare(double *_scanA, double *_scanB,
                  unsigned int _sampleCount, double &_diffMax,
-                 double &_diffSum, double &_diffAvg)
-             {
-               double diff;
-               _diffMax = 0;
-               _diffSum = 0;
-               _diffAvg = 0;
-               for (unsigned int i = 0; i < _sampleCount; ++i)
-               {
-                 diff = fabs(math::precision(_scanA[i], 10) -
-                             math::precision(_scanB[i], 10));
-                 _diffSum += diff;
-                 if (diff > _diffMax)
-                 {
-                   _diffMax = diff;
-                 }
-               }
-               _diffAvg = _diffSum / _sampleCount;
-             }
+                 double &_diffSum, double &_diffAvg);
 
-  protected: void ImageCompare(unsigned char **_imageA,
-                 unsigned char *_imageB[],
+  /// \brief Function to compare two images.
+  /// \param[in] _imageA First image to compare.
+  /// \param[in] _imageB Second image to compare.
+  /// \param[in] _width Width of both images.
+  /// \param[in] _height Height of both images.
+  /// \param[in] _depth Depth of both images.
+  /// \param[out] _diffMax Maximum difference between the two arrays.
+  /// \param[out] _diffSum Sum of the differences between the two arrays.
+  /// \param[out] _diffAvg Average difference between the two arrays.
+  protected: void ImageCompare(unsigned char *_imageA,
+                 unsigned char *_imageB,
                  unsigned int _width, unsigned int _height, unsigned int _depth,
                  unsigned int &_diffMax, unsigned int &_diffSum,
-                 double &_diffAvg)
-             {
-               _diffMax = 0;
-               _diffSum = 0;
-               _diffAvg = 0;
+                 double &_diffAvg);
 
-               for (unsigned int y = 0; y < _height; y++)
-               {
-                 for (unsigned int x = 0; x < _width*_depth; x++)
-                 {
-                   unsigned int a = (*_imageA)[(y*_width*_depth)+x];
-                   unsigned int b = (*_imageB)[(y*_width*_depth)+x];
-
-                   unsigned int diff = (unsigned int)(fabs(a - b));
-
-                   if (diff > _diffMax)
-                     _diffMax = diff;
-
-                   _diffSum += diff;
-                 }
-               }
-               _diffAvg = _diffSum / (_height*_width*_depth);
-             }
-
+  /// \brief Function that receives new image frames.
+  /// \param[in] _image Image data.
+  /// \param[in] _width Width of the image frame.
+  /// \param[in] _height Height of the image frame.
+  /// \param[in] _depth Depth of the image frame.
+  /// \param[in] _format Pixel format.
   private: void OnNewFrame(const unsigned char *_image,
-                              unsigned int _width, unsigned int _height,
-                              unsigned int _depth,
-                              const std::string &/*_format*/)
-           {
-             memcpy(*this->imgData, _image, _width * _height * _depth);
-             this->gotImage+= 1;
-           }
+                           unsigned int _width, unsigned int _height,
+                           unsigned int _depth,
+                           const std::string &/*_format*/);
 
+  /// \brief Get an image frame from a camera.
+  /// \param[in] _cameraName Name of the camera to get a frame from.
+  /// \param[out] _imgData Array that receives the image data.
+  /// \param[in] _width Width of the image frame.
+  /// \param[in] _height Height of the image frame.
   protected: void GetFrame(const std::string &_cameraName,
                  unsigned char **_imgData, unsigned int &_width,
-                 unsigned int &_height)
-             {
-               sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
-               EXPECT_TRUE(sensor);
-               sensors::CameraSensorPtr camSensor =
-                 boost::shared_dynamic_cast<sensors::CameraSensor>(sensor);
+                 unsigned int &_height);
 
-               _width = camSensor->GetImageWidth();
-               _height = camSensor->GetImageHeight();
-
-               if (*_imgData)
-               {
-                 delete *_imgData;
-                 *_imgData = NULL;
-               }
-               (*_imgData) = new unsigned char[_width *_height*3];
-               this->imgData = _imgData;
-
-               this->gotImage = 0;
-               event::ConnectionPtr c =
-                 camSensor->GetCamera()->ConnectNewImageFrame(
-                     boost::bind(&ServerFixture::OnNewFrame,
-                                 this, _1, _2, _3, _4, _5));
-
-               while (this->gotImage < 20)
-                 common::Time::MSleep(10);
-
-               camSensor->GetCamera()->DisconnectNewImageFrame(c);
-             }
-
+  /// \brief Spawn a camera.
+  /// \param[in] _modelName Name of the model.
+  /// \param[in] _cameraName Name of the camera.
+  /// \param[in] _pos Camera position.
+  /// \param[in] _rpy Camera roll, pitch, yaw.
+  /// \param[in] _width Output image width.
+  /// \param[in] _height Output image height.
+  /// \param[in] _rate Output Hz.
+  /// \param[in] _noiseType Type of noise to apply.
+  /// \param[in] _noiseMean Mean noise value.
+  /// \param[in] _noiseStdDev Standard deviation of the noise.
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
-                 double _rate = 25)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+                 double _rate = 25,
+                 const std::string &_noiseType = "",
+                 double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0);
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _modelName << "'>"
-                 << "<static>true</static>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
-                 << "<link name ='body'>"
-                 << "  <sensor name ='" << _cameraName
-                 << "' type ='camera'>"
-                 << "    <always_on>1</always_on>"
-                 << "    <update_rate>" << _rate << "</update_rate>"
-                 << "    <visualize>true</visualize>"
-                 << "    <camera>"
-                 << "      <horizontal_fov>0.78539816339744828</horizontal_fov>"
-                 << "      <image>"
-                 << "        <width>" << _width << "</width>"
-                 << "        <height>" << _height << "</height>"
-                 << "        <format>R8G8B8</format>"
-                 << "      </image>"
-                 << "      <clip>"
-                 << "        <near>0.1</near><far>100</far>"
-                 << "      </clip>"
-                 // << "      <save enabled ='true' path ='/tmp/camera/'/>"
-                 << "    </camera>"
-                 << "  </sensor>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
+  /// \brief Spawn a laser.
+  /// \param[in] _modelName Name of the model.
+  /// \param[in] _raySensorName Name of the laser.
+  /// \param[in] _pos Camera position.
+  /// \param[in] _rpy Camera roll, pitch, yaw.
+  /// \param[in] _hMinAngle Horizontal min angle
+  /// \param[in] _hMaxAngle Horizontal max angle
+  /// \param[in] _minRange Min range
+  /// \param[in] _maxRange Max range
+  /// \param[in] _rangeResolution Resolution of the scan
+  /// \param[in] _samples Number of samples.
+  /// \param[in] _rate Output Hz.
+  /// \param[in] _noiseType Type of noise to apply.
+  /// \param[in] _noiseMean Mean noise value.
+  /// \param[in] _noiseStdDev Standard deviation of the noise.
+  protected: void SpawnRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 unsigned int _vSamples = 1, double _hResolution = 1.0,
+                 double _vResolution = 1.0,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0);
 
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
+  /// \brief Spawn a gpu laser.
+  /// \param[in] _modelName Name of the model.
+  /// \param[in] _raySensorName Name of the laser.
+  /// \param[in] _pos Camera position.
+  /// \param[in] _rpy Camera roll, pitch, yaw.
+  /// \param[in] _hMinAngle Horizontal min angle
+  /// \param[in] _hMaxAngle Horizontal max angle
+  /// \param[in] _minRange Min range
+  /// \param[in] _maxRange Max range
+  /// \param[in] _rangeResolution Resolution of the scan
+  /// \param[in] _samples Number of samples.
+  /// \param[in] _rate Output Hz.
+  /// \param[in] _noiseType Type of noise to apply.
+  /// \param[in] _noiseMean Mean noise value.
+  /// \param[in] _noiseStdDev Standard deviation of the noise.
+  protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                 const std::string &_raySensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                 double _minRange = 0.08, double _maxRange = 10,
+                 double _rangeResolution = 0.01, unsigned int _samples = 640,
+                 const std::string &_noiseType = "", double _noiseMean = 0.0,
+                 double _noiseStdDev = 0.0);
 
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName))
-                 common::Time::MSleep(10);
-             }
+  /// \brief Spawn an imu sensor laser.
+  /// \param[in] _modelName Name of the model.
+  /// \param[in] _imuSensorName Name of the imu sensor.
+  /// \param[in] _pos Camera position.
+  /// \param[in] _rpy Camera roll, pitch, yaw.
+  /// \param[in] _noiseType Type of noise to apply.
+  /// \param[in] _noiseMean Mean noise value.
+  /// \param[in] _noiseStdDev Standard deviation of the noise.
+  /// \param[in] _accelNoiseMean Acceleration based noise mean.
+  /// \param[in] _accelNoiseStdDev Acceleration based noise standard
+  /// deviation.
+  /// \param[in] _accelBiasMean Acceleration mean bias
+  /// \param[in] _accelBiasStdDev Acceleration standard deviation bias
+  protected: void SpawnImuSensor(const std::string &_modelName,
+                 const std::string &_imuSensorName,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const std::string &_noiseType = "",
+                 double _rateNoiseMean = 0.0, double _rateNoiseStdDev = 0.0,
+                 double _rateBiasMean = 0.0, double _rateBiasStdDev = 0.0,
+                 double _accelNoiseMean = 0.0, double _accelNoiseStdDev = 0.0,
+                 double _accelBiasMean = 0.0, double _accelBiasStdDev = 0.0);
 
+  /// \brief Spawn a contact sensor with the specified collision geometry
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitContactSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false);
+
+  /// \brief Spawn an IMU sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _collisionType Type of collision, box or cylinder
+  /// \param[in] _topic Topic to publish IMU data to
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _static True to make the model static
+  protected: void SpawnUnitImuSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const std::string &_collisionType,
+                 const std::string &_topic, const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy, bool _static = false);
+
+  /// \brief generate a gtest failure from a timeout error and display a
+  /// log message about the problem.
+  /// \param[in] log_msg: error msg related to the timeout
+  /// \param[in] timeoutCS: failing period (in centiseconds)
+  private: void launchTimeoutFailure(const char *_logMsg, const int _timeoutCS);
+
+  /// \brief Spawn an Wireless transmitter sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _essid Service set identifier (network name)
+  /// \param[in] _freq Frequency of transmission (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _visualize Enable sensor visualization
+  protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 const std::string &_essid,
+                 double _freq,
+                 double _power,
+                 double _gain,
+                 bool _visualize = true);
+
+  /// \brief Spawn an Wireless receiver sensor on a link
+  /// \param[in] _name Model name
+  /// \param[in] _sensorName Sensor name
+  /// \param[in] _pos World position
+  /// \param[in] _rpy World rotation in Euler angles
+  /// \param[in] _minFreq Minimum frequency to be filtered (MHz)
+  /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
+  /// \param[in] _power Transmission power (dBm)
+  /// \param[in] _gain Antenna gain (dBi)
+  /// \param[in] _sensitivity Receiver sensitibity (dBm)
+  /// \param[in] _visualize Enable sensor visualization
+  protected: void SpawnWirelessReceiverSensor(const std::string &_name,
+                 const std::string &_sensorName,
+                 const math::Vector3 &_pos,
+                 const math::Vector3 &_rpy,
+                 double _minFreq,
+                 double _maxFreq,
+                 double _power,
+                 double _gain,
+                 double _sensitivity,
+                 bool _visualize = true);
+
+  /// \brief Wait for a number of ms. and attempts until the entity is spawned
+  /// \param[in] _name Model name
+  /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  protected: void WaitUntilEntitySpawn(const std::string &_name,
+                                     unsigned int _sleepEach,
+                                     int _retries);
+
+  /// \brief Wait for a number of ms. and attempts until the sensor is spawned
+  /// \param[in] _name Sensor name
+  /// \param[in] _sleepEach Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  protected: void WaitUntilSensorSpawn(const std::string &_name,
+                                     unsigned int _sleepEach,
+                                     int _retries);
+
+  /// \brief Spawn a cylinder
+  /// \param[in] _name Name for the model.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _static True to make the model static.
   protected: void SpawnCylinder(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false);
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
-                 << "<link name ='body'>"
-                 << "  <collision name ='geom'>"
-                 << "    <geometry>"
-                 << "      <cylinder>"
-                 << "        <radius>.5</radius><length>1.0</length>"
-                 << "      </cylinder>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name ='visual'>"
-                 << "    <geometry>"
-                 << "      <cylinder>"
-                 << "        <radius>.5</radius><length>1.0</length>"
-                 << "      </cylinder>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
-
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
-             }
-
-
+  /// \brief Spawn a sphere
+  /// \param[in] _name Name for the model.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _static True to make the model static.
+  /// \param[in] _wait True to wait for the sphere to spawn before
+  /// returning.
   protected: void SpawnSphere(const std::string &_name,
                  const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 bool _wait = true)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+                 bool _wait = true, bool _static = false);
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
-                 << "<link name ='body'>"
-                 << "  <collision name ='geom'>"
-                 << "    <geometry>"
-                 << "      <sphere><radius>.5</radius></sphere>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name ='visual'>"
-                 << "    <geometry>"
-                 << "      <sphere><radius>.5</radius></sphere>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
+  /// \brief Spawn a sphere
+  /// \param[in] _name Name for the model.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _cog Center of gravity.
+  /// \param[in] _radius Sphere radius.
+  /// \param[in] _static True to make the model static.
+  /// \param[in] _wait True to wait for the sphere to spawn before
+  /// returning.
+  protected: void SpawnSphere(const std::string &_name,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const math::Vector3 &_cog, double _radius,
+                 bool _wait = true, bool _static = false);
 
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
-
-               // Wait for the entity to spawn
-               while (_wait && !this->HasEntity(_name))
-                 common::Time::MSleep(10);
-             }
-
+  /// \brief Spawn a box.
+  /// \param[in] _name Name for the model.
+  /// \param[in] _size Size of the box.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _static True to make the model static.
   protected: void SpawnBox(const std::string &_name,
                  const math::Vector3 &_size, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy)
-             {
-               msgs::Factory msg;
-               std::ostringstream newModelStr;
+                 const math::Vector3 &_rpy, bool _static = false);
 
-               newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-                 << "<model name ='" << _name << "'>"
-                 << "<pose>" << _pos.x << " "
-                                     << _pos.y << " "
-                                     << _pos.z << " "
-                                     << _rpy.x << " "
-                                     << _rpy.y << " "
-                                     << _rpy.z << "</pose>"
-                 << "<link name ='body'>"
-                 << "  <collision name ='geom'>"
-                 << "    <geometry>"
-                 << "      <box><size>" << _size << "</size></box>"
-                 << "    </geometry>"
-                 << "  </collision>"
-                 << "  <visual name ='visual'>"
-                 << "    <geometry>"
-                 << "      <box><size>" << _size << "</size></box>"
-                 << "    </geometry>"
-                 << "  </visual>"
-                 << "</link>"
-                 << "</model>"
-                 << "</gazebo>";
+  /// \brief Spawn a triangle mesh.
+  /// \param[in] _name Name for the model.
+  /// \param[in] _modelPath Path to the mesh file.
+  /// \param[in] _scale Scaling factor.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _static True to make the model static.
+  protected: void SpawnTrimesh(const std::string &_name,
+                 const std::string &_modelPath, const math::Vector3 &_scale,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false);
 
-               msg.set_sdf(newModelStr.str());
-               this->factoryPub->Publish(msg);
+  /// \brief Spawn an empty link.
+  /// \param[in] _name Name for the model.
+  /// \param[in] _pos Position for the model.
+  /// \param[in] _rpy Roll, pitch, yaw for the model.
+  /// \param[in] _static True to make the model static.
+  protected: void SpawnEmptyLink(const std::string &_name,
+                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 bool _static = false);
 
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name))
-                 common::Time::MSleep(10);
-             }
+  /// \brief Spawn a model from file.
+  /// \param[in] _filename File to load a model from.
+  protected: void SpawnModel(const std::string &_filename);
 
-  protected: void SpawnModel(const std::string &_filename)
-             {
-               msgs::Factory msg;
-               msg.set_sdf_filename(_filename);
-               this->factoryPub->Publish(msg);
-             }
+  /// \brief Send a factory message based on an SDF string.
+  /// \param[in] _sdf SDF string to publish.
+  protected: void SpawnSDF(const std::string &_sdf);
 
-  protected: void SpawnSDF(const std::string &_sdf)
-             {
-               msgs::Factory msg;
-               msg.set_sdf(_sdf);
-               this->factoryPub->Publish(msg);
-             }
-
+  /// \brief Load a plugin.
+  /// \param[in] _filename Plugin filename to load.
+  /// \param[in] _name Name to associate with with the plugin.
   protected: void LoadPlugin(const std::string &_filename,
-                             const std::string &_name)
-             {
-               // Get the first world...we assume it the only one running
-               physics::WorldPtr world = physics::get_world();
-               world->LoadPlugin(_filename, _name, sdf::ElementPtr());
-             }
+                             const std::string &_name);
 
-  protected: physics::ModelPtr GetModel(const std::string &_name)
-             {
-               // Get the first world...we assume it the only one running
-               physics::WorldPtr world = physics::get_world();
-               return world->GetModel(_name);
-             }
+  /// \brief Get a pointer to a model.
+  /// \param[in] _name Name of the model to get.
+  /// \return Pointer to the model, or NULL if the model was not found.
+  protected: physics::ModelPtr GetModel(const std::string &_name);
 
+  /// \brief Remove a model by name.
+  /// \param[in] _name Name of the model to remove.
+  protected: void RemoveModel(const std::string &_name);
 
-  protected: void RemovePlugin(const std::string &_name)
-             {
-               // Get the first world...we assume it the only one running
-               physics::WorldPtr world = physics::get_world();
-               world->RemovePlugin(_name);
-             }
+  /// \brief Remove a plugin.
+  /// \param[in] _name Name of the plugin to remove.
+  protected: void RemovePlugin(const std::string &_name);
 
+  /// \brief Get the current memory information.
+  /// \param[out] _resident Resident memory.
+  /// \param[out] _share Shared memory.
+  protected: void GetMemInfo(double &_resident, double &_share);
+
+  /// \brief Pointer the Gazebo server.
   protected: Server *server;
+
+  /// \brief Pointer the thread the runs the server.
   protected: boost::thread *serverThread;
 
+  /// \brief Pointer to a node for communication.
   protected: transport::NodePtr node;
+
+  /// \brief Pose subscription.
   protected: transport::SubscriberPtr poseSub;
+
+  /// \brief World statistics subscription.
   protected: transport::SubscriberPtr statsSub;
+
+  /// \brief Factory publisher.
   protected: transport::PublisherPtr factoryPub;
 
+  /// \brief Request publisher.
+  protected: transport::PublisherPtr requestPub;
+
+  /// \brief Map of received poses.
   protected: std::map<std::string, math::Pose> poses;
+
+  /// \brief Mutex to protect data structures that store messages.
   protected: boost::mutex receiveMutex;
 
+  /// \brief Image data
   private: unsigned char **imgData;
+
+  /// \brief Increments when images are received.
   private: int gotImage;
 
+  /// \brief Current simulation time, real time, and pause time.
   protected: common::Time simTime, realTime, pauseTime;
+
+  /// \brief Current percent realtime.
   private: double percentRealTime;
+
+  /// \brief True if paused.
   private: bool paused;
+
+  /// \brief True if server is running.
   private: bool serverRunning;
 };
+#endif  // define _GAZEBO_SERVER_FIXTURE_HH_

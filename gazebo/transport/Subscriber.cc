@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@
  * Author: Nate Koenig
  */
 
-#include "transport/TopicManager.hh"
-#include "transport/Subscriber.hh"
+#include "gazebo/transport/TopicManager.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Subscriber.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -49,5 +50,18 @@ void Subscriber::Unsubscribe() const
   if (this->node)
   {
     TopicManager::Instance()->Unsubscribe(this->topic, this->node);
+    this->node->RemoveCallback(this->topic, this->callbackId);
   }
+}
+
+//////////////////////////////////////////////////
+void Subscriber::SetCallbackId(unsigned int _id)
+{
+  this->callbackId = _id;
+}
+
+//////////////////////////////////////////////////
+unsigned int Subscriber::GetCallbackId() const
+{
+  return this->callbackId;
 }

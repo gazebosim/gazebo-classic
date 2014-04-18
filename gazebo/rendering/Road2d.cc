@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ using namespace rendering;
 Road2d::Road2d()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
   this->sub = this->node->Subscribe("~/roads", &Road2d::OnRoadMsg, this, true);
 
   this->connections.push_back(
@@ -247,21 +247,33 @@ void Road2d::Segment::Load(msgs::Road _msg)
       vBuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   math::Vector3 pA, pB, tangent;
-  double factor = 1.0;
-  double theta = 0.0;
 
   math::Box bounds;
   bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
   bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
 
-  float texCoord = 0.0;
+  // length for each texture tile, same as road width as texture is square
+  // (if texture size should change or made custom in a future version
+  // there needs to be code to handle this)
+  double texMaxLen = this->width;
+
+  // current road length
+  double curLen = 0.0;
 
   // Generate the triangles for the road
   for (unsigned int i = 0; i < this->points.size(); ++i)
   {
-    factor = 1.0;
+    double factor = 1.0;
 
-    texCoord = i / static_cast<float>(this->points.size());
+    // update current road length
+    if (i > 0)
+    {
+      curLen += this->points[i].Distance(this->points[i-1]);
+    }
+
+    // assign texture coordinate as percentage of texture tile size
+    // and let ogre/opengl handle the texture wrapping
+    float texCoord = curLen/texMaxLen;
 
     // Start point is a special case
     if (i == 0)
@@ -291,7 +303,7 @@ void Road2d::Segment::Load(msgs::Road _msg)
 
     // The tangent is used to calculate the two verteces to either side of
     // the point. The vertices define the triangle mesh of the road
-    theta = atan2(tangent.x, -tangent.y);
+    double theta = atan2(tangent.x, -tangent.y);
 
     pA = pB = this->points[i];
     double w = (this->width * factor) * 0.5;

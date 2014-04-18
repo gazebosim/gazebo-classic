@@ -12,6 +12,6 @@ void main()
 
   if (l>far)
     l = far;
-  
+
   gl_FragColor = vec4(l, retro, 0, 1.0);
 }

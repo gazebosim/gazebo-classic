@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  *
 */
 
-#ifndef COLLADALOADER_HH
-#define COLLADALOADER_HH
+#ifndef _COLLADALOADER_HH_
+#define _COLLADALOADER_HH_
 
 #include <map>
 #include <string>
 #include <vector>
 
-#include "common/MeshLoader.hh"
-#include "math/MathTypes.hh"
+#include "gazebo/common/MeshLoader.hh"
+#include "gazebo/math/MathTypes.hh"
+#include "gazebo/util/system.hh"
 
 class TiXmlElement;
 
@@ -38,7 +39,7 @@ namespace gazebo
 
     /// \class ColladaLoader ColladaLoader.hh common/common.hh
     /// \brief Class used to load Collada mesh files
-    class ColladaLoader : public MeshLoader
+    class GAZEBO_VISIBLE ColladaLoader : public MeshLoader
     {
       /// \brief Constructor
       public: ColladaLoader();
@@ -57,7 +58,7 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh);
+          TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
       /// \param[in] _xml Animation XML instance
@@ -211,6 +212,9 @@ namespace gazebo
 
       /// \brief directory of COLLADA file name
       private: std::string path;
+
+      /// \brief Name of the current node.
+      private: std::string currentNodeName;
     };
     /// \}
   }

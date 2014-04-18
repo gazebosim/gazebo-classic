@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -45,7 +46,7 @@ namespace gazebo
     /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \brief Contact sensor. This sensor detects and reports contacts between
     ///  objects
-    class ContactSensor: public Sensor
+    class GAZEBO_VISIBLE ContactSensor: public Sensor
     {
       /// \brief Constructor.
       public: ContactSensor();
@@ -66,9 +67,8 @@ namespace gazebo
       /// \brief Initialize the sensor.
       public: virtual void Init();
 
-      /// \brief Update the sensor information.
-      /// \param[in] _force True if update is forced, false if not.
-      protected: virtual void UpdateImpl(bool _force);
+      // Documentation inherited
+      protected: virtual bool UpdateImpl(bool _force);
 
       /// \brief Finalize the sensor.
       protected: virtual void Fini();
@@ -88,9 +88,44 @@ namespace gazebo
       public: unsigned int GetCollisionContactCount(
                   const std::string &_collisionName) const;
 
-
-      /// \brief Get all the contacts
-      /// \return Message that contains all the contact information
+      /// \brief Get all the contacts for the ContactSensor
+      /// \return Message that contains contact information between collision
+      /// pairs.
+      ///
+      /// During ODEPhysics::UpdateCollisions, all collision pairs in the
+      /// world are pushed into a buffer within ContactManager.
+      /// Subsequently, World::Update invokes ContactManager::PublishContacts
+      /// to publish all contacts generated within a timestep onto
+      /// Gazebo topic ~/physics/contacts.
+      ///
+      /// Each ContactSensor subscribes to the Gazebo ~/physics/contacts topic,
+      /// retrieves all contact pairs in a time step and filters them wthin
+      /// ContactSensor::OnContacts against <collision> body name
+      /// specified by the ContactSensor SDF.
+      /// All collision pairs between ContactSensor <collision> body and
+      /// other bodies in the world are stored in an array inside
+      /// contacts.proto.
+      ///
+      /// Within each element of the contact.proto array inside contacts.proto,
+      /// list of collisions between collision bodies
+      /// (collision1 and collision 2) are stored in an array of
+      /// elements, (position, normal, depth, wrench).  A timestamp has also
+      /// been added (time).  Details are described below:
+      ///
+      ///    \li string collision1  name of the first collision object.
+      ///    \li string collision2  name of the second collision object.
+      ///    \li Vector3d position  position of the contact joint in
+      ///                           inertial frame.
+      ///    \li Vector3d normal    normal of the contact joint in
+      ///                           inertial frame.
+      ///    \li double depth       intersection (penetration)
+      ///                           depth of two collision bodies.
+      ///    \li JointWrench wrench Forces and torques acting on both collision
+      ///                           bodies.  See joint_wrench.proto for details.
+      ///                           The forces and torques are applied at the
+      ///                           CG of perspective links for each collision
+      ///                           body, specified in the inertial frame.
+      ///    \li Time time          time at which this contact happened.
       public: msgs::Contacts GetContacts() const;
 
       /// \brief Gets contacts of a collision
@@ -115,7 +150,7 @@ namespace gazebo
       private: transport::SubscriberPtr contactSub;
 
       /// \brief Mutex to protect reads and writes.
-      private: boost::mutex mutex;
+      private: mutable boost::mutex mutex;
 
       /// \brief Contacts message used to output sensor data.
       private: msgs::Contacts contactsMsg;

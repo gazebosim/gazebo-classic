@@ -12,9 +12,11 @@
   <file>images/pointlight.png</file>
   <file>images/directionallight.png</file>
   <file>images/gazebo.svg</file>
+  <file>images/gazebo_neg_60x71.png</file>
   <file>images/insertModel.png</file>
   <file>images/translate.png</file>
   <file>images/rotate.png</file>
+  <file>images/scale.png</file>  
   <file>images/arrow.png</file>
   <file>images/down_arrow.png</file>
   <file>images/box_selection.png</file>
@@ -27,5 +29,15 @@
   <file>images/paste_object.png</file>
   <file>images/rotate_object.png</file>
   <file>images/scale_object.png</file>
+  <file>images/door.png</file>
+  <file>images/window.png</file>  
+  <file>images/stairs.png</file>
+  <file>images/wall.png</file> 
+  <file>images/record.png</file>
+  <file>images/record_stop.png</file>
+  <file>images/right_arrow.png</file>
+  <file>images/left_arrow.png</file>
+  <file>images/up_arrow.png</file>
+  <file>images/screenshot.png</file>  
 </qresource>
 </RCC>

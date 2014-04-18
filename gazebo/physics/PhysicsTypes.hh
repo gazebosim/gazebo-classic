@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,10 @@
 #define _PHYSICSTYPES_HH_
 
 #include <vector>
+#include <map>
+#include <string>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -35,6 +38,7 @@ namespace gazebo
     class Actor;
     class Link;
     class Collision;
+    class Gripper;
     class Joint;
     class JointController;
     class Contact;
@@ -48,9 +52,13 @@ namespace gazebo
     class SurfaceParams;
     class BoxShape;
     class CylinderShape;
+    class MeshShape;
     class SphereShape;
     class MeshShape;
     class HeightmapShape;
+    class ModelState;
+    class LinkState;
+    class JointState;
 
     /// \def BasePtr
     /// \brief Boost shared pointer to a Base object
@@ -140,6 +148,10 @@ namespace gazebo
     /// \brief Boost shared pointer to a MeshShape object
     typedef boost::shared_ptr<MeshShape> MeshShapePtr;
 
+    /// \def GripperPtr
+    /// \brief Boost shared pointer to a Gripper object
+    typedef boost::shared_ptr<Gripper> GripperPtr;
+
     /// \def Base_V
     /// \brief Vector of BasePtr
     typedef std::vector<BasePtr> Base_V;
@@ -168,6 +180,18 @@ namespace gazebo
     /// \brief Vector of CollisionPtr
     typedef std::vector<CollisionPtr>  Collision_V;
 
+    /// \def ModelState_M
+    /// \brief Map of model state
+    typedef std::map<std::string, ModelState> ModelState_M;
+
+    /// \def LinkState_M
+    /// \brief Map of link state
+    typedef std::map<std::string, LinkState> LinkState_M;
+
+    /// \def JointState_M
+    /// \brief Map of joint state
+    typedef std::map<std::string, JointState> JointState_M;
+
     #ifndef GZ_COLLIDE_BITS
 
     /// \def GZ_ALL_COLLIDE
@@ -185,7 +209,7 @@ namespace gazebo
 
     /// \def GZ_SENSOR_COLLIDE
     /// \brief Collision object will collide only with sensors
-    #define GZ_SENSOR_COLLIDE 0x00000003
+    #define GZ_SENSOR_COLLIDE 0x00000002
 
     /// \def GZ_GHOST_COLLIDE
     /// \brief Collides with everything else but other ghost.

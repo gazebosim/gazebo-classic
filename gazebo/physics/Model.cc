@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models.
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
 
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
@@ -26,6 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <sstream>
 
+#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -45,38 +42,21 @@
 
 #include "gazebo/sensors/SensorManager.hh"
 
-#include "transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 using namespace gazebo;
 using namespace physics;
-
-class LinkUpdate_TBB
-{
-  public: LinkUpdate_TBB(Link_V *_bodies) : bodies(_bodies) {}
-  public: void operator() (const tbb::blocked_range<size_t> &_r) const
-  {
-    for (size_t i = _r.begin(); i != _r.end(); i++)
-    {
-      (*this->bodies)[i]->Update();
-    }
-  }
-
-  private: Link_V *bodies;
-};
-
 
 //////////////////////////////////////////////////
 Model::Model(BasePtr _parent)
   : Entity(_parent)
 {
   this->AddType(MODEL);
-  this->updateMutex = new boost::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
 Model::~Model()
 {
-  delete this->updateMutex;
 }
 
 //////////////////////////////////////////////////
@@ -86,11 +66,11 @@ void Model::Load(sdf::ElementPtr _sdf)
 
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
-  this->SetStatic(this->sdf->GetValueBool("static"));
+  this->SetStatic(this->sdf->Get<bool>("static"));
   this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
       boost::bind(&Entity::IsStatic, this));
 
-  this->SetAutoDisable(this->sdf->GetValueBool("allow_auto_disable"));
+  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -115,7 +95,7 @@ void Model::LoadLinks()
     {
       // Create a new link
       LinkPtr link = this->GetWorld()->GetPhysicsEngine()->CreateLink(
-          boost::shared_static_cast<Model>(shared_from_this()));
+          boost::static_pointer_cast<Model>(shared_from_this()));
 
       /// \TODO: canonical link is hardcoded to the first link.
       ///        warn users for now, need  to add parsing of
@@ -131,6 +111,7 @@ void Model::LoadLinks()
       // bodies collisionetries
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
+      this->links.push_back(link);
     }
   }
 }
@@ -177,33 +158,56 @@ void Model::Init()
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
-       iter!= this->children.end(); ++iter)
+       iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::LINK))
-      boost::shared_static_cast<Link>(*iter)->Init();
+    {
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
+      if (link)
+        link->Init();
+      else
+        gzerr << "Child [" << (*iter)->GetName()
+              << "] has type Base::LINK, but cannot be dynamically casted\n";
+    }
     else if ((*iter)->HasType(Base::MODEL))
-      boost::shared_static_cast<Model>(*iter)->Init();
+      boost::static_pointer_cast<Model>(*iter)->Init();
   }
 
   // Initialize the joints last.
   for (Joint_V::iterator iter = this->joints.begin();
        iter != this->joints.end(); ++iter)
   {
-    (*iter)->Init();
+    try
+    {
+      (*iter)->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Init joint failed" << std::endl;
+      return;
+    }
+    // The following message used to be filled and sent in Model::LoadJoint
+    // It is moved here, after Joint::Init, so that the joint properties
+    // can be included in the message.
+    msgs::Joint msg;
+    (*iter)->FillMsg(msg);
+    this->jointPub->Publish(msg);
   }
 
-  for (std::vector<Gripper*>::iterator iter = this->grippers.begin();
+  for (std::vector<GripperPtr>::iterator iter = this->grippers.begin();
        iter != this->grippers.end(); ++iter)
   {
     (*iter)->Init();
   }
 }
 
-
 //////////////////////////////////////////////////
 void Model::Update()
 {
-  this->updateMutex->lock();
+  if (this->IsStatic())
+    return;
+
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
@@ -212,7 +216,7 @@ void Model::Update()
   if (this->jointController)
     this->jointController->Update();
 
-  if (this->jointAnimations.size() > 0)
+  if (!this->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
@@ -247,15 +251,14 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
-
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
-void Model::SetJointPosition(const std::string &_jointName, double _position)
+void Model::SetJointPosition(
+  const std::string &_jointName, double _position, int _index)
 {
   if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position);
+    this->jointController->SetJointPosition(_jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
@@ -297,14 +300,17 @@ void Model::RemoveChild(EntityPtr _child)
         }
       }
     }
+
+    this->RemoveLink(_child->GetScopedName());
   }
 
   Entity::RemoveChild(_child->GetId());
 
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(true);
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->SetEnabled(true);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -315,6 +321,7 @@ void Model::Fini()
   this->attachedModels.clear();
   this->joints.clear();
   this->plugins.clear();
+  this->links.clear();
   this->canonicalLink.reset();
 }
 
@@ -328,8 +335,8 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(
-          this->GetChild(linkElem->GetValueString("name")));
+      LinkPtr link = boost::dynamic_pointer_cast<Link>(
+          this->GetChild(linkElem->Get<std::string>("name")));
       link->UpdateParameters(linkElem);
       linkElem = linkElem->GetNextElement("link");
     }
@@ -341,7 +348,7 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::shared_dynamic_cast<Joint>(this->GetChild(jointElem->GetValueString("name")));
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
       joint->UpdateParameters(jointElem);
       jointElem = jointElem->GetNextElement("joint");
     }
@@ -366,8 +373,15 @@ void Model::Reset()
     (*iter)->Reset();
   }
 
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
+  }
+
   for (Joint_V::iterator jiter = this->joints.begin();
-       jiter!= this->joints.end(); ++jiter)
+       jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
@@ -376,14 +390,13 @@ void Model::Reset()
 //////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
-  for (Base_V::iterator iter = this->children.begin();
-      iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearVel(_vel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetLinearVel(_vel);
     }
   }
 }
@@ -391,15 +404,13 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularVel(_vel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetAngularVel(_vel);
     }
   }
 }
@@ -407,15 +418,13 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetLinearAccel(_accel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetLinearAccel(_accel);
     }
   }
 }
@@ -423,15 +432,13 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      link->SetEnabled(true);
-      link->SetAngularAccel(_accel);
+      (*iter)->SetEnabled(true);
+      (*iter)->SetAngularAccel(_accel);
     }
   }
 }
@@ -513,18 +520,17 @@ math::Vector3 Model::GetWorldAngularAccel() const
 math::Box Model::GetBoundingBox() const
 {
   math::Box box;
-  Base_V::const_iterator iter;
 
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*iter)
     {
       math::Box linkBox;
-      LinkPtr link = boost::shared_static_cast<Link>(*iter);
-      linkBox = link->GetBoundingBox();
+      linkBox = (*iter)->GetBoundingBox();
       box += linkBox;
     }
   }
@@ -574,32 +580,19 @@ JointPtr Model::GetJoint(const std::string &_name)
 //////////////////////////////////////////////////
 LinkPtr Model::GetLinkById(unsigned int _id) const
 {
-  return boost::shared_dynamic_cast<Link>(this->GetById(_id));
+  return boost::dynamic_pointer_cast<Link>(this->GetById(_id));
 }
 
 //////////////////////////////////////////////////
 Link_V Model::GetLinks() const
 {
-  Link_V links;
-  for (unsigned int i = 0; i < this->GetChildCount(); ++i)
-  {
-    if (this->GetChild(i)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::shared_static_cast<Link>(this->GetChild(i));
-      if (link)
-        links.push_back(link);
-      else
-        gzerr << "Child [" << this->GetChild(i)->GetName()
-              << "] has type Base::LINK, but cannot be dynamically casted\n";
-    }
-  }
-  return links;
+  return this->links;
 }
 
 //////////////////////////////////////////////////
 LinkPtr Model::GetLink(const std::string &_name) const
 {
-  Base_V::const_iterator biter;
+  Link_V::const_iterator iter;
   LinkPtr result;
 
   if (_name == "canonical")
@@ -608,12 +601,11 @@ LinkPtr Model::GetLink(const std::string &_name) const
   }
   else
   {
-    for (biter = this->children.begin(); biter != this->children.end(); ++biter)
+    for (iter = this->links.begin(); iter != this->links.end(); ++iter)
     {
-      if (((*biter)->GetScopedName() == _name) ||
-          ((*biter)->GetName() == _name))
+      if (((*iter)->GetScopedName() == _name) || ((*iter)->GetName() == _name))
       {
-        result = boost::shared_dynamic_cast<Link>(*biter);
+        result = *iter;
         break;
       }
     }
@@ -627,38 +619,42 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
 {
   JointPtr joint;
 
-  std::string stype = _sdf->GetValueString("type");
+  std::string stype = _sdf->Get<std::string>("type");
 
   joint = this->GetWorld()->GetPhysicsEngine()->CreateJoint(stype,
-     boost::shared_static_cast<Model>(shared_from_this()));
+     boost::static_pointer_cast<Model>(shared_from_this()));
   if (!joint)
-    gzthrow("Unable to create joint of type[" + stype + "]\n");
+  {
+    gzerr << "Unable to create joint of type[" << stype << "]\n";
+    // gzthrow("Unable to create joint of type[" + stype + "]\n");
+    return;
+  }
 
-  joint->SetModel(boost::shared_static_cast<Model>(shared_from_this()));
+  joint->SetModel(boost::static_pointer_cast<Model>(shared_from_this()));
 
   // Load the joint
   joint->Load(_sdf);
 
   if (this->GetJoint(joint->GetScopedName()) != NULL)
-    gzthrow("can't have two joint with the same name");
-
-  msgs::Joint msg;
-  joint->FillMsg(msg);
-  this->jointPub->Publish(msg);
+  {
+    gzerr << "can't have two joint with the same name\n";
+    gzthrow("can't have two joints with the same name ["+
+      joint->GetScopedName() + "]\n");
+  }
 
   this->joints.push_back(joint);
 
   if (!this->jointController)
     this->jointController.reset(new JointController(
-        boost::shared_dynamic_cast<Model>(shared_from_this())));
+        boost::dynamic_pointer_cast<Model>(shared_from_this())));
   this->jointController->AddJoint(joint);
 }
 
 //////////////////////////////////////////////////
 void Model::LoadGripper(sdf::ElementPtr _sdf)
 {
-  Gripper *gripper = new Gripper(
-      boost::shared_static_cast<Model>(shared_from_this()));
+  GripperPtr gripper(new Gripper(
+      boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
 }
@@ -727,8 +723,8 @@ unsigned int Model::GetSensorCount() const
   unsigned int result = 0;
 
   // Count all the sensors on all the links
-  Link_V links = this->GetLinks();
-  for (Link_V::const_iterator iter = links.begin(); iter != links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
   {
     result += (*iter)->GetSensorCount();
   }
@@ -739,20 +735,22 @@ unsigned int Model::GetSensorCount() const
 //////////////////////////////////////////////////
 void Model::LoadPlugin(sdf::ElementPtr _sdf)
 {
-  std::string name = _sdf->GetValueString("name");
-  std::string filename = _sdf->GetValueString("filename");
-  gazebo::ModelPluginPtr plugin = gazebo::ModelPlugin::Create(filename, name);
+  std::string pluginName = _sdf->Get<std::string>("name");
+  std::string filename = _sdf->Get<std::string>("filename");
+  gazebo::ModelPluginPtr plugin =
+    gazebo::ModelPlugin::Create(filename, pluginName);
   if (plugin)
   {
     if (plugin->GetType() != MODEL_PLUGIN)
     {
       gzerr << "Model[" << this->GetName() << "] is attempting to load "
             << "a plugin, but detected an incorrect plugin type. "
-            << "Plugin filename[" << filename << "] name[" << name << "]\n";
+            << "Plugin filename[" << filename << "] name["
+            << pluginName << "]\n";
       return;
     }
 
-    ModelPtr myself = boost::shared_static_cast<Model>(shared_from_this());
+    ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
     plugin->Init();
     this->plugins.push_back(plugin);
@@ -762,13 +760,12 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::SetGravityMode(const bool &_v)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter != this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      boost::shared_static_cast<Link>(*iter)->SetGravityMode(_v);
+      (*liter)->SetGravityMode(_v);
     }
   }
 }
@@ -776,13 +773,12 @@ void Model::SetGravityMode(const bool &_v)
 //////////////////////////////////////////////////
 void Model::SetCollideMode(const std::string &_m)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter != this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-      boost::shared_static_cast<Link>(*iter)->SetCollideMode(_m);
+      (*liter)->SetCollideMode(_m);
     }
   }
 }
@@ -790,13 +786,12 @@ void Model::SetCollideMode(const std::string &_m)
 //////////////////////////////////////////////////
 void Model::SetLaserRetro(const float _retro)
 {
-  Base_V::iterator iter;
-
-  for (iter = this->children.begin(); iter!= this->children.end(); ++iter)
+  for (Link_V::iterator liter = this->links.begin();
+      liter != this->links.end(); ++liter)
   {
-    if (*iter && (*iter)->HasType(LINK))
+    if (*liter)
     {
-       boost::shared_static_cast<Link>(*iter)->SetLaserRetro(_retro);
+      (*liter)->SetLaserRetro(_retro);
     }
   }
 }
@@ -806,29 +801,30 @@ void Model::FillMsg(msgs::Model &_msg)
 {
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
-  _msg.mutable_pose()->CopyFrom(msgs::Convert(this->GetWorldPose()));
+  msgs::Set(_msg.mutable_pose(), this->GetWorldPose());
   _msg.set_id(this->GetId());
+  msgs::Set(_msg.mutable_scale(), this->scale);
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (unsigned int j = 0; j < this->GetChildCount(); ++j)
+  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
+      ++iter)
   {
-    if (this->GetChild(j)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::shared_dynamic_cast<Link>(this->GetChild(j));
-      link->FillMsg(*_msg.add_link());
-    }
+    (*iter)->FillMsg(*_msg.add_link());
   }
 
-  for (unsigned int j = 0; j < this->joints.size(); ++j)
-    this->joints[j]->FillMsg(*_msg.add_joint());
+  for (Joint_V::iterator iter = this->joints.begin();
+       iter != this->joints.end(); ++iter)
+  {
+    (*iter)->FillMsg(*_msg.add_joint());
+  }
 }
 
 //////////////////////////////////////////////////
 void Model::ProcessMsg(const msgs::Model &_msg)
 {
-  if (!(_msg.has_id() && _msg.id() == this->GetId()))
+  if (_msg.has_id() && _msg.id() != this->GetId())
   {
     gzerr << "Incorrect ID[" << _msg.id() << " != " << this->GetId() << "]\n";
     return;
@@ -853,14 +849,17 @@ void Model::ProcessMsg(const msgs::Model &_msg)
 
   if (_msg.has_is_static())
     this->SetStatic(_msg.is_static());
+
+  if (_msg.has_scale())
+    this->SetScale(msgs::Convert(_msg.scale()));
 }
 
 //////////////////////////////////////////////////
 void Model::SetJointAnimation(
-    const std::map<std::string, common::NumericAnimationPtr> _anims,
+    const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
@@ -868,17 +867,15 @@ void Model::SetJointAnimation(
   }
   this->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
 void Model::StopAnimation()
 {
-  this->updateMutex->lock();
+  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
   Entity::StopAnimation();
   this->onJointAnimationComplete.clear();
   this->jointAnimations.clear();
-  this->updateMutex->unlock();
 }
 
 //////////////////////////////////////////////////
@@ -925,31 +922,54 @@ void Model::SetState(const ModelState &_state)
 {
   this->SetWorldPose(_state.GetPose(), true);
 
-  /*for (unsigned int i = 0; i < _state.GetLinkStateCount(); ++i)
+  LinkState_M linkStates = _state.GetLinkStates();
+  for (LinkState_M::iterator iter = linkStates.begin();
+       iter != linkStates.end(); ++iter)
   {
-    LinkState linkState = _state.GetLinkState(i);
-    LinkPtr link = this->GetLink(linkState.GetName());
+    LinkPtr link = this->GetLink(iter->first);
     if (link)
-      link->SetState(linkState);
+      link->SetState(iter->second);
     else
-      gzerr << "Unable to find link[" << linkState.GetName() << "]\n";
-  }*/
+      gzerr << "Unable to find link[" << iter->first << "]\n";
+  }
 
-  for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  // For now we don't use the joint state values to set the state of
+  // simulation.
+  // for (unsigned int i = 0; i < _state.GetJointStateCount(); ++i)
+  // {
+  //   JointState jointState = _state.GetJointState(i);
+  //   this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
+  //                          jointState.GetAngle(0).Radian());
+  // }
+}
+
+/////////////////////////////////////////////////
+void Model::SetScale(const math::Vector3 &_scale)
+{
+  if (this->scale == _scale)
+    return;
+
+  this->scale = _scale;
+
+  Base_V::iterator iter;
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
-    JointState jointState = _state.GetJointState(i);
-    this->SetJointPosition(this->GetName() + "::" + jointState.GetName(),
-                           jointState.GetAngle(0).Radian());
+    if (*iter && (*iter)->HasType(LINK))
+    {
+      boost::static_pointer_cast<Link>(*iter)->SetScale(_scale);
+    }
   }
 }
 
 /////////////////////////////////////////////////
 void Model::SetEnabled(bool _enabled)
 {
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetEnabled(_enabled);
+  for (Link_V::iterator liter = this->links.begin();
+      liter != this->links.end(); ++liter)
+  {
+    if (*liter)
+      (*liter)->SetEnabled(_enabled);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -977,18 +997,93 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 /////////////////////////////////////////////////
 void Model::SetAutoDisable(bool _auto)
 {
-  if (this->joints.size() > 0)
+  if (!this->joints.empty())
     return;
 
-  Base_V::iterator iter;
-  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
-    if (*iter && (*iter)->HasType(LINK))
-      boost::static_pointer_cast<Link>(*iter)->SetAutoDisable(_auto);
+  for (Link_V::iterator liter = this->links.begin();
+      liter != this->links.end(); ++liter)
+  {
+    if (*liter)
+    {
+      (*liter)->SetAutoDisable(_auto);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 bool Model::GetAutoDisable() const
 {
-  return this->sdf->GetValueBool("allow_auto_disable");
+  return this->sdf->Get<bool>("allow_auto_disable");
 }
 
+/////////////////////////////////////////////////
+void Model::RemoveLink(const std::string &_name)
+{
+  for (Link_V::iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    {
+      this->links.erase(iter);
+      break;
+    }
+  }
+}
+/////////////////////////////////////////////////
+JointControllerPtr Model::GetJointController()
+{
+  return this->jointController;
+}
+
+/////////////////////////////////////////////////
+GripperPtr Model::GetGripper(size_t _index) const
+{
+  if (_index < this->grippers.size())
+    return this->grippers[_index];
+  else
+    return GripperPtr();
+}
+
+/////////////////////////////////////////////////
+size_t Model::GetGripperCount() const
+{
+  return this->grippers.size();
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyPotential() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyPotential();
+  }
+  for (Joint_V::const_iterator iter = this->joints.begin();
+    iter != this->joints.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    {
+      e += (*iter)->GetWorldEnergyPotentialSpring(j);
+    }
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKinetic() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyKinetic();
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}

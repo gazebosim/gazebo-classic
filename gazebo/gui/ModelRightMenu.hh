@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +35,7 @@ namespace gazebo
 
     /// \class ModelRightMenu ModelRightMenu.hh gui/gui.hh
     /// \brief Displays a menu when the right mouse button has been pressed.
-    class ModelRightMenu : public QObject
+    class GAZEBO_VISIBLE ModelRightMenu : public QObject
     {
       Q_OBJECT
 
@@ -52,6 +54,9 @@ namespace gazebo
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
 
+      /// \brief QT callback when follow has been selected.
+      private slots: void OnFollow();
+
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
       private slots: void OnDelete(const std::string &_name="");
@@ -59,8 +64,12 @@ namespace gazebo
       /// \brief QT callback when snap below has been selected.
       // private slots: void OnSnapBelow();
 
-      // private slots: void OnFollow();
       // private slots: void OnSkeleton();
+
+      /// \brief Key release callback.
+      /// \param[in] _event The key event.
+      /// \return True if the key press was handled.
+      private: bool OnKeyRelease(const common::KeyEvent &_event);
 
       /// \brief Request callback.
       /// \param[in] _msg Request message to process.
@@ -78,10 +87,12 @@ namespace gazebo
       /// \brief Action for moving the camera to an object.
       private: QAction *moveToAct;
 
+      /// \brief Action for attaching the camera to a model.
+      private: QAction *followAct;
+
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
-      // private: QAction *followAct;
       // private: QAction *skeletonAct;
 
       /// \brief The various view states
@@ -89,12 +100,17 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
+
+      /// \todo In gazebo 3.0 move this function to the correct section.
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh
     /// \brief A class for managing view visualization states.
     /// Used by ModelRightMenu.
-    class ViewState : public QObject
+    class GAZEBO_VISIBLE ViewState : public QObject
     {
       Q_OBJECT
 

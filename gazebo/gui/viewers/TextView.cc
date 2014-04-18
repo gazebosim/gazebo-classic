@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -63,6 +63,9 @@ TextView::TextView(QWidget *_parent, const std::string &_msgType)
   frameLayout->addWidget(this->msgList);
   frameLayout->addLayout(controlLayout);
 
+  connect(this, SIGNAL(AddMsg(QString)), this, SLOT(OnAddMsg(QString)),
+          Qt::QueuedConnection);
+
   this->frame->setObjectName("blackBorderFrame");
   this->frame->setLayout(frameLayout);
   // }
@@ -83,6 +86,7 @@ void TextView::SetTopic(const std::string &_topicName)
 {
   TopicView::SetTopic(_topicName);
 
+  boost::mutex::scoped_lock lock(this->mutex);
   this->msg = msgs::MsgFactory::NewMsg(this->msgTypeName);
 
   this->msgList->clear();
@@ -90,7 +94,6 @@ void TextView::SetTopic(const std::string &_topicName)
   // Subscribe to the new topic if we have generated an appropriate message
   if (this->msg)
   {
-    this->sub.reset();
     this->sub = this->node->Subscribe(_topicName, &TextView::OnText, this);
   }
   else
@@ -107,26 +110,32 @@ void TextView::OnText(const std::string &_msg)
   if (this->paused)
     return;
 
+  boost::mutex::scoped_lock lock(this->mutex);
+
   // Update the Hz and Bandwidth info.
   this->OnMsg(common::Time::GetWallTime(), _msg.size());
 
   // Convert the raw data to a message.
   this->msg->ParseFromString(_msg);
 
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
+  // Signal to add message to the gui list.
+  this->AddMsg(QString::fromStdString(this->msg->DebugString()));
+}
 
-    // Create a new list item.
-    QListWidgetItem *item = new QListWidgetItem(
-        QString::fromStdString(msg->DebugString()));
+/////////////////////////////////////////////////
+void TextView::OnAddMsg(QString _msg)
+{
+  boost::mutex::scoped_lock lock(this->mutex);
 
-    // Add the new text to the output view.
-    this->msgList->addItem(item);
+  // Create a new list item.
+  QListWidgetItem *item = new QListWidgetItem(_msg);
 
-    // Remove items if the list is too long.
-    while (this->msgList->count() > this->bufferSize)
-      delete this->msgList->takeItem(0);
-  }
+  // Add the new text to the output view.
+  this->msgList->addItem(item);
+
+  // Remove items if the list is too long.
+  while (this->msgList->count() > this->bufferSize)
+    delete this->msgList->takeItem(0);
 }
 
 /////////////////////////////////////////////////

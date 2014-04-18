@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 
-#include "gui/GuiEvents.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -28,5 +28,5 @@ event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
 event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
-event::EventT<void (const common::MouseEvent &)> Events::mousePress;
-event::EventT<void (const common::MouseEvent &)> Events::mouseRelease;
+event::EventT<void (int)> Events::inputStepSize;
+event::EventT<void (const std::string &)> Events::follow;

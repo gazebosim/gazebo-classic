@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,43 +25,41 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 #include <utility>
-#include <list>
 #include <vector>
 
-#include "common/Event.hh"
-#include "math/Box.hh"
-#include "math/Pose.hh"
-#include "math/Quaternion.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
+#include <sdf/sdf.hh>
 
-#include "sdf/sdf.hh"
-#include "msgs/msgs.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Color.hh"
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Time.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/math/Box.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
   class MovableObject;
   class SceneNode;
-  class StaticGeometry;
-  class RibbonTrail;
-  class AnimationState;
-  class SkeletonInstance;
 }
 
 namespace gazebo
 {
   namespace rendering
   {
-    class WireBox;
+    class VisualPrivate;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -155,10 +153,15 @@ namespace gazebo
 
       /// \brief Attach a mesh to this visual by name.
       /// \param[in] _meshName Name of the mesh.
+      /// \param[in] _subMesh Name of the submesh. Empty string to use all
+      /// submeshes.
+      /// \param[in] _centerSubmesh True to center a submesh.
       /// \param[in] _objName Name of the attached Object to put the mesh
       /// onto.
       public: Ogre::MovableObject *AttachMesh(const std::string &_meshName,
-                                              const std::string &_objName="");
+                  const std::string &_subMesh="",
+                  bool _centerSubmesh = false,
+                  const std::string &_objName="");
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
@@ -167,6 +170,10 @@ namespace gazebo
       /// \brief Get the scale.
       /// \return The scaling factor.
       public: math::Vector3 GetScale();
+
+      /// \brief Set whether or not to enable or disable lighting.
+      /// \param[in] _lighting True to enable lighting.
+      public: void SetLighting(bool _lighting);
 
       /// \brief Set the material.
       /// \param[in] _materialName The name of the material.
@@ -191,6 +198,10 @@ namespace gazebo
       /// \brief Attach visualization axes
       public: void AttachAxes();
 
+      /// \brief Enable or disable wireframe for this visual.
+      /// \param[in] _show True to enable wireframe for this visual.
+      public: void SetWireframe(bool _show);
+
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
@@ -204,6 +215,11 @@ namespace gazebo
       /// often used when an object is selected by a user via the GUI.
       /// \param[in] _highlighted True to enable the highlighting.
       public: void SetHighlighted(bool _highlighted);
+
+      /// \brief Get whether or not the visual is visually highlighted. This is
+      /// most often means that an object is selected by a user via the GUI.
+      /// \return True if the visual is highlighted.
+      public: bool GetHighlighted() const;
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
@@ -255,7 +271,7 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
@@ -325,11 +341,19 @@ namespace gazebo
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _meshName Name of the mesh to insert.
-      public: void InsertMesh(const std::string &_meshName);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
+      public: void InsertMesh(const std::string &_meshName,
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Insert a mesh into Ogre.
       /// \param[in] _mesh Pointer to the mesh to insert.
-      public: static void InsertMesh(const common::Mesh *_mesh);
+      /// \param[in] _subMesh Name of the mesh within _meshName to insert.
+      /// \param[in] _centerSubmesh True to center the submesh.
+      public: static void InsertMesh(const common::Mesh *_mesh,
+                  const std::string &_subMesh = "",
+                  bool _centerSubmesh = false);
 
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.
@@ -375,14 +399,14 @@ namespace gazebo
       /// \param[in] _flags The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: void SetVisibilityFlags(uint32_t _flags);
 
       /// \brief Get visibility flags for this visual and all children.
       /// \return The visiblity flags.
       /// \sa GZ_VISIBILITY_ALL
       /// \sa GZ_VISIBILITY_GUI
-      /// \sa GZ_VISIBILITY_NOT_SELECTABLE
+      /// \sa GZ_VISIBILITY_SELECTABLE
       public: uint32_t GetVisibilityFlags();
 
       /// \brief Display the bounding box visual.
@@ -429,14 +453,69 @@ namespace gazebo
       /// \param _name The unique name of the plugin to remove
       public: void RemovePlugin(const std::string &_name);
 
+      /// \brief Get the id associated with this visual
+      public: uint32_t GetId() const;
+
+      /// \brief Set the id associated with this visual
+      public: void SetId(uint32_t _id);
+
+      /// \brief The name of the mesh set in the visual's SDF.
+      /// \return Name of the mesh.
+      public: std::string GetMeshName() const;
+
+      /// \brief Get the name of the sub mesh set in the visual's SDF.
+      /// \return Name of the submesh. Empty string if no submesh is
+      /// specified.
+      public: std::string GetSubMeshName() const;
+
+      /// \brief Clear parents.
+      public: void ClearParent();
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _parent Parent of the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, VisualPtr _parent,
+                        bool _useRTShader = true);
+
+      /// \internal
+      /// \brief Constructor used by inherited classes
+      /// \param[in] _dataPtr Pointer to private data.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      protected: Visual(VisualPrivate &_dataPtr,
+                        const std::string &_name, ScenePtr _scene,
+                        bool _useRTShader = true);
+
+      /// \brief Helper function for initializing the visual with a scene as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, ScenePtr _scene,
+          bool _useRTShader);
+
+      /// \brief Helper function for initializing the visual with a visual as
+      /// its parent.
+      /// \param[in] _name Name of the visual.
+      /// \param[in] _scene Scene containing the visual.
+      /// \param[in] _useRTShader True if the visual should use the
+      /// real-time shader system (RTShader).
+      private: void Init(const std::string &_name, VisualPtr _parent,
+          bool _useRTShader);
+
       /// \brief Load all plugins
-      ///
       /// Load all plugins specified in the SDF for the model.
       private: void LoadPlugins();
 
       private: void LoadPlugin(sdf::ElementPtr _sdf);
-
-      private: std::vector<VisualPluginPtr> plugins;
 
       /// \brief Helper function to get the bounding box for a visual.
       /// \param[in] _node Pointer to the Ogre Node to process.
@@ -444,87 +523,19 @@ namespace gazebo
       private: void GetBoundsHelper(Ogre::SceneNode *_node,
                                     math::Box &_box) const;
 
-      /// \brief The name of the mesh set in the visual's SDF.
-      /// \return Name of the mesh.
-      private: std::string GetMeshName() const;
-
-      /// \brief Clear parents.
-      public: void ClearParent();
-
-      /// \brief Pointer to the visual's scene.
-      protected: ScenePtr scene;
-
-      /// \brief Pointer to the visual's scene node in Ogre.
-      protected: Ogre::SceneNode *sceneNode;
-
-      /// \brief Parent visual.
-      protected: VisualPtr parent;
+      /// \brief Return true if the submesh should be centered.
+      /// \return True if the submesh should be centered when it's inserted
+      /// into OGRE.
+      private: bool GetCenterSubMesh() const;
 
       /// \brief Destroy all the movable objects attached to a scene node.
       /// \param[in] _sceneNode Pointer to the scene node to process.
       private: void DestroyAllAttachedMovableObjects(
                    Ogre::SceneNode *_sceneNode);
 
-      /// \brief The SDF element for the visual.
-      private: sdf::ElementPtr sdf;
-
-      /// \brief The unique name for the visual's material.
-      private: std::string myMaterialName;
-
-      /// \brief The original name for the visual's material.
-      private: std::string origMaterialName;
-
-      /// \brief Transparency value.
-      private: float transparency;
-
-      /// \brief True if the visual is static, which allows Ogre to improve
-      /// performance.
-      private: bool isStatic;
-
-      /// \brief Pointer to the static geometry.
-      private: Ogre::StaticGeometry *staticGeom;
-
-      /// \brief True if rendered.
-      private: bool visible;
-
-      /// \brief The ribbon train created by the visual.
-      private: Ogre::RibbonTrail *ribbonTrail;
-
-      /// \brief The visual's skeleton, used only for person simulation.
-      private: Ogre::SkeletonInstance *skeleton;
-
-      /// \brief Connection for the pre render event.
-      private: event::ConnectionPtr preRenderConnection;
-
-      /// \brief List of all the lines created
-      private: std::list<DynamicLines*> lines;
-
-      /// \brief Lines and their vertices connected to this visual.
-      private: std::list< std::pair<DynamicLines*, unsigned int> > lineVertices;
-
-      /// \brief Name of the visual.
-      private: std::string name;
-
-      /// \brief Children visuals.
-      private: std::vector<VisualPtr> children;
-
-      /// \brief Used to animate the visual.
-      private: Ogre::AnimationState *animState;
-
-      /// \brief Time of the previous animation step.
-      private: common::Time prevAnimTime;
-
-      /// \brief Callback for the animation complete event.
-      private: boost::function<void()> onAnimationComplete;
-
-      /// \brief True to use RT shader system
-      private: bool useRTShader;
-
-      /// \brief True if initialized.
-      private: bool initialized;
-
-      /// \brief A wire frame bounding box.
-      private: WireBox *boundingBox;
+      /// \internal
+      /// \brief Pointer to private data.
+      protected: VisualPrivate *dataPtr;
     };
     /// \}
   }

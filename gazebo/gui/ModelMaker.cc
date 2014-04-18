@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,25 @@
  */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "common/MouseEvent.hh"
-#include "common/Exception.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "math/Quaternion.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
-#include "gui/ModelMaker.hh"
+#include "gazebo/gui/ModelManipulator.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/ModelMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -43,6 +44,7 @@ using namespace gui;
 : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->clone = false;
 }
 
@@ -53,28 +55,31 @@ ModelMaker::~ModelMaker()
 }
 
 /////////////////////////////////////////////////
-bool ModelMaker::InitFromModel(const std::string &_modelName)
-{
-  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-  if (this->modelVisual)
-  {
-    scene->RemoveVisual(this->modelVisual);
-    this->modelVisual.reset();
-    this->visuals.clear();
-  }
-
-  this->modelVisual = scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
-
-  if (!this->modelVisual)
-  {
-    gzerr << "Unable to clone\n";
-    return false;
-  }
-
-  this->clone = true;
-
-  return true;
-}
+// bool ModelMaker::InitFromModel(const std::string & /*_modelName*/)
+// {
+//   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+//   if (this->modelVisual)
+//   {
+//     scene->RemoveVisual(this->modelVisual);
+//     this->modelVisual.reset();
+//     this->visuals.clear();
+//   }
+//
+//   // This function is currently not executed. Commenting out the following
+//   // line to prevent a compile warning.
+//   // this->modelVisual =
+//   // scene->CloneVisual(_modelName, _modelName + "_clone_tmp");
+//
+//   if (!this->modelVisual)
+//   {
+//     gzerr << "Unable to clone\n";
+//     return false;
+//   }
+//
+//   this->clone = true;
+//
+//   return true;
+// }
 
 /////////////////////////////////////////////////
 bool ModelMaker::InitFromSDFString(const std::string &_data)
@@ -148,10 +153,10 @@ bool ModelMaker::Init()
   }
 
   if (modelElem->HasElement("pose"))
-    modelPose = modelElem->GetValuePose("pose");
+    modelPose = modelElem->Get<math::Pose>("pose");
 
   modelName = this->node->GetTopicNamespace() + "::" +
-    modelElem->GetValueString("name");
+    modelElem->Get<std::string>("name");
 
   this->modelVisual.reset(new rendering::Visual(modelName,
                           scene->GetWorldVisual()));
@@ -171,9 +176,9 @@ bool ModelMaker::Init()
     {
       while (linkElem)
       {
-        std::string linkName = linkElem->GetValueString("name");
+        std::string linkName = linkElem->Get<std::string>("name");
         if (linkElem->HasElement("pose"))
-          linkPose = linkElem->GetValuePose("pose");
+          linkPose = linkElem->Get<math::Pose>("pose");
         else
           linkPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -192,7 +197,7 @@ bool ModelMaker::Init()
         while (visualElem)
         {
           if (visualElem->HasElement("pose"))
-            visualPose = visualElem->GetValuePose("pose");
+            visualPose = visualElem->Get<math::Pose>("pose");
           else
             visualPose.Set(0, 0, 0, 0, 0, 0);
 
@@ -265,10 +270,16 @@ void ModelMaker::OnMousePush(const common::MouseEvent &/*_event*/)
 /////////////////////////////////////////////////
 void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button == common::MouseEvent::LEFT && !_event.dragging)
+  if (_event.button == common::MouseEvent::LEFT)
   {
-    this->CreateTheEntity();
-    this->Stop();
+    // Place if not dragging, or if dragged for less than 50 pixels.
+    // The 50 pixels is used to account for accidental mouse movement
+    // when placing an object.
+    if (!_event.dragging || _event.pressPos.Distance(_event.pos) < 50)
+    {
+      this->CreateTheEntity();
+      this->Stop();
+    }
   }
 }
 
@@ -276,41 +287,11 @@ void ModelMaker::OnMouseRelease(const common::MouseEvent &_event)
 void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
 {
   math::Pose pose = this->modelVisual->GetWorldPose();
-
-  math::Vector3 origin1, dir1, p1;
-  math::Vector3 origin2, dir2, p2;
-
-  // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x, _event.pos.y,
-      origin1, dir1);
-
-  // Compute the distance from the camera to plane of translation
-  math::Plane plane(math::Vector3(0, 0, 1), 0);
-
-  double dist1 = plane.Distance(origin1, dir1);
-
-  // Compute two points on the plane. The first point is the current
-  // mouse position, the second is the previous mouse position
-  p1 = origin1 + dir1 * dist1;
-  pose.pos = p1;
+  pose.pos = ModelManipulator::GetMousePositionOnPlane(this->camera, _event);
 
   if (!_event.shift)
   {
-    if (ceil(pose.pos.x) - pose.pos.x <= .4)
-      pose.pos.x = ceil(pose.pos.x);
-    else if (pose.pos.x - floor(pose.pos.x) <= .4)
-      pose.pos.x = floor(pose.pos.x);
-
-    if (ceil(pose.pos.y) - pose.pos.y <= .4)
-      pose.pos.y = ceil(pose.pos.y);
-    else if (pose.pos.y - floor(pose.pos.y) <= .4)
-      pose.pos.y = floor(pose.pos.y);
-
-    /*  if (ceil(pose.pos.z) - pose.pos.z <= .4)
-        pose.pos.z = ceil(pose.pos.z);
-        else if (pose.pos.z - floor(pose.pos.z) <= .4)
-        pose.pos.z = floor(pose.pos.z);
-        */
+    pose.pos = ModelManipulator::SnapPoint(pose.pos);
   }
   pose.pos.z = this->modelVisual->GetWorldPose().pos.z;
 
@@ -343,14 +324,14 @@ void ModelMaker::CreateTheEntity()
       isLight = true;
     }
 
-    std::string modelName = modelElem->GetValueString("name");
+    std::string modelName = modelElem->Get<std::string>("name");
 
     // Automatically create a new name if the model exists
     int i = 0;
     while ((isModel && has_entity_name(modelName)) ||
         (isLight && scene->GetLight(modelName)))
     {
-      modelName = modelElem->GetValueString("name") + "_" +
+      modelName = modelElem->Get<std::string>("name") + "_" +
         boost::lexical_cast<std::string>(i++);
     }
 

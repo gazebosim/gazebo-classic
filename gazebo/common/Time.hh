@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,13 @@
 #ifndef _TIME_HH_
 #define _TIME_HH_
 
+#include <string>
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,8 +40,11 @@ namespace gazebo
     /// \class Time Time.hh common/common.hh
     /// \brief A Time class, can be used to hold wall- or sim-time.
     ///        stored as sec and nano-sec.
-    class Time
+    class GAZEBO_VISIBLE Time
     {
+      /// \brief A static zero time variable set to common::Time(0, 0).
+      public: static const Time Zero;
+
       /// \brief Constructors
       public: Time();
 
@@ -69,6 +76,10 @@ namespace gazebo
       /// \return the current time
       public: static const Time &GetWallTime();
 
+      /// \brief Get the wall time as an ISO string: YYYY-MM-DDTHH:MM:SS
+      /// \return The current wall time as an ISO string.
+      public: static const std::string &GetWallTimeAsISOString();
+
       /// \brief Set the time to the wall time
       public: void SetToWallTime();
 
@@ -89,17 +100,20 @@ namespace gazebo
       /// \return Time as a float in seconds
       public: float Float() const;
 
+      /// \brief Sleep for the specified time
+      /// \param[in] _time Sleep time
+      /// \return Time actually slept
+      public: static Time Sleep(const common::Time &_time);
+
       /// \brief Millisecond sleep
       /// \param[in] _ms milliseconds
+      /// \return Time actually slept
       public: static Time MSleep(unsigned int _ms);
 
       /// \brief Nano sleep
       /// \param[in] _ns nanoseconds
+      /// \return Time actually slept
       public: static Time NSleep(unsigned int _ns);
-
-      /// \brief Nano sleep
-      /// \param[in] _time is a Time
-      public: static Time NSleep(Time _time);
 
       /// \brief Assignment operator
       /// \param[in] _tv the new time
@@ -360,19 +374,19 @@ namespace gazebo
       /// \param[in] _sec duration in seconds
       /// \return nanoseconds
       public: static inline double SecToNano(double _sec)
-              { return _sec * 1e-9;}
+              { return _sec * 1e9;}
 
       /// \brief Convert milliseconds to nanoseconds
       /// \param[in] _ms milliseconds
       /// \return nanoseconds
       public: static inline double MilToNano(double _ms)
-              { return _ms * 1e-6;}
+              { return _ms * 1e6;}
 
       /// \brief Convert microseconds to nanoseconds
       /// \param _ms microseconds
       /// \return nanoseconds
       public: static inline double MicToNano(double _ms)
-              { return _ms * 1e-3;}
+              { return _ms * 1e3;}
 
       /// \brief Stream insertion operator
       /// \param[in] _out the output stream
@@ -401,11 +415,14 @@ namespace gazebo
       /// \brief Seconds
       public: int32_t sec;
 
-      /// \brief Microseconds
+      /// \brief Nanoseconds
       public: int32_t nsec;
 
       /// \brief a singleton value of the last GetWallTime() value
       private: static Time wallTime;
+
+      /// \brief Wall time as an ISO string.
+      private: static std::string wallTimeISO;
 
       /// \brief Correct the time so that small additions/substractions
       /// preserve the internal seconds and nanoseconds separation
@@ -429,7 +446,7 @@ namespace gazebo
                  this->sec += this->nsec / static_cast<int32_t>(1e9);
                  this->nsec = this->nsec % static_cast<int32_t>(1e9);
                }
-      private: static struct timespec clock_resolution;
+      private: static struct timespec clockResolution;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,26 +25,25 @@
 #include <string>
 #include <vector>
 
-#include "rendering/Camera.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  class UserCameraPrivate;
+
   namespace rendering
   {
-    class OrbitViewController;
-    class FPSViewController;
-    class Visual;
     class GUIOverlay;
-    class SelectionBuffer;
 
     /// \addtogroup gazebo_rendering
     /// \{
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class UserCamera : public Camera
+    class GAZEBO_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
@@ -99,6 +98,10 @@ namespace gazebo
       public: void SetViewController(const std::string &_type,
                                      const math::Vector3 &_pos);
 
+      /// \brief Get current view controller type.
+      /// \return Type of the current view controller: "orbit", "fps"
+      public: std::string GetViewControllerTypeString();
+
       /// \brief Resize the camera.
       /// \param[in] _w Width of the camera image.
       /// \param[in] _h Height of the camera image.
@@ -118,7 +121,7 @@ namespace gazebo
 
       /// \brief Get the triangle count.
       /// \return The number of triangles currently being rendered.
-      public: float GetTriangleCount() const;
+      public: unsigned int GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.
@@ -167,6 +170,20 @@ namespace gazebo
       /// \param[in] _pt The focal point
       public: void SetFocalPoint(const math::Vector3 &_pt);
 
+      // Documentation inherited
+      public: virtual unsigned int GetImageWidth() const;
+
+      // Documentation inherited
+      public: virtual unsigned int GetImageHeight() const;
+
+      /// brief Show if the user camera pose has changed in the world file.
+      /// return true if the camera pose changed in the world file.
+      public: bool IsCameraSetInWorldFile();
+
+      /// brief Set if the user camera pose has changed in the world file.
+      /// \param[in] _value True if the camera pose changed in the world file.
+      public: void SetUseSDFPose(bool _value);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -205,26 +222,9 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
-      /// \brief The visual used to render the camera's appearance.
-      private: Visual *visual;
-
-      /// \brief The currently active view controller.
-      private: ViewController *viewController;
-
-      /// \brief An orbit view controller.
-      private: OrbitViewController *orbitViewController;
-
-      /// \brief A FPS view controller.
-      private: FPSViewController *fpsViewController;
-
-      /// \brief The GUI overlay.
-      private: GUIOverlay *gui;
-
-      /// \brief Draws a 3D axis in the viewport.
-      // private: Ogre::SceneNode *axisNode;
-
-      /// \brief Used to select objects from mouse clicks.
-      private: SelectionBuffer *selectionBuffer;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: UserCameraPrivate *dataPtr;
     };
     /// \}
   }

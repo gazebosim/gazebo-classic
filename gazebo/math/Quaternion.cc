@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
-#include "math/Helpers.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Quaternion.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -158,7 +158,7 @@ Quaternion Quaternion::GetExp() const
 void Quaternion::Invert()
 {
   this->Normalize();
-  this->w = this->w;
+  // this->w = this->w;
   this->x = -this->x;
   this->y = -this->y;
   this->z = -this->z;
@@ -428,8 +428,8 @@ Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
 //////////////////////////////////////////////////
 bool Quaternion::IsFinite() const
 {
-  return finite(this->w) && finite(this->x) && finite(this->y) &&
-         finite(this->z);
+  return std::isfinite(this->w) && std::isfinite(this->x) &&
+         std::isfinite(this->y) && std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////

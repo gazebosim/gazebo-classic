@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,13 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class TextView : public TopicView
+    class GAZEBO_VISIBLE TextView : public TopicView
     {
       Q_OBJECT
 
@@ -45,6 +46,10 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void SetTopic(const std::string &_topicName);
+
+      /// \brief Signal to add a message to the GUI list.
+      /// \param[in] _msg Text message to add.
+      signals: void AddMsg(QString _msg);
 
       // Documentation inherited
       private: virtual void UpdateImpl();
@@ -61,6 +66,10 @@ namespace gazebo
       /// \param[in] _value New value of the check box.
       private slots: void OnPause(bool _value);
 
+      /// \brief Callback from the ::AddMsg function.
+      /// \param[in] _msg Message to add to the list.
+      private slots: void OnAddMsg(QString _msg);
+
       /// \brief A scolling list of text data.
       private: QListWidget *msgList;
 
@@ -71,7 +80,7 @@ namespace gazebo
       /// \brief The protobuf message used to decode incoming message data.
       private: boost::shared_ptr<google::protobuf::Message> msg;
 
-      /// \brief Mutex to protec message buffer.
+      /// \brief Mutex to protect message buffer.
       private: boost::mutex mutex;
 
       /// \brief Flag used to pause message parsing.

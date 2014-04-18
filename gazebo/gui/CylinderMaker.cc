@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,18 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "math/Quaternion.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/math/Quaternion.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "gui/CylinderMaker.hh"
+#include "gazebo/transport/Publisher.hh"
+
+#include "gazebo/gui/CylinderMaker.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -36,9 +38,10 @@ CylinderMaker::CylinderMaker()
   : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::CYLINDER);
-  this->visualMsg->mutable_material()->mutable_script()->set_uri(
+  this->visualMsg->mutable_material()->mutable_script()->add_uri(
       "gazebo://media/materials/scripts/gazebo.material");
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
@@ -186,7 +189,7 @@ std::string CylinderMaker::GetSDFString()
   std::ostringstream newModelStr;
 
   newModelStr
-    << "<sdf version ='1.3'>"
+    << "<sdf version ='" << SDF_VERSION << "'>"
     << "  <model name ='unit_cylinder_" << counter << "'>"
     << "    <pose>0 0 0.5 0 0 0</pose>"
     << "    <link name='link'>"
@@ -235,6 +238,3 @@ void CylinderMaker::CreateTheEntity()
   this->makerPub->Publish(msg);
   this->camera.reset();
 }
-
-
-

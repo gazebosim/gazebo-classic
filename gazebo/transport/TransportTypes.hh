@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 #define _TRANSPORT_TYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <google/protobuf/message.h>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_transport
@@ -32,6 +34,10 @@ namespace gazebo
     class Subscriber;
     class SubscriptionTransport;
     class Node;
+
+    /// \def MessagePtr
+    /// \brief Shared_ptr to protobuf message
+    typedef boost::shared_ptr<google::protobuf::Message> MessagePtr;
 
     /// \def PublisherPtr
     /// \brief Shared_ptr to Publisher object

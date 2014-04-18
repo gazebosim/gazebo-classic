@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,14 @@
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/gazebo_config.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Data structure for contact feedbacks
-    class ODEJointFeedback
+    class GAZEBO_VISIBLE ODEJointFeedback
     {
       public: ODEJointFeedback() : contact(NULL), count(0) {}
 
@@ -58,8 +59,43 @@ namespace gazebo
     };
 
     /// \brief ODE physics engine.
-    class ODEPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE ODEPhysics : public PhysicsEngine
     {
+      /// \enum ODEParam
+      /// \brief ODE Physics parameter types.
+      public: enum ODEParam
+      {
+        /// \brief Solve type
+        SOLVER_TYPE,
+
+        /// \brief Constraint force mixing
+        GLOBAL_CFM,
+
+        /// \brief Error reduction parameter
+        GLOBAL_ERP,
+
+        /// \brief Number of iterations
+        SOR_PRECON_ITERS,
+
+        /// \brief Number of iterations
+        PGS_ITERS,
+
+        /// \brief SOR over-relaxation parameter
+        SOR,
+
+        /// \brief Max correcting velocity
+        CONTACT_MAX_CORRECTING_VEL,
+
+        /// \brief Surface layer depth
+        CONTACT_SURFACE_LAYER,
+
+        /// \brief Maximum number of contacts
+        MAX_CONTACTS,
+
+        /// \brief Minimum step size
+        MIN_STEP_SIZE
+      };
+
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
       public: ODEPhysics(WorldPtr _world);
@@ -89,10 +125,8 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual void SetStepTime(double _value);
-
-      // Documentation inherited
-      public: virtual double GetStepTime();
+      public: virtual std::string GetType() const
+                      { return "ode"; }
 
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
@@ -158,13 +192,36 @@ namespace gazebo
       public: virtual double GetContactSurfaceLayer();
 
       // Documentation inherited
-      public: virtual int GetMaxContacts();
+      public: virtual unsigned int GetMaxContacts();
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
 
       // Documentation inherited
       public: virtual void SetSeed(uint32_t _seed);
+
+      /// \brief Set a parameter of the bullet physics engine
+      /// \sa bool SetParam(const std::string &_key,
+      /// const boost::any &_value)
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \param[in] _value The value to set to
+      /// \return true if SetParam is successful, false if operation fails.
+      public: virtual bool SetParam(ODEParam _param,
+                  const boost::any &_value) GAZEBO_DEPRECATED(3.0);
+
+      /// Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// Documentation inherited
+      public: virtual boost::any GetParam(const std::string &_key) const;
+
+      /// \brief Get an parameter of the physics engine
+      /// \sa boost::any GetParam(const std::string &_key) const
+      /// \param[in] _param A parameter listed in the ODEParam enum
+      /// \return The value of the parameter
+      public: virtual boost::any GetParam(ODEParam _param) const
+                GAZEBO_DEPRECATED(3.0);
 
       /// \brief Return the world space id.
       /// \return The space id for the world.
@@ -238,9 +295,6 @@ namespace gazebo
       /// \brief Collision attributes
       private: dJointGroupID contactGroup;
 
-      /// \brief Store the value of the stepTime parameter to improve efficiency
-      private: double stepTimeDouble;
-
       /// \brief The type of the solver.
       private: std::string stepType;
 
@@ -274,6 +328,9 @@ namespace gazebo
 
       /// \brief Indices used during creation of contact joints.
       private: int indices[MAX_CONTACT_JOINTS];
+
+      /// \brief Maximum number of contact points per collision pair.
+      private: unsigned int maxContacts;
     };
   }
 }

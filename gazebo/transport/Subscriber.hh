@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "transport/CallbackHelper.hh"
+#include "gazebo/transport/CallbackHelper.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Subscriber Subscriber.hh transport/transport.hh
     /// \brief A subscriber to a topic
-    class Subscriber
+    class GAZEBO_VISIBLE Subscriber
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're subscribing to
@@ -45,6 +46,18 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~Subscriber();
 
+      /// \internal
+      /// \brief Set the ID of the callback which is associated with this
+      /// subscriber. This function should only be used by Node.hh
+      /// \param[in] _id ID of the callback
+      public: void SetCallbackId(unsigned int _id);
+
+      /// \internal
+      /// \brief Get the ID of the callback which is associated with this
+      /// subscriber. This function should only be used by Node.hh
+      /// \return ID of the callback
+      public: unsigned int GetCallbackId() const;
+
       /// \brief Get the topic name
       /// \return The topic name
       public: std::string GetTopic() const;
@@ -52,8 +65,14 @@ namespace gazebo
       /// \brief Unsubscribe from the topic
       public: void Unsubscribe() const;
 
+      /// \brief Topic this object is subscribe to.
       private: std::string topic;
+
+      /// \brief Node which handles communication.
       private: NodePtr node;
+
+      /// \brief Id of the callback associated with this object.
+      private: unsigned int callbackId;
     };
     /// \}
   }

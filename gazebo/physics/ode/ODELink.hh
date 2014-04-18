@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,14 @@
 #include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE Link class.
-    class ODELink : public Link
+    class GAZEBO_VISIBLE ODELink : public Link
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent model.
@@ -47,9 +48,6 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Fini();
-
-      // Documentation inherited
-      public: virtual void Update();
 
       // Documentation inherited
       public: virtual void OnPoseChange();
@@ -100,7 +98,16 @@ namespace gazebo
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual math::Vector3 GetWorldLinearVel(
+          const math::Vector3 &_offset) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const;
+
+      // Documentation inherited
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
 
       // Documentation inherited
       public: virtual math::Vector3 GetWorldAngularVel() const;
@@ -115,7 +122,7 @@ namespace gazebo
       public: virtual void SetGravityMode(bool _mode);
 
       // Documentation inherited
-      public: virtual bool GetGravityMode();
+      public: virtual bool GetGravityMode() const;
 
       // Documentation inherited
       public: void SetSelfCollide(bool _collide);
@@ -155,6 +162,9 @@ namespace gazebo
       ///        propagates the chagnes in pose back to Gazebo
       /// \param[in] _id Id of the body.
       public: static void MoveCallback(dBodyID _id);
+
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
 
       /// \brief ODE link handle
       private: dBodyID linkId;

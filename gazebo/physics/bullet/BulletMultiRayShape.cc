@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,16 @@
  * limitations under the License.
  *
  */
-#include "physics/World.hh"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletCollision.hh"
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/bullet/BulletRayShape.hh"
-#include "physics/bullet/BulletMultiRayShape.hh"
+
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletRayShape.hh"
+#include "gazebo/physics/bullet/BulletMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -30,7 +33,7 @@ BulletMultiRayShape::BulletMultiRayShape(CollisionPtr _parent)
 : MultiRayShape(_parent)
 {
   this->SetName("Bullet Multiray Shape");
-  this->physicsEngine = boost::shared_static_cast<BulletPhysics>(
+  this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
       this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
@@ -42,7 +45,7 @@ BulletMultiRayShape::~BulletMultiRayShape()
 //////////////////////////////////////////////////
 void BulletMultiRayShape::UpdateRays()
 {
-  std::vector< RayShapePtr >::iterator iter;
+  std::vector<RayShapePtr>::iterator iter;
   for (iter = this->rays.begin(); iter != this->rays.end(); ++iter)
   {
     (*iter)->Update();
@@ -54,7 +57,8 @@ void BulletMultiRayShape::AddRay(const math::Vector3 &_start,
     const math::Vector3 &_end)
 {
   MultiRayShape::AddRay(_start, _end);
-  BulletRayShapePtr ray(new BulletRayShape(this->physicsEngine));
+
+  BulletRayShapePtr ray(new BulletRayShape(this->collisionParent));
   ray->SetPoints(_start, _end);
 
   this->rays.push_back(ray);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,11 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class JointTrajectoryPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE JointTrajectoryPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: JointTrajectoryPlugin();
@@ -44,10 +45,15 @@ namespace gazebo
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Update the controller
-    private: void UpdateStates();
+    /// \param[in] _info Update information provided by the server.
+    private: void UpdateStates(const common::UpdateInfo &_info);
 
-    private: void FixLink(physics::LinkPtr link);
-    private: void UnfixLink();
+
+    // This function is commented out because it is not used.
+    // private: void FixLink(physics::LinkPtr link);
+
+    // This function is commented out because it is not used.
+    // private: void UnfixLink();
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;

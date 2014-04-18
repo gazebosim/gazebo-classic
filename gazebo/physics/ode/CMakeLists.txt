@@ -1,49 +1,73 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
-link_directories(  
-  ${CCD_LIBRARY_DIRS} 
+
+link_directories(
+  ${CCD_LIBRARY_DIRS}
 )
 
 
-set (sources ODEPhysics.cc
-             ODECollision.cc
-             ODELink.cc
-             ODEJoint.cc
-             ODESliderJoint.cc
-             ODEHingeJoint.cc
-             ODEHinge2Joint.cc
-             ODEUniversalJoint.cc
-             ODEBallJoint.cc
-             ODETrimeshShape.cc
-             ODERayShape.cc
-             ODEMultiRayShape.cc
-             ODEHeightmapShape.cc
-             ODEScrewJoint.cc
+set (sources
+  ODEBallJoint.cc
+  ODECollision.cc
+  ODEGearboxJoint.cc
+  ODEHeightmapShape.cc
+  ODEHinge2Joint.cc
+  ODEHingeJoint.cc
+  ODEJoint.cc
+  ODELink.cc
+  ODEMeshShape.cc
+  ODEMultiRayShape.cc
+  ODEPhysics.cc
+  ODERayShape.cc
+  ODEScrewJoint.cc
+  ODESliderJoint.cc
+  ODESurfaceParams.cc
+  ODEUniversalJoint.cc
 )
 
-SET (headers ODEPhysics.hh
-             ODECollision.hh
-             ODELink.hh
-             ODEJoint.hh
-             ODESliderJoint.hh
-             ODEHingeJoint.hh
-             ODEHinge2Joint.hh
-             ODEUniversalJoint.hh
-             ODEBallJoint.hh
-             ODETrimeshShape.hh
-             ODERayShape.hh
-             ODEMultiRayShape.hh
-             ODEHeightmapShape.hh
-             ODESphereShape.hh
-             ODEBoxShape.hh
-             ODEPlaneShape.hh
-             ODECylinderShape.hh
-             ODETypes.hh
-             ODEScrewJoint.hh
+SET (headers
+  ode_inc.h
+  ODEBallJoint.hh
+  ODEBoxShape.hh
+  ODECollision.hh
+  ODECylinderShape.hh
+  ODEGearboxJoint.hh
+  ODEHeightmapShape.hh
+  ODEHinge2Joint.hh
+  ODEHingeJoint.hh
+  ODEJoint.hh
+  ODELink.hh
+  ODEMeshShape.hh
+  ODEMultiRayShape.hh
+  ODEPhysics.hh
+  ODEPlaneShape.hh
+  ODERayShape.hh
+  ODEScrewJoint.hh
+  ODESliderJoint.hh
+  ODESphereShape.hh
+  ODESurfaceParams.hh
+  ODETypes.hh
+  ODEUniversalJoint.hh
 )
 
-gz_add_library(gazebo_physics_ode ${sources})
-target_link_libraries(gazebo_physics_ode gazebo_ode gazebo_opcode ${TBB_LIBRARIES})
+set (gtest_sources
+  ODEPhysics_TEST.cc
+)
+gz_build_tests(${gtest_sources})
+
+gz_add_library(gazebo_physics_ode ${headers} ${sources})
+target_link_libraries(gazebo_physics_ode
+  gazebo_ode
+  gazebo_opcode
+  gazebo_math
+  gazebo_common
+  ${TBB_LIBRARIES}
+)
 
 gz_install_library(gazebo_physics_ode)
+
+# unit tests
+set (gtest_sources
+)
+gz_build_tests(${gtest_sources})

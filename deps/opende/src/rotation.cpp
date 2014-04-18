@@ -27,6 +27,7 @@ quaternions have the format: (s,vx,vy,vz) where (vx,vy,vz) is the
 
 */
 
+#include <iostream>
 #include <ode/rotation.h>
 #include <ode/odemath.h>
 #include "config.h"
@@ -57,7 +58,7 @@ void dRSetIdentity (dMatrix3 R)
 
 
 void dRFromAxisAndAngle (dMatrix3 R, dReal ax, dReal ay, dReal az,
-			 dReal angle)
+       dReal angle)
 {
   dAASSERT (R);
   dQuaternion q;
@@ -92,13 +93,14 @@ void dRFromEulerAngles (dMatrix3 R, dReal phi, dReal theta, dReal psi)
 
 
 void dRFrom2Axes (dMatrix3 R, dReal ax, dReal ay, dReal az,
-		  dReal bx, dReal by, dReal bz)
+      dReal bx, dReal by, dReal bz)
 {
   dReal l,k;
   dAASSERT (R);
   l = dSqrt (ax*ax + ay*ay + az*az);
   if (l <= REAL(0.0)) {
     dDEBUGMSG ("zero length vector");
+    memset(R, 0, sizeof(dReal)*12);
     return;
   }
   l = dRecip(l);
@@ -111,6 +113,7 @@ void dRFrom2Axes (dMatrix3 R, dReal ax, dReal ay, dReal az,
   bz -= k*az;
   l = dSqrt (bx*bx + by*by + bz*bz);
   if (l <= REAL(0.0)) {
+    memset(R, 0, sizeof(dReal)*12);
     dDEBUGMSG ("zero length vector");
     return;
   }
@@ -167,7 +170,7 @@ void dQSetIdentity (dQuaternion q)
 
 
 void dQFromAxisAndAngle (dQuaternion q, dReal ax, dReal ay, dReal az,
-			 dReal angle)
+       dReal angle)
 {
   dAASSERT (q);
   dReal l = ax*ax + ay*ay + az*az;
@@ -258,9 +261,10 @@ void dRfromQ (dMatrix3 R, const dQuaternion q)
 void dQfromR (dQuaternion q, const dMatrix3 R)
 {
   dAASSERT (q && R);
-  dReal tr,s;
+  dReal tr(0), s(0);
   tr = _R(0,0) + _R(1,1) + _R(2,2);
-  if (tr >= 0) {
+  if (tr >= 0)
+  {
     s = dSqrt (tr + 1);
     q[0] = REAL(0.5) * s;
     s = REAL(0.5) * dRecip(s);

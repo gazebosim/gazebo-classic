@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 
 #include <string>
 
-#include "msgs/msgs.hh"
-#include "gui/EntityMaker.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,7 @@ namespace gazebo
 
   namespace gui
   {
-    class LightMaker : public EntityMaker
+    class GAZEBO_VISIBLE LightMaker : public EntityMaker
     {
       public: LightMaker();
 
@@ -54,7 +55,7 @@ namespace gazebo
       private: rendering::Light *light;
     };
 
-    class PointLightMaker : public LightMaker
+    class GAZEBO_VISIBLE PointLightMaker : public LightMaker
     {
       public: PointLightMaker() : LightMaker()
               {
@@ -64,7 +65,7 @@ namespace gazebo
               }
     };
 
-    class SpotLightMaker : public LightMaker
+    class GAZEBO_VISIBLE SpotLightMaker : public LightMaker
     {
       public: SpotLightMaker() : LightMaker()
               {
@@ -80,7 +81,7 @@ namespace gazebo
               }
     };
 
-    class DirectionalLightMaker : public LightMaker
+    class GAZEBO_VISIBLE DirectionalLightMaker : public LightMaker
     {
       public: DirectionalLightMaker() : LightMaker()
               {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,13 @@
 #include "gazebo/gui/viewers/ViewFactory.hh"
 
 #include "gazebo/gui/viewers/ImageView.hh"
+#include "gazebo/gui/viewers/ImagesView.hh"
+#include "gazebo/gui/viewers/LaserView.hh"
 #include "gazebo/gui/viewers/TextView.hh"
 
 void RegisterImageView();
+void RegisterImagesView();
+void RegisterLaserView();
 
 using namespace gazebo;
 using namespace gui;
@@ -32,7 +36,9 @@ std::map<std::string, ViewFactoryFn> ViewFactory::viewMap;
 /////////////////////////////////////////////////
 void ViewFactory::RegisterAll()
 {
+  RegisterLaserView();
   RegisterImageView();
+  RegisterImagesView();
 }
 
 /////////////////////////////////////////////////
@@ -49,8 +55,9 @@ TopicView *ViewFactory::NewView(const std::string &_msgType,
 {
   TopicView *view = NULL;
 
-  if (viewMap[_msgType])
-    view = (viewMap[_msgType]) (_parent);
+  std::map<std::string, ViewFactoryFn>::iterator iter = viewMap.find(_msgType);
+  if (iter != viewMap.end())
+    view = (iter->second) (_parent);
   else
     view = new TextView(_parent, _msgType);
 

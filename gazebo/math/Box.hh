@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 #define _BOX_HH_
 
 #include <iostream>
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,7 +30,7 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
-    class Box
+    class GAZEBO_VISIBLE Box
     {
       /// \brief Default constructor
       public: Box();
@@ -88,7 +89,7 @@ namespace gazebo
       /// \brief Equality test operatoer
       /// \param[in] _b Box to test
       /// \return True if equal
-      public: bool operator==(const Box &_b);
+      public: bool operator==(const Box &_b) const;
 
       /// \brief Subtract a vector from the min and max values
       /// \param _v The vector to use during subtraction

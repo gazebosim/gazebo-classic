@@ -1,38 +1,55 @@
 include_directories(
-  ${PROJECT_BINARY_DIR}/gazebo
-  ${PROJECT_SOURCE_DIR}/gazebo
+  ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
+  ${SDF_INCLUDE_DIRS}
+  ${OGRE_INCLUDE_DIRS}
 )
 
-if(HAVE_URDFDOM_HEADERS)
-  link_directories(
-    ${urdfdom_LIBRARY_DIRS}
-    ${urdfdom_headers_LIBRARY_DIRS})
-endif(HAVE_URDFDOM_HEADERS)
+# Tinyxml are used since the plugins are linking against gazebo_common
+# which uses tinxyml. Not defining the link directory here will end up 
+# failures in clang.
+link_directories(
+  ${SDF_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
+)
 
-if(HAVE_CONSOLE_BRIDGE)
-  link_directories(
-    ${console_bridge_LIBRARY_DIRS})
-endif(HAVE_CONSOLE_BRIDGE)
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
 
 set (plugins
+  BreakableJointPlugin
   CameraPlugin
-  DepthCameraPlugin
-  GpuRayPlugin
+  CartDemoPlugin
   ContactPlugin
-  CartTestPlugin
-  ForceTorquePlugin
-  ModelTrajectoryTestPlugin
-  RayPlugin
-  RubblePlugin
-  SpringTestPlugin
+  DepthCameraPlugin
   DiffDrivePlugin
+  ForceTorquePlugin
+  GpuRayPlugin
   JointTrajectoryPlugin
+  LiftDragPlugin
+  ModelPropShop
+  MudPlugin
+  PressurePlugin
+  RayPlugin
+  RaySensorNoisePlugin
+  RubblePlugin
+  SkidSteerDrivePlugin
+  SonarPlugin
+  SphereAtlasDemoPlugin
   VehiclePlugin)
 
+set(GAZEBO_PLUGIN_INSTALL_DIR
+  ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
+)
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors)
-  install (TARGETS ${src} DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
+  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})
+
+target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
+set_target_properties(BreakableJointPlugin PROPERTIES
+  INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
+)

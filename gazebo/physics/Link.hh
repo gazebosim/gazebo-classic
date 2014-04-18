@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@
 #include <vector>
 #include <string>
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportTypes.hh"
+
+#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -32,9 +36,16 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace util
+  {
+    class OpenALSource;
+    class OpenALSink;
+  }
+
   namespace physics
   {
     class Model;
@@ -47,7 +58,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class Link : public Entity
+    class GAZEBO_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.
@@ -69,12 +80,21 @@ namespace gazebo
       /// \brief Reset the link.
       public: void Reset();
 
+      /// \brief Reset the link.
+      public: void ResetPhysicsStates();
+
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Update the body.
-      public: virtual void Update();
+      /// \brief Update the collision.
+      /// \param[in] _info Update information.
+      public: void Update(const common::UpdateInfo &_info);
+      using Base::Update;
+
+      /// \brief Set the scale of the link.
+      /// \param[in] _scale Scale to set the link to.
+      public: void SetScale(const math::Vector3 &_scale);
 
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
@@ -95,13 +115,12 @@ namespace gazebo
 
       /// \brief Get the gravity mode.
       /// \return True if gravity is enabled.
-      public: virtual bool GetGravityMode() = 0;
+      public: virtual bool GetGravityMode() const = 0;
 
       /// \brief Set whether this body will collide with others in the
       /// model.
       /// \param[in] _collid True to enable collisions.
       public: virtual void SetSelfCollide(bool _collide) = 0;
-
 
       /// \brief Set the collide mode of the body.
       /// \param[in] _mode Collision Mode,
@@ -116,7 +135,7 @@ namespace gazebo
       /// \brief Get Self-Collision Flag, if this is true, this body will
       /// collide with other bodies even if they share the same parent.
       /// \return True if self collision is enabled.
-      public: bool GetSelfCollide();
+      public: bool GetSelfCollide() const;
 
       /// \brief Set the laser retro reflectiveness.
       /// \param[in] _retro Retro value for all child collisions.
@@ -178,6 +197,45 @@ namespace gazebo
       /// \param[in] _torque Torque value to add.
       public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
 
+      /// \brief Get the pose of the body's center of gravity in the world
+      ///        coordinate frame.
+      /// \return Pose of the body's center of gravity in the world coordinate
+      ///         frame.
+      public: math::Pose GetWorldCoGPose() const;
+
+      /// \brief Get the linear velocity of the origin of the link frame,
+      ///        expressed in the world frame.
+      /// \return Linear velocity of the link frame.
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              {return this->GetWorldLinearVel(math::Vector3::Zero);}
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in a body-fixed frame. If
+      ///        no offset is given, the velocity at the origin of the Link
+      ///        frame will be returned.
+      /// \param[in] _offset Offset of the point from the origin of the Link
+      ///                    frame, expressed in the body-fixed frame.
+      /// \return Linear velocity of the point on the body
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset) const = 0;
+
+      /// \brief Get the linear velocity of a point on the body in the world
+      ///        frame, using an offset expressed in an arbitrary frame.
+      /// \param[in] _offset Offset from the origin of the link frame expressed
+      ///                    in a frame defined by _q.
+      /// \param[in] _q Describes the rotation of a reference frame relative to
+      ///               the world reference frame.
+      /// \return Linear velocity of the point on the body in the world frame.
+      public: virtual math::Vector3 GetWorldLinearVel(
+                  const math::Vector3 &_offset,
+                  const math::Quaternion &_q) const = 0;
+
+      /// \brief Get the linear velocity at the body's center of gravity in the
+      ///        world frame.
+      /// \return Linear velocity at the body's center of gravity in the world
+      ///         frame.
+      public: virtual math::Vector3 GetWorldCoGLinearVel() const = 0;
+
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
       public: math::Vector3 GetRelativeLinearVel() const;
@@ -231,10 +289,25 @@ namespace gazebo
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
 
+      /// \brief Get the world pose of the link inertia (cog position
+      /// and Moment of Inertia frame). This differs from GetWorldCoGPose(),
+      /// which returns the cog position in the link frame
+      /// (not the Moment of Inertia frame).
+      /// \return Inertial pose in world frame.
+      public: math::Pose GetWorldInertialPose() const;
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
+      public: math::Matrix3 GetWorldInertiaMatrix() const;
+
+      /// \cond
+      /// This is an internal function
       /// \brief Get a collision by id.
       /// \param[in] _id Id of the collision object to find.
       /// \return Pointer to the collision, NULL if the id is invalid.
       public: CollisionPtr GetCollisionById(unsigned int _id) const;
+      /// \endcond
 
       /// \brief Get a child collision by name
       /// \param[in] _name Name of the collision object.
@@ -330,13 +403,17 @@ namespace gazebo
       /// \param[in] _joint Joint that is a parent of this link.
       public: void AddParentJoint(JointPtr _joint);
 
-      /// \brief Remove Joints that have this Link as a parent Link.
-      /// \param[in] _joint Joint that is a child of this link.
-      public: void RemoveChildJoint(JointPtr _joint);
+      /// \brief Remove Joints that have this Link as a child Link.
+      /// \param[in] _jointName Parent Joint name.
+      public: void RemoveParentJoint(const std::string &_jointName);
 
-      /// \brief Remove Joints that have this Link as a child Link
-      /// \param[in] _joint Joint that is a parent of this link.
-      public: void RemoveParentJoint(JointPtr _joint);
+      /// \brief Remove Joints that have this Link as a parent Link
+      /// \param[in] _jointName Child Joint name.
+      public: void RemoveChildJoint(const std::string &_jointName);
+
+      // Documentation inherited.
+      public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
@@ -377,6 +454,44 @@ namespace gazebo
       /// \return Vector of parent Links connected by joints.
       public: Link_V GetParentJointsLinks() const;
 
+      /// \brief Enable/Disable link data publishing
+      /// \param[in] _enable True to enable publishing, false to stop publishing
+      public: void SetPublishData(bool _enable);
+
+      /// \brief Get the parent joints.
+      public: Joint_V GetParentJoints() const;
+
+      /// \brief Get the child joints.
+      public: Joint_V GetChildJoints() const;
+
+      /// \brief Remove a collision from the link.
+      /// \param[int] _name Name of the collision to remove.
+      public: void RemoveCollision(const std::string &_name);
+
+      /// \brief Returns this link's potential energy,
+      /// based on position in world frame and gravity.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential() const;
+
+      /// \brief Returns this link's kinetic energy
+      /// computed using link's CoG velocity in the inertial (world) frame.
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic() const;
+
+      /// \brief Returns this link's total energy, or
+      /// sum of Link::GetWorldEnergyPotential() and
+      /// Link::GetWorldEnergyKinetic().
+      /// \return this link's total energy
+      public: double GetWorldEnergy() const;
+
+      /// \brief Freeze link to ground (inertial frame).
+      /// \param[in] _static if true, freeze link to ground.  Otherwise
+      /// unfreeze link.
+      public: virtual void SetLinkStatic(bool _static) = 0;
+
+      /// \brief Publish timestamped link data such as velocity.
+      private: void PublishData();
+
       /// \brief Load a new collision helper function.
       /// \param[in] _sdf SDF element used to load the collision.
       private: void LoadCollision(sdf::ElementPtr _sdf);
@@ -385,14 +500,25 @@ namespace gazebo
       /// entities.
       private: void SetInertialFromCollisions();
 
+      /// \brief On collision callback.
+      /// \param[in] _msg Message that contains contact information.
+      private: void OnCollision(ConstContactsPtr &_msg);
+
+      /// \brief Parse visuals from SDF
+      private: void ParseVisuals();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
       /// \brief Center of gravity visual elements.
       protected: std::vector<std::string> cgVisuals;
 
+      /// \def Visuals_M
+      /// \brief Map of unique ID to visual message.
+      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
+
       /// \brief Link visual elements.
-      protected: std::vector<std::string> visuals;
+      protected: Visuals_M visuals;
 
       /// \brief Linear acceleration.
       protected: math::Vector3 linearAccel;
@@ -402,6 +528,9 @@ namespace gazebo
 
       /// \brief Offsets for the attached models.
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief This flag is set to true when the link is initialized.
+      protected: bool initialized;
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;
@@ -420,6 +549,33 @@ namespace gazebo
 
       /// \brief All the attached models.
       private: std::vector<ModelPtr> attachedModels;
+
+      /// \brief Link data publisher
+      private: transport::PublisherPtr dataPub;
+
+      /// \brief Link data message
+      private: msgs::LinkData linkDataMsg;
+
+      /// \brief True to publish data, false otherwise
+      private: bool publishData;
+
+      /// \brief Mutex to protect the publishData variable
+      private: boost::recursive_mutex *publishDataMutex;
+
+      /// \brief Cached list of collisions. This is here for performance.
+      private: Collision_V collisions;
+
+#ifdef HAVE_OPENAL
+      /// \brief All the audio sources
+      private: std::vector<util::OpenALSourcePtr> audioSources;
+
+      /// \brief An audio sink
+      private: util::OpenALSinkPtr audioSink;
+
+      /// \brief Subscriber to contacts with this collision. Used for audio
+      /// playback.
+      private: transport::SubscriberPtr audioContactsSub;
+#endif
     };
     /// \}
   }

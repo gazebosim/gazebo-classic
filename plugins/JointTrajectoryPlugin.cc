@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ JointTrajectoryPlugin::JointTrajectoryPlugin()
 /////////////////////////////////////////////////
 JointTrajectoryPlugin::~JointTrajectoryPlugin()
 {
-  event::Events::DisconnectWorldUpdateStart(this->updateConnection);
+  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
 }
 
 /////////////////////////////////////////////////
@@ -51,35 +51,36 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
-  this->updateConnection = event::Events::ConnectWorldUpdateStart(
-      boost::bind(&JointTrajectoryPlugin::UpdateStates, this));
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&JointTrajectoryPlugin::UpdateStates, this, _1));
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
-{
-  this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
-      this->model);
-
-  this->joint->SetModel(this->model);
-  math::Pose pose = _link->GetWorldPose();
-  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), _link, pose);
-  this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-  this->joint->SetHighStop(0, 0);
-  this->joint->SetLowStop(0, 0);
-  this->joint->SetAnchor(0, pose.pos);
-  this->joint->Init();
-}
-
-/////////////////////////////////////////////////
-void JointTrajectoryPlugin::UnfixLink()
-{
-  this->joint.reset();
-}
+// void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
+// {
+//   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+//       this->model);
+//
+//   this->joint->SetModel(this->model);
+//   math::Pose pose = _link->GetWorldPose();
+//   // math::Pose  pose(math::Vector3(0, 0, 0.2),
+//                       math::Quaternion(1, 0, 0, 0));
+//   this->joint->Load(physics::LinkPtr(), _link, pose);
+//   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
+//   this->joint->SetHighStop(0, 0);
+//   this->joint->SetLowStop(0, 0);
+//   this->joint->SetAnchor(0, pose.pos);
+//   this->joint->Init();
+// }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::UpdateStates()
+// void JointTrajectoryPlugin::UnfixLink()
+// {
+//   this->joint.reset();
+// }
+
+/////////////////////////////////////////////////
+void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)
 {
   common::Time cur_time = this->world->GetSimTime();
 

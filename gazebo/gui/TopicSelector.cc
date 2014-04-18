@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
  */
 
 #include "gazebo/transport/transport.hh"
-
-#include "gazebo/common/Events.hh"
-#include "gazebo/gui/JointControlWidget.hh"
 #include "gazebo/gui/TopicSelector.hh"
 
 using namespace gazebo;
@@ -111,8 +108,7 @@ void TopicSelector::GetTopicList()
     for (std::list<std::string>::iterator topicIter = iter->second.begin();
         topicIter != iter->second.end(); ++topicIter)
     {
-      if ((*topicIter).find("__dbg") == std::string::npos &&
-          std::find(added.begin(), added.end(), *topicIter) == added.end())
+      if (std::find(added.begin(), added.end(), *topicIter) == added.end())
       {
         QTreeWidgetItem *topicItem = new QTreeWidgetItem(topItem,
             QStringList(QString::fromStdString(*topicIter)));
@@ -135,6 +131,8 @@ void TopicSelector::OnOkay()
 /////////////////////////////////////////////////
 void TopicSelector::OnCancel()
 {
+  this->msgType.clear();
+  this->topicName.clear();
   this->done(QDialog::Rejected);
 }
 

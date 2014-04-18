@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Joint Visualization Class
- * Author: Nate Koenig
- */
 
 #ifndef _JOINTVISUAL_HH_
 #define _JOINTVISUAL_HH_
 
 #include <string>
-#include "rendering/Visual.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class JointVisual JointVisual.hh rendering/rendering.hh
     /// \brief Visualization for joints
-    class JointVisual : public Visual
+    class GAZEBO_VISIBLE JointVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual
@@ -46,9 +46,7 @@ namespace gazebo
       /// \brief Load the visual based on a message
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
-
-      /// \brief The visual used to draw the joint.
-      private: AxisVisualPtr axisVisual;
+      using Visual::Load;
     };
     /// \}
   }

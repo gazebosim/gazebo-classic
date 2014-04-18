@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<sdf version="1.3">
+  <world name="default">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <include>
+      <uri>model://camera</uri>
+      <pose>0 0 0 0 0 0</pose>
+      <name>camera_1</name>
+    </include>
+
+    <include>
+      <uri>model://camera</uri>
+      <pose>2 0 0 0 0 0</pose>
+      <name>camera_2</name>
+    </include>
+
+    <include>
+      <uri>model://hokuyo</uri>
+      <pose>-2 0 0 0 0 0</pose>
+      <name>laser_1</name>
+    </include>
+
+    <include>
+      <uri>model://hokuyo</uri>
+      <pose>-4 0 0 0 0 0</pose>
+      <name>laser_2</name>
+    </include>
+
+  </world>
+</sdf>

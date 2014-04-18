@@ -14,5 +14,3 @@ message Image
   // repeated uint32 data          = 5; // Actual data, size if (step * rows)
   required bytes data          = 5; // Actual data, size if (step * rows)
 }
-
-

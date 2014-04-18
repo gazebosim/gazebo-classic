@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,29 @@
  * limitations under the License.
  *
 */
+#include <boost/program_options.hpp>
+#include <signal.h>
 #include <google/protobuf/message.h>
+#include <boost/thread.hpp>
 
-#include "transport/Transport.hh"
-#include "transport/TransportTypes.hh"
-#include "transport/Node.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/Node.hh"
 
-#include "common/Animation.hh"
-#include "common/KeyFrame.hh"
+#include "gazebo/common/Animation.hh"
+#include "gazebo/common/KeyFrame.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 std::list<common::Time> simTimes, realTimes;
 
-/////////////////////////////////////////////////
-void help()
-{
-  std::cerr << "This tool displays statistics about a running Gazebo world.\n"
-            << "  Usage: gzstats <world_name>\n"
-            << "    <world_name> : Output statistics for the given world. "
-            << " (Default = \"default\")\n"
-            << "    help         : This help text\n";
-}
+boost::mutex mutex;
+boost::condition_variable condition;
+
+bool g_plot;
 
 /////////////////////////////////////////////////
 void cb(ConstWorldStatisticsPtr &_msg)
@@ -66,6 +65,11 @@ void cb(ConstWorldStatisticsPtr &_msg)
     ++simIter;
     ++realIter;
   }
+
+  // Prevent divide by zero
+  if (realAvg <= 0)
+    return;
+
   simAvg = simAvg / realAvg;
 
   if (simAvg > 0)
@@ -79,36 +83,107 @@ void cb(ConstWorldStatisticsPtr &_msg)
   else
     paused = 'F';
 
-  printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
-      percent, simTime.Double(), realTime.Double(), paused);
+  if (g_plot)
+  {
+    static bool first = true;
+    if (first)
+    {
+      printf("# real-time factor (percent), simtime (sec), realtime (sec), "
+             "paused (T or F)\n");
+      first = false;
+    }
+    printf("%4.2f, %16.6f, %16.6f, %c\n",
+        percent, simTime.Double(), realTime.Double(), paused);
+    fflush(stdout);
+  }
+  else
+    printf("Factor[%4.2f] SimTime[%4.2f] RealTime[%4.2f] Paused[%c]\n",
+        percent, simTime.Double(), realTime.Double(), paused);
+}
+
+//////////////////////////////////////////////////
+void SignalHandler(int /*dummy*/)
+{
+  boost::mutex::scoped_lock lock(mutex);
+  condition.notify_all();
+  return;
 }
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
-  std::string worldName = "default";
-  if (argc > 1)
-    worldName = argv[1];
-
-  if (worldName == "help")
+  if (signal(SIGINT, SignalHandler) == SIG_ERR)
   {
-    help();
+    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return -1;
   }
 
-  transport::init();
+  po::options_description desc("Options");
+  desc.add_options()
+    ("help,h", "Print help message.")
+    ("plot,p", "Output comma-separated values, useful for processing and "
+               "plotting.")
+    ("world-name,w", po::value<std::string>(), "The Gazebo world to monitor.");
+  po::variables_map vm;
 
-  transport::NodePtr node(new transport::Node());
+  try
+  {
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+  }
+  catch(po::unknown_option& e)
+  {
+    std::cerr << e.what() << std::endl;
+    std::cerr << desc << std::endl;
+    return 1;
+  }
 
-  node->Init(worldName);
+  po::notify(vm);
 
-  std::string topic = "~/world_stats";
+  if (vm.count("help"))
+  {
+    std::cerr << "gzstats -- DEPRECATED(see 'gz help sdf')\n\n";
 
-  transport::SubscriberPtr sub = node->Subscribe(topic, cb);
-  transport::run();
+    std::cerr << "`gzstats` [options]\n\n";
 
-  while (true)
-    common::Time::MSleep(10);
+    std::cerr << "This tool displays statistics about a running "
+      "Gazebo world.\n\n";
+
+    std::cerr << desc << "\n";
+
+    std::cerr << "See also:\n"
+      << "Examples and more information can be found at: "
+      << "http://gazebosim.org/wiki/Tools#World_Statistics\n";
+
+    return 1;
+  }
+
+  std::string worldName;
+  if (vm.count("world-name"))
+  {
+    worldName = vm["world-name"].as<std::string>();
+  }
+
+  if (vm.count("plot"))
+  {
+    g_plot = true;
+  }
+
+  if (transport::init())
+  {
+    transport::NodePtr node(new transport::Node());
+
+    node->Init(worldName);
+
+    std::string topic = "~/world_stats";
+
+    transport::SubscriberPtr sub = node->Subscribe(topic, cb);
+    transport::run();
+
+    boost::mutex::scoped_lock lock(mutex);
+    condition.wait(lock);
+  }
 
   transport::fini();
+
+  return 0;
 }

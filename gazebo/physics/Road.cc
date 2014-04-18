@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,24 +36,28 @@ Road::~Road()
 /////////////////////////////////////////////////
 void Road::Load(sdf::ElementPtr _elem)
 {
+  Base::Load(_elem);
+  this->SetName(_elem->Get<std::string>("name"));
+}
+
+/////////////////////////////////////////////////
+void Road::Init()
+{
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
+  this->node->Init();
 
   this->roadPub = this->node->Advertise<msgs::Road>("~/roads", 10);
 
   msgs::Road msg;
-  Base::Load(_elem);
-
-  this->SetName(_elem->GetValueString("name"));
   msg.set_name(this->GetName());
 
-  this->width = _elem->GetValueDouble("width");
+  this->width = this->sdf->Get<double>("width");
   msg.set_width(this->width);
 
-  sdf::ElementPtr pointElem = _elem->GetElement("point");
+  sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector3 point = pointElem->GetValueVector3();
+    math::Vector3 point = pointElem->Get<math::Vector3>();
     pointElem = pointElem->GetNextElement("point");
 
     msgs::Vector3d *ptMsg = msg.add_point();
@@ -61,9 +65,4 @@ void Road::Load(sdf::ElementPtr _elem)
   }
 
   this->roadPub->Publish(msg);
-}
-
-/////////////////////////////////////////////////
-void Road::Init()
-{
 }

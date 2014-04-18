@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,32 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
 #include <vector>
 #include <list>
+#include <set>
 #include <deque>
 #include <string>
+#include <boost/thread.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
+
+#include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/sdf/sdf.hh"
-
-namespace boost
-{
-  class thread;
-  class mutex;
-  class recursive_mutex;
-}
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -63,10 +56,9 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class World : public boost::enable_shared_from_this<World>
+    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
-      ///
       /// Constructor for the World. Must specify a unique name.
       /// \param[in] _name Name of the world.
       public: explicit World(const std::string &_name = "");
@@ -75,38 +67,40 @@ namespace gazebo
       public: ~World();
 
       /// \brief Load the world using SDF parameters.
-      ///
       /// Load a world from and SDF pointer.
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Save a world to a file.
-      ///
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
       public: void Save(const std::string &_filename);
 
       /// \brief Initialize the world.
-      ///
       /// This is called after Load.
       public: void Init();
 
       /// \brief Run the world in a thread.
-      ///
       /// Run the update loop.
-      public: void Run();
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void Run(unsigned int _iterations = 0);
+
+      /// \brief Return the running state of the world.
+      /// \return True if the world is running.
+      public: bool GetRunning() const;
 
       /// \brief Stop the world.
-      ///
       /// Stop the update loop.
       public: void Stop();
 
       /// \brief Finalize the world.
-      ///
       /// Call this function to tear-down the world.
       public: void Fini();
 
       /// \brief Remove all entities from the world.
+      /// This function has delayed effect. Models are cleared at the end
+      /// of the current update iteration.
       public: void Clear();
 
       /// \brief Get the name of the world.
@@ -114,17 +108,19 @@ namespace gazebo
       public: std::string GetName() const;
 
       /// \brief Return the physics engine.
-      ///
       /// Get a pointer to the physics engine used by the world.
       /// \return Pointer to the physics engine.
       public: PhysicsEnginePtr GetPhysicsEngine() const;
+
+      /// \brief Return the spherical coordinates converter.
+      /// \return Pointer to the spherical coordinates converter.
+      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const;
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
       public: unsigned int GetModelCount() const;
 
       /// \brief Get a model based on an index.
-      ///
       /// Get a Model using an index, where index must be greater than zero
       /// and less than World::GetModelCount()
       /// \param[in] _index The index of the model [0..GetModelCount)
@@ -136,7 +132,6 @@ namespace gazebo
       public: Model_V GetModels() const;
 
       /// \brief Reset with options.
-      ///
       /// The _type parameter specifies which type of eneities to reset. See
       /// Base::EntityType.
       /// \param[in] _type The type of reset.
@@ -149,13 +144,11 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Get the selected Entity.
-      ///
       /// The selected entity is set via the GUI.
       /// \return A point to the Entity, NULL if nothing is selected.
       public: EntityPtr GetSelectedEntity() const;
 
       /// \brief Print Entity tree.
-      ///
       /// Prints alls the entities to stdout.
       public: void PrintEntityTree();
 
@@ -189,7 +182,6 @@ namespace gazebo
       public: void SetPaused(bool _p);
 
       /// \brief Get an element by name.
-      ///
       /// Searches the list of entities, and return a pointer to the model
       /// with a matching _name.
       /// \param[in] _name The name of the Model to find.
@@ -197,7 +189,6 @@ namespace gazebo
       public: BasePtr GetByName(const std::string &_name);
 
       /// \brief Get a model by name.
-      ///
       /// This function is the same as GetByName, but limits the search to
       /// only models.
       /// \param[in] _name The name of the Model to find.
@@ -205,22 +196,22 @@ namespace gazebo
       public: ModelPtr GetModel(const std::string &_name);
 
       /// \brief Get a pointer to an Entity based on a name.
-      ///
       /// This function is the same as GetByName, but limits the search to
       /// only Entities.
       /// \param[in] _name The name of the Entity to find.
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get the nearest model below a point.
-      ///
+      /// \brief Get the nearest model below and not encapsulating a point.
+      /// Only objects below the start point can be returned. Any object
+      /// that encapsulates the start point can not be returned from this
+      /// function.
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
 
       /// \brief Get the nearest entity below a point.
-      ///
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
@@ -232,19 +223,16 @@ namespace gazebo
       public: void SetState(const WorldState &_state);
 
       /// \brief Insert a model from an SDF file.
-      ///
       /// Spawns a model into the world base on and SDF file.
       /// \param[in] _sdfFilename The name of the SDF file (including path).
       public: void InsertModelFile(const std::string &_sdfFilename);
 
       /// \brief Insert a model from an SDF string.
-      ///
       /// Spawns a model into the world base on and SDF string.
       /// \param[in] _sdfString A string containing valid SDF markup.
       public: void InsertModelString(const std::string &_sdfString);
 
       /// \brief Insert a model using SDF.
-      ///
       /// Spawns a model into the world base on and SDF object.
       /// \param[in] _sdf A reference to an SDF object.
       public: void InsertModelSDF(const sdf::SDF &_sdf);
@@ -255,20 +243,23 @@ namespace gazebo
       public: std::string StripWorldName(const std::string &_name) const;
 
       /// \brief Enable all links in all the models.
-      ///
       /// Enable is a physics concept. Enabling means that the physics
       /// engine should update an entity.
       public: void EnableAllModels();
 
       /// \brief Disable all links in all the models.
-      ///
       /// Disable is a physics concept. Disabling means that the physics
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Step the world forward in time.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -304,18 +295,33 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
-      /// \brief Enqueue a pose message for publication.
-      /// These messages will be transmitted at the end of every iteration.
-      /// \param[in] _msg The message to enqueue.
-      public: void EnqueueMsg(msgs::Pose *_msg);
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
 
+      /// \brief Publish pose updates for a model.
+      /// This list of models to publish is processed and cleared once every
+      /// iteration.
+      /// \param[in] _model Pointer to the model to publish.
+      public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Get the total number of iterations.
+      /// \return Number of iterations that simulation has taken.
+      public: uint32_t GetIterations() const;
+
+      /// \brief Get the current scene in message form.
+      /// \return The scene state as a protobuf message.
+      public: msgs::Scene GetSceneMsg() const;
+
+      /// \cond
+      /// This is an internal function.
       /// \brief Get a model by id.
-      ///
       /// Each Entity has a unique ID, this function finds a Model with
       /// a passed in _id.
       /// \param[in] _id The id of the Model
       /// \return A pointer to the model, or NULL if no Model was found.
       private: ModelPtr GetModelById(unsigned int _id);
+      /// \endcond
 
       /// \brief Load all plugins.
       ///
@@ -397,7 +403,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.
@@ -409,19 +415,24 @@ namespace gazebo
       /// \param[in] _model Pointer to the model to get the data from.
       private: void FillModelMsg(msgs::Model &_msg, ModelPtr _model);
 
-      /// \brief Process all recieved entity messages.
+      /// \brief Process all received entity messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessEntityMsgs();
 
-      /// \brief Process all recieved request messages.
+      /// \brief Process all received request messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessRequestMsgs();
 
-      /// \brief Process all recieved factory messages.
+      /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Process all recieved model messages.
+      /// \brief Remove a model from the cached list of models.
+      /// This does not delete the model.
+      /// \param[in] _name Name of the model to remove.
+      private: void RemoveModel(const std::string &_name);
+
+      /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
 
@@ -434,11 +445,21 @@ namespace gazebo
       /// \brief Publish the world stats message.
       private: void PublishWorldStats();
 
+      /// \brief Thread function for logging state data.
+      private: void LogWorker();
+
+      /// \brief Callback when a light message is received.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightMsg(ConstLightPtr &_msg);
+
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
 
       /// \brief Pointer the physics engine.
       private: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Pointer the spherical coordinates data.
+      private: common::SphericalCoordinatesPtr sphericalCoordinates;
 
       /// \brief The root of all entities in the world.
       private: BasePtr rootElement;
@@ -451,9 +472,6 @@ namespace gazebo
 
       /// \brief The entity currently selected by the user.
       private: EntityPtr selectedEntity;
-
-      /// \brief Incoming message buffer.
-      private: std::vector<google::protobuf::Message> messages;
 
       /// \brief Name of the world.
       private: std::string name;
@@ -485,6 +503,9 @@ namespace gazebo
       /// \brief Publisher for world statistics messages.
       private: transport::PublisherPtr statPub;
 
+      /// \brief Publisher for diagnostic messages.
+      private: transport::PublisherPtr diagPub;
+
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
 
@@ -500,6 +521,9 @@ namespace gazebo
       /// \brief Publisher for pose messages.
       private: transport::PublisherPtr posePub;
 
+      /// \brief Publisher for local pose messages.
+      private: transport::PublisherPtr poseLocalPub;
+
       /// \brief Subscriber to world control messages.
       private: transport::SubscriberPtr controlSub;
 
@@ -508,6 +532,9 @@ namespace gazebo
 
       /// \brief Subscriber to joint messages.
       private: transport::SubscriberPtr jointSub;
+
+      /// \brief Subscriber to light messages.
+      private: transport::SubscriberPtr lightSub;
 
       /// \brief Subscriber to model messages.
       private: transport::SubscriberPtr modelSub;
@@ -524,9 +551,6 @@ namespace gazebo
       /// \brief Function pointer to the model update function.
       private: void (World::*modelUpdateFunc)();
 
-      /// \brief Period used to send out world statistics.
-      private: common::Time statPeriod;
-
       /// \brief Last time a world statistics message was sent.
       private: common::Time prevStatTime;
 
@@ -536,7 +560,7 @@ namespace gazebo
       /// \brief Used to compute a more accurate real time value.
       private: common::Time realTimeOffset;
 
-      /// \brief Mutext to protect incoming message buffers.
+      /// \brief Mutex to protect incoming message buffers.
       private: boost::recursive_mutex *receiveMutex;
 
       /// \brief Mutex to protext loading of models.
@@ -615,8 +639,12 @@ namespace gazebo
       /// \brief Period over which messages should be processed.
       private: common::Time processMsgsPeriod;
 
-      /// \brief Buffer of states.
-      private: std::deque<WorldState> states;
+      /// \brief Alternating buffer of states.
+      private: std::deque<WorldState> states[2];
+
+      /// \brief Keep track of current state buffer being updated
+      private: int currentStateBuffer;
+
       private: WorldState prevStates[2];
       private: int stateToggle;
 
@@ -627,8 +655,52 @@ namespace gazebo
       /// objects are inserted via the factory.
       private: sdf::SDFPtr factorySDF;
 
-      /// \brief The list of pose messages to output.
-      private: msgs::Pose_V poseMsgs;
+      /// \brief The list of models that need to publish their pose.
+      private: std::set<ModelPtr> publishModelPoses;
+
+      /// \brief Info passed through the WorldUpdateBegin event.
+      private: common::UpdateInfo updateInfo;
+
+      /// \brief The number of simulation iterations.
+      private: uint64_t iterations;
+
+      /// \brief The number of simulation iterations to take before stopping.
+      private: uint64_t stopIterations;
+
+      /// \brief Condition used for log worker.
+      private: boost::condition_variable logCondition;
+
+      /// \brief Condition used to guarantee the log worker thread doesn't
+      /// skip an interation.
+      private: boost::condition_variable logContinueCondition;
+
+      /// \brief Last iteration recorded by the log worker thread.
+      private: uint64_t logPrevIteration;
+
+      /// \brief Real time value set from a log file.
+      private: common::Time logRealTime;
+
+      /// \brief Mutex to protect the log worker thread.
+      private: boost::mutex logMutex;
+
+      /// \brief Mutex to protect the log state buffers
+      private: boost::mutex logBufferMutex;
+
+      /// \brief Mutex to protect the deleteEntity list.
+      private: boost::mutex entityDeleteMutex;
+
+      /// \brief Worker thread for logging.
+      private: boost::thread *logThread;
+
+      /// \brief A cached list of models. This is here for performance.
+      private: Model_V models;
+
+      /// \todo In gazebo 3.0 this should be move to the proper section.
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
     };
     /// \}
   }
