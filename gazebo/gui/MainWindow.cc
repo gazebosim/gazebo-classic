@@ -191,6 +191,24 @@ MainWindow::~MainWindow()
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
+#ifdef HAVE_OCULUS
+  int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
+
+  if (oculusAutoLaunch == 1 && !visual.empty())
+  {
+    gui::OculusWindow *oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+
+    if (oculusWindow->CreateCamera())
+      oculusWindow->show();
+  }
+  else
+    gzlog << "Oculus: No visual link specified in for attaching the camera. "
+         << "Did you forget to set ~/.gazebo/gui.ini?\n";
+#endif
 }
 
 /////////////////////////////////////////////////
