@@ -116,6 +116,7 @@ void OculusWindow::AttachCameraToVisual()
   if (tries >= 50)
   {
     gzerr << "Oculus: visual link not found and Oculus is not attached."
+          << std::endl;
     return;
   }
 
