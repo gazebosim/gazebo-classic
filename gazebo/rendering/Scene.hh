@@ -167,6 +167,11 @@ namespace gazebo
       /// \param[in] _name Name of the new camera.
       /// \return Pointer to the new camera.
       public: OculusCameraPtr CreateOculusCamera(const std::string &_name);
+
+      /// \brief Get the number of cameras in this scene
+      /// \return Number of cameras.
+      public: uint32_t GetOculusCameraCount() const;
+
 #endif
 
       /// \brief Create depth camera
@@ -186,7 +191,7 @@ namespace gazebo
                                          bool _autoRender = true);
 
       /// \brief Get the number of cameras in this scene
-      /// \return Number of lasers.
+      /// \return Number of cameras.
       public: uint32_t GetCameraCount() const;
 
       /// \brief Get a camera based on an index. Index must be between

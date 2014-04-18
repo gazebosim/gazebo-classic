@@ -578,6 +578,12 @@ OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 
   return camera;
 }
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetOculusCameraCount() const
+{
+  return this->oculusCameras.size();
+}
 #endif
 
 //////////////////////////////////////////////////

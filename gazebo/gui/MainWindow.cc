@@ -34,6 +34,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -807,12 +808,21 @@ void MainWindow::Orbit()
 void MainWindow::ViewOculus()
 {
 #ifdef HAVE_OCULUS
+  rendering::ScenePtr scene = rendering::get_scene();
+  if (scene->GetOculusCameraCount() != 0)
+  {
+    gzlog << "Oculus camera already exists." << std::endl;
+    return;
+  }
+
+
   int oculusX = getINIProperty<int>("oculus.x", 0);
   int oculusY = getINIProperty<int>("oculus.y", 0);
   std::string visual = getINIProperty<std::string>("oculus.visual", "");
 
   if (!visual.empty())
   {
+
     gui::OculusWindow *oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
