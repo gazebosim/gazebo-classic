@@ -3,7 +3,7 @@ varying vec4 vertex_depth;
 
 void main()
 {
-  float depth = (vertex_depth.z+0.0005) / vertex_depth.w;
+  float depth = (vertex_depth.z) / vertex_depth.w;
 
   // Linear
   // float depth = (vertex_depth.z - depth_range.x) / depth_range.w;
