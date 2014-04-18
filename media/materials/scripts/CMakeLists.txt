@@ -21,6 +21,7 @@ set (files
   VPL.material
   VPL.program
   shadow_caster.program
+  warp.material
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/scripts/)
