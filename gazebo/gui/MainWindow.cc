@@ -198,7 +198,6 @@ void MainWindow::Load()
 
   if (oculusAutoLaunch == 1 && !visual.empty())
   {
-    std::cout << "Creating the Oculus window" << std::endl;
     gui::OculusWindow *oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
@@ -814,7 +813,6 @@ void MainWindow::ViewOculus()
 
   if (!visual.empty())
   {
-    std::cout << "Creating the Oculus window" << std::endl;
     gui::OculusWindow *oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
