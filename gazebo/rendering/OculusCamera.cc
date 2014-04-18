@@ -343,7 +343,7 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 
 //////////////////////////////////////////////////
 void OculusCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
-                                       float /*w_*/, float /*h_*/)
+                                         float /*w_*/, float /*h_*/)
 {
   // this->viewport->setDimensions(x, y, w, h);
 }
@@ -603,7 +603,7 @@ void OculusCamera::Oculus()
     cam = i == 0 ? this->camera : this->rightCamera;
 
     int idx = i * 2 - 1;
-    if(this->stereoConfig)
+    if (this->stereoConfig)
     {
       // Setup cameras.
       cam->setNearClipDistance(this->stereoConfig->GetEyeToScreenDistance());
@@ -648,7 +648,7 @@ void OculusCamera::Oculus()
 void OculusCamera::AdjustAspect(double _v)
 {
   Ogre::Camera *cam;
-  for(int i=0;i<2;++i)
+  for(int i = 0; i < 2; ++i)
   {
     cam = i == 0 ? this->camera : this->rightCamera;
     cam->setAspectRatio(cam->getAspectRatio() + _v);
