@@ -554,7 +554,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
   if (this->animState)
     return;
 
-  this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
+  this->sceneNode->_setDerivedPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
   this->sceneNode->needUpdate();
 }
 
@@ -569,8 +569,7 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   // Set the roll and yaw for sceneNode
   math::Quaternion s(rpy.x, rpy.y, rpy.z);
 
-  this->sceneNode->setOrientation(
-      Ogre::Quaternion(s.w, s.x, s.y, s.z));
+  this->sceneNode->_setDerivedOrientation(Ogre::Quaternion(s.w, s.x, s.y, s.z));
 
   this->sceneNode->needUpdate();
 }

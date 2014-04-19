@@ -367,6 +367,15 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   sensors::MultiCameraSensorPtr multicamera4 =
     boost::dynamic_pointer_cast<sensors::MultiCameraSensor>(sensor4);
 
+  ASSERT_TRUE(model1 != NULL);
+  ASSERT_TRUE(model2 != NULL);
+  ASSERT_TRUE(model3 != NULL);
+  ASSERT_TRUE(model4 != NULL);
+  ASSERT_TRUE(multicamera1 != NULL);
+  ASSERT_TRUE(camera2 != NULL);
+  ASSERT_TRUE(multicamera3 != NULL);
+  ASSERT_TRUE(multicamera4 != NULL);
+
   // check poses in world frame
   // each multicamera have 2 cameras
 
@@ -387,6 +396,18 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   math::Pose cameraPose(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
+
+  // Wait for the AttachToVisual request msg to be processed so that the camera
+  // is attached to the parent visual.
+  int sleep = 0;
+  int maxSleep = 100;
+  while (cameraPose == multicamera1->GetCamera(0)->GetWorldPose()
+      && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
   // verify multicamera sensor's camera world pose
   EXPECT_EQ(cameraPose + multicamera1->GetPose() + model1->GetWorldPose(),
     multicamera1->GetCamera(0)->GetWorldPose());
@@ -435,6 +456,18 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   cameraPose = math::Pose(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
+
+  // Wait for the AttachToVisual request msg to be processed so that the camera
+  // is attached to the parent visual.
+  sleep = 0;
+  maxSleep = 100;
+  while (cameraPose == multicamera3->GetCamera(0)->GetWorldPose()
+      && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera3->GetPose() + model3->GetWorldPose(),
     multicamera3->GetCamera(0)->GetWorldPose());
@@ -467,6 +500,18 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   cameraPose = math::Pose(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
+
+  // Wait for the AttachToVisual request msg to be processed so that the camera
+  // is attached to the parent visual.
+  sleep = 0;
+  maxSleep = 100;
+  while (cameraPose == multicamera4->GetCamera(0)->GetWorldPose()
+      && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(0)->GetWorldPose());
@@ -478,6 +523,18 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   cameraPose = math::Pose(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
+
+  // Wait for the AttachToVisual request msg to be processed so that the camera
+  // is attached to the parent visual.
+  sleep = 0;
+  maxSleep = 100;
+  while (cameraPose == multicamera4->GetCamera(1)->GetWorldPose()
+      && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
   // verify multicamera4 sensor's camera 1 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(1)->GetWorldPose());
