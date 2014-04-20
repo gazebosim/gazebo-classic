@@ -37,7 +37,7 @@ static std::string forceTorqueSensorString =
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a ForceTorque sensor
-void ForceTorqueSensor_TEST::ForceTorqueSensorTest(const std::string &_physicsEngine)
+void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 {
   Load("worlds/pioneer2dx.world", true, _physicsEngine);
 
@@ -77,12 +77,14 @@ void ForceTorqueSensor_TEST::ForceTorqueSensorTest(const std::string &_physicsEn
 }
 
 /////////////////////////////////////////////////
-TEST_P(ForceTorqueSensor_TEST, ForceTorqueSensorTest)
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTest)
 {
   ForceTorqueSensorTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ForceTorqueSensor_TEST, PHYSICS_ENGINE_VALUES);
+INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+                        ForceTorqueSensor_TEST,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
