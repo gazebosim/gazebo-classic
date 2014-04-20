@@ -120,6 +120,11 @@ QToolBar
   border-radius: 0px;
 }
 
+QToolBar#playToolBar
+{
+  max-height: 25px;
+}
+
 QToolButton
 {
   padding: 2px;
@@ -639,6 +644,7 @@ QWidget#renderBottomFrame
 
 QWidget#timePanel
 {
+  max-height: 40px;
   background-color: #808080;
   border-bottom-right-radius: 10px;
 }
