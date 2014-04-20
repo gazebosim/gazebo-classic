@@ -24,7 +24,7 @@ using namespace gazebo;
 class ForceTorqueSensor_TEST : public ServerFixture,
                                public testing::WithParamInterface<const char*>
 {
-    public: void ForceTorqueSensorTest(const std::string &_physicsEngine);
+    public: void ForceTorqueTest(const std::string &_physicsEngine);
 };
 
 static std::string forceTorqueSensorString =
@@ -79,7 +79,7 @@ void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 TEST_P(ForceTorqueSensor_TEST, ForceTorqueTest)
 {
-  ForceTorqueSensorTest(GetParam());
+  ForceTorqueTest(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines,
