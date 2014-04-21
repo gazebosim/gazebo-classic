@@ -217,7 +217,7 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
       measured_torque = -1*wrench.body1Torque;
     }
   }
-  else if(measure_frame == CHILD_LINK)
+  else if (measure_frame == CHILD_LINK)
   {
     if (!parent_to_child)
     {
