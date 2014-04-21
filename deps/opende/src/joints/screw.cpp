@@ -258,7 +258,11 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             q[2] = node[0].body->posr.pos[2] - offset[2];
         }
         lin_disp = dCalcVectorDot3 ( ax1, q );
-        lin_err = -(lin_disp*thread_pitch-cumulative_angle);
+        // linear error should be scaled to length (lin_disp)
+        if (!_dequal(thread_pitch, 0.0))
+          lin_err = -(lin_disp-cumulative_angle/thread_pitch);
+        else
+          lin_err = 0.0;
         // printf("lin disp: %f lin err: %f\n", lin_disp, lin_err);
       }
 
