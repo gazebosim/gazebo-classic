@@ -29,10 +29,10 @@ message Physics
   optional int32 precon_iters                = 4;  // engine specific
   optional int32 iters                       = 5;  // engine specific
   optional double sor                        = 6;  // engine specific
-  optional double cfm                        = 7;  // engine specific
-  optional double erp                        = 8;  // engine specific
-  optional double contact_max_correcting_vel = 9;  // engine specific
-  optional double contact_surface_layer      = 10;  // engine specific
+  // optional double cfm                        = 7;  // engine specific
+  // optional double erp                        = 8;  // engine specific
+  // optional double contact_max_correcting_vel = 9;  // engine specific
+  // optional double contact_surface_layer      = 10;  // engine specific
   optional Vector3d gravity                  = 11;  // generic param
   optional bool enable_physics               = 12;  // generic param
   optional double real_time_factor           = 13;  // generic param

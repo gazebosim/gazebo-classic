@@ -50,6 +50,7 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  physics_custom.proto
   physics_bullet.proto
   physics_dart.proto
   physics_ode.proto
