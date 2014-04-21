@@ -364,13 +364,11 @@ unsigned int OculusCamera::GetTriangleCount() const
 //////////////////////////////////////////////////
 void OculusCamera::ToggleShowVisual()
 {
-  // this->visual->ToggleVisible();
 }
 
 //////////////////////////////////////////////////
 void OculusCamera::ShowVisual(bool /*_s*/)
 {
-  // this->visual->SetVisible(_s);
 }
 
 //////////////////////////////////////////////////

@@ -692,7 +692,6 @@ void MainWindow::OnFullScreen(bool _value)
     this->leftColumn->show();
     this->toolsWidget->show();
     this->menuBar->show();
-    this->centralWidget()->layout()->setContentsMargins(10, 10, 10, 10);
   }
 }
 
@@ -815,14 +814,12 @@ void MainWindow::ViewOculus()
     return;
   }
 
-
   int oculusX = getINIProperty<int>("oculus.x", 0);
   int oculusY = getINIProperty<int>("oculus.y", 0);
   std::string visual = getINIProperty<std::string>("oculus.visual", "");
 
   if (!visual.empty())
   {
-
     gui::OculusWindow *oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
