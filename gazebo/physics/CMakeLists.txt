@@ -145,5 +145,6 @@ set (gtest_sources
 gz_build_tests(${gtest_sources})
 
 
-add_library(PhysicsPluginExample SHARED PhysicsPluginExample.cc)
+add_library(PhysicsPluginExample SHARED PhysicsPluginExample.c)
 
+target_link_libraries(gazebo_physics PhysicsPluginExample)

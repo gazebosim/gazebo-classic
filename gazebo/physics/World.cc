@@ -163,7 +163,7 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
-  PhysicsPlugin *pl = this->CreatePhysicsPlugin("libphysicsexample.so");
+  PhysicsPlugin *pl = this->CreatePhysicsPlugin("libPhysicsPluginExample.so");
   pl->hello();
 
   this->loaded = false;
@@ -359,6 +359,14 @@ void World::Run(unsigned int _iterations)
   this->stopIterations = _iterations;
 
   this->thread = new boost::thread(boost::bind(&World::RunLoop, this));
+}
+
+//////////////////////////////////////////////////
+void World::RunBlocking(unsigned int _iterations)
+{
+  this->stop = false;
+  this->stopIterations = _iterations;
+  this->RunLoop();
 }
 
 //////////////////////////////////////////////////
@@ -2009,6 +2017,7 @@ void World::RemoveModel(const std::string &_name)
 //////////////////////////////////////////////////
 PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
 {
+  printf("A\n");
   PhysicsPlugin *plugin = NULL;
 
   // PluginPtr result;
@@ -2019,6 +2028,7 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
   std::list<std::string> pluginPaths =
     common::SystemPaths::Instance()->GetPluginPaths();
 
+  printf("B\n");
   for (iter = pluginPaths.begin();
       iter!= pluginPaths.end(); ++iter)
   {
@@ -2033,6 +2043,7 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
   if (!found)
     fullname = filename;
 
+  printf("C\n");
   union
   {
     PhysicsPlugin *(*func)();
@@ -2041,6 +2052,7 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
 
   std::string registerName = "create_engine";
 
+  printf("D\n");
   void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!dlHandle)
   {
@@ -2058,8 +2070,16 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
     return plugin;
   }
 
+  printf("REGISTER FUNC\n");
   // Register the new controller.
   plugin = registerFunc.func();
 
   return plugin;
+}
+
+
+/////////////////////////////////////////////////
+msgs::Scene World::GetSceneMsg() const
+{
+  return this->sceneMsg;
 }
