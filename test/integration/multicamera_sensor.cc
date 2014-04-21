@@ -384,6 +384,9 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_EQ(model1->GetWorldPose(),
     multicamera1->GetPose() + model1->GetWorldPose());
   EXPECT_EQ(model1->GetWorldPose(),
+    multicamera1->GetPose() + model1->GetWorldPose());
+
+  EXPECT_EQ(model1->GetWorldPose(),
     sensor1->GetPose() + model1->GetWorldPose());
 
   // multicamera1 sensor's camera 0 has a pose offset from the sensor
@@ -411,6 +414,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera world pose
   EXPECT_EQ(cameraPose + multicamera1->GetPose() + model1->GetWorldPose(),
     multicamera1->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model1->GetWorldPose().rot * multicamera1->GetPose().rot
+      * cameraPose.rot, multicamera1->GetCamera(0)->GetWorldRotation());
 
   // multicamera1 sensor's camera 1 has zero pose offset from the sensor
   EXPECT_EQ(multicamera1->GetPose() + model1->GetWorldPose(),
@@ -471,6 +476,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera3->GetPose() + model3->GetWorldPose(),
     multicamera3->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model3->GetWorldPose().rot * multicamera3->GetPose().rot
+      * cameraPose.rot, multicamera3->GetCamera(0)->GetWorldRotation());
 
   // multicamera3 sensor's camera 1 has zero pose offset from the sensor
   EXPECT_EQ(multicamera3->GetPose() + model3->GetWorldPose(),
@@ -515,6 +522,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(0)->GetWorldPose());
+  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
+      * cameraPose.rot, multicamera4->GetCamera(0)->GetWorldRotation());
 
   // multicamera4 sensor's camera 1 has a pose offset from the sensor
   EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
@@ -538,6 +547,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera4 sensor's camera 1 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(1)->GetWorldPose());
+  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
+      * cameraPose.rot, multicamera4->GetCamera(1)->GetWorldRotation());
 
   gzdbg << "model4 [" << model4->GetWorldPose() << "]\n"
         << "sensor4 [" << sensor4->GetPose() + model4->GetWorldPose() << "]\n"
