@@ -77,6 +77,10 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
     {
       measure_frame = CHILD_LINK;
     }
+    else if (measureFrameSDF == "joint")
+    {
+      measure_frame = JOINT;
+    }
     else
     {
       gzwarn << "ignoring unknown force_torque frame \"" << measureFrameSDF
@@ -88,6 +92,15 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
   {
     measure_frame = default_frame;
   }
+
+  // Save joint_child orientation, useful if the measure
+  // is expressed in joint orientation
+  GZ_ASSERT(this->parentJoint,
+            "parentJoint should be defined by single argument Load()");
+  math::Quaternion rotation_child_joint =
+    this->parentJoint->GetInitialAnchorPose().rot;
+  this->rotation_joint_child =
+    rotation_child_joint.GetInverse().GetAsMatrix3();
 
   // Handle measure direction
   bool default_direction_is_parent_to_child = false;
@@ -204,10 +217,8 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
       measured_torque = -1*wrench.body1Torque;
     }
   }
-  else
+  else if(measure_frame == CHILD_LINK)
   {
-    GZ_ASSERT(measure_frame == CHILD_LINK,
-              "measure_frame must be PARENT_LINK or CHILD_LINK");
     if (!parent_to_child)
     {
       measured_force = wrench.body2Force;
@@ -217,6 +228,21 @@ bool ForceTorqueSensor::UpdateImpl(bool /*_force*/)
     {
       measured_force = -1*wrench.body2Force;
       measured_torque = -1*wrench.body2Torque;
+    }
+  }
+  else
+  {
+    GZ_ASSERT(measure_frame == JOINT,
+              "measure_frame must be PARENT_LINK, CHILD_LINK or JOINT");
+    if (!parent_to_child)
+    {
+      measured_force = rotation_joint_child*wrench.body2Force;
+      measured_torque = rotation_joint_child*wrench.body2Torque;
+    }
+    else
+    {
+      measured_force = rotation_joint_child*(-1*wrench.body2Force);
+      measured_torque = rotation_joint_child*(-1*wrench.body2Torque);
     }
   }
 
