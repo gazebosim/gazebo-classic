@@ -384,9 +384,6 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_EQ(model1->GetWorldPose(),
     multicamera1->GetPose() + model1->GetWorldPose());
   EXPECT_EQ(model1->GetWorldPose(),
-    multicamera1->GetPose() + model1->GetWorldPose());
-
-  EXPECT_EQ(model1->GetWorldPose(),
     sensor1->GetPose() + model1->GetWorldPose());
 
   // multicamera1 sensor's camera 0 has a pose offset from the sensor
