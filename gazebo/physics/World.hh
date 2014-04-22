@@ -70,7 +70,10 @@ namespace gazebo
       /// \brief Load the world using SDF parameters.
       /// Load a world from and SDF pointer.
       /// \param[in] _sdf SDF parameters.
-      public: void Load(sdf::ElementPtr _sdf);
+      /// \param[in] _physicsPlugin Shared library filensmae that is a
+      /// physics plugin.
+      public: void Load(sdf::ElementPtr _sdf,
+                        const std::string &_physicsPlugin = "");
 
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
@@ -703,6 +706,9 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \brief Pointer to the physics plugin
+      private: PhysicsPlugin *physicsPlugin;
     };
     /// \}
   }

@@ -66,9 +66,11 @@ namespace gazebo
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.
     /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
+    /// \param[in] _physicsPlugin A physics plugin to load.
     /// \return True on success.
     public: bool LoadFile(const std::string &_filename="worlds/empty.world",
-                          const std::string &_physics="");
+                          const std::string &_physics="",
+                          const std::string &_physicsPlugin="");
 
     /// \brief Load the Server from an SDF string.
     /// \param[in] _sdfString SDF string from which to load a World.
@@ -95,8 +97,10 @@ namespace gazebo
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
     /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
+    /// \param[in] _physicsPlugin A physics plugin to load.
     private: bool LoadImpl(sdf::ElementPtr _elem,
-                           const std::string &_physics="");
+                           const std::string &_physics="",
+                           const std::string &_physicsPlugin="");
 
     /// \brief SIGINT handler
     /// \param[in] _v Unused.

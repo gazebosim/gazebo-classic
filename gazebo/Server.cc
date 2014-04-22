@@ -102,6 +102,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
+    ("physics-plugin,l", po::value<std::string>(),
+     "Specify a physics plugin to load. "
+     "This will suepercede the --physics option.")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -257,8 +260,14 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (this->vm.count("physics"))
       physics = this->vm["physics"].as<std::string>();
 
+    // Get the physics plugin name specified from the command line, or use ""
+    // if no physics plugin is specified.
+    std::string physicsPlugin;
+    if (this->vm.count("physics-plugin"))
+      physicsPlugin = this->vm["physics-plugin"].as<std::string>();
+
     // Load the server
-    if (!this->LoadFile(configFilename, physics))
+    if (!this->LoadFile(configFilename, physics, physicsPlugin))
       return false;
   }
 
@@ -275,7 +284,8 @@ bool Server::GetInitialized() const
 
 /////////////////////////////////////////////////
 bool Server::LoadFile(const std::string &_filename,
-                      const std::string &_physics)
+                      const std::string &_physics,
+                      const std::string &_physicsPlugin)
 {
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
@@ -300,7 +310,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  return this->LoadImpl(sdf->root, _physics);
+  return this->LoadImpl(sdf->root, _physics, _physicsPlugin);
 }
 
 /////////////////////////////////////////////////
@@ -332,9 +342,12 @@ bool Server::PreLoad()
 
 /////////////////////////////////////////////////
 bool Server::LoadImpl(sdf::ElementPtr _elem,
-                      const std::string &_physics)
+                      const std::string &_physics,
+                      const std::string &_physicsPlugin)
 {
   // If a physics engine is specified,
+  // \todo This is not very clean. Setting a command line argument should
+  // not modify SDF.
   if (_physics.length())
   {
     // Check if physics engine name is valid
@@ -365,7 +378,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
     // Create the world
     try
     {
-      physics::load_world(world, worldElem);
+      physics::load_world(world, worldElem, _physicsPlugin);
     }
     catch(common::Exception &e)
     {

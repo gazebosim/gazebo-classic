@@ -161,11 +161,8 @@ World::~World()
 }
 
 //////////////////////////////////////////////////
-void World::Load(sdf::ElementPtr _sdf)
+void World::Load(sdf::ElementPtr _sdf, const std::string &_physicsPlugin)
 {
-  PhysicsPlugin *pl = this->CreatePhysicsPlugin("libPhysicsPluginExample.so");
-  pl->hello();
-
   this->loaded = false;
   this->sdf = _sdf;
 
@@ -224,6 +221,9 @@ void World::Load(sdf::ElementPtr _sdf)
   std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
+
+  if (!_physicsPlugin.empty())
+    this->physicsPlugin = this->CreatePhysicsPlugin(_physicsPlugin);
 
   if (this->physicsEngine == NULL)
     gzthrow("Unable to create physics engine\n");
@@ -295,6 +295,12 @@ void World::Load(sdf::ElementPtr _sdf)
   event::Events::worldCreated(this->GetName());
 
   this->loaded = true;
+
+  // Initialize the physics plugin
+  if (this->physicsPlugin)
+  {
+    this->physicsPlugin->init();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -703,6 +709,12 @@ void World::Update()
 void World::Fini()
 {
   this->Stop();
+  if (this->physicsPlugin)
+  {
+    this->physicsPlugin->destroy();
+    this->physicsPlugin = NULL;
+  }
+
   this->plugins.clear();
 
   this->publishModelPoses.clear();
@@ -2017,7 +2029,6 @@ void World::RemoveModel(const std::string &_name)
 //////////////////////////////////////////////////
 PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
 {
-  printf("A\n");
   PhysicsPlugin *plugin = NULL;
 
   // PluginPtr result;
@@ -2028,7 +2039,6 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
   std::list<std::string> pluginPaths =
     common::SystemPaths::Instance()->GetPluginPaths();
 
-  printf("B\n");
   for (iter = pluginPaths.begin();
       iter!= pluginPaths.end(); ++iter)
   {
@@ -2043,16 +2053,14 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
   if (!found)
     fullname = filename;
 
-  printf("C\n");
   union
   {
     PhysicsPlugin *(*func)();
     void *ptr;
   } registerFunc;
 
-  std::string registerName = "create_engine";
+  std::string registerName = "create";
 
-  printf("D\n");
   void *dlHandle = dlopen(fullname.c_str(), RTLD_LAZY|RTLD_GLOBAL);
   if (!dlHandle)
   {
@@ -2070,13 +2078,11 @@ PhysicsPlugin *World::CreatePhysicsPlugin(const std::string &_filename)
     return plugin;
   }
 
-  printf("REGISTER FUNC\n");
   // Register the new controller.
   plugin = registerFunc.func();
 
   return plugin;
 }
-
 
 /////////////////////////////////////////////////
 msgs::Scene World::GetSceneMsg() const

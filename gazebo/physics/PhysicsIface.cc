@@ -118,9 +118,10 @@ void physics::stop_worlds()
 }
 
 /////////////////////////////////////////////////
-void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf)
+void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf,
+    const std::string &_physicsPlugin)
 {
-  _world->Load(_sdf);
+  _world->Load(_sdf, _physicsPlugin);
 }
 
 /////////////////////////////////////////////////

@@ -144,7 +144,8 @@ set (gtest_sources
 )
 gz_build_tests(${gtest_sources})
 
-
+# todo: This is just an example. This should be cleaned up and moved to a more permanent location.
 add_library(PhysicsPluginExample SHARED PhysicsPluginExample.c)
+install (TARGETS PhysicsPluginExample DESTINATION ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/)
 
 target_link_libraries(gazebo_physics PhysicsPluginExample)

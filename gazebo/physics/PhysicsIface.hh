@@ -55,8 +55,11 @@ namespace gazebo
     /// \brief Load world from sdf::Element pointer.
     /// \param[in] _world Pointer to a world.
     /// \param[in] _sdf SDF values to load from.
+    /// \param[in] _physicsPlugin Shared library filename that is a
+    /// physics plugin.
     GAZEBO_VISIBLE
-    void load_world(WorldPtr _world, sdf::ElementPtr _sdf);
+    void load_world(WorldPtr _world, sdf::ElementPtr _sdf,
+        const std::string &_physicsPlugin = "");
 
     /// \brief Init world given a pointer to it.
     /// \param[in] _world World to initialize.
