@@ -51,20 +51,28 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  // Simple shapes tree item
+  // Parts tree item
   this->modelItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Link Palette")));
   this->modelTreeWidget->addTopLevelItem(this->modelItem);
 
-  QTreeWidgetItem *modelChildItem =
+  QTreeWidgetItem *simpleShapesItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Simple Shapes")));
+  this->modelItem->addChild(simpleShapesItem);
+
+  QTreeWidgetItem *simpleShapesChildItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelItem->addChild(modelChildItem);
+  simpleShapesItem->addChild(simpleShapesChildItem);
+
 
   // Shapes buttons
   QWidget *modelWidget = new QWidget;
+  QWidget *customWidget = new QWidget;
   QVBoxLayout *modelLayout = new QVBoxLayout;
   QGridLayout *partsLayout = new QGridLayout;
+  QGridLayout *customLayout = new QGridLayout;
 
   // cylinder button
   QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
@@ -84,22 +92,37 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   boxButton->setChecked(false);
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
-  // Box button
-  QPushButton *customButton = new QPushButton(tr("Custom"), this);
+  partsLayout->addWidget(cylinderButton, 0, 0);
+  partsLayout->addWidget(sphereButton, 1, 0);
+  partsLayout->addWidget(boxButton, 2, 0);
+
+  modelWidget->setLayout(partsLayout);
+//  modelLayout->addLayout(partsLayout);
+
+  // custom button
+  QTreeWidgetItem *customItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Custom")));
+  this->modelItem->addChild(customItem);
+
+  QTreeWidgetItem *customChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  customItem->addChild(customChildItem);
+
+  QPushButton *customButton = new QPushButton(tr("Add"), this);
   customButton->setCheckable(true);
   customButton->setChecked(false);
   connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
+  customLayout->addWidget(customButton, 0, 0);
+  customWidget->setLayout(customLayout);
 
-  partsLayout->addWidget(cylinderButton, 0, 0);
-  partsLayout->addWidget(sphereButton, 0, 1);
-  partsLayout->addWidget(boxButton, 1, 0);
-  partsLayout->addWidget(customButton, 1, 1);
-
-  modelWidget->setLayout(modelLayout);
-  modelLayout->addLayout(partsLayout);
-  this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
+  this->modelTreeWidget->setItemWidget(simpleShapesChildItem, 0, modelWidget);
+  this->modelTreeWidget->setItemWidget(customChildItem, 0, customWidget);
   this->modelItem->setExpanded(true);
-  modelChildItem->setExpanded(true);
+  simpleShapesItem->setExpanded(true);
+  simpleShapesChildItem->setExpanded(true);
+  customItem->setExpanded(true);
+  customChildItem->setExpanded(true);
 
   this->partButtonGroup = new QButtonGroup;
   this->partButtonGroup->addButton(cylinderButton);
