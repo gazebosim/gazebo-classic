@@ -47,11 +47,20 @@ namespace gazebo
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
+      /// \brief Toggle main window's toolbar to display model editor icons.
+      private: void ToggleToolbar();
+
       /// \brief Contains all the model editor tools.
       private: ModelEditorPalette *modelPalette;
 
       /// \brief True if model editor is active.
       private: bool active;
+
+      /// \brief Qt action for adding a joint in the model editor.
+      private: QAction *jointAct;
+
+      /// \brief Qt signal mapper for mapping add jointsignals.
+      private:  QSignalMapper *signalMapper;
     };
   }
 }

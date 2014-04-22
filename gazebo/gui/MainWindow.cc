@@ -102,11 +102,11 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
 
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -1038,7 +1038,6 @@ void MainWindow::CreateActions()
   g_showJointsAct->setChecked(false);
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
-
 
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));

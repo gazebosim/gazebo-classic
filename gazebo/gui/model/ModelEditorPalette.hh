@@ -56,6 +56,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~ModelEditorPalette();
 
+      /// \brief Qt callback when a joint is to be added
+      /// \param[in] _type Type of joint to add.
+      public slots: void OnAddJoint(const QString &_type);
+
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
       /// \return True if the event was handled

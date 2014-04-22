@@ -99,11 +99,11 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
   this->modelItem->addChild(modelChildItem);
 
-  // Parts and joints buttons
+  // Shapes buttons
   QWidget *modelWidget = new QWidget;
   QVBoxLayout *modelLayout = new QVBoxLayout;
   QGridLayout *partsLayout = new QGridLayout;
-  QLabel *partsLabel = new QLabel(tr("Parts"));
+  QLabel *partsLabel = new QLabel(tr("Simple Shapes"));
 
   // cylinder button
   QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
@@ -305,6 +305,39 @@ void ModelEditorPalette::OnCustom()
   }
 }
 
+/////////////////////////////////////////////////
+void ModelEditorPalette::OnAddJoint(const QString &_type)
+{
+  std::string type = _type.toStdString();
+  if (_type == "Fixed")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
+  }
+  else if (_type == "Revolute")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
+  }
+  else if (_type == "Revolute2")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
+  }
+  else if (_type == "Prismatic")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
+  }
+  else if (_type == "Ball")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
+  }
+  else if (_type == "Universal")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
+  }
+  else if (_type == "Screw")
+  {
+    this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
+  }
+}
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnFixedJoint()
