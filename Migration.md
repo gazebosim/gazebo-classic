@@ -99,3 +99,15 @@
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + template<typename T> event::ConnectionPtr ConnectContact(T _subscriber)
+    + template<typename T> event::ConnectionPtr DisconnectContact(T _subscriber)
+    + ***Note:*** The ContactManager::CreateFilter functions can be used to
+      create a gazebo topic with contact messages filtered by the name(s)
+      of collision shapes. The topic can then be subscribed with a callback
+      to replicate this removed functionality. See
+      [gazebo pull request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+      for an example migration.
