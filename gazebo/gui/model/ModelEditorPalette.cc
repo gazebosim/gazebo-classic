@@ -51,7 +51,63 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(this->modelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  // Create a top-level tree item for the path
+  // Simple shapes tree item
+  this->modelItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Link Palette")));
+  this->modelTreeWidget->addTopLevelItem(this->modelItem);
+
+  QTreeWidgetItem *modelChildItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
+  this->modelItem->addChild(modelChildItem);
+
+  // Shapes buttons
+  QWidget *modelWidget = new QWidget;
+  QVBoxLayout *modelLayout = new QVBoxLayout;
+  QGridLayout *partsLayout = new QGridLayout;
+
+  // cylinder button
+  QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
+  cylinderButton->setCheckable(true);
+  cylinderButton->setChecked(false);
+  connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
+
+  // Sphere button
+  QPushButton *sphereButton = new QPushButton(tr("Sphere"), this);
+  sphereButton->setCheckable(true);
+  sphereButton->setChecked(false);
+  connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
+
+  // Box button
+  QPushButton *boxButton = new QPushButton(tr("Box"), this);
+  boxButton->setCheckable(true);
+  boxButton->setChecked(false);
+  connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
+
+  // Box button
+  QPushButton *customButton = new QPushButton(tr("Custom"), this);
+  customButton->setCheckable(true);
+  customButton->setChecked(false);
+  connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
+
+  partsLayout->addWidget(cylinderButton, 0, 0);
+  partsLayout->addWidget(sphereButton, 0, 1);
+  partsLayout->addWidget(boxButton, 1, 0);
+  partsLayout->addWidget(customButton, 1, 1);
+
+  modelWidget->setLayout(modelLayout);
+  modelLayout->addLayout(partsLayout);
+  this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
+  this->modelItem->setExpanded(true);
+  modelChildItem->setExpanded(true);
+
+  this->partButtonGroup = new QButtonGroup;
+  this->partButtonGroup->addButton(cylinderButton);
+  this->partButtonGroup->addButton(sphereButton);
+  this->partButtonGroup->addButton(boxButton);
+  this->partButtonGroup->addButton(customButton);
+
+  // model settings tree item
   this->modelSettingsItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Model Settings")));
@@ -90,126 +146,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   this->modelSettingsItem->setExpanded(true);
   modelSettingsChildItem->setExpanded(true);
 
-  this->modelItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Parts and Joints")));
-  this->modelTreeWidget->addTopLevelItem(this->modelItem);
-
-  QTreeWidgetItem *modelChildItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->modelItem->addChild(modelChildItem);
-
-  // Shapes buttons
-  QWidget *modelWidget = new QWidget;
-  QVBoxLayout *modelLayout = new QVBoxLayout;
-  QGridLayout *partsLayout = new QGridLayout;
-  QLabel *partsLabel = new QLabel(tr("Simple Shapes"));
-
-  // cylinder button
-  QPushButton *cylinderButton = new QPushButton(tr("Cylinder"), this);
-  cylinderButton->setCheckable(true);
-  cylinderButton->setChecked(false);
-  connect(cylinderButton, SIGNAL(clicked()), this, SLOT(OnCylinder()));
-
-  // Sphere button
-  QPushButton *sphereButton = new QPushButton(tr("Sphere"), this);
-  sphereButton->setCheckable(true);
-  sphereButton->setChecked(false);
-  connect(sphereButton, SIGNAL(clicked()), this, SLOT(OnSphere()));
-
-  // Box button
-  QPushButton *boxButton = new QPushButton(tr("Box"), this);
-  boxButton->setCheckable(true);
-  boxButton->setChecked(false);
-  connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
-
-  // Box button
-  QPushButton *customButton = new QPushButton(tr("Custom"), this);
-  customButton->setCheckable(true);
-  customButton->setChecked(false);
-  connect(customButton, SIGNAL(clicked()), this, SLOT(OnCustom()));
-
-  partsLayout->addWidget(partsLabel, 0, 0);
-  partsLayout->addWidget(cylinderButton, 1, 0);
-  partsLayout->addWidget(sphereButton, 1, 1);
-  partsLayout->addWidget(boxButton, 2, 0);
-  partsLayout->addWidget(customButton, 2, 1);
-
-  QGridLayout *jointsLayout = new QGridLayout;
-  QLabel *jointsLabel = new QLabel(tr("Joints"));
-
-  // Fixed joint button
-  QPushButton *fixedJointButton = new QPushButton(tr("Fixed"), this);
-  fixedJointButton->setCheckable(true);
-  fixedJointButton->setChecked(false);
-  connect(fixedJointButton, SIGNAL(clicked()), this, SLOT(OnFixedJoint()));
-
-  // Hinge joint button
-  QPushButton *hingeJointButton = new QPushButton(tr("Revolute"), this);
-  hingeJointButton->setCheckable(true);
-  hingeJointButton->setChecked(false);
-  connect(hingeJointButton, SIGNAL(clicked()), this, SLOT(OnHingeJoint()));
-
-  // Hinge2 joint button
-  QPushButton *hinge2JointButton = new QPushButton(tr("Revolute2"), this);
-  hinge2JointButton->setCheckable(true);
-  hinge2JointButton->setChecked(false);
-  connect(hinge2JointButton, SIGNAL(clicked()), this, SLOT(OnHinge2Joint()));
-
-  // slider joint button
-  QPushButton *sliderJointButton = new QPushButton(tr("Prismatic"), this);
-  sliderJointButton->setCheckable(true);
-  sliderJointButton->setChecked(false);
-  connect(sliderJointButton, SIGNAL(clicked()), this, SLOT(OnSliderJoint()));
-
-  // Screw joint button
-  QPushButton *screwJointButton = new QPushButton(tr("Screw"), this);
-  screwJointButton->setCheckable(true);
-  screwJointButton->setChecked(false);
-  connect(screwJointButton, SIGNAL(clicked()), this, SLOT(OnScrewJoint()));
-
-  // Universal joint button
-  QPushButton *universalJointButton = new QPushButton(tr("Universal"), this);
-  universalJointButton->setCheckable(true);
-  universalJointButton->setChecked(false);
-  connect(universalJointButton, SIGNAL(clicked()), this,
-      SLOT(OnUniversalJoint()));
-
-  // Ball joint button
-  QPushButton *ballJointButton = new QPushButton(tr("Ball"), this);
-  ballJointButton->setCheckable(true);
-  ballJointButton->setChecked(false);
-  connect(ballJointButton, SIGNAL(clicked()), this, SLOT(OnBallJoint()));
-
-  partJointsButtonGroup = new QButtonGroup;
-  this->partJointsButtonGroup->addButton(cylinderButton);
-  this->partJointsButtonGroup->addButton(sphereButton);
-  this->partJointsButtonGroup->addButton(boxButton);
-  this->partJointsButtonGroup->addButton(customButton);
-  this->partJointsButtonGroup->addButton(fixedJointButton);
-  this->partJointsButtonGroup->addButton(sliderJointButton);
-  this->partJointsButtonGroup->addButton(hingeJointButton);
-  this->partJointsButtonGroup->addButton(hinge2JointButton);
-  this->partJointsButtonGroup->addButton(screwJointButton);
-  this->partJointsButtonGroup->addButton(universalJointButton);
-  this->partJointsButtonGroup->addButton(ballJointButton);
-
-  jointsLayout->addWidget(jointsLabel, 0, 0);
-//  jointsLayout->addWidget(fixedJointButton, 1, 0);
-  jointsLayout->addWidget(sliderJointButton, 1, 0);
-  jointsLayout->addWidget(hingeJointButton, 1, 1);
-  jointsLayout->addWidget(hinge2JointButton, 2, 0);
-  jointsLayout->addWidget(screwJointButton, 2, 1);
-  jointsLayout->addWidget(universalJointButton, 3, 0);
-  jointsLayout->addWidget(ballJointButton, 3, 1);
-
-  modelLayout->addLayout(partsLayout);
-  modelLayout->addLayout(jointsLayout);
-  modelWidget->setLayout(modelLayout);
-  this->modelTreeWidget->setItemWidget(modelChildItem, 0, modelWidget);
-  this->modelItem->setExpanded(true);
-  modelChildItem->setExpanded(true);
-
   // plugin
   this->pluginItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
@@ -233,9 +169,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   buttonsLayout->setAlignment(Qt::AlignCenter);
 
   this->modelCreator = new ModelCreator();
-
-  connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
-      SLOT(OnJointAdded()));
   connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
@@ -309,11 +242,7 @@ void ModelEditorPalette::OnCustom()
 void ModelEditorPalette::OnAddJoint(const QString &_type)
 {
   std::string type = _type.toStdString();
-  if (_type == "Fixed")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
-  }
-  else if (_type == "Revolute")
+  if (_type == "Revolute")
   {
     this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
   }
@@ -340,63 +269,12 @@ void ModelEditorPalette::OnAddJoint(const QString &_type)
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnFixedJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_FIXED);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnHingeJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnHinge2Joint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnSliderJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnScrewJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnUniversalJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnBallJoint()
-{
-  this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
-}
-
-/////////////////////////////////////////////////
-void ModelEditorPalette::OnJointAdded()
-{
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
-}
-
-/////////////////////////////////////////////////
 void ModelEditorPalette::OnPartAdded()
 {
-  this->partJointsButtonGroup->setExclusive(false);
-  if (this->partJointsButtonGroup->checkedButton())
-    this->partJointsButtonGroup->checkedButton()->setChecked(false);
-  this->partJointsButtonGroup->setExclusive(true);
+  this->partButtonGroup->setExclusive(false);
+  if (this->partButtonGroup->checkedButton())
+    this->partButtonGroup->checkedButton()->setChecked(false);
+  this->partButtonGroup->setExclusive(true);
 }
 
 /////////////////////////////////////////////////
@@ -488,8 +366,6 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
     // this->modelCreator->Stop();
     // call the slots to uncheck the buttons
     this->OnPartAdded();
-    this->OnJointAdded();
-    return true;
   }
   return false;
 }

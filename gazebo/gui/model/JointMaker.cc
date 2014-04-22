@@ -282,9 +282,9 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     // first and JoinMaker would not receive it.
     MouseEventHandler::Instance()->AddPressFilter("model_joint",
         boost::bind(&JointMaker::OnMousePress, this, _1));
-
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
       boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+
   }
 }
 

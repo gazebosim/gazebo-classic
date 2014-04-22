@@ -22,9 +22,7 @@
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -37,7 +35,6 @@ namespace gazebo
 
   namespace gui
   {
-    class JointMaker;
     class ModelCreator;
 
     /// \addtogroup gazebo_gui
@@ -82,30 +79,6 @@ namespace gazebo
       /// \brief Qt callback when custom button is clicked.
       private slots: void OnCustom();
 
-      /// \brief Qt callback when fixed joint button is clicked.
-      private slots: void OnFixedJoint();
-
-      /// \brief Qt callback when hinge joint button is clicked.
-      private slots: void OnHingeJoint();
-
-      /// \brief Qt callback when hinge2 joint button is clicked.
-      private slots: void OnHinge2Joint();
-
-      /// \brief Qt callback when slider joint button is clicked.
-      private slots: void OnSliderJoint();
-
-      /// \brief Qt callback when screw joint button is clicked.
-      private slots: void OnScrewJoint();
-
-      /// \brief Qt callback when universal joint button is clicked.
-      private slots: void OnUniversalJoint();
-
-      /// \brief Qt callback when universal joint button is clicked.
-      private slots: void OnBallJoint();
-
-      /// \brief Qt callback when a joint has been added.
-      private slots: void OnJointAdded();
-
       /// \brief Qt callback when a part has been added.
       private slots: void OnPartAdded();
 
@@ -136,8 +109,8 @@ namespace gazebo
       /// \brief Plugin item in the tree widget.
       private: QTreeWidgetItem *pluginItem;
 
-      /// \brief Parts and Joints button group.
-      private: QButtonGroup *partJointsButtonGroup;
+      /// \brief Parts button group.
+      private: QButtonGroup *partButtonGroup;
 
       /// \brief Model creator.
       private: ModelCreator *modelCreator;

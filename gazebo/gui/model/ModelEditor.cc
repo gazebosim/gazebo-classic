@@ -52,7 +52,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   QMenu *jointMenu = new QMenu(jointButton);
   jointButton->setMenu(jointMenu);
   jointButton->setPopupMode(QToolButton::InstantPopup);
-  QAction *fixedJointAct = new QAction(tr("Fixed"), this);
   QAction *revoluteJointAct = new QAction(tr("Revolute"), this);
   QAction *revolute2JointAct = new QAction(tr("Revolute2"), this);
   QAction *prismaticJointAct = new QAction(tr("Prismatic"), this);
@@ -60,7 +59,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   QAction *universalJointAct = new QAction(tr("Universal"), this);
   QAction *screwJointAct = new QAction(tr("Screw"), this);
 
-  jointMenu->addAction(fixedJointAct);
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
   jointMenu->addAction(prismaticJointAct);
@@ -75,10 +73,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->signalMapper, SIGNAL(mapped(const QString)),
       this->modelPalette, SLOT(OnAddJoint(const QString)));
 
-  connect(fixedJointAct, SIGNAL(triggered()), this->signalMapper,
-      SLOT(map()));
-  this->signalMapper->setMapping(fixedJointAct,
-      fixedJointAct->text());
   connect(revoluteJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(revoluteJointAct,
