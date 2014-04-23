@@ -72,7 +72,7 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 //////////////////////////////////////////////////////////////////////////
 static void add_constraint(GtsConstraint *_c, GtsSurface *_s)
 {
-  g_assert(gts_delaunay_add_constraint(_s, _c) == NULL);
+  gts_delaunay_add_constraint(_s, _c);
 }
 
 //////////////////////////////////////////////////
