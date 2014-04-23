@@ -44,7 +44,7 @@ echo "OK"
 
 # Install gazebo
 echo "Installing Gazebo"
-sudo apt-get install gazebo-current
+sudo apt-get install gazebo3
 
 ###
 # Cleanup
