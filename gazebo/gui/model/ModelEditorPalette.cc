@@ -43,6 +43,7 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->modelTreeWidget = new QTreeWidget();
   this->modelTreeWidget->setColumnCount(1);
+  this->modelTreeWidget->setIndentation(10);
   this->modelTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->modelTreeWidget->header()->hide();
   this->modelTreeWidget->setFocusPolicy(Qt::NoFocus);
@@ -70,7 +71,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   // Shapes buttons
   QWidget *modelWidget = new QWidget;
   QWidget *customWidget = new QWidget;
-  QVBoxLayout *modelLayout = new QVBoxLayout;
   QGridLayout *partsLayout = new QGridLayout;
   QGridLayout *customLayout = new QGridLayout;
 
@@ -93,11 +93,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
   connect(boxButton, SIGNAL(clicked()), this, SLOT(OnBox()));
 
   partsLayout->addWidget(cylinderButton, 0, 0);
-  partsLayout->addWidget(sphereButton, 1, 0);
-  partsLayout->addWidget(boxButton, 2, 0);
-
+  partsLayout->addWidget(sphereButton, 0, 1);
+  partsLayout->addWidget(boxButton, 0, 2);
   modelWidget->setLayout(partsLayout);
-//  modelLayout->addLayout(partsLayout);
 
   // custom button
   QTreeWidgetItem *customItem =

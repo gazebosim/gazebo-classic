@@ -469,26 +469,6 @@ void JointMaker::CreateHotSpot()
   handleNode->setInheritOrientation(false);
   joint->handles = handleSet;
 
-
-/*  rendering::DynamicLines *handle =
-     hotspotVisual->CreateDynamicLine(rendering::RENDERING_POINT_LIST);
-
-  Ogre::SceneNode *handleNode =
-      hotspotVisual->GetSceneNode()->createChildSceneNode();
-  handle->getParentSceneNode()->detachObject(handle);
-  handleNode->attachObject(handle);
-  handleNode->setInheritScale(false);
-  handleNode->setInheritOrientation(false);
-
-  joint->handle = handle;
-  joint->handle->AddPoint(0, 0, 0);
-  joint->handle->SetColor(0, common::Color(1, 0, 0, 0.5));
-  joint->handle->AddPoint(0, 0, 0);
-  joint->handle->SetColor(1, common::Color(0, 1, 0, 0.5));
-  joint->handle->setMaterial("Gazebo/PointCloud");*/
-
-  //hotspotVisual->SetMaterial("Gazebo/RedTransparent");
-
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
