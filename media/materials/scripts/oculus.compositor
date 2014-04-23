@@ -2,7 +2,7 @@ compositor OculusLeft
 {
     technique
     {
-        texture rt0 target_width_scaled 1.5 target_height_scaled 1.5 PF_R8G8B8
+        texture rt0 1024 1024 PF_R8G8B8
 
         target rt0 { input previous }
 
@@ -24,7 +24,7 @@ compositor OculusRight
 {
     technique
     {
-        texture rt0 target_width_scaled 1.5 target_height_scaled 1.5 PF_R8G8B8
+        texture rt0 1024 1024 PF_R8G8B8
 
         target rt0 { input previous }
 
