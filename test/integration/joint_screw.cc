@@ -21,11 +21,12 @@
 // #include "gazebo/physics/ScrewJoint.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
+#include "test/integration/joint_test.hh"
 
 using namespace gazebo;
+const double g_tolerance = 1e-2;
 
-class JointTestScrew : public ServerFixture,
-                       public testing::WithParamInterface<const char*>
+class JointTestScrew : public JointTest
 {
   /// \brief Test screw joint implementation with SetWorldPose.
   /// Set link poses in world frame, check joint angles and joint axis.
@@ -42,7 +43,67 @@ class JointTestScrew : public ServerFixture,
   /// Keep increasing force until something gives
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void ScrewJointLimitForce(const std::string &_physicsEngine);
+
+  /// \brief Spin joints several rotations and verify that the angles
+  /// wrap properly.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void WrapAngle(const std::string &_physicsEngine);
 };
+
+////////////////////////////////////////////////////////////
+void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
+{
+  /// \TODO: bullet hinge angles are wrapped (#1074)
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test for bullet, see issues #1074.\n";
+    return;
+  }
+
+  // Load an empty world
+  Load("worlds/empty.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  bool isOde = physics->GetType().compare("ode") == 0;
+
+  // disable gravity
+  physics->SetGravity(math::Vector3::Zero);
+
+  {
+    std::string jointType = "screw";
+    gzdbg << "SpawnJoint " << jointType << " child world" << std::endl;
+    physics::JointPtr joint = SpawnJoint(jointType, false, true);
+    ASSERT_TRUE(joint != NULL);
+
+    // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    double vel = 2*M_PI;
+    unsigned int stepSize = 50;
+    unsigned int stepCount = 30;
+    joint->SetVelocity(0, vel);
+    if (isOde)
+      joint->SetMaxForce(0, 1e4);
+
+    // expect that joint velocity is constant
+    // and that joint angle is unwrapped
+    for (unsigned int i = 0; i < stepCount; ++i)
+    {
+      world->Step(stepSize);
+      EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
+      double time = world->GetSimTime().Double();
+      EXPECT_NEAR(joint->GetAngle(0).Radian(), time*vel, g_tolerance);
+    }
+  }
+}
+
+TEST_P(JointTestScrew, WrapAngle)
+{
+  WrapAngle(this->physicsEngine);
+}
 
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
@@ -171,7 +232,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
 TEST_P(JointTestScrew, ScrewJointSetWorldPose)
 {
-  ScrewJointSetWorldPose(GetParam());
+  ScrewJointSetWorldPose(this->physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -386,7 +447,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
 TEST_P(JointTestScrew, ScrewJointForce)
 {
-  ScrewJointForce(GetParam());
+  ScrewJointForce(this->physicsEngine);
 }
 
 //////////////////////////////////////////////////
@@ -443,11 +504,12 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 
 TEST_P(JointTestScrew, ScrewJointLimitForce)
 {
-  ScrewJointLimitForce(GetParam());
+  ScrewJointLimitForce(this->physicsEngine);
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestScrew,
-  PHYSICS_ENGINE_VALUES);
+  ::testing::Combine(PHYSICS_ENGINE_VALUES,
+  ::testing::Values("screw")));
 
 int main(int argc, char **argv)
 {
