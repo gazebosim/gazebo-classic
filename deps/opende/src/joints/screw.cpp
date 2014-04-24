@@ -21,68 +21,11 @@
  *************************************************************************/
 
 
+#include <ode/misc.h>
 #include "config.h"
 #include "screw.h"
 #include "joint_internal.h"
 
-//****************************************************************************
-// helper function: shortest_angular_distance implementation
-
-  /*!
-   * \brief normalize_angle_positive
-   *
-   *        Normalizes the angle to be 0 to 2*M_PI
-   *        It takes and returns radians.
-   */
-  static inline double normalize_angle_positive(double angle)
-  {
-    return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
-  }
-
-
-  /*!
-   * \brief normalize
-   *
-   * Normalizes the angle to be -M_PI circle to +M_PI circle
-   * It takes and returns radians.
-   *
-   */
-  static inline double normalize_angle(double angle)
-  {
-    double a = normalize_angle_positive(angle);
-    if (a > M_PI)
-      a -= 2.0 *M_PI;
-    return a;
-  }
-
-
-  /*!
-   * \function
-   * \brief shortest_angular_distance
-   *
-   * Given 2 angles, this returns the shortest angular
-   * difference.  The inputs and ouputs are of course radians.
-   *
-   * The result
-   * would always be -pi <= result <= pi.  Adding the result
-   * to "from" will always get you an equivelent angle to "to".
-   */
-
-  static inline double shortest_angular_distance(double from, double to)
-  {
-    double result = normalize_angle_positive(normalize_angle_positive(to) - normalize_angle_positive(from));
-
-    if (result > M_PI)
-      // If the result > 180,
-      // It's shorter the other way.
-      result = -(2.0*M_PI - result);
-
-    return normalize_angle(result);
-  }
-
-
-
-//****************************************************************************
 // screw
 
 dxJointScrew::dxJointScrew( dxWorld *w ) :
@@ -124,8 +67,8 @@ dxJointScrew::getInfo1( dxJoint::Info1 *info )
                                      node[1].body,
                                      axis1, qrel );
         // from angle, update cumulative_angle, which does not wrap
-        cumulative_angle = cumulative_angle +
-          shortest_angular_distance(cumulative_angle, angle);
+        cumulative_angle =
+          dShortestAngularDistanceUpdate(cumulative_angle,angle);
 
         // printf("angle: %f lo[%f] hi[%f]\n", cumulative_angle,
         //   limot.lostop, limot.histop);
@@ -228,11 +171,6 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
       dReal lin_disp; // linear displacement
       dReal lin_err; // linear displacement
       {
-        dReal ang; // angular displacement
-        // get angular disp for screw
-        ang = getHingeAngle(node[0].body,node[1].body,axis1,qrel);
-        cumulative_angle = cumulative_angle
-                         + shortest_angular_distance(cumulative_angle,ang);
         // get linear disp for screw
         // get axis1 in global coordinates
         dVector3 ax1, q;
@@ -258,11 +196,21 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
             q[2] = node[0].body->posr.pos[2] - offset[2];
         }
         lin_disp = dCalcVectorDot3 ( ax1, q );
-        // linear error should be scaled to length (lin_disp)
-        if (!_dequal(thread_pitch, 0.0))
+
+        // linear error should be length scaled, BUT
+        if (dFabs(thread_pitch) > 1.0)
+        {
+          // constraint is written in length scale, so
+          // linear error is length scaled.
           lin_err = -(lin_disp-cumulative_angle/thread_pitch);
+        }
         else
-          lin_err = 0.0;
+        {
+          // here the entire constraint equation, including lin_err
+          // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+          // for added numerical stability,
+          lin_err = -(thread_pitch*lin_disp-cumulative_angle);
+        }
         // printf("lin disp: %f lin err: %f\n", lin_disp, lin_err);
       }
 
@@ -319,8 +267,19 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
       // screw constraint:
       // now constrain the sliding axis by rotation of the other body
-      for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i]*thread_pitch;
-      for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i];
+      if (dFabs(thread_pitch) > 1.0)
+      {
+        for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i];
+        for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i]/thread_pitch;
+      }
+      else
+      {
+        // here the entire constraint equation, including lin_err
+        // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+        // for added numerical stability,
+        for (int i = 0; i < 3; ++i ) info->J1l[s2+i] = ax1[i]*thread_pitch;
+        for (int i = 0; i < 3; ++i ) info->J1a[s2+i] = -ax1[i];
+      }
 
       // repeat above for child body if one exists
       if ( node[1].body )
@@ -340,8 +299,19 @@ dxJointScrew::getInfo2( dxJoint::Info2 *info )
 
         // screw constraint:
         // constrain the sliding axis by rotation of the other body
-        for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i];
-        for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
+        if (dFabs(thread_pitch) > 1.0)
+        {
+          for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i]/thread_pitch;
+          for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i];
+        }
+        else
+        {
+          // here the entire constraint equation, including lin_err
+          // is multiplied by thread_pitch for |thread_pitch| less than 1.0
+          // for added numerical stability,
+          for (int i = 0; i < 3; ++i ) info->J2a[s2+i] =  ax1[i];
+          for (int i = 0; i < 3; ++i ) info->J2l[s2+i] = -ax1[i]*thread_pitch;
+        }
       }
 
       // debug
@@ -698,11 +668,12 @@ dReal dJointGetScrewAngle( dJointID j )
                                    joint->axis1,
                                    joint->qrel );
         // from angle, update cumulative_angle, which does not wrap
-        joint->cumulative_angle = joint->cumulative_angle + shortest_angular_distance(joint->cumulative_angle,ang);
+        dReal joint_angle =
+          dShortestAngularDistanceUpdate(joint->cumulative_angle,ang);
         if ( joint->flags & dJOINT_REVERSE )
-            return -joint->cumulative_angle;
+            return -joint_angle;
         else
-            return joint->cumulative_angle;
+            return joint_angle;
     }
     else return 0;
 }
