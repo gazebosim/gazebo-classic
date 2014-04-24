@@ -980,6 +980,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     {
       this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
+      ModelManipulator::Instance()->Detach();
     }
   }
 }

@@ -399,9 +399,13 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
-    // this->modelCreator->Stop();
     // call the slots to uncheck the buttons
     this->OnPartAdded();
+  }
+  if (_event.key == Qt::Key_Delete)
+  {
+    event::Events::setSelectedEntity("", "normal");
+    g_arrowAct->trigger();
   }
   return false;
 }

@@ -119,11 +119,16 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 /////////////////////////////////////////////////
 void JointMaker::RemoveJointsByPart(const std::string &_partName)
 {
+  std::cerr << "  b4 remove joint " <<joints.size() << std::endl;
   std::vector<std::string> toDelete;
   boost::unordered_map<std::string, JointData *>::iterator it;
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
+
+    std::cerr << "  remove " <<joint->child->GetName() << " "
+    << joint->parent->GetName() << " " <<_partName << std::endl;
+
     if (joint->child->GetName() == _partName ||
         joint->parent->GetName() == _partName)
     {
@@ -134,15 +139,14 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   for (unsigned i = 0; i < toDelete.size(); ++i)
     this->RemoveJoint(toDelete[i]);
 
+  std::cerr << "  remove joint " <<joints.size() << std::endl;
+
   toDelete.clear();
 }
 
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
-
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
@@ -154,8 +158,17 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
     {
+      // trigger joint inspector on right click
+      if (_event.button == common::MouseEvent::RIGHT)
+      {
+        this->inspectVis = vis;
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+      }
+
       // stop event propagation as we don't want users to manipulate the
-      // hotspot for now.
+      // hotspot
       return true;
     }
     return false;
@@ -167,26 +180,6 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  // Get the active camera and scene.
-  rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
-  rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-
-  if (_event.button == common::MouseEvent::RIGHT)
-  {
-    if (vis)
-    {
-      if (this->joints.find(vis->GetName()) != this->joints.end())
-      {
-        this->inspectVis = vis;
-        QMenu menu;
-        menu.addAction(this->inspectAct);
-        menu.exec(QCursor::pos());
-        return true;
-      }
-    }
-  }
-
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
@@ -212,7 +205,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      math::Vector3 origin = this->selectedVis->GetWorldPose().pos
+      math::Vector3 origin = this->GetPartWorldCentroid(this->selectedVis)
           - this->selectedVis->GetParent()->GetWorldPose().pos;
       jointLine->AddPoint(origin);
       jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
@@ -336,11 +329,13 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (this->hoverVis && this->hoverVis != this->selectedVis)
       this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
 
-    // only highlight editor parts
+    // only highlight editor parts by making sure it's not an item in the
+    // gui tree widget or a joint hotspot.
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     if (rootVis->IsPlane())
       this->hoverVis = vis->GetParent();
-    else if (!gui::get_entity_id(rootVis->GetName()))
+    else if (!gui::get_entity_id(rootVis->GetName()) &&
+        vis->GetName().find("_HOTSPOT_") == std::string::npos)
     {
       this->hoverVis = vis->GetParent();
       if (!this->selectedVis ||
@@ -359,12 +354,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos
+        parentPos =  this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
       this->mouseJoint->line->SetPoint(1,
           this->GetPartWorldCentroid(this->hoverVis) - parentPos);
-//          this->hoverVis->GetWorldPose().pos - parentPos);
-
     }
     else
     {
@@ -373,11 +366,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos
+        parentPos = this->GetPartWorldCentroid(this->mouseJoint->parent)
             - this->mouseJoint->line->GetPoint(0);
       this->mouseJoint->line->SetPoint(1,
           this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
-//          this->hoverVis->GetWorldPose().pos - parentPos + pt);
     }
   }
   return true;
@@ -454,7 +446,7 @@ void JointMaker::CreateHotSpot()
 
   // create two handles at the ends of the line
   Ogre::BillboardSet *handleSet =
-      camera->GetScene()->GetManager()->createBillboardSet(2);
+      camera->GetScene()->GetManager()->createBillboardSet(3);
   handleSet->setAutoUpdate(true);
   handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =
@@ -484,7 +476,8 @@ void JointMaker::CreateHotSpot()
   this->joints[hotSpotName] = joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
-  // remove line as now we are using a hotspot visual to represent the joint
+  // remove line as we are using a cylinder hotspot visual to
+  // represent the joint
   joint->visual->DeleteDynamicLine(joint->line);
 
   joint->dirty = true;
@@ -494,7 +487,6 @@ void JointMaker::CreateHotSpot()
 void JointMaker::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-
   if (this->newJointCreated)
   {
     this->CreateHotSpot();

@@ -547,18 +547,42 @@ void ModelCreator::Stop()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnDelete(const std::string &_part)
+void ModelCreator::OnDelete(const std::string &_entity)
 {
-  if (_part == this->modelName)
+  // check if it's our model
+  if (_entity == this->modelName)
   {
     this->Reset();
     return;
   }
 
-  if (this->jointMaker)
-    this->jointMaker->RemoveJointsByPart(_part);
+  // if it's a link
+  if (this->allParts.find(_entity) != this->allParts.end())
+  {
+    if (this->jointMaker)
+      this->jointMaker->RemoveJointsByPart(_entity);
+    this->RemovePart(_entity);
+    return;
+  }
 
-  this->RemovePart(_part);
+  // if it's a visual
+  rendering::VisualPtr vis =
+      gui::get_active_camera()->GetScene()->GetVisual(_entity);
+  if (vis)
+  {
+    rendering::VisualPtr parentLink = vis->GetParent();
+    if (this->allParts.find(parentLink->GetName()) != this->allParts.end())
+    {
+      // remove the parent link if it's the only child
+      if (parentLink->GetChildCount() == 1)
+      {
+        if (this->jointMaker)
+          this->jointMaker->RemoveJointsByPart(parentLink->GetName());
+        this->RemovePart(parentLink->GetName());
+        return;
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -582,9 +606,6 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
-
   if (this->mouseVisual)
   {
     // set the part data pose
@@ -610,6 +631,11 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
+      // intercept right click events
+      if (_event.button == common::MouseEvent::RIGHT)
+        return true;
+
+      // if the model is selected
       if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
           == this->modelVisual || this->selectedVis)
       {

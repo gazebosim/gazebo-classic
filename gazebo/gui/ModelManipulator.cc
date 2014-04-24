@@ -87,6 +87,14 @@ void ModelManipulator::Init()
 }
 
 /////////////////////////////////////////////////
+void ModelManipulator::Detach()
+{
+  this->dataPtr->selectionObj->SetMode(
+      rendering::SelectionObj::SELECTION_NONE);
+  this->dataPtr->selectionObj->Detach();
+}
+
+/////////////////////////////////////////////////
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
