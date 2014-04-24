@@ -36,6 +36,11 @@ namespace Ogre
   class BillboardSet;
 }
 
+namespace boost
+{
+  class recursive_mutex;
+}
+
 namespace gazebo
 {
   namespace gui
@@ -144,6 +149,12 @@ namespace gazebo
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
 
+      /// \brief Get the centroid of the part visual in world coordinates.
+      /// \param[in] _visual Visual of the part.
+      /// \return Centroid in world coordinates;
+      private: math::Vector3 GetPartWorldCentroid(
+          const rendering::VisualPtr _visual);
+
       /// \brief Open joint inspector.
       /// \param[in] _name Name of joint.
       private: void OpenInspector(const std::string &_name);
@@ -193,6 +204,9 @@ namespace gazebo
 
       /// \brief Qt action for opening the joint inspector.
       private: QAction *inspectAct;
+
+      /// \brief Mutex to protect the list of joints
+      private: boost::recursive_mutex *updateMutex;
     };
     /// \}
 

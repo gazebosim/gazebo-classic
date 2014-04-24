@@ -20,6 +20,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
@@ -228,28 +229,39 @@ void ModelEditorPalette::OnItemSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCylinder()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_CYLINDER);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnSphere()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_SPHERE);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnBox()
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   this->modelCreator->AddPart(ModelCreator::PART_BOX);
 }
 
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnCustom()
 {
-  ImportDialog importDialog;
+  ImportDialog importDialog(this);
   importDialog.deleteLater();
   if (importDialog.exec() == QDialog::Accepted)
   {
+    event::Events::setSelectedEntity("", "normal");
+    g_arrowAct->trigger();
     this->modelCreator->AddCustom(importDialog.GetImportPath());
   }
   else
@@ -262,6 +274,9 @@ void ModelEditorPalette::OnCustom()
 /////////////////////////////////////////////////
 void ModelEditorPalette::OnAddJoint(const QString &_type)
 {
+  event::Events::setSelectedEntity("", "normal");
+  g_arrowAct->trigger();
+
   std::string type = _type.toStdString();
   if (_type == "Revolute")
   {
@@ -269,7 +284,7 @@ void ModelEditorPalette::OnAddJoint(const QString &_type)
   }
   else if (_type == "Revolute2")
   {
-    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
+    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
   }
   else if (_type == "Prismatic")
   {

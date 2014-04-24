@@ -47,7 +47,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   // Add a joint icon to the render widget toolbar
   QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
   QToolButton *jointButton = new QToolButton(toolbar);
-  jointButton->setIcon(QIcon(":/images/box.png"));
+  jointButton->setIcon(QIcon(":/images/draw_link.svg"));
   jointButton->setText(tr("Joint"));
   QMenu *jointMenu = new QMenu(jointButton);
   jointButton->setMenu(jointMenu);

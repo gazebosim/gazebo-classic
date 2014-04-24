@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/thread/recursive_mutex.hpp>
+
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -60,6 +62,8 @@ JointMaker::JointMaker()
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
+
+  this->updateMutex = new boost::recursive_mutex();
 }
 
 /////////////////////////////////////////////////
@@ -72,9 +76,7 @@ JointMaker::~JointMaker()
 /////////////////////////////////////////////////
 void JointMaker::Reset()
 {
-//  if (!gui::get_active_camera() || !gui::get_active_camera()->GetScene())
-//    return;
-
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   this->newJointCreated = false;
   if (this->mouseJoint)
   {
@@ -96,19 +98,20 @@ void JointMaker::Reset()
 /////////////////////////////////////////////////
 void JointMaker::RemoveJoint(const std::string &_jointName)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   if (this->joints.find(_jointName) != this->joints.end())
   {
     JointData *joint = this->joints[_jointName];
     rendering::ScenePtr scene = joint->hotspot->GetScene();
+    scene->GetManager()->destroyBillboardSet(joint->handles);
     scene->RemoveVisual(joint->hotspot);
     scene->RemoveVisual(joint->visual);
     joint->hotspot.reset();
     joint->visual.reset();
     joint->parent.reset();
     joint->child.reset();
-    delete joint->line;
     delete joint->inspector;
-    scene->GetManager()->destroyBillboardSet(joint->handles);
     this->joints.erase(_jointName);
   }
 }
@@ -133,7 +136,6 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 
   toDelete.clear();
 }
-
 
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
@@ -206,12 +208,14 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       std::stringstream ss;
       ss << this->selectedVis->GetName() << "_JOINT_" << this->jointCounter++;
       rendering::VisualPtr jointVis(
-          new rendering::Visual(ss.str(), this->selectedVis));
+          new rendering::Visual(ss.str(), this->selectedVis->GetParent()));
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      jointLine->AddPoint(math::Vector3(0, 0, 0));
-      jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+      math::Vector3 origin = this->selectedVis->GetWorldPose().pos
+          - this->selectedVis->GetParent()->GetWorldPose().pos;
+      jointLine->AddPoint(origin);
+      jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
       jointVis->GetSceneNode()->setInheritScale(false);
       jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -335,10 +339,10 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     // only highlight editor parts
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     if (rootVis->IsPlane())
-      this->hoverVis = vis;
+      this->hoverVis = vis->GetParent();
     else if (!gui::get_entity_id(rootVis->GetName()))
     {
-      this->hoverVis = vis;
+      this->hoverVis = vis->GetParent();
       if (!this->selectedVis ||
            (this->selectedVis && this->hoverVis != this->selectedVis))
         this->hoverVis->SetEmissive(common::Color(0.5, 0.5, 0.5));
@@ -355,9 +359,12 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+        parentPos = this->mouseJoint->parent->GetWorldPose().pos
+            - this->mouseJoint->line->GetPoint(0);
       this->mouseJoint->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos);
+          this->GetPartWorldCentroid(this->hoverVis) - parentPos);
+//          this->hoverVis->GetWorldPose().pos - parentPos);
+
     }
     else
     {
@@ -366,9 +373,11 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
       camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
           math::Plane(math::Vector3(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+        parentPos = this->mouseJoint->parent->GetWorldPose().pos
+            - this->mouseJoint->line->GetPoint(0);
       this->mouseJoint->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos + pt);
+          this->GetPartWorldCentroid(this->hoverVis) - parentPos + pt);
+//          this->hoverVis->GetWorldPose().pos - parentPos + pt);
     }
   }
   return true;
@@ -433,35 +442,34 @@ void JointMaker::CreateHotSpot()
 
   joint->hotspot = hotspotVisual;
 
+  // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
-
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
       "__HOTSPOT__" + joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->setUserAny(Ogre::Any(hotSpotName));
-
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
-
-
   hotspotVisual->SetMaterial(this->jointMaterials[joint->type]);
   hotspotVisual->SetTransparency(0.5);
 
-
+  // create two handles at the ends of the line
   Ogre::BillboardSet *handleSet =
       camera->GetScene()->GetManager()->createBillboardSet(2);
-  handleSet->setMaterialName("Gazebo/PointCloud");
-
+  handleSet->setAutoUpdate(true);
+  handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =
       Ogre::MaterialManager::getSingleton().getByName(
       this->jointMaterials[joint->type]);
   Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
   color.a = 0.5;
-
-  handleSet->setDefaultDimensions(0.05, 0.05);
+  double dimension = 0.1;
+  handleSet->setDefaultDimensions(dimension, dimension);
   Ogre::Billboard *parentHandle = handleSet->createBillboard(0, 0, 0);
   parentHandle->setColour(color);
   Ogre::Billboard *childHandle = handleSet->createBillboard(0, 0, 0);
   childHandle->setColour(color);
+  Ogre::Billboard *childCenterHandle = handleSet->createBillboard(0, 0, 0);
+  childCenterHandle->setDimensions(dimension*0.5, dimension*0.5);
   Ogre::SceneNode *handleNode =
       hotspotVisual->GetSceneNode()->createChildSceneNode();
   handleNode->attachObject(handleSet);
@@ -475,12 +483,18 @@ void JointMaker::CreateHotSpot()
 
   this->joints[hotSpotName] = joint;
   camera->GetScene()->AddVisual(hotspotVisual);
+
+  // remove line as now we are using a hotspot visual to represent the joint
+  joint->visual->DeleteDynamicLine(joint->line);
+
   joint->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void JointMaker::Update()
 {
+  boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
+
   if (this->newJointCreated)
   {
     this->CreateHotSpot();
@@ -497,17 +511,19 @@ void JointMaker::Update()
     {
       if (joint->child && joint->parent)
       {
-        joint->line->SetPoint(1,
-            joint->child->GetWorldPose().pos -
-            joint->parent->GetWorldPose().pos);
+        // get centroid of parent part visuals
+        math::Vector3 parentCentroid =
+            this->GetPartWorldCentroid(joint->parent);
 
-        math::Vector3 dPos = (joint->child->GetWorldPose().pos -
-            joint->parent->GetWorldPose().pos);
+        // get centroid of child part visuals
+        math::Vector3 childCentroid =
+            this->GetPartWorldCentroid(joint->child);
+
+        // set orientation of joint hotspot
+        math::Vector3 dPos = (childCentroid - parentCentroid);
         math::Vector3 center = dPos/2.0;
         joint->hotspot->SetScale(math::Vector3(0.02, 0.02, dPos.GetLength()));
-        joint->hotspot->SetWorldPosition(joint->parent->GetWorldPose().pos
-            + center);
-        // set orientation of hotspot
+        joint->hotspot->SetWorldPosition(parentCentroid + center);
         math::Vector3 u = dPos.Normalize();
         math::Vector3 v = math::Vector3::UnitZ;
         double cosTheta = v.Dot(u);
@@ -517,18 +533,16 @@ void JointMaker::Update()
         q.SetFromAxis(w, angle);
         joint->hotspot->SetWorldRotation(q);
 
+        // set pos of joint handles
         joint->handles->getBillboard(0)->setPosition(
-            rendering::Conversions::Convert(joint->child->GetWorldPose().pos -
+            rendering::Conversions::Convert(parentCentroid -
             joint->hotspot->GetWorldPose().pos));
         joint->handles->getBillboard(1)->setPosition(
-            rendering::Conversions::Convert(joint->parent->GetWorldPose().pos -
+            rendering::Conversions::Convert(childCentroid -
             joint->hotspot->GetWorldPose().pos));
+        joint->handles->getBillboard(2)->setPosition(
+            joint->handles->getBillboard(1)->getPosition());
         joint->handles->_updateBounds();
-
-/*        joint->handle->SetPoint(0, (joint->child->GetWorldPose().pos -
-            joint->hotspot->GetWorldPose().pos));
-        joint->handle->SetPoint(1, (joint->parent->GetWorldPose().pos -
-            joint->hotspot->GetWorldPose().pos));*/
       }
     }
   }
@@ -656,6 +670,17 @@ int JointMaker::GetJointAxisCount(JointMaker::JointType _type)
 JointMaker::JointType JointMaker::GetState() const
 {
   return this->jointType;
+}
+
+/////////////////////////////////////////////////
+math::Vector3 JointMaker::GetPartWorldCentroid(
+    const rendering::VisualPtr _visual)
+{
+  math::Vector3 centroid;
+  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+    centroid += _visual->GetChild(i)->GetWorldPose().pos;
+  centroid /= _visual->GetChildCount();
+  return centroid;
 }
 
 /////////////////////////////////////////////////

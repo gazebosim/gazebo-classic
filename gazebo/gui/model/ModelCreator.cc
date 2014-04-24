@@ -333,6 +333,12 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
+  if (part->partVisual == this->selectedVis)
+  {
+    this->selectedVis->SetHighlighted(false);
+    this->selectedVis.reset();
+  }
+
   rendering::ScenePtr scene = part->partVisual->GetScene();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
@@ -341,6 +347,7 @@ void ModelCreator::RemovePart(const std::string &_partName)
   }
   scene->RemoveVisual(part->partVisual);
   part->visuals.clear();
+  part->partVisual.reset();
 
   for (unsigned int i = 0; i < part->collisions.size(); ++i)
   {
