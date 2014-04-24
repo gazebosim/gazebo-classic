@@ -177,7 +177,7 @@ namespace gazebo
       /// \brief Currently selected visual
       private: rendering::VisualPtr selectedVis;
 
-      /// \brief Visual that is currently being inspected.
+      /// \brief Joint visual that is currently being inspected.
       private: rendering::VisualPtr inspectVis;
 
       /// \brief All joints created by joint maker.

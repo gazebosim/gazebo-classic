@@ -181,6 +181,10 @@ namespace gazebo
       /// \param[in] _visual Visual used to create the part.
       private: void CreatePart(const rendering::VisualPtr &_visual);
 
+      /// \brief Open the part inspector.
+      /// \param[in] _name Name of part.
+      private: void OpenInspector(const std::string &_name);
+
       // Documentation inherited
       private: virtual void CreateTheEntity();
 
@@ -196,8 +200,11 @@ namespace gazebo
       private: std::string GetTemplateSDFString();
 
       /// \brief Qt callback when a delete signal has been emitted.
-      /// \param[in] _name Name of the part or model to delete.
+      /// \param[in] _name Name of the entity to delete.
       private slots: void OnDelete(const std::string &_name="");
+
+      /// \brief Qt Callback to open part inspector
+      private slots: void OnOpenInspector();
 
       /// \brief Qt signal when the a part has been added.
       Q_SIGNALS: void PartAdded();
@@ -269,6 +276,12 @@ namespace gazebo
 
       /// \brief Selected partv visual;
       private: rendering::VisualPtr selectedVis;
+
+      /// \brief Qt action for opening the part inspector.
+      private: QAction *inspectAct;
+
+      /// \brief Part visual that is currently being inspected.
+      private: rendering::VisualPtr inspectVis;
     };
     /// \}
   }

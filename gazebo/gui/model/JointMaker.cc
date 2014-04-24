@@ -119,15 +119,11 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
 /////////////////////////////////////////////////
 void JointMaker::RemoveJointsByPart(const std::string &_partName)
 {
-  std::cerr << "  b4 remove joint " <<joints.size() << std::endl;
   std::vector<std::string> toDelete;
   boost::unordered_map<std::string, JointData *>::iterator it;
   for (it = this->joints.begin(); it != this->joints.end(); ++it)
   {
     JointData *joint = it->second;
-
-    std::cerr << "  remove " <<joint->child->GetName() << " "
-    << joint->parent->GetName() << " " <<_partName << std::endl;
 
     if (joint->child->GetName() == _partName ||
         joint->parent->GetName() == _partName)
@@ -138,8 +134,6 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 
   for (unsigned i = 0; i < toDelete.size(); ++i)
     this->RemoveJoint(toDelete[i]);
-
-  std::cerr << "  remove joint " <<joints.size() << std::endl;
 
   toDelete.clear();
 }

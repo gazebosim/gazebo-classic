@@ -69,6 +69,10 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  this->inspectAct = new QAction(tr("Open Part Inspector"), this);
+  connect(this->inspectAct, SIGNAL(triggered()), this,
+      SLOT(OnOpenInspector()));
+
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
 
@@ -631,9 +635,16 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
-      // intercept right click events
+      // trigger part inspector on right click
       if (_event.button == common::MouseEvent::RIGHT)
+      {
+        this->inspectVis = vis->GetParent();
+        QMenu menu;
+        menu.addAction(this->inspectAct);
+        menu.exec(QCursor::pos());
+//        this->ShowInspector(vis->GetParent()->GetName());
         return true;
+      }
 
       // if the model is selected
       if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
@@ -702,37 +713,50 @@ bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
     if (this->selectedVis)
       this->selectedVis->SetHighlighted(false);
 
-    PartData *part = this->allParts[vis->GetParent()->GetName()];
-    PartGeneralTab *generalTab = part->inspector->GetGeneral();
-    generalTab->SetGravity(part->gravity);
-    generalTab->SetSelfCollide(part->selfCollide);
-    generalTab->SetKinematic(part->kinematic);
-    generalTab->SetPose(part->pose);
-    generalTab->SetMass(part->inertial->GetMass());
-    generalTab->SetInertialPose(part->inertial->GetPose());
-    generalTab->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
-        part->inertial->GetIZZ(), part->inertial->GetIXY(),
-        part->inertial->GetIXZ(), part->inertial->GetIYZ());
-
-    PartVisualTab *visualTab = part->inspector->GetVisual();
-
-    for (unsigned int i = 0; i < part->visuals.size(); ++i)
-    {
-      if (i >= visualTab->GetVisualCount())
-        visualTab->AddVisual();
-      visualTab->SetName(i, part->visuals[i]->GetName());
-      visualTab->SetPose(i, part->visuals[i]->GetPose());
-      visualTab->SetTransparency(i, part->visuals[i]->GetTransparency());
-      visualTab->SetMaterial(i, part->visuals[i]->GetMaterialName());
-      visualTab->SetGeometry(i, part->visuals[i]->GetMeshName());
-    }
-
-    part->inspector->show();
+    this->OpenInspector(vis->GetParent()->GetName());
     return true;
   }
 
   return false;
 }
+
+/////////////////////////////////////////////////
+void ModelCreator::OnOpenInspector()
+{
+  this->OpenInspector(this->inspectVis->GetName());
+  this->inspectVis.reset();
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OpenInspector(const std::string &_name)
+{
+  PartData *part = this->allParts[_name];
+  PartGeneralTab *generalTab = part->inspector->GetGeneral();
+  generalTab->SetGravity(part->gravity);
+  generalTab->SetSelfCollide(part->selfCollide);
+  generalTab->SetKinematic(part->kinematic);
+  generalTab->SetPose(part->pose);
+  generalTab->SetMass(part->inertial->GetMass());
+  generalTab->SetInertialPose(part->inertial->GetPose());
+  generalTab->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
+      part->inertial->GetIZZ(), part->inertial->GetIXY(),
+      part->inertial->GetIXZ(), part->inertial->GetIYZ());
+
+  PartVisualTab *visualTab = part->inspector->GetVisual();
+
+  for (unsigned int i = 0; i < part->visuals.size(); ++i)
+  {
+    if (i >= visualTab->GetVisualCount())
+      visualTab->AddVisual();
+    visualTab->SetName(i, part->visuals[i]->GetName());
+    visualTab->SetPose(i, part->visuals[i]->GetPose());
+    visualTab->SetTransparency(i, part->visuals[i]->GetTransparency());
+    visualTab->SetMaterial(i, part->visuals[i]->GetMaterialName());
+    visualTab->SetGeometry(i, part->visuals[i]->GetMeshName());
+  }
+  part->inspector->show();
+}
+
 
 /////////////////////////////////////////////////
 JointMaker *ModelCreator::GetJointMaker() const
