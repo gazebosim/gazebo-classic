@@ -129,18 +129,17 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   world->Step(300);
 
   // Set a fixed velocity on revolute joint that connects to the screw joint
-  unsigned int steps = 1000000;
+  unsigned int steps = 1000;
   for (unsigned int i = 0; i < steps; ++i)
   {
     motor->SetForce(0, 10);
     world->Step(1);
+  }
 
   // Expect torso to lift at least 1 mm/s
   gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
   gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
   gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  getchar();
-  }
   EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
 }
 
