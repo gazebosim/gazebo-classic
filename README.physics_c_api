@@ -1,0 +1,17 @@
+The key files are:
+
+1. gazebo/physics/PhysicsPlugin.h
+    * Defines the generic C plugin interface
+    * Add a typedef for each function you need, and a instance of the function pointer the the _PhysicsPlugin structure.
+    * This should be a strict C file. 
+
+1. gazebo/physics/PhysicsPluginExample.c
+    * An example implementation of a physics plugin. This does nothing except print a message.
+    * I would suggest turning this into a test or suite of tests. 
+
+1. gazebo/Server.cc
+    * Added the --physics-plugin command line argument.
+
+To test:
+
+gzserver --physics-plugin libPhysicsPluginExample.so
