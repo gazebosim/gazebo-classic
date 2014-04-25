@@ -281,11 +281,6 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
 bool OculusCamera::TrackVisualImpl(VisualPtr _visual)
 {
   Camera::TrackVisualImpl(_visual);
-  /*if (_visual)
-    this->SetViewController(OrbitViewController::GetTypeString());
-  else
-    this->SetViewController(FPSViewController::GetTypeString());
-    */
 
   return true;
 }
@@ -321,20 +316,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->viewport->setDimensions(0, 0, 0.5, 1);
     this->rightViewport->setDimensions(0.5, 0, 0.5, 1);
 
-    // double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-    //               static_cast<double>(this->viewport->getActualHeight());
-
-    /*double hfov = 85.0;
-      //this->sdf->Get<double>("horizontal_fov");
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
-
-    this->rightCamera->setAspectRatio(ratio);
-    this->rightCamera->setFOVy(Ogre::Radian(vfov));
-    */
-
     delete [] this->saveFrameBuffer;
     this->saveFrameBuffer = NULL;
   }
@@ -344,7 +325,6 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 void OculusCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
                                          float /*w_*/, float /*h_*/)
 {
-  // this->viewport->setDimensions(x, y, w, h);
 }
 
 //////////////////////////////////////////////////
@@ -484,9 +464,6 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   this->initialized = true;
-
-  // this->selectionBuffer = new SelectionBuffer(this->name,
-  //    this->scene->GetManager(), this->renderTarget);
 
   this->Oculus();
 }

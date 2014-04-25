@@ -177,7 +177,7 @@ void OculusWindow::showEvent(QShowEvent *_event)
   winSize.setHeight(800);
   this->resize(winSize);
 
-  // Put the window on the ocuclus screen
+  // Put the window on the oculus screen
   this->setGeometry(this->xPos, this->yPos, 1280, 800);
 
   // Make the window full screen
