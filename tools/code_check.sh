@@ -72,7 +72,7 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 # It's disable for now because checking for missing includes is very
 # time consuming. See CPPCHECK_CMD3.
 # Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
-if [ -n `which lsb_release` ]; then
+if [ -n "$(which lsb_release)" ]; then
    case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
        "12.04" | "13.04" )
          echo "missingIncludeSystem" >> $SUPPRESS
