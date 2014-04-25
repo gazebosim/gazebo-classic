@@ -163,14 +163,9 @@ const Mesh *MeshManager::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
-    bool _exportTextures)
+    const std::string &_extension, bool _exportTextures)
 {
-  std::string extension;
-  if (_filename.find(".") != std::string::npos)
-  {
-    extension = _filename.substr(_filename.rfind(".")+1, _filename.size());
-  }
-  if (extension == "dae" || extension == "")
+  if (_extension == "dae")
   {
     this->colladaExporter->Export(_mesh, _filename, _exportTextures);
   }

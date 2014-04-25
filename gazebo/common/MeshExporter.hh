@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef MESHEXPORTER_HH
-#define MESHEXPORTER_HH
+#ifndef _GAZEBO_MESHEXPORTER_HH_
+#define _GAZEBO_MESHEXPORTER_HH_
 
 #include <string>
 #include "gazebo/util/system.hh"
@@ -25,8 +25,6 @@ namespace gazebo
   namespace common
   {
     class Mesh;
-    class Skeleton;
-    class SkeletonNode;
 
     /// \addtogroup gazebo_common Common
     /// \{

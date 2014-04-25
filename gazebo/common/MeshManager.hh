@@ -63,10 +63,11 @@ namespace gazebo
       /// \brief Export a mesh to a file
       /// \param[in] _mesh Pointer to the mesh to be exported
       /// \param[in] _filename Exported file's path and name
+      /// \param[in] _extension Exported file's format ("dae" for Collada)
       /// \param[in] _exportTextures True to export texture images to
       /// '../materials/textures' folder
       public: void Export(const Mesh *_mesh, const std::string &_filename,
-          bool _exportTextures = false);
+          const std::string &_extension, bool _exportTextures = false);
 
       /// \brief Checks a path extension against the list of valid extensions.
       /// \return true if the file extension is loadable

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _COLLADAEXPORTER_HH_
-#define _COLLADAEXPORTER_HH_
+#ifndef _GAZEBO_COLLADAEXPORTER_HH_
+#define _GAZEBO_COLLADAEXPORTER_HH_
 
 #include <map>
 #include <string>
@@ -33,6 +33,7 @@ namespace gazebo
   namespace common
   {
     class Material;
+    class ColladaExporterPrivate;
 
     /// \addtogroup gazebo_common Common
     /// \{
@@ -52,7 +53,7 @@ namespace gazebo
 
       /// \brief Export a mesh to a file
       /// \param[in] _mesh Pointer to the mesh to be exported
-      /// \param[in] _filename Exported file's path and name including extension
+      /// \param[in] _filename Exported file's path and name
       /// \param[in] _exportTextures True to export texture images to
       /// '../materials/textures' folder
       public: virtual void Export(const Mesh *_mesh,
@@ -101,24 +102,9 @@ namespace gazebo
       /// \param[in] _sceneXml Pointer to the scene XML instance
       private: void ExportScene(TiXmlElement *_sceneXml);
 
-      /// \brief Gazebo mesh
-      private: const Mesh *mesh;
-
-      /// \brief Material count
-      private: unsigned int materialCount;
-
-      /// \brief SubMesh count
-      private: unsigned int subMeshCount;
-
-      /// \brief File path
-      private: std::string path;
-
-      /// \brief File name
-      private: std::string filename;
-
-      /// \brief True to export texture images to '../materials/textures'
-      /// folder
-      private: bool exportTextures;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ColladaExporterPrivate *dataPtr;
     };
     /// \}
   }

@@ -37,7 +37,7 @@ TEST_F(ColladaExporter, ExportBox)
   boost::filesystem::create_directories(pathOut /
       boost::filesystem::path("tmp"));
   std::string filenameOut = pathOut.string() +
-      "/tmp/box_exported.dae";
+      "/tmp/box_exported";
 
   common::ColladaLoader loader;
   const common::Mesh *meshOriginal = loader.Load(
@@ -49,6 +49,7 @@ TEST_F(ColladaExporter, ExportBox)
 
   // Check .dae file
   TiXmlDocument xmlDoc;
+  filenameOut = filenameOut + ".dae";
   EXPECT_TRUE(xmlDoc.LoadFile(filenameOut));
 
   const char *countDae = xmlDoc.FirstChildElement("COLLADA")
@@ -73,11 +74,29 @@ TEST_F(ColladaExporter, ExportBox)
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
   EXPECT_EQ(meshOriginal->GetMaterialCount(),
       meshReloaded->GetMaterialCount());
+  EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
   EXPECT_EQ(meshOriginal->GetVertexCount(), meshReloaded->GetVertexCount());
   EXPECT_EQ(meshOriginal->GetNormalCount(), meshReloaded->GetNormalCount());
   EXPECT_EQ(meshOriginal->GetTexCoordCount(),
       meshReloaded->GetTexCoordCount());
-  EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
+  for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); ++i)
+  {
+    for (unsigned int j = 0; j < meshOriginal->GetVertexCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetVertex(j),
+          meshReloaded->GetSubMesh(i)->GetVertex(j));
+    }
+    for (unsigned int j = 0; j < meshOriginal->GetNormalCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetNormal(j),
+          meshReloaded->GetSubMesh(i)->GetNormal(j));
+    }
+    for (unsigned int j = 0; j < meshOriginal->GetTexCoordCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetTexCoord(j),
+          meshReloaded->GetSubMesh(i)->GetTexCoord(j));
+    }
+  }
 
   // Remove temp directory
   boost::filesystem::remove_all(pathOut.string() + "/tmp");
@@ -91,7 +110,6 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
       std::string(PROJECT_SOURCE_PATH) +
       "/test/data/cordless_drill/meshes/cordless_drill.dae");
 
-  // Export without expliciting extension or 'meshes' directory
   boost::filesystem::path pathOut(boost::filesystem::current_path());
   boost::filesystem::create_directories(pathOut /
       boost::filesystem::path("tmp"));
@@ -137,11 +155,29 @@ TEST_F(ColladaExporter, ExportCordlessDrill)
   EXPECT_EQ(meshOriginal->GetSubMeshCount(), meshReloaded->GetSubMeshCount());
   EXPECT_EQ(meshOriginal->GetMaterialCount(),
       meshReloaded->GetMaterialCount());
+  EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
   EXPECT_EQ(meshOriginal->GetVertexCount(), meshReloaded->GetVertexCount());
   EXPECT_EQ(meshOriginal->GetNormalCount(), meshReloaded->GetNormalCount());
   EXPECT_EQ(meshOriginal->GetTexCoordCount(),
       meshReloaded->GetTexCoordCount());
-  EXPECT_EQ(meshOriginal->GetIndexCount(), meshReloaded->GetIndexCount());
+  for (unsigned int i = 0; i < meshOriginal->GetSubMeshCount(); ++i)
+  {
+    for (unsigned int j = 0; j < meshOriginal->GetVertexCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetVertex(j),
+          meshReloaded->GetSubMesh(i)->GetVertex(j));
+    }
+    for (unsigned int j = 0; j < meshOriginal->GetNormalCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetNormal(j),
+          meshReloaded->GetSubMesh(i)->GetNormal(j));
+    }
+    for (unsigned int j = 0; j < meshOriginal->GetTexCoordCount(); ++j)
+    {
+      EXPECT_EQ(meshOriginal->GetSubMesh(i)->GetTexCoord(j),
+          meshReloaded->GetSubMesh(i)->GetTexCoord(j));
+    }
+  }
 
   // Remove temp directory
   boost::filesystem::remove_all(pathOut.string() + "/tmp");

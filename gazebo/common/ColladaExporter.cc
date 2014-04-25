@@ -20,50 +20,47 @@
 
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/ColladaExporterPrivate.hh"
+#include "gazebo/common/ColladaExporter.hh"
 
 using namespace gazebo;
 using namespace common;
 
 //////////////////////////////////////////////////
 ColladaExporter::ColladaExporter()
-: MeshExporter()
+: MeshExporter(), dataPtr(new ColladaExporterPrivate)
 {
 }
 
 //////////////////////////////////////////////////
 ColladaExporter::~ColladaExporter()
 {
+  delete this->dataPtr;
+  this->dataPtr = 0;
 }
 
 //////////////////////////////////////////////////
 void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
     bool _exportTextures)
 {
-  this->mesh = _mesh;
-  this->materialCount = this->mesh->GetMaterialCount();
-  this->subMeshCount = this->mesh->GetSubMeshCount();
-  this->exportTextures = _exportTextures;
+  this->dataPtr->mesh = _mesh;
+  this->dataPtr->materialCount = this->dataPtr->mesh->GetMaterialCount();
+  this->dataPtr->subMeshCount = this->dataPtr->mesh->GetSubMeshCount();
+  this->dataPtr->exportTextures = _exportTextures;
 
   // File name and path
   unsigned int beginFilename = _filename.rfind("/")+1;
-  unsigned int endFilename;
-  if (_filename.find(".dae") == std::string::npos)
-  {
-    endFilename = _filename.length();
-  }
-  else
-  {
-    endFilename = _filename.find(".dae");
-  }
-  this->path = _filename.substr(0, beginFilename);
-  this->filename = _filename.substr(beginFilename, endFilename-beginFilename);
 
-  if (this->materialCount != 0 && this->materialCount != this->subMeshCount)
+  this->dataPtr->path = _filename.substr(0, beginFilename);
+  this->dataPtr->filename = _filename.substr(beginFilename);
+
+  if (this->dataPtr->materialCount != 0 &&
+      this->dataPtr->materialCount != this->dataPtr->subMeshCount)
   {
-    gzwarn << "Material count [" << this->materialCount <<
-        "] different from submesh count [" << this->subMeshCount << "]\n";
+    gzwarn << "Material count [" << this->dataPtr->materialCount <<
+        "] different from submesh count [" <<
+        this->dataPtr->subMeshCount << "]\n";
   }
 
   // Collada file
@@ -90,7 +87,7 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   this->ExportGeometries(libraryGeometriesXml);
   colladaXml->LinkEndChild(libraryGeometriesXml);
 
-  if (this->materialCount != 0)
+  if (this->dataPtr->materialCount != 0)
   {
     // Library images element
     TiXmlElement *libraryImagesXml = new TiXmlElement("library_images");
@@ -123,17 +120,19 @@ void ColladaExporter::Export(const Mesh *_mesh, const std::string &_filename,
   colladaXml->LinkEndChild(sceneXml);
 
   // Save file
-  if (this->exportTextures)
+  if (this->dataPtr->exportTextures)
   {
     boost::filesystem::create_directories(
-        boost::filesystem::path(this->path + this->filename +
+        boost::filesystem::path(this->dataPtr->path + this->dataPtr->filename +
         std::string("/meshes/")));
-    xmlDoc.SaveFile(this->path + this->filename + std::string("/meshes/") +
-        this->filename + std::string(".dae"));
+    xmlDoc.SaveFile(this->dataPtr->path + this->dataPtr->filename +
+        std::string("/meshes/") + this->dataPtr->filename +
+        std::string(".dae"));
   }
   else
   {
-    xmlDoc.SaveFile(this->path + this->filename + std::string(".dae"));
+    xmlDoc.SaveFile(this->dataPtr->path + this->dataPtr->filename +
+        std::string(".dae"));
   }
 }
 
@@ -157,7 +156,7 @@ void ColladaExporter::ExportGeometrySource(
 {
   char sourceId[100], sourceArrayId[100];
   std::ostringstream fillData;
-  fillData.precision(5);
+  fillData.precision(8);
   fillData << std::fixed;
   int stride;
   unsigned int count = 0;
@@ -253,7 +252,7 @@ void ColladaExporter::ExportGeometrySource(
 //////////////////////////////////////////////////
 void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 {
-  for (unsigned int i = 0; i < this->subMeshCount; ++i)
+  for (unsigned int i = 0; i < this->dataPtr->subMeshCount; ++i)
   {
     char meshId[100], materialId[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -266,7 +265,8 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
     TiXmlElement *meshXml = new TiXmlElement("mesh");
     geometryXml->LinkEndChild(meshXml);
 
-    const gazebo::common::SubMesh *subMesh = this->mesh->GetSubMesh(i);
+    const gazebo::common::SubMesh *subMesh =
+        this->dataPtr->mesh->GetSubMesh(i);
 
     ExportGeometrySource(subMesh, meshXml, POSITION, meshId);
     ExportGeometrySource(subMesh, meshXml, NORMAL, meshId);
@@ -294,7 +294,7 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
     TiXmlElement *trianglesXml = new TiXmlElement("triangles");
     meshXml->LinkEndChild(trianglesXml);
     trianglesXml->SetAttribute("count", indexCount/3);
-    if (this->materialCount != 0)
+    if (this->dataPtr->materialCount != 0)
     {
       trianglesXml->SetAttribute("material", materialId);
     }
@@ -344,9 +344,10 @@ void ColladaExporter::ExportGeometries(TiXmlElement *_libraryGeometriesXml)
 int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 {
   int imageCount = 0;
-  for (unsigned int i = 0; i < this->materialCount; ++i)
+  for (unsigned int i = 0; i < this->dataPtr->materialCount; ++i)
   {
-    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material =
+        this->dataPtr->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
 
     if (imageString.find("meshes/") != std::string::npos)
@@ -363,13 +364,14 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
         imageString.substr(imageString.find("meshes/")+7)));
       imageXml->LinkEndChild(initFromXml);
 
-      if (this->exportTextures)
+      if (this->dataPtr->exportTextures)
       {
         boost::filesystem::create_directories(boost::filesystem::path(
-            this->path + this->filename + "/materials/textures"));
+            this->dataPtr->path + this->dataPtr->filename +
+            "/materials/textures"));
 
         std::ifstream  src(imageString.c_str(), std::ios::binary);
-        std::ofstream  dst((this->path + this->filename +
+        std::ofstream  dst((this->dataPtr->path + this->dataPtr->filename +
             "/materials/textures" + imageString.substr(
             imageString.rfind("/"))).c_str(), std::ios::binary);
         dst << src.rdbuf();
@@ -385,7 +387,7 @@ int ColladaExporter::ExportImages(TiXmlElement *_libraryImagesXml)
 //////////////////////////////////////////////////
 void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
 {
-  for (unsigned int i = 0; i < this->materialCount; ++i)
+  for (unsigned int i = 0; i < this->dataPtr->materialCount; ++i)
   {
     char id[100];
     snprintf(id, sizeof(id), "material_%u", i);
@@ -404,7 +406,7 @@ void ColladaExporter::ExportMaterials(TiXmlElement *_libraryMaterialsXml)
 //////////////////////////////////////////////////
 void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
 {
-  for (unsigned int i = 0; i < this->materialCount; ++i)
+  for (unsigned int i = 0; i < this->dataPtr->materialCount; ++i)
   {
     char id[100];
     snprintf(id, sizeof(id), "material_%u_fx", i);
@@ -417,7 +419,8 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     effectXml->LinkEndChild(profileCommonXml);
 
     // Image
-    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material =
+        this->dataPtr->mesh->GetMaterial(i);
     std::string imageString = material->GetTextureImage();
 
     if (imageString.find("meshes/") != std::string::npos)
@@ -462,7 +465,8 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     techniqueXml->SetAttribute("sid", "COMMON");
     profileCommonXml->LinkEndChild(techniqueXml);
 
-    // gazebo::common::Material::ShadeMode shadeMode = material->GetShadeMode();
+    // gazebo::common::Material::ShadeMode shadeMode =
+    //    material->GetShadeMode();
 
     // Using phong for now
     TiXmlElement *phongXml = new TiXmlElement("phong");
@@ -577,7 +581,7 @@ void ColladaExporter::ExportVisualScenes(
   nodeXml->SetAttribute("name", "node");
   nodeXml->SetAttribute("id", "node");
 
-  for (unsigned int i = 0; i < this->subMeshCount; ++i)
+  for (unsigned int i = 0; i < this->dataPtr->subMeshCount; ++i)
   {
     char meshId[100], materialId[100], attributeValue[100];
     snprintf(meshId, sizeof(meshId), "mesh_%u", i);
@@ -588,7 +592,8 @@ void ColladaExporter::ExportVisualScenes(
     snprintf(attributeValue, sizeof(attributeValue), "#%s", meshId);
     instanceGeometryXml->SetAttribute("url", attributeValue);
 
-    const gazebo::common::Material *material = this->mesh->GetMaterial(i);
+    const gazebo::common::Material *material =
+        this->dataPtr->mesh->GetMaterial(i);
 
     if (material)
     {
@@ -598,7 +603,8 @@ void ColladaExporter::ExportVisualScenes(
       TiXmlElement *techniqueCommonXml = new TiXmlElement("technique_common");
       bindMaterialXml->LinkEndChild(techniqueCommonXml);
 
-      TiXmlElement *instanceMaterialXml = new TiXmlElement("instance_material");
+      TiXmlElement *instanceMaterialXml =
+          new TiXmlElement("instance_material");
       techniqueCommonXml->LinkEndChild(instanceMaterialXml);
       instanceMaterialXml->SetAttribute("symbol", materialId);
       snprintf(attributeValue, sizeof(attributeValue), "#%s", materialId);
