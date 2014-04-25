@@ -1497,14 +1497,17 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
 #endif
 
-      // compute scalar MOI in line with S, where S is a unit vector in the constraint direction:
-      //   moi_S = S' * I * S
+      // compute scalar MOI in line with S, where S is a unit vector
+      // in the constraint direction:
+      //   m1 = S' * MOI1 * S
+      //   m2 = S' * MOI2 * S
       dVector3 S = // line about which we want to compute MOI along
            { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
       dNormalize3(S);
       dVector3 tmp31;
       dMultiply0_133(tmp31, S, MOI_ptr1);
-      dReal m1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+      // scalar MOI component along vector S
+      dReal m1 = dCalcVectorDot3(tmp31, S);
 
       // get MOI from body 2
       dReal *invMOI_ptr2 = invMOI + b2 * 12;
@@ -1520,7 +1523,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       // FIXME:  check that directions of J1a == J2a
       // compute scalar MOI in line with S:
       dMultiply0_133(tmp31, S, MOI_ptr2);
-      dReal m2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+      // scalar MOI component along vector S
+      dReal m2 = dCalcVectorDot3(tmp31, S);
 #ifdef DEBUG_INERTIA_PROPAGATION
       printf("--------S VECTORS-----------\n");
       printf("MOI1 b1[%d] S[%f %f %f] = %g\n",b1, S[0], S[1], S[2], m1);
@@ -1562,9 +1566,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// \todo automatically adjust moi_ratio_tol such that
       /// abs sum of off-diagonals remains smaller than the diagonal
       /// for all rows.
-      const dReal moi_ratio_tol = 10.0;  // increase moi_ratio_tol to skip checks and increase performance
-      const dReal gamma1 = 1.5;  // increase to add stability
-      const dReal gamma2 = 1.5;  // increase to add stability
+      // increase moi_ratio_tol to skip checks and increase performance
+      const dReal moi_ratio_tol = 10.0;
+      // increase gamma1 or gamma2 to add stability
+      const dReal gamma1 = 1.5;
+      const dReal gamma2 = 1.5;
       dReal m1_new, m2_new;
       if ((m1 > moi_ratio_tol * m2) || (m2 > moi_ratio_tol * m1))
       {
@@ -1586,26 +1592,28 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // doi = {10.1590/S0101-82052003000100006},
         // issn = {0101-8205},
         // journal = {Computational \& Applied Mathematics},
-        // keywords = {gauss-seidel method,line criterion,manufacturing sys-,stability and control of},
         // number = {1},
         // pages = {91--97},
         // title = {{Generalized line criterion for Gauss-Seidel method}},
-        // url = {http://www.scielo.br/scielo.php?pid=S1807-03022003000100006&script=sci_arttext},
+        // url = {http://www.ime.usp.br/~jstern/papers/papersJS/ghs03.pdf},
         // volume = {22},
         // year = {2003}
         // }
         //
-        // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiags.
-        // Adjust MOI ratio and make sure that each row of new MOI satisfies the line criterion.
+        // To do this, first compute the sum of the absolute values
+        // of the off diagonal terms and store in sumAbsOffDiags.
+        // Adjust MOI ratio and make sure that each row of new MOI
+        // satisfies the line criterion.
         //
         // Terminology:
-        //   S: an unit vector in the direction of constraint DOF for which we want to reduce inertia.
+        //   S: an unit vector in the direction of constraint DOF for which
+        //      we want to reduce inertia.
         //   SS: MOI component matrix constructed by S*S'
         //   M1: MOI of body 1
         //   M1_new: MOI of body 1 after adjustment
         //   m1: scalar MOI of body 1 along a vector S, m1 = S'*M1*S
         //   M1d: absolute value of M1 diagonal
-        //   M1od: sum of absolute values of M1 off-diagonals
+        //   M1od: scalar sum of absolute values of M1 off-diagonal row
         //   M2: MOI of body 2
         //   M2_new: MOI of body 2 after adjustment
         //   m2: scalar MOI of body 2 along a vector S, m2 = S'*M2*S
@@ -1613,35 +1621,37 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //   M2od: sum of absolute values of M2 off-diagonals
         //   SSd: absolute value of SS diagonal
         //   SSod: sum of absolute values of SS off-diagonals
-        //   moi_sum: m1 + m2 (this should stay the same after adjustment to ensure dynamics does not change).
+        //   moi_sum: m1 + m2 (this should stay the same after adjustment
+        //                     to ensure dynamics does not change).
         //   m1_new: desired m1 after adjustment.
         //   m2_new: desired m2 after adjustment.
-        //   moi_ratio: desired ratio of m1_new / m2_new or m2_new / m1_new whichever is > 1
-        //   alpha1: m1_new - m1
-        //   alpha2: m2_new - m2
+        //   moi_ratio: desired ratio of
+        //              m1_new / m2_new or m2_new / m1_new whichever is > 1
+        //   dm1: m1_new - m1
+        //   dm2: m2_new - m2
         //
         // Derivations:
         //   (find a place to put detailed derivations).
         //   Key equations:
         //     Basic adjustment:
-        //       M1_new = M1 + alpha1 * SS
-        //       M2_new = M2 + alpha2 * SS
-        //     To eliminate alpha2, use:
-        //       alpha1 + alpha2 = 0  (eq 4) (easy to derive)
-        //     Check for DD:
-        //       M1d_new  = M1d  + alpha1 * SSd
-        //       M1od_new = M1od + alpha1 * SSod
-        //       M2d_new  = M2d  + alpha1 * SSd
-        //       M2od_new = M2od + alpha2 * SSod
+        //       M1_new = M1 + dm1 * SS
+        //       M2_new = M2 + dm2 * SS
+        //     To eliminate dm2, use:
+        //       dm1 + dm2 = 0  (eq 4) (easy to derive)
+        //     Check for Diagonal Dominance (DD):
+        //       M1d_new  = M1d  + dm1 * SSd
+        //       M1od_new = M1od + dm1 * SSod
+        //       M2d_new  = M2d  + dm2 * SSd
+        //       M2od_new = M2od + dm2 * SSod
         //     For DD, enforce:
         //       M1d_new / M1od_new = gamma1 > 1  (eq 5)
         //       M2d_new / M2od_new = gamma2 > 1  (eq 6)
         //     For simplicity, look at the case where m1 > m2:
         //       (for m2 > m1, one can infer the results.)
-        //     To eliminate alpha1, find alpha1 as a function of moi_ratio:
-        //       moi_ratio = m1_new / m2_new = (m1 + alpha1) / (m2 + alpha2)
-        //       moi_ratio = (m1 + alpha1) / (m2 - alpha1)
-        //       alpha1 = (moi_ratio * m2 - m1) / (1 + moi_ratio) (eq 7)
+        //     To eliminate dm1, find dm1 as a function of moi_ratio:
+        //       moi_ratio = m1_new / m2_new = (m1 + dm1) / (m2 + dm2)
+        //       moi_ratio = (m1 + dm1) / (m2 - dm1)
+        //       dm1 = (moi_ratio * m2 - m1) / (1 + moi_ratio) (eq 7)
         //     Substitute eq 4, 7 into eq 5 and do some algebra:
         //       (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd) / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod) = gamma1 > 1 (eq 13)
         //     Solve eq 13 for moi_ratio:
@@ -2149,9 +2159,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           {
             m2_new = (moi_sum)/(moi_ratio + 1.0);
             m1_new = moi_ratio*m2_new;
-            // alpha1 = m1_new - m1
-            // alpha2 = m2_new - m2
-            // alpha1 + alpha2 = 0  // since moi sum is conserved
+            // dm1 = m1_new - m1
+            // dm2 = m2_new - m2
+            // dm1 + dm2 = 0  // since moi sum is conserved
             // make sure m1 / m2 < moi_ratio
             // pick moi_ratio such that 
           }
@@ -2163,8 +2173,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
           // update MOI1 and MOI2
           // Then modify MOI by adding delta scalar MOI in tensor form, but
-          dReal alpha1 = m1_new - m1;
-          dReal alpha2 = m2_new - m2;
+          dReal dm1 = m1_new - m1;
+          dReal dm2 = m2_new - m2;
           for (int si = 0; si < 12; ++si)
           {
             int col = si%4;
@@ -2176,8 +2186,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             }
             else
             {
-              MOI_ptr1[si] = MOI_ptr1[si] + alpha1 * SS[si];
-              MOI_ptr2[si] = MOI_ptr2[si] + alpha2 * SS[si];
+              MOI_ptr1[si] = MOI_ptr1[si] + dm1 * SS[si];
+              MOI_ptr2[si] = MOI_ptr2[si] + dm2 * SS[si];
               /* update M1d M1od M2d M2od for additional DD check
               // not needed if previous moi_ratio calculation is working as expected
               M1d[row] = 
@@ -2198,8 +2208,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             }
             else
             {
-              MOI_ptr1[si] = MOI_ptr1[si] + alpha1 * SS[si];
-              MOI_ptr2[si] = MOI_ptr2[si] + alpha2 * SS[si];
+              MOI_ptr1[si] = MOI_ptr1[si] + dm1 * SS[si];
+              MOI_ptr2[si] = MOI_ptr2[si] + dm2 * SS[si];
               // this should be fine as long as moi_ratio check above is working correctly
               if (row == col)
               {
