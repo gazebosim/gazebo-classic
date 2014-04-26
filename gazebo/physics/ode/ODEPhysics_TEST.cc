@@ -112,7 +112,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
 
   // Set params to different values and verify the old values are correctly
   // replaced by the new ones.
-  type = "world";
+  type = "quick";
   preconIters = 10;
   iters = 55;
   sor = 1.4;
@@ -132,7 +132,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   odePhysics->SetParam("contact_surface_layer",
       contactSurfaceLayer);
 
-  value = odePhysics->GetParam("type");
+  value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = odePhysics->GetParam("iters");
