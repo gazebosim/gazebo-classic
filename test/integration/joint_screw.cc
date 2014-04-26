@@ -69,7 +69,6 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  bool isOde = physics->GetType().compare("ode") == 0;
 
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);
@@ -80,19 +79,24 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     physics::JointPtr joint = SpawnJoint(jointType, false, true);
     ASSERT_TRUE(joint != NULL);
 
-    // set velocity to 2 pi rad/s and step forward 1.5 seconds.
-    double vel = 2*M_PI;
-    unsigned int stepSize = 50;
-    unsigned int stepCount = 30;
-    joint->SetVelocity(0, vel);
-    if (isOde)
-      joint->SetMaxForce(0, 1e4);
+    // \TODO: option to set thread pitch, create another test
+    // double threadPitch = 100.0;
+    // joint->SetParam("thread_pitch", threadPitch);
 
+    // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    double torque = 2*M_PI;
+    unsigned int stepCount = 30;
     // expect that joint velocity is constant
     // and that joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)
     {
-      world->Step(stepSize);
+      joint->SetForce(0, torque);
+      // compute what velocity should be for the force
+      double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() /
+        (1.0 / (1.0*1.0) + 1.0));
+      world->Step(1);
+      gzdbg << "v: " << joint->GetVelocity(0)
+            << " ve: " << vel << "\n";
       EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
       double time = world->GetSimTime().Double();
       EXPECT_NEAR(joint->GetAngle(0).Radian(), time*vel, g_tolerance);
