@@ -136,6 +136,7 @@ World::World(const std::string &_name)
   this->connections.push_back(
      event::Events::ConnectPause(
        boost::bind(&World::SetPaused, this, _1)));
+  this->physicsPlugin = NULL;
 }
 
 //////////////////////////////////////////////////
