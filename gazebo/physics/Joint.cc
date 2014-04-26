@@ -947,7 +947,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
   if (_index >= this->GetAngleCount())
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
-          << std::endl;
+          << " returning identity rotation." << std::endl;
     return math::Quaternion();
   }
 

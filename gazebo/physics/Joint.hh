@@ -559,6 +559,8 @@ namespace gazebo
       /// appropriate frame internally.
       /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to joint frame.
+      /// If supplied _index is out of range, or use_parent_model_frame
+      /// is not true, this function returns identity rotation quaternion.
       public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
