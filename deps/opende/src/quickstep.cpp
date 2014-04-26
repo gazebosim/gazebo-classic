@@ -1706,17 +1706,14 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           int row = si/4;
           if (!(row == col))  // off-diagonal terms
           {
-            // either we preserve off-diagonal terms
-            // tmpDiag1[row] += MOI_ptr1[si] + (m1_new - m1) * SS[si];
-            // tmpDiag2[row] += MOI_ptr2[si] + (m2_new - m2) * SS[si];
-
-            // or update off-diagonal terms
+            // compute off-diagonal terms
             M1od[row] += dFabs(MOI_ptr1[si]);
             M2od[row] += dFabs(MOI_ptr2[si]);
             SSod[row] += dFabs(SS[si]);
           }
-          else if (row == col)  // diagonal element
+          else if (row == col)
           {
+            // compute diagonal element
             M1d[row] = dFabs(MOI_ptr1[si]);
             M2d[row] = dFabs(MOI_ptr2[si]);
             SSd[row] = dFabs(SS[si]);
