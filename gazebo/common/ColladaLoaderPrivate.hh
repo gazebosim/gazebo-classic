@@ -60,24 +60,40 @@ namespace gazebo
       /// \brief Map of collada TEXCOORD ids to list of texture coordinates.
       public: std::map<std::string, std::vector<math::Vector2d> >texcoordIds;
 
-      /// \brief Map of collada  Material ids to Gazebo materials.
+      /// \brief Map of collada Material ids to Gazebo materials.
       public: std::map<std::string, Material *> materialIds;
+
+      /// \brief Map of collada POSITION ids to a map of
+      /// duplicate positions.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          positionDuplicateMap;
+
+      /// \brief Map of collada NORMAL ids to a map of
+      /// duplicate normals.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          normalDuplicateMap;
+
+      /// \brief Map of collada TEXCOORD ids to a map of
+      /// duplicate texture coordinates.
+      public: std::map<std::string, std::map<unsigned int, unsigned int> >
+          texcoordDuplicateMap;
+
     };
 
     /// \brief Helper data structure for loading collada geometries.
     class GeometryIndices
     {
       /// \brief Index of a vertex in the collada <p> element
-      public: int vertexIndex;
+      public: unsigned int vertexIndex;
 
       /// \brief Index of a normal in the collada <p> element
-      public: int normalIndex;
+      public: unsigned int normalIndex;
 
       /// \brief Index of a texture coordinate in the collada <p> element
-      public: int texcoordIndex;
+      public: unsigned int texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
-      public: int mappedIndex;
+      public: unsigned int mappedIndex;
     };
   }
 }
