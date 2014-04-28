@@ -112,7 +112,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
 
   // Set params to different values and verify the old values are correctly
   // replaced by the new ones.
-  type = "quick";
+  type = "world";
   preconIters = 10;
   iters = 55;
   sor = 1.4;
@@ -121,7 +121,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   contactMaxCorrectingVel = 40;
   contactSurfaceLayer = 0.03;
 
-  odePhysics->SetParam("type", type);
+  odePhysics->SetParam("solver_type", type);
   odePhysics->SetParam("precon_iters", preconIters);
   odePhysics->SetParam("iters", iters);
   odePhysics->SetParam("sor", sor);
