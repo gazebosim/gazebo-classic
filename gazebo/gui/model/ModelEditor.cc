@@ -65,9 +65,11 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(ballJointAct);
   jointMenu->addAction(universalJointAct);
   jointMenu->addAction(screwJointAct);
-  this->jointAct = toolbar->addWidget(jointButton);
-  this->jointAct->setVisible(false);
 
+  this->jointSeparatorAct = toolbar->addSeparator();
+  this->jointAct = toolbar->addWidget(jointButton);
+  this->jointSeparatorAct->setVisible(false);
+  this->jointAct->setVisible(false);
 
   this->signalMapper = new QSignalMapper(this);
   connect(this->signalMapper, SIGNAL(mapped(const QString)),
@@ -149,4 +151,5 @@ void ModelEditor::ToggleToolbar()
   }
 
   this->jointAct->setVisible(this->active);
+  this->jointSeparatorAct->setVisible(this->active);
 }

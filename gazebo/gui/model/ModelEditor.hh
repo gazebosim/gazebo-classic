@@ -59,6 +59,9 @@ namespace gazebo
       /// \brief Qt action for adding a joint in the model editor.
       private: QAction *jointAct;
 
+      /// \brief A separator for the joint icon.
+      private: QAction *jointSeparatorAct;
+
       /// \brief Qt signal mapper for mapping add jointsignals.
       private:  QSignalMapper *signalMapper;
     };

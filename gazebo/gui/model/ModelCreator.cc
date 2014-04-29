@@ -642,7 +642,6 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
         QMenu menu;
         menu.addAction(this->inspectAct);
         menu.exec(QCursor::pos());
-//        this->ShowInspector(vis->GetParent()->GetName());
         return true;
       }
 
@@ -838,7 +837,7 @@ void ModelCreator::GenerateSDF()
 
       visualElem->GetAttribute("name")->Set(visual->GetName());
       collisionElem->GetAttribute("name")->Set(
-          visual->GetName() + "_collision");
+          visual->GetParent()->GetName() + "_collision");
       visualElem->GetElement("pose")->Set(visual->GetPose());
       collisionElem->GetElement("pose")->Set(visual->GetPose());
 
