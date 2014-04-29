@@ -552,9 +552,9 @@ void JointMaker::GenerateSDF()
     jointElem->GetAttribute("name")->Set(joint->visual->GetName());
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
-    parentElem->Set(joint->parent->GetParent()->GetName());
+    parentElem->Set(joint->parent->GetName());
     sdf::ElementPtr childElem = jointElem->GetElement("child");
-    childElem->Set(joint->child->GetParent()->GetName());
+    childElem->Set(joint->child->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
     poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
     int axisCount = GetJointAxisCount(joint->type);
