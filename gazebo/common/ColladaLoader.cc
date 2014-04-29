@@ -840,7 +840,6 @@ void ColladaLoader::LoadVertices(const std::string &_id,
     std::vector<math::Vector3> &_verts,
     std::vector<math::Vector3> &_norms)
 {
-
   std::map<unsigned int, unsigned int> vertDup;
   std::map<unsigned int, unsigned int> normDup;
   this->LoadVertices(_id, _transform, _verts, _norms, vertDup, normDup);
@@ -1451,12 +1450,15 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 
               if (hasNormals)
               {
-                // Get the vertex normal index value. If the normal is a duplicate
-                // then reset the index to the first instance of the duplicated
-                // position
+                // Get the vertex normal index value. If the normal is a
+                // duplicate then reset the index to the first instance of the
+                // duplicated position
                 unsigned int remappedNormalIndex = values[inputs[NORMAL]];
-                if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
+                if (normalDupMap.find(remappedNormalIndex)
+                    != normalDupMap.end())
+                 {
                   remappedNormalIndex = normalDupMap[remappedNormalIndex];
+                 }
 
                 if (iv.normalIndex == remappedNormalIndex)
                   normEqual = true;
