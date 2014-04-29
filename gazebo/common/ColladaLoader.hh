@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "gazebo/common/MeshLoader.hh"
 #include "gazebo/math/MathTypes.hh"
@@ -115,37 +116,58 @@ namespace gazebo
       /// \return A Matrix4 transform
       private: math::Matrix4 LoadNodeTransform(TiXmlElement *_elem);
 
+
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
       /// \param[in] _transform Transform to apply to all vertices
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       private: void LoadVertices(const std::string &_id,
-                                 const math::Matrix4 &_transform,
-                                 std::vector<math::Vector3> &_verts,
-                                 std::vector<math::Vector3> &_norms);
+         const math::Matrix4 &_transform,
+         std::vector<math::Vector3> &_verts,
+         std::vector<math::Vector3> &_norms);
+
+      /// \brief Load vertices
+      /// \param[in] _id String id of the vertices XML node
+      /// \param[in] _transform Transform to apply to all vertices
+      /// \param[out] _verts Holds the resulting vertices
+      /// \param[out] _norms Holds the resulting normals
+      /// \param[out] _vertDup Holds a map of duplicate position indices
+      /// \param[out] _normDup Holds a map of duplicate normal indices
+      private: void LoadVertices(const std::string &_id,
+         const math::Matrix4 &_transform,
+         std::vector<math::Vector3> &_verts,
+         std::vector<math::Vector3> &_norms,
+         std::map<unsigned int, unsigned int> &_vertDup,
+         std::map<unsigned int, unsigned int> &_normDup);
 
       /// \brief Load positions
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all positions
       /// \param[out] _values Holds the resulting position values
+      /// \param[out] _values Holds a map of duplicate position indices
       private: void LoadPositions(const std::string &_id,
-                                  const math::Matrix4 &_transform,
-                                  std::vector<math::Vector3> &_values);
+          const math::Matrix4 &_transform,
+          std::vector<math::Vector3> &_values,
+          std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load normals
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all normals
       /// \param[out] _values Holds the resulting normal values
+      /// \param[out] _values Holds a map of duplicate normal indices
       private: void LoadNormals(const std::string &_id,
-                                const math::Matrix4 &_transform,
-                                std::vector<math::Vector3> &_values);
+          const math::Matrix4 &_transform,
+          std::vector<math::Vector3> &_values,
+          std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load texture coordinates
       /// \param[in] _id String id of the XML node
-      /// \param[out] _values Holds the resulting normal values
+      /// \param[out] _values Holds the resulting uv values
+      /// \param[out] _values Holds a map of duplicate uv indices
       private: void LoadTexCoords(const std::string &_id,
-                                 std::vector<math::Vector2d> &_values);
+          std::vector<math::Vector2d> &_values,
+          std::map<unsigned int, unsigned int> &_duplicates);
 
       /// \brief Load a material
       /// \param _name Name of the material XML element
@@ -197,6 +219,22 @@ namespace gazebo
       /// \param[in] _elem Pointer to the XML element
       /// \param[out] _mat Material to hold the transparent properties
       private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
+
+      /// \brief Create an indices map that is used as a look-up table of
+      // dupliate 3d vectors.
+      /// \param[in] _values input 3d vectors.
+      /// \param[in] _map Map of an index to its duplicate.
+      private: void CreateDuplicateIndicesMap(
+          const std::vector<math::Vector3> &_values,
+          std::map<unsigned int, unsigned int> &_map);
+
+      /// \brief Create an indices map that is used as a look-up table of
+      // dupliate 2d vectors.
+      /// \param[in] _values input 2d vectors.
+      /// \param[in] _map Map of an index to its duplicate.
+      private: void CreateDuplicateIndicesMap(
+          const std::vector<math::Vector2d> &_values,
+          std::map<unsigned int, unsigned int> &_map);
 
       /// \internal
       /// \brief Pointer to private data.
