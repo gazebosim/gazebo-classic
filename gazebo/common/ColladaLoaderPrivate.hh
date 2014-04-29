@@ -77,7 +77,6 @@ namespace gazebo
       /// duplicate texture coordinates.
       public: std::map<std::string, std::map<unsigned int, unsigned int> >
           texcoordDuplicateMap;
-
     };
 
     /// \brief Helper data structure for loading collada geometries.
