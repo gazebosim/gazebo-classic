@@ -267,13 +267,6 @@ bool ODEUniversalJoint::SetLowStop(
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAttribute(
-  const std::string &_key, unsigned int _index, const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool ODEUniversalJoint::SetParam(
   const std::string &_key, unsigned int _index, const boost::any &_value)
 {
@@ -375,13 +368,6 @@ bool ODEUniversalJoint::SetParam(
     return ODEJoint::SetParam(_key, _index, _value);
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-double ODEUniversalJoint::GetAttribute(
-  const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

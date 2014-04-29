@@ -85,21 +85,9 @@ bool setup(int _argc, char **_argv)
 }
 
 /////////////////////////////////////////////////
-void gazebo::print_version()
-{
-  fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-/////////////////////////////////////////////////
 void gazebo::printVersion()
 {
   fprintf(stderr, "%s", GAZEBO_VERSION_HEADER);
-}
-
-/////////////////////////////////////////////////
-void gazebo::add_plugin(const std::string &_filename)
-{
-  gazebo::addPlugin(_filename);
 }
 
 /////////////////////////////////////////////////
@@ -121,47 +109,6 @@ void gazebo::addPlugin(const std::string &_filename)
     }
     g_plugins.push_back(plugin);
   }
-}
-
-/////////////////////////////////////////////////
-bool gazebo::load(int _argc, char **_argv)
-{
-  return gazebo::setupClient(_argc, _argv);
-}
-
-/////////////////////////////////////////////////
-bool gazebo::init()
-{
-  for (std::vector<SystemPluginPtr>::iterator iter = g_plugins.begin();
-       iter != g_plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
-
-  return true;
-}
-
-/////////////////////////////////////////////////
-void gazebo::run()
-{
-  // Run transport loop. Starts a thread
-  gazebo::transport::run();
-}
-
-/////////////////////////////////////////////////
-void gazebo::stop()
-{
-  util::LogRecord::Instance()->Stop();
-  gazebo::transport::stop();
-}
-
-/////////////////////////////////////////////////
-void gazebo::fini()
-{
-  boost::mutex::scoped_lock lock(fini_mutex);
-  util::LogRecord::Instance()->Fini();
-  g_plugins.clear();
-  gazebo::transport::fini();
 }
 
 /////////////////////////////////////////////////
