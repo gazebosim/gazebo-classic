@@ -24,6 +24,8 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/model/ModelEditorPalette.hh"
 #include "gazebo/gui/model/ModelEditorEvents.hh"
+#include "gazebo/gui/model/ModelCreator.hh"
+#include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
 using namespace gazebo;
@@ -46,12 +48,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   // Add a joint icon to the render widget toolbar
   QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
-  QToolButton *jointButton = new QToolButton(toolbar);
-  jointButton->setIcon(QIcon(":/images/draw_link.svg"));
-  jointButton->setText(tr("Joint"));
-  QMenu *jointMenu = new QMenu(jointButton);
-  jointButton->setMenu(jointMenu);
-  jointButton->setPopupMode(QToolButton::InstantPopup);
+  this->jointButton = new QToolButton(toolbar);
+  this->jointButton->setIcon(QIcon(":/images/draw_link.svg"));
+  this->jointButton->setText(tr("Joint"));
+  this->jointButton->setFixedWidth(50);
+  this->jointButton->setCheckable(true);
+  QMenu *jointMenu = new QMenu(this->jointButton);
+  this->jointButton->setMenu(jointMenu);
   QAction *revoluteJointAct = new QAction(tr("Revolute"), this);
   QAction *revolute2JointAct = new QAction(tr("Revolute2"), this);
   QAction *prismaticJointAct = new QAction(tr("Prismatic"), this);
@@ -67,43 +70,71 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(screwJointAct);
 
   this->jointSeparatorAct = toolbar->addSeparator();
-  this->jointAct = toolbar->addWidget(jointButton);
+  this->jointAct = toolbar->addWidget(this->jointButton);
   this->jointSeparatorAct->setVisible(false);
   this->jointAct->setVisible(false);
 
   this->signalMapper = new QSignalMapper(this);
   connect(this->signalMapper, SIGNAL(mapped(const QString)),
-      this->modelPalette, SLOT(OnAddJoint(const QString)));
+      this, SLOT(OnAddJoint(const QString)));
 
   connect(revoluteJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(revoluteJointAct,
-      revoluteJointAct->text());
+      revoluteJointAct->text().toLower());
   connect(revolute2JointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(revolute2JointAct,
-      revolute2JointAct->text());
+      revolute2JointAct->text().toLower());
   connect(prismaticJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(prismaticJointAct,
-      prismaticJointAct->text());
+      prismaticJointAct->text().toLower());
   connect(ballJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(ballJointAct,
-      ballJointAct->text());
+      ballJointAct->text().toLower());
   connect(universalJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(universalJointAct,
-      universalJointAct->text());
+      universalJointAct->text().toLower());
   connect(screwJointAct, SIGNAL(triggered()), this->signalMapper,
       SLOT(map()));
   this->signalMapper->setMapping(screwJointAct,
-      screwJointAct->text());
+      screwJointAct->text().toLower());
+
+  // set default joint type.
+  this->selectedJointType = revoluteJointAct->text().toLower().toStdString();
+  connect(this->jointButton, SIGNAL(clicked()), this,
+      SLOT(OnAddSelectedJoint()));
+
+  connect(this->modelPalette->GetModelCreator()->GetJointMaker(),
+      SIGNAL(JointAdded()), this, SLOT(OnJointAdded()));
 }
 
 /////////////////////////////////////////////////
 ModelEditor::~ModelEditor()
 {
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnAddSelectedJoint()
+{
+  this->modelPalette->AddJoint(this->selectedJointType);
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnAddJoint(const QString &_type)
+{
+  std::string type = _type.toStdString();
+  this->modelPalette->AddJoint(type);
+  this->selectedJointType = type;
+}
+
+/////////////////////////////////////////////////
+void ModelEditor::OnJointAdded()
+{
+  this->jointButton->setChecked(false);
 }
 
 /////////////////////////////////////////////////

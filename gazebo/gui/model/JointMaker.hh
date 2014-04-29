@@ -89,6 +89,10 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Create a joint
+      /// \param[_type] Type of joint to be created in string.
+      public: void CreateJoint(const std::string &_type);
+
+      /// \brief Create a joint
       /// \param[_type] Type of joint to be created
       public: void CreateJoint(JointType _type);
 

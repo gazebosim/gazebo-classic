@@ -44,6 +44,16 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief QT callback when the joint button is clicked.
+      private slots: void OnAddSelectedJoint();
+
+      /// \brief QT callback when a joint menu is selected
+      /// \param[in] _type Type of joint.
+      private slots: void OnAddJoint(const QString &_type);
+
+      /// \brief Qt callback when a joint is added.
+      private slots: void OnJointAdded();
+
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
@@ -62,8 +72,14 @@ namespace gazebo
       /// \brief A separator for the joint icon.
       private: QAction *jointSeparatorAct;
 
+      /// \brief Qt tool button associated with the joint action.
+      private: QToolButton *jointButton;
+
       /// \brief Qt signal mapper for mapping add jointsignals.
-      private:  QSignalMapper *signalMapper;
+      private: QSignalMapper *signalMapper;
+
+      /// \brief Previously selected joint type.
+      private: std::string selectedJointType;
     };
   }
 }

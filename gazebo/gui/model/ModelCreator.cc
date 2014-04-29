@@ -100,7 +100,7 @@ std::string ModelCreator::CreateModel()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::AddJoint(JointMaker::JointType _type)
+void ModelCreator::AddJoint(const std::string &_type)
 {
   this->Stop();
   if (this->jointMaker)

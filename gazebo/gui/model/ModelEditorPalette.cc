@@ -272,36 +272,12 @@ void ModelEditorPalette::OnCustom()
 }
 
 /////////////////////////////////////////////////
-void ModelEditorPalette::OnAddJoint(const QString &_type)
+void ModelEditorPalette::AddJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
   g_arrowAct->trigger();
 
-  std::string type = _type.toStdString();
-  if (_type == "Revolute")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE);
-  }
-  else if (_type == "Revolute2")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_HINGE2);
-  }
-  else if (_type == "Prismatic")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_SLIDER);
-  }
-  else if (_type == "Ball")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_BALL);
-  }
-  else if (_type == "Universal")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_UNIVERSAL);
-  }
-  else if (_type == "Screw")
-  {
-    this->modelCreator->AddJoint(JointMaker::JOINT_SCREW);
-  }
+  this->modelCreator->AddJoint(_type);
 }
 
 /////////////////////////////////////////////////
@@ -408,4 +384,10 @@ bool ModelEditorPalette::OnKeyPress(const common::KeyEvent &_event)
     g_arrowAct->trigger();
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+ModelCreator *ModelEditorPalette::GetModelCreator()
+{
+  return this->modelCreator;
 }

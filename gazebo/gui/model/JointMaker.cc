@@ -243,11 +243,40 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       this->CreateJoint(JointMaker::JOINT_NONE);
 
       this->newJointCreated = true;
-      emit JointAdded();
     }
   }
 
   return true;
+}
+
+
+/////////////////////////////////////////////////
+void JointMaker::CreateJoint(const std::string &_type)
+{
+  if (_type == "revolute")
+  {
+    this->CreateJoint(JointMaker::JOINT_HINGE);
+  }
+  else if (_type == "revolute2")
+  {
+    this->CreateJoint(JointMaker::JOINT_HINGE2);
+  }
+  else if (_type == "prismatic")
+  {
+    this->CreateJoint(JointMaker::JOINT_SLIDER);
+  }
+  else if (_type == "ball")
+  {
+    this->CreateJoint(JointMaker::JOINT_BALL);
+  }
+  else if (_type == "universal")
+  {
+    this->CreateJoint(JointMaker::JOINT_UNIVERSAL);
+  }
+  else if (_type == "screw")
+  {
+    this->CreateJoint(JointMaker::JOINT_SCREW);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -276,6 +305,8 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
       boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
 
+    // signal the end of a joint action.
+    emit JointAdded();
   }
 }
 

@@ -85,7 +85,7 @@ namespace gazebo
       public: std::string GetModelName() const;
 
       /// \brief Finish the model and create the entity on the gzserver.
-       public: void FinishModel();
+      public: void FinishModel();
 
       /// \brief Add a box to the model.
       /// \param[in] _size Size of the box.
@@ -121,8 +121,7 @@ namespace gazebo
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
-      /// \return Name of the joint that has been added.
-      public: void AddJoint(JointMaker::JointType _type);
+      public: void AddJoint(const std::string &_type);
 
       /// \brief Remove a part from the model.
       /// \param[in] _partName Name of the part to remove
