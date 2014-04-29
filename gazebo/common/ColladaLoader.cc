@@ -917,17 +917,12 @@ void ColladaLoader::LoadPositions(const std::string &_id,
     vec = _transform * vec;
     _values.push_back(vec);
 
+    // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
       _duplicates[_values.size()-1] = unique[vec];
-
     else
       unique[vec] = _values.size()-1;
   }
-
-  std::cerr << " position unique vs duplicates " << unique.size() << " "
-      << _duplicates.size() << std::endl;
-
-  //this->CreateDuplicateIndicesMap(_values, _duplicates);
 
   this->dataPtr->positionDuplicateMap[_id] = _duplicates;
   this->dataPtr->positionIds[_id] = _values;
@@ -977,15 +972,13 @@ void ColladaLoader::LoadNormals(const std::string &_id,
       vec.Normalize();
       _values.push_back(vec);
 
+      // create a map of duplicate indices
       if (unique.find(vec) != unique.end())
         _duplicates[_values.size()-1] = unique[vec];
       else
         unique[vec] = _values.size()-1;
     }
   } while (iss);
-
-  std::cerr << " normal unique vs duplicates " << unique.size() << " "
-      << _duplicates.size() << std::endl;
 
   this->dataPtr->normalDuplicateMap[_id] = _duplicates;
   this->dataPtr->normalIds[_id] = _values;
@@ -1100,14 +1093,12 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
           1.0 - boost::lexical_cast<double>(values[i+1]));
     _values.push_back(vec);
 
+    // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
       _duplicates[i] = unique[vec];
     else
       unique[vec] = i;
   }
-
-  std::cerr << " texcoord unique vs duplicates " << unique.size() << " "
-      << _duplicates.size() << std::endl;
 
   this->dataPtr->texcoordDuplicateMap[_id] = _duplicates;
   this->dataPtr->texcoordIds[_id] = _values;
@@ -1565,7 +1556,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 
   _mesh->AddSubMesh(subMesh);
 }
-int reusedd = 0;
+
 /////////////////////////////////////////////////
 void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   const math::Matrix4 &_transform,
@@ -1670,9 +1661,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
 
   boost::split(strs, pStr, boost::is_any_of("   "));
 
-  // TODO remove me
-  int reused = 0;
-
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {
     for (unsigned int i = 0; i < offsetSize; ++i)
@@ -1742,9 +1730,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             toDuplicate = false;
             reuseIndex = iv.mappedIndex;
             subMesh->AddIndex(reuseIndex);
-            // TODO remove me
-            reused++; reusedd++;
-
             break;
           }
         }
@@ -1809,8 +1794,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
   }
 
-  // TODO remove me
-  std::cerr << "reused " << reused << " " << reusedd << std::endl;
   delete [] values;
   _mesh->AddSubMesh(subMesh);
 }
