@@ -20,6 +20,7 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -39,6 +40,31 @@
 
 using namespace gazebo;
 using namespace common;
+
+/////////////////////////////////////////////////
+struct Vector3Hash : std::unary_function<const math::Vector3, std::size_t>
+{
+  std::size_t operator()(const math::Vector3 _v) const
+  {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, _v.x);
+    boost::hash_combine(seed, _v.y);
+    boost::hash_combine(seed, _v.z);
+    return seed;
+  }
+};
+
+/////////////////////////////////////////////////
+struct Vector2dHash : std::unary_function<const math::Vector2d, std::size_t>
+{
+  std::size_t operator()(const math::Vector2d _v) const
+  {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, _v.x);
+    boost::hash_combine(seed, _v.y);
+    return seed;
+  }
+};
 
 //////////////////////////////////////////////////
   ColladaLoader::ColladaLoader()
@@ -877,6 +903,8 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   }
   std::string valueStr = floatArrayXml->GetText();
 
+  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+
   std::vector<std::string> strs;
   std::vector<std::string>::iterator iter, end;
   boost::split(strs, valueStr, boost::is_any_of("   "));
@@ -888,9 +916,18 @@ void ColladaLoader::LoadPositions(const std::string &_id,
         math::parseFloat(*(iter+2)));
     vec = _transform * vec;
     _values.push_back(vec);
+
+    if (unique.find(vec) != unique.end())
+      _duplicates[_values.size()-1] = unique[vec];
+
+    else
+      unique[vec] = _values.size()-1;
   }
 
-  this->CreateDuplicateIndicesMap(_values, _duplicates);
+  std::cerr << " position unique vs duplicates " << unique.size() << " "
+      << _duplicates.size() << std::endl;
+
+  //this->CreateDuplicateIndicesMap(_values, _duplicates);
 
   this->dataPtr->positionDuplicateMap[_id] = _duplicates;
   this->dataPtr->positionIds[_id] = _values;
@@ -926,6 +963,8 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     return;
   }
 
+  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
   do
@@ -937,10 +976,16 @@ void ColladaLoader::LoadNormals(const std::string &_id,
       vec = rotMat * vec;
       vec.Normalize();
       _values.push_back(vec);
+
+      if (unique.find(vec) != unique.end())
+        _duplicates[_values.size()-1] = unique[vec];
+      else
+        unique[vec] = _values.size()-1;
     }
   } while (iss);
 
-  this->CreateDuplicateIndicesMap(_values, _duplicates);
+  std::cerr << " normal unique vs duplicates " << unique.size() << " "
+      << _duplicates.size() << std::endl;
 
   this->dataPtr->normalDuplicateMap[_id] = _duplicates;
   this->dataPtr->normalIds[_id] = _values;
@@ -1040,6 +1085,8 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
     return;
   }
 
+  boost::unordered_map<math::Vector2d, unsigned int, Vector2dHash> unique;
+
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
   std::vector<std::string> values;
@@ -1049,55 +1096,22 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    _values.push_back(math::Vector2d(boost::lexical_cast<double>(values[i]),
-          1.0 - boost::lexical_cast<double>(values[i+1])));
+    math::Vector2d vec(boost::lexical_cast<double>(values[i]),
+          1.0 - boost::lexical_cast<double>(values[i+1]));
+    _values.push_back(vec);
+
+    if (unique.find(vec) != unique.end())
+      _duplicates[i] = unique[vec];
+    else
+      unique[vec] = i;
   }
 
-  this->CreateDuplicateIndicesMap(_values, _duplicates);
+  std::cerr << " texcoord unique vs duplicates " << unique.size() << " "
+      << _duplicates.size() << std::endl;
 
   this->dataPtr->texcoordDuplicateMap[_id] = _duplicates;
   this->dataPtr->texcoordIds[_id] = _values;
 }
-
-/////////////////////////////////////////////////
-void ColladaLoader::CreateDuplicateIndicesMap(
-          const std::vector<math::Vector3> &_values,
-          std::map<unsigned int, unsigned int> &_map)
-{
-  for (unsigned int i = 0; i < _values.size(); ++i)
-  {
-    for (unsigned int j = 0; j < i; ++j)
-    {
-      if (math::equal(_values[i].x, _values[j].x) &&
-          math::equal(_values[i].y, _values[j].y) &&
-          math::equal(_values[i].z, _values[j].z))
-        {
-          _map[i] = j;
-          break;
-        }
-    }
-  }
-}
-
-/////////////////////////////////////////////////
-void ColladaLoader::CreateDuplicateIndicesMap(
-          const std::vector<math::Vector2d> &_values,
-          std::map<unsigned int, unsigned int> &_map)
-{
-  for (unsigned int i = 0; i < _values.size(); ++i)
-  {
-    for (unsigned int j = 0; j < i; ++j)
-    {
-      if (math::equal(_values[i].x, _values[j].x) &&
-          math::equal(_values[i].y, _values[j].y))
-        {
-          _map[i] = j;
-          break;
-        }
-    }
-  }
-}
-
 
 /////////////////////////////////////////////////
 Material *ColladaLoader::LoadMaterial(const std::string &_name)
@@ -1551,8 +1565,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
 
   _mesh->AddSubMesh(subMesh);
 }
-
-
+int reusedd = 0;
 /////////////////////////////////////////////////
 void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   const math::Matrix4 &_transform,
@@ -1730,7 +1743,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             reuseIndex = iv.mappedIndex;
             subMesh->AddIndex(reuseIndex);
             // TODO remove me
-            reused++;
+            reused++; reusedd++;
 
             break;
           }
@@ -1797,7 +1810,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
 
   // TODO remove me
-  std::cerr << "reused " << reused << std::endl;
+  std::cerr << "reused " << reused << " " << reusedd << std::endl;
   delete [] values;
   _mesh->AddSubMesh(subMesh);
 }

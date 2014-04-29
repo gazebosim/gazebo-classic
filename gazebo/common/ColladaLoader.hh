@@ -220,22 +220,6 @@ namespace gazebo
       /// \param[out] _mat Material to hold the transparent properties
       private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
 
-      /// \brief Create an indices map that is used as a look-up table of
-      // dupliate 3d vectors.
-      /// \param[in] _values input 3d vectors.
-      /// \param[in] _map Map of an index to its duplicate.
-      private: void CreateDuplicateIndicesMap(
-          const std::vector<math::Vector3> &_values,
-          std::map<unsigned int, unsigned int> &_map);
-
-      /// \brief Create an indices map that is used as a look-up table of
-      // dupliate 2d vectors.
-      /// \param[in] _values input 2d vectors.
-      /// \param[in] _map Map of an index to its duplicate.
-      private: void CreateDuplicateIndicesMap(
-          const std::vector<math::Vector2d> &_values,
-          std::map<unsigned int, unsigned int> &_map);
-
       /// \internal
       /// \brief Pointer to private data.
       private: ColladaLoaderPrivate *dataPtr;
