@@ -305,6 +305,12 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #1174.\n";
+    return;
+  }
+
   Load("worlds/multilink_shape.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -385,6 +391,12 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #1175.\n";
+    return;
+  }
+
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
