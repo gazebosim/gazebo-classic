@@ -43,7 +43,7 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
-  if (!((_physicsEngine == "ode" || _physicsEngine == "bullet")))
+  if (_physicsEngine == "dart")
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine
           << "] with joint type [" << _jointType << "]"
@@ -66,17 +66,17 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
   SpawnJointOptions opt;
   opt.type = _jointType;
-  double Am = M_PI / 12;
+  double Am = M_PI / 11;
   double Al = M_PI / 12;
-  double Aj = M_PI / 12;
+  double Aj = M_PI / 13;
   opt.modelPose.rot.SetFromEuler(0, 0, Am);
   opt.childLinkPose.rot.SetFromEuler(0, 0, Al);
   opt.jointPose.rot.SetFromEuler(0, 0, Aj);
   opt.axis.Set(1, 0, 0);
 
-  // i = 0: child parent
-  // i = 1: child world
-  // i = 2: world parent
+  // i = 0: joint between child link and parent link
+  // i = 1: joint between child link and world
+  // i = 2: joint between world and parent link
   for (int i = 0; i < 3; ++i)
   {
     gzdbg << "SpawnJoint " << _jointType;
@@ -102,36 +102,42 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
     std::cout << std::endl;
 
-    // parent model frame
+    // spawn joint using using parent model frame to define joint axis
     {
+      gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
       physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
       ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
       if (opt.worldParent)
       {
+        gzdbg << "  where parent is world.\n";
         this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
       }
       else
       {
+        gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(jointUseParentModelFrame,
           math::Vector3(cos(Am), sin(Am), 0));
       }
     }
 
-    // joint frame
+    // spawn joint using using child link frame to define joint axis
     {
+      gzdbg << "test case with joint axis specified in child link frame.\n";
       opt.useParentModelFrame = false;
       physics::JointPtr joint = SpawnJoint(opt);
       ASSERT_TRUE(joint != NULL);
 
       if (opt.worldChild)
       {
+        gzdbg << "  where parent is world.\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Aj), sin(Aj), 0));
       }
       else
       {
+        gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(joint,
           math::Vector3(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
@@ -152,6 +158,27 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
 
   // Check that Joint::GetGlobalAxis matches _axis
   EXPECT_EQ(_axis, _joint->GetGlobalAxis(0));
+
+  // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // get axis specified locally (in joint frame or in parent model frame)
+  math::Vector3 axisLocalFrame = _joint->GetLocalAxis(0);
+  {
+    // rotate axis into global frame
+    math::Vector3 axisGlobalFrame =
+      _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
+    // Test GetAxisFrame: check that axis in global frame is
+    // computed correctly.
+    EXPECT_EQ(axisGlobalFrame, _axis);
+  }
+  {
+    // rotate axis into joint frame
+    math::Vector3 axisJointFrame =
+      _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
+    // roate axis specified in global frame into joint frame
+    math::Vector3 axisJointFrame2 =
+      _joint->GetWorldPose().rot.RotateVectorReverse(_axis);
+    EXPECT_EQ(axisJointFrame, axisJointFrame2);
+  }
 
   if (!_joint->GetChild())
   {
@@ -209,6 +236,16 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
         }
       }
     }
+    gzdbg << "    joint pose:        " << _joint->GetWorldPose() << std::endl;
+    gzdbg << "    global axis:       " << _axis << std::endl;
+    gzdbg << "    axis frame:        " << _joint->GetAxisFrame(0) << std::endl;
+    gzdbg << "    axis frame offset: "
+          << _joint->GetAxisFrameOffset(0) << std::endl;
+    gzdbg << "    desired velocity:  " << vel << std::endl;
+    gzdbg << "    joint velocity:    " << _joint->GetVelocity(0) << std::endl;
+    gzdbg << "    child velocity:    " << childVelocity << std::endl;
+    gzdbg << "    parent velocity:   " << parentVelocity << std::endl;
+    std::cout << std::endl;
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
   }
 }
