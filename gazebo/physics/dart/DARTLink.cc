@@ -35,7 +35,7 @@ DARTLink::DARTLink(EntityPtr _parent)
   : Link(_parent),
     dtBodyNode(NULL),
     staticLink(false),
-    weldConst(NULL)
+    weldJointConst(NULL)
 {
 }
 
@@ -610,14 +610,14 @@ void DARTLink::SetLinkStatic(bool _static)
   if (_static == true)
   {
     // Add weld joint constraint to DART
-    this->weldConst =
+    this->weldJointConst =
         new dart::constraint::WeldJointConstraint(this->dtBodyNode);
-    GetDARTWorld()->getConstraintSolver()->addConstraint(weldConst);
+    GetDARTWorld()->getConstraintSolver()->addConstraint(weldJointConst);
   }
   else
   {
     // Remove ball and revolute joint constraints from DART
-    GetDARTWorld()->getConstraintSolver()->removeConstraint(weldConst);
+    GetDARTWorld()->getConstraintSolver()->removeConstraint(weldJointConst);
   }
 
   staticLink = _static;

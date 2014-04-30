@@ -187,8 +187,8 @@ namespace gazebo
       /// \brief If true, freeze link to world (inertial) frame.
       private: bool staticLink;
 
-      /// \brief Ball joint constraint for SetLinkStatic()
-      private: dart::constraint::WeldJointConstraint *weldConst;
+      /// \brief Weld joint constraint for SetLinkStatic()
+      private: dart::constraint::WeldJointConstraint *weldJointConst;
     };
     /// \}
   }
