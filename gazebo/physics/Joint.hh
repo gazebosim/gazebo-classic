@@ -522,6 +522,20 @@ namespace gazebo
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
 
+      /// \brief Get orientation of joint axis reference frame
+      /// relative to joint frame. This should always return identity unless
+      /// flag use_parent_model_frame is true in sdf 1.5 or using sdf 1.4-,
+      /// i.e. bug described in issue #494 is present.
+      /// In addition, if use_parent_model_frame is true, and the parent
+      /// link of the joint is world, the axis is defined in the world frame.
+      /// The value of axisParentModelFrame is used to determine the
+      /// appropriate frame internally.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to joint frame.
+      /// If supplied _index is out of range, or use_parent_model_frame
+      /// is not true, this function returns identity rotation quaternion.
+      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const;
+
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.
       /// If using metric system, the unit of energy will be Joules.
