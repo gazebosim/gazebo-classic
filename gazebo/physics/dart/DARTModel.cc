@@ -177,9 +177,11 @@ void DARTModel::BackupState()
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
-  GZ_ASSERT(dtConfig.size() == this->dtSkeleton->getNumGenCoords(),
+  GZ_ASSERT(static_cast<size_t>(dtConfig.size()) ==
+            this->dtSkeleton->getNumGenCoords(),
             "Cannot RestoreState, invalid size");
-  GZ_ASSERT(dtVelocity.size() == this->dtSkeleton->getNumGenCoords(),
+  GZ_ASSERT(static_cast<size_t>(dtVelocity.size()) ==
+            this->dtSkeleton->getNumGenCoords(),
             "Cannot RestoreState, invalid size");
 
   this->dtSkeleton->setConfigs(dtConfig, true, false, false);
