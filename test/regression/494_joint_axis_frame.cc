@@ -180,6 +180,11 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     EXPECT_EQ(axisJointFrame, axisJointFrame2);
   }
 
+  if (_joint->HasType(physics::Base::UNIVERSAL_JOINT))
+  {
+    gzerr << "The rest of this test fails for this joint type" << std::endl;
+    return;
+  }
   if (!_joint->GetChild())
   {
     gzerr << "The rest of this test fails without a child link" << std::endl;
@@ -257,8 +262,7 @@ TEST_P(Issue494Test, CheckAxisFrame)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
-  ::testing::Values("revolute")));
-//  ::testing::Values("revolute", "prismatic", "screw")));
+  ::testing::Values("revolute", "prismatic", "universal")));
 
 /////////////////////////////////////////////////
 /// Main
