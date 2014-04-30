@@ -223,7 +223,9 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
       // Create joint data with selected visual as parent
-      this->mouseJoint = CreateJoint(this->selectedVis, rendering::VisualPtr());
+      // the child will be set on the second mouse release.
+      this->mouseJoint = this->CreateJoint(this->selectedVis,
+          rendering::VisualPtr());
     }
     // Pressed child part
     else if (this->selectedVis != this->hoverVis)

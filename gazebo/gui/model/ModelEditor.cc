@@ -64,12 +64,28 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   QAction *universalJointAct = new QAction(tr("Universal"), this);
   QAction *screwJointAct = new QAction(tr("Screw"), this);
 
+  revoluteJointAct->setCheckable(true);
+  revolute2JointAct->setCheckable(true);
+  prismaticJointAct->setCheckable(true);
+  ballJointAct->setCheckable(true);
+  universalJointAct->setCheckable(true);
+  screwJointAct->setCheckable(true);
+
   jointMenu->addAction(revoluteJointAct);
   jointMenu->addAction(revolute2JointAct);
   jointMenu->addAction(prismaticJointAct);
   jointMenu->addAction(ballJointAct);
   jointMenu->addAction(universalJointAct);
   jointMenu->addAction(screwJointAct);
+
+  QActionGroup *jointActionGroup = new QActionGroup(this);
+  jointActionGroup->addAction(revoluteJointAct);
+  jointActionGroup->addAction(revolute2JointAct);
+  jointActionGroup->addAction(prismaticJointAct);
+  jointActionGroup->addAction(ballJointAct);
+  jointActionGroup->addAction(universalJointAct);
+  jointActionGroup->addAction(screwJointAct);
+  jointActionGroup->setExclusive(true);
 
   this->jointSeparatorAct = toolbar->addSeparator();
   toolbar->addAction(this->jointAct);
@@ -108,6 +124,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       screwJointAct->text().toLower());
 
   // set default joint type.
+  revoluteJointAct->setChecked(true);
   this->selectedJointType = revoluteJointAct->text().toLower().toStdString();
   connect(this->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
