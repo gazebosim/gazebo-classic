@@ -188,10 +188,7 @@ namespace gazebo
       private: bool staticLink;
 
       /// \brief Ball joint constraint for SetLinkStatic()
-      private: dart::constraint::BallJointConstraint *ballConst;
-
-      /// \brief Revolute joint constraint for SetLinkStatic()
-      private: dart::constraint::RevoluteJointConstraint *revConst;
+      private: dart::constraint::WeldJointConstraint *weldConst;
     };
     /// \}
   }
