@@ -88,17 +88,21 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // double threadPitch = 100.0;
     // joint->SetParam("thread_pitch", threadPitch);
 
-    // set velocity to 2 pi rad/s and step forward 1.5 seconds.
+    // set torque to 2 pi rad/s and step forward 1.5 seconds.
     double torque = 2*M_PI;
     unsigned int stepCount = 30;
-    // expect that joint velocity is constant
-    // and that joint angle is unwrapped
+    // compute joint velocity analytically with constant torque
+    // joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)
     {
       joint->SetForce(0, torque);
       // compute what velocity should be for the force
+      /// \TODO: get constants below from model
+      const double moi = 1.0;
+      const double threadPitch = 1.0;
+      const double mass = 1.0;
       double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() /
-        (1.0 / (1.0*1.0) + 1.0));
+        (moi / (threadPitch*threadPitch) + mass));
       world->Step(1);
       gzdbg << "v: " << joint->GetVelocity(0)
             << " ve: " << vel << "\n";
