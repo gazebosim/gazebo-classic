@@ -1351,6 +1351,12 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         texDupMap = this->dataPtr->texcoordDuplicateMap[source];
       hasTexcoords = true;
     }
+    else
+    {
+      gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
+          << "not supported" << std::endl;
+    }
+
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
   }
 
@@ -1634,6 +1640,11 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       this->LoadTexCoords(source, texcoords, texDupMap);
       inputs[TEXCOORD] = math::parseInt(offset);
       hasTexcoords = true;
+    }
+    else
+    {
+      gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
+          << "not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
     offsetSize++;
