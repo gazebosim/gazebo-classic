@@ -31,13 +31,13 @@ void JointMaker_TEST::JointState()
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
 
-  jointMaker->CreateJoint(gui::JointMaker::JOINT_HINGE);
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_HINGE);
 
   jointMaker->Reset();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
 
-  jointMaker->CreateJoint(gui::JointMaker::JOINT_SLIDER);
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_SLIDER);
 
   jointMaker->Stop();
@@ -71,7 +71,7 @@ void JointMaker_TEST::CreateJoint()
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
 
-  jointMaker->CreateJoint(gui::JointMaker::JOINT_HINGE);
+  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
   QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_HINGE);
 
 

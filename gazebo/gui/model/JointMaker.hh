@@ -89,13 +89,19 @@ namespace gazebo
       /// \brief Reset the joint maker;
       public: void Reset();
 
-      /// \brief Create a joint
-      /// \param[_type] Type of joint to be created in string.
-      public: void CreateJoint(const std::string &_type);
+      /// \brief Add a joint
+      /// \param[in] _type Type of joint to be added in string.
+      public: void AddJoint(const std::string &_type);
 
-      /// \brief Create a joint
-      /// \param[_type] Type of joint to be created
-      public: void CreateJoint(JointType _type);
+      /// \brief Add a joint
+      /// \param[in] _type Type of joint to be added
+      public: void AddJoint(JointType _type);
+
+      /// \brief Create a joint with parent and child.
+      /// \param[in] _parent Parent of the joint.
+      /// \param[in] _child Child of the joint.
+      public: JointData *CreateJoint(rendering::VisualPtr _parent,
+          rendering::VisualPtr _child);
 
       /// \brief Update callback on PreRender.
       public: void Update();

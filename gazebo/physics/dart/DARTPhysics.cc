@@ -455,29 +455,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
-{
-  boost::any value = 0;
-  switch (_param)
-  {
-    case MAX_CONTACTS:
-    {
-      return this->GetParam("max_contacts");
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->GetParam("min_step_size");
-    }
-    default:
-    {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
-      break;
-    }
-  }
-  return value;
-}
-
-//////////////////////////////////////////////////
 dart::simulation::World *DARTPhysics::GetDARTWorld()
 {
   return this->dtWorld;

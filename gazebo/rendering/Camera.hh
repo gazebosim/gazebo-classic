@@ -107,16 +107,9 @@ namespace gazebo
       /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
       /// camera images.
-      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
-      // and change Render(bool _force) to have a default value of false.
-      public: void Render();
-
-      /// \brief Render the camera.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(bool _force);
+      public: void Render(bool _force = false);
 
       /// \brief Post render
       ///
@@ -334,10 +327,6 @@ namespace gazebo
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
-
-      /// \brief Deprecated: Get the camera's pitch scene node
-      /// \return NULL. Use GetSceheNode() instead.
-      public: Ogre::SceneNode *GetPitchNode() const GAZEBO_DEPRECATED(3.0);
 
       /// \brief Get a pointer to the image data
       ///

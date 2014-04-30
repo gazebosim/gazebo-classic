@@ -222,42 +222,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
       this->selectedVis = this->hoverVis;
       this->hoverVis.reset();
-
-      std::stringstream ss;
-      ss << this->selectedVis->GetName() << "_JOINT_" << this->jointCounter++;
-      rendering::VisualPtr jointVis(
-          new rendering::Visual(ss.str(), this->selectedVis->GetParent()));
-      jointVis->Load();
-      rendering::DynamicLines *jointLine =
-          jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      math::Vector3 origin = this->GetPartWorldCentroid(this->selectedVis)
-          - this->selectedVis->GetParent()->GetWorldPose().pos;
-      jointLine->AddPoint(origin);
-      jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
-      jointVis->GetSceneNode()->setInheritScale(false);
-      jointVis->GetSceneNode()->setInheritOrientation(false);
-
-      JointData *jointData = new JointData;
-      jointData->dirty = false;
-      jointData->visual = jointVis;
-      jointData->parent = this->selectedVis;
-      jointData->line = jointLine;
-      jointData->type = this->jointType;
-      jointData->inspector = new JointInspector(JointMaker::JOINT_NONE);
-      jointData->inspector->setModal(false);
-      connect(jointData->inspector, SIGNAL(Applied()),
-          jointData, SLOT(OnApply()));
-
-      int axisCount = JointMaker::GetJointAxisCount(jointData->type);
-      for (int i = 0; i < axisCount; ++i)
-      {
-        jointData->axis[i] = math::Vector3::UnitX;
-        jointData->lowerLimit[i] = -1e16;
-        jointData->upperLimit[i] = 1e16;
-      }
-      jointData->anchor = math::Vector3::Zero;
-      this->mouseJoint = jointData;
-      jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+      // Create joint data with selected visual as parent
+      this->mouseJoint = CreateJoint(this->selectedVis, rendering::VisualPtr());
     }
     // Pressed child part
     else if (this->selectedVis != this->hoverVis)
@@ -271,7 +237,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       // reset variables.
       this->selectedVis.reset();
       this->hoverVis.reset();
-      this->CreateJoint(JointMaker::JOINT_NONE);
+      this->AddJoint(JointMaker::JOINT_NONE);
 
       this->newJointCreated = true;
     }
@@ -281,36 +247,78 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateJoint(const std::string &_type)
+JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
+    rendering::VisualPtr _child)
+{
+  std::stringstream ss;
+  ss << _parent->GetName() << "_JOINT_" << this->jointCounter++;
+  rendering::VisualPtr jointVis(
+      new rendering::Visual(ss.str(), _parent->GetParent()));
+  jointVis->Load();
+  rendering::DynamicLines *jointLine =
+      jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
+  math::Vector3 origin = this->GetPartWorldCentroid(_parent)
+      - _parent->GetParent()->GetWorldPose().pos;
+  jointLine->AddPoint(origin);
+  jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
+  jointVis->GetSceneNode()->setInheritScale(false);
+  jointVis->GetSceneNode()->setInheritOrientation(false);
+
+  JointData *jointData = new JointData;
+  jointData->dirty = false;
+  jointData->visual = jointVis;
+  jointData->parent = _parent;
+  jointData->child = _child;
+  jointData->line = jointLine;
+  jointData->type = this->jointType;
+  jointData->inspector = new JointInspector(JointMaker::JOINT_NONE);
+  jointData->inspector->setModal(false);
+  connect(jointData->inspector, SIGNAL(Applied()),
+      jointData, SLOT(OnApply()));
+
+  int axisCount = JointMaker::GetJointAxisCount(jointData->type);
+  for (int i = 0; i < axisCount; ++i)
+  {
+    jointData->axis[i] = math::Vector3::UnitX;
+    jointData->lowerLimit[i] = -1e16;
+    jointData->upperLimit[i] = 1e16;
+  }
+  jointData->anchor = math::Vector3::Zero;
+  jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+  return jointData;
+}
+
+/////////////////////////////////////////////////
+void JointMaker::AddJoint(const std::string &_type)
 {
   if (_type == "revolute")
   {
-    this->CreateJoint(JointMaker::JOINT_HINGE);
+    this->AddJoint(JointMaker::JOINT_HINGE);
   }
   else if (_type == "revolute2")
   {
-    this->CreateJoint(JointMaker::JOINT_HINGE2);
+    this->AddJoint(JointMaker::JOINT_HINGE2);
   }
   else if (_type == "prismatic")
   {
-    this->CreateJoint(JointMaker::JOINT_SLIDER);
+    this->AddJoint(JointMaker::JOINT_SLIDER);
   }
   else if (_type == "ball")
   {
-    this->CreateJoint(JointMaker::JOINT_BALL);
+    this->AddJoint(JointMaker::JOINT_BALL);
   }
   else if (_type == "universal")
   {
-    this->CreateJoint(JointMaker::JOINT_UNIVERSAL);
+    this->AddJoint(JointMaker::JOINT_UNIVERSAL);
   }
   else if (_type == "screw")
   {
-    this->CreateJoint(JointMaker::JOINT_SCREW);
+    this->AddJoint(JointMaker::JOINT_SCREW);
   }
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateJoint(JointMaker::JointType _type)
+void JointMaker::AddJoint(JointMaker::JointType _type)
 {
   this->jointType = _type;
   if (_type != JointMaker::JOINT_NONE)
@@ -356,7 +364,7 @@ void JointMaker::Stop()
       delete this->mouseJoint;
       this->mouseJoint = NULL;
     }
-    this->CreateJoint(JointMaker::JOINT_NONE);
+    this->AddJoint(JointMaker::JOINT_NONE);
     if (this->hoverVis)
       this->hoverVis->SetEmissive(common::Color(0, 0, 0));
     if (this->selectedVis)
