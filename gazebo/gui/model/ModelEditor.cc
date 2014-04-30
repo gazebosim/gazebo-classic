@@ -47,12 +47,14 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
       boost::bind(&ModelEditor::OnFinish, this)));
 
   // Add a joint icon to the render widget toolbar
+  this->jointAct  = new QAction(QIcon(":/images/draw_link.svg"),
+      tr("Joint"), this);
+  this->jointAct->setCheckable(true);
+
   QToolBar *toolbar = this->mainWindow->GetRenderWidget()->GetToolbar();
   this->jointButton = new QToolButton(toolbar);
-  this->jointButton->setIcon(QIcon(":/images/draw_link.svg"));
-  this->jointButton->setText(tr("Joint"));
-  this->jointButton->setFixedWidth(50);
-  this->jointButton->setCheckable(true);
+  this->jointButton->setFixedWidth(15);
+  this->jointButton->setPopupMode(QToolButton::InstantPopup);
   QMenu *jointMenu = new QMenu(this->jointButton);
   this->jointButton->setMenu(jointMenu);
   QAction *revoluteJointAct = new QAction(tr("Revolute"), this);
@@ -70,9 +72,11 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   jointMenu->addAction(screwJointAct);
 
   this->jointSeparatorAct = toolbar->addSeparator();
-  this->jointAct = toolbar->addWidget(this->jointButton);
-  this->jointSeparatorAct->setVisible(false);
+  toolbar->addAction(this->jointAct);
+  this->jointTypeAct = toolbar->addWidget(this->jointButton);
   this->jointAct->setVisible(false);
+  this->jointSeparatorAct->setVisible(false);
+  this->jointTypeAct->setVisible(false);
 
   this->signalMapper = new QSignalMapper(this);
   connect(this->signalMapper, SIGNAL(mapped(const QString)),
@@ -105,7 +109,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
 
   // set default joint type.
   this->selectedJointType = revoluteJointAct->text().toLower().toStdString();
-  connect(this->jointButton, SIGNAL(clicked()), this,
+  connect(this->jointAct, SIGNAL(triggered()), this,
       SLOT(OnAddSelectedJoint()));
 
   connect(this->modelPalette->GetModelCreator()->GetJointMaker(),
@@ -129,12 +133,13 @@ void ModelEditor::OnAddJoint(const QString &_type)
   std::string type = _type.toStdString();
   this->modelPalette->AddJoint(type);
   this->selectedJointType = type;
+  this->jointAct->setChecked(true);
 }
 
 /////////////////////////////////////////////////
 void ModelEditor::OnJointAdded()
 {
-  this->jointButton->setChecked(false);
+  this->jointAct->setChecked(false);
 }
 
 /////////////////////////////////////////////////
@@ -182,5 +187,6 @@ void ModelEditor::ToggleToolbar()
   }
 
   this->jointAct->setVisible(this->active);
+  this->jointTypeAct->setVisible(this->active);
   this->jointSeparatorAct->setVisible(this->active);
 }

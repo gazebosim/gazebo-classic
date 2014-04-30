@@ -68,7 +68,6 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
   simpleShapesItem->addChild(simpleShapesChildItem);
 
-
   // Shapes buttons
   QWidget *modelWidget = new QWidget;
   QWidget *customWidget = new QWidget;

@@ -49,7 +49,7 @@ void JointMaker_TEST::JointState()
 /////////////////////////////////////////////////
 void JointMaker_TEST::CreateJoint()
 {
-/*  this->resMaxPercentChange = 5.0;
+  this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/shapes.world", false, false, true);
@@ -89,22 +89,19 @@ void JointMaker_TEST::CreateJoint()
   QCoreApplication::processEvents();
 
   int sleep = 0;
-  int maxSleep = 1000;
+  int maxSleep = 100000;
   while (sleep < maxSleep)
   {
-//  QTest::mouseClick(glWidget, Qt::LeftButton, 0, QPoint(1840, 475));
+    //QTest::mouseClick(glWidget, Qt::LeftButton, 0, QPoint(1840, 475));
     QCoreApplication::processEvents();
     QTest::qWait(10);
     sleep++;
   }
 
-
-
   mainWindow->close();
 
   delete jointMaker;
   delete mainWindow;
-  */
 }
 
 

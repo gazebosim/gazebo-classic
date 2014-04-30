@@ -66,7 +66,11 @@ namespace gazebo
       /// \brief True if model editor is active.
       private: bool active;
 
-      /// \brief Qt action for adding a joint in the model editor.
+      /// \brief Qt action for selecting and adding a joint in the model editor.
+      private: QAction *jointTypeAct;
+
+      /// \brief Qt action for adding a previously selected joint in the
+      /// model editor.
       private: QAction *jointAct;
 
       /// \brief A separator for the joint icon.
