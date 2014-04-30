@@ -610,6 +610,9 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 {
+  if (this->jointMaker->GetState() != JointMaker::JOINT_NONE)
+    return false;
+
   if (this->mouseVisual)
   {
     // set the part data pose

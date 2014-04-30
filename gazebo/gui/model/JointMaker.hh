@@ -25,6 +25,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/MouseEvent.hh"
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -150,6 +151,11 @@ namespace gazebo
       /// \return True if the event was handled
       private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
+      /// \brief Key event filter callback when key is pressed.
+      /// \param[in] _event The key event.
+      /// \return True if the event was handled
+      private: bool OnKeyPress(const common::KeyEvent &_event);
+
       /// \brief Helper method to create hotspot visual for mouse interaction.
       private: void CreateHotSpot();
 
@@ -211,6 +217,9 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of joints
       private: boost::recursive_mutex *updateMutex;
+
+      /// \brief Selected joint.
+      private: rendering::VisualPtr selectedJoint;
     };
     /// \}
 

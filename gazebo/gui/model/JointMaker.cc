@@ -26,6 +26,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
@@ -54,6 +55,12 @@ JointMaker::JointMaker()
 
   MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
     boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+
+  MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseRelease, this, _1));
+
+  KeyEventHandler::Instance()->AddPressFilter("model_joint",
+      boost::bind(&JointMaker::OnKeyPress, this, _1));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
@@ -89,6 +96,7 @@ void JointMaker::Reset()
   this->hoverVis.reset();
   this->prevHoverVis.reset();
   this->inspectVis.reset();
+  this->selectedJoint.reset();
 
   while (this->joints.size() > 0)
     this->RemoveJoint(this->joints.begin()->first);
@@ -152,30 +160,53 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
     {
-      // trigger joint inspector on right click
-      if (_event.button == common::MouseEvent::RIGHT)
-      {
-        this->inspectVis = vis;
-        QMenu menu;
-        menu.addAction(this->inspectAct);
-        menu.exec(QCursor::pos());
-      }
-
       // stop event propagation as we don't want users to manipulate the
       // hotspot
       return true;
     }
-    return false;
   }
-
   return false;
 }
 
 /////////////////////////////////////////////////
 bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
-  if (_event.button != common::MouseEvent::LEFT)
-    return false;
+  if (this->jointType == JointMaker::JOINT_NONE)
+  {
+    rendering::UserCameraPtr camera = gui::get_active_camera();
+    rendering::ScenePtr scene = camera->GetScene();
+    rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+    if (vis)
+    {
+      if (this->selectedJoint)
+        this->selectedJoint->SetHighlighted(false);
+      this->selectedJoint.reset();
+      if (this->joints.find(vis->GetName()) != this->joints.end())
+      {
+        // trigger joint inspector on right click
+        if (_event.button == common::MouseEvent::RIGHT)
+        {
+          this->inspectVis = vis;
+          QMenu menu;
+          menu.addAction(this->inspectAct);
+          menu.exec(QCursor::pos());
+        }
+        else if (_event.button == common::MouseEvent::LEFT)
+        {
+          // turn off model selection so we don't end up with
+          // both joint and model selected at the same time
+          event::Events::setSelectedEntity("", "normal");
+
+          this->selectedJoint = vis;
+          this->selectedJoint->SetHighlighted(true);
+        }
+        // stop event propagation as we don't want users to manipulate the
+        // hotspot
+        return true;
+      }
+      return false;
+    }
+  }
 
   if (this->hoverVis)
   {
@@ -249,7 +280,6 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
   return true;
 }
 
-
 /////////////////////////////////////////////////
 void JointMaker::CreateJoint(const std::string &_type)
 {
@@ -286,8 +316,6 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   if (_type != JointMaker::JOINT_NONE)
   {
     // Add an event filter, which allows the JointMaker to capture mouse events.
-    MouseEventHandler::Instance()->AddReleaseFilter("model_joint",
-        boost::bind(&JointMaker::OnMouseRelease, this, _1));
     MouseEventHandler::Instance()->AddMoveFilter("model_joint",
         boost::bind(&JointMaker::OnMouseMove, this, _1));
   }
@@ -295,16 +323,18 @@ void JointMaker::CreateJoint(JointMaker::JointType _type)
   {
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+    //MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 
     // Press event added only after a joint is created. Needs to be added here
     // instead of in the constructor otherwise GLWidget would get the event
     // first and JoinMaker would not receive it.
-    MouseEventHandler::Instance()->AddPressFilter("model_joint",
-        boost::bind(&JointMaker::OnMousePress, this, _1));
-    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-
+    if (!this->joints.empty())
+    {
+      MouseEventHandler::Instance()->AddPressFilter("model_joint",
+          boost::bind(&JointMaker::OnMousePress, this, _1));
+      MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
+        boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+    }
     // signal the end of a joint action.
     emit JointAdded();
   }
@@ -440,6 +470,20 @@ bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
     }
   }
 
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Delete)
+  {
+    if (this->selectedJoint)
+    {
+      this->RemoveJoint(this->selectedJoint->GetName());
+      this->selectedJoint.reset();
+    }
+  }
   return false;
 }
 
