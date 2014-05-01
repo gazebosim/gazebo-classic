@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/smart_ptr.hpp>
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
@@ -97,10 +98,18 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     {
       joint->SetForce(0, torque);
       // compute what velocity should be for the force
-      /// \TODO: get constants below from model
       const double moi = 1.0;
       const double threadPitch = 1.0;
       const double mass = 1.0;
+
+      // Verify parameters
+      EXPECT_NEAR(threadPitch, joint->GetParam("thread_pitch", 0), g_tolerance);
+      {
+        physics::LinkPtr child = joint->GetChild();
+        EXPECT_NEAR(mass, child->GetInertial()->GetMass(), g_tolerance);
+      }
+      /// \TODO: verify moi
+
       double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() /
         (moi / (threadPitch*threadPitch) + mass));
       world->Step(1);
