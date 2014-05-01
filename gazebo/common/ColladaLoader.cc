@@ -1345,6 +1345,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     else if (semantic == "TEXCOORD")
     {
       this->LoadTexCoords(source, texcoords, texDupMap);
+      inputs[TEXCOORD] = math::parseInt(offset);
       hasTexcoords = true;
     }
     else
