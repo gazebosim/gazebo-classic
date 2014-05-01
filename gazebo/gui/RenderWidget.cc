@@ -52,7 +52,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setObjectName("toolFrame");
   toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  QToolBar *toolbar = new QToolBar;
+  this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -62,24 +62,24 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
 
-  toolbar->addAction(g_arrowAct);
-  toolbar->addAction(g_translateAct);
-  toolbar->addAction(g_rotateAct);
-  toolbar->addAction(g_scaleAct);
+  this->toolbar->addAction(g_arrowAct);
+  this->toolbar->addAction(g_translateAct);
+  this->toolbar->addAction(g_rotateAct);
+  this->toolbar->addAction(g_scaleAct);
 
-  toolbar->addSeparator();
-  toolbar->addAction(g_boxCreateAct);
-  toolbar->addAction(g_sphereCreateAct);
-  toolbar->addAction(g_cylinderCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_pointLghtCreateAct);
-  toolbar->addAction(g_spotLghtCreateAct);
-  toolbar->addAction(g_dirLghtCreateAct);
-  toolbar->addSeparator();
-  toolbar->addAction(g_screenshotAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_boxCreateAct);
+  this->toolbar->addAction(g_sphereCreateAct);
+  this->toolbar->addAction(g_cylinderCreateAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_pointLghtCreateAct);
+  this->toolbar->addAction(g_spotLghtCreateAct);
+  this->toolbar->addAction(g_dirLghtCreateAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_screenshotAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -303,4 +303,10 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_translateAct->setEnabled(false);
     g_rotateAct->setEnabled(false);
   }
+}
+
+/////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar()
+{
+  return this->toolbar;
 }

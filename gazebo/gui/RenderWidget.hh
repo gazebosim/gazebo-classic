@@ -60,6 +60,10 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
+      /// \brief Get the toolbar on top of the render widget
+      /// \return Toolbar
+      public: QToolBar *GetToolbar();
+
       private slots: virtual void update();
 
       /// \brief Qt callback to clear overlay message if a duration is
@@ -113,6 +117,9 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief Toolbar consisting of various Qt actions
+      private: QToolBar *toolbar;
     };
   }
 }

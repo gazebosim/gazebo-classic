@@ -141,7 +141,7 @@ void ImportDialog::OnImport()
   {
     std::string msg = this->pathLineEdit->text().toStdString() +
         " is not a valid mesh file.\nPlease select another file.";
-    QMessageBox::warning(0, QString("Invalid Mesh File"),
+    QMessageBox::warning(this, QString("Invalid Mesh File"),
         QString(msg.c_str()), QMessageBox::Ok,
         QMessageBox::Ok);
   }
