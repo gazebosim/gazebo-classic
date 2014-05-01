@@ -24,6 +24,7 @@ set (msgs
   gz_string_v.proto
   header.proto
   heightmapgeom.proto
+  hydra.proto
   imagegeom.proto
   image.proto
   image_stamped.proto
