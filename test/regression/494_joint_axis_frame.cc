@@ -180,11 +180,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     EXPECT_EQ(axisJointFrame, axisJointFrame2);
   }
 
-  if (_joint->HasType(physics::Base::UNIVERSAL_JOINT))
-  {
-    gzerr << "The rest of this test fails for this joint type" << std::endl;
-    //return;
-  }
   if (!_joint->GetChild())
   {
     gzerr << "The rest of this test fails without a child link" << std::endl;
