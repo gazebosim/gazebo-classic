@@ -20,6 +20,7 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/unordered_map.hpp>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -47,16 +48,16 @@ namespace gazebo
     class GeometryIndices
     {
       /// \brief Index of a vertex in the collada <p> element
-      public: int vertexIndex;
+      public: unsigned int vertexIndex;
 
       /// \brief Index of a normal in the collada <p> element
-      public: int normalIndex;
+      public: unsigned int normalIndex;
 
       /// \brief Index of a texture coordinate in the collada <p> element
-      public: int texcoordIndex;
+      public: unsigned int texcoordIndex;
 
       /// \brief Index of a vertex in the Gazebo mesh
-      public: int mappedIndex;
+      public: unsigned int mappedIndex;
     };
 
     /// \brief Map of collada POSITION ids to list of vectors.
@@ -70,11 +71,51 @@ namespace gazebo
 
     /// \brief Map of collada  Material ids to Gazebo materials.
     static std::map<std::string, Material *> materialIds;
+
+    /// \brief Map of collada POSITION ids to a map of
+    /// duplicate positions.
+    static std::map<std::string, std::map<unsigned int, unsigned int> >
+        positionDuplicateMap;
+
+    /// \brief Map of collada NORMAL ids to a map of
+    /// duplicate normals.
+    static std::map<std::string, std::map<unsigned int, unsigned int> >
+        normalDuplicateMap;
+
+    /// \brief Map of collada TEXCOORD ids to a map of
+    /// duplicate texture coordinates.
+    static std::map<std::string, std::map<unsigned int, unsigned int> >
+        texcoordDuplicateMap;
   }
 }
 
 using namespace gazebo;
 using namespace common;
+
+/////////////////////////////////////////////////
+struct Vector3Hash : std::unary_function<const math::Vector3, std::size_t>
+{
+  std::size_t operator()(const math::Vector3 _v) const
+  {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, _v.x);
+    boost::hash_combine(seed, _v.y);
+    boost::hash_combine(seed, _v.z);
+    return seed;
+  }
+};
+
+/////////////////////////////////////////////////
+struct Vector2dHash : std::unary_function<const math::Vector2d, std::size_t>
+{
+  std::size_t operator()(const math::Vector2d _v) const
+  {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, _v.x);
+    boost::hash_combine(seed, _v.y);
+    return seed;
+  }
+};
 
 //////////////////////////////////////////////////
   ColladaLoader::ColladaLoader()
@@ -90,10 +131,14 @@ ColladaLoader::~ColladaLoader()
 //////////////////////////////////////////////////
 Mesh *ColladaLoader::Load(const std::string &_filename)
 {
+  // backport fix, do not merge with gazebo 4.0+
   positionIds.clear();
   normalIds.clear();
   texcoordIds.clear();
   materialIds.clear();
+  positionDuplicateMap.clear();
+  normalDuplicateMap.clear();
+  texcoordDuplicateMap.clear();
 
   // reset scale
   this->meter = 1.0;
@@ -836,11 +881,25 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
   return NULL;
 }
 
+
 /////////////////////////////////////////////////
 void ColladaLoader::LoadVertices(const std::string &_id,
     const math::Matrix4 &_transform,
     std::vector<math::Vector3> &_verts,
     std::vector<math::Vector3> &_norms)
+{
+  std::map<unsigned int, unsigned int> vertDup;
+  std::map<unsigned int, unsigned int> normDup;
+  this->LoadVertices(_id, _transform, _verts, _norms, vertDup, normDup);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::LoadVertices(const std::string &_id,
+    const math::Matrix4 &_transform,
+    std::vector<math::Vector3> &_verts,
+    std::vector<math::Vector3> &_norms,
+    std::map<unsigned int, unsigned int> &_vertDups,
+    std::map<unsigned int, unsigned int> &_normDups)
 {
   TiXmlElement *verticesXml = this->GetElementId(this->colladaXml,
                                                  "vertices", _id);
@@ -858,11 +917,11 @@ void ColladaLoader::LoadVertices(const std::string &_id,
     std::string sourceStr = inputXml->Attribute("source");
     if (semantic == "NORMAL")
     {
-      this->LoadNormals(sourceStr, _transform, _norms);
+      this->LoadNormals(sourceStr, _transform, _norms, _normDups);
     }
     else if (semantic == "POSITION")
     {
-      this->LoadPositions(sourceStr, _transform, _verts);
+      this->LoadPositions(sourceStr, _transform, _verts, _vertDups);
     }
 
     inputXml = inputXml->NextSiblingElement("input");
@@ -872,11 +931,13 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 /////////////////////////////////////////////////
 void ColladaLoader::LoadPositions(const std::string &_id,
     const math::Matrix4 &_transform,
-    std::vector<math::Vector3> &_values)
+    std::vector<math::Vector3> &_values,
+    std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (positionIds.find(_id) != positionIds.end())
   {
     _values = positionIds[_id];
+    _duplicates = positionDuplicateMap[_id];
     return;
   }
 
@@ -889,6 +950,8 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   }
   std::string valueStr = floatArrayXml->GetText();
 
+  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+
   std::vector<std::string> strs;
   std::vector<std::string>::iterator iter, end;
   boost::split(strs, valueStr, boost::is_any_of("   "));
@@ -900,21 +963,33 @@ void ColladaLoader::LoadPositions(const std::string &_id,
         math::parseFloat(*(iter+2)));
     vec = _transform * vec;
     _values.push_back(vec);
+
+    // create a map of duplicate indices
+    if (unique.find(vec) != unique.end())
+      _duplicates[_values.size()-1] = unique[vec];
+    else
+      unique[vec] = _values.size()-1;
   }
 
+  positionDuplicateMap[_id] = _duplicates;
   positionIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadNormals(const std::string &_id,
-    const math::Matrix4 &/*_transform*/,
-    std::vector<math::Vector3> &_values)
+    const math::Matrix4 &_transform,
+    std::vector<math::Vector3> &_values,
+    std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (normalIds.find(_id) != normalIds.end())
   {
     _values = normalIds[_id];
+    _duplicates = normalDuplicateMap[_id];
     return;
   }
+
+  math::Matrix4 rotMat = _transform;
+  rotMat.SetTranslate(math::Vector3::Zero);
 
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
@@ -930,6 +1005,8 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     return;
   }
 
+  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
   do
@@ -937,20 +1014,32 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     math::Vector3 vec;
     iss >> vec.x >> vec.y >> vec.z;
     if (iss)
+    {
+      vec = rotMat * vec;
+      vec.Normalize();
       _values.push_back(vec);
+
+      // create a map of duplicate indices
+      if (unique.find(vec) != unique.end())
+        _duplicates[_values.size()-1] = unique[vec];
+      else
+        unique[vec] = _values.size()-1;
+    }
   } while (iss);
 
+  normalDuplicateMap[_id] = _duplicates;
   normalIds[_id] = _values;
 }
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadTexCoords(const std::string &_id,
-                                  std::vector<math::Vector2d> &_values)
+    std::vector<math::Vector2d> &_values,
+    std::map<unsigned int, unsigned int> &_duplicates)
 {
-
   if (texcoordIds.find(_id) != texcoordIds.end())
   {
     _values = texcoordIds[_id];
+    _duplicates = texcoordDuplicateMap[_id];
     return;
   }
 
@@ -1036,6 +1125,8 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
     return;
   }
 
+  boost::unordered_map<math::Vector2d, unsigned int, Vector2dHash> unique;
+
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
   std::vector<std::string> values;
@@ -1045,10 +1136,18 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    _values.push_back(math::Vector2d(boost::lexical_cast<double>(values[i]),
-          1.0 - boost::lexical_cast<double>(values[i+1])));
+    math::Vector2d vec(boost::lexical_cast<double>(values[i]),
+          1.0 - boost::lexical_cast<double>(values[i+1]));
+    _values.push_back(vec);
+
+    // create a map of duplicate indices
+    if (unique.find(vec) != unique.end())
+      _duplicates[i] = unique[vec];
+    else
+      unique[vec] = i;
   }
 
+  texcoordDuplicateMap[_id] = _duplicates;
   texcoordIds[_id] = _values;
 }
 
@@ -1257,6 +1356,11 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   bool hasNormals = false;
   bool hasTexcoords = false;
 
+  // look up table of position/normal/texcoord duplicate indices
+  std::map<unsigned int, unsigned int> texDupMap;
+  std::map<unsigned int, unsigned int> normalDupMap;
+  std::map<unsigned int, unsigned int> positionDupMap;
+
   math::Matrix4 bindShapeMat(math::Matrix4::IDENTITY);
   if (_mesh->HasSkeleton())
     bindShapeMat = _mesh->GetSkeleton()->GetBindShapeTransform();
@@ -1271,7 +1375,8 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     if (semantic == "VERTEX")
     {
       unsigned int count = norms.size();
-      this->LoadVertices(source, _transform, verts, norms);
+      this->LoadVertices(source, _transform, verts, norms,
+          positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
       inputs[VERTEX] = math::parseInt(offset);
@@ -1279,14 +1384,14 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     }
     else if (semantic == "NORMAL")
     {
-      this->LoadNormals(source, _transform, norms);
+      this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
       inputs[NORMAL] = math::parseInt(offset);
       hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
     {
-      this->LoadTexCoords(source, texcoords);
+      this->LoadTexCoords(source, texcoords, texDupMap);
       inputs[TEXCOORD] = math::parseInt(offset);
       hasTexcoords = true;
     }
@@ -1312,7 +1417,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // vertexIndexMap is a map of collada vertex index to Gazebo submesh vertex
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
-  int *values = new int[inputs.size()];
+  unsigned int *values = new unsigned int[inputs.size()];
 
   std::vector<std::string> strs;
   boost::split(strs, pStr, boost::is_any_of("   "));
@@ -1360,7 +1465,11 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
         // only do this if the mesh has vertices
         if (hasVertices)
         {
+          // Get the vertex position index value. If it is a duplicate then use
+          // the existing index instead
           daeVertIndex = values[inputs[VERTEX]];
+          if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
+            daeVertIndex = positionDupMap[daeVertIndex];
 
           // if the vertex index has not been previously added then just add it.
           if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
@@ -1381,13 +1490,33 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
               GeometryIndices iv = inputValues[i];
               bool normEqual = false;
               bool texEqual = false;
-              if (hasNormals && iv.normalIndex == values[inputs[NORMAL]])
+
+              if (hasNormals)
               {
-                normEqual = true;
+                // Get the vertex normal index value. If the normal is a
+                // duplicate then reset the index to the first instance of the
+                // duplicated position
+                unsigned int remappedNormalIndex = values[inputs[NORMAL]];
+                if (normalDupMap.find(remappedNormalIndex)
+                    != normalDupMap.end())
+                 {
+                  remappedNormalIndex = normalDupMap[remappedNormalIndex];
+                 }
+
+                if (iv.normalIndex == remappedNormalIndex)
+                  normEqual = true;
               }
-              if (hasTexcoords && iv.texcoordIndex == values[inputs[TEXCOORD]])
+              if (hasTexcoords)
               {
-                texEqual = true;
+                // Get the vertex texcoord index value. If the texcoord is a
+                // duplicate then reset the index to the first instance of the
+                // duplicated texcoord
+                unsigned int remappedTexcoordIndex = values[inputs[TEXCOORD]];
+                if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
+                  remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
+
+                if (iv.texcoordIndex == remappedTexcoordIndex)
+                  texEqual = true;
               }
 
               // if the vertex has matching normal and texcoord index values
@@ -1504,6 +1633,12 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   bool hasTexcoords = false;
   unsigned int offsetSize = 0;
   std::map<const unsigned int, int> inputs;
+
+  // look up table of position/normal/texcoord duplicate indices
+  std::map<unsigned int, unsigned int> texDupMap;
+  std::map<unsigned int, unsigned int> normalDupMap;
+  std::map<unsigned int, unsigned int> positionDupMap;
+
   while (trianglesInputXml)
   {
     std::string semantic = trianglesInputXml->Attribute("semantic");
@@ -1512,7 +1647,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     if (semantic == "VERTEX")
     {
       unsigned int count = norms.size();
-      this->LoadVertices(source, _transform, verts, norms);
+      this->LoadVertices(source, _transform, verts, norms,
+          positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
       inputs[VERTEX] = math::parseInt(offset);
@@ -1520,7 +1656,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
     else if (semantic == "NORMAL")
     {
-      this->LoadNormals(source, _transform, norms);
+      this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
       inputs[NORMAL] = math::parseInt(offset);
       hasNormals = true;
@@ -1528,7 +1664,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     else if (semantic == "TEXCOORD" && !hasTexcoords)
     {
       // we currently only support one set of UVs
-      this->LoadTexCoords(source, texcoords);
+      this->LoadTexCoords(source, texcoords, texDupMap);
       inputs[TEXCOORD] = math::parseInt(offset);
       hasTexcoords = true;
     }
@@ -1555,7 +1691,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   // indices, used for identifying vertices that can be shared.
   std::map<unsigned int, std::vector<GeometryIndices> > vertexIndexMap;
 
-  int *values = new int[offsetSize];
+  unsigned int *values = new unsigned int[offsetSize];
   std::vector<std::string> strs;
 
   boost::split(strs, pStr, boost::is_any_of("   "));
@@ -1572,7 +1708,11 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     // only do this if the mesh has vertices
     if (hasVertices)
     {
+      // Get the vertex position index value. If it is a duplicate then use
+      // the existing index instead
       daeVertIndex = values[inputs[VERTEX]];
+      if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
+        daeVertIndex = positionDupMap[daeVertIndex];
 
       // if the vertex index has not been previously added then just add it.
       if (vertexIndexMap.find(daeVertIndex) == vertexIndexMap.end())
@@ -1592,13 +1732,29 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           GeometryIndices iv = inputValues[i];
           bool normEqual = false;
           bool texEqual = false;
-          if (hasNormals && iv.normalIndex == values[inputs[NORMAL]])
+          if (hasNormals)
           {
-            normEqual = true;
+            // Get the vertex normal index value. If the normal is a duplicate
+            // then reset the index to the first instance of the duplicated
+            // position
+            unsigned int remappedNormalIndex = values[inputs[NORMAL]];
+            if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
+              remappedNormalIndex = normalDupMap[remappedNormalIndex];
+
+            if (iv.normalIndex == remappedNormalIndex)
+              normEqual = true;
           }
-          if (hasTexcoords && iv.texcoordIndex == values[inputs[TEXCOORD]])
+          if (hasTexcoords)
           {
-            texEqual = true;
+            // Get the vertex texcoord index value. If the texcoord is a
+            // duplicate then reset the index to the first instance of the
+            // duplicated texcoord
+            unsigned int remappedTexcoordIndex = values[inputs[TEXCOORD]];
+            if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
+              remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
+
+            if (iv.texcoordIndex == remappedTexcoordIndex)
+              texEqual = true;
           }
 
           // if the vertex has matching normal and texcoord index values then
@@ -1647,14 +1803,20 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        subMesh->AddNormal(norms[values[inputs[NORMAL]]]);
-        input.normalIndex = values[inputs[NORMAL]];
+        unsigned int inputRemappedNormalIndex = values[inputs[NORMAL]];
+        if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
+          inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
+        subMesh->AddNormal(norms[inputRemappedNormalIndex]);
+        input.normalIndex = inputRemappedNormalIndex;
       }
       if (hasTexcoords)
       {
-        subMesh->AddTexCoord(texcoords[values[inputs[TEXCOORD]]].x,
-            texcoords[values[inputs[TEXCOORD]]].y);
-        input.texcoordIndex = values[inputs[TEXCOORD]];
+        unsigned int inputRemappedTexcoordIndex = values[inputs[TEXCOORD]];
+        if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
+          inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
+        subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].x,
+            texcoords[inputRemappedTexcoordIndex].y);
+        input.texcoordIndex = inputRemappedTexcoordIndex;
       }
 
       // add the new gazebo submesh vertex index to the map
