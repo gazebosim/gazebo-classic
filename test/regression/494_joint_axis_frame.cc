@@ -183,7 +183,7 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   if (_joint->HasType(physics::Base::UNIVERSAL_JOINT))
   {
     gzerr << "The rest of this test fails for this joint type" << std::endl;
-    return;
+    //return;
   }
   if (!_joint->GetChild())
   {
