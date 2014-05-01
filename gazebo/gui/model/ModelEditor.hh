@@ -17,6 +17,8 @@
 #ifndef _MODEL_EDITOR_HH_
 #define _MODEL_EDITOR_HH_
 
+#include <string>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Editor.hh"
 #include "gazebo/util/system.hh"

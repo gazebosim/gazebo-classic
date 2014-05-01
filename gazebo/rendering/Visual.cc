@@ -775,7 +775,8 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, entityMeshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(
+      objName, entityMeshName));
 
   this->AttachObject(obj);
   return obj;

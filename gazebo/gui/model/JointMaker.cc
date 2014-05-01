@@ -77,6 +77,9 @@ JointMaker::JointMaker()
 JointMaker::~JointMaker()
 {
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
+  KeyEventHandler::Instance()->RemovePressFilter("model_joint");
+
   this->Reset();
 }
 
@@ -334,7 +337,6 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
   {
     // Remove the event filters.
     MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
-    //MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 
     // Press event added only after a joint is created. Needs to be added here
     // instead of in the constructor otherwise GLWidget would get the event

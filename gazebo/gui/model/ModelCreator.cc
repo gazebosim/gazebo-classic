@@ -673,7 +673,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
 {
   // open the part inspector on double click
- rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (!vis)
     return false;
 
