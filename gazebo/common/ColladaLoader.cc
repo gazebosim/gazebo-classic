@@ -1344,11 +1344,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     }
     else if (semantic == "TEXCOORD")
     {
-      this->LoadTexCoords(source, texcoords, positionDupMap);
-      inputs[TEXCOORD] = math::parseInt(offset);
-      if (this->dataPtr->texcoordDuplicateMap.find(source) !=
-          this->dataPtr->texcoordDuplicateMap.end())
-        texDupMap = this->dataPtr->texcoordDuplicateMap[source];
+      this->LoadTexCoords(source, texcoords, texDupMap);
       hasTexcoords = true;
     }
     else
@@ -1430,8 +1426,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           // Get the vertex position index value. If it is a duplicate then use
           // the existing index instead
           daeVertIndex = values[inputs[VERTEX]];
-          if (positionDupMap.find(daeVertIndex)
-              != positionDupMap.end())
+          if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
             daeVertIndex = positionDupMap[daeVertIndex];
 
           // if the vertex index has not been previously added then just add it.
