@@ -219,7 +219,8 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       physics::LinkPtr child = _joint->GetChild();
       if (child)
       {
-        if (_joint->HasType(physics::Base::HINGE_JOINT))
+        if (_joint->HasType(physics::Base::HINGE_JOINT)
+              || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
           childVelocity = child->GetWorldAngularVel();
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
@@ -232,7 +233,8 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       physics::LinkPtr parent = _joint->GetParent();
       if (parent)
       {
-        if (_joint->HasType(physics::Base::HINGE_JOINT))
+        if (_joint->HasType(physics::Base::HINGE_JOINT)
+              || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
           parentVelocity = parent->GetWorldAngularVel();
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
