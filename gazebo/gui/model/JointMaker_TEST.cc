@@ -73,7 +73,6 @@ void JointMaker_TEST::CreateRemoveJoint()
     mainWindow->repaint();
   }
 
-  // Get the user camera, and tell it to save frames
   rendering::UserCameraPtr cam = gui::get_active_camera();
   Q_ASSERT(cam);
   rendering::ScenePtr scene = cam->GetScene();
