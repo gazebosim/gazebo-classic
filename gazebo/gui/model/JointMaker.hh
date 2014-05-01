@@ -103,6 +103,10 @@ namespace gazebo
       public: JointData *CreateJoint(rendering::VisualPtr _parent,
           rendering::VisualPtr _child);
 
+      /// \brief Helper method to create hotspot visual for mouse interaction.
+      /// \param[in] _joint Joint data used for creating the hotspot
+      public: void CreateHotSpot(JointData *_joint);
+
       /// \brief Update callback on PreRender.
       public: void Update();
 
@@ -137,6 +141,10 @@ namespace gazebo
       /// \brief Stop the process of adding joint to the model.
       public: void Stop();
 
+      /// \brief Get the number of joints added.
+      /// return Number of joints.
+      public: unsigned int GetJointCount();
+
       /// \brief Mouse event filter callback when mouse button is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
@@ -161,9 +169,6 @@ namespace gazebo
       /// \param[in] _event The key event.
       /// \return True if the event was handled
       private: bool OnKeyPress(const common::KeyEvent &_event);
-
-      /// \brief Helper method to create hotspot visual for mouse interaction.
-      private: void CreateHotSpot();
 
       /// \brief Get the centroid of the part visual in world coordinates.
       /// \param[in] _visual Visual of the part.

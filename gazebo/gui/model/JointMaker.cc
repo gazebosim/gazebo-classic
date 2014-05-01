@@ -107,7 +107,6 @@ void JointMaker::Reset()
 void JointMaker::RemoveJoint(const std::string &_jointName)
 {
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
-
   if (this->joints.find(_jointName) != this->joints.end())
   {
     JointData *joint = this->joints[_jointName];
@@ -120,6 +119,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     joint->parent.reset();
     joint->child.reset();
     delete joint->inspector;
+    delete joint;
     this->joints.erase(_jointName);
   }
 }
@@ -263,8 +263,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
       - _parent->GetParent()->GetWorldPose().pos;
   jointLine->AddPoint(origin);
   jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
-  jointVis->GetSceneNode()->setInheritScale(false);
-  jointVis->GetSceneNode()->setInheritOrientation(false);
+//  jointVis->GetSceneNode()->setInheritScale(false);
+//  jointVis->GetSceneNode()->setInheritOrientation(false);
 
   JointData *jointData = new JointData;
   jointData->dirty = false;
@@ -287,6 +287,7 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
   }
   jointData->anchor = math::Vector3::Zero;
   jointData->line->setMaterial(this->jointMaterials[jointData->type]);
+
   return jointData;
 }
 
@@ -498,29 +499,27 @@ bool JointMaker::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void JointMaker::CreateHotSpot()
+void JointMaker::CreateHotSpot(JointData *_joint)
 {
-  if (!this->mouseJoint)
+  if (!_joint)
     return;
-
-  JointData *joint = this->mouseJoint;
 
   rendering::UserCameraPtr camera = gui::get_active_camera();
 
-  std::string hotSpotName = joint->visual->GetName() + "_HOTSPOT_";
+  std::string hotSpotName = _joint->visual->GetName() + "_HOTSPOT_";
   rendering::VisualPtr hotspotVisual(
-      new rendering::Visual(hotSpotName, joint->visual, false));
+      new rendering::Visual(hotSpotName, _joint->visual, false));
 
-  joint->hotspot = hotspotVisual;
+  _joint->hotspot = hotspotVisual;
 
   // create a cylinder to represent the joint
   hotspotVisual->InsertMesh("unit_cylinder");
   Ogre::MovableObject *hotspotObj =
       (Ogre::MovableObject*)(camera->GetScene()->GetManager()->createEntity(
-      "__HOTSPOT__" + joint->visual->GetName(), "unit_cylinder"));
+      "__HOTSPOT__" + _joint->visual->GetName(), "unit_cylinder"));
   hotspotObj->setUserAny(Ogre::Any(hotSpotName));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
-  hotspotVisual->SetMaterial(this->jointMaterials[joint->type]);
+  hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
   hotspotVisual->SetTransparency(0.5);
 
   // create two handles at the ends of the line
@@ -530,7 +529,7 @@ void JointMaker::CreateHotSpot()
   handleSet->setMaterialName("Gazebo/PointHandle");
   Ogre::MaterialPtr mat =
       Ogre::MaterialManager::getSingleton().getByName(
-      this->jointMaterials[joint->type]);
+      this->jointMaterials[_joint->type]);
   Ogre::ColourValue color = mat->getTechnique(0)->getPass(0)->getDiffuse();
   color.a = 0.5;
   double dimension = 0.1;
@@ -546,20 +545,20 @@ void JointMaker::CreateHotSpot()
   handleNode->attachObject(handleSet);
   handleNode->setInheritScale(false);
   handleNode->setInheritOrientation(false);
-  joint->handles = handleSet;
+  _joint->handles = handleSet;
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
   hotspotVisual->GetSceneNode()->setInheritScale(false);
 
-  this->joints[hotSpotName] = joint;
+  this->joints[hotSpotName] = _joint;
   camera->GetScene()->AddVisual(hotspotVisual);
 
   // remove line as we are using a cylinder hotspot visual to
   // represent the joint
-  joint->visual->DeleteDynamicLine(joint->line);
+  _joint->visual->DeleteDynamicLine(_joint->line);
 
-  joint->dirty = true;
+  _joint->dirty = true;
 }
 
 /////////////////////////////////////////////////
@@ -568,7 +567,7 @@ void JointMaker::Update()
   boost::recursive_mutex::scoped_lock lock(*this->updateMutex);
   if (this->newJointCreated)
   {
-    this->CreateHotSpot();
+    this->CreateHotSpot(this->mouseJoint);
     this->mouseJoint = NULL;
     this->newJointCreated = false;
   }
@@ -752,6 +751,12 @@ math::Vector3 JointMaker::GetPartWorldCentroid(
     centroid += _visual->GetChild(i)->GetWorldPose().pos;
   centroid /= _visual->GetChildCount();
   return centroid;
+}
+
+/////////////////////////////////////////////////
+unsigned int JointMaker::GetJointCount()
+{
+  return this->joints.size();
 }
 
 /////////////////////////////////////////////////

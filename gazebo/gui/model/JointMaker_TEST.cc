@@ -18,6 +18,7 @@
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/JointMaker_TEST.hh"
 
@@ -47,14 +48,18 @@ void JointMaker_TEST::JointState()
 }
 
 /////////////////////////////////////////////////
-void JointMaker_TEST::CreateJoint()
+void JointMaker_TEST::CreateRemoveJoint()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
   this->Load("worlds/shapes.world", false, false, true);
 
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  gui::JointMaker *jointMaker = new gui::JointMaker();
+  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
+
+  gui::MainWindow *mainWindow = new gui::MainWindow();
   QVERIFY(mainWindow != NULL);
   mainWindow->Load();
   mainWindow->Init();
@@ -68,42 +73,64 @@ void JointMaker_TEST::CreateJoint()
     mainWindow->repaint();
   }
 
-  gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  // Get the user camera, and tell it to save frames
+  rendering::UserCameraPtr cam = gui::get_active_camera();
+  Q_ASSERT(cam);
+  rendering::ScenePtr scene = cam->GetScene();
+  Q_ASSERT(scene);
 
+  rendering::VisualPtr boxLink = scene->GetVisual("box::link");
+  rendering::VisualPtr sphereLink = scene->GetVisual("sphere::link");
+  rendering::VisualPtr cylinderLink = scene->GetVisual("cylinder::link");
+
+  Q_ASSERT(boxLink.get());
+  Q_ASSERT(sphereLink.get());
+  Q_ASSERT(cylinderLink.get());
+
+  // Add a revolute joint
   jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_HINGE);
+  gui::JointData *revoluteJointData =
+      jointMaker->CreateJoint(boxLink, sphereLink);
+  jointMaker->CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
 
+  // Add a prismatic joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  gui::JointData *prismaticJointData =
+      jointMaker->CreateJoint(sphereLink, cylinderLink);
+  jointMaker->CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
 
-  // Get tree widget
-  gui::GLWidget *glWidget = mainWindow->findChild<gui::GLWidget *>("GLWidget");
+  // Add a screw joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
+  gui::JointData *screwJointData =
+      jointMaker->CreateJoint(cylinderLink, boxLink);
+  jointMaker->CreateHotSpot(screwJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
 
-  QTest::mouseMove(glWidget, QPoint(1835, 475));
-  QCoreApplication::processEvents();
+  // Remove the screw joint
+  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 2u);
 
-  QTest::mouseMove(glWidget, QPoint(1840, 475));
-  QCoreApplication::processEvents();
+  // Add a ball joint
+  jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
+  gui::JointData *ballJointData =
+      jointMaker->CreateJoint(cylinderLink, boxLink);
+  jointMaker->CreateHotSpot(ballJointData);
+  QCOMPARE(jointMaker->GetJointCount(), 3u);
 
+  // Remove the two joints connected to the sphere
+  jointMaker->RemoveJointsByPart(sphereLink->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 1u);
 
-  QTest::mouseClick(glWidget, Qt::LeftButton, 0, QPoint(1840, 475));
-  QCoreApplication::processEvents();
-
-  int sleep = 0;
-  int maxSleep = 100000;
-  while (sleep < maxSleep)
-  {
-    //QTest::mouseClick(glWidget, Qt::LeftButton, 0, QPoint(1840, 475));
-    QCoreApplication::processEvents();
-    QTest::qWait(10);
-    sleep++;
-  }
+  // Remove the last joint
+  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
+  QCOMPARE(jointMaker->GetJointCount(), 0u);
 
   mainWindow->close();
-
   delete jointMaker;
   delete mainWindow;
 }
-
 
 // Generate a main function for the test
 QTEST_MAIN(JointMaker_TEST)

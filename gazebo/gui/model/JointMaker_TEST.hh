@@ -28,8 +28,8 @@ class JointMaker_TEST : public QTestFixture
   /// \brief Test joint states
   private slots: void JointState();
 
-  /// \brief Test creating a joint
-  private slots: void CreateJoint();
+  /// \brief Test creating and removing joints
+  private slots: void CreateRemoveJoint();
 };
 
 #endif
