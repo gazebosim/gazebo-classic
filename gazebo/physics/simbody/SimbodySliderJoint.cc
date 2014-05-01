@@ -123,11 +123,11 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
       const SimTK::Transform &X_OM = this->mobod.getOutboardFrame(
         this->simbodyPhysics->integ->getState());
 
-      // express Z-axis of X_OM in world frame
-      SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.z()));
+      // express X-axis of X_OM in world frame
+      SimTK::Vec3 x_W(this->mobod.expressVectorInGroundFrame(
+        this->simbodyPhysics->integ->getState(), X_OM.x()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3(x_W);
     }
     else
     {
