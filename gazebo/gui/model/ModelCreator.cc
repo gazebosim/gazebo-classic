@@ -40,8 +40,6 @@
 #include "gazebo/gui/ModelManipulator.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
-#include "gazebo/gui/model/PartGeneralTab.hh"
-#include "gazebo/gui/model/PartVisualTab.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 
@@ -299,7 +297,6 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   part->inertial.reset(new physics::Inertial);
   CollisionData *collisionData = new CollisionData;
   part->collisions.push_back(collisionData);
-  part->sensorData = new SensorData;
 
   this->allParts[part->name] = part;
 }
@@ -343,7 +340,6 @@ void ModelCreator::RemovePart(const std::string &_partName)
   part->collisions.clear();
 
   part->inertial.reset();
-  delete part->sensorData;
 
   this->allParts.erase(_partName);
 }
