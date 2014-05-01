@@ -263,8 +263,8 @@ JointData *JointMaker::CreateJoint(rendering::VisualPtr _parent,
       - _parent->GetParent()->GetWorldPose().pos;
   jointLine->AddPoint(origin);
   jointLine->AddPoint(origin + math::Vector3(0, 0, 0.1));
-//  jointVis->GetSceneNode()->setInheritScale(false);
-//  jointVis->GetSceneNode()->setInheritOrientation(false);
+  jointVis->GetSceneNode()->setInheritScale(false);
+  jointVis->GetSceneNode()->setInheritOrientation(false);
 
   JointData *jointData = new JointData;
   jointData->dirty = false;
