@@ -408,8 +408,6 @@ if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
-
-
 ########################################
 # Find libdl
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
