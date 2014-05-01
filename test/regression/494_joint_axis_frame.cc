@@ -238,15 +238,18 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
         }
       }
     }
-    gzdbg << "    joint pose:        " << _joint->GetWorldPose() << std::endl;
-    gzdbg << "    global axis:       " << _axis << std::endl;
-    gzdbg << "    axis frame:        " << _joint->GetAxisFrame(0) << std::endl;
-    gzdbg << "    axis frame offset: "
-          << _joint->GetAxisFrameOffset(0) << std::endl;
-    gzdbg << "    desired velocity:  " << vel << std::endl;
-    gzdbg << "    joint velocity:    " << _joint->GetVelocity(0) << std::endl;
-    gzdbg << "    child velocity:    " << childVelocity << std::endl;
-    gzdbg << "    parent velocity:   " << parentVelocity << std::endl;
+    std::cout << "    joint pose:        " << _joint->GetWorldPose()
+              << std::endl;
+    std::cout << "    global axis:       " << _axis << std::endl;
+    std::cout << "    axis frame:        " << _joint->GetAxisFrame(0)
+              << std::endl;
+    std::cout << "    axis frame offset: " << _joint->GetAxisFrameOffset(0)
+              << std::endl;
+    std::cout << "    desired velocity:  " << vel << std::endl;
+    std::cout << "    joint velocity:    " << _joint->GetVelocity(0)
+              << std::endl;
+    std::cout << "    child velocity:    " << childVelocity << std::endl;
+    std::cout << "    parent velocity:   " << parentVelocity << std::endl;
     std::cout << std::endl;
     EXPECT_NEAR(vel, _axis.Dot(childVelocity - parentVelocity), g_tolerance);
   }
