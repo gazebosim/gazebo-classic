@@ -98,7 +98,6 @@ namespace gazebo
 
       /// \brief Collisions of the part.
       public: std::vector<CollisionData *> collisions;
-//      public: std::vector<physics::CollisionPtr> collisions;
 
       /// \brief Sensor data
       public: SensorData *sensorData;
