@@ -1,13 +1,28 @@
+/*
+ * Copyright (C) 2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #include <errno.h>
 #include <libusb-1.0/libusb.h>
-#include <linux/types.h>
-#include <linux/input.h>
 #include <linux/hidraw.h>
+#include <linux/input.h>
+#include <linux/types.h>
 #include <cstring>
-
-#include "gazebo/transport/transport.hh"
 #include "gazebo/physics/physics.hh"
-
+#include "gazebo/transport/transport.hh"
 #include "plugins/HydraPlugin.hh"
 
 // Loosely adapted from the following
@@ -218,7 +233,7 @@ void RazerHydra::Run()
 {
   double cornerHz = 2.5;
 
-  while(!this->stop)
+  while (!this->stop)
   {
     this->Poll(cornerHz);
   }
@@ -250,7 +265,7 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
     return false;
   }
 
-  if(_lowPassCornerHz <= std::numeric_limits<float>::epsilon())
+  if (_lowPassCornerHz <= std::numeric_limits<float>::epsilon())
   {
     gzerr << "Corner frequency for low-pass filter must be greater than 0."
       << "Aborting.\n";
@@ -265,7 +280,7 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
     static bool firstTime = true;
 
     // Update average read period
-    if(!firstTime)
+    if (!firstTime)
     {
       this->periodEstimate.Process(
           (common::Time::GetWallTime() - this->lastCycleStart).Double());
@@ -287,28 +302,28 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
     }
 
     // Read data
-    this->rawPos[0] = *((int16_t *)(buf+8));
-    this->rawPos[1] = *((int16_t *)(buf+10));
-    this->rawPos[2] = *((int16_t *)(buf+12));
-    this->rawQuat[0] = *((int16_t *)(buf+14));
-    this->rawQuat[1] = *((int16_t *)(buf+16));
-    this->rawQuat[2] = *((int16_t *)(buf+18));
-    this->rawQuat[3] = *((int16_t *)(buf+20));
+    this->rawPos[0] = *(reinterpret_cast<int16_t *>(buf+8));
+    this->rawPos[1] = *(reinterpret_cast<int16_t *>(buf+10));
+    this->rawPos[2] = *(reinterpret_cast<int16_t *>(buf+12));
+    this->rawQuat[0] = *(reinterpret_cast<int16_t *>(buf+14));
+    this->rawQuat[1] = *(reinterpret_cast<int16_t *>(buf+16));
+    this->rawQuat[2] = *(reinterpret_cast<int16_t *>(buf+18));
+    this->rawQuat[3] = *(reinterpret_cast<int16_t *>(buf+20));
     this->rawButtons[0] = buf[22] & 0x7f;
-    this->rawAnalog[0] = *((int16_t *)(buf+23));
-    this->rawAnalog[1] = *((int16_t *)(buf+25));
+    this->rawAnalog[0] = *(reinterpret_cast<int16_t *>(buf+23));
+    this->rawAnalog[1] = *(reinterpret_cast<int16_t *>(buf+25));
     this->rawAnalog[2] = buf[27];
 
-    this->rawPos[3] = *((int16_t *)(buf+30));
-    this->rawPos[4] = *((int16_t *)(buf+32));
-    this->rawPos[5] = *((int16_t *)(buf+34));
-    this->rawQuat[4] = *((int16_t *)(buf+36));
-    this->rawQuat[5] = *((int16_t *)(buf+38));
-    this->rawQuat[6] = *((int16_t *)(buf+40));
-    this->rawQuat[7] = *((int16_t *)(buf+42));
+    this->rawPos[3] = *(reinterpret_cast<int16_t *>(buf+30));
+    this->rawPos[4] = *(reinterpret_cast<int16_t *>(buf+32));
+    this->rawPos[5] = *(reinterpret_cast<int16_t *>(buf+34));
+    this->rawQuat[4] = *(reinterpret_cast<int16_t *>(buf+36));
+    this->rawQuat[5] = *(reinterpret_cast<int16_t *>(buf+38));
+    this->rawQuat[6] = *(reinterpret_cast<int16_t *>(buf+40));
+    this->rawQuat[7] = *(reinterpret_cast<int16_t *>(buf+42));
     this->rawButtons[1] = buf[44] & 0x7f;
-    this->rawAnalog[3] = *((int16_t *)(buf+45));
-    this->rawAnalog[4] = *((int16_t *)(buf+47));
+    this->rawAnalog[3] = *(reinterpret_cast<int16_t *>(buf+45));
+    this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
     this->rawAnalog[5] = buf[49];
 
     boost::mutex::scoped_lock lock(this->mutex);

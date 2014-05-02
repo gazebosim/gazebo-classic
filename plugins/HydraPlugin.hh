@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
 #ifndef _GAZEBO_RAZER_HYDRA_HH_
 #define _GAZEBO_RAZER_HYDRA_HH_
 
@@ -11,6 +28,7 @@ namespace gazebo
   template <class T>
   class Filter
   {
+    public: virtual ~Filter() {}
     public: virtual void SetValue(const T &_val) { y0 = _val; }
     public: virtual void SetFc(double _fc, double _fs) = 0;
     public: inline virtual const T& GetValue() { return y0; }
@@ -26,22 +44,22 @@ namespace gazebo
     public: OnePole() : a0(0), b1(0) {}
 
     public: OnePole(double _fc, double _fs)
-            : a0(0), b1(0)
-            {
-              this->SetFc(_fc, _fs);
-            }
+      : a0(0), b1(0)
+    {
+      this->SetFc(_fc, _fs);
+    }
 
     public: virtual void SetFc(double _fc, double _fs)
-            {
-              b1 = exp(-2.0 * M_PI * _fc / _fs);
-              a0 = 1.0 - b1;
-            }
+    {
+      b1 = exp(-2.0 * M_PI * _fc / _fs);
+      a0 = 1.0 - b1;
+    }
 
     public: inline const T& Process(const T &_x)
-            {
-              this->y0 = a0 * _x + b1 * this->y0;
-              return this->y0;
-            }
+    {
+      this->y0 = a0 * _x + b1 * this->y0;
+      return this->y0;
+    }
 
     protected: double a0;
     protected: double b1;
@@ -51,36 +69,36 @@ namespace gazebo
   class OnePoleQuaternion : public OnePole<math::Quaternion>
   {
     public: OnePoleQuaternion()
-            {
-              this->SetValue(math::Quaternion(1,0,0,0));
-            }
+    {
+      this->SetValue(math::Quaternion(1, 0, 0, 0));
+    }
 
     public: OnePoleQuaternion(double _fc, double _fs)
-            : OnePole<math::Quaternion>(_fc, _fs)
-            {
-              this->SetValue(math::Quaternion(1,0,0,0));
-            }
+      : OnePole<math::Quaternion>(_fc, _fs)
+    {
+      this->SetValue(math::Quaternion(1, 0, 0, 0));
+    }
 
     public: inline const math::Quaternion& Process(const math::Quaternion &_x)
-            {
-              y0 = math::Quaternion::Slerp(a0, y0, _x);
-              return y0;
-            }
+    {
+      y0 = math::Quaternion::Slerp(a0, y0, _x);
+      return y0;
+    }
   };
 
   /// \brief One-pole vector3 filter.
   class OnePoleVector3 : public OnePole<math::Vector3>
   {
     public: OnePoleVector3()
-            {
-              this->SetValue(math::Vector3(0,0,0));
-            }
+    {
+      this->SetValue(math::Vector3(0, 0, 0));
+    }
 
     public: OnePoleVector3(double _fc, double _fs)
-            : OnePole<math::Vector3>(_fc, _fs)
-            {
-              this->SetValue(math::Vector3(0,0,0));
-            }
+      : OnePole<math::Vector3>(_fc, _fs)
+    {
+      this->SetValue(math::Vector3(0, 0, 0));
+    }
   };
 
   /// \brief Bi-quad filter base class.
@@ -89,50 +107,52 @@ namespace gazebo
   class BiQuad : public Filter<T>
   {
     public: BiQuad()
-            : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0) { }
+      : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
+    {
+    }
 
     public: BiQuad(double _fc, double _fs)
-            : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
-            {
-              this->SetFc(_fc, _fs);
-            }
+      : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0)
+    {
+      this->SetFc(_fc, _fs);
+    }
 
     public: inline void SetFc(double _fc, double _fs)
-            {
-              this->SetFc(_fc, _fs, 0.5);
-            }
+    {
+      this->SetFc(_fc, _fs, 0.5);
+    }
 
     public: inline void SetFc(double _fc, double _fs, double _q)
-            {
-              double k = tan(M_PI * _fc / _fs);
-              double kQuadDenom = k * k + k / _q + 1.0;
-              this->a0 = k * k/ kQuadDenom;
-              this->a1 = 2 * this->a0;
-              this->a2 = this->a0;
-              this->b0 = 1.0;
-              this->b1 = 2 * (k * k - 1.0) / kQuadDenom;
-              this->b2 = (k * k - k / _q + 1.0) / kQuadDenom;
-            }
+    {
+      double k = tan(M_PI * _fc / _fs);
+      double kQuadDenom = k * k + k / _q + 1.0;
+      this->a0 = k * k/ kQuadDenom;
+      this->a1 = 2 * this->a0;
+      this->a2 = this->a0;
+      this->b0 = 1.0;
+      this->b1 = 2 * (k * k - 1.0) / kQuadDenom;
+      this->b2 = (k * k - k / _q + 1.0) / kQuadDenom;
+    }
 
     public: virtual void SetValue(const T &_val)
-            {
-              this->y0 = this->y1 = this->y2 = this->x1 = this->x2 = _val;
-            }
+    {
+      this->y0 = this->y1 = this->y2 = this->x1 = this->x2 = _val;
+    }
 
     public: inline virtual const T& process(const T &_x)
-            {
-              this->y0 = this->a0 * _x +
-                         this->a1 * this->x1 +
-                         this->a2 * this->x2 -
-                         this->b1 * this->y1 -
-                         this->b2 * this->y2;
+    {
+      this->y0 = this->a0 * _x +
+                 this->a1 * this->x1 +
+                 this->a2 * this->x2 -
+                 this->b1 * this->y1 -
+                 this->b2 * this->y2;
 
-              this->x2 = this->x1;
-              this->x1 = _x;
-              this->y2 = this->y1;
-              this->y1 = this->y0;
-              return this->y0;
-            }
+      this->x2 = this->x1;
+      this->x1 = _x;
+      this->y2 = this->y1;
+      this->y1 = this->y0;
+      return this->y0;
+    }
 
     protected: double a0, a1, a2, b0, b1, b2;
     protected: T x1, x2, y1, y2;
@@ -142,15 +162,15 @@ namespace gazebo
   class BiQuadVector3 : public BiQuad<math::Vector3>
   {
     public: BiQuadVector3()
-            {
-              this->SetValue(math::Vector3(0,0,0));
-            }
+    {
+      this->SetValue(math::Vector3(0, 0, 0));
+    }
 
     public: BiQuadVector3(double _fc, double _fs)
-            : BiQuad<math::Vector3>(_fc, _fs)
-            {
-              this->SetValue(math::Vector3(0,0,0));
-            }
+      : BiQuad<math::Vector3>(_fc, _fs)
+    {
+      this->SetValue(math::Vector3(0, 0, 0));
+    }
   };
 
   class RazerHydra : public WorldPlugin

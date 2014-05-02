@@ -19,7 +19,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include "gazebo/transport/transport.hh"
-#include "HydraDemoPlugin.hh"
+#include "plugins/HydraDemoPlugin.hh"
 
 using namespace gazebo;
 
