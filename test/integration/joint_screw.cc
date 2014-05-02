@@ -103,8 +103,8 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     /// \TODO: verify momentOfInertia
 
     // set torque and step forward
-    double torque = 35;
-    unsigned int stepCount = 1000;
+    const double torque = 35;
+    const unsigned int stepCount = 1000;
     double dt = physics->GetMaxStepSize();
     double stepTime = stepCount * dt;
 
