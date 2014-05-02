@@ -234,8 +234,8 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
   if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(
-          _index, this->stiffnessCoefficient[_index], _damping);
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+                              _damping);
   }
   else
   {
