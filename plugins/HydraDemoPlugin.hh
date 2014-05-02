@@ -35,7 +35,7 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~HydraDemoPlugin();
 
-    /// \brief Load the controller
+    // Documentation Inherited.
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
 
     /// \brief Update the controller
@@ -43,6 +43,7 @@ namespace gazebo
     private: void Update(const common::UpdateInfo &_info);
 
     /// \brief Callback executed every time a new hydra message is received.
+    /// \param[in] _msg The hydra message.
     private: void OnHydra(ConstHydraPtr &_msg);
 
     /// \brief World pointer
