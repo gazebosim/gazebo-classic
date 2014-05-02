@@ -1862,6 +1862,66 @@ void Visual::InsertMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
+void Visual::UpdatetMesh(const common::Mesh *_mesh)
+{
+  Ogre::MeshPtr ogreMesh = Ogre::MeshManager::getSingleton().getByName(
+      _mesh->GetName());
+
+  for (unsigned int i = 0; i < _mesh->GetSubMeshCount(); ++i)
+  {
+    const common::SubMesh *subMesh = _mesh->GetSubMesh(i);
+    Ogre::SubMesh *ogreSubMesh = ogreMesh->getSubMesh(subMesh->GetName());
+
+    Ogre::HardwareVertexBufferSharedPtr vbuf =
+        ogreSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
+
+    Ogre::Real *vPos =
+        static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
+
+    for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
+    {
+      math::Vector3 v = subMesh->GetVertex(j);
+      math::Vector3 n = subMesh->GetNormal(j);
+
+      // update vertex pos
+      *vPos++ = v.x;
+      *vPos++ = v.y;
+      *vPos++ = v.z;
+
+      // update normal
+      if (subMesh->GetNormalCount() > 0)
+      {
+        *vPos++ = n.x;
+        *vPos++ = n.y;
+        *vPos++ = n.z;
+      }
+    }
+    vbuf->unlock();
+  }
+
+  // update mesh bounding box.
+  math::Vector3 max = _mesh->GetMax();
+  math::Vector3 min = _mesh->GetMin();
+
+  if (_mesh->HasSkeleton())
+  {
+    min = math::Vector3(-1, -1, -1);
+    max = math::Vector3(1, 1, 1);
+  }
+
+  if (!max.IsFinite())
+    gzthrow("Max bounding box is not finite[" << max << "]\n");
+
+  if (!min.IsFinite())
+    gzthrow("Min bounding box is not finite[" << min << "]\n");
+
+  ogreMesh->_setBounds(Ogre::AxisAlignedBox(
+        Ogre::Vector3(min.x, min.y, min.z),
+        Ogre::Vector3(max.x, max.y, max.z)),
+        false);
+}
+
+//////////////////////////////////////////////////
 void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
     bool _centerSubmesh)
 {
