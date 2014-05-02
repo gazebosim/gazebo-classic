@@ -8,7 +8,7 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/physics/physics.hh"
 
-#include "plugins/Hydra.hh"
+#include "plugins/HydraPlugin.hh"
 
 // loosely adapted from the following
 // https://github.com/ros-drivers/razer_hydra/blob/groovy-devel/src/hydra.cpp

@@ -41,7 +41,8 @@ set (plugins
 
 if (HAVE_USB)
   set (plugins ${plugins}
-    Hydra
+    HydraPlugin
+    HydraDemoPlugin
   )
 endif()
 
