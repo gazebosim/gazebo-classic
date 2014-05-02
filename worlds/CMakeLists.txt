@@ -52,7 +52,7 @@ set (files
 
 if (HAVE_USB)
   set (files ${files}
-    hydra.world
+    hydra_demo.world
   )
 endif()
 
