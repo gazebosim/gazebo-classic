@@ -161,19 +161,18 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~RazerHydra();
 
-    /// \brief Load and initialize the hydra.
+    // Documentation Inherited.
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
     /// \brief Poll the hydra for input.
-    /// \param[in] _timeToWait
-    /// \param[in] lowPassCornerHz
-    private: bool Poll(const common::Time &_timeToWait,
-                       float _lowPassCornerHz = 5.0);
+    /// \param[in] lowPassCornerHz Filter frequency.
+    private: bool Poll(float _lowPassCornerHz = 5.0);
 
     /// \brief Method executed in a separate thread to poll hydra for updates.
     private: void Run();
 
     /// \brief Update the hydra.
+    /// \param[in] _info Update information.
     private: void Update(const common::UpdateInfo &_info);
 
     /// \brief Raw controller positions.

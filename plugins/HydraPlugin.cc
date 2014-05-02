@@ -216,12 +216,11 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
 /////////////////////////////////////////////////
 void RazerHydra::Run()
 {
-  common::Time pollTime(0, 5000);
   double cornerHz = 2.5;
 
   while(!this->stop)
   {
-    this->Poll(pollTime, cornerHz);
+    this->Poll(cornerHz);
   }
 
   if (this->hidrawFd >= 0)
@@ -243,17 +242,11 @@ void RazerHydra::Run()
 }
 
 /////////////////////////////////////////////////
-bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
+bool RazerHydra::Poll(float _lowPassCornerHz)
 {
   if (this->hidrawFd < 0)
   {
     gzerr << "hidraw device is not open, couldn't poll.\n";
-    return false;
-  }
-
-  if(_timeToWait == common::Time::Zero)
-  {
-    gzerr << "_msToWait must be at least 1.\n";
     return false;
   }
 
@@ -263,8 +256,6 @@ bool RazerHydra::Poll(const common::Time &_timeToWait, float _lowPassCornerHz)
       << "Aborting.\n";
     return false;
   }
-
-  common::Time deadline = common::Time::GetWallTime() + _timeToWait;
 
   uint8_t buf[64];
   ssize_t nread = read(this->hidrawFd, buf, sizeof(buf));
