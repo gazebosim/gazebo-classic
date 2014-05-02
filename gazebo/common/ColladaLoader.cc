@@ -1094,9 +1094,11 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
 
     // create a map of duplicate indices
     if (unique.find(vec) != unique.end())
-      _duplicates[i] = unique[vec];
+    {
+      _duplicates[_values.size()-1] = unique[vec];
+    }
     else
-      unique[vec] = i;
+      unique[vec] = _values.size()-1;
   }
 
   this->dataPtr->texcoordDuplicateMap[_id] = _duplicates;
