@@ -105,14 +105,14 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // set torque and step forward
     double torque = 35;
     unsigned int stepCount = 1000;
-    double dt = 1e-3;
+    double dt = physics->GetMaxStepSize();
     double stepTime = stepCount * dt;
-    EXPECT_NEAR(physics->GetMaxStepSize(), dt, 1e-6);
 
     // Expect constant torque to give quadratic response in position
     {
       // Expected max joint angle (quatratic in time)
       math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
+      // Verify that the joint should make more than 1 revolution
       EXPECT_GT(maxAngle.Radian(), 1.25 * 2 * M_PI);
     }
 

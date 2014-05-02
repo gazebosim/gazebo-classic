@@ -128,10 +128,9 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
-    double dt = 1e-3;
-    EXPECT_NEAR(physics->GetMaxStepSize(), dt, 1e-6);
+    double dt = physics->GetMaxStepSize();
 
-    // Verify that the angle should wrap
+    // Verify that the joint should make more than 1 revolution
     EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
 
     joint->SetVelocity(0, vel);
