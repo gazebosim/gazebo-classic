@@ -15,7 +15,6 @@
  *
 */
 
-#include <boost/smart_ptr.hpp>
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
@@ -89,36 +88,50 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // double threadPitch = 100.0;
     // joint->SetParam("thread_pitch", threadPitch);
 
-    // set torque to 2 pi rad/s and step forward 1.5 seconds.
-    double torque = 2*M_PI;
-    unsigned int stepCount = 30;
+    // Inertial parameters
+    const double momentOfInertia = 1.0;
+    const double threadPitch = 1.0;
+    const double mass = 1.0;
+    double inertia = momentOfInertia + mass / (threadPitch*threadPitch);
+
+    // Verify inertial parameters
+    EXPECT_NEAR(threadPitch, joint->GetParam("thread_pitch", 0), g_tolerance);
+    {
+      physics::LinkPtr child = joint->GetChild();
+      EXPECT_NEAR(mass, child->GetInertial()->GetMass(), g_tolerance);
+    }
+    /// \TODO: verify momentOfInertia
+
+    // set torque and step forward
+    double torque = 35;
+    unsigned int stepCount = 1000;
+    double dt = physics->GetMaxStepSize();
+    double stepTime = stepCount * dt;
+
+    // Expect constant torque to give quadratic response in position
+    {
+      // Expected max joint angle (quatratic in time)
+      math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
+      // Verify that the joint should make more than 1 revolution
+      EXPECT_GT(maxAngle.Radian(), 1.25 * 2 * M_PI);
+    }
+
     // compute joint velocity analytically with constant torque
     // joint angle is unwrapped
     for (unsigned int i = 0; i < stepCount; ++i)
     {
       joint->SetForce(0, torque);
-      // compute what velocity should be for the force
-      const double moi = 1.0;
-      const double threadPitch = 1.0;
-      const double mass = 1.0;
 
-      // Verify parameters
-      EXPECT_NEAR(threadPitch, joint->GetParam("thread_pitch", 0), g_tolerance);
-      {
-        physics::LinkPtr child = joint->GetChild();
-        EXPECT_NEAR(mass, child->GetInertial()->GetMass(), g_tolerance);
-      }
-      /// \TODO: verify moi
-
-      double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() /
-        (moi / (threadPitch*threadPitch) + mass));
+      double vel = sqrt(2.0*torque*joint->GetAngle(0).Radian() / inertia);
       world->Step(1);
-      gzdbg << "v: " << joint->GetVelocity(0)
-            << " ve: " << vel << "\n";
-      EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
+      EXPECT_NEAR(joint->GetVelocity(0), vel, 2e-2);
       double time = world->GetSimTime().Double();
-      EXPECT_NEAR(joint->GetAngle(0).Radian(), time*vel, g_tolerance);
+      math::Angle angle(0.5 * torque * time*time / inertia);
+      EXPECT_NEAR(joint->GetAngle(0).Radian(), angle.Radian(), g_tolerance);
     }
+    std::cout << "Final time:  " << world->GetSimTime().Double() << std::endl;
+    std::cout << "Final angle: " << joint->GetAngle(0).Radian() << std::endl;
+    std::cout << "Final speed: " << joint->GetVelocity(0) << std::endl;
   }
 }
 
