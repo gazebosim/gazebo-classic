@@ -29,8 +29,11 @@ namespace gazebo
   class Filter
   {
     public: virtual ~Filter() {}
+
     public: virtual void SetValue(const T &_val) { y0 = _val; }
+
     public: virtual void SetFc(double _fc, double _fs) = 0;
+
     public: inline virtual const T& GetValue() { return y0; }
 
     protected: T y0;
