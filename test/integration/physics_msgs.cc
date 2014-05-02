@@ -28,10 +28,84 @@ using namespace gazebo;
 class PhysicsMsgsTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
+  /// \brief Remove a model using entity_delete request and
+  /// verify that the model is deleted.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void EntityDelete(const std::string &_physicsEngine);
+
+  /// \brief Move and rotate a model using the ~/model/modify topic
+  /// and verify that the model is moved.
+  /// \param[in] _physicsEngine Type of physics engine to use.
   public: void MoveTool(const std::string &_physicsEngine);
+
+  /// \brief Set gravity using ~/physics topic and verify that gravity
+  /// changes.
+  /// \param[in] _physicsEngine Type of physics engine to use.
   public: void SetGravity(const std::string &_physicsEngine);
+
+  /// \brief SimpleShapeResize: (Test adapted from PhysicsTest::SpawnDrop)
+  /// Load a world, check that gravity points along z axis, spawn simple
+  /// shapes (box, sphere, cylinder), resize them to be smaller, verify that
+  /// they then start falling.
   public: void SimpleShapeResize(const std::string &_physicsEngine);
 };
+
+/////////////////////////////////////////////////
+void PhysicsMsgsTest::EntityDelete(const std::string &_physicsEngine)
+{
+  Load("worlds/shapes.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  math::Vector3 g = physics->GetGravity();
+
+  // Assume gravity vector points down z axis only.
+  EXPECT_EQ(g.x, 0);
+  EXPECT_EQ(g.y, 0);
+  EXPECT_LE(g.z, -9.8);
+
+  // Verify that expected models exist
+  {
+    physics::ModelPtr model = world->GetModel("ground_plane");
+    ASSERT_TRUE(model != NULL);
+  }
+  {
+    physics::ModelPtr model = world->GetModel("box");
+    ASSERT_TRUE(model != NULL);
+  }
+
+  // Delete the ground plane and wait for message to propagate
+  ServerFixture::RemoveModel("ground_plane");
+  int i;
+  int msWait = 1000;
+  for (int i = 0; i < msWait; ++i)
+  {
+    physics::ModelPtr model = world->GetModel("ground_plane");
+    if (model == NULL)
+    {
+      gzdbg << "world has deleted ground_plane" << std::endl;
+      break;
+    }
+    common::Time::MSleep(1000);
+  }
+
+  // Expect that loop terminated early.
+  EXPECT_LT(i, msWait);
+
+  // Step forward 1 second and verify that box is falling.
+  gzdbg << "Verify that box falls" << std::endl;
+  physics->SetRealTimeUpdateRate(0);
+  double tolerance = 0.2;
+  world->StepWorld(1000);
+  physics::ModelPtr model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+  EXPECT_LT(model->GetWorldLinearVel().z, g.z* (1-tolerance));
+  EXPECT_LT(model->GetWorldPose().pos.z, 0.5*g.z* (1-tolerance));
+}
 
 /////////////////////////////////////////////////
 void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
@@ -307,6 +381,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
+TEST_P(PhysicsMsgsTest, EntityDelete)
+{
+  EntityDelete(GetParam());
+}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SetGravity)
