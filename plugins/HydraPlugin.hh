@@ -2,14 +2,6 @@
 #define _GAZEBO_RAZER_HYDRA_HH_
 
 #include <stdint.h>
-//#include <fcntl.h>
-//#include <unistd.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
-//#include <sys/ioctl.h>
-//#include <linux/hidraw.h>
-//#include <libusb-1.0/libusb.h>
-
 #include <gazebo/math/Vector3.hh>
 #include <gazebo/gazebo.hh>
 
@@ -173,42 +165,45 @@ namespace gazebo
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
     /// \brief Poll the hydra for input.
+    /// \param[in] _timeToWait
+    /// \param[in] lowPassCornerHz
     private: bool Poll(const common::Time &_timeToWait,
-                      float lowPassCornerHz = 5.0);
+                       float _lowPassCornerHz = 5.0);
 
+    /// \brief Method executed in a separate thread to poll hydra for updates.
     private: void Run();
 
     /// \brief Update the hydra.
     private: void Update(const common::UpdateInfo &_info);
 
-    /// \brief
+    /// \brief Raw controller positions.
     private: int16_t rawPos[6];
 
-    /// \brief
+    /// \brief Raw controller orientations.
     private: int16_t rawQuat[8];
 
-    /// \brief
+    /// \brief Raw value of the buttons.
     private: uint8_t rawButtons[2];
 
-    /// \brief
+    /// \brief Raw values of the analog joysticks.
     private: double rawAnalog[6];
 
-    /// \brief
+    /// \brief Device file descriptor
     private: int hidrawFd;
 
-    /// \brief
+    /// \brief Left and right controller positions.
     private: math::Vector3 pos[2];
 
-    /// \brief
+    /// \brief Left and right controller orientations.
     private: math::Quaternion quat[2];
 
-    /// \brief
+    /// \brief Left and right filtered positions.
     private: OnePoleVector3 filterPos[2];
 
-    /// \brief
+    /// \brief Left and right filtered controller orientations.
     private: OnePoleQuaternion filterQuat[2];
 
-    /// \brief
+    /// \brief Analog joysticks
     private: float analog[6];
 
     /// \brief Buttons that have been pressed.
@@ -223,19 +218,19 @@ namespace gazebo
     // Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
-    private: physics::ModelPtr rightModel;
-    private: physics::ModelPtr leftModel;
-
-    private: math::Pose basePoseRight, resetPoseRight;
-    private: math::Pose basePoseLeft, resetPoseLeft;
-
+    /// \brief Mutex
     private: boost::mutex mutex;
+
+    /// \brief Additional thread
     private: boost::thread *pollThread;
+
+    /// \brief Use to stop the additional thread that the plugin uses.
     private: bool stop;
 
-    private: uint8_t prevState;
-
+    /// \brief Gazebo communication node pointer.
     private: transport::NodePtr node;
+
+    /// \brief Publisher pointer used to publish the messages.
     private: transport::PublisherPtr pub;
   };
 }

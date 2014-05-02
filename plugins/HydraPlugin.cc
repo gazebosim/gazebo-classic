@@ -10,7 +10,7 @@
 
 #include "plugins/HydraPlugin.hh"
 
-// loosely adapted from the following
+// Loosely adapted from the following
 // https://github.com/ros-drivers/razer_hydra/blob/groovy-devel/src/hydra.cpp
 
 // Ugly hack to work around failing compilation on systems that don't
@@ -23,7 +23,7 @@
 #define HIDIOCGFEATURE(len)    _IOC(_IOC_WRITE|_IOC_READ, 'H', 0x07, len)
 #endif
 
-// eventually crawl hidraw file system using this:
+// Eventually crawl hidraw file system using this:
 // http://www.signal11.us/oss/udev/
 
 using namespace gazebo;
