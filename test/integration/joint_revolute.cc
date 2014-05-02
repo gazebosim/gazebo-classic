@@ -128,6 +128,12 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
+    double dt = 1e-3;
+    EXPECT_NEAR(physics->GetMaxStepSize(), dt, 1e-6);
+
+    // Verify that the angle should wrap
+    EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
+
     joint->SetVelocity(0, vel);
     if (isOde)
       joint->SetMaxForce(0, 1e4);
