@@ -72,8 +72,9 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
                                         const std::string &_jointType)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody")  // &&
-  //    _jointType != "revolute" && _jointType != "prismatic")
+  if (_physicsEngine == "simbody" && (
+      _jointType == "gearbox" ||
+      _jointType == "revolute2"))
   {
     gzerr << "Aborting test for Simbody, see issues #859, #861.\n";
     return;
@@ -115,6 +116,18 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzerr << "Skip connect to world tests, since we aren't specifying "
           << "the reference body."
+          << std::endl;
+    return;
+  }
+  if (_jointType == "revolute2")
+  {
+    gzerr << "Skip connect to world tests for revolute2."
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody" && _jointType == "screw")
+  {
+    gzerr << "Simbody fails when connecting screw joint to world."
           << std::endl;
     return;
   }
