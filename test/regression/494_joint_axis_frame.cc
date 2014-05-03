@@ -43,6 +43,14 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
+  if (_physicsEngine == "simbody" && _jointType == "revolute2")
+  {
+    gzerr << "This test doesn't yet work for [" << _physicsEngine
+          << "] with joint type [" << _jointType << "]"
+          << std::endl;
+    return;
+  }
+
   if (_physicsEngine == "dart")
   {
     gzerr << "This test doesn't yet work for [" << _physicsEngine
@@ -263,6 +271,7 @@ TEST_P(Issue494Test, CheckAxisFrame)
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue494Test,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
+                  , "revolute2"
                   , "prismatic"
                   , "universal")));
 

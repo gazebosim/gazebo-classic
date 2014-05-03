@@ -210,10 +210,10 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   world->Step(50);
   math::Pose childPose = child->GetWorldPose();
   math::Pose parentPose = parent->GetWorldPose();
-  EXPECT_TRUE(parentPose.pos != pos);
-  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos == parentPose.pos);
+  EXPECT_NE(parentPose.pos, pos);
+  EXPECT_NE(parentPose.pos, math::Vector3::Zero);
+  EXPECT_NE(childPose.pos, math::Vector3::Zero);
+  EXPECT_EQ(childPose.pos, parentPose.pos);
   EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
   EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
 }
@@ -460,18 +460,20 @@ INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_All,
                   , "revolute2"
                   , "gearbox")));
 
-// Skip prismatic, screw, and revolute2 because they allow translation
+// Skip prismatic and screw because they allow translation
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_Rotational,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
+                  , "revolute2"
                   , "universal"
                   , "ball")));
 
-// Skip prismatic, screw, and revolute2 because they allow translation
-// Skip universal because it can't be connected to world in bullet.
+// Skip prismatic and screw because they allow translation
+// Skip revolute2 because it can't be connected to world.
 INSTANTIATE_TEST_CASE_P(TestRuns, JointSpawningTest_RotationalWorld,
   ::testing::Combine(PHYSICS_ENGINE_VALUES,
   ::testing::Values("revolute"
+                  , "universal"
                   , "ball")));
 
 int main(int argc, char **argv)
