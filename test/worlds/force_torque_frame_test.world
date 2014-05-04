@@ -139,21 +139,21 @@
             <measure_direction>child_to_parent</measure_direction>
           </force_torque>
         </sensor>
-        <sensor name="force_torque_01_joint_and_parent_to_child" type="force_torque">
+        <sensor name="force_torque_01_sensor_and_parent_to_child" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
           <force_torque>
-            <frame>joint</frame>
+            <frame>sensor</frame>
             <measure_direction>parent_to_child</measure_direction>
           </force_torque>
         </sensor>
-        <sensor name="force_torque_01_joint_and_child_to_parent" type="force_torque">
+        <sensor name="force_torque_01_sensor_and_child_to_parent" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
           <force_torque>
-            <frame>joint</frame>
+            <frame>sensor</frame>
             <measure_direction>child_to_parent</measure_direction>
           </force_torque>
         </sensor>
@@ -216,21 +216,21 @@
             <measure_direction>child_to_parent</measure_direction>
           </force_torque>
         </sensor>
-        <sensor name="force_torque_12_joint_and_parent_to_child" type="force_torque">
+        <sensor name="force_torque_12_sensor_and_parent_to_child" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
           <force_torque>
-            <frame>joint</frame>
+            <frame>sensor</frame>
             <measure_direction>parent_to_child</measure_direction>
           </force_torque>
         </sensor>
-        <sensor name="force_torque_12_joint_and_child_to_parent" type="force_torque">
+        <sensor name="force_torque_12_sensor_and_child_to_parent" type="force_torque">
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
           <force_torque>
-            <frame>joint</frame>
+            <frame>sensor</frame>
             <measure_direction>child_to_parent</measure_direction>
           </force_torque>
         </sensor>

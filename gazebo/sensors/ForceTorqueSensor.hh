@@ -108,21 +108,21 @@ namespace gazebo
       {
         PARENT_LINK,
         CHILD_LINK,
-        JOINT
+        SENSOR
       };
 
       /// \brief Frame in which we return the measured force torque info.
-      private: MeasureFrame measure_frame;
+      private: MeasureFrame measureFrame;
 
       /// \brief Direction of the measure
       ///        True if the measured force torque is the one applied
       ///        by the parent on the child, false otherwise
-      private: bool parent_to_child;
+      private: bool parentToChild;
 
       /// \brief Rotation matrix than transforms a vector expressed in child
       ///        orientation in a vector expressed in joint orientation.
       ///        Necessary is the measure is specified in joint frame.
-      private: math::Matrix3 rotation_joint_child;
+      private: math::Matrix3 rotationSensorChild;
     };
     /// \}
   }
