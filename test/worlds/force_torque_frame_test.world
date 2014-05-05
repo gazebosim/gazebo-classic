@@ -166,7 +166,7 @@
         <parent>link_1</parent>
         <child>link_2</child>
         <!-- joint_12 at the interface between the two cylinders -->
-        <pose>0 -10 0 0 -1.5708 0</pose>
+        <pose>0 -10 0 0 -0.7854 0</pose>
         <axis>
           <limit>
             <lower>-0.0</lower>
@@ -217,6 +217,7 @@
           </force_torque>
         </sensor>
         <sensor name="force_torque_12_sensor_and_parent_to_child" type="force_torque">
+          <pose>0 0 0 0 -0.7854 0</pose>
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
@@ -226,6 +227,7 @@
           </force_torque>
         </sensor>
         <sensor name="force_torque_12_sensor_and_child_to_parent" type="force_torque">
+          <pose>0 0 0 0 -0.7854 0</pose>
           <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>1000</update_rate>
