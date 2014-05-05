@@ -62,6 +62,9 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
 
   sdf::ElementPtr forceTorqueElem = this->sdf->GetElement("force_torque");
 
+  GZ_ASSERT(forceTorqueElem,
+    "force_torque element should be present in a ForceTorqueSensor sdf");
+
   // Handle frame setting
   MeasureFrame defaultFrame = CHILD_LINK;
   if (forceTorqueElem->HasElement("frame"))
