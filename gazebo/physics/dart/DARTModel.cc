@@ -42,9 +42,8 @@ DARTModel::~DARTModel()
 //////////////////////////////////////////////////
 void DARTModel::Load(sdf::ElementPtr _sdf)
 {
-  // create skeletonDynamics of DART
-  this->dtSkeleton = dynamic_cast<dart::dynamics::Skeleton*>(
-    new dart::dynamics::SoftSkeleton());
+  // create skeleton of DART
+  this->dtSkeleton = new dart::dynamics::Skeleton();
 
   Model::Load(_sdf);
 }
@@ -120,11 +119,9 @@ void DARTModel::Init()
   {
     this->dtSkeleton->enableSelfCollision();
 
-    dart::simulation::SoftWorld *dtWorld =
-      dynamic_cast<dart::simulation::SoftWorld*>(
-      this->GetDARTPhysics()->GetDARTWorld());
+    dart::simulation::World *dtWorld = this->GetDARTPhysics()->GetDARTWorld();
     dart::collision::CollisionDetector *dtCollDet =
-        dtWorld->getConstraintHandler()->getCollisionDetector();
+        dtWorld->getConstraintSolver()->getCollisionDetector();
 
     for (size_t i = 0; i < linkList.size() - 1; ++i)
     {

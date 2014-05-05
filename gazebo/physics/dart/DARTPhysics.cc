@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 
+#include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/physics/Collision.hh"
@@ -31,6 +32,8 @@
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/World.hh"
+
+#include "gazebo/physics/dart/dart_inc.h"
 
 #include "gazebo/physics/dart/DARTScrewJoint.hh"
 #include "gazebo/physics/dart/DARTHingeJoint.hh"
@@ -62,8 +65,7 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
-  this->dtWorld =
-    static_cast<dart::simulation::World*>(new dart::simulation::SoftWorld);
+  this->dtWorld = new dart::simulation::World;
 //  this->dtWorld->getConstraintHandler()->setCollisionDetector(
 //        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
@@ -147,20 +149,18 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  dart::constraint::ConstraintDynamics *dtConstraintDynamics =
-      this->dtWorld->getConstraintHandler();
+  dart::constraint::ConstraintSolver *dtConstraintSolver =
+      this->dtWorld->getConstraintSolver();
   dart::collision::CollisionDetector *dtCollisionDetector =
-      dtConstraintDynamics->getCollisionDetector();
+      dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 =
-        dtContact.collisionNode1->getBodyNode();
-    dart::dynamics::BodyNode *dtBodyNode2 =
-        dtContact.collisionNode2->getBodyNode();
+    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
+    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
@@ -227,16 +227,32 @@ void DARTPhysics::UpdateCollision()
 
     ++contactFeedback->count;
 
-  for (int i = 0; i < dtBodyNode1->getNumCollisionShapes(); ++i)
-  {
-    dart::dynamics::Shape* shape1 = dtBodyNode1->getCollisionShape(i);
-    if (shape1->getShapeType() == dynamics::Shape::SOFT_MESH)
+    // publish soft body mesh data
+    for (int j = 0; j < dtBodyNode1->getNumCollisionShapes(); ++j)
     {
-      SoftMeshShape* softMeshShape = static_cast<SoftMeshShape*>(shape);
-      msgs::Mesh meshMsg;
-      this->FillMeshMsg(meshMsg, softMeshShape);
-      //this->meshPub->Publish(meshMsg);
+      dart::dynamics::Shape *shape1 = dtBodyNode1->getCollisionShape(j);
+      if (shape1->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
+      {
+        dart::dynamics::SoftMeshShape* softMeshShape =
+            static_cast<dart::dynamics::SoftMeshShape*>(shape1);
+        msgs::Mesh meshMsg;
+        this->FillMeshMsg(meshMsg, softMeshShape);
+        this->meshPub->Publish(meshMsg);
+      }
     }
+    for (int j = 0; j < dtBodyNode2->getNumCollisionShapes(); ++j)
+    {
+      dart::dynamics::Shape *shape2 = dtBodyNode2->getCollisionShape(j);
+      if (shape2->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
+      {
+        dart::dynamics::SoftMeshShape* softMeshShape =
+            static_cast<dart::dynamics::SoftMeshShape*>(shape2);
+        msgs::Mesh meshMsg;
+        this->FillMeshMsg(meshMsg, softMeshShape);
+        this->meshPub->Publish(meshMsg);
+      }
+    }
+
   }
 }
 
@@ -244,18 +260,25 @@ void DARTPhysics::UpdateCollision()
 void DARTPhysics::FillMeshMsg(msgs::Mesh &_meshMsg,
     dart::dynamics::SoftMeshShape *_meshShape)
 {
-  fcl::Transform3f shapeT = getFclTransform(_meshShape->getLocalTransform());
+  msgs::SubMesh *submeshMsg = _meshMsg.add_submeshes();
+  //fcl::Transform3f shapeT = getFclTransform(_meshShape->getLocalTransform());
   const aiMesh* mesh = _meshShape->getAssimpMesh();
 
-  for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+  for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
   {
-    fcl::Vec3f vertices[3];
+    //fcl::Vec3f vertices[3];
     for (unsigned int k = 0; k < 3; k++)
     {
       const aiVector3D& vertex
-          = mesh->mVertices[mesh->mFaces[j].mIndices[k]];
-      vertices[k] = fcl::Vec3f(vertex.x, vertex.y, vertex.z);
-      vertices[k] = shapeT.transform(vertices[k]);
+          = mesh->mVertices[mesh->mFaces[i].mIndices[k]];
+
+      msgs::Vector3d *vMsg = submeshMsg->add_vertices();
+      vMsg->set_x(vertex.x);
+      vMsg->set_y(vertex.y);
+      vMsg->set_z(vertex.z);
+//      msgs::Convert(math::Vector3(vertex.x, vertex.y, vertex.z)
+      //vertices[k] = fcl::Vec3f(vertex.x, vertex.y, vertex.z);
+      //vertices[k] = shapeT.transform(vertices[k]);
     }
    // mMeshes[i]->updateTriangle(vertices[0], vertices[1], vertices[2]);
   }

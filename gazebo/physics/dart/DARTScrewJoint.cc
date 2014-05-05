@@ -180,12 +180,12 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     if (_index == 0)
     {
       // angular position
-      result.SetFromRadian(this->dartScrewJoint->getGenCoord(0)->getConfig());
+      result.SetFromRadian(this->dartScrewJoint->getGenCoord(0)->getPos());
     }
     else if (_index == 1)
     {
       // linear position
-      double angPos = this->dartScrewJoint->getGenCoord(0)->getConfig();
+      double angPos = this->dartScrewJoint->getGenCoord(0)->getPos();
       result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
     }
     else
@@ -238,7 +238,7 @@ math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->getConfigMax();
+    return this->dtJoint->getGenCoord(_index)->getPosMax();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -252,7 +252,7 @@ math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->getConfigMin();
+    return this->dtJoint->getGenCoord(_index)->getPosMin();
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };

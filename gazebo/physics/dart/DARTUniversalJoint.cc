@@ -133,12 +133,12 @@ math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->getConfig();
+    double radianAngle = this->dtJoint->getGenCoord(0)->getPos();
     result.SetFromRadian(radianAngle);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dtJoint->getGenCoord(1)->getConfig();
+    double radianAngle = this->dtJoint->getGenCoord(1)->getPos();
     result.SetFromRadian(radianAngle);
   }
   else
