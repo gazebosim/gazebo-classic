@@ -73,6 +73,10 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 //        DART_TO_RADIAN*1e-1);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
 //        DART_TO_RADIAN*1e-0);
+
+  this->meshPub =
+    this->node->Advertise<msgs::Mesh>("~/mesh");
+
 }
 
 //////////////////////////////////////////////////
@@ -222,6 +226,38 @@ void DARTPhysics::UpdateCollision()
     }
 
     ++contactFeedback->count;
+
+  for (int i = 0; i < dtBodyNode1->getNumCollisionShapes(); ++i)
+  {
+    dart::dynamics::Shape* shape1 = dtBodyNode1->getCollisionShape(i);
+    if (shape1->getShapeType() == dynamics::Shape::SOFT_MESH)
+    {
+      SoftMeshShape* softMeshShape = static_cast<SoftMeshShape*>(shape);
+      msgs::Mesh meshMsg;
+      this->FillMeshMsg(meshMsg, softMeshShape);
+      //this->meshPub->Publish(meshMsg);
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::FillMeshMsg(msgs::Mesh &_meshMsg,
+    dart::dynamics::SoftMeshShape *_meshShape)
+{
+  fcl::Transform3f shapeT = getFclTransform(_meshShape->getLocalTransform());
+  const aiMesh* mesh = _meshShape->getAssimpMesh();
+
+  for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+  {
+    fcl::Vec3f vertices[3];
+    for (unsigned int k = 0; k < 3; k++)
+    {
+      const aiVector3D& vertex
+          = mesh->mVertices[mesh->mFaces[j].mIndices[k]];
+      vertices[k] = fcl::Vec3f(vertex.x, vertex.y, vertex.z);
+      vertices[k] = shapeT.transform(vertices[k]);
+    }
+   // mMeshes[i]->updateTriangle(vertices[0], vertices[1], vertices[2]);
   }
 }
 
@@ -569,4 +605,3 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
   return res;
 }
-
