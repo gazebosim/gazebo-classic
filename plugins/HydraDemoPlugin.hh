@@ -61,7 +61,7 @@ namespace gazebo
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
-    /// \brief Mutex to protect hydraMsgs.
+    /// \brief Mutex to protect hydraMsgPtr.
     private: boost::mutex msgMutex;
 
     /// \brief Store the last message from hydra.
