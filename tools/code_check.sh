@@ -169,4 +169,3 @@ if [ $xmlout -eq 1 ]; then
 else
   ./tools/msg_check.py 2>&1
 fi
-
