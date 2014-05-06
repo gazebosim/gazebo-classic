@@ -141,8 +141,11 @@ bool OculusWindow::CreateCamera()
   {
     this->scene = rendering::get_scene();
 
-    // CreateCoulusCamera will throw an exception if Oculus is not connected.
-    this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+    if (this->scene)
+      // CreateCoulusCamera will throw an exception if Oculus is not connected.
+      this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+    else
+      gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
   }
   catch(const common::Exception &_e)
   {
