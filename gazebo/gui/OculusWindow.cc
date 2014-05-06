@@ -103,7 +103,7 @@ void OculusWindow::AttachCameraToVisual()
 {
   if (!this->scene)
   {
-    gzerr << "Scene is NULL!" << std::endl;
+    gzerr << "OculusWindow::AttachCameraToVisual(): Scene is NULL" << std::endl;
     return;
   }
   int tries = 0;
