@@ -77,9 +77,9 @@ namespace gazebo
           dart::dynamics::EllipsoidShape *dtEllipsoidShape =
               dynamic_cast<dart::dynamics::EllipsoidShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
-          dtEllipsoidShape->setDim(Eigen::Vector3d(_radius*2.0,
-                                                   _radius*2.0,
-                                                   _radius*2.0));
+          dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,
+                                                    _radius*2.0,
+                                                    _radius*2.0));
         }
       }
     };

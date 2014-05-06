@@ -96,7 +96,7 @@ namespace gazebo
           dart::dynamics::BoxShape *dtBoxShape =
               dynamic_cast<dart::dynamics::BoxShape*>(
                 dartCollisionParent->GetDARTCollisionShape());
-          dtBoxShape->setDim(DARTTypes::ConvVec3(size));
+          dtBoxShape->setSize(DARTTypes::ConvVec3(size));
         }
       }
     };
