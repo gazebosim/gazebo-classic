@@ -29,17 +29,12 @@ using namespace gui;
 /////////////////////////////////////////////////
 OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
     QWidget *_parent)
-  : QWidget(_parent)
+  : QWidget(_parent), windowId(-1), isFullScreen(false),
+    xPos(_x), yPos(_y), visualName(_visual)
 {
-  this->xPos = _x;
-  this->yPos = _y;
-  this->visualName = _visual;
-
   setAttribute(Qt::WA_NativeWindow, true);
   setAttribute(Qt::WA_OpaquePaintEvent, true);
   setAttribute(Qt::WA_PaintOnScreen, true);
-
-  this->windowId = -1;
 
   this->setObjectName("oculusWindow");
 
@@ -58,7 +53,6 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   renderLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(renderLayout);
-  this->isFullScreen = false;
 }
 
 /////////////////////////////////////////////////
