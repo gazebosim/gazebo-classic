@@ -807,9 +807,10 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+#ifdef HAVE_OCULUS
 void MainWindow::ViewOculus()
 {
-#ifdef HAVE_OCULUS
+
   rendering::ScenePtr scene = rendering::get_scene();
   if (scene->GetOculusCameraCount() != 0)
   {
@@ -832,9 +833,8 @@ void MainWindow::ViewOculus()
   else
     gzlog << "Oculus: No visual link specified in for attaching the camera. "
          << "Did you forget to set ~/.gazebo/gui.ini?\n";
-#endif
 }
-
+#endif
 
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
