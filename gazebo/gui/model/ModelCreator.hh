@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,18 @@
 #ifndef _MODEL_CREATOR_HH_
 #define _MODEL_CREATOR_HH_
 
+#include <boost/unordered/unordered_map.hpp>
+#include <sdf/sdf.hh>
+
 #include <list>
 #include <string>
 #include <vector>
 
-#include <boost/unordered/unordered_map.hpp>
-
-#include <sdf/sdf.hh>
-
 #include "gazebo/common/KeyEvent.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/JointMaker.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
