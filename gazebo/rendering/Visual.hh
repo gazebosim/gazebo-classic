@@ -356,8 +356,8 @@ namespace gazebo
                   bool _centerSubmesh = false);
 
       /// \brief Update the mesh of the visual
-      /// \param[in] _mesh New mesh used for the update.
-      public: void UpdatetMesh(const common::Mesh *_mesh);
+      /// \param[in] _msg Mesh message containing new mesh data.
+      public: void UpdateMeshFromMsg(const msgs::Mesh *_msg);
 
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.

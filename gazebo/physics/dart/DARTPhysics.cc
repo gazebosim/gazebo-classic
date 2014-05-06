@@ -76,8 +76,8 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 //  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
 //        DART_TO_RADIAN*1e-0);
 
-  this->meshPub =
-    this->node->Advertise<msgs::Mesh>("~/mesh");
+  this->meshUpdatePub =
+    this->node->Advertise<msgs::MeshUpdate>("~/mesh_update");
 
 }
 
@@ -155,6 +155,8 @@ void DARTPhysics::UpdateCollision()
       dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
+  std::map<int, DARTLinkPtr> collisionEntities;
+
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
@@ -164,6 +166,11 @@ void DARTPhysics::UpdateCollision()
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
+
+    if (collisionEntities.find(dartLink1->GetId()) == collisionEntities.end())
+      collisionEntities[dartLink1->GetId()] = dartLink1;
+    if (collisionEntities.find(dartLink2->GetId()) == collisionEntities.end())
+      collisionEntities[dartLink2->GetId()] = dartLink2;
 
     GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
     GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
@@ -226,48 +233,49 @@ void DARTPhysics::UpdateCollision()
     }
 
     ++contactFeedback->count;
-
-    // publish soft body mesh data
-    for (int j = 0; j < dtBodyNode1->getNumCollisionShapes(); ++j)
-    {
-      dart::dynamics::Shape *shape1 = dtBodyNode1->getCollisionShape(j);
-      if (shape1->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
-      {
-        dart::dynamics::SoftMeshShape* softMeshShape =
-            static_cast<dart::dynamics::SoftMeshShape*>(shape1);
-        msgs::Mesh meshMsg;
-        this->FillMeshMsg(meshMsg, softMeshShape);
-        this->meshPub->Publish(meshMsg);
-      }
-    }
-    for (int j = 0; j < dtBodyNode2->getNumCollisionShapes(); ++j)
-    {
-      dart::dynamics::Shape *shape2 = dtBodyNode2->getCollisionShape(j);
-      if (shape2->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
-      {
-        dart::dynamics::SoftMeshShape* softMeshShape =
-            static_cast<dart::dynamics::SoftMeshShape*>(shape2);
-        msgs::Mesh meshMsg;
-        this->FillMeshMsg(meshMsg, softMeshShape);
-        this->meshPub->Publish(meshMsg);
-      }
-    }
-
   }
+
+  // publish soft body mesh data
+  for (std::map<int, DARTLinkPtr>::iterator it = collisionEntities.begin();
+      it != collisionEntities.end(); ++it)
+  {
+    dart::dynamics::BodyNode *dtBodyNode = it->second->GetDARTBodyNode();
+    for (int j = 0; j < dtBodyNode->getNumCollisionShapes();
+        ++j)
+    {
+      dart::dynamics::Shape *shape = dtBodyNode->getCollisionShape(j);
+      if (shape->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
+      {
+        dart::dynamics::SoftMeshShape* softMeshShape =
+            static_cast<dart::dynamics::SoftMeshShape*>(shape);
+        msgs::MeshUpdate meshUpdateMsg;
+        meshUpdateMsg.set_parent_name(it->second->GetScopedName());
+        this->FillMeshMsg(meshUpdateMsg, softMeshShape);
+        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        this->meshUpdatePub->Publish(meshUpdateMsg);
+      }
+    }
+  }
+  collisionEntities.clear();
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::FillMeshMsg(msgs::Mesh &_meshMsg,
+void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
     dart::dynamics::SoftMeshShape *_meshShape)
 {
-  msgs::SubMesh *submeshMsg = _meshMsg.add_submeshes();
+  msgs::Mesh *meshMsg = _meshUpdateMsg.mutable_mesh();
+  // looking at DARTLink.cc, seems like box is the only supported shape
+  // at the moment.
+  meshMsg->set_name("unit_box");
+
+  msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
   //fcl::Transform3f shapeT = getFclTransform(_meshShape->getLocalTransform());
   const aiMesh* mesh = _meshShape->getAssimpMesh();
 
   for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
   {
     //fcl::Vec3f vertices[3];
-    for (unsigned int k = 0; k < 3; k++)
+    for (unsigned int k = 0; k < 3; ++k)
     {
       const aiVector3D& vertex
           = mesh->mVertices[mesh->mFaces[i].mIndices[k]];
@@ -276,11 +284,9 @@ void DARTPhysics::FillMeshMsg(msgs::Mesh &_meshMsg,
       vMsg->set_x(vertex.x);
       vMsg->set_y(vertex.y);
       vMsg->set_z(vertex.z);
-//      msgs::Convert(math::Vector3(vertex.x, vertex.y, vertex.z)
       //vertices[k] = fcl::Vec3f(vertex.x, vertex.y, vertex.z);
       //vertices[k] = shapeT.transform(vertices[k]);
     }
-   // mMeshes[i]->updateTriangle(vertices[0], vertices[1], vertices[2]);
   }
 }
 

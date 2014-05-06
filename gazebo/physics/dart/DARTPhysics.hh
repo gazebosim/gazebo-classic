@@ -152,7 +152,7 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      protected: void FillMeshMsg(msgs::Mesh &_meshMsg,
+      protected: void FillMeshMsg(msgs::MeshUpdate &_meshMsg,
           dart::dynamics::SoftMeshShape *_meshShape);
 
       /// \brief Find DART Link corresponding to DART BodyNode.
@@ -165,7 +165,7 @@ namespace gazebo
       private: dart::simulation::World *dtWorld;
 
       /// \brief Publisher for mesh messages.
-      private: transport::PublisherPtr meshPub;
+      private: transport::PublisherPtr meshUpdatePub;
     };
 
   /// \}
