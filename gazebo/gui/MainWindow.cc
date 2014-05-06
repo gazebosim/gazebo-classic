@@ -810,7 +810,6 @@ void MainWindow::Orbit()
 #ifdef HAVE_OCULUS
 void MainWindow::ViewOculus()
 {
-
   rendering::ScenePtr scene = rendering::get_scene();
   if (scene->GetOculusCameraCount() != 0)
   {
