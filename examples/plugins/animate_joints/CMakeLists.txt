@@ -7,5 +7,8 @@ endif()
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
+include(FindBoost)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex)
+
 add_library(animate_joints SHARED animate_joints.cc)
-target_link_libraries(animate_joints ${GAZEBO_LIBRARIES})
+target_link_libraries(animate_joints ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
