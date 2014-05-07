@@ -250,7 +250,8 @@ void DARTPhysics::UpdateCollision()
             static_cast<dart::dynamics::SoftMeshShape*>(shape);
         msgs::MeshUpdate meshUpdateMsg;
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
-        this->FillMeshMsg(meshUpdateMsg, softMeshShape);
+        this->FillMeshMsg(meshUpdateMsg,
+            dynamic_cast<dart::dynamics::SoftBodyNode *>(dtBodyNode));
         //std::cerr << meshUpdateMsg.DebugString() << std::endl;
         this->meshUpdatePub->Publish(meshUpdateMsg);
       }
@@ -261,7 +262,8 @@ void DARTPhysics::UpdateCollision()
 
 //////////////////////////////////////////////////
 void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
-    dart::dynamics::SoftMeshShape *_meshShape)
+    dart::dynamics::SoftBodyNode *_softBodyNode)
+    //dart::dynamics::SoftMeshShape *_meshShape)
 {
   msgs::Mesh *meshMsg = _meshUpdateMsg.mutable_mesh();
   // looking at DARTLink.cc, seems like box is the only supported shape
@@ -269,24 +271,15 @@ void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
   meshMsg->set_name("unit_box");
 
   msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
-  //fcl::Transform3f shapeT = getFclTransform(_meshShape->getLocalTransform());
-  const aiMesh* mesh = _meshShape->getAssimpMesh();
 
-  for (unsigned int i = 0; i < mesh->mNumFaces; ++i)
+  for (int i = 0; i < _softBodyNode->getNumPointMasses(); ++i)
   {
-    //fcl::Vec3f vertices[3];
-    for (unsigned int k = 0; k < 3; ++k)
-    {
-      const aiVector3D& vertex
-          = mesh->mVertices[mesh->mFaces[i].mIndices[k]];
-
-      msgs::Vector3d *vMsg = submeshMsg->add_vertices();
-      vMsg->set_x(vertex.x);
-      vMsg->set_y(vertex.y);
-      vMsg->set_z(vertex.z);
-      //vertices[k] = fcl::Vec3f(vertex.x, vertex.y, vertex.z);
-      //vertices[k] = shapeT.transform(vertices[k]);
-    }
+    dart::dynamics::PointMass* itPointMass = _softBodyNode->getPointMass(i);
+    const Eigen::Vector3d& vertex = itPointMass->getLocalPosition();
+    msgs::Vector3d *vMsg = submeshMsg->add_vertices();
+    vMsg->set_x(vertex[0]);
+    vMsg->set_y(vertex[1]);
+    vMsg->set_z(vertex[2]);
   }
 }
 

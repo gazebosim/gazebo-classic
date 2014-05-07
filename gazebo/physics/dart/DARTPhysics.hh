@@ -153,7 +153,7 @@ namespace gazebo
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
       protected: void FillMeshMsg(msgs::MeshUpdate &_meshMsg,
-          dart::dynamics::SoftMeshShape *_meshShape);
+          dart::dynamics::SoftBodyNode *_softBodyNode);
 
       /// \brief Find DART Link corresponding to DART BodyNode.
       /// \param[in] _dtBodyNode The DART BodyNode.

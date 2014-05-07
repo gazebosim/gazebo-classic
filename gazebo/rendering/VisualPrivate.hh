@@ -139,6 +139,10 @@ namespace gazebo
 
       /// \brief A list of visual plugins.
       public: std::vector<VisualPluginPtr> plugins;
+
+      /// \brief True if the visual is using a clone (copy) of the mesh rather
+      /// than an instance.
+      public: bool meshClone;
     };
     /// \}
   }

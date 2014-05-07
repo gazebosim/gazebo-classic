@@ -89,6 +89,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->sceneNode = NULL;
   this->dataPtr->animState = NULL;
   this->dataPtr->skeleton = NULL;
+  this->dataPtr->meshClone = false;
   this->dataPtr->initialized = false;
 
   std::string uniqueName = this->GetName();
@@ -123,6 +124,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->SetName(_name);
   this->dataPtr->sceneNode = NULL;
   this->dataPtr->animState = NULL;
+  this->dataPtr->meshClone = false;
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
 
@@ -714,6 +716,22 @@ unsigned int Visual::GetAttachedObjectCount() const
 void Visual::DetachObjects()
 {
   this->dataPtr->sceneNode->detachAllObjects();
+
+  if (this->dataPtr->meshClone)
+  {
+    for (unsigned int i = 0; i <
+        this->dataPtr->sceneNode->numAttachedObjects(); ++i)
+    {
+      Ogre::MovableObject *ogreObj =
+        this->dataPtr->sceneNode->getAttachedObject(i);
+      if (ogreObj->getName().find("_CLONE_") != std::string::npos)
+      {
+        this->dataPtr->sceneNode->getCreator()->destroyEntity(
+            dynamic_cast<Ogre::Entity *>(ogreObj));
+      }
+    }
+    this->dataPtr->meshClone = false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1871,9 +1889,28 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
     Ogre::MovableObject *ogreObj =
         this->dataPtr->sceneNode->getAttachedObject(i);
     Ogre::Entity *ogreEnt = dynamic_cast<Ogre::Entity *>(ogreObj);
+
     if (ogreEnt)
     {
       ogreMesh = ogreEnt->getMesh();
+
+      if (ogreMesh.isNull())
+        continue;
+
+      if (!this->dataPtr->meshClone)
+      {
+        // clone the mesh so that other visuals with the same mesh do not get
+        // affected by the changes.
+        this->dataPtr->sceneNode->detachObject(ogreObj);
+        ogreMesh = ogreMesh->clone(ogreMesh->getName() + "_CLONE_");
+
+        Ogre::MovableObject *obj = dynamic_cast<Ogre::MovableObject *>
+            (this->dataPtr->sceneNode->getCreator()->createEntity(
+            ogreObj->getName() + "_CLONE_", ogreMesh->getName()));
+
+        this->dataPtr->sceneNode->attachObject(obj);
+        this->dataPtr->meshClone = true;
+      }
       break;
     }
   }
