@@ -39,6 +39,12 @@ class Issue940Test : public ServerFixture,
 // \brief Compare force and torque measures with analytical solutions
 void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
 {
+  if (SDF_MAJOR_VERSION < 2 ||
+      std::string(SDF_VERSION_FULL) == std::string("2.0.0"))
+  {
+    gzerr << "Skipping test since SDF is too old" << std::endl;
+    return;
+  }
   if (_physicsEngine == "bullet")
   {
     gzerr << "Skipping this test for " << _physicsEngine
