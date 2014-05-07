@@ -1933,6 +1933,12 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
     Ogre::Real *vPos =
         static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
 
+    Ogre::HardwareIndexBufferSharedPtr ibuf =
+        ogreSubMesh->indexData->indexBuffer;
+
+    uint32_t * indices = static_cast<uint32_t *>(
+        ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
     /// FIXME use indices data to update the vertices!
     for (int j = 0; j < subMeshMsg.vertices_size(); ++j)
     {
@@ -1955,7 +1961,13 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
         *vPos++ = n.z;*/
       }
     }
+
+    // Add all the indices
+    for (int j = 0; j < subMeshMsg.indices_size(); ++j)
+      *indices++ = subMeshMsg.indices(j);
+
     vbuf->unlock();
+    ibuf->unlock();
   }
 
   // update mesh bounding box.

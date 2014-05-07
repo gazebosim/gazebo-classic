@@ -246,8 +246,6 @@ void DARTPhysics::UpdateCollision()
       dart::dynamics::Shape *shape = dtBodyNode->getCollisionShape(j);
       if (shape->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
       {
-        dart::dynamics::SoftMeshShape* softMeshShape =
-            static_cast<dart::dynamics::SoftMeshShape*>(shape);
         msgs::MeshUpdate meshUpdateMsg;
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
         this->FillMeshMsg(meshUpdateMsg,
@@ -280,6 +278,13 @@ void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
     vMsg->set_x(vertex[0]);
     vMsg->set_y(vertex[1]);
     vMsg->set_z(vertex[2]);
+  }
+  for (int i = 0; i < _softBodyNode->getNumFaces(); ++i)
+  {
+    Eigen::Vector3i itFace = _softBodyNode->getFace(i);
+    submeshMsg->add_indices(itFace[0]);
+    submeshMsg->add_indices(itFace[1]);
+    submeshMsg->add_indices(itFace[2]);
   }
 }
 
