@@ -24,7 +24,7 @@
 #include "gazebo/gui/GuiIface.hh"
 
 bool sig_killed = false;
-int status1, status2, status3;
+int status1, status2;
 pid_t  pid1, pid2;
 bool killed1 = false;
 bool killed2 = false;
@@ -140,12 +140,14 @@ int main(int _argc, char **_argv)
     pid2 = fork();
     if (pid2)
     {
-      pid_t dead_child = wait(&status3);
+      int child_exit_status;
+      pid_t dead_child = wait(&child_exit_status);
       // WIFEXITED will return zero if the process finished not reaching
       // return or exit calls.
       // WEXITSTATUS will check the value of the return function, not being
       // zero means problems.
-      if ((WIFEXITED(status3) == 0) || (WEXITSTATUS(status3) != 0))
+      if ((WIFEXITED(child_exit_status)   == 0) || 
+          (WEXITSTATUS(child_exit_status) != 0))
         return_value = -1;
       else
         return_value = 0;
