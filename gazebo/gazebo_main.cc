@@ -133,7 +133,7 @@ int main(int _argc, char **_argv)
 
   // Need to check the return of wait function (8 lines below) to know
   // what should be returned by the process
-  int return_value = 0;
+  int returnValue = 0;
 
   if (pid1)
   {
@@ -148,9 +148,9 @@ int main(int _argc, char **_argv)
       // zero means problems.
       if ((WIFEXITED(child_exit_status)   == 0) || 
           (WEXITSTATUS(child_exit_status) != 0))
-        return_value = -1;
+        returnValue = -1;
       else
-        return_value = 0;
+        returnValue = 0;
         
       if (dead_child == pid1)
         killed1 = true;
@@ -182,5 +182,5 @@ int main(int _argc, char **_argv)
   delete[] argvServer;
   delete[] argvClient;
 
-  return return_value;
+  return returnValue;
 }
