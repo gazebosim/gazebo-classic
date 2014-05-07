@@ -24,7 +24,7 @@
 #include "gazebo/gui/GuiIface.hh"
 
 bool sig_killed = false;
-int status1, status2;
+int status1, status2, status3;
 pid_t  pid1, pid2;
 bool killed1 = false;
 bool killed2 = false;
@@ -131,12 +131,25 @@ int main(int _argc, char **_argv)
   argvServer[_argc] = static_cast<char*>(NULL);
   argvClient[_argc] = static_cast<char*>(NULL);
 
+  // Need to check the return of wait function (8 lines below) to know
+  // what should be returned by the process
+  int return_value = 0;
+
   if (pid1)
   {
     pid2 = fork();
     if (pid2)
     {
-      pid_t dead_child = wait(&status1);
+      pid_t dead_child = wait(&status3);
+      // WIFEXITED will return zero if the process finished not reaching
+      // return or exit calls.
+      // WEXITSTATUS will check the value of the return function, not being
+      // zero means problems.
+      if ((WIFEXITED(status3) == 0) || (WEXITSTATUS(status3) != 0))
+        return_value = -1;
+      else
+        return_value = 0;
+        
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)
@@ -167,5 +180,5 @@ int main(int _argc, char **_argv)
   delete[] argvServer;
   delete[] argvClient;
 
-  return 0;
+  return return_value;
 }
