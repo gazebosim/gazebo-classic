@@ -55,8 +55,11 @@ void posesStampedCallback(ConstPosesStampedPtr &posesStamped)
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-    std::string str = "../animated_box.world";
-    if (_argc > 1) { str = _argv[1]; }
+    std::string str = "animated_box.world";
+    if (_argc > 1)
+    {
+      str = _argv[1];
+    }
 
     // load gazebo server
     gazebo::setupServer(_argc, _argv);
