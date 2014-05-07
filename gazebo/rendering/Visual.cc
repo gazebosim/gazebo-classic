@@ -184,6 +184,12 @@ void Visual::Fini()
     this->sceneNode = NULL;
   }
 
+  if (this->preRenderConnection)
+  {
+    event::Events::DisconnectPreRender(this->preRenderConnection);
+    this->preRenderConnection.reset();
+  }
+
   RTShaderSystem::Instance()->DetachEntity(this);
 }
 
@@ -1545,7 +1551,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
+      boost::bind(&Visual::Update, shared_from_this()));
 
   DynamicLines *line = new DynamicLines(_type);
   this->lines.push_back(line);
