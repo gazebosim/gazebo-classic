@@ -29,22 +29,20 @@ void JointMaker_TEST::JointState()
 {
   this->Load("worlds/empty.world");
 
-  gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  gui::JointMaker jointMaker;
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_NONE);
 
-  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_HINGE);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_HINGE);
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_HINGE);
 
-  jointMaker->Reset();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
+  jointMaker.Reset();
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_NONE);
 
-  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_SLIDER);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_SLIDER);
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_SLIDER);
 
-  jointMaker->Stop();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
-
-  delete jointMaker;
+  jointMaker.Stop();
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_NONE);
 }
 
 /////////////////////////////////////////////////
@@ -55,22 +53,21 @@ void JointMaker_TEST::CreateRemoveJoint()
 
   this->Load("worlds/shapes.world", false, false, true);
 
-  gui::JointMaker *jointMaker = new gui::JointMaker();
-  QCOMPARE(jointMaker->GetState(), gui::JointMaker::JOINT_NONE);
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  gui::JointMaker jointMaker;
+  QCOMPARE(jointMaker.GetState(), gui::JointMaker::JOINT_NONE);
+  QCOMPARE(jointMaker.GetJointCount(), 0u);
 
-  gui::MainWindow *mainWindow = new gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
-  mainWindow->Load();
-  mainWindow->Init();
-  mainWindow->show();
+  gui::MainWindow mainWindow;
+  mainWindow.Load();
+  mainWindow.Init();
+  mainWindow.show();
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
-    mainWindow->repaint();
+    mainWindow.repaint();
   }
 
   rendering::UserCameraPtr cam = gui::get_active_camera();
@@ -87,48 +84,46 @@ void JointMaker_TEST::CreateRemoveJoint()
   Q_ASSERT(cylinderLink.get());
 
   // Add a revolute joint
-  jointMaker->AddJoint(gui::JointMaker::JOINT_HINGE);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_HINGE);
   gui::JointData *revoluteJointData =
-      jointMaker->CreateJoint(boxLink, sphereLink);
-  jointMaker->CreateHotSpot(revoluteJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+      jointMaker.CreateJoint(boxLink, sphereLink);
+  jointMaker.CreateHotSpot(revoluteJointData);
+  QCOMPARE(jointMaker.GetJointCount(), 1u);
 
   // Add a prismatic joint
-  jointMaker->AddJoint(gui::JointMaker::JOINT_SLIDER);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_SLIDER);
   gui::JointData *prismaticJointData =
-      jointMaker->CreateJoint(sphereLink, cylinderLink);
-  jointMaker->CreateHotSpot(prismaticJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+      jointMaker.CreateJoint(sphereLink, cylinderLink);
+  jointMaker.CreateHotSpot(prismaticJointData);
+  QCOMPARE(jointMaker.GetJointCount(), 2u);
 
   // Add a screw joint
-  jointMaker->AddJoint(gui::JointMaker::JOINT_SCREW);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_SCREW);
   gui::JointData *screwJointData =
-      jointMaker->CreateJoint(cylinderLink, boxLink);
-  jointMaker->CreateHotSpot(screwJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+      jointMaker.CreateJoint(cylinderLink, boxLink);
+  jointMaker.CreateHotSpot(screwJointData);
+  QCOMPARE(jointMaker.GetJointCount(), 3u);
 
   // Remove the screw joint
-  jointMaker->RemoveJoint(screwJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 2u);
+  jointMaker.RemoveJoint(screwJointData->hotspot->GetName());
+  QCOMPARE(jointMaker.GetJointCount(), 2u);
 
   // Add a ball joint
-  jointMaker->AddJoint(gui::JointMaker::JOINT_BALL);
+  jointMaker.AddJoint(gui::JointMaker::JOINT_BALL);
   gui::JointData *ballJointData =
-      jointMaker->CreateJoint(cylinderLink, boxLink);
-  jointMaker->CreateHotSpot(ballJointData);
-  QCOMPARE(jointMaker->GetJointCount(), 3u);
+      jointMaker.CreateJoint(cylinderLink, boxLink);
+  jointMaker.CreateHotSpot(ballJointData);
+  QCOMPARE(jointMaker.GetJointCount(), 3u);
 
   // Remove the two joints connected to the sphere
-  jointMaker->RemoveJointsByPart(sphereLink->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 1u);
+  jointMaker.RemoveJointsByPart(sphereLink->GetName());
+  QCOMPARE(jointMaker.GetJointCount(), 1u);
 
   // Remove the last joint
-  jointMaker->RemoveJoint(ballJointData->hotspot->GetName());
-  QCOMPARE(jointMaker->GetJointCount(), 0u);
+  jointMaker.RemoveJoint(ballJointData->hotspot->GetName());
+  QCOMPARE(jointMaker.GetJointCount(), 0u);
 
-  mainWindow->close();
-  delete jointMaker;
-  delete mainWindow;
+  mainWindow.close();
 }
 
 // Generate a main function for the test
