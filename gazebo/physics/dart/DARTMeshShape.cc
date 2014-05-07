@@ -15,13 +15,14 @@
  *
 */
 
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
 
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -75,6 +76,7 @@ void DARTMeshShape::Init()
 
   DARTCollisionPtr dartCollisionParent
       = boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+  GZ_ASSERT(dartCollisionParent, "dartCollisionParent is null");
 
   float *localVertices = NULL;
   int   *localIndices  = NULL;
@@ -124,6 +126,8 @@ void DARTMeshShape::Init()
   dart::dynamics::MeshShape *dtMeshShape
       = new dart::dynamics::MeshShape(
         DARTTypes::ConvVec3(meshScale), assimpScene);
+  GZ_ASSERT(dartCollisionParent->GetDARTBodyNode(),
+    "dartCollisionParent->GetDARTBodyNode() is null");
   dartCollisionParent->GetDARTBodyNode()->addCollisionShape(dtMeshShape);
   dartCollisionParent->SetDARTCollisionShape(dtMeshShape);
 
