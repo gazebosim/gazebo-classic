@@ -51,6 +51,7 @@ int main(int argc, char **argv)
 
     server->Fini();
     delete server;
+    return -1;
   }
 
   return 0;
