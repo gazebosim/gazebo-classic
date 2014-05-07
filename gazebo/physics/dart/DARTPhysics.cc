@@ -250,7 +250,7 @@ void DARTPhysics::UpdateCollision()
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
         this->FillMeshMsg(meshUpdateMsg,
             dynamic_cast<dart::dynamics::SoftBodyNode *>(dtBodyNode));
-        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        std::cerr << meshUpdateMsg.DebugString() << std::endl;
         this->meshUpdatePub->Publish(meshUpdateMsg);
       }
     }

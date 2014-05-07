@@ -1930,6 +1930,10 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
         ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
         Ogre::VES_NORMAL);
 
+    const Ogre::VertexElement *texcoordVertexElement =
+        ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
+        Ogre::VES_TEXTURE_COORDINATES);
+
     Ogre::Real *vPos =
         static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
 
@@ -1959,6 +1963,12 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
         /**vPos++ = n.x;
         *vPos++ = n.y;
         *vPos++ = n.z;*/
+      }
+
+      if (texcoordVertexElement)
+      {
+        *vPos++;
+        *vPos++;
       }
     }
 
