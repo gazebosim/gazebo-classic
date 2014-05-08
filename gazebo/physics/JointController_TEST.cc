@@ -160,9 +160,23 @@ TEST_F(JointControllerTest, AddJoint)
     jointController->GetJoints();
   EXPECT_EQ(joints.size(), 1u);
 
-  // Check the default position PID values
+  // Set a new position PID
+  jointController->SetPositionPID(joint->GetScopedName(), common::PID(4, 1, 9));
+
+  // Check the new position PID values
   std::map<std::string, common::PID> posPids =
     jointController->GetPositionPIDs();
+  EXPECT_EQ(posPids.size(), 1u);
+  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 9);
+
+  // Restore the default value
+  jointController->SetPositionPID(
+        joint->GetScopedName(), common::PID(1, 0.1, 0.01));
+
+  // Check the default position PID values
+  posPids = jointController->GetPositionPIDs();
   EXPECT_EQ(posPids.size(), 1u);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetPGain(), 1);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 0.1);
