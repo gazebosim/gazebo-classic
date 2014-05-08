@@ -604,7 +604,7 @@ void JointController::SetPositionPID(const std::string &_jointName,
   iter = this->dataPtr->joints.find(_jointName);
 
   if (iter != this->dataPtr->joints.end())
-    this->dataPtr->posPids[_jointName]  = _pid;
+    this->dataPtr->posPids[_jointName] = _pid;
   else
     gzerr << "Unable to find joint with name[" << _jointName << "]\n";
 }
@@ -623,6 +623,19 @@ bool JointController::SetPositionTarget(const std::string &_jointName,
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+void JointController::SetVelocityPID(const std::string &_jointName,
+                                     const common::PID &_pid)
+{
+  std::map<std::string, JointPtr>::iterator iter;
+  iter = this->dataPtr->joints.find(_jointName);
+
+  if (iter != this->dataPtr->joints.end())
+    this->dataPtr->velPids[_jointName] = _pid;
+  else
+    gzerr << "Unable to find joint with name[" << _jointName << "]\n";
 }
 
 /////////////////////////////////////////////////

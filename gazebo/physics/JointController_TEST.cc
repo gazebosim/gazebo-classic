@@ -171,7 +171,7 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 1);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 9);
 
-  // Restore the default value
+  // Restore the default position PID values
   jointController->SetPositionPID(
         joint->GetScopedName(), common::PID(1, 0.1, 0.01));
 
@@ -182,9 +182,23 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetIGain(), 0.1);
   EXPECT_DOUBLE_EQ(posPids[joint->GetScopedName()].GetDGain(), 0.01);
 
-  // Check the default velocity PID values
+  // Set a new velocity PID
+  jointController->SetVelocityPID(joint->GetScopedName(), common::PID(4, 1, 9));
+
+  // Check the new velocity PID values
   std::map<std::string, common::PID> velPids =
     jointController->GetVelocityPIDs();
+  EXPECT_EQ(velPids.size(), 1u);
+  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetDGain(), 9);
+
+  // Restore the default velocity PID values
+  jointController->SetVelocityPID(
+        joint->GetScopedName(), common::PID(1, 0.1, 0.01));
+
+  // Check the default velocity PID values
+  velPids = jointController->GetVelocityPIDs();
   EXPECT_EQ(velPids.size(), 1u);
   EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetPGain(), 1);
   EXPECT_DOUBLE_EQ(velPids[joint->GetScopedName()].GetIGain(), 0.1);
