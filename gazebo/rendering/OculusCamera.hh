@@ -66,6 +66,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
+      /// \throws common::Exception when Oculus Rift is not plugged in.
       public: OculusCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
