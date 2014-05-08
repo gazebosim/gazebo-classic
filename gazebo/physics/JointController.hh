@@ -82,6 +82,12 @@ namespace gazebo
       /// be controlled.
       public: std::map<std::string, JointPtr> GetJoints() const;
 
+      /// \brief Set the position PID values for a joint.
+      /// \param[in] _jointName Scoped name of the joint.
+      /// \param[in] _pid New position PID controller.
+      public: void SetPositionPID(const std::string &_jointName,
+                                  const common::PID &_pid);
+
       /// \brief Set the target position for the position PID controller.
       /// \param[in] _jointName Scoped name of the joint.
       /// \param[in] _target Position target.

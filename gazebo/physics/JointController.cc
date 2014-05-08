@@ -596,6 +596,19 @@ std::map<std::string, double> JointController::GetVelocities() const
   return this->dataPtr->velocities;
 }
 
+//////////////////////////////////////////////////
+void JointController::SetPositionPID(const std::string &_jointName,
+                                     const common::PID &_pid)
+{
+  std::map<std::string, JointPtr>::iterator iter;
+  iter = this->dataPtr->joints.find(_jointName);
+
+  if (iter != this->dataPtr->joints.end())
+    this->dataPtr->posPids[_jointName]  = _pid;
+  else
+    gzerr << "Unable to find joint with name[" << _jointName << "]\n";
+}
+
 /////////////////////////////////////////////////
 bool JointController::SetPositionTarget(const std::string &_jointName,
     double _target)
