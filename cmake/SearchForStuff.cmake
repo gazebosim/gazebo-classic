@@ -447,7 +447,7 @@ pkg_check_modules(OculusVR OculusVR)
 
 if (OculusVR_FOUND)
   set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
-  include_directories(${OculusVR_INCLUDEDIR})
+  include_directories(SYSTEM ${OculusVR_INCLUDEDIR})
 else ()
   BUILD_WARNING ("OculusVR not found, Oculus support will be disabled.")
   set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
