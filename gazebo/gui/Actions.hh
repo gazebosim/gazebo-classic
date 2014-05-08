@@ -19,8 +19,6 @@
 #define _GUI_ACTIONS_HH_
 
 #include <string>
-
-#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -83,9 +81,7 @@ namespace gazebo
 
     extern QAction *g_viewWireframeAct;
 
-#ifdef HAVE_OCULUS
     extern QAction *g_viewOculusAct;
-#endif
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
