@@ -22,7 +22,6 @@
 #include <vector>
 #include <list>
 
-#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
@@ -122,9 +121,7 @@ namespace gazebo
       private slots: void FullScreen();
       private slots: void FPS();
       private slots: void Orbit();
-#ifdef HAVE_OCULUS
       private slots: void ViewOculus();
-#endif
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();

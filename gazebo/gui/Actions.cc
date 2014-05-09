@@ -15,7 +15,6 @@
  *
  */
 
-#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/util/system.hh"
 
@@ -99,12 +98,8 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
-
-#ifdef HAVE_OCULUS
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewOculusAct = 0;
-#endif
-
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;
 GAZEBO_VISIBLE

@@ -807,9 +807,9 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_OCULUS
 void MainWindow::ViewOculus()
 {
+#ifdef HAVE_OCULUS
   rendering::ScenePtr scene = rendering::get_scene();
   if (scene->GetOculusCameraCount() != 0)
   {
@@ -832,8 +832,8 @@ void MainWindow::ViewOculus()
   else
     gzlog << "Oculus: No visual link specified in for attaching the camera. "
          << "Did you forget to set ~/.gazebo/gui.ini?\n";
-}
 #endif
+}
 
 /////////////////////////////////////////////////
 void MainWindow::DataLogger()
@@ -1108,10 +1108,11 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
-#ifdef HAVE_OCULUS
   g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
   g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
   connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
+#ifndef HAVE_OCULUS
+  g_viewOculusAct->setEnabled(false);
 #endif
 
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
