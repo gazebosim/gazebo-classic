@@ -441,15 +441,29 @@ else ()
   set (HAVE_GDAL ON CACHE BOOL "HAVE GDAL" FORCE)
 endif ()
 
+########################################
+# Find libusb
+pkg_check_modules(libusb-1.0 libusb-1.0)
+if (NOT libusb-1.0_FOUND)
+  BUILD_WARNING ("libusb-1.0 not found. USB peripherals support will be disabled.")
+  set (HAVE_USB OFF CACHE BOOL "HAVE USB" FORCE)
+else()
+  message (STATUS "Looking for libusb-1.0 - found. USB peripherals support enabled.")
+  set (HAVE_USB ON CACHE BOOL "HAVE USB" FORCE)
+  include_directories(${libusb-1.0_INCLUDE_DIRS})
+  link_directories(${libusb-1.0_LIBRARY_DIRS})
+endif ()
+
 #################################################
 # Find Oculus SDK.
 pkg_check_modules(OculusVR OculusVR)
 
-if (OculusVR_FOUND)
+if (HAVE_USB AND OculusVR_FOUND)
+  message (STATUS "Oculus Rift support enabled.")
   set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
   include_directories(SYSTEM ${OculusVR_INCLUDEDIR})
 else ()
-  BUILD_WARNING ("OculusVR not found, Oculus support will be disabled.")
+  BUILD_WARNING ("Oculus Rift support will be disabled.")
   set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
 endif()
 
