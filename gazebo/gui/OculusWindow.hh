@@ -15,6 +15,9 @@
  *
  */
 
+#ifndef _GAZEBO_OCULUS_WINDOW_HH_
+#define _GAZEBO_OCULUS_WINDOW_HH_
+
 #include <boost/thread.hpp>
 #include <string>
 
@@ -93,3 +96,4 @@ namespace gazebo
     };
   }
 }
+#endif

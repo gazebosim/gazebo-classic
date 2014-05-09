@@ -22,11 +22,16 @@
 #include <vector>
 #include <list>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
 
 namespace gazebo
 {
@@ -242,6 +247,10 @@ namespace gazebo
 
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
+
+#ifdef HAVE_OCULUS
+      private: gui::OculusWindow *oculusWindow;
+#endif
     };
   }
 }

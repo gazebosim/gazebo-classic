@@ -201,11 +201,11 @@ void MainWindow::Load()
   {
     if (!visual.empty())
     {
-      gui::OculusWindow *oculusWindow = new gui::OculusWindow(
+      this->oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
-      if (oculusWindow->CreateCamera())
-        oculusWindow->show();
+      if (this->oculusWindow->CreateCamera())
+        this->oculusWindow->show();
     }
     else
       gzlog << "Oculus: No visual link specified in for attaching the camera. "
@@ -271,6 +271,14 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+#ifdef HAVE_OCULUS
+  if (this->oculusWindow)
+  {
+    delete this->oculusWindow;
+    this->oculusWindow = NULL;
+  }
+#endif
 
   gazebo::shutdown();
 }
@@ -823,11 +831,11 @@ void MainWindow::ViewOculus()
 
   if (!visual.empty())
   {
-    gui::OculusWindow *oculusWindow = new gui::OculusWindow(
+    this->oculusWindow = new gui::OculusWindow(
         oculusX, oculusY, visual);
 
-    if (oculusWindow->CreateCamera())
-      oculusWindow->show();
+    if (this->oculusWindow->CreateCamera())
+      this->oculusWindow->show();
   }
   else
     gzlog << "Oculus: No visual link specified in for attaching the camera. "
