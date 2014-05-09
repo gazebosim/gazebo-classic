@@ -314,6 +314,19 @@ void Joint::Init()
 }
 
 //////////////////////////////////////////////////
+void Joint::Fini()
+{
+  for (std::vector<std::string>::iterator iter = this->sensors.begin();
+      iter != this->sensors.end(); ++iter)
+  {
+    sensors::remove_sensor(*iter);
+  }
+  this->sensors.clear();
+
+  Base::Fini();
+}
+
+//////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
   math::Vector3 vec;
@@ -519,15 +532,21 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
+  // switch below to return this->SetUpperLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
-void Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle);
+  // switch below to return this->SetLowerLimit when we implement
+  // issue #1108
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -920,6 +939,36 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
   }
 
   return this->GetWorldPose().rot;
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << " returning identity rotation." << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // axis is defined in parent model frame, so return the rotation
+    // from joint frame to parent model frame, or
+    // world frame in absence of parent link.
+    math::Pose parentModelWorldPose;
+    math::Pose jointWorldPose = this->GetWorldPose();
+    if (this->parentLink)
+    {
+      parentModelWorldPose = this->parentLink->GetModel()->GetWorldPose();
+    }
+    return (parentModelWorldPose - jointWorldPose).rot;
+  }
+
+  // axis is defined in the joint frame, so
+  // return the rotation from joint frame to joint frame.
+  return math::Quaternion();
 }
 
 //////////////////////////////////////////////////

@@ -108,6 +108,9 @@ namespace gazebo
       /// \brief Initialize a joint.
       public: virtual void Init();
 
+      /// \brief Finialize the object
+      public: virtual void Fini();
+
       /// \brief Update the joint.
       public: void Update();
 
@@ -168,11 +171,12 @@ namespace gazebo
       public: double GetDamping(unsigned int _index);
 
       /// \brief Callback to apply damping force to joint.
-      /// Deprecated by ApplyStiffnessDamping.
+      /// Deprecated by ApplySpringStiffnessDamping.
       public: virtual void ApplyDamping() GAZEBO_DEPRECATED(3.0);
 
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
+      /// \TODO: rename to ApplySpringStiffnessDamping()
       public: virtual void ApplyStiffnessDamping();
 
       /// \brief Set the joint spring stiffness.
@@ -180,6 +184,7 @@ namespace gazebo
       ///                   implemented.
       /// \param[in] _stiffness Stiffness value for the axis.
       /// \param[in] _reference Spring zero load reference position.
+      /// \TODO: rename to SetSpringStiffnessDamping()
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0) = 0;
 
@@ -187,6 +192,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set, currently ignored, to be
       ///                   implemented.
       /// \param[in] _stiffness Spring stiffness value for the axis.
+      /// \TODO: rename to SetSpringStiffness()
       public: virtual void SetStiffness(unsigned int _index,
                                         double _stiffness) = 0;
 
@@ -194,6 +200,7 @@ namespace gazebo
       /// \param[in] _index Index of the axis to get, currently ignored, to be
       ///                   implemented.
       /// \return Joint spring stiffness coefficient for this joint.
+      /// \TODO: rename to GetSpringStiffness()
       public: double GetStiffness(unsigned int _index);
 
       /// \brief Get joint spring reference position.
@@ -239,13 +246,13 @@ namespace gazebo
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                                        const math::Angle &_angle);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
 
       /// \brief Get the high stop of an axis(index).
@@ -394,16 +401,33 @@ namespace gazebo
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
+      public: virtual bool SetParam(const std::string &_key,
+                                    unsigned int _index,
+                                    const boost::any &_value) = 0;
+
+      /// \brief Set a non-generic parameter for the joint.
+      /// replaces SetAttribute(Attribute, int, double)
+      /// Deprecated by bool SetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _value Value of the attribute.
       public: virtual void SetAttribute(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value) = 0;
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index) = 0;
+
+      /// \brief Get a non-generic parameter for the joint.
+      /// Deprecated by GetParam
+      /// \param[in] _key String key.
+      /// \param[in] _index Index of the axis.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -524,6 +548,20 @@ namespace gazebo
       /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to world frame.
       public: math::Quaternion GetAxisFrame(unsigned int _index) const;
+
+      /// \brief Get orientation of joint axis reference frame
+      /// relative to joint frame. This should always return identity unless
+      /// flag use_parent_model_frame is true in sdf 1.5 or using sdf 1.4-,
+      /// i.e. bug described in issue #494 is present.
+      /// In addition, if use_parent_model_frame is true, and the parent
+      /// link of the joint is world, the axis is defined in the world frame.
+      /// The value of axisParentModelFrame is used to determine the
+      /// appropriate frame internally.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to joint frame.
+      /// If supplied _index is out of range, or use_parent_model_frame
+      /// is not true, this function returns identity rotation quaternion.
+      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.

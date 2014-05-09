@@ -128,6 +128,11 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     double vel = 2*M_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
+    double dt = physics->GetMaxStepSize();
+
+    // Verify that the joint should make more than 1 revolution
+    EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
+
     joint->SetVelocity(0, vel);
     if (isOde)
       joint->SetMaxForce(0, 1e4);
@@ -623,7 +628,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     //       << "]\n";
   }
   physicsEngine->SetMaxStepSize(0.0001);
-  physicsEngine->SetSORPGSIters(1000);
+  physicsEngine->SetParam("iters", 1000);
 
   {
     // test with global contact_max_correcting_vel at 0 as set by world file

@@ -118,12 +118,12 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
-  this->bulletUniversal->setUpperLimit(
-    this->angleOffset[1] + this->GetUpperLimit(1).Radian(),
-    this->angleOffset[0] + this->GetUpperLimit(0).Radian());
-  this->bulletUniversal->setLowerLimit(
-    this->angleOffset[1] + this->GetLowerLimit(1).Radian(),
-    this->angleOffset[0] + this->GetLowerLimit(0).Radian());
+  // Get{Upp|Low}erLimit gets the original sdf values
+  // Set{High|Low}Stop translates to bullet's axis definitions
+  this->SetHighStop(0, this->GetUpperLimit(0));
+  this->SetHighStop(1, this->GetUpperLimit(1));
+  this->SetLowStop(0, this->GetLowerLimit(0));
+  this->SetLowStop(1, this->GetLowerLimit(1));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
@@ -274,7 +274,7 @@ double BulletUniversalJoint::GetMaxForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetHighStop(unsigned int _index,
+bool BulletUniversalJoint::SetHighStop(unsigned int _index,
     const math::Angle &_angle)
 {
   // bullet does not handle joint angles near [-pi/2, +pi/2]
@@ -294,19 +294,29 @@ void BulletUniversalJoint::SetHighStop(unsigned int _index,
     {
       this->bulletUniversal->setLowerLimit(
         this->angleOffset[0] - angle, -this->GetHighStop(0).Radian());
+      return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setLowerLimit(
         -this->GetHighStop(1).Radian(), this->angleOffset[1] - angle);
+      return true;
     }
     else
+    {
       gzerr << "Invalid axis index [" << _index << "].\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "bulletUniversal not yet created.\n";
+    return false;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetLowStop(unsigned int _index,
+bool BulletUniversalJoint::SetLowStop(unsigned int _index,
     const math::Angle &_angle)
 {
   // bullet does not handle joint angles near [-pi/2, +pi/2]
@@ -326,14 +336,24 @@ void BulletUniversalJoint::SetLowStop(unsigned int _index,
     {
       this->bulletUniversal->setUpperLimit(
         this->angleOffset[0] - angle, -this->GetLowStop(0).Radian());
+      return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setUpperLimit(
         -this->GetLowStop(1).Radian(), this->angleOffset[1] - angle);
+      return true;
     }
     else
+    {
       gzerr << "Invalid axis index [" << _index << "].\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "bulletUniversal not yet created.\n";
+    return false;
   }
 }
 
@@ -344,7 +364,7 @@ math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    double limit1, limit2;
+    btScalar limit1, limit2;
     this->bulletUniversal->getLowerLimit(limit1, limit2);
     if (_index == 1)
       result.SetFromRadian(-limit1);
@@ -364,7 +384,7 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 
   if (this->bulletUniversal)
   {
-    double limit1, limit2;
+    btScalar limit1, limit2;
     this->bulletUniversal->getUpperLimit(limit1, limit2);
     if (_index == 1)
       result.SetFromRadian(-limit1);

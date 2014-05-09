@@ -34,6 +34,15 @@ std::vector<gazebo::SystemPluginPtr> g_plugins;
 gazebo::Master *g_master = NULL;
 
 /////////////////////////////////////////////////
+struct g_vectorStringDup
+{
+  char *operator()(const std::string &_s)
+  {
+    return strdup(_s.c_str());
+  }
+};
+
+/////////////////////////////////////////////////
 // This function is used by both setupClient and setupServer
 bool setup(int _argc, char **_argv)
 {
@@ -195,6 +204,22 @@ bool gazebo::setupServer(int _argc, char **_argv)
 }
 
 /////////////////////////////////////////////////
+bool gazebo::setupServer(const std::vector<std::string> &_args)
+{
+  std::vector<char *> pointers(_args.size());
+  std::transform(_args.begin(), _args.end(), pointers.begin(),
+                 g_vectorStringDup());
+  pointers.push_back(0);
+  bool result = gazebo::setupServer(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
+}
+
+/////////////////////////////////////////////////
 bool gazebo::setupClient(int _argc, char **_argv)
 {
   if (!setup(_argc, _argv))
@@ -221,6 +246,22 @@ bool gazebo::setupClient(int _argc, char **_argv)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+bool gazebo::setupClient(const std::vector<std::string> &_args)
+{
+  std::vector<char *> pointers(_args.size());
+  std::transform(_args.begin(), _args.end(), pointers.begin(),
+                 g_vectorStringDup());
+  pointers.push_back(0);
+  bool result = gazebo::setupClient(_args.size(), &pointers[0]);
+
+  // Deallocate memory for the command line arguments alloocated with strdup.
+  for (size_t i = 0; i < pointers.size(); ++i)
+    free(pointers.at(i));
+
+  return result;
 }
 
 /////////////////////////////////////////////////

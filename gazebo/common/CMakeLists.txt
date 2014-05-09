@@ -146,6 +146,10 @@ set_property(
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
 )
 
+link_directories( 
+  ${tinyxml_LIBRARY_DIRS}
+)
+
 target_link_libraries(gazebo_common
   gazebo_math
   ${libdl_library}
@@ -155,6 +159,7 @@ target_link_libraries(gazebo_common
   ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
