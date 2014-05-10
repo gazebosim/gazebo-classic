@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
@@ -104,6 +106,7 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc

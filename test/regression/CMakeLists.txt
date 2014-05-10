@@ -25,6 +25,7 @@ set(tests
   494_joint_axis_frame.cc
   624_collision_world_pose.cc
   876_random_number_generator.cc
+  940_force_torque_sensor_frame.cc
   978_joint_anchor.cc
   1082_pid_limits.cc
   1112_force_torque_model_removal.cc
