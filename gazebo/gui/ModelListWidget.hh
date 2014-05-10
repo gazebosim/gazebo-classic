@@ -67,9 +67,12 @@ namespace gazebo
       private: void OnResponse(ConstResponsePtr &_msg);
 
       private: void OnModelUpdate(const msgs::Model &_msg);
-      private: void OnRequest(ConstRequestPtr &_msg);
 
-      private: void OnLightMsg(ConstLightPtr &_msg);
+      /// \brief An event callback to handle light update msgs.
+      /// \param[in] _msg Light message.
+      private: void OnLightUpdate(const msgs::Light &_msg);
+
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       private: void OnRemoveScene(const std::string &_name);
       private: void OnCreateScene(const std::string &_name);
@@ -202,7 +205,6 @@ namespace gazebo
 
       private: transport::SubscriberPtr responseSub;
       private: transport::SubscriberPtr requestSub;
-      private: transport::SubscriberPtr lightSub;
 
       private: QTreeWidgetItem *sceneItem;
       private: QTreeWidgetItem *physicsItem;

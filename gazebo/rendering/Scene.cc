@@ -2438,7 +2438,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   {
     LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }

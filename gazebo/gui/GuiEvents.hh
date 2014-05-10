@@ -84,6 +84,14 @@ namespace gazebo
 
       //////////////////////////////////////////////////////////////////////////
       public: template<typename T>
+              static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+              { return lightUpdate.Connect(_subscriber); }
+      public: static void DisconnectLightUpdate(
+                  event::ConnectionPtr _subscriber)
+              { lightUpdate.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      public: template<typename T>
               static event::ConnectionPtr ConnectModelUpdate(T _subscriber)
               { return modelUpdate.Connect(_subscriber); }
       public: static void DisconnectModelUpdate(
@@ -118,6 +126,10 @@ namespace gazebo
                                          std::string)> createEntity;
 
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
+
+      /// \brief A event to notify light updates.
+      public: static event::EventT<void (const msgs::Light &)> lightUpdate;
+
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;

@@ -28,5 +28,6 @@ event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
 event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
+event::EventT<void (const msgs::Light &)> Events::lightUpdate;
 event::EventT<void (int)> Events::inputStepSize;
 event::EventT<void (const std::string &)> Events::follow;

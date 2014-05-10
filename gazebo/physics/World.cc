@@ -1325,6 +1325,28 @@ void World::ProcessEntityMsgs()
         this->sdf->RemoveChild(childElem);
     }
 
+    if (this->sdf->HasElement("light"))
+    {
+      sdf::ElementPtr childElem = this->sdf->GetElement("light");
+      while (childElem && childElem->Get<std::string>("name") != (*iter))
+        childElem = childElem->GetNextElement("light");
+      if (childElem)
+      {
+        this->sdf->RemoveChild(childElem);
+        // Find the light by name in the scene msg, and remove it.
+        for (int i = 0; i < this->sceneMsg.light_size(); ++i)
+        {
+          if (this->sceneMsg.light(i).name() == (*iter))
+          {
+            this->sceneMsg.mutable_light()->SwapElements(i,
+                this->sceneMsg.light_size()-1);
+            this->sceneMsg.mutable_light()->RemoveLast();
+            break;
+          }
+        }
+      }
+    }
+
     this->rootElement->RemoveChild((*iter));
     this->RemoveModel(*iter);
   }
