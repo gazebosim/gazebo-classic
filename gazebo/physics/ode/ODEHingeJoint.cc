@@ -127,25 +127,6 @@ math::Angle ODEHingeJoint::GetAngleImpl(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
-{
-  double result = 0;
-
-  if (this->jointId)
-    result = dJointGetHingeAngleRate(this->jointId);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
-{
-  this->SetParam(dParamVel, _angle);
-}
-
-//////////////////////////////////////////////////
 void ODEHingeJoint::SetMaxForce(unsigned int /*index*/, double _t)
 {
   return this->SetParam(dParamFMax, _t);

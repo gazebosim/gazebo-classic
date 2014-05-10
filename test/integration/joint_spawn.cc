@@ -327,11 +327,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     double vel = *iter;
     _joint->SetVelocity(_index, vel);
 
-    // ODE requires maxForce to be non-zero for SetVelocity to work
-    // See issue #964 for discussion of consistent API
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
-
     // Take a step and verify that Joint::GetVelocity returns the same value
     world->Step(1);
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
