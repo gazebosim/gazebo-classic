@@ -274,8 +274,6 @@ void ModelEditorPalette::OnCustom()
 void ModelEditorPalette::AddJoint(const std::string &_type)
 {
   event::Events::setSelectedEntity("", "normal");
-  g_arrowAct->trigger();
-
   this->modelCreator->AddJoint(_type);
 }
 

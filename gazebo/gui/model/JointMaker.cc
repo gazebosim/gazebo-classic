@@ -121,6 +121,7 @@ void JointMaker::RemoveJoint(const std::string &_jointName)
     joint->visual.reset();
     joint->parent.reset();
     joint->child.reset();
+    joint->inspector->hide();
     delete joint->inspector;
     delete joint;
     this->joints.erase(_jointName);
@@ -152,6 +153,11 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
+  return false;
+
+  if (_event.button != common::MouseEvent::LEFT)
+    return false;
+
   if (this->jointType != JointMaker::JOINT_NONE)
     return false;
 
@@ -159,12 +165,14 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
+  std::cerr << " joint maker mouse press " << std::endl;
   if (vis)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
     {
       // stop event propagation as we don't want users to manipulate the
       // hotspot
+      std::cerr << " joint maker return true " << std::endl;
       return true;
     }
   }
@@ -321,6 +329,10 @@ void JointMaker::AddJoint(const std::string &_type)
   {
     this->AddJoint(JointMaker::JOINT_SCREW);
   }
+  else if (_type == "none")
+  {
+    this->AddJoint(JointMaker::JOINT_NONE);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -341,13 +353,11 @@ void JointMaker::AddJoint(JointMaker::JointType _type)
     // Press event added only after a joint is created. Needs to be added here
     // instead of in the constructor otherwise GLWidget would get the event
     // first and JoinMaker would not receive it.
-    if (!this->joints.empty())
-    {
-      MouseEventHandler::Instance()->AddPressFilter("model_joint",
-          boost::bind(&JointMaker::OnMousePress, this, _1));
-      MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
-        boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
-    }
+    MouseEventHandler::Instance()->AddPressFilter("model_joint",
+        boost::bind(&JointMaker::OnMousePress, this, _1));
+    MouseEventHandler::Instance()->AddDoubleClickFilter("model_joint",
+      boost::bind(&JointMaker::OnMouseDoubleClick, this, _1));
+
     // signal the end of a joint action.
     emit JointAdded();
   }
@@ -456,6 +466,8 @@ void JointMaker::OpenInspector(const std::string &_name)
   JointData *joint = this->joints[_name];
   joint->inspector->SetType(joint->type);
   joint->inspector->SetName(joint->visual->GetName());
+  joint->inspector->SetParent(joint->parent->GetName());
+  joint->inspector->SetChild(joint->child->GetName());
   joint->inspector->SetAnchor(0, joint->anchor);
   int axisCount = JointMaker::GetJointAxisCount(joint->type);
   for (int i = 0; i < axisCount; ++i)
@@ -698,6 +710,10 @@ std::string JointMaker::GetTypeAsString(JointMaker::JointType _type)
   else if (_type == JointMaker::JOINT_BALL)
   {
     jointTypeStr = "ball";
+  }
+  else if (_type == JointMaker::JOINT_NONE)
+  {
+    jointTypeStr = "none";
   }
 
   return jointTypeStr;

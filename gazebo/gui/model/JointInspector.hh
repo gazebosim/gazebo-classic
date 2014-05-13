@@ -71,9 +71,17 @@ namespace gazebo
       /// \return Joint type.
       public: JointMaker::JointType GetType() const;
 
-      /// \brief Set the item name.
+      /// \brief Set the joint name.
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
+
+      /// \brief Set the joint parent name.
+      /// \param[in] _name Name of joint parent.
+      public: void SetParent(const std::string &_parent);
+
+      /// \brief Set the joint child name.
+      /// \param[in] _name Name of joint child.
+      public: void SetChild(const std::string &_child);
 
       /// \brief Set anchor position.
       /// \param[in] _index Index of anchor.
@@ -113,6 +121,12 @@ namespace gazebo
 
       /// \brief Label that displays the name of the joint.
       private: QLabel* jointNameLabel;
+
+      /// \brief Label that displays the parent name of the joint.
+      private: QLabel* jointParentLabel;
+
+      /// \brief Label that displays the child name of the joint.
+      private: QLabel* jointChildLabel;
 
       /// \brief Label that displays the type of the joint.
       private: QLabel *jointTypeLabel;
