@@ -838,8 +838,10 @@ void MainWindow::ViewOculus()
       this->oculusWindow->show();
   }
   else
+  {
     gzlog << "Oculus: No visual link specified in for attaching the camera. "
-         << "Did you forget to set ~/.gazebo/gui.ini?\n";
+          << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
 #endif
 }
 
@@ -1221,9 +1223,7 @@ void MainWindow::CreateMenuBar()
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
 
-#ifdef HAVE_OCULUS
   windowMenu->addAction(g_viewOculusAct);
-#endif
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);

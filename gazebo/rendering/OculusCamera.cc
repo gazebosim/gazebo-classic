@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,13 +62,9 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!this->deviceManager)
     gzthrow("Oculus: Failed to create Device Manager\n");
 
-  gzlog << "Oculus: Created Device Manager\n";
-
   this->stereoConfig = new OVR::Util::Render::StereoConfig();
   if (!this->stereoConfig)
     gzthrow("Oculus: Failed to create StereoConfig\n");
-
-  gzlog << "Oculus: Created StereoConfig\n";
 
   this->centerOffset = this->stereoConfig->GetProjectionCenterOffset();
 
@@ -91,20 +87,15 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   if (!this->sensor)
     gzthrow("Oculus: Failed to create sensor\n");
 
-  gzlog << "Oculus: Created sensor\n";
-
   this->sensorFusion = new OVR::SensorFusion();
   if (!sensorFusion)
   {
     gzlog << "Oculus: Failed to create SensorFusion\n";
     return;
   }
-  gzlog << "Oculus: Created SensorFusion\n";
 
   this->sensorFusion->AttachToSensor(this->sensor);
   this->sensorFusion->SetPredictionEnabled(true);
-
-  gzlog << "Oculus: Oculus setup completed successfully\n";
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -149,7 +140,8 @@ void OculusCamera::Init()
 
   // Oculus
   {
-    this->rightCamera = this->scene->GetManager()->createCamera("UserRight");
+    this->rightCamera = this->scene->GetManager()->createCamera(
+      "OculusUserRight");
     this->rightCamera->pitch(Ogre::Degree(90));
 
     // Don't yaw along variable axis, causes leaning
@@ -557,10 +549,9 @@ void OculusCamera::Oculus()
   comp->getTechnique(0)->getOutputTargetPass()->getPass(0)->setMaterialName(
       "Ogre/Compositor/Oculus/Right");
 
-  Ogre::Camera *cam;
   for (int i = 0; i < 2; ++i)
   {
-    cam = i == 0 ? this->camera : this->rightCamera;
+    Ogre::Camera *cam = i == 0 ? this->camera : this->rightCamera;
 
     int idx = i * 2 - 1;
     if (this->stereoConfig)
@@ -607,10 +598,9 @@ void OculusCamera::Oculus()
 /////////////////////////////////////////////////
 void OculusCamera::AdjustAspect(double _v)
 {
-  Ogre::Camera *cam;
   for (int i = 0; i < 2; ++i)
   {
-    cam = i == 0 ? this->camera : this->rightCamera;
+    Ogre::Camera *cam = i == 0 ? this->camera : this->rightCamera;
     cam->setAspectRatio(cam->getAspectRatio() + _v);
   }
 }

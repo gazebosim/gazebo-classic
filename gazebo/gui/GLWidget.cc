@@ -174,8 +174,10 @@ void GLWidget::showEvent(QShowEvent *_event)
     this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
         CreateWindow(this->GetOgreHandle(), this->width(), this->height());
     if (this->userCamera)
+    {
       rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->windowId, this->userCamera);
+    }
   }
 
   QWidget::showEvent(_event);
