@@ -167,14 +167,12 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
   rendering::UserCameraPtr camera = gui::get_active_camera();
   rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
-  std::cerr << " joint maker mouse press " << std::endl;
   if (vis)
   {
     if (this->joints.find(vis->GetName()) != this->joints.end())
     {
       // stop event propagation as we don't want users to manipulate the
       // hotspot
-      std::cerr << " joint maker return true " << std::endl;
       return true;
     }
   }
