@@ -56,7 +56,7 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   // Set default OculusCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
-  OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_All));
+  OVR::System::Init(OVR::Log::ConfigureDefaultLog(OVR::LogMask_None));
 
   this->deviceManager = OVR::DeviceManager::Create();
   if (!this->deviceManager)
