@@ -32,11 +32,12 @@ TEST_F(ModelTest, GetLinksV)
   for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
        iter != model->GetLinks().end(); ++iter)
   {
+    gzdbg << "checking link" << std::endl;
     EXPECT_TRUE(*iter);
     EXPECT_FALSE((*iter)->GetName().empty());
   }
 
-  EXPECT_EQ(model->GetLinks().size(), 1);
+  EXPECT_EQ(model->GetLinks().size(), 1u);
 }
 
 int main(int argc, char **argv)
