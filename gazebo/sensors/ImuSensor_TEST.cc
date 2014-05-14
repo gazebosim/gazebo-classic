@@ -19,14 +19,12 @@
 #include <gtest/gtest.h>
 
 #include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/sensors/ImuSensor.hh"
 
 #define TOL 1e-4
 
 using namespace gazebo;
-class ImuSensor_TEST : public ServerFixture,
-                       public testing::WithParamInterface<const char*>
+class ImuSensor_TEST : public ServerFixture
 {
   public: void BasicImuSensorCheck(const std::string &_physicsEngine);
   public: void LinearAccelerationTest(const std::string &_physicsEngine);
@@ -43,7 +41,6 @@ static std::string imuSensorString =
 "  </sensor>"
 "</sdf>";
 
-/////////////////////////////////////////////////
 void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 {
   Load("worlds/empty.world", false, _physicsEngine);
@@ -75,7 +72,25 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
   EXPECT_EQ(sensor->GetOrientation(), math::Quaternion(0, 0, 0, 0));
 }
 
-/////////////////////////////////////////////////
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckODE)
+{
+  BasicImuSensorCheck("ode");
+}
+
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckBullet)
+{
+  BasicImuSensorCheck("bullet");
+}
+#endif
+
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, BasicImuSensorCheckDART)
+{
+  BasicImuSensorCheck("dart");
+}
+#endif
+
 // Drop a model with imu sensor and measure its linear acceleration
 void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 {
@@ -133,25 +148,33 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->Step(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
+  // Issue #848
+  if (_physicsEngine == "bullet" && LIBBULLET_VERSION < 2.82)
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, 1e-1);
+  else
+    EXPECT_NEAR(imuSensor->GetLinearAcceleration().x, 0, TOL);
   EXPECT_NEAR(imuSensor->GetLinearAcceleration().y, 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, 0.4);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z, -gravityZ, TOL);
 }
 
-/////////////////////////////////////////////////
-TEST_P(ImuSensor_TEST, BasicImuSensorCheck)
+TEST_F(ImuSensor_TEST, LinearAccelerationTestODE)
 {
-  BasicImuSensorCheck(GetParam());
+  LinearAccelerationTest("ode");
 }
 
-/////////////////////////////////////////////////
-TEST_P(ImuSensor_TEST, LinearAccelerationTest)
+#ifdef HAVE_BULLET
+TEST_F(ImuSensor_TEST, LinearAccelerationTestBullet)
 {
-  LinearAccelerationTest(GetParam());
+  LinearAccelerationTest("bullet");
 }
+#endif
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, ImuSensor_TEST,
-                        PHYSICS_ENGINE_VALUES);
+#ifdef HAVE_DART
+TEST_F(ImuSensor_TEST, LinearAccelerationTestDART)
+{
+  LinearAccelerationTest("dart");
+}
+#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
