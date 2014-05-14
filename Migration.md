@@ -1,3 +1,10 @@
+## Gazebo 3.0 to 4.0
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
