@@ -759,6 +759,7 @@ namespace gazebo
         lightSDF = _sdf;
       else
         lightSDF.reset(new sdf::Element);
+        sdf::initFile("light.sdf", lightSDF);
 
       lightSDF->GetAttribute("name")->Set(_msg.name());
 
