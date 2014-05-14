@@ -34,7 +34,7 @@ TEST_F(ModelTest, GetLinksV)
   {
     EXPECT_TRUE(*iter);
     EXPECT_FALSE((*iter)->GetName().empty());
-    gzdbg << "Model Link Name[" << (*iter)->GetName() << "]\n";
+    EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
   }
 
   EXPECT_EQ(model->GetLinks().size(), 1u);
