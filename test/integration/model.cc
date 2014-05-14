@@ -28,7 +28,7 @@ TEST_F(ModelTest, GetLinksV)
   Load("worlds/joint_test.world");
   physics::ModelPtr model = GetModel("model_1");
 
-  // This for-loop would cause a seg-fault in gazebo 2.2 and before.
+  // This for-loop would cause a seg-fault in gazebo 3.0 and before.
   for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
        iter != model->GetLinks().end(); ++iter)
   {
