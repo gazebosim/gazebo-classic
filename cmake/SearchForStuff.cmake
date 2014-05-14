@@ -137,11 +137,12 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.0)
+  find_package(DARTCore 4.0 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
+    message (STATUS "Looking for DARTCore - not found")
     BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
     set (HAVE_DART FALSE)
   endif()
