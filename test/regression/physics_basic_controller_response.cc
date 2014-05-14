@@ -150,7 +150,7 @@ void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
   }
   if (_physicsEngine == "simbody" || _physicsEngine == "dart")
   {
-    gzerr << "simbody and dart axis inteprtation is wrong, see issue #1143.\n";
+    gzerr << "simbody and dart axis intepretation is wrong, see issue #1143.\n";
     return;
   }
 
