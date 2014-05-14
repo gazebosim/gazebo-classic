@@ -255,7 +255,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
-
     /// \brief Create an SDF element from a msgs::Scene
     /// \param[in] _msg Light messsage
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
