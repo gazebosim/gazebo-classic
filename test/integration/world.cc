@@ -128,7 +128,7 @@ TEST_F(WorldTest, ModifyLight)
   ServerFixture::RemoveModel("test_light");
 
   // Allow the world time to process the messages
-  world->Step(10);
+  world->Step(1000);
 
   // Verify that the test_light is gone and that the sun remains
   {
