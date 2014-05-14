@@ -584,7 +584,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+const Link_V &Model::GetLinks() const
 {
   return this->links;
 }

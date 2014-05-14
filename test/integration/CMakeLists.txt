@@ -34,6 +34,7 @@ set(tests
   gripper.cc
   imu.cc
   laser.cc
+  model.cc
   nondefault_world.cc
   physics.cc
   physics_friction.cc
