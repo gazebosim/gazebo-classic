@@ -5,6 +5,11 @@
 1. **gazebo/msgs/msgs.hh**
     + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr());
 
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
