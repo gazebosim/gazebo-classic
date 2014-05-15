@@ -1,3 +1,10 @@
+## Gazebo 3.0 to 4.0
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
@@ -442,6 +449,9 @@
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
 
+1. **gazebo/physics/Joint.hh**
+    + math::Quaternion GetAxisFrameOffset(unsigned int _index) const
+
 ### Deletions
 
 1. **Removed libtool**
@@ -582,3 +592,15 @@
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + template<typename T> event::ConnectionPtr ConnectContact(T _subscriber)
+    + template<typename T> event::ConnectionPtr DisconnectContact(T _subscriber)
+    + ***Note:*** The ContactManager::CreateFilter functions can be used to
+      create a gazebo topic with contact messages filtered by the name(s)
+      of collision shapes. The topic can then be subscribed with a callback
+      to replicate this removed functionality. See
+      [gazebo pull request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+      for an example migration.

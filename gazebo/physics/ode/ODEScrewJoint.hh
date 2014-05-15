@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _ODESCREWJOINT_HH_
 #define _ODESCREWJOINT_HH_
 
@@ -99,18 +94,8 @@ namespace gazebo
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value)
-                                        GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
                                                 unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

@@ -477,13 +477,6 @@ void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &_key,
-    unsigned int _index, const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
@@ -491,11 +484,6 @@ bool SimbodyJoint::SetParam(const std::string &/*_key*/,
   return false;
 }
 
-//////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
 //////////////////////////////////////////////////
 double SimbodyJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
@@ -513,9 +501,18 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->GetLowStop(_index).Radian(), _angle.Radian());
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          this->GetLowStop(_index).Radian(), _angle.Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
     }
     else
     {
@@ -540,10 +537,19 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->GetHighStop(_index).Radian());
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          _angle.Radian(),
+          this->GetHighStop(_index).Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetLowStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
     }
     else
     {

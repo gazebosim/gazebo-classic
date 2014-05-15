@@ -378,10 +378,6 @@ namespace gazebo
       /// \brief Clear rendering::Scene
       public: void Clear();
 
-      /// \brief Deprecated.
-      public: VisualPtr CloneVisual(const std::string &_visualName,
-                  const std::string &_newName) GAZEBO_DEPRECATED(2.0);
-
       /// \brief Get the currently selected visual.
       /// \return Pointer to the currently selected visual, or NULL if
       /// nothing is selected.

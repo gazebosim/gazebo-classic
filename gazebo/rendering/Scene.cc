@@ -167,6 +167,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 void Scene::Clear()
 {
   this->node->Fini();
+  this->modelMsgs.clear();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
@@ -2762,13 +2763,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->Load(_elem);
   comVis->SetVisible(false);
   this->visuals[comVis->GetId()] = comVis;
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
 }
 
 /////////////////////////////////////////////////
