@@ -40,6 +40,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
+#include "gazebo/gui/OculusConfig.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -818,6 +819,16 @@ void MainWindow::Orbit()
 void MainWindow::ViewOculus()
 {
 #ifdef HAVE_OCULUS
+  OculusConfig *config = new OculusConfig(this);
+  if (config->exec() == QDialog::Accepted)
+  {
+    math::Vector2d oculusWindowPose = config->GetOculuswindowCoordinates();
+    std::string visualLink = config->GetVisual();
+    math::Pose offset = config->GetOffset();
+    std::cout << "Ok" << std::endl;
+  }
+  delete config;
+
   rendering::ScenePtr scene = rendering::get_scene();
   if (scene->GetOculusCameraCount() != 0)
   {
