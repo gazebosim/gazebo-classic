@@ -149,12 +149,12 @@ int main(int _argc, char **_argv)
       // return or exit calls.
       // WEXITSTATUS will check the value of the return function, not being
       // zero means problems.
-      if ((WIFEXITED(child_exit_status)   == 0) || 
+      if ((WIFEXITED(child_exit_status)   == 0) ||
           (WEXITSTATUS(child_exit_status) != 0))
         returnValue = -1;
       else
         returnValue = 0;
-        
+
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)
