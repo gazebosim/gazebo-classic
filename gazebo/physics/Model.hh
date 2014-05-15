@@ -42,6 +42,8 @@ namespace gazebo
 {
   namespace physics
   {
+    class ModelPrivate;
+
     class Gripper;
 
     /// \addtogroup gazebo_physics
@@ -347,42 +349,9 @@ namespace gazebo
       /// \param[in] _name Name of the link to remove.
       private: void RemoveLink(const std::string &_name);
 
-      /// used by Model::AttachStaticModel
-      protected: std::vector<ModelPtr> attachedModels;
-
-      /// used by Model::AttachStaticModel
-      protected: std::vector<math::Pose> attachedModelsOffset;
-
-      /// \brief Publisher for joint info.
-      protected: transport::PublisherPtr jointPub;
-
-      /// \brief The canonical link of the model.
-      private: LinkPtr canonicalLink;
-
-      /// \brief All the joints in the model.
-      private: Joint_V joints;
-
-      /// \brief Cached list of links. This is here for performance.
-      private: Link_V links;
-
-      /// \brief All the grippers in the model.
-      private: std::vector<GripperPtr> grippers;
-
-      /// \brief All the model plugins.
-      private: std::vector<ModelPluginPtr> plugins;
-
-      /// \brief The joint animations.
-      private: std::map<std::string, common::NumericAnimationPtr>
-               jointAnimations;
-
-      /// \brief Callback used when a joint animation completes.
-      private: boost::function<void()> onJointAnimationComplete;
-
-      /// \brief Mutex used during the update cycle.
-      private: mutable boost::recursive_mutex updateMutex;
-
-      /// \brief Controller for the joints.
-      private: JointControllerPtr jointController;
+      /// \internal
+      /// \brief Pointer to private data
+      protected: ModelPrivate *dataPtr;
     };
     /// \}
   }

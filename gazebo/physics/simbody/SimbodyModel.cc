@@ -17,6 +17,8 @@
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/physics/ModelPrivate.hh"
 #include "gazebo/physics/Gripper.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
@@ -102,7 +104,7 @@ void SimbodyModel::Init()
     // can be included in the message.
     msgs::Joint msg;
     (*iter)->FillMsg(msg);
-    this->jointPub->Publish(msg);
+    this->dataPtr->jointPub->Publish(msg);
   }
 }
 

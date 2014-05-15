@@ -37,6 +37,7 @@
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/ModelPrivate.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Contact.hh"
 
@@ -49,7 +50,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Model::Model(BasePtr _parent)
-  : Entity(_parent)
+  : Entity(_parent), dataPtr(new ModelPrivate)
 {
   this->AddType(MODEL);
 }
@@ -64,7 +65,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
+  this->dataPtr->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
   this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
@@ -103,7 +104,7 @@ void Model::LoadLinks()
       if (!canonicalLinkInitialized)
       {
         link->SetCanonicalLink(true);
-        this->canonicalLink = link;
+        this->dataPtr->canonicalLink = link;
         canonicalLinkInitialized = true;
       }
 
@@ -111,7 +112,7 @@ void Model::LoadLinks()
       // bodies collisionetries
       link->Load(linkElem);
       linkElem = linkElem->GetNextElement("link");
-      this->links.push_back(link);
+      this->dataPtr->links.push_back(link);
     }
   }
 }
@@ -174,8 +175,8 @@ void Model::Init()
   }
 
   // Initialize the joints last.
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (Joint_V::iterator iter = this->dataPtr->joints.begin();
+       iter != this->dataPtr->joints.end(); ++iter)
   {
     try
     {
@@ -191,11 +192,11 @@ void Model::Init()
     // can be included in the message.
     msgs::Joint msg;
     (*iter)->FillMsg(msg);
-    this->jointPub->Publish(msg);
+    this->dataPtr->jointPub->Publish(msg);
   }
 
-  for (std::vector<GripperPtr>::iterator iter = this->grippers.begin();
-       iter != this->grippers.end(); ++iter)
+  for (std::vector<GripperPtr>::iterator iter = this->dataPtr->grippers.begin();
+       iter != this->dataPtr->grippers.end(); ++iter)
   {
     (*iter)->Init();
   }
@@ -207,22 +208,22 @@ void Model::Update()
   if (this->IsStatic())
     return;
 
-  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(this->dataPtr->updateMutex);
 
-  for (Joint_V::iterator jiter = this->joints.begin();
-       jiter != this->joints.end(); ++jiter)
+  for (Joint_V::iterator jiter = this->dataPtr->joints.begin();
+       jiter != this->dataPtr->joints.end(); ++jiter)
     (*jiter)->Update();
 
-  if (this->jointController)
-    this->jointController->Update();
+  if (this->dataPtr->jointController)
+    this->dataPtr->jointController->Update();
 
-  if (!this->jointAnimations.empty())
+  if (!this->dataPtr->jointAnimations.empty())
   {
     common::NumericKeyFrame kf(0);
     std::map<std::string, double> jointPositions;
     std::map<std::string, common::NumericAnimationPtr>::iterator iter;
-    iter = this->jointAnimations.begin();
-    while (iter != this->jointAnimations.end())
+    iter = this->dataPtr->jointAnimations.begin();
+    while (iter != this->dataPtr->jointAnimations.end())
     {
       iter->second->GetInterpolatedKeyFrame(kf);
 
@@ -237,17 +238,17 @@ void Model::Update()
       }
       else
       {
-        this->jointAnimations.erase(iter++);
+        this->dataPtr->jointAnimations.erase(iter++);
       }
     }
     if (!jointPositions.empty())
     {
-      this->jointController->SetJointPositions(jointPositions);
+      this->dataPtr->jointController->SetJointPositions(jointPositions);
     }
     else
     {
-      if (this->onJointAnimationComplete)
-        this->onJointAnimationComplete();
+      if (this->dataPtr->onJointAnimationComplete)
+        this->dataPtr->onJointAnimationComplete();
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
@@ -257,16 +258,17 @@ void Model::Update()
 void Model::SetJointPosition(
   const std::string &_jointName, double _position, int _index)
 {
-  if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position, _index);
+  if (this->dataPtr->jointController)
+    this->dataPtr->jointController->SetJointPosition(
+      _jointName, _position, _index);
 }
 
 //////////////////////////////////////////////////
 void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
 {
-  if (this->jointController)
-    this->jointController->SetJointPositions(_jointPositions);
+  if (this->dataPtr->jointController)
+    this->dataPtr->jointController->SetJointPositions(_jointPositions);
 }
 
 //////////////////////////////////////////////////
@@ -282,7 +284,8 @@ void Model::RemoveChild(EntityPtr _child)
     {
       done = true;
 
-      for (jiter = this->joints.begin(); jiter != this->joints.end(); ++jiter)
+      for (jiter = this->dataPtr->joints.begin();
+           jiter != this->dataPtr->joints.end(); ++jiter)
       {
         if (!(*jiter))
           continue;
@@ -294,7 +297,7 @@ void Model::RemoveChild(EntityPtr _child)
             jlink1->GetName() == _child->GetName() ||
             jlink0->GetName() == jlink1->GetName())
         {
-          this->joints.erase(jiter);
+          this->dataPtr->joints.erase(jiter);
           done = false;
           break;
         }
@@ -306,8 +309,8 @@ void Model::RemoveChild(EntityPtr _child)
 
   Entity::RemoveChild(_child->GetId());
 
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+       liter != this->dataPtr->links.end(); ++liter)
   {
     (*liter)->SetEnabled(true);
   }
@@ -318,11 +321,11 @@ void Model::Fini()
 {
   Entity::Fini();
 
-  this->attachedModels.clear();
-  this->joints.clear();
-  this->plugins.clear();
-  this->links.clear();
-  this->canonicalLink.reset();
+  this->dataPtr->attachedModels.clear();
+  this->dataPtr->joints.clear();
+  this->dataPtr->plugins.clear();
+  this->dataPtr->links.clear();
+  this->dataPtr->canonicalLink.reset();
 }
 
 //////////////////////////////////////////////////
@@ -367,21 +370,22 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
+  for (std::vector<ModelPluginPtr>::iterator
+       iter = this->dataPtr->plugins.begin();
+       iter != this->dataPtr->plugins.end(); ++iter)
   {
     (*iter)->Reset();
   }
 
   // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+       liter != this->dataPtr->links.end(); ++liter)
   {
     (*liter)->ResetPhysicsStates();
   }
 
-  for (Joint_V::iterator jiter = this->joints.begin();
-       jiter != this->joints.end(); ++jiter)
+  for (Joint_V::iterator jiter = this->dataPtr->joints.begin();
+       jiter != this->dataPtr->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
@@ -390,8 +394,8 @@ void Model::Reset()
 //////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -404,8 +408,8 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -418,8 +422,8 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -432,8 +436,8 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -524,8 +528,8 @@ math::Box Model::GetBoundingBox() const
   box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if (*iter)
     {
@@ -541,13 +545,13 @@ math::Box Model::GetBoundingBox() const
 //////////////////////////////////////////////////
 unsigned int Model::GetJointCount() const
 {
-  return this->joints.size();
+  return this->dataPtr->joints.size();
 }
 
 //////////////////////////////////////////////////
 const Joint_V &Model::GetJoints() const
 {
-  return this->joints;
+  return this->dataPtr->joints;
 }
 
 //////////////////////////////////////////////////
@@ -556,7 +560,8 @@ JointPtr Model::GetJoint(const std::string &_name)
   JointPtr result;
   Joint_V::iterator iter;
 
-  for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
+  for (iter = this->dataPtr->joints.begin();
+       iter != this->dataPtr->joints.end(); ++iter)
   {
     if ((*iter)->GetScopedName() == _name ||
         (*iter)->GetName() == _name)
@@ -586,7 +591,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 //////////////////////////////////////////////////
 Link_V Model::GetLinks() const
 {
-  return this->links;
+  return this->dataPtr->links;
 }
 
 //////////////////////////////////////////////////
@@ -597,11 +602,12 @@ LinkPtr Model::GetLink(const std::string &_name) const
 
   if (_name == "canonical")
   {
-    result = this->canonicalLink;
+    result = this->dataPtr->canonicalLink;
   }
   else
   {
-    for (iter = this->links.begin(); iter != this->links.end(); ++iter)
+    for (iter = this->dataPtr->links.begin();
+         iter != this->dataPtr->links.end(); ++iter)
     {
       if (((*iter)->GetScopedName() == _name) || ((*iter)->GetName() == _name))
       {
@@ -642,12 +648,12 @@ void Model::LoadJoint(sdf::ElementPtr _sdf)
       joint->GetScopedName() + "]\n");
   }
 
-  this->joints.push_back(joint);
+  this->dataPtr->joints.push_back(joint);
 
-  if (!this->jointController)
-    this->jointController.reset(new JointController(
+  if (!this->dataPtr->jointController)
+    this->dataPtr->jointController.reset(new JointController(
         boost::dynamic_pointer_cast<Model>(shared_from_this())));
-  this->jointController->AddJoint(joint);
+  this->dataPtr->jointController->AddJoint(joint);
 }
 
 //////////////////////////////////////////////////
@@ -656,7 +662,7 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
   GripperPtr gripper(new Gripper(
       boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
-  this->grippers.push_back(gripper);
+  this->dataPtr->grippers.push_back(gripper);
 }
 
 //////////////////////////////////////////////////
@@ -723,8 +729,8 @@ unsigned int Model::GetSensorCount() const
   unsigned int result = 0;
 
   // Count all the sensors on all the links
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     result += (*iter)->GetSensorCount();
   }
@@ -753,15 +759,15 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
     plugin->Load(myself, _sdf);
     plugin->Init();
-    this->plugins.push_back(plugin);
+    this->dataPtr->plugins.push_back(plugin);
   }
 }
 
 //////////////////////////////////////////////////
 void Model::SetGravityMode(const bool &_v)
 {
-  for (Link_V::iterator liter = this->links.begin();
-      liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+      liter != this->dataPtr->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -773,8 +779,8 @@ void Model::SetGravityMode(const bool &_v)
 //////////////////////////////////////////////////
 void Model::SetCollideMode(const std::string &_m)
 {
-  for (Link_V::iterator liter = this->links.begin();
-      liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+      liter != this->dataPtr->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -786,8 +792,8 @@ void Model::SetCollideMode(const std::string &_m)
 //////////////////////////////////////////////////
 void Model::SetLaserRetro(const float _retro)
 {
-  for (Link_V::iterator liter = this->links.begin();
-      liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+      liter != this->dataPtr->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -808,14 +814,15 @@ void Model::FillMsg(msgs::Model &_msg)
   msgs::Set(this->visualMsg->mutable_pose(), this->GetWorldPose());
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  for (Link_V::iterator iter = this->links.begin(); iter != this->links.end();
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end();
       ++iter)
   {
     (*iter)->FillMsg(*_msg.add_link());
   }
 
-  for (Joint_V::iterator iter = this->joints.begin();
-       iter != this->joints.end(); ++iter)
+  for (Joint_V::iterator iter = this->dataPtr->joints.begin();
+       iter != this->dataPtr->joints.end(); ++iter)
   {
     (*iter)->FillMsg(*_msg.add_joint());
   }
@@ -859,23 +866,23 @@ void Model::SetJointAnimation(
     const std::map<std::string, common::NumericAnimationPtr> &_anims,
     boost::function<void()> _onComplete)
 {
-  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(this->dataPtr->updateMutex);
   std::map<std::string, common::NumericAnimationPtr>::const_iterator iter;
   for (iter = _anims.begin(); iter != _anims.end(); ++iter)
   {
-    this->jointAnimations[iter->first] = iter->second;
+    this->dataPtr->jointAnimations[iter->first] = iter->second;
   }
-  this->onJointAnimationComplete = _onComplete;
+  this->dataPtr->onJointAnimationComplete = _onComplete;
   this->prevAnimationTime = this->world->GetSimTime();
 }
 
 //////////////////////////////////////////////////
 void Model::StopAnimation()
 {
-  boost::recursive_mutex::scoped_lock lock(this->updateMutex);
+  boost::recursive_mutex::scoped_lock lock(this->dataPtr->updateMutex);
   Entity::StopAnimation();
-  this->onJointAnimationComplete.clear();
-  this->jointAnimations.clear();
+  this->dataPtr->onJointAnimationComplete.clear();
+  this->dataPtr->jointAnimations.clear();
 }
 
 //////////////////////////////////////////////////
@@ -887,19 +894,21 @@ void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
     return;
   }
 
-  this->attachedModels.push_back(_model);
-  this->attachedModelsOffset.push_back(_offset);
+  this->dataPtr->attachedModels.push_back(_model);
+  this->dataPtr->attachedModelsOffset.push_back(_offset);
 }
 
 //////////////////////////////////////////////////
 void Model::DetachStaticModel(const std::string &_modelName)
 {
-  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
   {
-    if (this->attachedModels[i]->GetName() == _modelName)
+    if (this->dataPtr->attachedModels[i]->GetName() == _modelName)
     {
-      this->attachedModels.erase(this->attachedModels.begin()+i);
-      this->attachedModelsOffset.erase(this->attachedModelsOffset.begin()+i);
+      this->dataPtr->attachedModels.erase(
+        this->dataPtr->attachedModels.begin()+i);
+      this->dataPtr->attachedModelsOffset.erase(
+        this->dataPtr->attachedModelsOffset.begin()+i);
       break;
     }
   }
@@ -909,11 +918,11 @@ void Model::DetachStaticModel(const std::string &_modelName)
 void Model::OnPoseChange()
 {
   math::Pose p;
-  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
   {
     p = this->GetWorldPose();
-    p += this->attachedModelsOffset[i];
-    this->attachedModels[i]->SetWorldPose(p, true);
+    p += this->dataPtr->attachedModelsOffset[i];
+    this->dataPtr->attachedModels[i]->SetWorldPose(p, true);
   }
 }
 
@@ -964,8 +973,8 @@ void Model::SetScale(const math::Vector3 &_scale)
 /////////////////////////////////////////////////
 void Model::SetEnabled(bool _enabled)
 {
-  for (Link_V::iterator liter = this->links.begin();
-      liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+      liter != this->dataPtr->links.end(); ++liter)
   {
     if (*liter)
       (*liter)->SetEnabled(_enabled);
@@ -997,11 +1006,11 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 /////////////////////////////////////////////////
 void Model::SetAutoDisable(bool _auto)
 {
-  if (!this->joints.empty())
+  if (!this->dataPtr->joints.empty())
     return;
 
-  for (Link_V::iterator liter = this->links.begin();
-      liter != this->links.end(); ++liter)
+  for (Link_V::iterator liter = this->dataPtr->links.begin();
+      liter != this->dataPtr->links.end(); ++liter)
   {
     if (*liter)
     {
@@ -1019,12 +1028,12 @@ bool Model::GetAutoDisable() const
 /////////////////////////////////////////////////
 void Model::RemoveLink(const std::string &_name)
 {
-  for (Link_V::iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (Link_V::iterator iter = this->dataPtr->links.begin();
+       iter != this->dataPtr->links.end(); ++iter)
   {
     if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
     {
-      this->links.erase(iter);
+      this->dataPtr->links.erase(iter);
       break;
     }
   }
@@ -1032,14 +1041,14 @@ void Model::RemoveLink(const std::string &_name)
 /////////////////////////////////////////////////
 JointControllerPtr Model::GetJointController()
 {
-  return this->jointController;
+  return this->dataPtr->jointController;
 }
 
 /////////////////////////////////////////////////
 GripperPtr Model::GetGripper(size_t _index) const
 {
-  if (_index < this->grippers.size())
-    return this->grippers[_index];
+  if (_index < this->dataPtr->grippers.size())
+    return this->dataPtr->grippers[_index];
   else
     return GripperPtr();
 }
@@ -1047,20 +1056,20 @@ GripperPtr Model::GetGripper(size_t _index) const
 /////////////////////////////////////////////////
 size_t Model::GetGripperCount() const
 {
-  return this->grippers.size();
+  return this->dataPtr->grippers.size();
 }
 
 /////////////////////////////////////////////////
 double Model::GetWorldEnergyPotential() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->dataPtr->links.begin();
+    iter != this->dataPtr->links.end(); ++iter)
   {
     e += (*iter)->GetWorldEnergyPotential();
   }
-  for (Joint_V::const_iterator iter = this->joints.begin();
-    iter != this->joints.end(); ++iter)
+  for (Joint_V::const_iterator iter = this->dataPtr->joints.begin();
+    iter != this->dataPtr->joints.end(); ++iter)
   {
     for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
     {
@@ -1074,8 +1083,8 @@ double Model::GetWorldEnergyPotential() const
 double Model::GetWorldEnergyKinetic() const
 {
   double e = 0;
-  for (Link_V::const_iterator iter = this->links.begin();
-    iter != this->links.end(); ++iter)
+  for (Link_V::const_iterator iter = this->dataPtr->links.begin();
+    iter != this->dataPtr->links.end(); ++iter)
   {
     e += (*iter)->GetWorldEnergyKinetic();
   }
