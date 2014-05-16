@@ -41,14 +41,22 @@ TEST_F(Issue1124Test, SetModelPose)
   ASSERT_TRUE(coll);
 
   // The start pose should be centered at the origin
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
-  EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
+  {
+    math::Pose initialPose(0, 0, 0.5, 0, 0, 0);
+    EXPECT_EQ(model->GetWorldPose(), initialPose);
+    EXPECT_EQ(link->GetWorldPose(), initialPose);
+    EXPECT_EQ(coll->GetWorldPose(), initialPose);
+  }
 
-  model->SetWorldPose(math::Pose(2, 2, 0.5, 0, 0, 0));
+  {
+    // The new pose should be centered a the new model location
+    math::Pose newPose(2, 2, 0.5, 0, 0, 0);
+    model->SetWorldPose(newPose);
 
-  // The new pose should be centered a the new model location
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(2, 2, 0.5, 0, 0, 0));
-  EXPECT_EQ(coll->GetWorldPose(), math::Pose(2, 2, 0.5, 0, 0, 0));
+    EXPECT_EQ(model->GetWorldPose(), newPose);
+    EXPECT_EQ(link->GetWorldPose(), newPose);
+    EXPECT_EQ(coll->GetWorldPose(), newPose);
+  }
 }
 
 /////////////////////////////////////////////////
