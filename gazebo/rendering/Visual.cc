@@ -1040,7 +1040,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
-      && !this->dataPtr->lighting &&
+      && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();

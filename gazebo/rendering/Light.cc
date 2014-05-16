@@ -141,7 +141,10 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
   this->Update();
 
   if (_msg->has_pose())
+  {
     this->SetPosition(msgs::Convert(_msg->pose().position()));
+    this->SetRotation(msgs::Convert(_msg->pose().orientation()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -152,7 +155,10 @@ void Light::LoadFromMsg(const msgs::Light &_msg)
   this->Load();
 
   if (_msg.has_pose())
+  {
     this->SetPosition(msgs::Convert(_msg.pose().position()));
+    this->SetRotation(msgs::Convert(_msg.pose().orientation()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -340,6 +346,18 @@ void Light::SetPosition(const math::Vector3 &_p)
 math::Vector3 Light::GetPosition() const
 {
   return this->visual->GetPosition();
+}
+
+//////////////////////////////////////////////////
+void Light::SetRotation(const math::Quaternion &_q)
+{
+  this->visual->SetRotation(_q);
+}
+
+//////////////////////////////////////////////////
+math::Quaternion Light::GetRotation() const
+{
+  return this->visual->GetRotation();
 }
 
 //////////////////////////////////////////////////
@@ -562,7 +580,7 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_type(msgs::Light::DIRECTIONAL);
 
   msgs::Set(_msg.mutable_pose()->mutable_position(), this->GetPosition());
-  msgs::Set(_msg.mutable_pose()->mutable_orientation(), math::Quaternion());
+  msgs::Set(_msg.mutable_pose()->mutable_orientation(), this->GetRotation());
   msgs::Set(_msg.mutable_diffuse(), this->GetDiffuseColor());
   msgs::Set(_msg.mutable_specular(), this->GetSpecularColor());
   msgs::Set(_msg.mutable_direction(), this->GetDirection());
