@@ -1216,7 +1216,6 @@ void MainWindow::CreateMenuBar()
   viewMenu->addSeparator();
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
-  viewMenu->addSeparator();
 
   QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
