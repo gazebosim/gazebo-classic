@@ -155,8 +155,6 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
-  return false;
-
   if (_event.button != common::MouseEvent::LEFT)
     return false;
 
@@ -218,45 +216,48 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       return false;
     }
   }
-
-  if (this->hoverVis)
+  else
   {
-    if (this->hoverVis->IsPlane())
-      return false;
-
-    // Pressed parent part
-    if (!this->selectedVis)
+    if (this->hoverVis)
     {
-      if (this->mouseJoint)
+      if (this->hoverVis->IsPlane())
         return false;
 
-      this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-      this->selectedVis = this->hoverVis;
-      this->hoverVis.reset();
-      // Create joint data with selected visual as parent
-      // the child will be set on the second mouse release.
-      this->mouseJoint = this->CreateJoint(this->selectedVis,
-          rendering::VisualPtr());
-    }
-    // Pressed child part
-    else if (this->selectedVis != this->hoverVis)
-    {
-      if (this->hoverVis)
+      // Pressed parent part
+      if (!this->selectedVis)
+      {
+        if (this->mouseJoint)
+          return false;
+
         this->hoverVis->SetEmissive(common::Color(0, 0, 0));
-      if (this->selectedVis)
-        this->selectedVis->SetEmissive(common::Color(0, 0, 0));
-      this->mouseJoint->child = this->hoverVis;
+        this->selectedVis = this->hoverVis;
+        this->hoverVis.reset();
+        // Create joint data with selected visual as parent
+        // the child will be set on the second mouse release.
+        this->mouseJoint = this->CreateJoint(this->selectedVis,
+            rendering::VisualPtr());
+      }
+      // Pressed child part
+      else if (this->selectedVis != this->hoverVis)
+      {
+        if (this->hoverVis)
+          this->hoverVis->SetEmissive(common::Color(0, 0, 0));
+        if (this->selectedVis)
+          this->selectedVis->SetEmissive(common::Color(0, 0, 0));
+        this->mouseJoint->child = this->hoverVis;
 
-      // reset variables.
-      this->selectedVis.reset();
-      this->hoverVis.reset();
-      this->AddJoint(JointMaker::JOINT_NONE);
+        // reset variables.
+        this->selectedVis.reset();
+        this->hoverVis.reset();
+        this->AddJoint(JointMaker::JOINT_NONE);
 
-      this->newJointCreated = true;
+        this->newJointCreated = true;
+      }
     }
-  }
 
-  return true;
+    return true;
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////

@@ -1794,8 +1794,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       Ogre::Any any = obj->getUserAny();
       if (any.getType() == typeid(std::string))
       {
-        std::string str = Ogre::any_cast<std::string>(any);
-        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans")
+        std::string str = Ogre::any_cast<std::string>(any).substr(0, 5);
+        if (str.substr(0, 3) == "rot" || str == "trans" || str == "scale")
           continue;
       }
 
