@@ -259,6 +259,22 @@ namespace gazebo
       public: virtual void ApplyStiffnessDamping();
 
       // Documentation inherited.
+      public: bool SetPosition(unsigned int _index, double _position,
+                               double _velocity = 0.0);
+
+      /// \brief internal helper
+      private: bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks);
+
+      /// \brief internal function to help us compute child link pose
+      /// if a joint position change is applied.
+      /// \param[in] _index axis index
+      /// \param[in] _position new joint position
+      /// \return new child link pose at new joint position.
+      private: math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+      // Documentation inherited.
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
@@ -297,6 +313,10 @@ namespace gazebo
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
+
+      /// \brief internally keep track of links for SetVelocity and SetPosition
+      /// when propagating changes to all descendant child links.
+      public: Link_V updatedLinks;
     };
   }
 }

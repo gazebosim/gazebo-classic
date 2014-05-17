@@ -489,6 +489,17 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      /// \brief Move Link given source and targe frames specified in
+      /// world coordinates. Assuming link's relative pose to
+      /// source frame (_worldRefernceFrameSrc) remains unchanged to destination
+      /// frame (_worldRefernceFrameDst).
+      /// \param[in] _worldRefernceFrameSrc initial reference frame to
+      /// which this link is attached.
+      /// \param[in] _worldRefernceFrameDst final location of the
+      /// reference frame specified in world coordinates.
+      public: void Move(const math::Pose &_worldRefernceFrameSrc,
+                        const math::Pose &_worldRefernceFrameDst);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -506,6 +517,17 @@ namespace gazebo
 
       /// \brief Parse visuals from SDF
       private: void ParseVisuals();
+
+      /// \brief Helper function to find all connected links of a link
+      /// based on parent/child relations of joints
+      public: bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks, bool _first = false);
+
+      /// \brief Helper function to see if _value is contained in _vector
+      /// \param[in] _vector
+      /// \param[in] _value
+      /// \return true if value is in vector
+      private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;

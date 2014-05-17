@@ -552,11 +552,17 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 {
+  this->SetPosition(_index, _angle.Radian());
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPosition(unsigned int _index, double _position, double _velocity)
+{
   if (this->model->IsStatic())
-    this->staticAngle = _angle;
-  else
-    this->model->SetJointPosition(
-      this->GetScopedName(), _angle.Radian(), _index);
+  {
+    this->staticAngle = _position;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -565,7 +571,7 @@ void Joint::SetState(const JointState &_state)
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
-    this->SetAngle(i, _state.GetAngle(i));
+    this->SetPosition(i, _state.GetAngle(i).Radian());
 }
 
 //////////////////////////////////////////////////

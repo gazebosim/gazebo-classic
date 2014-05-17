@@ -19,6 +19,7 @@
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/ode/ODELink.hh"
@@ -1466,3 +1467,293 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
 }
+
+//////////////////////////////////////////////////
+bool ODEJoint::SetPosition(unsigned int _index, double _position,
+                           double _velocity)
+{
+  gzwarn << "Setting joint position set collision broken, see issue #1138\n";
+
+  // check if index is inbound
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index too large.\n";
+    return false;
+  }
+
+  if (!Joint::SetPosition(_index, _position, _velocity))
+  {
+    gzerr << "something is wrong, returning.\n";
+    return false;
+  }
+
+  // truncate position by joint limits
+  double lower = this->GetLowStop(_index).Radian();
+  double upper = this->GetHighStop(_index).Radian();
+  _position = _position < lower? lower :
+  (_position > upper? upper : _position);
+
+  // keep track of updatd links, make sure each is upated only once
+  this->updatedLinks.clear();
+
+  // only deal with hinge and revolute joints in the user
+  // request joint_names list
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT) ||
+      this->HasType(Base::SLIDER_JOINT))
+  {
+    // if (parentLink->GetScopedName() == childLink->GetScopedName())
+    // {
+    //   gzerr << "Is this even possible?\n";
+    //   return;
+    // }
+
+    if (childLink)
+    {
+      // Get all connected links to this joint
+      Link_V connectedLinks;
+      if (this->FindAllConnectedLinks(this->parentLink, connectedLinks))
+      {
+        // successfully found a subset of links connected to this joint
+        // (parent link cannot be in this set).  Next, compute transform
+        // to apply to all these links.
+
+        // Everything here must be done within one time step,
+        // Link pose updates need to be synchronized.
+
+        // compute transform about the current anchor, about the axis
+        // rotate child (childLink) about anchor point,
+
+        // Get Child Link Pose
+        math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+        // Compute new child link pose based on position change
+        math::Pose newChildLinkPose =
+          this->ComputeChildLinkPose(_index, _position);
+
+        // update all connected links
+        for (Link_V::iterator li = connectedLinks.begin();
+                              li != connectedLinks.end(); ++li)
+        {
+          /// \TODO: this checks is called everytime, not efficient
+          if ((*li).get() != this->childLink.get())
+          {
+            // set pose of each link based on child link pose change
+            (*li)->Move(childLinkPose, newChildLinkPose);
+          }
+        }
+      }
+      else
+      {
+        // if parent Link is found in search, return false
+        gzerr << "failed to find a clean set of connected links,"
+              << " i.e. this joint is inside a loop, cannot SetPosition"
+              << " kinematically.\n";
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "child link is null.\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "joint type SetPosition not supported.\n";
+    return false;
+  }
+
+  /// \todo:  Set link and joint "velocities" based on change / time
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool ODEJoint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks)
+{
+  // unlikely, but check anyways to make sure we don't have a 0-height tree
+  if (this->childLink.get() == _originalParentLink.get())
+  {
+    // if parent is a child
+    gzerr << "we have a zero length loop.\n";
+    _connectedLinks.clear();
+    return false;
+  }
+  else
+  {
+    // add this->childLink to the list of descendent child links (should be
+    // the very first one added).
+    _connectedLinks.push_back(this->childLink);
+
+    // START RECURSIVE SEARCH, start adding child links of this->childLink
+    // to the collection of _connectedLinks.
+    return this->childLink->FindAllConnectedLinks(_originalParentLink,
+      _connectedLinks, true);
+  }
+}
+
+//////////////////////////////////////////////////
+math::Pose ODEJoint::ComputeChildLinkPose( unsigned int _index,
+          double _position)
+{
+  // child link pose
+  math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+  // default return to current pose
+  math::Pose newRelativePose = childLinkPose;
+
+  // get anchor and axis of the joint
+  math::Vector3 anchor;
+  math::Vector3 axis;
+
+  if (this->model->IsStatic())
+  {
+    /// \TODO: we want to get axis in global frame, but GetGlobalAxis
+    /// not implemented for static models yet.
+    axis = childLinkPose.rot.RotateVector(this->GetLocalAxis(_index));
+    anchor = childLinkPose.pos;
+  }
+  else
+  {
+    anchor = this->GetAnchor(_index);
+    axis = this->GetGlobalAxis(_index);
+  }
+  
+  // delta-position along an axis
+  double dposition = _position - this->GetAngle(_index).Radian();
+
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // take axis rotation and turn it int a quaternion
+    math::Quaternion rotation(axis, dposition);
+
+    // rotate relative pose by rotation
+
+    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+    newRelativePose.rot = rotation * relativePose.rot;
+
+    math::Pose newWorldPose(newRelativePose.pos + anchor,
+                            newRelativePose.rot);
+
+    // \TODO: ideally we want to set this according to
+    // Joint Trajectory velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // slide relative pose by dposition along axis
+    newRelativePose.pos = relativePose.pos + axis * dposition;
+    newRelativePose.rot = relativePose.rot;
+
+    math::Pose newWorldPose(newRelativePose.pos + anchor,
+                            newRelativePose.rot);
+
+    /// \TODO: ideally we want to set this according to Joint Trajectory
+    /// velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else
+  {
+    gzerr << "Not supported yet.\n";
+  }
+
+  return newRelativePose;
+}
+
+/*
+//////////////////////////////////////////////////
+void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
+     const math::Pose &_old, const math::Pose &_new, double _dt)
+{
+    math::Vector3 linear_vel(0, 0, 0);
+    math::Vector3 angular_vel(0, 0, 0);
+    if (math::equal(_dt, 0.0))
+    {
+      gzwarn << "dt is 0, unable to compute velocity, set to 0s\n";
+    }
+    else
+    {
+      linear_vel = (_new.pos - _old.pos) / _dt;
+      angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
+    }
+    _link->SetLinearVel(linear_vel);
+    _link->SetAngularVel(angular_vel);
+}
+
+//////////////////////////////////////////////////
+void JointController::AddConnectedLinks(Link_V &_linksOut,
+                                        const LinkPtr &_link,
+                                        bool _checkParentTree)
+{
+  // strategy, for each child, recursively look for children
+  //           for each child, also look for parents to catch multiple roots
+
+
+  Link_V childLinks = _link->GetChildJointsLinks();
+  for (Link_V::iterator childLink = childLinks.begin();
+                                      childLink != childLinks.end();
+                                      ++childLink)
+  {
+    // add this link to the list of links to be updated by SetJointPosition
+    if (!this->ContainsLink(_linksOut, *childLink))
+    {
+      _linksOut.push_back(*childLink);
+      // recurse into children, but not parents
+      this->AddConnectedLinks(_linksOut, *childLink);
+    }
+
+    if (_checkParentTree)
+    {
+      // catch additional roots by looping
+      // through all parents of childLink,
+      // but skip parent link itself (_link)
+      Link_V parentLinks = (*childLink)->GetParentJointsLinks();
+      for (Link_V::iterator parentLink = parentLinks.begin();
+                                          parentLink != parentLinks.end();
+                                          ++parentLink)
+      {
+        if ((*parentLink)->GetScopedName() != _link->GetName() &&
+            !this->ContainsLink(_linksOut, (*parentLink)))
+        {
+          _linksOut.push_back(*parentLink);
+          // add all childrend links of parentLink, but
+          // stop the recursion if any of the child link is already added
+          this->AddConnectedLinks(_linksOut, *parentLink, _link);
+        }
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+bool JointController::ContainsLink(
+const Link_V &_vector, const LinkPtr &_value)
+{
+  for (Link_V::const_iterator iter = _vector.begin();
+       iter != _vector.end(); ++iter)
+  {
+    if ((*iter)->GetScopedName() == _value->GetScopedName())
+      return true;
+  }
+  return false;
+}
+*/

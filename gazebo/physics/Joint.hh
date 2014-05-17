@@ -348,6 +348,11 @@ namespace gazebo
       /// \brief Set the max allowed force of an axis(index).
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
+      /// Curret implementation is engine dependent. See for example
+      /// ODE implementation in ODEHingeJoint::SetMaxForce.
+      /// Curret implementation in Bullet and ODE is enforced through amotor,
+      /// which enforces force/torque limits when calling Joint::SetVelocity.
+      /// Implementation in DART is by 
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
       public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
@@ -377,7 +382,22 @@ namespace gazebo
       /// by calling JointController::SetJointPosition.
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(unsigned int _index, math::Angle _angle);
+      public: void SetAngle(unsigned int _index, math::Angle _angle)
+              GAZEBO_DEPRECATED(3.1);
+
+      /// \brief If the Joint is static, Gazebo stores the state of
+      /// this Joint as a scalar inside the Joint class, so
+      /// this call will NOT move the joint dynamically for a static Model.
+      /// But if this Model is not static, then it is updated dynamically,
+      /// all the conencted children Link's are moved as a result of the
+      /// Joint angle setting.
+      /// \param[in] _index Index of the joint axis (degree of freedom).
+      /// \param[in] _position Position to set the joint to.
+      /// \param[in] _velocity Velocity for the joint, defaults to 0 if
+      /// unspecified, pure kinematic teleportation.
+      /// \return returns true if operation succeeds, 0 if it fails.
+      public: virtual bool SetPosition(unsigned int _index, double _position,
+                                       double _velocity = 0.0);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.

@@ -1156,3 +1156,100 @@ double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }
+
+/////////////////////////////////////////////////
+void Link::Move(const math::Pose &_worldReferenceFrameSrc,
+                const math::Pose &_worldReferenceFrameDst)
+{
+  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
+    + _worldReferenceFrameDst;
+  this->SetWorldPose(targetWorldPose);
+}
+
+/////////////////////////////////////////////////
+bool Link::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks, bool _first)
+{
+  // get all child joints from this link
+  Link_V childLinks = this->GetChildJointsLinks();
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = childLinks.begin();
+                        li != childLinks.end(); ++li)
+  {
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      // if parent is a child, failed search to find a nice subset of links
+      gzerr << "we have a loop! cannot find nice set of connected links.\n";
+      _connectedLinks.clear();
+      return false;
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+    }
+    else
+    {
+      // add child link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if child link has already been checked?
+      return (*li)->FindAllConnectedLinks(_originalParentLink,
+        _connectedLinks);
+    }
+  }
+
+  // search parents, but if this is the first search, keep going, otherwise
+  // flag failure
+  // get all parent joints from this link
+  Link_V parentLinks = this->GetParentJointsLinks();
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = parentLinks.begin();
+                        li != parentLinks.end(); ++li)
+  {
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      if (_first)
+      {
+        // this is the first child link, simply skip
+      }
+      else
+      {
+        // if parent is a child, failed search to find a nice subset of links
+        gzerr << "we have a loop! cannot find nice set of connected links.\n";
+        _connectedLinks.clear();
+        return false;
+      }
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+    }
+    else
+    {
+      // add child link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if child link has already been checked?
+      return (*li)->FindAllConnectedLinks(_originalParentLink,
+        _connectedLinks);
+    }
+  }
+
+  // no child, this is a leaf Link node.
+  return true;
+}
+/////////////////////////////////////////////////
+bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
+{
+  for (Link_V::const_iterator iter = _vector.begin();
+       iter != _vector.end(); ++iter)
+  {
+    if ((*iter).get() == _value.get())
+      return true;
+  }
+  return false;
+}

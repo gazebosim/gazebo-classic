@@ -1,3 +1,11 @@
+## Gazebo 3.0 to 4.0
+
+### New Deprecations
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
+    + ***Replacement*** virtual void SetPosition(unsigned int, double)
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
