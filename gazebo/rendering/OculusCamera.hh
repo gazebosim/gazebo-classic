@@ -66,7 +66,6 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      /// \throws common::Exception when Oculus Rift is not plugged in.
       public: OculusCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
@@ -93,7 +92,7 @@ namespace gazebo
 
       /// \brief Set the pose in the world coordinate frame.
       /// \param[in] _pose New pose of the camera.
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      //public: virtual void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
@@ -185,7 +184,7 @@ namespace gazebo
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      public: void SetFocalPoint(const math::Vector3 &_pt);
+      //public: void SetFocalPoint(const math::Vector3 &_pt);
 
       // Documentation inherited
       public: virtual unsigned int GetImageWidth() const;
@@ -195,6 +194,10 @@ namespace gazebo
 
       /// \brief Reset the Oculus Rift sensor orientation.
       public: void ResetSensor();
+
+      /// \brief Used to check if Oculus is plugged in and can be used.
+      /// \return True when Oculus is ready to use.
+      public: bool Ready();
 
       /// \brief Set the camera to be attached to a visual.
       ///
@@ -275,6 +278,9 @@ namespace gazebo
 
       /// \brief Subscriber used to receive updates on world_control topic.
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief True when Oculus is connected and ready to use.
+      private: bool ready;
     };
     /// \}
   }

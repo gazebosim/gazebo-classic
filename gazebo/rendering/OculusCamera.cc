@@ -17,6 +17,7 @@
 
 #include <OVR.h>
 #include <sstream>
+#include <string>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -53,6 +54,9 @@ const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
 OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
+  // Oculus is not ready yet.
+  this->ready = false;
+
   // Set default OculusCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
@@ -60,16 +64,16 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 
   this->deviceManager = OVR::DeviceManager::Create();
   if (!this->deviceManager)
-    gzthrow("Oculus: Failed to create Device Manager\n");
+    return;
 
   this->stereoConfig = new OVR::Util::Render::StereoConfig();
   if (!this->stereoConfig)
-    gzthrow("Oculus: Failed to create StereoConfig\n");
+    return;
 
   this->centerOffset = this->stereoConfig->GetProjectionCenterOffset();
 
-  this->hmd = this->deviceManager->EnumerateDevices<
-    OVR::HMDDevice>().CreateDevice();
+  this->hmd =
+    this->deviceManager->EnumerateDevices<OVR::HMDDevice>().CreateDevice();
   if (this->hmd)
   {
     OVR::HMDInfo devinfo;
@@ -79,20 +83,16 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
   }
   else
   {
-    gzlog << "Oculus: Failed to create HMD. Creating sensor manually.\n";
-    this->sensor = this->deviceManager->EnumerateDevices<
-      OVR::SensorDevice>().CreateDevice();
+    this->sensor =
+      this->deviceManager->EnumerateDevices<OVR::SensorDevice>().CreateDevice();
   }
 
   if (!this->sensor)
-    gzthrow("Oculus: Failed to create sensor\n");
+    return;
 
   this->sensorFusion = new OVR::SensorFusion();
   if (!sensorFusion)
-  {
-    gzlog << "Oculus: Failed to create SensorFusion\n";
     return;
-  }
 
   this->sensorFusion->AttachToSensor(this->sensor);
   this->sensorFusion->SetPredictionEnabled(true);
@@ -102,6 +102,9 @@ OculusCamera::OculusCamera(const std::string &_name, ScenePtr _scene)
 
   this->controlSub = this->node->Subscribe("~/world_control",
                                            &OculusCamera::OnControl, this);
+
+  // Oculus is now ready.
+  this->ready = true;
 }
 
 //////////////////////////////////////////////////
@@ -113,7 +116,8 @@ OculusCamera::~OculusCamera()
 //////////////////////////////////////////////////
 void OculusCamera::Load(sdf::ElementPtr _sdf)
 {
-  Camera::Load(_sdf);
+  if (this->Ready())
+    Camera::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
@@ -128,12 +132,16 @@ void OculusCamera::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void OculusCamera::Load()
 {
-  Camera::Load();
+  if (this->Ready())
+    Camera::Load();
 }
 
 //////////////////////////////////////////////////
 void OculusCamera::Init()
 {
+  if (!this->Ready())
+    return;
+
   Camera::Init();
 
   this->SetHFOV(GZ_DTOR(60));
@@ -183,14 +191,17 @@ void OculusCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void OculusCamera::SetWorldPose(const math::Pose &_pose)
+/*void OculusCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
-}
+}*/
 
 //////////////////////////////////////////////////
 void OculusCamera::Update()
 {
+  if (!this->Ready())
+    return;
+
   Camera::Update();
 
   OVR::Quatf q = this->sensorFusion->GetPredictedOrientation();
@@ -207,6 +218,12 @@ void OculusCamera::ResetSensor()
 }
 
 //////////////////////////////////////////////////
+bool OculusCamera::Ready()
+{
+  return this->ready;
+}
+
+//////////////////////////////////////////////////
 void OculusCamera::PostRender()
 {
   Camera::PostRender();
@@ -219,19 +236,19 @@ void OculusCamera::Fini()
 }
 
 //////////////////////////////////////////////////
-void OculusCamera::HandleMouseEvent(const common::MouseEvent & /*_evt*/)
-{
-}
+//void OculusCamera::HandleMouseEvent(const common::MouseEvent & /*_evt*/)
+//{
+//}
 
 /////////////////////////////////////////////////
-void OculusCamera::HandleKeyPressEvent(const std::string & /*_key*/)
-{
-}
+//void OculusCamera::HandleKeyPressEvent(const std::string & /*_key*/)
+//{
+//}
 
 /////////////////////////////////////////////////
-void OculusCamera::HandleKeyReleaseEvent(const std::string & /*_key*/)
-{
-}
+//void OculusCamera::HandleKeyReleaseEvent(const std::string & /*_key*/)
+//{
+//}
 
 /////////////////////////////////////////////////
 bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
@@ -261,10 +278,10 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
     math::Vector3 pos = bb.GetCenter();
     pos.z = bb.max.z;
 
-    this->SetViewController(OrbitViewController::GetTypeString(), pos);
+    //this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
-  else
-    this->SetViewController(FPSViewController::GetTypeString());
+  //else
+  //  this->SetViewController(FPSViewController::GetTypeString());
 
   return true;
 }
@@ -278,15 +295,15 @@ bool OculusCamera::TrackVisualImpl(VisualPtr _visual)
 }
 
 //////////////////////////////////////////////////
-void OculusCamera::SetViewController(const std::string & /*_type*/)
-{
-}
+//void OculusCamera::SetViewController(const std::string & /*_type*/)
+//{
+//}
 
 //////////////////////////////////////////////////
-void OculusCamera::SetViewController(const std::string & /*_type*/,
-                                    const math::Vector3 &/*_pos*/)
-{
-}
+//void OculusCamera::SetViewController(const std::string & /*_type*/,
+//                                    const math::Vector3 &/*_pos*/)
+//{
+//}
 
 //////////////////////////////////////////////////
 unsigned int OculusCamera::GetImageWidth() const
@@ -314,10 +331,10 @@ void OculusCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
 }
 
 //////////////////////////////////////////////////
-void OculusCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
-                                         float /*w_*/, float /*h_*/)
-{
-}
+//void OculusCamera::SetViewportDimensions(float /*x_*/, float /*y_*/,
+//                                         float /*w_*/, float /*h_*/)
+//{
+//}
 
 //////////////////////////////////////////////////
 float OculusCamera::GetAvgFPS() const
@@ -334,14 +351,14 @@ unsigned int OculusCamera::GetTriangleCount() const
 }
 
 //////////////////////////////////////////////////
-void OculusCamera::ToggleShowVisual()
+/*void OculusCamera::ToggleShowVisual()
 {
-}
+}*/
 
 //////////////////////////////////////////////////
-void OculusCamera::ShowVisual(bool /*_s*/)
-{
-}
+//void OculusCamera::ShowVisual(bool /*_s*/)
+//{
+//}
 
 //////////////////////////////////////////////////
 bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
@@ -433,9 +450,9 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
 }
 
 /////////////////////////////////////////////////
-void OculusCamera::OnMoveToVisualComplete()
+/*void OculusCamera::OnMoveToVisualComplete()
 {
-}
+}*/
 
 //////////////////////////////////////////////////
 void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
@@ -462,40 +479,43 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
 
 //////////////////////////////////////////////////
-void OculusCamera::EnableViewController(bool /*_value*/) const
-{
-}
+//void OculusCamera::EnableViewController(bool /*_value*/) const
+//{
+//}
 
 //////////////////////////////////////////////////
-VisualPtr OculusCamera::GetVisual(const math::Vector2i & /*_mousePos*/,
-                                  std::string & /*_mod*/)
-{
-  VisualPtr result;
-  return result;
-}
+//VisualPtr OculusCamera::GetVisual(const math::Vector2i & /*_mousePos*/,
+//                                  std::string & /*_mod*/)
+//{
+ // VisualPtr result;
+//  return result;
+//}
 
 //////////////////////////////////////////////////
-void OculusCamera::SetFocalPoint(const math::Vector3 & /*_pt*/)
-{
-}
+//void OculusCamera::SetFocalPoint(const math::Vector3 & /*_pt*/)
+//{
+//}
 
 //////////////////////////////////////////////////
-VisualPtr OculusCamera::GetVisual(const math::Vector2i & /*_mousePos*/) const
-{
-  VisualPtr result;
-
-  return result;
-}
+//VisualPtr OculusCamera::GetVisual(const math::Vector2i & /*_mousePos*/) const
+//{
+//  VisualPtr result;
+//
+//  return result;
+//}
 
 //////////////////////////////////////////////////
-std::string OculusCamera::GetViewControllerTypeString()
+/*std::string OculusCamera::GetViewControllerTypeString()
 {
   return "";
-}
+}*/
 
 //////////////////////////////////////////////////
 void OculusCamera::Oculus()
 {
+  if (!this->Ready())
+    return;
+
   Ogre::MaterialPtr matLeft =
     Ogre::MaterialManager::getSingleton().getByName("Ogre/Compositor/Oculus");
   Ogre::MaterialPtr matRight = matLeft->clone("Ogre/Compositor/Oculus/Right");
@@ -598,6 +618,9 @@ void OculusCamera::Oculus()
 /////////////////////////////////////////////////
 void OculusCamera::AdjustAspect(double _v)
 {
+  if (!this->Ready())
+    return;
+
   for (int i = 0; i < 2; ++i)
   {
     Ogre::Camera *cam = i == 0 ? this->camera : this->rightCamera;

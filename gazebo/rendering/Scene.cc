@@ -572,9 +572,13 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
-  camera->Load();
-  camera->Init();
-  this->oculusCameras.push_back(camera);
+
+  if (camera->Ready())
+  {
+    camera->Load();
+    camera->Init();
+    this->oculusCameras.push_back(camera);
+  }
 
   return camera;
 }
