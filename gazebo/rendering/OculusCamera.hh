@@ -66,7 +66,6 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
       /// \param[in] _scene Scene to put the camera in.
-      /// \throws common::Exception when Oculus Rift is not plugged in.
       public: OculusCamera(const std::string &_name, ScenePtr _scene);
 
       /// \brief Destructor
@@ -91,48 +90,10 @@ namespace gazebo
       /// \brief Finialize
       public: void Fini();
 
-      /// \brief Set the pose in the world coordinate frame.
-      /// \param[in] _pose New pose of the camera.
-      public: virtual void SetWorldPose(const math::Pose &_pose);
-
-      /// \brief Handle a mouse event.
-      /// \param[in] _evt The mouse event.
-      public: void HandleMouseEvent(const common::MouseEvent &_evt);
-
-      /// \brief Handle a key press.
-      /// \param[in] _key The key pressed.
-      public: void HandleKeyPressEvent(const std::string &_key);
-
-      /// \brief Handle a key release.
-      /// \param[in] _key The key released.
-      public: void HandleKeyReleaseEvent(const std::string &_key);
-
-      /// \brief Set view controller.
-      /// \param[in] _type The type of view controller: "orbit", "fps"
-      public: void SetViewController(const std::string &_type);
-
-      /// \brief Set view controller
-      /// \param[in] _type The type of view controller: "orbit", "fps"
-      /// \param[in] _pos The initial pose of the camera.
-      public: void SetViewController(const std::string &_type,
-                                     const math::Vector3 &_pos);
-
-      /// \brief Get current view controller type.
-      /// \return Type of the current view controller: "orbit", "fps"
-      public: std::string GetViewControllerTypeString();
-
       /// \brief Resize the camera.
       /// \param[in] _w Width of the camera image.
       /// \param[in] _h Height of the camera image.
       public: void Resize(unsigned int _w, unsigned int _h);
-
-      /// \brief Set the dimensions of the viewport.
-      /// \param[in] _x X position of the viewport.
-      /// \param[in] _y Y position of the viewport.
-      /// \param[in] _w Width of the viewport.
-      /// \param[in] _h Height of the viewport.
-      public: void SetViewportDimensions(float _x, float _y,
-                                         float _w, float _h);
 
       /// \brief Get the average frames per second
       /// \return The average rendering frames per second
@@ -160,32 +121,13 @@ namespace gazebo
       /// \param[in] _target The new rendering target.
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
-      /// \brief Set whether the view controller is enabled.
-      ///
-      /// The view controller is used to handle user camera movements.
-      /// \param[in] _value True to enable viewcontroller, False to
-      /// disable.
-      public: void EnableViewController(bool _value) const;
-
       /// \brief Change screen aspect ratio.
       /// \param[in] _v Aspect ratio.
       public: void AdjustAspect(double _v);
 
-      /// \brief Get an entity at a pixel location using a camera. Used for
-      /// mouse picking.
-      /// \param[in] _mousePos The position of the mouse in screen coordinates
-      /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos,
-                                  std::string &_mod);
-
-      /// \brief Get a visual at a mouse position
-      /// \param[in] _mousePos 2D position of the mouse in pixels.
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const;
-
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      public: void SetFocalPoint(const math::Vector3 &_pt);
+      //public: void SetFocalPoint(const math::Vector3 &_pt);
 
       // Documentation inherited
       public: virtual unsigned int GetImageWidth() const;
@@ -195,6 +137,10 @@ namespace gazebo
 
       /// \brief Reset the Oculus Rift sensor orientation.
       public: void ResetSensor();
+
+      /// \brief Used to check if Oculus is plugged in and can be used.
+      /// \return True when Oculus is ready to use.
+      public: bool Ready();
 
       /// \brief Set the camera to be attached to a visual.
       ///
@@ -218,21 +164,9 @@ namespace gazebo
       /// \return True if the camera is now tracking the visual.
       protected: virtual bool TrackVisualImpl(VisualPtr _visual);
 
-      /// \brief Toggle whether to show the visual.
-      private: void ToggleShowVisual();
-
-      /// \brief Set whether to show the visual.
-      /// \param[in] _show True to show the visual representation for this
-      /// camera. Currently disabled.
-      private: void ShowVisual(bool _show);
-
       /// \brief Receive world control messages. Used to reset the oculus
       /// sensor.
       private: void OnControl(ConstWorldControlPtr &_data);
-
-      /// \brief Callback used when the camera has finished moving to
-      /// a visual.
-      private: void OnMoveToVisualComplete();
 
       /// \brief Apply distorsion to the render target.
       private: void Oculus();
@@ -242,9 +176,6 @@ namespace gazebo
 
       /// \brief View poer for the right camera.
       protected: Ogre::Viewport *rightViewport;
-
-      /// \brief Used to select objects from mouse clicks.
-      private: SelectionBuffer *selectionBuffer;
 
       /// \brief Ogre Compositors
       private: Ogre::CompositorInstance *compositors[2];
@@ -275,6 +206,9 @@ namespace gazebo
 
       /// \brief Subscriber used to receive updates on world_control topic.
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief True when Oculus is connected and ready to use.
+      private: bool ready;
     };
     /// \}
   }

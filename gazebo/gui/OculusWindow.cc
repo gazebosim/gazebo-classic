@@ -131,24 +131,13 @@ void OculusWindow::AttachCameraToVisual()
 /////////////////////////////////////////////////
 bool OculusWindow::CreateCamera()
 {
-  try
-  {
-    this->scene = rendering::get_scene();
+  this->scene = rendering::get_scene();
 
-    if (this->scene)
-    {
-      // CreateCoulusCamera will throw an exception if Oculus is not connected.
-      this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
-    }
-    else
-      gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
-  }
-  catch(const common::Exception &_e)
-  {
-    gzlog << _e.GetErrorStr() << std::endl;
-    return false;
-  }
-  return true;
+  if (!this->scene)
+    gzerr << "Unable to create an oculus camera, scene is NULL" << std::endl;
+
+  this->oculusCamera = this->scene->CreateOculusCamera("gzoculus_camera");
+  return this->oculusCamera->Ready();
 }
 
 /////////////////////////////////////////////////
