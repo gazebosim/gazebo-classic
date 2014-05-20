@@ -1682,11 +1682,8 @@ void World::ProcessFactoryMsgs()
         }
         else if (isLight)
         {
-          /// \TODO: Current broken. See Issue #67.
           msgs::Light *lm = this->sceneMsg.add_light();
           lm->CopyFrom(msgs::LightFromSDF(elem));
-
-          this->lightPub->Publish(*lm);
         }
       }
     }
