@@ -5,6 +5,10 @@
 1. **gazebo/msgs/msgs.hh**
     + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr());
 
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
