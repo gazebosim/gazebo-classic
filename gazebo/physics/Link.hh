@@ -519,9 +519,20 @@ namespace gazebo
       private: void ParseVisuals();
 
       /// \brief Helper function to find all connected links of a link
-      /// based on parent/child relations of joints
-      public: bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
-        Link_V &_connectedLinks, bool _first = false);
+      /// based on parent/child relations of joints. For example,
+      /// if Link0 --> Link1 --> ... --> LinkN is a kinematic chain
+      /// with Link0 being the base link.  Then, call by Link1:
+      ///   Link1->FindAllConnectedLinksHelper(Link0, _list, true);
+      /// should return true with _list containing Link1 through LinkN.
+      /// \param[in] _originParentLink if this link is a child link of
+      /// the search, we've found a loop.
+      /// \param[in/out] _connectedLinks aggregate list of connected links.
+      /// \param[in] _fistLink this is the first Link, skip over the parent
+      /// link that matches the _originalParentLink.
+      /// \return true if successfully found a subset of connected links
+      public: bool FindAllConnectedLinksHelper(
+        const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks, bool _fistLink = false);
 
       /// \brief Helper function to see if _value is contained in _vector
       /// \param[in] _vector

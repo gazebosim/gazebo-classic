@@ -1518,8 +1518,8 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
         // gzerr << "found connected links: ";
         // for (Link_V::iterator li = connectedLinks.begin();
         //                       li != connectedLinks.end(); ++li)
-        //   gzerr << (*li)->GetName() << " ";
-        // gzerr << "\n";
+        //   std::cout << (*li)->GetName() << " ";
+        // std::cout << "\n";
 
         // successfully found a subset of links connected to this joint
         // (parent link cannot be in this set).  Next, compute transform
@@ -1616,7 +1616,7 @@ bool ODEJoint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 
     // START RECURSIVE SEARCH, start adding child links of this->childLink
     // to the collection of _connectedLinks.
-    return this->childLink->FindAllConnectedLinks(_originalParentLink,
+    return this->childLink->FindAllConnectedLinksHelper(_originalParentLink,
       _connectedLinks, true);
   }
 }
