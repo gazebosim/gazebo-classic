@@ -1180,32 +1180,51 @@ bool Link::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
   // get all child joints from this link
   Link_V childLinks = this->GetChildJointsLinks();
 
+  // gzerr << "debug: child links are: ";
+  // for (Link_V::iterator li = childLinks.begin();
+  //                       li != childLinks.end(); ++li)
+  //   std::cout << (*li)->GetName() << " ";
+  // std::cout << "\n";
+
   // loop through all joints where this link is a parent link of the joint
   for (Link_V::iterator li = childLinks.begin();
                         li != childLinks.end(); ++li)
   {
+    // gzerr << "debug: checking " << (*li)->GetName() << "\n";
+
     // check child link of each child joint recursively
     if ((*li).get() == _originalParentLink.get())
     {
       // if parent is a child, failed search to find a nice subset of links
-      gzerr << "we have a loop! cannot find nice set of connected links.\n";
+      gzwarn << "we have a loop! cannot find nice subset of connected links,"
+             << " this link " << this->GetName() << " connects back to"
+             << " parent " << _originalParentLink->GetName() << ".\n";
       _connectedLinks.clear();
       return false;
     }
     else if (this->ContainsLink(_connectedLinks, (*li)))
     {
       // do nothing
+      // gzerr << "debug: do nothing with " << (*li)->GetName() << "\n";
     }
     else
     {
+      // gzerr << "debug: add and recurse " << (*li)->GetName() << "\n";
       // add child link to list
       _connectedLinks.push_back((*li));
 
-      // recursively check if child link has already been checked?
-      return (*li)->FindAllConnectedLinks(_originalParentLink,
-        _connectedLinks);
+      // recursively check if child link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinks(_originalParentLink, _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
     }
   }
+
+  /// \todo: later we can optimize loop below by merging and using a flag.
 
   // search parents, but if this is the first search, keep going, otherwise
   // flag failure
@@ -1226,7 +1245,9 @@ bool Link::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
       else
       {
         // if parent is a child, failed search to find a nice subset of links
-        gzerr << "we have a loop! cannot find nice set of connected links.\n";
+      gzwarn << "we have a loop! cannot find nice subset of connected links,"
+             << " this link " << this->GetName() << " connects back to"
+             << " parent " << _originalParentLink->GetName() << ".\n";
         _connectedLinks.clear();
         return false;
       }
@@ -1240,13 +1261,17 @@ bool Link::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
       // add child link to list
       _connectedLinks.push_back((*li));
 
-      // recursively check if child link has already been checked?
-      return (*li)->FindAllConnectedLinks(_originalParentLink,
-        _connectedLinks);
+      // recursively check if child link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinks(_originalParentLink, _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
     }
   }
 
-  // no child, this is a leaf Link node.
   return true;
 }
 /////////////////////////////////////////////////

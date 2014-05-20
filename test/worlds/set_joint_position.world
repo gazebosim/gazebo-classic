@@ -287,6 +287,253 @@
           <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
       </joint>
+
+      <!-- branch from link_2 -->
+      <link name="link_2a">
+        <pose>2 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0.5 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_22a" type="revolute">
+        <parent>link_2</parent>
+        <child>link_2a</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="link_2b">
+        <pose>3 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0.5 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_2a2b" type="revolute">
+        <parent>link_2a</parent>
+        <child>link_2b</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <!-- another loop from link_2b -->
+      <link name="link_3a">
+        <pose>4 0 0 0 0 1.570796</pose>
+        <inertial>
+          <pose>0.5 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_2b3a" type="revolute">
+        <parent>link_2b</parent>
+        <child>link_3a</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="link_4a">
+        <pose>4 1 0 0 0 3.14159</pose>
+        <inertial>
+          <pose>0.5 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_3a4a" type="revolute">
+        <parent>link_3a</parent>
+        <child>link_4a</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <link name="link_5a">
+        <pose>3 1 0 0 0 4.712389</pose>
+        <inertial>
+          <pose>0.5 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <pose>0.5 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1. .1 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+      <joint name="joint_4a5a" type="revolute">
+        <parent>link_4a</parent>
+        <child>link_5a</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+      <joint name="joint_5a2b" type="revolute">
+        <parent>link_5a</parent>
+        <child>link_2b</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.7071</upper>
+            <lower>-0.7071</lower>
+          </limit>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+
     </model>
   </world>
 </sdf>

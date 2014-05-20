@@ -1544,17 +1544,24 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
         //       << "]\n";
 
         // update all connected links
-        for (Link_V::iterator li = connectedLinks.begin();
-                              li != connectedLinks.end(); ++li)
         {
-          // set pose of each link based on child link pose change
-          (*li)->Move(childLinkPose, newChildLinkPose);
+          // lock physics
+          boost::recursive_mutex::scoped_lock lock(
+            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-          // debug
-          // gzerr << "moved " << (*li)->GetName()
-          //       << " p0 [" << childLinkPose
-          //       << "] p1 [" << newChildLinkPose
-          //       << "]\n"; getchar();
+          for (Link_V::iterator li = connectedLinks.begin();
+                                li != connectedLinks.end(); ++li)
+          {
+            // set pose of each link based on child link pose change
+            (*li)->Move(childLinkPose, newChildLinkPose);
+
+            // debug
+            // gzerr << "moved " << (*li)->GetName()
+            //       << " p0 [" << childLinkPose
+            //       << "] p1 [" << newChildLinkPose
+            //       << "]\n";
+            // getchar();
+          }
         }
       }
       else

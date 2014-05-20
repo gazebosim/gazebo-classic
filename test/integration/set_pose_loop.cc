@@ -96,480 +96,101 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
   double start_time;
   double start_wall_time;
   double test_duration;
-  double pub_rate;
   double last_update_time;
   double elapsed_wall_time;
-
-
-  physics::JointPtr joint_01 = model->GetJoint("model_1::joint_01");
-  physics::JointPtr joint_12 = model->GetJoint("model_1::joint_12");
-  physics::JointPtr joint_23 = model->GetJoint("model_1::joint_23");
-  physics::JointPtr joint_34 = model->GetJoint("model_1::joint_34");
-  physics::JointPtr joint_45 = model->GetJoint("model_1::joint_45");
-  physics::JointPtr joint_52 = model->GetJoint("model_1::joint_52");
-
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 10;
-  pub_rate = 10.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing Joint::SetAngle at ["
-    << pub_rate << "] Hz.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses without violation\n";
-      // double cur_time = world->GetSimTime().Double();
-      joint_01->SetAngle(0, 0.1);
-      joint_12->SetAngle(0, 0.1);
-      joint_23->SetAngle(0, 0.1);
-      joint_34->SetAngle(0, 0.1);
-      joint_45->SetAngle(0, 0.1);
-      joint_52->SetAngle(0, 0.1);
-
-      joint_01->SetAngle(0, 0.2);
-      joint_12->SetAngle(0, 0.2);
-      joint_23->SetAngle(0, 0.2);
-      joint_34->SetAngle(0, 0.2);
-      joint_45->SetAngle(0, 0.2);
-      joint_52->SetAngle(0, 0.2);
-    }
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
-
-
-
-
-  world->EnablePhysicsEngine(false);
-
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 20;
-  pub_rate = 10.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing Joint::SetAngle at ["
-    << pub_rate << "] Hz with real time duration.\n";
-  last_update_time = start_wall_time;
-  while (world->GetRealTime().Double() < start_wall_time + test_duration)
-    if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetRealTime().Double();
-      joint_01->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      joint_12->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      joint_23->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      joint_34->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      joint_45->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      joint_52->SetAngle(0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      sleep(1);
-    }
-  test_duration = world->GetSimTime().Double() - start_time;
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
-
-
-  world->EnablePhysicsEngine(true);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   physics::LinkPtr link_1 = model->GetLink("link_1");
   physics::LinkPtr link_2 = model->GetLink("link_2");
   physics::LinkPtr link_3 = model->GetLink("link_3");
   physics::LinkPtr link_4 = model->GetLink("link_4");
   physics::LinkPtr link_5 = model->GetLink("link_5");
+  physics::LinkPtr link_2a = model->GetLink("link_2a");
+  physics::LinkPtr link_2b = model->GetLink("link_2b");
+  physics::LinkPtr link_3a = model->GetLink("link_3a");
+  physics::LinkPtr link_4a = model->GetLink("link_4a");
+  physics::LinkPtr link_5a = model->GetLink("link_5a");
 
-  EXPECT_TRUE(link_1 != NULL);
+  EXPECT_TRUE(link_1  != NULL);
+  EXPECT_TRUE(link_2  != NULL);
+  EXPECT_TRUE(link_3  != NULL);
+  EXPECT_TRUE(link_4  != NULL);
+  EXPECT_TRUE(link_5  != NULL);
+  EXPECT_TRUE(link_2a != NULL);
+  EXPECT_TRUE(link_2b != NULL);
+  EXPECT_TRUE(link_3a != NULL);
+  EXPECT_TRUE(link_4a != NULL);
+  EXPECT_TRUE(link_5a != NULL);
+
+  physics::JointPtr joint_01   = model->GetJoint("model_1::joint_01");
+  physics::JointPtr joint_12   = model->GetJoint("model_1::joint_12");
+  physics::JointPtr joint_23   = model->GetJoint("model_1::joint_23");
+  physics::JointPtr joint_34   = model->GetJoint("model_1::joint_34");
+  physics::JointPtr joint_45   = model->GetJoint("model_1::joint_45");
+  physics::JointPtr joint_52   = model->GetJoint("model_1::joint_52");
+  physics::JointPtr joint_22a  = model->GetJoint("model_1::joint_22a");
+  physics::JointPtr joint_2a2b = model->GetJoint("model_1::joint_2a2b");
+  physics::JointPtr joint_2b3a = model->GetJoint("model_1::joint_2b3a");
+  physics::JointPtr joint_3a4a = model->GetJoint("model_1::joint_3a4a");
+  physics::JointPtr joint_4a5a = model->GetJoint("model_1::joint_4a5a");
+  physics::JointPtr joint_5a2b = model->GetJoint("model_1::joint_5a2b");
+
+  EXPECT_TRUE(joint_01   != NULL);
+  EXPECT_TRUE(joint_12   != NULL);
+  EXPECT_TRUE(joint_23   != NULL);
+  EXPECT_TRUE(joint_34   != NULL);
+  EXPECT_TRUE(joint_45   != NULL);
+  EXPECT_TRUE(joint_52   != NULL);
+  EXPECT_TRUE(joint_22a  != NULL);
+  EXPECT_TRUE(joint_2a2b != NULL);
+  EXPECT_TRUE(joint_2b3a != NULL);
+  EXPECT_TRUE(joint_3a4a != NULL);
+  EXPECT_TRUE(joint_4a5a != NULL);
+  EXPECT_TRUE(joint_5a2b != NULL);
 
   start_time = world->GetSimTime().Double();
   start_wall_time = world->GetRealTime().Double();
   test_duration = 10;
-  pub_rate = 2.0;
   gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing SetWorld Pose at ["
-    << pub_rate << "] Hz without constraint violation.\n";
+  gzdbg << " Oscillate between two angles: -0.5 and 0.5 for "
+        << test_duration << " secs\n";
+  gzdbg << " see how well Joint::SetPosition deals with rapid updates.\n";
+  gzdbg << " Publishing Joint::SetPosition every time step.\n";
   last_update_time = start_time;
   while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      // gzdbg << "setting link poses without violation\n";
-      // double cur_time = world->GetSimTime().Double();
-      last_update_time = world->GetSimTime().Double();
-      link_1->SetWorldPose(math::Pose(0,    0, 3, 0,        0, 0));
-      link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0,        0, 0));
-      link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0.5*M_PI, 0));
-      link_4->SetWorldPose(math::Pose(2.00, 1, 3, 0, 1.0*M_PI, 0));
-      link_5->SetWorldPose(math::Pose(1.00, 1, 3, 0, 1.5*M_PI, 0));
-    }
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
-
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 10;
-  pub_rate = 1.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing SetWorld Pose at ["
-    << pub_rate << "] Hz without constraint violation.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses without violation\n";
-      // double cur_time = world->GetSimTime().Double();
-      link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
-      link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
-      link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0.5*M_PI, 0));
-      link_4->SetWorldPose(math::Pose(2.00, 1, 3, 0, 1.0*M_PI, 0));
-      link_5->SetWorldPose(math::Pose(1.00, 1, 3, 0, 1.5*M_PI, 0));
-    }
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
-
-
-
-
-  // set random pose within joint limit
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 20;
-  pub_rate = 2.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing SetWorld Pose at ["
-    << pub_rate << "] Hz with less constraint violation.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    // if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
   {
     last_update_time = world->GetSimTime().Double();
-    math::Pose p;
-    p = math::Pose(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_1->SetWorldPose(p);
-    p = math::Pose(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_2->SetWorldPose(p);
-    p = math::Pose(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 2.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/
-        static_cast<double>(RAND_MAX) + 3.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/
-        static_cast<double>(RAND_MAX) + 0.5*M_PI,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_3->SetWorldPose(p);
-    p = math::Pose(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 2.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/
-        static_cast<double>(RAND_MAX) + M_PI,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_4->SetWorldPose(p);
-    p = math::Pose(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 1.0,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX) + 3.0,
-        static_cast<double>(rand_r(&seed))/
-        static_cast<double>(RAND_MAX) + 1.5*M_PI,
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_5->SetWorldPose(p);
+    // gzdbg << "setting link poses without violation\n";
+    // double cur_time = world->GetSimTime().Double();
+    joint_01->SetPosition(0, -0.5);
+    joint_12->SetPosition(0, -0.5);
+    joint_23->SetPosition(0, -0.5);
+    joint_34->SetPosition(0, -0.5);
+    joint_45->SetPosition(0, -0.5);
+    joint_52->SetPosition(0, -0.5);
+    joint_22a->SetPosition(0, -0.5);
+    joint_2a2b->SetPosition(0, -0.5);
+    joint_2b3a->SetPosition(0, -0.5);
+    joint_3a4a->SetPosition(0, -0.5);
+    joint_4a5a->SetPosition(0, -0.5);
+    joint_5a2b->SetPosition(0, -0.5);
 
-    math::Vector3 v;
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_1->SetAngularVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_1->SetLinearVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_2->SetAngularVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_2->SetLinearVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_3->SetAngularVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_3->SetLinearVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_4->SetAngularVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_4->SetLinearVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_5->SetAngularVel(v);
-    v = math::Vector3(
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-        static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-    link_5->SetLinearVel(v);
+    joint_01->SetPosition(0, 0.5);
+    joint_12->SetPosition(0, 0.5);
+    joint_23->SetPosition(0, 0.5);
+    joint_34->SetPosition(0, 0.5);
+    joint_45->SetPosition(0, 0.5);
+    joint_52->SetPosition(0, 0.5);
+    joint_22a->SetPosition(0, 0.5);
+    joint_2a2b->SetPosition(0, 0.5);
+    joint_2b3a->SetPosition(0, 0.5);
+    joint_3a4a->SetPosition(0, 0.5);
+    joint_4a5a->SetPosition(0, 0.5);
+    joint_5a2b->SetPosition(0, 0.5);
+
+    EXPECT_EQ(link_5a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_5a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
   }
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
 
-
-
-  // set random pose outside of joint limit
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 20;
-  pub_rate = 1000.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing SetWorld Pose at ["
-    << pub_rate << "] Hz with more random constraint violation.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      math::Pose p;
-      p = math::Pose(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 3.0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.57079,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_1->SetWorldPose(p);
-      p = math::Pose(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 2.0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.57079,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_2->SetWorldPose(p);
-      p = math::Pose(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.57079,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_3->SetWorldPose(p);
-      p = math::Pose(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.57079,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_4->SetWorldPose(p);
-      p = math::Pose(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.0,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/
-          static_cast<double>(RAND_MAX) + 1.57079,
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_5->SetWorldPose(p);
-
-      math::Vector3 v;
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_1->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_1->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_2->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_2->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_3->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_3->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_4->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_4->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_5->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_5->SetLinearVel(v);
-    }
-  elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
-  gzdbg << "  elapsed sim time [" << test_duration
-    << "] elapsed wall time [" << elapsed_wall_time
-    << "] sim performance [" << test_duration / elapsed_wall_time
-    << "]\n";
-
-
-
-  start_time = world->GetSimTime().Double();
-  start_wall_time = world->GetRealTime().Double();
-  test_duration = 10;
-  pub_rate = 1000.0;
-  gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing Set*Vel at ["
-    << pub_rate << "] Hz with random velocities.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
-    {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses with violation\n";
-      math::Vector3 v;
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_1->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_1->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_2->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_2->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_3->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_3->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_4->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_4->SetLinearVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_5->SetAngularVel(v);
-      v = math::Vector3(
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX),
-          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
-      link_5->SetLinearVel(v);
-    }
   elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
   gzdbg << "  elapsed sim time [" << test_duration
     << "] elapsed wall time [" << elapsed_wall_time
@@ -579,35 +200,59 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
   start_time = world->GetSimTime().Double();
   start_wall_time = world->GetRealTime().Double();
   test_duration = 20;
-  pub_rate = 500.0;
+  const double pub_rate = 10.0;
+  const double pause_time = 1.0;
   gzdbg << " -------------------------------------------------------------\n";
-  gzdbg << " Publishing Set*Vel at ["
-    << pub_rate << "] Hz with velocity decay.\n";
-  last_update_time = start_time;
-  while (world->GetSimTime().Double() < start_time + test_duration)
-    if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
+  gzdbg << " Send random joint position commands with " << pause_time
+        << " sec delay between calls for " << test_duration
+        << " secs, see how well Joint::SetPosition delas with random inputs.\n";
+  gzdbg << " Publishing Joint::SetPosition at [" << pub_rate
+        << "] Hz with real time duration.\n";
+  last_update_time = start_wall_time;
+  while (world->GetRealTime().Double() < start_wall_time + test_duration)
+    if (world->GetRealTime().Double() - last_update_time >= (1.0/pub_rate))
     {
-      last_update_time = world->GetSimTime().Double();
-      // gzdbg << "setting link poses with violation\n";
-      link_1->SetAngularVel(link_1->GetWorldAngularVel() * 0.999);
-      link_1->SetLinearVel(link_1->GetWorldLinearVel()  * 0.999);
-      link_2->SetAngularVel(link_2->GetWorldAngularVel() * 0.999);
-      link_2->SetLinearVel(link_2->GetWorldLinearVel()  * 0.999);
-      link_3->SetAngularVel(link_3->GetWorldAngularVel() * 0.999);
-      link_3->SetLinearVel(link_3->GetWorldLinearVel()  * 0.999);
-      link_4->SetAngularVel(link_4->GetWorldAngularVel() * 0.999);
-      link_4->SetLinearVel(link_4->GetWorldLinearVel()  * 0.999);
-      link_5->SetAngularVel(link_5->GetWorldAngularVel() * 0.999);
-      link_5->SetLinearVel(link_5->GetWorldLinearVel()  * 0.999);
+      last_update_time = world->GetRealTime().Double();
+      joint_01->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_12->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_23->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_34->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_45->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_52->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_22a->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_2a2b->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_2b3a->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_3a4a->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_4a5a->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      joint_5a2b->SetPosition(0,
+          static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
+      sleep(pause_time);
+      gzdbg << "running ["
+            << world->GetRealTime().Double()
+            << " / " << start_wall_time + test_duration
+            << "]\n";
+
+      EXPECT_EQ(link_5a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_5a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
     }
+  test_duration = world->GetSimTime().Double() - start_time;
   elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
+
   gzdbg << "  elapsed sim time [" << test_duration
     << "] elapsed wall time [" << elapsed_wall_time
     << "] sim performance [" << test_duration / elapsed_wall_time
     << "]\n";
-
-  EXPECT_EQ(link_3->GetWorldPose(),
-      math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
 }
 
 TEST_P(JointTestScrew, SetJointPositionTest)
