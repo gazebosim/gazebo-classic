@@ -1567,9 +1567,9 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
       else
       {
         // if parent Link is found in search, return false
-        gzerr << "failed to find a clean set of connected links,"
-              << " i.e. this joint is inside a loop, cannot SetPosition"
-              << " kinematically.\n";
+        gzwarn << "failed to find a clean set of connected links,"
+               << " i.e. this joint is inside a loop, cannot SetPosition"
+               << " kinematically.\n";
         return false;
       }
     }

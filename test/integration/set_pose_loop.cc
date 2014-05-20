@@ -187,7 +187,25 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
     joint_4a5a->SetPosition(0, 0.5);
     joint_5a2b->SetPosition(0, 0.5);
 
+    EXPECT_EQ(link_1->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_3->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_4->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_5->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2b->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_3a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_4a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
     EXPECT_EQ(link_5a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_1->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_3->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_4->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_5->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_2b->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_3a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+    EXPECT_EQ(link_4a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
     EXPECT_EQ(link_5a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
   }
 
@@ -243,7 +261,25 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
             << " / " << start_wall_time + test_duration
             << "]\n";
 
+      EXPECT_EQ(link_1->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_3->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_4->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_5->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2b->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_3a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_4a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
       EXPECT_EQ(link_5a->GetWorldLinearVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_1->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_3->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_4->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_5->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_2b->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_3a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
+      EXPECT_EQ(link_4a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
       EXPECT_EQ(link_5a->GetWorldAngularVel(), math::Vector3(0, 0, 0));
     }
   test_duration = world->GetSimTime().Double() - start_time;
