@@ -1170,6 +1170,13 @@ void Link::Move(const math::Pose &_worldReferenceFrameSrc,
 bool Link::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
   Link_V &_connectedLinks, bool _first)
 {
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "subsequent call to find connected links: "
+  //       << " parent " << pn
+  //       << " this link " << this->GetName() << "\n";
+
   // get all child joints from this link
   Link_V childLinks = this->GetChildJointsLinks();
 

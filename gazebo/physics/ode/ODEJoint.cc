@@ -1514,6 +1514,13 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
       Link_V connectedLinks;
       if (this->FindAllConnectedLinks(this->parentLink, connectedLinks))
       {
+        // debug
+        // gzerr << "found connected links: ";
+        // for (Link_V::iterator li = connectedLinks.begin();
+        //                       li != connectedLinks.end(); ++li)
+        //   gzerr << (*li)->GetName() << " ";
+        // gzerr << "\n";
+
         // successfully found a subset of links connected to this joint
         // (parent link cannot be in this set).  Next, compute transform
         // to apply to all these links.
@@ -1531,16 +1538,23 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
         math::Pose newChildLinkPose =
           this->ComputeChildLinkPose(_index, _position);
 
+        // debug
+        // gzerr << "child link pose0 [" << childLinkPose
+        //       << "] new child link pose0 [" << newChildLinkPose
+        //       << "]\n";
+
         // update all connected links
         for (Link_V::iterator li = connectedLinks.begin();
                               li != connectedLinks.end(); ++li)
         {
-          /// \TODO: this checks is called everytime, not efficient
-          if ((*li).get() != this->childLink.get())
-          {
-            // set pose of each link based on child link pose change
-            (*li)->Move(childLinkPose, newChildLinkPose);
-          }
+          // set pose of each link based on child link pose change
+          (*li)->Move(childLinkPose, newChildLinkPose);
+
+          // debug
+          // gzerr << "moved " << (*li)->GetName()
+          //       << " p0 [" << childLinkPose
+          //       << "] p1 [" << newChildLinkPose
+          //       << "]\n"; getchar();
         }
       }
       else
@@ -1572,6 +1586,13 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
 bool ODEJoint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
   Link_V &_connectedLinks)
 {
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "first call to find connected links: "
+  //       << " parent " << pn
+  //       << " this joint " << this->GetName() << "\n";
+
   // unlikely, but check anyways to make sure we don't have a 0-height tree
   if (this->childLink.get() == _originalParentLink.get())
   {
@@ -1601,7 +1622,8 @@ math::Pose ODEJoint::ComputeChildLinkPose( unsigned int _index,
   math::Pose childLinkPose = this->childLink->GetWorldPose();
 
   // default return to current pose
-  math::Pose newRelativePose = childLinkPose;
+  math::Pose newRelativePose;
+  math::Pose newWorldPose = childLinkPose;
 
   // get anchor and axis of the joint
   math::Vector3 anchor;
@@ -1639,8 +1661,8 @@ math::Pose ODEJoint::ComputeChildLinkPose( unsigned int _index,
     newRelativePose.pos = rotation.RotateVector(relativePose.pos);
     newRelativePose.rot = rotation * relativePose.rot;
 
-    math::Pose newWorldPose(newRelativePose.pos + anchor,
-                            newRelativePose.rot);
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
 
     // \TODO: ideally we want to set this according to
     // Joint Trajectory velocity and use time step since last update.
@@ -1660,8 +1682,8 @@ math::Pose ODEJoint::ComputeChildLinkPose( unsigned int _index,
     newRelativePose.pos = relativePose.pos + axis * dposition;
     newRelativePose.rot = relativePose.rot;
 
-    math::Pose newWorldPose(newRelativePose.pos + anchor,
-                            newRelativePose.rot);
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
 
     /// \TODO: ideally we want to set this according to Joint Trajectory
     /// velocity and use time step since last update.
@@ -1676,7 +1698,7 @@ math::Pose ODEJoint::ComputeChildLinkPose( unsigned int _index,
     gzerr << "Not supported yet.\n";
   }
 
-  return newRelativePose;
+  return newWorldPose;
 }
 
 /*
