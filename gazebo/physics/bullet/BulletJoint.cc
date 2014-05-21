@@ -588,8 +588,6 @@ math::Angle BulletJoint::GetLowStop(unsigned int _index)
 bool BulletJoint::SetPosition(unsigned int _index, double _position,
                            double _velocity)
 {
-  gzwarn << "Setting joint position set collision broken, see issue #1138\n";
-
   // check if index is inbound
   if (_index >= this->GetAngleCount())
   {
