@@ -50,6 +50,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  model.cc
   model_database.cc
   noise.cc
   nondefault_world.cc

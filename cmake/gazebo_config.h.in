@@ -14,6 +14,7 @@
 #cmakedefine BUILD_TYPE_PROFILE 1
 #cmakedefine BUILD_TYPE_DEBUG 1
 #cmakedefine BUILD_TYPE_RELEASE 1
+#cmakedefine BUILD_TYPE_COVERAGE 1
 #cmakedefine HAVE_CEGUI 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1

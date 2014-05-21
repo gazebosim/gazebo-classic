@@ -191,22 +191,6 @@ void Collision::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool /*_enable*/)
-{
-}
-
-//////////////////////////////////////////////////
-bool Collision::GetContactsEnabled() const
-{
-  return false;
-}
-
-//////////////////////////////////////////////////
-void Collision::AddContact(const Contact & /*_contact*/)
-{
-}
-
-//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
   if (this->link)

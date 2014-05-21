@@ -118,22 +118,6 @@ namespace gazebo
       /// \param[in] _scale Scale to set the collision to.
       public: void SetScale(const math::Vector3 &_scale);
 
-      /// \brief Turn contact recording on or off.
-      /// Deprecated by?
-      /// \param[in] _enable True to enable collision contacts.
-      public: void SetContactsEnabled(bool _enable) GAZEBO_DEPRECATED(2.0);
-
-      /// \brief Return true of contacts are on.
-      /// Deprecated by?
-      /// \return True of contact are on.
-      public: bool GetContactsEnabled() const GAZEBO_DEPRECATED(2.0);
-
-      /// \brief Add an occurance of a contact to this collision.
-      /// Deprecated by?
-      /// \param[in] _contact The contact which was detected by a collision
-      /// engine.
-      public: void AddContact(const Contact &_contact) GAZEBO_DEPRECATED(2.0);
-
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
       public: virtual math::Vector3 GetRelativeLinearVel() const;

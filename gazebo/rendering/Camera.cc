@@ -373,12 +373,6 @@ void Camera::Update()
 }
 
 //////////////////////////////////////////////////
-void Camera::Render()
-{
-  this->Render(false);
-}
-
-//////////////////////////////////////////////////
 void Camera::Render(bool _force)
 {
   if (this->initialized && (_force ||
@@ -908,14 +902,6 @@ void Camera::SetSceneNode(Ogre::SceneNode *_node)
 Ogre::SceneNode *Camera::GetSceneNode() const
 {
   return this->sceneNode;
-}
-
-//////////////////////////////////////////////////
-Ogre::SceneNode *Camera::GetPitchNode() const
-{
-  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL."
-        << " Use GetSceneNode() instead.\n";
-  return NULL;
 }
 
 //////////////////////////////////////////////////

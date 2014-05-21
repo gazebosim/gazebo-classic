@@ -170,10 +170,6 @@ namespace gazebo
       /// \return Joint viscous damping coefficient for this joint.
       public: double GetDamping(unsigned int _index);
 
-      /// \brief Callback to apply damping force to joint.
-      /// Deprecated by ApplySpringStiffnessDamping.
-      public: virtual void ApplyDamping() GAZEBO_DEPRECATED(3.0);
-
       /// \brief Callback to apply spring stiffness and viscous damping
       /// effects to joint.
       /// \TODO: rename to ApplySpringStiffnessDamping()
@@ -428,29 +424,11 @@ namespace gazebo
                                     unsigned int _index,
                                     const boost::any &_value) = 0;
 
-      /// \brief Set a non-generic parameter for the joint.
-      /// replaces SetAttribute(Attribute, int, double)
-      /// Deprecated by bool SetParam
-      /// \param[in] _key String key.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _value Value of the attribute.
-      public: virtual void SetAttribute(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value)
-                                        GAZEBO_DEPRECATED(3.0) = 0;
-
       /// \brief Get a non-generic parameter for the joint.
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,
-                                          unsigned int _index) = 0;
-
-      /// \brief Get a non-generic parameter for the joint.
-      /// Deprecated by GetParam
-      /// \param[in] _key String key.
-      /// \param[in] _index Index of the axis.
-      public: virtual double GetAttribute(const std::string &_key,
-                unsigned int _index) GAZEBO_DEPRECATED(3.0) = 0;
+                                      unsigned int _index) = 0;
 
       /// \brief Get the child link
       /// \return Pointer to the child link.
@@ -513,12 +491,7 @@ namespace gazebo
       public: virtual void SetProvideFeedback(bool _enable);
 
       /// \brief Cache Joint Force Torque Values if necessary for physics engine
-      public: virtual void CacheForceTorque() { }
-
-      /// \brief Get damping coefficient of this joint
-      /// Depreated, use GetDamping(_index) instead.
-      /// \return viscous joint damping coefficient
-      public: double GetDampingCoefficient() const GAZEBO_DEPRECATED(3.0);
+      public: virtual void CacheForceTorque();
 
       /// \brief Set joint stop stiffness.
       /// \param[in] _index joint axis index.
@@ -649,12 +622,7 @@ namespace gazebo
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
 
-      /// \brief joint dissipationCoefficient
-      /// Deprecated: not used, replaced by dissipationCoefficient array
-      protected: double dampingCoefficient;
-
       /// \brief joint viscous damping coefficient
-      /// Replaces dampingCoefficient
       protected: double dissipationCoefficient[MAX_JOINT_AXIS];
 
       /// \brief joint stiffnessCoefficient
@@ -681,11 +649,6 @@ namespace gazebo
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
       protected: JointWrench wrench;
-
-      /// \brief option to use implicit damping
-      /// Deprecated, pushing this flag into individual physics engine,
-      /// for example: ODEJoint::useImplicitSpringDamper.
-      protected: bool useCFMDamping;
 
       /// \brief Flags that are set to true if an axis value is expressed
       /// in the parent model frame. Otherwise use the joint frame.

@@ -2766,13 +2766,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 }
 
 /////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
-}
-
-/////////////////////////////////////////////////
 void Scene::SetWireframe(bool _show)
 {
   this->wireframe = _show;

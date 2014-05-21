@@ -541,14 +541,6 @@ void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(const std::string &_key,
-    unsigned int _index,
-    const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
@@ -563,13 +555,6 @@ double BulletJoint::GetParam(const std::string &/*_key*/,
 {
   gzdbg << "Not implement in Bullet\n";
   return 0;
-}
-
-//////////////////////////////////////////////////
-double BulletJoint::GetAttribute(const std::string &_key,
-    unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

@@ -27,6 +27,6 @@ if (NOT APPLE)
     sensor_stress.cc
     transport_stress.cc
   )
-  
+
   gz_build_tests(${tests})
 endif()

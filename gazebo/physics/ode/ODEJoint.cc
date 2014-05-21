@@ -75,13 +75,7 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr elem = this->sdf->GetElement("physics")->GetElement("ode");
 
-    if (elem->HasElement("cfm_damping"))
-    {
-      gzwarn << "Deprecating sdf <cfm_damping>, "
-             << "replace with <implicit_spring_damper> in sdf 1.5.\n";
-      this->useImplicitSpringDamper = elem->Get<bool>("cfm_damping");
-    }
-    else if (elem->HasElement("implicit_spring_damper"))
+    if (elem->HasElement("implicit_spring_damper"))
     {
       this->useImplicitSpringDamper = elem->Get<bool>("implicit_spring_damper");
     }
@@ -411,57 +405,6 @@ void ODEJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->sdf->GetElement("axis2")->GetElement("xyz")->Set(_axis);
   else
     gzerr << "SetAxis index [" << _index << "] out of bounds\n";
-}
-
-//////////////////////////////////////////////////
-void ODEJoint::SetAttribute(Attribute _attr, unsigned int _index, double _value)
-{
-  switch (_attr)
-  {
-    case FUDGE_FACTOR:
-      this->SetParam(dParamFudgeFactor, _value);
-      break;
-    case SUSPENSION_ERP:
-      this->SetParam(dParamSuspensionERP, _value);
-      break;
-    case SUSPENSION_CFM:
-      this->SetParam(dParamSuspensionCFM, _value);
-      break;
-    case STOP_ERP:
-      this->SetParam("stop_erp", _index, _value);
-      break;
-    case STOP_CFM:
-      this->SetParam("stop_cfm", _index, _value);
-      break;
-    case ERP:
-      this->SetParam(dParamERP, _value);
-      break;
-    case CFM:
-      this->SetParam(dParamCFM, _value);
-      break;
-    case FMAX:
-      this->SetParam(dParamFMax, _value);
-      break;
-    case VEL:
-      this->SetParam(dParamVel, _value);
-      break;
-    case HI_STOP:
-      this->SetParam("hi_stop", _index, _value);
-      break;
-    case LO_STOP:
-      this->SetParam("lo_stop", _index, _value);
-      break;
-    default:
-      gzerr << "Unable to handle joint attribute[" << _attr << "]\n";
-      break;
-  };
-}
-
-//////////////////////////////////////////////////
-void ODEJoint::SetAttribute(const std::string &_key, unsigned int _index,
-                            const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
 }
 
 //////////////////////////////////////////////////
@@ -912,12 +855,6 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double ODEJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
 void ODEJoint::Reset()
 {
   if (this->jointId)
@@ -1118,12 +1055,6 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
   }
 
   return this->wrench;
-}
-
-//////////////////////////////////////////////////
-void ODEJoint::CFMDamping()
-{
-  this->ApplyImplicitStiffnessDamping();
 }
 
 //////////////////////////////////////////////////
