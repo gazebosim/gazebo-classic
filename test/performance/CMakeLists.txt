@@ -23,6 +23,7 @@ if (NOT APPLE)
     RAMLibrary_TEST.cc
     factory_stress.cc
     gz_stress.cc
+    image_convert_stress.cc
     sensor_stress.cc
     transport_stress.cc
   )

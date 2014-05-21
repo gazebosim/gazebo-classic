@@ -233,8 +233,6 @@ void DARTJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
-  this->dampingCoefficient = _damping;
-
   if (this->GetAngleCount() > 2)
   {
      gzerr << "Incompatible joint type, GetAngleCount() = "
@@ -242,7 +240,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
      return;
   }
 
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
+  this->dissipationCoefficient[_index] = _damping;
 
   /// \TODO:  this check might not be needed?  attaching an object to a static
   /// body should not affect damping application.
