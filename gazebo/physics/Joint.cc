@@ -550,20 +550,121 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _angle)
+void Joint::SetAngle(unsigned int _index, math::Angle _position)
 {
-  this->SetPosition(_index, _angle.Radian());
-}
+  // check if index is inbound
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index too large.\n";
+    return;
+  }
 
-//////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int _index, double _position,
-  double /*_velocity*/)
-{
   if (this->model->IsStatic())
   {
     this->staticAngle = _position;
   }
-  return true;
+
+  // truncate position by joint limits
+  math::Angle lower = this->GetLowStop(_index);
+  math::Angle upper = this->GetHighStop(_index);
+  if (lower < upper)
+    _position = math::clamp(_position, lower, upper);
+  else
+    _position = math::clamp(_position, upper, lower);
+
+  // only deal with hinge and revolute joints in the user
+  // request joint_names list
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT) ||
+      this->HasType(Base::SLIDER_JOINT))
+  {
+    // if (parentLink->GetScopedName() == childLink->GetScopedName())
+    // {
+    //   gzerr << "Is this even possible?\n";
+    //   return;
+    // }
+
+    if (childLink)
+    {
+      // Get all connected links to this joint
+      Link_V connectedLinks;
+      if (this->FindAllConnectedLinks(this->parentLink, connectedLinks))
+      {
+        // debug
+        // gzerr << "found connected links: ";
+        // for (Link_V::iterator li = connectedLinks.begin();
+        //                       li != connectedLinks.end(); ++li)
+        //   std::cout << (*li)->GetName() << " ";
+        // std::cout << "\n";
+
+        // successfully found a subset of links connected to this joint
+        // (parent link cannot be in this set).  Next, compute transform
+        // to apply to all these links.
+
+        // Everything here must be done within one time step,
+        // Link pose updates need to be synchronized.
+
+        // compute transform about the current anchor, about the axis
+        // rotate child (childLink) about anchor point,
+
+        // Get Child Link Pose
+        math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+        // Compute new child link pose based on position change
+        math::Pose newChildLinkPose =
+          this->ComputeChildLinkPose(_index, _position.Radian());
+
+        // debug
+        // gzerr << "child link pose0 [" << childLinkPose
+        //       << "] new child link pose0 [" << newChildLinkPose
+        //       << "]\n";
+
+        // update all connected links
+        {
+          // block any other physics pose updates
+          boost::recursive_mutex::scoped_lock lock(
+            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+  printf("step1a\n");
+          for (Link_V::iterator li = connectedLinks.begin();
+                                li != connectedLinks.end(); ++li)
+          {
+            // set pose of each link based on child link pose change
+            (*li)->Move(childLinkPose, newChildLinkPose);
+
+            // debug
+            gzerr << "moved " << (*li)->GetName()
+                  << " p0 [" << childLinkPose
+                  << "] p1 [" << newChildLinkPose
+                  << "]\n";
+          }
+  printf("step2a\n");
+        }
+        getchar();
+      }
+      else
+      {
+        // if parent Link is found in search, return false
+        gzwarn << "failed to find a clean set of connected links,"
+               << " i.e. this joint is inside a loop, cannot SetPosition"
+               << " kinematically.\n";
+        return;
+      }
+    }
+    else
+    {
+      gzerr << "child link is null.\n";
+      return;
+    }
+  }
+  else
+  {
+    gzerr << "joint type SetPosition not supported.\n";
+    return;
+  }
+
+  /// \todo:  Set link and joint "velocities" based on change / time
+  return;
 }
 
 //////////////////////////////////////////////////
@@ -572,7 +673,7 @@ void Joint::SetState(const JointState &_state)
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
-    this->SetPosition(i, _state.GetAngle(i).Radian());
+    this->SetAngle(i, _state.GetAngle(i).Radian());
 }
 
 //////////////////////////////////////////////////

@@ -302,7 +302,7 @@ void JointController::SetJointPositions(
     const std::map<std::string, double> & _jointPositions)
 {
   gzwarn << "Setting joint positions is disabled, see issue #1138\n"
-         << "Replaced by Joint::SetPosition.\n";
+         << "Replaced by Joint::SetAngle.\n";
   return;
 
   // go through all joints in this model and update each one
@@ -332,7 +332,7 @@ void JointController::SetJointPositions(
 void JointController::SetJointPosition(
   JointPtr _joint, double _position, int _index)
 {
-  _joint->SetPosition(_index, _position);
+  _joint->SetAngle(_index, math::Angle(_position));
 }
 
 /////////////////////////////////////////////////

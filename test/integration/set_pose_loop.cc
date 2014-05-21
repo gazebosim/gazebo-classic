@@ -163,7 +163,7 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetPosition(0,
+        (*ji)->SetAngle(0,
             static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       }
 
@@ -172,6 +172,7 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
             << " / " << start_wall_time + test_wall_duration
             << "]\n";
     }
+    getchar();
 
     // step simulation
     world->Step(1);
@@ -311,7 +312,7 @@ void JointTestScrew::SetJointPositionThreadedTest(
   }
 
   // debug:
-  // getchar();
+  getchar();
   gzdbg << " -------------------------------------------------------------\n";
   gzdbg << " Send random joint position commands for " << test_wall_duration
         << " secs, see how well Joint::SetPosition delas with random inputs.\n"
@@ -337,7 +338,7 @@ void JointTestScrew::SetJointPositionThreadedTest(
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetPosition(0,
+        (*ji)->SetAngle(0,
             static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       }
 
@@ -371,6 +372,7 @@ void JointTestScrew::SetJointPositionThreadedTest(
     << "] elapsed wall time [" << elapsed_wall_time
     << "] sim performance [" << test_duration / elapsed_wall_time
     << "]\n";
+  getchar();
 }
 
 TEST_P(JointTestScrew, SetJointPositionThreadedTest)

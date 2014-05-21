@@ -1164,6 +1164,7 @@ void Link::Move(const math::Pose &_worldReferenceFrameSrc,
   math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
     + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
+  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
 }
 
 /////////////////////////////////////////////////

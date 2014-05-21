@@ -236,6 +236,12 @@ namespace gazebo
       /// \return The dirty pose of the entity.
       public: const math::Pose &GetDirtyPose() const;
 
+      /// \brief Sets Entity#dirtyPose.
+      /// The dirty pose is the pose set by the physics engine before it's
+      /// value is propagated to the rest of the simulator.
+      /// \param[in] The dirty pose of the entity.
+      public: void SetDirtyPose(const math::Pose &_pose);
+
       /// \brief Publish the pose.
       private: void PublishPose();
 

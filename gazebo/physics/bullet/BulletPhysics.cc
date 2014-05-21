@@ -471,8 +471,10 @@ void BulletPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
+  printf("step1\n");
   this->dynamicsWorld->stepSimulation(
     this->maxStepSize, 1, this->maxStepSize);
+  printf("step2\n");
 }
 
 //////////////////////////////////////////////////

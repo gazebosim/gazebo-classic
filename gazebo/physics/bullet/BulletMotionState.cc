@@ -19,6 +19,7 @@
  * Date: 25 May 2009
  */
 
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletMotionState.hh"
@@ -61,8 +62,10 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
 
   // The second argument is set to false to prevent Entity.cc from propagating
   // the pose change all the way back to bullet.
-  // \TODO: consider using the dirtyPose mechanism employed by ODE.
-  this->link->SetWorldPose(pose, false);
+  // Using the dirtyPose mechanism employed by ODE.
+  // \TODO: this is an ugly line of code. It's like this for speed.
+  this->link->SetDirtyPose(pose);
+  this->link->GetWorld()->dirtyPoses.push_back(this->link.get());
 
   // below is inefficient as we end up double caching for some joints
   // should consider adding a "dirty" flag.

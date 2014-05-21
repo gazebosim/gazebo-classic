@@ -586,6 +586,12 @@ const math::Pose &Entity::GetDirtyPose() const
 }
 
 //////////////////////////////////////////////////
+void Entity::SetDirtyPose(const math::Pose &_pose)
+{
+  this->dirtyPose = _pose;
+}
+
+//////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
   BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
