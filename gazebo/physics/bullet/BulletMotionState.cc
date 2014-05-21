@@ -63,6 +63,10 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
   // The second argument is set to false to prevent Entity.cc from propagating
   // the pose change all the way back to bullet.
   // Using the dirtyPose mechanism employed by ODE.
+  // \TODO: In attempt to ensure locking between Joint::SetAngle(SetPosition)
+  // and physics updates, use the same dirtyPose mechanism as ODE. Unfortunately
+  // Joint::SetAngle(SetPosition) is still broken, probably due to issue #1194,
+  // as indicated in set_pose_loop.cc integration test.
   // \TODO: this is an ugly line of code. It's like this for speed.
   this->link->SetDirtyPose(pose);
   this->link->GetWorld()->dirtyPoses.push_back(this->link.get());
