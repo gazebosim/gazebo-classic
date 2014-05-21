@@ -41,6 +41,12 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
   srand(time(NULL));
   unsigned int seed = time(NULL);
 
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Bullet Joint::SetAngle affected by issue #1194.\n";
+    return;
+  }
+
   if (_physicsEngine == "dart")
   {
     gzerr << "DART Joint::SetPosition not yet working.\n";
@@ -216,6 +222,12 @@ void JointTestScrew::SetJointPositionThreadedTest(
   // init random seed
   srand(time(NULL));
   unsigned int seed = time(NULL);
+
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Bullet Joint::SetAngle affected by issue #1194.\n";
+    return;
+  }
 
   if (_physicsEngine == "dart")
   {
