@@ -994,3 +994,122 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
 }
+
+//////////////////////////////////////////////////
+bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks)
+{
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "first call to find connected links: "
+  //       << " parent " << pn
+  //       << " this joint " << this->GetName() << "\n";
+
+  // unlikely, but check anyways to make sure we don't have a 0-height tree
+  if (this->childLink.get() == _originalParentLink.get())
+  {
+    // if parent is a child
+    gzerr << "we have a zero length loop.\n";
+    _connectedLinks.clear();
+    return false;
+  }
+  else
+  {
+    // add this->childLink to the list of descendent child links (should be
+    // the very first one added).
+    _connectedLinks.push_back(this->childLink);
+
+    // START RECURSIVE SEARCH, start adding child links of this->childLink
+    // to the collection of _connectedLinks.
+    return this->childLink->FindAllConnectedLinksHelper(_originalParentLink,
+      _connectedLinks, true);
+  }
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::ComputeChildLinkPose( unsigned int _index,
+          double _position)
+{
+  // child link pose
+  math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+  // default return to current pose
+  math::Pose newRelativePose;
+  math::Pose newWorldPose = childLinkPose;
+
+  // get anchor and axis of the joint
+  math::Vector3 anchor;
+  math::Vector3 axis;
+
+  if (this->model->IsStatic())
+  {
+    /// \TODO: we want to get axis in global frame, but GetGlobalAxis
+    /// not implemented for static models yet.
+    axis = childLinkPose.rot.RotateVector(this->GetLocalAxis(_index));
+    anchor = childLinkPose.pos;
+  }
+  else
+  {
+    anchor = this->GetAnchor(_index);
+    axis = this->GetGlobalAxis(_index);
+  }
+  
+  // delta-position along an axis
+  double dposition = _position - this->GetAngle(_index).Radian();
+
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // take axis rotation and turn it int a quaternion
+    math::Quaternion rotation(axis, dposition);
+
+    // rotate relative pose by rotation
+
+    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+    newRelativePose.rot = rotation * relativePose.rot;
+
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+
+    // \TODO: ideally we want to set this according to
+    // Joint Trajectory velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // slide relative pose by dposition along axis
+    newRelativePose.pos = relativePose.pos + axis * dposition;
+    newRelativePose.rot = relativePose.rot;
+
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+
+    /// \TODO: ideally we want to set this according to Joint Trajectory
+    /// velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else
+  {
+    gzerr << "Not supported yet.\n";
+  }
+
+  return newWorldPose;
+}

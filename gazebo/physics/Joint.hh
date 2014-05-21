@@ -595,6 +595,27 @@ namespace gazebo
       protected: virtual math::Angle GetAngleImpl(
                      unsigned int _index) const = 0;
 
+      /// \brief internal helper to find all links connected to the child link
+      /// branching out from the children of the child link and any parent
+      /// of the child link other than the parent link through this joint.
+      /// \param[in] _originalParentLink parent link of this joint, this
+      /// is used to check for loops connecting back to the parent link.
+      /// \param[in/out] _connectedLinks list of aggregated links that
+      /// contains all links connected to the child link of this joint.
+      /// Empty if a loop is found that connects back to the parent link.
+      /// \return true if successful, false if a loop is found that connects
+      /// back to the parent link.
+      protected: bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks);
+
+      /// \brief internal function to help us compute child link pose
+      /// if a joint position change is applied.
+      /// \param[in] _index axis index
+      /// \param[in] _position new joint position
+      /// \return new child link pose at new joint position.
+      protected: math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
       private: void LoadImpl(const math::Pose &_pose);
