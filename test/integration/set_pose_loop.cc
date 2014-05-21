@@ -18,15 +18,14 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
-// #include "gazebo/physics/ScrewJoint.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
 #define TOL 0.001
 using namespace gazebo;
 
-class JointTestScrew : public ServerFixture,
-                       public testing::WithParamInterface<const char*>
+class JointKinematicTest : public ServerFixture,
+                           public testing::WithParamInterface<const char*>
 {
   /// \brief 
   /// \param[in] 
@@ -35,7 +34,7 @@ class JointTestScrew : public ServerFixture,
 };
 
 //////////////////////////////////////////////////
-void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
+void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
 {
   // init random seed
   srand(time(NULL));
@@ -210,13 +209,13 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
     << "]\n";
 }
 
-TEST_P(JointTestScrew, SetJointPositionTest)
+TEST_P(JointKinematicTest, SetJointPositionTest)
 {
   SetJointPositionTest(GetParam());
 }
 
 //////////////////////////////////////////////////
-void JointTestScrew::SetJointPositionThreadedTest(
+void JointKinematicTest::SetJointPositionThreadedTest(
   const std::string &_physicsEngine)
 {
   // init random seed
@@ -389,12 +388,12 @@ void JointTestScrew::SetJointPositionThreadedTest(
   // getchar();
 }
 
-TEST_P(JointTestScrew, SetJointPositionThreadedTest)
+TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
 {
   SetJointPositionThreadedTest(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointTestScrew,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointKinematicTest,
   PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
