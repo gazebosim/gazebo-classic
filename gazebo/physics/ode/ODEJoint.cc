@@ -1490,8 +1490,10 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
   // truncate position by joint limits
   double lower = this->GetLowStop(_index).Radian();
   double upper = this->GetHighStop(_index).Radian();
-  _position = _position < lower? lower :
-  (_position > upper? upper : _position);
+  if (lower < upper)
+    _position = math::clamp(_position, lower, upper);
+  else
+    _position = math::clamp(_position, upper, lower);
 
   // keep track of updatd links, make sure each is upated only once
   this->updatedLinks.clear();
@@ -1544,10 +1546,25 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
         //       << "]\n";
 
         // update all connected links
+        // get lock for SetWorldPose
+        boost::mutex *lockSWP = this->GetWorld()->GetSetWorldPoseMutex();
+        while(!lockSWP->try_lock())
+        {
+          // keep trying?
+          common::Time::NSleep(1000);
+          std::cout << ".";
+        }
+
         {
           // lock physics
-          boost::recursive_mutex::scoped_lock lock(
-            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+          // below fails to block collisions
+          // boost::recursive_mutex::scoped_lock lock(
+          //   *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+          // below leads to deadlock
+          // boost::mutex::scoped_lock lock(
+          //   *this->GetWorld()->GetSetWorldPoseMutex());
 
           for (Link_V::iterator li = connectedLinks.begin();
                                 li != connectedLinks.end(); ++li)
@@ -1563,6 +1580,7 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
             // getchar();
           }
         }
+        lockSWP->unlock();
       }
       else
       {
