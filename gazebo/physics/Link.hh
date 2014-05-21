@@ -534,10 +534,10 @@ namespace gazebo
         const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks, bool _fistLink = false);
 
-      /// \brief Helper function to see if _value is contained in _vector
-      /// \param[in] _vector
-      /// \param[in] _value
-      /// \return true if value is in vector
+      /// \brief Helper function to see if _value is contained in _vector.
+      /// \param[in] _vector a vector of boost link pointers.
+      /// \param[in] _value a particular link pointer.
+      /// \return true if value is in vector.
       private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
       /// \brief Inertial properties.

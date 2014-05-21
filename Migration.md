@@ -6,6 +6,22 @@
     + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
     + ***Replacement*** virtual void SetPosition(unsigned int, double)
 
+### Additions
+
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void Move(const math::Pose &_worldRefernceFrameSrc,
+                        const math::Pose &_worldRefernceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
