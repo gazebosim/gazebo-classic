@@ -603,6 +603,11 @@ bool BulletJoint::SetPosition(unsigned int _index, double _position,
     return false;
   }
 
+  if (!math::equal(_velocity, 0.0))
+  {
+    gzwarn << "Setting velocity is not yet supported.\n";
+  }
+
   // truncate position by joint limits
   double lower = this->GetLowStop(_index).Radian();
   double upper = this->GetHighStop(_index).Radian();

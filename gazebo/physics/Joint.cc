@@ -556,7 +556,8 @@ void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int _index, double _position, double _velocity)
+bool Joint::SetPosition(unsigned int _index, double _position,
+  double /*_velocity*/)
 {
   if (this->model->IsStatic())
   {
