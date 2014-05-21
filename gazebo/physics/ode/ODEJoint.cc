@@ -1546,25 +1546,10 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
         //       << "]\n";
 
         // update all connected links
-        // get lock for SetWorldPose
-        boost::mutex *lockSWP = this->GetWorld()->GetSetWorldPoseMutex();
-        while(!lockSWP->try_lock())
         {
-          // keep trying?
-          common::Time::NSleep(1000);
-          std::cout << ".";
-        }
-
-        {
-          // lock physics
-
-          // below fails to block collisions
-          // boost::recursive_mutex::scoped_lock lock(
-          //   *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
-
-          // below leads to deadlock
-          // boost::mutex::scoped_lock lock(
-          //   *this->GetWorld()->GetSetWorldPoseMutex());
+          // block any other physics pose updates
+          boost::recursive_mutex::scoped_lock lock(
+            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
           for (Link_V::iterator li = connectedLinks.begin();
                                 li != connectedLinks.end(); ++li)
@@ -1580,7 +1565,6 @@ bool ODEJoint::SetPosition(unsigned int _index, double _position,
             // getchar();
           }
         }
-        lockSWP->unlock();
       }
       else
       {
