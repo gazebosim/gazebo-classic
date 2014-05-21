@@ -73,13 +73,14 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 
   // test World::GetRealTime()
-  world->SetPaused(true);
-  double startRealTime = world->GetRealTime().Double();
-  for(unsigned int i = 0; i < 2000; ++i)
-  {
-    world->Step(1);
-    EXPECT_GT(world->GetRealTime().Double(), startRealTime);
-  }
+  /// \TODO: Disabled for now, per issue #1193
+  // world->SetPaused(true);
+  // double startRealTime = world->GetRealTime().Double();
+  // for(unsigned int i = 0; i < 2000; ++i)
+  // {
+  //   world->Step(1);
+  //   EXPECT_GT(world->GetRealTime().Double(), startRealTime);
+  // }
 }
 
 TEST_P(PhysicsTest, EmptyWorld)
