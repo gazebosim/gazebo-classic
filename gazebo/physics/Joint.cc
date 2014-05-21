@@ -625,7 +625,6 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
           boost::recursive_mutex::scoped_lock lock(
             *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-  printf("step1a\n");
           for (Link_V::iterator li = connectedLinks.begin();
                                 li != connectedLinks.end(); ++li)
           {
@@ -633,14 +632,12 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
             (*li)->Move(childLinkPose, newChildLinkPose);
 
             // debug
-            gzerr << "moved " << (*li)->GetName()
-                  << " p0 [" << childLinkPose
-                  << "] p1 [" << newChildLinkPose
-                  << "]\n";
+            // gzerr << "moved " << (*li)->GetName()
+            //       << " p0 [" << childLinkPose
+            //       << "] p1 [" << newChildLinkPose
+            //       << "]\n";
           }
-  printf("step2a\n");
         }
-        getchar();
       }
       else
       {

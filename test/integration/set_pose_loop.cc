@@ -172,7 +172,8 @@ void JointTestScrew::SetJointPositionTest(const std::string &_physicsEngine)
             << " / " << start_wall_time + test_wall_duration
             << "]\n";
     }
-    getchar();
+    // debug:
+    // getchar();
 
     // step simulation
     world->Step(1);
@@ -372,7 +373,8 @@ void JointTestScrew::SetJointPositionThreadedTest(
     << "] elapsed wall time [" << elapsed_wall_time
     << "] sim performance [" << test_duration / elapsed_wall_time
     << "]\n";
-  getchar();
+  // debug:
+  // getchar();
 }
 
 TEST_P(JointTestScrew, SetJointPositionThreadedTest)
