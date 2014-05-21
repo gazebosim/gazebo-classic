@@ -142,11 +142,10 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 //////////////////////////////////////////////////
 void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
-  // this->SetParam(dParamVel, _angle);
+  /// \TODO: FIXME: change this implementation to kinematic velocity setting
+  /// similar to BulletHingeJoint::SetVelocity
 
-  // FIXME: change this implementation to kinematic velocity setting
-  // similar to BulletHingeJoint::SetVelocity
-
+  this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
