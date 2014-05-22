@@ -65,6 +65,7 @@ RenderEngine::RenderEngine()
 {
   this->logManager = NULL;
   this->root = NULL;
+  this->overlaySystem = NULL;
 
   this->dummyDisplay = NULL;
 
@@ -116,10 +117,12 @@ void RenderEngine::Load()
       gzthrow("Unable to create an Ogre rendering environment, no Root ");
     }
 
-#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
-    // Must be created after this->root, but before this->root is
-    // initialized.
-    this->overlaySystem = new Ogre::OverlaySystem();
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+    // OgreOverlay is a component on its own in ogre 1.9 so must manually
+    // initialize it. Must be created after this->root, but before this->root
+    // is initialized.
+    if (!this->overlaySystem)
+      this->overlaySystem = new Ogre::OverlaySystem();
 #endif
 
     // Load all the plugins
@@ -325,6 +328,11 @@ void RenderEngine::Fini()
   {
     this->RemoveScene(this->scenes.front()->GetName());
   }
+
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+  delete this->overlaySystem;
+  this->overlaySystem = NULL;
+#endif
 
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->root)
@@ -768,7 +776,7 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
   return this->windowManager;
 }
 
-#if OGRE_VERSION_MAJR > 1 || OGRE_VERSION_MINOR >= 9
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
 /////////////////////////////////////////////////
 Ogre::OverlaySystem *RenderEngine::GetOverlaySystem() const
 {
