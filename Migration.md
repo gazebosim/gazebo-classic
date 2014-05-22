@@ -1,5 +1,18 @@
 ## Gazebo 3.0 to 4.0
 
+### Additions
+
+1. **gazebo/msgs/msgs.hh**
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
+
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
@@ -79,7 +92,7 @@
 1. **gazebo/physics/bullet/BulletScrewJoint.hh**
     + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
- 
+
 1. **gazebo/physics/dart/DARTJoint.hh**
     + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
@@ -218,7 +231,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
     + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
- 
+
 1. **gazebo/physics/Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -232,7 +245,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
- 
+
 1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -422,11 +435,11 @@
 
 1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ode/ODEScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ScrewJoint.hh**
     + virtual math::Vector3 GetAnchor(unsigned int _index) const
