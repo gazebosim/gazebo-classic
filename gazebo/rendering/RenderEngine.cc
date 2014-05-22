@@ -65,7 +65,10 @@ RenderEngine::RenderEngine()
 {
   this->logManager = NULL;
   this->root = NULL;
+
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
   this->overlaySystem = NULL;
+#endif
 
   this->dummyDisplay = NULL;
 
