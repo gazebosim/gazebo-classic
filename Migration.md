@@ -13,6 +13,17 @@
 
 ### Additions
 
+1. **gazebo/msgs/msgs.hh**
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
+
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
+
 1. **gazebo/physics/Joint.hh**
       + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
           Link_V &_connectedLinks);

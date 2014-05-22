@@ -130,6 +130,10 @@ ModelListWidget::ModelListWidget(QWidget *_parent)
         boost::bind(&ModelListWidget::OnModelUpdate, this, _1)));
 
   this->connections.push_back(
+      gui::Events::ConnectLightUpdate(
+        boost::bind(&ModelListWidget::OnLightUpdate, this, _1)));
+
+  this->connections.push_back(
       rendering::Events::ConnectCreateScene(
         boost::bind(&ModelListWidget::OnCreateScene, this, _1)));
 
@@ -284,6 +288,15 @@ void ModelListWidget::OnModelUpdate(const msgs::Model &_msg)
   msgs::Model msg;
   msg.CopyFrom(_msg);
   this->modelMsgs.push_back(msg);
+}
+
+/////////////////////////////////////////////////
+void ModelListWidget::OnLightUpdate(const msgs::Light &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  msgs::Light msg;
+  msg.CopyFrom(_msg);
+  this->lightMsgs.push_back(msg);
 }
 
 /////////////////////////////////////////////////
@@ -2201,15 +2214,6 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
 }
 
 /////////////////////////////////////////////////
-void ModelListWidget::OnLightMsg(ConstLightPtr &_msg)
-{
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
-  msgs::Light msg;
-  msg.CopyFrom(*_msg);
-  this->lightMsgs.push_back(msg);
-}
-
-/////////////////////////////////////////////////
 void ModelListWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
@@ -2290,9 +2294,6 @@ void ModelListWidget::InitTransport(const std::string &_name)
 
   this->requestSub = this->node->Subscribe("~/request",
       &ModelListWidget::OnRequest, this, false);
-
-  this->lightSub = this->node->Subscribe("~/light",
-                                         &ModelListWidget::OnLightMsg, this);
 }
 
 /////////////////////////////////////////////////
