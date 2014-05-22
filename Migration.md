@@ -3,11 +3,15 @@
 ### Additions
 
 1. **gazebo/msgs/msgs.hh**
-    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr());
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
 
 1. **gazebo/rendering/Light.hh**
     + math::Quaternion GetRotation() const
     + void SetRotation(const math::Quaternion &_q)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
 
 ### Modifications
 1. **gazebo/physics/Model.hh**

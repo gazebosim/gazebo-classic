@@ -978,6 +978,9 @@ void ServerFixture::SpawnLight(const std::string &_name,
     double _attenuationConstant,
     double _attenuationLinear,
     double _attenuationQuadratic,
+    double _spotInnerAngle,
+    double _spotOuterAngle,
+    double _spotFallOff,
     bool _castShadows)
 {
   msgs::Factory msg;
@@ -994,8 +997,18 @@ void ServerFixture::SpawnLight(const std::string &_name,
     << "  <constant>" << _attenuationConstant << "</constant>"
     << "  <linear>" << _attenuationLinear << "</linear>"
     << "  <quadratic>" << _attenuationQuadratic << "</quadratic>"
-    << "</attenuation>"
-    << "<cast_shadows>" << _castShadows << "</cast_shadows>"
+    << "</attenuation>";
+
+  if (_type == "spot")
+  {
+    newLightStr << "<spot>"
+    << "  <inner_angle>" << _spotInnerAngle << "</inner_angle>"
+    << "  <outer_angle>" << _spotOuterAngle << "</outer_angle>"
+    << "  <falloff>" << _spotFallOff << "</falloff>"
+    << "</spot>";
+  }
+
+  newLightStr << "<cast_shadows>" << _castShadows << "</cast_shadows>"
     << "</light>"
     << "</sdf>";
 

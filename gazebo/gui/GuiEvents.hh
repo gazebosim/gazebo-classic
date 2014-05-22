@@ -83,6 +83,7 @@ namespace gazebo
               { keyPress.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the light update signal
       public: template<typename T>
               static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
               { return lightUpdate.Connect(_subscriber); }
