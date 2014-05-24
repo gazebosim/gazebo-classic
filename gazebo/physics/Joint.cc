@@ -556,11 +556,19 @@ void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int _index, double _position,
+bool Joint::SetPosition(unsigned int /*_index*/, double _position,
   double /*_velocity*/)
 {
-  if (this->model->IsStatic())
+  if (this->model)
   {
+    if (this->model->IsStatic())
+    {
+      this->staticAngle = _position;
+    }
+  }
+  else
+  {
+    gzerr << "model not setup yet, setting staticAngle.\n";
     this->staticAngle = _position;
   }
   return true;
