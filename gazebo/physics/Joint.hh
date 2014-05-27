@@ -352,7 +352,7 @@ namespace gazebo
       /// ODE implementation in ODEHingeJoint::SetMaxForce.
       /// Curret implementation in Bullet and ODE is enforced through amotor,
       /// which enforces force/torque limits when calling Joint::SetVelocity.
-      /// Implementation in DART is by 
+      /// Implementation in DART is by
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
       public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
@@ -599,7 +599,7 @@ namespace gazebo
       /// \param[in] _index axis index
       /// \param[in] _position new joint position
       /// \return new child link pose at new joint position.
-      protected: math::Pose ComputeChildLinkPose( unsigned int _index,
+      protected: math::Pose ComputeChildLinkPose(unsigned int _index,
           double _position);
 
       /// \brief Helper function to load a joint.

@@ -110,7 +110,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
 
   double start_time;
   double start_wall_time;
-  double test_wall_duration;
+  double test_wall_duration = 10.0;
   double elapsed_wall_time;
   const double pub_rate = 10.0;
 
@@ -163,7 +163,6 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   world->SetPaused(true);
   start_time = world->GetSimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
-  test_wall_duration = 10;
   double last_update_wall_time = -1e16;
   // run test for 10 seconds real time.
   while (common::Time::GetWallTime().Double() <
@@ -292,7 +291,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
 
   double start_time;
   double start_wall_time;
-  double test_wall_duration;
+  double test_wall_duration 10.0;
   double elapsed_wall_time;
   const double pub_rate = 10000.0;
 
@@ -345,7 +344,6 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   world->SetPaused(false);
   start_time = world->GetSimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
-  test_wall_duration = 10;
   double last_update_wall_time = -1e16;
   // run test for 10 seconds real time.
   while (common::Time::GetWallTime().Double() <
