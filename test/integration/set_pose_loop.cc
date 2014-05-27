@@ -27,9 +27,18 @@ using namespace gazebo;
 class JointKinematicTest : public ServerFixture,
                            public testing::WithParamInterface<const char*>
 {
-  /// \brief 
-  /// \param[in] 
+  /// \brief Test setting joint position.  Joint::SetAngle is called
+  /// in series with World::Step(1) with physics paused to avoid race
+  /// conditions between physics updating link poses and Joint::Angle setting
+  /// link poses.
+  /// \param[in] _physicsEngine physics engine type [bullet|dart|ode|simbody]
   public: void SetJointPositionTest(const std::string &_physicsEngine);
+
+  /// \brief Test setting joint position.  Joint::SetAngle is called
+  /// in parallel with World::Step(1) with physics running to check for race
+  /// conditions between physics updating link poses and Joint::Angle setting
+  /// link poses.
+  /// \param[in] _physicsEngine physics engine type [bullet|dart|ode|simbody]
   public: void SetJointPositionThreadedTest(const std::string &_physicsEngine);
 };
 
