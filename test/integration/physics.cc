@@ -75,7 +75,7 @@ void PhysicsTest::EmptyWorld(const std::string &_physicsEngine)
   // test World::GetRealTime()
   world->SetPaused(true);
   double startRealTime = world->GetRealTime().Double();
-  for(unsigned int i = 0; i < 2000; ++i)
+  for(unsigned int i = 0; i < 20; ++i)
   {
     world->Step(1);
     EXPECT_GT(world->GetRealTime().Double(), startRealTime);
