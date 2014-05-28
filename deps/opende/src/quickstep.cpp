@@ -1637,51 +1637,88 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //       M1_new = M1 + dm1 * SS
         //       M2_new = M2 + dm2 * SS
         //     To eliminate dm2, use:
-        //       dm1 + dm2 = 0  (eq 4) (easy to derive)
+        //       (equation 4) dm1 + dm2 = 0
         //     Check for Diagonal Dominance (DD):
         //       M1d_new  = M1d  + dm1 * SSd
         //       M1od_new = M1od + dm1 * SSod
         //       M2d_new  = M2d  + dm2 * SSd
         //       M2od_new = M2od + dm2 * SSod
         //     For DD, enforce:
-        //       M1d_new / M1od_new = gamma1 > 1  (eq 5)
-        //       M2d_new / M2od_new = gamma2 > 1  (eq 6)
+        //       (eq 5) M1d_new / M1od_new = gamma1 > 1
+        //       (eq 6) M2d_new / M2od_new = gamma2 > 1
         //     For simplicity, look at the case where m1 > m2:
         //       (for m2 > m1, one can infer the results.)
         //     To eliminate dm1, find dm1 as a function of moi_ratio:
         //       moi_ratio = m1_new / m2_new = (m1 + dm1) / (m2 + dm2)
         //       moi_ratio = (m1 + dm1) / (m2 - dm1)
-        //       dm1 = (moi_ratio * m2 - m1) / (1 + moi_ratio) (eq 7)
-        //     Substitute eq 4, 7 into eq 5 and do some algebra:
-        //       (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd) / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod) = gamma1 > 1 (eq 13)
-        //     Solve eq 13 for moi_ratio:
-        //       moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod)) > m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod)) < m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od) (eq 14)
+        //       (eq 7) dm1 = (moi_ratio * m2 - m1) / (1 + moi_ratio)
+        //     Substitute eq 4, 7 above into eq 5 and do some algebra:
+        //       (eq 13) (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd)
+        //             / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod)
+        //             = gamma1 > 1
+        //     Solve eq 13 above for moi_ratio:
+        //       if denominator of lhs of eq 13 is > 0,
+        //         (eq 14a)
+        //         moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod))
+        //         > m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od)
+        //       otherwise,
+        //         (eq 14b)
+        //         moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod))
+        //         < m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od)
         //     Similarly, substitute eq 4, 7 into eq 6:
-        //       (moi_ratio * (M2d - m2 * SSd) + M2d + m1*SSd) / (moi_ratio*(M2od - m2*SSod) + M2od + m1*SSod) = gamma2 > 1 (eq 15)
+        //       (eq 15) (moi_ratio * (M2d - m2 * SSd) + M2d + m1*SSd)
+        //             / (moi_ratio*(M2od - m2*SSod) + M2od + m1*SSod)
+        //             = gamma2 > 1
         //     Solve eq 15 for moi_ratio:
-        //       moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod)) > (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod)) < (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd) (eq 16)
-        //     Lastly, repeat for the case where m2 > m1.  Similarly, equation numbers 18, 19, 20, 21 are analogs of 13-16 for m2 > m1.
-        //       (moi_ratio * (M1d - m1 * SSd) + M1d + m2*SSd) / (moi_ratio*(M1od - m1*SSod) + M1od + m2*SSod) = gamma1 > 1 (eq 18)
+        //       if denominator of lhs of eq 15 is > 0,
+        //        (eq 16a)
+        //         moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod))
+        //         > (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd)
+        //       otherwise,
+        //        (eq 16b)
+        //         moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod))
+        //         < (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd)
+        //     Lastly, repeat for the case where m2 > m1.
+        //     Similarly, equation numbers 18, 19, 20, 21 are analogs
+        //     of 13-16 for m2 > m1.
+        //       (eq 18) (moi_ratio * (M1d - m1 * SSd) + M1d + m2*SSd)
+        //             / (moi_ratio*(M1od - m1*SSod) + M1od + m2*SSod)
+        //             = gamma1 > 1
         //     Solve eq 13 for moi_ratio:
-        //       moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod)) > m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod)) < m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d) (eq 19)
+        //       if denominator of lhs of eq 18 is > 0,
+        //         (eq 19a)
+        //         moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod))
+        //         > m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d)
+        //       otherwise,
+        //         (eq 19b)
+        //         moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod))
+        //         < m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d)
         //     Similarly, substitute eq 4, 7 into eq 6:
-        //       (moi_ratio * (M2d + m1 * SSd) + M2d - m2*SSd) / (moi_ratio*(M2od + m1*SSod) + M2od - m2*SSod) = gamma2 > 1 (eq 20)
-        //     Solve eq 15 for moi_ratio:
-        //       moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod)) > (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod) ,this is true if rhs is > 0, otherwise
-        //       moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod)) < (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod) (eq 21)
+        //       (eq 20) (moi_ratio * (M2d + m1 * SSd) + M2d - m2*SSd)
+        //             / (moi_ratio*(M2od + m1*SSod) + M2od - m2*SSod)
+        //             = gamma2 > 1
+        //     Solve eq 20 for moi_ratio:
+        //       if denominator of lhs of eq 20 is > 0,
+        //        (eq 21a)
+        //         moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod))
+        //         > (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod)
+        //       otherwise,
+        //        (eq 21b)
+        //         moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod))
+        //         < (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod)
         //
-        //     Implementation below refers to equations numbers 13, 14, 15, 16 for m1 > m2, otherwise for m2 > m1
+        //     Implementation below refers to:
+        //       for m1 > m2, equation numbers 13, 14, 15, 16
+        //       otherwise,   equation numbers 18, 19, 20, 21
         //     
         //   Goal:
         //     select initial moi_ratio (currently set to 10)
         //     increase moi_ratio as necessary if DD is violated.
-        //     A "problem" flag is introduced, if there are no solutions, skip inertia ratio reduction. So far, we have
-        //     not encountered any "problem" cases.
+        //     A "problem" flag is introduced, if there are no solutions,
+        //     skip inertia ratio reduction.
 
-        // To do this, first compute abs sum of off diagonals and store in sumAbsOffDiag.
+        // To do this, first compute abs sum of off-diagonals and
+        // store in sumAbsOffDiag.
         // sum off-diagonals terms (to check diagonal dominance)
         dReal M1od[4];  // abs sum of MOI1 off diagonal elements
         dReal M2od[4];  // abs sum of MOI2 off diagonal elements
@@ -1730,16 +1767,20 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         bool problem = false;
         for (int moi_iters = 0; moi_iters < 2; ++moi_iters)
         {
-          // printf("----------------------- iteration [%d] -----------------------------\n", moi_iters);
+          // printf("------ iteration [%d] ------n", moi_iters);
           for (int row = 0; row < 3; ++row)
           {
             if (m1 > m2)
             {
               // check equations 13 and 14 (gamma1 > 1)
-              dReal denom_13 = moi_ratio * ( M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
-              // dReal nomin_13 = moi_ratio * ( M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
-              dReal left_14 = M1d[row] - gamma1*M1od[row] + m2*(SSd[row] - gamma1*SSod[row]);
-              dReal right_14 = m1*(SSd[row] - gamma1*SSod[row]) - (M1d[row] - gamma1*M1od[row]);
+              dReal denom_13 = moi_ratio *
+                (M1od[row] + m2*SSod[row]) + M1od[row] - m1*SSod[row];
+              // dReal nomin_13 = moi_ratio *
+              //   (M1d[row] + m2*SSd[row]) + M1d[row] - m1*SSd[row];
+              dReal left_14 = M1d[row] - gamma1*M1od[row] + m2*(SSd[row]
+                - gamma1*SSod[row]);
+              dReal right_14 = m1*(SSd[row] - gamma1*SSod[row])
+                - (M1d[row] - gamma1*M1od[row]);
               // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
               //   denom_13, nomin_13, left_14, right_14);
               if (denom_13 > 0)
