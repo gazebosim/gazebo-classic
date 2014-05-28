@@ -291,7 +291,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
 
   double start_time;
   double start_wall_time;
-  double test_wall_duration 10.0;
+  double test_wall_duration = 10.0;
   double elapsed_wall_time;
   const double pub_rate = 10000.0;
 
