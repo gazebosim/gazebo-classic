@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 // #include "gazebo/physics/Joint.hh"
-// #include "gazebo/physics/ScrewJoint.hh"
 #include "ServerFixture.hh"
 #include "helper_physics_generator.hh"
 
@@ -26,7 +25,7 @@
 using namespace gazebo;
 
 class JointKinematicTest : public ServerFixture,
-                       public testing::WithParamInterface<const char*>
+                           public testing::WithParamInterface<const char*>
 {
   /// \brief Test setting joint position.  Joint::SetAngle is called
   /// in series with World::Step(1) with physics paused to avoid race
@@ -155,8 +154,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   start_time = world->GetSimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
   double last_update_wall_time = -1e16;
-  // debug:
-  // getchar();
+
   gzdbg << " -------------------------------------------------------------\n";
   gzdbg << " Send random joint position commands for " << test_wall_duration
         << " secs, see how well Joint::SetPosition delas with random inputs.\n"
@@ -333,8 +331,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   start_time = world->GetSimTime().Double();
   start_wall_time = common::Time::GetWallTime().Double();
   double last_update_wall_time = -1e16;
-  // debug:
-  // getchar();
+
   gzdbg << " -------------------------------------------------------------\n";
   gzdbg << " Send random joint position commands for " << test_wall_duration
         << " secs, see how well Joint::SetPosition delas with random inputs.\n"
