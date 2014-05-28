@@ -60,7 +60,7 @@ set(tests
   physics_thread_safe.cc
   pioneer2dx.cc
   server_fixture.cc
-  set_pose_loop.cc
+  joint_set_position_test.cc
   speed.cc
   stress_spawn_models.cc
   #state_log.cc
