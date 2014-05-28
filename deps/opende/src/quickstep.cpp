@@ -1701,9 +1701,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         //       (eq 4) dm1 + dm2 = 0
         //     Check for Diagonal Dominance (DD):
         //       M1d_new  = M1d  + dm1 * SSd
-        //       M1od_new = M1od + dm1 * SSod
+        //       M1od_new ≤ M1od + dm1 * SSod
         //       M2d_new  = M2d  + dm2 * SSd
-        //       M2od_new = M2od + dm2 * SSod
+        //       M2od_new ≤ M2od + dm2 * SSod
         //     For DD, enforce:
         //       (eq 5) M1d_new / M1od_new = gamma1 > 1
         //       (eq 6) M2d_new / M2od_new = gamma2 > 1
