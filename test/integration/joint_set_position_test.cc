@@ -110,7 +110,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
 
   double start_time;
   double start_wall_time;
-  double test_wall_duration = 10.0;
+  const double test_wall_duration = 10;
   double elapsed_wall_time;
   const double pub_rate = 10.0;
 
@@ -150,8 +150,11 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
     EXPECT_TRUE((*ji)  != NULL);
   }
 
-  // debug:
-  // getchar();
+  world->SetPaused(true);
+  start_time = world->GetSimTime().Double();
+  start_wall_time = common::Time::GetWallTime().Double();
+  double last_update_wall_time = -1e16;
+
   gzdbg << " -------------------------------------------------------------\n";
   gzdbg << " Send random joint position commands for " << test_wall_duration
         << " secs, see how well Joint::SetPosition delas with random inputs.\n"
@@ -160,11 +163,6 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
         << " with Link::SetWorldPose from ODEJoint::SetPosition.\n";
   gzdbg << " Calling Joint::SetPosition at [" << pub_rate
         << "] Hz with real time duration.\n";
-  world->SetPaused(true);
-  start_time = world->GetSimTime().Double();
-  start_wall_time = common::Time::GetWallTime().Double();
-  double last_update_wall_time = -1e16;
-  // run test for 10 seconds real time.
   while (common::Time::GetWallTime().Double() <
          start_wall_time + test_wall_duration)
   {
@@ -185,8 +183,6 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
             << " / " << start_wall_time + test_wall_duration
             << "]\n";
     }
-    // debug:
-    // getchar();
 
     // step simulation
     world->Step(1);
@@ -291,7 +287,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
 
   double start_time;
   double start_wall_time;
-  double test_wall_duration = 10.0;
+  const double test_wall_duration = 10;
   double elapsed_wall_time;
   const double pub_rate = 10000.0;
 
@@ -331,8 +327,11 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     EXPECT_TRUE((*ji)  != NULL);
   }
 
-  // debug:
-  getchar();
+  world->SetPaused(false);
+  start_time = world->GetSimTime().Double();
+  start_wall_time = common::Time::GetWallTime().Double();
+  double last_update_wall_time = -1e16;
+
   gzdbg << " -------------------------------------------------------------\n";
   gzdbg << " Send random joint position commands for " << test_wall_duration
         << " secs, see how well Joint::SetPosition delas with random inputs.\n"
@@ -341,11 +340,6 @@ void JointKinematicTest::SetJointPositionThreadedTest(
         << " with Link::SetWorldPose from ODEJoint::SetPosition.\n";
   gzdbg << " Calling Joint::SetPosition at [" << pub_rate
         << "] Hz with real time duration.\n";
-  world->SetPaused(false);
-  start_time = world->GetSimTime().Double();
-  start_wall_time = common::Time::GetWallTime().Double();
-  double last_update_wall_time = -1e16;
-  // run test for 10 seconds real time.
   while (common::Time::GetWallTime().Double() <
          start_wall_time + test_wall_duration)
   {
@@ -391,8 +385,6 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     << "] elapsed wall time [" << elapsed_wall_time
     << "] sim performance [" << test_duration / elapsed_wall_time
     << "]\n";
-  // debug:
-  // getchar();
 }
 
 TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
