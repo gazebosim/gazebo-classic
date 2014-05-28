@@ -2108,7 +2108,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n",
-                    //        moi_ratio, tmp);
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2117,7 +2117,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               else
               {
                 // printf("denom_18 [%f]<0, do the checks backwards.\n",
-                    //        denom_18);
+                //        denom_18);
                 // continue to 19, but flip > to <
                 if (left_19 < 0)
                 {
@@ -2158,7 +2158,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n",
-                    //        moi_ratio, tmp);
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2167,12 +2167,17 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
 
               // equations 15, 16 maps to 20, 21
               // check equations 20 and 21 (gamma2 > 1)
-              dReal denom_20 = moi_ratio * (M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
-              // dReal nomin_20 = moi_ratio * (M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
-              dReal left_21 = M2d[row] - gamma2*M2od[row] + m1*(SSd[row] - gamma2*SSod[row]);
-              dReal right_21 = m2*(SSd[row] - gamma2*SSod[row]) - (M2d[row] - gamma2*M2od[row]);
-              // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
-              //   denom_20, nomin_20, left_21, right_21);
+              dReal denom_20 = moi_ratio *
+                (M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
+              // dReal nomin_20 = moi_ratio *
+              //   (M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
+              dReal left_21 = M2d[row] - gamma2*M2od[row] +
+                m1*(SSd[row] - gamma2*SSod[row]);
+              dReal right_21 = m2*(SSd[row] - gamma2*SSod[row]) -
+                (M2d[row] - gamma2*M2od[row]);
+              // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f]"
+              //        " left_21 [%f]>0? right_21 [%f]\n", row,
+              //        denom_20, nomin_20, left_21, right_21);
               if (denom_20 > 0)
               {
                 // ok continue to 21
@@ -2216,7 +2221,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n",
-                    //        moi_ratio, tmp);
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2225,7 +2230,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               else
               {
                 // printf("denom_20 [%f]<0, do the checks backwards.\n",
-                    //        denom_20);
+                //        denom_20);
                 // continue to 21, but flip > to <
                 if (left_21 < 0)
                 {
@@ -2267,7 +2272,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     {
                       // update moi_ratio
                       // printf("update: reduce moi_ratio %f --> %f\n",
-                    //        moi_ratio, tmp);
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
