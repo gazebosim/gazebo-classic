@@ -345,14 +345,15 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Set the max allowed force of an axis(index).
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// Curret implementation is engine dependent. See for example
-      /// ODE implementation in ODEHingeJoint::SetMaxForce.
+      /// \brief Set the max allowed force of an axis(index) when using
+      /// Joint::SetVelocity.
       /// Curret implementation in Bullet and ODE is enforced through amotor,
       /// which enforces force/torque limits when calling Joint::SetVelocity.
-      /// Implementation in DART is by
+      /// Curret implementation is engine dependent. See for example
+      /// ODE implementation in ODEHingeJoint::SetMaxForce.
+      /// Note this functionality is not implemented in DART and Simbody.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
       public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
