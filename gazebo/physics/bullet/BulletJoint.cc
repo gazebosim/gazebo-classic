@@ -605,13 +605,13 @@ bool BulletJoint::SetPosition(unsigned int _index, double _position,
       this->HasType(Base::UNIVERSAL_JOINT) ||
       this->HasType(Base::SLIDER_JOINT))
   {
-    // if (parentLink->GetScopedName() == childLink->GetScopedName())
+    // if (parentLink->GetScopedName() == this->childLink->GetScopedName())
     // {
     //   gzerr << "Is this even possible?\n";
     //   return;
     // }
 
-    if (childLink)
+    if (this->childLink)
     {
       // Get all connected links to this joint
       Link_V connectedLinks;
