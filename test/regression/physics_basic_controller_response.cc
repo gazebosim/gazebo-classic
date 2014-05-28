@@ -36,14 +36,12 @@ class PhysicsTest : public ServerFixture,
   // truncated unequally based on cartesian orientation of the link.
   // hence this test is added to ensure we get the same dynamics behavior
   // regardless the orientation of the inertia matricies in world frame.
-  public: void TrikeyWheelResponse(const std::string &_physicsEngine);
-
-  // same test as TrikeyWheelResponse, but slightly different inertias
-  // and geometry.
-  public: void TrikeyWheelResponse2(const std::string &_physicsEngine);
+  public: void TrikeyWheelResponse(const std::string &_physicsEngine,
+                                   const std::string &_worldFileName);
 };
 
-void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
+void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine
+                                      const std::string &_worldFileName)
 {
   if (_physicsEngine == "bullet")
   {
@@ -58,7 +56,7 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
 
   // Random seed is set to prevent brittle failures (gazebo issue #479)
   math::Rand::SetSeed(18420503);
-  Load("worlds/inertia_ratio_reduction_test.world", true, _physicsEngine);
+  Load(_worldFileName, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -138,105 +136,12 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine)
 
 TEST_F(PhysicsTest, TrikeyWheelResponse)
 {
-  TrikeyWheelResponse("ode");
-}
-
-void PhysicsTest::TrikeyWheelResponse2(const std::string &_physicsEngine)
-{
-  if (_physicsEngine == "bullet")
-  {
-    gzerr << "bullet dynamics not working as expected, issue #1144.\n";
-    return;
-  }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
-  {
-    gzerr << "simbody and dart axis intepretation is wrong, see issue #1143.\n";
-    return;
-  }
-
-  // Random seed is set to prevent brittle failures (gazebo issue #479)
-  math::Rand::SetSeed(18420503);
-  Load("worlds/inertia_ratio_reduction_test2.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // get model
-  int i = 0;
-  std::string modelName = "trikey";
-  while (!this->HasEntity(modelName) && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-
-  if (i > 20)
-    gzthrow("Unable to get model [" << modelName << "].");
-
-  physics::ModelPtr model = world->GetModel(modelName);
-  EXPECT_TRUE(model != NULL);
-
-  // get joints
-  physics::JointPtr joint1 = model->GetJoint("wheel1_joint");
-  physics::JointPtr joint2 = model->GetJoint("wheel2_joint");
-  physics::JointPtr joint3 = model->GetJoint("wheel3_joint");
-  ASSERT_TRUE(joint1 != NULL);
-  ASSERT_TRUE(joint2 != NULL);
-  ASSERT_TRUE(joint3 != NULL);
-
-  // setup position PID controllers for each joint
-  const double pGain = 10;
-  const double iGain = 0;
-  const double dGain = 0;
-  const double iMax = 0;
-  const double iMin = 0;
-  const double cmdMax = 0;
-  const double cmdMin = 0;
-  common::PID pid1(pGain, iGain, dGain, iMax, iMin, cmdMax, cmdMin);
-  common::PID pid2(pGain, iGain, dGain, iMax, iMin, cmdMax, cmdMin);
-  common::PID pid3(pGain, iGain, dGain, iMax, iMin, cmdMax, cmdMin);
-  // set arbitrary target position
-  const double cmdPos = 1.3;
-  pid1.SetCmd(cmdPos);
-  pid2.SetCmd(cmdPos);
-  pid3.SetCmd(cmdPos);
-
-  // step for some time and expect all three joints to behave
-  // the same way (check joint velocity and position).
-  double test_duration = 1.5;
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
-  int steps = test_duration/dt;
-
-  double t0 = world->GetSimTime().Double();
-
-  // for (int j = 0; j < 1000; ++j) //  for debug
-  for (int i = 0; i < steps; ++i)
-  {
-    double pos1 = joint1->GetAngle(0).Radian();
-    double pos2 = joint2->GetAngle(0).Radian();
-    double pos3 = joint3->GetAngle(0).Radian();
-    double error1 = pos1 - cmdPos;
-    double error2 = pos2 - cmdPos;
-    double error3 = pos3 - cmdPos;
-    double force1 = pid1.Update(error1, dt);
-    double force2 = pid2.Update(error2, dt);
-    double force3 = pid3.Update(error3, dt);
-    joint1->SetForce(0, force1);
-    joint2->SetForce(0, force2);
-    joint3->SetForce(0, force3);
-    EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint3->GetAngle(0).Radian(), TOL);
-    world->StepWorld(1);
-  }
+  TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test.world");
 }
 
 TEST_F(PhysicsTest, TrikeyWheelResponse2)
 {
-  TrikeyWheelResponse2("ode");
+  TrikeyWheelResponse("ode", "worlds/inertia_ratio_reduction_test2.world");
 }
 
 int main(int argc, char **argv)
