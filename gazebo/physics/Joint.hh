@@ -400,6 +400,9 @@ namespace gazebo
       public: virtual bool SetPosition(unsigned int _index, double _position,
                                        double _velocity = 0.0);
 
+      protected: bool SetPositionMaximal(unsigned int _index, double _position,
+                                 double _velocity);
+
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
       /// Note that the unit of force should be consistent with the rest
