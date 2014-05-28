@@ -1945,11 +1945,15 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               // check equations 15 and 16 (gamma2 > 1)
               dReal denom_15 = moi_ratio *
                 (M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
-              // dReal nomin_15 = moi_ratio * (M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
-              dReal left_16 = M2d[row] - gamma2*M2od[row] - m2*(SSd[row] - gamma2*SSod[row]);
-              dReal right_16 = (gamma2*M2od[row] - M2d[row]) + m1*(gamma2*SSod[row] - SSd[row]);
-              // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
-              //   denom_15, nomin_15, left_16, right_16);
+              // dReal nomin_15 = moi_ratio *
+              //   (M2d[row] - m2*SSd[row]) + M2d[row]  + m1*SSd[row];
+              dReal left_16 = M2d[row] - gamma2*M2od[row] -
+                m2*(SSd[row] - gamma2*SSod[row]);
+              dReal right_16 = (gamma2*M2od[row] - M2d[row]) +
+                m1*(gamma2*SSod[row] - SSd[row]);
+              // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f]"
+              //        " left_16 [%f]>0? right_16 [%f]\n", row,
+              //        denom_15, nomin_15, left_16, right_16);
               if (denom_15 > 0)
               {
                 // ok continue to 16
@@ -1965,7 +1969,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -1989,7 +1994,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -1997,7 +2003,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               }
               else
               {
-                // printf("denom_15 [%f]<0, do the checks backwards.\n", denom_15);
+                // printf("denom_15 [%f]<0, do the checks backwards.\n",
+                //        denom_15);
                 // continue to 16, but flip > to <
                 if (left_16 < 0)
                 {
@@ -2011,7 +2018,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -2035,7 +2043,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2046,12 +2055,17 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
             {
               // equations 13, 14 maps to 18, 19
               // check equations 18 and 19 (gamma1 > 1)
-              dReal denom_18 = moi_ratio * (M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
-              // dReal nomin_18 = moi_ratio * (M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
-              dReal left_19 = M1d[row] - gamma1*M1od[row] - m1*(SSd[row] - gamma2*SSod[row]);
-              dReal right_19 = m2*(gamma1*SSod[row] - SSd[row]) + (gamma1*M1od[row] - M1d[row]);
-              // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
-              //   denom_18, nomin_18, left_19, right_19);
+              dReal denom_18 = moi_ratio *
+                (M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
+              // dReal nomin_18 = moi_ratio *
+              //  (M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
+              dReal left_19 = M1d[row] - gamma1*M1od[row] -
+                m1*(SSd[row] - gamma2*SSod[row]);
+              dReal right_19 = m2*(gamma1*SSod[row] - SSd[row]) +
+                (gamma1*M1od[row] - M1d[row]);
+              // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f]"
+              //        " left_19 [%f]>0? right_19 [%f]\n", row,
+              //        denom_18, nomin_18, left_19, right_19);
               if (denom_18 > 0)
               {
                 // ok continue to 19
@@ -2067,7 +2081,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -2092,7 +2107,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2100,7 +2116,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               }
               else
               {
-                // printf("denom_18 [%f]<0, do the checks backwards.\n", denom_18);
+                // printf("denom_18 [%f]<0, do the checks backwards.\n",
+                    //        denom_18);
                 // continue to 19, but flip > to <
                 if (left_19 < 0)
                 {
@@ -2114,7 +2131,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -2139,7 +2157,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2170,7 +2189,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -2195,7 +2215,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2203,7 +2224,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
               }
               else
               {
-                // printf("denom_20 [%f]<0, do the checks backwards.\n", denom_20);
+                // printf("denom_20 [%f]<0, do the checks backwards.\n",
+                    //        denom_20);
                 // continue to 21, but flip > to <
                 if (left_21 < 0)
                 {
@@ -2218,7 +2240,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -2243,7 +2266,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -2294,14 +2318,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
             {
               MOI_ptr1[si] = MOI_ptr1[si] + dm1 * SS[si];
               MOI_ptr2[si] = MOI_ptr2[si] + dm2 * SS[si];
-              /* update M1d M1od M2d M2od for additional DD check
-              // not needed if previous moi_ratio calculation is working as expected
-              M1d[row] = 
-              */
             }
           }
 
-          /* check and maintain diagonal dominance using the precomputed off-diagonal-sums.
+          /* check and maintain diagonal dominance using the precomputed
+             off-diagonal-sums.
           for (int si = 0; si < 12; ++si)
           {
             int col = si%4;
@@ -2316,7 +2337,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
             {
               MOI_ptr1[si] = MOI_ptr1[si] + dm1 * SS[si];
               MOI_ptr2[si] = MOI_ptr2[si] + dm2 * SS[si];
-              // this should be fine as long as moi_ratio check above is working correctly
+              // this should be fine as long as moi_ratio check above
+              // is working correctly
               if (row == col)
               {
                 if (MOI_ptr1[si] < M1od[row])
@@ -2336,93 +2358,129 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
 
           // Update invMOI by inverting analytically (may not be efficient).
           // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
-          //   (http://math.stackexchange.com/questions/17776/inverse-of-the-sum-of-matrices)
+          //   (http://math.stackexchange.com/questions/17776)
           // try taking advantage of symmetry of MOI
-          dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
-                      -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
-                      +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
-          invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
-          invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
-          invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]-MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
+          dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
+                      -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
+                      -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
+                      -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
+                      +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
+                      -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
+          invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
+                                -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
+          invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
+                                -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
+          invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
+                                -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
           // invMOI_ptr1[0*4+3] = 0.0;
           invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
-          invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
-          invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
+          invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]
+                                -MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
+          invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]
+                                -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
           // invMOI_ptr1[1*4+3] = 0.0;
           invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
           invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
-          invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]-MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
+          invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]
+                                -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
           // invMOI_ptr1[2*4+3] = 0.0;
 
-          dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
-                      -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
-                      +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
-          invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
-          invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
-          invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]-MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
+          dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
+                      -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
+                      -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
+                      -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
+                      +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
+                      -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
+          invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
+                                -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
+          invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
+                                -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
+          invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
+                                -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
           // invMOI_ptr2[0*4+3] = 0.0;
           invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
-          invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
-          invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
+          invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]
+                                -MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
+          invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]
+                                -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
           // invMOI_ptr2[1*4+3] = 0.0;
           invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
           invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
-          invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]-MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
+          invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]
+                                -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
           // invMOI_ptr2[2*4+3] = 0.0;
 
   #ifdef DEBUG_INERTIA_PROPAGATION
           printf("----------new MOI---------\n");
 
-          printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
+          printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+            b1,
             MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
             MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
             MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
 
           // Modify MOI_ptr2
-          printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
+          printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+            b2,
             MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
             MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
             MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
 
           // double check resulting MOI along s
           dMultiply0_133(tmp31, S, MOI_ptr1);
-          m1 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+          // scalar body 1 MOI component along vector S
+          m1 = dCalcVectorDot3(tmp31, S);
           printf("new MOI1 along S [%f]\n", m1);
           dMultiply0_133(tmp31, S, MOI_ptr2);
-          m2 = dCalcVectorDot3(tmp31, S); // scalar MOI component along vector S
+          // scalar body 2 MOI component along vector S
+          m2 = dCalcVectorDot3(tmp31, S);
           printf("new MOI2 along S [%f]\n", m2);
 
-          /// \todo double check resulting MOI along joint axis and see that it's the same
-          /// question: where to get ax1 from?
+          /// \todo double check resulting MOI along joint axis and
+          /// see that it's the same
 
           printf("----------new inv---------\n");
-          printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b1,
-            invMOI_ptr1[0*4+0],invMOI_ptr1[0*4+1],invMOI_ptr1[0*4+2],invMOI_ptr1[0*4+3],
-            invMOI_ptr1[1*4+0],invMOI_ptr1[1*4+1],invMOI_ptr1[1*4+2],invMOI_ptr1[1*4+3],
-            invMOI_ptr1[2*4+0],invMOI_ptr1[2*4+1],invMOI_ptr1[2*4+2],invMOI_ptr1[2*4+3]);
+          printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
+                 "[%f %f %f %f]\n", b1,
+                 invMOI_ptr1[0*4+0], invMOI_ptr1[0*4+1],
+                 invMOI_ptr1[0*4+2], invMOI_ptr1[0*4+3],
+                 invMOI_ptr1[1*4+0], invMOI_ptr1[1*4+1],
+                 invMOI_ptr1[1*4+2], invMOI_ptr1[1*4+3],
+                 invMOI_ptr1[2*4+0], invMOI_ptr1[2*4+1],
+                 invMOI_ptr1[2*4+2], invMOI_ptr1[2*4+3]);
 
           // Modify invMOI_ptr2
-          printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n", b2,
-            invMOI_ptr2[0*4+0],invMOI_ptr2[0*4+1],invMOI_ptr2[0*4+2],invMOI_ptr2[0*4+3],
-            invMOI_ptr2[1*4+0],invMOI_ptr2[1*4+1],invMOI_ptr2[1*4+2],invMOI_ptr2[1*4+3],
-            invMOI_ptr2[2*4+0],invMOI_ptr2[2*4+1],invMOI_ptr2[2*4+2],invMOI_ptr2[2*4+3]);
+          printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
+                 "[%f %f %f %f]\n", b2,
+                 invMOI_ptr2[0*4+0], invMOI_ptr2[0*4+1],
+                 invMOI_ptr2[0*4+2], invMOI_ptr2[0*4+3],
+                 invMOI_ptr2[1*4+0], invMOI_ptr2[1*4+1],
+                 invMOI_ptr2[1*4+2], invMOI_ptr2[1*4+3],
+                 invMOI_ptr2[2*4+0], invMOI_ptr2[2*4+1],
+                 invMOI_ptr2[2*4+2], invMOI_ptr2[2*4+3]);
   #endif
 
   #ifdef DEBUG_INERTIA_PROPAGATION
           // check if diagonally-dominant
           if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
-            printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n", MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
+            printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n",
+                   MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
           if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
-            printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n", MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
+            printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n",
+                   MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
           if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
-            printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n", MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
+            printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n",
+                   MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
 
           if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
-            printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n", MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
+            printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n",
+                   MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
           if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
-            printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n", MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
+            printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n",
+                   MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
           if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
-            printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n", MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
+            printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n",
+                   MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
   #endif
         }
       }
@@ -2445,18 +2503,21 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
   // for all bodies, compute the inertia tensor and its inverse in the global
   // frame, and compute the rotational force and add it to the torque
-  // accumulator. MOI and invMOI are a vertical stack of 3x4 matrices, one per body.
+  // accumulator. MOI and invMOI are a vertical stack of 3x4 matrices,
+  // one per body.
   dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
   dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
-  // TODO: possible optimization: move this to inside joint getInfo2, for inertia tweaking
+  // TODO: possible optimization: move this to inside joint getInfo2,
+  // for inertia tweaking.
   // update tacc from external force and inertia tensor in inerial frame
   // for now, modify MOI and invMOI after getInfo2 is called
   {
     dReal *invMOIrow = invMOI;
     dReal *MOIrow = MOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+      invMOIrow += 12, MOIrow += 12, bodycurr++) {
       dMatrix3 tmp;
       dxBody *b_ptr = *bodycurr;
 
@@ -2481,7 +2542,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
   {
     dReal *invMrow = invM;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMrow++, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+      invMrow++, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       //*invMrow = b_ptr->mass.mass;
       *invMrow = b_ptr->invMass;
@@ -2524,19 +2586,22 @@ void dxQuickStepper (dxWorldProcessContext *context,
     }
   }
 
-  // get joint information (m = total constraint dimension, nub = number of unbounded variables).
+  // get joint information (m = total constraint dimension,
+  // nub = number of unbounded variables).
   // joints with m=0 are inactive and are removed from the joints array
   // entirely, so that the code that follows does not consider them.
-  dJointWithInfo1 *const jointiinfos = context->AllocateArray<dJointWithInfo1> (_nj);
+  dJointWithInfo1 *const jointiinfos =
+    context->AllocateArray<dJointWithInfo1> (_nj);
   int nj;
 
   {
     dJointWithInfo1 *jicurr = jointiinfos;
     dxJoint *const *const _jend = _joint + _nj;
-    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {  // jicurr=dest, _jcurr=src
+    for (dxJoint *const *_jcurr = _joint; _jcurr != _jend; _jcurr++) {
       dxJoint *j = *_jcurr;
       j->getInfo1 (&jicurr->info);
-      dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 && jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
+      dIASSERT (jicurr->info.m >= 0 && jicurr->info.m <= 6 &&
+                jicurr->info.nub >= 0 && jicurr->info.nub <= jicurr->info.m);
       if (jicurr->info.m > 0) {
         jicurr->joint = j;
         jicurr++;
@@ -2548,7 +2613,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
   context->ShrinkArray<dJointWithInfo1>(jointiinfos, _nj, nj);
 
   int m;
-  int mfb; // number of rows of Jacobian we will have to save for joint feedback
+  // number of rows of Jacobian we will have to save for joint feedback
+  int mfb;
 
   {
     int mcurr = 0, mfbcurr = 0;
@@ -2611,7 +2677,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int i=0; i<mlocal; i++) findex[i] = -1;
 
       c_v_max = context->AllocateArray<dReal> (mlocal);
-      for (int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel; // init all to world max surface vel
+      // init all to world max surface vel
+      for (int i=0; i<mlocal; i++) c_v_max[i] = world->contactp.max_vel;
 
       const unsigned jbelements = mlocal*2;
       jb = context->AllocateArray<int> (jbelements);
@@ -2634,10 +2701,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // format:
         //
         //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 \    .
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )-- jacobian for joint 0, body 1 and body 2 (3 rows)
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 /
-        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )--- jacobian for joint 1, body 1 and body 2 (3 rows)
-        //   etc...
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2  )-- jacobian for joint 0,
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 /    body 1 and body 2 (3 rows)
+        //   l1 l1 l1 a1 a1 a1 l2 l2 l2 a2 a2 a2 )--- jacobian for joint 1,
+        //   etc...                                   body 1 and body 2 (3 rows)
         //
         //   (lll) = linear jacobian data
         //   (aaa) = angular jacobian data
@@ -2716,18 +2783,18 @@ void dxQuickStepper (dxWorldProcessContext *context,
         dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
         dSetZero(tmp1,nb*6);
         // put v/h + invM*fe into tmp1
-        dReal *tmp1curr = tmp1;
+        dReal *tmpcurr = tmp1;
         const dReal *invMOIrow = invMOI;
         dxBody *const *const bodyend = body + nb;
         for (dxBody *const *bodycurr = body;
              bodycurr != bodyend;
-             tmp1curr+=6, invMOIrow+=12, bodycurr++) {
+             tmpcurr+=6, invMOIrow+=12, bodycurr++) {
           dxBody *b_ptr = *bodycurr;
           dReal body_invMass = b_ptr->invMass;
           for (int j=0; j<3; j++)
-            tmp1curr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
-          dMultiply0_331 (tmp1curr + 3,invMOIrow,b_ptr->tacc);
-          for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->avel[k] * stepsize1;
+            tmpcurr[j] = b_ptr->facc[j]*body_invMass + b_ptr->lvel[j]*stepsize1;
+          dMultiply0_331 (tmpcurr + 3,invMOIrow,b_ptr->tacc);
+          for (int k=0; k<3; k++) tmpcurr[3+k] += b_ptr->avel[k] * stepsize1;
         }
 
         // put J*tmp1 into rhs
@@ -2745,26 +2812,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
           rhs[i]   = c[i]*stepsize1 - rhs[i];
       }
 
-
-
-
-
-
-
       // compute rhs_precon
       if (world->qs.precon_iterations > 0)
         computeRHSPrecon(context,m,nb,MOI,body,stepsize1,c,J,jb,rhs_precon);
-
-
-
-
-
-
-
-
-
-
-
 
       // scale CFM
       for (int j=0; j<m; j++) cfm[j] *= stepsize1;
@@ -2772,7 +2822,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     } END_STATE_SAVE(context, cstate);
 
 #ifdef PENETRATION_JVERROR_CORRECTION
-    // allocate and populate vnew with v(n+1) due to non-constraint forces as the starting value
+    // allocate and populate vnew with v(n+1) due to non-constraint
+    // forces as the starting value
     vnew = context->AllocateArray<dReal> (nb*6);
     {
       dRealMutablePtr vnewcurr = vnew;
@@ -2786,7 +2837,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
         // add stepsize * invM * fe to the body velocity
         dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
         for (int j=0; j<3; j++) {
-          vnewcurr[j]   = b_ptr->lvel[j] + body_invMass_mul_stepsize * b_ptr->facc[j];
+          vnewcurr[j]   = b_ptr->lvel[j] +
+            body_invMass_mul_stepsize * b_ptr->facc[j];
           vnewcurr[j+3] = b_ptr->avel[j];
           tmp_tacc[j]   = b_ptr->tacc[j]*stepsize;
         }
@@ -2808,9 +2860,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (lambdacurr, jicurr->joint->lambda, infom * sizeof(dReal));
+        memcpy (lambdacurr, jicurr->joint->lambda, infom*sizeof(dReal));
         lambdacurr += infom;
-        memcpy (lambda_erpcurr, jicurr->joint->lambda_erp, infom * sizeof(dReal));
+        memcpy(lambda_erpcurr, jicurr->joint->lambda_erp, infom*sizeof(dReal));
         lambda_erpcurr += infom;
       }
     }
@@ -2861,7 +2913,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
         int infom = jicurr->info.m;
         memcpy (jicurr->joint->lambda, lambdacurr, infom * sizeof(dReal));
         lambdacurr += infom;
-        memcpy (jicurr->joint->lambda_erp, lambda_erpcurr, infom * sizeof(dReal));
+        memcpy (jicurr->joint->lambda_erp,
+          lambda_erpcurr, infom * sizeof(dReal));
         lambda_erpcurr += infom;
       }
     }
@@ -2878,7 +2931,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
       //
       const dReal *caccelcurr = caccel_erp;
       dxBody *const *const bodyend = body + nb;
-      for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+      for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+        caccelcurr+=6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
           b_ptr->lvel[j] += stepsize * caccelcurr[j];
@@ -2942,7 +2996,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     // add stepsize * invM * fe to the body velocity
     const dReal *invMOIrow = invMOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+      invMOIrow += 12, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       dReal body_invMass_mul_stepsize = stepsize * b_ptr->invMass;
       for (int j=0; j<3; j++) {
@@ -2971,7 +3026,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
       //  put residual into tmp
       dRealMutablePtr velcurr = vel;
       //dxBody* const* bodyend = body + nb;
-      for (dxBody* const* bodycurr = body; bodycurr != bodyend; velcurr += 6, bodycurr++) {
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend;
+        velcurr += 6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
           velcurr[j]   = b_ptr->lvel[j];
@@ -3014,8 +3070,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
       for (int j=0; j<3; j++) {
         // dReal v0 = b_ptr->lvel[j];
         // dReal a0 = b_ptr->avel[j];
-        dReal dv = erp_removal * stepsize * (caccel_curr[j]   - caccel_erp_curr[j]);
-        dReal da = erp_removal * stepsize * (caccel_curr[3+j] - caccel_erp_curr[3+j]);
+        dReal dv = erp_removal * stepsize *
+          (caccel_curr[j]   - caccel_erp_curr[j]);
+        dReal da = erp_removal * stepsize *
+          (caccel_curr[3+j] - caccel_erp_curr[3+j]);
 
         /* default v removal
         */
@@ -3039,9 +3097,10 @@ void dxQuickStepper (dxWorldProcessContext *context,
         */
 
         /*  DEBUG PRINTOUTS, total forces/accel on a body
-        printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f] a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
+        printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f]"
+               " a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
                ,nb, m, debug_count, j, v0, dv, b_ptr->lvel[j]
-                 , a0, da, b_ptr->avel[j]
+               , a0, da, b_ptr->avel[j]
                ,caccel_curr[j], caccel_erp_curr[j]
                ,caccel_curr[3+j], caccel_erp_curr[3+j]);
         */
@@ -3063,7 +3122,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
       //  put residual into tmp
       dRealMutablePtr velcurr = vel;
       //dxBody* const* bodyend = body + nb;
-      for (dxBody* const* bodycurr = body; bodycurr != bodyend; velcurr += 6, bodycurr++) {
+      for (dxBody* const* bodycurr = body; bodycurr != bodyend;
+        velcurr += 6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         for (int j=0; j<3; j++) {
           velcurr[j]   = b_ptr->lvel[j];
@@ -3087,7 +3147,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
     // ADD CACCEL CORRECTION FROM VELOCITY CONSTRAINT VIOLATION
     caccelcurr = caccel;
     const dReal* caccel_corrcurr = caccel_corr;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccel_corrcurr+=6, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+      caccel_corrcurr+=6, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       for (int j=0; j<3; j++) {
         b_ptr->lvel[j] += erp_removal * stepsize * caccel_corrcurr[j];
@@ -3168,13 +3229,15 @@ size_t dxEstimateQuickStepMemoryRequirements (
   size_t res = 0;
 
   res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for invMOI
-  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for MOI (inertia) needed by preconditioner
+  res += dEFFICIENT_SIZE(sizeof(dReal) * 3 * 4 * nb); // for MOI preconditioner
   res += dEFFICIENT_SIZE(sizeof(dReal) * nb); // for invM
 
   {
-    size_t sub1_res1 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * _nj); // for initial jointiinfos
+    size_t sub1_res1 =
+      dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * _nj); // for initial jointiinfos
 
-    size_t sub1_res2 = dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * nj); // for shrunk jointiinfos
+    size_t sub1_res2 =
+      dEFFICIENT_SIZE(sizeof(dJointWithInfo1) * nj); // for shrunk jointiinfos
     if (m > 0) {
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J
       sub1_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for J_precon
@@ -3190,7 +3253,8 @@ size_t dxEstimateQuickStepMemoryRequirements (
       {
         size_t sub2_res1 = dEFFICIENT_SIZE(sizeof(dReal) * m); // for c
         {
-          size_t sub3_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
+          size_t sub3_res1 =
+            dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for tmp1
 
           size_t sub3_res2 = 0;
 
@@ -3209,12 +3273,14 @@ size_t dxEstimateQuickStepMemoryRequirements (
         sub2_res2 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 #endif
         {
-          size_t sub3_res1 = EstimateSOR_LCPMemoryRequirements(m,nb); // for SOR_LCP
+          size_t sub3_res1 =
+            EstimateSOR_LCPMemoryRequirements(m,nb); // for SOR_LCP
 
           size_t sub3_res2 = 0;
 #ifdef CHECK_VELOCITY_OBEYS_CONSTRAINT
           {
-            size_t sub4_res1 = dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
+            size_t sub4_res1 =
+              dEFFICIENT_SIZE(sizeof(dReal) * 6 * nb); // for vel
             sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * m); // for tmp
             sub4_res1 += dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
 
@@ -3225,11 +3291,9 @@ size_t dxEstimateQuickStepMemoryRequirements (
 #endif
           sub2_res2 += (sub3_res1 >= sub3_res2) ? sub3_res1 : sub3_res2;
         }
-
         sub1_res2 += (sub2_res1 >= sub2_res2) ? sub2_res1 : sub2_res2;
       }
     }
-
     res += (sub1_res1 >= sub1_res2) ? sub1_res1 : sub1_res2;
   }
 
