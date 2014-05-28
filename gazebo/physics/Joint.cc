@@ -1027,7 +1027,7 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::ComputeChildLinkPose( unsigned int _index,
+math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
   // child link pose
@@ -1053,14 +1053,13 @@ math::Pose Joint::ComputeChildLinkPose( unsigned int _index,
     anchor = this->GetAnchor(_index);
     axis = this->GetGlobalAxis(_index);
   }
-  
+
   // delta-position along an axis
   double dposition = _position - this->GetAngle(_index).Radian();
 
   if (this->HasType(Base::HINGE_JOINT) ||
       this->HasType(Base::UNIVERSAL_JOINT))
   {
-
     // relative to anchor point
     math::Pose relativePose(childLinkPose.pos - anchor,
                             childLinkPose.rot);

@@ -591,7 +591,7 @@ namespace gazebo
       /// \param[in] _index axis index
       /// \param[in] _position new joint position
       /// \return new child link pose at new joint position.
-      protected: math::Pose ComputeChildLinkPose( unsigned int _index,
+      protected: math::Pose ComputeChildLinkPose(unsigned int _index,
           double _position);
 
       /// \brief Helper function to load a joint.
