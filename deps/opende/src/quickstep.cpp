@@ -1667,8 +1667,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         // satisfies the line criterion.
         //
         // Terminology:
-        //   S: an unit vector in the direction of constraint DOF for which
-        //      we want to reduce inertia.
+        //   S: a unit column vector in the direction of constraint DOF
+        //      for which we want to reduce inertia.
         //   SS: MOI component matrix constructed by S*S'
         //   M1: MOI of body 1
         //   M1_new: MOI of body 1 after adjustment
