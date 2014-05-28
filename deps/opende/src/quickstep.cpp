@@ -1622,18 +1622,18 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         SS[2*4+0],SS[2*4+1],SS[2*4+2],SS[2*4+3]);
 #endif
 
-      // limit MOI1 and MOI2 such that MOI_max / MOI_min < 10.0
-      /// \todo make moi_ratio_tol adjustable
-      /// \todo automatically adjust moi_ratio_tol such that
+      // limit MOI1 and MOI2 such that MOI_max / MOI_min < moi_ratio_max
+      /// \todo make moi_ratio_max adjustable
+      /// \todo automatically adjust moi_ratio_max such that
       /// abs sum of off-diagonals remains smaller than the diagonal
       /// for all rows.
-      // increase moi_ratio_tol to skip checks and increase performance
-      const dReal moi_ratio_tol = 10.0;
+      // increase moi_ratio_max to skip checks and increase performance
+      const dReal moi_ratio_max = 10.0;
       // increase gamma1 or gamma2 to add stability
       const dReal gamma1 = 1.5;
       const dReal gamma2 = 1.5;
       dReal m1_new, m2_new;
-      if ((m1 > moi_ratio_tol * m2) || (m2 > moi_ratio_tol * m1))
+      if ((m1 > moi_ratio_max * m2) || (m2 > moi_ratio_max * m1))
       {
 #ifdef DEBUG_INERTIA_PROPAGATION
         printf("---------S Scalars--------\n");
@@ -1822,7 +1822,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         dReal moi_sum = (m1 + m2);
 
         // some ratio
-        dReal moi_ratio = moi_ratio_tol;
+        dReal moi_ratio = moi_ratio_max;
 
         // fixed point iteration for reducing moi_ratio across constraints
         bool problem = false;
