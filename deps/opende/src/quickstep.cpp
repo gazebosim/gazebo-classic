@@ -49,6 +49,7 @@
 #define SMOOTH_LAMBDA
 #undef RECOMPUTE_RMS
 #undef USE_1NORM
+#undef DEBUG_INERTIA_PROPAGATION
 //#define LOCAL_STEPPING  // not yet implemented
 //#define PENETRATION_JVERROR_CORRECTION
 //#define POST_UPDATE_CONSTRAINT_VIOLATION_CORRECTION
@@ -405,33 +406,37 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
-    /************************************************************************************/
-    /*                                                                                  */
-    /*               compute preconditioned rhs                                         */
-    /*                                                                                  */
-    /*  J J' lambda = J * ( M * dv / dt + fe )                                          */
-    /*                                                                                  */
-    /************************************************************************************/
-    // mimic computation of rhs, but do it with J*M*inv(J) prefixed for preconditioned case.
+    /**************************************************************************/
+    /*                                                                        */
+    /*               compute preconditioned rhs                               */
+    /*                                                                        */
+    /*  J J' lambda = J * (M * dv / dt + fe)                                  */
+    /*                                                                        */
+    /**************************************************************************/
+    // mimic computation of rhs, but do it with J*M*inv(J) prefixed
+    // for preconditioned case.
     BEGIN_STATE_SAVE(context, tmp2state) {
       IFTIMING (dTimerNow ("compute rhs_precon"));
 
       // compute the "preconditioned" right hand side `rhs_precon'
       dReal *tmp1 = context->AllocateArray<dReal> (nb*6);
-      // this is slightly different than non precon, where M is left multiplied by the pre J terms
+      // this is slightly different than non precon, where M is left
+      // multiplied by the pre J terms
       //
       // tmp1 = M*v/h + fe
       //
       dReal *tmp1curr = tmp1;
       const dReal *MOIrow = MOI;
       dxBody *const *const bodyend = body + nb;
-      for (dxBody *const *bodycurr = body; bodycurr != bodyend; tmp1curr+=6, MOIrow+=12, bodycurr++) {
+      for (dxBody *const *bodycurr = body;
+        bodycurr != bodyend; tmp1curr+=6, MOIrow+=12, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
         // dReal body_mass = b_ptr->mass.mass;
-        for (int j=0; j<3; j++)
-          tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
+        // +  body_mass * b_ptr->lvel[j] * stepsize1;
+        for (int j=0; j<3; j++) tmp1curr[j] = b_ptr->facc[j];
         dReal tmpa[3];
-        for (int j=0; j<3; j++) tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
+        //b_ptr->avel[j] * stepsize1;
+        for (int j=0; j<3; j++) tmpa[j] = 0;
         dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
         for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
@@ -441,7 +446,8 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
       multiply_J (m,J,jb,tmp1,rhs_precon);
 
       //
-      // no need to add constraint violation correction tterm if we assume acceleration is 0
+      // no need to add constraint violation correction tterm
+      // if we assume acceleration is 0
       //
       for (int i=0; i<m; i++) rhs_precon[i] = - rhs_precon[i];
 
@@ -457,7 +463,8 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
 static inline dReal dot6(dRealPtr a, dRealPtr b)
 {
 #ifdef SSE
-  __m128d d = _mm_load_pd(a+0) * _mm_load_pd(b+0) + _mm_load_pd(a+2) * _mm_load_pd(b+2) + _mm_load_pd(a+4) * _mm_load_pd(b+4);
+  __m128d d = _mm_load_pd(a+0) * _mm_load_pd(b+0) + _mm_load_pd(a+2) *
+              _mm_load_pd(b+2) + _mm_load_pd(a+4) * _mm_load_pd(b+4);
   double r[2];
   _mm_store_pd(r, d);
   return r[0] + r[1];
@@ -508,7 +515,8 @@ static void ComputeRows(
   //printf("thread %d started at time %f\n",thread_id,cur_time);
   #endif
 
-  //boost::recursive_mutex::scoped_lock lock(*mutex); // put in caccel read/writes?
+  //boost::recursive_mutex::scoped_lock lock(*mutex);
+  // put in caccel read/writes?
   dxQuickStepParameters *qs    = params.qs;
   int startRow                 = params.nStart;   // 0
   int nRows                    = params.nChunkSize; // m
@@ -547,8 +555,10 @@ static void ComputeRows(
 #endif
 
   //printf("iiiiiiiii %d %d %d\n",thread_id,jb[0],jb[1]);
-  //for (int i=startRow; i<startRow+nRows; i++) // swap within boundary of our own segment
-  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",thread_id,startRow,nRows,i,order[i].index);
+  // swap within boundary of our own segment
+  //for (int i=startRow; i<startRow+nRows; i++)
+  //  printf("wwwwwwwwwwwww>id %d start %d n %d  order[%d].index=%d\n",
+  //    thread_id,startRow,nRows,i,order[i].index);
 
 
 
@@ -563,7 +573,8 @@ static void ComputeRows(
   }
   printf("\n");
 
-  // print J, J_precon (already premultiplied by inverse of diagonal of LHS) and rhs_precon and rhs
+  // print J, J_precon (already premultiplied by inverse of diagonal of LHS)
+  // and rhs_precon and rhs
   printf("J_precon\n");
   for (int i=startRow; i<startRow+nRows; i++) {
     for (int j=0; j < 12 ; j++) {
@@ -599,8 +610,8 @@ static void ComputeRows(
   double sor_lcp_tolerance = qs->sor_lcp_tolerance;
 
 
-  // FIME: preconditioning can be defined insdie iterations loop now, becareful to match last iteration with
-  //       velocity update
+  // FIME: preconditioning can be defined insdie iterations loop now,
+  // becareful to match last iteration with velocity update
   bool preconditioning;
 
 #ifdef SHOW_CONVERGENCE
@@ -626,14 +637,17 @@ static void ComputeRows(
   dRealMutablePtr caccel_erp_ptr2;
   dRealMutablePtr cforce_ptr1;
   dRealMutablePtr cforce_ptr2;
-  for (int iteration=0; iteration < num_iterations + precon_iterations + friction_iterations; iteration++) {
+  for (int iteration=0;
+    iteration < num_iterations + precon_iterations + friction_iterations;
+    iteration++) {
 
     rms_error = 0;
 
     if (iteration < precon_iterations) preconditioning = true;
     else                               preconditioning = false;
 
-#ifdef REORDER_CONSTRAINTS //FIXME: do it for lambda_erp and last_lambda_erp
+#ifdef REORDER_CONSTRAINTS
+    //FIXME: do it for lambda_erp and last_lambda_erp
     // constraints with findex < 0 always come first.
     if (iteration < 2) {
       // for the first two iterations, solve the constraints in
@@ -653,7 +667,8 @@ static void ComputeRows(
         dReal v2 = dFabs (last_lambda[i]);
         dReal max = (v1 > v2) ? v1 : v2;
         if (max > 0) {
-          //@@@ relative error: order[i].error = dFabs(lambda[i]-last_lambda[i])/max;
+          //@@@ relative error: order[i].error =
+          //  dFabs(lambda[i]-last_lambda[i])/max;
           order[i].error = dFabs(lambda[i]-last_lambda[i]);
         }
         else {
@@ -664,7 +679,9 @@ static void ComputeRows(
       }
     }
 
-    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("=====> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++)
+    //  printf("=====> %d %d %d %f %d\n", thread_id, iteration,
+    //    i, order[i].error, order[i].index);
 
     qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
 
@@ -673,26 +690,34 @@ static void ComputeRows(
     //    returned to the caller
     memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
 
-    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++) printf("-----> %d %d %d %f %d\n",thread_id,iteration,i,order[i].error,order[i].index);
+    //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++)
+    //  printf("-----> %d %d %d %f %d\n", thread_id, iteration,
+    //    i, order[i].error, order[i].index);
 
 #endif
 #ifdef RANDOMLY_REORDER_CONSTRAINTS
     if ((iteration & 7) == 0) {
       #ifdef LOCK_WHILE_RANDOMLY_REORDER_CONSTRAINTS
-        boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every swap
+        // lock for every swap
+        boost::recursive_mutex::scoped_lock lock(*mutex);
       #endif
-      //  int swapi = dRandInt(i+1); // swap across engire matrix
-      for (int i=startRow+1; i<startRow+nRows; i++) { // swap within boundary of our own segment
-        int swapi = dRandInt(i+1-startRow)+startRow; // swap within boundary of our own segment
-        //printf("xxxxxxxx>id %d swaping order[%d].index=%d order[%d].index=%d\n",thread_id,i,order[i].index,swapi,order[swapi].index);
+      // swap across engire matrix
+      //  int swapi = dRandInt(i+1);
+      for (int i=startRow+1; i<startRow+nRows; i++) {
+        // swap within boundary of our own segment
+        int swapi = dRandInt(i+1-startRow)+startRow;
+        // printf("xxxxxxxx>id %d swaping order[%d].index=%d"
+        //        " order[%d].index=%d\n", thread_id, i,
+        //        order[i].index, swapi, order[swapi].index);
         IndexError tmp = order[i];
         order[i] = order[swapi];
         order[swapi] = tmp;
       }
 
       // {
-      //   // verify
-      //   boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
+      //   // debug verify
+      //   // lock for every row
+      //   boost::recursive_mutex::scoped_lock lock(*mutex);
       //   printf("  random id %d iter %d\n",thread_id,iteration);
       //   for (int i=startRow+1; i<startRow+nRows; i++)
       //     printf(" %5d,",i);
@@ -711,15 +736,13 @@ static void ComputeRows(
     dReal Jvnew = 0;
 #endif
     for (int i=startRow; i<startRow+nRows; i++) {
-      //boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
-
       // @@@ potential optimization: we could pre-sort J and iMJ, thereby
       //     linearizing access to those arrays. hmmm, this does not seem
       //     like a win, but we should think carefully about our memory
       //     access pattern.
 
       int index = order[i].index;
-      int normal_index = findex[index];  // cache for efficiency
+      int normal_index = findex[index];
 
       if (iteration >= num_iterations + precon_iterations && normal_index < 0)
         continue;
@@ -805,7 +828,8 @@ static void ComputeRows(
         }
 #else
         dReal nl = old_lambda+ delta_precon;
-        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+        _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+          _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
         lambda[index] = nl;
         delta_precon = nl - old_lambda;
 #endif
@@ -813,7 +837,7 @@ static void ComputeRows(
         // update cforce (this is strictly for the precon case)
         {
           // for preconditioning case, compute cforce
-          J_ptr = J_orig + index*12; // FIXME: need un-altered unscaled J, not J_precon!!
+          J_ptr = J_orig + index*12;
 
           // update cforce.
           sum6(cforce_ptr1, delta_precon, J_ptr);
@@ -909,13 +933,15 @@ static void ComputeRows(
   #else
           // FOR erp throttled by info.c_v_max or info.c
           dReal nl = old_lambda + delta;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+            _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
           lambda[index] = nl;
           delta = nl - old_lambda;
 
           // for the unthrottled _erp version
           dReal nl = old_lambda_erp + delta_erp;
-          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl), _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
+          _mm_store_sd(&nl, _mm_max_sd(_mm_min_sd(_mm_load_sd(&nl),
+            _mm_load_sd(&hi_act)), _mm_load_sd(&lo_act)));
           lambda_erp[index] = nl;
           delta_erp = nl - old_lambda_erp;
   #endif
@@ -924,7 +950,8 @@ static void ComputeRows(
 #ifdef SMOOTH_LAMBDA
           {
             // smooth delta lambda
-            // equivalent to first order artificial dissipation on lambda update.
+            // equivalent to first order artificial dissipation
+            // on lambda update.
 #ifdef SHOW_CONVERGENCE
             if (0)
             {
@@ -942,7 +969,8 @@ static void ComputeRows(
               // extra residual smoothing for contact constraints
               lambda[index] = (1.0 - SMOOTH)*lambda[index] + SMOOTH*old_lambda;
               // is filtering lambda_erp necessary?
-              // lambda_erp[index] = (1.0 - SMOOTH)*lambda_erp[index] + SMOOTH*old_lambda_erp;
+              // lambda_erp[index] = (1.0 - SMOOTH)*lambda_erp[index]
+              //   + SMOOTH*old_lambda_erp;
             }
           }
 #endif
@@ -1010,7 +1038,8 @@ static void ComputeRows(
 
 #ifdef PENETRATION_JVERROR_CORRECTION
     Jvnew_final = Jvnew*stepsize1;
-    Jvnew_final = Jvnew_final > 1.0 ? 1.0 : ( Jvnew_final < -1.0 ? -1.0 : Jvnew_final );
+    Jvnew_final = Jvnew_final > 1.0 ? 1.0 :
+      (Jvnew_final < -1.0 ? -1.0 : Jvnew_final);
 #endif
 
     // DO WE NEED TO COMPUTE NORM ACROSS ENTIRE SOLUTION SPACE (0,m)?
@@ -1024,10 +1053,11 @@ static void ComputeRows(
         {
           rms_error = dFabs(delta_error[order[i].index]) > rms_error ? dFabs(delta_error[order[i].index]) : rms_error; // 1norm test
         }
-    #else // use 2 norm
-        //for (int i=startRow; i<startRow+nRows; i++)
-        for (int i=startRow; i<startRow+nRows; i++)  // use entire solution vector errors
-          rms_error += delta_error[order[i].index]*delta_error[order[i].index]; ///(dReal)nRows;
+    #else
+        // compute 2 norm
+        // use entire solution vector errors
+        for (int i=startRow; i<startRow+nRows; i++)
+          rms_error += delta_error[order[i].index]*delta_error[order[i].index];
         rms_error = sqrt(rms_error/(dReal)nRows);
     #endif
 #else
@@ -1035,10 +1065,8 @@ static void ComputeRows(
 #endif
 
     //printf("------ %d %d %20.18f\n",thread_id,iteration,rms_error);
-
-    //for (int i=startRow; i<startRow+nRows; i++) printf("debug: %d %f\n",i,delta_error[i]);
-
-
+    //for (int i=startRow; i<startRow+nRows; i++)
+    //  printf("debug: %d %f\n",i,delta_error[i]);
     //{
     //  // verify
     //  boost::recursive_mutex::scoped_lock lock(*mutex); // lock for every row
@@ -1056,63 +1084,69 @@ static void ComputeRows(
 
 #ifdef SHOW_CONVERGENCE
     // show per iteration history
-    if (0)
     {
-      printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,iteration,rms_error);
+      printf("MONITOR: id: %d iteration: %d error: %20.16f\n",
+        thread_id, iteration, rms_error);
     }
-    if (0)
-    {
-      for (int i=startRow; i<startRow+nRows; i++)
-      {
-        printf("%f, ", lambda[i]);
-      }
-      printf("\n");
-    }
+    // debug: very verbose
+    // for (int i=startRow; i<startRow+nRows; i++)
+    // {
+    //   printf("%f, ", lambda[i]);
+    // }
+    // printf("\n");
 #endif
 
     if (rms_error < sor_lcp_tolerance)
     {
       #ifdef REPORT_MONITOR
-        printf("CONVERGED: id: %d steps: %d rms(%20.18f < %20.18f)\n",thread_id,iteration,rms_error,sor_lcp_tolerance);
+        printf("CONVERGED: id: %d steps: %d rms(%20.18f < %20.18f)\n",
+          thread_id, iteration, rms_error, sor_lcp_tolerance);
       #endif
-      if (iteration < precon_iterations) iteration = precon_iterations; // goto non-precon step
-      else                               break;                         // finished
+      if (iteration < precon_iterations)
+      {
+        // goto non-precon step
+        iteration = precon_iterations;
+      }
+      else
+      {
+        break;
+      }
     }
     else if (iteration == num_iterations + precon_iterations -1)
     {
       #ifdef REPORT_MONITOR
-        printf("WARNING: id: %d did not converge in %d steps, rms(%20.18f > %20.18f)\n",thread_id,num_iterations,rms_error,sor_lcp_tolerance);
+        printf("WARNING: id: %d did not converge in %d steps,"
+               " rms(%20.18f > %20.18f)\n", thread_id, num_iterations,
+               rms_error, sor_lcp_tolerance);
       #endif
     }
 
   } // end of for loop on iterations
 
 #ifdef SHOW_CONVERGENCE
-  if (1)
+  // show lambda at end of iterations
+  printf("lambda end: [");
+  for (int i=startRow; i<startRow+nRows; i++)
   {
-    // show starting lambda
-    printf("lambda end: [");
-    for (int i=startRow; i<startRow+nRows; i++)
-    {
-      printf("%f, ", lambda[i]);
-    }
-    printf("]\n");
-    printf("MONITOR: id: %d iteration: %d error: %20.16f\n",thread_id,num_iterations,rms_error);
+    printf("%f, ", lambda[i]);
   }
+  printf("]\n");
+  printf("MONITOR: id: %d iteration: %d error: %20.16f\n",
+    thread_id, num_iterations, rms_error);
 #endif
+
   //printf("vnew: ");
   //for (int i=0; i<6*nb; i++) printf(" %f ",vnew[i]);
   //printf("\n");
 
-
-
   qs->rms_error          = rms_error;
 
-  #ifdef REPORT_THREAD_TIMING
+#ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  printf("      quickstep row thread %d start time %f ended time %f duration %f\n",thread_id,cur_time,end_time,end_time - cur_time);
-  #endif
+  printf("quickstep row thread %d start time %f ended time %f duration %f\n",
+    thread_id, cur_time, end_time, end_time - cur_time);
+#endif
 }
 
 //***************************************************************************
@@ -1121,7 +1155,8 @@ static void ComputeRows(
 // nb is the number of bodies in the body array.
 // J is an m*12 matrix of constraint rows
 // jb is an array of first and second body numbers for each constraint row
-// invMOI is the global frame inverse inertia for each body (stacked 3x3 matrices)
+// invMOI is the global frame inverse inertia for each body
+// (stacked 3x3 matrices)
 //
 // this returns lambda and cforce (the constraint force).
 // note: cforce is returned as inv(M)*J'*lambda,
@@ -1130,8 +1165,10 @@ static void ComputeRows(
 // rhs, lo and hi are modified on exit
 //
 static void SOR_LCP (dxWorldProcessContext *context,
-  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon, dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda, dRealMutablePtr lambda_erp,
+  const int m, const int nb, dRealMutablePtr J, dRealMutablePtr J_precon,
+  dRealMutablePtr J_orig, dRealMutablePtr vnew, int *jb, dxBody * const *body,
+  dRealPtr invMOI, dRealPtr MOI, dRealMutablePtr lambda,
+  dRealMutablePtr lambda_erp,
   dRealMutablePtr caccel, dRealMutablePtr caccel_erp, dRealMutablePtr cforce,
   dRealMutablePtr rhs, dRealMutablePtr rhs_erp, dRealMutablePtr rhs_precon,
   dRealPtr lo, dRealPtr hi, dRealPtr cfm, const int *findex,
@@ -1217,7 +1254,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
     /* which is a mX1 column vector */
     /********************************/
     // compute Adcfm_precon for the preconditioned case
-    //   do this first before J gets altered (J's diagonals gets premultiplied by Ad)
+    //   do this first before J gets altered (J's diagonals gets
+    //   premultiplied by Ad)
     //   and save a copy of J into J_orig
     //   as J becomes J * Ad, J_precon becomes J * Ad_precon
     Adcfm_precon = context->AllocateArray<dReal> (m);
@@ -1231,7 +1269,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
       dRealMutablePtr J_ptr = J;
       dRealMutablePtr J_orig_ptr = J_orig;
       dRealMutablePtr J_precon_ptr = J_precon;
-      for (int i=0; i<m; J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
+      for (int i=0; i<m;
+        J_ptr += 12, J_precon_ptr += 12, J_orig_ptr += 12, i++) {
         dReal Ad_precon_i = Ad_precon[i];
         for (int j=0; j<12; j++) {
           J_precon_ptr[j] = J_ptr[j] * Ad_precon_i;
@@ -1368,13 +1407,15 @@ static void SOR_LCP (dxWorldProcessContext *context,
   IFTIMING (dTimerNow ("start pgs rows"));
   for (int i=0; i<m; i+= chunk,thread_id++)
   {
-    //for (int ijk=0;ijk<m;ijk++) printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
+    //for (int ijk=0;ijk<m;ijk++)
+    //  printf("thread_id> id:%d jb[%d]=%d\n",thread_id,ijk,jb[ijk]);
 
     int nStart = i - qs->num_overlap < 0 ? 0 : i - qs->num_overlap;
     int nEnd   = i + chunk + qs->num_overlap;
     if (nEnd > m) nEnd = m;
     // if every one reorders constraints, this might just work
-    // comment out below if using defaults (0 and m) so every thread runs through all joints
+    // comment out below if using defaults (0 and m) so every thread
+    //   runs through all joints
     params[thread_id].qs  = qs ;
     params[thread_id].nStart = nStart;   // 0
     params[thread_id].nChunkSize = nEnd - nStart; // m
@@ -1409,15 +1450,18 @@ static void SOR_LCP (dxWorldProcessContext *context,
 #endif
 
 #ifdef REPORT_MONITOR
-    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",thread_id,i,m,chunk,nStart,nEnd);
+    printf("thread summary: id %d i %d m %d chunk %d start %d end %d \n",
+      thread_id, i, m, chunk, nStart, nEnd);
 #endif
 #ifdef USE_TPROW
     if (row_threadpool && row_threadpool->size() > 0)
-      row_threadpool->schedule(boost::bind(ComputeRows,thread_id,order, body, params[thread_id], mutex));
-    else //automatically skip threadpool if only 1 thread allocated
-      ComputeRows(thread_id,order, body, params[thread_id], mutex);
+      row_threadpool->schedule(boost::bind(ComputeRows, thread_id,order,
+        body, params[thread_id], mutex));
+    else
+      //automatically skip threadpool if only 1 thread allocated
+      ComputeRows(thread_id, order, body, params[thread_id], mutex);
 #else
-    ComputeRows(thread_id,order, body, params[thread_id], mutex);
+    ComputeRows(thread_id, order, body, params[thread_id], mutex);
 #endif
   }
 
@@ -1425,7 +1469,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
   // check time for scheduling, this is usually very quick
   //gettimeofday(&tv,NULL);
   //double wait_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  //printf("      quickstep done scheduling start time %f stopped time %f duration %f\n",cur_time,wait_time,wait_time - cur_time);
+  //printf("quickstep done scheduling start time %f stopped time %f"
+  //       " duration %f\n", cur_time, wait_time, wait_time - cur_time);
 
 #ifdef USE_TPROW
   IFTIMING (dTimerNow ("wait for threads"));
@@ -1439,7 +1484,8 @@ static void SOR_LCP (dxWorldProcessContext *context,
   #ifdef REPORT_THREAD_TIMING
   gettimeofday(&tv,NULL);
   double end_time = (double)tv.tv_sec + (double)tv.tv_usec / 1.e6;
-  printf("    quickstep threads start time %f stopped time %f duration %f\n",cur_time,end_time,end_time - cur_time);
+  printf("    quickstep threads start time %f stopped time %f duration %f\n",
+    cur_time, end_time, end_time - cur_time);
   #endif
 
   delete [] params;
@@ -1456,31 +1502,43 @@ struct dJointWithInfo1
 // Modifying inertia without modifying dynamics,
 // Unless moment of inertia modification makes the system unstable,
 // in which case, diagonal terms are increased to make moi diagonally dominant.
-static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
+static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
+                            const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,
                             dRealMutablePtr invMOI, dRealMutablePtr MOI)
 {
   /// INERTIA PROPAGATION ACROSS CONSTRAINED JOINTS
   for (int j=0; j<infom; j++) {
-
-#undef DEBUG_INERTIA_PROPAGATION
 #ifdef DEBUG_INERTIA_PROPAGATION
     printf("--------JAC---------------\n");
-    printf("jacobian [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f] J2a [%f %f %f]\n", j,
-           Jinfo.J1l[0+j*Jinfo.rowskip],Jinfo.J1l[1+j*Jinfo.rowskip],Jinfo.J1l[2+j*Jinfo.rowskip],
-           Jinfo.J2l[0+j*Jinfo.rowskip],Jinfo.J2l[1+j*Jinfo.rowskip],Jinfo.J2l[2+j*Jinfo.rowskip],
-           Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip],
-           Jinfo.J2a[0+j*Jinfo.rowskip],Jinfo.J2a[1+j*Jinfo.rowskip],Jinfo.J2a[2+j*Jinfo.rowskip]);
+    printf("jacobian [%d] J1l [%f %f %f] J2l [%f %f %f] J1a [%f %f %f]"
+           " J2a [%f %f %f]\n", j,
+           Jinfo.J1l[0+j*Jinfo.rowskip],
+           Jinfo.J1l[1+j*Jinfo.rowskip],
+           Jinfo.J1l[2+j*Jinfo.rowskip],
+           Jinfo.J2l[0+j*Jinfo.rowskip],
+           Jinfo.J2l[1+j*Jinfo.rowskip],
+           Jinfo.J2l[2+j*Jinfo.rowskip],
+           Jinfo.J1a[0+j*Jinfo.rowskip],
+           Jinfo.J1a[1+j*Jinfo.rowskip],
+           Jinfo.J1a[2+j*Jinfo.rowskip],
+           Jinfo.J2a[0+j*Jinfo.rowskip],
+           Jinfo.J2a[1+j*Jinfo.rowskip],
+           Jinfo.J2a[2+j*Jinfo.rowskip]);
 #endif
-    /// \FIXME: For now, implement only for the two non-free axial rotation constraints for hinge joints.
+    /// \FIXME: For now, implement only for the two non-free axial rotation
+    /// constraints for hinge joints.
     /// this only makes sense if joint connects two dynamic bodies (b2 >= 0)
     /// Skip this entire block if we don't want to modify inertia for stability.
-    if (b2 >= 0 && jicurr->joint->type() == dJointTypeHinge && (j == 3 || j == 4))
+    if (b2 >= 0 && jicurr->joint->type() == dJointTypeHinge &&
+        (j == 3 || j == 4))
     {
       /// In hinge joint, pure rotational constraint,
-      /// J1l and J2l should be zeros, and J1a and J2a should be equal and opposite
-      /// to each other.  J1a or J2a indicates the constrained axis direction.
-      /// For this implementation, determine constrained axis(s) direction from J1a for hinge joints.
+      /// J1l and J2l should be zeros, and J1a and J2a should be equal
+      /// and opposite to each other.
+      /// J1a or J2a indicates the constrained axis direction.
+      /// For this implementation, determine constrained axis(s)
+      /// direction from J1a for hinge joints.
 
 
       /// get the MOI for parent and child bodies constrained by J1a and J2a.
@@ -1501,8 +1559,11 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       // in the constraint direction:
       //   m1 = S' * MOI1 * S
       //   m2 = S' * MOI2 * S
-      dVector3 S = // line about which we want to compute MOI along
-           { Jinfo.J1a[0+j*Jinfo.rowskip],Jinfo.J1a[1+j*Jinfo.rowskip],Jinfo.J1a[2+j*Jinfo.rowskip] };
+      // S is the line along which we want to compute MOI
+      dVector3 S =
+        {Jinfo.J1a[0+j*Jinfo.rowskip],
+         Jinfo.J1a[1+j*Jinfo.rowskip],
+         Jinfo.J1a[2+j*Jinfo.rowskip] };
       dNormalize3(S);
       dVector3 tmp31;
       dMultiply0_133(tmp31, S, MOI_ptr1);
@@ -1781,8 +1842,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                 - gamma1*SSod[row]);
               dReal right_14 = m1*(SSd[row] - gamma1*SSod[row])
                 - (M1d[row] - gamma1*M1od[row]);
-              // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f] left_14 [%f]>0? right_14 [%f]\n", row,
-              //   denom_13, nomin_13, left_14, right_14);
+              // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f]"
+              //        " left_14 [%f]>0? right_14 [%f]\n", row,
+              //        denom_13, nomin_13, left_14, right_14);
               if (denom_13 > 0)
               {
                 // ok continue to 14
@@ -1798,7 +1860,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -1822,7 +1885,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -1830,7 +1894,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               }
               else
               {
-                // printf("denom_13 [%f]<0, do the checks backwards.\n", denom_13);
+                // printf("denom_13 [%f]<0, do the checks backwards.\n",
+                //        denom_13);
                 // continue to 14, but flip > to <
                 if (left_14 < 0)
                 {
@@ -1844,7 +1909,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                   else
                   {
                     // update moi_ratio
-                    // printf("update: increase moi_ratio %f --> %f\n", moi_ratio, tmp);
+                    // printf("update: increase moi_ratio %f --> %f\n",
+                    //        moi_ratio, tmp);
                     moi_ratio = tmp;
                   }
                 }
@@ -1868,7 +1934,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
                     else
                     {
                       // update moi_ratio
-                      // printf("update: reduce moi_ratio %f --> %f\n", moi_ratio, tmp);
+                      // printf("update: reduce moi_ratio %f --> %f\n",
+                      //        moi_ratio, tmp);
                       // moi_ratio = std::max(1.0, tmp);
                     }
                   }
@@ -1876,8 +1943,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
               }
 
               // check equations 15 and 16 (gamma2 > 1)
-              dReal denom_15 = moi_ratio * ( M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
-              // dReal nomin_15 = moi_ratio * ( M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
+              dReal denom_15 = moi_ratio *
+                (M2od[row] - m2*SSod[row]) + M2od[row] + m1*SSod[row];
+              // dReal nomin_15 = moi_ratio * (M2d[row] - m2*SSd[row])  + M2d[row]  + m1*SSd[row];
               dReal left_16 = M2d[row] - gamma2*M2od[row] - m2*(SSd[row] - gamma2*SSod[row]);
               dReal right_16 = (gamma2*M2od[row] - M2d[row]) + m1*(gamma2*SSod[row] - SSd[row]);
               // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f] left_16 [%f]>0? right_16 [%f]\n", row,
@@ -1978,8 +2046,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
             {
               // equations 13, 14 maps to 18, 19
               // check equations 18 and 19 (gamma1 > 1)
-              dReal denom_18 = moi_ratio * ( M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
-              // dReal nomin_18 = moi_ratio * ( M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
+              dReal denom_18 = moi_ratio * (M1od[row] - m1*SSod[row]) + M1od[row] + m2*SSod[row];
+              // dReal nomin_18 = moi_ratio * (M1d[row] - m1*SSd[row]) + M1d[row] + m2*SSd[row];
               dReal left_19 = M1d[row] - gamma1*M1od[row] - m1*(SSd[row] - gamma2*SSod[row]);
               dReal right_19 = m2*(gamma1*SSod[row] - SSd[row]) + (gamma1*M1od[row] - M1d[row]);
               // printf("row [%d] denom_18 [%f]>0? nomin_18 [%f] left_19 [%f]>0? right_19 [%f]\n", row,
@@ -2080,8 +2148,8 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
 
               // equations 15, 16 maps to 20, 21
               // check equations 20 and 21 (gamma2 > 1)
-              dReal denom_20 = moi_ratio * ( M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
-              // dReal nomin_20 = moi_ratio * ( M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
+              dReal denom_20 = moi_ratio * (M2od[row] + m1*SSod[row]) + M2od[row] - m2*SSod[row];
+              // dReal nomin_20 = moi_ratio * (M2d[row] + m1*SSd[row])  + M2d[row]  - m2*SSd[row];
               dReal left_21 = M2d[row] - gamma2*M2od[row] + m1*(SSd[row] - gamma2*SSod[row]);
               dReal right_21 = m2*(SSd[row] - gamma2*SSod[row]) - (M2d[row] - gamma2*M2od[row]);
               // printf("row [%d] denom_20 [%f]>0? nomin_20 [%f] left_21 [%f]>0? right_21 [%f]\n", row,
