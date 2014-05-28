@@ -1698,7 +1698,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         //       M1_new = M1 + dm1 * SS
         //       M2_new = M2 + dm2 * SS
         //     To eliminate dm2, use:
-        //       (equation 4) dm1 + dm2 = 0
+        //       (eq 4) dm1 + dm2 = 0
         //     Check for Diagonal Dominance (DD):
         //       M1d_new  = M1d  + dm1 * SSd
         //       M1od_new = M1od + dm1 * SSod
