@@ -1658,9 +1658,17 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         //       M1od_new ≤ M1od + dm1 * SSod
         //       M2d_new  = M2d  + dm2 * SSd
         //       M2od_new ≤ M2od + dm2 * SSod
-        //     For DD, enforce:
+        //     Where if M1_new_od is the sum of absolute values of
+        //     off diagonal values of M1_new, and M1od_new is as
+        //     defined above, then
+        //       M1_new_od ≤ M1od_new
+        //       M2_new_od ≤ M2od_new
+        //     Hence, below is necessary for DD:
         //       (eq 5) M1d_new / M1od_new = gamma1 > 1
         //       (eq 6) M2d_new / M2od_new = gamma2 > 1
+        //     And we know that enforcing eq 5 and eq 6 is sufficient, since:
+        //       M1d_new / M1_new_od ≥ M1d_new / M1od_new
+        //       M2d_new / M2_new_od ≥ M2d_new / M2od_new
         //     For simplicity, look at the case where m1 > m2:
         //       (for m2 > m1, one can infer the results.)
         //     To eliminate dm1, find dm1 as a function of moi_ratio:
