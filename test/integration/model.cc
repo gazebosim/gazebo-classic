@@ -40,6 +40,27 @@ TEST_F(ModelTest, GetLinksV)
   EXPECT_EQ(model->GetLinks().size(), 1u);
 }
 
+/////////////////////////////////////////////////
+// This tests getting the scoped name of a model and its links.
+TEST_F(ModelTest, GetScopedName)
+{
+  Load("worlds/simple_arm_test.world");
+
+  physics::ModelPtr model = GetModel("simple_arm");
+
+  std::string modelName = model->GetScopedName();
+  EXPECT_EQ(modelName, std::string("default::simple_arm"));
+
+  // This for-loop would cause a seg-fault in gazebo 3.0 and before.
+  for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
+       iter != model->GetLinks().end(); ++iter)
+  {
+    EXPECT_TRUE(*iter);
+    EXPECT_FALSE((*iter)->GetName().empty());
+    EXPECT_EQ((*iter)->GetScopedName(), modelName + "::" + (*iter)->GetName());
+  }
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
