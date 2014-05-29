@@ -31,15 +31,6 @@ TEST_F(ModelTest, GetScopedName)
 
   std::string modelName = model->GetScopedName();
   EXPECT_EQ(modelName, std::string("default::simple_arm"));
-
-  // This for-loop would cause a seg-fault in gazebo 3.0 and before.
-  for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
-       iter != model->GetLinks().end(); ++iter)
-  {
-    EXPECT_TRUE(*iter);
-    EXPECT_FALSE((*iter)->GetName().empty());
-    EXPECT_EQ((*iter)->GetScopedName(), modelName + "::" + (*iter)->GetName());
-  }
 }
 
 int main(int argc, char **argv)
