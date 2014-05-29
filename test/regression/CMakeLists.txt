@@ -42,6 +42,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  346_save_lights.cc
   846_typo_in_camera.cc
 )
 
