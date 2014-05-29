@@ -100,6 +100,7 @@ set (headers
   WrenchVisual.hh
   ogre_gazebo.h
   cegui.h
+  CEGUIOgreRenderer.h
 )
 
 set (gtest_sources

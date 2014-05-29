@@ -25,7 +25,13 @@
 #ifdef HAVE_CEGUI
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/CEGUIEventArgs.h>
+// For ogre-1.9 or greater while CEGUI is lower than 0.8
+// check issue: https://bitbucket.org/osrf/gazebo/issue/994
+#if ((OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && (CEGUI_VERSION_MINOR < 8))
+#include "gazebo/rendering/CEGUIOgreRenderer.h"
+#else
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #endif
 
+#endif
 #endif
