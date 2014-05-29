@@ -277,7 +277,7 @@ static void multiply_J_invM_JT (int m, int nb, dRealMutablePtr J, dRealMutablePt
 
 #ifdef USE_CG_LCP
 
-static inline dReal dot (int n, dRealPtr x, dRealPtr y)
+static inline dReal dot(int n, dRealPtr x, dRealPtr y)
 {
   dReal sum=0;
   for (int i=0; i<n; i++) sum += x[i]*y[i];
@@ -287,14 +287,16 @@ static inline dReal dot (int n, dRealPtr x, dRealPtr y)
 
 // x = y + z*alpha
 
-static inline void add (int n, dRealMutablePtr x, dRealPtr y, dRealPtr z, dReal alpha)
+static inline void add(int n, dRealMutablePtr x, dRealPtr y, dRealPtr z,
+  dReal alpha)
 {
   for (int i=0; i<n; i++) x[i] = y[i] + z[i]*alpha;
 }
 
 static void CG_LCP (dxWorldProcessContext *context,
   int m, int nb, dRealMutablePtr J, int *jb, dxBody * const *body,
-  dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce, dRealMutablePtr rhs,
+  dRealPtr invMOI, dRealMutablePtr lambda, dRealMutablePtr cforce,
+  dRealMutablePtr rhs,
   dRealMutablePtr lo, dRealMutablePtr hi, dRealPtr cfm, int *findex,
   dxQuickStepParameters *qs)
 {
@@ -331,12 +333,12 @@ static void CG_LCP (dxWorldProcessContext *context,
   for (int k=0; k<m; k++) r[k] = rhs[k] - r[k];
 #else
   dSetZero (lambda,m);
-  memcpy (r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
+  memcpy(r,rhs,m*sizeof(dReal));    // residual r = rhs - A*lambda
 #endif
 
   for (int iteration=0; iteration < num_iterations; iteration++) {
     for (int i=0; i<m; i++) z[i] = r[i]*Ad[i];  // z = inv(M)*r
-    dReal rho = dot (m,r,z);    // rho = r'*z
+    dReal rho = dot(m,r,z);    // rho = r'*z
 
     // @@@
     // we must check for convergence, otherwise rho will go to 0 if
@@ -347,18 +349,18 @@ static void CG_LCP (dxWorldProcessContext *context,
     }
 
     if (iteration==0) {
-      memcpy (p,z,m*sizeof(dReal));  // p = z
+      memcpy(p,z,m*sizeof(dReal));  // p = z
     }
     else {
-      add (m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
+      add(m,p,z,p,rho/last_rho);  // p = z + (rho/last_rho)*p
     }
 
     // compute q = (J*inv(M)*J')*p
     multiply_J_invM_JT (m,nb,J,iMJ,jb,cfm,cforce,p,q);
 
-    dReal alpha = rho/dot (m,p,q);    // alpha = rho/(p'*q)
-    add (m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
-    add (m,r,r,q,-alpha);      // r = r - alpha*q
+    dReal alpha = rho/dot(m,p,q);    // alpha = rho/(p'*q)
+    add(m,lambda,lambda,p,alpha);    // lambda = lambda + alpha*p
+    add(m,r,r,q,-alpha);      // r = r - alpha*q
     last_rho = rho;
   }
 
@@ -403,7 +405,8 @@ static int compare_index_error (const void *a, const void *b)
 
 void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
                       dRealPtr MOI, dxBody * const *body,
-                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/, dRealMutablePtr J,
+                      const dReal /*stepsize1*/, dRealMutablePtr /*c*/,
+                      dRealMutablePtr J,
                       int *jb, dRealMutablePtr rhs_precon)
 {
     /**************************************************************************/
@@ -683,12 +686,12 @@ static void ComputeRows(
     //  printf("=====> %d %d %d %f %d\n", thread_id, iteration,
     //    i, order[i].error, order[i].index);
 
-    qsort (order+startRow,nRows,sizeof(IndexError),&compare_index_error);
+    qsort(order+startRow, nRows, sizeof(IndexError), &compare_index_error);
 
     //@@@ potential optimization: swap lambda and last_lambda pointers rather
     //    than copying the data. we must make sure lambda is properly
     //    returned to the caller
-    memcpy (last_lambda+startRow,lambda+startRow,nRows*sizeof(dReal));
+    memcpy(last_lambda+startRow, lambda+startRow, nRows*sizeof(dReal));
 
     //if (thread_id == 0) for (int i=startRow;i<startRow+nRows;i++)
     //  printf("-----> %d %d %d %f %d\n", thread_id, iteration,
@@ -1051,7 +1054,9 @@ static void ComputeRows(
         //for (int i=startRow; i<startRow+nRows; i++)
         for (int i=0; i<m; i++)
         {
-          rms_error = dFabs(delta_error[order[i].index]) > rms_error ? dFabs(delta_error[order[i].index]) : rms_error; // 1norm test
+          // 1norm test
+          rms_error = dFabs(delta_error[order[i].index]) > rms_error ?
+            dFabs(delta_error[order[i].index]) : rms_error;
         }
     #else
         // compute 2 norm
@@ -1542,8 +1547,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
 
 
       /// get the MOI for parent and child bodies constrained by J1a and J2a.
-      /// MOI and invMOI are already in inertial frame (previously rotated by body.posr.R)
-      /// get pointers to our invMOI/MOI matrices
+      /// MOI and invMOI are already in inertial frame (previously rotated
+      /// by body.posr.R).
+      /// Get pointers to our invMOI/MOI matrices
       dReal *invMOI_ptr1 = invMOI + b1 * 12;
       dReal *MOI_ptr1 = MOI + b1 * 12;
 
@@ -2865,7 +2871,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (lambdacurr, jicurr->joint->lambda, infom*sizeof(dReal));
+        memcpy(lambdacurr, jicurr->joint->lambda, infom*sizeof(dReal));
         lambdacurr += infom;
         memcpy(lambda_erpcurr, jicurr->joint->lambda_erp, infom*sizeof(dReal));
         lambda_erpcurr += infom;
@@ -2916,9 +2922,9 @@ void dxQuickStepper (dxWorldProcessContext *context,
       const dJointWithInfo1 *const jiend = jicurr + nj;
       for (; jicurr != jiend; jicurr++) {
         int infom = jicurr->info.m;
-        memcpy (jicurr->joint->lambda, lambdacurr, infom * sizeof(dReal));
+        memcpy(jicurr->joint->lambda, lambdacurr, infom * sizeof(dReal));
         lambdacurr += infom;
-        memcpy (jicurr->joint->lambda_erp,
+        memcpy(jicurr->joint->lambda_erp,
           lambda_erpcurr, infom * sizeof(dReal));
         lambda_erpcurr += infom;
       }
