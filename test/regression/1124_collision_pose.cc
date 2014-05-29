@@ -27,7 +27,7 @@ class Issue1124Test : public ServerFixture
 // \brief Test for issue #1124 by directly setting a model pose
 TEST_F(Issue1124Test, SetModelPose)
 {
-  Load("worlds/box_plane_low_friction_test.world");
+  Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
@@ -43,10 +43,21 @@ TEST_F(Issue1124Test, SetModelPose)
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
 
+  // The world->steps are not necessary. There are included to
+  // err on the side of caution.
+  world->Step(1);
   model->SetWorldPose(math::Pose(2, 2, 0.5, 0, 0, 0));
+  world->Step(1);
+
+  EXPECT_EQ(model->GetWorldPose(), math::Pose(2, 2, 0.5, 0, 0, 0));
+  world->Step(1);
+
+  EXPECT_EQ(link->GetWorldPose(), math::Pose(2, 2, 0.5, 0, 0, 0));
+  world->Step(1);
 
   // The new pose should be centered a the new model location
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(2, 2, 0.5, 0, 0, 0));
+  world->Step(1);
 }
 
 /////////////////////////////////////////////////
