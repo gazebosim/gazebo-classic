@@ -1,4 +1,4 @@
-## Gazebo 3.0 to 4.0
+## Gazebo 3.x to 4.0
 
 ### Additions
 
@@ -17,6 +17,14 @@
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+## Gazebo 3.0 to 3.1
+
+### Additions
+
+1. **gazebo/physics/JointController.hh**
+    + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);
+    + void SetVelocityPID(const std::string &_jointName, const common::PID &_pid);
 
 ## Gazebo 2.0 to 3.0
 
