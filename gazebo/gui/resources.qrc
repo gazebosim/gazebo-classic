@@ -25,8 +25,8 @@
   <file>images/snap_to_grid.png</file>
   <file>images/undo.png</file>
   <file>images/no_image.png</file>
-  <file>images/copy_object.png</file>
-  <file>images/paste_object.png</file>
+  <file>images/copy_object.svg</file>
+  <file>images/paste_object.svg</file>
   <file>images/rotate_object.png</file>
   <file>images/scale_object.png</file>
   <file>images/door.png</file>

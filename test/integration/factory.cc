@@ -163,12 +163,10 @@ TEST_P(FactoryTest, Cylinder)
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/pr2.world", true, _physicsEngine);
 
-  std::string name = "test_cylinder";
-  setPose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
-  SpawnCylinder(name, setPose.pos, setPose.rot.GetAsEuler());
-
+  // clone the pr2
+  std::string name = "pr2";
   msgs::Factory msg;
   math::Pose clonePose;
   clonePose.Set(math::Vector3(2, 3, 0.5), math::Quaternion(0, 0, 0));
@@ -176,7 +174,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
 
-  // Wait for the cloned entity to spawn
+  // Wait for the pr2 clone to spawn
   std::string cloneName = name + "_clone";
   int maxSleep = 50;
   int sleepCount = 0;
@@ -191,6 +189,85 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   EXPECT_TRUE(math::equal(testPose.pos.x, clonePose.pos.x, 0.1));
   EXPECT_TRUE(math::equal(testPose.pos.y, clonePose.pos.y, 0.1));
   EXPECT_TRUE(math::equal(testPose.pos.z, clonePose.pos.z, 0.1));
+
+  // Verify properties of the pr2 clone with the original model.
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Check model
+  physics::ModelPtr model = world->GetModel(name);
+  ASSERT_TRUE(model != NULL);
+  physics::ModelPtr modelClone = world->GetModel(cloneName);
+  ASSERT_TRUE(modelClone != NULL);
+  EXPECT_EQ(model->GetJointCount(), modelClone->GetJointCount());
+  EXPECT_EQ(model->GetLinks().size(), modelClone->GetLinks().size());
+  EXPECT_EQ(model->GetSensorCount(), modelClone->GetSensorCount());
+  EXPECT_EQ(model->GetPluginCount(), modelClone->GetPluginCount());
+  EXPECT_EQ(model->GetAutoDisable(), modelClone->GetAutoDisable());
+
+  // Check links
+  physics::Link_V links = model->GetLinks();
+  physics::Link_V linkClones = modelClone->GetLinks();
+  for (unsigned int i = 0; i < links.size(); ++i)
+  {
+    physics::LinkPtr link = links[i];
+    physics::LinkPtr linkClone = linkClones[i];
+
+    EXPECT_EQ(link->GetSensorCount(), linkClone->GetSensorCount());
+    EXPECT_EQ(link->GetKinematic(), linkClone->GetKinematic());
+
+    // Check collisions
+    physics::Collision_V collisions = link->GetCollisions();
+    physics::Collision_V collisionClones = linkClone->GetCollisions();
+    EXPECT_EQ(collisions.size(), collisionClones.size());
+    for (unsigned int j = 0; j < collisions.size(); ++j)
+    {
+      physics::CollisionPtr collision = collisions[j];
+      physics::CollisionPtr collisionClone = collisionClones[j];
+      EXPECT_EQ(collision->GetShapeType(), collisionClone->GetShapeType());
+      EXPECT_EQ(collision->GetMaxContacts(), collisionClone->GetMaxContacts());
+
+      // Check surface
+      physics::SurfaceParamsPtr surface = collision->GetSurface();
+      physics::SurfaceParamsPtr cloneSurface = collisionClone->GetSurface();
+      EXPECT_EQ(surface->collideWithoutContact,
+          cloneSurface->collideWithoutContact);
+      EXPECT_EQ(surface->collideWithoutContactBitmask,
+          cloneSurface->collideWithoutContactBitmask);
+    }
+
+    // Check inertial
+    physics::InertialPtr inertial = link->GetInertial();
+    physics::InertialPtr inertialClone = linkClone->GetInertial();
+    EXPECT_EQ(inertial->GetMass(), inertialClone->GetMass());
+    EXPECT_EQ(inertial->GetCoG(), inertialClone->GetCoG());
+    EXPECT_EQ(inertial->GetPrincipalMoments(),
+        inertialClone->GetPrincipalMoments());
+    EXPECT_EQ(inertial->GetProductsofInertia(),
+        inertialClone->GetProductsofInertia());
+  }
+
+  // Check joints
+  physics::Joint_V joints = model->GetJoints();
+  physics::Joint_V jointClones = modelClone->GetJoints();
+  for (unsigned int i = 0; i < joints.size(); ++i)
+  {
+    physics::JointPtr joint = joints[i];
+    physics::JointPtr jointClone = jointClones[i];
+    EXPECT_EQ(joint->GetAngleCount(), jointClone->GetAngleCount());
+    for (unsigned j = 0; j < joint->GetAngleCount(); ++j)
+    {
+      EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
+      EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));
+      EXPECT_EQ(joint->GetEffortLimit(j), jointClone->GetEffortLimit(j));
+      EXPECT_EQ(joint->GetVelocityLimit(j), jointClone->GetVelocityLimit(j));
+      EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
+      EXPECT_EQ(joint->GetStopDissipation(j),
+          jointClone->GetStopDissipation(j));
+      EXPECT_EQ(joint->GetLocalAxis(j), jointClone->GetLocalAxis(j));
+      EXPECT_EQ(joint->GetDamping(j), jointClone->GetDamping(j));
+    }
+  }
 }
 
 /////////////////////////////////////////////////
