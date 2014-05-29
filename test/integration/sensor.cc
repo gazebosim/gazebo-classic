@@ -17,20 +17,21 @@
 #include <string.h>
 #include "ServerFixture.hh"
 
-class ModelTest : public ServerFixture
+class SensorTest : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
-// This tests getting the scoped name of a model.
-TEST_F(ModelTest, GetScopedName)
+// This tests getting links from a model.
+TEST_F(SensorTest, GetScopedName)
 {
-  Load("worlds/simple_arm_test.world");
+  Load("worlds/camera_pose_test.world");
 
-  physics::ModelPtr model = GetModel("simple_arm");
+  sensors::SensorPtr sensor = sensors::get_sensor("cam1");
+  ASSERT_TRUE(sensor);
 
-  std::string modelName = model->GetScopedName();
-  EXPECT_EQ(modelName, std::string("default::simple_arm"));
+  std::string sensorName = sensor->GetScopedName();
+  EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
 }
 
 int main(int argc, char **argv)
