@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Return the dot product of this vector and _v
       /// \param[in] _v the vector
-      /// \return the cross product
+      /// \return the dot product
       public: double Dot(const Vector2d &_v) const;
 
       /// \brief Assignment operator
