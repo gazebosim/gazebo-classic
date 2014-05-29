@@ -809,6 +809,8 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
 
+    std::cout << "World::Name[" << this->rootElement->GetName() << "]\n";
+    std::cout << "World::LoadModel[" << model->GetScopedName() << "]\n";
     event::Events::addEntity(model->GetScopedName());
 
     msgs::Model msg;

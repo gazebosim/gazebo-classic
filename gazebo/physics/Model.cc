@@ -83,6 +83,7 @@ void Model::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Model::LoadLinks()
 {
+  printf("Load Links\n");
   /// \TODO: check for duplicate model, and raise an error
   /// BasePtr dup = Base::GetByName(this->GetScopedName());
 
