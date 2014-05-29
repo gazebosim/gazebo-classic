@@ -3109,11 +3109,11 @@ void dxQuickStepper (dxWorldProcessContext *context,
 
         /*  DEBUG PRINTOUTS, total forces/accel on a body
         printf("nb[%d] m[%d] b[%d] i[%d] v[%f] dv[%f] vf[%f]"
-               " a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n"
-               ,nb, m, debug_count, j, v0, dv, b_ptr->lvel[j]
-               , a0, da, b_ptr->avel[j]
-               ,caccel_curr[j], caccel_erp_curr[j]
-               ,caccel_curr[3+j], caccel_erp_curr[3+j]);
+               " a[%f] da[%f] af[%f] debug[%f - %f][%f - %f]\n",
+               nb, m, debug_count, j, v0, dv, b_ptr->lvel[j],
+               a0, da, b_ptr->avel[j],
+               caccel_curr[j], caccel_erp_curr[j],
+               caccel_curr[3+j], caccel_erp_curr[3+j]);
         */
       }
       /*  DEBUG PRINTOUTS
