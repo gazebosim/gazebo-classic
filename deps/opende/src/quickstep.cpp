@@ -432,8 +432,7 @@ void computeRHSPrecon(dxWorldProcessContext *context, const int m, const int nb,
         for (int j=0; j<3; j++)
           tmp1curr[j] = b_ptr->facc[j]; // +  body_mass * b_ptr->lvel[j] * stepsize1;
         dReal tmpa[3];
-        for (int j=0; j<3; j++)
-          tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
+        for (int j=0; j<3; j++) tmpa[j] = 0; //b_ptr->avel[j] * stepsize1;
         dMultiply0_331 (tmp1curr + 3,MOIrow,tmpa);
         for (int k=0; k<3; k++) tmp1curr[3+k] += b_ptr->tacc[k];
       }
