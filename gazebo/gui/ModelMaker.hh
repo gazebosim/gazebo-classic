@@ -38,7 +38,11 @@ namespace gazebo
       public: ModelMaker();
       public: virtual ~ModelMaker();
 
-      // public: bool InitFromModel(const std::string &_modelName);
+      /// \brief Initialize the model maker with an existing model
+      /// \param[in] _modelName Name of existing model in the scene.
+      /// \return True if initialization is successful.
+      public: bool InitFromModel(const std::string &_modelName);
+
       public: bool InitFromSDFString(const std::string &_data);
       public: bool InitFromFile(const std::string &_filename);
 

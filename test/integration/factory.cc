@@ -35,6 +35,7 @@ class FactoryTest : public ServerFixture,
   public: void Box(const std::string &_physicsEngine);
   public: void Sphere(const std::string &_physicsEngine);
   public: void Cylinder(const std::string &_physicsEngine);
+  public: void Clone(const std::string &_physicsEngine);
 };
 
 ///////////////////////////////////////////////////
@@ -76,11 +77,13 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_P(FactoryTest, BoxSdf)
 {
   BoxSdf(GetParam());
 }
 
+/////////////////////////////////////////////////
 void FactoryTest::Box(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
@@ -100,11 +103,13 @@ void FactoryTest::Box(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_P(FactoryTest, Box)
 {
   Box(GetParam());
 }
 
+/////////////////////////////////////////////////
 void FactoryTest::Sphere(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
@@ -123,11 +128,13 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_P(FactoryTest, Sphere)
 {
   Sphere(GetParam());
 }
 
+/////////////////////////////////////////////////
 void FactoryTest::Cylinder(const std::string &_physicsEngine)
 {
   math::Pose setPose, testPose;
@@ -146,9 +153,50 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
   }
 }
 
+/////////////////////////////////////////////////
 TEST_P(FactoryTest, Cylinder)
 {
   Cylinder(GetParam());
+}
+
+/////////////////////////////////////////////////
+void FactoryTest::Clone(const std::string &_physicsEngine)
+{
+  math::Pose setPose, testPose;
+  Load("worlds/empty.world", true, _physicsEngine);
+
+  std::string name = "test_cylinder";
+  setPose.Set(math::Vector3(0, 0, 0.5), math::Quaternion(0, 0, 0));
+  SpawnCylinder(name, setPose.pos, setPose.rot.GetAsEuler());
+
+  msgs::Factory msg;
+  math::Pose clonePose;
+  clonePose.Set(math::Vector3(2, 3, 0.5), math::Quaternion(0, 0, 0));
+  msgs::Set(msg.mutable_pose(), clonePose);
+  msg.set_clone_model_name(name);
+  this->factoryPub->Publish(msg);
+
+  // Wait for the cloned entity to spawn
+  std::string cloneName = name + "_clone";
+  int maxSleep = 50;
+  int sleepCount = 0;
+  while (!this->HasEntity(cloneName) && sleepCount < maxSleep)
+  {
+    common::Time::MSleep(100);
+    sleepCount++;
+  }
+
+  EXPECT_TRUE(this->HasEntity(cloneName));
+  testPose = GetEntityPose(cloneName);
+  EXPECT_TRUE(math::equal(testPose.pos.x, clonePose.pos.x, 0.1));
+  EXPECT_TRUE(math::equal(testPose.pos.y, clonePose.pos.y, 0.1));
+  EXPECT_TRUE(math::equal(testPose.pos.z, clonePose.pos.z, 0.1));
+}
+
+/////////////////////////////////////////////////
+TEST_P(FactoryTest, Clone)
+{
+  Clone(GetParam());
 }
 
 // Disabling this test for now. Different machines return different
@@ -187,6 +235,7 @@ TEST_P(FactoryTest, Cylinder)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

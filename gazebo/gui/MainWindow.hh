@@ -138,6 +138,12 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
+      /*/// \brief Qt callback when the copy action is triggered.
+      private slots: void Copy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void Paste();*/
+
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 

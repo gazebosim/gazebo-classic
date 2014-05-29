@@ -472,6 +472,12 @@ namespace gazebo
       public: void ClearParent();
 
       /// \internal
+      /// \brief Helper function to update the geometry object size based on
+      /// the scale of the visual.
+      /// \param[in] _scale Scale of visual
+      public: void UpdateGeomSize(const math::Vector3 &_scale);
+
+      /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
       /// \param[in] _name Name of the visual.
