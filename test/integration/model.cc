@@ -22,7 +22,7 @@ class ModelTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
-// This tests getting the scoped name of a model and its links.
+// This tests getting the scoped name of a model.
 TEST_F(ModelTest, GetScopedName)
 {
   Load("worlds/simple_arm_test.world");
