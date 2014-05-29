@@ -2467,15 +2467,14 @@ void dxQuickStepper (dxWorldProcessContext *context,
   dReal *invMOI = context->AllocateArray<dReal> (3*4*nb);
   dReal *MOI = context->AllocateArray<dReal> (3*4*nb);
 
-  // TODO: possible optimization: move this to inside joint getInfo2, for inertia tweaking.
+  // TODO: possible optimization: move this to inside joint getInfo2, for inertia tweaking
   // update tacc from external force and inertia tensor in inerial frame
   // for now, modify MOI and invMOI after getInfo2 is called
   {
     dReal *invMOIrow = invMOI;
     dReal *MOIrow = MOI;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-      invMOIrow += 12, MOIrow += 12, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMOIrow += 12, MOIrow += 12, bodycurr++) {
       dMatrix3 tmp;
       dxBody *b_ptr = *bodycurr;
 
@@ -2500,8 +2499,7 @@ void dxQuickStepper (dxWorldProcessContext *context,
   {
     dReal *invMrow = invM;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
-      invMrow++, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend; invMrow++, bodycurr++) {
       dxBody *b_ptr = *bodycurr;
       //*invMrow = b_ptr->mass.mass;
       *invMrow = b_ptr->invMass;
