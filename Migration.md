@@ -18,12 +18,6 @@
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
 
-## Gazebo 3.0 to 3.1
-
-### Modification
-1. **gazebo/physics/Base.cc**
-   + ***GetScopedName()*** Functionality was broken, did not prepend world name as described in function documentation.
-
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
