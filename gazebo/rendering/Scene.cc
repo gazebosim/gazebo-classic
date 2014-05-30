@@ -171,6 +171,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 void Scene::Clear()
 {
   this->node->Fini();
+  this->modelMsgs.clear();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
@@ -2464,7 +2465,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   {
     LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -2789,13 +2789,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->Load(_elem);
   comVis->SetVisible(false);
   this->visuals[comVis->GetId()] = comVis;
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
 }
 
 /////////////////////////////////////////////////

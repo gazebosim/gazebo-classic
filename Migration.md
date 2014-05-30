@@ -1,3 +1,23 @@
+## Gazebo 3.0 to 4.0
+
+### Additions
+
+1. **gazebo/msgs/msgs.hh**
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
+
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
@@ -72,7 +92,7 @@
 1. **gazebo/physics/bullet/BulletScrewJoint.hh**
     + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
- 
+
 1. **gazebo/physics/dart/DARTJoint.hh**
     + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
@@ -211,7 +231,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
     + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
- 
+
 1. **gazebo/physics/Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -225,7 +245,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
- 
+
 1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -415,11 +435,11 @@
 
 1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ode/ODEScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ScrewJoint.hh**
     + virtual math::Vector3 GetAnchor(unsigned int _index) const
@@ -436,6 +456,9 @@
 1. **gazebo/physics/dart/DARTPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/Joint.hh**
+    + math::Quaternion GetAxisFrameOffset(unsigned int _index) const
 
 ### Deletions
 
@@ -577,3 +600,15 @@
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + template<typename T> event::ConnectionPtr ConnectContact(T _subscriber)
+    + template<typename T> event::ConnectionPtr DisconnectContact(T _subscriber)
+    + ***Note:*** The ContactManager::CreateFilter functions can be used to
+      create a gazebo topic with contact messages filtered by the name(s)
+      of collision shapes. The topic can then be subscribed with a callback
+      to replicate this removed functionality. See
+      [gazebo pull request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+      for an example migration.

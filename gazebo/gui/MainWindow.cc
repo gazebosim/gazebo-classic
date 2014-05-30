@@ -247,6 +247,8 @@ void MainWindow::Init()
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
 
+  this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
+
   this->statsSub =
     this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
@@ -257,7 +259,7 @@ void MainWindow::Init()
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
 
-  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 }
 
@@ -1344,33 +1346,44 @@ void MainWindow::OnModel(ConstModelPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnLight(ConstLightPtr &_msg)
+{
+  gui::Events::lightUpdate(*_msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  msgs::Model_V modelVMsg;
+  msgs::Scene sceneMsg;
 
-  if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
-    modelVMsg.ParseFromString(_msg->serialized_data());
+    sceneMsg.ParseFromString(_msg->serialized_data());
 
-    for (int i = 0; i < modelVMsg.models_size(); i++)
+    for (int i = 0; i < sceneMsg.model_size(); ++i)
     {
-      this->entities[modelVMsg.models(i).name()] = modelVMsg.models(i).id();
+      this->entities[sceneMsg.model(i).name()] = sceneMsg.model(i).id();
 
-      for (int j = 0; j < modelVMsg.models(i).link_size(); j++)
+      for (int j = 0; j < sceneMsg.model(i).link_size(); ++j)
       {
-        this->entities[modelVMsg.models(i).link(j).name()] =
-          modelVMsg.models(i).link(j).id();
+        this->entities[sceneMsg.model(i).link(j).name()] =
+          sceneMsg.model(i).link(j).id();
 
-        for (int k = 0; k < modelVMsg.models(i).link(j).collision_size(); k++)
+        for (int k = 0; k < sceneMsg.model(i).link(j).collision_size(); ++k)
         {
-          this->entities[modelVMsg.models(i).link(j).collision(k).name()] =
-            modelVMsg.models(i).link(j).collision(k).id();
+          this->entities[sceneMsg.model(i).link(j).collision(k).name()] =
+            sceneMsg.model(i).link(j).collision(k).id();
         }
       }
-      gui::Events::modelUpdate(modelVMsg.models(i));
+      gui::Events::modelUpdate(sceneMsg.model(i));
+    }
+
+    for (int i = 0; i < sceneMsg.light_size(); ++i)
+    {
+      gui::Events::lightUpdate(sceneMsg.light(i));
     }
   }
 
@@ -1417,7 +1430,7 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   if (_msg->has_create() && _msg->create())
   {
     this->renderWidget->CreateScene(_msg->world_name());
-    this->requestMsg = msgs::CreateRequest("entity_list");
+    this->requestMsg = msgs::CreateRequest("scene_info");
     this->requestPub->Publish(*this->requestMsg);
   }
   else if (_msg->has_remove() && _msg->remove())

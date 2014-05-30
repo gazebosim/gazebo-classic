@@ -118,10 +118,6 @@ namespace gazebo
                   unsigned int _index);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                  unsigned int _index) GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
