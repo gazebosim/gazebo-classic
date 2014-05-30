@@ -1158,8 +1158,8 @@ double Link::GetWorldEnergy() const
 }
 
 /////////////////////////////////////////////////
-void Link::Move(const math::Pose &_worldReferenceFrameSrc,
-                const math::Pose &_worldReferenceFrameDst)
+void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                     const math::Pose &_worldReferenceFrameDst)
 {
   math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
     + _worldReferenceFrameDst;

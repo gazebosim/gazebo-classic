@@ -623,7 +623,7 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->Move(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
 
             // debug
             // gzerr << "moved " << (*li)->GetName()
