@@ -942,6 +942,36 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
+math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+          << " returning identity rotation." << std::endl;
+    return math::Quaternion();
+  }
+
+  // Legacy support for specifying axis in parent model frame (#494)
+  if (this->axisParentModelFrame[_index])
+  {
+    // axis is defined in parent model frame, so return the rotation
+    // from joint frame to parent model frame, or
+    // world frame in absence of parent link.
+    math::Pose parentModelWorldPose;
+    math::Pose jointWorldPose = this->GetWorldPose();
+    if (this->parentLink)
+    {
+      parentModelWorldPose = this->parentLink->GetModel()->GetWorldPose();
+    }
+    return (parentModelWorldPose - jointWorldPose).rot;
+  }
+
+  // axis is defined in the joint frame, so
+  // return the rotation from joint frame to joint frame.
+  return math::Quaternion();
+}
+
+//////////////////////////////////////////////////
 double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())

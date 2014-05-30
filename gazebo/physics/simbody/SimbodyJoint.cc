@@ -513,9 +513,18 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        this->GetLowStop(_index).Radian(), _angle.Radian());
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          this->GetLowStop(_index).Radian(), _angle.Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetHighStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
     }
     else
     {
@@ -540,10 +549,19 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   {
     if (this->physicsInitialized)
     {
-      this->limitForce[_index].setBounds(
-        this->simbodyPhysics->integ->updAdvancedState(),
-        _angle.Radian(),
-        this->GetHighStop(_index).Radian());
+      if (!this->limitForce[_index].isEmptyHandle())
+      {
+        this->limitForce[_index].setBounds(
+          this->simbodyPhysics->integ->updAdvancedState(),
+          _angle.Radian(),
+          this->GetHighStop(_index).Radian());
+      }
+      else
+      {
+        gzerr << "child link is NULL, force element not initialized, "
+              << "SetLowStop failed. Please file a report on issue tracker.\n";
+        return false;
+      }
     }
     else
     {

@@ -167,6 +167,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 void Scene::Clear()
 {
   this->node->Fini();
+  this->modelMsgs.clear();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
