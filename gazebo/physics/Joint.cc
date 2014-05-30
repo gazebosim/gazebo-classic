@@ -578,12 +578,6 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
       this->HasType(Base::UNIVERSAL_JOINT) ||
       this->HasType(Base::SLIDER_JOINT))
   {
-    // if (parentLink->GetScopedName() == childLink->GetScopedName())
-    // {
-    //   gzerr << "Is this even possible?\n";
-    //   return;
-    // }
-
     if (childLink)
     {
       // Get all connected links to this joint
