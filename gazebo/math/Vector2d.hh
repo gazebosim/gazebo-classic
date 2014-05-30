@@ -67,7 +67,6 @@ namespace gazebo
       public: void Set(double _x, double _y);
 
       /// \brief Return the cross product of this vector and _v
-      /// \brief Return the dot product of this vector and _v
       /// \param[in] _v the vector
       /// \return the cross product
       public: Vector2d Cross(const Vector2d &_v) const;
