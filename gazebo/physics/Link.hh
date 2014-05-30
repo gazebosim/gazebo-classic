@@ -491,14 +491,14 @@ namespace gazebo
 
       /// \brief Move Link given source and targe frames specified in
       /// world coordinates. Assuming link's relative pose to
-      /// source frame (_worldRefernceFrameSrc) remains unchanged to destination
-      /// frame (_worldRefernceFrameDst).
-      /// \param[in] _worldRefernceFrameSrc initial reference frame to
+      /// source frame (_worldReferenceFrameSrc) remains unchanged relative
+      /// to destination frame (_worldReferenceFrameDst).
+      /// \param[in] _worldReferenceFrameSrc initial reference frame to
       /// which this link is attached.
-      /// \param[in] _worldRefernceFrameDst final location of the
+      /// \param[in] _worldReferenceFrameDst final location of the
       /// reference frame specified in world coordinates.
-      public: void Move(const math::Pose &_worldRefernceFrameSrc,
-                        const math::Pose &_worldRefernceFrameDst);
+      public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                        const math::Pose &_worldReferenceFrameDst);
 
       /// \brief Helper function to find all connected links of a link
       /// based on parent/child relations of joints. For example,
