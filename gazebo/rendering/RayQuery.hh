@@ -21,11 +21,6 @@
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 
-namespace Ogre
-{
-
-}
-
 namespace gazebo
 {
   /// \ingroup gazebo_rendering
