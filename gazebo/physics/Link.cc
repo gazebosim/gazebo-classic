@@ -1261,10 +1261,10 @@ bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
     }
     else
     {
-      // add child link to list
+      // add parent link to list
       _connectedLinks.push_back((*li));
 
-      // recursively check if child link has already been checked
+      // recursively check if parent link has already been checked
       // if it returns false, it looped back to parent, mark flag and break
       // from current for-loop.
       if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
