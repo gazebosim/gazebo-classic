@@ -1,4 +1,4 @@
-## Gazebo 3.0 to 4.0
+## Gazebo 3.1 to 4.0
 
 ### Additions
 
@@ -17,6 +17,12 @@
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+## Gazebo 3.0 to 3.1
+
+### Modification
+1. **gazebo/physics/Base.cc**
+   + ***GetScopedName()*** Functionality was broken, did not prepend world name as described in function documentation.
 
 ## Gazebo 2.0 to 3.0
 
