@@ -125,10 +125,6 @@ namespace gazebo
       /// \param[in] _v Aspect ratio.
       public: void AdjustAspect(double _v);
 
-      /// \brief Set the point the camera should orbit around.
-      /// \param[in] _pt The focal point
-      //public: void SetFocalPoint(const math::Vector3 &_pt);
-
       // Documentation inherited
       public: virtual unsigned int GetImageWidth() const;
 
