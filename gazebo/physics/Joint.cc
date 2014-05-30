@@ -1206,7 +1206,8 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   }
   else
   {
-    gzerr << "Not supported yet.\n";
+    gzerr << "Setting joint position is only supported for"
+          << " higne, universal and slider joints right now.\n";
   }
 
   return newWorldPose;
