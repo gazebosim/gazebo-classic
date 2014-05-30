@@ -68,7 +68,6 @@ void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
   // Joint::SetAngle(SetPosition) is still broken, probably due to issue #1194,
   // as indicated in set_pose_loop.cc integration test.
   // \TODO: this is an ugly line of code. It's like this for speed.
-  this->link->SetDirtyPose(pose);
   this->link->GetWorld()->dirtyPoses.push_back(this->link.get());
 
   // below is inefficient as we end up double caching for some joints
