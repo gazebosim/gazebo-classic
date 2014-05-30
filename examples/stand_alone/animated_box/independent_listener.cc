@@ -23,31 +23,30 @@
 
 /////////////////////////////////////////////////
 // Function is called every time a message is received.
-
 void posesStampedCallback(ConstPosesStampedPtr &posesStamped)
 {
-    std::cout << posesStamped->DebugString();
+  std::cout << posesStamped->DebugString();
 
-    ::google::protobuf::int32 sec = posesStamped->time().sec();
-    ::google::protobuf::int32 nsec = posesStamped->time().nsec();
-    std::cout << "Read time: sec: " << sec << " nsec: " << nsec << "\n";
+  ::google::protobuf::int32 sec = posesStamped->time().sec();
+  ::google::protobuf::int32 nsec = posesStamped->time().nsec();
+  std::cout << "Read time: sec: " << sec << " nsec: " << nsec << std::endl;
 
-    for (int i =0; i < posesStamped->pose_size(); ++i)
+  for (int i =0; i < posesStamped->pose_size(); ++i)
+  {
+    const ::gazebo::msgs::Pose &pose = posesStamped->pose(i);
+    std::string name = pose.name();
+    if (name == std::string("box"))
     {
-        const ::gazebo::msgs::Pose& pose = posesStamped->pose(i);
-        std::string name = pose.name();
-        if (name == std::string("box"))
-        {
-          const ::gazebo::msgs::Vector3d& position = pose.position();
+      const ::gazebo::msgs::Vector3d &position = pose.position();
 
-          double x = position.x();
-          double y = position.y();
-          double z = position.z();
+      double x = position.x();
+      double y = position.y();
+      double z = position.z();
 
-          std::cout << "Read position: x: " << x
-          << " y: " << y << " z: " << z << "\n";
-        }
+      std::cout << "Read position: x: " << x
+          << " y: " << y << " z: " << z << std::endl;
     }
+  }
 }
 
 /////////////////////////////////////////////////

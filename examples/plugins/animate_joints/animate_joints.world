@@ -19,7 +19,7 @@
       <max_step_size>0.01</max_step_size>
     </physics>
     <!-- Ground Plane -->
-    <include><uri>model://ground_plane.model</uri></include>
+    <include><uri>model://ground_plane</uri></include>
     <model name="box">
       <link name="base_link">
         <pose>0 0 0.5 0 0 0</pose>
