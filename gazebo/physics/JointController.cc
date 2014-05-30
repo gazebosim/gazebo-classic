@@ -130,24 +130,24 @@ void JointController::Update()
     }
   }
 
-  /* enable below for kinematic joint position control
-  if (this->dataPtr->positions.size() > 0)
-  {
-    std::map<std::string, JointPtr>::iterator iter;
-    for (iter = this->dataPtr->joints.begin();
-         iter != this->dataPtr->joints.end(); ++iter)
-    {
-      if (this->dataPtr->positions.find(iter->first) ==
-          this->dataPtr->positions.end())
-      {
-        this->dataPtr->positions[iter->first] =
-          iter->second->GetAngle(0).Radian();
-      }
-    }
-    this->SetJointPositions(this->dataPtr->positions);
-    this->dataPtr->positions.clear();
-  }
-  */
+  // Enable below for kinematic joint position control.
+  // Disabled for now. Collisions don't update properly #1124
+  // if (this->dataPtr->positions.size() > 0)
+  // {
+  //   std::map<std::string, JointPtr>::iterator iter;
+  //   for (iter = this->dataPtr->joints.begin();
+  //        iter != this->dataPtr->joints.end(); ++iter)
+  //   {
+  //     if (this->dataPtr->positions.find(iter->first) ==
+  //         this->dataPtr->positions.end())
+  //     {
+  //       this->dataPtr->positions[iter->first] =
+  //         iter->second->GetAngle(0).Radian();
+  //     }
+  //   }
+  //   this->SetJointPositions(this->dataPtr->positions);
+  //   this->dataPtr->positions.clear();
+  // }
 }
 
 /////////////////////////////////////////////////
