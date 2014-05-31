@@ -13,6 +13,9 @@
     + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
     + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
 
+1. **gazebo/gui/ModelMaker.hh**
+    +bool InitFromModel(const std::string & _modelName)
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
