@@ -24,7 +24,7 @@
 /////////////////////////////////////////////////
 std::string customExec(std::string _cmd)
 {
-  _cmd += " 2>/dev/null";
+  _cmd += " 2>&1";
   FILE* pipe = popen(_cmd.c_str(), "r");
 
   if (!pipe)
