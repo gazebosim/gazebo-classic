@@ -19,6 +19,8 @@
 #include <string>
 #include <gtest/gtest.h>
 
+#include "gazebo/common/Console.hh"
+
 #include "test_config.h"
 
 /////////////////////////////////////////////////
@@ -72,9 +74,12 @@ TEST(WorldsInstalled, checkWorlds)
       bool success = boost::algorithm::find_first(result, "Success");
       EXPECT_TRUE(success);
       if (!success)
+      {
+        gzdbg << result << std::endl;
         std::cerr << "World file [" << dir_itr->path()
                   << "] is going to be installed but it's not SDF compliant.\n";
       }
+    }
   }
 }
 
