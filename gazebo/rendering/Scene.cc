@@ -24,7 +24,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/gazebo_config.h"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -64,6 +64,10 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/rendering/Scene.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/rendering/OculusCamera.hh"
+#endif
 
 using namespace gazebo;
 using namespace rendering;
@@ -563,6 +567,29 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+#ifdef HAVE_OCULUS
+OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
+{
+  OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
+
+  if (camera->Ready())
+  {
+    camera->Load();
+    camera->Init();
+    this->oculusCameras.push_back(camera);
+  }
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetOculusCameraCount() const
+{
+  return this->oculusCameras.size();
+}
+#endif
 
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
