@@ -1,4 +1,4 @@
-## Gazebo 3.0 to 4.0
+## Gazebo 3.1 to 4.0
 
 ### Additions
 
@@ -150,10 +150,12 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Entity.hh**
+    + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
+    + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
 1. **gazebo/physics/Box.hh**
     + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
     + ***Replacement:***  bool operator==(const Box &_b) const
-
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -318,6 +320,9 @@
 
 ### Additions
 
+1. **gazebo/physics/Collision.hh**
+    + void SetWorldPoseDirty()
+    + virtual const math::Pose &GetWorldPose() const
 1. **gazebo/physics/JointController.hh**
       + common::Time GetLastUpdateTime() const
       + std::map<std::string, JointPtr> GetJoints() const
