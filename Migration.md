@@ -19,7 +19,8 @@
     + ***Replacement:***  const Link_V &GetLinks() const
 
 1. **gazebo/physics/Base.cc**
-   + ***GetScopedName()*** Functionality was broken, did not prepend world name as described in function documentation.
+   + ***Removed*** std::string GetScopedName() const
+   + ***Replaced*** std::string GetScopedName(bool _prependWorldName) const
 
 ## Gazebo 2.0 to 3.0
 
