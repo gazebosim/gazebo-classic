@@ -146,10 +146,6 @@ namespace gazebo
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
-
-      /// \brief Qt callback when the paste action is triggered.
-      private slots: void Paste();*/
-
       private: void OnFullScreen(bool _value);
       private: void OnMoveMode(bool _mode);
 
