@@ -17,39 +17,21 @@
 #include <string.h>
 #include "ServerFixture.hh"
 
-class ModelTest : public ServerFixture
+class SensorTest : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
 // This tests getting links from a model.
-TEST_F(ModelTest, GetLinksV)
+TEST_F(SensorTest, GetScopedName)
 {
-  Load("worlds/joint_test.world");
-  physics::ModelPtr model = GetModel("model_1");
+  Load("worlds/camera_pose_test.world");
 
-  // This for-loop would cause a seg-fault in gazebo 3.0 and before.
-  for (physics::Link_V::const_iterator iter = model->GetLinks().begin();
-       iter != model->GetLinks().end(); ++iter)
-  {
-    EXPECT_TRUE(*iter);
-    EXPECT_FALSE((*iter)->GetName().empty());
-    EXPECT_STREQ((*iter)->GetName().c_str(), "link_1");
-  }
+  sensors::SensorPtr sensor = sensors::get_sensor("cam1");
+  ASSERT_TRUE(sensor);
 
-  EXPECT_EQ(model->GetLinks().size(), 1u);
-}
-
-/////////////////////////////////////////////////
-// This tests getting the scoped name of a model.
-TEST_F(ModelTest, GetScopedName)
-{
-  Load("worlds/simple_arm_test.world");
-
-  physics::ModelPtr model = GetModel("simple_arm");
-
-  std::string modelName = model->GetScopedName();
-  EXPECT_EQ(modelName, std::string("default::simple_arm"));
+  std::string sensorName = sensor->GetScopedName();
+  EXPECT_EQ(sensorName, std::string("default::rotated_box::link::cam1"));
 }
 
 int main(int argc, char **argv)

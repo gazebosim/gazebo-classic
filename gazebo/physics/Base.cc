@@ -311,8 +311,7 @@ void Base::ComputeScopedName()
 
   while (p)
   {
-    if (p->GetParent())
-      this->scopedName.insert(0, p->GetName()+"::");
+    this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
 }
