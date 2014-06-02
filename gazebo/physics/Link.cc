@@ -156,7 +156,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       {
         std::string sensorName =
           sensors::create_sensor(sensorElem, this->GetWorld()->GetName(),
-              this->GetScopedName(), this->GetId());
+              this->GetScopedName(false), this->GetId());
         this->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");

@@ -778,10 +778,18 @@ common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
 //////////////////////////////////////////////////
 BasePtr World::GetByName(const std::string &_name)
 {
+  BasePtr result;
   if (this->rootElement)
-    return this->rootElement->GetByName(_name);
-  else
-    return BasePtr();
+  {
+    // First try to get the entity using the name provided.
+    if (!(result = this->rootElement->GetByName(_name)))
+    {
+      // If that fails, try adding the world name
+      result = this->rootElement->GetByName(this->name + "::" + _name);
+    }
+  }
+
+  return result;
 }
 
 /////////////////////////////////////////////////

@@ -292,15 +292,20 @@ BasePtr Base::GetByName(const std::string &_name)
 
   for (iter = this->children.begin();
       iter != this->children.end() && result == NULL; ++iter)
+  {
     result = (*iter)->GetByName(_name);
+  }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-std::string Base::GetScopedName() const
+std::string Base::GetScopedName(bool _prependWorldName) const
 {
-  return this->scopedName;
+  if (_prependWorldName)
+    return this->world->GetName() + "::" + this->scopedName;
+  else
+    return this->scopedName;
 }
 
 //////////////////////////////////////////////////
@@ -311,7 +316,8 @@ void Base::ComputeScopedName()
 
   while (p)
   {
-    this->scopedName.insert(0, p->GetName()+"::");
+    if (p->GetParent())
+      this->scopedName.insert(0, p->GetName()+"::");
     p = p->GetParent();
   }
 }

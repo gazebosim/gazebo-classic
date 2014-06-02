@@ -258,9 +258,12 @@ namespace gazebo
       public: unsigned int GetType() const;
 
       /// \brief Return the name of this entity with the model scope
+      /// model1::...::modelN::entityName
+      /// \param[in] _prependWorldName If true the world name is prepended
+      /// to the return value. The result is
       /// world::model1::...::modelN::entityName
       /// \return The scoped name.
-      public: std::string GetScopedName() const;
+      public: std::string GetScopedName(bool _prependWorldName=false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.
