@@ -36,7 +36,7 @@ namespace gazebo
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
     /// \brief Poll the hydra for input.
-    /// \param[in] lowPassCornerHz Filter frequency.
+    /// \param[in] _lowPassCornerHz Filter frequency.
     /// \return true when there is a new update coming from the controller.
     private: bool Poll(float _lowPassCornerHz = 5.0);
 
