@@ -70,6 +70,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->renderFrame->setFrameShape(QFrame::NoFrame);
   this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
+  this->renderFrame->setContentsMargins(0, 0, 0, 0);
   this->renderFrame->show();
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(this->renderFrame);
@@ -171,14 +172,20 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 void GLWidget::showEvent(QShowEvent *_event)
 {
   QApplication::flush();
-  this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
-    CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+
+  if (this->windowId < 0)
+  {
+    this->windowId = rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(this->GetOgreHandle(), this->width(), this->height());
+    if (this->userCamera)
+    {
+      rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->windowId, this->userCamera);
+    }
+  }
 
   QWidget::showEvent(_event);
 
-  if (this->userCamera)
-    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-        this->windowId, this->userCamera);
   this->setFocus();
 }
 

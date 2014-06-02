@@ -22,11 +22,16 @@
 #include <vector>
 #include <list>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
+#endif
 
 namespace gazebo
 {
@@ -121,6 +126,7 @@ namespace gazebo
       private slots: void FullScreen();
       private slots: void FPS();
       private slots: void Orbit();
+      private slots: void ViewOculus();
       private slots: void OnResetModelOnly();
       private slots: void OnResetWorld();
       private slots: void SetTransparent();
@@ -138,8 +144,8 @@ namespace gazebo
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
 
-      /*/// \brief Qt callback when the copy action is triggered.
-      private slots: void Copy();
+      /// \brief Toggle full screen display.
+      /// \param[in] _value True to display in full screen mode.
 
       /// \brief Qt callback when the paste action is triggered.
       private slots: void Paste();*/
@@ -253,6 +259,10 @@ namespace gazebo
 
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
+
+#ifdef HAVE_OCULUS
+      private: gui::OculusWindow *oculusWindow;
+#endif
     };
   }
 }
