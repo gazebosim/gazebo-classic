@@ -46,7 +46,7 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
     else if (this->stamp == "real")
       _stream << _state.GetRealTime().Double() << " ";
     else if (this->stamp == "wall")
-      _stream << _state.GetWallTime().Double() << " "; 
+      _stream << _state.GetWallTime().Double() << " ";
     _stream.setf(flags);
   }
 
