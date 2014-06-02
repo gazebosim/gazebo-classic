@@ -905,7 +905,6 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   {
     g_copyAct->setEnabled(false);
   }
-
 }
 
 /////////////////////////////////////////////////
