@@ -636,6 +636,7 @@ TEST_F(gzTest, SDF)
     // | sed ':a;N;$!ba;s/\n/\\n/g' | sed 's/"/\\"/g'
     std::string output =
       custom_exec_str(std::string("gz sdf -p ") + path.string());
+    std::err << output << std::endl;
     std::string shasum = gazebo::common::get_sha1<std::string>(output);
     EXPECT_EQ(shasum, "19898716e05fecb7bd1d78e43fe1294ccf403bbf");
   }
