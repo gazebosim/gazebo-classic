@@ -21,15 +21,6 @@
 1. **gazebo/physics/Base.cc**
    + ***GetScopedName()*** Functionality was broken, did not prepend world name as described in function documentation.
 
-
-## Gazebo 3.0 to 3.1
-
-### Additions
-
-1. **gazebo/physics/JointController.hh**
-    + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);
-    + void SetVelocityPID(const std::string &_jointName, const common::PID &_pid);
-
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
