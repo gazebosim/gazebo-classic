@@ -279,99 +279,97 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   uint8_t buf[64];
   ssize_t nread = read(this->hidrawFd, buf, sizeof(buf));
 
-  if (nread > 0)
-  {
-    static bool firstTime = true;
-
-    // Update average read period
-    if (!firstTime)
-    {
-      this->periodEstimate.Process(
-          (common::Time::GetWallTime() - this->lastCycleStart).Double());
-    }
-
-    this->lastCycleStart = common::Time::GetWallTime();
-
-    if (firstTime)
-      firstTime = false;
-
-    // Update filter frequencies
-    float fs = 1.0 / this->periodEstimate.GetValue();
-    float fc = _lowPassCornerHz;
-
-    for (int i = 0; i < 2; ++i)
-    {
-      this->filterPos[i].SetFc(fc, fs);
-      this->filterQuat[i].SetFc(fc, fs);
-    }
-
-    // Read data
-    this->rawPos[0] = *(reinterpret_cast<int16_t *>(buf+8));
-    this->rawPos[1] = *(reinterpret_cast<int16_t *>(buf+10));
-    this->rawPos[2] = *(reinterpret_cast<int16_t *>(buf+12));
-    this->rawQuat[0] = *(reinterpret_cast<int16_t *>(buf+14));
-    this->rawQuat[1] = *(reinterpret_cast<int16_t *>(buf+16));
-    this->rawQuat[2] = *(reinterpret_cast<int16_t *>(buf+18));
-    this->rawQuat[3] = *(reinterpret_cast<int16_t *>(buf+20));
-    this->rawButtons[0] = buf[22] & 0x7f;
-    this->rawAnalog[0] = *(reinterpret_cast<int16_t *>(buf+23));
-    this->rawAnalog[1] = *(reinterpret_cast<int16_t *>(buf+25));
-    this->rawAnalog[2] = buf[27];
-
-    this->rawPos[3] = *(reinterpret_cast<int16_t *>(buf+30));
-    this->rawPos[4] = *(reinterpret_cast<int16_t *>(buf+32));
-    this->rawPos[5] = *(reinterpret_cast<int16_t *>(buf+34));
-    this->rawQuat[4] = *(reinterpret_cast<int16_t *>(buf+36));
-    this->rawQuat[5] = *(reinterpret_cast<int16_t *>(buf+38));
-    this->rawQuat[6] = *(reinterpret_cast<int16_t *>(buf+40));
-    this->rawQuat[7] = *(reinterpret_cast<int16_t *>(buf+42));
-    this->rawButtons[1] = buf[44] & 0x7f;
-    this->rawAnalog[3] = *(reinterpret_cast<int16_t *>(buf+45));
-    this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
-    this->rawAnalog[5] = buf[49];
-
-    boost::mutex::scoped_lock lock(this->mutex);
-    // Put the raw position and orientation into Gazebo coordinate frame
-    for (int i = 0; i < 2; i++)
-    {
-      this->pos[i].x = -this->rawPos[3*i+1] * 0.001;
-      this->pos[i].y = -this->rawPos[3*i+0] * 0.001;
-      this->pos[i].z = -this->rawPos[3*i+2] * 0.001;
-
-      this->quat[i].w = this->rawQuat[i*4+0] / 32768.0;
-      this->quat[i].x = -this->rawQuat[i*4+2] / 32768.0;
-      this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
-      this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
-    }
-
-    // Apply filters
-    for (int i = 0; i < 2; i++)
-    {
-      this->quat[i] = this->filterQuat[i].Process(this->quat[i]);
-      this->pos[i] = this->filterPos[i].Process(this->pos[i]);
-    }
-
-    this->analog[0] = this->rawAnalog[0] / 32768.0;
-    this->analog[1] = this->rawAnalog[1] / 32768.0;
-    this->analog[2] = this->rawAnalog[2] / 255.0;
-    this->analog[3] = this->rawAnalog[3] / 32768.0;
-    this->analog[4] = this->rawAnalog[4] / 32768.0;
-    this->analog[5] = this->rawAnalog[5] / 255.0;
-
-    for (int i = 0; i < 2; ++i)
-    {
-      this->buttons[i*7  ] = (this->rawButtons[i] & 0x01) ? 1 : 0;
-      this->buttons[i*7+1] = (this->rawButtons[i] & 0x04) ? 1 : 0;
-      this->buttons[i*7+2] = (this->rawButtons[i] & 0x08) ? 1 : 0;
-      this->buttons[i*7+3] = (this->rawButtons[i] & 0x02) ? 1 : 0;
-      this->buttons[i*7+4] = (this->rawButtons[i] & 0x10) ? 1 : 0;
-      this->buttons[i*7+5] = (this->rawButtons[i] & 0x20) ? 1 : 0;
-      this->buttons[i*7+6] = (this->rawButtons[i] & 0x40) ? 1 : 0;
-    }
-  }
-  else
-  {
+  // No updates.
+  if (nread <= 0)
     return false;
+
+
+  static bool firstTime = true;
+
+  // Update average read period
+  if (!firstTime)
+  {
+    this->periodEstimate.Process(
+      (common::Time::GetWallTime() - this->lastCycleStart).Double());
+  }
+
+  this->lastCycleStart = common::Time::GetWallTime();
+
+  if (firstTime)
+    firstTime = false;
+
+  // Update filter frequencies
+  float fs = 1.0 / this->periodEstimate.GetValue();
+  float fc = _lowPassCornerHz;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    this->filterPos[i].SetFc(fc, fs);
+    this->filterQuat[i].SetFc(fc, fs);
+  }
+
+  // Read data
+  this->rawPos[0] = *(reinterpret_cast<int16_t *>(buf+8));
+  this->rawPos[1] = *(reinterpret_cast<int16_t *>(buf+10));
+  this->rawPos[2] = *(reinterpret_cast<int16_t *>(buf+12));
+  this->rawQuat[0] = *(reinterpret_cast<int16_t *>(buf+14));
+  this->rawQuat[1] = *(reinterpret_cast<int16_t *>(buf+16));
+  this->rawQuat[2] = *(reinterpret_cast<int16_t *>(buf+18));
+  this->rawQuat[3] = *(reinterpret_cast<int16_t *>(buf+20));
+  this->rawButtons[0] = buf[22] & 0x7f;
+  this->rawAnalog[0] = *(reinterpret_cast<int16_t *>(buf+23));
+  this->rawAnalog[1] = *(reinterpret_cast<int16_t *>(buf+25));
+  this->rawAnalog[2] = buf[27];
+
+  this->rawPos[3] = *(reinterpret_cast<int16_t *>(buf+30));
+  this->rawPos[4] = *(reinterpret_cast<int16_t *>(buf+32));
+  this->rawPos[5] = *(reinterpret_cast<int16_t *>(buf+34));
+  this->rawQuat[4] = *(reinterpret_cast<int16_t *>(buf+36));
+  this->rawQuat[5] = *(reinterpret_cast<int16_t *>(buf+38));
+  this->rawQuat[6] = *(reinterpret_cast<int16_t *>(buf+40));
+  this->rawQuat[7] = *(reinterpret_cast<int16_t *>(buf+42));
+  this->rawButtons[1] = buf[44] & 0x7f;
+  this->rawAnalog[3] = *(reinterpret_cast<int16_t *>(buf+45));
+  this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
+  this->rawAnalog[5] = buf[49];
+
+  boost::mutex::scoped_lock lock(this->mutex);
+  // Put the raw position and orientation into Gazebo coordinate frame
+  for (int i = 0; i < 2; ++i)
+  {
+    this->pos[i].x = -this->rawPos[3*i+1] * 0.001;
+    this->pos[i].y = -this->rawPos[3*i+0] * 0.001;
+    this->pos[i].z = -this->rawPos[3*i+2] * 0.001;
+
+    this->quat[i].w = this->rawQuat[i*4+0] / 32768.0;
+    this->quat[i].x = -this->rawQuat[i*4+2] / 32768.0;
+    this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
+    this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
+  }
+
+  // Apply filters
+  for (int i = 0; i < 2; ++i)
+  {
+    this->quat[i] = this->filterQuat[i].Process(this->quat[i]);
+    this->pos[i] = this->filterPos[i].Process(this->pos[i]);
+  }
+
+  this->analog[0] = this->rawAnalog[0] / 32768.0;
+  this->analog[1] = this->rawAnalog[1] / 32768.0;
+  this->analog[2] = this->rawAnalog[2] / 255.0;
+  this->analog[3] = this->rawAnalog[3] / 32768.0;
+  this->analog[4] = this->rawAnalog[4] / 32768.0;
+  this->analog[5] = this->rawAnalog[5] / 255.0;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    this->buttons[i*7  ] = (this->rawButtons[i] & 0x01) ? 1 : 0;
+    this->buttons[i*7+1] = (this->rawButtons[i] & 0x04) ? 1 : 0;
+    this->buttons[i*7+2] = (this->rawButtons[i] & 0x08) ? 1 : 0;
+    this->buttons[i*7+3] = (this->rawButtons[i] & 0x02) ? 1 : 0;
+    this->buttons[i*7+4] = (this->rawButtons[i] & 0x10) ? 1 : 0;
+    this->buttons[i*7+5] = (this->rawButtons[i] & 0x20) ? 1 : 0;
+    this->buttons[i*7+6] = (this->rawButtons[i] & 0x40) ? 1 : 0;
   }
 
   return true;
