@@ -101,8 +101,10 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
     {
       std::string line;
       while (std::getline(fileIn, line) && device.empty())
+      {
         if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
           device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+      }
     }
   }
 
@@ -126,7 +128,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   // Get Raw Name
   res = ioctl(this->hidrawFd, HIDIOCGRAWNAME(256), buf);
   if (res < 0)
-    perror("HIDIOCGRAWNAME");
+    gzerr << "Hydro ioctl error HIDIOCGRAWNAME: " << strerror(errno) << "\n";
 
   // set feature to start it streaming
   memset(buf, 0x0, sizeof(buf));
@@ -141,8 +143,8 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
     res = ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf);
     if (res < 0)
     {
-      gzerr << "unable to start streaming\n";
-      perror("HIDIOCSFEATURE");
+      gzerr << "Unable to start streaming. HIDIOCSFEATURE: "
+            << strerror(errno) << "\n";
       common::Time::MSleep(500);
     }
     else
@@ -235,7 +237,8 @@ void RazerHydra::Run()
 
   while (!this->stop)
   {
-    this->Poll(cornerHz);
+    if (!this->Poll(cornerHz))
+      common::Time::NSleep(250000);
   }
 
   if (this->hidrawFd >= 0)
@@ -248,8 +251,8 @@ void RazerHydra::Run()
 
     if (ioctl(this->hidrawFd, HIDIOCSFEATURE(91), buf) < 0)
     {
-      gzerr << "unable to stop streaming\n";
-      perror("HIDIOCSFEATURE");
+      gzerr << "Unable to stop streaming. HIDIOCSFEATURE: "
+            << strerror(errno) << "\n";
     }
 
     close(this->hidrawFd);
@@ -268,8 +271,9 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   if (_lowPassCornerHz <= std::numeric_limits<float>::epsilon())
   {
     gzerr << "Corner frequency for low-pass filter must be greater than 0."
-      << "Aborting.\n";
-    return false;
+      << "Using a default value of 2.5Hz.\n";
+    // Set a default value if the value is incorrect.
+    _lowPassCornerHz = 2.5;
   }
 
   uint8_t buf[64];
@@ -364,13 +368,11 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
       this->buttons[i*7+5] = (this->rawButtons[i] & 0x20) ? 1 : 0;
       this->buttons[i*7+6] = (this->rawButtons[i] & 0x40) ? 1 : 0;
     }
-
-    return true;
   }
   else
   {
-    common::Time::NSleep(250000);
+    return false;
   }
 
-  return false;
+  return true;
 }

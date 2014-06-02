@@ -14,6 +14,7 @@ set (files
   gripper.world
   heightmap_dem.world
   heightmap.world
+  hydra_demo.world
   joint_damping_demo.world
   joints.world
   lights.world
@@ -49,11 +50,5 @@ set (files
   willowgarage.world
   wireless_sensors.world
 )
-
-if (HAVE_USB)
-  set (files ${files}
-    hydra_demo.world
-  )
-endif()
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/worlds/)
