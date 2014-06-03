@@ -54,6 +54,8 @@
 
 #include <dart/constraint/Constraint.h>
 #include <dart/constraint/ConstraintSolver.h>
+#include <dart/constraint/ContactConstraint.h>
+#include <dart/constraint/JointLimitConstraint.h>
 #include <dart/constraint/WeldJointConstraint.h>
 
 #include <dart/simulation/World.h>

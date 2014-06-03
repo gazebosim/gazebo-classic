@@ -63,7 +63,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->dtWorld = new dart::simulation::World;
-//  this->dtWorld->getConstraintHandler()->setCollisionDetector(
+//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
 //        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(

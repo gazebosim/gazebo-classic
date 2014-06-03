@@ -429,8 +429,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 void DARTLink::SetForce(const math::Vector3 &_force)
 {
   // DART assume that _force is external force.
-  this->dtBodyNode->setExtForce(Eigen::Vector3d::Zero(),
-                                DARTTypes::ConvVec3(_force));
+  this->dtBodyNode->setExtForce(DARTTypes::ConvVec3(_force));
 }
 
 //////////////////////////////////////////////////
@@ -443,15 +442,14 @@ void DARTLink::SetTorque(const math::Vector3 &_torque)
 //////////////////////////////////////////////////
 void DARTLink::AddForce(const math::Vector3 &_force)
 {
-  this->dtBodyNode->addExtForce(Eigen::Vector3d::Zero(),
-                                DARTTypes::ConvVec3(_force));
+  this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force));
 }
 
 /////////////////////////////////////////////////
 void DARTLink::AddRelativeForce(const math::Vector3 &_force)
 {
-  this->dtBodyNode->addExtForce(Eigen::Vector3d::Zero(),
-                                DARTTypes::ConvVec3(_force),
+  this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force),
+                                Eigen::Vector3d::Zero(),
                                 true, true);
 }
 
@@ -468,8 +466,8 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
 void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
                                           const math::Vector3 &_relpos)
 {
-  this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_relpos),
-                                DARTTypes::ConvVec3(_force),
+  this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force),
+                                DARTTypes::ConvVec3(_relpos),
                                 true, true);
 }
 
@@ -502,8 +500,10 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 {
   Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);
+  Eigen::Vector3d bodyOffset =
+      this->dtBodyNode->getTransform().linear().transpose() * worldOffset;
   Eigen::Vector3d linVel =
-    this->dtBodyNode->getWorldLinearVelocity(worldOffset);
+    this->dtBodyNode->getWorldLinearVelocity(bodyOffset);
 
   return DARTTypes::ConvVec3(linVel);
 }
