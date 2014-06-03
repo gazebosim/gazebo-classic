@@ -187,10 +187,10 @@ void DARTPhysics::UpdateCollision()
     // calculate torque in world frame
     Eigen::Vector3d torqueA =
         (dtContact.point -
-         dtBodyNode1->getWorldTransform().translation()).cross(force);
+         dtBodyNode1->getTransform().translation()).cross(force);
     Eigen::Vector3d torqueB =
         (dtContact.point -
-         dtBodyNode2->getWorldTransform().translation()).cross(-force);
+         dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(

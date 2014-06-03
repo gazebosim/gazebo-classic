@@ -225,7 +225,7 @@ void DARTLink::Init()
   double Ixy = this->inertial->GetIXY();
   double Ixz = this->inertial->GetIXZ();
   double Iyz = this->inertial->GetIYZ();
-  this->dtBodyNode->setInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
+  this->dtBodyNode->setMomentOfInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
 
   // Visual
   this->visuals;
@@ -272,23 +272,17 @@ void DARTLink::OnPoseChange()
     Eigen::Isometry3d P = Eigen::Isometry3d::Identity();
 
     if (this->dtBodyNode->getParentBodyNode())
-      P = this->dtBodyNode->getParentBodyNode()->getWorldTransform();
+      P = this->dtBodyNode->getParentBodyNode()->getTransform();
 
     Eigen::Isometry3d Q = T1.inverse() * P.inverse() * W * InvT2;
     // Set generalized coordinate and update the transformations only
-    freeJoint->setConfigs(dart::math::logMap(Q), true, false, false);
-  }
-  else if (joint->getNumGenCoords() > 0)
-  {
-    // If the parent joint is not free joint (nor weld joint), set the n dof
-    // as minimal value that makes the link's pose close to the target pose.
-    const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
-    this->dtBodyNode->fitWorldTransform(W);
+    freeJoint->setPositions(dart::math::logMap(Q));
+    freeJoint->getSkeleton()->computeForwardKinematics(true, false, false);
   }
   else
   {
-    gzdbg << "DARTLink::OnPoseChange() doesn't make sense if the dof of the "
-          << "parent joint is 0.\n";
+    gzdbg << "DARTLink::OnPoseChange() doesn't make sense if the parent joint"
+          << "is not free joint (6-dof).\n";
   }
 }
 
@@ -308,13 +302,127 @@ bool DARTLink::GetEnabled() const
 //////////////////////////////////////////////////
 void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 {
-  dtBodyNode->fitWorldLinearVel(DARTTypes::ConvVec3(_vel));
+  // DART body node always have its parent joint.
+  dart::dynamics::Joint* joint = this->dtBodyNode->getParentJoint();
+
+  // This is for the case this function called before DARTModel::Init() is
+  // called.
+  if (joint == NULL)
+    return;
+
+  // Check if the parent joint is free joint
+  dart::dynamics::FreeJoint* freeJoint =
+      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
+
+  // If the parent joint is free joint, set the proper generalized velocity to
+  // fit the linear velocity of the link
+  if (freeJoint)
+  {
+    // Generalized velocities
+    Eigen::Vector3d genVel = DARTTypes::ConvVec3(_vel);
+
+    // If this link has parent link then subtract the effect of parent link's
+    // linear and angular velocities
+    if (this->dtBodyNode->getParentBodyNode())
+    {
+      // Local transformation from the parent link frame to this link frame
+      Eigen::Isometry3d T = freeJoint->getLocalTransform();
+
+      // Parent link's linear and angular velocities
+      Eigen::Vector3d parentLinVel =
+          this->dtBodyNode->getParentBodyNode()->getBodyLinearVelocity();
+      Eigen::Vector3d parentAngVel =
+          this->dtBodyNode->getParentBodyNode()->getBodyAngularVelocity();
+
+      // The effect of the parent link's velocities
+      Eigen::Vector3d propagatedLinVel =
+          T.linear().transpose() *
+          (parentAngVel.cross(T.translation()) + parentLinVel);
+
+      // Subtract the effect
+      genVel -= propagatedLinVel;
+    }
+
+    // Rotation matrix from world frame to this link frame
+    Eigen::Matrix3d R = this->dtBodyNode->getTransform().linear();
+
+    // Change the reference frame to world
+    genVel = R * genVel;
+
+    // Set the generalized velocities
+    freeJoint->setVelocity(3, genVel[0]);
+    freeJoint->setVelocity(4, genVel[1]);
+    freeJoint->setVelocity(5, genVel[2]);
+
+    // Update spatial velocities of all the links in the model
+    freeJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
+  else
+  {
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+          << "is not free joint (6-dof).\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 {
-  dtBodyNode->fitWorldAngularVel(DARTTypes::ConvVec3(_vel));
+  // DART body node always have its parent joint.
+  dart::dynamics::Joint* joint = this->dtBodyNode->getParentJoint();
+
+  // This is for the case this function called before DARTModel::Init() is
+  // called.
+  if (joint == NULL)
+    return;
+
+  // Check if the parent joint is free joint
+  dart::dynamics::FreeJoint* freeJoint =
+      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
+
+  // If the parent joint is free joint, set the proper generalized velocity to
+  // fit the linear velocity of the link
+  if (freeJoint)
+  {
+    // Generalized velocities
+    Eigen::Vector3d genVel = DARTTypes::ConvVec3(_vel);
+
+    // If this link has parent link then subtract the effect of parent link's
+    // linear and angular velocities
+    if (this->dtBodyNode->getParentBodyNode())
+    {
+      // Local transformation from the parent link frame to this link frame
+      Eigen::Isometry3d T = freeJoint->getLocalTransform();
+
+      // Parent link's linear and angular velocities
+      Eigen::Vector3d parentAngVel =
+          this->dtBodyNode->getParentBodyNode()->getBodyAngularVelocity();
+
+      // The effect of the parent link's velocities
+      Eigen::Vector3d propagatedAngVel = T.linear().transpose() * parentAngVel;
+
+      // Subtract the effect
+      genVel -= propagatedAngVel;
+    }
+
+    // Rotation matrix from world frame to this link frame
+    Eigen::Matrix3d R = this->dtBodyNode->getTransform().linear();
+
+    // Change the reference frame to world
+    genVel = R * genVel;
+
+    // Set the generalized velocities
+    freeJoint->setVelocity(0, genVel[0]);
+    freeJoint->setVelocity(1, genVel[1]);
+    freeJoint->setVelocity(2, genVel[2]);
+
+    // Update spatial velocities of all the links in the model
+    freeJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
+  else
+  {
+    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint"
+          << "is not free joint (6-dof).\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -381,9 +489,8 @@ void DARTLink::AddRelativeTorque(const math::Vector3 &_torque)
 gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
     const math::Vector3 &_offset) const
 {
-  const Eigen::Vector3d &linVel =
-      this->dtBodyNode->getWorldVelocity(
-        DARTTypes::ConvVec3(_offset)).tail<3>();
+  Eigen::Vector3d linVel =
+      this->dtBodyNode->getWorldLinearVelocity(DARTTypes::ConvVec3(_offset));
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -396,7 +503,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
   Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);
   Eigen::Vector3d linVel =
-    this->dtBodyNode->getWorldVelocity(worldOffset).tail<3>();
+    this->dtBodyNode->getWorldLinearVelocity(worldOffset);
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -404,9 +511,7 @@ math::Vector3 DARTLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 {
-  Eigen::Vector3d localCOM = this->dtBodyNode->getLocalCOM();
-  Eigen::Vector3d linVel
-    = this->dtBodyNode->getWorldVelocity(localCOM, true).tail<3>();
+  Eigen::Vector3d linVel = this->dtBodyNode->getWorldCOMVelocity();
 
   return DARTTypes::ConvVec3(linVel);
 }
@@ -414,8 +519,7 @@ math::Vector3 DARTLink::GetWorldCoGLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldAngularVel() const
 {
-  const Eigen::Vector3d &angVel
-    = this->dtBodyNode->getWorldVelocity().head<3>();
+  Eigen::Vector3d angVel = this->dtBodyNode->getWorldAngularVelocity();
 
   return DARTTypes::ConvVec3(angVel);
 }
@@ -433,8 +537,8 @@ math::Vector3 DARTLink::GetWorldTorque() const
   // TODO: Need verification
   math::Vector3 torque;
 
-  Eigen::Isometry3d W = this->dtBodyNode->getWorldTransform();
-  Eigen::Matrix6d G   = this->dtBodyNode->getInertia();
+  Eigen::Isometry3d W = this->dtBodyNode->getTransform();
+  Eigen::Matrix6d G   = this->dtBodyNode->getSpatialInertia();
   Eigen::VectorXd V   = this->dtBodyNode->getBodyVelocity();
   Eigen::VectorXd dV  = this->dtBodyNode->getBodyAcceleration();
   Eigen::Vector6d F   = G * dV - dart::math::dad(V, G * V);
@@ -629,7 +733,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
   // Step 1: get dart body's transformation
   // Step 2: set gazebo link's pose using the transformation
   math::Pose newPose = DARTTypes::ConvPose(
-                         this->dtBodyNode->getWorldTransform());
+                         this->dtBodyNode->getTransform());
 
   // Set the new pose to this link
   this->dirtyPose = newPose;

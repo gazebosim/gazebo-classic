@@ -319,7 +319,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     case 0:
     case 1:
     case 2:
-      this->dtJoint->getGenCoord(_index)->setPosMax(_angle.Radian());
+      this->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
       return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -335,7 +335,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   case 0:
   case 1:
   case 2:
-    this->dtJoint->getGenCoord(_index)->setPosMin(_angle.Radian());
+    this->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
     return true;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -351,7 +351,7 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getGenCoord(_index)->getPosMax();
+    return this->dtJoint->getPositionUpperLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -367,7 +367,7 @@ math::Angle DARTJoint::GetLowStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getGenCoord(_index)->getPosMin();
+    return this->dtJoint->getPositionLowerLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -623,7 +623,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dtJoint->getNumGenCoords();
+  angleCount = this->dtJoint->getDof();
 
   return angleCount;
 }

@@ -39,7 +39,6 @@
 #include <dart/dynamics/CylinderShape.h>
 #include <dart/dynamics/EllipsoidShape.h>
 #include <dart/dynamics/FreeJoint.h>
-#include <dart/dynamics/GenCoord.h>
 #include <dart/dynamics/Joint.h>
 #include <dart/dynamics/MeshShape.h>
 #include <dart/dynamics/PointMass.h>
