@@ -347,7 +347,9 @@ bool GUIOverlay::AttachCameraToImage(DepthCameraPtr &_camera,
 }
 
 /////////////////////////////////////////////////
-#ifdef HAVE_CEGUI
+#if defined(HAVE_CEGUI) && \
+   ((OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || \
+   (CEGUI_VERSION >= ((0 << 16) | (8 << 8) | 3)))
 bool GUIOverlay::AttachCameraToImage(CameraPtr &_camera,
                                      const std::string &_windowName)
 {
