@@ -263,7 +263,7 @@ namespace gazebo
       /// with the world name. The result will be
       /// world::model1::...::modelN::entityName.
       /// \return The scoped name.
-      public: std::string GetScopedName(bool _prependWorldName=false) const;
+      public: std::string GetScopedName(bool _prependWorldName = false) const;
 
       /// \brief Print this object to screen via gzmsg.
       /// \param[in] _prefix Usually a set of spaces.
