@@ -947,10 +947,12 @@ void GLWidget::Paste(const std::string &_name)
     if (this->entityMaker)
       this->entityMaker->Stop();
 
-    this->modelMaker.InitFromModel(_name);
-    this->entityMaker = &this->modelMaker;
-    this->entityMaker->Start(this->userCamera);
-    gui::Events::manipMode("make_entity");
+    if (this->modelMaker.InitFromModel(_name))
+    {
+      this->entityMaker = &this->modelMaker;
+      this->entityMaker->Start(this->userCamera);
+      gui::Events::manipMode("make_entity");
+    }
   }
 }
 
@@ -1028,6 +1030,11 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
     {
       this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
+    }
+    if (this->copyEntitylName == _msg->data())
+    {
+      this->copyEntitylName = "";
+      g_pasteAct->setEnabled(false);
     }
   }
 }
