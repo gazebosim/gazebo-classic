@@ -243,8 +243,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    result->dataPtr->children.push_back(
-        (*iter)->Clone((*iter)->GetName(), result));
+    (*iter)->Clone((*iter)->GetName(), result);
   }
 
   if (_newParent == this->dataPtr->scene->GetWorldVisual())

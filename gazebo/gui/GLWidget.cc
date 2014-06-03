@@ -287,7 +287,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C)
+    if (_event->key() == Qt::Key_C && this->selectedVis)
     {
       this->Copy(this->selectedVis->GetName());
     }
@@ -295,7 +295,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     {
       this->Paste(this->copyEntitylName);
       // this makes the entity appear at the mouse cursor
-      this->entityMaker->OnMouseMove(this->mouseEvent);
+      if (this->entityMaker)
+        this->entityMaker->OnMouseMove(this->mouseEvent);
     }
   }
 

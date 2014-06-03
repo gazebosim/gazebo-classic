@@ -25,6 +25,9 @@ class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test copying and pasting an entity
+  private slots: void CopyPaste();
+
   /// \brief Test that trigger of the view wireframe action creates an
   /// appropriate request.
   private slots: void Wireframe();

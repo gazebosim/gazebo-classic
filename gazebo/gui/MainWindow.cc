@@ -149,6 +149,10 @@ MainWindow::MainWindow()
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
+#ifdef HAVE_OCULUS
+  this->oculusWindow = NULL;
+#endif
+
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
