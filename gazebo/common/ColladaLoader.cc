@@ -1292,18 +1292,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    bool hasMaterial = false;
     common::Material *mat = this->LoadMaterial(matStr);
-    for (unsigned int i = 0; i < _mesh->GetMaterialCount(); ++i)
-    {
-      if (_mesh->GetMaterial(i) == mat)
-      {
-        matIndex = i;
-        hasMaterial = true;
-        break;
-      }
-    }
-    if (!hasMaterial)
+
+    matIndex = _mesh->GetMaterialIndex(mat);
+    if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 
     if (matIndex < 0)
@@ -1598,18 +1590,9 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    bool hasMaterial = false;
     common::Material *mat = this->LoadMaterial(matStr);
-    for (unsigned int i = 0; i < _mesh->GetMaterialCount(); ++i)
-    {
-      if (_mesh->GetMaterial(i) == mat)
-      {
-        matIndex = i;
-        hasMaterial = true;
-        break;
-      }
-    }
-    if (!hasMaterial)
+    matIndex = _mesh->GetMaterialIndex(mat);
+    if (matIndex < 0)
       matIndex = _mesh->AddMaterial(mat);
 
     if (matIndex < 0)

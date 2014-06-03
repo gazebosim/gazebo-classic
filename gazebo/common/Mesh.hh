@@ -108,6 +108,11 @@ namespace gazebo
       /// \return the material or NULL if the index is out of bounds
       public: const Material *GetMaterial(int _index) const;
 
+      /// \brief Get the index of material
+      /// \param[in] _mat the matieral
+      /// \return the index of the material or -1 if not found.
+      public: unsigned int GetMaterialIndex(const Material *_mat) const;
+
       /// \brief Get a child mesh
       /// \param[in] _i the index
       /// \return the submesh. An exception is thrown if the index is out of
