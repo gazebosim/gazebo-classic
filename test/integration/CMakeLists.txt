@@ -60,6 +60,7 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  sensor.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc

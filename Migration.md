@@ -18,6 +18,10 @@
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
 
+1. **gazebo/physics/Base.cc**
+    + ***Removed*** std::string GetScopedName() const
+    + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
