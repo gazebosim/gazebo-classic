@@ -111,7 +111,7 @@ namespace gazebo
       /// \brief Get the index of material
       /// \param[in] _mat the matieral
       /// \return the index of the material or -1 if not found.
-      public: unsigned int GetMaterialIndex(const Material *_mat) const;
+      public: int GetMaterialIndex(const Material *_mat) const;
 
       /// \brief Get a child mesh
       /// \param[in] _i the index

@@ -14,7 +14,7 @@
     + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
 
 1. **gazebo/common/Mesh.hh**
-    + unsigned int GetMaterialIndex(const Material *_mat) const
+    + int GetMaterialIndex(const Material *_mat) const
 
 ### Modifications
 1. **gazebo/physics/Model.hh**

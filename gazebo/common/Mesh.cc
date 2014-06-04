@@ -260,7 +260,7 @@ const Material *Mesh::GetMaterial(int index) const
 }
 
 //////////////////////////////////////////////////
-unsigned int Mesh::GetMaterialIndex(const Material *_mat) const
+int Mesh::GetMaterialIndex(const Material *_mat) const
 {
   for (unsigned int i = 0; i < this->materials.size(); ++i)
   {
