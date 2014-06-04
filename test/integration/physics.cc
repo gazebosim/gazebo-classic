@@ -1244,13 +1244,6 @@ TEST_P(PhysicsTest, SphereAtlasLargeError)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issue #1206.\n"
-          << std::endl;
-    return;
-  }
-
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
