@@ -49,6 +49,9 @@ TEST_F(ModelTest, GetScopedName)
   physics::ModelPtr model = GetModel("simple_arm");
 
   std::string modelName = model->GetScopedName();
+  EXPECT_EQ(modelName, std::string("simple_arm"));
+
+  modelName = model->GetScopedName(true);
   EXPECT_EQ(modelName, std::string("default::simple_arm"));
 }
 
