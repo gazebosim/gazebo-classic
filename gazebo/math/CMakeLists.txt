@@ -21,6 +21,7 @@ set (sources
 set (headers
   Angle.hh
   Box.hh
+  Filter.hh
   Helpers.hh
   MathTypes.hh
   Matrix3.hh

@@ -16,6 +16,9 @@
 1. **gazebo/common/Mesh.hh**
     + int GetMaterialIndex(const Material *_mat) const
 
+1. **gazebo/math/Filter.hh**
+    + ***New classes:*** Filter, OnePole, OnePoleQuaternion, OnePoleVector3, BiQuad, and BiQuadVector3
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
