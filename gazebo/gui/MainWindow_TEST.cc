@@ -50,7 +50,6 @@ void MainWindow_TEST::CopyPasteModel()
   mainWindow->show();
 
   std::string modelName = "cylinder";
-  std::string lightName = "sun";
 
   gazebo::rendering::Events::createScene("default");
 
