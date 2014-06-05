@@ -1,4 +1,4 @@
-## Gazebo 3.0 to 4.0
+## Gazebo 3.1 to 4.0
 
 ### Additions
 
@@ -13,10 +13,17 @@
     + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
     + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
 
+1. **gazebo/common/Mesh.hh**
+    + int GetMaterialIndex(const Material *_mat) const
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gazebo/physics/Base.cc**
+    + ***Removed*** std::string GetScopedName() const
+    + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
 
 ## Gazebo 2.0 to 3.0
 
@@ -150,10 +157,12 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Entity.hh**
+    + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
+    + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
 1. **gazebo/physics/Box.hh**
     + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
     + ***Replacement:***  bool operator==(const Box &_b) const
-
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -318,6 +327,9 @@
 
 ### Additions
 
+1. **gazebo/physics/Collision.hh**
+    + void SetWorldPoseDirty()
+    + virtual const math::Pose &GetWorldPose() const
 1. **gazebo/physics/JointController.hh**
       + common::Time GetLastUpdateTime() const
       + std::map<std::string, JointPtr> GetJoints() const

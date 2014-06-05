@@ -10,6 +10,8 @@ set (files
   grid.material
   kitchen.material
   noise.compositor
+  glsl120.program
+  oculus.compositor
   perpixel.program
   picker.material
   ShadowCaster.material
@@ -19,6 +21,7 @@ set (files
   VPL.material
   VPL.program
   shadow_caster.program
+  warp.material
 )
 
 install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/scripts/)
