@@ -57,7 +57,6 @@ void MainWindow_TEST::CopyPasteModel()
   // Otherwise test segfaults later when selecting a model due to making
   // this call outside the rendering thread.
   gazebo::event::Events::setSelectedEntity(modelName, "normal");
-//  gazebo::event::Events::setSelectedEntity(lightName, "normal");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)

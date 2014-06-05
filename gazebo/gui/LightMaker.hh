@@ -47,6 +47,8 @@ namespace gazebo
       public: virtual void OnMouseDrag(const common::MouseEvent &) {}
 
       /// \brief Initialize the light maker from an existing light in the scene.
+      /// \param[in] _lightName Name of existing light in the scene.
+      /// \return True if initialization is successful.
       public: bool InitFromLight(const std::string & _lightName);
 
       /// \brief Initialize the light maker.

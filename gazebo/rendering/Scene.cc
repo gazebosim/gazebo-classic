@@ -2751,11 +2751,7 @@ void Scene::RemoveLight(LightPtr _light)
   {
     // Delete the light
     std::string n = this->StripSceneName(_light->GetName());
-    Light_M::iterator iter = this->lights.find(n);
-    if (iter != this->lights.end())
-    {
-      this->lights.erase(iter);
-    }
+    this->lights.erase(n);
   }
 }
 
