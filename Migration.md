@@ -8,13 +8,21 @@
 1. **gazebo/rendering/Light.hh**
     + math::Quaternion GetRotation() const
     + void SetRotation(const math::Quaternion &_q)
+    + LightPtr Clone(const std::string &_name, ScenePtr _scene)
+
+1. **gazebo/rendering/Scene.hh**
+    + void AddLight(LightPtr _light)
+    + void RemoveLight(LightPtr _light)
 
 1. **gazebo/gui/GuiEvents.hh**
     + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
     + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
 
 1. **gazebo/gui/ModelMaker.hh**
-    +bool InitFromModel(const std::string & _modelName)
+    + bool InitFromModel(const std::string & _modelName)
+
+1. **gazebo/gui/LightMaker.hh**
+    + bool InitFromLight(const std::string & _lightName)
 
 ### Modifications
 1. **gazebo/physics/Model.hh**
