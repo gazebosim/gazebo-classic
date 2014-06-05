@@ -24,10 +24,17 @@
 1. **gazebo/gui/LightMaker.hh**
     + bool InitFromLight(const std::string & _lightName)
 
+1. **gazebo/common/Mesh.hh**
+    + int GetMaterialIndex(const Material *_mat) const
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gazebo/physics/Base.cc**
+    + ***Removed*** std::string GetScopedName() const
+    + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
 
 ## Gazebo 2.0 to 3.0
 
