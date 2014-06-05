@@ -176,13 +176,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
 
   // Wait for the pr2 clone to spawn
   std::string cloneName = name + "_clone";
-  int maxSleep = 50;
-  int sleepCount = 0;
-  while (!this->HasEntity(cloneName) && sleepCount < maxSleep)
-  {
-    common::Time::MSleep(100);
-    sleepCount++;
-  }
+  this->WaitUntilEntitySpawn(cloneName, 100, 100);
 
   EXPECT_TRUE(this->HasEntity(cloneName));
   testPose = GetEntityPose(cloneName);

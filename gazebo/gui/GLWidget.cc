@@ -57,7 +57,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->setObjectName("GLWidget");
   this->state = "select";
   this->sceneCreated = false;
-  this->copyEntitylName = "";
+  this->copyEntityName = "";
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -148,6 +148,11 @@ GLWidget::GLWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 GLWidget::~GLWidget()
 {
+  MouseEventHandler::Instance()->RemovePressFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
+
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
@@ -289,14 +294,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   {
     if (_event->key() == Qt::Key_C && this->selectedVis)
     {
-      this->Copy(this->selectedVis->GetName());
+      this->OnCopy();
     }
-    else if (_event->key() == Qt::Key_V && !this->copyEntitylName.empty())
+    else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
     {
-      this->Paste(this->copyEntitylName);
-      // this makes the entity appear at the mouse cursor
-      if (this->entityMaker)
-        this->entityMaker->OnMouseMove(this->mouseEvent);
+      this->OnPaste();
     }
   }
 
@@ -640,15 +642,13 @@ void GLWidget::OnMouseReleaseNormal()
       this->userCamera->GetVisual(this->mouseEvent.pos);
     if (vis)
     {
+      vis = vis->GetRootVisual();
+      this->SetSelectedVisual(vis);
+      event::Events::setSelectedEntity(vis->GetName(), "normal");
+
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
         g_modelRightMenu->Run(vis->GetName(), QCursor::pos());
-      }
-      else if (this->mouseEvent.button == common::MouseEvent::LEFT)
-      {
-        vis = vis->GetRootVisual();
-        this->SetSelectedVisual(vis);
-        event::Events::setSelectedEntity(vis->GetName(), "normal");
       }
     }
     else
@@ -923,36 +923,46 @@ void GLWidget::OnManipMode(const std::string &_mode)
 void GLWidget::OnCopy()
 {
   if (this->selectedVis)
-    this->Copy(this->selectedVis->GetName());
+  {
+    this->copyEntityName = this->selectedVis->GetName();
+    g_pasteAct->setEnabled(true);
+  }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  this->Paste(this->copyEntitylName);
-}
-
-/////////////////////////////////////////////////
-void GLWidget::Copy(const std::string &_name)
-{
-  this->copyEntitylName = _name;
-  g_pasteAct->setEnabled(true);
-}
-
-/////////////////////////////////////////////////
-void GLWidget::Paste(const std::string &_name)
-{
-  if (!_name.empty())
+  if (!this->copyEntityName.empty())
   {
-    this->ClearSelection();
-    if (this->entityMaker)
-      this->entityMaker->Stop();
+    bool isModel = false;
+    bool isLight = false;
+    if (scene->GetLight(this->copyEntityName))
+      isLight = true;
+    else if (scene->GetVisual(this->copyEntityName))
+      isModel = true;
 
-    if (this->modelMaker.InitFromModel(_name))
+    if (isLight || isModel)
     {
-      this->entityMaker = &this->modelMaker;
-      this->entityMaker->Start(this->userCamera);
-      gui::Events::manipMode("make_entity");
+      this->ClearSelection();
+      if (this->entityMaker)
+        this->entityMaker->Stop();
+
+      if (isLight && this->lightMaker.InitFromLight(this->copyEntityName))
+      {
+        this->entityMaker = &this->lightMaker;
+        this->entityMaker->Start(this->userCamera);
+        // this makes the entity appear at the mouse cursor
+        this->entityMaker->OnMouseMove(this->mouseEvent);
+        gui::Events::manipMode("make_entity");
+      }
+      else if (isModel && this->modelMaker.InitFromModel(this->copyEntityName))
+      {
+        this->entityMaker = &this->modelMaker;
+        this->entityMaker->Start(this->userCamera);
+        // this makes the entity appear at the mouse cursor
+        this->entityMaker->OnMouseMove(this->mouseEvent);
+        gui::Events::manipMode("make_entity");
+      }
     }
   }
 }
@@ -1032,9 +1042,9 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       this->selectedVis.reset();
       this->SetSelectedVisual(rendering::VisualPtr());
     }
-    if (this->copyEntitylName == _msg->data())
+    if (this->copyEntityName == _msg->data())
     {
-      this->copyEntitylName = "";
+      this->copyEntityName = "";
       g_pasteAct->setEnabled(false);
     }
   }
