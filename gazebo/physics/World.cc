@@ -1560,7 +1560,6 @@ void World::ProcessFactoryMsgs()
         iter != this->factoryMsgs.end(); ++iter)
     {
       this->factorySDF->root->ClearElements();
-
       if ((*iter).has_sdf() && !(*iter).sdf().empty())
       {
         // SDF Parsing happens here

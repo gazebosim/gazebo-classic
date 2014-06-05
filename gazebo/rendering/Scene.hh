@@ -369,6 +369,14 @@ namespace gazebo
       /// \param[in] _vis Visual to remove.
       public: void RemoveVisual(VisualPtr _vis);
 
+      /// \brief Add a light to the scene
+      /// \param[in] _light Light to add.
+      public: void AddLight(LightPtr _light);
+
+      /// \brief Remove a light to the scene
+      /// \param[in] _light Light to Remove.
+      public: void RemoveLight(LightPtr _light);
+
       /// \brief Set the grid on or off
       /// \param[in] _enabled Set to true to turn on the grid
       public: void SetGrid(bool _enabled);

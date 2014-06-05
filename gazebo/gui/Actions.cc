@@ -117,3 +117,9 @@ QAction *gazebo::gui::g_diagnosticsAct = 0;
 
 GAZEBO_VISIBLE
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_copyAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_pasteAct = 0;

@@ -83,6 +83,9 @@ namespace gazebo
 
     extern QAction *g_viewOculusAct;
 
+    extern QAction *g_copyAct;
+    extern QAction *g_pasteAct;
+
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
     class GAZEBO_VISIBLE DeleteAction : public QAction
