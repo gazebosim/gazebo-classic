@@ -294,11 +294,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   {
     if (_event->key() == Qt::Key_C && this->selectedVis)
     {
-      this->OnCopy();
+      g_copyAct->trigger();
     }
     else if (_event->key() == Qt::Key_V && !this->copyEntityName.empty())
     {
-      this->OnPaste();
+      g_pasteAct->trigger();
     }
   }
 
@@ -923,22 +923,32 @@ void GLWidget::OnManipMode(const std::string &_mode)
 void GLWidget::OnCopy()
 {
   if (this->selectedVis)
-  {
-    this->copyEntityName = this->selectedVis->GetName();
-    g_pasteAct->setEnabled(true);
-  }
+    this->Copy(this->selectedVis->GetName());
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  if (!this->copyEntityName.empty())
+  this->Paste(this->copyEntityName);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::Copy(const std::string &_name)
+{
+  this->copyEntityName = _name;
+  g_pasteAct->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::Paste(const std::string &_name)
+{
+  if (!_name.empty())
   {
     bool isModel = false;
     bool isLight = false;
-    if (scene->GetLight(this->copyEntityName))
+    if (scene->GetLight(_name))
       isLight = true;
-    else if (scene->GetVisual(this->copyEntityName))
+    else if (scene->GetVisual(_name))
       isModel = true;
 
     if (isLight || isModel)
@@ -947,7 +957,7 @@ void GLWidget::OnPaste()
       if (this->entityMaker)
         this->entityMaker->Stop();
 
-      if (isLight && this->lightMaker.InitFromLight(this->copyEntityName))
+      if (isLight && this->lightMaker.InitFromLight(_name))
       {
         this->entityMaker = &this->lightMaker;
         this->entityMaker->Start(this->userCamera);
@@ -955,7 +965,7 @@ void GLWidget::OnPaste()
         this->entityMaker->OnMouseMove(this->mouseEvent);
         gui::Events::manipMode("make_entity");
       }
-      else if (isModel && this->modelMaker.InitFromModel(this->copyEntityName))
+      else if (isModel && this->modelMaker.InitFromModel(_name))
       {
         this->entityMaker = &this->modelMaker;
         this->entityMaker->Start(this->userCamera);

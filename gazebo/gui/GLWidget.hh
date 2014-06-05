@@ -151,6 +151,14 @@ namespace gazebo
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Copy an entity by name
+      /// \param[in] _name Name of entity to be copied.
+      private: void Copy(const std::string &_name);
+
+      /// \brief Paste an entity by name
+      /// \param[in] _name Name of entity to be pasted.
+      private: void Paste(const std::string &_name);
+
       /// \brief Qt callback when the copy action is triggered.
       private slots: void OnCopy();
 
