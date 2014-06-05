@@ -245,7 +245,7 @@ std::string Sensor::GetName() const
 std::string Sensor::GetScopedName() const
 {
   return this->world->GetName() + "::" + this->parentName + "::" +
-         this->GetName();
+    this->GetName();
 }
 
 //////////////////////////////////////////////////

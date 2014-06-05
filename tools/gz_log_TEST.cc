@@ -244,29 +244,29 @@ TEST(gz_log, HzFilter)
 
 /////////////////////////////////////////////////
 /// Check to raw filtering with time stamps
-TEST(gzlog, RawFilterStamp)
+TEST(gz_log, RawFilterStamp)
 {
   std::string echo, validEcho;
 
   // Sim time
   echo = custom_exec(
-      std::string("gzlog echo -r -s sim --filter pr2.pose.x ") +
+      std::string("gz log --echo -r --stamp sim --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
-  validEcho = "0.021344 0.000000 \n0.0289582 0.000000";
+  validEcho = "0.021344 0.000000 \n0.028958 0.000000";
   EXPECT_EQ(validEcho, echo);
 
   // Real time
   echo = custom_exec(
-      std::string("gzlog echo -r -s real --filter pr2.pose.x ") +
+      std::string("gz log --echo -r --stamp real --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
-  validEcho = "0.001 0.000000 \n0.002 0.000000";
+  validEcho = "0.001000 0.000000 \n0.002000 0.000000";
   EXPECT_EQ(validEcho, echo);
 
   // Wall time
   echo = custom_exec(
-      std::string("gzlog echo -r -s wall --filter pr2.pose.x ") +
+      std::string("gz log --echo -r --stamp wall --filter pr2.pose.x -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = std::string("1360301758.939690 0.000000 \n")
