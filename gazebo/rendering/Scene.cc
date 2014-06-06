@@ -2734,6 +2734,28 @@ void Scene::RemoveVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+void Scene::AddLight(LightPtr _light)
+{
+  std::string n = this->StripSceneName(_light->GetName());
+  Light_M::iterator iter = this->lights.find(n);
+  if (iter != this->lights.end())
+    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+
+  this->lights[n] = _light;
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveLight(LightPtr _light)
+{
+  if (_light)
+  {
+    // Delete the light
+    std::string n = this->StripSceneName(_light->GetName());
+    this->lights.erase(n);
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled && this->grids.empty())

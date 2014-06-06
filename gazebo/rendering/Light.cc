@@ -51,11 +51,16 @@ Light::Light(ScenePtr _scene)
 Light::~Light()
 {
   if (this->light)
+  {
     this->scene->GetManager()->destroyLight(this->GetName());
+  }
 
-  this->visual->DeleteDynamicLine(this->line);
-  this->scene->RemoveVisual(this->visual);
-  this->visual.reset();
+  if (this->visual)
+  {
+    this->visual->DeleteDynamicLine(this->line);
+    this->scene->RemoveVisual(this->visual);
+    this->visual.reset();
+  }
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -68,6 +73,7 @@ void Light::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
+  this->scene->AddLight(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -600,4 +606,19 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_spot_outer_angle(elem->Get<double>("outer_angle"));
     _msg.set_spot_falloff(elem->Get<double>("falloff"));
   }
+}
+
+//////////////////////////////////////////////////
+LightPtr Light::Clone(const std::string &_name, ScenePtr _scene)
+{
+  LightPtr result(new Light(_scene));
+  sdf::ElementPtr sdfCopy(new sdf::Element);
+  sdfCopy->Copy(this->sdf);
+  sdfCopy->GetAttribute("name")->Set(_name);
+  result->Load(sdfCopy);
+
+  result->SetPosition(this->GetPosition());
+  result->SetRotation(this->GetRotation());
+
+  return result;
 }

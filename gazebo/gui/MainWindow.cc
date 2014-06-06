@@ -149,6 +149,10 @@ MainWindow::MainWindow()
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
 
+#ifdef HAVE_OCULUS
+  this->oculusWindow = NULL;
+#endif
+
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
@@ -1137,6 +1141,19 @@ void MainWindow::CreateActions()
   g_screenshotAct->setStatusTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
+
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct->setStatusTip(tr("Copy Entity"));
+  g_copyAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
+  g_copyAct->setEnabled(false);
+
+  g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
+      tr("Paste"), this);
+  g_pasteAct->setStatusTip(tr("Paste Entity"));
+  g_pasteAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
+  g_pasteAct->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
