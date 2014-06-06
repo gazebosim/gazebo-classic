@@ -20,7 +20,7 @@
 class WorldTest : public ServerFixture
 {
 };
-
+/*
 /////////////////////////////////////////////////
 TEST_F(WorldTest, ClearEmptyWorld)
 {
@@ -112,6 +112,53 @@ TEST_F(WorldTest, ModifyLight)
   EXPECT_EQ(sceneMsg2.light(1).diffuse().g(), 0);
   EXPECT_EQ(sceneMsg2.light(1).diffuse().b(), 1);
   EXPECT_EQ(sceneMsg2.light(1).type(), msgs::Light::POINT);
+}
+*/
+
+/////////////////////////////////////////////////
+TEST_F(WorldTest, RemoveModelPaused)
+{
+  Load("worlds/shapes.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  physics::ModelPtr boxModel = world->GetModel("box");
+
+  EXPECT_TRUE(sphereModel);
+  EXPECT_TRUE(boxModel);
+
+  world->RemoveModel(sphereModel);
+  world->RemoveModel("box");
+
+  sphereModel = world->GetModel("sphere");
+  boxModel = world->GetModel("box");
+
+  EXPECT_FALSE(sphereModel);
+  EXPECT_FALSE(boxModel);
+}
+
+/////////////////////////////////////////////////
+TEST_F(WorldTest, RemoveModelUnPaused)
+{
+  Load("worlds/shapes.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  physics::ModelPtr sphereModel = world->GetModel("sphere");
+  physics::ModelPtr boxModel = world->GetModel("box");
+
+  EXPECT_TRUE(sphereModel);
+  EXPECT_TRUE(boxModel);
+
+  world->RemoveModel(sphereModel);
+  world->RemoveModel("box");
+
+  sphereModel = world->GetModel("sphere");
+  boxModel = world->GetModel("box");
+
+  EXPECT_FALSE(sphereModel);
+  EXPECT_FALSE(boxModel);
 }
 
 /////////////////////////////////////////////////

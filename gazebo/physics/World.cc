@@ -366,6 +366,13 @@ void World::RunBlocking(unsigned int _iterations)
 }
 
 //////////////////////////////////////////////////
+void World::RemoveModel(ModelPtr _model)
+{
+  if (_model)
+    this->RemoveModel(_model->GetName());
+}
+
+//////////////////////////////////////////////////
 bool World::GetRunning() const
 {
   return !this->stop;
@@ -1309,29 +1316,6 @@ void World::ProcessEntityMsgs()
   for (iter = this->deleteEntity.begin();
        iter != this->deleteEntity.end(); ++iter)
   {
-    // Remove all the dirty poses from the delete entity.
-    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
-         iter2 != this->dirtyPoses.end();)
-    {
-      if ((*iter2)->GetName() == *iter ||
-          (*iter2)->GetParent()->GetName() == *iter)
-      {
-        this->dirtyPoses.erase(iter2++);
-      }
-      else
-        ++iter2;
-    }
-
-    if (this->sdf->HasElement("model"))
-    {
-      sdf::ElementPtr childElem = this->sdf->GetElement("model");
-      while (childElem && childElem->Get<std::string>("name") != (*iter))
-        childElem = childElem->GetNextElement("model");
-      if (childElem)
-        this->sdf->RemoveChild(childElem);
-    }
-
-    this->rootElement->RemoveChild((*iter));
     this->RemoveModel(*iter);
   }
 
@@ -2014,8 +1998,35 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
+  boost::recursive_mutex::scoped_lock lock(
+      *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+  // Remove all the dirty poses from the delete entity.
+  for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
+      iter2 != this->dirtyPoses.end();)
+  {
+    if ((*iter2)->GetName() == _name ||
+        (*iter2)->GetParent()->GetName() == _name)
+    {
+      this->dirtyPoses.erase(iter2++);
+    }
+    else
+      ++iter2;
+  }
+
+  if (this->sdf->HasElement("model"))
+  {
+    sdf::ElementPtr childElem = this->sdf->GetElement("model");
+    while (childElem && childElem->Get<std::string>("name") != _name)
+      childElem = childElem->GetNextElement("model");
+    if (childElem)
+      this->sdf->RemoveChild(childElem);
+  }
+
+  this->rootElement->RemoveChild(_name);
+
   for (Model_V::iterator iter = this->models.begin();
-       iter != this->models.end(); ++iter)
+      iter != this->models.end(); ++iter)
   {
     if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
     {

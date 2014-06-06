@@ -313,6 +313,24 @@ namespace gazebo
       /// \return The scene state as a protobuf message.
       public: msgs::Scene GetSceneMsg() const;
 
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
+
+      /// \brief Remove a model. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _model Pointer to a model to remove.
+      public: void RemoveModel(ModelPtr _model);
+
+      /// \brief Remove a model by name. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _name Name of the model to remove.
+      public: void RemoveModel(const std::string &_name);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -426,11 +444,6 @@ namespace gazebo
       /// \brief Process all received factory messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
-
-      /// \brief Remove a model from the cached list of models.
-      /// This does not delete the model.
-      /// \param[in] _name Name of the model to remove.
-      private: void RemoveModel(const std::string &_name);
 
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
@@ -694,13 +707,6 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
-
-      /// \todo In gazebo 3.0 this should be move to the proper section.
-      /// \brief Run the world. This call blocks.
-      /// Run the update loop.
-      /// \param[in] _iterations Run for this many iterations, then stop.
-      /// A value of zero disables run stop.
-      public: void RunBlocking(unsigned int _iterations = 0);
     };
     /// \}
   }
