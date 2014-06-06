@@ -27,6 +27,8 @@ namespace gazebo
   /// \brief Rendering namespace
   namespace rendering
   {
+    class RayQueryPrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -36,14 +38,20 @@ namespace gazebo
     /// Provides the interface to load, initialize the rendering engine.
     class GAZEBO_VISIBLE RayQuery
     {
+      /// \brief Constructor
+      /// \param[in] _camera Pointer to camera used for ray casting.
+      public: RayQuery(CameraPtr _camera);
+
+      /// \brief Destructor
+      public: ~RayQuery();
+
       /// \brief Raycast from a point in to the scene.
-      /// \param[in] _point Point to analyse
-      /// \param[in] _normal Direction
+      /// \param[in] _x x position on screen in pixels.
+      /// \param[in] _y y position on screen in pixels.
       /// \param[out] _result Intersection point on the object
       /// \return True if there is intersection
-      public: static bool RaycastFromPoint(ScenePtr scene,
-          const Ogre::Vector3 &_point, const Ogre::Vector3 &_normal,
-          Ogre::Vector3 &_result);
+      public: bool RaycastFromPoint(int _x, int _y,
+          math::Vector3 &_result);
 
       /// \brief Get geometry information of an entity.
       /// \param[in] _entity Ogre entity.
@@ -54,7 +62,7 @@ namespace gazebo
       /// \param[out] _vertices Mesh vertices.
       /// \param[out] _indexCount Number of indices in the mesh.
       /// \param[out] _indices Mesh indices.
-      private: static void GetEntityInformation(const Ogre::Entity *_entity,
+      private: void GetEntityInformation(const Ogre::Entity *_entity,
           const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
           const Ogre::Vector3 &_scale, std::vector<Ogre::Vector3> &_vertices,
           std::vector<unsigned long> &_indices);
@@ -68,7 +76,7 @@ namespace gazebo
       /// \param[out] _vertices Mesh vertices.
       /// \param[out] _indexCount Number of indices in the mesh.
       /// \param[out] _indices Mesh indices.
-      private: static void GetManualObjectInformation(
+      private: void GetManualObjectInformation(
           const Ogre::ManualObject *_manual,
           const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
           const Ogre::Vector3 &_scale, std::vector<Ogre::Vector3> &_vertices,
@@ -83,11 +91,15 @@ namespace gazebo
       /// \param[out] _vertices Mesh vertices.
       /// \param[out] _indexCount Number of indices in the mesh.
       /// \param[out] _indices Mesh indices.
-      private: static void GetMeshInformation(const Ogre::MeshPtr _mesh,
+      private: void GetMeshInformation(const Ogre::MeshPtr _mesh,
           const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
           const Ogre::Vector3 &_scale, unsigned int &_vertexCount,
           Ogre::Vector3 *&_vertices, unsigned int &_indexCount,
           unsigned long *&_indices);
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: RayQueryPrivate *dataPtr;
     };
     /// \}
   }

@@ -15,17 +15,35 @@
  *
 */
 
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RayQueryPrivate.hh"
 #include "gazebo/rendering/RayQuery.hh"
 
 using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-bool RayQuery::RaycastFromPoint(ScenePtr scene, const Ogre::Vector3 &_point,
-    const Ogre::Vector3 &_normal, Ogre::Vector3 &_result)
+RayQuery::RayQuery(CameraPtr _camera)
+  : dataPtr(new RayQueryPrivate)
 {
-  Ogre::SceneManager *sceneMgr = scene->GetManager();
+  this->dataPtr->camera = _camera;
+}
+
+/////////////////////////////////////////////////
+RayQuery::~RayQuery()
+{
+  delete this->dataPtr;
+  this->dataPtr = NULL;
+}
+
+/////////////////////////////////////////////////
+bool RayQuery::RaycastFromPoint(int _x, int _y, math::Vector3 &_result)
+{
+  Ogre::SceneManager *sceneMgr =
+      this->dataPtr->camera->GetScene()->GetManager();
   Ogre::RaySceneQuery *raySceneQuery =
       sceneMgr->createRayQuery(Ogre::Ray(),
       Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK);
@@ -39,7 +57,11 @@ bool RayQuery::RaycastFromPoint(ScenePtr scene, const Ogre::Vector3 &_point,
   raySceneQuery->setSortByDistance(true);
 
   // create the ray to test
-  Ogre::Ray ray(_point, _normal);
+  // Ogre::Ray ray(Conversions::Convert(_point), Conversions::Convert(_normal));
+  Ogre::Ray ray =
+      this->dataPtr->camera->GetOgreCamera()->getCameraToViewportRay(
+      static_cast<float>(_x) / this->dataPtr->camera->GetViewportWidth(),
+      static_cast<float>(_y) / this->dataPtr->camera->GetViewportHeight());
 
   // create a query object
   raySceneQuery->setRay(ray);
@@ -144,7 +166,7 @@ bool RayQuery::RaycastFromPoint(ScenePtr scene, const Ogre::Vector3 &_point,
   if (closestDistance >= 0.0f)
   {
     // raycast success
-    _result = closestResult;
+    _result = Conversions::Convert(closestResult);
     return true;
   }
   // raycast failed

@@ -35,6 +35,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
+#include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -433,6 +434,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
+  else if (this->state == "align")
+    ModelAlign::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -447,6 +450,8 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+  else if (this->state == "align")
+    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -462,6 +467,8 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
+  else if (this->state == "align")
+    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }

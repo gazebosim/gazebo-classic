@@ -68,6 +68,7 @@ void ModelAlign::Init()
   this->dataPtr->node->Init();
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
+
   this->dataPtr->initialized = true;
 }
 
