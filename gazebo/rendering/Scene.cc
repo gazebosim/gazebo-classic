@@ -171,6 +171,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 void Scene::Clear()
 {
   this->node->Fini();
+  this->modelMsgs.clear();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
@@ -572,9 +573,13 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
 {
   OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
-  camera->Load();
-  camera->Init();
-  this->oculusCameras.push_back(camera);
+
+  if (camera->Ready())
+  {
+    camera->Load();
+    camera->Init();
+    this->oculusCameras.push_back(camera);
+  }
 
   return camera;
 }
@@ -2460,7 +2465,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   {
     LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -2730,6 +2734,28 @@ void Scene::RemoveVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+void Scene::AddLight(LightPtr _light)
+{
+  std::string n = this->StripSceneName(_light->GetName());
+  Light_M::iterator iter = this->lights.find(n);
+  if (iter != this->lights.end())
+    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+
+  this->lights[n] = _light;
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveLight(LightPtr _light)
+{
+  if (_light)
+  {
+    // Delete the light
+    std::string n = this->StripSceneName(_light->GetName());
+    this->lights.erase(n);
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled && this->grids.empty())
@@ -2785,13 +2811,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->Load(_elem);
   comVis->SetVisible(false);
   this->visuals[comVis->GetId()] = comVis;
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
 }
 
 /////////////////////////////////////////////////

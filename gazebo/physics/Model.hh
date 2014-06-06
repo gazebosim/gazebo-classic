@@ -151,7 +151,7 @@ namespace gazebo
       /// \brief Construct and return a vector of Link's in this model
       /// Note this constructs the vector of Link's on the fly, could be costly
       /// \return a vector of Link's in this model
-      public: Link_V GetLinks() const;
+      public: const Link_V &GetLinks() const;
 
       /// \brief Get the joints.
       /// \return Vector of joints.

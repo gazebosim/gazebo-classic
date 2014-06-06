@@ -171,6 +171,11 @@ namespace gazebo
       public: void ShowMenuBar(QMenuBar *_bar = NULL);
 
       private: void OnModel(ConstModelPtr &_msg);
+
+      /// \brief Light message callback.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLight(ConstLightPtr &_msg);
+
       private: void OnResponse(ConstResponsePtr &_msg);
       private: void OnWorldModify(ConstWorldModifyPtr &_msg);
       private: void OnManipMode(const std::string &_mode);
@@ -209,6 +214,9 @@ namespace gazebo
       private: transport::SubscriberPtr guiSub;
       private: transport::SubscriberPtr newEntitySub, statsSub;
       private: transport::SubscriberPtr worldModSub;
+
+      /// \brief Subscriber to the light topic.
+      private: transport::SubscriberPtr lightSub;
 
       private: QDockWidget *toolsDock;
 

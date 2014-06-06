@@ -137,11 +137,12 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore)
+  find_package(DARTCore QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
+    message (STATUS "Looking for DARTCore - not found")
     BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core3.")
     set (HAVE_DART FALSE)
   endif()
@@ -408,8 +409,6 @@ if (NOT Boost_FOUND)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
-
-
 ########################################
 # Find libdl
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
@@ -461,7 +460,8 @@ pkg_check_modules(OculusVR OculusVR)
 if (HAVE_USB AND OculusVR_FOUND)
   message (STATUS "Oculus Rift support enabled.")
   set (HAVE_OCULUS ON CACHE BOOL "HAVE OCULUS" FORCE)
-  include_directories(SYSTEM ${OculusVR_INCLUDEDIR})
+  include_directories(SYSTEM ${OculusVR_INCLUDE_DIRS})
+  link_directories(${OculusVR_LIBRARY_DIRS})
 else ()
   BUILD_WARNING ("Oculus Rift support will be disabled.")
   set (HAVE_OCULUS OFF CACHE BOOL "HAVE OCULUS" FORCE)
