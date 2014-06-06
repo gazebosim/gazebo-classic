@@ -105,6 +105,9 @@ namespace gazebo
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
 
+      /// \brief Qt callback when the align mode is triggered.
+      private slots: void Align();
+
       private slots: void CreateBox();
       private slots: void CreateSphere();
       private slots: void CreateCylinder();

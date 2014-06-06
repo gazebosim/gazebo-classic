@@ -61,6 +61,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
+  actionGroup->addAction(g_alignAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
@@ -81,6 +82,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addSeparator();
   toolbar->addAction(g_copyAct);
   toolbar->addAction(g_pasteAct);
+
+  toolbar->addSeparator();
+  toolbar->addAction(g_alignAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);

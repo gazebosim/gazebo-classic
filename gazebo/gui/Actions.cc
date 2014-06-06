@@ -45,7 +45,6 @@ QAction *gazebo::gui::g_quitAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
-
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_newModelAct = 0;
 GAZEBO_VISIBLE
@@ -123,3 +122,6 @@ QAction *gazebo::gui::g_copyAct = 0;
 
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_pasteAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_alignAct = 0;

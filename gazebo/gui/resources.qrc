@@ -39,5 +39,6 @@
   <file>images/left_arrow.png</file>
   <file>images/up_arrow.png</file>
   <file>images/screenshot.png</file>
+  <file>images/align.png</file>  
 </qresource>
 </RCC>

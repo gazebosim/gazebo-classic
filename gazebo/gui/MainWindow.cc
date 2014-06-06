@@ -629,6 +629,11 @@ void MainWindow::Scale()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Align()
+{
+  gui::Events::manipMode("align");
+}
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -1154,6 +1159,13 @@ void MainWindow::CreateActions()
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+
+  g_alignAct = new QAction(QIcon(":/images/align.png"),
+      tr("Align Mode"), this);
+  g_alignAct->setStatusTip(tr("Align entity"));
+  g_alignAct->setCheckable(true);
+  g_alignAct->setToolTip(tr("Align Mode"));
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////
