@@ -45,6 +45,9 @@ namespace gazebo
       /// \brief Pointer to the scene where models are in.
       public: rendering::ScenePtr scene;
 
+      /// \brief Ray query for selecting a surface of an entity.
+      public: rendering::RayQueryPtr rayQuery;
+
       /// \brief Current mouse event.
       public: common::MouseEvent mouseEvent;
 

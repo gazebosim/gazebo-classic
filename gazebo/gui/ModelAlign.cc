@@ -17,11 +17,13 @@
 
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/RayQuery.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/MouseEventHandler.hh"
@@ -69,6 +71,9 @@ void ModelAlign::Init()
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
 
+  this->dataPtr->rayQuery.reset(
+      new rendering::RayQuery(this->dataPtr->userCamera));
+
   this->dataPtr->initialized = true;
 }
 
@@ -86,7 +91,6 @@ void ModelAlign::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-
   }
   else
     this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
@@ -105,7 +109,18 @@ void ModelAlign::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
-  this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
+  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+      this->dataPtr->mouseEvent.pos);
+  if (vis && !vis->IsPlane() &&
+      this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
+  {
+    math::Vector3 intersect;
+    std::vector<math::Vector3> vertices;
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y, vis,
+        intersect, vertices);
+  }
+  else
+    this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
 }
 
 //////////////////////////////////////////////////

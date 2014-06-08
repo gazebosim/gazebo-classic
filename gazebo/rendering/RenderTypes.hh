@@ -62,6 +62,7 @@ namespace gazebo
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class RayQuery;
 
 #ifdef HAVE_OCULUS
     class OculusCamera;
@@ -147,9 +148,13 @@ namespace gazebo
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
 
-    /// \def ContactVisualPtr
+    /// \def SelectionObj
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def RayQueryPtr
+    /// \brief Shared pointer to RayQuery
+    typedef boost::shared_ptr<RayQuery> RayQueryPtr;
 
 #ifdef HAVE_OCULUS
     /// \def OculusCameraPtr

@@ -468,7 +468,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
   else if (this->state == "align")
-    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+    ModelAlign::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -792,6 +792,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->ViewScene(rendering::get_scene(_name));
 
   ModelManipulator::Instance()->Init();
+  ModelAlign::Instance()->Init();
 
   this->sceneCreated = true;
 }

@@ -45,57 +45,15 @@ namespace gazebo
       /// \brief Destructor
       public: ~RayQuery();
 
-      /// \brief Raycast from a point in to the scene.
-      /// \param[in] _x x position on screen in pixels.
-      /// \param[in] _y y position on screen in pixels.
-      /// \param[out] _result Intersection point on the object
-      /// \return True if there is intersection
-      public: bool RaycastFromPoint(int _x, int _y,
-          math::Vector3 &_result);
-
-      /// \brief Get geometry information of an entity.
-      /// \param[in] _entity Ogre entity.
-      /// \param[in] _position Position of the mesh in world coordinates.
-      /// \param[in] _orient Position of the mesh in world coordinates.
-      /// \param[in] _scale Scale of the mesh in world coordinates.
-      /// \param[out] _vertexCount Number of vertices in the mesh.
-      /// \param[out] _vertices Mesh vertices.
-      /// \param[out] _indexCount Number of indices in the mesh.
-      /// \param[out] _indices Mesh indices.
-      private: void GetEntityInformation(const Ogre::Entity *_entity,
-          const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
-          const Ogre::Vector3 &_scale, std::vector<Ogre::Vector3> &_vertices,
-          std::vector<unsigned long> &_indices);
-
-      /// \brief Get geometry information of a manual object
-      /// \param[in] _mesh Ogre manual object.
-      /// \param[in] _position Position of the mesh in world coordinates.
-      /// \param[in] _orient Position of the mesh in world coordinates.
-      /// \param[in] _scale Scale of the mesh in world coordinates.
-      /// \param[out] _vertexCount Number of vertices in the mesh.
-      /// \param[out] _vertices Mesh vertices.
-      /// \param[out] _indexCount Number of indices in the mesh.
-      /// \param[out] _indices Mesh indices.
-      private: void GetManualObjectInformation(
-          const Ogre::ManualObject *_manual,
-          const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
-          const Ogre::Vector3 &_scale, std::vector<Ogre::Vector3> &_vertices,
-          std::vector<unsigned long> &_indices);
-
-      /// \brief Get geometry information of a mesh
-      /// \param[in] _mesh Ogre mesh
-      /// \param[in] _position Position of the mesh in world coordinates.
-      /// \param[in] _orient Position of the mesh in world coordinates.
-      /// \param[in] _scale Scale of the mesh in world coordinates.
-      /// \param[out] _vertexCount Number of vertices in the mesh.
-      /// \param[out] _vertices Mesh vertices.
-      /// \param[out] _indexCount Number of indices in the mesh.
-      /// \param[out] _indices Mesh indices.
-      private: void GetMeshInformation(const Ogre::MeshPtr _mesh,
-          const Ogre::Vector3 &_position, const Ogre::Quaternion &_orient,
-          const Ogre::Vector3 &_scale, unsigned int &_vertexCount,
-          Ogre::Vector3 *&_vertices, unsigned int &_indexCount,
-          unsigned long *&_indices);
+      /// \brief Select a triangle on mesh given screen coordinates
+      /// \param[in] _x X position on screen in pixels.
+      /// \param[in] _y Y position on screen in pixels.
+      /// \param[in] _visual Visual containing the mesh to be selected.
+      /// \param[out] _intersect Intersection point.
+      /// \param[out] _vertices Vertices of the triangle.
+      /// \param[out] _vertices Vertices of the triangle.
+      public: bool SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
+          math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices);
 
       /// \internal
       /// \brief Pointer to private data.
