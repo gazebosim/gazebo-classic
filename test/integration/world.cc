@@ -20,7 +20,7 @@
 class WorldTest : public ServerFixture
 {
 };
-/*
+
 /////////////////////////////////////////////////
 TEST_F(WorldTest, ClearEmptyWorld)
 {
@@ -113,7 +113,7 @@ TEST_F(WorldTest, ModifyLight)
   EXPECT_EQ(sceneMsg2.light(1).diffuse().b(), 1);
   EXPECT_EQ(sceneMsg2.light(1).type(), msgs::Light::POINT);
 }
-*/
+
 
 /////////////////////////////////////////////////
 TEST_F(WorldTest, RemoveModelPaused)
