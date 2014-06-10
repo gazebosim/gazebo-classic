@@ -200,7 +200,7 @@ opt_parser = OptionParser.new do |o|
        "Summarize a pull request with fields:\n" + " "*37 +
        "[id] [source] [dest] [branch]")  { |o| options["summary"] = o }
   o.on("-t", "--title",
-       "Show pull request title") { |o| options["title"] = o }
+       "Show pull request title with --list, --summary") { |o| options["title"] = o }
   o.on("-u", "--show-url",
        "Show urls accessed") { |o| options["show-url"] = o }
   o.on("-v", "--verbose",
