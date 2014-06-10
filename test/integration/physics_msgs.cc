@@ -385,9 +385,9 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 {
-  if (_physicsEngine != "dart")
+  if (_physicsEngine == "dart")
   {
-//    gzerr << "Aborting test for DART, see issue #1175.\n";
+    gzerr << "Aborting test for DART, see issue #1175.\n";
     return;
   }
 
@@ -535,28 +535,28 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
 
 /////////////////////////////////////////////////
-//TEST_P(PhysicsMsgsTest, SetGravity)
-//{
-//  SetGravity(GetParam());
-//}
+TEST_P(PhysicsMsgsTest, SetGravity)
+{
+  SetGravity(GetParam());
+}
 
 /////////////////////////////////////////////////
-//TEST_P(PhysicsMsgsTest, MoveTool)
-//{
-//  MoveTool(GetParam());
-//}
+TEST_P(PhysicsMsgsTest, MoveTool)
+{
+  MoveTool(GetParam());
+}
 
 /////////////////////////////////////////////////
-//TEST_P(PhysicsMsgsTest, LinkProperties)
-//{
-//  LinkProperties(GetParam());
-//}
+TEST_P(PhysicsMsgsTest, LinkProperties)
+{
+  LinkProperties(GetParam());
+}
 
 /////////////////////////////////////////////////
-//TEST_P(PhysicsMsgsTest, LinkPose)
-//{
-//  LinkPose(GetParam());
-//}
+TEST_P(PhysicsMsgsTest, LinkPose)
+{
+  LinkPose(GetParam());
+}
 
 /////////////////////////////////////////////////
 TEST_P(PhysicsMsgsTest, SimpleShapeResize)
