@@ -59,6 +59,12 @@ namespace gazebo
 
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
+
+      /// \brief Vertices of a mesh triangle used as the basis for alignment.
+      public: std::vector<math::Vector3> selectedTriangle;
+
+      /// \brief Currently selected visual.
+      public: rendering::VisualPtr selectedVis;
     };
   }
 }

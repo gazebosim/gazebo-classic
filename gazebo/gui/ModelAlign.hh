@@ -50,6 +50,13 @@ namespace gazebo
       /// \brief Set the visual to be manipulated by the model manipulator.
       public: void SetAttachedVisual(rendering::VisualPtr _vis);
 
+      /// \brief Reset the model alignment too.
+      public: void Reset();
+
+      /// \brief Publish visual's pose to the server
+      /// \param[in] _vis Pointer to the visual whose pose is to be published.
+      private: void PublishVisualPose(rendering::VisualPtr _vis);
+
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.
       public: void OnMousePressEvent(const common::MouseEvent &_event);

@@ -925,6 +925,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
+  ModelAlign::Instance()->Reset();
 }
 
 /////////////////////////////////////////////////
