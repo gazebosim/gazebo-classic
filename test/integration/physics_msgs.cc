@@ -271,8 +271,8 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   }
   else
   {
-    gzerr << "Skipping LinkProperties's kinematic test for Bullet" <<
-        std::endl;
+    gzerr << "Skipping LinkProperties's kinematic test for "
+          << _physicsEngine << std::endl;
   }
 
   {
