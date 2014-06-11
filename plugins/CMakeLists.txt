@@ -5,8 +5,12 @@ include_directories(
   ${OGRE_INCLUDE_DIRS}
 )
 
+# Tinyxml are used since the plugins are linking against gazebo_common
+# which uses tinxyml. Not defining the link directory here will end up
+# failures in clang.
 link_directories(
   ${SDF_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -34,6 +38,13 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin)
+
+if (HAVE_USB)
+  set (plugins ${plugins}
+    HydraPlugin
+    HydraDemoPlugin
+  )
+endif()
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/

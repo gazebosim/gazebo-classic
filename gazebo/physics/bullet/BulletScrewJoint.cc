@@ -602,13 +602,6 @@ math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double BulletScrewJoint::GetAttribute(
-  const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
 double BulletScrewJoint::GetParam(
   const std::string &_key, unsigned int _index)
 {
