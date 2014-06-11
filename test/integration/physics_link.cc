@@ -114,33 +114,18 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   // Set upward velocity and check
   math::Vector3 vel(0, 0, 1);
   link->SetLinearVel(vel);
-  gzmsg << "pos1: " << link->GetWorldPose() << std::endl;
-  gzmsg << "lvel1: " << link->GetWorldLinearVel() << std::endl;
-  gzmsg << "avel1: " << link->GetWorldAngularVel() << std::endl;
-  gzmsg << "lacc1: " << link->GetWorldLinearAccel() << std::endl;
-  gzmsg << "aacc1: " << link->GetWorldAngularAccel() << std::endl;
   world->Step(1);
-  gzmsg << "pos2: " << link->GetWorldPose() << std::endl;
-  gzmsg << "lvel2: " << link->GetWorldLinearVel() << std::endl;
-  gzmsg << "avel2: " << link->GetWorldAngularVel() << std::endl;
-  gzmsg << "lacc2: " << link->GetWorldLinearAccel() << std::endl;
-  gzmsg << "aacc2: " << link->GetWorldAngularAccel() << std::endl;
   EXPECT_EQ(vel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
   // Step forward and check velocity again
-  world->Step(1);
+  world->Step(44);
   double time = world->GetSimTime().Double();
   EXPECT_EQ(vel, link->GetWorldLinearVel());
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
-  gzmsg << "vel: " << vel << std::endl;
-  gzmsg << "time: " << time << std::endl;
-  gzmsg << "pos0: " << pos0 << std::endl;
-
   // check position
   math::Vector3 pos = link->GetWorldPose().pos;
-  gzmsg << "pos: " << pos << std::endl;
   if (_physicsEngine.compare("bullet") == 0)
   {
     /// \TODO skipping bullet, see issue #1081
