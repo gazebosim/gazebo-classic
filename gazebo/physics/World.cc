@@ -681,13 +681,16 @@ void World::Update()
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); ++iter)
     {
-      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
-    }
+      boost::mutex::scoped_lock lock(this->dirtyPoseMutex);
+      for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
+          iter != this->dirtyPoses.end(); ++iter)
+      {
+        (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      }
 
-    this->dirtyPoses.clear();
+      this->dirtyPoses.clear();
+    }
 
     DIAG_TIMER_LAP("World::Update", "SetWorldPose(dirtyPoses)");
   }
@@ -1998,20 +2001,20 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
-  boost::recursive_mutex::scoped_lock lock(
-      *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
-
   // Remove all the dirty poses from the delete entity.
-  for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
-      iter2 != this->dirtyPoses.end();)
   {
-    if ((*iter2)->GetName() == _name ||
-        (*iter2)->GetParent()->GetName() == _name)
+    boost::mutex::scoped_lock lock(this->dirtyPoseMutex);
+    for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
+        iter2 != this->dirtyPoses.end();)
     {
-      this->dirtyPoses.erase(iter2++);
+      if ((*iter2)->GetName() == _name ||
+          ((*iter2)->GetParent() && (*iter2)->GetParent()->GetName() == _name))
+      {
+        this->dirtyPoses.erase(iter2++);
+      }
+      else
+        ++iter2;
     }
-    else
-      ++iter2;
   }
 
   if (this->sdf->HasElement("model"))
@@ -2023,15 +2026,34 @@ void World::RemoveModel(const std::string &_name)
       this->sdf->RemoveChild(childElem);
   }
 
-  this->rootElement->RemoveChild(_name);
-
-  for (Model_V::iterator iter = this->models.begin();
-      iter != this->models.end(); ++iter)
   {
-    if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    this->rootElement->RemoveChild(_name);
+
+    for (Model_V::iterator iter = this->models.begin();
+        iter != this->models.end(); ++iter)
     {
-      this->models.erase(iter);
-      break;
+      if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+      {
+        this->models.erase(iter);
+        break;
+      }
+    }
+  }
+
+  // Cleanup the publishModelPoses list.
+  {
+    boost::recursive_mutex::scoped_lock lock2(*this->receiveMutex);
+    for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
+        iter != this->publishModelPoses.end(); iter++)
+    {
+      if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
+      {
+        this->publishModelPoses.erase(iter);
+        break;
+      }
     }
   }
 }
