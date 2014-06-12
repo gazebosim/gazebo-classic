@@ -39,7 +39,7 @@ set (plugins
   SphereAtlasDemoPlugin
   VehiclePlugin)
 
-if (HAVE_USB)
+if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
     HydraPlugin
     HydraDemoPlugin
