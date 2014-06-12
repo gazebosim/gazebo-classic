@@ -281,7 +281,7 @@ void DARTLink::OnPoseChange()
   }
   else
   {
-    gzdbg << "DARTLink::OnPoseChange() doesn't make sense if the parent joint"
+    gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
