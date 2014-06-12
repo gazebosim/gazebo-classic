@@ -167,6 +167,12 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #1197.\n";
+    return;
+  }
+
   // Load our force torque test world
   Load("worlds/force_torque_test.world", true, _physicsEngine);
 
@@ -318,6 +324,12 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   if (_physicsEngine == "bullet")
   {
     gzerr << "Aborting test for bullet, see issue #619.\n";
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for dart, see issue #1197.\n";
     return;
   }
 
