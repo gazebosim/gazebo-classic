@@ -312,6 +312,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       {
         gzerr << _physicsEngine
               << " has reduced accuracy for spring energy conservation"
+              << ", see #975"
               << std::endl;
       }
       EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 2e-2);
@@ -337,6 +338,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   {
     gzerr << _physicsEngine
           << " doesn't support joint limit stiffness"
+          << ", see #975"
           << std::endl;
   }
   else
