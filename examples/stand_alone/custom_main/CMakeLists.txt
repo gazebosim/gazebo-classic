@@ -15,3 +15,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_executable(custom_main custom_main.cc)
 target_link_libraries(custom_main ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+
+add_executable(custom_main_vector custom_main_vector.cc)
+target_link_libraries(custom_main_vector ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)

@@ -159,6 +159,7 @@ set (BUILD_TYPE_PROFILE FALSE)
 set (BUILD_TYPE_RELEASE FALSE)
 set (BUILD_TYPE_RELWITHDEBINFO FALSE)
 set (BUILD_TYPE_DEBUG FALSE)
+set (BUILD_TYPE_COVERAGE FALSE)
 
 if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
   set (BUILD_TYPE_PROFILE TRUE)
@@ -168,6 +169,12 @@ elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
   set (BUILD_TYPE_RELWITHDEBINFO TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
   set (BUILD_TYPE_DEBUG TRUE)
+elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
+  # Disable DART for now due to eigen problem (issue #1160)
+  set (HAVE_DART FALSE)
+  set (BUILD_TYPE_COVERAGE TRUE)
+  include (${gazebo_cmake_dir}/CodeCoverage.cmake)
+  setup_target_for_coverage(coverage coverage)
 else()
   build_error("CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} unknown. Valid options are: Debug Release RelWithDebInfo Profile Check")
 endif()
@@ -335,8 +342,8 @@ else (build_errors)
 
   set(cmake_conf_file "cmake/gazebo-config.cmake")
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/${cmake_conf_file}.in" "${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}" @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME_LOWER}/cmake/ COMPONENT cmake)
-
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} DESTINATION 
+      ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/ COMPONENT cmake)
 
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
