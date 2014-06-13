@@ -45,7 +45,7 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~PressurePlugin();
 
-    // Docfumentation inherited.
+    // Documentation inherited.
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     // Documentation inherited.
