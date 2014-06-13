@@ -20,7 +20,7 @@
 
 #include <gazebo/math/Filter.hh>
 #include <gazebo/math/Vector3.hh>
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 
 namespace gazebo
 {

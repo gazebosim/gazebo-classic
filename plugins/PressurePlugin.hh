@@ -24,7 +24,7 @@
 #include <string>
 #include <boost/unordered_map.hpp>
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 #include "gazebo/util/system.hh"
@@ -45,7 +45,7 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~PressurePlugin();
 
-    // Documentation inherited.
+    // Docfumentation inherited.
     public: virtual void Load(sensors::SensorPtr _sensor, sdf::ElementPtr _sdf);
 
     // Documentation inherited.
