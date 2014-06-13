@@ -1570,7 +1570,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// abs sum of off-diagonals remains smaller than the diagonal
       /// for all rows (see comments below about Gauss-Seidel stability).
       // increase moi_ratio_max to skip checks and increase performance
-      const dReal moi_ratio_max = 10.0;
+      const dReal moi_ratio_max = 200.0;
       if (m_large > moi_ratio_max * m_small)
       {
         // Large inertia ratio detected, try reducing it.
