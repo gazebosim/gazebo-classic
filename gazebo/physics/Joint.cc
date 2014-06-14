@@ -1158,7 +1158,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     math::Pose relativePose(childLinkPose.pos - anchor,
                             childLinkPose.rot);
 
-    // take axis rotation and turn it int a quaternion
+    // take axis rotation and turn it into a quaternion
     math::Quaternion rotation(axis, dposition);
 
     // rotate relative pose by rotation
@@ -1201,7 +1201,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   else
   {
     gzerr << "Setting joint position is only supported for"
-          << " higne, universal and slider joints right now.\n";
+          << " hinge, universal and slider joints right now.\n";
   }
 
   return newWorldPose;
