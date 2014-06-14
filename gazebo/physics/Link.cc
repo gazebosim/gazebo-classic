@@ -1278,6 +1278,7 @@ bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
 
   return true;
 }
+
 /////////////////////////////////////////////////
 bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
 {
