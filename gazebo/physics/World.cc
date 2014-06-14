@@ -2050,7 +2050,7 @@ void World::OnLightMsg(ConstLightPtr &_msg)
     if (this->sceneMsg.light(i).name() == _msg->name())
     {
       lightExists = true;
-      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      this->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
 
       sdf::ElementPtr childElem = this->sdf->GetElement("light");
       while (childElem && childElem->Get<std::string>("name") != _msg->name())
