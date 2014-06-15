@@ -151,7 +151,7 @@ TEST_F(WorldTest, ModifyLight)
 
   {
     msgs::Scene sceneMsg = world->GetSceneMsg();
-    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 1);
     EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 1);
@@ -174,7 +174,7 @@ TEST_F(WorldTest, ModifyLight)
   // Verify the light gets the new pose and retains values of other properties
   {
     msgs::Scene sceneMsg = world->GetSceneMsg();
-    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_EQ(sceneMsg.light_size(), 2);
     EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_spot_light");
     EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 1);
     EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 1);
