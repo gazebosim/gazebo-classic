@@ -631,7 +631,7 @@ unsigned int DARTJoint::GetAngleCount() const
 /////////////////////////////////////////////////
 void DARTJoint::ApplyDamping()
 {
-  // renaem ApplyDamping to ApplyStiffnessDamping (below) in gazebo 4.0.
+  // rename ApplyDamping to ApplyStiffnessDamping (below) in gazebo 4.0.
   // public: virtual void ApplyStiffnessDamping();
 
   // DART applies stiffness and damping force implicitly itself by setting
