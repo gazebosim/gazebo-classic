@@ -19,7 +19,7 @@
 #define _GAZEBO_FILTER_HH_
 
 #include <gazebo/math/Vector3.hh>
-#include <gazebo/gazebo.hh>
+#include <gazebo/math/Quaternion.hh>
 
 namespace gazebo
 {
