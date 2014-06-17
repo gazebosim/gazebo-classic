@@ -674,10 +674,16 @@ void World::Update()
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); ++iter)
     {
-      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      // block any other pose updates (e.g. Joint::SetPosition)
+      boost::recursive_mutex::scoped_lock lock(
+        *this->physicsEngine->GetPhysicsUpdateMutex());
+
+      for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
+          iter != this->dirtyPoses.end(); ++iter)
+      {
+        (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      }
     }
 
     this->dirtyPoses.clear();
