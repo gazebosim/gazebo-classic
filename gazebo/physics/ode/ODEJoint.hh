@@ -236,10 +236,6 @@ namespace gazebo
       public: virtual void ApplyStiffnessDamping();
 
       // Documentation inherited.
-      public: bool SetPosition(unsigned int _index, double _position,
-                               double _velocity = 0.0);
-
-      // Documentation inherited.
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.

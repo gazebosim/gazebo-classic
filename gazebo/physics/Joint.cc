@@ -605,18 +605,12 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position,
   else
     _position = math::clamp(_position, upper, lower);
 
-  // only deal with hinge and revolute joints in the user
+  // only deal with hinge, universal, slider joints in the user
   // request joint_names list
   if (this->HasType(Base::HINGE_JOINT) ||
       this->HasType(Base::UNIVERSAL_JOINT) ||
       this->HasType(Base::SLIDER_JOINT))
   {
-    // if (parentLink->GetScopedName() == childLink->GetScopedName())
-    // {
-    //   gzerr << "Is this even possible?\n";
-    //   return;
-    // }
-
     if (childLink)
     {
       // Get all connected links to this joint
@@ -662,14 +656,13 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position,
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->Move(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
 
             // debug
             // gzerr << "moved " << (*li)->GetName()
             //       << " p0 [" << childLinkPose
             //       << "] p1 [" << newChildLinkPose
             //       << "]\n";
-            // getchar();
           }
         }
       }
@@ -1188,7 +1181,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     math::Pose relativePose(childLinkPose.pos - anchor,
                             childLinkPose.rot);
 
-    // take axis rotation and turn it int a quaternion
+    // take axis rotation and turn it into a quaternion
     math::Quaternion rotation(axis, dposition);
 
     // rotate relative pose by rotation
@@ -1230,7 +1223,8 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   }
   else
   {
-    gzerr << "Not supported yet.\n";
+    gzerr << "Setting joint position is only supported for"
+          << " hinge, universal and slider joints right now.\n";
   }
 
   return newWorldPose;

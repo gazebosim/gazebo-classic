@@ -46,6 +46,7 @@ set(tests
   joint_gearbox.cc
   joint_revolute.cc
   joint_screw.cc
+  joint_set_position_test.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
@@ -62,7 +63,6 @@ set(tests
   pioneer2dx.cc
   sensor.cc
   server_fixture.cc
-  joint_set_position_test.cc
   speed.cc
   stress_spawn_models.cc
   #state_log.cc

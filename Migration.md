@@ -64,6 +64,14 @@
     + ***Removed*** std::string GetScopedName() const
     + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
 
+## Gazebo 3.0 to 3.1
+
+### Additions
+
+1. **gazebo/physics/JointController.hh**
+    + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);
+    + void SetVelocityPID(const std::string &_jointName, const common::PID &_pid);
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
@@ -202,6 +210,7 @@
 1. **gazebo/physics/Box.hh**
     + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
     + ***Replacement:***  bool operator==(const Box &_b) const
+
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -365,6 +374,20 @@
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
 
 ### Additions
+
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                       const math::Pose &_worldReferenceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
 1. **gazebo/physics/Collision.hh**
     + void SetWorldPoseDirty()

@@ -1184,12 +1184,13 @@ double Link::GetWorldEnergy() const
 }
 
 /////////////////////////////////////////////////
-void Link::Move(const math::Pose &_worldReferenceFrameSrc,
-                const math::Pose &_worldReferenceFrameDst)
+void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                     const math::Pose &_worldReferenceFrameDst)
 {
   math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
     + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
+  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
 }
 
 /////////////////////////////////////////////////
@@ -1286,10 +1287,10 @@ bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
     }
     else
     {
-      // add child link to list
+      // add parent link to list
       _connectedLinks.push_back((*li));
 
-      // recursively check if child link has already been checked
+      // recursively check if parent link has already been checked
       // if it returns false, it looped back to parent, mark flag and break
       // from current for-loop.
       if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
@@ -1303,6 +1304,7 @@ bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
 
   return true;
 }
+
 /////////////////////////////////////////////////
 bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
 {

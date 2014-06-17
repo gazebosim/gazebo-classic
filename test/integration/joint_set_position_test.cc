@@ -402,7 +402,8 @@ TEST_P(JointKinematicTest, SetJointPositionThreadedTest)
 }
 
 //////////////////////////////////////////////////
-void JointKinematicTest::SetJointPositionLoopJointTest(const std::string &_physicsEngine)
+void JointKinematicTest::SetJointPositionLoopJointTest(
+    const std::string &_physicsEngine)
 {
   // init random seed
   srand(time(NULL));
@@ -527,7 +528,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(const std::string &_physi
         << " with Link::SetWorldPose from ODEJoint::SetPosition.\n";
   gzdbg << " Calling Joint::SetPosition at [" << pub_rate
         << "] Hz with real time duration.\n";
-  for(int i = 0; i < iterations; ++i)
+  for (int i = 0; i < iterations; ++i)
   {
     // limit setting pose to some rate in wall time
     if (common::Time::GetWallTime().Double() - last_update_wall_time

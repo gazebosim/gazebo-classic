@@ -343,9 +343,9 @@ namespace gazebo
 
       /// \brief Set the max allowed force of an axis(index) when using
       /// Joint::SetVelocity.
-      /// Curret implementation in Bullet and ODE is enforced through amotor,
+      /// Current implementation in Bullet and ODE is enforced using impulses,
       /// which enforces force/torque limits when calling Joint::SetVelocity.
-      /// Curret implementation is engine dependent. See for example
+      /// Current implementation is engine dependent. See for example
       /// ODE implementation in ODEHingeJoint::SetMaxForce.
       /// Note this functionality is not implemented in DART and Simbody.
       /// Note that the unit of force should be consistent with the rest
@@ -400,6 +400,16 @@ namespace gazebo
       public: virtual bool SetPosition(unsigned int _index, double _position,
                                        double _velocity = 0.0);
 
+      /// \brief Helper function for maximal coordinate solver SetPosition.
+      /// The child link of this joint is updated based on position change.
+      /// And all the links connected to the child link of this joint
+      /// except through the parent link of this joint moves with the child
+      /// link.
+      /// \param[in] _index Index of the joint axis (degree of freedom).
+      /// \param[in] _position Position to set the joint to.
+      /// \param[in] _velocity Velocity for the joint, defaults to 0 if
+      /// unspecified, pure kinematic teleportation.
+      /// \return returns true if operation succeeds, 0 if it fails.
       protected: bool SetPositionMaximal(unsigned int _index, double _position,
                                  double _velocity);
 
