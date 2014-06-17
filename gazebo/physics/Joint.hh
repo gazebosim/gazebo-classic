@@ -347,9 +347,9 @@ namespace gazebo
 
       /// \brief Set the max allowed force of an axis(index) when using
       /// Joint::SetVelocity.
-      /// Curret implementation in Bullet and ODE is enforced using impulses,
+      /// Current implementation in Bullet and ODE is enforced using impulses,
       /// which enforces force/torque limits when calling Joint::SetVelocity.
-      /// Curret implementation is engine dependent. See for example
+      /// Current implementation is engine dependent. See for example
       /// ODE implementation in ODEHingeJoint::SetMaxForce.
       /// Note this functionality is not implemented in DART and Simbody.
       /// Note that the unit of force should be consistent with the rest

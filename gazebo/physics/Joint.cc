@@ -572,7 +572,7 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
   else
     _position = math::clamp(_position, upper, lower);
 
-  // only deal with hinge and revolute joints in the user
+  // only deal with hinge, universal, slider joints in the user
   // request joint_names list
   if (this->HasType(Base::HINGE_JOINT) ||
       this->HasType(Base::UNIVERSAL_JOINT) ||
