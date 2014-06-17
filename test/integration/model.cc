@@ -40,6 +40,21 @@ TEST_F(ModelTest, GetLinksV)
   EXPECT_EQ(model->GetLinks().size(), 1u);
 }
 
+/////////////////////////////////////////////////
+// This tests getting the scoped name of a model.
+TEST_F(ModelTest, GetScopedName)
+{
+  Load("worlds/simple_arm_test.world");
+
+  physics::ModelPtr model = GetModel("simple_arm");
+
+  std::string modelName = model->GetScopedName();
+  EXPECT_EQ(modelName, std::string("simple_arm"));
+
+  modelName = model->GetScopedName(true);
+  EXPECT_EQ(modelName, std::string("default::simple_arm"));
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

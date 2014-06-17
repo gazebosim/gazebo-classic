@@ -518,6 +518,9 @@ namespace gazebo
       /// \brief Parse visuals from SDF
       private: void ParseVisuals();
 
+      /// \brief Update visual SDFs.
+      private: void UpdateVisualSDF();
+
       /// \brief Helper function to find all connected links of a link
       /// based on parent/child relations of joints. For example,
       /// if Link0 --> Link1 --> ... --> LinkN is a kinematic chain
@@ -597,6 +600,9 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
+
+      /// \brief scale of the link.
+      private: math::Vector3 scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

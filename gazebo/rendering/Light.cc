@@ -51,11 +51,19 @@ Light::Light(ScenePtr _scene)
 Light::~Light()
 {
   if (this->light)
+  {
     this->scene->GetManager()->destroyLight(this->GetName());
+  }
 
-  this->visual->DeleteDynamicLine(this->line);
-  this->scene->RemoveVisual(this->visual);
-  this->visual.reset();
+  this->scene->GetManager()->destroyEntity(
+      this->GetName() + "_selection_sphere");
+
+  if (this->visual)
+  {
+    this->visual->DeleteDynamicLine(this->line);
+    this->scene->RemoveVisual(this->visual);
+    this->visual.reset();
+  }
 
   this->sdf->Reset();
   this->sdf.reset();
@@ -68,6 +76,7 @@ void Light::Load(sdf::ElementPtr _sdf)
 {
   this->sdf->Copy(_sdf);
   this->Load();
+  this->scene->AddLight(shared_from_this());
 }
 
 //////////////////////////////////////////////////
@@ -212,11 +221,14 @@ void Light::CreateVisual()
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
 
+    Ogre::Entity *ent =
+        visSceneNode->getCreator()->createEntity(this->GetName() +
+        "_selection_sphere", "unit_sphere");
+
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
-      (visSceneNode->getCreator()->createEntity(this->GetName() +
-                                                "_selection_sphere",
-                                                "unit_sphere"));
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
     // Attach the selection object to the light visual
     visSceneNode->attachObject(obj);
@@ -600,4 +612,19 @@ void Light::FillMsg(msgs::Light &_msg) const
     _msg.set_spot_outer_angle(elem->Get<double>("outer_angle"));
     _msg.set_spot_falloff(elem->Get<double>("falloff"));
   }
+}
+
+//////////////////////////////////////////////////
+LightPtr Light::Clone(const std::string &_name, ScenePtr _scene)
+{
+  LightPtr result(new Light(_scene));
+  sdf::ElementPtr sdfCopy(new sdf::Element);
+  sdfCopy->Copy(this->sdf);
+  sdfCopy->GetAttribute("name")->Set(_name);
+  result->Load(sdfCopy);
+
+  result->SetPosition(this->GetPosition());
+  result->SetRotation(this->GetRotation());
+
+  return result;
 }

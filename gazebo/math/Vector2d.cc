@@ -204,4 +204,8 @@ double Vector2d::operator[](unsigned int index) const
   }
 }
 
-
+//////////////////////////////////////////////////
+double Vector2d::Dot(const Vector2d &_v) const
+{
+  return (this->x * _v.x) + (this->y * _v.y);
+}

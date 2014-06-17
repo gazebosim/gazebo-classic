@@ -34,6 +34,7 @@
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -51,6 +52,10 @@
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
+#endif
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
 #endif
 
 
@@ -114,6 +119,7 @@ MainWindow::MainWindow()
   splitter->addWidget(this->leftColumn);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
+  splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -135,7 +141,6 @@ MainWindow::MainWindow()
   mainLayout->addLayout(centerLayout, 1);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
-
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
@@ -143,6 +148,10 @@ MainWindow::MainWindow()
   std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
+
+#ifdef HAVE_OCULUS
+  this->oculusWindow = NULL;
+#endif
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -186,6 +195,27 @@ MainWindow::~MainWindow()
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
+#ifdef HAVE_OCULUS
+  int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
+
+  if (oculusAutoLaunch == 1)
+  {
+    if (!visual.empty())
+    {
+      this->oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+
+      if (this->oculusWindow->CreateCamera())
+        this->oculusWindow->show();
+    }
+    else
+      gzlog << "Oculus: No visual link specified in for attaching the camera. "
+            << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -247,6 +277,14 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+#ifdef HAVE_OCULUS
+  if (this->oculusWindow)
+  {
+    delete this->oculusWindow;
+    this->oculusWindow = NULL;
+  }
+#endif
 
   gazebo::shutdown();
 }
@@ -659,15 +697,15 @@ void MainWindow::OnFullScreen(bool _value)
   if (_value)
   {
     this->showFullScreen();
-    this->renderWidget->showFullScreen();
     this->leftColumn->hide();
     this->toolsWidget->hide();
     this->menuBar->hide();
+    this->setContentsMargins(0, 0, 0, 0);
+    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
     this->showNormal();
-    this->renderWidget->showNormal();
     this->leftColumn->show();
     this->toolsWidget->show();
     this->menuBar->show();
@@ -780,6 +818,37 @@ void MainWindow::FPS()
 void MainWindow::Orbit()
 {
   gui::Events::orbit();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::ViewOculus()
+{
+#ifdef HAVE_OCULUS
+  rendering::ScenePtr scene = rendering::get_scene();
+  if (scene->GetOculusCameraCount() != 0)
+  {
+    gzlog << "Oculus camera already exists." << std::endl;
+    return;
+  }
+
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
+
+  if (!visual.empty())
+  {
+    this->oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+
+    if (this->oculusWindow->CreateCamera())
+      this->oculusWindow->show();
+  }
+  else
+  {
+    gzlog << "Oculus: No visual link specified in for attaching the camera. "
+          << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1055,6 +1124,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
+  g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
+  connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
+#ifndef HAVE_OCULUS
+  g_viewOculusAct->setEnabled(false);
+#endif
+
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
@@ -1065,6 +1141,19 @@ void MainWindow::CreateActions()
   g_screenshotAct->setStatusTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
+
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct->setStatusTip(tr("Copy Entity"));
+  g_copyAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
+  g_copyAct->setEnabled(false);
+
+  g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
+      tr("Paste"), this);
+  g_pasteAct->setStatusTip(tr("Paste Entity"));
+  g_pasteAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
+  g_pasteAct->setEnabled(false);
 }
 
 /////////////////////////////////////////////////
@@ -1151,6 +1240,8 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
+
+  windowMenu->addAction(g_viewOculusAct);
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);
