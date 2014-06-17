@@ -29,13 +29,6 @@ class Pioneer2dx : public ServerFixture,
 /////////////////////////////////////////////////
 void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not handle pioneer2dx model yet, "
-          << "Please see issue #866.\n";
-    return;
-  }
-
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not handle pioneer2dx model yet.\n"
@@ -44,14 +37,42 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/pioneer2dx.world", false, _physicsEngine);
+  Load("worlds/pioneer2dx.world", true, _physicsEngine);
   transport::PublisherPtr velPub = this->node->Advertise<gazebo::msgs::Pose>(
       "~/pioneer2dx/vel_cmd");
 
-  int i = 0;
-  for (i = 0; i < 1000 && !this->HasEntity("pioneer2dx"); ++i)
-    common::Time::MSleep(500);
-  ASSERT_LT(i, 1000);
+  std::string modelName = "pioneer2dx";
+
+  // Check wheelSeparation and wheelRadius for DiffDrivePlugin
+  {
+    physics::WorldPtr world = physics::get_world();
+    ASSERT_TRUE(world != NULL);
+
+    physics::ModelPtr model = world->GetModel(modelName);
+    ASSERT_TRUE(model != NULL);
+
+    physics::JointPtr leftJoint = model->GetJoint("left_wheel_hinge");
+    physics::JointPtr rightJoint = model->GetJoint("right_wheel_hinge");
+    ASSERT_TRUE(leftJoint != NULL);
+    ASSERT_TRUE(rightJoint != NULL);
+
+    double wheelSeparation = leftJoint->GetAnchor(0).Distance(
+                            rightJoint->GetAnchor(0));
+    EXPECT_NEAR(0.28, wheelSeparation, 1e-3);
+
+    physics::LinkPtr leftWheel = leftJoint->GetChild();
+
+    math::Box bb = leftWheel->GetBoundingBox();
+    // This assumes that the largest dimension of the wheel is the diameter
+    double wheelRadius = bb.GetSize().GetMax() * 0.5;
+    EXPECT_NEAR(0.11, wheelRadius, 1e-3);
+
+    // Verify positive (and thus non-zero) value of wheelRadius
+    // to prevent NaN's.
+    ASSERT_GT(wheelRadius, 0.0);
+
+    world->SetPaused(false);
+  }
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
@@ -61,24 +82,18 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
   velPub->Publish(msg);
 
   math::Pose startPose, endPose;
-  startPose = this->poses["pioneer2dx"];
+  startPose = this->poses[modelName];
 
   common::Time startTime = this->simTime;
   common::Time currTime = this->simTime;
 
-  /*struct timespec interval;
-  struct timespec remainder;
-  interval.tv_sec = 1 / 1000;
-  interval.tv_nsec = (1 % 1000) * 1000000;
-  */
   while (currTime - startTime < common::Time(20, 0))
   {
-    // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }
 
-  endPose = this->poses["pioneer2dx"];
+  endPose = this->poses[modelName];
 
   double dist = (currTime - startTime).Double() * 0.2;
   std::cout << "Dist[" << dist << "]\n";
