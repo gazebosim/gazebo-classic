@@ -125,3 +125,6 @@ QAction *gazebo::gui::g_pasteAct = 0;
 
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_alignAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_attachAct = 0;

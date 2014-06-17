@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_ALIGN_PRIVATE_HH_
-#define _MODEL_ALIGN_PRIVATE_HH_
+#ifndef _MODEL_ATTACH_PRIVATE_HH_
+#define _MODEL_ATTACH_PRIVATE_HH_
 
 #include <string>
 
@@ -30,8 +30,8 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief Private data for the ModelAlign class
-    class ModelAlignPrivate
+    /// \brief Private data for the ModelAttach class
+    class ModelAttachPrivate
     {
       /// \brief Transportation node.
       public: transport::NodePtr node;

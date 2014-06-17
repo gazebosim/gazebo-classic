@@ -633,6 +633,13 @@ void MainWindow::Align()
 {
   gui::Events::manipMode("align");
 }
+
+/////////////////////////////////////////////////
+void MainWindow::Attach()
+{
+  gui::Events::manipMode("attach");
+}
+
 /////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
@@ -1166,6 +1173,13 @@ void MainWindow::CreateActions()
   g_alignAct->setCheckable(true);
   g_alignAct->setToolTip(tr("Align Mode"));
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+
+  g_attachAct = new QAction(QIcon(":/images/magnet.png"),
+      tr("Attach Mode"), this);
+  g_attachAct->setStatusTip(tr("Attach entity"));
+  g_attachAct->setCheckable(true);
+  g_attachAct->setToolTip(tr("Attach Mode"));
+  connect(g_attachAct, SIGNAL(triggered()), this, SLOT(Attach()));
 }
 
 /////////////////////////////////////////////////

@@ -35,7 +35,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
-#include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/ModelAttach.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -434,8 +434,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
-  else if (this->state == "align")
-    ModelAlign::Instance()->OnMousePressEvent(this->mouseEvent);
+  else if (this->state == "attach")
+    ModelAttach::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -450,8 +450,8 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
-  else if (this->state == "align")
-    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+  else if (this->state == "attach")
+    ModelAttach::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -467,8 +467,8 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
-  else if (this->state == "align")
-    ModelAlign::Instance()->OnMouseMoveEvent(this->mouseEvent);
+  else if (this->state == "attach")
+    ModelAttach::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -792,7 +792,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->ViewScene(rendering::get_scene(_name));
 
   ModelManipulator::Instance()->Init();
-  ModelAlign::Instance()->Init();
+  ModelAttach::Instance()->Init();
 
   this->sceneCreated = true;
 }
@@ -925,7 +925,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
-  ModelAlign::Instance()->Reset();
+  ModelAttach::Instance()->Reset();
 }
 
 /////////////////////////////////////////////////

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_ALIGN_HH_
-#define _MODEL_ALIGN_HH_
+#ifndef _MODEL_ATTACH_HH_
+#define _MODEL_ATTACH_HH_
 
 #include <string>
 
@@ -31,18 +31,18 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelAlignPrivate;
+    class ModelAttachPrivate;
 
-    /// \class ModelAlign ModelAlign.hh gui/Gui.hh
+    /// \class ModelAttach ModelAttach.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class GAZEBO_VISIBLE ModelAlign : public SingletonT<ModelAlign>
+    class GAZEBO_VISIBLE ModelAttach : public SingletonT<ModelAttach>
     {
       /// \brief Constructor
-      private: ModelAlign();
+      private: ModelAttach();
 
       /// \brief Destructor
-      private: virtual ~ModelAlign();
+      private: virtual ~ModelAttach();
 
       /// \brief Initialize the model manipulator.
       public: void Init();
@@ -82,11 +82,11 @@ namespace gazebo
       private: void SetMouseMoveVisual(rendering::VisualPtr _vis);
 
       /// \brief This is a singleton class.
-      private: friend class SingletonT<ModelAlign>;
+      private: friend class SingletonT<ModelAttach>;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelAlignPrivate *dataPtr;
+      private: ModelAttachPrivate *dataPtr;
     };
   }
 }

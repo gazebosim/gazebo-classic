@@ -30,21 +30,21 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "gazebo/gui/ModelAlignPrivate.hh"
-#include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/ModelAttachPrivate.hh"
+#include "gazebo/gui/ModelAttach.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelAlign::ModelAlign()
-  : dataPtr(new ModelAlignPrivate)
+ModelAttach::ModelAttach()
+  : dataPtr(new ModelAttachPrivate)
 {
   this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
-ModelAlign::~ModelAlign()
+ModelAttach::~ModelAttach()
 {
   this->dataPtr->modelPub.reset();
   delete this->dataPtr;
@@ -52,7 +52,7 @@ ModelAlign::~ModelAlign()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Init()
+void ModelAttach::Init()
 {
   if (this->dataPtr->initialized)
     return;
@@ -79,14 +79,14 @@ void ModelAlign::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::Reset()
+void ModelAttach::Reset()
 {
   this->dataPtr->selectedVis.reset();
   this->dataPtr->selectedTriangle.clear();
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::OnMousePressEvent(const common::MouseEvent &_event)
+void ModelAttach::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
   //this->dataPtr->mouseStart = _event.pressPos;
@@ -105,7 +105,7 @@ void ModelAlign::OnMousePressEvent(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::OnMouseMoveEvent(const common::MouseEvent &_event)
+void ModelAttach::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
@@ -113,7 +113,7 @@ void ModelAlign::OnMouseMoveEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelAlign::OnMouseReleaseEvent(const common::MouseEvent &_event)
+void ModelAttach::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
@@ -205,13 +205,13 @@ void ModelAlign::OnMouseReleaseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelAlign::OnKeyPressEvent(const common::KeyEvent &_event)
+void ModelAttach::OnKeyPressEvent(const common::KeyEvent &_event)
 {
   this->dataPtr->keyEvent = _event;
 }
 
 //////////////////////////////////////////////////
-void ModelAlign::OnKeyReleaseEvent(const common::KeyEvent &_event)
+void ModelAttach::OnKeyReleaseEvent(const common::KeyEvent &_event)
 {
   this->dataPtr->keyEvent = _event;
 
@@ -219,13 +219,13 @@ void ModelAlign::OnKeyReleaseEvent(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::SetMouseMoveVisual(rendering::VisualPtr _vis)
+void ModelAttach::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->dataPtr->mouseMoveVis = _vis;
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)
+void ModelAttach::PublishVisualPose(rendering::VisualPtr _vis)
 {
   if (!_vis)
     return;

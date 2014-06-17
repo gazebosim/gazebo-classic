@@ -34,7 +34,7 @@ set (sources
   KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
-  ModelAlign.cc
+  ModelAttach.cc
   ModelManipulator.cc
   MeshMaker.cc
   ModelEditWidget.cc
@@ -77,7 +77,7 @@ set (headers
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
-  ModelAlign.hh
+  ModelAttach.hh
   ModelManipulator.hh
   MeshMaker.hh
   MouseEventHandler.hh

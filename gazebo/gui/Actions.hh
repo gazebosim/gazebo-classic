@@ -87,6 +87,7 @@ namespace gazebo
     extern QAction *g_pasteAct;
 
     extern QAction *g_alignAct;
+    extern QAction *g_attachAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
