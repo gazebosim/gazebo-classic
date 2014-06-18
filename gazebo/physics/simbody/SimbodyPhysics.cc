@@ -1203,6 +1203,14 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         boost::shared_ptr<physics::SphereShape> s =
           boost::dynamic_pointer_cast<physics::SphereShape>((*ci)->GetShape());
         double r = s->GetRadius();
+        ContactGeometry::Sphere cg(r);
+
+        // pass back pointer to ContactGeometry to SimbodyCollision.
+        SimbodyCollisionPtr simbodyCollision =
+          boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+        simbodyCollision->SetCollisionShape(&cg);
+
+        // create surface
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
