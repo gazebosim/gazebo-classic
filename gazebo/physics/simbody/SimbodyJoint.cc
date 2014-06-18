@@ -451,8 +451,7 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return this->GetWorldPose().pos;
 }
 
 //////////////////////////////////////////////////
