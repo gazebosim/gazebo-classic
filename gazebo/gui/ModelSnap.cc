@@ -30,21 +30,21 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "gazebo/gui/ModelAttachPrivate.hh"
-#include "gazebo/gui/ModelAttach.hh"
+#include "gazebo/gui/ModelSnapPrivate.hh"
+#include "gazebo/gui/ModelSnap.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ModelAttach::ModelAttach()
-  : dataPtr(new ModelAttachPrivate)
+ModelSnap::ModelSnap()
+  : dataPtr(new ModelSnapPrivate)
 {
   this->dataPtr->initialized = false;
 }
 
 /////////////////////////////////////////////////
-ModelAttach::~ModelAttach()
+ModelSnap::~ModelSnap()
 {
   this->dataPtr->modelPub.reset();
   delete this->dataPtr;
@@ -52,7 +52,7 @@ ModelAttach::~ModelAttach()
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::Init()
+void ModelSnap::Init()
 {
   if (this->dataPtr->initialized)
     return;
@@ -79,14 +79,14 @@ void ModelAttach::Init()
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::Reset()
+void ModelSnap::Reset()
 {
   this->dataPtr->selectedVis.reset();
   this->dataPtr->selectedTriangle.clear();
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::OnMousePressEvent(const common::MouseEvent &_event)
+void ModelSnap::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
   //this->dataPtr->mouseStart = _event.pressPos;
@@ -105,7 +105,7 @@ void ModelAttach::OnMousePressEvent(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::OnMouseMoveEvent(const common::MouseEvent &_event)
+void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
@@ -113,7 +113,7 @@ void ModelAttach::OnMouseMoveEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelAttach::OnMouseReleaseEvent(const common::MouseEvent &_event)
+void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
@@ -205,13 +205,13 @@ void ModelAttach::OnMouseReleaseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelAttach::OnKeyPressEvent(const common::KeyEvent &_event)
+void ModelSnap::OnKeyPressEvent(const common::KeyEvent &_event)
 {
   this->dataPtr->keyEvent = _event;
 }
 
 //////////////////////////////////////////////////
-void ModelAttach::OnKeyReleaseEvent(const common::KeyEvent &_event)
+void ModelSnap::OnKeyReleaseEvent(const common::KeyEvent &_event)
 {
   this->dataPtr->keyEvent = _event;
 
@@ -219,13 +219,13 @@ void ModelAttach::OnKeyReleaseEvent(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::SetMouseMoveVisual(rendering::VisualPtr _vis)
+void ModelSnap::SetMouseMoveVisual(rendering::VisualPtr _vis)
 {
   this->dataPtr->mouseMoveVis = _vis;
 }
 
 /////////////////////////////////////////////////
-void ModelAttach::PublishVisualPose(rendering::VisualPtr _vis)
+void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 {
   if (!_vis)
     return;

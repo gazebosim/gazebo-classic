@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_ATTACH_PRIVATE_HH_
-#define _MODEL_ATTACH_PRIVATE_HH_
+#ifndef _MODEL_SNAP_PRIVATE_HH_
+#define _MODEL_SNAP_PRIVATE_HH_
 
 #include <string>
 
@@ -30,8 +30,8 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief Private data for the ModelAttach class
-    class ModelAttachPrivate
+    /// \brief Private data for the ModelSnap class
+    class ModelSnapPrivate
     {
       /// \brief Transportation node.
       public: transport::NodePtr node;

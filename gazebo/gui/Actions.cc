@@ -124,7 +124,7 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_pasteAct = 0;
 
 GAZEBO_VISIBLE
-QAction *gazebo::gui::g_alignAct = 0;
+QAction *gazebo::gui::g_snapAct = 0;
 
 GAZEBO_VISIBLE
-QAction *gazebo::gui::g_attachAct = 0;
+QWidgetAction *gazebo::gui::g_alignAct = 0;

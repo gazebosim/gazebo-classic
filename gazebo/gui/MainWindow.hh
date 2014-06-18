@@ -108,8 +108,8 @@ namespace gazebo
       /// \brief Qt callback when the align mode is triggered.
       private slots: void Align();
 
-      /// \brief Qt callback when the attach mode is triggered.
-      private slots: void Attach();
+      /// \brief Qt callback when the snap mode is triggered.
+      private slots: void Snap();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();

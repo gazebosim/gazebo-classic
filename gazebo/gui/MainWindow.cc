@@ -635,9 +635,9 @@ void MainWindow::Align()
 }
 
 /////////////////////////////////////////////////
-void MainWindow::Attach()
+void MainWindow::Snap()
 {
-  gui::Events::manipMode("attach");
+  gui::Events::manipMode("snap");
 }
 
 /////////////////////////////////////////////////
@@ -1167,19 +1167,71 @@ void MainWindow::CreateActions()
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
 
-  g_alignAct = new QAction(QIcon(":/images/align.png"),
+  g_snapAct = new QAction(QIcon(":/images/magnet.png"),
+      tr("Snap Mode"), this);
+  g_snapAct->setStatusTip(tr("Snap entity"));
+  g_snapAct->setCheckable(true);
+  g_snapAct->setToolTip(tr("Snap Mode"));
+  connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
+
+/*  g_alignAct = new QAction(QIcon(":/images/align.png"),
       tr("Align Mode"), this);
   g_alignAct->setStatusTip(tr("Align entity"));
   g_alignAct->setCheckable(true);
   g_alignAct->setToolTip(tr("Align Mode"));
-  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));*/
 
-  g_attachAct = new QAction(QIcon(":/images/magnet.png"),
-      tr("Attach Mode"), this);
-  g_attachAct->setStatusTip(tr("Attach entity"));
-  g_attachAct->setCheckable(true);
-  g_attachAct->setToolTip(tr("Attach Mode"));
-  connect(g_attachAct, SIGNAL(triggered()), this, SLOT(Attach()));
+  // set up align actions and widget
+  QAction *xAlignMin = new QAction(QIcon(":/images/horz_left.png"),
+      tr("X Align Min"), this);
+  QAction *xAlignCenter = new QAction(QIcon(":/images/horz_center.png"),
+      tr("X Align Center"), this);
+  QAction *xAlignMax = new QAction(QIcon(":/images/horz_right.png"),
+      tr("X Align Max"), this);
+  QAction *yAlignMin = new QAction(QIcon(":/images/vert_bottom.png"),
+      tr("Y Align Min"), this);
+  QAction *yAlignCenter = new QAction(QIcon(":/images/vert_center.png"),
+      tr("Y Align Center"), this);
+  QAction *yAlignMax = new QAction(QIcon(":/images/vert_top.png"),
+      tr("Y Align Max"), this);
+
+  xAlignMin->setCheckable(true);
+  xAlignCenter->setCheckable(true);
+  xAlignMax->setCheckable(true);
+  yAlignMin->setCheckable(true);
+  yAlignCenter->setCheckable(true);
+  yAlignMax->setCheckable(true);
+
+  QActionGroup *xAlignActionGroup = new QActionGroup(this);
+  xAlignActionGroup->addAction(xAlignMin);
+  xAlignActionGroup->addAction(xAlignCenter);
+  xAlignActionGroup->addAction(xAlignMax);
+  xAlignActionGroup->setExclusive(true);
+  QActionGroup *yAlignActionGroup = new QActionGroup(this);
+  yAlignActionGroup->addAction(yAlignMin);
+  yAlignActionGroup->addAction(yAlignCenter);
+  yAlignActionGroup->addAction(yAlignMax);
+  yAlignActionGroup->setExclusive(true);
+
+  QWidget *alignWidget = new QWidget;
+  QVBoxLayout *alignLayout = new QVBoxLayout;
+  QToolBar *xAlignBar = new QToolBar(alignWidget);
+  QToolBar *yAlignBar = new QToolBar(alignWidget);
+  xAlignBar->addAction(xAlignMin);
+  xAlignBar->addAction(xAlignCenter);
+  xAlignBar->addAction(xAlignMax);
+  yAlignBar->addAction(yAlignMin);
+  yAlignBar->addAction(yAlignCenter);
+  yAlignBar->addAction(yAlignMax);
+  alignLayout->addWidget(xAlignBar);
+  alignLayout->addWidget(yAlignBar);
+  alignWidget->setLayout(alignLayout);
+  alignWidget->adjustSize();
+  alignWidget->setFixedWidth(alignWidget->width()+1);
+
+  g_alignAct = new QWidgetAction(this);
+  g_alignAct->setDefaultWidget(alignWidget);
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////
