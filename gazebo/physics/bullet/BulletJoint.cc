@@ -515,8 +515,7 @@ void BulletJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Vector3 BulletJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return this->GetWorldPose().pos;
 }
 
 //////////////////////////////////////////////////

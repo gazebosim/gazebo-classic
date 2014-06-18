@@ -171,13 +171,9 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
+math::Vector3 BulletHingeJoint::GetAnchor(unsigned int _index) const
 {
-  btTransform trans = this->bulletHinge->getAFrame();
-  trans.getOrigin() +=
-    this->bulletHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(),
-      trans.getOrigin().getY(), trans.getOrigin().getZ());
+  return BulletJoint::GetAnchor(_index);
 }
 
 //////////////////////////////////////////////////
