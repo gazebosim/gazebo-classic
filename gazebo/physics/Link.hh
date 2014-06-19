@@ -536,9 +536,6 @@ namespace gazebo
       /// \brief Parse visuals from SDF
       private: void ParseVisuals();
 
-      /// \brief Update visual SDFs.
-      private: void UpdateVisualSDF();
-
       /// \brief Helper function to see if _value is contained in _vector.
       /// \param[in] _vector a vector of boost link pointers.
       /// \param[in] _value a particular link pointer.
