@@ -341,17 +341,15 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
 
-  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
-  {
-    gzerr << "BulletSliderJoint fails the SetForce and axis limit tests"
-          << std::endl;
-    return;
-  }
-
   // Test SetForce with positive value
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
+    if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
+    {
+      gzerr << "Bullet is off by one time step (#1081)" << std::endl;
+      world->Step(1);
+    }
     EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
@@ -378,6 +376,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+  }
+
+  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
+  {
+    gzerr << "BulletSliderJoint fails the joint limit tests" << std::endl;
+    return;
   }
 
   if (isBullet && _joint->HasType(physics::Base::HINGE_JOINT))

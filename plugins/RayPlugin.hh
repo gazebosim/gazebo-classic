@@ -25,7 +25,6 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/RaySensor.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

@@ -41,14 +41,17 @@ set(tests
   gz_physics.cc
   gz_world.cc
   imu.cc
+  joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
   joint_revolute.cc
   joint_screw.cc
+  joint_set_position_test.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
   laser.cc
+  model.cc
   model_database.cc
   noise.cc
   nondefault_world.cc
@@ -59,6 +62,7 @@ set(tests
   physics_thread_safe.cc
   pioneer2dx.cc
   road.cc
+  sensor.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc
@@ -91,7 +95,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
-  camera_follow.cc
+  camera.cc
   camera_sensor.cc
   gpu_laser.cc
   gz_camera.cc
