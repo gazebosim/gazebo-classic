@@ -22,6 +22,7 @@
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/WirelessTransceiver.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class WirelessReceiver WirelessReceiver.hh sensors/sensors.hh
     /// \brief Sensor class for receiving wireless signals.
-    class WirelessReceiver: public WirelessTransceiver
+    class GAZEBO_VISIBLE WirelessReceiver: public WirelessTransceiver
     {
       /// \brief Constructor
       public: WirelessReceiver();
@@ -50,7 +51,7 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      private: virtual void UpdateImpl(bool _force);
+      private: virtual bool UpdateImpl(bool _force);
 
       /// \brief Returns the minimum frequency filtered (MHz).
       /// \return Reception frequency (MHz).

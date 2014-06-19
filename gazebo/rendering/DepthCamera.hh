@@ -33,6 +33,7 @@
 #include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -53,7 +54,7 @@ namespace gazebo
 
     /// \class DepthCamera DepthCamera.hh rendering/rendering.hh
     /// \brief Depth camera used to render depth data into an image buffer
-    class DepthCamera : public Camera
+    class GAZEBO_VISIBLE DepthCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -67,7 +68,7 @@ namespace gazebo
 
       /// \brief Load the camera with a set of parmeters
       /// \param[in] _sdf The SDF camera info
-      public: void Load(sdf::ElementPtr &_sdf);
+      public: void Load(sdf::ElementPtr _sdf);
 
        /// \brief Load the camera with default parmeters
       public: void Load();

@@ -19,6 +19,7 @@
 #define _GAZEBO_PID_HH_
 
 #include "gazebo/common/Time.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
     /// Generic proportiolnal-integral-derivative controller class that
     /// keeps track of PID-error states and control inputs given
     /// the state of a system and a user specified target state.
-    class PID
+    class GAZEBO_VISIBLE PID
     {
       /// \brief Constructor, zeros out Pid values when created and
       /// initialize Pid-gains and integral term limits:[iMax:iMin]-[I1:I2].
@@ -91,6 +92,34 @@ namespace gazebo
       /// \param[in] _c The maximum value
       public: void SetCmdMin(double _c);
 
+      /// \brief Get the proportional Gain.
+      /// \return The proportional gain value
+      public: double GetPGain() const;
+
+      /// \brief Get the integral Gain.
+      /// \return The integral gain value
+      public: double GetIGain() const;
+
+      /// \brief Get the derivative Gain.
+      /// \return The derivative gain value
+      public: double GetDGain() const;
+
+      /// \brief Get the integral upper limit.
+      /// \return The integral upper limit value
+      public: double GetIMax() const;
+
+      /// \brief Get the integral lower limit.
+      /// \return The integral lower limit value
+      public: double GetIMin() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMax() const;
+
+      /// \brief Get the maximum value for the command.
+      /// \return The maximum value
+      public: double GetCmdMin() const;
+
       /// \brief Update the Pid loop with nonuniform time step size.
       /// \param[_in] _error  Error since last call (p_state - p_target).
       /// \param[_in] _dt Change in time since last update call.
@@ -128,6 +157,12 @@ namespace gazebo
                 this->iMax = _p.iMax;
                 this->iMin = _p.iMin;
                 this->cmdMax = _p.cmdMax;
+                this->cmdMin = _p.cmdMin;
+                this->pErrLast = _p.pErrLast;
+                this->pErr = _p.pErr;
+                this->iErr = _p.iErr;
+                this->dErr = _p.dErr;
+                this->cmd = _p.cmd;
 
                 this->Reset();
                 return *this;

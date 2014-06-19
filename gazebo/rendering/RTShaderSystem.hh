@@ -31,6 +31,7 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -47,7 +48,7 @@ namespace gazebo
     ///
     /// This class allows Gazebo to generate per-pixel shaders for every
     /// material at run-time.
-    class RTShaderSystem : public SingletonT<RTShaderSystem>
+    class GAZEBO_VISIBLE RTShaderSystem : public SingletonT<RTShaderSystem>
     {
       /// \enum LightingModel.
       /// \brief The type of lighting.
@@ -161,7 +162,8 @@ namespace gazebo
       /// \brief Mutex used to protext the entities list.
       private: boost::mutex *entityMutex;
 
-      private: Ogre::PSSMShadowCameraSetup *pssmSetup;
+      /// \brief Parallel Split Shadow Map (PSSM) camera setup
+      private: Ogre::ShadowCameraSetupPtr pssmSetup;
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

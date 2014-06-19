@@ -27,6 +27,7 @@
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -38,7 +39,7 @@ namespace gazebo
     /// \class Hinge2Joint Hinge2Joint.hh physics/physics.hh
     /// \brief A two axis hinge joint
     template< class T>
-    class Hinge2Joint : public T
+    class GAZEBO_VISIBLE Hinge2Joint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent link.
@@ -49,7 +50,7 @@ namespace gazebo
       public: virtual ~Hinge2Joint()
               { }
 
-      /// \interal
+      // Documentation inherited.
       public: virtual unsigned int GetAngleCount() const
               {return 2;}
 

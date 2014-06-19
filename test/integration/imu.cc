@@ -59,7 +59,7 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   math::Vector3 rateSum, accelSum;
   for (unsigned int i = 0; i < _cnt; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
 
     int j = 0;
     while (_imu->GetLastMeasurementTime() == gazebo::common::Time::Zero &&

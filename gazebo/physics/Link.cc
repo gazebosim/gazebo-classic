@@ -46,7 +46,7 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent)
+    : Entity(_parent), initialized(false)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
@@ -241,6 +241,8 @@ void Link::Init()
       collision->Init();
     }
   }
+
+  this->initialized = true;
 }
 
 //////////////////////////////////////////////////
@@ -274,6 +276,8 @@ void Link::Fini()
   }
 
 #ifdef HAVE_OPENAL
+  this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+      this->GetScopedName() + "/audio_collision");
   this->audioSink.reset();
 #endif
 
@@ -673,6 +677,28 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 }
 
 //////////////////////////////////////////////////
+math::Pose Link::GetWorldInertialPose() const
+{
+  math::Pose inertialPose;
+  if (this->inertial)
+    inertialPose = this->inertial->GetPose();
+  return inertialPose + this->GetWorldPose();
+}
+
+//////////////////////////////////////////////////
+math::Matrix3 Link::GetWorldInertiaMatrix() const
+{
+  math::Matrix3 moi;
+  if (this->inertial)
+  {
+    math::Vector3 pos = this->inertial->GetPose().pos;
+    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
+    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+  }
+  return moi;
+}
+
+//////////////////////////////////////////////////
 void Link::AddParentJoint(JointPtr _joint)
 {
   this->parentJoints.push_back(_joint);
@@ -779,6 +805,9 @@ void Link::FillMsg(msgs::Link &_msg)
     proj->set_far_clip(elem->Get<double>("far_clip"));
     msgs::Set(proj->mutable_pose(), elem->Get<math::Pose>("pose"));
   }
+
+  if (this->IsCanonicalLink())
+    _msg.set_canonical(true);
 }
 
 //////////////////////////////////////////////////
@@ -825,7 +854,6 @@ void Link::ProcessMsg(const msgs::Link &_msg)
   if (_msg.collision_size()>0)
     this->UpdateSurface();
 }
-
 
 //////////////////////////////////////////////////
 unsigned int Link::GetSensorCount() const
@@ -1085,4 +1113,180 @@ void Link::SetScale(const math::Vector3 &_scale)
 
     this->visPub->Publish(msg);
   }*/
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyPotential() const
+{
+  // compute gravitational potential energy for link CG location
+  // use origin as reference position
+  // E = -m g^T z
+  double m = this->GetInertial()->GetMass();
+  math::Vector3 g = this->GetWorld()->GetPhysicsEngine()->GetGravity();
+  math::Vector3 z = this->GetWorldCoGPose().pos;
+  return -m * g.Dot(z);
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergyKinetic() const
+{
+  double energy = 0.0;
+
+  // compute linear kinetic energy
+  // E = 1/2 m v^T v
+  {
+    double m = this->GetInertial()->GetMass();
+    math::Vector3 v = this->GetWorldCoGLinearVel();
+    energy += 0.5 * m * v.Dot(v);
+  }
+
+  // compute angular kinetic energy
+  // E = 1/2 w^T I w
+  {
+    math::Vector3 w = this->GetWorldAngularVel();
+    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    energy += 0.5 * w.Dot(I * w);
+  }
+
+  return energy;
+}
+
+/////////////////////////////////////////////////
+double Link::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}
+
+/////////////////////////////////////////////////
+void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                     const math::Pose &_worldReferenceFrameDst)
+{
+  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
+    + _worldReferenceFrameDst;
+  this->SetWorldPose(targetWorldPose);
+  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+}
+
+/////////////////////////////////////////////////
+bool Link::FindAllConnectedLinksHelper(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks, bool _fistLink)
+{
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "subsequent call to find connected links: "
+  //       << " parent " << pn
+  //       << " this link " << this->GetName() << "\n";
+
+  // get all child joints from this link
+  Link_V childLinks = this->GetChildJointsLinks();
+
+  // gzerr << "debug: child links are: ";
+  // for (Link_V::iterator li = childLinks.begin();
+  //                       li != childLinks.end(); ++li)
+  //   std::cout << (*li)->GetName() << " ";
+  // std::cout << "\n";
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = childLinks.begin();
+                        li != childLinks.end(); ++li)
+  {
+    // gzerr << "debug: checking " << (*li)->GetName() << "\n";
+
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      // if parent is a child, failed search to find a nice subset of links
+      gzdbg << "we have a loop! cannot find nice subset of connected links,"
+            << " this link " << this->GetName() << " connects back to"
+            << " parent " << _originalParentLink->GetName() << ".\n";
+      _connectedLinks.clear();
+      return false;
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+      // gzerr << "debug: do nothing with " << (*li)->GetName() << "\n";
+    }
+    else
+    {
+      // gzerr << "debug: add and recurse " << (*li)->GetName() << "\n";
+      // add child link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if child link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  /// \todo: later we can optimize loop below by merging and using a flag.
+
+  // search parents, but if this is the first search, keep going, otherwise
+  // flag failure
+  // get all parent joints from this link
+  Link_V parentLinks = this->GetParentJointsLinks();
+
+  // loop through all joints where this link is a parent link of the joint
+  for (Link_V::iterator li = parentLinks.begin();
+                        li != parentLinks.end(); ++li)
+  {
+    // check child link of each child joint recursively
+    if ((*li).get() == _originalParentLink.get())
+    {
+      if (_fistLink)
+      {
+        // this is the first child link, simply skip if the parent is
+        // the _originalParentLink
+      }
+      else
+      {
+        // if parent is a child, failed search to find a nice subset of links
+        gzdbg << "we have a loop! cannot find nice subset of connected links,"
+              << " this link " << this->GetName() << " connects back to"
+              << " parent " << _originalParentLink->GetName() << ".\n";
+        _connectedLinks.clear();
+        return false;
+      }
+    }
+    else if (this->ContainsLink(_connectedLinks, (*li)))
+    {
+      // do nothing
+    }
+    else
+    {
+      // add parent link to list
+      _connectedLinks.push_back((*li));
+
+      // recursively check if parent link has already been checked
+      // if it returns false, it looped back to parent, mark flag and break
+      // from current for-loop.
+      if (!(*li)->FindAllConnectedLinksHelper(_originalParentLink,
+        _connectedLinks))
+      {
+        // one of the recursed link is the parent link
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
+{
+  for (Link_V::const_iterator iter = _vector.begin();
+       iter != _vector.end(); ++iter)
+  {
+    if ((*iter).get() == _value.get())
+      return true;
+  }
+  return false;
 }

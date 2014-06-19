@@ -448,16 +448,21 @@ dReal getHingeAngle( dxBody *body1, dxBody *body2, dVector3 axis,
 {
     // get qrel = relative rotation between the two bodies
     dQuaternion qrel;
-    if ( body2 )
+    if ( body1 && body2 )
     {
         dQuaternion qq;
         dQMultiply1( qq, body1->q, body2->q );
         dQMultiply2( qrel, qq, q_initial );
     }
-    else
+    else if (body1)
     {
         // pretend body2->q is the identity
         dQMultiply3( qrel, body1->q, q_initial );
+    }
+    else if (body2)
+    {
+        // pretend body1->q is the identity
+        dQMultiply3( qrel, body2->q, q_initial );
     }
 
     return getHingeAngleFromRelativeQuat( qrel, axis );

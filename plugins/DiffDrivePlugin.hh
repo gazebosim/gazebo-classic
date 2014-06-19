@@ -21,10 +21,11 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class DiffDrivePlugin : public ModelPlugin
+  class GAZEBO_VISIBLE DiffDrivePlugin : public ModelPlugin
   {
     public: DiffDrivePlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
@@ -47,8 +48,6 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
-
-    private: double sum;
   };
 }
 #endif

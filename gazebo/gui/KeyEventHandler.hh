@@ -23,6 +23,7 @@
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/KeyEvent.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
   {
     /// \class KeyEventHandler KeyEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters keyboard events.
-    class KeyEventHandler : public SingletonT<KeyEventHandler>
+    class GAZEBO_VISIBLE KeyEventHandler : public SingletonT<KeyEventHandler>
     {
       /// \def KeyEventFilter
       /// \brief Key event function pointer.

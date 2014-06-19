@@ -15,11 +15,14 @@
  *
 */
 
-#include "test/ServerFixture.hh"
+#include "gazebo/physics/BoxShape.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
-TEST(BoxShapeTest, Scale)
+class BoxShapeTest : public gazebo::testing::AutoLogFixture { };
+
+TEST_F(BoxShapeTest, Scale)
 {
   std::ostringstream boxStr;
   boxStr << "<sdf version ='" << SDF_VERSION << "'>"

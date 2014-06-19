@@ -23,6 +23,7 @@
 #define BULLETRAYSENSOR_HH
 
 #include <vector>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief An Bullet Ray sensor
-    class BulletRaySensor : public PhysicsRaySensor
+    class GAZEBO_VISIBLE BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
       public: BulletRaySensor(Link *body);

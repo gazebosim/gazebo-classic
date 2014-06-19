@@ -52,7 +52,7 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
+math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -62,7 +62,7 @@ math::Vector3 DARTSliderJoint::GetAnchor(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetGlobalAxis(int _index) const
+math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -85,7 +85,7 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   if (_index == 0)
   {
@@ -106,7 +106,7 @@ void DARTSliderJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTSliderJoint::GetAngleImpl(int _index) const
+math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
@@ -124,7 +124,7 @@ math::Angle DARTSliderJoint::GetAngleImpl(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetVelocity(int _index, double _vel)
+void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_dq(_vel);
@@ -133,7 +133,7 @@ void DARTSliderJoint::SetVelocity(int _index, double _vel)
 }
 
 //////////////////////////////////////////////////
-double DARTSliderJoint::GetVelocity(int _index) const
+double DARTSliderJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0.0;
 
@@ -146,7 +146,7 @@ double DARTSliderJoint::GetVelocity(int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetMaxForce(int _index, double _force)
+void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tauMax(_force);
@@ -155,7 +155,7 @@ void DARTSliderJoint::SetMaxForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-double DARTSliderJoint::GetMaxForce(int _index)
+double DARTSliderJoint::GetMaxForce(unsigned int _index)
 {
   double result = 0.0;
 
@@ -168,7 +168,7 @@ double DARTSliderJoint::GetMaxForce(int _index)
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetForceImpl(int _index, double _effort)
+void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
     this->dtJoint->getGenCoord(0)->set_tau(_effort);

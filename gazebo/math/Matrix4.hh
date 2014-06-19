@@ -22,6 +22,7 @@
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Matrix4 Matrix4.hh math/gzmath.hh
     /// \brief A 3x3 matrix class
-    class Matrix4
+    class GAZEBO_VISIBLE Matrix4
     {
       /// \brief Constructor
       public: Matrix4();

@@ -160,6 +160,27 @@ namespace gazebo
       _t->set_nsec(_v.nsec);
     }
 
+    /////////////////////////////////////////////////
+    void Set(msgs::SphericalCoordinates *_s,
+             const common::SphericalCoordinates &_v)
+    {
+      switch (_v.GetSurfaceType())
+      {
+        case common::SphericalCoordinates::EARTH_WGS84:
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+        default:
+          gzerr << "Unable to map surface type[" <<  _v.GetSurfaceType()
+            << "] to a SphericalCoordinates message.\n";
+          _s->set_surface_model(msgs::SphericalCoordinates::EARTH_WGS84);
+          break;
+      };
+
+      _s->set_latitude_deg(_v.GetLatitudeReference().Degree());
+      _s->set_longitude_deg(_v.GetLongitudeReference().Degree());
+      _s->set_heading_deg(_v.GetHeadingOffset().Degree());
+      _s->set_elevation(_v.GetElevationReference());
+    }
 
     /////////////////////////////////////////////////
     void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
@@ -497,14 +518,11 @@ namespace gazebo
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<math::Vector3>("pos"));
 
-        common::Image img(geomElem->Get<std::string>("uri"));
-        msgs::Set(result.mutable_heightmap()->mutable_image(), img);
-
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
-        msgs::HeightmapGeom::Texture *tex;
         while (textureElem)
         {
-          tex = result.mutable_heightmap()->add_texture();
+          msgs::HeightmapGeom::Texture *tex =
+            result.mutable_heightmap()->add_texture();
           tex->set_diffuse(textureElem->Get<std::string>("diffuse"));
           tex->set_normal(textureElem->Get<std::string>("normal"));
           tex->set_size(textureElem->Get<double>("size"));
@@ -512,10 +530,10 @@ namespace gazebo
         }
 
         sdf::ElementPtr blendElem = geomElem->GetElement("blend");
-        msgs::HeightmapGeom::Blend *blend;
         while (blendElem)
         {
-          blend = result.mutable_heightmap()->add_blend();
+          msgs::HeightmapGeom::Blend *blend =
+            result.mutable_heightmap()->add_blend();
 
           blend->set_min_height(blendElem->Get<double>("min_height"));
           blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
@@ -583,6 +601,11 @@ namespace gazebo
             matMsg->mutable_script()->add_uri(uriElem->Get<std::string>());
             uriElem = uriElem->GetNextElement("uri");
           }
+        }
+
+        if (elem->HasElement("lighting"))
+        {
+          matMsg->set_lighting(elem->Get<bool>("lighting"));
         }
 
         if (elem->HasElement("shader"))

@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: The Bullet physics engine wrapper
- * Author: Nate Koenig
- * Date: 11 June 2007
- */
+
+#include <algorithm>
+#include <string>
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -58,6 +57,7 @@
 #include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -278,6 +278,8 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
   this->SetSeed(math::Rand::GetSeed());
+
+  btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
 
 //////////////////////////////////////////////////
@@ -316,8 +318,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   // but can lead to improper stacking of objects, see
   // http://web.archive.org/web/20120430155635/http://bulletphysics.org/
   //     mediawiki-1.5.8/index.php/BtContactSolverInfo#Split_Impulse
-  info.m_splitImpulse = 1;
-  info.m_splitImpulsePenetrationThreshold = -0.02;
+  info.m_splitImpulse =
+      boost::any_cast<bool>(this->GetParam("split_impulse"));
+  info.m_splitImpulsePenetrationThreshold =
+    boost::any_cast<double>(
+    this->GetParam("split_impulse_penetration_threshold"));
 
   // Use multiple friction directions.
   // This is important for rolling without slip (see issue #480)
@@ -331,9 +336,9 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
   info.m_erp = bulletElem->GetElement("constraints")->Get<double>("erp");
 
   info.m_numIterations =
-      boost::any_cast<int>(this->GetParam(PGS_ITERS));
+      boost::any_cast<int>(this->GetParam("iters"));
   info.m_sor =
-      boost::any_cast<double>(this->GetParam(SOR));
+      boost::any_cast<double>(this->GetParam("sor"));
 
   gzlog << " debug physics: "
         << " iters[" << info.m_numIterations
@@ -379,18 +384,20 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->solverType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
-        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+      boost::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.set_iters(
-        boost::any_cast<int>(this->GetParam(PGS_ITERS)));
+      boost::any_cast<int>(this->GetParam("iters")));
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
     physicsMsg.set_sor(
-        boost::any_cast<double>(this->GetParam(SOR)));
+      boost::any_cast<double>(this->GetParam("sor")));
     physicsMsg.set_cfm(
-        boost::any_cast<double>(this->GetParam(GLOBAL_CFM)));
+      boost::any_cast<double>(this->GetParam("cfm")));
     physicsMsg.set_erp(
-        boost::any_cast<double>(this->GetParam(GLOBAL_ERP)));
+      boost::any_cast<double>(this->GetParam("erp")));
+
     physicsMsg.set_contact_surface_layer(
-        boost::any_cast<double>(this->GetParam(CONTACT_SURFACE_LAYER)));
+      boost::any_cast<double>(this->GetParam("contact_surface_layer")));
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -406,28 +413,28 @@ void BulletPhysics::OnRequest(ConstRequestPtr &_msg)
 void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
   if (_msg->has_min_step_size())
-    this->SetParam(MIN_STEP_SIZE, _msg->min_step_size());
+    this->SetParam("min_step_size", _msg->min_step_size());
 
   if (_msg->has_solver_type())
-    this->SetParam(SOLVER_TYPE, _msg->solver_type());
+    this->SetParam("solver_type", _msg->solver_type());
 
   if (_msg->has_iters())
-    this->SetParam(PGS_ITERS, _msg->iters());
+    this->SetParam("iters", _msg->iters());
 
   if (_msg->has_sor())
-    this->SetParam(SOR, _msg->sor());
+    this->SetParam("sor", _msg->sor());
 
   if (_msg->has_cfm())
-    this->SetParam(GLOBAL_CFM, _msg->cfm());
+    this->SetParam("cfm", _msg->cfm());
 
   if (_msg->has_erp())
-    this->SetParam(GLOBAL_ERP, _msg->erp());
+    this->SetParam("erp", _msg->erp());
 
   if (_msg->has_enable_physics())
     this->world->EnablePhysicsEngine(_msg->enable_physics());
 
   if (_msg->has_contact_surface_layer())
-    this->SetParam(CONTACT_SURFACE_LAYER, _msg->contact_surface_layer());
+    this->SetParam("contact_surface_layer", _msg->contact_surface_layer());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::Convert(_msg->gravity()));
@@ -447,6 +454,9 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 
   /// Make sure all models get at least one update cycle.
   this->world->EnableAllModels();
+
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////
@@ -496,275 +506,359 @@ void BulletPhysics::SetSORPGSIters(unsigned int _iters)
 
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
+bool BulletPhysics::SetParam(BulletParam _param, const boost::any &_value)
 {
   if (!this->dynamicsWorld)
-    return;
+    return false;
 
+  gzwarn << "Deprecated by "
+         << "bool SetParam(const std::string&, const boost::any&).\n";
+
+  switch (_param)
+  {
+    case SOLVER_TYPE:
+    {
+      return this->SetParam("solver_type", _value);
+    }
+    case GLOBAL_CFM:
+    {
+      return this->SetParam("cfm", _value);
+    }
+    case GLOBAL_ERP:
+    {
+      return this->SetParam("erp", _value);
+    }
+    case PGS_ITERS:
+    {
+      return this->SetParam("iters", _value);
+    }
+    case SOR:
+    {
+      return this->SetParam("sor", _value);
+    }
+    case CONTACT_SURFACE_LAYER:
+    {
+      return this->SetParam("contact_surface_layer", _value);
+    }
+    case MAX_CONTACTS:
+    {
+      return this->SetParam("max_contacts", _value);
+    }
+    case MIN_STEP_SIZE:
+    {
+      return this->SetParam("min_step_size", _value);
+    }
+    default:
+    {
+      gzwarn << "Param not supported in bullet" << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
   GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
-  switch (_param)
+  if (_key == "type")
   {
-    case SOLVER_TYPE:
+    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
+           << " use `solver_type`.\n";
+    return this->SetParam("solver_type", _value);
+  }
+  else if (_key == "solver_type")
+  {
+    std::string value;
+    try
     {
-      std::string value;
-      try
-      {
-        value = boost::any_cast<std::string>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      if (value == "sequential_impulse")
-      {
-        bulletElem->GetElement("solver")->GetElement("type")->Set(value);
-        this->solverType = value;
-      }
-      else
-        gzwarn << "Currently only 'sequential_impulse' solver is supported"
-            << std::endl;
-      break;
+      value = boost::any_cast<std::string>(_value);
     }
-    case GLOBAL_CFM:
+    catch(const boost::bad_any_cast &e)
     {
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
-      info.m_globalCfm = value;
-      break;
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
     }
-    case GLOBAL_ERP:
+    if (value == "sequential_impulse")
     {
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
-      info.m_erp = value;
-      break;
+      bulletElem->GetElement("solver")->GetElement("type")->Set(value);
+      this->solverType = value;
     }
-    case PGS_ITERS:
+    else
     {
-      int value;
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-      bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
-      info.m_numIterations = value;
-      break;
-    }
-    case SOR:
-    {
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
-      info.m_sor = value;
-      break;
-    }
-    case CONTACT_SURFACE_LAYER:
-    {
-      /// TODO: Implement contact surface layer param
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("constraints")->GetElement(
-          "contact_surface_layer")->Set(value);
-      break;
-    }
-    case MAX_CONTACTS:
-    {
-      /// TODO: Implement max contacts param
-      int value;
-      try
-      {
-        value = boost::any_cast<int>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        value = boost::any_cast<unsigned int>(_value);
-      }
-      bulletElem->GetElement("max_contacts")->GetValue()->Set(value);
-      break;
-    }
-    case MIN_STEP_SIZE:
-    {
-      /// TODO: Implement min step size param
-      double value;
-      try
-      {
-        value = boost::any_cast<double>(_value);
-      }
-      catch(boost::bad_any_cast &e)
-      {
-        gzerr << "boost any_cast error:" << e.what() << "\n";
-        return;
-      }
-      bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
-      break;
-    }
-    default:
-    {
-      gzwarn << "Param not supported in bullet" << std::endl;
-      break;
+      gzwarn << "Currently only 'sequential_impulse' solver is supported"
+             << std::endl;
+      return false;
     }
   }
-}
-
-//////////////////////////////////////////////////
-void BulletPhysics::SetParam(const std::string &_key, const boost::any &_value)
-{
-  BulletParam param;
-
-  if (_key == "type")
-    param = SOLVER_TYPE;
   else if (_key == "cfm")
-    param = GLOBAL_CFM;
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement("cfm")->Set(value);
+    info.m_globalCfm = value;
+  }
   else if (_key == "erp")
-    param = GLOBAL_ERP;
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement("erp")->Set(value);
+    info.m_erp = value;
+  }
   else if (_key == "iters")
-    param = PGS_ITERS;
+  {
+    int value;
+    try
+    {
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("solver")->GetElement("iters")->Set(value);
+    info.m_numIterations = value;
+  }
   else if (_key == "sor")
-    param = SOR;
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("solver")->GetElement("sor")->Set(value);
+    info.m_sor = value;
+  }
   else if (_key == "contact_surface_layer")
-    param = CONTACT_SURFACE_LAYER;
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement(
+        "contact_surface_layer")->Set(value);
+  }
+  else if (_key == "split_impulse")
+  {
+    bool value;
+    try
+    {
+      value = boost::any_cast<bool>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement(
+        "split_impulse")->Set(value);
+  }
+  else if (_key == "split_impulse_penetration_threshold")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("constraints")->GetElement(
+        "split_impulse_penetration_threshold")->Set(value);
+  }
   else if (_key == "max_contacts")
-    param = MAX_CONTACTS;
+  {
+    /// TODO: Implement max contacts param
+    int value;
+    try
+    {
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        value = boost::any_cast<unsigned int>(_value);
+      }
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    this->sdf->GetElement("max_contacts")->GetValue()->Set(value);
+  }
   else if (_key == "min_step_size")
-    param = MIN_STEP_SIZE;
+  {
+    /// TODO: Implement min step size param
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    bulletElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    this->SetMaxStepSize(value);
+  }
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
-    return;
+    return false;
   }
 
-  this->SetParam(param, _value);
+  return true;
 }
 
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(BulletParam _param) const
 {
-  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
-  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
-
   boost::any value = 0;
   switch (_param)
   {
     case SOLVER_TYPE:
     {
-      value = bulletElem->GetElement("solver")->Get<std::string>("type");
-      break;
+      return this->GetParam("solver_type");
     }
     case GLOBAL_CFM:
     {
-      value = bulletElem->GetElement("constraints")->Get<double>("cfm");
-      break;
+      return this->GetParam("cfm");
     }
     case GLOBAL_ERP:
     {
-      value = bulletElem->GetElement("constraints")->Get<double>("erp");
-      break;
+      return this->GetParam("erp");
     }
     case PGS_ITERS:
     {
-      value = bulletElem->GetElement("solver")->Get<int>("iters");
-      break;
+      return this->GetParam("iters");
     }
     case SOR:
     {
-      value = bulletElem->GetElement("solver")->Get<double>("sor");
-      break;
+      return this->GetParam("sor");
     }
     case CONTACT_SURFACE_LAYER:
     {
-      value = bulletElem->GetElement("constraints")->Get<double>(
-          "contact_surface_layer");
-      break;
+      return this->GetParam("contact_surface_layer");
     }
     case MAX_CONTACTS:
     {
-      value = bulletElem->GetElement("max_contacts")->Get<int>();
-      break;
+      return this->GetParam("max_contacts");
     }
     case MIN_STEP_SIZE:
     {
-      value = bulletElem->GetElement("solver")->Get<double>("min_step_size");
-      break;
+      return this->GetParam("min_step_size");
     }
     default:
     {
       gzwarn << "Param not supported in bullet" << std::endl;
-      break;
+      return value;
     }
   }
-  return value;
 }
 
 //////////////////////////////////////////////////
 boost::any BulletPhysics::GetParam(const std::string &_key) const
 {
-  BulletParam param;
+  sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
+  GZ_ASSERT(bulletElem != NULL, "Bullet SDF element does not exist");
 
   if (_key == "type")
-    param = SOLVER_TYPE;
+  {
+    gzwarn << "keyword `type` for GetParam/SetParam is deprecated, please"
+           << " use `solver_type`.\n";
+    return this->GetParam("solver_type");
+  }
+  else if (_key == "solver_type")
+    return bulletElem->GetElement("solver")->Get<std::string>("type");
   else if (_key == "cfm")
-    param = GLOBAL_CFM;
+    return bulletElem->GetElement("constraints")->Get<double>("cfm");
   else if (_key == "erp")
-    param = GLOBAL_ERP;
+    return bulletElem->GetElement("constraints")->Get<double>("erp");
   else if (_key == "iters")
-    param = PGS_ITERS;
+    return bulletElem->GetElement("solver")->Get<int>("iters");
   else if (_key == "sor")
-    param = SOR;
+    return bulletElem->GetElement("solver")->Get<double>("sor");
   else if (_key == "contact_surface_layer")
-    param = CONTACT_SURFACE_LAYER;
+    return bulletElem->GetElement("constraints")->Get<double>(
+        "contact_surface_layer");
+  else if (_key == "split_impulse")
+  {
+    return bulletElem->GetElement("constraints")->Get<bool>(
+      "split_impulse");
+  }
+  else if (_key == "split_impulse_penetration_threshold")
+  {
+    return bulletElem->GetElement("constraints")->Get<double>(
+      "split_impulse_penetration_threshold");
+  }
   else if (_key == "max_contacts")
-    param = MAX_CONTACTS;
+    return this->sdf->GetElement("max_contacts")->Get<int>();
   else if (_key == "min_step_size")
-    param = MIN_STEP_SIZE;
+    return bulletElem->GetElement("solver")->Get<double>("min_step_size");
+  else if (_key == "max_step_size")
+    return this->GetMaxStepSize();
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;
     return 0;
   }
-  return this->GetParam(param);
 }
 
 //////////////////////////////////////////////////

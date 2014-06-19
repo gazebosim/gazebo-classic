@@ -76,7 +76,6 @@ sudo apt-get install cmake \
      libxml2-dev \
      pkg-config \
      libqt4-dev \
-     libltdl-dev \
      libboost-thread-dev \
      libboost-signals-dev \
      libboost-system-dev \

@@ -205,6 +205,9 @@ src/joints/plane2d.cpp
 src/joints/pr.cpp
 src/joints/pu.cpp
 src/joints/screw.cpp
+src/joints/dhinge.cpp
+src/joints/dball.cpp
+src/joints/gearbox.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
 )

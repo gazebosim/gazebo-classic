@@ -66,7 +66,6 @@ Base::~Base()
       (*iter)->SetParent(BasePtr());
   }
   this->children.clear();
-  this->childrenEnd = this->children.end();
   if (this->sdf)
     this->sdf->Reset();
   this->sdf.reset();
@@ -112,7 +111,6 @@ void Base::Fini()
       (*iter)->Fini();
 
   this->children.clear();
-  this->childrenEnd = this->children.end();
 
   this->world.reset();
   this->parent.reset();
@@ -196,7 +194,6 @@ void Base::AddChild(BasePtr _child)
 
   // Add this _child to our list
   this->children.push_back(_child);
-  this->childrenEnd = this->children.end();
 }
 
 //////////////////////////////////////////////////
@@ -212,7 +209,6 @@ void Base::RemoveChild(unsigned int _id)
       break;
     }
   }
-  this->childrenEnd = this->children.end();
 }
 
 //////////////////////////////////////////////////
@@ -259,15 +255,12 @@ void Base::RemoveChild(const std::string &_name)
     (*iter)->Fini();
     this->children.erase(iter);
   }
-
-  this->childrenEnd = this->children.end();
 }
 
 //////////////////////////////////////////////////
 void Base::RemoveChildren()
 {
   this->children.clear();
-  this->childrenEnd = this->children.end();
 }
 
 //////////////////////////////////////////////////

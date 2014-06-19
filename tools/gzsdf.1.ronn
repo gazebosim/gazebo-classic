@@ -1,4 +1,4 @@
-gzsdf -- Tool to provide information about SDF files.
+gzsdf -- DEPRECATED(see 'gz help sdf')
 =============================================
 
 ## SYNOPSIS

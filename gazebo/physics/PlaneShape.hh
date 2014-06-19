@@ -24,6 +24,7 @@
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     ///
     /// This collision is used primarily for ground planes.  Note that while
     /// the plane in infinite, only the part near the camera is drawn.
-    class PlaneShape : public Shape
+    class GAZEBO_VISIBLE PlaneShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Link to which we are attached.

@@ -4,11 +4,14 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
   add_definitions(${gts_CFLAGS})
+endif()
+
+if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
 set (sources
@@ -21,10 +24,12 @@ set (sources
   Color.cc
   CommonIface.cc
   Console.cc
+  Dem.cc
   Event.cc
   Events.cc
   Exception.cc
   Image.cc
+  ImageHeightmap.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -53,10 +58,15 @@ set (headers
   CommonTypes.hh
   Color.hh
   Console.hh
+  Dem.hh
+  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
+  MovingWindowFilter.hh
+  HeightmapData.hh
   Image.hh
+  ImageHeightmap.hh
   KeyEvent.hh
   KeyFrame.hh
   Material.hh
@@ -71,12 +81,14 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
+  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
   Timer.hh
   UpdateInfo.hh
   Video.hh
+  ffmpeg_inc.h
  )
 
 if (HAVE_GTS)
@@ -96,10 +108,14 @@ set (gtest_sources
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
+  Dem_TEST.cc
   Exception_TEST.cc
+  Event_TEST.cc
+  Image_TEST.cc
+  ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
-  Image_TEST.cc
+  MovingWindowFilter_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
@@ -128,6 +144,10 @@ set_property(
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+link_directories( 
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 target_link_libraries(gazebo_common
@@ -159,6 +179,10 @@ endif()
 
 if (HAVE_OPENAL)
   target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+endif()
+
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_common ${GDAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_common)

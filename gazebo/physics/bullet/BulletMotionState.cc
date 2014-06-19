@@ -42,7 +42,8 @@ BulletMotionState::~BulletMotionState()
 //////////////////////////////////////////////////
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
-  _cogWorldTrans = BulletTypes::ConvertPose(this->link->GetWorldCoGPose());
+  _cogWorldTrans =
+    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
 }
 
 //////////////////////////////////////////////////

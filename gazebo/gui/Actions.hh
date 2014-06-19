@@ -21,6 +21,7 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,6 +32,7 @@ namespace gazebo
     extern QAction *g_importAct;
     extern QAction *g_saveAct;
     extern QAction *g_saveAsAct;
+    extern QAction *g_saveCfgAct;
     extern QAction *g_aboutAct;
     extern QAction *g_quitAct;
 
@@ -41,6 +43,7 @@ namespace gazebo
     extern QAction *g_resetWorldAct;
     extern QAction *g_editBuildingAct;
     extern QAction *g_editTerrainAct;
+    extern QAction *g_editModelAct;
 
     extern QAction *g_playAct;
     extern QAction *g_pauseAct;
@@ -81,7 +84,7 @@ namespace gazebo
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
-    class DeleteAction : public QAction
+    class GAZEBO_VISIBLE DeleteAction : public QAction
     {
       Q_OBJECT
       /// \brief Constructor

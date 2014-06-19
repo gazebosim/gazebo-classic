@@ -29,10 +29,11 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class JointTrajectoryPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE JointTrajectoryPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: JointTrajectoryPlugin();
@@ -48,8 +49,11 @@ namespace gazebo
     private: void UpdateStates(const common::UpdateInfo &_info);
 
 
-    private: void FixLink(physics::LinkPtr link);
-    private: void UnfixLink();
+    // This function is commented out because it is not used.
+    // private: void FixLink(physics::LinkPtr link);
+
+    // This function is commented out because it is not used.
+    // private: void UnfixLink();
 
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;

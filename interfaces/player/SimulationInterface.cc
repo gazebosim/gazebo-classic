@@ -150,7 +150,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
@@ -181,7 +181,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
     {
-      snprintf(this->pose3dReq.name, sizeof(this->pose3dReq.name),
+      snprintf(this->pose3dReq.name, strlen(this->pose3dReq.name),
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 

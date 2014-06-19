@@ -284,7 +284,7 @@ math::Matrix4 ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadController(TiXmlElement *_contrXml,
-      TiXmlElement *_skelXml, const math::Matrix4 _transform, Mesh *_mesh)
+      TiXmlElement *_skelXml, const math::Matrix4 &_transform, Mesh *_mesh)
 {
   Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
   _mesh->SetSkeleton(skeleton);

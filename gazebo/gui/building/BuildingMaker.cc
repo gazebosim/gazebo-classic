@@ -41,7 +41,7 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gui/building/FinishBuildingDialog.hh"
-#include "gazebo/gui/building/EditorEvents.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"

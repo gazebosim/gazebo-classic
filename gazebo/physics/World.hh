@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
@@ -44,6 +39,7 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -60,7 +56,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class World : public boost::enable_shared_from_this<World>
+    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -256,9 +252,14 @@ namespace gazebo
       /// engine should not update an entity.
       public: void DisableAllModels();
 
-      /// \brief Step callback.
+      /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      public: void StepWorld(int _steps);
+      /// \note Deprecated. Please use World::Step
+      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Step the world forward in time.
+      /// \param[in] _steps The number of steps the World should take.
+      public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
       /// \param[in] _filename The filename of the plugin.
@@ -294,11 +295,23 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
+
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
       /// \param[in] _model Pointer to the model to publish.
       public: void PublishModelPose(physics::ModelPtr _model);
+
+      /// \brief Get the total number of iterations.
+      /// \return Number of iterations that simulation has taken.
+      public: uint32_t GetIterations() const;
+
+      /// \brief Get the current scene in message form.
+      /// \return The scene state as a protobuf message.
+      public: msgs::Scene GetSceneMsg() const;
 
       /// \cond
       /// This is an internal function.
@@ -435,9 +448,9 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
-      /// \brief Remove all entities from the world. Implementation of
-      /// World::Clear
-      public: void ClearModels();
+      /// \brief Callback when a light message is received.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -519,6 +532,9 @@ namespace gazebo
 
       /// \brief Subscriber to joint messages.
       private: transport::SubscriberPtr jointSub;
+
+      /// \brief Subscriber to light messages.
+      private: transport::SubscriberPtr lightSub;
 
       /// \brief Subscriber to model messages.
       private: transport::SubscriberPtr modelSub;

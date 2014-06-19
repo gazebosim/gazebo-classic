@@ -38,7 +38,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int Heightmap::NumTerrainSubdivisions = 16;
 const unsigned int Heightmap::numTerrainSubdivisions = 16;
 const double Heightmap::loadRadiusFactor = 1.0;
 const double Heightmap::holdRadiusFactor = 1.15;
@@ -180,7 +179,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
       "Invalid number of terrain divisions (it should be 4 or 16)");
 
   int count = 0;
-  int tileIndex = 0;
   int width = sqrt(_heightmap.size());
   int newWidth = 1 + (width - 1) / sqrt(_n);
 
@@ -189,7 +187,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 
   for (int tileR = 0; tileR < sqrt(_n); ++tileR)
   {
-    tileIndex = tileR * sqrt(_n);
+    int tileIndex = tileR * sqrt(_n);
     for (int row = 0; row < newWidth - 1; ++row)
     {
       for (int tileC = 0; tileC < sqrt(_n); ++tileC)
@@ -318,15 +316,13 @@ void Heightmap::Load()
     geomMsg.ParseFromString(response->serialized_data());
 
     // Copy the height data.
+    this->terrainSize = msgs::Convert(geomMsg.heightmap().size());
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
 
-    this->useTerrainPaging = false;
-
-#if GAZEBO_MAJOR_VERSION >= 3
     if (geomMsg.heightmap().has_filename())
     {
       // Get the full path of the image heightmap
@@ -345,7 +341,6 @@ void Heightmap::Load()
             "General");
       }
     }
-#endif
   }
 
   if (!math::isPowerOfTwo(this->dataSize - 1))
@@ -388,6 +383,29 @@ void Heightmap::Load()
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
   this->SetupShadows(true);
+
+  if (!this->heights.empty())
+  {
+    UserCameraPtr userCam = this->scene->GetUserCamera(0);
+
+    // Move the camera above the terrain only if the user did not modify the
+    // camera position in the world file
+    if (userCam && !userCam->IsCameraSetInWorldFile())
+    {
+      double h = *std::max_element(
+        &this->heights[0], &this->heights[0] + this->heights.size());
+
+      math::Vector3 camPos(5, -5, h + 200);
+      math::Vector3 lookAt(0, 0, h);
+      math::Vector3 delta = lookAt - camPos;
+
+      double yaw = atan2(delta.y, delta.x);
+      double pitch = atan2(-delta.z,
+                           sqrt(delta.x * delta.x + delta.y * delta.y));
+
+      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+    }
+  }
 
   if (this->useTerrainPaging)
   {

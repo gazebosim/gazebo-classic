@@ -57,7 +57,6 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
     std::string &_result)
 {
   int i = 0;
-  int j = 0;
   unsigned char charArray3[3];
   unsigned char charArray4[4];
 
@@ -81,7 +80,7 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
 
   if (i)
   {
-    for (j = i; j < 3; ++j)
+    for (int j = i; j < 3; ++j)
       charArray3[j] = '\0';
 
     charArray4[0] = (charArray3[0] & 0xfc) >> 2;
@@ -91,7 +90,7 @@ void Base64Encode(const char *_bytesToEncode, unsigned int _inLen,
       ((charArray3[2] & 0xc0) >> 6);
     charArray4[3] = charArray3[2] & 0x3f;
 
-    for (j = 0; (j < i + 1); ++j)
+    for (int j = 0; (j < i + 1); ++j)
       _result += base64Chars[charArray4[j]];
 
     while ((i++ < 3))
@@ -104,7 +103,6 @@ std::string Base64Decode(const std::string &_encodedString)
 {
   int inLen = _encodedString.size();
   int i = 0;
-  int j = 0;
   int in = 0;
   unsigned char charArray4[4], charArray3[3];
   std::string ret;
@@ -134,10 +132,10 @@ std::string Base64Decode(const std::string &_encodedString)
 
   if (i)
   {
-    for (j = i; j <4; ++j)
+    for (int j = i; j <4; ++j)
       charArray4[j] = 0;
 
-    for (j = 0; j <4; ++j)
+    for (int j = 0; j <4; ++j)
       charArray4[j] = base64Chars.find(charArray4[j]);
 
     charArray3[0] = (charArray4[0] << 2) + ((charArray4[1] & 0x30) >> 4);
@@ -145,7 +143,7 @@ std::string Base64Decode(const std::string &_encodedString)
       ((charArray4[2] & 0x3c) >> 2);
     charArray3[2] = ((charArray4[2] & 0x3) << 6) + charArray4[3];
 
-    for (j = 0; (j < i - 1); ++j)
+    for (int j = 0; (j < i - 1); ++j)
       ret += charArray3[j];
   }
 

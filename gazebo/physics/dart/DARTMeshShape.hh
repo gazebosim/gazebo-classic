@@ -19,13 +19,14 @@
 #define _GAZEBO_DARTMESHSHAPE_HH_
 
 #include "gazebo/physics/MeshShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief Triangle mesh collision.
-    class DARTMeshShape : public MeshShape
+    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision object.

@@ -25,6 +25,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \brief Sensor with sonar cone.
     ///
     /// This sensor uses a cone .
-    class SonarSensor: public Sensor
+    class GAZEBO_VISIBLE SonarSensor: public Sensor
     {
       /// \brief Constructor
       public: SonarSensor();
@@ -54,7 +55,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();

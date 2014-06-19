@@ -47,106 +47,69 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::Init()
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAnchor(int /*index*/) const
+math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAxis(int /*index*/) const
+math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-double SimbodyHinge2Joint::GetVelocity(int /*_index*/) const
+double SimbodyHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
+void SimbodyHinge2Joint::SetVelocity(unsigned int /*_index*/,
+    double /*_angle*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+void SimbodyHinge2Joint::SetAxis(unsigned int /*_index*/,
+    const math::Vector3 &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetDamping(int /*index*/, double /*_damping*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void SimbodyHinge2Joint::SetForceImpl(
+    unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodyHinge2Joint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-double SimbodyHinge2Joint::GetMaxForce(int /*_index*/)
+double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented";
   return 0;
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetHighStop(int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetLowStop(int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetHighStop(int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetLowStop(int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";
   return math::Vector3();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
   return math::Angle();

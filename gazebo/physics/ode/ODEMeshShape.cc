@@ -20,7 +20,7 @@
  */
 
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/ode/ODECollision.hh"
