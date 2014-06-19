@@ -175,6 +175,7 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
     EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
   }
 }
+
 //////////////////////////////////////////////////
 void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 {
@@ -208,23 +209,31 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   physics::ModelPtr modelRevolute = world->GetModel("model_3_revolute");
   physics::ModelPtr modelPlugin = world->GetModel("model_4_prismatic_plugin");
   physics::ModelPtr modelContact = world->GetModel("model_5_soft_contact");
+  physics::ModelPtr modelPrismatic2 = world->GetModel("model_6_prismatic_sdf");
+  physics::ModelPtr modelRevolute2 = world->GetModel("model_7_revolute_sdf");
 
   ASSERT_TRUE(modelPrismatic != NULL);
   ASSERT_TRUE(modelRevolute != NULL);
   ASSERT_TRUE(modelPlugin != NULL);
   ASSERT_TRUE(modelContact != NULL);
+  ASSERT_TRUE(modelPrismatic2 != NULL);
+  ASSERT_TRUE(modelRevolute2 != NULL);
 
   physics::LinkPtr linkPrismatic = modelPrismatic->GetLink("link_1");
   physics::LinkPtr linkRevolute = modelRevolute->GetLink("link_1");
   physics::LinkPtr linkPluginExplicit = modelPlugin->GetLink("link_1");
   physics::LinkPtr linkPluginImplicit = modelPlugin->GetLink("link_2");
   physics::LinkPtr linkContact = modelContact->GetLink("link_1");
+  physics::LinkPtr linkPrismatic2 = modelPrismatic2->GetLink("link");
+  physics::LinkPtr linkRevolute2 = modelRevolute2->GetLink("link");
 
   ASSERT_TRUE(linkPrismatic != NULL);
   ASSERT_TRUE(linkRevolute != NULL);
   ASSERT_TRUE(linkPluginExplicit != NULL);
   ASSERT_TRUE(linkPluginImplicit != NULL);
   ASSERT_TRUE(linkContact != NULL);
+  ASSERT_TRUE(linkPrismatic2 != NULL);
+  ASSERT_TRUE(linkRevolute2 != NULL);
 
   physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
   ASSERT_TRUE(jointPluginImplicit);
@@ -234,12 +243,16 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   int cyclesPluginExplicit = 0;
   int cyclesPluginImplicit = 0;
   int cyclesContact = 0;
+  int cyclesPrismatic2 = 0;
+  int cyclesRevolute2 = 0;
 
   double velPrismatic = 1.0;
   double velRevolute = 1.0;
   double velPluginExplicit = 1.0;
   double velPluginImplicit = 1.0;
   double velContact = 1.0;
+  double velPrismatic2 = 1.0;
+  double velRevolute2 = 1.0;
   const double vT = 0.01;
 
   double energyPluginImplicit0 = linkPluginImplicit->GetWorldEnergy()
@@ -309,6 +322,26 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       cyclesContact++;
       velContact = -1.0;
     }
+    if (linkPrismatic2->GetWorldLinearVel().z > vT && velPrismatic2 < -vT)
+    {
+      cyclesPrismatic2++;
+      velPrismatic2 = 1.0;
+    }
+    else if (linkPrismatic2->GetWorldLinearVel().z < -vT && velPrismatic2 > vT)
+    {
+      cyclesPrismatic2++;
+      velPrismatic2 = -1.0;
+    }
+    if (-linkRevolute2->GetRelativeAngularVel().y > vT && velRevolute2 < -vT)
+    {
+      cyclesRevolute2++;
+      velRevolute2 = 1.0;
+    }
+    else if (-linkRevolute2->GetRelativeAngularVel().y < -vT && velRevolute2 > vT)
+    {
+      cyclesRevolute2++;
+      velRevolute2 = -1.0;
+    }
 
     double energy = linkPluginImplicit->GetWorldEnergy() +
                    jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
@@ -330,6 +363,8 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   EXPECT_EQ(cyclesRevolute,       17);
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
+  EXPECT_EQ(cyclesPrismatic2,     17);
+  EXPECT_EQ(cyclesRevolute2,      17);
 }
 
 //////////////////////////////////////////////////

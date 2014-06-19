@@ -149,8 +149,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
       {
         stiffness = dynamicsElem->Get<double>("spring_stiffness");
       }
-      this->SetStiffnessDamping(0,
-        dynamicsElem->Get<double>("damping"), stiffness, reference);
+      this->SetStiffnessDamping(0, stiffness,
+        dynamicsElem->Get<double>("damping"), reference);
     }
     if (axisElem->HasElement("limit"))
     {
@@ -189,8 +189,8 @@ void Joint::Load(sdf::ElementPtr _sdf)
       {
         stiffness = dynamicsElem->Get<double>("spring_stiffness");
       }
-      this->SetStiffnessDamping(0,
-        dynamicsElem->Get<double>("damping"), stiffness, reference);
+      this->SetStiffnessDamping(1, stiffness,
+        dynamicsElem->Get<double>("damping"), reference);
     }
     if (axisElem->HasElement("limit"))
     {
