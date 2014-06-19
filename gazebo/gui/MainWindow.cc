@@ -635,6 +635,13 @@ void MainWindow::Align()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnAlignMode(QString _mode)
+{
+  std::string mode = _mode.toStdString();
+  gui::Events::alignMode(mode.substr(0,1), mode.substr(1));
+}
+
+/////////////////////////////////////////////////
 void MainWindow::Snap()
 {
   gui::Events::manipMode("snap");
@@ -1232,6 +1239,23 @@ void MainWindow::CreateActions()
   g_alignAct = new QWidgetAction(this);
   g_alignAct->setDefaultWidget(alignWidget);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
+
+  QSignalMapper *alignSignalMapper = new QSignalMapper(this);
+  connect(alignSignalMapper, SIGNAL(mapped(Qstring)),
+      this, SLOT(OnAlignMode(Qstring)));
+
+  connect(xAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(xAlignMin, tr("xmin"));
+  connect(xAlignCenter, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(xAlignCenter, tr("xcenter"));
+  connect(xAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(xAlignMax, tr("xmax"));
+  connect(yAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(yAlignMin, tr("ymin"));
+  connect(yAlignCenter, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(yAlignCenter, tr("ycenter"));
+  connect(yAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
+  alignSignalMapper->setMapping(yAlignMax, tr("ymax"));
 }
 
 /////////////////////////////////////////////////

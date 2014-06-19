@@ -54,9 +54,6 @@ namespace gazebo
       /// \brief Current key event.
       public: common::KeyEvent keyEvent;
 
-      /// \brief The current visual attached to the mouse.
-      public: rendering::VisualPtr mouseMoveVis;
-
       /// \brief True if the model align tool is initialized.
       public: bool initialized;
 

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MODEL_SNAP_HH_
-#define _MODEL_SNAP_HH_
+#ifndef _MODEL_ALIGN_HH_
+#define _MODEL_ALIGN_HH_
 
 #include <string>
 
@@ -31,18 +31,18 @@ namespace gazebo
 {
   namespace gui
   {
-    class ModelSnapPrivate;
+    class ModelAlignPrivate;
 
-    /// \class ModelSnap ModelSnap.hh gui/Gui.hh
+    /// \class ModelAlign ModelAlign.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class GAZEBO_VISIBLE ModelSnap : public SingletonT<ModelSnap>
+    class GAZEBO_VISIBLE ModelAlign : public SingletonT<ModelAlign>
     {
       /// \brief Constructor
-      private: ModelSnap();
+      private: ModelAlign();
 
       /// \brief Destructor
-      private: virtual ~ModelSnap();
+      private: virtual ~ModelAlign();
 
       /// \brief Initialize the model manipulator.
       public: void Init();
@@ -73,16 +73,21 @@ namespace gazebo
       /// \param[in] _event Key event.
       public: void OnKeyReleaseEvent(const common::KeyEvent &_event);
 
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      private: void OnAlignMode(std::string _axis, std::string _config);
+
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
 
       /// \brief This is a singleton class.
-      private: friend class SingletonT<ModelSnap>;
+      private: friend class SingletonT<ModelAlign>;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ModelSnapPrivate *dataPtr;
+      private: ModelAlignPrivate *dataPtr;
     };
   }
 }

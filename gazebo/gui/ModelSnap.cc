@@ -90,7 +90,6 @@ void ModelSnap::OnMousePressEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
   //this->dataPtr->mouseStart = _event.pressPos;
-  this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
   rendering::VisualPtr mouseVis
@@ -216,12 +215,6 @@ void ModelSnap::OnKeyReleaseEvent(const common::KeyEvent &_event)
   this->dataPtr->keyEvent = _event;
 
   this->dataPtr->keyEvent.key = 0;
-}
-
-/////////////////////////////////////////////////
-void ModelSnap::SetMouseMoveVisual(rendering::VisualPtr _vis)
-{
-  this->dataPtr->mouseMoveVis = _vis;
 }
 
 /////////////////////////////////////////////////
