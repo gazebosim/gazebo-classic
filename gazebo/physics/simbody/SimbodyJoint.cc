@@ -67,11 +67,10 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      /// \TODO: switch to GetElement so default values apply
-      /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (dynamicsElem->HasElement("friction"))
       {
-        this->dissipationCoefficient[0] = dynamicsElem->Get<double>("damping");
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
       }
     }
   }
@@ -83,11 +82,10 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      /// \TODO: switch to GetElement so default values apply
-      /// \TODO: check all physics engines
-      if (dynamicsElem->HasElement("damping"))
+      if (dynamicsElem->HasElement("friction"))
       {
-        this->dissipationCoefficient[1] = dynamicsElem->Get<double>("damping");
+        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
+        gzlog << "joint friction not implemented\n";
       }
     }
   }
