@@ -429,18 +429,21 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
     this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
-    // set damper coefficient
-    this->damper[_index].setDamping(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _damping);
+    if (this->physicsInitialized)
+    {
+      // set damper coefficient
+      this->damper[_index].setDamping(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _damping);
 
-    // set spring stiffness and reference position
-    this->spring[_index].setStiffness(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _stiffness);
-    this->spring[_index].setQZero(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      _reference);
+      // set spring stiffness and reference position
+      this->spring[_index].setStiffness(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _stiffness);
+      this->spring[_index].setQZero(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        _reference);
+    }
   }
   else
     gzerr << "SetStiffnessDamping _index too large.\n";
