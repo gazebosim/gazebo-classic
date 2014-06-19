@@ -545,6 +545,9 @@ namespace gazebo
       /// \return true if value is in vector.
       private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
+      /// \brief Update visual SDFs.
+      private: void UpdateVisualSDF();
+
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
 
