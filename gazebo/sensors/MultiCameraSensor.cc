@@ -69,7 +69,8 @@ void MultiCameraSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   // Create the publisher of image data.
-  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(this->GetTopic());
+  this->imagePub = this->node->Advertise<msgs::ImagesStamped>(
+      this->GetTopic(), 50);
 }
 
 //////////////////////////////////////////////////
@@ -272,5 +273,6 @@ bool MultiCameraSensor::SaveFrame(const std::vector<std::string> &_filenames)
 //////////////////////////////////////////////////
 bool MultiCameraSensor::IsActive()
 {
-  return Sensor::IsActive() || this->imagePub->HasConnections();
+  return Sensor::IsActive() ||
+    (this->imagePub && this->imagePub->HasConnections());
 }

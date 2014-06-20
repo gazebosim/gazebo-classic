@@ -35,6 +35,10 @@ RayPlugin::RayPlugin()
 /////////////////////////////////////////////////
 RayPlugin::~RayPlugin()
 {
+  this->parentSensor->GetLaserShape()->DisconnectNewLaserScans(
+      this->newLaserScansConnection);
+  this->newLaserScansConnection.reset();
+
   this->parentSensor.reset();
   this->world.reset();
 }

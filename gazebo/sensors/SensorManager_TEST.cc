@@ -111,11 +111,18 @@ TEST_F(SensorManager_TEST, InitRemove)
   sensors::Sensor_V sensors = mgr->GetSensors();
   EXPECT_EQ(sensors.size(), sensorCount);
 
-  // Try removing a few senors.
+  std::vector<std::string> sensorNames;
   for (sensors::Sensor_V::iterator iter = sensors.begin();
-       iter != sensors.end() && sensorCount > 10; ++iter)
+       iter != sensors.end(); ++iter)
   {
-    mgr->RemoveSensor((*iter)->GetName());
+    sensorNames.push_back((*iter)->GetName());
+  }
+
+  // Try removing a few senors.
+  for (std::vector<std::string>::iterator iter = sensorNames.begin();
+       iter != sensorNames.end() && sensorCount > 10; ++iter)
+  {
+    mgr->RemoveSensor(*iter);
 
     --sensorCount;
 
@@ -137,8 +144,19 @@ TEST_F(SensorManager_TEST, InitRemove)
   // Remove the rest of the sensors
   mgr->RemoveSensors();
 
+  int i = 0;
+  // Wait for a sensor manager update.
+  while (mgr->GetSensors().size() > 0 && i < 100)
+  {
+    gazebo::common::Time::MSleep(100);
+    ++i;
+  }
+  EXPECT_LT(i, 100);
+
   // Make sure all the sensors have been removed
   EXPECT_EQ(mgr->GetSensors().size(), size_t(0));
+
+  printf("Done done\n");
 }
 
 /////////////////////////////////////////////////

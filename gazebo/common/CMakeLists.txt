@@ -9,6 +9,7 @@ endif()
 set (sources 
   Animation.cc
   Assert.cc
+  Base64.cc
   BVHLoader.cc
   ColladaLoader.cc
   Color.cc
@@ -37,6 +38,7 @@ set (sources
 set (headers 
   Animation.hh
   Assert.hh
+  Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
   Common.hh

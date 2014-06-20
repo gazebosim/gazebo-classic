@@ -387,6 +387,13 @@ namespace SkyX
     }
 
   private:
+
+    /// Enable starfield?
+    bool mStarfield;
+
+    /// Lighting mode
+    LightingMode mLightingMode;
+
     /// Scene manager
     Ogre::SceneManager *mSceneManager;
 
@@ -423,11 +430,6 @@ namespace SkyX
 
     /// Is SkyX visible?
     bool mVisible;
-
-    /// Lighting mode
-    LightingMode mLightingMode;
-    /// Enable starfield?
-    bool mStarfield;
 
     /// Time multiplier
     Ogre::Real mTimeMultiplier;

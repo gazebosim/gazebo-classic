@@ -124,8 +124,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     {
       msgs::Visual msg = msgs::VisualFromSDF(visualElem);
 
-      std::string visName = this->GetScopedName() + "::" + msg.name();
-      msg.set_name(visName);
+      msg.set_name(this->GetScopedName() + "::" + msg.name());
       msg.set_parent_name(this->GetScopedName());
       msg.set_is_static(this->IsStatic());
 

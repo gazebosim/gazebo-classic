@@ -33,9 +33,9 @@ TEST_F(PR2Test, Load)
   SpawnModel("model://pr2");
 
   int i;
-  for (i = 0; i < 200 && !this->HasEntity("pr2"); ++i)
-    common::Time::MSleep(200);
-  EXPECT_LT(i, 200);
+  for (i = 0; i < 1000 && !this->HasEntity("pr2"); ++i)
+    common::Time::MSleep(1000);
+  EXPECT_LT(i, 1000);
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)

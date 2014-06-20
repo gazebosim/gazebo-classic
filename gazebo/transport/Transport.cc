@@ -39,6 +39,11 @@ std::list<boost::shared_ptr<msgs::Response> > g_responses;
 #define DEFAULT_MASTER_PORT 11345
 
 /////////////////////////////////////////////////
+void dummy_callback_fn(uint32_t)
+{
+}
+
+/////////////////////////////////////////////////
 bool transport::get_master_uri(std::string &_masterHost,
                                unsigned int &_masterPort)
 {

@@ -33,6 +33,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
 {
   this->queueLimitWarned = false;
   this->updatePeriod = 0;
+  this->waiting = false;
 }
 
 //////////////////////////////////////////////////
@@ -45,6 +46,8 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;
+  this->waiting = false;
+  this->pubId = 0;
 }
 
 //////////////////////////////////////////////////
@@ -73,6 +76,22 @@ void Publisher::WaitForConnection() const
 }
 
 //////////////////////////////////////////////////
+bool Publisher::WaitForConnection(const common::Time &_timeout) const
+{
+  common::Time start = common::Time::GetWallTime();
+  common::Time curr = common::Time::GetWallTime();
+
+  while (!this->HasConnections() &&
+      (_timeout <= 0.0 || curr - start < _timeout))
+  {
+    common::Time::MSleep(100);
+    curr = common::Time::GetWallTime();
+  }
+
+  return this->HasConnections();
+}
+
+//////////////////////////////////////////////////
 void Publisher::PublishImpl(const google::protobuf::Message &_message,
                             bool _block)
 {
@@ -82,13 +101,10 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
   if (!_message.IsInitialized())
   {
     gzerr << "Publishing an uninitialized message on topic[" <<
-        this->topic << "]. Required field [" <<
-        _message.InitializationErrorString() << "] missing.\n";
+      this->topic << "]. Required field [" <<
+      _message.InitializationErrorString() << "] missing.\n";
     return;
   }
-
-  // if (!this->HasConnections())
-  // return;
 
   // Check if a throttling rate has been set
   if (this->updatePeriod > 0)
@@ -99,7 +115,7 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
     // Skip publication if the time difference is less than the update period.
     if (this->prevPublishTime != common::Time(0, 0) &&
         (this->currentTime - this->prevPublishTime).Double() <
-         this->updatePeriod)
+        this->updatePeriod)
     {
       return;
     }
@@ -126,9 +142,9 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
       if (!queueLimitWarned)
       {
         gzwarn << "Queue limit reached for topic "
-               << this->topic
-               << ", deleting message. "
-               << "This warning is printed only once." << std::endl;
+          << this->topic
+          << ", deleting message. "
+          << "This warning is printed only once." << std::endl;
         queueLimitWarned = true;
       }
     }
@@ -151,9 +167,19 @@ void Publisher::PublishImpl(const google::protobuf::Message &_message,
 void Publisher::SendMessage()
 {
   std::list<MessagePtr> localBuffer;
+  std::list<uint32_t> localIds;
 
   {
     boost::mutex::scoped_lock lock(this->mutex);
+    if (!this->pubIds.empty() || this->messages.empty())
+      return;
+
+    for (unsigned int i = 0; i < this->messages.size(); ++i)
+    {
+      this->pubId = (this->pubId + 1) % 10000;
+      this->pubIds.push_back(this->pubId);
+      localIds.push_back(this->pubId);
+    }
 
     std::copy(this->messages.begin(), this->messages.end(),
         std::back_inserter(localBuffer));
@@ -163,18 +189,42 @@ void Publisher::SendMessage()
   // Only send messages if there is something to send
   if (!localBuffer.empty())
   {
+    std::list<uint32_t>::iterator pubIter = localIds.begin();
+
     // Send all the current messages
     for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
-        iter != localBuffer.end(); ++iter)
+        iter != localBuffer.end(); ++iter, ++pubIter)
     {
       // Send the latest message.
-      TopicManager::Instance()->Publish(this->topic, *iter,
-          boost::bind(&Publisher::OnPublishComplete, this));
+      this->publication->Publish(*iter,
+          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
     }
 
     // Clear the local buffer.
     localBuffer.clear();
+    localIds.clear();
   }
+
+
+  /*MessagePtr msg;
+  {
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (!this->messages.empty() && !this->waiting)
+    {
+      msg = this->messages.front();
+      this->waiting = true;
+      this->pubId = (this->pubId + 1) % 10000;
+      this->pubIds.insert(this->pubId);
+    }
+  }
+
+  // Send the latest message.
+  if (msg && this->publication)
+  {
+    this->publication->Publish(msg,
+        boost::bind(&Publisher::OnPublishComplete, this, _1), this->pubId);
+  }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -203,8 +253,17 @@ std::string Publisher::GetMsgType() const
 }
 
 //////////////////////////////////////////////////
-void Publisher::OnPublishComplete()
+void Publisher::OnPublishComplete(uint32_t _id)
 {
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  std::list<uint32_t>::iterator iter =
+    std::find(this->pubIds.begin(), this->pubIds.end(), _id);
+  if (iter != this->pubIds.end())
+  {
+    this->pubIds.erase(iter);
+    this->waiting = false;
+  }
 }
 
 //////////////////////////////////////////////////

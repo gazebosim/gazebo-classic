@@ -175,6 +175,10 @@ namespace gazebo
       /// \param[in] _force True to skip waiting on dataAvailableCondition.
       public: void Write(bool _force = false);
 
+      /// \brief Get the size of the buffer.
+      /// \return Size of the buffer, in bytes.
+      public: unsigned int GetBufferSize() const;
+
       /// \brief Update the log files
       ///
       /// Captures the current state of all registered entities, and outputs

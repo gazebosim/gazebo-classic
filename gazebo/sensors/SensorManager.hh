@@ -259,6 +259,9 @@ namespace gazebo
       ///        i.e. SensorManager::sensors are initialized.
       private: bool initialized;
 
+      /// \brief True removes all sensors from all sensor containers.
+      private: bool removeAllSensors;
+
       /// \brief Mutex used when adding and removing sensors.
       private: mutable boost::recursive_mutex mutex;
 

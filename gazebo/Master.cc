@@ -185,7 +185,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == pub.topic())
       {
-        iter->second->EnqueueMsg(msgs::Package("publisher_update", pub));
+        iter->second->EnqueueMsg(msgs::Package("publisher_advertise", pub));
       }
     }
   }
@@ -216,7 +216,7 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
     {
       if (iter->first.topic() == sub.topic())
       {
-        conn->EnqueueMsg(msgs::Package("publisher_update", iter->first));
+        conn->EnqueueMsg(msgs::Package("publisher_subscribe", iter->first));
       }
     }
   }

@@ -202,6 +202,7 @@ bool LinkState::IsZero() const
   // }
 
   // return result && this->pose == math::Pose::Zero;
+
   return this->pose == math::Pose::Zero;
 }
 

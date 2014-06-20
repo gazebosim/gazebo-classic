@@ -160,11 +160,12 @@ namespace gazebo
 
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
-      /// \param _topic Name of the topic
-      /// \param _message The message to send.
-      /// \param _cb Callback, used when the publish is completed.
+      /// \param [in] _topic Name of the topic
+      /// \param [in] _message The message to send.
+      /// \param [in] _cb Callback, used when the publish is completed.
+      /// \param [in] _id ID associated with the message.
       public: void Publish(const std::string &_topic, MessagePtr _message,
-                  const boost::function<void()> &_cb = NULL);
+                  boost::function<void(uint32_t)> _cb, uint32_t _id);
 
       /// \brief Connection a local Publisher to a remote Subscriber
       /// \param[in] _topic The topic to use

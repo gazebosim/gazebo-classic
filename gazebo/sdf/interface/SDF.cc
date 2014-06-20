@@ -1257,14 +1257,16 @@ void Element::Reset()
   for (ElementPtr_V::iterator iter = this->elements.begin();
       iter != this->elements.end(); ++iter)
   {
-    (*iter)->Reset();
+    if (*iter)
+      (*iter)->Reset();
     (*iter).reset();
   }
 
   for (ElementPtr_V::iterator iter = this->elementDescriptions.begin();
       iter != this->elementDescriptions.end(); ++iter)
   {
-    (*iter)->Reset();
+    if (*iter)
+      (*iter)->Reset();
     (*iter).reset();
   }
   this->elements.clear();
