@@ -133,7 +133,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->installEventFilter(this);
   this->keyModifiers = 0;
 
-  this->selectedVis.reset();
+  //this->selectedVis.reset();
 
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
       boost::bind(&GLWidget::OnMousePress, this, _1));
@@ -276,8 +276,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   // Trigger a model delete if the Delete key was pressed, and a model
   // is currently selected.
-  if (_event->key() == Qt::Key_Delete && this->selectedVis)
-    g_deleteAct->Signal(this->selectedVis->GetName());
+  if (_event->key() == Qt::Key_Delete)
+  {
+    while (!this->selectedVisuals.empty())
+      g_deleteAct->Signal(this->selectedVisuals.back()->GetName());
+  }
 
   if (_event->key() == Qt::Key_Escape)
   {
@@ -298,7 +301,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C && this->selectedVis)
+    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
     {
       g_copyAct->trigger();
     }
@@ -441,8 +444,6 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
   else if (this->state == "snap")
     ModelSnap::Instance()->OnMousePressEvent(this->mouseEvent);
-//  else if (this->state == "align")
-//    ModelAlign::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -459,8 +460,6 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
     ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
   else if (this->state == "snap")
     ModelSnap::Instance()->OnMouseReleaseEvent(this->mouseEvent);
-//  else if (this->state == "align")
-//    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -478,8 +477,6 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
   else if (this->state == "snap")
     ModelSnap::Instance()->OnMouseMoveEvent(this->mouseEvent);
-//  else if (this->state == "align")
-//    ModelAlign::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -920,23 +917,25 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     this->selectedVisuals.clear();
   }
 
-  if (this->selectedVis && !this->mouseEvent.control)
+  if (_vis && !_vis->IsPlane())
   {
-    this->selectedVis->SetHighlighted(false);
-  }
-
-  this->selectedVis = _vis;
-
-  if (this->selectedVis && !this->selectedVis->IsPlane())
-  {
-    this->selectedVis->SetHighlighted(true);
+    _vis->SetHighlighted(true);
 
     // enable multi-selection if control is pressed
-    if (this->selectedVisuals.empty() || (this->mouseEvent.control &&
-        std::find(this->selectedVisuals.begin(), this->selectedVisuals.end(),
-        this->selectedVis) == this->selectedVisuals.end()))
+    if (this->selectedVisuals.empty() || this->mouseEvent.control)
     {
-      this->selectedVisuals.push_back(this->selectedVis);
+      std::vector<rendering::VisualPtr>::iterator it =
+          std::find(this->selectedVisuals.begin(),
+          this->selectedVisuals.end(), _vis);
+      if (it == this->selectedVisuals.end())
+        this->selectedVisuals.push_back(_vis);
+      else
+      {
+        // if element already exists, move to the back of vector
+        rendering::VisualPtr vis = (*it);
+        this->selectedVisuals.erase(it);
+        this->selectedVisuals.push_back(vis);
+      }
     }
     g_copyAct->setEnabled(true);
   }
@@ -951,21 +950,39 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  if (this->selectedVis)
-    ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
+  if (!this->selectedVisuals.empty())
+  {
+    ModelManipulator::Instance()->SetAttachedVisual(
+        this->selectedVisuals.back());
+  }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
+
   if (this->state == "snap")
   {
     ModelSnap::Instance()->Reset();
+  }
+  else if (this->state != "select")
+  {
+    // only support multi-model selection in select mode for now.
+    // deselect 0 to n-1 models.
+    if (this->selectedVisuals.size() > 1)
+    {
+      for(std::vector<rendering::VisualPtr>::iterator it
+          = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
+      {
+         (*it)->SetHighlighted(false);
+         it = this->selectedVisuals.erase(it);
+      }
+    }
   }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
-  if (this->selectedVis)
-    this->Copy(this->selectedVis->GetName());
+  if (!this->selectedVisuals.empty())
+    this->Copy(this->selectedVisuals.back()->GetName());
 }
 
 /////////////////////////////////////////////////
@@ -1089,11 +1106,20 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
+    if (!this->selectedVisuals.empty())
     {
-      this->selectedVis.reset();
-      this->SetSelectedVisual(rendering::VisualPtr());
+      for (std::vector<rendering::VisualPtr>::iterator it =
+          this->selectedVisuals.begin(); it != this->selectedVisuals.end();
+          ++it)
+      {
+        if ((*it)->GetName() == _msg->data())
+        {
+          this->selectedVisuals.erase(it);
+          break;
+        }
+      }
     }
+
     if (this->copyEntityName == _msg->data())
     {
       this->copyEntityName = "";

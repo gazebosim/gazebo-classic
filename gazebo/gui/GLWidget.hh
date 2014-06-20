@@ -195,7 +195,7 @@ namespace gazebo
       /// \brief Light maker
       private: LightMaker lightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis;
+      private: rendering::VisualPtr hoverVis;
 
       private: std::vector<rendering::VisualPtr> selectedVisuals;
 
