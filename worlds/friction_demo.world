@@ -26,11 +26,8 @@
       <max_step_size>0.001000</max_step_size>
     </physics>
     <model name="gplane">
-      <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
       <link name="plane">
-        <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
         <collision name="plane">
-          <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
           <geometry>
             <plane>
               <normal>0.000000 0.000000 1.000000</normal>
@@ -38,14 +35,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>50.0</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>50.0</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -64,9 +54,6 @@
           </surface>
           <laser_retro>0.000000</laser_retro>
         </collision>
-        <gravity>1</gravity>
-        <self_collide>0</self_collide>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
     </model>
@@ -96,14 +83,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>0.998</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>0.998</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -168,14 +148,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>0.9985</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>0.9985</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -240,14 +213,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>0.999</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>0.999</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -312,14 +278,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>0.9995</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>0.9995</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -384,14 +343,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>1.0</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>1.0</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>
@@ -456,14 +408,7 @@
           </geometry>
           <surface>
             <friction>
-              <magnitude>1.01</magnitude>
-              <ode>
-                <mu1_ratio>1.0</mu1_ratio>
-                <mu2_ratio>1.0</mu2_ratio>
-                <fdir1>0.000000 0.000000 0.000000</fdir1>
-                <slip1>0.000000</slip1>
-                <slip2>0.000000</slip2>
-              </ode>
+              <static_friction>1.01</static_friction>
             </friction>
             <bounce>
               <restitution_coefficient>0.000000</restitution_coefficient>

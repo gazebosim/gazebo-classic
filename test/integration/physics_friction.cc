@@ -292,6 +292,18 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   {
     ASSERT_TRUE(box->model != NULL);
     ASSERT_GT(box->friction, 0.0);
+    if (box->modelName.compare("box_01_model") == 0)
+      EXPECT_NEAR(box->friction, 0.9980, 1e-5);
+    else if (box->modelName.compare("box_02_model") == 0)
+      EXPECT_NEAR(box->friction, 0.9985, 1e-5);
+    else if (box->modelName.compare("box_03_model") == 0)
+      EXPECT_NEAR(box->friction, 0.9990, 1e-5);
+    else if (box->modelName.compare("box_04_model") == 0)
+      EXPECT_NEAR(box->friction, 0.9995, 1e-5);
+    else if (box->modelName.compare("box_05_model") == 0)
+      EXPECT_NEAR(box->friction, 1.0000, 1e-5);
+    else if (box->modelName.compare("box_06_model") == 0)
+      EXPECT_NEAR(box->friction, 1.0100, 1e-5);
   }
 
   common::Time t = world->GetSimTime();
