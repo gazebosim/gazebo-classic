@@ -27,6 +27,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include "gazebo/common/common.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/MovableText.hh"
 
@@ -271,8 +272,8 @@ void MovableText::_setupGeometry()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  assert(this->font);
-  assert(!this->material.isNull());
+  GZ_ASSERT(this->font, "font class member is null");
+  GZ_ASSERT(!this->material.isNull(), "material class member is null");
 
   Ogre::VertexDeclaration *decl = NULL;
   Ogre::VertexBufferBinding *bind = NULL;
@@ -606,8 +607,8 @@ void MovableText::_updateColors(void)
   Ogre::RGBA *pDest = NULL;
   unsigned int i;
 
-  assert(this->font);
-  assert(!this->material.isNull());
+  GZ_ASSERT(this->font, "font class member is null");
+  GZ_ASSERT(!this->material.isNull(), "material class member is null");
 
   // Convert to system-specific
   Ogre::ColourValue cv(this->color.r, this->color.g,
@@ -633,7 +634,7 @@ void MovableText::_updateColors(void)
 const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  assert(this->camera);
+  GZ_ASSERT(this->camera, "camera class member is null");
   return const_cast<Ogre::Quaternion&>(this->camera->getDerivedOrientation());
   // return mParentNode->_getDerivedOrientation();
 }
@@ -642,7 +643,7 @@ const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
 const Ogre::Vector3 & MovableText::getWorldPosition(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  assert(mParentNode);
+  GZ_ASSERT(mParentNode, "mParentNode class member is null");
   return mParentNode->_getDerivedPosition();
 }
 
@@ -721,7 +722,7 @@ void MovableText::getRenderOperation(Ogre::RenderOperation & op)
 const Ogre::MaterialPtr &MovableText::getMaterial(void) const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  assert(!this->material.isNull());
+  GZ_ASSERT(!this->material.isNull(), "material class member is null");
   return this->material;
 }
 

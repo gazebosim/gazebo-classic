@@ -33,8 +33,6 @@
 using namespace gazebo;
 using namespace physics;
 
-boost::mutex Gripper::mutexContacts;
-
 /////////////////////////////////////////////////
 Gripper::Gripper(ModelPtr _model)
 {
@@ -56,6 +54,13 @@ Gripper::Gripper(ModelPtr _model)
 /////////////////////////////////////////////////
 Gripper::~Gripper()
 {
+  if (this->world && this->world->GetRunning())
+  {
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    mgr->RemoveFilter(this->GetName());
+  }
+
   this->model.reset();
   this->physics.reset();
   this->world.reset();

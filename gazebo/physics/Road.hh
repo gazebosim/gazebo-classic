@@ -22,6 +22,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class Road Road.hh physics/physics.hh
     /// \brief for building a Road from SDF
-    class Road : public Base
+    class GAZEBO_VISIBLE Road : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of this road object.

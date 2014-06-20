@@ -23,12 +23,15 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/gazebo_config.h"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class OpenAL : public gazebo::testing::AutoLogFixture { };
+
 #ifdef HAVE_OPENAL
 /////////////////////////////////////////////////
-TEST(OpenAL, SourceInvalid)
+TEST_F(OpenAL, SourceInvalid)
 {
   common::load();
   util::OpenALSourcePtr source;
@@ -37,7 +40,7 @@ TEST(OpenAL, SourceInvalid)
   ASSERT_NO_THROW(util::OpenAL::Instance()->Fini());
 }
 /////////////////////////////////////////////////
-TEST(OpenAL, DefaultDevice)
+TEST_F(OpenAL, DefaultDevice)
 {
   common::load();
 
@@ -59,7 +62,7 @@ TEST(OpenAL, DefaultDevice)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, NonDefaultDevice)
+TEST_F(OpenAL, NonDefaultDevice)
 {
   common::load();
 
@@ -80,7 +83,7 @@ TEST(OpenAL, NonDefaultDevice)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, BadSDF)
+TEST_F(OpenAL, BadSDF)
 {
   common::load();
   util::OpenALSourcePtr source;
@@ -97,7 +100,7 @@ TEST(OpenAL, BadSDF)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, BadValues)
+TEST_F(OpenAL, BadValues)
 {
   common::load();
 
@@ -132,7 +135,7 @@ TEST(OpenAL, BadValues)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, SourcePlay)
+TEST_F(OpenAL, SourcePlay)
 {
   util::OpenALSourcePtr source;
   common::load();
@@ -197,7 +200,7 @@ TEST(OpenAL, SourcePlay)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, SourceVelPose)
+TEST_F(OpenAL, SourceVelPose)
 {
   util::OpenALSourcePtr source;
   common::load();
@@ -226,7 +229,7 @@ TEST(OpenAL, SourceVelPose)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, Sourcevalid)
+TEST_F(OpenAL, Sourcevalid)
 {
   common::load();
 
@@ -275,7 +278,7 @@ TEST(OpenAL, Sourcevalid)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, SinkCreate)
+TEST_F(OpenAL, SinkCreate)
 {
   util::OpenALSinkPtr sink1;
   util::OpenALSinkPtr sink2;
@@ -292,7 +295,7 @@ TEST(OpenAL, SinkCreate)
 }
 
 /////////////////////////////////////////////////
-TEST(OpenAL, SinkVelPose)
+TEST_F(OpenAL, SinkVelPose)
 {
   util::OpenALSinkPtr sink;
   common::load();

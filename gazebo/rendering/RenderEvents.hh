@@ -20,6 +20,7 @@
 #include <string>
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class Events Events.hh rendering/rendering.hh
     /// \brief Base class for rendering events
-    class Events
+    class GAZEBO_VISIBLE Events
     {
       /// \brief Connect to a scene created event.
       /// \param[in] _subscriber Callback to trigger when event occurs.

@@ -54,7 +54,14 @@ Entity::Entity(BasePtr _parent)
 
   this->visualMsg = new msgs::Visual;
   this->visualMsg->set_id(this->id);
-  this->visualMsg->set_parent_name(this->world->GetName());
+
+  if (this->world)
+    this->visualMsg->set_parent_name(this->world->GetName());
+  else
+  {
+    gzerr << "No world set when constructing an Entity.\n";
+    this->visualMsg->set_parent_name("no_world_name");
+  }
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -581,14 +588,8 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  math::Box box;
-  for (Base_V::const_iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    box += this->GetCollisionBoundingBoxHelper(*iter);
-  }
-
-  return box;
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
+  this->GetCollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////

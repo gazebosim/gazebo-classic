@@ -231,7 +231,6 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   }
 
   int ring, seg;
-  float r0;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
   math::Vector3 vert, norm;
@@ -247,7 +246,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    r0 = radius * sinf(ring * deltaRingAngle);
+    float r0 = radius * sinf(ring * deltaRingAngle);
     vert.y = radius * cosf(ring * deltaRingAngle);
 
     // Generate the group of segments for the current ring
@@ -692,14 +691,12 @@ void MeshManager::CreateCone(const std::string &name, float radius,
 
   float deltaSegAngle = (2.0 * M_PI / segments);
 
-  double ringRadius;
-
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
     vert.z = ring * height/rings - height/2.0;
 
-    ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
@@ -908,8 +905,8 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
 void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
     bool doubleSided)
 {
-  int vInc, uInc, v, u, iterations;
-  int vCount, uCount;
+  int vInc, v, iterations;
+  int uCount;
 
   if (doubleSided)
   {
@@ -929,10 +926,10 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
   while (iterations--)
   {
     // Make tris in a zigzag pattern (compatible with strips)
-    u = 0;
-    uInc = 1;
+    int u = 0;
+    int uInc = 1;
 
-    vCount = meshHeight - 1;
+    int vCount = meshHeight - 1;
     while (vCount--)
     {
       uCount = meshWidth - 1;

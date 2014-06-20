@@ -60,11 +60,17 @@ void BulletMeshShape::Init()
 
   btTriangleMesh *mTriMesh = new btTriangleMesh();
 
-  unsigned int numVertices = this->mesh->GetVertexCount();
-  unsigned int numIndices = this->mesh->GetIndexCount();
+  unsigned int numVertices = this->submesh ? this->submesh->GetVertexCount() :
+    this->mesh->GetVertexCount();
+
+  unsigned int numIndices = this->submesh ? this->submesh->GetIndexCount() :
+    this->mesh->GetIndexCount();
 
   // Get all the vertex and index data
-  this->mesh->FillArrays(&vertices, &indices);
+  if (!this->submesh)
+    this->mesh->FillArrays(&vertices, &indices);
+  else
+    this->submesh->FillArrays(&vertices, &indices);
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < numVertices; j++)
@@ -95,9 +101,11 @@ void BulletMeshShape::Init()
     mTriMesh->addTriangle(bv0, bv1, bv2);
   }
 
-  btConvexShape* convexShape = new btConvexTriangleMeshShape(mTriMesh, true);
-  convexShape->setMargin(0.001f);
-  bParent->SetCollisionShape(convexShape);
+  btGImpactMeshShape *gimpactMeshShape =
+    new btGImpactMeshShape(mTriMesh);
+  gimpactMeshShape->updateBound();
+
+  bParent->SetCollisionShape(gimpactMeshShape);
 
   delete [] vertices;
   delete [] indices;

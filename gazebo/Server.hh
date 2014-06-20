@@ -18,19 +18,17 @@
 #define _SERVER_HH_
 
 #include <string>
-#include <vector>
 #include <list>
-#include <map>
 
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
 
+#include <sdf/sdf.hh>
+
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/World.hh"
-
-namespace po = boost::program_options;
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -44,13 +42,22 @@ namespace gazebo
   /// \class Master Master.hh gazebo_core.hh
   /// \brief Base class for simulation server that handles commandline options,
   /// starts a Master, runs World update and sensor generation loops.
-  class Server
+  class GAZEBO_VISIBLE Server
   {
+    /// \brief Constructor.
     public: Server();
+
+    /// \brief Destructor.
     public: virtual ~Server();
 
+    /// \brief Output help about gzserver.
     public: void PrintUsage();
-    public: bool ParseArgs(int argc, char **argv);
+
+    /// \brief Parse command line arguments.
+    /// \param[in] _argc Number of arguments.
+    /// \param[in] _argv Array of argument values.
+    /// \return True on success.
+    public: bool ParseArgs(int _argc, char **_argv);
 
     /// \brief Preload the server.
     /// \return True if load was successful.
@@ -59,19 +66,30 @@ namespace gazebo
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.
     /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
+    /// \return True on success.
     public: bool LoadFile(const std::string &_filename="worlds/empty.world",
                           const std::string &_physics="");
 
+    /// \brief Load the Server from an SDF string.
+    /// \param[in] _sdfString SDF string from which to load a World.
+    /// \return True on success.
     public: bool LoadString(const std::string &_sdfString);
-    /// \todo remove the method when releasing gazebo 3.0
-    /// \brief Deprecated. Do not need to call Init anymore.
-    public: void Init() GAZEBO_DEPRECATED(2.3);
+
+    /// \brief Run the Server.
     public: void Run();
+
+    /// \brief Stop the Server.
     public: void Stop();
+
+    /// \brief Finalize the Server.
     public: void Fini();
 
-    public: void SetParams(const common::StrStr_M &params);
+    /// \brief Set the parameters.
+    /// \param[in] _params Map of string parameters
+    public: void SetParams(const common::StrStr_M &_params);
 
+    /// \brief Get whether the Server has been initialized.
+    /// \return True if initialized.
     public: bool GetInitialized() const;
 
     /// \brief Load implementation.
@@ -80,37 +98,57 @@ namespace gazebo
     private: bool LoadImpl(sdf::ElementPtr _elem,
                            const std::string &_physics="");
 
+    /// \brief SIGINT handler
+    /// \param[in] _v Unused.
     private: static void SigInt(int _v);
 
+    /// \brief Process all command line parameters.
     private: void ProcessParams();
 
+    /// \brief Receive a control message, and push it onto a queue.
+    /// \param[in] _msg Message that is received.
     private: void OnControl(ConstServerControlPtr &_msg);
 
+    /// \brief Open a new world.
+    /// \param[in] _filename Name and path of the world to open.
+    /// \return True on success.
     private: bool OpenWorld(const std::string &_filename);
 
+    /// \brief Handle all control messages.
     private: void ProcessControlMsgs();
 
+    /// \brief Boolean used to stop the server.
     private: static bool stop;
 
-    private: Master *master;
-    private: boost::thread *masterThread;
+    /// \brief Communication node.
     private: transport::NodePtr node;
+
+    /// \brief Subscribe to server control messages.
     private: transport::SubscriberPtr serverSub;
+
+    /// \brief Publisher for world modifications.
     private: transport::PublisherPtr worldModPub;
 
-    private: boost::mutex *receiveMutex;
+    /// \brief Mutex to protect controlMsgs.
+    private: boost::mutex receiveMutex;
+
+    /// \brief List of received control messages.
     private: std::list<msgs::ServerControl> controlMsgs;
 
+    /// \brief Command line params that are passed to various Gazebo objects.
     private: gazebo::common::StrStr_M params;
-    private: po::variables_map vm;
+
+    /// \brief Boost program options variable map.
+    private: boost::program_options::variables_map vm;
 
     /// \brief True when initialized.
-    /// \todo Remove "static" in Gazebo 3.0
-    private: static bool initialized;
+    private: bool initialized;
 
-    // save argc and argv for access by system plugins
-    public: int systemPluginsArgc;
-    public: char** systemPluginsArgv;
+    /// \brief Save argc for access by system plugins.
+    private: int systemPluginsArgc;
+
+    /// \brief Save argv for access by system plugins.
+    private: char **systemPluginsArgv;
   };
 }
 

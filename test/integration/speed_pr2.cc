@@ -26,12 +26,6 @@ class SpeedPR2Test : public ServerFixture,
 
 void SpeedPR2Test::PR2World(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Abort test since simbody does not support screw joints in PR2, "
-          << "Please see issue #857.\n";
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "Abort test since dart does not support ray sensor in PR2, "

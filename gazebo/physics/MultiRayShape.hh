@@ -26,6 +26,7 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/RayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     /// \class MultiRayShape MultiRayShape.hh physics/physics.hh
     /// \brief Laser collision contains a set of ray-collisions,
     /// structured to simulate a laser range scanner.
-    class MultiRayShape : public Shape
+    class GAZEBO_VISIBLE MultiRayShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision shape.
@@ -56,17 +57,17 @@ namespace gazebo
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
       /// \returns Returns DBL_MAX for no detection.
-      public: double GetRange(int _index);
+      public: double GetRange(unsigned int _index);
 
       /// \brief Get detected retro (intensity) value for a ray.
       /// \param[in] _index Index of the ray.
       /// \return Retro value for the ray.
-      public: double GetRetro(int _index);
+      public: double GetRetro(unsigned int _index);
 
       /// \brief Get detected fiducial value for a ray.
       /// \param[in] _index Index of the ray.
       /// \return Fiducial value for the ray.
-      public: int GetFiducial(int _index);
+      public: int GetFiducial(unsigned int _index);
 
       /// \brief Get the minimum range.
       /// \return Minimum range of all the rays.

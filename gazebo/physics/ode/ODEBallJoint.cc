@@ -41,7 +41,7 @@ ODEBallJoint::~ODEBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -54,7 +54,8 @@ math::Vector3 ODEBallJoint::GetAnchor(int /*_index*/) const
 
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
+void ODEBallJoint::SetAnchor(unsigned int /*_index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->jointId)
     dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
@@ -63,7 +64,78 @@ void ODEBallJoint::SetAnchor(int /*_index*/, const math::Vector3 &_anchor)
 }
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ODEBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+{
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
+{
+}
+
+//////////////////////////////////////////////////
+double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+double ODEBallJoint::GetMaxForce(unsigned int /*_index*/)
+{
+  return 0;
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
+{
+}
+
+//////////////////////////////////////////////////
+math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+{
+  return math::Angle(0);
+}
+
+//////////////////////////////////////////////////
+void ODEBallJoint::SetAxis(unsigned int /*_index*/,
+                            const math::Vector3 &/*_axis*/)
+{
+  gzerr << "ODEBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle ODEBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle ODEBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "ODEBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+bool ODEBallJoint::SetHighStop(unsigned int /*_index*/,
+                               const math::Angle &/*_angle*/)
+{
+  gzerr << "ODEBallJoint::SetHighStop not implemented" << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool ODEBallJoint::SetLowStop(unsigned int /*_index*/,
+                              const math::Angle &/*_angle*/)
+{
+  gzerr << "ODEBallJoint::SetLowStop not implemented" << std::endl;
+  return false;
 }

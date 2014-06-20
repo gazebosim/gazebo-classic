@@ -5,8 +5,12 @@ include_directories(
   ${OGRE_INCLUDE_DIRS}
 )
 
+# Tinyxml are used since the plugins are linking against gazebo_common
+# which uses tinxyml. Not defining the link directory here will end up 
+# failures in clang.
 link_directories(
   ${SDF_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -16,23 +20,23 @@ endif()
 set (plugins
   BreakableJointPlugin
   CameraPlugin
-  CartTestPlugin
+  CartDemoPlugin
   ContactPlugin
   DepthCameraPlugin
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
   JointTrajectoryPlugin
+  LiftDragPlugin
   ModelPropShop
-  ModelTrajectoryTestPlugin
   MudPlugin
   PressurePlugin
   RayPlugin
+  RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
   SonarPlugin
-  SpringTestPlugin
-  SphereAtlasTestPlugin
+  SphereAtlasDemoPlugin
   VehiclePlugin)
 
 set(GAZEBO_PLUGIN_INSTALL_DIR

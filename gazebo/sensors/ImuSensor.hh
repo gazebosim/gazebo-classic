@@ -23,6 +23,7 @@
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class ImuSensor ImuSensor.hh sensors/sensors.hh
     /// \brief An IMU sensor.
-    class ImuSensor: public Sensor
+    class GAZEBO_VISIBLE ImuSensor: public Sensor
     {
       /// \brief Constructor.
       public: ImuSensor();
@@ -51,7 +52,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      protected: virtual void UpdateImpl(bool _force);
+      protected: virtual bool UpdateImpl(bool _force);
 
       // Documentation inherited
       protected: virtual void Fini();

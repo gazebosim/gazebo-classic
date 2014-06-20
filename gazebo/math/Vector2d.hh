@@ -25,6 +25,7 @@
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Vector2d Vector2D.hh math/gzmath.hh
     /// \brief Generic double x, y vector
-    class Vector2d
+    class GAZEBO_VISIBLE Vector2d
     {
       /// \brief Constructor
       public: Vector2d();
@@ -69,6 +70,11 @@ namespace gazebo
       /// \param[in] _v the vector
       /// \return the cross product
       public: Vector2d Cross(const Vector2d &_v) const;
+
+      /// \brief Return the dot product of this vector and _v
+      /// \param[in] _v the vector
+      /// \return the dot product
+      public: double Dot(const Vector2d &_v) const;
 
       /// \brief Assignment operator
       /// \param[in] _v a value for x and y element

@@ -21,6 +21,8 @@
 
 #include <boost/bind.hpp>
 
+#include <string>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -49,11 +51,45 @@ ODEScrewJoint::~ODEScrewJoint()
 void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<ODEJoint>::Load(_sdf);
-  this->SetThreadPitch(0, this->threadPitch);
+  this->SetThreadPitch(this->threadPitch);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
+math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
+{
+  dVector3 result;
+  // initialize to 0
+  result[0] = result[1] = result[2] = 0.0;
+
+  if (this->jointId)
+    dJointGetScrewAnchor(this->jointId, result);
+  else
+    gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
+
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
+{
+  if (!this->jointId)
+  {
+    gzerr << "ODE Joint ID is invalid, anchor not set.\n";
+    return;
+  }
+
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
+
+  if (this->jointId)
+    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
 
@@ -66,41 +102,12 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(int /*_index*/) const
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
 {
-  math::Angle result;
-  if (this->jointId)
-    result = dJointGetScrewPosition(this->jointId);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-double ODEScrewJoint::GetVelocity(int /*index*/) const
-{
-  double result = 0;
-
-  if (this->jointId)
-    result = dJointGetScrewPositionRate(this->jointId);
-  else
-    gzerr << "ODE Joint ID is invalid\n";
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void ODEScrewJoint::SetVelocity(int /*index*/, double _angle)
-{
-  this->SetParam(dParamVel, _angle);
-}
-
-//////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
-{
-  if (this->childLink) this->childLink->SetEnabled(true);
-  if (this->parentLink) this->parentLink->SetEnabled(true);
+  if (this->childLink)
+    this->childLink->SetEnabled(true);
+  if (this->parentLink)
+    this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
   /// \TODO: currently we assume joint axis is specified in model frame,
@@ -118,10 +125,85 @@ void ODEScrewJoint::SetAxis(int /*index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
+math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
+{
+  math::Angle result;
+  if (this->jointId)
+  {
+    if (_index < this->GetAngleCount())
+    {
+      if (_index == 0)
+        result = dJointGetScrewAngle(this->jointId);
+      else if (_index == 1)
+        result = dJointGetScrewPosition(this->jointId);
+    }
+    else
+    {
+      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+             << "): invalid index exceeds allowed range("
+             << this->GetAngleCount() << ").\n";
+    }
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetVelocity(unsigned int _index) const
+{
+  double result = 0;
+
+  if (this->jointId)
+  {
+    if (_index < this->GetAngleCount())
+    {
+      if (_index == 0)
+        result = dJointGetScrewAngleRate(this->jointId);
+      else if (_index == 1)
+        result = dJointGetScrewPositionRate(this->jointId);
+    }
+    else
+    {
+      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+             << "): invalid index exceeds allowed range("
+             << this->GetAngleCount() << ").\n";
+    }
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetVelocity(unsigned int /*index*/, double _angle)
+{
+  this->SetParam(dParamVel, _angle);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetThreadPitch(unsigned int /*_index*/, double _threadPitch)
 {
   if (this->jointId)
-    dJointSetScrewThreadPitch(this->jointId, _threadPitch);
+  {
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
+  }
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetThreadPitch(double _threadPitch)
+{
+  if (this->jointId)
+  {
+    /// \TODO: create an issue on making thread pitch = translation / angle
+    dJointSetScrewThreadPitch(this->jointId, -_threadPitch);
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -129,12 +211,17 @@ void ODEScrewJoint::SetThreadPitch(int /*_index*/, double _threadPitch)
 //////////////////////////////////////////////////
 double ODEScrewJoint::GetThreadPitch(unsigned int /*_index*/)
 {
-  gzerr << "not yet implemented\n";
-  return 0;
+  return this->GetThreadPitch();
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetForceImpl(int /*_index*/, double _effort)
+double ODEScrewJoint::GetThreadPitch()
+{
+  return this->threadPitch;
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->jointId)
   {
@@ -146,9 +233,10 @@ void ODEScrewJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetParam(int _parameter, double _value)
+void ODEScrewJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
+
   if (this->jointId)
     dJointSetScrewParam(this->jointId, _parameter, _value);
   else
@@ -156,7 +244,7 @@ void ODEScrewJoint::SetParam(int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetParam(int _parameter) const
+double ODEScrewJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -169,13 +257,57 @@ double ODEScrewJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetMaxForce(int /*_index*/, double _t)
+void ODEScrewJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 {
   this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetMaxForce(int /*_index*/)
+double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+void ODEScrewJoint::SetAttribute(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
+{
+  this->SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+bool ODEScrewJoint::SetParam(const std::string &_key,
+  unsigned int _index, const boost::any &_value)
+{
+  if (_key  == "thread_pitch")
+  {
+    try
+    {
+      this->threadPitch = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else
+    return ODEJoint::SetParam(_key, _index, _value);
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->threadPitch;
+  else
+    return ODEJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
+double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
+{
+  return this->GetParam(_key, _index);
 }

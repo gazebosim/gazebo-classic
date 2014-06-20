@@ -141,8 +141,7 @@ int main(int argc, char **argv)
 
   if (vm.count("help"))
   {
-    std::cerr << "gzstats -- This tool displays statistics about a "
-      "running Gazebo world\n\n";
+    std::cerr << "gzstats -- DEPRECATED(see 'gz help sdf')\n\n";
 
     std::cerr << "`gzstats` [options]\n\n";
 

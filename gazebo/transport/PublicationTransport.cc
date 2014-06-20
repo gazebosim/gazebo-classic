@@ -38,8 +38,6 @@ PublicationTransport::~PublicationTransport()
 {
   if (this->connection)
   {
-    this->connection->DisconnectShutdown(this->shutdownConnectionPtr);
-
     msgs::Subscribe sub;
     sub.set_topic(this->topic);
     sub.set_msg_type(this->msgType);
@@ -71,15 +69,8 @@ void PublicationTransport::Init(const ConnectionPtr &_conn, bool _latched)
   // Start reading messages from the remote publisher
   this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish,
         this, _1));
-
-  this->shutdownConnectionPtr = this->connection->ConnectToShutdown(
-      boost::bind(&PublicationTransport::OnConnectionShutdown, this));
 }
 
-/////////////////////////////////////////////////
-void PublicationTransport::OnConnectionShutdown()
-{
-}
 
 /////////////////////////////////////////////////
 void PublicationTransport::AddCallback(

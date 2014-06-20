@@ -696,3 +696,10 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
 }
+
+//////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),
+  translated(false)
+{
+}

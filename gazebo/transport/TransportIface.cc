@@ -70,15 +70,24 @@ bool transport::get_master_uri(std::string &_masterHost,
   }
   else
   {
-    _masterPort = boost::lexical_cast<unsigned int>(
-        masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    try
+    {
+      _masterPort = boost::lexical_cast<unsigned int>(
+          masterURI.substr(lastColon + 1, masterURI.size() - (lastColon + 1)));
+    }
+    catch(...)
+    {
+      gzerr << "Unable to port from GAZEBO_MASTER_URI[" << masterURI << "]."
+        << "Using the default port number of 11345.\n";
+    }
   }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
+bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
+    uint32_t _timeoutIterations)
 {
   std::string host = _masterHost;
   unsigned int port = _masterPort;
@@ -87,7 +96,9 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort)
     get_master_uri(host, port);
 
   transport::TopicManager::Instance()->Init();
-  if (!transport::ConnectionManager::Instance()->Init(host, port))
+
+  if (!transport::ConnectionManager::Instance()->Init(host, port,
+        _timeoutIterations))
     return false;
 
   return true;
@@ -118,9 +129,9 @@ void transport::stop()
 /////////////////////////////////////////////////
 void transport::fini()
 {
-  transport::stop();
   transport::TopicManager::Instance()->Fini();
 
+  transport::stop();
   if (g_runThread)
   {
     g_runThread->join();
@@ -328,6 +339,65 @@ void transport::setMinimalComms(bool _enabled)
 bool transport::getMinimalComms()
 {
   return g_minimalComms;
+}
+
+/////////////////////////////////////////////////
+transport::ConnectionPtr transport::connectToMaster()
+{
+  std::string data, namespacesData, publishersData;
+  msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
+
+  // Connect to the master
+  transport::ConnectionPtr connection(new transport::Connection());
+
+  if (connection->Connect(host, port))
+  {
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "version_init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
+    else
+    {
+      gzerr  << "Failed to received version_init packet from master. "
+        << "Connection to master failed\n";
+      connection.reset();
+    }
+  }
+  else
+  {
+    gzerr << "Unable to connect to master.\n";
+    connection.reset();
+  }
+
+  if (connection && !connection->IsOpen())
+  {
+    gzerr << "Connection to master instatiated, but socket is not open."
+      << "Connection to master failed\n";
+    connection.reset();
+  }
+
+  return connection;
 }
 
 /////////////////////////////////////////////////

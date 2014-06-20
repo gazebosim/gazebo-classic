@@ -18,21 +18,26 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "test/util.hh"
+
+class LogRecord_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord constructor and a few accessors
-TEST(LogRecord_TEST, Constructor)
+TEST_F(LogRecord_TEST, Constructor)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
   char *homePath = getenv("HOME");
   EXPECT_TRUE(homePath != NULL);
 
-  boost::filesystem::path logPath = "/tmp/gazebo";
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::path logPath = paths->GetTmpPath() + "/gazebo";
   if (homePath)
     logPath = boost::filesystem::path(homePath);
   logPath /= "/.gazebo/log/";
@@ -50,7 +55,7 @@ TEST(LogRecord_TEST, Constructor)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Start errors
-TEST(LogRecord_TEST, StartErrors)
+TEST_F(LogRecord_TEST, StartErrors)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
@@ -92,7 +97,7 @@ TEST(LogRecord_TEST, StartErrors)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start_bzip2)
+TEST_F(LogRecord_TEST, Start_bzip2)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 
@@ -134,7 +139,7 @@ TEST(LogRecord_TEST, Start_bzip2)
 
 /////////////////////////////////////////////////
 /// \brief Test LogRecord Init and Start
-TEST(LogRecord_TEST, Start_zlib)
+TEST_F(LogRecord_TEST, Start_zlib)
 {
   gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
 

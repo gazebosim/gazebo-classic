@@ -56,27 +56,28 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
-{
-  this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
-      this->model);
-
-  this->joint->SetModel(this->model);
-  math::Pose pose = _link->GetWorldPose();
-  // math::Pose  pose(math::Vector3(0, 0, 0.2), math::Quaternion(1, 0, 0, 0));
-  this->joint->Load(physics::LinkPtr(), _link, pose);
-  this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-  this->joint->SetHighStop(0, 0);
-  this->joint->SetLowStop(0, 0);
-  this->joint->SetAnchor(0, pose.pos);
-  this->joint->Init();
-}
+// void JointTrajectoryPlugin::FixLink(physics::LinkPtr _link)
+// {
+//   this->joint = this->world->GetPhysicsEngine()->CreateJoint("revolute",
+//       this->model);
+//
+//   this->joint->SetModel(this->model);
+//   math::Pose pose = _link->GetWorldPose();
+//   // math::Pose  pose(math::Vector3(0, 0, 0.2),
+//                       math::Quaternion(1, 0, 0, 0));
+//   this->joint->Load(physics::LinkPtr(), _link, pose);
+//   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
+//   this->joint->SetHighStop(0, 0);
+//   this->joint->SetLowStop(0, 0);
+//   this->joint->SetAnchor(0, pose.pos);
+//   this->joint->Init();
+// }
 
 /////////////////////////////////////////////////
-void JointTrajectoryPlugin::UnfixLink()
-{
-  this->joint.reset();
-}
+// void JointTrajectoryPlugin::UnfixLink()
+// {
+//   this->joint.reset();
+// }
 
 /////////////////////////////////////////////////
 void JointTrajectoryPlugin::UpdateStates(const common::UpdateInfo & /*_info*/)

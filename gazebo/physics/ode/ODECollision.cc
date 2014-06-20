@@ -25,7 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Box.hh"
 
-#include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODELink.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
@@ -43,6 +43,8 @@ ODECollision::ODECollision(LinkPtr _link)
 
   this->SetSpaceId(
       boost::static_pointer_cast<ODELink>(this->link)->GetSpaceId());
+
+  this->surface.reset(new ODESurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -62,6 +64,13 @@ void ODECollision::Load(sdf::ElementPtr _sdf)
   {
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
+
+  // Force max correcting velocity to zero for certain collision entities
+  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
+      this->shape->HasType(Base::MAP_SHAPE))
+  {
+    this->GetODESurface()->maxVel = 0.0;
   }
 }
 
@@ -186,6 +195,12 @@ dSpaceID ODECollision::GetSpaceId() const
 void ODECollision::SetSpaceId(dSpaceID _spaceid)
 {
   this->spaceId = _spaceid;
+}
+
+/////////////////////////////////////////////////
+ODESurfaceParamsPtr ODECollision::GetODESurface() const
+{
+  return boost::dynamic_pointer_cast<ODESurfaceParams>(this->surface);
 }
 
 /////////////////////////////////////////////////

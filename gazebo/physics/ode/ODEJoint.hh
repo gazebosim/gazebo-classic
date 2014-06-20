@@ -27,22 +27,23 @@
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief ODE joint interface
-    class ODEJoint : public Joint
+    class GAZEBO_VISIBLE ODEJoint : public Joint
     {
-      /// \brief internal variables used for cfm damping
+      /// \brief internal variables used for implicit damping
       public:  enum CFMMode
       {
-        /// \brief cfm damping not active
+        /// \brief implicit damping not active
         NONE           = 0x00000000,
-        /// \brief cfm damping active, joints within limits
+        /// \brief implicit damping active, joints within limits
         DAMPING_ACTIVE = 0x00000001,
-        /// \brief cfm damping not active, enforcing joints limits
+        /// \brief implicit damping not active, enforcing joints limits
         JOINT_LIMIT    = 0x00000002
       };
 
@@ -60,7 +61,7 @@ namespace gazebo
       public: virtual void Reset();
 
       // Documentation inherited.
-      public: virtual LinkPtr GetJointLink(int _index) const;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
@@ -71,7 +72,7 @@ namespace gazebo
       /// overriden in the child classes where appropriate.
       /// \param[in] _parameter ID of the parameter to get.
       /// \return Value of the parameter.
-      public: virtual double GetParam(int _parameter) const;
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       /// \brief Set an ODE joint paramter.
       ///
@@ -79,10 +80,18 @@ namespace gazebo
       /// classes where appropriate
       /// \param[in] _parameter ID of the parameter to set.
       /// \param[in] _value Value to set.
-      public: virtual void SetParam(int _parameter, double _value);
+      public: virtual void SetParam(unsigned int _parameter, double _value);
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual void SetDamping(unsigned int _index, double _damping);
+
+      // Documentation inherited.
+      public: virtual void SetStiffness(unsigned int _index,
+                                        const double _stiffness);
+
+      // Documentation inherited.
+      public: virtual void SetStiffnessDamping(unsigned int _index,
+        double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
@@ -111,7 +120,19 @@ namespace gazebo
       public: dJointFeedback *GetFeedback();
 
       /// \brief simulating damping with CFM and meddling with Joint limits
-      public: void CFMDamping();
+      /// Deprecated by ODEJoint::ApplyImplicitStiffnessDamping()
+      public: void CFMDamping() GAZEBO_DEPRECATED(3.0);
+
+      /// \brief Get flag indicating whether implicit spring damper is enabled.
+      /// \return True if implicit spring damper is used.
+      public: bool UsesImplicitSpringDamper();
+
+      /// \brief simulate implicit spring and damper with CFM/ERP
+      /// and meddling with Joint limits.
+      public: void ApplyImplicitStiffnessDamping();
+
+      /// \brief simulating a joint spring and damper explicitly.
+      public: void ApplyExplicitStiffnessDamping();
 
       /// \brief Get access to stopCFM
       /// \return Returns joint's cfm for end stops
@@ -127,27 +148,67 @@ namespace gazebo
         return this->stopERP;
       }
 
-      /// \brief internal variable to keep track of cfm damping internals
-      private: int cfmDampingState[3];
+      /// \brief EXPERIMENTAL: If specified damping coefficient is negative,
+      /// apply adaptive damping.  What this means is that
+      /// if resulting acceleration is outside of stability region,
+      /// then increase damping using a limiter based on (f, v).
+      /// This approach safeguards dynamics against unstable joint behavior
+      /// at low speed (|v| < vThreshold) and
+      /// high force (|f| > fThreshold) scenarios.
+      /// Stability region is determined by:
+      ///   max_damping_coefficient = f / ( sign(v) * max( |v|, vThreshold ) )
+      private: double ApplyAdaptiveDamping(unsigned int _index,
+                   const double _damping);
 
-      /// \brief current cfm damping for stability reasons
-      private: double dStable[3];
+      /// \brief Helper funciton to convert Kp and Kd to CFM and ERP
+      /// \param[in] _dt time step size
+      /// \param[in] _kp spring stiffness
+      /// \param[in] _kd spring damping
+      /// \param[out] _cfm equivalent constraint force mixing
+      /// \param[out] _erp equivalent error reduction parameter
+      private: void KpKdToCFMERP(const double _dt,
+                                 const double _kp, const double _kd,
+                                 double &_cfm, double &_erp);
+
+      /// \brief Helper funciton to convert CFM and ERP to Kp and Kd
+      /// \param[in] _dt time step size
+      /// \param[in] _cfm constraint force mixing
+      /// \param[in] _erp error reduction parameter
+      /// \param[out] _kp equivalent spring stiffness
+      /// \param[out] _kd equivalent spring damping
+      private: void CFMERPToKpKd(const double _dt,
+                                 const double _cfm, const double _erp,
+                                 double &_kp, double &_kd);
+
+      /// \brief internal variable to keep track of implicit damping internals
+      private: int implicitDampingState[MAX_JOINT_AXIS];
+
+      /// \brief save current implicit damping coefficient
+      private: double currentKd[MAX_JOINT_AXIS];
+
+      /// \brief save current implicit stiffness coefficient
+      private: double currentKp[MAX_JOINT_AXIS];
 
       /// \brief internal variable to keep track if ConnectJointUpdate
       /// has been called on a damping method
-      private: bool dampingInitialized;
+      private: bool stiffnessDampingInitialized;
+
+      /// \brief flag to use implicit joint stiffness damping if true.
+      private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      public: virtual bool SetHighStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
+      public: virtual bool SetLowStop(unsigned int _index,
+                  const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(int _index);
+      public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(int _index);
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
@@ -156,19 +217,31 @@ namespace gazebo
       public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAttribute(Attribute _attr, int _index,
-                                        double _value);
+      public: virtual void SetAttribute(Attribute _attr, unsigned int _index,
+                                        double _value) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key, int _index,
+      public: virtual bool SetParam(const std::string &_key,
+                                        unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual void SetAttribute(const std::string &_key,
+                                        unsigned int _index,
+                                        const boost::any &_value)
+                                        GAZEBO_DEPRECATED(3.0);
+
+      // Documentation inherited.
+      public: virtual double GetParam(const std::string &_key,
                                                 unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual double GetAttribute(const std::string &_key,
+                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual void SetProvideFeedback(bool _enable);
@@ -177,13 +250,13 @@ namespace gazebo
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetForce(int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force);
 
       // Documentation inherited.
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void ApplyDamping();
+      public: virtual void ApplyStiffnessDamping();
 
       // Documentation inherited.
       /// \brief Set the force applied to this physics::Joint.
@@ -194,12 +267,13 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      protected: virtual void SetForceImpl(int _index, double _force) = 0;
+      protected: virtual void SetForceImpl(
+                     unsigned int _index, double _force) = 0;
 
       /// \brief Save external forces applied to this Joint.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      private: void SaveForce(int _index, double _force);
+      private: void SaveForce(unsigned int _index, double _force);
 
       /// \brief This is our ODE ID
       protected: dJointID jointId;

@@ -25,6 +25,7 @@
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Skeleton.hh"
 #include "gazebo/common/Animation.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,14 +37,29 @@ namespace gazebo
 
   namespace physics
   {
-    struct TrajectoryInfo
+    /// \brief Information about a trajectory for an Actor.
+    class GAZEBO_VISIBLE TrajectoryInfo
     {
-      unsigned int id;
-      std::string type;
-      double duration;
-      double startTime;
-      double endTime;
-      bool translated;
+      /// \brief Constructor.
+      public: TrajectoryInfo();
+
+      /// \brief ID of the trajectory.
+      public: unsigned int id;
+
+      /// \brief Type of trajectory.
+      public: std::string type;
+
+      /// \brief Duration of the trajectory.
+      public: double duration;
+
+      /// \brief Start time of the trajectory.
+      public: double startTime;
+
+      /// \brief End time of the trajectory.
+      public: double endTime;
+
+      /// \brief True if the trajectory is tranlated.
+      public: bool translated;
     };
 
     /// \addtogroup gazebo_physics
@@ -52,7 +68,7 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class Actor : public Model
+    class GAZEBO_VISIBLE Actor : public Model
     {
       /// \brief Constructor
       /// \param[in] _parent Parent object

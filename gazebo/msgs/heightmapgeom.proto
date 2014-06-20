@@ -33,6 +33,6 @@ message HeightmapGeom
   repeated Blend blend             = 8; // How to blend the textures
   optional bool use_terrain_paging = 9; // Enable terrain paging in rendering
 
-  // The image filename. This will appear in Gazebo 3.0.
-  // optional string filename         = 10;
+  // The image filename
+  optional string filename         = 10;
 }

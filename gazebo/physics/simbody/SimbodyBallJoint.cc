@@ -46,81 +46,92 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetAnchor(int /*_index*/) const
+math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::Init()
-{
-  gzerr << "Not implemented\n";
-}
-
-//////////////////////////////////////////////////
-void SimbodyBallJoint::SetDamping(int /*_index*/, double /*_damping*/)
+void SimbodyBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 {
   gzerr << "Not implemented\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::SetVelocity(int /*_index*/, double /*_angle*/)
-{
-  gzerr << "Not implemented\n";
-}
-
-/////////////////////////////////////////////////
-double SimbodyBallJoint::GetVelocity(int /*_index*/) const
+double SimbodyBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-double SimbodyBallJoint::GetMaxForce(int /*_index*/)
+double SimbodyBallJoint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented\n";
   return 0;
 }
 
 /////////////////////////////////////////////////
-void SimbodyBallJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void SimbodyBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 {
   gzerr << "Not implemented\n";
   return;
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 SimbodyBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Vector3();
 }
 
 /////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetAngleImpl(int /*_index*/) const
+math::Angle SimbodyBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return math::Angle();
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetForceImpl(int /*_index*/, double /*_torque*/)
+void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
   gzerr << "Not implemented";
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetHighStop(int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
+                               const math::Vector3 &/*_axis*/)
 {
-  gzerr << "Not implemented\n";
+  gzerr << "SimbodyBallJoint::SetAxis not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetLowStop(int /*_index*/,
+math::Angle SimbodyBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "SimbodyBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle SimbodyBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "SimbodyBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
+                                   const math::Angle &/*_angle*/)
+{
+  gzerr << "SimbodyBallJoint::SetHighStop not implemented" << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
                                   const math::Angle &/*_angle*/)
 {
-  gzerr << "Not implemented\n";
+  gzerr << "SimbodyBallJoint::SetLowStop not implemented" << std::endl;
+  return false;
 }
 

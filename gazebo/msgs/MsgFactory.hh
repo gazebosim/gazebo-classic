@@ -23,6 +23,7 @@
 #include <vector>
 #include <google/protobuf/message.h>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     /// \class MsgFactory MsgFactory.hh msgs/msgs.hh
     /// \brief A factory that generates protobuf message based on a string
     /// type.
-    class MsgFactory
+    class GAZEBO_VISIBLE MsgFactory
     {
       /// \brief Register a message.
       /// \param[in] _msgType Type of message to register.
@@ -67,12 +68,13 @@ namespace gazebo
     /// \param[in] _msgtype Message type name.
     /// \param[in] _classname Class name for message.
     #define GZ_REGISTER_STATIC_MSG(_msgtype, _classname) \
+    GAZEBO_VISIBLE \
     boost::shared_ptr<google::protobuf::Message> New##_classname() \
     { \
       return boost::shared_ptr<gazebo::msgs::_classname>(\
           new gazebo::msgs::_classname); \
     } \
-    class Msg##_classname \
+    class GAZEBO_VISIBLE Msg##_classname \
     { \
       public: Msg##_classname() \
       { \

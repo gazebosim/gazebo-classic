@@ -36,6 +36,7 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Inertial.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -57,7 +58,7 @@ namespace gazebo
     /// \brief Link class defines a rigid body entity, containing
     /// information on inertia, visual and collision properties of
     /// a rigid body.
-    class Link : public Entity
+    class GAZEBO_VISIBLE Link : public Entity
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of this link.
@@ -89,6 +90,7 @@ namespace gazebo
       /// \brief Update the collision.
       /// \param[in] _info Update information.
       public: void Update(const common::UpdateInfo &_info);
+      using Base::Update;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale to set the link to.
@@ -201,6 +203,12 @@ namespace gazebo
       ///         frame.
       public: math::Pose GetWorldCoGPose() const;
 
+      /// \brief Get the linear velocity of the origin of the link frame,
+      ///        expressed in the world frame.
+      /// \return Linear velocity of the link frame.
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              {return this->GetWorldLinearVel(math::Vector3::Zero);}
+
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in a body-fixed frame. If
       ///        no offset is given, the velocity at the origin of the Link
@@ -209,7 +217,7 @@ namespace gazebo
       ///                    frame, expressed in the body-fixed frame.
       /// \return Linear velocity of the point on the body
       public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset = math::Vector3(0, 0, 0)) const = 0;
+                  const math::Vector3 &_offset) const = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
@@ -280,6 +288,18 @@ namespace gazebo
       /// \brief Set the mass of the link.
       /// \parma[in] _inertial Inertial value for the link.
       public: void SetInertial(const InertialPtr &_inertial);
+
+      /// \brief Get the world pose of the link inertia (cog position
+      /// and Moment of Inertia frame). This differs from GetWorldCoGPose(),
+      /// which returns the cog position in the link frame
+      /// (not the Moment of Inertia frame).
+      /// \return Inertial pose in world frame.
+      public: math::Pose GetWorldInertialPose() const;
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
+      public: math::Matrix3 GetWorldInertiaMatrix() const;
 
       /// \cond
       /// This is an internal function
@@ -393,6 +413,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void RemoveChild(EntityPtr _child);
+      using Base::RemoveChild;
 
       /// \brief Attach a static model to this link
       /// \param[in] _model Pointer to a static model.
@@ -447,10 +468,55 @@ namespace gazebo
       /// \param[int] _name Name of the collision to remove.
       public: void RemoveCollision(const std::string &_name);
 
+      /// \brief Returns this link's potential energy,
+      /// based on position in world frame and gravity.
+      /// \return this link's potential energy,
+      public: double GetWorldEnergyPotential() const;
+
+      /// \brief Returns this link's kinetic energy
+      /// computed using link's CoG velocity in the inertial (world) frame.
+      /// \return this link's kinetic energy
+      public: double GetWorldEnergyKinetic() const;
+
+      /// \brief Returns this link's total energy, or
+      /// sum of Link::GetWorldEnergyPotential() and
+      /// Link::GetWorldEnergyKinetic().
+      /// \return this link's total energy
+      public: double GetWorldEnergy() const;
+
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
+
+      /// \brief Move Link given source and targe frames specified in
+      /// world coordinates. Assuming link's relative pose to
+      /// source frame (_worldReferenceFrameSrc) remains unchanged relative
+      /// to destination frame (_worldReferenceFrameDst).
+      /// \param[in] _worldReferenceFrameSrc initial reference frame to
+      /// which this link is attached.
+      /// \param[in] _worldReferenceFrameDst final location of the
+      /// reference frame specified in world coordinates.
+      public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                        const math::Pose &_worldReferenceFrameDst);
+
+      /// \brief Helper function to find all connected links of a link
+      /// based on parent/child relations of joints. For example,
+      /// if Link0 --> Link1 --> ... --> LinkN is a kinematic chain
+      /// with Link0 being the base link.  Then, call by Link1:
+      ///   Link1->FindAllConnectedLinksHelper(Link0, _list, true);
+      /// should return true with _list containing Link1 through LinkN.
+      /// In the case the _originalParentLink is part of a loop,
+      /// _connectedLinks is cleared and the function returns false.
+      /// \param[in] _originParentLink if this link is a child link of
+      /// the search, we've found a loop.
+      /// \param[in/out] _connectedLinks aggregate list of connected links.
+      /// \param[in] _fistLink this is the first Link, skip over the parent
+      /// link that matches the _originalParentLink.
+      /// \return true if successfully found a subset of connected links
+      public: bool FindAllConnectedLinksHelper(
+        const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks, bool _fistLink = false);
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -469,6 +535,12 @@ namespace gazebo
 
       /// \brief Parse visuals from SDF
       private: void ParseVisuals();
+
+      /// \brief Helper function to see if _value is contained in _vector.
+      /// \param[in] _vector a vector of boost link pointers.
+      /// \param[in] _value a particular link pointer.
+      /// \return true if value is in vector.
+      private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -491,6 +563,9 @@ namespace gazebo
 
       /// \brief Offsets for the attached models.
       protected: std::vector<math::Pose> attachedModelsOffset;
+
+      /// \brief This flag is set to true when the link is initialized.
+      protected: bool initialized;
 
       /// \brief Event used when the link is enabled or disabled.
       private: event::EventT<void (bool)> enabledSignal;
@@ -515,9 +590,6 @@ namespace gazebo
 
       /// \brief Link data message
       private: msgs::LinkData linkDataMsg;
-
-      /// \brief Event connections
-      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief True to publish data, false otherwise
       private: bool publishData;

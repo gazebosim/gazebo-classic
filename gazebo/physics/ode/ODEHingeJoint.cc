@@ -54,7 +54,7 @@ void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
+math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
 
@@ -67,7 +67,8 @@ math::Vector3 ODEHingeJoint::GetAnchor(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
+void ODEHingeJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -82,7 +83,7 @@ void ODEHingeJoint::SetAnchor(int /*index*/, const math::Vector3 &_anchor)
 
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -94,7 +95,7 @@ math::Vector3 ODEHingeJoint::GetGlobalAxis(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
+void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -103,14 +104,9 @@ void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
   if (this->parentLink)
     this->parentLink->SetEnabled(true);
 
-  /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  // ODE needs global axis
+  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
     dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
@@ -119,7 +115,7 @@ void ODEHingeJoint::SetAxis(int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
+math::Angle ODEHingeJoint::GetAngleImpl(unsigned int /*index*/) const
 {
   math::Angle result;
   if (this->jointId)
@@ -131,7 +127,7 @@ math::Angle ODEHingeJoint::GetAngleImpl(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-double ODEHingeJoint::GetVelocity(int /*index*/) const
+double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 {
   double result = 0;
 
@@ -144,25 +140,27 @@ double ODEHingeJoint::GetVelocity(int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetVelocity(int /*index*/, double _angle)
+void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
 {
+  /// \TODO: FIXME: change this implementation to kinematic velocity setting
+  // similar to BulletHingeJoint::SetVelocity
   this->SetParam(dParamVel, _angle);
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetMaxForce(int /*index*/, double _t)
+void ODEHingeJoint::SetMaxForce(unsigned int /*index*/, double _t)
 {
   return this->SetParam(dParamFMax, _t);
 }
 
 //////////////////////////////////////////////////
-double ODEHingeJoint::GetMaxForce(int /*index*/)
+double ODEHingeJoint::GetMaxForce(unsigned int /*index*/)
 {
   return this->GetParam(dParamFMax);
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetForceImpl(int /*_index*/, double _effort)
+void ODEHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 {
   if (this->jointId)
     dJointAddHingeTorque(this->jointId, _effort);
@@ -171,7 +169,7 @@ void ODEHingeJoint::SetForceImpl(int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-double ODEHingeJoint::GetParam(int _parameter) const
+double ODEHingeJoint::GetParam(unsigned int _parameter) const
 {
   double result = 0;
 
@@ -184,7 +182,7 @@ double ODEHingeJoint::GetParam(int _parameter) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetParam(int _parameter, double _value)
+void ODEHingeJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
 
