@@ -584,6 +584,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
     return false;
   }
 
+  /// If the Joint is static, Gazebo stores the state of
+  /// this Joint as a scalar inside the Joint class in Joint::SetPosition.
   if (!Joint::SetPosition(_index, _position))
   {
     gzerr << "something is wrong, returning.\n";

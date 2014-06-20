@@ -384,12 +384,8 @@ namespace gazebo
       public: void SetAngle(unsigned int _index, math::Angle _angle)
               GAZEBO_DEPRECATED(3.1);
 
-      /// \brief If the Joint is static, Gazebo stores the state of
-      /// this Joint as a scalar inside the Joint class, so
-      /// this call will NOT move the joint dynamically for a static Model.
-      /// But if this Model is not static, then it is updated dynamically.
-      /// The child link of this joint is updated based on position change.
-      /// And all the links connected to the child link of this joint
+      /// \brief The child links of this joint is updated based on desired
+      /// position.  And all the links connected to the child link of this joint
       /// except through the parent link of this joint moves with the child
       /// link.
       /// \param[in] _index Index of the joint axis (degree of freedom).
