@@ -29,6 +29,36 @@ pid_t  pid1, pid2;
 bool killed1 = false;
 bool killed2 = false;
 
+/////////////////////////////////////////////////
+void help()
+{
+  std::cerr << "gazebo -- Run the Gazebo server and GUI.\n\n";
+  std::cerr << "`gazebo` [options] <world_file>\n\n";
+  std::cerr << "Gazebo server runs simulation and handles commandline "
+    << "options, starts a Master, runs World update and sensor generation "
+    << "loops. This also starts the Gazebo GUI client in a separate "
+    << "process.\n\n";
+
+  std::cerr << "Options:\n"
+  << "  -q [ --quiet ]                Reduce output to stdout.\n"
+  << "  -h [ --help ]                 Produce this help message.\n"
+  << "  -u [ --pause ]                Start the server in a paused state.\n"
+  << "  -e [ --physics ] arg          Specify a physics engine "
+  << "(ode|bullet|dart|simbody).\n"
+  << "  -p [ --play ] arg             Play a log file.\n"
+  << "  -r [ --record ]               Record state data.\n"
+  << "  --record_encoding arg (=zlib) Compression encoding format for log "
+  << "data \n"
+  << "                                (zlib|bz2|txt).\n"
+  << "  --record_path arg             Absolute path in which to store "
+  << "state data\n"
+  << "  --seed arg                    Start with a given random number seed.\n"
+  << "  --iters arg                   Number of iterations to simulate.\n"
+  << "  --minimal_comms               Reduce the messages output by gzserver\n"
+  << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
+}
+
+/////////////////////////////////////////////////
 void sig_handler(int /*signo*/)
 {
   sig_killed = true;
@@ -68,8 +98,16 @@ void sig_handler(int /*signo*/)
   }
 }
 
+/////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+  if (_argc >= 2 &&
+      (strcmp(_argv[1], "-h") == 0 || strcmp(_argv[1], "--help") == 0))
+  {
+    help();
+    return 0;
+  }
+
   struct sigaction sigact;
   sigact.sa_handler = sig_handler;
   if (sigaction(SIGINT, &sigact, NULL))
@@ -93,12 +131,27 @@ int main(int _argc, char **_argv)
   argvServer[_argc] = static_cast<char*>(NULL);
   argvClient[_argc] = static_cast<char*>(NULL);
 
+  // Need to check the return of wait function (8 lines below) to know
+  // what should be returned by the process
+  int returnValue = 0;
+
   if (pid1)
   {
     pid2 = fork();
     if (pid2)
     {
-      pid_t dead_child = wait(&status1);
+      int child_exit_status;
+      pid_t dead_child = wait(&child_exit_status);
+      // WIFEXITED will return zero if the process finished not reaching
+      // return or exit calls.
+      // WEXITSTATUS will check the value of the return function, not being
+      // zero means problems.
+      if ((WIFEXITED(child_exit_status)   == 0) || 
+          (WEXITSTATUS(child_exit_status) != 0))
+        returnValue = -1;
+      else
+        returnValue = 0;
+        
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)
@@ -129,5 +182,5 @@ int main(int _argc, char **_argv)
   delete[] argvServer;
   delete[] argvClient;
 
-  return 0;
+  return returnValue;
 }

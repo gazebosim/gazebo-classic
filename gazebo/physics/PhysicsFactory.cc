@@ -28,8 +28,16 @@
 
 void RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+void RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   void RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  void RegisterDARTPhysics();
 #endif
 
 using namespace gazebo;
@@ -43,8 +51,16 @@ void PhysicsFactory::RegisterAll()
 {
   RegisterODEPhysics();
 
+#ifdef HAVE_SIMBODY
+  RegisterSimbodyPhysics();
+#endif
+
 #ifdef HAVE_BULLET
   RegisterBulletPhysics();
+#endif
+
+#ifdef HAVE_DART
+  RegisterDARTPhysics();
 #endif
 }
 

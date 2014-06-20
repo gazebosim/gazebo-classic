@@ -28,16 +28,6 @@ using namespace transport;
 
 //////////////////////////////////////////////////
 Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
-                     unsigned int _limit, bool /*_latch*/)
-  : topic(_topic), msgType(_msgType), queueLimit(_limit)
-{
-  this->queueLimitWarned = false;
-  this->updatePeriod = 0;
-  this->waiting = false;
-}
-
-//////////////////////////////////////////////////
-Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
                      unsigned int _limit, double _hzRate)
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)
@@ -267,22 +257,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
 }
 
 //////////////////////////////////////////////////
-void Publisher::SetPublication(PublicationPtr &_publication, int _i)
-{
-  if (_i == 0)
-    this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
 void Publisher::SetPublication(PublicationPtr _publication)
 {
   this->publication = _publication;
-}
-
-//////////////////////////////////////////////////
-bool Publisher::GetLatching() const
-{
-  return false;
 }
 
 //////////////////////////////////////////////////

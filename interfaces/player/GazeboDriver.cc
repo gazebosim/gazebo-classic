@@ -70,16 +70,6 @@ void GazeboDriver_Register(DriverTable *_table)
   // TODO: Fix the PACKAGE_VERSION
   // printf("\n ** Gazebo plugin v%s **", PACKAGE_VERSION);
 
-  if (!player_quiet_startup)
-  {
-    puts("\n * Part of the Player/Stage Project "
-          "[http://playerstage.sourceforge.net]\n"
-          " * Copyright 2000-2006 Richard Vaughan, Andrew Howard, "
-          "Brian Gerkey, Nathan Koenig\n"
-          " * and contributors. Released under the GNU General Public"
-          " License v2.");
-  }
-
   _table->AddDriver(const_cast<char*>("gazebo"), GazeboDriver_Init);
 }
 

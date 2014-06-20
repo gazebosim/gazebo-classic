@@ -121,6 +121,9 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);
+
+  // this->collisionShape->setFriction(1.0);
+  // this->collisionShape->setAnisotropicFriction(btVector3(0, 0, 0));
 }
 
 //////////////////////////////////////////////////

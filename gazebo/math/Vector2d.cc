@@ -187,7 +187,7 @@ bool Vector2d::operator ==(const Vector2d &pt) const
 //////////////////////////////////////////////////
 bool Vector2d::IsFinite() const
 {
-  return finite(this->x) && finite(this->y);
+  return std::isfinite(this->x) && std::isfinite(this->y);
 }
 
 //////////////////////////////////////////////////

@@ -52,14 +52,20 @@ namespace gazebo
     public: void PrintUsage();
     public: bool ParseArgs(int argc, char **argv);
 
+    /// \brief Preload the server.
+    /// \return True if load was successful.
+    public: bool PreLoad();
+
     /// \brief Load a world file and optionally override physics engine type.
     /// \param[in] _filename Name of the world file to load.
-    /// \param[in] _physics Type of physics engine to use (ode|bullet).
+    /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
     public: bool LoadFile(const std::string &_filename="worlds/empty.world",
                           const std::string &_physics="");
 
     public: bool LoadString(const std::string &_sdfString);
-    public: void Init();
+    /// \todo remove the method when releasing gazebo 3.0
+    /// \brief Deprecated. Do not need to call Init anymore.
+    public: void Init() GAZEBO_DEPRECATED(2.3);
     public: void Run();
     public: void Stop();
     public: void Fini();
@@ -70,7 +76,7 @@ namespace gazebo
 
     /// \brief Load implementation.
     /// \param[in] _elem Description of the world to load.
-    /// \param[in] _physics Type of physics engine to use (ode|bullet).
+    /// \param[in] _physics Physics engine type (ode|bullet|dart|simbody).
     private: bool LoadImpl(sdf::ElementPtr _elem,
                            const std::string &_physics="");
 
@@ -97,6 +103,10 @@ namespace gazebo
 
     private: gazebo::common::StrStr_M params;
     private: po::variables_map vm;
+
+    /// \brief True when initialized.
+    /// \todo Remove "static" in Gazebo 3.0
+    private: static bool initialized;
 
     // save argc and argv for access by system plugins
     public: int systemPluginsArgc;

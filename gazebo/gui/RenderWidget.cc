@@ -60,10 +60,12 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_arrowAct);
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
+  actionGroup->addAction(g_scaleAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
   toolbar->addAction(g_rotateAct);
+  toolbar->addAction(g_scaleAct);
 
   toolbar->addSeparator();
   toolbar->addAction(g_boxCreateAct);

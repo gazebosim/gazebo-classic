@@ -331,7 +331,8 @@ bool Vector3::operator!=(const Vector3 &_pt) const
 //////////////////////////////////////////////////
 bool Vector3::IsFinite() const
 {
-  return finite(this->x) && finite(this->y) && finite(this->z);
+  return std::isfinite(this->x) && std::isfinite(this->y) &&
+         std::isfinite(this->z);
 }
 
 //////////////////////////////////////////////////

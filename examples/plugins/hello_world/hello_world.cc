@@ -27,7 +27,7 @@ namespace gazebo
 
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             {
-            };
+            }
   };
   GZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)
 }

@@ -1,0 +1,47 @@
+gazebo -- Run the Gazebo server and GUI.
+=============================================
+
+## SYNOPSIS
+
+`gazebo` [options] <world_file>
+
+## DESCRIPTION
+
+Gazebo server runs simulation and handles commandline options, starts a Master, runs World update and sensor generation loops. This also starts the Gazebo GUI client in a separate process.
+
+## OPTIONS
+
+* -q, --quiet :
+ Reduce output to stdout.
+* -h, --help :
+ Produce this help message.
+* -u, --pause :
+ Start the server in a paused state.
+* -e, --physics arg :
+ Specify a physics engine (ode|bullet|dart|simbody).
+* -p, --play arg :
+ Play a log file.
+* -r, --record :
+ Record state data.
+* --record_encoding arg (=zlib) :
+ Compression encoding format for log data (zlib|bz2|txt).
+* --record_path arg :
+ Absolute path in which to store state data
+* --seed arg :
+ Start with a given random number seed.
+* --iters arg :
+ Number of iterations to simulate.
+* --minimal_comms :
+ Reduce the messages output by gzserver
+* -s, --server-plugin arg :
+ Load a plugin.
+
+
+## AUTHOR
+  Open Source Robotics Foundation
+
+## COPYRIGHT 
+  Copyright (C) 2012-2014 Open Source Robotics Foundation
+       
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.

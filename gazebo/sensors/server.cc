@@ -41,7 +41,7 @@ void Load()
   gazebo::sensors::load();
   gazebo::sensors::init();
 
-  gazebo::rendering::create_scene("world_1", false);
+  gazebo::rendering::create_scene("world_1", false, true);
   gazebo::common::Time::MSleep(10);
 }
 
@@ -68,5 +68,3 @@ int main(int /*argc*/, char ** /*argv*/)
 
   return 0;
 }
-
-

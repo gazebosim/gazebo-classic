@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Nate Koenig
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,8 +99,8 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
     bool _paused, bool _createScene)
 {
   this->server = new gazebo::Server();
+  this->server->PreLoad();
   this->server->LoadFile(_worldFilename);
-  this->server->Init();
 
   this->SetPause(_paused);
 
@@ -109,9 +109,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
         gazebo::physics::get_world()->GetName(), false);
 
   this->server->Run();
-
-  if (_createScene)
-    gazebo::rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
   this->server->Fini();
 
@@ -128,7 +125,7 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
-  // gazebo::rendering::fini();
+  gazebo::gui::stop();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);

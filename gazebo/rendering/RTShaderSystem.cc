@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Wrapper around the OGRE RTShader system
- * Author: Nate Koenig
- */
 
 #include <sys/stat.h>
 #include <boost/bind.hpp>
@@ -97,7 +94,11 @@ void RTShaderSystem::Fini()
   // Finalize RTShader system.
   if (this->shaderGenerator != NULL)
   {
+#if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
     Ogre::RTShader::ShaderGenerator::finalize();
+#else
+    Ogre::RTShader::ShaderGenerator::destroy();
+#endif
     this->shaderGenerator = NULL;
   }
 

@@ -174,6 +174,9 @@ namespace gazebo
       /// \return The value of the parameter
       public: virtual boost::any GetParam(BulletParam _param) const;
 
+      // Documentation inherited
+      public: virtual void SetSORPGSIters(unsigned int iters);
+
       private: btBroadphaseInterface *broadPhase;
       private: btDefaultCollisionConfiguration *collisionConfig;
       private: btCollisionDispatcher *dispatcher;

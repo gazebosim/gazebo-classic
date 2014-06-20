@@ -1,6 +1,0 @@
-<!-- Model -->
-<element name="road" required="*">
-  <attribute name="name" type="string" default="__default__" required="1"/>
-  <element name="width" type="double" default="1.0" required="1"/>
-  <element name="point" type="vector3" default="0 0 0" required="+"/>
-</element>

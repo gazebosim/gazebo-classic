@@ -1,5 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+if (HAVE_OPENAL)
+  include_directories(${OPENAL_INCLUDE_DIR})
+endif()
+
+
 if (HAVE_GTS)
   include_directories(${gts_INCLUDE_DIRS})
   link_directories(${gts_LIBRARY_DIRS})
@@ -9,6 +14,7 @@ endif()
 set (sources
   Animation.cc
   Assert.cc
+  AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
   ColladaLoader.cc
@@ -28,6 +34,7 @@ set (sources
   PID.cc
   SkeletonAnimation.cc
   Skeleton.cc
+  SphericalCoordinates.cc
   STLLoader.cc
   SystemPaths.cc
   Time.cc
@@ -38,6 +45,7 @@ set (sources
 set (headers
   Animation.hh
   Assert.hh
+  AudioDecoder.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -62,6 +70,7 @@ set (headers
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
+  SphericalCoordinates.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -85,14 +94,22 @@ set (gtest_sources
   Animation_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
+  CommonIface_TEST.cc
   Console_TEST.cc
   Exception_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   Image_TEST.cc
+  SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   Time_TEST.cc
 )
+
+if (HAVE_FFMPEG)
+  set (gtest_sources ${gtest_sources}
+                     AudioDecoder_TEST.cc)
+endif()
+
 gz_build_tests(${gtest_sources})
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
@@ -118,14 +135,16 @@ target_link_libraries(gazebo_common
   ${libdl_library}
   ${libtool_library}
   ${Boost_LIBRARIES}
-  ${freeimage_library}
-  ${tinyxml_libraries}
+  ${freeimage_LIBRARIES}
+  ${tinyxml_LIBRARIES}
   ${libavcodec_LIBRARIES}
   ${libavformat_LIBRARIES}
+  ${libavutil_LIBRARIES}
   ${CURL_LIBRARIES}
   ${libswscale_LIBRARIES}
-  ${libtar_libraries}
+  ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
+  ${SDF_LIBRARIES}
   pthread
 )
 
@@ -134,16 +153,13 @@ if (NOT APPLE)
   target_link_libraries(gazebo_common rt)
 endif()
 
-if (HAVE_SDF)
-  target_link_libraries(gazebo_common ${SDF_LIBRARIES})
-endif()
-
 if (HAVE_GTS)
   target_link_libraries(gazebo_common ${gts_LIBRARIES})
 endif()
 
+if (HAVE_OPENAL)
+  target_link_libraries(gazebo_common ${OPENAL_LIBRARY})
+endif()
+
 gz_install_library(gazebo_common)
 gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
-
-# Deprecated Common.hh
-gz_issue_775("Common")

@@ -189,35 +189,8 @@ void ODEHinge2Joint::SetMaxForce(int _index, double _t)
 
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetForce(int _index, double _effort)
+void ODEHinge2Joint::SetForceImpl(int _index, double _effort)
 {
-  if (_index < 0 || static_cast<unsigned int>(_index) >= this->GetAngleCount())
-  {
-    gzerr << "Calling BulletHingeJoint::SetForce with an index ["
-          << _index << "] out of range\n";
-    return;
-  }
-
-  // truncating SetForce effort if velocity limit reached.
-  if (this->velocityLimit[_index] >= 0)
-  {
-    if (this->GetVelocity(_index) > this->velocityLimit[_index])
-      _effort = _effort > 0 ? 0 : _effort;
-    else if (this->GetVelocity(_index) < -this->velocityLimit[_index])
-      _effort = _effort < 0 ? 0 : _effort;
-  }
-
-  // truncate effort if effortLimit is not negative
-  if (this->effortLimit[_index] >= 0)
-    _effort = math::clamp(_effort,
-      -this->effortLimit[_index], this->effortLimit[_index]);
-
-  ODEJoint::SetForce(_index, _effort);
-  if (this->childLink)
-    this->childLink->SetEnabled(true);
-  if (this->parentLink)
-    this->parentLink->SetEnabled(true);
-
   if (this->jointId)
   {
     if (_index == 0)

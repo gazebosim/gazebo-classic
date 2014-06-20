@@ -56,18 +56,9 @@ namespace gazebo
       /// \return The size of the triangle mesh.
       public: virtual math::Vector3 GetSize() const;
 
-      /// Deprecated
-      /// \sa GetMeshURI
-      public: std::string GetFilename() const GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
       public: std::string GetMeshURI() const;
-
-      /// Deprecated.
-      /// \sa SetMesh
-      public: void SetFilename(
-                  const std::string &_filename) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.

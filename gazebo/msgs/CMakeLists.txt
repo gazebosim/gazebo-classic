@@ -16,6 +16,7 @@ set (msgs
   fog.proto
   friction.proto
   geometry.proto
+  gps.proto
   gui_overlay_config.proto
   gui_camera.proto
   gui.proto
@@ -60,6 +61,8 @@ set (msgs
   pose_v.proto
   poses_stamped.proto
   projector.proto
+  propagation_particle.proto
+  propagation_grid.proto
   publishers.proto
   publish.proto
   quaternion.proto
@@ -86,6 +89,8 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wireless_node.proto
+  wireless_nodes.proto
   world_control.proto
   world_reset.proto
   world_stats.proto
@@ -102,7 +107,7 @@ gz_build_tests(${msgs_tests_sources})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-gz_add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
+add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
 target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
 
 set (sources msgs.cc MsgFactory.cc)
@@ -136,10 +141,6 @@ target_link_libraries(gazebo_msgs
   gazebo_math
   ${PROTOBUF_LIBRARY}
 )
-
-if (NOT HAVE_SDF)
-  target_link_libraries(gazebo_msgs gazebo_sdf_interface)
-endif()
 
 add_dependencies(gazebo_msgs gazebomsgs_out)
 

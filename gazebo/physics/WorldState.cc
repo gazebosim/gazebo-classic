@@ -96,8 +96,11 @@ void WorldState::Load(const WorldPtr _world)
 /////////////////////////////////////////////////
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
-  // Copy the name
+  // Copy the name and time information
   this->name = _elem->Get<std::string>("world_name");
+  this->simTime = _elem->Get<common::Time>("sim_time");
+  this->wallTime = _elem->Get<common::Time>("wall_time");
+  this->realTime = _elem->Get<common::Time>("real_time");
 
   // Add the model states
   this->modelStates.clear();
@@ -107,16 +110,15 @@ void WorldState::Load(const sdf::ElementPtr _elem)
 
     while (childElem)
     {
+      std::string modelName = childElem->Get<std::string>("name");
       this->modelStates.insert(std::make_pair(
-            childElem->Get<std::string>("name"), ModelState(childElem)));
+            modelName, ModelState(childElem)));
+      this->modelStates[modelName].SetSimTime(this->simTime);
+      this->modelStates[modelName].SetWallTime(this->wallTime);
+      this->modelStates[modelName].SetRealTime(this->realTime);
       childElem = childElem->GetNextElement("model");
     }
   }
-
-  // Copy the name and time information
-  this->simTime = _elem->Get<common::Time>("sim_time");
-  this->wallTime = _elem->Get<common::Time>("wall_time");
-  this->realTime = _elem->Get<common::Time>("real_time");
 }
 
 /////////////////////////////////////////////////
@@ -151,20 +153,6 @@ ModelState_M WorldState::GetModelStates(const boost::regex &_regex) const
 unsigned int WorldState::GetModelStateCount() const
 {
   return this->modelStates.size();
-}
-
-/////////////////////////////////////////////////
-ModelState WorldState::GetModelState(unsigned int _index) const
-{
-  if (_index < this->modelStates.size())
-  {
-    ModelState_M::const_iterator iter = this->modelStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Invalid model state index\n");
-  return ModelState();
 }
 
 /////////////////////////////////////////////////

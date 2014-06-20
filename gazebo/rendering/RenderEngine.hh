@@ -35,6 +35,7 @@ namespace Ogre
 {
   class Root;
   class LogManager;
+  class OverlaySystem;
 }
 
 namespace gazebo
@@ -89,7 +90,8 @@ namespace gazebo
       /// \param[in] _enableVisualizations True enables visualization
       /// elements such as laser lines.
       public: ScenePtr CreateScene(const std::string &_name,
-                                   bool _enableVisualizations);
+                                   bool _enableVisualizations,
+                                   bool _isServer = false);
 
       /// \brief Remove a scene
       /// \param[in] _name The name of the scene to remove.
@@ -124,6 +126,12 @@ namespace gazebo
       /// \brief Get a pointer to the window manager.
       /// \return Pointer to the window manager.
       public: WindowManagerPtr GetWindowManager() const;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      /// \brief Get a pointer to the Ogre overlay system.
+      /// \return Pointer to the OGRE overlay system.
+      public: Ogre::OverlaySystem *GetOverlaySystem() const;
+#endif
 
       /// \brief Create a render context.
       /// \return True if the context was created.
@@ -178,6 +186,7 @@ namespace gazebo
       /// \brief All the event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
+      /// \brief Remove this in gazebo 3.0.
       /// \brief Node for communications.
       private: transport::NodePtr node;
 
@@ -186,6 +195,10 @@ namespace gazebo
 
       /// \brief Pointer to the window manager.
       private: WindowManagerPtr windowManager;
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+      private: Ogre::OverlaySystem *overlaySystem;
+#endif
 
       /// \brief Makes this class a singleton.
       private: friend class SingletonT<RenderEngine>;

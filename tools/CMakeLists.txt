@@ -2,7 +2,7 @@ include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories( 
-  ${tinyxml_include_dirs}
+  ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDF_INCLUDE_DIRS}
 )
@@ -11,6 +11,10 @@ link_directories(
   ${SDF_LIBRARY_DIRS}
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
 set (test_sources 
   gzlog_TEST.cc 
 )
@@ -18,11 +22,7 @@ set (test_sources
 gz_build_tests(${test_sources})
 
 add_executable(gzsdf gzsdf.cc)
-if (NOT HAVE_SDF)
-  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_sdf_interface gazebo_common)
-else()
-  target_link_libraries(gzsdf ${tinyxml_libraries} gazebo_common)
-endif()
+target_link_libraries(gzsdf ${tinyxml_LIBRARIES} gazebo_common)
 gz_install_executable(gzsdf)
 
 add_executable(gztopic gztopic.cc)
@@ -45,7 +45,7 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-install (PROGRAMS gzmodel_create gzmodel_create.sh DESTINATION ${BIN_INSTALL_DIR})
-if (${GAZEBO_VERSION} VERSION_GREATER 1.9)
-  message (WARNING "Installing deprecated gzmodel_create.sh. This should be removed after Gazebo 1.9")
-endif()
+install (PROGRAMS gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
+
+install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
+manpage(gzprop 1)

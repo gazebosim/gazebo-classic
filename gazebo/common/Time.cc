@@ -221,12 +221,6 @@ Time Time::NSleep(unsigned int _ns)
 }
 
 /////////////////////////////////////////////////
-Time Time::NSleep(Time _time)
-{
-  return Time::Sleep(_time);
-}
-
-/////////////////////////////////////////////////
 Time &Time::operator =(const struct timeval &_tv)
 {
   this->sec = _tv.tv_sec;

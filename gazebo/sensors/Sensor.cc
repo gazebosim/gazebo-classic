@@ -31,21 +31,30 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
 
+sdf::ElementPtr Sensor::sdfSensor;
+
 //////////////////////////////////////////////////
 Sensor::Sensor(SensorCategory _cat)
 {
+  if (!this->sdfSensor)
+  {
+    this->sdfSensor.reset(new sdf::Element);
+    sdf::initFile("sensor.sdf", this->sdfSensor);
+  }
+
   this->category = _cat;
 
-  this->sdf.reset(new sdf::Element);
-  sdf::initFile("sensor.sdf", this->sdf);
+  this->sdf = this->sdfSensor->Clone();
 
   this->active = false;
 
@@ -53,6 +62,8 @@ Sensor::Sensor(SensorCategory _cat)
 
   this->updateDelay = common::Time(0.0);
   this->updatePeriod = common::Time(0.0);
+
+  this->id = physics::getUniqueId();
 }
 
 //////////////////////////////////////////////////
@@ -87,6 +98,9 @@ void Sensor::Load(const std::string &_worldName)
     this->SetActive(true);
 
   this->world = physics::get_world(_worldName);
+
+  if (this->category == IMAGE)
+    this->scene = rendering::get_scene(_worldName);
 
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
@@ -123,9 +137,28 @@ void Sensor::SetParent(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+void Sensor::SetParent(const std::string &_name, uint32_t _id)
+{
+  this->parentName = _name;
+  this->parentId = _id;
+}
+
+//////////////////////////////////////////////////
 std::string Sensor::GetParentName() const
 {
   return this->parentName;
+}
+
+//////////////////////////////////////////////////
+uint32_t Sensor::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+uint32_t Sensor::GetParentId() const
+{
+  return this->parentId;
 }
 
 //////////////////////////////////////////////////
@@ -133,13 +166,25 @@ void Sensor::Update(bool _force)
 {
   if (this->IsActive() || _force)
   {
-    // Adjust time-to-update period to compensate for delays caused by another
-    // sensor's update in the same thread.
-    common::Time adjustedElapsed = this->world->GetSimTime() -
-        this->lastUpdateTime + this->updateDelay;
-
-    if (adjustedElapsed >= this->updatePeriod || _force)
     {
+      boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
+      common::Time simTime;
+      if (this->category == IMAGE && this->scene)
+        simTime = this->scene->GetSimTime();
+      else
+        simTime = this->world->GetSimTime();
+
+      if (simTime == this->lastUpdateTime && !_force)
+        return;
+
+      // Adjust time-to-update period to compensate for delays caused by another
+      // sensor's update in the same thread.
+      common::Time adjustedElapsed = simTime - this->lastUpdateTime +
+          this->updateDelay;
+
+      if (adjustedElapsed < this->updatePeriod && !_force)
+        return;
+
       this->updateDelay = std::max(common::Time::Zero,
           adjustedElapsed - this->updatePeriod);
 
@@ -150,10 +195,10 @@ void Sensor::Update(bool _force)
       if (this->updateDelay >= this->updatePeriod)
         this->updateDelay = common::Time::Zero;
 
-      this->lastUpdateTime = this->world->GetSimTime();
-      this->UpdateImpl(_force);
-      this->updated();
+      this->lastUpdateTime = simTime;
     }
+    this->UpdateImpl(_force);
+    this->updated();
   }
 }
 
@@ -275,8 +320,10 @@ std::string Sensor::GetTopic() const
 void Sensor::FillMsg(msgs::Sensor &_msg)
 {
   _msg.set_name(this->GetName());
+  _msg.set_id(this->GetId());
   _msg.set_type(this->GetType());
   _msg.set_parent(this->GetParentName());
+  _msg.set_parent_id(this->GetParentId());
   msgs::Set(_msg.mutable_pose(), this->GetPose());
 
   _msg.set_visualize(this->GetVisualize());
@@ -306,5 +353,6 @@ SensorCategory Sensor::GetCategory() const
 //////////////////////////////////////////////////
 void Sensor::ResetLastUpdateTime()
 {
+  boost::mutex::scoped_lock lock(this->mutexLastUpdateTime);
   this->lastUpdateTime = 0.0;
 }

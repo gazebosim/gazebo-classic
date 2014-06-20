@@ -90,6 +90,12 @@ void ForceTorqueSensor::Fini()
 }
 
 //////////////////////////////////////////////////
+physics::JointPtr ForceTorqueSensor::GetJoint() const
+{
+  return this->parentJoint;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 ForceTorqueSensor::GetForce() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().force());

@@ -119,16 +119,6 @@ namespace gazebo
       /// expression.
       public: JointState_M GetJointStates(const boost::regex &_regex) const;
 
-      /// \brief Get a link state.
-      ///
-      /// Get a Link State based on an index, where index is in the range of
-      /// 0...ModelState::GetLinkStateCount
-      /// \param[in] _index Index of the LinkState
-      /// \return State of the Link.
-      /// \throws common::Exception When _index is out of range.
-      public: LinkState GetLinkState(unsigned int _index) const
-              GAZEBO_DEPRECATED(1.7);
-
       /// \brief Get a link state by Link name
       ///
       /// Searches through all LinkStates. Returns the LinkState with the

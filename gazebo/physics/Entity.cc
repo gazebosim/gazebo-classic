@@ -53,8 +53,8 @@ Entity::Entity(BasePtr _parent)
   this->AddType(ENTITY);
 
   this->visualMsg = new msgs::Visual;
+  this->visualMsg->set_id(this->id);
   this->visualMsg->set_parent_name(this->world->GetName());
-  this->poseMsg = new msgs::Pose;
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -64,6 +64,8 @@ Entity::Entity(BasePtr _parent)
   }
 
   this->setWorldPoseFunc = &Entity::SetWorldPoseDefault;
+
+  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -74,9 +76,6 @@ Entity::~Entity()
 
   delete this->visualMsg;
   this->visualMsg = NULL;
-
-  delete this->poseMsg;
-  this->poseMsg = NULL;
 
   this->visPub.reset();
   this->requestPub.reset();
@@ -97,7 +96,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
       this->worldPose = this->sdf->Get<math::Pose>("pose") +
@@ -109,15 +107,18 @@ void Entity::Load(sdf::ElementPtr _sdf)
   }
 
   if (this->parent)
+  {
     this->visualMsg->set_parent_name(this->parent->GetScopedName());
+    this->visualMsg->set_parent_id(this->parent->GetId());
+  }
   else
+  {
     this->visualMsg->set_parent_name(this->world->GetName());
-
+    this->visualMsg->set_parent_id(0);
+  }
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
 
   this->visPub->Publish(*this->visualMsg);
-
-  this->poseMsg->set_name(this->GetScopedName());
 
   if (this->HasType(Base::MODEL))
     this->setWorldPoseFunc = &Entity::SetWorldPoseModel;

@@ -276,8 +276,9 @@ void LogRecord::Add(const std::string &_name, const std::string &_filename,
 
     if (this->logs.find(_name)->second->GetRelativeFilename() != _filename)
     {
-      gzthrow(std::string("Attempting to add a duplicate log object named[")
-          + _name + "] with a filename of [" + _filename + "]\n");
+      gzerr << "Attempting to add a duplicate log object named["
+          << _name << "] with a filename of [" << _filename << "].\n";
+      return;
     }
     else
     {

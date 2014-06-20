@@ -188,7 +188,8 @@ bool Vector2i::operator ==(const Vector2i &_pt) const
 //////////////////////////////////////////////////
 bool Vector2i::IsFinite() const
 {
-  return finite(this->x) && finite(this->y);
+  // integer types are always finite
+  return true;
 }
 
 //////////////////////////////////////////////////

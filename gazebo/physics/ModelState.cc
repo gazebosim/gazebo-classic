@@ -246,20 +246,6 @@ JointState_M ModelState::GetJointStates(const boost::regex &_regex) const
 }
 
 /////////////////////////////////////////////////
-LinkState ModelState::GetLinkState(unsigned int _index) const
-{
-  if (_index < this->linkStates.size())
-  {
-    LinkState_M::const_iterator iter = this->linkStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Index is out of range");
-  return LinkState();
-}
-
-/////////////////////////////////////////////////
 LinkState ModelState::GetLinkState(const std::string &_linkName) const
 {
   // Search for the link name

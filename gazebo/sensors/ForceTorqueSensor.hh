@@ -94,6 +94,10 @@ namespace gazebo
 
       /// \brief Update event.
       protected: event::EventT<void(msgs::WrenchStamped)> update;
+
+      /// \brief Get Parent Joint
+      /// \return Pointer to the joint containing this sensor
+      public: physics::JointPtr GetJoint() const;
     };
     /// \}
   }

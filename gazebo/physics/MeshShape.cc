@@ -105,21 +105,9 @@ math::Vector3 MeshShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-std::string MeshShape::GetFilename() const
-{
-  return this->GetMeshURI();
-}
-
-//////////////////////////////////////////////////
 std::string MeshShape::GetMeshURI() const
 {
   return this->sdf->Get<std::string>("uri");
-}
-
-//////////////////////////////////////////////////
-void MeshShape::SetFilename(const std::string &_filename)
-{
-  this->SetMesh(_filename);
 }
 
 //////////////////////////////////////////////////

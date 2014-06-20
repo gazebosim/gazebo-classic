@@ -120,51 +120,31 @@ namespace gazebo
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       private: void LoadVertices(const std::string &_id,
-         const math::Matrix4 &_transform,
-         std::vector<math::Vector3> &_verts,
-         std::vector<math::Vector3> &_norms);
-
-      /// \brief Load vertices
-      /// \param[in] _id String id of the vertices XML node
-      /// \param[in] _transform Transform to apply to all vertices
-      /// \param[out] _verts Holds the resulting vertices
-      /// \param[out] _norms Holds the resulting normals
-      /// \param[out] _vertDup Holds a map of duplicate position indices
-      /// \param[out] _normDup Holds a map of duplicate normal indices
-      private: void LoadVertices(const std::string &_id,
-         const math::Matrix4 &_transform,
-         std::vector<math::Vector3> &_verts,
-         std::vector<math::Vector3> &_norms,
-         std::map<unsigned int, unsigned int> &_vertDup,
-         std::map<unsigned int, unsigned int> &_normDup);
+                                 const math::Matrix4 &_transform,
+                                 std::vector<math::Vector3> &_verts,
+                                 std::vector<math::Vector3> &_norms);
 
       /// \brief Load positions
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all positions
       /// \param[out] _values Holds the resulting position values
-      /// \param[out] _values Holds a map of duplicate position indices
       private: void LoadPositions(const std::string &_id,
-          const math::Matrix4 &_transform,
-          std::vector<math::Vector3> &_values,
-          std::map<unsigned int, unsigned int> &_duplicates);
+                                  const math::Matrix4 &_transform,
+                                  std::vector<math::Vector3> &_values);
 
       /// \brief Load normals
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all normals
       /// \param[out] _values Holds the resulting normal values
-      /// \param[out] _values Holds a map of duplicate normal indices
       private: void LoadNormals(const std::string &_id,
-          const math::Matrix4 &_transform,
-          std::vector<math::Vector3> &_values,
-          std::map<unsigned int, unsigned int> &_duplicates);
+                                const math::Matrix4 &_transform,
+                                std::vector<math::Vector3> &_values);
 
       /// \brief Load texture coordinates
       /// \param[in] _id String id of the XML node
-      /// \param[out] _values Holds the resulting uv values
-      /// \param[out] _values Holds a map of duplicate uv indices
+      /// \param[out] _values Holds the resulting normal values
       private: void LoadTexCoords(const std::string &_id,
-          std::vector<math::Vector2d> &_values,
-          std::map<unsigned int, unsigned int> &_duplicates);
+                                 std::vector<math::Vector2d> &_values);
 
       /// \brief Load a material
       /// \param _name Name of the material XML element

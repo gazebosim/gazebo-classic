@@ -103,7 +103,22 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
   _dist = 0;
   _entity = "";
 
-  if (this->physicsEngine && this->collisionParent)
+  if (this->collisionParent)
+  {
+    BulletCollisionPtr collision =
+        boost::static_pointer_cast<BulletCollision>(this->collisionParent);
+
+    LinkPtr link = this->collisionParent->GetLink();
+    GZ_ASSERT(link != NULL, "Bullet link is NULL");
+
+    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
+          this->relativeStartPos);
+
+    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
+          this->relativeEndPos);
+  }
+
+  if (this->physicsEngine)
   {
     btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
         this->globalStartPos.z);

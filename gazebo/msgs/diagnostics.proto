@@ -1,7 +1,7 @@
 package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
-/// \interface Diagnostic information 
+/// \interface Diagnostics
 /// \brief Diagnostic information about a running instance of Gazebo.
 /// Gazebo must have been compiled with the ENABLE_DIAGNOSTICS flag.
 

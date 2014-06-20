@@ -1,0 +1,20 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface GPS
+/// \brief Data from a GPS sensor
+
+
+import "time.proto";
+
+message GPS
+{
+  required Time time                    = 1;
+  required string link_name             = 2;
+  required double latitude_deg          = 3;
+  required double longitude_deg         = 4;
+  required double altitude              = 5;
+  optional double velocity_east         = 6;
+  optional double velocity_north        = 7;
+  optional double velocity_up           = 8;
+}

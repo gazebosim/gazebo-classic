@@ -20,6 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo.hh"
 
+#include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -50,27 +51,29 @@ bool g_fullscreen = false;
 //////////////////////////////////////////////////
 void print_usage()
 {
-  fprintf(stderr, "Usage: gzclient [-h]\n");
-  fprintf(stderr, "  -h            : Print this message.\n");
+  std::cerr << "gzclient -- Gazebo GUI Client\n\n";
+  std::cerr << "`gzclient` [options]\n\n";
+  std::cerr << "Gazebo GUI client which allows visualization and user "
+    << "interaction.\n\n";
 }
 
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
-  gazebo::stop();
   gazebo::gui::stop();
+  gazebo::shutdown();
 }
 
 //////////////////////////////////////////////////
 bool parse_args(int _argc, char **_argv)
 {
-  po::options_description v_desc("Allowed options");
+  po::options_description v_desc("Options");
   v_desc.add_options()
     ("quiet,q", "Reduce output to stdout.")
     ("help,h", "Produce this help message.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
-  po::options_description desc("Allowed options");
+  po::options_description desc("Options");
   desc.add(v_desc);
 
   try
@@ -84,17 +87,18 @@ bool parse_args(int _argc, char **_argv)
     return false;
   }
 
-  if (!vm.count("quiet"))
-    gazebo::print_version();
-  else
-    gazebo::common::Console::Instance()->SetQuiet(true);
-
   if (vm.count("help"))
   {
     print_usage();
     std::cerr << v_desc << "\n";
     return false;
   }
+
+  if (!vm.count("quiet"))
+    gazebo::printVersion();
+  else
+    gazebo::common::Console::Instance()->SetQuiet(true);
+
 
   /// Load all the plugins specified on the command line
   if (vm.count("gui-plugin"))
@@ -105,7 +109,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 
@@ -127,6 +131,9 @@ namespace gazebo
     /////////////////////////////////////////////////
     void fini()
     {
+      // Cleanup model database.
+      common::ModelDatabase::Instance()->Fini();
+
       gui::clear_active_camera();
       rendering::fini();
       fflush(stdout);
@@ -137,6 +144,7 @@ namespace gazebo
 /////////////////////////////////////////////////
 void gui::init()
 {
+  g_modelRightMenu->Init();
   g_main_win->show();
   g_main_win->Init();
 }
@@ -177,19 +185,17 @@ bool gui::run(int _argc, char **_argv)
   // Initialize the informational logger. This will log warnings, and errors.
   gazebo::common::Console::Instance()->Init("gzclient.log");
 
+  // Make sure the model database has started
+  gazebo::common::ModelDatabase::Instance()->Start();
+
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::load())
+  if (!gazebo::setupClient())
     return false;
-
-  gazebo::run();
 
   gazebo::gui::load();
   gazebo::gui::init();
-
-  if (!gazebo::init())
-    return false;
 
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
@@ -203,15 +209,15 @@ bool gui::run(int _argc, char **_argv)
 
   g_app->exec();
 
-  gazebo::fini();
   gazebo::gui::fini();
+  gazebo::shutdown();
   return true;
 }
 
 /////////////////////////////////////////////////
 void gui::stop()
 {
-  gazebo::stop();
+  gazebo::shutdown();
   g_active_camera.reset();
   g_app->quit();
 }

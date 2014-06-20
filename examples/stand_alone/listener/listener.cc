@@ -33,9 +33,7 @@ void cb(ConstWorldStatisticsPtr &_msg)
 int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::load(_argc, _argv);
-
-  gazebo::run();
+  gazebo::setupClient(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -49,5 +47,5 @@ int main(int _argc, char **_argv)
     gazebo::common::Time::MSleep(10);
 
   // Make sure to shut everything down.
-  gazebo::transport::fini();
+  gazebo::shutdown();
 }

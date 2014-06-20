@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface WirelessNodes
+/// \brief Msgs for sending information about a list of wireless transmitters
+
+
+import "wireless_node.proto";
+
+message WirelessNodes
+{
+  repeated WirelessNode node = 1;
+}
+

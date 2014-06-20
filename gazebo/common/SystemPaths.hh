@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Gazebo configuration on this computer
- * Date: 3 May 2008
- */
-
 #ifndef _GAZEBO_SYSTEMPATHS_HH_
 #define _GAZEBO_SYSTEMPATHS_HH_
 

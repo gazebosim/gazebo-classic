@@ -439,6 +439,12 @@ void Light::ShowVisual(bool _s)
 }
 
 //////////////////////////////////////////////////
+bool Light::GetVisible() const
+{
+  return this->visual->GetVisible();
+}
+
+//////////////////////////////////////////////////
 void Light::SetLightType(const std::string &_type)
 {
   // Set the light _type

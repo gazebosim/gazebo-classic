@@ -318,21 +318,10 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   {
     this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
   }
-  else if (_msg->has_update_rate())
-  {
-    this->SetRealTimeUpdateRate(_msg->update_rate());
-    gzwarn <<
-        "Physics update rate is deprecated by real time update rate\n";
-  }
 
   if (_msg->has_max_step_size())
   {
     this->SetMaxStepSize(_msg->max_step_size());
-  }
-  else if (_msg->has_dt())
-  {
-    this->SetMaxStepSize(_msg->dt());
-    gzwarn << "Physics dt is deprecated by max step size\n";
   }
 
   /// Make sure all models get at least on update cycle.
@@ -908,10 +897,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != math::Vector3::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd = _collision1->GetWorldPose().rot.RotateVector(fd);
-    fd = (_collision1->GetRelativePose() +
-      _collision1->GetLink()->GetWorldPose()).rot.RotateVector(fd.Normalize());
+    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -926,10 +912,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         _collision1->GetSurface()->mu1 > _collision2->GetSurface()->mu1))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    /// \TODO: once issue #624 is fixed, switch to below:
-    /// fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
-    fd = (_collision2->GetRelativePose() +
-      _collision2->GetLink()->GetWorldPose()).rot.RotateVector(fd2.Normalize());
+    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
     /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&

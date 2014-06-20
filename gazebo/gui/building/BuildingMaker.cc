@@ -90,8 +90,6 @@ double BuildingMaker::conversionScale;
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
   this->finishDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);
-
-  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -184,6 +182,11 @@ std::string BuildingMaker::AddPart(const std::string &_type,
 std::string BuildingMaker::AddWall(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Wall_" << wallCounter++;
   std::string linkName = linkNameStream.str();
@@ -212,7 +215,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -220,6 +223,11 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
 std::string BuildingMaker::AddWindow(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
@@ -249,7 +257,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = windowManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -257,6 +265,11 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 std::string BuildingMaker::AddDoor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
   linkNameStream << "Door_" << this->doorCounter++;
@@ -287,7 +300,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = doorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -295,6 +308,11 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 std::string BuildingMaker::AddStairs(const QVector3D &_size,
     const QVector3D &_pos, double _angle, int _steps)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   std::ostringstream linkNameStream;
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
@@ -352,7 +370,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     stepVisual->SetRotation(baseStepVisual->GetRotation());
   }
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -360,6 +378,11 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
 std::string BuildingMaker::AddFloor(const QVector3D &_size,
     const QVector3D &_pos, double _angle)
 {
+  if (!this->modelVisual)
+  {
+    this->Reset();
+  }
+
   /// TODO a copy of AddWindow function. FIXME later
   std::ostringstream linkNameStream;
   linkNameStream << "Floor_" << this->floorCounter++;
@@ -390,7 +413,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
 }
 
@@ -459,7 +482,7 @@ void BuildingMaker::Reset()
   this->modelVisual->Load();
   this->modelPose = math::Pose::Zero;
   this->modelVisual->SetPose(this->modelPose);
-  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_NOT_SELECTABLE);
+  this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   scene->AddVisual(this->modelVisual);
 
   std::map<std::string, BuildingModelManip *>::iterator it;
@@ -1107,7 +1130,6 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
   startings.insert(start);
 
   std::multiset<QPointF>::iterator startIt;
-  std::multiset<QRectF>::iterator filledIt;
 
   // Surface subdivision algorithm:
   // subdivisions are called blocks here

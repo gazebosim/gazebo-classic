@@ -56,7 +56,6 @@ namespace gazebo
       /// \brief QT callback when follow has been selected.
       private slots: void OnFollow();
 
-
       /// \brief QT callback when delete has been selected.
       /// \param[in] _name Name of the model to delete.
       private slots: void OnDelete(const std::string &_name="");
@@ -100,6 +99,11 @@ namespace gazebo
 
       // The view state class is a friend for convenience
       private: friend class ViewState;
+
+      /// \todo In gazebo 3.0 move this function to the correct section.
+      /// \brief Initialize the right menu.
+      /// \return True on success.
+      public: bool Init();
     };
 
     /// \class ViewState ViewState.hh gui/gui.hh

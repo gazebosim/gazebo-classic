@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: Ogre Visual Class
- * Author: Nate Koenig
- * Date: 14 Dec 2007
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
+#include "gazebo/rendering/CameraVisual.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -44,12 +40,16 @@
 using namespace gazebo;
 using namespace rendering;
 
+// Note: The value of GZ_UINT32_MAX is reserved as a flag.
+uint32_t Visual::visualIdCount = GZ_UINT32_MAX - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
+  this->scale = math::Vector3::One;
 
   this->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->sdf);
@@ -92,6 +92,7 @@ Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, ScenePtr _scene, bool _useRTShader)
 {
+  this->id = this->visualIdCount--;
   this->boundingBox = NULL;
   this->useRTShader = _useRTShader;
 
@@ -133,11 +134,10 @@ Visual::~Visual()
 
   // delete instance from lines vector
   /*for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
     delete *iter;
     */
   this->lines.clear();
-
 
   if (this->sceneNode != NULL)
   {
@@ -147,6 +147,7 @@ Visual::~Visual()
     this->sceneNode = NULL;
   }
 
+  this->scene.reset();
   this->sdf->Reset();
   this->sdf.reset();
   this->parent.reset();
@@ -157,6 +158,7 @@ Visual::~Visual()
 void Visual::Fini()
 {
   this->plugins.clear();
+
   // Detach from the parent
   if (this->parent)
     this->parent->DetachVisual(this->GetName());
@@ -204,7 +206,7 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
 }
 
 /////////////////////////////////////////////////
-void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode* _sceneNode)
+void Visual::DestroyAllAttachedMovableObjects(Ogre::SceneNode *_sceneNode)
 {
   if (!_sceneNode)
     return;
@@ -439,8 +441,38 @@ void Visual::Load()
   if (obj)
     meshSize = obj->getBoundingBox().getSize();
 
-  math::Vector3 scale = this->GetScale();
-  this->sceneNode->setScale(scale.x, scale.y, scale.z);
+  if (this->sdf->HasElement("geometry"))
+  {
+    sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
+
+    if (geomElem->HasElement("box"))
+    {
+      this->scale = geomElem->GetElement("box")->Get<math::Vector3>("size");
+    }
+    else if (geomElem->HasElement("sphere"))
+    {
+      double r = geomElem->GetElement("sphere")->Get<double>("radius");
+      this->scale.Set(r * 2.0, r * 2.0, r * 2.0);
+    }
+    else if (geomElem->HasElement("cylinder"))
+    {
+      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
+      double l = geomElem->GetElement("cylinder")->Get<double>("length");
+      this->scale.Set(r * 2.0, r * 2.0, l);
+    }
+    else if (geomElem->HasElement("plane"))
+    {
+      math::Vector2d size =
+        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
+      this->scale.Set(size.x, size.y, 1);
+    }
+    else if (geomElem->HasElement("mesh"))
+    {
+      this->scale = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+    }
+  }
+
+  this->sceneNode->setScale(this->scale.x, this->scale.y, this->scale.z);
 
   // Set the material of the mesh
   if (this->sdf->HasElement("material"))
@@ -583,15 +615,18 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
   if (!this->HasAttachedObject(_obj->getName()))
   {
     this->sceneNode->attachObject(_obj);
-    if (this->useRTShader)
+    if (this->useRTShader && this->scene->GetInitialized() &&
+      _obj->getName().find("__COLLISION_VISUAL__") == std::string::npos)
+    {
       RTShaderSystem::Instance()->UpdateShaders();
+    }
     _obj->setUserAny(Ogre::Any(this->GetName()));
   }
   else
     gzerr << "Visual[" << this->GetName() << "] already has object["
           << _obj->getName() << "] attached.";
 
-  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_NOT_SELECTABLE);
+  _obj->setVisibilityFlags(GZ_VISIBILITY_ALL);
 }
 
 //////////////////////////////////////////////////
@@ -681,27 +716,37 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
+  if (this->scale == _scale)
+    return;
+
+  math::Vector3 tmpScale = this->scale;
+  this->scale = _scale;
+
   sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
+  {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
+  }
   else if (geomElem->HasElement("cylinder"))
   {
-    geomElem->GetElement("cylinder")->GetElement("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("cylinder")->GetElement("radius")
+        ->Set(_scale.x/2.0);
     geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
 
-  this->sceneNode->setScale(Conversions::Convert(_scale));
+  this->sceneNode->setScale(Conversions::Convert(this->scale));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
-  math::Vector3 result(1, 1, 1);
+  return this->scale;
+  /*math::Vector3 result(1, 1, 1);
   if (this->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->sdf->GetElement("geometry");
@@ -733,7 +778,7 @@ math::Vector3 Visual::GetScale()
     }
   }
 
-  return result;
+  return result;*/
 }
 
 
@@ -794,6 +839,8 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
   else
   {
+    if ( this->myMaterialName == _materialName)
+      return;
     this->myMaterialName = _materialName;
   }
 
@@ -838,8 +885,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
     (*iter)->SetMaterial(_materialName, _unique);
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized() &&
+    this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
+  {
     RTShaderSystem::Instance()->UpdateShaders();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1079,13 +1129,15 @@ void Visual::SetWireframe(bool _show)
     {
       Ogre::SubEntity *subEntity = entity->getSubEntity(j);
       Ogre::MaterialPtr material = subEntity->getMaterial();
+      if (material.isNull())
+        continue;
 
       unsigned int techniqueCount, passCount;
       Ogre::Technique *technique;
       Ogre::Pass *pass;
 
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-           techniqueCount++)
+           ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
@@ -1172,7 +1224,7 @@ void Visual::SetTransparency(float _trans)
     }
   }
 
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1425,7 +1477,7 @@ void Visual::SetNormalMap(const std::string &_nmap)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetElement("normal_map")->GetValue()->Set(_nmap);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1441,7 +1493,7 @@ void Visual::SetShaderType(const std::string &_type)
 {
   this->sdf->GetElement("material")->GetElement(
       "shader")->GetAttribute("type")->Set(_type);
-  if (this->useRTShader)
+  if (this->useRTShader && this->scene->GetInitialized())
     RTShaderSystem::Instance()->UpdateShaders();
 }
 
@@ -1490,12 +1542,12 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 }
 
 //////////////////////////////////////////////////
-DynamicLines *Visual::CreateDynamicLine(RenderOpType type)
+DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->preRenderConnection = event::Events::ConnectPreRender(
       boost::bind(&Visual::Update, this));
 
-  DynamicLines *line = new DynamicLines(type);
+  DynamicLines *line = new DynamicLines(_type);
   this->lines.push_back(line);
   this->AttachObject(line);
   return line;
@@ -1506,7 +1558,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 {
   // delete instance from lines vector
   for (std::list<DynamicLines*>::iterator iter = this->lines.begin();
-       iter!= this->lines.end(); ++iter)
+       iter != this->lines.end(); ++iter)
   {
     if (*iter == _line)
     {
@@ -1949,50 +2001,59 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
   }
 
+  if (_msg->has_scale())
+    this->SetScale(msgs::Convert(_msg->scale()));
+
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 scale(1, 1, 1);
+    math::Vector3 geomScale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
-      scale = msgs::Convert(_msg->geometry().box().size());
+      geomScale = msgs::Convert(_msg->geometry().box().size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      scale.x = _msg->geometry().cylinder().radius() * 2.0;
-      scale.y = _msg->geometry().cylinder().radius() * 2.0;
-      scale.z = _msg->geometry().cylinder().length();
+      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.z = _msg->geometry().cylinder().length();
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
-      scale.x = scale.y = scale.z = _msg->geometry().sphere().radius() * 2.0;
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().sphere().radius() * 2.0;
+    }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      scale.x = scale.y = 1.0;
+      geomScale.x = geomScale.y = 1.0;
       if (_msg->geometry().plane().has_size())
       {
-        scale.x = _msg->geometry().plane().size().x();
-        scale.y = _msg->geometry().plane().size().y();
+        geomScale.x = _msg->geometry().plane().size().x();
+        geomScale.y = _msg->geometry().plane().size().y();
       }
-      scale.z = 1.0;
+      geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
-      scale.x = scale.y = scale.z = _msg->geometry().image().scale();
+    {
+      geomScale.x = geomScale.y = geomScale.z
+          = _msg->geometry().image().scale();
+    }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-      scale = msgs::Convert(_msg->geometry().heightmap().size());
+      geomScale = msgs::Convert(_msg->geometry().heightmap().size());
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
       if (_msg->geometry().mesh().has_scale())
-        scale = msgs::Convert(_msg->geometry().mesh().scale());
+        geomScale = msgs::Convert(_msg->geometry().mesh().scale());
       else
-        scale.x = scale.y = scale.z = 1.0;
+        geomScale.x = geomScale.y = geomScale.z = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      scale.x = scale.y = scale.z = 1.0;
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
-    this->SetScale(scale);
+    this->SetScale(geomScale);
   }
 
   /*if (msg->points.size() > 0)
@@ -2396,4 +2457,16 @@ void Visual::LoadPlugin(sdf::ElementPtr _sdf)
   std::string pluginName = _sdf->Get<std::string>("name");
   std::string filename = _sdf->Get<std::string>("filename");
   this->LoadPlugin(filename, pluginName, _sdf);
+}
+
+//////////////////////////////////////////////////
+uint32_t Visual::GetId() const
+{
+  return this->id;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetId(uint32_t _id)
+{
+  this->id = _id;
 }

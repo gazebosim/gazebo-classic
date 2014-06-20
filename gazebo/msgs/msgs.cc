@@ -192,6 +192,10 @@ namespace gazebo
       unsigned int size;
       _i.GetData(&data, size);
       _msg->set_data(data, size);
+      if (data)
+      {
+        delete[] data;
+      }
     }
 
     /////////////////////////////////////////////////
@@ -517,6 +521,11 @@ namespace gazebo
           blend->set_fade_dist(blendElem->Get<double>("fade_dist"));
           blendElem = blendElem->GetNextElement("blend");
         }
+
+        // Set if the rendering engine uses terrain paging
+        bool useTerrainPaging =
+            geomElem->Get<bool>("use_terrain_paging");
+        result.mutable_heightmap()->set_use_terrain_paging(useTerrainPaging);
       }
       else if (geomElem->GetName() == "mesh")
       {

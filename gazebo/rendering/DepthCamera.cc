@@ -145,7 +145,7 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         Conversions::Convert(this->scene->GetBackgroundColor()));
     this->pcdViewport->setOverlaysEnabled(false);
     this->pcdViewport->setVisibilityMask(
-        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+        GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     this->pcdMaterial = (Ogre::Material*)(
     Ogre::MaterialManager::getSingleton().getByName("Gazebo/XYZPoints").get());

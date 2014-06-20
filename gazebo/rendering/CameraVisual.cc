@@ -27,17 +27,22 @@
 using namespace gazebo;
 using namespace rendering;
 
-/// \brief Constructor
+/////////////////////////////////////////////////
 CameraVisual::CameraVisual(const std::string &_name, VisualPtr _vis)
 : Visual(_name, _vis)
 {
 }
 
+/////////////////////////////////////////////////
 CameraVisual::~CameraVisual()
 {
+  if (this->scene)
+    this->scene->RemoveCamera(this->camera->GetName());
+
   this->camera.reset();
 }
 
+/////////////////////////////////////////////////
 void CameraVisual::Load(unsigned int _width, unsigned int _height)
 {
   double dist = 2.0;
@@ -95,7 +100,10 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);
 
   this->AttachObject(planeEnt);
-  this->camera->AttachToVisual(this->GetName(), true);
+  this->camera->AttachToVisual(this->GetId(), true);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  if (this->parent)
+    this->parent->AttachVisual(shared_from_this());
 }

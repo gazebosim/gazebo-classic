@@ -1,9 +1,0 @@
-<element name="plane" required="0">
-  <description>Plane shape</description>
-  <element name="normal" type="vector3" default="0 0 1" required="1">
-    <description>Normal direction for the plane</description>
-  </element>
-  <element name="size" type="vector2d" default="1 1" min="0 0" required="1">
-    <description>Length of each side of the plane</description> 
-  </element>
-</element>

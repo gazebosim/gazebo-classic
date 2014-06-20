@@ -49,9 +49,6 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited
-      public: virtual void Update();
-
-      // Documentation inherited
       public: virtual void OnPoseChange();
 
       // Documentation inherited
@@ -164,6 +161,9 @@ namespace gazebo
       ///        propagates the chagnes in pose back to Gazebo
       /// \param[in] _id Id of the body.
       public: static void MoveCallback(dBodyID _id);
+
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
 
       /// \brief ODE link handle
       private: dBodyID linkId;

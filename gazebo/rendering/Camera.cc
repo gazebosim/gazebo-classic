@@ -15,11 +15,6 @@
  *
 */
 
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #include <dirent.h>
 #include <sstream>
 #include <boost/filesystem.hpp>
@@ -144,8 +139,8 @@ Camera::Camera(const std::string &_namePrefix, ScenePtr _scene,
 
   if (_autoRender)
   {
-    this->connections.push_back(
-        event::Events::ConnectRender(boost::bind(&Camera::Render, this)));
+    this->connections.push_back(event::Events::ConnectRender(
+          boost::bind(&Camera::Render, this, false)));
     this->connections.push_back(
         event::Events::ConnectPostRender(
           boost::bind(&Camera::PostRender, this)));
@@ -171,7 +166,7 @@ Camera::~Camera()
   this->renderTexture = NULL;
   this->renderTarget = NULL;
 
-  if (this->camera)
+  if (this->camera && this->scene && this->scene->GetManager())
   {
     this->scene->GetManager()->destroyCamera(this->name);
     this->camera = NULL;
@@ -179,6 +174,7 @@ Camera::~Camera()
 
   this->connections.clear();
 
+  this->sdf->Reset();
   this->imageElem.reset();
   this->sdf.reset();
 }
@@ -259,6 +255,7 @@ void Camera::Init()
 
   this->CreateCamera();
 
+  // Create a scene node to control pitch motion
   this->sceneNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
@@ -272,6 +269,9 @@ void Camera::Init()
 //////////////////////////////////////////////////
 void Camera::Fini()
 {
+  this->initialized = false;
+  this->connections.clear();
+
   if (this->gaussianNoiseCompositorListener)
   {
     this->gaussianNoiseInstance->removeListener(
@@ -282,6 +282,9 @@ void Camera::Fini()
 
   if (this->renderTarget && this->scene->GetInitialized())
     this->renderTarget->removeAllViewports();
+
+  this->viewport = NULL;
+  this->renderTarget = NULL;
 
   this->connections.clear();
 }
@@ -320,11 +323,17 @@ void Camera::Update()
     {
       msgs::TrackVisual msg;
       msg.ParseFromString((*iter).data());
-      if (this->AttachToVisualImpl(msg.name(), msg.inherit_orientation(),
-                                    msg.min_dist(), msg.max_dist()))
-      {
+      bool result = false;
+
+      if (msg.id() < GZ_UINT32_MAX)
+        result = this->AttachToVisualImpl(msg.id(),
+            msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
+      else
+        result = this->AttachToVisualImpl(msg.name(),
+            msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
+
+      if (result)
         erase = true;
-      }
     }
 
     if (erase)
@@ -357,7 +366,7 @@ void Camera::Update()
       if (this->onAnimationComplete)
         this->onAnimationComplete();
 
-      if (this->moveToPositionQueue.size() > 0)
+      if (!this->moveToPositionQueue.empty())
       {
         this->MoveToPosition(this->moveToPositionQueue[0].first,
                              this->moveToPositionQueue[0].second);
@@ -374,8 +383,11 @@ void Camera::Update()
     double pitch = atan2(-direction.z,
                          sqrt(pow(direction.x, 2) + pow(direction.y, 2)));
 
-    double currPitch = this->GetWorldRotation().GetAsEuler().y;
-    double currYaw = this->GetWorldRotation().GetAsEuler().z;
+    Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+    math::Quaternion localRot = math::Quaternion(
+      localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+    double currPitch = localRot.GetAsEuler().y;
+    double currYaw = localRot.GetAsEuler().z;
 
     double pitchError = currPitch - pitch;
 
@@ -401,7 +413,9 @@ void Camera::Update()
     displacement.Normalize();
     displacement *= scaling;
 
-    math::Vector3 pos = this->GetWorldPosition() + displacement;
+    math::Vector3 localPos =
+      Conversions::Convert(this->sceneNode->_getDerivedPosition());
+    math::Vector3 pos = localPos + displacement;
 
     this->SetWorldPosition(pos);
   }
@@ -411,8 +425,15 @@ void Camera::Update()
 //////////////////////////////////////////////////
 void Camera::Render()
 {
-  if (common::Time::GetWallTime() - this->lastRenderWallTime >=
-      this->renderPeriod)
+  this->Render(false);
+}
+
+//////////////////////////////////////////////////
+void Camera::Render(bool _force)
+{
+  if (this->initialized && (_force ||
+       common::Time::GetWallTime() - this->lastRenderWallTime >=
+        this->renderPeriod))
   {
     this->newData = true;
     this->RenderImpl();
@@ -516,7 +537,7 @@ math::Vector3 Camera::GetWorldPosition() const
 //////////////////////////////////////////////////
 math::Quaternion Camera::GetWorldRotation() const
 {
-  Ogre::Quaternion rot = this->sceneNode->getOrientation();
+  Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
   return math::Quaternion(rot.w, rot.x, rot.y, rot.z);
 }
 
@@ -533,9 +554,7 @@ void Camera::SetWorldPosition(const math::Vector3 &_pos)
   if (this->animState)
     return;
 
-  this->sceneNode->setPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
-
-  // The pitch nodes needs to be told to update its transform
+  this->sceneNode->_setDerivedPosition(Ogre::Vector3(_pos.x, _pos.y, _pos.z));
   this->sceneNode->needUpdate();
 }
 
@@ -550,8 +569,8 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
   // Set the roll and yaw for sceneNode
   math::Quaternion s(rpy.x, rpy.y, rpy.z);
 
-  this->sceneNode->setOrientation(
-      Ogre::Quaternion(s.w, s.x, s.y, s.z));
+  this->sceneNode->_setDerivedOrientation(Ogre::Quaternion(s.w, s.x, s.y, s.z));
+
   this->sceneNode->needUpdate();
 }
 
@@ -777,6 +796,12 @@ void Camera::EnableSaveFrame(bool _enable)
   sdf::ElementPtr elem = this->sdf->GetElement("save");
   elem->GetAttribute("enabled")->Set(_enable);
   this->captureData = _enable;
+}
+
+//////////////////////////////////////////////////
+bool Camera::GetCaptureData() const
+{
+  return this->captureData;
 }
 
 //////////////////////////////////////////////////
@@ -1008,8 +1033,13 @@ bool Camera::SaveFrame(const unsigned char *_image,
 
   // Write out
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
-  pCodec->codeToFile(stream, filename, codecDataPtr);
 
+  // OGRE 1.9 renames codeToFile to encodeToFile
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  pCodec->codeToFile(stream, filename, codecDataPtr);
+  #else
+  pCodec->encodeToFile(stream, filename, codecDataPtr);
+  #endif
   return true;
 }
 
@@ -1174,11 +1204,11 @@ void Camera::SetCaptureDataOnce()
 }
 
 //////////////////////////////////////////////////
-void Camera::CreateRenderTexture(const std::string &textureName)
+void Camera::CreateRenderTexture(const std::string &_textureName)
 {
   // Create the render texture
   this->renderTexture = (Ogre::TextureManager::getSingleton().createManual(
-      textureName,
+      _textureName,
       "General",
       Ogre::TEX_TYPE_2D,
       this->GetImageWidth(),
@@ -1191,6 +1221,7 @@ void Camera::CreateRenderTexture(const std::string &textureName)
       4)).getPointer();
 
   this->SetRenderTarget(this->renderTexture->getBuffer()->getRenderTarget());
+
   this->initialized = true;
 }
 
@@ -1205,13 +1236,9 @@ void Camera::CreateCamera()
 {
   this->camera = this->scene->GetManager()->createCamera(this->name);
 
-  // Use X/Y as horizon, Z up
-  this->camera->pitch(Ogre::Degree(90));
-
-  // Don't yaw along variable axis, causes leaning
-  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
-  this->camera->setDirection(1, 0, 0);
+  this->camera->setFixedYawAxis(false);
+  this->camera->yaw(Ogre::Degree(-90.0));
+  this->camera->roll(Ogre::Degree(-90.0));
 }
 
 //////////////////////////////////////////////////
@@ -1246,12 +1273,14 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport = this->renderTarget->addViewport(this->camera);
     this->viewport->setClearEveryFrame(true);
     this->viewport->setShadowsEnabled(true);
+    this->viewport->setOverlaysEnabled(false);
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
     this->viewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
-    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_GUI);
+    this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
+        ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
                    static_cast<double>(this->viewport->getActualHeight());
@@ -1323,12 +1352,41 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
+void Camera::AttachToVisual(uint32_t _visualId,
+                            bool _inheritOrientation,
+                            double _minDist, double _maxDist)
+{
+  msgs::Request request;
+  msgs::TrackVisual track;
+
+  track.set_name(this->GetName() + "_attach_to_visual_track");
+  track.set_id(_visualId);
+  track.set_min_dist(_minDist);
+  track.set_max_dist(_maxDist);
+  track.set_inherit_orientation(_inheritOrientation);
+
+  std::string *serializedData = request.mutable_data();
+  track.SerializeToString(serializedData);
+
+  request.set_request("attach_visual");
+  request.set_id(_visualId);
+  this->requests.push_back(request);
+}
+
+//////////////////////////////////////////////////
 void Camera::AttachToVisual(const std::string &_visualName,
                             bool _inheritOrientation,
                             double _minDist, double _maxDist)
 {
   msgs::Request request;
   msgs::TrackVisual track;
+
+  VisualPtr visual = this->scene->GetVisual(_visualName);
+
+  if (visual)
+    track.set_id(visual->GetId());
+  else
+    track.set_id(GZ_UINT32_MAX);
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
@@ -1354,6 +1412,15 @@ void Camera::TrackVisual(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+bool Camera::AttachToVisualImpl(uint32_t _id,
+    bool _inheritOrientation, double _minDist, double _maxDist)
+{
+  VisualPtr visual = this->scene->GetVisual(_id);
+  return this->AttachToVisualImpl(visual, _inheritOrientation,
+                                  _minDist, _maxDist);
+}
+
+//////////////////////////////////////////////////
 bool Camera::AttachToVisualImpl(const std::string &_name,
     bool _inheritOrientation, double _minDist, double _maxDist)
 {
@@ -1371,10 +1438,8 @@ bool Camera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
     _visual->GetSceneNode()->addChild(this->sceneNode);
     this->sceneNode->setInheritOrientation(_inheritOrientation);
-    this->SetWorldPose(origPose);
     return true;
   }
 
@@ -1466,7 +1531,10 @@ bool Camera::MoveToPosition(const math::Pose &_pose, double _time)
   math::Vector3 rpy = _pose.rot.GetAsEuler();
   math::Vector3 start = this->GetWorldPose().pos;
 
-  double dyaw =  this->GetWorldRotation().GetAsEuler().z - rpy.z;
+  Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+  math::Quaternion localRot = math::Quaternion(
+    localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+  double dyaw =  localRot.GetAsEuler().z - rpy.z;
 
   if (dyaw > M_PI)
     rpy.z += 2*M_PI;
@@ -1545,7 +1613,10 @@ bool Camera::MoveToPositions(const std::vector<math::Pose> &_pts,
   double dt = _time / (_pts.size()-1);
   double tt = 0;
 
-  double prevYaw = this->GetWorldRotation().GetAsEuler().z;
+  Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
+  math::Quaternion localRot = math::Quaternion(
+    localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
+  double prevYaw = localRot.GetAsEuler().z;
   for (unsigned int j = 0; j < _pts.size(); j++)
   {
     math::Vector3 pos = _pts[j].pos;
@@ -1598,12 +1669,6 @@ double Camera::GetRenderRate() const
 //////////////////////////////////////////////////
 void Camera::AnimationComplete()
 {
-}
-
-//////////////////////////////////////////////////
-bool Camera::IsInitialized() const
-{
-  return this->GetInitialized();
 }
 
 //////////////////////////////////////////////////

@@ -50,8 +50,6 @@ using namespace rendering;
 UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   : Camera(_name, _scene)
 {
-  std::stringstream stream;
-
   this->gui = new GUIOverlay();
 
   this->orbitViewController = NULL;
@@ -98,6 +96,11 @@ void UserCamera::Init()
   this->viewController = this->orbitViewController;
 
   Camera::Init();
+
+  // Don't yaw along variable axis, causes leaning
+  this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+  this->camera->setDirection(1, 0, 0);
+
   this->SetHFOV(GZ_DTOR(60));
 
   // Careful when setting this value.
@@ -242,9 +245,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     math::Pose origPose = this->GetWorldPose();
-    double yaw = atan2(origPose.pos.x - _visual->GetWorldPose().pos.x,
-                       origPose.pos.y - _visual->GetWorldPose().pos.y);
-    yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
 
     double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
     double pitch = 0;
@@ -449,7 +450,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   end = mid + dir*(dist - scale);
 
-  dist = start.Distance(end);
+  // dist = start.Distance(end);
   // double vel = 5.0;
   double time = 0.5;  // dist / vel;
 
