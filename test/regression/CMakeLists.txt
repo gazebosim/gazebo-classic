@@ -29,6 +29,7 @@ set(tests
   1082_pid_limits.cc
   1112_force_torque_model_removal.cc
   1146_collision_bounding_box.cc
+  1208_world_plugin_init.cc
 )
 
 gz_build_tests(${tests})
