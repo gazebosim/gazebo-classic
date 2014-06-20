@@ -4,9 +4,16 @@ add_subdirectory(ode)
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
+if (HAVE_DART)
+  add_subdirectory(dart)
+endif()
 
 if (HAVE_SIMBODY)
   add_subdirectory(simbody)
+endif()
+
+if (HAVE_GDAL)
+  include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
 set (sources
@@ -110,9 +117,16 @@ target_link_libraries(gazebo_physics
 if (HAVE_BULLET)
   target_link_libraries(gazebo_physics gazebo_physics_bullet)
 endif()
+if (HAVE_DART)
+  target_link_libraries(gazebo_physics gazebo_physics_dart)
+endif()
 
 if (HAVE_SIMBODY)
   target_link_libraries(gazebo_physics gazebo_physics_simbody)
+endif()
+
+if (HAVE_GDAL)
+  target_link_libraries(gazebo_physics ${GDAL_LIBRARY})
 endif()
 
 gz_install_library(gazebo_physics)
@@ -121,9 +135,11 @@ gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 # unit tests
 set (gtest_sources
   BoxShape_TEST.cc
+  ContactManager_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
-  Joint_TEST.cc
+  JointController_TEST.cc
   PhysicsEngine_TEST.cc
-  SphereShape_TEST.cc)
+  SphereShape_TEST.cc
+)
 gz_build_tests(${gtest_sources})

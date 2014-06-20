@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
+#include "gazebo/physics/bullet/BulletSurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -32,6 +33,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
 {
   this->SetName("Bullet_Collision");
   this->collisionShape = NULL;
+  this->surface.reset(new BulletSurfaceParams());
 }
 
 //////////////////////////////////////////////////
@@ -136,4 +138,10 @@ btCollisionShape *BulletCollision::GetCollisionShape() const
 void BulletCollision::SetCompoundShapeIndex(int /*_index*/)
 {
   // this->compoundShapeIndex = 0;
+}
+
+/////////////////////////////////////////////////
+BulletSurfaceParamsPtr BulletCollision::GetBulletSurface() const
+{
+  return boost::dynamic_pointer_cast<BulletSurfaceParams>(this->surface);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -63,7 +64,6 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class GaussianNoiseCompositorListener;
     class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering
@@ -74,7 +74,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -107,16 +107,9 @@ namespace gazebo
       /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
       /// camera images.
-      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
-      // and change Render(bool _force) to have a default value of false.
-      public: void Render();
-
-      /// \brief Render the camera.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(bool _force);
+      public: void Render(bool _force = false);
 
       /// \brief Post render
       ///
@@ -313,11 +306,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() {return 0;}
+      public: virtual float GetAvgFPS() const {return 0;}
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() {return 0;}
+      public: virtual unsigned int GetTriangleCount() const {return 0;}
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -334,10 +327,6 @@ namespace gazebo
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
-
-      /// \brief Get the camera's pitch scene node
-      /// \return The pitch node the camera is attached to
-      public: Ogre::SceneNode *GetPitchNode() const;
 
       /// \brief Get a pointer to the image data
       ///
@@ -623,11 +612,8 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
-
-      /// \brief Scene nod that controls camera pitch.
-      protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;

@@ -16,9 +16,21 @@ if(HAVE_BULLET)
   include_directories ( ${BULLET_INCLUDE_DIRS} )
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
+if(HAVE_DART)
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
+endif()
 
 set(tests
+  494_joint_axis_frame.cc
+  624_collision_world_pose.cc
   876_random_number_generator.cc
+  940_force_torque_sensor_frame.cc
+  978_joint_anchor.cc
+  1082_pid_limits.cc
+  1112_force_torque_model_removal.cc
+  1124_collision_pose.cc
+  1146_collision_bounding_box.cc
 )
 
 gz_build_tests(${tests})
@@ -30,6 +42,7 @@ set(display_tests
 gz_build_display_tests(${display_tests})
 
 set(dri_tests
+  346_save_lights.cc
   846_typo_in_camera.cc
 )
 

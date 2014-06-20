@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -31,7 +32,8 @@ namespace gazebo
     /// \{
 
     /// \brief A simbody universal joint class
-    class SimbodyUniversalJoint : public UniversalJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyUniversalJoint
+      : public UniversalJoint<SimbodyJoint>
     {
       /// \brief Constructor
       /// \param[in] _world Pointer to the Simbody world.
@@ -46,49 +48,35 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: virtual void Init();
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(int _index) const;
+      public: virtual void SetVelocity(unsigned int _index, double _rate);
 
       // Documentation inherited.
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited.
-      public: virtual void SetMaxForce(int _index, double _t);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual double GetMaxForce(int _index);
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(int _index, const math::Angle &_angle);
+      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetLowStop(int _index, const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(int _index);
-
-      // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
-
-      // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(int _index) const;
-
-      // Documentation inherited.
-      protected: virtual void SetForceImpl(int _index, double _torque);
+      protected: virtual void SetForceImpl(unsigned int _index, double _torque);
     };
     /// \}
   }

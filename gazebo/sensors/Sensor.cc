@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
 #include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
@@ -77,6 +78,9 @@ Sensor::~Sensor()
     this->sdf->Reset();
   this->sdf.reset();
   this->connections.clear();
+
+  for (unsigned int i = 0; i < this->noises.size(); ++i)
+    this->noises[i].reset();
 }
 
 //////////////////////////////////////////////////
@@ -128,12 +132,6 @@ void Sensor::Init()
   msgs::Sensor msg;
   this->FillMsg(msg);
   this->sensorPub->Publish(msg);
-}
-
-//////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name)
-{
-  this->parentName = _name;
 }
 
 //////////////////////////////////////////////////
@@ -230,6 +228,9 @@ void Sensor::Update(bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  for (unsigned int i= 0; i < this->noises.size(); ++i)
+    this->noises[i]->Fini();
+
   this->active = false;
   this->plugins.clear();
 }
@@ -244,7 +245,7 @@ std::string Sensor::GetName() const
 std::string Sensor::GetScopedName() const
 {
   return this->world->GetName() + "::" + this->parentName + "::" +
-         this->GetName();
+    this->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -373,6 +374,17 @@ std::string Sensor::GetWorldName() const
 SensorCategory Sensor::GetCategory() const
 {
   return this->category;
+}
+
+//////////////////////////////////////////////////
+NoisePtr Sensor::GetNoise(unsigned int _index) const
+{
+  if (_index >= this->noises.size())
+  {
+    gzerr << "Get noise index out of range" << std::endl;
+    return NoisePtr();
+  }
+  return this->noises[_index];
 }
 
 //////////////////////////////////////////////////

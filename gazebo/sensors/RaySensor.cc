@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
+#include "gazebo/sensors/Noise.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -100,24 +101,12 @@ void RaySensor::Load(const std::string &_worldName)
   this->laserShape->Init();
 
   // Handle noise model settings.
-  this->noiseActive = false;
   sdf::ElementPtr rayElem = this->sdf->GetElement("ray");
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->noiseActive = true;
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
-        " and stddev " << this->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+    this->noises.push_back(
+        NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
+        this->GetType()));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -474,22 +463,13 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
         intensity = this->laserShape->GetRetro(j * this->GetRayCount() + i);
       }
 
-      if (this->noiseActive)
+      if (!this->noises.empty())
       {
-        switch (this->noiseType)
-        {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range +=
-                math::Rand::GetDblNormal(this->noiseMean, this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range =
-                math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
-        }
+        // currently supports only one noise model per laser sensor
+        range = this->noises[0]->Apply(range);
+        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
+
       scan->add_ranges(range);
       scan->add_intensities(intensity);
     }

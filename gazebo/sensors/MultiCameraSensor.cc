@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
 
@@ -138,6 +139,20 @@ void MultiCameraSensor::Init()
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentId, true);
+
+    // Handle noise model settings.
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+          this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(camera);
+    }
+    else
+    {
+      this->noises.push_back(NoisePtr(new Noise(Noise::NONE)));
+    }
 
     {
       boost::mutex::scoped_lock lock(this->cameraMutex);

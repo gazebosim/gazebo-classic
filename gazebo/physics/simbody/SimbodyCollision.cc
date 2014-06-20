@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -27,6 +28,7 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
 {
   this->SetName("Simbody_Collision");
   this->collisionShape = NULL;
+  this->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////

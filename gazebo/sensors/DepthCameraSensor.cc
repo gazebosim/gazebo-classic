@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ DepthCameraSensor::~DepthCameraSensor()
 
 //////////////////////////////////////////////////
 void DepthCameraSensor::Load(const std::string &_worldName,
-                                   sdf::ElementPtr &_sdf)
+                                   sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
@@ -147,8 +147,7 @@ void DepthCameraSensor::Render()
   if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
     return;
 
-  // Update all the cameras
-  this->Render();
+  this->camera->Render();
 
   this->rendered = true;
   this->lastMeasurementTime = this->scene->GetSimTime();

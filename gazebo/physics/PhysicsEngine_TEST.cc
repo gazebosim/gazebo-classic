@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 */
 
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/msgs/msgs.hh"
 
 using namespace gazebo;
 
-class PhysicsEngineTest : public ServerFixture
+class PhysicsEngineTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
@@ -64,6 +66,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
     type = msgs::Physics::ODE;
   else if (_physicsEngine == "bullet")
     type = msgs::Physics::BULLET;
+  else if (_physicsEngine == "dart")
+    type = msgs::Physics::DART;
   else
     type = msgs::Physics::ODE;
   physicsPubMsg.set_type(type);
@@ -92,17 +96,14 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsNode->Fini();
 }
 
-TEST_F(PhysicsEngineTest, PhysicsEngineParamODE)
+/////////////////////////////////////////////////
+TEST_P(PhysicsEngineTest, PhysicsEngineParam)
 {
-  PhysicsEngineParam("ode");
+  PhysicsEngineParam(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsEngineTest, PhysicsEngineParamBullet)
-{
-  PhysicsEngineParam("bullet");
-}
-#endif  // HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
