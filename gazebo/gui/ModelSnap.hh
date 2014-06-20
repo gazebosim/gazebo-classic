@@ -47,9 +47,6 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
-      /// \brief Set the visual to be manipulated by the model manipulator.
-      public: void SetAttachedVisual(rendering::VisualPtr _vis);
-
       /// \brief Reset the model alignment too.
       public: void Reset();
 

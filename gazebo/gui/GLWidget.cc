@@ -35,6 +35,7 @@
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
+#include "gazebo/gui/ModelAlign.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
@@ -109,6 +110,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->connections.push_back(
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&GLWidget::OnSetSelectedEntity, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::Events::ConnectAlignMode(
+        boost::bind(&GLWidget::OnAlignMode, this, _1, _2)));
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -436,6 +441,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
   else if (this->state == "snap")
     ModelSnap::Instance()->OnMousePressEvent(this->mouseEvent);
+//  else if (this->state == "align")
+//    ModelAlign::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -450,8 +457,10 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
-  else if (this->state == "attach")
+  else if (this->state == "snap")
     ModelSnap::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+//  else if (this->state == "align")
+//    ModelAlign::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -467,8 +476,10 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
-  else if (this->state == "attach")
+  else if (this->state == "snap")
     ModelSnap::Instance()->OnMouseMoveEvent(this->mouseEvent);
+//  else if (this->state == "align")
+//    ModelAlign::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -793,6 +804,7 @@ void GLWidget::OnCreateScene(const std::string &_name)
 
   ModelManipulator::Instance()->Init();
   ModelSnap::Instance()->Init();
+  ModelAlign::Instance()->Init();
 
   this->sceneCreated = true;
 }
@@ -898,7 +910,17 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
-  if (this->selectedVis)
+  // deselect all if not in multi-selection mode.
+  if (!this->mouseEvent.control)
+  {
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    {
+      this->selectedVisuals[i]->SetHighlighted(false);
+    }
+    this->selectedVisuals.clear();
+  }
+
+  if (this->selectedVis && !this->mouseEvent.control)
   {
     this->selectedVis->SetHighlighted(false);
   }
@@ -908,6 +930,14 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   if (this->selectedVis && !this->selectedVis->IsPlane())
   {
     this->selectedVis->SetHighlighted(true);
+
+    // enable multi-selection if control is pressed
+    if (this->selectedVisuals.empty() || (this->mouseEvent.control &&
+        std::find(this->selectedVisuals.begin(), this->selectedVisuals.end(),
+        this->selectedVis) == this->selectedVisuals.end()))
+    {
+      this->selectedVisuals.push_back(this->selectedVis);
+    }
     g_copyAct->setEnabled(true);
   }
   else
@@ -925,7 +955,10 @@ void GLWidget::OnManipMode(const std::string &_mode)
     ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
-  ModelSnap::Instance()->Reset();
+  if (this->state == "snap")
+  {
+    ModelSnap::Instance()->Reset();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1067,4 +1100,12 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
       g_pasteAct->setEnabled(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnAlignMode(std::string _axis, std::string _config)
+{
+  std::cerr<< " align manip in glwidget " <<
+      this->selectedVisuals.size() << std::endl;
+  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config);
 }

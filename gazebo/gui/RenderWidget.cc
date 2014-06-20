@@ -61,7 +61,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
-  actionGroup->addAction(g_alignAct);
   actionGroup->addAction(g_snapAct);
 
   toolbar->addAction(g_arrowAct);

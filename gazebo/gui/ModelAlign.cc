@@ -72,9 +72,9 @@ void ModelAlign::Init()
   this->dataPtr->modelPub =
       this->dataPtr->node->Advertise<msgs::Model>("~/model/modify");
 
-  this->dataPtr->connections.push_back(
+/*  this->dataPtr->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&ModelAlign::OnAlignMode, this, _1, _2)));
+        boost::bind(&ModelAlign::OnAlignMode, this, _1, _2)));*/
 
   this->dataPtr->initialized = true;
 }
@@ -82,7 +82,7 @@ void ModelAlign::Init()
 /////////////////////////////////////////////////
 void ModelAlign::Reset()
 {
-  this->dataPtr->targetVis.reset();
+  /*this->dataPtr->targetVis.reset();
   for (std::map<rendering::VisualPtr, math::Pose>::iterator it
       = this->dataPtr->selectedVisuals.begin();
       it != this->dataPtr->selectedVisuals.end(); ++it)
@@ -90,14 +90,25 @@ void ModelAlign::Reset()
     if (it->first)
       it->first->SetHighlighted(false);
   }
-  this->dataPtr->selectedVisuals.clear();
+  this->dataPtr->selectedVisuals.clear();*/
 }
 
 /////////////////////////////////////////////////
-void ModelAlign::OnAlignMode(std::string _axis, std::string _config)
+/*void ModelAlign::SetVisuals(std::vector<rendering::VisualPtr> _visuals)
 {
+  this->dataPtr->selectedVisuals = _visuals;
+}*/
+
+/////////////////////////////////////////////////
+void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
+    std::string _axis, std::string _config)
+{
+  this->dataPtr->selectedVisuals = _visuals;
+
   if (this->dataPtr->selectedVisuals.size() <= 1)
     return;
+
+  this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
 
   math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
   math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
@@ -105,8 +116,49 @@ void ModelAlign::OnAlignMode(std::string _axis, std::string _config)
       + targetWorldPose.pos;
   math::Vector3 targetMax = targetWorldPose.rot * targetBbox.max
       + targetWorldPose.pos;
+  math::Vector3 targetCenter = targetWorldPose.rot * targetBbox.GetCenter()
+      + targetWorldPose.pos;
 
-  for (std::map<rendering::VisualPtr, math::Pose>::iterator it
+  std::cerr << " on align mode " << _axis << " " << _config << " "
+      << this->dataPtr->selectedVisuals.size()  <<  std::endl;
+
+  for (unsigned i = 0; i < this->dataPtr->selectedVisuals.size() -1; ++i)
+  {
+    rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
+
+    math::Pose worldPose = vis->GetWorldPose();
+    math::Box bbox = vis->GetBoundingBox();
+    math::Vector3 boxWorldMin = worldPose.rot * bbox.min + worldPose.pos;
+    math::Vector3 boxWorldMax = worldPose.rot * bbox.max + worldPose.pos;
+    math::Vector3 boxWorldCenter = targetWorldPose.rot * bbox.GetCenter()
+      + worldPose.pos;
+
+    math::Vector3 trans;
+    if (_config == "min")
+      trans = targetMin - boxWorldMin;
+    else if (_config == "center")
+      trans = targetCenter - boxWorldCenter;
+    else if (_config == "max")
+      trans = targetMax - boxWorldMax;
+
+    if (_axis == "x")
+    {
+      trans.y = trans.z = 0;
+      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+    }
+    if (_axis == "y")
+    {
+      trans.x = trans.z = 0;
+      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+    }
+    if (_axis == "z")
+    {
+      trans.x = trans.y = 0;
+      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+    }
+  }
+
+/*  for (std::map<rendering::VisualPtr, math::Pose>::iterator it
       = this->dataPtr->selectedVisuals.begin(),
       j = --this->dataPtr->selectedVisuals.end();
       it != j; ++it)
@@ -140,9 +192,9 @@ void ModelAlign::OnAlignMode(std::string _axis, std::string _config)
       it->first->SetWorldPosition(it->first->GetWorldPose().pos + trans);
     }
   }
-
+*/
 }
-
+/*
 /////////////////////////////////////////////////
 void ModelAlign::OnMousePressEvent(const common::MouseEvent &_event)
 {
@@ -203,7 +255,7 @@ void ModelAlign::OnKeyReleaseEvent(const common::KeyEvent &_event)
   this->dataPtr->keyEvent = _event;
 
   this->dataPtr->keyEvent.key = 0;
-}
+}*/
 
 /////////////////////////////////////////////////
 void ModelAlign::PublishVisualPose(rendering::VisualPtr _vis)

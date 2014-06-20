@@ -631,12 +631,15 @@ void MainWindow::Scale()
 /////////////////////////////////////////////////
 void MainWindow::Align()
 {
-  gui::Events::manipMode("align");
+//  gui::Events::manipMode("align");
+//  std::cerr << " Align! " << std::endl;
 }
 
 /////////////////////////////////////////////////
 void MainWindow::OnAlignMode(QString _mode)
 {
+//  gui::Events::manipMode("align");
+
   std::string mode = _mode.toStdString();
   gui::Events::alignMode(mode.substr(0,1), mode.substr(1));
 }
@@ -1237,12 +1240,13 @@ void MainWindow::CreateActions()
   alignWidget->setFixedWidth(alignWidget->width()+1);
 
   g_alignAct = new QWidgetAction(this);
+  g_alignAct->setCheckable(true);
   g_alignAct->setDefaultWidget(alignWidget);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 
   QSignalMapper *alignSignalMapper = new QSignalMapper(this);
-  connect(alignSignalMapper, SIGNAL(mapped(Qstring)),
-      this, SLOT(OnAlignMode(Qstring)));
+  connect(alignSignalMapper, SIGNAL(mapped(QString)),
+      this, SLOT(OnAlignMode(QString)));
 
   connect(xAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
   alignSignalMapper->setMapping(xAlignMin, tr("xmin"));

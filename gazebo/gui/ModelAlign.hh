@@ -47,12 +47,12 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
-      /// \brief Set the visual to be manipulated by the model manipulator.
-      public: void SetAttachedVisual(rendering::VisualPtr _vis);
+      /// \brief Set the visuals to be aligned.
+      // public: void SetVisuals(std::vector<rendering::VisualPtr> _visuals);
 
       /// \brief Reset the model alignment too.
       public: void Reset();
-
+/*
       /// \brief Process an object translate mouse press event.
       /// \param[in] _event Mouse event.
       public: void OnMousePressEvent(const common::MouseEvent &_event);
@@ -72,11 +72,13 @@ namespace gazebo
       /// \brief Process a key release event.
       /// \param[in] _event Key event.
       public: void OnKeyReleaseEvent(const common::KeyEvent &_event);
-
+*/
       /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
-      private: void OnAlignMode(std::string _axis, std::string _config);
+      public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
+          std::string _axis, std::string _config);
 
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
