@@ -41,11 +41,14 @@
   <file>images/screenshot.png</file>
   <file>images/align.png</file>
   <file>images/magnet.png</file>
-  <file>images/horz_left.png</file>
-  <file>images/horz_center.png</file>
-  <file>images/horz_right.png</file>
-  <file>images/vert_top.png</file>
-  <file>images/vert_center.png</file>
-  <file>images/vert_bottom.png</file>
+  <file>images/x_min.png</file>
+  <file>images/x_center.png</file>
+  <file>images/x_max.png</file>
+  <file>images/y_min.png</file>
+  <file>images/y_center.png</file>
+  <file>images/y_max.png</file>
+  <file>images/z_min.png</file>
+  <file>images/z_center.png</file>  
+  <file>images/z_max.png</file>        
 </qresource>
 </RCC>
