@@ -1,27 +1,9 @@
 #!/bin/sh
 
-manifest="<?xml version='1.0'?>
-<model>
-  <name>my_model</name>
-  <version>1.0</version>
-  <sdf>model.sdf</sdf>
+echo
+echo "Warning: the command was renamed to gzmodel_create (without .sh suffix)"
+echo "please use that form in the future, this version will be deleted in "
+echo "next versions"
+echo
 
-  <author>
-    <name>my_name</name>
-    <email>me@my.email</email>
-  </author>
-  
-  <description>
-  A description of my model
-  </description>
-</model>";
-
-if [ $1 ]
-then
-  mkdir $1
-  echo "$manifest" > $1/manifest.xml;
-else
-  echo "Enter a directory to create for the model."
-  echo "Usage:"
-  echo "  gzmodel_create [directory]"
-fi
+gzmodel_create $@

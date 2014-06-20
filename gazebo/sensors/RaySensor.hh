@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@
 #include <vector>
 #include <string>
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "transport/TransportTypes.hh"
-#include "sensors/Sensor.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
 
 namespace gazebo
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <gazebo/gazebo.hh>
 
 #include <gazebo/common/Time.hh>
-#include <gazebo/transport/Transport.hh>
+#include <gazebo/transport/TransportIface.hh>
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/transport/Node.hh>
 
@@ -156,7 +156,17 @@ void list()
     request.set_id(0);
     request.set_request("get_publishers");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(data);
+
+    try
+    {
+      connection->Read(data);
+    }
+    catch(...)
+    {
+      gzerr << "An active gzserver is probably not present.\n";
+      connection.reset();
+      return;
+    }
 
     packet.ParseFromString(data);
     pubs.ParseFromString(packet.serialized_data());
@@ -202,7 +212,10 @@ void hzCB(const std::string &/*_data*/)
   common::Time cur_time = common::Time::GetWallTime();
 
   if (hz_prev_time != common::Time(0, 0))
-    printf("Hz: %6.2f\n", 1.0 / (cur_time - hz_prev_time).Double());
+  {
+    std::cout << "Hz: " << std::setw(6) << std::fixed << std::setprecision(2)
+              << 1.0 / (cur_time - hz_prev_time).Double() << std::endl;
+  }
 
   hz_prev_time = cur_time;
 }

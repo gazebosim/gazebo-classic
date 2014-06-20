@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 /// \brief The file name of model XML configuration.
 #define GZ_MODEL_MANIFEST_FILENAME "model.config"

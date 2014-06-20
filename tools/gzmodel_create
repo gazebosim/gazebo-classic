@@ -1,0 +1,27 @@
+#!/bin/sh
+
+manifest="<?xml version='1.0'?>
+<model>
+  <name>my_model</name>
+  <version>1.0</version>
+  <sdf>model.sdf</sdf>
+
+  <author>
+    <name>my_name</name>
+    <email>me@my.email</email>
+  </author>
+  
+  <description>
+  A description of my model
+  </description>
+</model>";
+
+if [ $1 ]
+then
+  mkdir $1
+  echo "$manifest" > $1/model.config;
+else
+  echo "Enter a directory to create for the model."
+  echo "Usage:"
+  echo "  gzmodel_create [directory]"
+fi

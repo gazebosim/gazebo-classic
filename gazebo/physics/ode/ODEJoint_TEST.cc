@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ class ODEJoint_TEST : public ServerFixture
 TEST_F(ODEJoint_TEST, GetForceTorqueWithAppliedForce)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo2.world", true);
+  Load("worlds/force_torque_test2.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -229,7 +229,7 @@ TEST_F(ODEJoint_TEST, CFMDamping)
 TEST_F(ODEJoint_TEST, GetForceTorque)
 {
   // Load our force torque test world
-  Load("worlds/force_torque_demo.world", true);
+  Load("worlds/force_torque_test.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 #include <boost/program_options.hpp>
 #include <fstream>
 #include <string>
-#include "transport/transport.hh"
+#include <gazebo/transport/transport.hh>
+#include <gazebo/common/CommonIface.hh>
 
 using namespace gazebo;
 namespace po = boost::program_options;
@@ -83,11 +84,11 @@ void Spawn(po::variables_map &_vm)
 
   // Get/Set the model name
   if (modelName.empty())
-    modelName = modelElem->GetValueString("name");
+    modelName = modelElem->Get<std::string>("name");
   else
     modelElem->GetAttribute("name")->SetFromString(modelName);
 
-  math::Pose pose = modelElem->GetValuePose("pose");
+  math::Pose pose = modelElem->Get<math::Pose>("pose");
   math::Vector3 rpy = pose.rot.GetAsEuler();
   if (_vm.count("pose-x"))
     pose.pos.x = _vm["pose-x"].as<double>();
@@ -205,6 +206,8 @@ int main(int argc, char **argv)
     std::cout << v_desc << "\n";
     return -1;
   }
+
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   if (vm.count("command"))
   {

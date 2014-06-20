@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,15 +31,16 @@
 #include <list>
 #include <string>
 
-#include "common/CommonTypes.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/Exception.hh"
+#include <sdf/sdf.hh>
 
-#include "physics/PhysicsTypes.hh"
-#include "sensors/SensorTypes.hh"
-#include "sdf/sdf.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -97,15 +98,26 @@ namespace gazebo
               // PluginPtr result;
               struct stat st;
               bool found = false;
-              std::string fullname;
+              std::string fullname, filename(_filename);
               std::list<std::string>::iterator iter;
               std::list<std::string> pluginPaths =
                 common::SystemPaths::Instance()->GetPluginPaths();
 
+#ifdef __APPLE__
+              // This is a hack to work around issue #800,
+              // error loading plugin libraries with different extensions
+              {
+                size_t soSuffix = filename.rfind(".so");
+                const std::string macSuffix(".dylib");
+                if (soSuffix != std::string::npos)
+                  filename.replace(soSuffix, macSuffix.length(), macSuffix);
+              }
+#endif  // ifdef __APPLE__
+
               for (iter = pluginPaths.begin();
                    iter!= pluginPaths.end(); ++iter)
               {
-                fullname = (*iter)+std::string("/")+_filename;
+                fullname = (*iter)+std::string("/")+filename;
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
@@ -114,7 +126,7 @@ namespace gazebo
               }
 
               if (!found)
-                fullname = _filename;
+                fullname = filename;
 
 #ifdef HAVE_DL
               fptr_union_t registerFunc;
@@ -188,7 +200,7 @@ namespace gazebo
 #endif  // HAVE_LTDL
 
               result->handle = _handle;
-              result->filename = _filename;
+              result->filename = filename;
 
               return result;
             }

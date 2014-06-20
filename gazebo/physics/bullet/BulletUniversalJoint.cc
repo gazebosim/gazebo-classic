@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ void BulletUniversalJoint::Attach(LinkPtr _one, LinkPtr _two)
     gzthrow("Requires bullet bodies");
 
   sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axisElem->GetValueVector3("xyz");
-  math::Vector3 axis2 = axisElem->GetValueVector3("xyz");
+  math::Vector3 axis1 = axisElem->Get<math::Vector3>("xyz");
+  math::Vector3 axis2 = axisElem->Get<math::Vector3>("xyz");
 
   this->bulletUniversal = new btUniversalConstraint(
       *bulletParentLink->GetBulletLink(),

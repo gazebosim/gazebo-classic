@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,18 +28,19 @@
 #include <list>
 #include <vector>
 #include <deque>
+#include <sdf/sdf.hh>
 
-#include "common/Event.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
 
-#include "math/Angle.hh"
-#include "math/Pose.hh"
-#include "math/Plane.hh"
-#include "math/Vector2i.hh"
+#include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Plane.hh"
+#include "gazebo/math/Vector2i.hh"
 
-#include "msgs/MessageTypes.hh"
-#include "rendering/RenderTypes.hh"
-#include "sdf/sdf.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -325,7 +326,9 @@ namespace gazebo
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
 
-      /// \brief Get the camera's pitch scene node
+      /// \brief Get the camera's legacy pitch scene node
+      /// Given pitch, roll and yaw are in sceneNode, this funciton call
+      /// returns sceneNode instead.  Used GetSceneNode instead.
       /// \return The pitch node the camera is attached to
       public: Ogre::SceneNode *GetPitchNode() const;
 
@@ -575,10 +578,11 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
-      /// \brief Scene node that controls camera position.
+      /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      /// \brief Scene nod that controls camera pitch.
+      /// \brief Legacy scene node that used to control camera pitch,
+      /// but it should remain NULL, all orientation is contained in sceneNode.
       protected: Ogre::SceneNode *pitchNode;
 
       // \brief Buffer for a single image frame.
@@ -682,6 +686,15 @@ namespace gazebo
 
       /// \brief Render period.
       private: common::Time renderPeriod;
+
+      /// \brief Position PID used to track a visual smoothly.
+      private: common::PID trackVisualPID;
+
+      /// \brief Pitch PID used to track a visual smoothly.
+      private: common::PID trackVisualPitchPID;
+
+      /// \brief Yaw PID used to track a visual smoothly.
+      private: common::PID trackVisualYawPID;
 
       /// \brief Which noise type we support
       private: enum NoiseModelType

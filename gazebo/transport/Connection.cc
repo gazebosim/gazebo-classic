@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,8 +59,9 @@ static bool addressIsLoopback(const boost::asio::ip::address_v4 &_addr)
 //////////////////////////////////////////////////
 Connection::Connection()
 {
+  this->isOpen = false;
   this->dropMsgLogged = false;
-  this->headerBuffer = new char[HEADER_LENGTH];
+  this->headerBuffer = new char[HEADER_LENGTH+1];
 
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -72,6 +73,7 @@ Connection::Connection()
 
   this->acceptor = NULL;
   this->readQuit = false;
+  this->connectError = false;
   this->writeQueue.clear();
   this->writeCount = 0;
 
@@ -95,7 +97,7 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  delete this->headerBuffer;
+  delete [] this->headerBuffer;
   this->headerBuffer = NULL;
 
   this->Shutdown();
@@ -180,6 +182,8 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
     return false;
   }
 
+  this->isOpen = true;
+
   return true;
 }
 
@@ -193,6 +197,8 @@ void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(
       boost::asio::ip::tcp::acceptor::reuse_address(true));
+  this->acceptor->set_option(
+      boost::asio::ip::tcp::acceptor::keep_alive(true));
 
   // Enable TCP_NO_DELAY
   this->acceptor->set_option(boost::asio::ip::tcp::no_delay(true));
@@ -213,6 +219,8 @@ void Connection::OnAccept(const boost::system::error_code &e)
   // Call the accept callback if there isn't an error
   if (!e)
   {
+    this->acceptConn->isOpen = true;
+
     if (!this->ipWhiteList.empty() &&
         this->ipWhiteList.find("," +
           this->acceptConn->GetRemoteHostname() + ",") == std::string::npos)
@@ -407,18 +415,8 @@ void Connection::Shutdown()
 bool Connection::IsOpen() const
 {
   bool result = this->socket && this->socket->is_open();
-  try
-  {
-    this->GetRemoteURI();
-  }
-  catch(...)
-  {
-    result = false;
-  }
-
-  return result;
+  return this->isOpen && result;
 }
-
 
 //////////////////////////////////////////////////
 void Connection::Close()
@@ -786,7 +784,7 @@ boost::asio::ip::tcp::endpoint Connection::GetRemoteEndpoint() const
     boost::system::error_code ec;
     ep = this->socket->remote_endpoint(ec);
     if (ec)
-        gzerr << "Getting remote endpoint failed" << std::endl;
+      gzerr << "Getting remote endpoint failed" << std::endl;
   }
   return ep;
 }

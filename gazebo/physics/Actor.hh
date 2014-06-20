@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 #include <map>
 #include <vector>
 
-#include "physics/Model.hh"
-#include "common/Time.hh"
-#include "common/Skeleton.hh"
-#include "common/Animation.hh"
+#include "gazebo/physics/Model.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/common/Skeleton.hh"
+#include "gazebo/common/Animation.hh"
 
 namespace gazebo
 {

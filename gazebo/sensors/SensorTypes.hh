@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ namespace gazebo
     class GpuRaySensor;
     class RFIDSensor;
     class RFIDTag;
+    class SonarSensor;
+    class ForceTorqueSensor;
 
     /// \def SensorPtr
     /// \brief Shared pointer to Sensor
@@ -74,6 +76,14 @@ namespace gazebo
     /// \def RFIDTagPtr
     /// \brief Shared pointer to RFIDTag
     typedef boost::shared_ptr<RFIDTag> RFIDTagPtr;
+
+    /// \def SonarSensorPtr
+    /// \brief Shared pointer to SonarSensor
+    typedef boost::shared_ptr<SonarSensor> SonarSensorPtr;
+
+    /// \def ForceTorqueSensorPtr
+    /// \brief Shared pointer to ForceTorqueSensor
+    typedef boost::shared_ptr<ForceTorqueSensor> ForceTorqueSensorPtr;
 
     /// \def Sensor_V
     /// \brief Vector of Sensor shared pointers

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Heightmap.hh"
 #include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/RenderEngine.hh"
@@ -34,8 +34,9 @@
 #include "gazebo/rendering/FPSViewController.hh"
 
 #include "gazebo/gui/MouseEventHandler.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/Actions.hh"
-#include "gazebo/gui/Gui.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -239,6 +240,8 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
+  this->keyEvent.key = _event->key();
+
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
   {
@@ -262,6 +265,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     this->keyModifiers & Qt::AltModifier ? true : false;
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandlePress(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -302,6 +308,9 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   }
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
+
+  // Process Key Events
+  KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
 }
 
 /////////////////////////////////////////////////
@@ -760,7 +769,7 @@ std::string GLWidget::GetOgreHandle() const
 {
   std::string ogreHandle;
 
-#ifdef WIN32
+#if defined(WIN32) || defined(__APPLE__)
   ogreHandle = boost::lexical_cast<std::string>(this->winId());
 #else
   QX11Info info = x11Info();

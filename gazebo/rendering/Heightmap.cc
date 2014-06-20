@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@
 #include <math.h>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/math/Helpers.hh"
 
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
@@ -144,6 +144,13 @@ void Heightmap::Load()
     return;
 
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
+
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
 
   msgs::Geometry geomMsg;
   boost::shared_ptr<msgs::Response> response = transport::request(

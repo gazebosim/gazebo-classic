@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,8 +156,8 @@ void BulletHingeJoint::Init()
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
   this->bulletHinge->setLimit(
-    this->angleOffset + limitElem->GetValueDouble("lower"),
-    this->angleOffset + limitElem->GetValueDouble("upper"));
+    this->angleOffset + limitElem->Get<double>("lower"),
+    this->angleOffset + limitElem->Get<double>("upper"));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");

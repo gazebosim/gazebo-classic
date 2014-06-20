@@ -31,6 +31,7 @@ set (sources
   Heightmap.cc
   JointVisual.cc
   LaserVisual.cc
+  SonarVisual.cc
   Light.cc
   Material.cc
   MovableText.cc
@@ -38,7 +39,7 @@ set (sources
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
-  Rendering.cc
+  RenderingIface.cc
   Road2d.cc
   RFIDVisual.cc
   RFIDTagVisual.cc
@@ -50,6 +51,7 @@ set (sources
   Visual.cc
   WireBox.cc
   WindowManager.cc
+  WrenchVisual.cc
 )
 
 set (headers
@@ -70,6 +72,7 @@ set (headers
   Heightmap.hh
   JointVisual.hh
   LaserVisual.hh
+  SonarVisual.hh
   Light.hh
   Material.hh
   MovableText.hh
@@ -77,7 +80,7 @@ set (headers
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh
-  Rendering.hh
+  RenderingIface.hh
   RenderTypes.hh
   Road2d.hh
   RFIDVisual.hh
@@ -90,6 +93,7 @@ set (headers
   Visual.hh
   WireBox.hh
   WindowManager.hh
+  WrenchVisual.hh
   ogre_gazebo.h
   cegui.h
 )
@@ -97,7 +101,7 @@ set (headers
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(rendering_headers
-                          "Rendering Headers" "#include \"rendering/${hdr}\"\n")
+    "Rendering Headers" "#include \"gazebo/rendering/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rendering.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
@@ -110,14 +114,16 @@ gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries( gazebo_rendering
   gazebo_common 
-  gazebo_sdf_interface
   gazebo_skyx
   gazebo_selection_buffer
   ${ogre_libraries} 
   ${OPENGL_LIBRARIES} 
   ${CEGUI_LIBRARIES}
-  X11 
 )
+
+if (NOT APPLE)
+  target_link_libraries(gazebo_rendering X11)
+endif()
 
 if (${OGRE_VERSION} GREATER 1.7.4)
   target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
@@ -125,6 +131,9 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
+
+# Deprecated Rendering.hh
+gz_issue_775("Rendering")
 
 # unit tests
 set (gtest_sources

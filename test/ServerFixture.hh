@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@
 # include <mach/mach.h>
 #endif  // __MACH__
 
+// Remove the gazebo_config and ifdefs in Gazebo 2.0
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_SDF
+#include <sdf/sdf.hh>
+#endif
+
 #include <gtest/gtest.h>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
@@ -33,16 +39,17 @@
 
 #include "gazebo/transport/transport.hh"
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 
 #include "test_config.h"
@@ -128,6 +135,11 @@ class ServerFixture : public testing::Test
              {
                delete this->server;
                this->server = NULL;
+
+               // We must set the findFile callback here,
+               // before the server loads the file (server->LoadFile).
+               sdf::setFindCallback(
+                   boost::bind(&gazebo::common::find_file, _1));
 
                // Create, load, and run the server in its own thread
                this->serverThread = new boost::thread(
@@ -224,6 +236,7 @@ class ServerFixture : public testing::Test
                rendering::remove_scene(gazebo::physics::get_world()->GetName());
 
                ASSERT_NO_THROW(this->server->Fini());
+
                delete this->server;
                this->server = NULL;
              }
@@ -483,14 +496,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 50)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               EXPECT_LT(i, 50);
+               WaitUntilEntitySpawn(_modelName, 100, 50);
+               WaitUntilSensorSpawn(_cameraName, 100, 100);
              }
 
   protected: void SpawnRaySensor(const std::string &_modelName,
@@ -551,14 +558,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               EXPECT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 100);
+               WaitUntilSensorSpawn(_raySensorName, 100, 100);
              }
 
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
@@ -620,14 +621,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               EXPECT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 100);
+               WaitUntilSensorSpawn(_raySensorName, 100, 100);
              }
 
   protected: void SpawnImuSensor(const std::string &_modelName,
@@ -688,14 +683,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_modelName) && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               EXPECT_LT(i, 100);
+               WaitUntilEntitySpawn(_modelName, 100, 1000);
+               WaitUntilSensorSpawn(_imuSensorName, 100, 100);
              }
 
   /// \brief Spawn a contact sensor with the specified collision geometry
@@ -734,6 +723,13 @@ class ServerFixture : public testing::Test
                  << "    <geometry>"
                  << shapeStr.str()
                  << "    </geometry>"
+                 << "    <surface>"
+                 << "      <contact>"
+                 << "        <ode>"
+                 << "          <min_depth>0.005</min_depth>"
+                 << "        </ode>"
+                 << "      </contact>"
+                 << "    </surface>"
                  << "  </collision>"
                  << "  <visual name ='visual'>"
                  << "    <geometry>"
@@ -752,14 +748,8 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
-               int i = 0;
-               // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 100)
-               {
-                 common::Time::MSleep(100);
-                 ++i;
-               }
-               EXPECT_LT(i, 100);
+               WaitUntilEntitySpawn(_name, 100, 100);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
              }
 
   /// \brief Spawn an IMU sensor on a link
@@ -821,14 +811,55 @@ class ServerFixture : public testing::Test
                msg.set_sdf(newModelStr.str());
                this->factoryPub->Publish(msg);
 
+               WaitUntilEntitySpawn(_name, 20, 50);
+               WaitUntilSensorSpawn(_sensorName, 100, 100);
+             }
+
+  /// \brief Wait for a number of ms. and attempts until the entity is spawned
+  /// \param[in] _name Model name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilEntitySpawn(const std::string &_name,
+                                     unsigned int _sleepEach,
+                                     int _retries)
+             {
                int i = 0;
                // Wait for the entity to spawn
-               while (!this->HasEntity(_name) && i < 50)
+               while (!this->HasEntity(_name) && i < _retries)
                {
-                 common::Time::MSleep(20);
+                 common::Time::MSleep(_sleepEach);
                  ++i;
                }
-               EXPECT_LT(i, 50);
+               EXPECT_LT(i, _retries);
+
+               if (i >= _retries)
+                 FAIL() << "ServerFixture timeout: max number of retries ("
+                        << _retries
+                        << ") exceeded while awaiting the spawn of " << _name;
+             }
+
+  /// \brief Wait for a number of ms. and attempts until the sensor is spawned
+  /// \param[in] _name Sensor name
+  /// \param[in] _sleep_each Number of milliseconds to sleep in each iteration
+  /// \param[in] _retries Number of iterations until give up
+  private: void WaitUntilSensorSpawn(const std::string &_name,
+                                     unsigned int _sleepEach,
+                                     int _retries)
+             {
+               int i = 0;
+               // Wait for the sensor to spawn
+               while (!sensors::get_sensor(_name) && i < _retries)
+               {
+                 common::Time::MSleep(_sleepEach);
+                 ++i;
+               }
+
+               EXPECT_LT(i, _retries);
+
+               if (i >= _retries)
+                 FAIL() << "ServerFixture timeout: max number of retries ("
+                        << _retries
+                        << ") exceeded while awaiting the spawn of " << _name;
              }
 
   protected: void SpawnCylinder(const std::string &_name,
@@ -1066,7 +1097,7 @@ class ServerFixture : public testing::Test
                  // Timeout of 30 seconds (3000 * 10 ms)
                  int waitCount = 0, maxWaitCount = 3000;
                  sdf::ElementPtr model = sdfParsed.root->GetElement("model");
-                 std::string name = model->GetValueString("name");
+                 std::string name = model->Get<std::string>("name");
                  while (!this->HasEntity(name) && ++waitCount < maxWaitCount)
                    common::Time::MSleep(100);
                  ASSERT_LT(waitCount, maxWaitCount);

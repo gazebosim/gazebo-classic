@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  * Date: 4 Apr 2007
  */
 
-#include "math/Helpers.hh"
-#include "math/Vector3.hh"
+#include "gazebo/math/Helpers.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -323,9 +323,9 @@ bool Vector3::operator ==(const Vector3 &_pt) const
 }
 
 //////////////////////////////////////////////////
-bool Vector3::operator!=(const Vector3 &pt) const
+bool Vector3::operator!=(const Vector3 &_pt) const
 {
-  return !(*this == pt);
+  return !(*this == _pt);
 }
 
 //////////////////////////////////////////////////
@@ -350,6 +350,7 @@ double Vector3::operator[](unsigned int index) const
   }
 }
 
+//////////////////////////////////////////////////
 /// Round all values to _decimalPlaces
 void Vector3::Round(int _precision)
 {
@@ -358,6 +359,7 @@ void Vector3::Round(int _precision)
   this->z = precision(this->z, _precision);
 }
 
+//////////////////////////////////////////////////
 /// Returns true if the two vectors are exacatly equal
 bool Vector3::Equal(const Vector3 &_v) const
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/MultiCameraSensor.hh"
@@ -109,13 +109,13 @@ void MultiCameraSensor::Init()
   sdf::ElementPtr cameraSdf = this->sdf->GetElement("camera");
   while (cameraSdf)
   {
-    rendering::CameraPtr camera = this->scene->CreateCamera(
-          cameraSdf->GetValueString("name"), false);
+    rendering::CameraPtr camera = scene->CreateCamera(
+          cameraSdf->Get<std::string>("name"), false);
 
     if (!camera)
     {
       gzthrow("Unable to create multicamera sensor[" +
-              cameraSdf->GetValueString("name"));
+              cameraSdf->Get<std::string>("name"));
       return;
     }
 
@@ -131,7 +131,7 @@ void MultiCameraSensor::Init()
 
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     camera->SetWorldPose(cameraPose);
     camera->AttachToVisual(this->parentName, true);
 

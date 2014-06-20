@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,8 @@ void ODELink::Init()
   }
 
   GZ_ASSERT(this->sdf != NULL, "Unable to initialize link, SDF is NULL");
-  this->SetKinematic(this->sdf->GetValueBool("kinematic"));
-  this->SetGravityMode(this->sdf->GetValueBool("gravity"));
+  this->SetKinematic(this->sdf->Get<bool>("kinematic"));
+  this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
   this->SetLinearDamping(this->GetLinearDamping());
   this->SetAngularDamping(this->GetAngularDamping());
@@ -405,7 +405,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -432,7 +432,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
         offsetFromCoG.z, dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldLinearVel returns default of "
@@ -453,7 +453,7 @@ math::Vector3 ODELink::GetWorldCoGLinearVel() const
     dvel = dBodyGetLinearVel(this->linkId);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldCoGLinearVel returns default of "
@@ -488,7 +488,7 @@ math::Vector3 ODELink::GetWorldAngularVel() const
 
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldAngularVel returns default of "
@@ -627,7 +627,7 @@ math::Vector3 ODELink::GetWorldForce() const
     force.y = dforce[1];
     force.z = dforce[2];
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldForce returns default of "
@@ -652,7 +652,7 @@ math::Vector3 ODELink::GetWorldTorque() const
     torque.y = dtorque[1];
     torque.z = dtorque[2];
   }
-  else
+  else if (!this->IsStatic())
   {
     gzlog << "ODE body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldTorque returns default of "

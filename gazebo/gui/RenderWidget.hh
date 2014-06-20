@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "gui/qt.h"
-#include "common/Event.hh"
+#include "gazebo/gui/qt.h"
+#include "gazebo/common/Event.hh"
 
 class QLineEdit;
 class QLabel;
@@ -70,13 +70,21 @@ namespace gazebo
 
       private: void OnFullScreen(bool &_value);
 
-      private: QHBoxLayout *bottomBarLayout;
+      /// \brief Handle follow model user event.
+      /// \param[in] _modelName Name of the model that is being followed.
+      private: void OnFollow(const std::string &_modelName);
+
+      /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 
-      // \brief Building editor widget for creating a building model
+      /// \brief Building editor widget for creating a building model
       private: BuildingEditorWidget *buildingEditorWidget;
 
+      /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
+
+      /// \brief All event connections.
+      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Bottom frame that holds the play/pause widgets
       private: QFrame *bottomFrame;
@@ -97,8 +105,6 @@ namespace gazebo
 
       /// \brief An overlay label on the 3D render widget
       private: QLabel *msgOverlayLabel;
-
-      private: std::vector<event::ConnectionPtr> connections;
 
       private: bool clear;
       private: std::string clearName;

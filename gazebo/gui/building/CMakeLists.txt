@@ -75,7 +75,6 @@ gz_add_library(gazebo_gui_building ${sources} ${headers_MOC} ${headers} ${resour
 target_link_libraries(gazebo_gui_building
   gazebo_common
   gazebo_transport
-  gazebo_sdf_interface
   gazebo_rendering
   gazebo_msgs)
 

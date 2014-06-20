@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 */
 
 #include <sys/stat.h>
-#include <gazebo/common/Console.hh>
-#include <gazebo/common/Exception.hh>
-#include "sdf/sdf.hh"
+
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
 std::vector<std::string> params;
 
@@ -36,7 +39,7 @@ void help()
   std::cout << "    doc [SDF version]          Print HTML SDF.\n";
   std::cout << "    check [file] [SDF version] Check the SDF format for the";
   std::cout << " given file.\n";
-  std::cout << "    print [SDF verison]         Prints SDF, useful for ";
+  std::cout << "    print [SDF version]         Prints SDF, useful for ";
   std::cout << " debugging and as a conversion tool.\n\n";
 }
 
@@ -76,6 +79,10 @@ int main(int argc, char** argv)
     help();
     return 0;
   }
+
+  // We must set the findFile callback here so that gzsdf check/print
+  // can find resource files when parsing the sdf in readFile().
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
 
   if ((params[0] == "check" || params[0] == "print" || params[0] == "convert"))
   {

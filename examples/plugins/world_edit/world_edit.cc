@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 /// \example examples/plugins/world_edit.cc
 /// This example creates a WorldPlugin, initializes the Transport system by

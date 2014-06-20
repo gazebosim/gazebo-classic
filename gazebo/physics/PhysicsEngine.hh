@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ namespace gazebo
       /// \param[in] _type Type of joint to create.
       /// \param[in] _parent Model parent.
       public: virtual JointPtr CreateJoint(const std::string &_type,
-                                           ModelPtr _parent) = 0;
+                                           ModelPtr _parent = ModelPtr()) = 0;
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.

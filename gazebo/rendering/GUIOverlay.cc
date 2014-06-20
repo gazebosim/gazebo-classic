@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  *
 */
 
-#include "rendering/GUIOverlay.hh"
-#include "common/Console.hh"
+#include "gazebo/rendering/GUIOverlay.hh"
+#include "gazebo/common/Console.hh"
 
-#include "common/SystemPaths.hh"
-#include "msgs/msgs.hh"
-#include "transport/Transport.hh"
-#include "transport/Node.hh"
-#include "math/Vector2d.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/math/Vector2d.hh"
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/RenderTypes.hh"
-#include "rendering/Camera.hh"
-#include "rendering/DepthCamera.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/DepthCamera.hh"
 
 using namespace gazebo;
 using namespace rendering;

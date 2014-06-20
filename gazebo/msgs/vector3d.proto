@@ -13,5 +13,3 @@ message Vector3d
   required double y = 3;
   required double z = 4;
 }
-
-

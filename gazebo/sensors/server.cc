@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 */
 #include <signal.h>
 #include <iostream>
-#include "common/SystemPaths.hh"
-#include "common/Time.hh"
-#include "transport/Transport.hh"
-#include "sensors/Sensors.hh"
-#include "rendering/Rendering.hh"
-#include "rendering/RenderEngine.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Time.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/sensors/SensorsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 
-#include "gazebo.hh"
+#include "gazebo/gazebo.hh"
 
 bool quit = false;
 

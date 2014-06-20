@@ -426,33 +426,35 @@
                 <to element="format"/>
               </rename>
             </convert> <!-- End image -->
-          </convert> <!-- End camera -->
 
-          <convert name="clip">
-            <rename>
-              <from attribute="near"/>
-              <to element="near"/>
-            </rename>
-            <rename>
-              <from attribute="far"/>
-              <to element="far"/>
-            </rename>
-          </convert> <!-- End clip -->
-
-          <convert name="save">
-            <rename>
+            <convert name="clip">
               <rename>
-                <from attribute="path"/>
-                <to element="path"/>
+                <from attribute="near"/>
+                <to element="near"/>
               </rename>
-            </rename>
-          </convert> <!-- End save -->
-          <convert name="depth_camera">
-            <rename>
-              <from attribute="output"/>
-              <to element="output"/>
-            </rename>
-          </convert> <!-- End depth_camera -->
+              <rename>
+                <from attribute="far"/>
+                <to element="far"/>
+              </rename>
+            </convert> <!-- End clip -->
+
+            <convert name="save">
+              <rename>
+                <rename>
+                  <from attribute="path"/>
+                  <to element="path"/>
+                </rename>
+              </rename>
+            </convert> <!-- End save -->
+
+            <convert name="depth_camera">
+              <rename>
+                <from attribute="output"/>
+                <to element="output"/>
+              </rename>
+            </convert> <!-- End depth_camera -->
+
+          </convert> <!-- End camera -->
         </convert> <!-- End sensor -->
 
         <convert name="collision">

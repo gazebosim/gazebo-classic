@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #ifndef _TIMER_HH_
 #define _TIMER_HH_
 
-#include "common/Console.hh"
-#include "common/Time.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Time.hh"
 
 namespace gazebo
 {

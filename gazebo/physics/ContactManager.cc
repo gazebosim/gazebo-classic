@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,10 +140,8 @@ Contact *ContactManager::NewContact(Collision *_collision1,
     return result;
 
   result->count = 0;
-  result->collision1 = _collision1->GetScopedName();
-  result->collision2 = _collision2->GetScopedName();
-  result->collisionPtr1 = _collision1;
-  result->collisionPtr2 = _collision2;
+  result->collision1 = _collision1;
+  result->collision2 = _collision2;
   result->time = _time;
   result->world = this->world;
 
@@ -242,6 +240,15 @@ void ContactManager::PublishContacts()
     contactPublisher->publisher->Publish(msg2);
     contactPublisher->contacts.clear();
   }
+}
+
+/////////////////////////////////////////////////
+std::string ContactManager::CreateFilter(const std::string &_name,
+    const std::string &_collision)
+{
+  std::vector<std::string> collisions;
+  collisions.push_back(_collision);
+  return this->CreateFilter(_name, collisions);
 }
 
 /////////////////////////////////////////////////

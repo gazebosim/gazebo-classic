@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@
  * Date: 15 May 2009
  */
 
-#include "common/Exception.hh"
-#include "common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Console.hh"
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletLink.hh"
-#include "physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletLink.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
 
 using namespace gazebo;
 using namespace physics;

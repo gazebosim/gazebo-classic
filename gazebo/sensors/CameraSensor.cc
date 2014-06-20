@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/Rendering.hh"
+#include "gazebo/rendering/RenderingIface.hh"
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
@@ -110,7 +110,7 @@ void CameraSensor::Init()
     }
 
     this->camera = this->scene->CreateCamera(
-        this->sdf->GetValueString("name"), false);
+        this->sdf->Get<std::string>("name"), false);
 
     if (!this->camera)
     {
@@ -133,7 +133,7 @@ void CameraSensor::Init()
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->GetValuePose("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentName, true);
   }

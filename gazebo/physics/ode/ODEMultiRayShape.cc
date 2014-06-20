@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
  */
-#include "common/Exception.hh"
+#include "gazebo/common/Exception.hh"
 
-#include "physics/World.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODELink.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODERayShape.hh"
-#include "physics/ode/ODEMultiRayShape.hh"
+#include "gazebo/physics/World.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODELink.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODERayShape.hh"
+#include "gazebo/physics/ode/ODEMultiRayShape.hh"
 
 using namespace gazebo;
 using namespace physics;

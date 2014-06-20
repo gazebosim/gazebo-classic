@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  *
 */
 #include <google/protobuf/descriptor.h>
-#include "transport/IOManager.hh"
+#include "gazebo/transport/IOManager.hh"
 
 #include "Master.hh"
 
-#include "gazebo_config.h"
+#include "gazebo/gazebo_config.h"
 
 using namespace gazebo;
 
@@ -52,7 +52,7 @@ void Master::Init(uint16_t _port)
 }
 
 //////////////////////////////////////////////////
-void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
+void Master::OnAccept(transport::ConnectionPtr _newConnection)
 {
   // Send the gazebo version string
   msgs::GzString versionMsg;
@@ -81,7 +81,6 @@ void Master::OnAccept(const transport::ConnectionPtr &_newConnection)
   }
   _newConnection->EnqueueMsg(
       msgs::Package("publishers_init", publishersMsg), true);
-
 
   // Add the connection to our list
   {

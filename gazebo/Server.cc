@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/gazebo.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -28,15 +30,14 @@
 #include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Events.hh"
 
-#include "gazebo/sdf/sdf.hh"
-
-#include "gazebo/sensors/Sensors.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/physics/PhysicsFactory.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Base.hh"
 
@@ -51,9 +52,6 @@ bool Server::stop = true;
 Server::Server()
 {
   this->receiveMutex = new boost::mutex();
-
-  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -94,9 +92,9 @@ bool Server::ParseArgs(int argc, char **argv)
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
-     "Compression encoding format for log data.")
+     "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
-     "Aboslute path in which to store state data")
+     "Absolute path in which to store state data")
     ("seed",  po::value<double>(),
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
@@ -200,6 +198,10 @@ bool Server::ParseArgs(int argc, char **argv)
   else
     this->params["pause"] = "false";
 
+  // We must set the findFile callback here, before potentially calling
+  // LoadFile() below.
+  sdf::setFindCallback(boost::bind(&gazebo::common::find_file, _1));
+
   // The following "if" block must be processed directly before
   // this->ProcessPrarams.
   //
@@ -279,7 +281,7 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(_filename, sdf))
+  if (!sdf::readFile(common::find_file(_filename), sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
@@ -402,6 +404,9 @@ void Server::Init()
 void Server::SigInt(int)
 {
   stop = true;
+
+  // Signal to plugins/etc that a shutdown event has occured
+  event::Events::sigInt();
 }
 
 /////////////////////////////////////////////////
@@ -433,6 +438,13 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = Server::SigInt;
+  if (sigaction(SIGINT, &sigact, NULL))
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
   if (this->stop)
     return;
 

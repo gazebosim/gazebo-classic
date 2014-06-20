@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/sdf/sdf.hh"
+#include <sdf/sdf.hh>
 #include "gazebo/math/Angle.hh"
 #include "test/ServerFixture.hh"
 

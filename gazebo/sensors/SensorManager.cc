@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/sensors/Sensor.hh"
@@ -238,7 +238,7 @@ std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
                                         const std::string &_worldName,
                                         const std::string &_parentName)
 {
-  std::string type = _elem->GetValueString("type");
+  std::string type = _elem->Get<std::string>("type");
   SensorPtr sensor = sensors::SensorFactory::NewSensor(type);
 
   if (!sensor)

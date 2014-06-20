@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
 
-#include "math/Vector3.hh"
+#include "gazebo/math/Vector3.hh"
 
-#include "physics/ode/ODEPhysics.hh"
-#include "physics/ode/ODETypes.hh"
-#include "physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEPhysics.hh"
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/BoxShape.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/BoxShape.hh"
 
 namespace gazebo
 {

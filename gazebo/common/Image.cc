@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,11 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
-#include "math/Vector3.hh"
-#include "common/Common.hh"
-#include "common/Console.hh"
-#include "common/Image.hh"
-#include "common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;

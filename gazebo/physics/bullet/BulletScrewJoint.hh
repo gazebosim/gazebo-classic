@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
-#include "physics/bullet/BulletJoint.hh"
-#include "physics/ScrewJoint.hh"
+#include "gazebo/physics/bullet/BulletJoint.hh"
+#include "gazebo/physics/ScrewJoint.hh"
 
 class btSliderConstraint;
 

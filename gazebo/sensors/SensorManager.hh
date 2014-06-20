@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,12 @@
 #include <vector>
 #include <list>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {

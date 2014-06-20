@@ -28,4 +28,3 @@ message Link
   repeated Sensor sensor        = 11;
   repeated Projector projector  = 12;
 }
-

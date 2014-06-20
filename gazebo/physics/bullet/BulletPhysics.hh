@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,10 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/PhysicsEngine.hh"
-#include "physics/Collision.hh"
-#include "physics/Shape.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/PhysicsEngine.hh"
+#include "gazebo/physics/Collision.hh"
+#include "gazebo/physics/Shape.hh"
 
 namespace gazebo
 {

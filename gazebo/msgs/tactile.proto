@@ -1,0 +1,15 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Tactile
+/// \brief Message for a tactile data
+
+import "time.proto";
+
+message Tactile
+{
+  repeated string collision_name = 1;
+  repeated uint32 collision_id   = 2;
+  repeated double pressure       = 3;
+  required Time time             = 4;
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <sdf/sdf.hh>
+
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
@@ -42,7 +44,6 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
-#include "gazebo/sdf/sdf.hh"
 
 namespace gazebo
 {
@@ -403,7 +404,7 @@ namespace gazebo
       /// \brief TBB version of model updating.
       private: void ModelUpdateTBB();
 
-      /// \brief Single loop verison of model updating.
+      /// \brief Single loop version of model updating.
       private: void ModelUpdateSingleLoop();
 
       /// \brief Helper function to load a plugin from SDF.

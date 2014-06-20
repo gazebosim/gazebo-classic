@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Create a temporary file
+tmpFile=`mktemp /tmp/CaseSensitiveXXXXXXXX`
+if [ -f `echo $tmpFile | tr '[A-Z]' '[a-z]'` ]
+then
+  #echo Not Case Sensitive
+  rm $tmpFile
+  exit 1
+fi
+#echo Case Sensitive
+rm $tmpFile

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  * Date: 03 Apr 2007
  */
 
-#include "math/Pose.hh"
+#include "gazebo/math/Pose.hh"
 
 using namespace gazebo;
 using namespace math;
@@ -136,6 +136,14 @@ bool Pose::operator!=(const Pose &_pose) const
 Pose Pose::operator*(const Pose &pose)
 {
   return Pose(this->CoordPositionAdd(pose),  pose.rot * this->rot);
+}
+
+//////////////////////////////////////////////////
+Pose &Pose::operator=(const Pose &_pose)
+{
+  this->pos = _pose.pos;
+  this->rot = _pose.rot;
+  return *this;
 }
 
 //////////////////////////////////////////////////

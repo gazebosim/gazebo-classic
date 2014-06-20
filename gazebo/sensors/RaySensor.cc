@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
-#include "gazebo/physics/Physics.hh"
+#include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Model.hh"
-#include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Collision.hh"
 
 #include "gazebo/common/Assert.hh"
@@ -106,12 +105,12 @@ void RaySensor::Load(const std::string &_worldName)
   if (rayElem->HasElement("noise"))
   {
     sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->GetValueString("type");
+    std::string type = noiseElem->Get<std::string>("type");
     if (type == "gaussian")
     {
       this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->GetValueDouble("mean");
-      this->noiseStdDev = noiseElem->GetValueDouble("stddev");
+      this->noiseMean = noiseElem->Get<double>("mean");
+      this->noiseStdDev = noiseElem->Get<double>("stddev");
       this->noiseActive = true;
       gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
         " and stddev " << this->noiseStdDev << std::endl;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
-#include "physics/bullet/bullet_inc.h"
-#include "physics/bullet/BulletTypes.hh"
-#include "physics/Link.hh"
+#include "gazebo/physics/bullet/bullet_inc.h"
+#include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/physics/Link.hh"
 
 class btRigidBody;
 

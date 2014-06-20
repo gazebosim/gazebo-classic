@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,7 +234,7 @@ bool Param::Get(bool &_value)
 {
   if (this->IsBool())
   {
-    _value = static_cast<ParamT<bool>*>(this)->GetValue();
+    _value = static_cast<ParamT<bool> *>(this)->GetValue();
     return true;
   }
   else

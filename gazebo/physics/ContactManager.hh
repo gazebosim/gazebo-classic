@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,14 @@ namespace gazebo
       /// \return New topic where filtered messages will be published to.
       public: std::string CreateFilter(const std::string &_topic,
                   const std::vector<std::string> &_collisions);
+
+      /// \brief Create a filter for contacts. A new publisher will be created
+      /// that publishes contacts associated to the input collision.
+      /// param[in] _name Filter name.
+      /// param[in] _collision A collision name used for filtering.
+      /// \return New topic where filtered messages will be published to.
+      public: std::string CreateFilter(const std::string &_topic,
+                  const std::string &_collision);
 
       private: std::vector<Contact*> contacts;
 

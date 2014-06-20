@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -198,7 +198,7 @@ namespace gazebo
       /// \param[in] _jointName Name of the joint to set.
       /// \param[in] _position Position to set the joint to.
       public: void SetJointPosition(const std::string &_jointName,
-                                    double _position);
+                                    double _position, int _index = 0);
 
       /// \brief Set the positions of a set of joints.
       /// \sa JointController::SetJointPositions.

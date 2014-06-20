@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,23 +17,23 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sdf/sdf.hh>
 
-#include "sdf/sdf.hh"
-#include "common/SystemPaths.hh"
-#include "common/Console.hh"
-#include "common/ModelDatabase.hh"
+#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/common/ModelDatabase.hh"
 
-#include "rendering/Rendering.hh"
-#include "rendering/Scene.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Visual.hh"
-#include "gui/Gui.hh"
-#include "gui/GuiEvents.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiEvents.hh"
 
-#include "transport/Node.hh"
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/InsertModelWidget.hh"
+#include "gazebo/gui/InsertModelWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

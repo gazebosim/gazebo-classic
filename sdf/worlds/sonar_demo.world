@@ -1,0 +1,58 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="box">
+      <pose>0 2 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/WoodPallet</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="sonar_model">
+      <pose>0 0 -0.8 0 0 0</pose>
+      <static>false</static>
+      <link name="link">
+        <pose>0 0 1.5 0 0 0</pose>
+        <gravity>false</gravity>
+
+        <sensor name="sonar" type="sonar">
+          <pose>0 0 0 0 -1.5707 1.5707</pose>
+          <sonar>
+            <min>0</min>
+            <max>2.00</max>
+            <radius>0.3</radius>
+          </sonar>
+
+         <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+
+      </link>
+    </model>
+
+  </world>
+</sdf>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@
 #include <string>
 #include <vector>
 
-#include "rendering/Camera.hh"
-#include "rendering/RenderTypes.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
 
 namespace gazebo
 {

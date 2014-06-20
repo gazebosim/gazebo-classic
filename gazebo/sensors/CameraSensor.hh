@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@
 
 #include <string>
 
-#include "sensors/Sensor.hh"
-#include "msgs/MessageTypes.hh"
-#include "transport/TransportTypes.hh"
-#include "rendering/RenderTypes.hh"
+#include "gazebo/sensors/Sensor.hh"
+#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {

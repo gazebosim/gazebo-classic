@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "common/Image.hh"
-#include "math/Vector3.hh"
-#include "math/Vector2d.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/common/Image.hh"
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector2d.hh"
+#include "gazebo/rendering/Scene.hh"
 
 namespace Ogre
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,13 @@
 #include "gazebo/sdf/interface/SDF.hh"
 #include "gazebo/sdf/interface/Param.hh"
 #include "gazebo/sdf/interface/parser.hh"
-#include "gazebo_config.h"
-#ifdef HAVE_URDFDOM
-  #include "gazebo/sdf/interface/parser_urdf.hh"
-#endif
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Pose.hh"
-#include "gazebo/common/Common.hh"
+#include "gazebo/common/CommonIface.hh"
 
 namespace sdf
 {
@@ -278,20 +275,10 @@ bool readFile(const std::string &_filename, SDFPtr _sdf)
     return true;
   else
   {
-#ifdef HAVE_URDFDOM
-    urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.InitModelFile(filename);
-    if (sdf::readDoc(&doc, _sdf, "urdf file"))
-    {
-      gzlog << "parse from urdf file [" << filename << "].\n";
-      return true;
-    }
+    if (_filename.find(".urdf") != std::string::npos)
+      gzerr << "Unable to parse URDF without SDF installed.\n";
     else
-    {
-      gzerr << "parse as old deprecated model file failed.\n";
-      return false;
-    }
-#endif
+      gzerr << "Unable to parser file[" << _filename << "]\n";
   }
 
   return false;
@@ -305,22 +292,7 @@ bool readString(const std::string &_xmlString, SDFPtr _sdf)
   if (readDoc(&xmlDoc, _sdf, "data-string"))
     return true;
   else
-  {
-#ifdef HAVE_URDFDOM
-    urdf2gazebo::URDF2Gazebo u2g;
-    TiXmlDocument doc = u2g.InitModelString(_xmlString);
-    if (sdf::readDoc(&doc, _sdf, "urdf string"))
-    {
-      gzwarn << "parse from urdf.\n";
-      return true;
-    }
-    else
-    {
-      gzerr << "parse as old deprecated model file failed.\n";
-      return false;
-    }
-#endif
-  }
+    gzerr << "Unable to parser string[" << _xmlString << "]\n";
 
   return false;
 }
@@ -349,14 +321,14 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
     return false;
   }
 
-  /* check sdf version, use old parser if necessary */
-  TiXmlElement *gazeboNode = _xmlDoc->FirstChildElement("sdf");
-  if (!gazeboNode)
-    gazeboNode = _xmlDoc->FirstChildElement("gazebo");
+  // check sdf version, use old parser if necessary
+  TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
+  if (!sdfNode)
+    sdfNode = _xmlDoc->FirstChildElement("gazebo");
 
-  if (gazeboNode && gazeboNode->Attribute("version"))
+  if (sdfNode && sdfNode->Attribute("version"))
   {
-    if (strcmp(gazeboNode->Attribute("version"), SDF::version.c_str()) != 0)
+    if (strcmp(sdfNode->Attribute("version"), SDF::version.c_str()) != 0)
     {
       gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
@@ -373,16 +345,16 @@ bool readDoc(TiXmlDocument *_xmlDoc, SDFPtr _sdf, const std::string &_source)
   else
   {
     // try to use the old deprecated parser
-    if (!gazeboNode)
+    if (!sdfNode)
       gzlog << "SDF has no <sdf> element in file["
              << _source << "]\n";
-    else if (!gazeboNode->Attribute("version"))
+    else if (!sdfNode->Attribute("version"))
       gzlog << "SDF element has no version in file["
              << _source << "]\n";
-    else if (strcmp(gazeboNode->Attribute("version"),
+    else if (strcmp(sdfNode->Attribute("version"),
                     SDF::version.c_str()) != 0)
       gzlog << "SDF version ["
-            << gazeboNode->Attribute("version")
+            << sdfNode->Attribute("version")
             << "] is not " << SDF::version << "\n";
     return false;
   }
@@ -401,24 +373,24 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   }
 
   /* check gazebo version, use old parser if necessary */
-  TiXmlElement *gazeboNode = _xmlDoc->FirstChildElement("sdf");
-  if (!gazeboNode)
-    gazeboNode = _xmlDoc->FirstChildElement("gazebo");
+  TiXmlElement *sdfNode = _xmlDoc->FirstChildElement("sdf");
+  if (!sdfNode)
+    sdfNode = _xmlDoc->FirstChildElement("gazebo");
 
-  if (gazeboNode && gazeboNode->Attribute("version"))
+  if (sdfNode && sdfNode->Attribute("version"))
   {
-    if (strcmp(gazeboNode->Attribute("version"),
+    if (strcmp(sdfNode->Attribute("version"),
                SDF::version.c_str()) != 0)
     {
       gzwarn << "Converting a deprecated SDF source[" << _source << "].\n";
       Converter::Convert(_xmlDoc, SDF::version);
     }
 
-    TiXmlElement* elemXml = gazeboNode;
-    if (gazeboNode->Value() != _sdf->GetName() &&
-        gazeboNode->FirstChildElement(_sdf->GetName()))
+    TiXmlElement* elemXml = sdfNode;
+    if (sdfNode->Value() != _sdf->GetName() &&
+        sdfNode->FirstChildElement(_sdf->GetName()))
     {
-      elemXml = gazeboNode->FirstChildElement(_sdf->GetName());
+      elemXml = sdfNode->FirstChildElement(_sdf->GetName());
     }
 
     /* parse new sdf xml */
@@ -431,14 +403,14 @@ bool readDoc(TiXmlDocument *_xmlDoc, ElementPtr _sdf,
   else
   {
     // try to use the old deprecated parser
-    if (!gazeboNode)
+    if (!sdfNode)
       gzwarn << "SDF has no <sdf> element\n";
-    else if (!gazeboNode->Attribute("version"))
+    else if (!sdfNode->Attribute("version"))
       gzwarn << "<sdf> element has no version\n";
-    else if (strcmp(gazeboNode->Attribute("version"),
+    else if (strcmp(sdfNode->Attribute("version"),
                     SDF::version.c_str()) != 0)
       gzwarn << "SDF version ["
-            << gazeboNode->Attribute("version")
+            << sdfNode->Attribute("version")
             << "] is not " << SDF::version << "\n";
     return false;
   }

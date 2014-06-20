@@ -22,7 +22,7 @@ gz_build_tests(${gtest_sources})
 set (util_headers "" CACHE INTERNAL "util headers" FORCE)
 foreach (hdr ${headers})
   APPEND_TO_CACHED_STRING(util_headers
-    "Utility Headers" "#include \"util/${hdr}\"\n")
+    "Utility Headers" "#include \"gazebo/util/${hdr}\"\n")
 endforeach()
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in

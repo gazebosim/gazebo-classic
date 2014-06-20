@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  * Date: 12 Nov 2009
  */
 
-#include "common/Exception.hh"
-#include "physics/ode/ODECollision.hh"
-#include "physics/ode/ODEHeightmapShape.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/physics/ode/ODECollision.hh"
+#include "gazebo/physics/ode/ODEHeightmapShape.hh"
 
 using namespace gazebo;
 using namespace physics;

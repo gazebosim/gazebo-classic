@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  * Author: Nate Koenig
  */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
@@ -43,11 +44,8 @@ WorldState::WorldState(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    if (!(*iter)->IsStatic())
-    {
-      this->modelStates.insert(std::make_pair((*iter)->GetName(),
-            ModelState(*iter, this->realTime, this->simTime)));
-    }
+    this->modelStates.insert(std::make_pair((*iter)->GetName(),
+          ModelState(*iter, this->realTime, this->simTime)));
   }
 }
 
@@ -79,11 +77,8 @@ void WorldState::Load(const WorldPtr _world)
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    if (!(*iter)->IsStatic())
-    {
-      this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-          this->simTime);
-    }
+    this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
+        this->simTime);
   }
 
   // Remove models that no longer exist. We determine this by check the time
@@ -102,7 +97,7 @@ void WorldState::Load(const WorldPtr _world)
 void WorldState::Load(const sdf::ElementPtr _elem)
 {
   // Copy the name
-  this->name = _elem->GetValueString("world_name");
+  this->name = _elem->Get<std::string>("world_name");
 
   // Add the model states
   this->modelStates.clear();
@@ -113,15 +108,15 @@ void WorldState::Load(const sdf::ElementPtr _elem)
     while (childElem)
     {
       this->modelStates.insert(std::make_pair(
-            childElem->GetValueString("name"), ModelState(childElem)));
+            childElem->Get<std::string>("name"), ModelState(childElem)));
       childElem = childElem->GetNextElement("model");
     }
   }
 
   // Copy the name and time information
-  this->SetSimTime(_elem->GetValueTime("sim_time"));
-  this->SetWallTime(_elem->GetValueTime("wall_time"));
-  this->SetRealTime(_elem->GetValueTime("real_time"));
+  this->simTime = _elem->Get<common::Time>("sim_time");
+  this->wallTime = _elem->Get<common::Time>("wall_time");
+  this->realTime = _elem->Get<common::Time>("real_time");
 }
 
 /////////////////////////////////////////////////

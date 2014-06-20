@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,7 +191,8 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 {
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
-  _viewport->setMaterialScheme(_scene->GetName());
+  if (_viewport && _scene && _scene->GetInitialized())
+    _viewport->setMaterialScheme(_scene->GetName());
 #endif
 }
 
@@ -474,10 +475,12 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   // pssmCasterPass->setFog(true);
 
   // shadow camera setup
-  if (!this->pssmSetup)
-    this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
 
-  double shadowFarDistance = 200;
+  // issue #925 workaround for gazebo 1.9 branch. DO NOT merge back to
+  // gazebo 3.0 as there is a better fix in place (pull request #867).
+  this->pssmSetup = new Ogre::PSSMShadowCameraSetup();
+
+  double shadowFarDistance = 500;
   double cameraNearClip = 0.1;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 

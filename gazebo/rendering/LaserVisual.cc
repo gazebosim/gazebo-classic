@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->scene->GetName());
 
-  this->laserScanSub = this->node->Subscribe(_topicName,
-      &LaserVisual::OnScan, this);
-
   this->rayFan = this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN);
 
   this->rayFan->setMaterial("Gazebo/BlueLaser");
   this->rayFan->AddPoint(math::Vector3(0, 0, 0));
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+
+  this->laserScanSub = this->node->Subscribe(_topicName,
+      &LaserVisual::OnScan, this);
 }
 
 /////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void LaserVisual::OnScan(ConstLaserScanStampedPtr &_msg)
     pt.x = 0 + r * cos(angle);
     pt.y = 0 + r * sin(angle);
     pt.z = 0;
-    pt += offset.pos;
+    pt = offset.rot * pt + offset.pos;
 
     if (i+1 >= this->rayFan->GetPointCount())
       this->rayFan->AddPoint(pt);

@@ -60,6 +60,14 @@ endif ()
 # Find packages
 if (PKG_CONFIG_FOUND)
 
+  pkg_check_modules(SDF sdformat)
+  if (NOT SDF_FOUND)
+    BUILD_WARNING ("Missing: SDF. Required for reading and writing SDF files. The deprecated SDF version will be used. Pay attention to this warning, because it will become an error in Gazebo 2.0.")
+    set (HAVE_SDF FALSE)
+  else()
+    set (HAVE_SDF TRUE)
+  endif()
+
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -104,7 +112,7 @@ if (PKG_CONFIG_FOUND)
       BUILD_WARNING ("CEGUI-OGRE not found, opengl GUI will be disabled.")
       set (HAVE_CEGUI OFF CACHE BOOL "HAVE CEGUI" FORCE)
     else()
-      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI" FORCE)
+      set (HAVE_CEGUI ON CACHE BOOL "HAVE CEGUI")
       set (CEGUI_LIBRARIES "CEGUIBase;CEGUIOgreRenderer")
       message (STATUS "Looking for CEGUI-OGRE, found")
     endif()
@@ -220,7 +228,6 @@ if (PKG_CONFIG_FOUND)
     set (OGRE_PLUGINDIR ${_pkgconfig_invoke_result})
   endif()
 
-
   ########################################
   # Find OpenAL
   # pkg_check_modules(OAL openal)
@@ -260,10 +267,10 @@ if (PKG_CONFIG_FOUND)
   # Find Player
   pkg_check_modules(PLAYER playercore>=3.0 playerc++)
   if (NOT PLAYER_FOUND)
-    set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player" FORCE)
+    set (INCLUDE_PLAYER OFF CACHE BOOL "Build gazebo plugin for player")
     BUILD_WARNING ("Player not found, gazebo plugin for player will not be built.")
   else (NOT PLAYER_FOUND)
-    set (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player" FORCE)
+    set (INCLUDE_PLAYER ON CACHE BOOL "Build gazebo plugin for player")
     set (PLAYER_INCLUDE_DIRS ${PLAYER_INCLUDE_DIRS} CACHE INTERNAL
          "Player include directory")
     set (PLAYER_LINK_DIRS ${PLAYER_LINK_DIRS} CACHE INTERNAL
@@ -283,15 +290,6 @@ if (PKG_CONFIG_FOUND)
     BUILD_WARNING ("GNU Triangulation Surface library not found - Gazebo will not have CSG support.")
   endif ()
 
-  #################################################
-  # Find bullet
-  pkg_check_modules(BULLET bullet)
-  if (BULLET_FOUND)
-    set (HAVE_BULLET TRUE)
-  else()
-    set (HAVE_BULLET FALSE)
-  endif()
-
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Error: pkg-config not found")
@@ -305,13 +303,12 @@ endif()
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost >=${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
   BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
-
 
 ########################################
 # Find avformat and avcodec

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 #include "ServerFixture.hh"
-#include "physics/physics.hh"
-#include "common/Time.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/common/Time.hh"
 
 using namespace gazebo;
 class Pioneer2dx : public ServerFixture
@@ -53,13 +53,13 @@ TEST_F(Pioneer2dx, StraightLine)
   interval.tv_sec = 1 / 1000;
   interval.tv_nsec = (1 % 1000) * 1000000;
   */
-
-  while (currTime - startTime < common::Time(100, 0))
+  while (currTime - startTime < common::Time(20, 0))
   {
     // nanosleep(&interval, &remainder);
     common::Time::MSleep(100);
     currTime = this->simTime;
   }
+
   endPose = this->poses["pioneer2dx"];
 
   double dist = (currTime - startTime).Double() * 0.2;

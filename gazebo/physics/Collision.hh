@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@
 #include <string>
 #include <vector>
 
-#include "common/Event.hh"
-#include "common/CommonTypes.hh"
+#include "gazebo/common/Event.hh"
+#include "gazebo/common/CommonTypes.hh"
 
-#include "physics/PhysicsTypes.hh"
-#include "physics/CollisionState.hh"
-#include "physics/Entity.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/CollisionState.hh"
+#include "gazebo/physics/Entity.hh"
 
 namespace gazebo
 {
@@ -227,7 +227,7 @@ namespace gazebo
       /// \brief The laser retro value.
       private: float laserRetro;
 
-      /// \brief Collision state.
+      /// \brief Stores collision state information.
       private: CollisionState state;
 
       /// \brief Number of contact points allowed for this collision.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ void UserCamera::Init()
   // window is resized
   /*
   this->axisNode =
-    this->pitchNode->createChildSceneNode(this->name + "AxisNode");
+    this->sceneNode->createChildSceneNode(this->name + "AxisNode");
 
   const Ogre::Vector3 *corners =
     this->camera->getWorldSpaceCorners();
@@ -275,10 +275,11 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 bool UserCamera::TrackVisualImpl(VisualPtr _visual)
 {
   Camera::TrackVisualImpl(_visual);
-  if (_visual)
+  /*if (_visual)
     this->SetViewController(OrbitViewController::GetTypeString());
   else
     this->SetViewController(FPSViewController::GetTypeString());
+    */
 
   return true;
 }
@@ -338,7 +339,7 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
                    static_cast<double>(this->viewport->getActualHeight());
 
     double hfov =
-      this->sdf->GetValueDouble("horizontal_fov");
+      this->sdf->Get<double>("horizontal_fov");
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
@@ -438,8 +439,9 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 
   double yawAngle = atan2(dir.y, dir.x);
   double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0, 0, 1));
-  Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0, 1, 0));
+  math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
+  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
+    pitchYawOnly.y, pitchYawOnly.z);
 
   dir.Normalize();
 
@@ -456,7 +458,6 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
   Ogre::NodeAnimationTrack *strack = anim->createNodeTrack(0, this->sceneNode);
-  Ogre::NodeAnimationTrack *ptrack = anim->createNodeTrack(1, this->pitchNode);
 
 
   Ogre::TransformKeyFrame *key;
@@ -465,23 +466,14 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
   key->setRotation(this->sceneNode->getOrientation());
 
-  key = ptrack->createNodeKeyFrame(0);
-  key->setRotation(this->pitchNode->getOrientation());
-
   /*key = strack->createNodeKeyFrame(time * 0.5);
   key->setTranslate(Ogre::Vector3(mid.x, mid.y, mid.z));
-  key->setRotation(yawFinal);
-
-  key = ptrack->createNodeKeyFrame(time * 0.5);
-  key->setRotation(pitchFinal);
+  key->setRotation(pitchYawFinal);
   */
 
   key = strack->createNodeKeyFrame(time);
   key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
-  key->setRotation(yawFinal);
-
-  key = ptrack->createNodeKeyFrame(time);
-  key->setRotation(pitchFinal);
+  key->setRotation(pitchYawFinal);
 
   this->animState =
     this->scene->GetManager()->createAnimationState("cameratrack");

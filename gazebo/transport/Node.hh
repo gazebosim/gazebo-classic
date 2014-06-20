@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@
 #include <string>
 #include <vector>
 
-#include "transport/TransportTypes.hh"
-#include "transport/TopicManager.hh"
+#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/transport/TopicManager.hh"
 
 namespace gazebo
 {

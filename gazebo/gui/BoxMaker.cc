@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 */
 #include <sstream>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
-#include "common/Console.hh"
-#include "gui/GuiEvents.hh"
-#include "math/Quaternion.hh"
-#include "common/MouseEvent.hh"
+#include "gazebo/common/Console.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/math/Quaternion.hh"
+#include "gazebo/common/MouseEvent.hh"
 
-#include "rendering/UserCamera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 
-#include "transport/Publisher.hh"
+#include "gazebo/transport/Publisher.hh"
 
-#include "gui/BoxMaker.hh"
+#include "gazebo/gui/BoxMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

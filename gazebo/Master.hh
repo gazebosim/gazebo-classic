@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 
-#include "msgs/msgs.hh"
-#include "transport/Connection.hh"
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/transport/Connection.hh"
 
 namespace gazebo
 {
@@ -80,7 +80,7 @@ namespace gazebo
 
     /// \brief Accept a new connection
     /// \param[in] _newConnection The new connection
-    private: void OnAccept(const transport::ConnectionPtr &_newConnection);
+    private: void OnAccept(transport::ConnectionPtr _newConnection);
 
     /// \brief Get a publisher for the given topic
     /// \param[in] _topic Name of the topic

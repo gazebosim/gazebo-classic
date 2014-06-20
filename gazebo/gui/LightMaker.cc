@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@
 #include <iostream>
 #include <sstream>
 
-#include "transport/Node.hh"
-#include "gui/GuiEvents.hh"
-#include "common/MouseEvent.hh"
-#include "rendering/UserCamera.hh"
-#include "rendering/Light.hh"
-#include "rendering/Scene.hh"
+#include "gazebo/transport/Node.hh"
+#include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/common/MouseEvent.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Light.hh"
+#include "gazebo/rendering/Scene.hh"
 
-#include "gui/LightMaker.hh"
+#include "gazebo/gui/LightMaker.hh"
 
 using namespace gazebo;
 using namespace gui;

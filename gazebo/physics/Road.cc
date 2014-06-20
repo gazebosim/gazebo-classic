@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ Road::~Road()
 void Road::Load(sdf::ElementPtr _elem)
 {
   Base::Load(_elem);
-  this->SetName(_elem->GetValueString("name"));
+  this->SetName(_elem->Get<std::string>("name"));
 }
 
 /////////////////////////////////////////////////
@@ -51,13 +51,13 @@ void Road::Init()
   msgs::Road msg;
   msg.set_name(this->GetName());
 
-  this->width = this->sdf->GetValueDouble("width");
+  this->width = this->sdf->Get<double>("width");
   msg.set_width(this->width);
 
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector3 point = pointElem->GetValueVector3();
+    math::Vector3 point = pointElem->Get<math::Vector3>();
     pointElem = pointElem->GetNextElement("point");
 
     msgs::Vector3d *ptMsg = msg.add_point();

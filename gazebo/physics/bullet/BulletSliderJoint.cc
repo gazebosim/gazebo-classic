@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,8 +162,8 @@ void BulletSliderJoint::Init()
   GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
   sdf::ElementPtr limitElem;
   limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->GetValueDouble("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->GetValueDouble("upper"));
+  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
+  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
 
   this->constraint = this->bulletSlider;
 

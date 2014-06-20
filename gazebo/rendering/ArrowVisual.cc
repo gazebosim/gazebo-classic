@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
  * Author: Nate Koenig
  */
 
-#include "common/MeshManager.hh"
+#include "gazebo/common/MeshManager.hh"
 
-#include "rendering/ogre_gazebo.h"
-#include "rendering/Scene.hh"
-#include "rendering/ArrowVisual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/ArrowVisual.hh"
 
 using namespace gazebo;
 using namespace rendering;

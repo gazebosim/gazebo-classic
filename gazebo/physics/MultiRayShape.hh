@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,12 +126,12 @@ namespace gazebo
       /// \return The connection, which must be kept in scope.
       public: template<typename T>
               event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
-              {return newLaserScans.Connect(_subscriber);}
+              {return this->newLaserScans.Connect(_subscriber);}
 
       /// \brief Disconnect from the new laser scans signal.
       /// \param[in] _conn Connection to remove.
       public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              {newLaserScans.Disconnect(_conn);}
+              {this->newLaserScans.Disconnect(_conn);}
 
       /// \brief Physics engine specific method for updating the rays.
       protected: virtual void UpdateRays() = 0;

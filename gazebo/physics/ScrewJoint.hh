@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,18 +59,21 @@ namespace gazebo
                    if (_sdf->HasElement("thread_pitch"))
                    {
                      this->threadPitch =
-                       _sdf->GetElement("thread_pitch")->GetValueDouble();
+                       _sdf->GetElement("thread_pitch")->Get<double>();
                    }
                    else
                    {
-                     gzerr << "should not see this\n";
                      this->threadPitch = 1.0;
+                     gzwarn << "<thread_pitch> element not specified. "
+                            << "Using default value of "
+                            << this->threadPitch
+                            << ". \n";
                    }
 
                    if (_sdf->HasElement("axis"))
                    {
                      sdf::ElementPtr axisElem = _sdf->GetElement("axis");
-                     this->SetAxis(0, axisElem->GetValueVector3("xyz"));
+                     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
                      if (axisElem->HasElement("limit"))
                      {
                        sdf::ElementPtr limitElem =
@@ -79,9 +82,9 @@ namespace gazebo
                        // Perform this three step ordering to ensure the
                        // parameters are set properly. This is taken from
                        // the ODE wiki.
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
-                       this->SetLowStop(0, limitElem->GetValueDouble("lower"));
-                       this->SetHighStop(0, limitElem->GetValueDouble("upper"));
+                       this->SetHighStop(0, limitElem->Get<double>("upper"));
+                       this->SetLowStop(0, limitElem->Get<double>("lower"));
+                       this->SetHighStop(0, limitElem->Get<double>("upper"));
                      }
                    }
                  }
@@ -89,8 +92,7 @@ namespace gazebo
       /// \brief Set the anchor.
       /// \param[in] _index Index of the axis. Not Used.
       /// \param[in] _anchor Anchor value for the joint.
-      public: virtual void SetAnchor(int _index,
-                                     const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
 
       /// \brief Get the anchor.
       /// \param[in] _index Index of the axis. Not Used.

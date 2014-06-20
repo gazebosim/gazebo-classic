@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "msgs/msgs.hh"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
@@ -30,7 +30,7 @@
 #include "gazebo/common/KeyFrame.hh"
 
 #include "gazebo/transport/Publisher.hh"
-#include "gazebo/transport/Transport.hh"
+#include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/physics/RayShape.hh"
@@ -69,8 +69,6 @@ Entity::Entity(BasePtr _parent)
 //////////////////////////////////////////////////
 Entity::~Entity()
 {
-  Base_V::iterator iter;
-
   // TODO: put this back in
   // this->GetWorld()->GetPhysicsEngine()->RemoveEntity(this);
 
@@ -102,12 +100,12 @@ void Entity::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->GetValuePose("pose") +
+      this->worldPose = this->sdf->Get<math::Pose>("pose") +
                         this->parentEntity->worldPose;
     else
-      this->worldPose = this->sdf->GetValuePose("pose");
+      this->worldPose = this->sdf->Get<math::Pose>("pose");
 
-    this->initialRelativePose = this->sdf->GetValuePose("pose");
+    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
   }
 
   if (this->parent)
@@ -144,7 +142,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
@@ -276,7 +274,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; ++iter)
+            iter != this->children.end(); ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -310,7 +308,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   // update all children pose, moving them with the model.
   // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->childrenEnd; ++iter)
+      iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
@@ -422,7 +420,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(LINK))
       {
@@ -438,7 +436,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (this->IsStatic())
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
@@ -540,7 +538,7 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->GetValuePose("pose");
+  math::Pose newPose = _sdf->Get<math::Pose>("pose");
   if (newPose != this->GetRelativePose())
   {
     this->SetRelativePose(newPose);

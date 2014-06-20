@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #ifndef _BULLETCYLINDERSHAPE_HH_
 #define _BULLETCYLINDERSHAPE_HH_
 
-#include "physics/bullet/BulletPhysics.hh"
-#include "physics/CylinderShape.hh"
+#include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/CylinderShape.hh"
 
 namespace gazebo
 {

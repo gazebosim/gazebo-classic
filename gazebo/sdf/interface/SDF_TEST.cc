@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -333,6 +333,7 @@ TEST(SdfUpdate, EmptyValues)
   elem->AddValue("double", "12.34", "0", "description");
   EXPECT_NEAR(elem->GetValueDouble(emptyString), 12.34, 1e-6);
 }
+
 /////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
