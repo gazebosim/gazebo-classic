@@ -273,14 +273,6 @@ double SimbodyScrewJoint::GetThreadPitch()
 }
 
 //////////////////////////////////////////////////
-void SimbodyScrewJoint::SetAttribute(const std::string &_key,
-  unsigned int _index,
-  const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool SimbodyScrewJoint::SetParam(const std::string &_key,
   unsigned int _index,
   const boost::any &_value)
@@ -301,13 +293,6 @@ bool SimbodyScrewJoint::SetParam(const std::string &_key,
     return SimbodyJoint::SetParam(_key, _index, _value);
 
   return true;
-}
-
-//////////////////////////////////////////////////
-double SimbodyScrewJoint::GetAttribute(const std::string &_key,
-  unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////

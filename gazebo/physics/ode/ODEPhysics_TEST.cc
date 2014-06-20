@@ -143,7 +143,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   double warmStartFactorRet;
   int extraFrictionIterationsRet;
 
-  odePhysics->SetParam("type", type);
+  odePhysics->SetParam("solver_type", type);
   odePhysics->SetParam("precon_iters", preconIters);
   odePhysics->SetParam("iters", iters);
   odePhysics->SetParam("sor", sor);
@@ -166,7 +166,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   odePhysics->SetParam("warm_start_factor", warmStartFactor);
   odePhysics->SetParam("extra_friction_iterations", extraFrictionIterations);
 
-  value = odePhysics->GetParam("type");
+  value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = odePhysics->GetParam("iters");
