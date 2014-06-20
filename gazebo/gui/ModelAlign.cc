@@ -100,6 +100,89 @@ void ModelAlign::Reset()
 }*/
 
 /////////////////////////////////////////////////
+void ModelAlign::Transform(math::Box _bbox, math::Pose _worldPose,
+    std::vector<math::Vector3> &_vertices)
+{
+  math::Vector3 center = _bbox.GetCenter();
+
+  // Get the 8 corners of the bounding box.
+  math::Vector3 v0 = center +
+      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
+      _bbox.GetZLength()/2.0);
+  math::Vector3 v1 = center +
+      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
+      _bbox.GetZLength()/2.0);
+  math::Vector3 v2 = center +
+      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
+      _bbox.GetZLength()/2.0);
+  math::Vector3 v3 = center +
+      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
+      _bbox.GetZLength()/2.0);
+
+  math::Vector3 v4 = center +
+      math::Vector3(-_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
+      -_bbox.GetZLength()/2.0);
+  math::Vector3 v5 = center +
+      math::Vector3(_bbox.GetXLength()/2.0, _bbox.GetYLength()/2.0,
+      -_bbox.GetZLength()/2.0);
+  math::Vector3 v6 = center +
+      math::Vector3(-_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
+      -_bbox.GetZLength()/2.0);
+  math::Vector3 v7 = center +
+      math::Vector3(_bbox.GetXLength()/2.0, -_bbox.GetYLength()/2.0,
+      -_bbox.GetZLength()/2.0);
+
+  // Transform corners into world spacce.
+  v0 = _worldPose.rot * v0 + _worldPose.pos;
+  v1 = _worldPose.rot * v1 + _worldPose.pos;
+  v2 = _worldPose.rot * v2 + _worldPose.pos;
+  v3 = _worldPose.rot * v3 + _worldPose.pos;
+  v4 = _worldPose.rot * v4 + _worldPose.pos;
+  v5 = _worldPose.rot * v5 + _worldPose.pos;
+  v6 = _worldPose.rot * v6 + _worldPose.pos;
+  v7 = _worldPose.rot * v7 + _worldPose.pos;
+
+  _vertices.clear();
+  _vertices.push_back(v0);
+  _vertices.push_back(v1);
+  _vertices.push_back(v2);
+  _vertices.push_back(v3);
+  _vertices.push_back(v4);
+  _vertices.push_back(v5);
+  _vertices.push_back(v6);
+  _vertices.push_back(v7);
+}
+
+/////////////////////////////////////////////////
+void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
+    math::Vector3 &_min, math::Vector3 &_max)
+{
+  if (_vertices.empty())
+    return;
+
+  _min = _vertices[0];
+  _max = _vertices[0];
+
+  // find min / max in world space;
+  for (unsigned int i = 1; i < _vertices.size(); ++i)
+  {
+    math::Vector3 v = _vertices[i];
+    if (_min.x > v.x)
+      _min.x = v.x;
+    if (_max.x < v.x)
+      _max.x = v.x;
+    if (_min.y > v.y)
+      _min.y = v.y;
+    if (_max.y < v.y)
+      _max.y = v.y;
+    if (_min.z > v.z)
+      _min.z = v.z;
+    if (_max.z < v.z)
+      _max.z = v.z;
+  }
+}
+
+/////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     std::string _axis, std::string _config)
 {
@@ -112,12 +195,18 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
   math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
   math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
-  math::Vector3 targetMin = targetWorldPose.rot * targetBbox.min
+
+  std::vector<math::Vector3> targetVertices;
+  this->Transform(targetBbox, targetWorldPose, targetVertices);
+
+  math::Vector3 targetMin;
+  math::Vector3 targetMax;
+  this->GetMinMax(targetVertices, targetMin, targetMax);
+
+  /*math::Vector3 targetMin = targetWorldPose.rot * targetBbox.min
       + targetWorldPose.pos;
   math::Vector3 targetMax = targetWorldPose.rot * targetBbox.max
-      + targetWorldPose.pos;
-  math::Vector3 targetCenter = targetWorldPose.rot * targetBbox.GetCenter()
-      + targetWorldPose.pos;
+      + targetWorldPose.pos;*/
 
   std::cerr << " on align mode " << _axis << " " << _config << " "
       << this->dataPtr->selectedVisuals.size()  <<  std::endl;
@@ -128,18 +217,25 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
 
     math::Pose worldPose = vis->GetWorldPose();
     math::Box bbox = vis->GetBoundingBox();
-    math::Vector3 boxWorldMin = worldPose.rot * bbox.min + worldPose.pos;
-    math::Vector3 boxWorldMax = worldPose.rot * bbox.max + worldPose.pos;
-    math::Vector3 boxWorldCenter = targetWorldPose.rot * bbox.GetCenter()
-      + worldPose.pos;
+//    math::Vector3 boxWorldMin = worldPose.rot * bbox.min + worldPose.pos;
+//    math::Vector3 boxWorldMax = worldPose.rot * bbox.max + worldPose.pos;
+//    math::Vector3 boxWorldCenter = targetWorldPose.rot * bbox.GetCenter()
+//      + worldPose.pos;
+
+    std::vector<math::Vector3> vertices;
+    this->Transform(bbox, worldPose, vertices);
+
+    math::Vector3 min;
+    math::Vector3 max;
+    this->GetMinMax(vertices, min, max);
 
     math::Vector3 trans;
     if (_config == "min")
-      trans = targetMin - boxWorldMin;
+      trans = targetMin - min;
     else if (_config == "center")
-      trans = targetCenter - boxWorldCenter;
+      trans = (targetMin + (targetMax-targetMin)/2) - (min + (max-min)/2);
     else if (_config == "max")
-      trans = targetMax - boxWorldMax;
+      trans = targetMax - max;
 
     if (_axis == "x")
     {

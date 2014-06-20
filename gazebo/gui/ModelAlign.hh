@@ -84,6 +84,12 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
 
+      private: void GetMinMax(std::vector<math::Vector3> _vertices,
+          math::Vector3 &_min, math::Vector3 &_max);
+
+      private: void Transform(math::Box _bbox, math::Pose _worldPose,
+          std::vector<math::Vector3> &_vertices);
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelAlign>;
 
