@@ -556,8 +556,7 @@ void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int /*_index*/, double _position,
-  double /*_velocity*/)
+bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 {
   // parent class doesn't do much, derived classes do all the work.
   if (this->model)
@@ -576,8 +575,7 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position,
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(unsigned int _index, double _position,
-                           double _velocity)
+bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 {
   // check if index is inbound
   if (_index >= this->GetAngleCount())
@@ -586,15 +584,10 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position,
     return false;
   }
 
-  if (!Joint::SetPosition(_index, _position, _velocity))
+  if (!Joint::SetPosition(_index, _position))
   {
     gzerr << "something is wrong, returning.\n";
     return false;
-  }
-
-  if (!math::equal(_velocity, 0.0))
-  {
-    gzwarn << "Setting velocity is not yet supported.\n";
   }
 
   // truncate position by joint limits

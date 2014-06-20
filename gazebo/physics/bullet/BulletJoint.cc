@@ -570,8 +570,7 @@ math::Angle BulletJoint::GetLowStop(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::SetPosition(unsigned int _index, double _position,
-                           double _velocity)
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
 {
-  return Joint::SetPositionMaximal(_index, _position, _velocity);
+  return Joint::SetPositionMaximal(_index, _position);
 }

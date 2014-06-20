@@ -1399,8 +1399,7 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::SetPosition(unsigned int _index, double _position,
-                           double _velocity)
+bool ODEJoint::SetPosition(unsigned int _index, double _position,C)
 {
-  return Joint::SetPositionMaximal(_index, _position, _velocity);
+  return Joint::SetPositionMaximal(_index, _position);
 }

@@ -394,11 +394,9 @@ namespace gazebo
       /// link.
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
-      /// \param[in] _velocity Velocity for the joint, defaults to 0 if
       /// unspecified, pure kinematic teleportation.
       /// \return returns true if operation succeeds, 0 if it fails.
-      public: virtual bool SetPosition(unsigned int _index, double _position,
-                                       double _velocity = 0.0);
+      public: virtual bool SetPosition(unsigned int _index, double _position);
 
       /// \brief Helper function for maximal coordinate solver SetPosition.
       /// The child link of this joint is updated based on position change.
@@ -407,11 +405,9 @@ namespace gazebo
       /// link.
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
-      /// \param[in] _velocity Velocity for the joint, defaults to 0 if
       /// unspecified, pure kinematic teleportation.
       /// \return returns true if operation succeeds, 0 if it fails.
-      protected: bool SetPositionMaximal(unsigned int _index, double _position,
-                                 double _velocity);
+      protected: bool SetPositionMaximal(unsigned int _index, double _position);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
