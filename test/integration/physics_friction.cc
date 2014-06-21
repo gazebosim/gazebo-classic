@@ -172,11 +172,21 @@ class PhysicsFrictionTest : public ServerFixture,
               << "      </geometry>"
               << "      <surface>"
               << "        <friction>"
+              << "          <static_friction>1.0</static_friction>"
               << "          <ode>"
-              << "            <mu>" << _opt.friction1 << "</mu>"
-              << "            <mu2>" << _opt.friction2 << "</mu2>"
+              << "            <friction1_ratio>" << _opt.friction1
+              << "</friction1_ratio>"
+              << "            <friction2_ratio>" << _opt.friction2
+              << "</friction2_ratio>"
               << "            <fdir1>" << _opt.direction1 << "</fdir1>"
               << "          </ode>"
+              << "          <bullet>"
+              << "            <friction1_ratio>" << _opt.friction1
+              << "</friction1_ratio>"
+              << "            <friction2_ratio>" << _opt.friction2
+              << "</friction2_ratio>"
+              << "            <fdir1>" << _opt.direction1 << "</fdir1>"
+              << "          </bullet>"
               << "        </friction>"
               << "      </surface>"
               << "    </collision>"

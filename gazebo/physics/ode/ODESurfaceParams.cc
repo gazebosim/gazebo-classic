@@ -78,15 +78,17 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
         gzerr << "Surface friction sdf member is NULL" << std::endl;
       else
       {
+        double staticFriction = frictionElem->Get<double>("static_friction");
+
         sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
         if (!frictionOdeElem)
           gzerr << "Surface friction ode sdf member is NULL" << std::endl;
         else
         {
           this->frictionPyramid.SetMuPrimary(
-            frictionOdeElem->Get<double>("mu"));
+            staticFriction * frictionOdeElem->Get<double>("friction1_ratio"));
           this->frictionPyramid.SetMuSecondary(
-            frictionOdeElem->Get<double>("mu2"));
+            staticFriction * frictionOdeElem->Get<double>("friction2_ratio"));
           this->frictionPyramid.direction1 =
             frictionOdeElem->Get<math::Vector3>("fdir1");
 

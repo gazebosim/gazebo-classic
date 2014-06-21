@@ -40,26 +40,33 @@ void BulletSurfaceParams::Load(sdf::ElementPtr _sdf)
   SurfaceParams::Load(_sdf);
 
   if (!_sdf)
+  {
     gzerr << "Surface _sdf is NULL" << std::endl;
+  }
   else
   {
     sdf::ElementPtr frictionElem = _sdf->GetElement("friction");
     if (!frictionElem)
-      gzerr << "Surface friction sdf member is NULL" << std::endl;
     {
-      // Note this should not be looking in the "ode" block
-      // Update this when sdformat has bullet friction parameters
-      // See sdformat issue #31
-      // https://bitbucket.org/osrf/sdformat/issue/31
-      sdf::ElementPtr frictionOdeElem = frictionElem->GetElement("ode");
-      if (!frictionOdeElem)
-        gzerr << "Surface friction ode sdf member is NULL" << std::endl;
+      gzerr << "Surface friction sdf member is NULL" << std::endl;
+    }
+    else
+    {
+      double staticFriction = frictionElem->Get<double>("static_friction");
+
+      sdf::ElementPtr frictionBulletElem = frictionElem->GetElement("bullet");
+      if (!frictionBulletElem)
+      {
+        gzerr << "Surface friction bullet sdf member is NULL" << std::endl;
+      }
       else
       {
         this->frictionPyramid.SetMuPrimary(
-          frictionOdeElem->Get<double>("mu"));
+          staticFriction * frictionBulletElem->Get<double>("friction1_ratio"));
         this->frictionPyramid.SetMuSecondary(
-          frictionOdeElem->Get<double>("mu2"));
+          staticFriction * frictionBulletElem->Get<double>("friction2_ratio"));
+        this->frictionPyramid.direction1 =
+          frictionBulletElem->Get<math::Vector3>("fdir1");
       }
     }
   }
