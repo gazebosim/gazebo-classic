@@ -32,7 +32,7 @@ namespace gazebo
     class IncrementalPlot;
 
     /// \brief Class to plot data from a topic
-    class TopicPlot : public QDialog
+    class GAZEBO_VISIBLE TopicPlot : public QDialog
     {
       Q_OBJECT
 
