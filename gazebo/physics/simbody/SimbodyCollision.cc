@@ -75,6 +75,16 @@ math::Box SimbodyCollision::GetBoundingBox() const
   }
   else
   {
+#if 1
+    // take this approach if calcSupportPoint is not working...
+    SimTK::Vec3 center;
+    double r;
+    this->collisionShape->getBoundingSphere(center, r);
+
+    // get AABB by calling calcSupportPoint
+    math::Vector3 minCorner(center[0]-r, center[1]-r, center[2]-r);
+    math::Vector3 maxCorner(center[0]+r, center[1]+r, center[2]+r);
+#else
     // get AABB by calling calcSupportPoint
     math::Vector3 minCorner;
     math::Vector3 maxCorner;
@@ -90,6 +100,7 @@ math::Box SimbodyCollision::GetBoundingBox() const
       this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, 0, -1))).z;
     maxCorner.z = SimbodyPhysics::Vec3ToVector3(
       this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, 0, 1))).z;
+#endif
     result = math::Box(minCorner, maxCorner);
   }
   return result;
