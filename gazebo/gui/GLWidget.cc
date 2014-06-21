@@ -943,6 +943,8 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   {
     g_copyAct->setEnabled(false);
   }
+
+  g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 }
 
 /////////////////////////////////////////////////

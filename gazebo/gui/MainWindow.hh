@@ -105,7 +105,6 @@ namespace gazebo
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
 
-      /// \brief Qt callback when the align mode is triggered.
       private slots: void Align();
 
       /// \brief Qt callback when a specific alignment configuration is
@@ -265,6 +264,9 @@ namespace gazebo
 
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
+
+      /// \brief List of all the align action groups.
+      private: std::vector<QActionGroup *> alignActionGroups;
 
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;

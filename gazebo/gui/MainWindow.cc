@@ -631,15 +631,18 @@ void MainWindow::Scale()
 /////////////////////////////////////////////////
 void MainWindow::Align()
 {
-//  gui::Events::manipMode("align");
-//  std::cerr << " Align! " << std::endl;
+  for (unsigned int i = 0 ; i < this->alignActionGroups.size(); ++i)
+  {
+    this->alignActionGroups[i]->setExclusive(false);
+    if (this->alignActionGroups[i]->checkedAction())
+      this->alignActionGroups[i]->checkedAction()->setChecked(false);
+    this->alignActionGroups[i]->setExclusive(true);
+  }
 }
 
 /////////////////////////////////////////////////
 void MainWindow::OnAlignMode(QString _mode)
 {
-//  gui::Events::manipMode("align");
-
   std::string mode = _mode.toStdString();
   gui::Events::alignMode(mode.substr(0,1), mode.substr(1));
 }
@@ -1184,13 +1187,6 @@ void MainWindow::CreateActions()
   g_snapAct->setToolTip(tr("Snap Mode"));
   connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
 
-/*  g_alignAct = new QAction(QIcon(":/images/align.png"),
-      tr("Align Mode"), this);
-  g_alignAct->setStatusTip(tr("Align entity"));
-  g_alignAct->setCheckable(true);
-  g_alignAct->setToolTip(tr("Align Mode"));
-  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));*/
-
   // set up align actions and widget
   QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
       tr("X Align Min"), this);
@@ -1232,10 +1228,13 @@ void MainWindow::CreateActions()
   yAlignActionGroup->addAction(yAlignMax);
   yAlignActionGroup->setExclusive(true);
   QActionGroup *zAlignActionGroup = new QActionGroup(this);
-  zAlignActionGroup->addAction(yAlignMin);
-  zAlignActionGroup->addAction(yAlignCenter);
-  zAlignActionGroup->addAction(yAlignMax);
+  zAlignActionGroup->addAction(zAlignMin);
+  zAlignActionGroup->addAction(zAlignCenter);
+  zAlignActionGroup->addAction(zAlignMax);
   zAlignActionGroup->setExclusive(true);
+  this->alignActionGroups.push_back(xAlignActionGroup);
+  this->alignActionGroups.push_back(yAlignActionGroup);
+  this->alignActionGroups.push_back(zAlignActionGroup);
 
   QWidget *alignWidget = new QWidget;
   QVBoxLayout *alignLayout = new QVBoxLayout;
@@ -1264,11 +1263,6 @@ void MainWindow::CreateActions()
   alignWidget->adjustSize();
   alignWidget->setFixedWidth(alignWidget->width()+1);
 
-  g_alignAct = new QWidgetAction(this);
-  g_alignAct->setCheckable(true);
-  g_alignAct->setDefaultWidget(alignWidget);
-  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
-
   QSignalMapper *alignSignalMapper = new QSignalMapper(this);
   connect(alignSignalMapper, SIGNAL(mapped(QString)),
       this, SLOT(OnAlignMode(QString)));
@@ -1291,6 +1285,12 @@ void MainWindow::CreateActions()
   alignSignalMapper->setMapping(zAlignCenter, tr("zcenter"));
   connect(zAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
   alignSignalMapper->setMapping(zAlignMax, tr("zmax"));
+
+  g_alignAct = new QWidgetAction(this);
+  g_alignAct->setCheckable(true);
+  g_alignAct->setDefaultWidget(alignWidget);
+  g_alignAct->setEnabled(false);
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////

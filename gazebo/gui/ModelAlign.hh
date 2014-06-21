@@ -47,32 +47,6 @@ namespace gazebo
       /// \brief Initialize the model manipulator.
       public: void Init();
 
-      /// \brief Set the visuals to be aligned.
-      // public: void SetVisuals(std::vector<rendering::VisualPtr> _visuals);
-
-      /// \brief Reset the model alignment too.
-      public: void Reset();
-/*
-      /// \brief Process an object translate mouse press event.
-      /// \param[in] _event Mouse event.
-      public: void OnMousePressEvent(const common::MouseEvent &_event);
-
-      /// \brief Process an object translate mouse move event.
-      /// \param[in] _event Mouse event.
-      public: void OnMouseMoveEvent(const common::MouseEvent &_event);
-
-      /// \brief Process an object translate mouse release event.
-      /// \param[in] _event Mouse event.
-      public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
-
-      /// \brief Process a key press event.
-      /// \param[in] _event Key event.
-      public: void OnKeyPressEvent(const common::KeyEvent &_event);
-
-      /// \brief Process a key release event.
-      /// \param[in] _event Key event.
-      public: void OnKeyReleaseEvent(const common::KeyEvent &_event);
-*/
       /// \brief Callback when a specific alignment configuration is set.
       /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
@@ -84,9 +58,18 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
 
+      /// \brief Get the minimum and maximum values of a list of vertices.
+      /// \param[in] _vertices A list of input vertices.
+      /// \param[out] _min Minimum x, y, z values.
+      /// \param[out] _max Maximum x, y, z values.
       private: void GetMinMax(std::vector<math::Vector3> _vertices,
           math::Vector3 &_min, math::Vector3 &_max);
 
+      /// \brief Transform a bounding box to the world space.
+      /// \param[in] _bbox Input bounding box.
+      /// \param[in] _worldPose Pose used to tranform the bounding box.
+      /// \param[out] _vertices Vertices of the tranformed bounding box in
+      /// world coordinates.
       private: void Transform(math::Box _bbox, math::Pose _worldPose,
           std::vector<math::Vector3> &_vertices);
 

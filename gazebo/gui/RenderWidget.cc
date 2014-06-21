@@ -83,17 +83,19 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_copyAct);
   toolbar->addAction(g_pasteAct);
 
+  toolbar->addSeparator();
+
   QToolButton *alignButton = new QToolButton;
   alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   alignButton->setIcon(QIcon(":/images/align.png"));
   alignButton->setArrowType(Qt::NoArrow);
-  QMenu *alignMenu = new QMenu;
+  QMenu *alignMenu = new QMenu(alignButton);
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-
-  toolbar->addSeparator();
   toolbar->addWidget(alignButton);
+  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+
   toolbar->addSeparator();
   toolbar->addAction(g_snapAct);
 
