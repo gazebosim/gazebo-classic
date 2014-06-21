@@ -15,8 +15,10 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
+#include "gazebo/physics/simbody/SimbodyPhysics.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;
@@ -67,6 +69,29 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 math::Box SimbodyCollision::GetBoundingBox() const
 {
   math::Box result;
+  if (this->collisionShape == NULL)
+  {
+    gzerr << "This SimbodyCollision has no collisionShape.\n";
+  }
+  else
+  {
+    // get AABB by calling calcSupportPoint
+    math::Vector3 minCorner;
+    math::Vector3 maxCorner;
+    minCorner.x = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(-1, 0, 0))).x;
+    maxCorner.x = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(1, 0, 0))).x;
+    minCorner.y = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, -1, 0))).y;
+    maxCorner.y = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, 1, 0))).y;
+    minCorner.z = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, 0, -1))).z;
+    maxCorner.z = SimbodyPhysics::Vec3ToVector3(
+      this->collisionShape->calcSupportPoint(SimTK::UnitVec3(0, 0, 1))).z;
+    result = math::Box(minCorner, maxCorner);
+  }
   return result;
 }
 
