@@ -31,20 +31,20 @@ using namespace physics;
 // Constructor of aiScene is missing so we define it here.
 aiScene::aiScene()
 {
-    mFlags = 0;
-    mRootNode = NULL;
-    mNumMeshes = 0;
-    mMeshes = NULL;
-    mNumMaterials = 0;
-    mMaterials = NULL;
-    mNumAnimations = 0;
-    mAnimations = NULL;
-    mNumTextures = 0;
-    mTextures = NULL;
-    mNumLights = 0;
-    mLights = NULL;
-    mNumCameras = 0;
-    mCameras = NULL;
+  mFlags = 0;
+  mRootNode = NULL;
+  mNumMeshes = 0;
+  mMeshes = NULL;
+  mNumMaterials = 0;
+  mMaterials = NULL;
+  mNumAnimations = 0;
+  mAnimations = NULL;
+  mNumTextures = 0;
+  mTextures = NULL;
+  mNumLights = 0;
+  mLights = NULL;
+  mNumCameras = 0;
+  mCameras = NULL;
 }
 
 //////////////////////////////////////////////////

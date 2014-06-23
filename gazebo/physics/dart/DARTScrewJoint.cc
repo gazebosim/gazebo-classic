@@ -75,7 +75,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
-  if (_index == 0 || _index == 1)
+  if (_index < this->GetAngleCount())
   {
     Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getTransformFromChildBodyNode();
@@ -139,7 +139,7 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
-  if (_index != 0)
+  if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
   this->SetThreadPitch(_threadPitch);
 }
@@ -154,7 +154,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  if (_index != 0)
+  if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
   return this->GetThreadPitch();
 }
