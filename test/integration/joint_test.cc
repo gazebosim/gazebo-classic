@@ -337,7 +337,8 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       cyclesRevolute2++;
       velRevolute2 = 1.0;
     }
-    else if (-linkRevolute2->GetRelativeAngularVel().y < -vT && velRevolute2 > vT)
+    else if (-linkRevolute2->GetRelativeAngularVel().y < -vT &&
+             velRevolute2 > vT)
     {
       cyclesRevolute2++;
       velRevolute2 = -1.0;
