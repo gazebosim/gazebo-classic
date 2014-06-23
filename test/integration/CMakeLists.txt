@@ -36,7 +36,9 @@ set(tests
   laser.cc
   nondefault_world.cc
   physics.cc
+  physics_basic_controller_response.cc
   physics_friction.cc
+  physics_inertia_ratio.cc
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
