@@ -133,8 +133,6 @@ GLWidget::GLWidget(QWidget *_parent)
   this->installEventFilter(this);
   this->keyModifiers = 0;
 
-  //this->selectedVis.reset();
-
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
       boost::bind(&GLWidget::OnMousePress, this, _1));
 

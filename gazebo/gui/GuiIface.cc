@@ -48,7 +48,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::MainWindow *g_main_win;
+gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -234,7 +234,10 @@ bool gui::load()
 /////////////////////////////////////////////////
 unsigned int gui::get_entity_id(const std::string &_name)
 {
-  return g_main_win->GetEntityId(_name);
+  if (g_main_win)
+    return g_main_win->GetEntityId(_name);
+  else
+    return 0;
 }
 
 /////////////////////////////////////////////////

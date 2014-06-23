@@ -197,6 +197,7 @@ namespace gazebo
 
       private: rendering::VisualPtr hoverVis;
 
+      /// \brief A list of selected visuals.
       private: std::vector<rendering::VisualPtr> selectedVisuals;
 
       private: transport::NodePtr node;
@@ -219,8 +220,6 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
-
-
     };
   }
 }

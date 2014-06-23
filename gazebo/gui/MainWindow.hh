@@ -105,6 +105,8 @@ namespace gazebo
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
 
+      /// \brief Qt callback when the main align action is triggered. Currently
+      /// just resets the child align actions.
       private slots: void Align();
 
       /// \brief Qt callback when a specific alignment configuration is
