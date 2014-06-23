@@ -104,8 +104,8 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   if (dartElem != NULL)
   {
     // Debug code
-    std::cout << "dartElem: " << dartElem << std::endl;
-    std::cout << "SoftBodyNode!" << std::endl;
+    gzdbg << "dartElem: " << dartElem << std::endl;
+    gzdbg << "SoftBodyNode!" << std::endl;
 
     // Create DART SoftBodyNode
     dart::dynamics::SoftBodyNode* dtSoftBodyNode
@@ -115,7 +115,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     double fleshMassFraction = dartElem->Get<double>("flesh_mass_fraction");
 
     // Debug code
-    std::cout << "fleshMassFraction: " << fleshMassFraction << std::endl;
+    gzdbg << "fleshMassFraction: " << fleshMassFraction << std::endl;
 
     // bone_attachment (Kv)
     if (dartElem->HasElement("bone_attachment"))
@@ -124,7 +124,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       dtSoftBodyNode->setVertexSpringStiffness(kv);
 
       // Debug code
-      std::cout << "bone_attachment: " << kv << std::endl;
+      gzdbg << "bone_attachment: " << kv << std::endl;
     }
 
     // stiffness (Ke)
@@ -134,7 +134,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       dtSoftBodyNode->setEdgeSpringStiffness(ke);
 
       // Debug code
-      std::cout << "stiffness: " << ke << std::endl;
+      gzdbg << "stiffness: " << ke << std::endl;
     }
 
     // damping
@@ -144,27 +144,27 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       dtSoftBodyNode->setDampingCoefficient(damping);
 
       // Debug code
-      std::cout << "damping: " << damping << std::endl;
+      gzdbg << "damping: " << damping << std::endl;
     }
 
     // pose
     Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
-    std::cout << "pose" << T.matrix() << std::endl;
+    gzdbg << "pose" << T.matrix() << std::endl;
     if (softCollElem->HasElement("pose"))
     {
       // Debug code
-      std::cout << "In pose!" << std::endl;
+      gzdbg << "In pose!" << std::endl;
       T = DARTTypes::ConvPose(softCollElem->Get<math::Pose>("pose"));
 
       // Debug code
-      std::cout << "pose" << T.matrix() << std::endl;
+      gzdbg << "pose" << T.matrix() << std::endl;
     }
 
     // geometry
     if (softGeomElem->HasElement("box"))
     {
       // Debug code
-      std::cout << "box" << std::endl;
+      gzdbg << "box" << std::endl;
 
       sdf::ElementPtr boxEle = softGeomElem->GetElement("box");
       Eigen::Vector3d size
@@ -175,7 +175,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
             new dart::dynamics::SoftMeshShape(dtSoftBodyNode));
 
       // Debug code
-      std::cout << "box finished" << std::endl;
+      gzdbg << "box finished" << std::endl;
     }
 //    else if (geomElem->HasElement("ellipsoid"))
 //    {
