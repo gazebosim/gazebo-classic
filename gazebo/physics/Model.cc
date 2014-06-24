@@ -558,18 +558,9 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name ||
-        (*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name || (*iter)->GetName() == _name)
     {
       result = (*iter);
-      break;
-    }
-    else if ((*iter)->GetName() == _name)
-    {
-      // check again without scoped names, deprecated, warn
-      result = (*iter);
-      gzwarn << "Calling Model::GetJoint(" << _name
-             << ") with un-scoped joint name is deprecated, please scope\n";
       break;
     }
   }
@@ -584,7 +575,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+const Link_V &Model::GetLinks() const
 {
   return this->links;
 }

@@ -16,11 +16,13 @@
 */
 
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/msgs/msgs.hh"
 
 using namespace gazebo;
 
-class PhysicsEngineTest : public ServerFixture
+class PhysicsEngineTest : public ServerFixture,
+                          public testing::WithParamInterface<const char*>
 {
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
@@ -94,24 +96,14 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsNode->Fini();
 }
 
-TEST_F(PhysicsEngineTest, PhysicsEngineParamODE)
+/////////////////////////////////////////////////
+TEST_P(PhysicsEngineTest, PhysicsEngineParam)
 {
-  PhysicsEngineParam("ode");
+  PhysicsEngineParam(GetParam());
 }
 
-#ifdef HAVE_BULLET
-TEST_F(PhysicsEngineTest, PhysicsEngineParamBullet)
-{
-  PhysicsEngineParam("bullet");
-}
-#endif  // HAVE_BULLET
-
-#ifdef HAVE_DART
-TEST_F(PhysicsEngineTest, PhysicsEngineParamDART)
-{
-  PhysicsEngineParam("dart");
-}
-#endif  // HAVE_DART
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

@@ -35,12 +35,6 @@ namespace gazebo
     GAZEBO_VISIBLE
     bool load();
 
-    /// \brief Deprecated.
-    GAZEBO_VISIBLE
-    std::string create_sensor(sdf::ElementPtr _elem,
-        const std::string &_worldName,
-        const std::string &_parentName) GAZEBO_DEPRECATED(2.0);
-
     /// \brief Create a sensor using SDF.
     /// \param[in] _elem The SDF element that describes the sensor.
     /// \param[in] _worldName Name of the world in which to create the sensor.

@@ -138,6 +138,7 @@ set (gtest_sources
   ContactManager_TEST.cc
   CylinderShape_TEST.cc
   Inertial_TEST.cc
+  JointController_TEST.cc
   PhysicsEngine_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
