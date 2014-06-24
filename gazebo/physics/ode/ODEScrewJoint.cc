@@ -151,12 +151,26 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-double ODEScrewJoint::GetVelocity(unsigned int /*index*/) const
+double ODEScrewJoint::GetVelocity(unsigned int _index) const
 {
   double result = 0;
 
   if (this->jointId)
-    result = dJointGetScrewPositionRate(this->jointId);
+  {
+    if (_index < this->GetAngleCount())
+    {
+      if (_index == 0)
+        result = dJointGetScrewAngleRate(this->jointId);
+      else if (_index == 1)
+        result = dJointGetScrewPositionRate(this->jointId);
+    }
+    else
+    {
+      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+             << "): invalid index exceeds allowed range("
+             << this->GetAngleCount() << ").\n";
+    }
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 
@@ -255,13 +269,6 @@ double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAttribute(const std::string &_key,
-  unsigned int _index, const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool ODEScrewJoint::SetParam(const std::string &_key,
   unsigned int _index, const boost::any &_value)
 {
@@ -290,10 +297,4 @@ double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
     return this->threadPitch;
   else
     return ODEJoint::GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
-double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }

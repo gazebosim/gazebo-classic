@@ -71,10 +71,19 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 # The follow suppression is useful when checking for missing includes.
 # It's disable for now because checking for missing includes is very
 # time consuming. See CPPCHECK_CMD3.
-echo "missingIncludeSystem" >> $SUPPRESS
+# Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
+if [ -n "$(which lsb_release)" ]; then
+   case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
+       "12.04" | "13.04" )
+         echo "missingIncludeSystem" >> $SUPPRESS
+       ;;
+   esac
+fi
 
-#cppcheck
-CPPCHECK_BASE="cppcheck -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+#cppcheck.
+# MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
+[ -z $MAKE_JOBS ] && MAKE_JOBS=1
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"

@@ -233,8 +233,6 @@ void DARTJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
-  this->dampingCoefficient = _damping;
-
   if (this->GetAngleCount() > 2)
   {
      gzerr << "Incompatible joint type, GetAngleCount() = "
@@ -242,7 +240,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
      return;
   }
 
-  // \TODO: implement on a per axis basis (requires additional sdf parameters)
+  this->dissipationCoefficient[_index] = _damping;
 
   /// \TODO:  this check might not be needed?  attaching an object to a static
   /// body should not affect damping application.
@@ -455,13 +453,6 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetAttribute(const std::string &_key, unsigned int _index,
-                             const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                              const boost::any &_value)
 {
@@ -495,13 +486,6 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     return false;
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-double DARTJoint::GetAttribute(const std::string& _key,
-                               unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////
