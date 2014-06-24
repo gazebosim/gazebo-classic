@@ -2084,3 +2084,4 @@ msgs::Scene World::GetSceneMsg() const
 {
   return this->sceneMsg;
 }
+
