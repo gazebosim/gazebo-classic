@@ -33,7 +33,8 @@ class ConcaveMeshTest : public PhysicsFixture,
 /////////////////////////////////////////////////
 void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
 {
-  LoadWorld("worlds/concave_submesh_no_collision_test.world", true, _physicsEngine);
+  LoadWorld("worlds/concave_submesh_no_collision_test.world",
+            true, _physicsEngine);
 
   world->Step(100);
 
@@ -50,7 +51,8 @@ void ConcaveMeshTest::SubmeshNoCollisionTest(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void ConcaveMeshTest::SubmeshCollisionTest(const std::string &_physicsEngine)
 {
-  LoadWorld("worlds/concave_submesh_collision_test.world", true, _physicsEngine);
+  LoadWorld("worlds/concave_submesh_collision_test.world",
+            true, _physicsEngine);
 
   world->Step(100);
 
