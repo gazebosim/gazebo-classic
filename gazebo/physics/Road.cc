@@ -98,3 +98,15 @@ void Road::Init()
 
   this->roadPub->Publish(msg);
 }
+
+/////////////////////////////////////////////////
+const std::vector<math::Vector3> &Road::GetPoints() const
+{
+  return this->points;
+}
+
+/////////////////////////////////////////////////
+double Road::GetWidth() const
+{
+  return this->width;
+}

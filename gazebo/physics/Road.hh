@@ -52,6 +52,14 @@ namespace gazebo
       /// \brief Initialize the road.
       public: virtual void Init();
 
+      /// \brief Get the point that define the road.
+      /// \return The vector of points that define the road.
+      public: const std::vector<math::Vector3> &GetPoints() const;
+
+      /// \brief Get the road width in meters.
+      /// \return Road width in meters.
+      public: double GetWidth() const;
+
       /// \brief Width of the road.
       private: double width;
 

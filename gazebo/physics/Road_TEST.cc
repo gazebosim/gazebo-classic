@@ -22,83 +22,48 @@ using namespace gazebo;
 
 class RoadTest : public gazebo::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
 TEST_F(RoadTest, Texture)
 {
   std::ostringstream roadStr;
-  roadStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<road name='my_road'>"
+  roadStr << "<sdf version='" << SDF_VERSION << "'><road name='my_road'>"
     << "<width>5</width>"
     << "<point>0 0 0</point>"
     << "<point>25 0 0</point>"
-    << "<texture>primary</texture>"
-    << "</road>"
-    << "</model>"
-    << "</sdf>";
+    << "<material>"
+    << "<script>"
+    << "<name>primary</name>"
+    << "</material>"
+    << "</script>"
+    << "</road></sdf>";
 
-  sdf::SDFPtr roadSDF(new sdf::SDF);
-  roadSDF->SetFromString(roadStr.str());
+  sdf::ElementPtr roadSDF(new sdf::Element);
+  sdf::initFile("road.sdf", roadSDF);
+  sdf::readString(roadStr.str(), roadSDF);
 
   physics::RoadPtr road(
       new physics::Road(physics::BasePtr()));
-  sdf::ElementPtr elem = roadSDF->root;
-  ASSERT_TRUE(elem);
-  elem = elem->GetElement("road");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
+  sdf::ElementPtr scriptElem = roadSDF->GetElement(
+      "material")->GetElement("script");
+  ASSERT_TRUE(scriptElem);
+  road->Load(roadSDF);
 
-  elem->GetElement("texture")->Set("lanes_2");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
+  EXPECT_STREQ(road->GetName().c_str(), "my_road");
+  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+      GetElement("script")->Get<std::string>("name").c_str(), "primary");
 
-  elem->GetElement("texture")->Set("motorway");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
+  scriptElem->GetElement("name")->Set("lanes_2");
+  road->Load(roadSDF);
+  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+      GetElement("script")->Get<std::string>("name").c_str(), "lanes_2");
 
-  elem->GetElement("texture")->Set("lanes_6");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("trunk");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("lanes_4");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("secondary");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("residential");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("lane_1");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("footway");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("sidewalk");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("tertiary");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
-
-  elem->GetElement("texture")->Set("Unknow_Value");
-  ASSERT_TRUE(elem);
-  road->Load(elem);
+  scriptElem->GetElement("name")->Set("motorway");
+  road->Load(roadSDF);
+  EXPECT_STREQ(road->GetSDF()->GetElement("material")->
+      GetElement("script")->Get<std::string>("name").c_str(), "motorway");
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

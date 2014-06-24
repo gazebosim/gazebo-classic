@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <scene>
       <grid>false</grid>
@@ -22,24 +22,24 @@
     <road name="my_road2">
       <width>5</width>
       <point>-38 -92 0</point>
-      <point>-92 -38  0</point>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Motorway</name>
-            </script>
-          </material>
+      <point>-92 -38 0</point>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Motorway</name>
+        </script>
+      </material>
     </road>
     <road name="my_road3">
       <width>5</width>
       <point>-92 -38 0</point>
-      <point>-92 38 0</point> 
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Residential</name>
-            </script>
-          </material>     
+      <point>-92 38 0</point>
+      <material>
+        <script>
+          <uri>file://media/materials/scripts/gazebo.material</uri>
+          <name>Gazebo/Residential</name>
+        </script>
+      </material>
     </road>
     <road name="my_road4">
       <width>5</width>
@@ -156,5 +156,5 @@
       <point>38 92 0</point>
       <point>-38 -92 0</point>
     </road>
-</world>
+  </world>
 </sdf>
