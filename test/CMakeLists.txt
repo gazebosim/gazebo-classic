@@ -34,6 +34,7 @@ set(ServerFixtureSources
   ${PROJECT_SOURCE_DIR}/gazebo/Server.cc
   ${PROJECT_SOURCE_DIR}/gazebo/Master.cc
   ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc
+  ${PROJECT_SOURCE_DIR}/test/PhysicsFixture.cc
   ${PROJECT_SOURCE_DIR}/test/ServerFixture.cc
 )
 add_library(server_fixture STATIC ${ServerFixtureSources})
