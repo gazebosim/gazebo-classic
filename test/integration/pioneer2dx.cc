@@ -63,6 +63,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
     physics::LinkPtr leftWheel = leftJoint->GetChild();
 
     math::Box bb = leftWheel->GetBoundingBox();
+    gzerr << bb << "\n";
     // This assumes that the largest dimension of the wheel is the diameter
     double wheelRadius = bb.GetSize().GetMax() * 0.5;
     EXPECT_NEAR(0.11, wheelRadius, 1e-3);

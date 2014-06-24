@@ -1194,7 +1194,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         if (addModelClique)
             surface.joinClique(_modelClique);
 
-        _mobod.updBody().addContactSurface(R_XN, surface);
+        int index = _mobod.updBody().addContactSurface(R_XN, surface);
+
+       // pass back pointer to ContactGeometry to SimbodyCollision.
+       SimbodyCollisionPtr simbodyCollision =
+         boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+       simbodyCollision->SetCollisionShape(
+         &_mobod.updBody().updContactSurface(index).updShape());
       }
       break;
 
@@ -1206,7 +1212,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         ContactSurface surface(ContactGeometry::Sphere(r), material);
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int index = _mobod.updBody().addContactSurface(X_LC, surface);
+
+       // pass back pointer to ContactGeometry to SimbodyCollision.
+       SimbodyCollisionPtr simbodyCollision =
+         boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+       simbodyCollision->SetCollisionShape(
+         &_mobod.updBody().updContactSurface(index).updShape());
       }
       break;
 
@@ -1231,7 +1243,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int index = _mobod.updBody().addContactSurface(X_LC, surface);
+
+       // pass back pointer to ContactGeometry to SimbodyCollision.
+       SimbodyCollisionPtr simbodyCollision =
+         boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+       simbodyCollision->SetCollisionShape(
+         &_mobod.updBody().updContactSurface(index).updShape());
       }
       break;
 
@@ -1256,7 +1274,13 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 
         if (addModelClique)
             surface.joinClique(_modelClique);
-        _mobod.updBody().addContactSurface(X_LC, surface);
+        int index = _mobod.updBody().addContactSurface(X_LC, surface);
+
+       // pass back pointer to ContactGeometry to SimbodyCollision.
+       SimbodyCollisionPtr simbodyCollision =
+         boost::dynamic_pointer_cast<physics::SimbodyCollision>(*ci);
+       simbodyCollision->SetCollisionShape(
+         &_mobod.updBody().updContactSurface(index).updShape());
       }
       break;
       default:
