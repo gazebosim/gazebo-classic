@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
@@ -25,23 +25,12 @@
 #define TOL 1e-4
 
 using namespace gazebo;
-class ContactSensor : public ServerFixture,
+class ContactSensor : public PhysicsFixture,
                       public testing::WithParamInterface<const char*>
 {
-  public: void EmptyWorld(const std::string &_physicsEngine);
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
 };
-
-void ContactSensor::EmptyWorld(const std::string &_physicsEngine)
-{
-  Load("worlds/empty.world", false, _physicsEngine);
-}
-
-TEST_P(ContactSensor, EmptyWorld)
-{
-  EmptyWorld(GetParam());
-}
 
 ////////////////////////////////////////////////////////////////////////
 // Test contact sensor using two configurations. Both place a sphere over
@@ -60,14 +49,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName01 = "contactModel01";
   std::string contactSensorName01 = "contactSensor01";
@@ -298,14 +280,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";

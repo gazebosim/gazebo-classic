@@ -27,17 +27,17 @@
 #endif
 
 #include "gazebo/transport/transport.hh"
-#include "ServerFixture.hh"
+#include "PhysicsFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
 const double g_friction_tolerance = 1e-3;
 
-class PhysicsFrictionTest : public ServerFixture,
-                        public testing::WithParamInterface<const char*>
+class PhysicsFrictionTest : public PhysicsFixture,
+                            public testing::WithParamInterface<const char*>
 {
-  protected: PhysicsFrictionTest() : ServerFixture(), spawnCount(0)
+  protected: PhysicsFrictionTest() : PhysicsFixture(), spawnCount(0)
              {
              }
 
@@ -189,7 +189,7 @@ class PhysicsFrictionTest : public ServerFixture,
               << "  </link>"
               << "</model>";
 
-            physics::WorldPtr world = physics::get_world("default");
+            EXPECT_TRUE(world != NULL);
             world->InsertModelString(modelStr.str());
 
             physics::ModelPtr model;
@@ -230,7 +230,7 @@ class PhysicsFrictionTest : public ServerFixture,
   public: void DirectionNaN(const std::string &_physicsEngine);
 
   /// \brief Test Link::GetWorldInertia* functions.
-  /// \TODO: move the SpawnBox function to ServerFixture,
+  /// \TODO: move the SpawnBox function to PhysicsFixture,
   /// and then move this test to a different file.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void LinkGetWorldInertia(const std::string &_physicsEngine);
@@ -263,14 +263,9 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/friction_demo.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/friction_demo.world", true, _physicsEngine);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
   math::Vector3 g = physics->GetGravity();
 
   // Custom gravity vector for this demo world.
@@ -355,14 +350,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // set the gravity vector
   // small positive y component
@@ -457,14 +445,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // set the gravity vector
   // small positive y component
@@ -502,14 +483,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
 {
   // Load a blank world (no ground plane)
-  Load("worlds/blank.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/blank.world", true, _physicsEngine);
 
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);

@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "helper_physics_generator.hh"
@@ -24,7 +24,7 @@
 #define IMU_TOL 1e-5
 
 using namespace gazebo;
-class ImuTest : public ServerFixture,
+class ImuTest : public PhysicsFixture,
                 public testing::WithParamInterface<const char*>
 {
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
@@ -39,10 +39,6 @@ class ImuTest : public ServerFixture,
 
 void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 {
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics);
   // Rotate into IMU's frame
   _g = _rot.GetInverse().RotateVector(physics->GetGravity());
 }
@@ -53,8 +49,6 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
                          math::Vector3 &_accelMean,
                          math::Quaternion& _orientation)
 {
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
   // Collect a number of samples and return the average rate and accel values
   math::Vector3 rateSum, accelSum;
   for (unsigned int i = 0; i < _cnt; ++i)
@@ -89,7 +83,7 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/empty.world", true, _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";
@@ -141,7 +135,7 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/empty.world", true, _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";
@@ -228,7 +222,7 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/empty.world", true, _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   std::string modelName = "imu_model";
   std::string imuSensorName = "imu_sensor";

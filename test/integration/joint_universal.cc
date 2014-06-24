@@ -17,15 +17,15 @@
 #include <string>
 
 #include "gazebo/physics/physics.hh"
-#include "ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
 const double g_tolerance = 1e-4;
 
-class JointTestUniversal : public ServerFixture,
-                        public testing::WithParamInterface<const char*>
+class JointTestUniversal : public PhysicsFixture,
+                           public testing::WithParamInterface<const char*>
 {
   /// \brief Test setting and enforcing joint limits.
   /// \param[in] _physicsEngine Type of physics engine to use.
@@ -52,16 +52,7 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   }
 
   // Load our universal joint test world
-  Load("worlds/universal_joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/universal_joint_test.world", true, _physicsEngine);
 
   // get model and joints
   physics::ModelPtr model = world->GetModel("model_1");
@@ -152,16 +143,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   }
 
   // Load our universal joint test world
-  Load("worlds/universal_joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/universal_joint_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 
@@ -265,16 +247,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   }
 
   // Load our universal joint test world
-  Load("worlds/universal_joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/universal_joint_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 

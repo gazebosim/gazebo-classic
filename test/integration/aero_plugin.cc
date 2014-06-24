@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Joint.hh"
-#include "test/ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 #define TOL 1e-6
@@ -26,8 +26,8 @@
 
 using namespace gazebo;
 
-class JointLiftDragPluginTest : public ServerFixture,
-                             public testing::WithParamInterface<const char*>
+class JointLiftDragPluginTest : public PhysicsFixture,
+                                public testing::WithParamInterface<const char*>
 {
   /// \brief Load example world with a lifting surface plugin
   /// Measure / verify force torques against analytical answers.
@@ -46,16 +46,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   }
 
   // Load our force torque test world
-  Load("worlds/lift_drag_plugin.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/lift_drag_plugin.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 

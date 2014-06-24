@@ -17,14 +17,14 @@
 #include <string.h>
 
 #include "gazebo/physics/physics.hh"
-#include "test/ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 #include "helper_physics_generator.hh"
 
 using namespace gazebo;
 
 const double g_tolerance = 1e-4;
 
-class PhysicsLinkTest : public ServerFixture,
+class PhysicsLinkTest : public PhysicsFixture,
                         public testing::WithParamInterface<const char*>
 {
   /// \brief Test GetWorldEnergy* functions.
@@ -39,14 +39,9 @@ class PhysicsLinkTest : public ServerFixture,
 /////////////////////////////////////////////////
 void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
 {
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
-  // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  // check the time step
   double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
@@ -94,14 +89,9 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
     return;
   }
 
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
-  // check the physics engine
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  // check the time step
   double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
 
