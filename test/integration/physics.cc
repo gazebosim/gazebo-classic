@@ -755,14 +755,6 @@ TEST_P(PhysicsTest, JointDampingTest)
 
 void PhysicsTest::DropStuff(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Skipping DropStuff for physics engine ["
-          << _physicsEngine
-          << "] due to issue #1209.\n";
-    return;
-  }
-
   Load("worlds/drop_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
