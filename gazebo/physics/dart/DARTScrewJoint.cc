@@ -171,6 +171,15 @@ double DARTScrewJoint::GetThreadPitch()
 }
 
 //////////////////////////////////////////////////
+double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->GetThreadPitch();
+  else
+    return DARTJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
 math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
