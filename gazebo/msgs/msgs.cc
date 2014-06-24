@@ -674,6 +674,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
     msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Fog result;
@@ -747,6 +748,97 @@ namespace gazebo
         result.set_shadows(_sdf->Get<bool>("shadows"));
 
       return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr lightSDF;
+
+      if (_sdf)
+      {
+        lightSDF = _sdf;
+      }
+      else
+      {
+        lightSDF.reset(new sdf::Element);
+        sdf::initFile("light.sdf", lightSDF);
+      }
+
+      lightSDF->GetAttribute("name")->Set(_msg.name());
+
+      if (_msg.has_type() && _msg.type() == msgs::Light::POINT)
+        lightSDF->GetAttribute("type")->Set("point");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::SPOT)
+        lightSDF->GetAttribute("type")->Set("spot");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::DIRECTIONAL)
+        lightSDF->GetAttribute("type")->Set("directional");
+
+      if (_msg.has_pose())
+      {
+        lightSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+      }
+
+      if (_msg.has_diffuse())
+      {
+        lightSDF->GetElement("diffuse")->Set(msgs::Convert(_msg.diffuse()));
+      }
+
+      if (_msg.has_specular())
+      {
+        lightSDF->GetElement("specular")->Set(msgs::Convert(_msg.specular()));
+      }
+
+      if (_msg.has_direction())
+      {
+        lightSDF->GetElement("direction")->Set(msgs::Convert(_msg.direction()));
+      }
+
+      if (_msg.has_attenuation_constant())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("constant")->Set(_msg.attenuation_constant());
+      }
+
+      if (_msg.has_attenuation_linear())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("linear")->Set(_msg.attenuation_linear());
+      }
+
+      if (_msg.has_attenuation_quadratic())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("quadratic")->Set(_msg.attenuation_quadratic());
+      }
+
+      if (_msg.has_range())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("range")->Set(_msg.range());
+      }
+
+      if (_msg.has_cast_shadows())
+        lightSDF->GetElement("cast_shadows")->Set(_msg.cast_shadows());
+
+      if (_msg.has_spot_inner_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("inner_angle")->Set(_msg.spot_inner_angle());
+      }
+
+      if (_msg.has_spot_outer_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("outer_angle")->Set(_msg.spot_outer_angle());
+      }
+
+      if (_msg.has_spot_falloff())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("falloff")->Set(_msg.spot_falloff());
+      }
+      return lightSDF;
     }
   }
 }
