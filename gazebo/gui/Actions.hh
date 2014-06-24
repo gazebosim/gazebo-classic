@@ -19,7 +19,6 @@
 #define _GUI_ACTIONS_HH_
 
 #include <string>
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -81,6 +80,11 @@ namespace gazebo
     extern QAction *g_diagnosticsAct;
 
     extern QAction *g_viewWireframeAct;
+
+    extern QAction *g_viewOculusAct;
+
+    extern QAction *g_copyAct;
+    extern QAction *g_pasteAct;
 
     /// \class DeleteAction Actions.hh gui/gui.hh
     /// \brief Custom delete action.
