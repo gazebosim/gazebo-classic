@@ -85,6 +85,10 @@ math::Box SimbodyCollision::GetBoundingBox() const
     math::Vector3 minCorner(center[0]-r, center[1]-r, center[2]-r);
     math::Vector3 maxCorner(center[0]+r, center[1]+r, center[2]+r);
 #else
+    /// commented out because:
+    /// calcSupportPoint() for TriMesh is not working yet in simbody
+    /// https://github.com/simbody/simbody/issues/174
+
     // get AABB by calling calcSupportPoint
     math::Vector3 minCorner;
     math::Vector3 maxCorner;
