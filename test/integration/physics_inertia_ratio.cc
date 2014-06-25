@@ -19,7 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
+#include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/PID.hh"
 #include "SimplePendulumIntegrator.hh"
@@ -79,10 +80,13 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   }
 }
 
-TEST_F(PhysicsTest, InertiaRatioPendulum)
+TEST_P(PhysicsTest, InertiaRatioPendulum)
 {
-  InertiaRatioPendulum("ode");
+  InertiaRatioPendulum(GetParam());
 }
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest,
+                        PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {
