@@ -26,8 +26,23 @@
 
 using namespace gazebo;
 
+class JointTests : public JointTest
+{
+  /// \brief Test Joint::GetInertiaRatio.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void GetInertiaRatio(const std::string &_physicsEngine);
+
+  /// \brief Create and destroy joints repeatedly, monitors memory usage.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
+
+  /// \brief Test spring dampers
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SpringDamperTest(const std::string &_physicsEngine);
+};
+
 //////////////////////////////////////////////////
-void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
+void JointTests::JointCreationDestructionTest(const std::string &_physicsEngine)
 {
   /// \TODO: Disable for now until functionality is implemented
   /// bullet collision parameters needs tweaking
@@ -149,7 +164,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
+void JointTests::GetInertiaRatio(const std::string &_physicsEngine)
 {
   // Load our inertia ratio world
   Load("worlds/inertia_ratio.world", true, _physicsEngine);
@@ -176,7 +191,7 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
   }
 }
 //////////////////////////////////////////////////
-void JointTest::SpringDamperTest(const std::string &_physicsEngine)
+void JointTests::SpringDamperTest(const std::string &_physicsEngine)
 {
   /// SpringDamper implemented not yet released for dart
   if (_physicsEngine == "dart")
@@ -374,17 +389,17 @@ TEST_F(JointTest, joint_SDF14)
   EXPECT_EQ(child->GetName(), "body1");
 }
 
-TEST_P(JointTest, JointCreationDestructionTest)
+TEST_P(JointTests, JointCreationDestructionTest)
 {
   JointCreationDestructionTest(this->physicsEngine);
 }
 
-TEST_P(JointTest, GetInertiaRatio)
+TEST_P(JointTests, GetInertiaRatio)
 {
   GetInertiaRatio(this->physicsEngine);
 }
 
-TEST_P(JointTest, SpringDamperTest)
+TEST_P(JointTests, SpringDamperTest)
 {
   SpringDamperTest(this->physicsEngine);
 }

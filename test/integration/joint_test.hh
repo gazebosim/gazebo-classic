@@ -31,23 +31,11 @@ using namespace gazebo;
 typedef std::tr1::tuple<const char *, const char *> std_string2;
 
 class JointTest : public ServerFixture,
-                   public ::testing::WithParamInterface<std_string2>
+                  public ::testing::WithParamInterface<std_string2>
 {
   protected: JointTest() : ServerFixture(), spawnCount(0)
              {
              }
-
-  /// \brief Test Joint::GetInertiaRatio.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void GetInertiaRatio(const std::string &_physicsEngine);
-
-  /// \brief Test spring dampers
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void SpringDamperTest(const std::string &_physicsEngine);
-
-  /// \brief Create and destroy joints repeatedly, monitors memory usage.
-  /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void JointCreationDestructionTest(const std::string &_physicsEngine);
 
   // Documentation inherited.
   public: virtual void SetUp()
