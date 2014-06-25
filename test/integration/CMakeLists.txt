@@ -63,6 +63,7 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  road.cc
   sensor.cc
   server_fixture.cc
   speed.cc
