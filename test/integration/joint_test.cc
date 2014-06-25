@@ -452,7 +452,7 @@ TEST_P(JointTests, JointCreationDestructionTest)
   JointCreationDestructionTest(this->physicsEngine);
 }
 
-TEST_P(JointTest, GetInertiaRatio)
+TEST_P(JointTests, GetInertiaRatio)
 {
   GetInertiaRatio(this->physicsEngine);
 }
