@@ -65,16 +65,7 @@ void JointTests::JointCreationDestructionTest(const std::string &_physicsEngine)
   }
 
   // Load our inertial test world
-  Load("worlds/joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/joint_test.world", true, _physicsEngine);
 
   // create some fake links
   physics::ModelPtr model = world->GetModel("model_1");
@@ -167,16 +158,7 @@ void JointTests::JointCreationDestructionTest(const std::string &_physicsEngine)
 void JointTests::GetInertiaRatio(const std::string &_physicsEngine)
 {
   // Load our inertia ratio world
-  Load("worlds/inertia_ratio.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/inertia_ratio.world", true, _physicsEngine);
 
   physics::ModelPtr model = world->GetModel("double_pendulum");
   ASSERT_TRUE(model != NULL);
@@ -207,16 +189,7 @@ void JointTests::SpringDamperTest(const std::string &_physicsEngine)
   }
 
   // Load our inertial test world
-  Load("worlds/spring_damper_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/spring_damper_test.world", true, _physicsEngine);
 
   // All models should oscillate with the same frequency
   physics::ModelPtr modelPrismatic = world->GetModel("model_3_prismatic");
@@ -350,26 +323,10 @@ void JointTests::SpringDamperTest(const std::string &_physicsEngine)
 //////////////////////////////////////////////////
 TEST_F(JointTest, joint_SDF14)
 {
-  Load("worlds/SDF_1_4.world");
+  LoadWorld("worlds/SDF_1_4.world", true, "ode");
 
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  this->world->SetPaused(false);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-
-  int i = 0;
-  while (!this->HasEntity("joint14_model") && i < 20)
-  {
-    common::Time::MSleep(100);
-    ++i;
-  }
-
-  if (i > 20)
-    gzthrow("Unable to get joint14_model");
-
-  physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
   physics::ModelPtr model = world->GetModel("joint14_model");
   EXPECT_TRUE(model);
   physics::LinkPtr link1 = model->GetLink("body1");

@@ -21,7 +21,7 @@
 #include <string>
 #include <sstream>
 
-#include "test/ServerFixture.hh"
+#include "test/PhysicsFixture.hh"
 
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/physics.hh"
@@ -30,10 +30,10 @@ using namespace gazebo;
 
 typedef std::tr1::tuple<const char *, const char *> std_string2;
 
-class JointTest : public ServerFixture,
+class JointTest : public PhysicsFixture,
                   public ::testing::WithParamInterface<std_string2>
 {
-  protected: JointTest() : ServerFixture(), spawnCount(0)
+  protected: JointTest() : PhysicsFixture(), spawnCount(0)
              {
              }
 

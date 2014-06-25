@@ -66,14 +66,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/empty.world", true, _physicsEngine);
 
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);
@@ -158,16 +151,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   }
 
   // Load our screw joint test world
-  Load("worlds/screw_joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/screw_joint_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 
@@ -287,16 +271,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   }
 
   // Load our screw joint test world
-  Load("worlds/screw_joint_test.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/screw_joint_test.world", true, _physicsEngine);
 
   physics->SetGravity(math::Vector3(0, 0, 0));
 
@@ -495,19 +470,10 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   }
 
   // Load pr2 world
-  ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
-
-  // Get a pointer to the world, make sure world loads
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  LoadWorld("worlds/pr2.world", true, _physicsEngine);
 
   // get time step size
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = physics->GetMaxStepSize();
   EXPECT_GT(dt, 0);
   gzlog << "dt : " << dt << "\n";
 
