@@ -60,7 +60,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
 
   for (int i = 0; i < 3000; ++i)
   {
-    world->StepWorld(1);
+    world->Step(1);
 
     // Check out of plane angles
     {

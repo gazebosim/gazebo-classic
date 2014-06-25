@@ -130,7 +130,7 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
                 joint2->GetAngle(0).Radian(), TOL);
     EXPECT_NEAR(joint1->GetAngle(0).Radian(),
                 joint3->GetAngle(0).Radian(), TOL);
-    world->StepWorld(1);
+    world->Step(1);
   }
 }
 
