@@ -19,6 +19,7 @@
 
 #include <OgreCompositorInstance.h>
 #include <OgreCustomCompositionPass.h>
+#include "gazebo/util/system.hh"
 
 
 namespace gazebo
@@ -29,7 +30,7 @@ namespace gazebo
     // composition pass. This is the class that will send the actual render
     // calls of the spheres (point lights), cones (spotlights) and quads
     // (directional lights) after the GBuffer has been constructed
-    class MergeRenderOperation :
+    class GAZEBO_VISIBLE MergeRenderOperation :
       public Ogre::CompositorInstance::RenderSystemOperation
     {
       public: MergeRenderOperation(Ogre::CompositorInstance *_instance,
@@ -44,7 +45,8 @@ namespace gazebo
 
     /// The custom composition pass that is used for rendering the light
     /// geometry. This class needs to be registered with the CompositorManager
-    class MergeCompositionPass : public Ogre::CustomCompositionPass
+    class GAZEBO_VISIBLE MergeCompositionPass :
+      public Ogre::CustomCompositionPass
     {
       /// @copydoc CustomCompositionPass::createOperation
       public: virtual Ogre::CompositorInstance::RenderSystemOperation *

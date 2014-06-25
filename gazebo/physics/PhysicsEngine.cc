@@ -216,7 +216,7 @@ void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetMaxContacts(double /*_maxContacts*/)
+void PhysicsEngine::SetMaxContacts(unsigned int /*_maxContacts*/)
 {
 }
 
@@ -236,13 +236,14 @@ void PhysicsEngine::SetContactSurfaceLayer(double /*_layerDepth*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetParam(std::string /*_key*/,
+bool PhysicsEngine::SetParam(const std::string &/*_key*/,
     const boost::any &/*_value*/)
 {
+  return true;
 }
 
 //////////////////////////////////////////////////
-boost::any PhysicsEngine::GetParam(std::string /*_key*/) const
+boost::any PhysicsEngine::GetParam(const std::string &/*_key*/) const
 {
   return 0;
 }

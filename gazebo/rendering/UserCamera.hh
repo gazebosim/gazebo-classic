@@ -27,6 +27,8 @@
 
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +43,7 @@ namespace gazebo
 
     /// \class UserCamera UserCamera.hh rendering/rendering.hh
     /// \brief A camera used for user visualization of a scene
-    class UserCamera : public Camera
+    class GAZEBO_VISIBLE UserCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _name Name of the camera.
@@ -119,7 +121,7 @@ namespace gazebo
 
       /// \brief Get the triangle count.
       /// \return The number of triangles currently being rendered.
-      public: float GetTriangleCount() const;
+      public: unsigned int GetTriangleCount() const;
 
       /// \brief Move the camera to focus on a visual.
       /// \param[in] _visual Visual to move the camera to.

@@ -40,6 +40,7 @@
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace Ogre
 {
@@ -58,7 +59,7 @@ namespace gazebo
 
     /// \class Visual Visual.hh rendering/rendering.hh
     /// \brief A renderable object
-    class Visual : public boost::enable_shared_from_this<Visual>
+    class GAZEBO_VISIBLE Visual : public boost::enable_shared_from_this<Visual>
     {
       /// \brief Constructor
       /// \param[in] _name Name of the visual.
@@ -270,7 +271,7 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      public: void SetWorldPose(const math::Pose _pose);
+      public: void SetWorldPose(const math::Pose &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.

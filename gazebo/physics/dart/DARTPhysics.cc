@@ -377,39 +377,96 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
-  DARTParam param;
+  sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
 
   if (_key == "max_contacts")
-    param = MAX_CONTACTS;
+  {
+    return dartElem->GetElement("max_contacts")->Get<int>();
+  }
   else if (_key == "min_step_size")
-    param = MIN_STEP_SIZE;
+  {
+    return dartElem->GetElement("solver")->Get<double>("min_step_size");
+  }
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
     return 0;
   }
 
-  return this->GetParam(param);
+  gzerr << "We should not be here, something is wrong." << std::endl;
+  return 0;
+}
+
+//////////////////////////////////////////////////
+bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
+{
+  /// \TODO fill this out, see issue #1115
+  if (_key == "max_contacts")
+  {
+    int value;
+    try
+    {
+      value = boost::any_cast<int>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in DART to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "min_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    gzerr << "Setting [" << _key << "] in DART to [" << value
+          << "] not yet supported.\n";
+  }
+  else if (_key == "max_step_size")
+  {
+    double value;
+    try
+    {
+      value = boost::any_cast<double>(_value);
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+    this->dtWorld->setTimeStep(value);
+  }
+  else
+  {
+    gzwarn << _key << " is not supported in DART" << std::endl;
+    return false;
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
 {
-  sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
-
   boost::any value = 0;
   switch (_param)
   {
     case MAX_CONTACTS:
     {
-      value = dartElem->GetElement("max_contacts")->Get<int>();
-      break;
+      return this->GetParam("max_contacts");
     }
     case MIN_STEP_SIZE:
     {
-      value = dartElem->GetElement("solver")->Get<double>("min_step_size");
-      break;
+      return this->GetParam("min_step_size");
     }
     default:
     {
@@ -475,6 +532,9 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 
   /// Make sure all models get at least on update cycle.
   this->world->EnableAllModels();
+
+  // Parent class handles many generic parameters
+  PhysicsEngine::OnPhysicsMsg(_msg);
 }
 
 //////////////////////////////////////////////////

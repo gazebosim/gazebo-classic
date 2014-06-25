@@ -1,4 +1,4 @@
-gztopic -- Tool to interact with gztopics on a Gazebo master
+gztopic -- DEPRECATED(see 'gz help topic')
 =============================================
 
 ## SYNOPSIS

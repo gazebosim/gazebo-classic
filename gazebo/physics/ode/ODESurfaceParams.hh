@@ -23,6 +23,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/SurfaceParams.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
     /// \{
 
     /// \brief ODE surface parameters.
-    class ODESurfaceParams : public SurfaceParams
+    class GAZEBO_VISIBLE ODESurfaceParams : public SurfaceParams
     {
       /// \brief Constructor.
       public: ODESurfaceParams();

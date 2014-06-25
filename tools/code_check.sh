@@ -38,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -47,6 +47,7 @@ then
 else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
+" ./test/examples ./test/plugins"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
   if [ $CPPCHECK_LT_157 -eq 1 ]; then
     # cppcheck is older than 1.57, so don't check header files (issue #907)
@@ -70,10 +71,19 @@ echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 # The follow suppression is useful when checking for missing includes.
 # It's disable for now because checking for missing includes is very
 # time consuming. See CPPCHECK_CMD3.
-echo "missingIncludeSystem" >> $SUPPRESS
+# Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
+if [ -n "$(which lsb_release)" ]; then
+   case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
+       "12.04" | "13.04" )
+         echo "missingIncludeSystem" >> $SUPPRESS
+       ;;
+   esac
+fi
 
-#cppcheck
-CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
+#cppcheck.
+# MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
+[ -z $MAKE_JOBS ] && MAKE_JOBS=1
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
@@ -123,7 +133,8 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
+        | grep -v 'use --check-config for details' \
+        | grep -v 'Include file: .*not found'
     fi
 
     # Undo changes to suppression file

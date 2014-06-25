@@ -461,7 +461,8 @@ void SensorManager::SensorContainer::RunLoop()
   boost::mutex::scoped_lock lock2(tmpMutex);
 
   // Wait for a sensor to be added.
-  if (this->sensors.empty())
+  // Use a while loop since world resets will notify the runCondition.
+  while (this->sensors.empty())
   {
     this->runCondition.wait(lock2);
     if (this->stop)
@@ -488,8 +489,14 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
-    if (this->sensors.empty())
+    // If all the sensors get deleted, wait here.
+    // Use a while loop since world resets will notify the runCondition.
+    while (this->sensors.empty())
+    {
       this->runCondition.wait(lock2);
+      if (this->stop)
+        return;
+    }
 
     // Get the start time of the update.
     startTime = world->GetSimTime();
@@ -518,7 +525,11 @@ void SensorManager::SensorContainer::RunLoop()
     SensorManager::Instance()->simTimeEventHandler->AddRelativeEvent(
         eventTime, &this->runCondition);
 
-    this->runCondition.wait(timingLock);
+    // This if statement helps prevent deadlock on osx during teardown.
+    if (!this->stop)
+    {
+      this->runCondition.wait(timingLock);
+    }
   }
 }
 

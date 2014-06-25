@@ -56,8 +56,7 @@ bool g_useShortDebugString = false;
 /////////////////////////////////////////////////
 void help(po::options_description &_options)
 {
-  std::cerr << "gztopic -- Tool to interact with gztopics on a "
-    "Gazebo master\n\n";
+  std::cerr << "gztopic -- DEPRECATED(see 'gz help topic')\n\n";
 
   std::cerr << "`gztopic` [options] <command>\n\n";
 
@@ -551,6 +550,8 @@ int main(int argc, char **argv)
 {
   if (!parse(argc, argv))
     return 0;
+
+  gazebo::common::Console::SetQuiet(true);
 
   if (params[0] == "list")
     list();

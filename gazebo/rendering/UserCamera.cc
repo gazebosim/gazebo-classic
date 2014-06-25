@@ -382,7 +382,7 @@ float UserCamera::GetAvgFPS() const
 }
 
 //////////////////////////////////////////////////
-float UserCamera::GetTriangleCount() const
+unsigned int UserCamera::GetTriangleCount() const
 {
   return RenderEngine::Instance()->GetWindowManager()->GetTriangleCount(
       this->windowId);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright 2013-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,20 @@
  *
 */
 
+#include "gazebo/sensors/SensorsIface.hh"
 #include "ServerFixture.hh"
 
 using namespace gazebo;
-class CameraFollow : public ServerFixture
+class GzCamera : public ServerFixture
 {
 };
 
 /////////////////////////////////////////////////
 // \brief Test the at camera follow (gz camera -f <model> -c <camera>) moves
 // the camera
-TEST_F(CameraFollow, Follow)
+TEST_F(GzCamera, Follow)
 {
-  Load("worlds/empty.world");
+  Load("worlds/empty_test.world");
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
@@ -56,25 +57,14 @@ TEST_F(CameraFollow, Follow)
 
   // Tell the camera to follow the box. The camera should move toward the
   // box.
-  msgs::CameraCmd msg;
-  msg.set_follow_model("box");
+  custom_exec("gz camera -c test_camera -f box");
+  world->Step(5000);
 
-  transport::NodePtr node(new transport::Node());
-  node->Init("default");
-
-  transport::PublisherPtr pub =
-    node->Advertise<msgs::CameraCmd>("~/test_camera/cmd");
-
-  pub->WaitForConnection();
-  pub->Publish(msg, true);
-
-  world->Step(1000);
-
-  // Make sure the sensor is at the correct initial pose
+  // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 4.3, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 4.3, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().pos.x, 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().pos.y, 9.9, 0.1);
 }
 
 /////////////////////////////////////////////////

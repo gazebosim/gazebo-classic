@@ -1049,3 +1049,41 @@ size_t Model::GetGripperCount() const
 {
   return this->grippers.size();
 }
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyPotential() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyPotential();
+  }
+  for (Joint_V::const_iterator iter = this->joints.begin();
+    iter != this->joints.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    {
+      e += (*iter)->GetWorldEnergyPotentialSpring(j);
+    }
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergyKinetic() const
+{
+  double e = 0;
+  for (Link_V::const_iterator iter = this->links.begin();
+    iter != this->links.end(); ++iter)
+  {
+    e += (*iter)->GetWorldEnergyKinetic();
+  }
+  return e;
+}
+
+/////////////////////////////////////////////////
+double Model::GetWorldEnergy() const
+{
+  return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
+}

@@ -44,6 +44,7 @@ using namespace gui;
 : EntityMaker()
 {
   this->state = 0;
+  this->leftMousePressed = false;
   this->clone = false;
 }
 

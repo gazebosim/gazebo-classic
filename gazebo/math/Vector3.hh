@@ -27,6 +27,7 @@
 #include <fstream>
 
 #include "gazebo/math/Helpers.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \brief The Vector3 class represents the generic vector containing 3
     ///        elements.  Since it's commonly used to keep coordinate system
     ///        related information, its elements are labeled by x, y, z.
-    class Vector3
+    class GAZEBO_VISIBLE Vector3
     {
       /// \brief math::Vector3(0, 0, 0)
       public: static const Vector3 Zero;

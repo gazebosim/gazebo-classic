@@ -23,6 +23,7 @@
 
 #include "gazebo/math/Matrix4.hh"
 #include "gazebo/math/Pose.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class NodeAnimation SkeletonAnimation.hh common/common.hh
     /// \brief Node animation
-    class NodeAnimation
+    class GAZEBO_VISIBLE NodeAnimation
     {
       /// \brief constructor
       /// \param[in] _name the name of the node
@@ -117,7 +118,7 @@ namespace gazebo
     };
 
     /// \brief Skeleton animation
-    class SkeletonAnimation
+    class GAZEBO_VISIBLE SkeletonAnimation
     {
       /// \brief The Constructor
       /// \param[in] _name the name of the animation

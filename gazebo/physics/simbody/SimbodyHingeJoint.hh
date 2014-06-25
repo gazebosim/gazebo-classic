@@ -25,6 +25,7 @@
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief A single axis hinge joint
-    class SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
+    class GAZEBO_VISIBLE SimbodyHingeJoint : public HingeJoint<SimbodyJoint>
     {
       ///  Constructor
       public: SimbodyHingeJoint(SimTK::MultibodySystem *world, BasePtr _parent);
@@ -60,20 +61,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual double GetMaxForce(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;

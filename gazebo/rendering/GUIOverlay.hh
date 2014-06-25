@@ -178,6 +178,11 @@ namespace gazebo
                   CEGUI::Event::Subscriber(&GUIOverlay::OnButtonClicked, this));
 
                 this->callbacks[_buttonName] = boost::bind(_fp, _obj);
+#else
+                if (_buttonName && _fp && _obj)
+                {
+                  gzerr << "CEGUI not installed." << std::endl;
+                }
 #endif
               }
 

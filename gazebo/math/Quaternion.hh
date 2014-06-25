@@ -31,6 +31,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
 #include "gazebo/math/Matrix4.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -41,7 +42,7 @@ namespace gazebo
 
   /// \class Quaternion Quaternion.hh math/gzmath.hh
   /// \brief A quaternion class
-  class Quaternion
+  class GAZEBO_VISIBLE Quaternion
   {
     /// \brief Default Constructor
     public: Quaternion();

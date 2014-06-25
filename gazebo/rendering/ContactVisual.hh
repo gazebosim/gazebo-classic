@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     ///
     /// This class visualizes contact points by drawing arrows in the 3D
     /// environment.
-    class ContactVisual : public Visual
+    class GAZEBO_VISIBLE ContactVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the ContactVisual

@@ -47,12 +47,6 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHinge2Joint::Init()
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
 math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
 {
   return this->anchorPos;
@@ -105,34 +99,6 @@ double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 {
   gzerr << "Not implemented";
   return 0;
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetHighStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-void SimbodyHinge2Joint::SetLowStop(unsigned int /*_index*/,
-  const math::Angle &/*_angle*/)
-{
-  gzerr << "Not implemented";
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetHighStop(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
-}
-
-//////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetLowStop(unsigned int /*_index*/)
-{
-  gzerr << "Not implemented";
-  return math::Angle();
 }
 
 //////////////////////////////////////////////////

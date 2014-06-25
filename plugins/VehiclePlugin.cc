@@ -73,17 +73,17 @@ void VehiclePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return;
   }
 
-  this->joints[0]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[0]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[0]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[0]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[1]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[1]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[1]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[1]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[2]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[2]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[2]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[2]->SetParam("suspension_cfm", 0, 0.04);
 
-  this->joints[3]->SetAttribute("suspension_erp", 0, 0.15);
-  this->joints[3]->SetAttribute("suspension_cfm", 0, 0.04);
+  this->joints[3]->SetParam("suspension_erp", 0, 0.15);
+  this->joints[3]->SetParam("suspension_cfm", 0, 0.04);
 
   this->gasJoint = this->model->GetJoint(_sdf->Get<std::string>("gas"));
   this->brakeJoint = this->model->GetJoint(_sdf->Get<std::string>("brake"));

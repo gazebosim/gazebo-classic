@@ -24,10 +24,11 @@
 #include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class GpuRayPlugin : public SensorPlugin
+  class GAZEBO_VISIBLE GpuRayPlugin : public SensorPlugin
   {
     public: GpuRayPlugin();
 

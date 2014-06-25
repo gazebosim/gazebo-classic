@@ -73,6 +73,7 @@ void DARTBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 //////////////////////////////////////////////////
 double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 {
+  gzerr << "DARTBallJoint::GetVelocity not implemented" << std::endl;
   return 0;
 }
 
@@ -90,11 +91,49 @@ void DARTBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 //////////////////////////////////////////////////
 math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
+  gzerr << "DARTBallJoint::GetAngleImpl not implemented" << std::endl;
   return math::Angle(0);
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 {
-  gzerr << "Not implemented";
+  gzerr << "DARTBallJoint::SetForceImpl not implemented";
+}
+
+//////////////////////////////////////////////////
+void DARTBallJoint::SetAxis(unsigned int /*_index*/,
+                            const math::Vector3 &/*_axis*/)
+{
+  gzerr << "DARTBallJoint::SetAxis not implemented" << std::endl;
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTBallJoint::GetHighStop(unsigned int /*_index*/)
+{
+  gzerr << "DARTBallJoint::GetHighStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+math::Angle DARTBallJoint::GetLowStop(unsigned int /*_index*/)
+{
+  gzerr << "DARTBallJoint::GetLowStop not implemented" << std::endl;
+  return math::Angle();
+}
+
+//////////////////////////////////////////////////
+bool DARTBallJoint::SetHighStop(unsigned int /*_index*/,
+                                const math::Angle &/*_angle*/)
+{
+  gzerr << "DARTBallJoint::SetHighStop not implemented" << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool DARTBallJoint::SetLowStop(unsigned int /*_index*/,
+                               const math::Angle &/*_angle*/)
+{
+  gzerr << "DARTBallJoint::SetLowStop not implemented" << std::endl;
+  return false;
 }

@@ -25,6 +25,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class GAZEBO_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();

@@ -14,6 +14,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
+  ForceTorqueModelRemovalTestPlugin
   ModelTrajectoryTestPlugin
   SpringTestPlugin
 )

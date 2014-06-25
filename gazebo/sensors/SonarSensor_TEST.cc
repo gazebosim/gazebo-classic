@@ -93,6 +93,8 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
   EXPECT_DOUBLE_EQ(sensor->GetRangeMax(), 1.0);
   EXPECT_DOUBLE_EQ(sensor->GetRadius(), 0.3);
   EXPECT_DOUBLE_EQ(sensor->GetRange(), 1.0);
+
+  EXPECT_TRUE(sensor->IsActive());
 }
 
 /////////////////////////////////////////////////

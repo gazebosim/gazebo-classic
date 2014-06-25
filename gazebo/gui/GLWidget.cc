@@ -635,8 +635,41 @@ void GLWidget::OnMouseReleaseNormal()
 //////////////////////////////////////////////////
 void GLWidget::ViewScene(rendering::ScenePtr _scene)
 {
+  // The user camera name.
+  std::string cameraBaseName = "gzclient_camera";
+  std::string cameraName = cameraBaseName;
+
+  transport::ConnectionPtr connection = transport::connectToMaster();
+  if (connection)
+  {
+    std::string topicData;
+    msgs::Packet packet;
+    msgs::Request request;
+    msgs::GzString_V topics;
+
+    request.set_id(0);
+    request.set_request("get_topics");
+    connection->EnqueueMsg(msgs::Package("request", request), true);
+    connection->Read(topicData);
+
+    packet.ParseFromString(topicData);
+    topics.ParseFromString(packet.serialized_data());
+
+    std::string searchable;
+    for (int i = 0; i < topics.data_size(); ++i)
+      searchable += topics.data(i);
+
+    int i = 0;
+    while (searchable.find(cameraName) != std::string::npos)
+    {
+      cameraName = cameraBaseName + boost::lexical_cast<std::string>(++i);
+    }
+  }
+  else
+    gzerr << "Unable to connect to a running Gazebo master.\n";
+
   if (_scene->GetUserCameraCount() == 0)
-    this->userCamera = _scene->CreateUserCamera("gzclient_camera");
+    this->userCamera = _scene->CreateUserCamera(cameraName);
   else
     this->userCamera = _scene->GetUserCamera(0);
 

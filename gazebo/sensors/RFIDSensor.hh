@@ -32,6 +32,7 @@
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/sensors/Sensor.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -46,7 +47,7 @@ namespace gazebo
 
     /// \class RFIDSensor RFIDSensor.hh sensors/sensors.hh
     /// \brief Sensor class for RFID type of sensor
-    class RFIDSensor: public Sensor
+    class GAZEBO_VISIBLE RFIDSensor: public Sensor
     {
       /// \brief Constructor
       public: RFIDSensor();
