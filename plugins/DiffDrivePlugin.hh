@@ -37,6 +37,8 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
+    private: common::PID leftPID;
+    private: common::PID rightPID;
 
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;

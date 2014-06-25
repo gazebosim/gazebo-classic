@@ -28,6 +28,9 @@ enum {RIGHT, LEFT};
 DiffDrivePlugin::DiffDrivePlugin()
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
+  // initialize with some default values
+  this->leftPID.Init(22, 0.004, 0.0001, 10, -10, 100, -100);
+  this->rightPID.Init(22, 0.004, 0.0001, 10, -10, 100, -100);
 }
 
 /////////////////////////////////////////////////
@@ -68,6 +71,8 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
     gzerr << "Unable to find right joint["
           << _sdf->GetElement("right_joint")->Get<std::string>() << "]\n";
 
+  this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
+
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&DiffDrivePlugin::OnUpdate, this));
 }
@@ -81,9 +86,42 @@ void DiffDrivePlugin::Init()
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
-  math::Box bb = parent->GetBoundingBox();
-  // This assumes that the largest dimension of the wheel is the diameter
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  // get wheel radius
+  this->wheelRadius = 0.0;
+
+  // assume only one collision
+  physics::CollisionPtr coll = this->leftJoint->GetChild()->GetCollisions()[0];
+
+  if (coll)
+  {
+    physics::ShapePtr shape = coll->GetShape();
+
+    if (shape)
+    {
+      if (shape->HasType(gazebo::physics::Base::CYLINDER_SHAPE))
+      {
+        physics::CylinderShape *cyl =
+            static_cast<physics::CylinderShape*>(shape.get());
+        this->wheelRadius = cyl->GetRadius();
+      }
+      else if (shape->HasType(physics::Base::SPHERE_SHAPE))
+      {
+        physics::SphereShape *sph =
+            static_cast<physics::SphereShape*>(shape.get());
+        this->wheelRadius = sph->GetRadius();
+      }
+      else
+        gzerr << "wheel shape is neither cylinder nor sphere,"
+              << " what's radius here?\n";
+    }
+    else
+      gzerr << "wheel collision GetShape failed\n";
+  }
+  else
+    gzerr << "wheel link GetCollision failed\n";
+
+  gzerr << "wheel radius [" << this->wheelRadius << "]\n";
+
 }
 
 /////////////////////////////////////////////////
@@ -116,12 +154,32 @@ void DiffDrivePlugin::OnUpdate()
   common::Time stepTime = currTime - this->prevUpdateTime;
   */
 
-  double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
-  double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
+  double dt = (this->model->GetWorld()->GetSimTime()
+    - this->prevUpdateTime).Double();
+  if (dt > 0)
+  {
+    double leftVelDesired = (this->wheelSpeed[LEFT] / this->wheelRadius);
+    double rightVelDesired = (this->wheelSpeed[RIGHT] / this->wheelRadius);
 
-  this->leftJoint->SetVelocity(0, leftVelDesired);
-  this->rightJoint->SetVelocity(0, rightVelDesired);
+    double leftError = this->leftJoint->GetVelocity(0) - leftVelDesired;
+    double rightError = this->rightJoint->GetVelocity(0) - rightVelDesired;
 
-  this->leftJoint->SetMaxForce(0, this->torque);
-  this->rightJoint->SetMaxForce(0, this->torque);
+    double leftForce = math::clamp(this->leftPID.Update(leftError, dt),
+      -this->torque, this->torque);
+    double rightForce = math::clamp(this->rightPID.Update(rightError, dt),
+      -this->torque, this->torque);
+
+    // switch to set force based control
+    this->leftJoint->SetForce(0, leftForce);
+    this->rightJoint->SetForce(0, rightForce);
+
+    gzerr << this->leftJoint->GetVelocity(0)
+          << " " << this->rightJoint->GetVelocity(0)
+          << " " << leftVelDesired
+          << " " << rightVelDesired
+          << " " << leftForce
+          << " " << rightForce
+          << "\n";
+    this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
+  }
 }

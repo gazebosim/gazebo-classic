@@ -61,11 +61,38 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
     EXPECT_NEAR(0.28, wheelSeparation, 1e-3);
 
     physics::LinkPtr leftWheel = leftJoint->GetChild();
+    // assume only one collision
+    physics::CollisionPtr coll = leftWheel->GetCollisions()[0];
 
-    math::Box bb = leftWheel->GetBoundingBox();
-    gzerr << bb << "\n";
-    // This assumes that the largest dimension of the wheel is the diameter
-    double wheelRadius = bb.GetSize().GetMax() * 0.5;
+    double wheelRadius = 0;
+    if (coll)
+    {
+      physics::ShapePtr shape = coll->GetShape();
+
+      if (shape)
+      {
+        if (shape->HasType(gazebo::physics::Base::CYLINDER_SHAPE))
+        {
+          physics::CylinderShape *cyl =
+              static_cast<physics::CylinderShape*>(shape.get());
+          wheelRadius = cyl->GetRadius();
+        }
+        else if (shape->HasType(physics::Base::SPHERE_SHAPE))
+        {
+          physics::SphereShape *sph =
+              static_cast<physics::SphereShape*>(shape.get());
+          wheelRadius = sph->GetRadius();
+        }
+        else
+          gzerr << "wheel shape is neither cylinder nor sphere,"
+                << " what's radius here?\n";
+      }
+      else
+        gzerr << "wheel collision GetShape failed\n";
+    }
+    else
+      gzerr << "wheel link GetCollision failed\n";
+
     EXPECT_NEAR(0.11, wheelRadius, 1e-3);
 
     // Verify positive (and thus non-zero) value of wheelRadius
