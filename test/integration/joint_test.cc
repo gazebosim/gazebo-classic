@@ -168,7 +168,7 @@ void JointTests::JointCreationDestructionTest(const std::string &_physicsEngine)
 }
 
 //////////////////////////////////////////////////
-void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
+void JointTests::GetInertiaRatio(const std::string &_physicsEngine)
 {
   // Load our inertia ratio world
   Load("worlds/inertia_ratio.world", true, _physicsEngine);
