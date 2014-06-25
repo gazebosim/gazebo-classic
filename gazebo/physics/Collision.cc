@@ -192,22 +192,6 @@ void Collision::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool /*_enable*/)
-{
-}
-
-//////////////////////////////////////////////////
-bool Collision::GetContactsEnabled() const
-{
-  return false;
-}
-
-//////////////////////////////////////////////////
-void Collision::AddContact(const Contact & /*_contact*/)
-{
-}
-
-//////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
   if (this->link)
@@ -383,4 +367,27 @@ void Collision::SetMaxContacts(unsigned int _maxContacts)
 unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
+}
+
+/////////////////////////////////////////////////
+const math::Pose &Collision::GetWorldPose() const
+{
+  // If true, compute a new world pose value.
+  //
+  if (this->worldPoseDirty)
+  {
+    this->worldPose = this->GetInitialRelativePose() +
+                      this->link->GetWorldPose();
+    this->worldPoseDirty = false;
+  }
+
+  return this->worldPose;
+}
+
+/////////////////////////////////////////////////
+void Collision::SetWorldPoseDirty()
+{
+  // Tell the collision object that the next call to ::GetWorldPose should
+  // compute a new worldPose value.
+  this->worldPoseDirty = true;
 }

@@ -1,3 +1,44 @@
+## Gazebo 3.1 to 4.0
+
+### Additions
+
+1. **gazebo/msgs/msgs.hh**
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
+
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+    + LightPtr Clone(const std::string &_name, ScenePtr _scene)
+
+1. **gazebo/rendering/Scene.hh**
+    + void AddLight(LightPtr _light)
+    + void RemoveLight(LightPtr _light)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
+
+1. **gazebo/gui/ModelMaker.hh**
+    + bool InitFromModel(const std::string & _modelName)
+
+1. **gazebo/gui/LightMaker.hh**
+    + bool InitFromLight(const std::string & _lightName)
+
+1. **gazebo/common/Mesh.hh**
+    + int GetMaterialIndex(const Material *_mat) const
+
+1. **gazebo/math/Filter.hh**
+    + ***New classes:*** Filter, OnePole, OnePoleQuaternion, OnePoleVector3, BiQuad, and BiQuadVector3
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gazebo/physics/Base.cc**
+    + ***Removed*** std::string GetScopedName() const
+    + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
@@ -72,7 +113,7 @@
 1. **gazebo/physics/bullet/BulletScrewJoint.hh**
     + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
- 
+
 1. **gazebo/physics/dart/DARTJoint.hh**
     + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
@@ -130,6 +171,12 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Entity.hh**
+    + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
+    + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
+1. **gazebo/physics/Box.hh**
+    + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
+    + ***Replacement:***  bool operator==(const Box &_b) const
 1. **gazebo/gui/GuiIface.hh**
     + ***Removed:*** void load() `ABI change`
     + ***Replacement:*** bool load()
@@ -207,7 +254,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
     + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
- 
+
 1. **gazebo/physics/Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -221,7 +268,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
- 
+
 1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -293,6 +340,31 @@
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
 
 ### Additions
+
+1. **gazebo/physics/Collision.hh**
+    + void SetWorldPoseDirty()
+    + virtual const math::Pose &GetWorldPose() const
+1. **gazebo/physics/JointController.hh**
+      + common::Time GetLastUpdateTime() const
+      + std::map<std::string, JointPtr> GetJoints() const
+      + bool SetPositionTarget(const std::string &_jointName, double _target)
+      + bool SetVelocityTarget(const std::string &_jointName, double _target)
+      + std::map<std::string, common::PID> GetPositionPIDs() const
+      + std::map<std::string, common::PID> GetVelocityPIDs() const
+      + std::map<std::string, double> GetForces() const
+      + std::map<std::string, double> GetPositions() const
+      + std::map<std::string, double> GetVelocities() const
+
+
+1. **gazebo/common/PID.hh**
+      + double GetPGain() const
+      + double GetIGain() const
+      + double GetDGain() const
+      + double GetIMax() const
+      + double GetIMin() const
+      + double GetCmdMax() const
+      + double GetCmdMin() const
+
 
 1. **gazebo/transport/TransportIface.hh**
     +  transport::ConnectionPtr connectToMaster()
@@ -389,11 +461,11 @@
 
 1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ode/ODEScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ScrewJoint.hh**
     + virtual math::Vector3 GetAnchor(unsigned int _index) const
@@ -410,6 +482,9 @@
 1. **gazebo/physics/dart/DARTPhysics.hh**
     + virtual boost::any GetParam(const std::string &_key) const
     + virtual bool SetParam(const std::string &_key, const boost::any &_value)
+
+1. **gazebo/physics/Joint.hh**
+    + math::Quaternion GetAxisFrameOffset(unsigned int _index) const
 
 ### Deletions
 
@@ -551,3 +626,15 @@
 1. **gazebo/common/Time.hh**
     + ***Removed*** static Time::NSleep(Time _time) `API change`
     + ***Replacement*** static Time NSleep(unsigned int _ns)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + template<typename T> event::ConnectionPtr ConnectContact(T _subscriber)
+    + template<typename T> event::ConnectionPtr DisconnectContact(T _subscriber)
+    + ***Note:*** The ContactManager::CreateFilter functions can be used to
+      create a gazebo topic with contact messages filtered by the name(s)
+      of collision shapes. The topic can then be subscribed with a callback
+      to replicate this removed functionality. See
+      [gazebo pull request #713](https://bitbucket.org/osrf/gazebo/pull-request/713)
+      for an example migration.

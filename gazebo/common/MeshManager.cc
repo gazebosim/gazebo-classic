@@ -27,6 +27,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
+#include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
 #include "gazebo/gazebo_config.h"
 
@@ -44,6 +45,7 @@ using namespace common;
 MeshManager::MeshManager()
 {
   this->colladaLoader = new ColladaLoader();
+  this->colladaExporter = new ColladaExporter();
   this->stlLoader = new STLLoader();
 
   // Create some basic shapes
@@ -75,6 +77,7 @@ MeshManager::MeshManager()
 MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
+  delete this->colladaExporter;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
   for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
@@ -158,6 +161,20 @@ const Mesh *MeshManager::Load(const std::string &_filename)
     gzerr << "Unable to find file[" << _filename << "]\n";
 
   return mesh;
+}
+
+//////////////////////////////////////////////////
+void MeshManager::Export(const Mesh *_mesh, const std::string &_filename,
+    const std::string &_extension, bool _exportTextures)
+{
+  if (_extension == "dae")
+  {
+    this->colladaExporter->Export(_mesh, _filename, _exportTextures);
+  }
+  else
+  {
+    gzerr << "Unsupported mesh format for file[" << _filename << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////

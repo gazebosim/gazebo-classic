@@ -20,6 +20,7 @@ set (sources
   AudioDecoder.cc
   Base64.cc
   BVHLoader.cc
+  ColladaExporter.cc
   ColladaLoader.cc
   Color.cc
   CommonIface.cc
@@ -33,6 +34,7 @@ set (sources
   KeyFrame.cc
   Material.cc
   Mesh.cc
+  MeshExporter.cc
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
@@ -106,6 +108,7 @@ endif()
 
 set (gtest_sources
   Animation_TEST.cc
+  ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
@@ -146,6 +149,10 @@ set_property(
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
+)
+
+link_directories( 
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 target_link_libraries(gazebo_common

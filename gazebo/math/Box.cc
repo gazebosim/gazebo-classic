@@ -147,7 +147,7 @@ const Box &Box::operator+=(const Box &_b)
 }
 
 //////////////////////////////////////////////////
-bool Box::operator==(const Box &_b)
+bool Box::operator==(const Box &_b) const
 {
   return this->min == _b.min && this->max == _b.max;
 }
