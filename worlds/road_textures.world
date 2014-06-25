@@ -14,8 +14,8 @@
 
     <road name="Primary">
       <width>5</width>
-      <point>38 -92 0.01</point>
-      <point>-38 -92 0.01</point>
+      <point>38 -92 0.005</point>
+      <point>-38 -92 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -25,8 +25,8 @@
     </road>
     <road name="Motorway">
       <width>15</width>
-      <point>-38 -92 0.01</point>
-      <point>-92 -38 0.01</point>
+      <point>-38 -92 0.005</point>
+      <point>-92 -38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -36,8 +36,8 @@
     </road>
     <road name="Residential">
       <width>5</width>
-      <point>-92 -38 0.01</point>
-      <point>-92 38 0.01</point>
+      <point>-92 -38 0.005</point>
+      <point>-92 38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -47,8 +47,8 @@
     </road>
     <road name="Trunk">
       <width>5</width>
-      <point>-92 38 0.01</point>
-      <point>-38 92 0.01</point>
+      <point>-92 38 0.005</point>
+      <point>-38 92 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -58,8 +58,8 @@
     </road>
     <road name="Tertiary">
       <width>5</width>
-      <point>-38 92 0.01</point>
-      <point>38 92 0.01</point>
+      <point>-38 92 0.005</point>
+      <point>38 92 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -69,8 +69,8 @@
     </road>
     <road name="Secondary">
       <width>5</width>
-      <point>38 92 0.01</point>
-      <point>92 38 0.01</point>
+      <point>38 92 0.005</point>
+      <point>92 38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -80,8 +80,8 @@
     </road>
     <road name="Lane_1">
       <width>2.5</width>
-      <point>92 38 0.01</point>
-      <point>-92 38 0.01</point>
+      <point>92 38 0.005</point>
+      <point>-92 38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -91,8 +91,8 @@
     </road>
     <road name="Lanes_2">
       <width>5</width>
-      <point>92 38 0.01</point>
-      <point>92 -38 0.01</point>
+      <point>92 38 0.005</point>
+      <point>92 -38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -102,8 +102,8 @@
     </road>
     <road name="Lanes_4">
       <width>10</width>
-      <point>92 -38 0.01</point>
-      <point>38 -92 0.01</point>
+      <point>92 -38 0.005</point>
+      <point>38 -92 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -113,8 +113,8 @@
     </road>
     <road name="Lanes_6">
       <width>15</width>
-      <point>38 -92 0.01</point>
-      <point>-92 38 0.01</point>
+      <point>38 -92 0.005</point>
+      <point>-92 38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -124,8 +124,8 @@
     </road>
     <road name="Footway">
       <width>3</width>
-      <point>-92 -38 0.01</point>
-      <point>92 -38 0.01</point>
+      <point>-92 -38 0.005</point>
+      <point>92 -38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -135,8 +135,8 @@
     </road>
     <road name="Pedestrian">
       <width>3</width>
-      <point>38 92 0.01</point>
-      <point>38 -92 0.01</point>
+      <point>38 92 0.005</point>
+      <point>38 -92 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -146,8 +146,8 @@
     </road>
     <road name="Steps">
       <width>3</width>
-      <point>-38 92 0.01</point>
-      <point>92 -38 0.01</point>
+      <point>-38 92 0.005</point>
+      <point>92 -38 0.005</point>
       <material>
         <script>
           <uri>file://media/materials/scripts/gazebo.material</uri>
@@ -157,8 +157,8 @@
     </road>
     <road name="Default">
       <width>5</width>
-      <point>38 92 0.01</point>
-      <point>-38 -92 0.01</point>
+      <point>38 92 0.005</point>
+      <point>-38 -92 0.005</point>
     </road>
   </world>
 </sdf>
