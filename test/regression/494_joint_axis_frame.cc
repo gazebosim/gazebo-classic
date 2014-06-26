@@ -105,6 +105,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     if (_physicsEngine == "dart")
     {
       gzerr << "dart doesn't support parent model frame, skipping sub-test"
+            << " per issue #1143"
             << std::endl;
     }
     else
