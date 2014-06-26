@@ -47,6 +47,8 @@ namespace gazebo
     private: double torque;
     private: double wheelSeparation;
     private: double wheelRadius;
+    private: double leftForce;
+    private: double rightForce;
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;

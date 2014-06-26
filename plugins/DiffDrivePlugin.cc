@@ -29,8 +29,10 @@ DiffDrivePlugin::DiffDrivePlugin()
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
   // initialize with some default values
-  this->leftPID.Init(22, 0.004, 0.0001, 10, -10, 100, -100);
-  this->rightPID.Init(22, 0.004, 0.0001, 10, -10, 100, -100);
+  this->leftPID.Init( 20, 0.001, 0.002, 0.5, -0.5, 5, -5);
+  this->rightPID.Init(20, 0.001, 0.002, 0.5, -0.5, 5, -5);
+  this->leftForce = 0;
+  this->rightForce = 0;
 }
 
 /////////////////////////////////////////////////
@@ -120,7 +122,7 @@ void DiffDrivePlugin::Init()
   else
     gzerr << "wheel link GetCollision failed\n";
 
-  gzerr << "wheel radius [" << this->wheelRadius << "]\n";
+  gzdbg << "wheel radius [" << this->wheelRadius << "]\n";
 
 }
 
@@ -164,22 +166,23 @@ void DiffDrivePlugin::OnUpdate()
     double leftError = this->leftJoint->GetVelocity(0) - leftVelDesired;
     double rightError = this->rightJoint->GetVelocity(0) - rightVelDesired;
 
-    double leftForce = math::clamp(this->leftPID.Update(leftError, dt),
-      -this->torque, this->torque);
-    double rightForce = math::clamp(this->rightPID.Update(rightError, dt),
-      -this->torque, this->torque);
+    this->leftForce = math::clamp(
+      this->leftPID.Update(leftError, dt), -this->torque, this->torque);
+    this->rightForce = math::clamp(
+      this->rightPID.Update(rightError, dt), -this->torque, this->torque);
 
-    // switch to set force based control
-    this->leftJoint->SetForce(0, leftForce);
-    this->rightJoint->SetForce(0, rightForce);
-
-    gzerr << this->leftJoint->GetVelocity(0)
-          << " " << this->rightJoint->GetVelocity(0)
-          << " " << leftVelDesired
-          << " " << rightVelDesired
-          << " " << leftForce
-          << " " << rightForce
-          << "\n";
     this->prevUpdateTime = this->model->GetWorld()->GetSimTime();
+
+    // gzdbg << this->leftJoint->GetVelocity(0)
+    //       << " " << this->rightJoint->GetVelocity(0)
+    //       << " " << leftVelDesired
+    //       << " " << rightVelDesired
+    //       << " " << this->leftForce
+    //       << " " << this->rightForce
+    //       << "\n";
   }
+
+  // switch to set force based control
+  this->leftJoint->SetForce(0, this->leftForce);
+  this->rightJoint->SetForce(0, this->rightForce);
 }
