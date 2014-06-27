@@ -56,7 +56,7 @@ ModelSnap::~ModelSnap()
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    this->dataPtr->snapVisual->DeleteDynamicLine(this->dataPtr->snapLines);
+    delete this->dataPtr->snapLines;
     this->dataPtr->snapVisual.reset();
   }
 
@@ -144,23 +144,24 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (!this->dataPtr->selectedVis)
     {
       math::Vector3 intersect;
-      std::vector<math::Vector3> worldTriangle;
+      //std::vector<math::Vector3> worldTriangle;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, worldTriangle);
+          vis->GetRootVisual(), intersect, this->dataPtr->selectedTriangle/*worldTriangle*/);
 
 
-      if (!worldTriangle.empty())
+      //if (!worldTriangle.empty())
+      if (!this->dataPtr->selectedTriangle.empty())
       {
         this->dataPtr->selectedVis = vis;
 
-        this->dataPtr->selectedTriangle.clear();
+        /*this->dataPtr->selectedTriangle.clear();
         for (unsigned int i = 0; i < worldTriangle.size(); ++i)
         {
           this->dataPtr->selectedTriangle.push_back(
               this->dataPtr->selectedVis->GetWorldPose().rot.GetInverse() *
               (worldTriangle[i] -
               this->dataPtr->selectedVis->GetWorldPose().pos));
-        }
+        }*/
 
         /*std::cerr << " got first tri " << intersect << std::endl;
         std::cerr << this->dataPtr->selectedTriangle[0] << std::endl;
@@ -175,7 +176,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
               boost::bind(&ModelSnap::Update, this));
       }
     }
-    else if (vis != this->dataPtr->selectedVis)
+    else if (vis->GetRootVisual()
+        != this->dataPtr->selectedVis->GetRootVisual())
     {
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
@@ -191,7 +193,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
         //std::cerr << "2nd normal " << math::Vector3::GetNormal(
         //    vertices[0], vertices[1], vertices[2]) << std::endl;
 
-        std::vector<math::Vector3> worldTriangle;
+        /*std::vector<math::Vector3> worldTriangle;
         {
           boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
           for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size();
@@ -202,42 +204,11 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
                 this->dataPtr->selectedVis->GetWorldPose().rot *
                 this->dataPtr->selectedTriangle[i]);
           }
-        }
+        }*/
 
-        math::Vector3 centroidA = (worldTriangle[0] + worldTriangle[1] +
-            worldTriangle[2]) / 3.0;
 
-        math::Vector3 centroidB =
-            (vertices[0] + vertices[1] + vertices[2]) / 3.0;
-
-//        std::cerr << "centroidA " << centroidA << std::endl;
-//        std::cerr << "centroidB " << centroidB << std::endl;
-        math::Vector3 normalA = math::Vector3::GetNormal(
-            worldTriangle[0], worldTriangle[1], worldTriangle[2]);
-
-        math::Vector3 normalB = math::Vector3::GetNormal(
-            vertices[0], vertices[1], vertices[2]);
-
-        math::Vector3 u = normalB.Normalize() * -1;
-        math::Vector3 v = normalA.Normalize();
-        double cosTheta = v.Dot(u);
-        double angle = acos(cosTheta);
-        math::Quaternion rotation;
-        // check the parallel case
-        if (math::equal(angle, M_PI))
-          rotation.SetFromAxis(u.GetPerpendicular(), angle);
-        else
-          rotation.SetFromAxis((v.Cross(u)).Normalize(), angle);
-
-        rendering::VisualPtr modelVis =
-            this->dataPtr->selectedVis->GetRootVisual();
-
-        // Get translation needed for alignment
-        // taking into account the rotated position of the mesh
-        math::Vector3 translation = centroidB -
-            (rotation * (centroidA - modelVis->GetWorldPose().pos) +
-            modelVis->GetWorldPose().pos);
-
+        this->Snap(this->dataPtr->selectedTriangle, vertices,
+            this->dataPtr->selectedVis->GetRootVisual());
 
         /*std::cerr << "angle " << angle << std::endl;
         std::cerr << "q " << rotation.GetAsEuler() << std::endl;
@@ -245,11 +216,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
         std::cerr << "centroidA " << centroidA << std::endl;
         std::cerr << "modelVis->GetWorldPose().pos " << modelVis->GetWorldPose().pos << std::endl;*/
 
-        modelVis->SetWorldPose(
-            math::Pose(modelVis->GetWorldPose().pos + translation,
-            rotation * modelVis->GetWorldPose().rot));
 
-        this->PublishVisualPose(modelVis);
 
         this->Reset();
         gui::Events::manipMode("select");
@@ -259,6 +226,60 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   else
     this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
 }
+
+//////////////////////////////////////////////////
+void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
+    const std::vector<math::Vector3> &_triangleDest,
+    rendering::VisualPtr _visualSrc)
+{
+  math::Vector3 translation;
+  math::Quaternion rotation;
+
+  this->GetSnapTransform(_triangleSrc, _triangleDest,
+      _visualSrc->GetWorldPose(), translation, rotation);
+
+  _visualSrc->SetWorldPose(
+      math::Pose(_visualSrc->GetWorldPose().pos + translation,
+      rotation * _visualSrc->GetWorldPose().rot));
+
+  this->PublishVisualPose(_visualSrc);
+}
+
+//////////////////////////////////////////////////
+void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
+    const std::vector<math::Vector3> &_triangleDest,
+    const math::Pose &_poseSrc, math::Vector3 &_trans,
+    math::Quaternion &_rot)
+{
+  math::Vector3 centroidSrc = (_triangleSrc[0] + _triangleSrc[1] +
+      _triangleSrc[2]) / 3.0;
+
+  math::Vector3 centroidDest =
+      (_triangleDest[0] + _triangleDest[1] + _triangleDest[2]) / 3.0;
+
+//        std::cerr << "centroidA " << centroidA << std::endl;
+//        std::cerr << "centroidB " << centroidB << std::endl;
+  math::Vector3 normalSrc = math::Vector3::GetNormal(
+      _triangleSrc[0], _triangleSrc[1], _triangleSrc[2]);
+
+  math::Vector3 normalDest = math::Vector3::GetNormal(
+      _triangleDest[0], _triangleDest[1], _triangleDest[2]);
+
+  math::Vector3 u = normalDest.Normalize() * -1;
+  math::Vector3 v = normalSrc.Normalize();
+  double cosTheta = v.Dot(u);
+  double angle = acos(cosTheta);
+  // check the parallel case
+  if (math::equal(angle, M_PI))
+    _rot.SetFromAxis(u.GetPerpendicular(), angle);
+  else
+    _rot.SetFromAxis((v.Cross(u)).Normalize(), angle);
+
+  // Get translation needed for alignment
+  // taking into account the rotated position of the mesh
+  _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
+}
+
 
 //////////////////////////////////////////////////
 void ModelSnap::OnKeyPressEvent(const common::KeyEvent &_event)
@@ -300,6 +321,19 @@ void ModelSnap::Update()
   if (this->dataPtr->selectedTriangle.empty())
     return;
 
+  // convert triangle to local coordinates relative to parent visual
+  std::vector<math::Vector3> triangle;
+  if (!this->dataPtr->snapVisual || !this->dataPtr->snapVisual->GetVisible())
+  {
+    for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size(); ++i)
+    {
+      triangle.push_back(
+          this->dataPtr->selectedVis->GetWorldPose().rot.GetInverse() *
+          (this->dataPtr->selectedTriangle[i] -
+          this->dataPtr->selectedVis->GetWorldPose().pos));
+    }
+  }
+
   if (!this->dataPtr->snapVisual)
   {
     rendering::UserCameraPtr camera = gui::get_active_camera();
@@ -313,10 +347,10 @@ void ModelSnap::Update()
         rendering::RENDERING_LINE_STRIP);
 
     this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-    this->dataPtr->snapLines->AddPoint(this->dataPtr->selectedTriangle[0]);
-    this->dataPtr->snapLines->AddPoint(this->dataPtr->selectedTriangle[1]);
-    this->dataPtr->snapLines->AddPoint(this->dataPtr->selectedTriangle[2]);
-    this->dataPtr->snapLines->AddPoint(this->dataPtr->selectedTriangle[0]);
+    this->dataPtr->snapLines->AddPoint(triangle[0]);
+    this->dataPtr->snapLines->AddPoint(triangle[1]);
+    this->dataPtr->snapLines->AddPoint(triangle[2]);
+    this->dataPtr->snapLines->AddPoint(triangle[0]);
     this->dataPtr->snapVisual->SetVisible(true);
     this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
     return;
@@ -325,13 +359,11 @@ void ModelSnap::Update()
   if (!this->dataPtr->snapVisual->GetVisible())
   {
     this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
-    this->dataPtr->snapLines->SetPoint(0, this->dataPtr->selectedTriangle[0]);
-    this->dataPtr->snapLines->SetPoint(1, this->dataPtr->selectedTriangle[1]);
-    this->dataPtr->snapLines->SetPoint(2, this->dataPtr->selectedTriangle[2]);
-    this->dataPtr->snapLines->SetPoint(3, this->dataPtr->selectedTriangle[0]);
+    this->dataPtr->snapLines->SetPoint(0, triangle[0]);
+    this->dataPtr->snapLines->SetPoint(1, triangle[1]);
+    this->dataPtr->snapLines->SetPoint(2, triangle[2]);
+    this->dataPtr->snapLines->SetPoint(3, triangle[0]);
 
     this->dataPtr->snapVisual->SetVisible(true);
   }
-
-  return;
 }

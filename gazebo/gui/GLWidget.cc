@@ -402,7 +402,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
   if (!this->scene)
     return;
-
+  std::cerr << _event->x() << " " << _event->y() << std::endl;
   this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 

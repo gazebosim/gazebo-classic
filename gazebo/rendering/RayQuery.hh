@@ -18,6 +18,8 @@
 #ifndef _RAYQUERY_HH_
 #define _RAYQUERY_HH_
 
+#include "gazebo/math/Vector3.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 

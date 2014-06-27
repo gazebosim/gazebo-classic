@@ -110,13 +110,13 @@ endif ()
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
-  TimePanel_TEST.cc
   ModelAlign_TEST.cc
+  TimePanel_TEST.cc
 )
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc ModelSnap_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests

@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _ModelAlign_TEST_HH_
-#define _ModelAlign_TEST_HH_
+#ifndef _MODELALIGN_TEST_HH_
+#define _MODELALIGN_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
