@@ -89,14 +89,6 @@ namespace gazebo
       /// \param[in] _event Mouse event.
       public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
 
-      /// \brief Process a key press event.
-      /// \param[in] _event Key event.
-      public: void OnKeyPressEvent(const common::KeyEvent &_event);
-
-      /// \brief Process a key release event.
-      /// \param[in] _event Key event.
-      public: void OnKeyReleaseEvent(const common::KeyEvent &_event);
-
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);

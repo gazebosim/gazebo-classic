@@ -402,7 +402,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
 {
   if (!this->scene)
     return;
-  std::cerr << _event->x() << " " << _event->y() << std::endl;
+
   this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
@@ -1128,7 +1128,5 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::OnAlignMode(std::string _axis, std::string _config)
 {
-  std::cerr<< " align manip in glwidget " <<
-      this->selectedVisuals.size() << std::endl;
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config);
 }

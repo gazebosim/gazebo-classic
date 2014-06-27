@@ -179,14 +179,6 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
-  /*math::Vector3 targetMin = targetWorldPose.rot * targetBbox.min
-      + targetWorldPose.pos;
-  math::Vector3 targetMax = targetWorldPose.rot * targetBbox.max
-      + targetWorldPose.pos;
-
-  std::cerr << " on align mode " << _axis << " " << _config << " "
-      << this->dataPtr->selectedVisuals.size()  <<  std::endl;*/
-
   for (unsigned i = 0; i < this->dataPtr->selectedVisuals.size() - 1; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];

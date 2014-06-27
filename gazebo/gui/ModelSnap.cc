@@ -15,8 +15,6 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -144,33 +142,12 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (!this->dataPtr->selectedVis)
     {
       math::Vector3 intersect;
-      //std::vector<math::Vector3> worldTriangle;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
-          vis->GetRootVisual(), intersect, this->dataPtr->selectedTriangle/*worldTriangle*/);
+          vis->GetRootVisual(), intersect, this->dataPtr->selectedTriangle);
 
-
-      //if (!worldTriangle.empty())
       if (!this->dataPtr->selectedTriangle.empty())
       {
         this->dataPtr->selectedVis = vis;
-
-        /*this->dataPtr->selectedTriangle.clear();
-        for (unsigned int i = 0; i < worldTriangle.size(); ++i)
-        {
-          this->dataPtr->selectedTriangle.push_back(
-              this->dataPtr->selectedVis->GetWorldPose().rot.GetInverse() *
-              (worldTriangle[i] -
-              this->dataPtr->selectedVis->GetWorldPose().pos));
-        }*/
-
-        /*std::cerr << " got first tri " << intersect << std::endl;
-        std::cerr << this->dataPtr->selectedTriangle[0] << std::endl;
-        std::cerr << this->dataPtr->selectedTriangle[1] << std::endl;
-        std::cerr << this->dataPtr->selectedTriangle[2] << std::endl;
-        std::cerr << "first normal " << math::Vector3::GetNormal(
-            this->dataPtr->selectedTriangle[0],
-            this->dataPtr->selectedTriangle[1],
-            this->dataPtr->selectedTriangle[2]) << std::endl;*/
 
         this->dataPtr->renderConnection = event::Events::ConnectRender(
               boost::bind(&ModelSnap::Update, this));
@@ -186,37 +163,8 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
       if (!vertices.empty())
       {
-        // std::cerr << " got second tri " << intersect << std::endl;
-        // std::cerr << vertices[0] << std::endl;
-        // std::cerr << vertices[1] << std::endl;
-        // std::cerr << vertices[2] << std::endl;
-        //std::cerr << "2nd normal " << math::Vector3::GetNormal(
-        //    vertices[0], vertices[1], vertices[2]) << std::endl;
-
-        /*std::vector<math::Vector3> worldTriangle;
-        {
-          boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-          for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size();
-              ++i)
-          {
-            worldTriangle.push_back(
-                this->dataPtr->selectedVis->GetWorldPose().pos +
-                this->dataPtr->selectedVis->GetWorldPose().rot *
-                this->dataPtr->selectedTriangle[i]);
-          }
-        }*/
-
-
         this->Snap(this->dataPtr->selectedTriangle, vertices,
             this->dataPtr->selectedVis->GetRootVisual());
-
-        /*std::cerr << "angle " << angle << std::endl;
-        std::cerr << "q " << rotation.GetAsEuler() << std::endl;
-        std::cerr << "translation " << translation << std::endl;
-        std::cerr << "centroidA " << centroidA << std::endl;
-        std::cerr << "modelVis->GetWorldPose().pos " << modelVis->GetWorldPose().pos << std::endl;*/
-
-
 
         this->Reset();
         gui::Events::manipMode("select");
@@ -257,8 +205,6 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
   math::Vector3 centroidDest =
       (_triangleDest[0] + _triangleDest[1] + _triangleDest[2]) / 3.0;
 
-//        std::cerr << "centroidA " << centroidA << std::endl;
-//        std::cerr << "centroidB " << centroidB << std::endl;
   math::Vector3 normalSrc = math::Vector3::GetNormal(
       _triangleSrc[0], _triangleSrc[1], _triangleSrc[2]);
 
@@ -278,21 +224,6 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
   // Get translation needed for alignment
   // taking into account the rotated position of the mesh
   _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
-}
-
-
-//////////////////////////////////////////////////
-void ModelSnap::OnKeyPressEvent(const common::KeyEvent &_event)
-{
-  this->dataPtr->keyEvent = _event;
-}
-
-//////////////////////////////////////////////////
-void ModelSnap::OnKeyReleaseEvent(const common::KeyEvent &_event)
-{
-  this->dataPtr->keyEvent = _event;
-
-  this->dataPtr->keyEvent.key = 0;
 }
 
 /////////////////////////////////////////////////
