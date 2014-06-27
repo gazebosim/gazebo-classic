@@ -50,10 +50,15 @@ namespace gazebo
       /// \param[in] _y Y position on screen in pixels.
       /// \param[in] _visual Visual containing the mesh to be selected.
       /// \param[out] _intersect Intersection point.
-      /// \param[out] _vertices Vertices of the triangle.
-      /// \param[out] _vertices Vertices of the triangle.
+      /// \param[out] _vertices Vertices of the selected triangle on the mesh.
       public: bool SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
           math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices);
+
+      /// \brief Helper method to recursively find all visuals that have a mesh.
+      /// \param[in] _visual Parent visual to be traversed.
+      /// \param[out] _visuals A list of visuals with mesh.
+      private: void GetMeshVisuals(rendering::VisualPtr _visual,
+          std::vector<rendering::VisualPtr> &_visuals);
 
       /// \internal
       /// \brief Pointer to private data.

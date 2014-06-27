@@ -62,6 +62,20 @@ namespace gazebo
 
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;
+
+      /// \brief Connection for the render event.
+      public: event::ConnectionPtr renderConnection;
+
+      /// \brief Mutex to protect the selected triangle vertices.
+      public: boost::recursive_mutex *updateMutex;
+
+      /// \brief A visual to represent the snap spot.
+      public: rendering::VisualPtr snapVisual;
+
+      /// \brief Lines to highlight the selected triangle.
+      public: rendering::DynamicLines *snapLines;
+
+
     };
   }
 }

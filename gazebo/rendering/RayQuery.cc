@@ -45,59 +45,73 @@ RayQuery::~RayQuery()
 bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
 {
+
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->GetOgreCamera()->getCameraToViewportRay(
       static_cast<float>(_x) / this->dataPtr->camera->GetViewportWidth(),
       static_cast<float>(_y) / this->dataPtr->camera->GetViewportHeight());
 
-  const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(_visual->GetMeshName());
+  std::vector<rendering::VisualPtr> visuals;
+  this->GetMeshVisuals(_visual, visuals);
 
-  if (!mesh)
-  {
-    gzwarn << "No mesh found " << std::endl;
-    return false;
-  }
 
-  std::vector<Ogre::Vector3> vertices;
   Ogre::Real closestDistance = -1.0f;
   Ogre::Vector3 closestResult;
-
-  Ogre::Matrix4 transform = _visual->GetSceneNode()->_getFullTransform();
-  // test for hitting individual triangles on the mesh
   bool newClosestFound = false;
-  for (unsigned int i = 0; i < mesh->GetSubMeshCount(); ++i)
+  std::vector<Ogre::Vector3> vertices;
+
+  for (unsigned int i = 0; i < visuals.size(); ++i)
   {
-    const common::SubMesh *submesh = mesh->GetSubMesh(i);
-    for (unsigned int j = 0; j < submesh->GetIndexCount(); j += 3)
+    const common::Mesh *mesh =
+      common::MeshManager::Instance()->GetMesh(visuals[i]->GetMeshName());
+
+    //std::cerr << "name " << _visual->GetName() << " " << _visual->GetMeshName() << std::endl;
+    if (!mesh)
+      continue;
+
+    Ogre::Matrix4 transform = visuals[i]->GetSceneNode()->_getFullTransform();
+    // test for hitting individual triangles on the mesh
+    for (unsigned int j = 0; j < mesh->GetSubMeshCount(); ++j)
     {
-      math::Vector3 vertexA = submesh->GetVertex(submesh->GetIndex(j));
-      math::Vector3 vertexB = submesh->GetVertex(submesh->GetIndex(j+1));
-      math::Vector3 vertexC = submesh->GetVertex(submesh->GetIndex(j+2));
-
-      Ogre::Vector3 worldVertexA = transform * Conversions::Convert(vertexA);
-      Ogre::Vector3 worldVertexB = transform * Conversions::Convert(vertexB);
-      Ogre::Vector3 worldVertexC = transform * Conversions::Convert(vertexC);
-
-      // check for a hit against this triangle
-      std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray,
-          worldVertexA, worldVertexB, worldVertexC, true, false);
-
-      // if it was a hit check if its the closest
-      if (hit.first &&
-          (closestDistance < 0.0f || hit.second < closestDistance))
+      const common::SubMesh *submesh = mesh->GetSubMesh(j);
+      for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
       {
-        // this is the closest so far, save it off
-        closestDistance = hit.second;
-        vertices.clear();
-        vertices.push_back(worldVertexA);
-        vertices.push_back(worldVertexB);
-        vertices.push_back(worldVertexC);
-        newClosestFound = true;
+        math::Vector3 vertexA = submesh->GetVertex(submesh->GetIndex(k));
+        math::Vector3 vertexB = submesh->GetVertex(submesh->GetIndex(k+1));
+        math::Vector3 vertexC = submesh->GetVertex(submesh->GetIndex(k+2));
+
+        Ogre::Vector3 worldVertexA = transform * Conversions::Convert(vertexA);
+        Ogre::Vector3 worldVertexB = transform * Conversions::Convert(vertexB);
+        Ogre::Vector3 worldVertexC = transform * Conversions::Convert(vertexC);
+
+        // check for a hit against this triangle
+        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(ray,
+            worldVertexA, worldVertexB, worldVertexC,
+           (worldVertexB - worldVertexA).crossProduct(
+           worldVertexC - worldVertexA));
+
+        std::cerr << " va " << worldVertexA << std::endl;
+        std::cerr << " vb " << worldVertexB << std::endl;
+        std::cerr << " vc " << worldVertexC << std::endl;
+        std::cerr << " j " << j << " k " << k << " hit.second " << hit.second << std::endl;
+        // if it was a hit check if its the closest
+        if (hit.first &&
+            (closestDistance < 0.0f || hit.second < closestDistance))
+        {
+          // this is the closest so far, save it off
+          closestDistance = hit.second;
+          vertices.clear();
+          vertices.push_back(worldVertexA);
+          vertices.push_back(worldVertexB);
+          vertices.push_back(worldVertexC);
+          newClosestFound = true;
+        }
       }
     }
+    std::cerr << " ========  " << std::endl;
   }
+
 
   // if we found a new closest raycast for this object, update the
   // closestResult before moving on to the next object.
@@ -113,10 +127,20 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     _vertices.push_back(Conversions::Convert(vertices[0]));
     _vertices.push_back(Conversions::Convert(vertices[1]));
     _vertices.push_back(Conversions::Convert(vertices[2]));
-    // std::cerr << _intersect  << std::endl;
-
     return true;
   }
   // raycast failed
   return false;
+
+}
+
+/////////////////////////////////////////////////
+void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
+    std::vector<rendering::VisualPtr> &_visuals)
+{
+  if (_visual->GetMeshName() != "")
+    _visuals.push_back(_visual);
+
+  for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
+    this->GetMeshVisuals(_visual->GetChild(i), _visuals);
 }

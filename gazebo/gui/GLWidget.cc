@@ -957,12 +957,9 @@ void GLWidget::OnManipMode(const std::string &_mode)
   }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
+  ModelSnap::Instance()->Reset();
 
-  if (this->state == "snap")
-  {
-    ModelSnap::Instance()->Reset();
-  }
-  else if (this->state != "select")
+  if (this->state != "select")
   {
     // only support multi-model selection in select mode for now.
     // deselect 0 to n-1 models.

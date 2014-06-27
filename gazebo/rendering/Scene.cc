@@ -709,7 +709,7 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
 //////////////////////////////////////////////////
 uint32_t Scene::GetVisualCount() const
 {
- return this->visuals.size();
+  return this->visuals.size();
 }
 
 //////////////////////////////////////////////////

@@ -74,6 +74,9 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
 
+      /// \brief Update the visual representation of the snap spot.
+      private: void Update();
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelSnap>;
 
