@@ -28,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class MainWindow;
+    
     /// \brief Load the graphical interface.
     /// \return True on success.
     GAZEBO_VISIBLE
@@ -57,6 +59,9 @@ namespace gazebo
     unsigned int get_entity_id(const std::string &_name);
     GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
+    
+    GAZEBO_VISIBLE
+    MainWindow *get_main_window();    
 
     /// \brief Load an INI configuration file.
     /// \param[in] _file Full path to the INI file.

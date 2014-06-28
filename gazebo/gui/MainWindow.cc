@@ -264,7 +264,9 @@ void MainWindow::Init()
                                             &MainWindow::OnWorldModify, this);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);
+  this->requestPub->Publish(*this->requestMsg);  
+  
+  gui::Events::mainWindowReady();  
 }
 
 /////////////////////////////////////////////////
@@ -1558,3 +1560,10 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
 }
+
+/////////////////////////////////////////////////
+void MainWindow::AddMenu(QMenu *_menu)
+{
+  this->menuBar->addMenu(_menu);
+}
+

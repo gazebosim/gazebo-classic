@@ -48,7 +48,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::MainWindow *g_main_win;
+gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -332,4 +332,10 @@ bool gui::saveINI(const boost::filesystem::path &_file)
     result = false;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+gui::MainWindow *gui::get_main_window()
+{
+  return g_main_win;
 }
