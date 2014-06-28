@@ -43,6 +43,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
@@ -226,6 +228,10 @@ void World::Load(sdf::ElementPtr _sdf)
 
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
+
+  // Check if we have to insert an object population.
+  if (this->sdf->HasElement("population"))
+    this->CreateEnvironmentPopulation(this->sdf->GetElement("population"));
 
   // This should also come before loading of entities
   {
@@ -638,6 +644,7 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
   // This must be called before PhysicsEngine::UpdatePhysics.
+
   this->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
@@ -2076,6 +2083,73 @@ void World::OnLightMsg(ConstLightPtr &_msg)
     sdf::ElementPtr lightSDF = msgs::LightToSDF(*_msg);
     lightSDF->SetParent(this->sdf);
     lightSDF->GetParent()->InsertElement(lightSDF);
+  }
+}
+
+/////////////////////////////////////////////////
+void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
+{
+  // Read all the population elements.
+  sdf::ElementPtr model = _pop->GetElement("model");
+  sdf::ElementPtr region = _pop->GetElement("region");
+  double density = _pop->Get<double>("density");
+  int modelCount = _pop->Get<int>("model_count");
+  bool preventCollisions = _pop->Get<bool>("prevent_collisions");
+  math::Vector3 minBoundingBox = region->Get<math::Vector3>("min");
+  math::Vector3 maxBoundingBox = region->Get<math::Vector3>("max");
+  std::string distribution = _pop->Get<std::string>("distribution");
+  std::string modelName = "model://" + model->Get<std::string>("name");
+  /*std::cout << "Model name: " << modelName << std::endl;
+  std::cout << "Density: " << density << std::endl;
+  std::cout << "Model count: " << modelCount << std::endl;
+  std::cout << "Collisions? " << preventCollisions << std::endl;
+  std::cout << "Distribution: " << distribution << std::endl;
+  std::cout << "Minimum: " << minBoundingBox << std::endl;*/
+
+  // Create an sdf containing the model description.
+  sdf::SDF modelSdf;
+  modelSdf.SetFromString(
+    "<sdf version ='1.5'>" + model->ToString("") + "</sdf>");
+
+  // Create a new model.
+  msgs::Factory msg;
+  double x, y, z, dx, dy, dz;
+  dx = maxBoundingBox.x - minBoundingBox.x;
+  dy = maxBoundingBox.y - minBoundingBox.y;
+  dz = maxBoundingBox.z - minBoundingBox.z;
+  x = minBoundingBox.x + math::Rand::GetDblUniform(0, dx);
+  y = minBoundingBox.y + math::Rand::GetDblUniform(0, dy);
+  z = minBoundingBox.z + math::Rand::GetDblUniform(0, dz);
+  msgs::Set(msg.mutable_pose(), gazebo::math::Pose(x, y, z, 0, 0, 0));
+  msg.set_sdf(modelSdf.ToString());
+
+  // Publish the new model.
+  transport::PublisherPtr popPub =
+    this->node->Advertise<msgs::Factory>("~/factory");
+  popPub->Publish(msg);
+
+  for (int i = 0; i < modelCount - 1; ++i)
+  {
+    msgs::Factory msg2;
+
+    // Random distribution.
+    x = minBoundingBox.x + math::Rand::GetDblUniform(0, dx);
+    y = minBoundingBox.y + math::Rand::GetDblUniform(0, dy);
+    z = minBoundingBox.z + math::Rand::GetDblUniform(0, dz);
+
+    msgs::Set(msg2.mutable_pose(), gazebo::math::Pose(x, y, z, 0, 0, 0));
+
+    std::string cloneSdf = modelSdf.ToString();
+    std::string delim = "model name='";
+    size_t first = cloneSdf.find(delim) + delim.size();
+    size_t last = cloneSdf.find("'", first);
+    std::string newName = std::string("beer_clone_") +
+      boost::lexical_cast<std::string>(i);
+    cloneSdf.replace(first, last - first, newName);
+
+    msg2.set_sdf(cloneSdf);
+
+    popPub->Publish(msg2);
   }
 }
 

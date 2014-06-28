@@ -9,5 +9,27 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+
+    <!-- Testing the automatic population of objects -->
+    <population name="beer_population">
+
+      <model name="beer">
+        <include>
+          <uri>model://beer</uri>
+        </include>
+      </model>
+
+      <region>
+        <min>0 0 0</min>
+        <max>1 1 0</max>
+      </region>
+
+      <density>1.0</density>
+
+      <model_count>500</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>random</distribution>
+    </population>
+
   </world>
 </sdf>

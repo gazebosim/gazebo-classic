@@ -447,6 +447,10 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
 
+      /// \brief Insert into the world a population of models.
+      /// \param[in] _pop SDF population element.
+      private: void CreateEnvironmentPopulation(const sdf::ElementPtr _pop);
+
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
 
