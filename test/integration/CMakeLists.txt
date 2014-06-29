@@ -46,6 +46,7 @@ set(tests
   joint_gearbox.cc
   joint_revolute.cc
   joint_screw.cc
+  joint_set_position_test.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
@@ -54,7 +55,9 @@ set(tests
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_basic_controller_response.cc
   physics_friction.cc
+  physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
   physics_thread_safe.cc

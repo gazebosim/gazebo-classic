@@ -583,4 +583,3 @@ math::Angle BulletJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
 }
-

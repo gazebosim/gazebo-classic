@@ -1,3 +1,11 @@
+## Gazebo 3.0 to 3.1
+
+### Additions
+
+1. **gazebo/physics/JointController.hh**
+    + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);
+    + void SetVelocityPID(const std::string &_jointName, const common::PID &_pid);
+
 ## Gazebo 2.0 to 3.0
 
 ### New Deprecations
@@ -72,7 +80,7 @@
 1. **gazebo/physics/bullet/BulletScrewJoint.hh**
     + ***Deprecation*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetParam(const std::string &_key, unsigned int _index)
- 
+
 1. **gazebo/physics/dart/DARTJoint.hh**
     + ***Deprecation*** virtual double GetParam(const std::string &_key, unsigned int _index)
     + ***Replacement*** virtual double GetAttribute(const std::string &_key, unsigned int _index)
@@ -211,7 +219,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
     + ***Replacement*** virtual bool SetLowStop(unsigned int /*_index*/, const math::Angle &/*_angle*/)
- 
+
 1. **gazebo/physics/Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -225,7 +233,7 @@
     ---
     + ***Removed*** virtual void SetLowStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
- 
+
 1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
     + ***Removed*** virtual void SetHighStop(unsigned int _index, const math::Angle &_angle)
     + ***Replacement*** virtual bool SetHighStop(unsigned int _index, const math::Angle &_angle)
@@ -297,6 +305,20 @@
     + ***Replacement*** virtual bool SetLowStop(unsigned int _index, const math::Angle &_angle)
 
 ### Additions
+
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                       const math::Pose &_worldReferenceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
 1. **gazebo/physics/JointController.hh**
       + common::Time GetLastUpdateTime() const
@@ -415,11 +437,11 @@
 
 1. **gazebo/physics/simbody/SimbodyScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ode/ODEScrewJoint.hh**
     + virtual void SetThreadPitch(double _threadPitch)
-    + virtual void GetThreadPitch() 
+    + virtual void GetThreadPitch()
 
 1. **gazebo/physics/ScrewJoint.hh**
     + virtual math::Vector3 GetAnchor(unsigned int _index) const

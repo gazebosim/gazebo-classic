@@ -674,10 +674,16 @@ void World::Update()
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); ++iter)
     {
-      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      // block any other pose updates (e.g. Joint::SetPosition)
+      boost::recursive_mutex::scoped_lock lock(
+        *this->physicsEngine->GetPhysicsUpdateMutex());
+
+      for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
+          iter != this->dirtyPoses.end(); ++iter)
+      {
+        (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      }
     }
 
     this->dirtyPoses.clear();
@@ -2038,7 +2044,7 @@ void World::OnLightMsg(ConstLightPtr &_msg)
     if (this->sceneMsg.light(i).name() == _msg->name())
     {
       lightExists = true;
-      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      this->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
       break;
     }
   }
