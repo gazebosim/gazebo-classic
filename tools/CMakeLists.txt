@@ -61,7 +61,5 @@ gz_install_executable(gz)
 
 roffman(gz 1)
 
-install (PROGRAMS gzmodel_create gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
-
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
 manpage(gzprop 1)
