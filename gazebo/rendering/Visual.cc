@@ -791,7 +791,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -2079,6 +2079,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       {
         rendering::Material::Update(material);
         ogreSubMesh->setMaterialName(material->GetName());
+      }
+      else
+      {
+        ogreSubMesh->setMaterialName("Gazebo/White");
       }
 
       // Unlock
