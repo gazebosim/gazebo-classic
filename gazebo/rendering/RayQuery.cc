@@ -64,9 +64,8 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   for (unsigned int i = 0; i < visuals.size(); ++i)
   {
     const common::Mesh *mesh =
-      common::MeshManager::Instance()->GetMesh(visuals[i]->GetMeshName());
+        common::MeshManager::Instance()->GetMesh(visuals[i]->GetMeshName());
 
-    //std::cerr << "name " << _visual->GetName() << " " << _visual->GetMeshName() << std::endl;
     if (!mesh)
       continue;
 
@@ -91,10 +90,6 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
            (worldVertexB - worldVertexA).crossProduct(
            worldVertexC - worldVertexA));
 
-        /*std::cerr << " va " << worldVertexA << std::endl;
-        std::cerr << " vb " << worldVertexB << std::endl;
-        std::cerr << " vc " << worldVertexC << std::endl;
-        std::cerr << " j " << j << " k " << k << " hit.second " << hit.second << std::endl;*/
         // if it was a hit check if its the closest
         if (hit.first &&
             (closestDistance < 0.0f || hit.second < closestDistance))
@@ -109,7 +104,6 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
         }
       }
     }
-//    std::cerr << " ========  " << std::endl;
   }
 
 
