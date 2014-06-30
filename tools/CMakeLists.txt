@@ -60,6 +60,7 @@ target_link_libraries(gz
 gz_install_executable(gz)
 
 roffman(gz 1)
+roffman(gzmodel_create 1)
 
 install (PROGRAMS gzmodel_create gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
 
