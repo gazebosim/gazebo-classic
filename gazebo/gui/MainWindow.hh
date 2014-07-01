@@ -29,10 +29,6 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 
-#ifdef HAVE_OCULUS
-#include "gazebo/gui/OculusWindow.hh"
-#endif
-
 namespace gazebo
 {
   namespace gui
@@ -41,6 +37,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class OculusWindow;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -76,7 +73,7 @@ namespace gazebo
 
       /// \brief Pause simulation.
       public slots: void Pause();
-      
+
       /// \brief Add a menu to the main window menu bar.
       /// \param[in] _menu Menu to be added.
       public: void AddMenu(QMenu *_menu);
