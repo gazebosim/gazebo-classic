@@ -352,6 +352,14 @@ TEST_P(PhysicsTest, SpawnDrop)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Skipping SpawnDropCoGOffset for physics engine ["
+          << _physicsEngine
+          << "] due to issue #1209.\n";
+    return;
+  }
+
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
