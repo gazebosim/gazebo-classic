@@ -245,7 +245,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_solver_type(this->stepType);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(
-        boost::any_cast<double>(this->GetParam(MIN_STEP_SIZE)));
+        boost::any_cast<double>(this->GetParam("min_step_size")));
     physicsMsg.mutable_ode()->set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.mutable_ode()->set_inertia_ratio_reduction(
         boost::any_cast<bool>(this->GetParam("inertia_ratio_reduction")));
