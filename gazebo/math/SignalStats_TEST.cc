@@ -46,24 +46,21 @@ TEST_F(SignalStatsTest, SignalMean)
     EXPECT_EQ(mean.GetCount(), 0);
 
     const double value = 3.14159;
-    for (int i = 1; i <= 10; ++i)
-    {
-      mean.Insert(value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i);
-    }
 
-    // Reset
-    mean.Reset();
-    EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
-
-    // Try it again
-    for (int i = 1; i <= 10; ++i)
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
     {
-      mean.Insert(value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i);
+      for (int i = 1; i <= 10; ++i)
+      {
+        mean.Insert(value);
+        EXPECT_NEAR(mean.Get(), value, 1e-10);
+        EXPECT_EQ(mean.GetCount(), i);
+      }
+
+      // Reset
+      mean.Reset();
+      EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
+      EXPECT_EQ(mean.GetCount(), 0);
     }
   }
 
@@ -75,26 +72,22 @@ TEST_F(SignalStatsTest, SignalMean)
     EXPECT_EQ(mean.GetCount(), 0);
 
     const double value = 3.14159;
-    for (int i = 1; i <= 10; ++i)
-    {
-      mean.Insert(value);
-      mean.Insert(-value);
-      EXPECT_NEAR(mean.Get(), 0.0, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2);
-    }
 
-    // Reset
-    mean.Reset();
-    EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
-
-    // Try it again
-    for (int i = 1; i <= 10; ++i)
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
     {
-      mean.Insert(value);
-      mean.Insert(-value);
-      EXPECT_NEAR(mean.Get(), 0.0, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2);
+      for (int i = 1; i <= 10; ++i)
+      {
+        mean.Insert(value);
+        mean.Insert(-value);
+        EXPECT_NEAR(mean.Get(), 0.0, 1e-10);
+        EXPECT_EQ(mean.GetCount(), i*2);
+      }
+
+      // Reset
+      mean.Reset();
+      EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
+      EXPECT_EQ(mean.GetCount(), 0);
     }
   }
 }
@@ -120,24 +113,21 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     EXPECT_EQ(rms.GetCount(), 0);
 
     const double value = 3.14159;
-    for (int i = 1; i <= 10; ++i)
-    {
-      rms.Insert(value);
-      EXPECT_NEAR(rms.Get(), value, 1e-10);
-      EXPECT_EQ(rms.GetCount(), i);
-    }
 
-    // Reset
-    rms.Reset();
-    EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
-    EXPECT_EQ(rms.GetCount(), 0);
-
-    // Try it again
-    for (int i = 1; i <= 10; ++i)
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
     {
-      rms.Insert(value);
-      EXPECT_NEAR(rms.Get(), value, 1e-10);
-      EXPECT_EQ(rms.GetCount(), i);
+      for (int i = 1; i <= 10; ++i)
+      {
+        rms.Insert(value);
+        EXPECT_NEAR(rms.Get(), value, 1e-10);
+        EXPECT_EQ(rms.GetCount(), i);
+      }
+
+      // Reset
+      rms.Reset();
+      EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
+      EXPECT_EQ(rms.GetCount(), 0);
     }
   }
 
@@ -149,32 +139,25 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     EXPECT_EQ(mean.GetCount(), 0);
 
     const double value = 3.14159;
-    for (int i = 1; i <= 10; ++i)
+
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
     {
-      mean.Insert(value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2-1);
+      for (int i = 1; i <= 10; ++i)
+      {
+        mean.Insert(value);
+        EXPECT_NEAR(mean.Get(), value, 1e-10);
+        EXPECT_EQ(mean.GetCount(), i*2-1);
 
-      mean.Insert(-value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2);
-    }
+        mean.Insert(-value);
+        EXPECT_NEAR(mean.Get(), value, 1e-10);
+        EXPECT_EQ(mean.GetCount(), i*2);
+      }
 
-    // Reset
-    mean.Reset();
-    EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
-
-    // Try it again
-    for (int i = 1; i <= 10; ++i)
-    {
-      mean.Insert(value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2-1);
-
-      mean.Insert(-value);
-      EXPECT_NEAR(mean.Get(), value, 1e-10);
-      EXPECT_EQ(mean.GetCount(), i*2);
+      // Reset
+      mean.Reset();
+      EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
+      EXPECT_EQ(mean.GetCount(), 0);
     }
   }
 }

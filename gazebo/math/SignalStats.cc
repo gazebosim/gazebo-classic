@@ -37,7 +37,7 @@ double SignalMean::Get() const
 {
   if (this->count == 0)
   {
-    return this->sum;
+    return 0;
   }
   return this->sum / this->count;
 }
@@ -77,7 +77,7 @@ double SignalRootMeanSquare::Get() const
 {
   if (this->count == 0)
   {
-    return this->sum;
+    return 0;
   }
   return sqrt(this->sum / this->count);
 }
