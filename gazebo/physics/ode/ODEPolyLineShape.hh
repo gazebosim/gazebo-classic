@@ -14,45 +14,39 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEPOLYLINESHAPE_HH_
-#define _ODEPOLYLINESHAPE_HH_
-#include <vector>
+#ifndef _GAZEBO_ODEPOLYLINESHAPE_HH_
+#define _GAZEBO_ODEPOLYLINESHAPE_HH_
 
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/PolyLineShape.hh"
-#include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class ODEMesh;
+
     /// \brief ODE polyline shape
     class GAZEBO_VISIBLE ODEPolyLineShape : public PolyLineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
-      public: explicit ODEPolyLineShape(ODECollisionPtr _parent)
-              : PolyLineShape(_parent) {}
+      public: explicit ODEPolyLineShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODEPolyLineShape() {}
+      public: virtual ~ODEPolyLineShape();
 
-      // Documentation inherited.
-      public: void SetPolylineShape(double _height,
-                                    std::vector<math::Vector2d> _vertices)
-      {
-        PolyLineShape::SetHeight(_height);
-        PolyLineShape::SetVertices(_vertices);
-        ODECollisionPtr oParent;
-        oParent =
-          boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
+      // Documentation inherited
+      public: virtual void Load(sdf::ElementPtr _sdf);
 
-        if (oParent->GetCollisionId() == NULL)
-          oParent->SetCollision(dCreatePolyLine(0, _height, _vertices), true);
-        else
-          dGeomPolyLineSetParams(oParent->GetCollisionId(), _height, _vertices);
-      }
+      // Documentation inherited
+      public: virtual void Init();
+
+      // Documentation inherited
+      public: virtual void Update();
+
+      /// \brief ODE collsion mesh helper class.
+      private: ODEMesh *odeMesh;
     };
   }
 }

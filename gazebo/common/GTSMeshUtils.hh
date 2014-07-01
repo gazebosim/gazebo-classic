@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  *
  */
-#ifndef _GTSMESHUTILS_HH_
-#define _GTSMESHUTILS_HH_
+#ifndef _GAZEBO_GTSMESHUTILS_HH_
+#define _GAZEBO_GTSMESHUTILS_HH_
 
 #include <vector>
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/math/Vector2d.hh"
-
 
 namespace gazebo
 {
@@ -42,13 +41,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GTSMeshUtils();
 
-      /// \brief Create an Extruded Polyline submesh
-      /// \param[in] _vertices the x y  dimentions of eah vertex in meter
+      /// \brief Create an extruded Polyline submesh
+      /// \param[in] _vertices the x y dimentions of eah vertex in meter
       /// \param[in] _height the height of the polyline
-      /// \return pointer to polyline submesh
-      public: SubMesh *CreateExtrudedPolyline(const std::vector<math::Vector2d>
-                                                               &_vertices,
-                                              const double &_height);
+      /// \return A submesh for the given polyline.
+      public: static bool CreateExtrudedPolyline(
+                  const std::vector<math::Vector2d> &_vertices,
+                  const double &_height,
+                  SubMesh *_submesh);
     };
   }
 }

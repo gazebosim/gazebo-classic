@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <stdio.h>
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
@@ -35,7 +34,6 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  std::cout << "hi";
   this->SetSize(this->sdf->Get<math::Vector3>("size"));
 }
 

@@ -16,10 +16,11 @@ set (sources
   ODEHingeJoint.cc
   ODEJoint.cc
   ODELink.cc
+  ODEMesh.cc
   ODEMeshShape.cc
   ODEMultiRayShape.cc
   ODEPhysics.cc
-#  ODEPolyLineShape.cc
+  ODEPolyLineShape.cc
   ODERayShape.cc
   ODEScrewJoint.cc
   ODESliderJoint.cc
@@ -39,11 +40,12 @@ SET (headers
   ODEHingeJoint.hh
   ODEJoint.hh
   ODELink.hh
+  ODEMesh.hh
   ODEMeshShape.hh
   ODEMultiRayShape.hh
   ODEPhysics.hh
   ODEPlaneShape.hh
-#  ODEPolyLineShape_new.hh
+  ODEPolyLineShape.hh
   ODERayShape.hh
   ODEScrewJoint.hh
   ODESliderJoint.hh

@@ -130,7 +130,6 @@ namespace gazebo
                 SPHERE_SHAPE    = 0x01000000,
                 /// \brief MeshShape type
                 MESH_SHAPE      = 0x02000000,
-
                 /// \brief PolyLineShape type
                 POLYLINE_SHAPE  = 0x04000000,
 

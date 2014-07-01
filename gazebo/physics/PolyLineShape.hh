@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _POLYLINESHAPE_HH_
-#define _POLYLINESHAPE_HH_
+#ifndef _GAZEBO_POLYLINESHAPE_HH_
+#define _GAZEBO_POLYLINESHAPE_HH_
 
 #include <vector>
-
 #include "gazebo/physics/Shape.hh"
 
 namespace gazebo
@@ -30,7 +29,7 @@ namespace gazebo
 
     /// \class PolyLineShape PolyLineShape.hh physics/physcs.hh
     /// \brief PolyLine geometry primitive.
-    class PolyLineShape : public Shape
+    class GAZEBO_VISIBLE PolyLineShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -73,8 +72,7 @@ namespace gazebo
       /// \param[in] _vertices std::vector<math::Vector2d>
       /// containing the vertex information
       public: void SetPolylineShape(const double &_height,
-                                    const std::vector<math::Vector2d>
-                                          &_vertices);
+                  const std::vector<math::Vector2d> &_vertices);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
@@ -83,6 +81,9 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// \brief Pointer to the mesh data.
+      protected: const common::Mesh *mesh;
     };
     /// \}
   }

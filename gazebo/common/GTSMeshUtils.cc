@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <gts.h>
 
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/GTSMeshUtils.hh"
 
@@ -51,9 +52,9 @@ static void FillVertex(GtsPoint *_p, gpointer *_data)
 static void FillFace(GtsTriangle *_t, gpointer *_data)
 {
   SubMesh *subMesh = reinterpret_cast<SubMesh *>(_data[0]);
-  GHashTable* vIndex = reinterpret_cast<GHashTable *>(_data[2]);
-  int* x = reinterpret_cast<int *>(_data[3]);
-  GtsVertex * v1, * v2, * v3;
+  GHashTable *vIndex = reinterpret_cast<GHashTable *>(_data[2]);
+  int *x = reinterpret_cast<int*>(_data[3]);
+  GtsVertex *v1, *v2, *v3;
   gts_triangle_vertices(_t, &v1, &v2, &v3);
   if (*x == 0)
   {
@@ -70,17 +71,25 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 }
 
 //////////////////////////////////////////////////////////////////////////
-static void add_constraint(GtsConstraint *_c, GtsSurface *_s)
+static void AddConstraint(GtsConstraint *_c, GtsSurface *_s)
 {
   gts_delaunay_add_constraint(_s, _c);
 }
 
 //////////////////////////////////////////////////
-SubMesh *GTSMeshUtils::CreateExtrudedPolyline(const std::vector
-                                                   <math::Vector2d>&_vertices,
-                                              const double &_height)
+bool GTSMeshUtils::CreateExtrudedPolyline(
+    const std::vector<math::Vector2d> &_vertices,
+    const double &_height, SubMesh *_subMesh)
 {
-  SubMesh *subMesh = new SubMesh();
+  if (_vertices.size() < 3)
+  {
+    gzerr << "Unable to create an extruded polyline mesh with "
+      << "less than 3 vertices\n";
+    return false;
+  }
+
+  if (_subMesh == NULL)
+    _subMesh = new SubMesh();
 
   int i, k;
 
@@ -92,56 +101,58 @@ SubMesh *GTSMeshUtils::CreateExtrudedPolyline(const std::vector
   //                = numFaces - 2
   //                = numSides
 
-  GSList * l, * verticesList = NULL;
-  GtsTriangle * tri;
+
+  GSList *l, *verticesList = NULL;
   double z;
-  for (k = 0; k < 2; k++)
+  for (k = 0; k < 2; ++k)
   {
-    GtsSurface * surface;
-    GtsVertex * v1, * v2, * v3;
-    GtsFifo * edgeList;
+    GtsSurface *surface;
+    GtsVertex *v1, *v2, *v3;
+    GtsFifo *edgeList;
     edgeList = gts_fifo_new();
     verticesList = NULL;
 
     if (k == 0)
-       z = 0.0;
+      z = 0.0;
     else
-       z = _height;
+      z = _height;
 
     // List the vertices and edges
-    for (i = 0; i < numSides; i++)
+    for (i = 0; i < numSides; ++i)
     {
       verticesList = g_slist_append(verticesList,
-                                    gts_vertex_new(gts_vertex_class(),
-                                    _vertices[i].x, _vertices[i].y, z));
+          gts_vertex_new(gts_vertex_class(),
+            _vertices[i].x, _vertices[i].y, z));
       if (i != 0)
       {
         gts_fifo_push(edgeList,
-                      gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
-                      reinterpret_cast<GtsVertex *>
-                                      (g_slist_nth_data(verticesList, i)),
-                      reinterpret_cast<GtsVertex *>
-                                      (g_slist_nth_data(verticesList, i-1))));
+            gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
+              reinterpret_cast<GtsVertex *>
+              (g_slist_nth_data(verticesList, i)),
+              reinterpret_cast<GtsVertex *>
+              (g_slist_nth_data(verticesList, i-1))));
       }
     }
-    gts_fifo_push(edgeList,
-                  gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
-                  reinterpret_cast<GtsVertex *>
-                                  (g_slist_nth_data(verticesList, i-1)),
-                  reinterpret_cast<GtsVertex *>
-                                  (g_slist_nth_data(verticesList, 0))));
 
-    tri = gts_triangle_enclosing(gts_triangle_class(), verticesList, 100.);
+    gts_fifo_push(edgeList,
+        gts_edge_new(GTS_EDGE_CLASS(gts_constraint_class()),
+          reinterpret_cast<GtsVertex *>
+          (g_slist_nth_data(verticesList, i-1)),
+          reinterpret_cast<GtsVertex *>
+          (g_slist_nth_data(verticesList, 0))));
+
+    GtsTriangle *tri = gts_triangle_enclosing(
+        gts_triangle_class(), verticesList, 100.);
     gts_triangle_vertices(tri, &v1, &v2, &v3);
 
     surface = gts_surface_new(gts_surface_class(),
-                              gts_face_class(),
-                              gts_edge_class(),
-                              gts_vertex_class());
+        gts_face_class(),
+        gts_edge_class(),
+        gts_vertex_class());
 
     gts_surface_add_face(surface,
-                         gts_face_new(gts_face_class(),
-                                      tri->e1, tri->e2, tri->e3));
+        gts_face_new(gts_face_class(),
+          tri->e1, tri->e2, tri->e3));
 
     l = verticesList;
     while (l)
@@ -156,7 +167,7 @@ SubMesh *GTSMeshUtils::CreateExtrudedPolyline(const std::vector
     }
 
     // add constraints
-    gts_fifo_foreach(edgeList, (GtsFunc) add_constraint, surface);
+    gts_fifo_foreach(edgeList, (GtsFunc) AddConstraint, surface);
 
     // delete the enclosing triangle
     gts_allow_floating_vertices = TRUE;
@@ -173,7 +184,7 @@ SubMesh *GTSMeshUtils::CreateExtrudedPolyline(const std::vector
     gpointer data[4];
     GHashTable *vIndex = g_hash_table_new(NULL, NULL);
 
-    data[0] = subMesh;
+    data[0] = _subMesh;
     data[1] = &n2;
     data[2] = vIndex;
     data[3] = &m;
@@ -186,5 +197,5 @@ SubMesh *GTSMeshUtils::CreateExtrudedPolyline(const std::vector
     gts_fifo_destroy(edgeList);
   }
 
-  return subMesh;
+  return true;
 }

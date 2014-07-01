@@ -116,8 +116,8 @@ namespace gazebo
     GAZEBO_VISIBLE
     math::Vector3    Convert(const msgs::Vector3d &_v);
 
-    /// \brief Convert a msgs::Vector2d to a math::Vector
-    /// \param[in] _v The plane to convert
+    /// \brief Convert a msgs::Vector2d to a math::Vector2d
+    /// \param[in] _v The vector2 to convert
     /// \return A math::Vector2d object
     GAZEBO_VISIBLE
     math::Vector2d    Convert(const msgs::Vector2d &_v);

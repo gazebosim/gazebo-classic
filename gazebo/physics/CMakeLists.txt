@@ -35,6 +35,7 @@ set (sources
   Link.cc
   LinkState.cc
   MapShape.cc
+  MeshShape.cc
   Model.cc
   ModelState.cc
   MultiRayShape.cc
@@ -49,7 +50,6 @@ set (sources
   SphereShape.cc
   State.cc
   SurfaceParams.cc
-  MeshShape.cc
   World.cc
   WorldState.cc
 )
@@ -78,6 +78,7 @@ set (headers
   Link.hh
   LinkState.hh
   MapShape.hh
+  MeshShape.hh
   Model.hh
   ModelState.hh
   MultiRayShape.hh
@@ -95,7 +96,6 @@ set (headers
   SphereShape.hh
   State.hh
   SurfaceParams.hh
-  MeshShape.hh
   UniversalJoint.hh
   World.hh
   WorldState.hh)
