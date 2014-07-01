@@ -85,6 +85,7 @@ set (headers
 
 set (install_headers
   ${headers}
+  Editor.hh
   MainWindow.hh
 )
 

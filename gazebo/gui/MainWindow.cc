@@ -107,11 +107,10 @@ MainWindow::MainWindow()
   this->tabWidget->setMinimumWidth(MINIMUM_TAB_WIDTH);
   this->AddToLeftColumn("default", this->tabWidget);
 
-  this->CreateEditors();
-
   this->toolsWidget = new ToolsWidget();
-
   this->renderWidget = new RenderWidget(mainWidget);
+
+  this->CreateEditors();
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
@@ -264,9 +263,9 @@ void MainWindow::Init()
                                             &MainWindow::OnWorldModify, this);
 
   this->requestMsg = msgs::CreateRequest("scene_info");
-  this->requestPub->Publish(*this->requestMsg);  
-  
-  gui::Events::mainWindowReady();  
+  this->requestPub->Publish(*this->requestMsg);
+
+  gui::Events::mainWindowReady();
 }
 
 /////////////////////////////////////////////////
@@ -1566,4 +1565,3 @@ void MainWindow::AddMenu(QMenu *_menu)
 {
   this->menuBar->addMenu(_menu);
 }
-

@@ -35,8 +35,6 @@ namespace gazebo
 
   namespace gui
   {
-    class BuildingEditorWidget;
-
     class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
@@ -46,9 +44,19 @@ namespace gazebo
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
-      /// \brief Show editor widget in the main window
-      /// param[in] _show True to show the editor widget, false to hide it.
-      public: void ShowEditor(bool _show);
+
+      /// \brief Add a widget inside the render widget
+      /// \param[in] _widget Widget to be added.
+      /// \param[in] _index Index in the splitter to add the widget at.
+      public: void InsertWidget(unsigned int _index, QWidget *_widget);
+
+      /// \brief Get the number of widgets inside the render widget.
+      /// \return Number of widgets.
+      public: unsigned int GetWidgetCount();
+
+      /// \brief Show the time panel.
+      /// \para[in] _show True to show the panel, false to hide it.
+      public: void ShowTimePanel(bool _show);
 
       /// \brief Display an overlay message
       /// \param[in] _msg Message to be displayed
@@ -76,7 +84,7 @@ namespace gazebo
       private: GLWidget *glWidget;
 
       /// \brief Building editor widget for creating a building model
-      private: BuildingEditorWidget *buildingEditorWidget;
+      //private: BuildingEditorWidget *buildingEditorWidget;
 
       /// \brief Frame that holds the contents of this widget.
       private: QFrame *mainFrame;
@@ -113,6 +121,9 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief Vertical splitter between widgets.
+      private: QSplitter *splitter;
     };
   }
 }
