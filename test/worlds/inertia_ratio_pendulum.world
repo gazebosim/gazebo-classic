@@ -1,0 +1,125 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <physics type="ode">
+      <gravity>0.100000 0.000000 -9.810000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>250</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.400000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.00000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>250</iters>
+          <sor>1.400000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </bullet>
+      <simbody>
+        <accuracy>0.001</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>10</dissipation>
+          <static_friction>0.15</static_friction>
+          <dynamic_friction>0.1</dynamic_friction>
+          <viscous_friction>0.0</viscous_friction>
+        </contact>
+      </simbody>
+      <real_time_update_rate>1000.000000</real_time_update_rate>
+      <max_step_size>0.001000</max_step_size>
+    </physics>
+
+    <model name="inertia_ratio">
+      <pose>0 0 0.9  0.7853981633974483 0 0</pose>
+      <link name="upper_link">
+        <pose>0 0 -0.05  0 0 0</pose>
+        <inertial>
+          <mass>0.02700000000000001</mass>
+          <inertia>
+            <ixx>2.272500000000001e-05</ixx>
+            <iyy>2.272500000000001e-05</iyy>
+            <izz>4.5000000000000035e-07</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.010000000000000002 0.010000000000000002 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.010000000000000002 0.010000000000000002 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="upper_joint" type="revolute">
+        <pose>0 0 0.05  0 0 0</pose>
+        <parent>world</parent>
+        <child>upper_link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+      <link name="lower_link">
+        <pose>0 0.17677669529663687 -0.2767766952966369  0.7853981633974483 0 0</pose>
+        <inertial>
+          <mass>3.375</mass>
+          <inertia>
+            <ixx>0.071015625</ixx>
+            <iyy>0.071015625</iyy>
+            <izz>0.0014062500000000004</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="lower_joint" type="revolute">
+        <pose>0 0 0.25  0 0 0</pose>
+        <parent>upper_link</parent>
+        <child>lower_link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+        </axis>
+      </joint>
+    </model>
+  </world>
+</sdf>
