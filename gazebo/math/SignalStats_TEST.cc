@@ -31,26 +31,26 @@ TEST_F(SignalStatsTest, SignalMean)
     // Constructor
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
+    EXPECT_EQ(mean.GetCount(), 0u);
 
     // Reset
     mean.Reset();
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
+    EXPECT_EQ(mean.GetCount(), 0u);
   }
 
   {
     // Constant values, mean should match
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
+    EXPECT_EQ(mean.GetCount(), 0u);
 
     const double value = 3.14159;
 
     // Loop two times to verify Reset
     for (int j = 0; j < 2; ++j)
     {
-      for (int i = 1; i <= 10; ++i)
+      for (unsigned int i = 1; i <= 10; ++i)
       {
         mean.Insert(value);
         EXPECT_NEAR(mean.Get(), value, 1e-10);
@@ -60,7 +60,7 @@ TEST_F(SignalStatsTest, SignalMean)
       // Reset
       mean.Reset();
       EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-      EXPECT_EQ(mean.GetCount(), 0);
+      EXPECT_EQ(mean.GetCount(), 0u);
     }
   }
 
@@ -69,14 +69,14 @@ TEST_F(SignalStatsTest, SignalMean)
     // Should be zero every other time
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
+    EXPECT_EQ(mean.GetCount(), 0u);
 
     const double value = 3.14159;
 
     // Loop two times to verify Reset
     for (int j = 0; j < 2; ++j)
     {
-      for (int i = 1; i <= 10; ++i)
+      for (unsigned int i = 1; i <= 10; ++i)
       {
         mean.Insert(value);
         mean.Insert(-value);
@@ -87,7 +87,7 @@ TEST_F(SignalStatsTest, SignalMean)
       // Reset
       mean.Reset();
       EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-      EXPECT_EQ(mean.GetCount(), 0);
+      EXPECT_EQ(mean.GetCount(), 0u);
     }
   }
 }
@@ -98,26 +98,26 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     // Constructor
     math::SignalRootMeanSquare rms;
     EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
-    EXPECT_EQ(rms.GetCount(), 0);
+    EXPECT_EQ(rms.GetCount(), 0u);
 
     // Reset
     rms.Reset();
     EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
-    EXPECT_EQ(rms.GetCount(), 0);
+    EXPECT_EQ(rms.GetCount(), 0u);
   }
 
   {
     // Constant values, rms should match
     math::SignalRootMeanSquare rms;
     EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
-    EXPECT_EQ(rms.GetCount(), 0);
+    EXPECT_EQ(rms.GetCount(), 0u);
 
     const double value = 3.14159;
 
     // Loop two times to verify Reset
     for (int j = 0; j < 2; ++j)
     {
-      for (int i = 1; i <= 10; ++i)
+      for (unsigned int i = 1; i <= 10; ++i)
       {
         rms.Insert(value);
         EXPECT_NEAR(rms.Get(), value, 1e-10);
@@ -127,7 +127,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
       // Reset
       rms.Reset();
       EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
-      EXPECT_EQ(rms.GetCount(), 0);
+      EXPECT_EQ(rms.GetCount(), 0u);
     }
   }
 
@@ -136,14 +136,14 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     // rms should match absolute value every time
     math::SignalRootMeanSquare mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0);
+    EXPECT_EQ(mean.GetCount(), 0u);
 
     const double value = 3.14159;
 
     // Loop two times to verify Reset
     for (int j = 0; j < 2; ++j)
     {
-      for (int i = 1; i <= 10; ++i)
+      for (unsigned int i = 1; i <= 10; ++i)
       {
         mean.Insert(value);
         EXPECT_NEAR(mean.Get(), value, 1e-10);
@@ -157,7 +157,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
       // Reset
       mean.Reset();
       EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-      EXPECT_EQ(mean.GetCount(), 0);
+      EXPECT_EQ(mean.GetCount(), 0u);
     }
   }
 }
