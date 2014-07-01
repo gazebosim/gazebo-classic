@@ -31,65 +31,64 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalStats
     {
       /// \brief Constructor
-      public: SignalStats() {}
+      public: SignalStats();
 
       /// \brief Destructor
-      public: virtual ~SignalStats() {}
+      public: virtual ~SignalStats();
 
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
       public: virtual double Get() const = 0;
+
+      /// \brief Get number of data points in measurement.
+      public: virtual unsigned int GetCount() const;
 
       /// \brief Add a new sample to the statistical measure.
       /// \param[in] _data New signal data point.
       public: virtual void Insert(double _data) = 0;
 
       /// \brief Forget all previous data.
-      public: virtual void Reset() = 0;
-    };
+      public: virtual void Reset();
+
+      /// \brief Scalar representation of signal data.
+      protected: double data;
+
+      /// \brief Count of data values in mean.
+      protected: unsigned int count;
+   };
     /// \}
 
     /// \class SignalMean SignalStats.hh math/gzmath.hh
     /// \brief Computing the mean value of a discretely sampled signal.
-    class GAZEBO_VISIBLE SignalMean : SignalStats
+    class GAZEBO_VISIBLE SignalMean : public SignalStats
     {
-      // Documentation inherited.
-      public: SignalMean();
-
-      // Documentation inherited.
-      public: virtual ~SignalMean();
-
       // Documentation inherited.
       public: virtual double Get() const;
 
-      /// \brief Get number of data points in measurement.
-      public: virtual unsigned int GetCount() const;
-
       // Documentation inherited.
       public: virtual void Insert(double _data);
-
-      // Documentation inherited.
-      public: virtual void Reset();
-
-      /// \brief Sum of all data values.
-      protected: double sum;
-
-      /// \brief Count of data values in mean.
-      protected: unsigned int count;
     };
     /// \}
 
     /// \class SignalRootMeanSquare SignalStats.hh math/gzmath.hh
     /// \brief Computing the square root of the mean squared value
     /// of a discretely sampled signal.
-    class GAZEBO_VISIBLE SignalRootMeanSquare : public SignalMean
+    class GAZEBO_VISIBLE SignalRootMeanSquare : public SignalStats
     {
       // Documentation inherited.
-      public: SignalRootMeanSquare();
+      public: virtual double Get() const;
 
       // Documentation inherited.
-      public: virtual ~SignalRootMeanSquare();
+      public: virtual void Insert(double _data);
+    };
+    /// \}
 
+    /// \class SignalMaxAbsoluteValue SignalStats.hh math/gzmath.hh
+    /// \brief Computing the maximum of the absolute value
+    /// of a discretely sampled signal.
+    /// Also known as the maximum norm, infinity norm, or supremum norm.
+    class GAZEBO_VISIBLE SignalMaxAbsoluteValue : public SignalStats
+    {
       // Documentation inherited.
       public: virtual double Get() const;
 

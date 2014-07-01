@@ -21,15 +21,28 @@ using namespace gazebo;
 using namespace math;
 
 //////////////////////////////////////////////////
-SignalMean::SignalMean() : SignalStats()
-  , sum(0.0)
+SignalStats::SignalStats()
+  : data(0.0)
   , count(0)
 {
 }
 
 //////////////////////////////////////////////////
-SignalMean::~SignalMean()
+SignalStats::~SignalStats()
 {
+}
+
+//////////////////////////////////////////////////
+unsigned int SignalStats::GetCount() const
+{
+  return this->count;
+}
+
+//////////////////////////////////////////////////
+void SignalStats::Reset()
+{
+  this->data = 0;
+  this->count = 0;
 }
 
 //////////////////////////////////////////////////
@@ -39,37 +52,14 @@ double SignalMean::Get() const
   {
     return 0;
   }
-  return this->sum / this->count;
-}
-
-//////////////////////////////////////////////////
-unsigned int SignalMean::GetCount() const
-{
-  return this->count;
+  return this->data / this->count;
 }
 
 //////////////////////////////////////////////////
 void SignalMean::Insert(double _data)
 {
-  this->sum += _data;
+  this->data += _data;
   this->count++;
-}
-
-//////////////////////////////////////////////////
-void SignalMean::Reset()
-{
-  this->sum = 0;
-  this->count = 0;
-}
-
-//////////////////////////////////////////////////
-SignalRootMeanSquare::SignalRootMeanSquare() : SignalMean()
-{
-}
-
-//////////////////////////////////////////////////
-SignalRootMeanSquare::~SignalRootMeanSquare()
-{
 }
 
 //////////////////////////////////////////////////
@@ -79,13 +69,30 @@ double SignalRootMeanSquare::Get() const
   {
     return 0;
   }
-  return sqrt(this->sum / this->count);
+  return sqrt(this->data / this->count);
 }
 
 //////////////////////////////////////////////////
 void SignalRootMeanSquare::Insert(double _data)
 {
-  this->sum += _data * _data;
+  this->data += _data * _data;
+  this->count++;
+}
+
+//////////////////////////////////////////////////
+double SignalMaxAbsoluteValue::Get() const
+{
+  return this->data;
+}
+
+//////////////////////////////////////////////////
+void SignalMaxAbsoluteValue::Insert(double _data)
+{
+  double fabsData = fabs(_data);
+  if (fabsData > this->data)
+  {
+    this->data = fabsData;
+  }
   this->count++;
 }
 

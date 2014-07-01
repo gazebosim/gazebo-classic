@@ -65,7 +65,7 @@ TEST_F(SignalStatsTest, SignalMean)
   }
 
   {
-    // Values with alternating sign, same magnitude
+    // Values with alternating sign, increasing magnitude
     // Should be zero every other time
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
@@ -78,8 +78,8 @@ TEST_F(SignalStatsTest, SignalMean)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        mean.Insert(value);
-        mean.Insert(-value);
+        mean.Insert(value * i);
+        mean.Insert(-value * i);
         EXPECT_NEAR(mean.Get(), 0.0, 1e-10);
         EXPECT_EQ(mean.GetCount(), i*2);
       }
@@ -134,9 +134,9 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
   {
     // Values with alternating sign, same magnitude
     // rms should match absolute value every time
-    math::SignalRootMeanSquare mean;
-    EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-    EXPECT_EQ(mean.GetCount(), 0u);
+    math::SignalRootMeanSquare rms;
+    EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
+    EXPECT_EQ(rms.GetCount(), 0u);
 
     const double value = 3.14159;
 
@@ -145,19 +145,90 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        mean.Insert(value);
-        EXPECT_NEAR(mean.Get(), value, 1e-10);
-        EXPECT_EQ(mean.GetCount(), i*2-1);
+        rms.Insert(value);
+        EXPECT_NEAR(rms.Get(), value, 1e-10);
+        EXPECT_EQ(rms.GetCount(), i*2-1);
 
-        mean.Insert(-value);
-        EXPECT_NEAR(mean.Get(), value, 1e-10);
-        EXPECT_EQ(mean.GetCount(), i*2);
+        rms.Insert(-value);
+        EXPECT_NEAR(rms.Get(), value, 1e-10);
+        EXPECT_EQ(rms.GetCount(), i*2);
       }
 
       // Reset
-      mean.Reset();
-      EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
-      EXPECT_EQ(mean.GetCount(), 0u);
+      rms.Reset();
+      EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
+      EXPECT_EQ(rms.GetCount(), 0u);
     }
   }
 }
+
+TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
+{
+  {
+    // Constructor
+    math::SignalMaxAbsoluteValue max;
+    EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+    EXPECT_EQ(max.GetCount(), 0u);
+
+    // Reset
+    max.Reset();
+    EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+    EXPECT_EQ(max.GetCount(), 0u);
+  }
+
+  {
+    // Constant values, max should match
+    math::SignalMaxAbsoluteValue max;
+    EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+    EXPECT_EQ(max.GetCount(), 0u);
+
+    const double value = 3.14159;
+
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
+    {
+      for (unsigned int i = 1; i <= 10; ++i)
+      {
+        max.Insert(value);
+        EXPECT_NEAR(max.Get(), value, 1e-10);
+        EXPECT_EQ(max.GetCount(), i);
+      }
+
+      // Reset
+      max.Reset();
+      EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+      EXPECT_EQ(max.GetCount(), 0u);
+    }
+  }
+
+  {
+    // Values with alternating sign, increasing magnitude
+    // max should match absolute value every time
+    math::SignalMaxAbsoluteValue max;
+    EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+    EXPECT_EQ(max.GetCount(), 0u);
+
+    const double value = 3.14159;
+
+    // Loop two times to verify Reset
+    for (int j = 0; j < 2; ++j)
+    {
+      for (unsigned int i = 1; i <= 10; ++i)
+      {
+        max.Insert(value * i);
+        EXPECT_NEAR(max.Get(), value * i, 1e-10);
+        EXPECT_EQ(max.GetCount(), i*2-1);
+
+        max.Insert(-value * i);
+        EXPECT_NEAR(max.Get(), value * i, 1e-10);
+        EXPECT_EQ(max.GetCount(), i*2);
+      }
+
+      // Reset
+      max.Reset();
+      EXPECT_DOUBLE_EQ(max.Get(), 0.0);
+      EXPECT_EQ(max.GetCount(), 0u);
+    }
+  }
+}
+
