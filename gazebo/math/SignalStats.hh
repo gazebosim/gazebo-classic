@@ -17,6 +17,7 @@
 #ifndef _SIGNAL_STATS_HH_
 #define _SIGNAL_STATS_HH_
 
+#include <string>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -39,6 +40,10 @@ namespace gazebo
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
       public: virtual double Get() const = 0;
+
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return Short name of the statistical measure.
+      public: virtual std::string GetShortName() const = 0;
 
       /// \brief Get number of data points in measurement.
       public: virtual unsigned int GetCount() const;
@@ -66,6 +71,9 @@ namespace gazebo
       public: virtual double Get() const;
 
       // Documentation inherited.
+      public: virtual std::string GetShortName() const;
+
+      // Documentation inherited.
       public: virtual void Insert(double _data);
     };
     /// \}
@@ -77,6 +85,9 @@ namespace gazebo
     {
       // Documentation inherited.
       public: virtual double Get() const;
+
+      // Documentation inherited.
+      public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
       public: virtual void Insert(double _data);
@@ -91,6 +102,9 @@ namespace gazebo
     {
       // Documentation inherited.
       public: virtual double Get() const;
+
+      // Documentation inherited.
+      public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
       public: virtual void Insert(double _data);

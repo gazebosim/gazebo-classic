@@ -56,6 +56,12 @@ double SignalMean::Get() const
 }
 
 //////////////////////////////////////////////////
+std::string SignalMean::GetShortName() const
+{
+  return "mean";
+}
+
+//////////////////////////////////////////////////
 void SignalMean::Insert(double _data)
 {
   this->data += _data;
@@ -73,6 +79,12 @@ double SignalRootMeanSquare::Get() const
 }
 
 //////////////////////////////////////////////////
+std::string SignalRootMeanSquare::GetShortName() const
+{
+  return "rms";
+}
+
+//////////////////////////////////////////////////
 void SignalRootMeanSquare::Insert(double _data)
 {
   this->data += _data * _data;
@@ -83,6 +95,12 @@ void SignalRootMeanSquare::Insert(double _data)
 double SignalMaxAbsoluteValue::Get() const
 {
   return this->data;
+}
+
+//////////////////////////////////////////////////
+std::string SignalMaxAbsoluteValue::GetShortName() const
+{
+  return "max";
 }
 
 //////////////////////////////////////////////////

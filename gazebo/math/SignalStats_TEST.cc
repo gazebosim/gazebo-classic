@@ -32,6 +32,7 @@ TEST_F(SignalStatsTest, SignalMean)
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Get(), 0.0);
     EXPECT_EQ(mean.GetCount(), 0u);
+    EXPECT_EQ(mean.GetShortName(), std::string("mean"));
 
     // Reset
     mean.Reset();
@@ -99,6 +100,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     math::SignalRootMeanSquare rms;
     EXPECT_DOUBLE_EQ(rms.Get(), 0.0);
     EXPECT_EQ(rms.GetCount(), 0u);
+    EXPECT_EQ(rms.GetShortName(), std::string("rms"));
 
     // Reset
     rms.Reset();
@@ -169,6 +171,7 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
     math::SignalMaxAbsoluteValue max;
     EXPECT_DOUBLE_EQ(max.Get(), 0.0);
     EXPECT_EQ(max.GetCount(), 0u);
+    EXPECT_EQ(max.GetShortName(), std::string("max"));
 
     // Reset
     max.Reset();
