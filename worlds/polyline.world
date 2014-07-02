@@ -58,7 +58,7 @@
         </visual>  
       </link>
     </model>
-    <!--
+
     <model name="pentagon">
       <static>true</static>
       <pose>0 2 5 0 0 0</pose>
@@ -133,6 +133,5 @@
         </visual>  
       </link>
     </model>
--->
   </world>
 </sdf>

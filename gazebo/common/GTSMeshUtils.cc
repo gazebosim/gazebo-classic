@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include <string>
 #include <vector>
 #include <gts.h>
 
@@ -25,15 +24,6 @@
 
 using namespace gazebo;
 using namespace common;
-
-//////////////////////////////////////////////////
-GTSMeshUtils::GTSMeshUtils()
-{
-}
-
-GTSMeshUtils::~GTSMeshUtils()
-{
-}
 
 //////////////////////////////////////////////////
 static void FillVertex(GtsPoint *_p, gpointer *_data)
@@ -88,7 +78,7 @@ bool GTSMeshUtils::CreateExtrudedPolyline(
     return false;
   }
 
-  if (_subMesh == NULL)
+  if (!_subMesh)
     _subMesh = new SubMesh();
 
   int i, k;

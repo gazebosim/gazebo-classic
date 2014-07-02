@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 

@@ -179,7 +179,7 @@ namespace gazebo
       private: std::string path;
 
       /// \brief The sub mesh array.
-      private: std::vector<SubMesh *> submeshes;
+      private: std::vector<SubMesh*> submeshes;
 
       /// \brief The materials array.
       private: std::vector<Material *> materials;

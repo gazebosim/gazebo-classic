@@ -249,7 +249,6 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   if (_newParent == this->dataPtr->scene->GetWorldVisual())
     result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
-
   return result;
 }
 
@@ -334,10 +333,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     {
      sdf::ElementPtr elem = geomElem->AddElement("polyline");
      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
-     for (int i = 0; i < _msg->geometry().polyline().point_size(); i++)
+     for (int i = 0; i < _msg->geometry().polyline().point_size(); ++i)
      {
-        elem->AddElement("point")->Set(msgs::Convert(_msg->geometry()
-                                                     .polyline().point(i)));
+       elem->AddElement("point")->Set(
+           msgs::Convert(_msg->geometry().polyline().point(i)));
      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
@@ -536,11 +535,11 @@ void Visual::Load()
       this->dataPtr->scale =
           geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
-//    else if (geomElem->HasElement("polyline"))
-//    {
-//      this->dataPtr->scale =
-//          geomElem->GetElement("polyline")->Get<math::Vector3>("scale");
-//    }
+    else if (geomElem->HasElement("polyline"))
+    {
+      this->dataPtr->scale =
+          geomElem->GetElement("polyline")->Get<math::Vector3>("scale");
+    }
   }
 
   this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,
@@ -2318,18 +2317,19 @@ std::string Visual::GetMeshName() const
       if (!meshManager->IsValidFilename(polyLineName))
       {
         std::vector<math::Vector2d> vertices;
-        sdf::ElementPtr pointElem = geomElem->GetElement("polyline")
-                                            ->GetElement("point");
+        sdf::ElementPtr pointElem =
+          geomElem->GetElement("polyline")->GetElement("point");
+
         while (pointElem)
         {
           math::Vector2d point = pointElem->Get<math::Vector2d>();
-          pointElem = pointElem->GetNextElement("point");
           vertices.push_back(point);
+          pointElem = pointElem->GetNextElement("point");
         }
+
         meshManager->CreateExtrudedPolyline(polyLineName, vertices,
-                                            geomElem->GetElement("polyline")
-                                            ->Get<double>("height"),
-                                            math::Vector2d(1, 1));
+            geomElem->GetElement("polyline")->Get<double>("height"),
+            math::Vector2d(1, 1));
        }
       return polyLineName;
     }

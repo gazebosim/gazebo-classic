@@ -35,16 +35,12 @@ namespace gazebo
     /// \brief Creates GTS utilities for meshes
     class GAZEBO_VISIBLE GTSMeshUtils
     {
-      /// \brief Constructor
-      public: GTSMeshUtils();
-
-      /// \brief Destructor
-      public: virtual ~GTSMeshUtils();
-
       /// \brief Create an extruded Polyline submesh
       /// \param[in] _vertices the x y dimentions of eah vertex in meter
       /// \param[in] _height the height of the polyline
-      /// \return A submesh for the given polyline.
+      /// \param[out] _submesh A submesh that will be populated with the
+      /// extruded polyline.
+      /// \return True on success.
       public: static bool CreateExtrudedPolyline(
                   const std::vector<math::Vector2d> &_vertices,
                   const double &_height,
