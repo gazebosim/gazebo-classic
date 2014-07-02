@@ -1,4 +1,5 @@
 set (files
+  actor.world
   blank.world
   camera.world
   cart_demo.world

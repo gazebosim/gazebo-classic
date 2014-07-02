@@ -1156,3 +1156,20 @@ double Link::GetWorldEnergy() const
 {
   return this->GetWorldEnergyPotential() + this->GetWorldEnergyKinetic();
 }
+
+/////////////////////////////////////////////////
+msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+{
+  msgs::Visual result;
+
+  Visuals_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    if (iter->second.name() == _name)
+      break;
+
+  if (iter != this->visuals.end())
+    result = iter->second;
+
+  return result;
+}
+

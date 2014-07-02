@@ -484,6 +484,10 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// \brief Returns the visual message specified by its name
+      /// \return visual message
+      msgs::Visual GetVisualMessage(const std::string &_name) const;
+
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
