@@ -17,7 +17,7 @@ set (sources
     DARTModel.cc
     DARTMultiRayShape.cc
     DARTPhysics.cc
-    DARTPolyline.cc
+    DARTPolylineShape.cc
     DARTRayShape.cc
     DARTScrewJoint.cc
     DARTSliderJoint.cc
@@ -40,7 +40,7 @@ SET (headers
     DARTMultiRayShape.hh
     DARTPhysics.hh
     DARTPlaneShape.hh
-    DARTPolyline.hh
+    DARTPolylineShape.hh
     DARTRayShape.hh
     DARTScrewJoint.hh
     DARTSliderJoint.hh

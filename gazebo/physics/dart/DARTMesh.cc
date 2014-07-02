@@ -20,6 +20,7 @@
 
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/physics/dart/DARTMesh.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -66,7 +67,7 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
   unsigned int numIndices = _subMesh->GetIndexCount();
 
   // Get all the vertex and index data
-  _subMesh->FillArrays(&localVertices, &localIndices);
+  _subMesh->FillArrays(&vertices, &indices);
 
   this->CreateMesh(vertices, indices, numVertices, numIndices,
                    _collision, _scale);
@@ -87,7 +88,7 @@ void DARTMesh::Init(const common::Mesh *_mesh,
   unsigned int numIndices = _mesh->GetIndexCount();
 
   // Get all the vertex and index data
-  _mesh->FillArrays(&localVertices, &localIndices);
+  _mesh->FillArrays(&vertices, &indices);
 
   this->CreateMesh(vertices, indices, numVertices, numIndices,
                    _collision, _scale);
@@ -96,9 +97,9 @@ void DARTMesh::Init(const common::Mesh *_mesh,
 }
 
 /////////////////////////////////////////////////
-void DARTMesh::CreateMesh(float *_vertices, float *_indices,
+void DARTMesh::CreateMesh(float *_vertices, int *_indices,
     unsigned int _numVertices, unsigned int _numIndices,
-    DARTCollisionPtr _collision, const math::Vector3d &_scale)
+    DARTCollisionPtr _collision, const math::Vector3 &_scale)
 {
   GZ_ASSERT(_collision, "DART collision is null");
 
@@ -136,10 +137,10 @@ void DARTMesh::CreateMesh(float *_vertices, float *_indices,
     itAIFace->mIndices[2] = _indices[i*3 + 2];
   }
 
-  dart::dynamics::Mesh *dtMesh = new dart::dynamics::Mesh(
+  dart::dynamics::MeshShape *dtMeshShape = new dart::dynamics::MeshShape(
       DARTTypes::ConvVec3(_scale), assimpScene);
   GZ_ASSERT(_collision->GetDARTBodyNode(),
     "DART _collision->GetDARTBodyNode() is null");
-  _collision->GetDARTBodyNode()->addCollisionShape(dtMesh);
-  _collision->SetDARTCollisionShape(dtMesh);
+  _collision->GetDARTBodyNode()->addCollisionShape(dtMeshShape);
+  _collision->SetDARTCollisionShape(dtMeshShape);
 }
