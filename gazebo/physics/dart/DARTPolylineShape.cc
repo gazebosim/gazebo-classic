@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/dart/DARTMesh.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -48,7 +49,10 @@ void DARTPolylineShape::Init()
 {
   PolylineShape::Init();
   if (!this->mesh)
+  {
+    gzerr << "Unable to create polyline in DART. Mesh pointer is null.\n";
     return;
+  }
 
   this->dartMesh->Init(this->mesh,
       boost::static_pointer_cast<DARTCollision>(this->collisionParent),

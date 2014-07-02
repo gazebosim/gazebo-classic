@@ -49,7 +49,10 @@ void SimbodyPolylineShape::Init()
 {
   PolylineShape::Init();
   if (!this->mesh)
+  {
+    gzerr << "Unable to create polyline in Simbody. Mesh pointer is null.\n";
     return;
+  }
 
   gzerr << "Polyline shapes are not supported in Simbody\n";
 

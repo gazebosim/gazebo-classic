@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/bullet/BulletMesh.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -48,7 +49,10 @@ void BulletPolylineShape::Init()
 {
   PolylineShape::Init();
   if (!this->mesh)
+  {
+    gzerr << "Unable to create polyline in Bullet. Mesh pointer is null.\n";
     return;
+  }
 
   this->bulletMesh->Init(this->mesh,
       boost::static_pointer_cast<BulletCollision>(this->collisionParent),
