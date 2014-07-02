@@ -235,3 +235,82 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
   }
 }
 
+TEST_F(SignalStatsTest, SignalStats)
+{
+  {
+    // Constructor
+    math::SignalStats stats;
+    EXPECT_TRUE(stats.GetMap().empty());
+    EXPECT_EQ(stats.GetCount(), 0u);
+
+    // Reset
+    stats.Reset();
+    EXPECT_TRUE(stats.GetMap().empty());
+    EXPECT_EQ(stats.GetCount(), 0u);
+  }
+
+  {
+    // InsertStatistic
+    math::SignalStats stats;
+    EXPECT_TRUE(stats.GetMap().empty());
+
+    EXPECT_TRUE(stats.InsertStatistic("max"));
+    EXPECT_FALSE(stats.InsertStatistic("max"));
+    EXPECT_FALSE(stats.GetMap().empty());
+
+    EXPECT_TRUE(stats.InsertStatistic("mean"));
+    EXPECT_FALSE(stats.InsertStatistic("mean"));
+    EXPECT_FALSE(stats.GetMap().empty());
+
+    EXPECT_TRUE(stats.InsertStatistic("rms"));
+    EXPECT_FALSE(stats.InsertStatistic("rms"));
+    EXPECT_FALSE(stats.GetMap().empty());
+
+    EXPECT_FALSE(stats.InsertStatistic("fake_statistic"));
+
+    // GetMap with no data
+    std::map<std::string, double> map = stats.GetMap();
+    EXPECT_FALSE(map.empty());
+    EXPECT_EQ(map.size(), 3u);
+    EXPECT_EQ(map.count("max"), 1u);
+    EXPECT_EQ(map.count("mean"), 1u);
+    EXPECT_EQ(map.count("rms"), 1u);
+    EXPECT_EQ(map.count("fake_statistic"), 0u);
+  }
+
+  {
+    // Add some statistics
+    math::SignalStats stats;
+    EXPECT_TRUE(stats.InsertStatistic("max"));
+    EXPECT_TRUE(stats.InsertStatistic("mean"));
+    EXPECT_TRUE(stats.InsertStatistic("rms"));
+    EXPECT_EQ(stats.GetMap().size(), 3u);
+
+    // No data yet
+    EXPECT_EQ(stats.GetCount(), 0u);
+
+    // Insert data with alternating signs
+    const double value = 3.14159;
+    stats.InsertData(value);
+    stats.InsertData(-value);
+    EXPECT_EQ(stats.GetCount(), 2u);
+
+    {
+      std::map<std::string, double> map = stats.GetMap();
+      EXPECT_NEAR(map["max"], value, 1e-10);
+      EXPECT_NEAR(map["rms"], value, 1e-10);
+      EXPECT_NEAR(map["mean"], 0.0, 1e-10);
+    }
+
+    stats.Reset();
+    EXPECT_EQ(stats.GetMap().size(), 3u);
+    EXPECT_EQ(stats.GetCount(), 0u);
+    {
+      std::map<std::string, double> map = stats.GetMap();
+      EXPECT_DOUBLE_EQ(map["max"], 0.0);
+      EXPECT_DOUBLE_EQ(map["rms"], 0.0);
+      EXPECT_DOUBLE_EQ(map["mean"], 0.0);
+    }
+  }
+}
+

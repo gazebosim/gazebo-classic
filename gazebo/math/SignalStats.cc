@@ -21,25 +21,25 @@ using namespace gazebo;
 using namespace math;
 
 //////////////////////////////////////////////////
-SignalStats::SignalStats()
+SignalStatistic::SignalStatistic()
   : data(0.0)
   , count(0)
 {
 }
 
 //////////////////////////////////////////////////
-SignalStats::~SignalStats()
+SignalStatistic::~SignalStatistic()
 {
 }
 
 //////////////////////////////////////////////////
-unsigned int SignalStats::GetCount() const
+unsigned int SignalStatistic::GetCount() const
 {
   return this->count;
 }
 
 //////////////////////////////////////////////////
-void SignalStats::Reset()
+void SignalStatistic::Reset()
 {
   this->data = 0;
   this->count = 0;
@@ -112,5 +112,95 @@ void SignalMaxAbsoluteValue::Insert(double _data)
     this->data = fabsData;
   }
   this->count++;
+}
+
+//////////////////////////////////////////////////
+SignalStats::SignalStats()
+{
+}
+
+//////////////////////////////////////////////////
+SignalStats::~SignalStats()
+{
+}
+
+//////////////////////////////////////////////////
+unsigned int SignalStats::GetCount() const
+{
+  unsigned int count = 0;
+  SignalStatistic_V::const_iterator iter = this->stats.begin();
+  if (iter != this->stats.end())
+  {
+    count = (*iter)->GetCount();
+  }
+  return count;
+}
+
+//////////////////////////////////////////////////
+std::map<std::string, double> SignalStats::GetMap() const
+{
+  std::map<std::string, double> map;
+  for (SignalStatistic_V::const_iterator iter = this->stats.begin();
+       iter != this->stats.end(); ++iter)
+  {
+    map[(*iter)->GetShortName()] = (*iter)->Get();
+  }
+  return map;
+}
+
+//////////////////////////////////////////////////
+void SignalStats::InsertData(double _data)
+{
+  for (SignalStatistic_V::iterator iter = this->stats.begin();
+       iter != this->stats.end(); ++iter)
+  {
+    (*iter)->Insert(_data);
+  }
+}
+
+//////////////////////////////////////////////////
+bool SignalStats::InsertStatistic(std::string _name)
+{
+  // Check if the statistic is already inserted
+  {
+    std::map<std::string, double> map = this->GetMap();
+    if (map.find(_name) != map.end())
+    {
+      return false;
+    }
+  }
+
+  SignalStatisticPtr stat;
+  if (_name == "max")
+  {
+    stat.reset(new SignalMaxAbsoluteValue());
+    this->stats.push_back(stat);
+  }
+  else if (_name == "mean")
+  {
+    stat.reset(new SignalMean());
+    this->stats.push_back(stat);
+  }
+  else if (_name == "rms")
+  {
+    stat.reset(new SignalRootMeanSquare());
+    this->stats.push_back(stat);
+  }
+  else
+  {
+    // Unrecognized name string
+    return false;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+void SignalStats::Reset()
+{
+  for (SignalStatistic_V::iterator iter = this->stats.begin();
+       iter != this->stats.end(); ++iter)
+  {
+    (*iter)->Reset();
+  }
 }
 
