@@ -87,6 +87,7 @@ set (install_headers
   ${headers}
   Editor.hh
   MainWindow.hh
+  RenderWidget.hh
 )
 
 if (HAVE_OCULUS)

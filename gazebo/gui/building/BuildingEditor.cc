@@ -141,7 +141,6 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->GetRenderWidget()->DisplayOverlayMsg(
         "Building is View Only");
     this->mainWindow->GetRenderWidget()->ShowTimePanel(false);
-
   }
   else
   {
@@ -151,6 +150,5 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->GetRenderWidget()->ShowTimePanel(true);
     this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
-
   }
 }
