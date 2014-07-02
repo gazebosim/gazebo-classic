@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_ODEPOLYLINESHAPE_HH_
 #define _GAZEBO_ODEPOLYLINESHAPE_HH_
 
-#include "gazebo/physics/PolyLineShape.hh"
+#include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -27,14 +27,14 @@ namespace gazebo
     class ODEMesh;
 
     /// \brief ODE polyline shape
-    class GAZEBO_VISIBLE ODEPolyLineShape : public PolyLineShape
+    class GAZEBO_VISIBLE ODEPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
-      public: explicit ODEPolyLineShape(CollisionPtr _parent);
+      public: explicit ODEPolylineShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~ODEPolyLineShape();
+      public: virtual ~ODEPolylineShape();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);

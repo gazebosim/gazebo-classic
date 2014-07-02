@@ -29,6 +29,7 @@
 #include "gazebo/physics/bullet/BulletBoxShape.hh"
 #include "gazebo/physics/bullet/BulletCylinderShape.hh"
 #include "gazebo/physics/bullet/BulletMeshShape.hh"
+#include "gazebo/physics/bullet/BulletPolylineShape.hh"
 #include "gazebo/physics/bullet/BulletRayShape.hh"
 
 #include "gazebo/physics/bullet/BulletHingeJoint.hh"
@@ -791,6 +792,8 @@ ShapePtr BulletPhysics::CreateShape(const std::string &_type,
     shape.reset(new BulletCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new BulletMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new BulletPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new BulletHeightmapShape(collision));
   else if (_type == "multiray")

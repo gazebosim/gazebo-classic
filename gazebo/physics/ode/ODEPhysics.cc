@@ -64,7 +64,7 @@
 #include "gazebo/physics/ode/ODEMeshShape.hh"
 #include "gazebo/physics/ode/ODEMultiRayShape.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
-#include "gazebo/physics/ode/ODEPolyLineShape.hh"
+#include "gazebo/physics/ode/ODEPolylineShape.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
@@ -488,7 +488,7 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "cylinder")
     shape.reset(new ODECylinderShape(collision));
   else if (_type == "polyline")
-    shape.reset(new ODEPolyLineShape(collision));
+    shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
     shape.reset(new ODEMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")

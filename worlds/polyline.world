@@ -11,7 +11,7 @@
     </include>
 
     <model name="triangle">
-      <link name="polyLine2">
+      <link name="link">
         <inertial>
           <pose>0 0 0.5 0 0 0</pose>
           <mass>1.0</mass>
@@ -25,7 +25,7 @@
           </inertia>
         </inertial>
 
-        <collision name="triangle_coll">
+        <collision name="collision">
           <geometry>
             <polyline>
               <point>-0.5 -0.5</point>

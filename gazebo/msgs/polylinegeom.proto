@@ -2,7 +2,7 @@ package gazebo.msgs;
 
 /// \ingroup gazebo_msgs
 /// \interface Polyline 
-/// \brief Information about PolyLine geometry
+/// \brief Information about Polyline geometry
 
 import "vector2d.proto";
 

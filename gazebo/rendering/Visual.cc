@@ -535,11 +535,6 @@ void Visual::Load()
       this->dataPtr->scale =
           geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
     }
-    else if (geomElem->HasElement("polyline"))
-    {
-      this->dataPtr->scale =
-          geomElem->GetElement("polyline")->Get<math::Vector3>("scale");
-    }
   }
 
   this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,

@@ -15,7 +15,7 @@
  *
  */
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/physics/PolyLineShape.hh"
+#include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Console.hh"
@@ -24,7 +24,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-PolyLineShape::PolyLineShape(CollisionPtr _parent) : Shape(_parent)
+PolylineShape::PolylineShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::POLYLINE_SHAPE);
   this->scale = math::Vector3::One;
@@ -32,12 +32,12 @@ PolyLineShape::PolyLineShape(CollisionPtr _parent) : Shape(_parent)
 }
 
 //////////////////////////////////////////////////
-PolyLineShape::~PolyLineShape()
+PolylineShape::~PolylineShape()
 {
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::Init()
+void PolylineShape::Init()
 {
   this->SetPolylineShape(this->GetHeight(),
       this->GetVertices());
@@ -57,7 +57,7 @@ void PolyLineShape::Init()
 }
 
 //////////////////////////////////////////////////
-std::vector<math::Vector2d> PolyLineShape::GetVertices() const
+std::vector<math::Vector2d> PolylineShape::GetVertices() const
 {
   std::vector<math::Vector2d> vertices;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
@@ -71,19 +71,19 @@ std::vector<math::Vector2d> PolyLineShape::GetVertices() const
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::SetHeight(const double &_height)
+void PolylineShape::SetHeight(const double &_height)
 {
   this->sdf->GetElement("height")->Set(_height);
 }
 
 //////////////////////////////////////////////////
-double PolyLineShape::GetHeight() const
+double PolylineShape::GetHeight() const
 {
   return this->sdf->Get<double>("height");
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::SetScale(const math::Vector3 &_scale)
+void PolylineShape::SetScale(const math::Vector3 &_scale)
 {
   if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
     return;
@@ -95,7 +95,7 @@ void PolyLineShape::SetScale(const math::Vector3 &_scale)
 }
 
 ////////////////////////////////////////////////////
-void PolyLineShape::SetVertices(const msgs::Geometry &_msg)
+void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 {
   int i;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
@@ -109,7 +109,7 @@ void PolyLineShape::SetVertices(const msgs::Geometry &_msg)
 }
 
 ////////////////////////////////////////////////////
-void PolyLineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
+void PolylineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
 {
   unsigned int i;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
@@ -121,7 +121,7 @@ void PolyLineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::SetPolylineShape(const double &_height,
+void PolylineShape::SetPolylineShape(const double &_height,
     const std::vector<math::Vector2d> &_vertices)
 {
   this->SetHeight(_height);
@@ -129,7 +129,7 @@ void PolyLineShape::SetPolylineShape(const double &_height,
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::FillMsg(msgs::Geometry &_msg)
+void PolylineShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::POLYLINE);
   _msg.mutable_polyline()->set_height(this->GetHeight());
@@ -144,7 +144,7 @@ void PolyLineShape::FillMsg(msgs::Geometry &_msg)
 }
 
 //////////////////////////////////////////////////
-void PolyLineShape::ProcessMsg(const msgs::Geometry &_msg)
+void PolylineShape::ProcessMsg(const msgs::Geometry &_msg)
 {
   this->SetHeight(_msg.polyline().height());
   this->SetVertices(_msg);

@@ -19,40 +19,40 @@
 #include "gazebo/physics/ode/ODEMesh.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODEPolyLineShape.hh"
+#include "gazebo/physics/ode/ODEPolylineShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEPolyLineShape::ODEPolyLineShape(CollisionPtr _parent)
-: PolyLineShape(_parent)
+ODEPolylineShape::ODEPolylineShape(CollisionPtr _parent)
+: PolylineShape(_parent)
 {
   this->odeMesh = new ODEMesh();
 }
 
 //////////////////////////////////////////////////
-ODEPolyLineShape::~ODEPolyLineShape()
+ODEPolylineShape::~ODEPolylineShape()
 {
   delete this->odeMesh;
 }
 
 //////////////////////////////////////////////////
-void ODEPolyLineShape::Update()
+void ODEPolylineShape::Update()
 {
   this->odeMesh->Update();
 }
 
 //////////////////////////////////////////////////
-void ODEPolyLineShape::Load(sdf::ElementPtr _sdf)
+void ODEPolylineShape::Load(sdf::ElementPtr _sdf)
 {
-  PolyLineShape::Load(_sdf);
+  PolylineShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void ODEPolyLineShape::Init()
+void ODEPolylineShape::Init()
 {
-  PolyLineShape::Init();
+  PolylineShape::Init();
   if (!this->mesh)
     return;
 

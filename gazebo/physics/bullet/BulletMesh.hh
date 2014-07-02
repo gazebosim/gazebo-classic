@@ -15,71 +15,57 @@
  *
 */
 
-#ifndef _GAZEBO_ODEMESH_HH_
-#define _GAZEBO_ODEMESH_HH_
+#ifndef _GAZEBO_BULLETMESH_HH_
+#define _GAZEBO_BULLETMESH_HH_
 
-#include "gazebo/physics/ode/ODETypes.hh"
-#include "gazebo/physics/ode/ode_inc.h"
-#include "gazebo/physics/MeshShape.hh"
+#include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    /// \brief Triangle mesh helper class.
-    class GAZEBO_VISIBLE ODEMesh
-    {
-      /// \brief Constructor.
-      public: explicit ODEMesh();
+    /// \ingroup gazebo_physics
+    /// \addtogroup gazebo_physics_bullet Bullet Physics
+    /// \{
 
-      /// \brief Destructor.
-      public: virtual ~ODEMesh();
+    /// \brief Triangle mesh collision helper class
+    class GAZEBO_VISIBLE BulletMesh
+    {
+      /// \brief Constructor
+      public: BulletMesh();
+
+      /// \brief Destructor
+      public: virtual ~BulletMesh();
 
       /// \brief Create a mesh collision shape using a submesh.
       /// \param[in] _subMesh Pointer to the submesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::SubMesh *_subMesh,
-                  ODECollisionPtr _collision,
-                  const math::Vector3 &_scale);
+                      BulletCollisionPtr _collision,
+                      const math::Vector3 &_scale);
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
-      public: void Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
-                  const math::Vector3 &_scale);
-
-      /// \brief Update the collision mesh.
-      public: virtual void Update();
+      public: void Init(const common::Mesh *_mesh,
+                      BulletCollisionPtr _collision,
+                      const math::Vector3 &_scale);
 
       /// \brief Helper function to create the collision shape.
+      /// \param[in] _vertices Array of vertices.
+      /// \param[in] _indices Array of indices.
       /// \param[in] _numVertices Number of vertices.
       /// \param[in] _numIndices Number of indices.
       /// \param[in] _collision Pointer to the collsion object.
-      private: void CreateMesh(unsigned int _numVertices,
-                   unsigned int _numIndices, ODECollisionPtr _collision,
+      private: void CreateMesh(float *_vertices, int *_indices,
+                   unsigned int _numVertices, unsigned int _numIndices,
+                   BulletCollisionPtr _collision,
                    const math::Vector3 &_scale);
-
-      /// \brief Transform matrix.
-      private: dReal transform[16*2];
-
-      /// \brief Transform matrix index.
-      private: int transformIndex;
-
-      /// \brief Array of vertex values.
-      private: float *vertices;
-
-      /// \brief Array of index values.
-      private: int *indices;
-
-      /// \brief ODE trimesh data.
-      private: dTriMeshDataID odeData;
-
-      /// \brief The collision id that this mesh is attached to.
-      private: dGeomID collisionId;
     };
+    /// \}
   }
 }
 #endif

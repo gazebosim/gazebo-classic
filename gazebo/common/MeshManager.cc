@@ -560,7 +560,7 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     startVert += 2;
     subMesh->AddIndex(endVert);
     subMesh->AddIndex(startVert);
-    for (i = 1; i < numSides-2; ++i
+    for (i = 1; i < numSides-2; ++i)
     {
       if (!i%2)
       {

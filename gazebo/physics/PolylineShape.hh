@@ -27,37 +27,19 @@ namespace gazebo
     /// \addtogroup gazebo_physics
     /// \{
 
-    /// \class PolyLineShape PolyLineShape.hh physics/physcs.hh
-    /// \brief PolyLine geometry primitive.
-    class GAZEBO_VISIBLE PolyLineShape : public Shape
+    /// \class PolylineShape PolylineShape.hh physics/physcs.hh
+    /// \brief Polyline geometry primitive.
+    class GAZEBO_VISIBLE PolylineShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit PolyLineShape(CollisionPtr _parent);
+      public: explicit PolylineShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~PolyLineShape();
+      public: virtual ~PolylineShape();
 
       /// \brief Initialize the polyLine.
       public: virtual void Init();
-
-      /// \brief Set the height of the polyLine.
-      /// \param[in] _height Height of the polyLine.
-      public: virtual void SetHeight(const double &_height);
-
-      /// \brief Set the scale of the polyLine.
-      /// \param[in] _scale Scale of the polyLine.
-      public: virtual void SetScale(const math::Vector3 &_scale);
-
-      /// \brief Set the vertices of the polyline
-      /// \param[in] _vertices std::vector<math::Vector2d>
-      /// containing the vertex information
-      public: virtual void SetVertices(const std::vector<math::Vector2d>
-                                             &_vertices);
-
-      /// \brief Set the vertices of the polyline
-      /// \param[in] _msg geometry msg containing the vertex information
-      public: virtual void SetVertices(const msgs::Geometry &_msg);
 
       /// \brief Get the vertices of the polyline
       /// \return The vertex information of the polyline
@@ -67,13 +49,6 @@ namespace gazebo
       /// \return The height of each side of the polyLine.
       public: double GetHeight() const;
 
-      /// \brief Set the parameters of polyline shape
-      /// \param[in] _height Height of the polygon
-      /// \param[in] _vertices std::vector<math::Vector2d>
-      /// containing the vertex information
-      public: void SetPolylineShape(const double &_height,
-                  const std::vector<math::Vector2d> &_vertices);
-
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.
       public: void FillMsg(msgs::Geometry &_msg);
@@ -81,6 +56,31 @@ namespace gazebo
       /// \brief Process a geometry message.
       /// \param[in] _msg The message to set values from.
       public: virtual void ProcessMsg(const msgs::Geometry &_msg);
+
+      /// \brief Set the scale of the polyLine.
+      /// \param[in] _scale Scale of the polyLine.
+      private: virtual void SetScale(const math::Vector3 &_scale);
+
+      /// \brief Set the vertices of the polyline
+      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// containing the vertex information
+      private: virtual void SetVertices(
+                  const std::vector<math::Vector2d> &_vertices);
+
+      /// \brief Set the vertices of the polyline
+      /// \param[in] _msg geometry msg containing the vertex information
+      private: virtual void SetVertices(const msgs::Geometry &_msg);
+
+      /// \brief Set the parameters of polyline shape
+      /// \param[in] _height Height of the polygon
+      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// containing the vertex information
+      private: void SetPolylineShape(const double &_height,
+                  const std::vector<math::Vector2d> &_vertices);
+
+      /// \brief Set the height of the polyLine.
+      /// \param[in] _height Height of the polyLine.
+      private: virtual void SetHeight(const double &_height);
 
       /// \brief Pointer to the mesh data.
       protected: const common::Mesh *mesh;
