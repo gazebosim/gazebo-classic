@@ -91,8 +91,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
             dartElem = softContactElem->GetElement("dart");
             softCollElem = collElem;
             softGeomElem = geomElem;
-
-            gzmsg << "This link is soft link.\n";
           }
         }
       }
@@ -103,10 +101,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 
   if (dartElem != NULL)
   {
-    // Debug code
-    gzdbg << "dartElem: " << dartElem << std::endl;
-    gzdbg << "SoftBodyNode!" << std::endl;
-
     // Create DART SoftBodyNode
     dart::dynamics::SoftBodyNode* dtSoftBodyNode
         = new dart::dynamics::SoftBodyNode();
@@ -114,17 +108,11 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     // Mass
     double fleshMassFraction = dartElem->Get<double>("flesh_mass_fraction");
 
-    // Debug code
-    gzdbg << "fleshMassFraction: " << fleshMassFraction << std::endl;
-
     // bone_attachment (Kv)
     if (dartElem->HasElement("bone_attachment"))
     {
       double kv = dartElem->Get<double>("bone_attachment");
       dtSoftBodyNode->setVertexSpringStiffness(kv);
-
-      // Debug code
-      gzdbg << "bone_attachment: " << kv << std::endl;
     }
 
     // stiffness (Ke)
@@ -132,9 +120,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     {
       double ke = dartElem->Get<double>("stiffness");
       dtSoftBodyNode->setEdgeSpringStiffness(ke);
-
-      // Debug code
-      gzdbg << "stiffness: " << ke << std::endl;
     }
 
     // damping
@@ -142,9 +127,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     {
       double damping = dartElem->Get<double>("damping");
       dtSoftBodyNode->setDampingCoefficient(damping);
-
-      // Debug code
-      gzdbg << "damping: " << damping << std::endl;
     }
 
     // pose
@@ -152,20 +134,12 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     gzdbg << "pose" << T.matrix() << std::endl;
     if (softCollElem->HasElement("pose"))
     {
-      // Debug code
-      gzdbg << "In pose!" << std::endl;
       T = DARTTypes::ConvPose(softCollElem->Get<math::Pose>("pose"));
-
-      // Debug code
-      gzdbg << "pose" << T.matrix() << std::endl;
     }
 
     // geometry
     if (softGeomElem->HasElement("box"))
     {
-      // Debug code
-      gzdbg << "box" << std::endl;
-
       sdf::ElementPtr boxEle = softGeomElem->GetElement("box");
       Eigen::Vector3d size
           = DARTTypes::ConvVec3(boxEle->Get<math::Vector3>("size"));
@@ -173,9 +147,6 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
             dtSoftBodyNode, size, T, fleshMassFraction);
       dtSoftBodyNode->addCollisionShape(
             new dart::dynamics::SoftMeshShape(dtSoftBodyNode));
-
-      // Debug code
-      gzdbg << "box finished" << std::endl;
     }
 //    else if (geomElem->HasElement("ellipsoid"))
 //    {
@@ -308,10 +279,13 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
   // This is for the case this function called before DARTModel::Init() is
   // called.
   if (joint == NULL)
+  {
+    gzerr << "DARTModel::Init() should be called first.\n";
     return;
+  }
 
   // Check if the parent joint is free joint
-  dart::dynamics::FreeJoint* freeJoint =
+  dart::dynamics::FreeJoint *freeJoint =
       dynamic_cast<dart::dynamics::FreeJoint*>(joint);
 
   // If the parent joint is free joint, set the proper generalized velocity to
@@ -368,15 +342,18 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 {
   // DART body node always have its parent joint.
-  dart::dynamics::Joint* joint = this->dtBodyNode->getParentJoint();
+  dart::dynamics::Joint *joint = this->dtBodyNode->getParentJoint();
 
   // This is for the case this function called before DARTModel::Init() is
   // called.
   if (joint == NULL)
+  {
+    gzerr << "DARTModel::Init() should be called first.\n";
     return;
+  }
 
   // Check if the parent joint is free joint
-  dart::dynamics::FreeJoint* freeJoint =
+  dart::dynamics::FreeJoint *freeJoint =
       dynamic_cast<dart::dynamics::FreeJoint*>(joint);
 
   // If the parent joint is free joint, set the proper generalized velocity to

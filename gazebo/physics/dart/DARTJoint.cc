@@ -239,8 +239,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
   }
   else
   {
-    gzerr << "DARTJoint::SetDamping: index[" << _index
-          << "] is out of bounds (GetAngleCount() = "
+    gzerr << "Index[" << _index << "] is out of bounds (GetAngleCount() = "
           << this->GetAngleCount() << ").\n";
     return;
   }

@@ -70,6 +70,10 @@ namespace gazebo
       public: virtual double GetThreadPitch();
 
       // Documentation inherited
+      public: virtual double GetParam(const std::string &_key,
+                  unsigned int _index);
+
+      // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
