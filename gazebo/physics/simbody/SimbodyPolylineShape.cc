@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,45 @@
 */
 
 #include "gazebo/common/Mesh.hh"
-
-#include "gazebo/physics/simbody/SimbodyTypes.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/simbody/SimbodyMesh.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyPolylineShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
-  : MeshShape(_parent)
+SimbodyPolylineShape::SimbodyPolylineShape(CollisionPtr _parent)
+: PolylineShape(_parent)
 {
   this->simbodyMesh = new SimbodyMesh();
 }
 
 //////////////////////////////////////////////////
-SimbodyMeshShape::~SimbodyMeshShape()
+SimbodyPolylineShape::~SimbodyPolylineShape()
 {
   delete this->simbodyMesh;
 }
 
 //////////////////////////////////////////////////
-void SimbodyMeshShape::Load(sdf::ElementPtr _sdf)
+void SimbodyPolylineShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Load(_sdf);
+  PolylineShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void SimbodyMeshShape::Init()
+void SimbodyPolylineShape::Init()
 {
-  MeshShape::Init();
+  PolylineShape::Init();
+  if (!this->mesh)
+    return;
 
-  if (this->submesh)
-  {
-    this->simbodyMesh->Init(this->submesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
-  else
-  {
-    this->simbodyMesh->Init(this->mesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
+  gzerr << "Polyline shapes are not supported in Simbody\n";
+
+  // Uncomment these lines when simbody supports mesh shapes.
+  // this->simbodyMesh->Init(this->mesh,
+  //     boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
+  //     math::Vector3(1, 1, 1));
 }

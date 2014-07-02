@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,50 +16,46 @@
 */
 
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
-#include "gazebo/physics/simbody/SimbodyMesh.hh"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
-#include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyMesh.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-SimbodyMeshShape::SimbodyMeshShape(CollisionPtr _parent)
-  : MeshShape(_parent)
+SimbodyMesh::SimbodyMesh()
 {
-  this->simbodyMesh = new SimbodyMesh();
 }
 
 //////////////////////////////////////////////////
-SimbodyMeshShape::~SimbodyMeshShape()
+SimbodyMesh::~SimbodyMesh()
 {
-  delete this->simbodyMesh;
 }
 
 //////////////////////////////////////////////////
-void SimbodyMeshShape::Load(sdf::ElementPtr _sdf)
+void SimbodyMesh::Init(const common::SubMesh * /*_subMesh*/,
+                      SimbodyCollisionPtr /*_collision*/,
+                      const math::Vector3 & /*_scale*/)
 {
-  MeshShape::Load(_sdf);
+  gzerr << "SimbodyMesh is not supported\n";
 }
 
 //////////////////////////////////////////////////
-void SimbodyMeshShape::Init()
+void SimbodyMesh::Init(const common::Mesh * /*_mesh*/,
+                       SimbodyCollisionPtr /*_collision*/,
+                       const math::Vector3 &/*_scale*/)
 {
-  MeshShape::Init();
+  gzerr << "SimbodyMesh is not supported\n";
+}
 
-  if (this->submesh)
-  {
-    this->simbodyMesh->Init(this->submesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
-  else
-  {
-    this->simbodyMesh->Init(this->mesh,
-        boost::static_pointer_cast<SimbodyCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
+//////////////////////////////////////////////////
+void SimbodyMesh::CreateMesh(float * /*_vertices*/, int * /*_indices*/,
+    unsigned int /*_numVertices*/, unsigned int /*_numIndices*/,
+    SimbodyCollisionPtr /*_collision*/,
+    const math::Vector3 & /*_scale*/)
+{
 }

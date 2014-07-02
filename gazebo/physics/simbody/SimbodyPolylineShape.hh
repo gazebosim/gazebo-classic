@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_SIMBODYPOLYLINESHAPE_HH_
+#define _GAZEBO_SIMBODYPOLYLINESHAPE_HH_
 
-#ifndef _SIMBODY_MESHSHAPE_HH_
-#define _SIMBODY_MESHSHAPE_HH_
-
-#include "gazebo/physics/MeshShape.hh"
+#include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -27,30 +26,25 @@ namespace gazebo
   {
     class SimbodyMesh;
 
-    /// \ingroup gazebo_physics
-    /// \addtogroup gazebo_physics_simbody Simbody Physics
-    /// \{
-
-    /// \brief Triangle mesh collision
-    class GAZEBO_VISIBLE SimbodyMeshShape : public MeshShape
+    /// \brief Simbody polyline shape
+    class GAZEBO_VISIBLE SimbodyPolylineShape : public PolylineShape
     {
       /// \brief Constructor
-      public: SimbodyMeshShape(CollisionPtr _parent);
+      /// \param[in] _parent Collision parent.
+      public: explicit SimbodyPolylineShape(CollisionPtr _parent);
 
-      /// \brief Destructor
-      public: virtual ~SimbodyMeshShape();
+      /// \brief Destructor.
+      public: virtual ~SimbodyPolylineShape();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      protected: virtual void Init();
+      public: virtual void Init();
 
-      /// \brief Simbody collision mesh helper class
+      /// \brief Simbody collsion mesh helper class.
       private: SimbodyMesh *simbodyMesh;
     };
-    /// \}
   }
 }
 #endif
-
