@@ -224,6 +224,12 @@ void Visual::Fini()
     this->dataPtr->sceneNode = NULL;
   }
 
+  if (this->dataPtr->preRenderConnection)
+  {
+    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+    this->dataPtr->preRenderConnection.reset();
+  }
+
   RTShaderSystem::Instance()->DetachEntity(this);
 }
 
@@ -1040,7 +1046,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
-      && !this->dataPtr->lighting &&
+      && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1413,7 +1419,10 @@ void Visual::SetHighlighted(bool _highlighted)
     }
     else
     {
-      this->dataPtr->boundingBox->Init(this->GetBoundingBox());
+      math::Box b = this->GetBoundingBox();
+      this->dataPtr->boundingBox->Init(math::Box(b.min/this->dataPtr->scale,
+          b.max/this->dataPtr->scale));
+      //this->dataPtr->boundingBox->Init(this->GetBoundingBox());
     }
     this->dataPtr->boundingBox->SetVisible(true);
   }
@@ -1732,7 +1741,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
+      boost::bind(&Visual::Update, shared_from_this()));
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
@@ -2425,8 +2434,11 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   if (!this->dataPtr->preRenderConnection)
+  {
     this->dataPtr->preRenderConnection =
-      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+      shared_from_this()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2464,7 +2476,8 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   this->dataPtr->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+    shared_from_this()));
 }
 
 //////////////////////////////////////////////////
