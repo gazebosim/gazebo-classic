@@ -19,11 +19,10 @@
 #include <string>
 #include <vector>
 
-#include "ServerFixture.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/common/PID.hh"
-#include "SimplePendulumIntegrator.hh"
+#include "test/ServerFixture.hh"
+#include "gazebo/math/SignalStats.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
 
@@ -58,23 +57,75 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   ASSERT_TRUE(upperLink != NULL);
   ASSERT_TRUE(lowerLink != NULL);
 
+  math::Vector3Stats upperAngles;
+  math::Vector3Stats lowerAngles;
+  upperAngles.InsertStatistic("max");
+  upperAngles.InsertStatistic("rms");
+  lowerAngles.InsertStatistic("max");
+  lowerAngles.InsertStatistic("rms");
+
   for (int i = 0; i < 3000; ++i)
   {
     world->Step(1);
 
-    // Check out of plane angles
-    {
-      math::Pose pose;
-      pose = upperLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
-    }
+    // Record out of plane angles
+    upperAngles.InsertData(upperLink->GetWorldPose().rot.GetAsEuler());
+    lowerAngles.InsertData(lowerLink->GetWorldPose().rot.GetAsEuler());
+  }
 
+  {
+    // upper pitch
+    std::map<std::string, double> map = upperAngles.y.GetMap();
+    EXPECT_NEAR(map["max"], 0.0, g_angle_y_tol);
+    std::string prefix = "upper_pitch_";
+    for (std::map<std::string, double>::iterator iter = map.begin();
+         iter != map.end(); ++iter)
     {
-      math::Pose pose;
-      pose = lowerLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
+      std::ostringstream stream;
+      stream << iter->second;
+      RecordProperty(prefix + iter->first, stream.str());
+    }
+  }
+
+  {
+    // upper yaw
+    std::map<std::string, double> map = upperAngles.z.GetMap();
+    EXPECT_NEAR(map["max"], 0.0, g_angle_z_tol);
+    std::string prefix = "upper_yaw_";
+    for (std::map<std::string, double>::iterator iter = map.begin();
+         iter != map.end(); ++iter)
+    {
+      std::ostringstream stream;
+      stream << iter->second;
+      RecordProperty(prefix + iter->first, stream.str());
+    }
+  }
+
+  {
+    // lower pitch
+    std::map<std::string, double> map = lowerAngles.y.GetMap();
+    EXPECT_NEAR(map["max"], 0.0, g_angle_y_tol);
+    std::string prefix = "lower_pitch_";
+    for (std::map<std::string, double>::iterator iter = map.begin();
+         iter != map.end(); ++iter)
+    {
+      std::ostringstream stream;
+      stream << iter->second;
+      RecordProperty(prefix + iter->first, stream.str());
+    }
+  }
+
+  {
+    // lower yaw
+    std::map<std::string, double> map = lowerAngles.z.GetMap();
+    EXPECT_NEAR(map["max"], 0.0, g_angle_z_tol);
+    std::string prefix = "lower_yaw_";
+    for (std::map<std::string, double>::iterator iter = map.begin();
+         iter != map.end(); ++iter)
+    {
+      std::ostringstream stream;
+      stream << iter->second;
+      RecordProperty(prefix + iter->first, stream.str());
     }
   }
 }
