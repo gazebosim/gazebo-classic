@@ -17,6 +17,7 @@
 /* Desc: Handles pushing messages out on a named topic
  * Author: Nate Koenig
  */
+#include <ignition/math.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/transport/Node.hh"
@@ -34,7 +35,7 @@ Publisher::Publisher(const std::string &_topic, const std::string &_msgType,
   : topic(_topic), msgType(_msgType), queueLimit(_limit),
     updatePeriod(0)
 {
-  if (!math::equal(_hzRate, 0.0))
+  if (!ignition::math::equal(_hzRate, 0.0))
     this->updatePeriod = 1.0 / _hzRate;
 
   this->queueLimitWarned = false;

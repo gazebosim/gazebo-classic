@@ -547,7 +547,7 @@ namespace gazebo
       /// is used to determine the appropriate frame.
       /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to world frame.
-      public: math::Quaternion GetAxisFrame(unsigned int _index) const;
+      public: math::Quaterniond GetAxisFrame(unsigned int _index) const;
 
       /// \brief Get orientation of joint axis reference frame
       /// relative to joint frame. This should always return identity unless
@@ -561,7 +561,7 @@ namespace gazebo
       /// \return Orientation of axis frame relative to joint frame.
       /// If supplied _index is out of range, or use_parent_model_frame
       /// is not true, this function returns identity rotation quaternion.
-      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const;
+      public: math::Quaterniond GetAxisFrameOffset(unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.

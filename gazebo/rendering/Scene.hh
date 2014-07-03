@@ -25,6 +25,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered/unordered_map.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Vector2.hh>
 
 #include <sdf/sdf.hh>
 
@@ -35,7 +36,6 @@
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/util/system.hh"
 
 namespace SkyX
@@ -254,8 +254,8 @@ namespace gazebo
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
       public: VisualPtr GetVisualAt(CameraPtr _camera,
-                                    const math::Vector2i &_mousePos,
-                                    std::string &_mod);
+                  const ignition::math::Vector2i &_mousePos,
+                  std::string &_mod);
 
       /// \brief Move the visual to be ontop of the nearest visual below it.
       /// \param[in] _visualName Name of the visual to move.
@@ -267,7 +267,7 @@ namespace gazebo
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
       /// \return Pointer to the visual, NULL if none found.
       public: VisualPtr GetVisualAt(CameraPtr _camera,
-                                    const math::Vector2i &_mousePos);
+                  const ignition::math::Vector2i &_mousePos);
 
       /// \brief Get a model's visual at a mouse position.
       /// \param[in] _camera Pointer to the camera used to project the mouse
@@ -275,7 +275,7 @@ namespace gazebo
       /// \param[in] _mousePos The 2d position of the mouse in pixels.
       /// \return Pointer to the visual, NULL if none found.
       public: VisualPtr GetModelVisualAt(CameraPtr _camera,
-                                         const math::Vector2i &_mousePos);
+                  const ignition::math::Vector2i &_mousePos);
 
 
       /// \brief Get the closest visual below a given visual.
@@ -287,7 +287,7 @@ namespace gazebo
       /// \param[in] _pt 3D point to get the visual below.
       /// \param[out] _visuals The visuals below the point order in
       /// proximity.
-      public: void GetVisualsBelowPoint(const math::Vector3 &_pt,
+      public: void GetVisualsBelowPoint(const ignition::math::Vector3d &_pt,
                                         std::vector<VisualPtr> &_visuals);
 
 
@@ -295,7 +295,7 @@ namespace gazebo
       /// \param[in] _pt Position to search below for a visual.
       /// \return The Z-value of the nearest visual below the point. Zero
       /// is returned if no visual is found.
-      public: double GetHeightBelowPoint(const math::Vector3 &_pt);
+      public: double GetHeightBelowPoint(const ignition::math::Vector3d &_pt);
 
       /// \brief Get the world pos of a the first contact at a pixel location.
       /// \param[in] _camera Pointer to the camera.
@@ -303,8 +303,8 @@ namespace gazebo
       /// \param[out] _position 3D position of the first contact point.
       /// \return True if a valid object was hit by the raycast.
       public: bool GetFirstContact(CameraPtr _camera,
-                                   const math::Vector2i &_mousePos,
-                                   math::Vector3 &_position);
+                                   const ignition::math::Vector2i &_mousePos,
+                                   ignition::math::Vector3d &_position);
 
       /// \brief Print the scene graph to std_out.
       public: void PrintSceneGraph();
@@ -319,8 +319,8 @@ namespace gazebo
       /// \param[in] _start Start position of the line.
       /// \param[in] _end End position of the line.
       /// \param[in] _name Name of the line.
-      public: void DrawLine(const math::Vector3 &_start,
-                            const math::Vector3 &_end,
+      public: void DrawLine(const ignition::math::Vector3d &_start,
+                            const ignition::math::Vector3d &_end,
                             const std::string &_name);
 
       /// \brief Set the fog parameters.
@@ -456,8 +456,8 @@ namespace gazebo
       /// which are GUI objects use to manipulate objects.
       /// \return Pointer to the Ogre::Entity, NULL if none.
       private: Ogre::Entity *GetOgreEntityAt(CameraPtr _camera,
-                                             const math::Vector2i &_mousePos,
-                                             bool _ignorSelectionObj);
+                   const ignition::math::Vector2i &_mousePos,
+                   bool _ignorSelectionObj);
 
       /// \brief Get the mesh information for the given mesh.
       /// \param[in] _mesh Mesh to get info about.

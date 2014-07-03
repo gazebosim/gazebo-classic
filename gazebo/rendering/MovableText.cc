@@ -14,21 +14,12 @@
  * limitations under the License.
  *
 */
-/**
- * File: MovableText.cpp
- *
- * description: This create create a billboarding object that display a text.
- *
- * @author  2003 by cTh see gavocanov@rambler.ru
- * @update  2006 by barraq see nospam@barraquand.com
- * @update  2007 by independentCreations see independentCreations@gmail.com
- */
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Assert.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
@@ -186,7 +177,7 @@ void MovableText::SetCharHeight(float _height)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->charHeight, _height))
+  if (!ignition::math::equal(this->charHeight, _height))
   {
     this->charHeight = _height;
     this->needUpdate = true;
@@ -198,7 +189,7 @@ void MovableText::SetSpaceWidth(float _width)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->spaceWidth, _width))
+  if (!ignition::math::equal(this->spaceWidth, _width))
   {
     this->spaceWidth = _width;
     this->needUpdate = true;
@@ -226,7 +217,7 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (!math::equal(this->baseline, _base))
+  if (!ignition::math::equal(this->baseline, _base))
   {
     this->baseline = _base;
     this->needUpdate = true;
@@ -255,14 +246,14 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+ignition::math::Box MovableText::GetAABB(void)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
-      math::Vector3(this->aabb->getMinimum().x,
+  return ignition::math::Box(
+      ignition::math::Vector3d(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),
-      math::Vector3(this->aabb->getMaximum().x,
+      ignition::math::Vector3d(this->aabb->getMaximum().x,
                     this->aabb->getMaximum().y,
                     this->aabb->getMaximum().z));
 }
@@ -355,7 +346,7 @@ void MovableText::_setupGeometry()
   pVert = static_cast<float*>(ptbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Derive space width from a capital A
-  if (math::equal(this->spaceWidth, 0.0f))
+  if (ignition::math::equal(this->spaceWidth, 0.0f))
     this->spaceWidth =
       this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 

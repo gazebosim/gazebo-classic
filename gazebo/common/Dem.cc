@@ -29,7 +29,6 @@
 #include "gazebo/common/DemPrivate.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/Angle.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -63,8 +62,8 @@ int Dem::Load(const std::string &_filename)
   unsigned int height;
   int xSize, ySize;
   double upLeftX, upLeftY, upRightX, upRightY, lowLeftX, lowLeftY;
-  math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
-  math::Angle lowLeftLat, lowLeftLong;
+  ignition::math::Angle upLeftLat, upLeftLong, upRightLat, upRightLong;
+  ignition::math::Angle lowLeftLat, lowLeftLong;
 
   // Sanity check
   std::string fullName = _filename;
@@ -125,15 +124,15 @@ int Dem::Load(const std::string &_filename)
                                             lowLeftLat, lowLeftLong);
 
   // Set the terrain's side (the terrain will be squared after the padding)
-  if (math::isPowerOfTwo(ySize - 1))
+  if (ignition::math::isPowerOfTwo(ySize - 1))
     height = ySize;
   else
-    height = math::roundUpPowerOfTwo(ySize) + 1;
+    height = ignition::math::roundUpPowerOfTwo(ySize) + 1;
 
-  if (math::isPowerOfTwo(xSize - 1))
+  if (ignition::math::isPowerOfTwo(xSize - 1))
     width = xSize;
   else
-    width = math::roundUpPowerOfTwo(xSize) + 1;
+    width = ignition::math::roundUpPowerOfTwo(xSize) + 1;
 
   this->dataPtr->side = std::max(width, height);
 
@@ -177,7 +176,7 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          math::Angle &_latitude, math::Angle &_longitude)
+                          ignition::math::Angle &_latitude, ignition::math::Angle &_longitude)
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
@@ -207,7 +206,7 @@ void Dem::GetGeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(math::Angle &_latitude, math::Angle &_longitude)
+void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude, ignition::math::Angle &_longitude)
 {
   return this->GetGeoReference(0, 0, _latitude, _longitude);
 }
@@ -238,7 +237,7 @@ double Dem::GetWorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-                        const math::Vector3 &_size, const math::Vector3 &_scale,
+                        const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale,
                         bool _flipY, std::vector<float> &_heights)
 {
   if (_subSampling <= 0)

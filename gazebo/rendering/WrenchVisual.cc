@@ -61,32 +61,32 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
-  math::Quaternion q;
+  ignition::math::Quaterniond q;
 
   dPtr->coneXNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
   dPtr->coneXNode->attachObject(coneXObj);
-  q.SetFromAxis(0, 1, 0, GZ_DTOR(-90));
-  dPtr->coneXNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.SetFromAxis(0, 1, 0, IGN_DTOR(-90));
+  dPtr->coneXNode->setOrientation(Conversions::Convert(q));
   dPtr->coneXNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneYNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
   dPtr->coneYNode->attachObject(coneYObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(90));
-  dPtr->coneYNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.SetFromAxis(1, 0, 0, IGN_DTOR(90));
+  dPtr->coneYNode->setOrientation(Conversions::Convert(q));
   dPtr->coneYNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneZNode =
     dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
   dPtr->coneZNode->attachObject(coneZObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(180));
-  dPtr->coneZNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.SetFromAxis(1, 0, 0, IGN_DTOR(180));
+  dPtr->coneZNode->setOrientation(Conversions::Convert(q));
   dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
-  dPtr->forceLine->AddPoint(math::Vector3(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
   dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   dPtr->forceNode = dPtr->sceneNode->createChildSceneNode(this->GetName() +
@@ -152,7 +152,8 @@ void WrenchVisual::Update()
       exp(-dPtr->wrenchMsg->wrench().torque().z() / magScale)) - offset;
 
   magScale = 50000;
-  math::Vector3 force = msgs::Convert(dPtr->wrenchMsg->wrench().force());
+  ignition::math::Vector3d force =
+    msgs::Convert(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
       exp(force.GetSquaredLength() / magScale)) - offset;
 

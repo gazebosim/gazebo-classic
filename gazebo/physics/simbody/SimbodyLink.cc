@@ -360,7 +360,7 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 SimbodyLink::GetWorldLinearVel(
   const math::Vector3 &_offset,
-  const math::Quaternion &_q) const
+  const math::Quaterniond &_q) const
 {
   math::Vector3 v;
 

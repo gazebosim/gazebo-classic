@@ -219,7 +219,7 @@ void BulletJoint::CacheForceTorque()
     // childMomentArm: from child CG to joint location in child link frame
     // moment arm rotated into world frame (given feedback is in world frame)
     math::Vector3 childMomentArm = childPose.rot.RotateVector(
-      (this->anchorPose - math::Pose(cgPose.pos, math::Quaternion())).pos);
+      (this->anchorPose - math::Pose(cgPose.pos, math::Quaterniond())).pos);
 
     // gzerr << "anchor [" << anchorPose
     //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
@@ -258,7 +258,7 @@ void BulletJoint::CacheForceTorque()
 
     // get parent CG pose in child link frame
     math::Pose parentCGInChildLink =
-      math::Pose(cgPose.pos, math::Quaternion()) - (childPose - parentPose);
+      math::Pose(cgPose.pos, math::Quaterniond()) - (childPose - parentPose);
 
     // anchor location in parent CG frame
     // this is the moment arm, but it's in parent CG frame, we need

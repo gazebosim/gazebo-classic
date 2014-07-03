@@ -122,7 +122,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
 
   gzdbg << "i2:\n" << i2 << "\n";
-  gzdbg << "R:\n" << math::Quaternion(0, 0, 0.5*M_PI).GetAsMatrix3() << "\n";
+  gzdbg << "R:\n" << math::Quaterniond(0, 0, 0.5*M_PI).GetAsMatrix3() << "\n";
   gzdbg << "I:\n" << i2.GetMOI() << "\n";
   i2.SetMOI(i2.GetMOI(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI)));
   gzdbg << "i2:\n" << i2 << "\n";

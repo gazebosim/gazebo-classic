@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: Image class
- * Author: Nate Koenig
- * Date: 14 July 2008
- */
 
 #include <boost/filesystem.hpp>
 #include <string>
@@ -26,7 +22,6 @@
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace common;

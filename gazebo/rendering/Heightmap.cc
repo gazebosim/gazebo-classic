@@ -14,19 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap geometry
- * Author: Nate Koenig
- * Date: 12 May 2009
- */
 
 #include <string.h>
 #include <math.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -343,7 +339,7 @@ void Heightmap::Load()
     }
   }
 
-  if (!math::isPowerOfTwo(this->dataSize - 1))
+  if (!ignition::math::isPowerOfTwo(this->dataSize - 1))
     gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
 
   // If the paging is enabled we modify the number of subterrains
@@ -369,15 +365,15 @@ void Heightmap::Load()
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
       1 + ((this->dataSize - 1) / sqrtN),
-      this->terrainSize.x / (sqrtN));
+      this->terrainSize.x() / (sqrtN));
 
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
-  math::Vector3 origin(
-      orig.x -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
-      orig.y -0.5 * this->terrainSize.x + 0.5 * this->terrainSize.x / sqrtN,
+  ignition::math::Vector3d origin(
+      orig.x -0.5 * this->terrainSize.x() + 0.5 * this->terrainSize.x() / sqrtN,
+      orig.y -0.5 * this->terrainSize.x() + 0.5 * this->terrainSize.x() / sqrtN,
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -395,15 +391,17 @@ void Heightmap::Load()
       double h = *std::max_element(
         &this->heights[0], &this->heights[0] + this->heights.size());
 
-      math::Vector3 camPos(5, -5, h + 200);
-      math::Vector3 lookAt(0, 0, h);
-      math::Vector3 delta = lookAt - camPos;
+      ignition::math::Vector3d camPos(5, -5, h + 200);
+      ignition::math::Vector3d lookAt(0, 0, h);
+      ignition::math::Vector3d delta = lookAt - camPos;
 
-      double yaw = atan2(delta.y, delta.x);
-      double pitch = atan2(-delta.z,
-                           sqrt(delta.x * delta.x + delta.y * delta.y));
+      double yaw = atan2(delta.y(), delta.x());
+      double pitch = atan2(-delta.z(),
+          sqrt(delta.x() * delta.x() + delta.y() * delta.y()));
 
-      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+      userCam->SetWorldPose(
+          ignition::math::Pose3d(camPos,
+            ignition::math::Vector3d(0, pitch, yaw)));
     }
   }
 
@@ -434,8 +432,8 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->loadRadiusFactor * this->terrainSize.x,
-        this->holdRadiusFactor * this->terrainSize.x,
+        this->loadRadiusFactor * this->terrainSize.x(),
+        this->holdRadiusFactor * this->terrainSize.x(),
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
@@ -524,7 +522,7 @@ void Heightmap::ConfigureTerrainDefaults()
     this->terrainGroup->getDefaultImportSettings();
 
   defaultimp.terrainSize = this->dataSize;
-  defaultimp.worldSize = this->terrainSize.x;
+  defaultimp.worldSize = this->terrainSize.x();
 
   defaultimp.inputScale = 1.0;
 
@@ -671,12 +669,12 @@ double Heightmap::GetHeight(double _x, double _y, double _z)
 
 /////////////////////////////////////////////////
 Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
-    math::Vector2i _mousePos)
+    ignition::math::Vector2i _mousePos)
 {
   Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_mousePos.x) /
+      static_cast<float>(_mousePos.x()) /
       _camera->GetViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.y) /
+      static_cast<float>(_mousePos.y()) /
       _camera->GetViewport()->getActualHeight());
 
   // The terrain uses a special ray intersection test.
@@ -684,7 +682,7 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Smooth(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
@@ -699,7 +697,7 @@ bool Heightmap::Smooth(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Flatten(CameraPtr _camera, ignition::math::Vector2i _mousePos,
                          double _outsideRadius, double _insideRadius,
                          double _weight)
 {
@@ -714,7 +712,7 @@ bool Heightmap::Flatten(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Raise(CameraPtr _camera, ignition::math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
@@ -729,7 +727,7 @@ bool Heightmap::Raise(CameraPtr _camera, math::Vector2i _mousePos,
 }
 
 /////////////////////////////////////////////////
-bool Heightmap::Lower(CameraPtr _camera, math::Vector2i _mousePos,
+bool Heightmap::Lower(CameraPtr _camera, ignition::math::Vector2i _mousePos,
     double _outsideRadius, double _insideRadius, double _weight)
 {
   // The terrain uses a special ray intersection test.
@@ -831,7 +829,7 @@ void Heightmap::ModifyTerrain(Ogre::Vector3 _pos, double _outsideRadius,
 
       if (dist > _insideRadius)
       {
-        weight = math::clamp(dist / _outsideRadius, 0.0, 1.0);
+        weight = ignition::math::clamp(dist / _outsideRadius, 0.0, 1.0);
         weight = 1.0 - (weight * weight);
       }
 

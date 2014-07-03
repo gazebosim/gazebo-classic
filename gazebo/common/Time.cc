@@ -14,10 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: Time class
- * Author: Nate Koenig
- * Date: 3 Apr 2007
- */
 
 #include <sys/time.h>
 #include <time.h>
@@ -30,7 +26,6 @@
 #include <mach/mach.h>
 #endif
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
 

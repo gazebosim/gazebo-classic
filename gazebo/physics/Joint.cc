@@ -918,13 +918,13 @@ math::Pose Joint::GetAnchorErrorPose() const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
+math::Quaterniond Joint::GetAxisFrame(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << std::endl;
-    return math::Quaternion();
+    return math::Quaterniond();
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -935,20 +935,20 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
       return this->parentLink->GetModel()->GetWorldPose().rot;
 
     // Parent model is world, use world frame
-    return math::Quaternion();
+    return math::Quaterniond();
   }
 
   return this->GetWorldPose().rot;
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
+math::Quaterniond Joint::GetAxisFrameOffset(unsigned int _index) const
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << " returning identity rotation." << std::endl;
-    return math::Quaternion();
+    return math::Quaterniond();
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -968,7 +968,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 
   // axis is defined in the joint frame, so
   // return the rotation from joint frame to joint frame.
-  return math::Quaternion();
+  return math::Quaterniond();
 }
 
 //////////////////////////////////////////////////

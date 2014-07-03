@@ -91,17 +91,17 @@ void CameraVisual::Load(unsigned int _width, unsigned int _height)
 
   DynamicLines *line = this->CreateDynamicLine(RENDERING_LINE_LIST);
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, -width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, -width*0.5, -height*0.5));
 
-  line->AddPoint(math::Vector3(0, 0, 0));
-  line->AddPoint(math::Vector3(dist, width*0.5, -height*0.5));
+  line->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  line->AddPoint(ignition::math::Vector3d(dist, width*0.5, -height*0.5));
 
   line->setMaterial("Gazebo/WhiteGlow");
   line->setVisibilityFlags(GZ_VISIBILITY_GUI);

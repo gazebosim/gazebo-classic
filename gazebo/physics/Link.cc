@@ -692,7 +692,7 @@ math::Matrix3 Link::GetWorldInertiaMatrix() const
   if (this->inertial)
   {
     math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
+    math::Quaterniond rot = this->GetWorldPose().rot.GetInverse();
     moi = this->inertial->GetMOI(math::Pose(pos, rot));
   }
   return moi;

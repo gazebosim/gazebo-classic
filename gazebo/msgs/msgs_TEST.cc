@@ -122,7 +122,7 @@ TEST_F(MsgsTest, ConvertMsgsVector3dToMath)
 TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+    msgs::Convert(math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
 
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
@@ -133,8 +133,8 @@ TEST_F(MsgsTest, ConvertMathQuaterionToMsgs)
 TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 {
   msgs::Quaternion msg =
-    msgs::Convert(math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
-  math::Quaternion v = msgs::Convert(msg);
+    msgs::Convert(math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
+  math::Quaterniond v = msgs::Convert(msg);
 
   // TODO: to real unit test move math::equal to EXPECT_DOUBLE_EQ
   EXPECT_TRUE(math::equal(v.x, -0.65328148243818818));
@@ -146,7 +146,7 @@ TEST_F(MsgsTest, ConvertMsgsQuaterionToMath)
 TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 {
   msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+        math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());
@@ -161,7 +161,7 @@ TEST_F(MsgsTest, ConvertPoseMathToMsgs)
 TEST_F(MsgsTest, ConvertMsgPoseToMath)
 {
   msgs::Pose msg = msgs::Convert(math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+        math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
   math::Pose v = msgs::Convert(msg);
 
   EXPECT_DOUBLE_EQ(1, v.pos.x);
@@ -254,7 +254,7 @@ TEST_F(MsgsTest, SetVector2d)
 TEST_F(MsgsTest, SetQuaternion)
 {
   msgs::Quaternion msg;
-  msgs::Set(&msg, math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI));
+  msgs::Set(&msg, math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI));
   EXPECT_TRUE(math::equal(msg.x(), -0.65328148243818818));
   EXPECT_TRUE(math::equal(msg.y(), 0.27059805007309856));
   EXPECT_TRUE(math::equal(msg.z(), 0.65328148243818829));
@@ -265,7 +265,7 @@ TEST_F(MsgsTest, SetPose)
 {
   msgs::Pose msg;
   msgs::Set(&msg, math::Pose(math::Vector3(1, 2, 3),
-        math::Quaternion(M_PI * 0.25, M_PI * 0.5, M_PI)));
+        math::Quaterniond(M_PI * 0.25, M_PI * 0.5, M_PI)));
 
   EXPECT_DOUBLE_EQ(1, msg.position().x());
   EXPECT_DOUBLE_EQ(2, msg.position().y());

@@ -20,10 +20,12 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
+
 
 namespace gazebo
 {
@@ -48,7 +50,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+          const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
       /// \brief Get the full filename of the image

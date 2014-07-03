@@ -228,7 +228,7 @@ namespace gazebo
       /// \return Linear velocity of the point on the body in the world frame.
       public: virtual math::Vector3 GetWorldLinearVel(
                   const math::Vector3 &_offset,
-                  const math::Quaternion &_q) const = 0;
+                  const math::Quaterniond &_q) const = 0;
 
       /// \brief Get the linear velocity at the body's center of gravity in the
       ///        world frame.

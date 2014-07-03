@@ -175,7 +175,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
           double theta = atan2(dir.y, dir.x);
           double phi = acos(dir.z / length);
 
-          math::Pose bonePose(linkPos, math::Quaternion(0.0, phi, theta));
+          math::Pose bonePose(linkPos, math::Quaterniond(0.0, phi, theta));
           bonePose.rot = pose.rot.GetInverse() * bonePose.rot;
 
           this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
@@ -502,7 +502,7 @@ void Actor::Update()
                   frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
 
   math::Vector3 rootPos = rootTrans.GetTranslation();
-  math::Quaternion rootRot = rootTrans.GetRotation();
+  math::Quaterniond rootRot = rootTrans.GetRotation();
 
   if (tinfo.translated)
     rootPos.x = 0.0;
@@ -558,7 +558,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
     {
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(math::Vector3()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-                                                    math::Quaternion()));
+                                                    math::Quaterniond()));
       mainLinkPose = bonePose;
     }
     else

@@ -361,7 +361,7 @@ void ODELink::UpdateMass()
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   // give ODE un-rotated inertia
   math::Matrix3 moi = this->inertial->GetMOI(
-    math::Pose(this->inertial->GetCoG(), math::Quaternion()));
+    math::Pose(this->inertial->GetCoG(), math::Quaterniond()));
   math::Vector3 principals(moi[0][0], moi[1][1], moi[2][2]);
   math::Vector3 products(moi[0][1], moi[0][2], moi[1][2]);
 
@@ -413,7 +413,7 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
-                                         const math::Quaternion &_q) const
+                                         const math::Quaterniond &_q) const
 {
   math::Vector3 vel;
 

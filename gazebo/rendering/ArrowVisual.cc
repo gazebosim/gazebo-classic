@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Arrow Visualization Class
- * Author: Nate Koenig
- */
 
 #include "gazebo/common/MeshManager.hh"
 

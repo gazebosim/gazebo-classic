@@ -18,7 +18,6 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/STLLoader.hh"
@@ -99,14 +98,14 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // FACET
     if (this->Leqi(token, const_cast<char*>("facet")))
     {
-      math::Vector3 normal;
+      ignition::math::Vector3d normal;
 
       // Get the XYZ coordinates of the normal vector to the face.
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
-      normal.x = r1;
-      normal.y = r2;
-      normal.z = r3;
+      normal.x(r1);
+      normal.y(r2);
+      normal.z(r3);
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
       {
@@ -116,7 +115,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
 
       for (; result; )
       {
-        math::Vector3 vertex;
+        ignition::math::Vector3d vertex;
         if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
         {
           result = false;
@@ -128,9 +127,9 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         if (count != 3)
           break;
 
-        vertex.x = r1;
-        vertex.y = r2;
-        vertex.z = r3;
+        vertex.x(r1);
+        vertex.y(r2);
+        vertex.z(r3);
 
         subMesh->AddVertex(vertex);
         subMesh->AddNormal(normal);
@@ -194,8 +193,8 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   // Number of faces.
   face_num = this->LongIntRead(_filein);
 
-  math::Vector3 normal;
-  math::Vector3 vertex;
+  ignition::math::Vector3d normal;
+  ignition::math::Vector3d vertex;
 
   // For each (triangular) face,
   // components of normal vector,
@@ -203,40 +202,75 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   // 2 byte "attribute".
   for (iface = 0; iface < face_num; iface++)
   {
-    if (!this->FloatRead(_filein, normal.x))
+    double v;
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, normal.y))
-      return false;
-    if (!this->FloatRead(_filein, normal.z))
-      return false;
+    else
+      normal.x(v);
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    else
+      normal.y(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    else
+      normal.z(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
+    else
+      vertex.x(v);
+
+    if (!this->FloatRead(_filein, v))
+      return false;
+    else
+      vertex.y(v);
+
+    if (!this->FloatRead(_filein, v))
+      return false;
+    else
+      vertex.z(v);
 
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    else
+      vertex.x(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    else
+      vertex.y(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
+    else
+      vertex.z(v);
+
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
 
-    if (!this->FloatRead(_filein, vertex.x))
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.y))
+    else
+      vertex.x(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
-    if (!this->FloatRead(_filein, vertex.z))
+    else
+      vertex.y(v);
+
+    if (!this->FloatRead(_filein, v))
       return false;
+    else
+      vertex.z(v);
+
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
     subMesh->AddIndex(subMesh->GetVertexCount()-1);
@@ -301,7 +335,7 @@ int STLLoader::RcolFind(float _a[][COR3_MAX], int _m, int _n, float _r[])
   {
     for (i = 0; i < _m; i++)
     {
-      if (!math::equal(_a[i][j], _r[i]))
+      if (!ignition::math::equal(_a[i][j], _r[i]))
         break;
       if (i == _m-1)
         return j;

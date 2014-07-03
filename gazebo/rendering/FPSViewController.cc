@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include "gazebo/math/Vector2i.hh"
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -52,33 +53,33 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (!this->enabled)
     return;
 
-  math::Vector2i drag = _event.pos - _event.prevPos;
+  ignition::math::Vector2i drag = _event.pos - _event.prevPos;
 
-  math::Vector3 directionVec(0, 0, 0);
+  ignition::math::Vector3d directionVec(0, 0, 0);
 
   if (_event.buttons & common::MouseEvent::LEFT)
   {
-    this->camera->RotateYaw(GZ_DTOR(drag.x * 0.1));
-    this->camera->RotatePitch(GZ_DTOR(-drag.y * 0.1));
+    this->camera->RotateYaw(IGN_DTOR(drag.x() * 0.1));
+    this->camera->RotatePitch(IGN_DTOR(-drag.y() * 0.1));
   }
   else if (_event.buttons & common::MouseEvent::RIGHT)
   {
     // interactively pan view
-    directionVec.x = 0;
-    directionVec.y =  drag.x * _event.moveScale;
-    directionVec.z =  drag.y * _event.moveScale;
+    directionVec.x(0);
+    directionVec.y(drag.x() * _event.moveScale);
+    directionVec.z(drag.y() * _event.moveScale);
   }
   else if (_event.buttons & common::MouseEvent::MIDDLE)
   {
-    directionVec.x =  drag.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
+    directionVec.x(drag.y() * _event.moveScale);
+    directionVec.y(0);
+    directionVec.z(0);
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
-    directionVec.x -=  50.0 * _event.scroll.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
+    directionVec.x() -= 50.0 * _event.scroll.y() * _event.moveScale;
+    directionVec.y(0);
+    directionVec.z(0);
   }
 
   this->camera->Translate(directionVec);

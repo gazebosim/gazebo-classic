@@ -15,13 +15,10 @@
  *
 */
 
-/* Desc: A camera sensor using OpenGL
- * Author: Nate Koenig
- * Date: 15 July 2003
- */
-
 #include <dirent.h>
 #include <sstream>
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RTShaderSystem.hh"
@@ -29,7 +26,6 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"

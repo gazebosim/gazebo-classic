@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A laser sensor using OpenGL
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
- */
 
 #ifndef _GPULASER_HH_
 #define _GPULASER_HH_
@@ -27,6 +23,10 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -34,9 +34,6 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre

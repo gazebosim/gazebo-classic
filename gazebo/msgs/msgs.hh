@@ -20,14 +20,9 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
-
-#include "gazebo/math/MathTypes.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/common/SphericalCoordinates.hh"
 #include "gazebo/common/Color.hh"
@@ -74,59 +69,59 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
-    /// \brief Convert a math::Vector3 to a msgs::Vector3d
+    /// \brief Convert a ignition::math::Vector3d to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
     GAZEBO_VISIBLE
-    msgs::Vector3d      Convert(const math::Vector3 &_v);
+    msgs::Vector3d      Convert(const ignition::math::Vector3d &_v);
 
-    /// \brief Convert a math::Quaternion to a msgs::Quaternion
+    /// \brief Convert a ignition::math::Quaterniond to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
     GAZEBO_VISIBLE
-    msgs::Quaternion Convert(const math::Quaternion &_q);
+    msgs::Quaternion Convert(const ignition::math::Quaterniond &_q);
 
-    /// \brief Convert a math::Pose to a msgs::Pose
+    /// \brief Convert an ignition::math::Pose3d to a msgs::Pose
     /// \param[in] _p The pose to convert
     /// \return A msgs::Pose object
     GAZEBO_VISIBLE
-    msgs::Pose       Convert(const math::Pose &_p);
+    msgs::Pose Convert(const ignition::math::Pose3d &_p);
 
     /// \brief Convert a common::Color to a msgs::Color
     /// \param[in] _c The color to convert
     /// \return A msgs::Color object
     GAZEBO_VISIBLE
-    msgs::Color      Convert(const common::Color &_c);
+    msgs::Color Convert(const common::Color &_c);
 
     /// \brief Convert a common::Time to a msgs::Time
     /// \param[in] _t The time to convert
     /// \return A msgs::Time object
     GAZEBO_VISIBLE
-    msgs::Time       Convert(const common::Time &_t);
+    msgs::Time  Convert(const common::Time &_t);
 
     /// \brief Convert a math::Plane to a msgs::PlaneGeom
     /// \param[in] _p The plane to convert
     /// \return A msgs::PlaneGeom object
     GAZEBO_VISIBLE
-    msgs::PlaneGeom Convert(const math::Plane &_p);
+    msgs::PlaneGeom Convert(const ignition::math::Planed &_p);
 
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
-    /// \return A math::Vector3 object
+    /// \return A ignition::math::Vector3d object
     GAZEBO_VISIBLE
-    math::Vector3    Convert(const msgs::Vector3d &_v);
+    ignition::math::Vector3d Convert(const msgs::Vector3d &_v);
 
-    /// \brief Convert a msgs::Quaternion to a math::Quaternion
+    /// \brief Convert a msgs::Quaternion to a ignition::math::Quaterniond
     /// \param[in] _q The quaternion to convert
-    /// \return A math::Quaternion object
+    /// \return A ignition::math::Quaterniond object
     GAZEBO_VISIBLE
-    math::Quaternion Convert(const msgs::Quaternion &_q);
+    ignition::math::Quaterniond Convert(const msgs::Quaternion &_q);
 
-    /// \brief Convert a msgs::Pose to a math::Pose
+    /// \brief Convert a msgs::Pose to an ignition::math::Pose3d
     /// \param[in] _q The pose to convert
-    /// \return A math::Pose object
+    /// \return An ignition::math::Pose3d object
     GAZEBO_VISIBLE
-    math::Pose       Convert(const msgs::Pose &_p);
+    ignition::math::Pose3d Convert(const msgs::Pose &_p);
 
     /// \brief Convert a msgs::Image to a common::Image
     /// \param[out] _img The common::Image container
@@ -138,19 +133,19 @@ namespace gazebo
     /// \param[in] _c The color to convert
     /// \return A common::Color object
     GAZEBO_VISIBLE
-    common::Color    Convert(const msgs::Color &_c);
+    common::Color Convert(const msgs::Color &_c);
 
     /// \brief Convert a msgs::Time to a common::Time
     /// \param[in] _t The time to convert
     /// \return A common::Time object
     GAZEBO_VISIBLE
-    common::Time     Convert(const msgs::Time &_t);
+    common::Time Convert(const msgs::Time &_t);
 
     /// \brief Convert a msgs::PlaneGeom to a common::Plane
     /// \param[in] _p The plane to convert
     /// \return A common::Plane object
     GAZEBO_VISIBLE
-    math::Plane      Convert(const msgs::PlaneGeom &_p);
+    ignition::math::Planed Convert(const msgs::PlaneGeom &_p);
 
     /// \brief Set a msgs::Image from a common::Image
     /// \param[out] _msg A msgs::Image pointer
@@ -158,29 +153,29 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(msgs::Image *_msg, const common::Image &_i);
 
-    /// \brief Set a msgs::Vector3d from a math::Vector3
+    /// \brief Set a msgs::Vector3d from a ignition::math::Vector3d
     /// \param[out] _pt A msgs::Vector3d pointer
-    /// \param[in] _v A math::Vector3 reference
+    /// \param[in] _v A ignition::math::Vector3d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v);
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v);
 
-    /// \brief Set a msgs::Vector2d from a math::Vector3
+    /// \brief Set a msgs::Vector2d from a ignition::math::Vector3d
     /// \param[out] _pt A msgs::Vector2d pointer
-    /// \param[in] _v A math::Vector2d reference
+    /// \param[in] _v An ignition::math::Vector2d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v);
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v);
 
-    /// \brief Set a msgs::Quaternion from a math::Quaternion
+    /// \brief Set a msgs::Quaternion from a ignition::math::Quaterniond
     /// \param[out] _q A msgs::Quaternion pointer
-    /// \param[in] _v A math::Quaternion reference
+    /// \param[in] _v A ignition::math::Quaterniond reference
     GAZEBO_VISIBLE
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v);
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v);
 
-    /// \brief Set a msgs::Pose from a math::Pose
+    /// \brief Set a msgs::Pose from a ignition::math::Pose3d
     /// \param[out] _p A msgs::Pose pointer
-    /// \param[in] _v A math::Pose reference
+    /// \param[in] _v A ignition::math::Pose3d reference
     GAZEBO_VISIBLE
-    void Set(msgs::Pose *_p, const math::Pose &_v);
+    void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v);
 
     /// \brief Set a msgs::Color from a common::Color
     /// \param[out] _p A msgs::Color pointer
@@ -201,11 +196,11 @@ namespace gazebo
     void Set(msgs::SphericalCoordinates *_s,
              const common::SphericalCoordinates &_v);
 
-    /// \brief Set a msgs::Plane from a math::Plane
+    /// \brief Set a msgs::Plane from an ignition::math::Planed
     /// \param[out] _p A msgs::Plane pointer
-    /// \param[in] _v A math::Plane reference
+    /// \param[in] _v An ignition::math::Planed reference
     GAZEBO_VISIBLE
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v);
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v);
 
     /// \brief Create a msgs::TrackVisual from a track visual SDF element
     /// \param[in] _sdf The sdf element

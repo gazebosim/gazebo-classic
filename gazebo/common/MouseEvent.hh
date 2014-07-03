@@ -17,7 +17,8 @@
 #ifndef _MOUSEEVENT_HH_
 #define _MOUSEEVENT_HH_
 
-#include "gazebo/math/Vector2i.hh"
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -48,16 +49,16 @@ namespace gazebo
 
 
       /// \brief Mouse pointer position on the screen.
-      public: math::Vector2i pos;
+      public: ignition::math::Vector2i pos;
 
       /// \brief Previous position.
-      public: math::Vector2i prevPos;
+      public: ignition::math::Vector2i prevPos;
 
       /// \brief Position of button press.
-      public: math::Vector2i pressPos;
+      public: ignition::math::Vector2i pressPos;
 
       /// \brief Scroll position.
-      public: math::Vector2i scroll;
+      public: ignition::math::Vector2i scroll;
 
       /// \brief Scaling factor.
       public: float moveScale;

@@ -72,7 +72,7 @@ namespace gazebo
       /// \brief get orientation of the IMU relative to the reference pose
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
-      public: math::Quaternion GetOrientation() const;
+      public: math::Quaterniond GetOrientation() const;
 
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();

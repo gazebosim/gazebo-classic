@@ -364,7 +364,7 @@ namespace gazebo
     /// \param[in] _q quaternion to output
     /// \return the stream
     public: friend  std::ostream &operator<<(std::ostream &_out,
-                const gazebo::math::Quaternion &_q)
+                const gazebo::math::Quaterniond &_q)
     {
       Vector3 v(_q.GetAsEuler());
       _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
@@ -377,7 +377,7 @@ namespace gazebo
     /// \param[in] _q Quaternion to read values into
     /// \return The istream
     public: friend std::istream &operator>>(std::istream &_in,
-                                             gazebo::math::Quaternion &_q)
+                                             gazebo::math::Quaterniond &_q)
     {
       Angle roll, pitch, yaw;
 

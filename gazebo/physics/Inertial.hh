@@ -177,7 +177,7 @@ namespace gazebo
 
       /// \brief Rotate this mass.
       /// \param[in] _rot Rotation amount.
-      public: void Rotate(const math::Quaternion &_rot);
+      public: void Rotate(const math::Quaterniond &_rot);
 
       /// \brief Equal operator.
       /// \param[in] _inertial Inertial to copy.

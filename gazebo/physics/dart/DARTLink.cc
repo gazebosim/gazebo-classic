@@ -237,7 +237,7 @@ gazebo::math::Vector3 DARTLink::GetWorldLinearVel(
 //////////////////////////////////////////////////
 math::Vector3 DARTLink::GetWorldLinearVel(
     const gazebo::math::Vector3 &_offset,
-    const gazebo::math::Quaternion &_q) const
+    const gazebo::math::Quaterniond &_q) const
 {
   Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);

@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Projector
- * Author: Jared Duke, (some maintainence by John Hsu)
- */
-
-#ifndef _PROJECTOR_HH_
-#define _PROJECTOR_HH_
+#ifndef _GAZEBO_PROJECTOR_HH_
+#define _GAZEBO_PROJECTOR_HH_
 
 #include <string>
 #include <map>
@@ -68,11 +63,12 @@ namespace gazebo
       /// \param[in] _farClip Far clip distance.
       /// \param[in] _fov Field of view.
       public: void Load(const std::string &_name,
-                        const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
-                        const std::string &_textureName = "",
-                        double _nearClip = 0.25,
-                        double _farClip = 15.0,
-                        double _fov = M_PI * 0.25);
+                  const ignition::math::Pose3d &_pose =
+                  ignition::math::Pose3d(0, 0, 0, 0, 0, 0),
+                  const std::string &_textureName = "",
+                  double _nearClip = 0.25,
+                  double _farClip = 15.0,
+                  double _fov = M_PI * 0.25);
 
       /// \brief Load a texture into the projector.
       /// \param[in] _textureName Name of the texture to project.
@@ -120,7 +116,7 @@ namespace gazebo
         public: void SetEnabled(bool _enabled);
         public: void SetUsingShaders(bool _usingShaders);
 
-        public: void SetPose(const math::Pose &_pose);
+        public: void SetPose(const ignition::math::Pose3d &_pose);
 
         private: void SetSceneNode();
 

@@ -23,15 +23,16 @@
 #include <list>
 #include <vector>
 
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Event.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -132,7 +133,7 @@ namespace gazebo
       public: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief True if lighting will be applied to this visual.
       public: bool lighting;

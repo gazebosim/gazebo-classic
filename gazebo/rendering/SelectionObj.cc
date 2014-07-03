@@ -95,7 +95,7 @@ void SelectionObj::Attach(rendering::VisualPtr _vis)
 
   dPtr->parent = _vis;
   dPtr->parent->AttachVisual(shared_from_this());
-  this->SetPosition(math::Vector3(0, 0, 0));
+  this->SetPosition(ignition::math::Vector3d(0, 0, 0));
 
   this->UpdateSize();
 }
@@ -110,18 +110,18 @@ void SelectionObj::UpdateSize()
 
   // don't include the selection obj itself when calculating the size.
   this->Detach();
-  math::Vector3 bboxSize = vis->GetBoundingBox().GetSize()
+  ignition::math::Vector3d bboxSize = vis->GetBoundingBox().Size()
       * vis->GetScale();
   dPtr->parent = vis;
   dPtr->parent->AttachVisual(shared_from_this());
 
-  double max = std::max(std::max(bboxSize.x, bboxSize.y), bboxSize.z);
+  double max = std::max(std::max(bboxSize.x(), bboxSize.y()), bboxSize.z());
 
   max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
 
   // Handle special case for rotation visuals. Only set the visuals to be
   // overlays for big objects.
-  if (math::equal(max, dPtr->maxScale))
+  if (ignition::math::equal(max, dPtr->maxScale))
   {
     dPtr->rotXVisual->SetMaterial(dPtr->xAxisMatOverlay, false);
     dPtr->rotYVisual->SetMaterial(dPtr->yAxisMatOverlay, false);
@@ -133,7 +133,7 @@ void SelectionObj::UpdateSize()
     dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat, false);
     dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat, false);
   }
-  this->SetScale(math::Vector3(max, max, max));
+  this->SetScale(ignition::math::Vector3d(max, max, max));
 }
 
 /////////////////////////////////////////////////
@@ -254,8 +254,9 @@ void SelectionObj::SetState(SelectionMode _state)
     Ogre::MaterialPtr mat =
       Ogre::MaterialManager::getSingleton().getByName(
       dPtr->selectedVis->GetMaterialName());
-    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
-      Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.5);
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)
+      ->setAlphaOperation(
+          Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.5);
     dPtr->selectedVis.reset();
   }
 
@@ -283,7 +284,8 @@ void SelectionObj::SetState(SelectionMode _state)
     Ogre::MaterialPtr mat =
       Ogre::MaterialManager::getSingleton().getByName(
       dPtr->selectedVis->GetMaterialName());
-    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setAlphaOperation(
+    mat->getTechnique(0)->getPass(0)->getTextureUnitState(0)
+      ->setAlphaOperation(
       Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT, 0.7);
   }
 }
@@ -405,15 +407,15 @@ void SelectionObj::CreateTranslateVisual()
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->transXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->transYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   dPtr->transXVisual->SetMaterial(dPtr->xAxisMatOverlay);
   dPtr->transYVisual->SetMaterial(dPtr->yAxisMatOverlay);
   dPtr->transZVisual->SetMaterial(dPtr->zAxisMatOverlay);
 
-  dPtr->transVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->transVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->transXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -486,9 +488,9 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotZVisual->Load();
 
   dPtr->rotXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->rotYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
@@ -497,7 +499,7 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotYVisual->SetMaterial(dPtr->yAxisMat);
   dPtr->rotZVisual->SetMaterial(dPtr->zAxisMat);
 
-  dPtr->rotVisual->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  dPtr->rotVisual->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
 
   dPtr->rotXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
@@ -609,15 +611,15 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->scaleXVisual->SetRotation(
-      math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->scaleYVisual->SetRotation(
-      math::Quaternion(math::Vector3(1, 0, 0), GZ_DTOR(-90)));
+      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   dPtr->scaleXVisual->SetMaterial(dPtr->xAxisMatOverlay);
   dPtr->scaleYVisual->SetMaterial(dPtr->yAxisMatOverlay);
   dPtr->scaleZVisual->SetMaterial(dPtr->zAxisMatOverlay);
 
-  dPtr->scaleVisual->SetScale(math::Vector3(5.0, 5.0, 5.0));
+  dPtr->scaleVisual->SetScale(ignition::math::Vector3d(5.0, 5.0, 5.0));
 
   dPtr->scaleXVisual->SetVisibilityFlags(
       GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);

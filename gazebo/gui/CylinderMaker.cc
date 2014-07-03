@@ -46,7 +46,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            math::Quaterniond());
 }
 
 CylinderMaker::~CylinderMaker()

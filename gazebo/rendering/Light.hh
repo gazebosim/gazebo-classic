@@ -88,11 +88,11 @@ namespace gazebo
 
       /// \brief Set the position of the light
       /// \param[in] _p New position for the light
-      public: void SetPosition(const math::Vector3 &_p);
+      public: void SetPosition(const ignition::math::Vector3d &_p);
 
       /// \brief Get the position of the light
       /// \return The position of the light
-      public: math::Vector3 GetPosition() const;
+      public: ignition::math::Vector3d GetPosition() const;
 
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.
@@ -133,11 +133,11 @@ namespace gazebo
       /// \brief Set the direction
       /// \param[in] _dir Set the light's direction. Only applicable to spot and
       /// directional lights.
-      public: void SetDirection(const math::Vector3 &_dir);
+      public: void SetDirection(const ignition::math::Vector3d &_dir);
 
       /// \brief Get the direction
       /// \return The light's direction.
-      public: math::Vector3 GetDirection() const;
+      public: ignition::math::Vector3d GetDirection() const;
 
       /// \brief Set the attenuation
       /// \param[in] _contant Constant attenuation

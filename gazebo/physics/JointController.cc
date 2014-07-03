@@ -408,7 +408,7 @@ void JointController::SetJointPosition(
 //                               linkWorldPose.rot);
 //
 //       // take axis rotation and turn it int a quaternion
-//       math::Quaternion rotation(_axis, _dposition);
+//       math::Quaterniond rotation(_axis, _dposition);
 //
 //       // rotate relative pose by rotation
 //       math::Pose newRelativePose;

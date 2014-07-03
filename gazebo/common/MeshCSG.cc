@@ -137,7 +137,7 @@ static void FillFace(GtsTriangle *_t, gpointer *_data)
 
 //////////////////////////////////////////////////
 Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
-    const math::Pose &_offset)
+    const ignition::math::Pose3d &_offset)
 {
   GtsSurface *s1, *s2, *s3;
   GtsSurfaceInter *si;
@@ -156,7 +156,7 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
 
   this->ConvertMeshToGTS(_m1, s1);
 
-  if (_offset != math::Pose::Zero)
+  if (_offset != ignition::math::Pose3d::Zero)
   {
     Mesh *m2 = new Mesh();
     for (unsigned int i = 0; i < _m2->GetSubMeshCount(); ++i)
@@ -169,7 +169,8 @@ Mesh *MeshCSG::CreateBoolean(const Mesh *_m1, const Mesh *_m2, int _operation,
         continue;
       for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
       {
-        m2SubMesh->AddVertex(_offset.pos + _offset.rot*subMesh->GetVertex(j));
+        m2SubMesh->AddVertex(_offset.Pos() + _offset.Rot() *
+            subMesh->GetVertex(j));
       }
       for (unsigned int j = 0; j < subMesh->GetIndexCount(); ++j)
       {
@@ -287,9 +288,9 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
 
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
-      math::Vector3 vertex = subMesh->GetVertex(j);
-      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.x,
-          vertex.y, vertex.z));
+      ignition::math::Vector3d vertex = subMesh->GetVertex(j);
+      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.x(),
+          vertex.y(), vertex.z()));
     }
 
     // merge duplicate vertices, otherwise gts produces undesirable results

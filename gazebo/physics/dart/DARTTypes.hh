@@ -66,15 +66,15 @@ namespace gazebo
         }
 
         /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
+      public: static Eigen::Quaterniond ConvQuat(const math::Quaterniond &_quat)
         {
             return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
         }
 
         /// \brief
-      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
+      public: static math::Quaterniond ConvQuat(const Eigen::Quaterniond &_quat)
         {
-            return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
+            return math::Quaterniond(_quat.w(), _quat.x(), _quat.y(), _quat.z());
         }
 
         /// \brief

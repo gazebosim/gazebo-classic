@@ -30,7 +30,7 @@
 /// \brief Converts degrees to radians
 /// \param[in] degrees
 /// \return radians
-#define GZ_DTOR(d) ((d) * M_PI / 180)
+#define IGN_DTOR(d) ((d) * M_PI / 180)
 
 /// \brief Macro tha normalizes an angle in the range -Pi to Pi
 /// \param[in] angle

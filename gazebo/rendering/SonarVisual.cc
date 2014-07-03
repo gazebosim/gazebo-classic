@@ -117,24 +117,27 @@ void SonarVisual::Update()
       - dPtr->sonarMsg->sonar().range_min();
   float radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!math::equal(dPtr->coneNode->getScale().z, rangeDelta) ||
-      !math::equal(dPtr->coneNode->getScale().x, radiusScale))
+  if (!ignition::math::equal(dPtr->coneNode->getScale().z, rangeDelta) ||
+      !ignition::math::equal(dPtr->coneNode->getScale().x, radiusScale))
   {
     dPtr->coneNode->setScale(radiusScale, radiusScale, rangeDelta);
-    dPtr->sonarRay->SetPoint(0, math::Vector3(0, 0, rangeDelta * 0.5));
+    dPtr->sonarRay->SetPoint(0,
+        ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
   }
 
-  math::Pose pose = msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
+  ignition::math::Pose3d pose =
+    msgs::Convert(dPtr->sonarMsg->sonar().world_pose());
   this->SetPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {
-    math::Vector3 pos = msgs::Convert(dPtr->sonarMsg->sonar().contact());
+    ignition::math::Vector3d pos =
+      msgs::Convert(dPtr->sonarMsg->sonar().contact());
     dPtr->sonarRay->SetPoint(1, pos);
   }
   else
   {
-    dPtr->sonarRay->SetPoint(1, math::Vector3(0, 0,
+    dPtr->sonarRay->SetPoint(1, ignition::math::Vector3d(0, 0,
           (rangeDelta * 0.5) - dPtr->sonarMsg->sonar().range()));
   }
   dPtr->receivedMsg = false;

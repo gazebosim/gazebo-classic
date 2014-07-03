@@ -220,7 +220,7 @@ math::Matrix3 Inertial::GetMOI() const
 }
 
 //////////////////////////////////////////////////
-void Inertial::Rotate(const math::Quaternion &_rot)
+void Inertial::Rotate(const math::Quaterniond &_rot)
 {
   /// \TODO: double check what this does, if needed
   this->cog.pos = _rot.RotateVector(this->cog.pos);
@@ -252,7 +252,7 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
     result.mass;
 
   // make a decision on the new orientation, set it to identity
-  result.cog.rot = math::Quaternion(1, 0, 0, 0);
+  result.cog.rot = math::Quaterniond(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
   math::Matrix3 Ithis = this->GetMOI(result.cog);

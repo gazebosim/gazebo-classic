@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/*
- * Desc: Projector
- * Author: Jared Duke, John Hsu, Nate Koenig
- */
-
 #include "gazebo/rendering/RTShaderSystem.hh"
 
 #include "gazebo/rendering/Conversions.hh"
@@ -51,7 +46,7 @@ Projector::~Projector()
 
 /////////////////////////////////////////////////
 void Projector::Load(const std::string &_name,
-                     const math::Pose &_pose,
+                     const ignition::math::Pose3d &_pose,
                      const std::string &_textureName,
                      double _nearClip,
                      double _farClip,
@@ -98,14 +93,14 @@ void Projector::Load(const std::string &_name,
 /////////////////////////////////////////////////
 void Projector::Load(sdf::ElementPtr _sdf)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->Get<math::Pose>("pose");
+    pose = _sdf->Get<ignition::math::Pose3d>("pose");
 
   if (_sdf->HasElement("texture_name"))
     textureName = _sdf->Get<std::string>("texture_name");
@@ -126,7 +121,7 @@ void Projector::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Projector::Load(const msgs::Projector &_msg)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
@@ -327,10 +322,11 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 }
 
 /////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
+void Projector::ProjectorFrameListener::SetPose(
+    const ignition::math::Pose3d &_pose)
 {
-  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
-  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
+  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Rot());
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Pos());
   Ogre::Quaternion offsetQuaternion;
 
   this->node->setPosition(ogreVec);

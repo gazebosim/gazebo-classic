@@ -1217,7 +1217,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
         msg_pose.position().y(),
         msg_pose.position().z());
 
-      math::Quaternion cam_pose_rot = math::Quaternion(
+      math::Quaterniond cam_pose_rot = math::Quaterniond(
         msg_pose.orientation().w(),
         msg_pose.orientation().x(),
         msg_pose.orientation().y(),

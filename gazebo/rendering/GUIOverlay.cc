@@ -15,10 +15,10 @@
  *
 */
 
-#include "gazebo/common/Console.hh"
+#include <ignition/math/Vector2.hh>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -141,8 +141,8 @@ void GUIOverlay::Update()
 void GUIOverlay::CreateWindow(const std::string &_type,
                                const std::string &_name,
                                const std::string &_parent,
-                               const math::Vector2d &_position,
-                               const math::Vector2d &_size,
+                               const ignition::math::Vector2d &_position,
+                               const ignition::math::Vector2d &_size,
                                const std::string &_text)
 {
   CEGUI::Window *parent =
@@ -152,19 +152,19 @@ void GUIOverlay::CreateWindow(const std::string &_type,
 
   parent->addChildWindow(window);
 
-  window->setPosition(CEGUI::UVector2(CEGUI::UDim(_position.x, 0),
-                                             CEGUI::UDim(_position.y, 0)));
+  window->setPosition(CEGUI::UVector2(CEGUI::UDim(_position.x(), 0),
+                                             CEGUI::UDim(_position.y(), 0)));
 
-  window->setSize(CEGUI::UVector2(CEGUI::UDim(_size.x, 0),
-                                         CEGUI::UDim(_size.y, 0)));
+  window->setSize(CEGUI::UVector2(CEGUI::UDim(_size.x(), 0),
+                                         CEGUI::UDim(_size.y(), 0)));
   window->setText(_text);
 }
 #else
 void GUIOverlay::CreateWindow(const std::string &/*_type*/,
                                const std::string &/*_name*/,
                                const std::string &/*_parent*/,
-                               const math::Vector2d &/*_position*/,
-                               const math::Vector2d &/*_size*/,
+                               const ignition::math::Vector2d &/*_position*/,
+                               const ignition::math::Vector2d &/*_size*/,
                                const std::string &/*_text*/)
 {
 }
@@ -218,7 +218,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   scroll = false;
 
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
-  pos = system->injectMousePosition(_evt.pos.x, _evt.pos.y);
+  pos = system->injectMousePosition(_evt.pos.x(), _evt.pos.y());
 
   if (_evt.type == common::MouseEvent::PRESS)
   {
@@ -241,7 +241,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   }
 
   if (_evt.type == common::MouseEvent::SCROLL)
-    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y);
+    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y());
 
   result = pos || release || press || scroll;
 

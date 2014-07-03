@@ -17,10 +17,6 @@
 #include <sys/stat.h>
 #include <string>
 
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Matrix3.hh"
-#include "gazebo/math/Matrix4.hh"
-
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -46,16 +42,17 @@ MeshManager::MeshManager()
 
   // Create some basic shapes
   this->CreatePlane("unit_plane",
-      math::Plane(math::Vector3(0, 0, 1), math::Vector2d(1, 1), 0),
-      math::Vector2d(1, 1),
-      math::Vector2d(1, 1));
+      ignition::math::Planed(ignition::math::Vector3d(0, 0, 1),
+                             ignition::math::Vector2d(1, 1), 0),
+      ignition::math::Vector2d(1, 1),
+      ignition::math::Vector2d(1, 1));
 
   this->CreateSphere("unit_sphere", 0.5, 32, 32);
   this->CreateSphere("joint_anchor", 0.01, 32, 32);
-  this->CreateBox("body_cg", math::Vector3(0.014, 0.014, 0.014),
-      math::Vector2d(0.014, 0.014));
-  this->CreateBox("unit_box", math::Vector3(1, 1, 1),
-      math::Vector2d(1, 1));
+  this->CreateBox("body_cg", ignition::math::Vector3d(0.014, 0.014, 0.014),
+      ignition::math::Vector2d(0.014, 0.014));
+  this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector2d(1, 1));
   this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
@@ -175,15 +172,15 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
 
 
 //////////////////////////////////////////////////
-void MeshManager::GetMeshAABB(const Mesh *_mesh, math::Vector3 &_center,
-    math::Vector3 &_min_xyz, math::Vector3 &_max_xyz)
+void MeshManager::GetMeshAABB(const Mesh *_mesh, ignition::math::Vector3d &_center,
+    ignition::math::Vector3d &_min_xyz, ignition::math::Vector3d &_max_xyz)
 {
   if (this->HasMesh(_mesh->GetName()))
     this->meshes[_mesh->GetName()]->GetAABB(_center, _min_xyz, _max_xyz);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, math::Vector3 _center)
+void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, ignition::math::Vector3d _center)
 {
   if (this->HasMesh(_mesh->GetName()))
     this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
@@ -233,7 +230,7 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
   float deltaRingAngle = (M_PI / rings);
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
 
   Mesh *mesh = new Mesh();
@@ -247,13 +244,13 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   for (ring = 0; ring <= rings; ring++)
   {
     float r0 = radius * sinf(ring * deltaRingAngle);
-    vert.y = radius * cosf(ring * deltaRingAngle);
+    vert.y(radius * cosf(ring * deltaRingAngle));
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.x = r0 * sinf(seg * deltaSegAngle);
-      vert.z = r0 * cosf(seg * deltaSegAngle);
+      vert.x(r0 * sinf(seg * deltaSegAngle));
+      vert.z(r0 * cosf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -285,17 +282,21 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreatePlane(const std::string &name, const math::Plane &plane,
-                              const math::Vector2d &segments,
-                              const math::Vector2d &uvTile)
+void MeshManager::CreatePlane(const std::string &name,
+    const ignition::math::Planed &plane,
+    const ignition::math::Vector2d &segments,
+    const ignition::math::Vector2d &uvTile)
 {
-  this->CreatePlane(name, plane.normal, plane.d, plane.size, segments, uvTile);
+  this->CreatePlane(name, plane.Normal(), plane.Offset(),
+                    plane.Size(), segments, uvTile);
 }
 
 //////////////////////////////////////////////////
 void MeshManager::CreatePlane(const std::string &name,
-    const math::Vector3 &normal, double d, const math::Vector2d &size,
-    const math::Vector2d &segments, const math::Vector2d &uvTile)
+    const ignition::math::Vector3d &normal, double d,
+    const ignition::math::Vector2d &size,
+    const ignition::math::Vector2d &segments,
+    const ignition::math::Vector2d &uvTile)
 {
   if (this->HasMesh(name))
   {
@@ -309,16 +310,16 @@ void MeshManager::CreatePlane(const std::string &name,
   SubMesh *subMesh = new SubMesh();
   mesh->AddSubMesh(subMesh);
 
-  math::Vector3 zAxis, yAxis, xAxis;
+  ignition::math::Vector3d zAxis, yAxis, xAxis;
   zAxis = normal;
   zAxis.Normalize();
   yAxis = zAxis.GetPerpendicular();
   xAxis = yAxis.Cross(zAxis);
 
-  math::Matrix4 xlate, xform, rot;
-  xlate = rot = math::Matrix4::IDENTITY;
+  ignition::math::Matrix4d xlate, xform, rot;
+  xlate = rot = ignition::math::Matrix4d::Identity;
 
-  math::Matrix3 rot3;
+  ignition::math::Matrix3d rot3;
   rot3.SetFromAxes(xAxis, yAxis, zAxis);
 
   rot = rot3;
@@ -326,14 +327,14 @@ void MeshManager::CreatePlane(const std::string &name,
   xlate.SetTranslate(normal * -d);
   xform = xlate * rot;
 
-  math::Vector3 vec;
-  math::Vector3 norm(0, 0, 1);
-  double xSpace = size.x / segments.x;
-  double ySpace = size.y / segments.y;
-  double halfWidth = size.x / 2.0;
-  double halfHeight = size.y / 2.0;
-  double xTex = uvTile.x / segments.x;
-  double yTex = uvTile.y / segments.y;
+  ignition::math::Vector3d vec;
+  ignition::math::Vector3d norm(0, 0, 1);
+  double xSpace = size.x() / segments.x();
+  double ySpace = size.y() / segments.y();
+  double halfWidth = size.x() / 2.0;
+  double halfHeight = size.y() / 2.0;
+  double xTex = uvTile.x() / segments.x();
+  double yTex = uvTile.y() / segments.y();
 
   // Give it some thickness to reduce shadow artifacts.
   double thickness = 0.01;
@@ -341,14 +342,14 @@ void MeshManager::CreatePlane(const std::string &name,
   for (int i = 0; i <= 1; ++i)
   {
     double z = i*thickness;
-    for (int y = 0; y <= segments.y; ++y)
+    for (int y = 0; y <= segments.y(); ++y)
     {
-      for (int x = 0; x <= segments.x; ++x)
+      for (int x = 0; x <= segments.x(); ++x)
       {
         // Compute the position of the vertex
-        vec.x = (x * xSpace) - halfWidth;
-        vec.y = (y * ySpace) - halfHeight;
-        vec.z = -z;
+        vec.x((x * xSpace) - halfWidth);
+        vec.y((y * ySpace) - halfHeight);
+        vec.z(-z);
         vec = xform.TransformAffine(vec);
         subMesh->AddVertex(vec);
 
@@ -362,12 +363,12 @@ void MeshManager::CreatePlane(const std::string &name,
     }
   }
 
-  this->Tesselate2DMesh(subMesh, segments.x + 1, segments.y + 1, false);
+  this->Tesselate2DMesh(subMesh, segments.x() + 1, segments.y() + 1, false);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
-    const math::Vector2d &uvCoords)
+void MeshManager::CreateBox(const std::string &name, const ignition::math::Vector3d &sides,
+    const ignition::math::Vector2d &uvCoords)
 {
   int i, k;
 
@@ -406,7 +407,7 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Texture coords
   double t[4][2] =
   {
-    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {uvCoords.x(), 0}, {0, 0}, {0, uvCoords.y()}, {uvCoords.x(), uvCoords.y()}
   };
 
   // Vertices
@@ -437,9 +438,9 @@ void MeshManager::CreateBox(const std::string &name, const math::Vector3 &sides,
   // Compute the vertices
   for (i = 0; i < 8; i++)
   {
-    v[i][0] *= sides.x * 0.5;
-    v[i][1] *= sides.y * 0.5;
-    v[i][2] *= sides.z * 0.5;
+    v[i][0] *= sides.x() * 0.5;
+    v[i][1] *= sides.y() * 0.5;
+    v[i][2] *= sides.z() * 0.5;
   }
 
   // For each face
@@ -503,7 +504,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   // Texture coords
   /*float t[4][2] =
     {
-    {uvCoords.x, 0}, {0, 0}, {0, uvCoords.y}, {uvCoords.x, uvCoords.y}
+    {uvCoords.x(), 0}, {0, 0}, {0, uvCoords.y()}, {uvCoords.x(), uvCoords.y()}
     };*/
 
   // Vertices
@@ -564,7 +565,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
 void MeshManager::CreateCylinder(const std::string &name, float radius,
                                  float height, int rings, int segments)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
@@ -586,13 +587,13 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.z(ring * height/rings - height/2.0);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.y(radius * cosf(seg * deltaSegAngle));
+      vert.x(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -669,7 +670,7 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
 void MeshManager::CreateCone(const std::string &name, float radius,
     float height, int rings, int segments)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   unsigned int i, j;
   int ring, seg;
@@ -694,15 +695,15 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.z(ring * height/rings - height/2.0);
 
-    double ringRadius = ((height - (vert.z+height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.z() + height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y = ringRadius * cosf(seg * deltaSegAngle);
-      vert.x = ringRadius * sinf(seg * deltaSegAngle);
+      vert.y(ringRadius * cosf(seg * deltaSegAngle));
+      vert.x(ringRadius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -780,7 +781,7 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
     float outterRadius, float height, int rings,
     int segments)
 {
-  math::Vector3 vert, norm;
+  ignition::math::Vector3d vert, norm;
   unsigned int verticeIndex = 0;
   int ring, seg;
   float deltaSegAngle = (2.0 * M_PI / segments);
@@ -805,13 +806,13 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   // Generate the group of rings for the outsides of the cylinder
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z = ring * height/rings - height/2.0;
+    vert.z(ring * height/rings - height/2.0);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.y(radius * cosf(seg * deltaSegAngle));
+      vert.x(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -864,13 +865,13 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   radius = innerRadius;
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z = (height/2.0) - (ring * height/rings);
+    vert.z((height/2.0) - (ring * height/rings));
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y = radius * cosf(seg * deltaSegAngle);
-      vert.x = radius * sinf(seg * deltaSegAngle);
+      vert.y(radius * cosf(seg * deltaSegAngle));
+      vert.x(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -970,7 +971,7 @@ void MeshManager::Tesselate2DMesh(SubMesh *sm, int meshWidth, int meshHeight,
 #ifdef HAVE_GTS
 //////////////////////////////////////////////////
 void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
-    const Mesh *_m2, int _operation, const math::Pose &_offset)
+    const Mesh *_m2, int _operation, const ignition::math::Pose3d &_offset)
 {
   if (this->HasMesh(_name))
     return;

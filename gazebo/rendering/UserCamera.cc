@@ -14,17 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/GUIOverlay.hh"
@@ -100,7 +96,7 @@ void UserCamera::Init()
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(IGN_DTOR(60));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -171,7 +167,7 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
+void UserCamera::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
@@ -255,25 +251,25 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Pose3d origPose = this->GetWorldPose();
+    double yaw = _visual->GetWorldPose().Rot().GetAsEuler().z();
 
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
+    double zDiff = origPose.Pos().z() - _visual->GetWorldPose().Pos().z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+      double dist = _visual->GetWorldPose().Pos().Distance(
+          this->GetWorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
     this->RotateYaw(yaw);
     this->RotatePitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    ignition::math::Box bb = _visual->GetBoundingBox();
+    ignition::math::Vector3d pos = bb.Center();
+    pos.z() = bb.Max().z();
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
@@ -314,7 +310,7 @@ void UserCamera::SetViewController(const std::string &type)
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &type,
-                                    const math::Vector3 &_pos)
+                                    const ignition::math::Vector3d &_pos)
 {
   if (this->dataPtr->viewController->GetTypeString() == type)
     return;
@@ -401,7 +397,7 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const math::Pose &_pose, double _time)
+bool UserCamera::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
 {
   return Camera::MoveToPosition(_pose, _time);
 }
@@ -427,33 +423,32 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
-  double maxSize = std::max(std::max(size.x, size.y), size.z);
+  ignition::math::Box box = _visual->GetBoundingBox();
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = size.Max();
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->GetWorldPose().Pos();
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  ignition::math::Vector3d end = box.Center() + _visual->GetWorldPose().Pos();
   end.Correct();
-  math::Vector3 dir = end - start;
+  ignition::math::Vector3d dir = end - start;
   dir.Correct();
   dir.Normalize();
 
   double dist = start.Distance(end) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
-  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+  ignition::math::Vector3d mid = start + dir*(dist*.5);
+  mid.z() = box.Center().z() + box.Size().z() + 2.0;
 
   dir = end - mid;
   dir.Correct();
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y, dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
-  math::Quaternion pitchYawOnly(0, pitchAngle, yawAngle);
-  Ogre::Quaternion pitchYawFinal(pitchYawOnly.w, pitchYawOnly.x,
-    pitchYawOnly.y, pitchYawOnly.z);
+  double yawAngle = atan2(dir.y(), dir.x());
+  double pitchAngle = atan2(-dir.z(), sqrt(dir.x()*dir.x() + dir.y()*dir.y()));
+  ignition::math::Quaterniond pitchYawOnly(0, pitchAngle, yawAngle);
+  Ogre::Quaternion pitchYawFinal(Conversions::Convert(pitchYawOnly));
 
   dir.Normalize();
 
@@ -475,7 +470,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->sceneNode->getOrientation());
 
   /*key = strack->createNodeKeyFrame(time * 0.5);
@@ -484,7 +479,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   */
 
   key = strack->createNodeKeyFrame(time);
-  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
+  key->setTranslate(Conversions::Convert(end));
   key->setRotation(pitchYawFinal);
 
   this->animState =
@@ -505,7 +500,7 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
 void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
-      this->GetWorldPose().pos.Distance(
+      this->GetWorldPose().Pos().Distance(
       this->dataPtr->orbitViewController->GetFocalPoint()));
 }
 
@@ -538,7 +533,7 @@ void UserCamera::EnableViewController(bool _value) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
+VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
   VisualPtr result;
@@ -550,7 +545,8 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
   this->dataPtr->selectionBuffer->Update();
 
   Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(
+        _mousePos.x(), _mousePos.y());
 
   _mod = "";
   if (entity)
@@ -590,18 +586,19 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
+void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
 {
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
+VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
   Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(
+        _mousePos.x(), _mousePos.y());
 
   if (entity && !entity->getUserAny().isEmpty())
   {

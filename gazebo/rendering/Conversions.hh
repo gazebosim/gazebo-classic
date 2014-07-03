@@ -17,11 +17,11 @@
 #ifndef _CONVERSIONS_HH_
 #define _CONVERSIONS_HH_
 
-#include "gazebo/rendering/ogre_gazebo.h"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -49,22 +49,24 @@ namespace gazebo
       /// \brief return Ogre Vector from Gazebo Vector3
       /// \param[in] _v Gazebo vector
       /// \return Ogre vector
-      public: static Ogre::Vector3 Convert(const math::Vector3 &_v);
+      public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &_v);
 
       /// \brief return gazebo Vector from ogre Vector3
       /// \param[in] _v Ogre vector
       /// \return Gazebo vector
-      public: static math::Vector3 Convert(const Ogre::Vector3 &_v);
+      public: static ignition::math::Vector3d Convert(const Ogre::Vector3 &_v);
 
       /// \brief Gazebo quaternion to Ogre quaternion
       /// \param[in] _v Gazebo quaternion
       /// \return Ogre quaternion
-      public: static Ogre::Quaternion Convert(const math::Quaternion &_v);
+      public: static Ogre::Quaternion Convert(
+                  const ignition::math::Quaterniond &_v);
 
       /// \brief Ogre quaternion to Gazebo quaternion
       /// \param[in] _v Ogre quaternion
       /// return Gazebo quaternion
-      public: static math::Quaternion Convert(const Ogre::Quaternion &_v);
+      public: static ignition::math::Quaterniond Convert(
+                  const Ogre::Quaternion &_v);
     };
     /// \}
   }

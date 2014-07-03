@@ -532,10 +532,10 @@ void RectItem::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
   // arbitrary (snap to parent items) when dragged
   QPointF trans = this->mapFromScene(_event->scenePos()) - this->mousePressPos;
   QPointF rotatedTrans;
-  rotatedTrans.setX(cos(GZ_DTOR(this->rotationAngle))*-trans.x()
-    - sin(GZ_DTOR(this->rotationAngle))*-trans.y());
-  rotatedTrans.setY(sin(GZ_DTOR(this->rotationAngle))*-trans.x()
-    + cos(GZ_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setX(cos(IGN_DTOR(this->rotationAngle))*-trans.x()
+    - sin(IGN_DTOR(this->rotationAngle))*-trans.y());
+  rotatedTrans.setY(sin(IGN_DTOR(this->rotationAngle))*-trans.x()
+    + cos(IGN_DTOR(this->rotationAngle))*-trans.y());
 
   this->SetPosition(this->pos() - rotatedTrans);
 }

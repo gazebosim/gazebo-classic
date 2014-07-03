@@ -21,7 +21,8 @@
 #include <map>
 #include <string>
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math.hh>
+
 #include "gazebo/util/system.hh"
 
 #define X_POSITION 0

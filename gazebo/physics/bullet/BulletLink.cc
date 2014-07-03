@@ -372,7 +372,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 
 //////////////////////////////////////////////////
 math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
-                                            const math::Quaternion &_q) const
+                                            const math::Quaterniond &_q) const
 {
   if (!this->rigidLink)
   {

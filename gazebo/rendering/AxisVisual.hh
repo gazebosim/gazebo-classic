@@ -19,8 +19,8 @@
 #define _AXISVISUAL_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -51,15 +51,15 @@ namespace gazebo
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleXAxis(const math::Vector3 &_scale);
+      public: void ScaleXAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Y axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleYAxis(const math::Vector3 &_scale);
+      public: void ScaleYAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Scale the Z axis
       /// \param[in] _scale Scaling factor
-      public: void ScaleZAxis(const math::Vector3 &_scale);
+      public: void ScaleZAxis(const ignition::math::Vector3d &_scale);
 
       /// \brief Set the material used to render and axis
       /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)

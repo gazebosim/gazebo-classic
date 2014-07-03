@@ -14,14 +14,10 @@
  * limitations under the License.
  *
 */
-
-/* Desc: A laser sensor using OpenGL
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
- */
-
 #include <dirent.h>
 #include <sstream>
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -32,7 +28,6 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/MeshManager.hh"
 #include "gazebo/common/Timer.hh"
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -642,12 +637,12 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = ignition::math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = ignition::math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
       submesh->AddTexCoord(u, v);
     }
@@ -688,9 +683,9 @@ void GpuLaser::CreateCanvas()
   this->object->setVisibilityFlags(GZ_VISIBILITY_ALL
       & ~GZ_VISIBILITY_SELECTABLE);
 
-  math::Pose pose;
-  pose.pos = math::Vector3(0.01, 0, 0);
-  pose.rot.SetFromEuler(math::Vector3(0, 0, 0));
+  ignition::math::Pose3d pose;
+  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Rot().SetFromEuler(ignition::math::Vector3d(0, 0, 0));
 
   this->visual->SetPose(pose);
 

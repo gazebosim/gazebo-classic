@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#include "KeyFrame.hh"
+#include "gazebo/common/KeyFrame.hh"
 
 using namespace gazebo;
 using namespace common;
 
-  KeyFrame::KeyFrame(double _time)
+KeyFrame::KeyFrame(double _time)
 : time(_time)
 {
 }
@@ -44,22 +44,22 @@ PoseKeyFrame::~PoseKeyFrame()
 {
 }
 
-void PoseKeyFrame::SetTranslation(const math::Vector3 &_trans)
+void PoseKeyFrame::SetTranslation(const ignition::math::Vector3d &_trans)
 {
   this->translate = _trans;
 }
 
-const math::Vector3 &PoseKeyFrame::GetTranslation() const
+const ignition::math::Vector3d &PoseKeyFrame::GetTranslation() const
 {
   return this->translate;
 }
 
-void PoseKeyFrame::SetRotation(const math::Quaternion &_rot)
+void PoseKeyFrame::SetRotation(const ignition::math::Quaterniond &_rot)
 {
   this->rotate = _rot;
 }
 
-const math::Quaternion &PoseKeyFrame::GetRotation() const
+const ignition::math::Quaterniond &PoseKeyFrame::GetRotation() const
 {
   return this->rotate;
 }

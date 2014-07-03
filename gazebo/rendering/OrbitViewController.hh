@@ -18,10 +18,10 @@
 #define _ORBITVIEWCONTROLLER_HH_
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Initialze the controller with a focal point.
       /// \param[in] _focalPoint Point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint);
 
       /// \brief Update.
       public: virtual void Update();
@@ -66,11 +66,11 @@ namespace gazebo
 
       /// \brief Set the focal point
       /// \param[in] _fp The focal point
-      public: void SetFocalPoint(const math::Vector3 &_fp);
+      public: void SetFocalPoint(const ignition::math::Vector3d &_fp);
 
       /// \brief Get the focal point
       /// \return The focal point
-      public: math::Vector3 GetFocalPoint() const;
+      public: ignition::math::Vector3d GetFocalPoint() const;
 
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);
@@ -80,11 +80,11 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateLocal(const math::Vector3 &_vec);
+      private: void TranslateLocal(const ignition::math::Vector3d &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateGlobal(const math::Vector3 &_vec);
+      private: void TranslateGlobal(const ignition::math::Vector3d &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.
@@ -118,7 +118,7 @@ namespace gazebo
       private: float distance;
 
       /// \brief The focal point.
-      private: math::Vector3 focalPoint;
+      private: ignition::math::Vector3d focalPoint;
 
       /// \brief A reference visual.
       private: VisualPtr refVisual;

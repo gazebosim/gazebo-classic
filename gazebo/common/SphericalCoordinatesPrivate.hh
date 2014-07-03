@@ -41,17 +41,17 @@ namespace gazebo
       public: SphericalCoordinates::SurfaceType surfaceType;
 
       /// \brief Latitude of reference point.
-      public: math::Angle latitudeReference;
+      public: ignition::math::Angle latitudeReference;
 
       /// \brief Longitude of reference point.
-      public: math::Angle longitudeReference;
+      public: ignition::math::Angle longitudeReference;
 
       /// \brief Elevation of reference point relative to sea level in meters.
       public: double elevationReference;
 
       /// \brief Heading offset, expressed as angle from East to
       ///        gazebo x-axis, or equivalently from North to gazebo y-axis.
-      public: math::Angle headingOffset;
+      public: ignition::math::Angle headingOffset;
     };
     /// \}
   }

@@ -105,15 +105,15 @@ namespace gazebo
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
 
-      /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
-      /// \param[in] _q Gazeb's math::Quaternion object
+      /// \brief Convert gazebo::math::Quaterniond to SimTK::Quaternion
+      /// \param[in] _q Gazeb's math::Quaterniond object
       /// \return Simbody's SimTK::Quaternion object
-      public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q);
+      public: static SimTK::Quaternion QuadToQuad(const math::Quaterniond &_q);
 
-      /// \brief Convert SimTK::Quaternion to gazebo::math::Quaternion
+      /// \brief Convert SimTK::Quaternion to gazebo::math::Quaterniond
       /// \param[in] _q Simbody's SimTK::Quaternion object
-      /// \return Gazeb's math::Quaternion object
-      public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q);
+      /// \return Gazeb's math::Quaterniond object
+      public: static math::Quaterniond QuadToQuad(const SimTK::Quaternion &_q);
 
       /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
       /// \param[in] _v Gazeb's math::Vector3 object

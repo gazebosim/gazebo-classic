@@ -21,9 +21,10 @@
 #include <string>
 #include <map>
 
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/common/MouseEvent.hh"
 
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/cegui.h"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -89,8 +90,8 @@ namespace gazebo
       public: void CreateWindow(const std::string &_type,
                                 const std::string &_name,
                                 const std::string &_parent,
-                                const math::Vector2d &_position,
-                                const math::Vector2d &_size,
+                                const ignition::math::Vector2d &_position,
+                                const ignition::math::Vector2d &_size,
                                 const std::string &_text);
 
       /// \brief Handle a mouse event.

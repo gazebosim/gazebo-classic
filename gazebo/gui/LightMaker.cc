@@ -94,7 +94,7 @@ void LightMaker::CreateTheEntity()
   msgs::Set(this->msg.mutable_pose()->mutable_position(),
             this->light->GetPosition());
   msgs::Set(this->msg.mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            math::Quaterniond());
   this->lightPub->Publish(this->msg);
   this->camera.reset();
 }

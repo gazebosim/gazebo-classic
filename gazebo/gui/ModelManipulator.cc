@@ -131,7 +131,7 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
   if (this->dataPtr->mouseEvent.control)
     angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
-  math::Quaternion rot(_axis, angle);
+  math::Quaterniond rot(_axis, angle);
 
   if (_local)
     rot = this->dataPtr->mouseMoveVisStartPose.rot * rot;
@@ -778,11 +778,11 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(yaw - snap) < GZ_DTOR(10))
+      if (fabs(yaw - snap) < IGN_DTOR(10))
         yaw = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x, rpy.y, yaw));
+    _vis->SetWorldRotation(math::Quaterniond(rpy.x, rpy.y, yaw));
   }
   else if (this->dataPtr->mouseEvent.buttons == common::MouseEvent::RIGHT)
   {
@@ -794,11 +794,11 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(pitch - snap) < GZ_DTOR(10))
+      if (fabs(pitch - snap) < IGN_DTOR(10))
         pitch = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(rpy.x, pitch, rpy.z));
+    _vis->SetWorldRotation(math::Quaterniond(rpy.x, pitch, rpy.z));
   }
   else if (this->dataPtr->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->dataPtr->mouseEvent.buttons & common::MouseEvent::RIGHT)
@@ -811,11 +811,11 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(roll - snap) < GZ_DTOR(10))
+      if (fabs(roll - snap) < IGN_DTOR(10))
         roll = snap;
     }
 
-    _vis->SetWorldRotation(math::Quaternion(roll, rpy.y, rpy.z));
+    _vis->SetWorldRotation(math::Quaterniond(roll, rpy.y, rpy.z));
   }
   else
   {

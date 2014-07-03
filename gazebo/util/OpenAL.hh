@@ -21,8 +21,9 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/UtilTypes.hh"
 
@@ -99,12 +100,12 @@ namespace gazebo
       /// \brief Set the position of the sink.
       /// \param[in] _pose New pose of the sink.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the velocity of the sink
       /// \param[in] _vel Velocity of the sink.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3d &_vel);
     };
 
     /// \class OpenALSource OpenALSource.hh util/util.hh
@@ -125,12 +126,12 @@ namespace gazebo
       /// \brief Set the position of the source.
       /// \param[in] _pose New pose of the source.
       /// \return True on success.
-      public: bool SetPose(const math::Pose &_pose);
+      public: bool SetPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the velocity of the source.
       /// \param[in] _vel New velocity of the source.
       /// \return True on success.
-      public: bool SetVelocity(const math::Vector3 &_vel);
+      public: bool SetVelocity(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the pitch of the source.
       /// \param[in] _p Pitch value.

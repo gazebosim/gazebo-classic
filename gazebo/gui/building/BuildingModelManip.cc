@@ -294,7 +294,7 @@ void BuildingModelManip::SetRotation(double _roll, double _pitch, double _yaw)
   double yawRad = BuildingMaker::ConvertAngle(_yaw);
 
   this->visual->GetParent()->SetRotation(
-      math::Quaternion(rollRad, pitchRad, -yawRad));
+      math::Quaterniond(rollRad, pitchRad, -yawRad));
 }
 
 /////////////////////////////////////////////////

@@ -77,12 +77,12 @@ void ODEHeightmapShape::Init()
   oParent->SetStatic(true);
 
   // Rotate so Z is up, not Y (which is the default orientation)
-  math::Quaternion quat;
+  math::Quaterniond quat;
   math::Pose pose = oParent->GetWorldPose();
 
   // TODO: FIXME:  double check this, if Y is up,
   // rotating by roll of 90 deg will put Z-down.
-  quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
+  quat.SetFromEuler(math::Vector3(IGN_DTOR(90), 0, 0));
 
   pose.rot = pose.rot * quat;
   // this->body->SetPose(pose);

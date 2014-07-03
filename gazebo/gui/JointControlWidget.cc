@@ -128,7 +128,7 @@ void JointPIDPosControl::SetToRadians()
   if (!this->radians)
   {
     this->radians = true;
-    this->posSpin->setValue(GZ_DTOR(this->posSpin->value()));
+    this->posSpin->setValue(IGN_DTOR(this->posSpin->value()));
   }
 }
 
@@ -138,7 +138,7 @@ void JointPIDPosControl::OnChanged(double _value)
   if (this->radians)
     emit changed(_value, this->name);
   else
-    emit changed(GZ_DTOR(_value), this->name);
+    emit changed(IGN_DTOR(_value), this->name);
 }
 
 /////////////////////////////////////////////////

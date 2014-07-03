@@ -22,13 +22,16 @@
 #include <gazebo/util/system.hh>
 
 #ifdef HAVE_GDAL
-# include <gdal/gdal_priv.h>
-# include <string>
-# include <vector>
+
+#include <gdal/gdal_priv.h>
+#include <string>
+#include <vector>
+
+#include <ignition/math/Angle.hh>
 
 # include "gazebo/common/DemPrivate.hh"
 # include "gazebo/common/HeightmapData.hh"
-# include "gazebo/math/Angle.hh"
+
 
 namespace gazebo
 {
@@ -70,8 +73,8 @@ namespace gazebo
       /// origin in WGS84.
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
-      public: void GetGeoReferenceOrigin(math::Angle &_latitude,
-                                         math::Angle &_longitude);
+      public: void GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+                                         ignition::math::Angle &_longitude);
 
       /// \brief Get the terrain's height. Due to the Ogre constrains, this
       /// value will be a power of two plus one. The value returned might be
@@ -110,7 +113,7 @@ namespace gazebo
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
+          const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's
@@ -120,8 +123,8 @@ namespace gazebo
       /// \param[out] _latitude Georeferenced latitude.
       /// \param[out] _longitude Georeferenced longitude.
       private: void GetGeoReference(double _x, double _y,
-                                    math::Angle &_latitude,
-                                    math::Angle &_longitude);
+                                    ignition::math::Angle &_latitude,
+                                    ignition::math::Angle &_longitude);
 
       /// \brief Get the terrain file as a data array. Due to the Ogre
       /// constrains, the data might be stored in a bigger vector representing

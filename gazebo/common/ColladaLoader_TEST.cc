@@ -33,8 +33,8 @@ TEST_F(ColladaLoader, LoadBox)
       std::string(PROJECT_SOURCE_PATH) + "/test/data/box.dae");
 
   EXPECT_STREQ("unknown", mesh->GetName().c_str());
-  EXPECT_EQ(math::Vector3(1, 1, 1), mesh->GetMax());
-  EXPECT_EQ(math::Vector3(-1, -1, -1), mesh->GetMin());
+  EXPECT_EQ(ignition::math::Vector3d(1, 1, 1), mesh->GetMax());
+  EXPECT_EQ(ignition::math::Vector3d(-1, -1, -1), mesh->GetMin());
   EXPECT_EQ(36u, mesh->GetVertexCount());
   EXPECT_EQ(36u, mesh->GetNormalCount());
   EXPECT_EQ(36u, mesh->GetIndexCount());

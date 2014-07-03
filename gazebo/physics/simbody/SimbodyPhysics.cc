@@ -1280,15 +1280,15 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 }
 
 /////////////////////////////////////////////////
-SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaterniond &_q)
 {
   return SimTK::Quaternion(_q.w, _q.x, _q.y, _q.z);
 }
 
 /////////////////////////////////////////////////
-math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
+math::Quaterniond SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 {
-  return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
+  return math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
 }
 
 /////////////////////////////////////////////////
@@ -1319,7 +1319,7 @@ math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
   return math::Pose(math::Vector3(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
-    math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
+    math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////

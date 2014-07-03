@@ -990,7 +990,7 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
       this->GetChildItem(_item, "pitch")).toDouble();
   yaw = this->variantManager->value(
       this->GetChildItem(_item, "yaw")).toDouble();
-  math::Quaternion q(roll, pitch, yaw);
+  math::Quaterniond q(roll, pitch, yaw);
 
   orientReflection->SetDouble(
       orientMessage,

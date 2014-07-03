@@ -18,12 +18,6 @@
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/Exception.hh"
@@ -42,7 +36,7 @@ namespace gazebo
 
       request->set_request(_request);
       request->set_data(_data);
-      request->set_id(math::Rand::GetIntUniform(1, 10000));
+      request->set_id(ignition::math::Rand::GetIntUniform(1, 10000));
 
       return request;
     }
@@ -119,31 +113,31 @@ namespace gazebo
       return data;
     }
 
-    void Set(msgs::Vector3d *_pt, const math::Vector3 &_v)
+    void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
     {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
-      _pt->set_z(_v.z);
+      _pt->set_x(_v.x());
+      _pt->set_y(_v.y());
+      _pt->set_z(_v.z());
     }
 
-    void Set(msgs::Vector2d *_pt, const math::Vector2d &_v)
+    void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v)
     {
-      _pt->set_x(_v.x);
-      _pt->set_y(_v.y);
+      _pt->set_x(_v.x());
+      _pt->set_y(_v.y());
     }
 
-    void Set(msgs::Quaternion *_q, const math::Quaternion &_v)
+    void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
     {
-      _q->set_x(_v.x);
-      _q->set_y(_v.y);
-      _q->set_z(_v.z);
-      _q->set_w(_v.w);
+      _q->set_x(_v.x());
+      _q->set_y(_v.y());
+      _q->set_z(_v.z());
+      _q->set_w(_v.w());
     }
 
-    void Set(msgs::Pose *_p, const math::Pose &_v)
+    void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v)
     {
-      Set(_p->mutable_position(), _v.pos);
-      Set(_p->mutable_orientation(), _v.rot);
+      Set(_p->mutable_position(), _v.Pos());
+      Set(_p->mutable_orientation(), _v.Rot());
     }
 
     void Set(msgs::Color *_c, const common::Color &_v)
@@ -183,12 +177,12 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    void Set(msgs::PlaneGeom *_p, const math::Plane &_v)
+    void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
-      Set(_p->mutable_normal(), _v.normal);
-      _p->mutable_size()->set_x(_v.size.x);
-      _p->mutable_size()->set_y(_v.size.y);
-      _p->set_d(_v.d);
+      Set(_p->mutable_normal(), _v.Normal());
+      _p->mutable_size()->set_x(_v.Size().x());
+      _p->mutable_size()->set_y(_v.Size().y());
+      _p->set_d(_v.Offset());
     }
 
     /////////////////////////////////////////////////
@@ -220,30 +214,30 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Vector3d Convert(const math::Vector3 &_v)
+    msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
-      result.set_x(_v.x);
-      result.set_y(_v.y);
-      result.set_z(_v.z);
+      result.set_x(_v.x());
+      result.set_y(_v.y());
+      result.set_z(_v.z());
       return result;
     }
 
-    msgs::Quaternion Convert(const math::Quaternion &_q)
+    msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
     {
       msgs::Quaternion result;
-      result.set_x(_q.x);
-      result.set_y(_q.y);
-      result.set_z(_q.z);
-      result.set_w(_q.w);
+      result.set_x(_q.x());
+      result.set_y(_q.y());
+      result.set_z(_q.z());
+      result.set_w(_q.w());
       return result;
     }
 
-    msgs::Pose Convert(const math::Pose &_p)
+    msgs::Pose Convert(const ignition::math::Pose3d &_p)
     {
       msgs::Pose result;
-      result.mutable_position()->CopyFrom(Convert(_p.pos));
-      result.mutable_orientation()->CopyFrom(Convert(_p.rot));
+      result.mutable_position()->CopyFrom(Convert(_p.Pos()));
+      result.mutable_orientation()->CopyFrom(Convert(_p.Rot()));
       return result;
     }
 
@@ -265,29 +259,29 @@ namespace gazebo
       return result;
     }
 
-    msgs::PlaneGeom Convert(const math::Plane &_p)
+    msgs::PlaneGeom Convert(const ignition::math::Planed &_p)
     {
       msgs::PlaneGeom result;
-      result.mutable_normal()->CopyFrom(Convert(_p.normal));
-      result.mutable_size()->set_x(_p.size.x);
-      result.mutable_size()->set_y(_p.size.y);
-      result.set_d(_p.d);
+      result.mutable_normal()->CopyFrom(Convert(_p.Normal()));
+      result.mutable_size()->set_x(_p.Size().x());
+      result.mutable_size()->set_y(_p.Size().y());
+      result.set_d(_p.Offset());
       return result;
     }
 
-    math::Vector3 Convert(const msgs::Vector3d &_v)
+    ignition::math::Vector3d Convert(const msgs::Vector3d &_v)
     {
-      return math::Vector3(_v.x(), _v.y(), _v.z());
+      return ignition::math::Vector3d(_v.x(), _v.y(), _v.z());
     }
 
-    math::Quaternion Convert(const msgs::Quaternion &_q)
+    ignition::math::Quaterniond Convert(const msgs::Quaternion &_q)
     {
-      return math::Quaternion(_q.w(), _q.x(), _q.y(), _q.z());
+      return ignition::math::Quaterniond(_q.w(), _q.x(), _q.y(), _q.z());
     }
 
-    math::Pose Convert(const msgs::Pose &_p)
+    ignition::math::Pose3d Convert(const msgs::Pose &_p)
     {
-      return math::Pose(Convert(_p.position()),
+      return ignition::math::Pose3d(Convert(_p.position()),
           Convert(_p.orientation()));
     }
 
@@ -301,10 +295,10 @@ namespace gazebo
       return common::Time(_t.sec(), _t.nsec());
     }
 
-    math::Plane Convert(const msgs::PlaneGeom &_p)
+    ignition::math::Planed Convert(const msgs::PlaneGeom &_p)
     {
-      return math::Plane(Convert(_p.normal()),
-          math::Vector2d(_p.size().x(), _p.size().y()),
+      return ignition::math::Planed(Convert(_p.normal()),
+          ignition::math::Vector2d(_p.size().x(), _p.size().y()),
           _p.d());
     }
 
@@ -324,7 +318,8 @@ namespace gazebo
 
         if (camSDF->HasElement("pose"))
         {
-          msgs::Set(guiCam->mutable_pose(), camSDF->Get<math::Pose>("pose"));
+          msgs::Set(guiCam->mutable_pose(),
+              camSDF->Get<ignition::math::Pose3d>("pose"));
         }
 
         if (camSDF->HasElement("view_controller"))
@@ -381,7 +376,8 @@ namespace gazebo
 
       if (_sdf->HasElement("pose"))
       {
-        result.mutable_pose()->CopyFrom(Convert(_sdf->Get<math::Pose>("pose")));
+        result.mutable_pose()->CopyFrom(Convert(
+              _sdf->Get<ignition::math::Pose3d>("pose")));
       }
 
       if (_sdf->HasElement("diffuse"))
@@ -408,7 +404,7 @@ namespace gazebo
       if (_sdf->HasElement("direction"))
       {
         result.mutable_direction()->CopyFrom(
-            Convert(_sdf->Get<math::Vector3>("direction")));
+            Convert(_sdf->Get<ignition::math::Vector3d>("direction")));
       }
 
       if (_sdf->HasElement("spot"))
@@ -434,7 +430,7 @@ namespace gazebo
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<math::Vector3>("scale"));
+        msgs::Set(result.mutable_scale(), _sdf->Get<ignition::math::Vector3d>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 
@@ -476,7 +472,7 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::BOX);
         msgs::Set(result.mutable_box()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
       }
       else if (geomElem->GetName() == "cylinder")
       {
@@ -496,9 +492,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::PLANE);
         msgs::Set(result.mutable_plane()->mutable_normal(),
-            geomElem->Get<math::Vector3>("normal"));
+            geomElem->Get<ignition::math::Vector3d>("normal"));
         msgs::Set(result.mutable_plane()->mutable_size(),
-            geomElem->Get<math::Vector2d>("size"));
+            geomElem->Get<ignition::math::Vector2d>("size"));
       }
       else if (geomElem->GetName() == "image")
       {
@@ -514,9 +510,9 @@ namespace gazebo
       {
         result.set_type(msgs::Geometry::HEIGHTMAP);
         msgs::Set(result.mutable_heightmap()->mutable_size(),
-            geomElem->Get<math::Vector3>("size"));
+            geomElem->Get<ignition::math::Vector3d>("size"));
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
-            geomElem->Get<math::Vector3>("pos"));
+            geomElem->Get<ignition::math::Vector3d>("pos"));
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         while (textureElem)
@@ -648,7 +644,8 @@ namespace gazebo
       // Set the origin of the visual
       if (_sdf->HasElement("pose"))
       {
-        msgs::Set(result.mutable_pose(), _sdf->Get<math::Pose>("pose"));
+        msgs::Set(result.mutable_pose(),
+            _sdf->Get<ignition::math::Pose3d>("pose"));
       }
 
       // Set plugins of the visual

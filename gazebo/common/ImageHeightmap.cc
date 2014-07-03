@@ -41,8 +41,8 @@ int ImageHeightmap::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const math::Vector3 &_size,
-    const math::Vector3 &_scale, bool _flipY,
+    unsigned int _vertSize, const ignition::math::Vector3d &_size,
+    const ignition::math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights)
 {
   // Resize the vector to match the size of the vertices.
@@ -91,12 +91,12 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
       double px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy)) * _scale.z;
+      float h = (h1 - ((h1 - h2) * dy)) * _scale.z();
 
       // invert pixel definition so 1=ground, 0=full height,
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
-      if (_size.z < 0)
+      if (_size.z() < 0)
         h = 1.0 - h;
 
       // Store the height for future use

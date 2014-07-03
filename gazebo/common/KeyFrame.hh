@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _KEYFRAME_HH_
-#define _KEYFRAME_HH_
+#ifndef _GAZEBO_KEYFRAME_HH_
+#define _GAZEBO_KEYFRAME_HH_
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math.hh>
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -59,25 +59,25 @@ namespace gazebo
 
       /// \brief Set the translation for the keyframe
       /// \param[in] _trans Translation amount
-      public: void SetTranslation(const math::Vector3 &_trans);
+      public: void SetTranslation(const ignition::math::Vector3d &_trans);
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      public: const math::Vector3 &GetTranslation() const;
+      public: const ignition::math::Vector3d &GetTranslation() const;
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
-      public: void SetRotation(const math::Quaternion &_rot);
+      public: void SetRotation(const ignition::math::Quaterniond &_rot);
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      public: const math::Quaternion &GetRotation() const;
+      public: const ignition::math::Quaterniond &GetRotation() const;
 
       /// \brief the translation vector
-      protected: math::Vector3 translate;
+      protected: ignition::math::Vector3d translate;
 
       /// \brief the rotation quaternion
-      protected: math::Quaternion rotate;
+      protected: ignition::math::Quaterniond rotate;
     };
 
     /// \brief A keyframe for a NumericAnimation

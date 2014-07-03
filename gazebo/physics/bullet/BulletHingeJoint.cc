@@ -189,7 +189,7 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
   if (this->bulletHinge == NULL)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    math::Quaterniond axisFrame = this->GetAxisFrame(0);
     this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else

@@ -188,8 +188,8 @@ bool WallItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
       angle = -range*increment;
       double lineLength = lineToPoint.length();
 
-      newScenePos.setX(startScenePoint.x() + cos(GZ_DTOR(angle))*lineLength);
-      newScenePos.setY(startScenePoint.y() + sin(GZ_DTOR(angle))*lineLength);
+      newScenePos.setX(startScenePoint.x() + cos(IGN_DTOR(angle))*lineLength);
+      newScenePos.setY(startScenePoint.y() + sin(IGN_DTOR(angle))*lineLength);
     }
 
     this->SetVertexPosition(grabberIndex, newScenePos);

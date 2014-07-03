@@ -206,7 +206,7 @@ math::Vector3 ImuSensor::GetLinearAcceleration() const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion ImuSensor::GetOrientation() const
+math::Quaterniond ImuSensor::GetOrientation() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
   return msgs::Convert(this->imuMsg.orientation());

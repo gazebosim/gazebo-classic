@@ -1061,7 +1061,7 @@ void ODEPhysics::DebugPrint() const
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
     math::Vector3 dpos(pos[0], pos[1], pos[2]);
-    math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
+    math::Quaterniond drot(rot[0], rot[1], rot[2], rot[3]);
 
     std::cout << "Body[" << link->GetScopedName() << "]\n";
     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";

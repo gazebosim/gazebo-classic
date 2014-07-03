@@ -28,7 +28,7 @@ class QuaternionTest : public gazebo::testing::AutoLogFixture { };
 TEST_F(QuaternionTest, Quaternion)
 {
   {
-    math::Quaternion q;
+    math::Quaterniond q;
     EXPECT_TRUE(math::equal(q.w, 1.0));
     EXPECT_TRUE(math::equal(q.x, 0.0));
     EXPECT_TRUE(math::equal(q.y, 0.0));
@@ -36,7 +36,7 @@ TEST_F(QuaternionTest, Quaternion)
   }
 
   {
-    math::Quaternion q(1, 2, 3, 4);
+    math::Quaterniond q(1, 2, 3, 4);
     EXPECT_TRUE(math::equal(q.w, 1.0));
     EXPECT_TRUE(math::equal(q.x, 2.0));
     EXPECT_TRUE(math::equal(q.y, 3.0));
@@ -44,17 +44,17 @@ TEST_F(QuaternionTest, Quaternion)
   }
 
   {
-    math::Quaternion q(0, 1, 2);
-    EXPECT_TRUE(q == math::Quaternion(math::Vector3(0, 1, 2)));
+    math::Quaterniond q(0, 1, 2);
+    EXPECT_TRUE(q == math::Quaterniond(math::Vector3(0, 1, 2)));
   }
 
-  math::Quaternion q1(math::Vector3(0, 0, 1), M_PI);
+  math::Quaterniond q1(math::Vector3(0, 0, 1), M_PI);
   EXPECT_TRUE(math::equal(q1.x, 0.0));
   EXPECT_TRUE(math::equal(q1.y, 0.0));
   EXPECT_TRUE(math::equal(q1.z, 1.0));
   EXPECT_TRUE(math::equal(q1.w, 0.0));
 
-  math::Quaternion q(q1);
+  math::Quaterniond q(q1);
   EXPECT_TRUE(q == q1);
 
   q.SetToIdentity();
@@ -63,34 +63,34 @@ TEST_F(QuaternionTest, Quaternion)
   EXPECT_TRUE(math::equal(q.y, 0.0));
   EXPECT_TRUE(math::equal(q.z, 0.0));
 
-  q = math::Quaternion(M_PI*0.1, M_PI*0.5, M_PI);
-  EXPECT_TRUE(q == math::Quaternion(0.110616, -0.698401, 0.110616, 0.698401));
+  q = math::Quaterniond(M_PI*0.1, M_PI*0.5, M_PI);
+  EXPECT_TRUE(q == math::Quaterniond(0.110616, -0.698401, 0.110616, 0.698401));
 
   EXPECT_TRUE(q.GetLog() ==
-      math::Quaternion(0, -1.02593, 0.162491, 1.02593));
+      math::Quaterniond(0, -1.02593, 0.162491, 1.02593));
 
   EXPECT_TRUE(q.GetExp() ==
-      math::Quaternion(0.545456, -0.588972, 0.093284, 0.588972));
+      math::Quaterniond(0.545456, -0.588972, 0.093284, 0.588972));
 
   q1 = q;
   q1.w = 2.0;
   EXPECT_TRUE(q1.GetLog() ==
-      math::Quaternion(0, -0.698401, 0.110616, 0.698401));
+      math::Quaterniond(0, -0.698401, 0.110616, 0.698401));
 
   q1.x = 0.000000001;
   q1.y = 0.0;
   q1.z = 0.0;
   q1.w = 0.0;
-  EXPECT_TRUE(q1.GetExp() == math::Quaternion(1, 0, 0, 0));
+  EXPECT_TRUE(q1.GetExp() == math::Quaterniond(1, 0, 0, 0));
 
   q.Invert();
-  EXPECT_TRUE(q == math::Quaternion(0.110616, 0.698401, -0.110616, -0.698401));
+  EXPECT_TRUE(q == math::Quaterniond(0.110616, 0.698401, -0.110616, -0.698401));
 
   q.SetFromAxis(0, 1, 0, M_PI);
-  EXPECT_TRUE(q == math::Quaternion(6.12303e-17, 0, 1, 0));
+  EXPECT_TRUE(q == math::Quaterniond(6.12303e-17, 0, 1, 0));
 
   q.SetFromAxis(math::Vector3(1, 0, 0), M_PI);
-  EXPECT_TRUE(q == math::Quaternion(0, 1, 0, 0));
+  EXPECT_TRUE(q == math::Quaterniond(0, 1, 0, 0));
 
   q.Set(1, 2, 3, 4);
   EXPECT_TRUE(math::equal(q.w, 1.0));
@@ -99,7 +99,7 @@ TEST_F(QuaternionTest, Quaternion)
   EXPECT_TRUE(math::equal(q.z, 4.0));
 
   q.Normalize();
-  EXPECT_TRUE(q == math::Quaternion(0.182574, 0.365148, 0.547723, 0.730297));
+  EXPECT_TRUE(q == math::Quaterniond(0.182574, 0.365148, 0.547723, 0.730297));
 
 
   EXPECT_TRUE(math::equal(q.GetRoll(), 1.4289, 1e-3));
@@ -113,25 +113,25 @@ TEST_F(QuaternionTest, Quaternion)
   EXPECT_TRUE(math::equal(angle, 2.77438, 1e-3));
 
   q.Scale(0.1);
-  EXPECT_TRUE(q == math::Quaternion(0.990394, 0.051354, 0.0770309, 0.102708));
+  EXPECT_TRUE(q == math::Quaterniond(0.990394, 0.051354, 0.0770309, 0.102708));
 
-  q = q + math::Quaternion(0, 1, 2);
-  EXPECT_TRUE(q == math::Quaternion(1.46455, -0.352069, 0.336066, 0.841168));
+  q = q + math::Quaterniond(0, 1, 2);
+  EXPECT_TRUE(q == math::Quaterniond(1.46455, -0.352069, 0.336066, 0.841168));
 
   q += q;
-  EXPECT_TRUE(q == math::Quaternion(2.92911, -0.704137, 0.672131, 1.68234));
+  EXPECT_TRUE(q == math::Quaterniond(2.92911, -0.704137, 0.672131, 1.68234));
 
-  q -= math::Quaternion(.4, .2, .1);
-  EXPECT_TRUE(q == math::Quaternion(1.95416, -0.896677, 0.56453, 1.65341));
+  q -= math::Quaterniond(.4, .2, .1);
+  EXPECT_TRUE(q == math::Quaterniond(1.95416, -0.896677, 0.56453, 1.65341));
 
-  q = q - math::Quaternion(0, 1, 2);
-  EXPECT_TRUE(q == math::Quaternion(1.48, -0.493254, 0.305496, 0.914947));
+  q = q - math::Quaterniond(0, 1, 2);
+  EXPECT_TRUE(q == math::Quaterniond(1.48, -0.493254, 0.305496, 0.914947));
 
-  q *= math::Quaternion(.4, .1, .01);
-  EXPECT_TRUE(q == math::Quaternion(1.53584, -0.236801, 0.551841, 0.802979));
+  q *= math::Quaterniond(.4, .1, .01);
+  EXPECT_TRUE(q == math::Quaterniond(1.53584, -0.236801, 0.551841, 0.802979));
 
   q = q * 5.0;
-  EXPECT_TRUE(q == math::Quaternion(7.67918, -1.184, 2.7592, 4.0149));
+  EXPECT_TRUE(q == math::Quaterniond(7.67918, -1.184, 2.7592, 4.0149));
 
   std::cerr << "[" << q.w << ", " << q.x << ", " << q.y << ", " << q.z << "]\n";
   std::cerr << q.RotateVectorReverse(math::Vector3(1, 2, 3)) << "\n";
@@ -139,15 +139,15 @@ TEST_F(QuaternionTest, Quaternion)
   EXPECT_TRUE(q.RotateVectorReverse(math::Vector3(1, 2, 3)) ==
       math::Vector3(-0.104115, 0.4975, 3.70697));
 
-  EXPECT_TRUE(math::equal(q.Dot(math::Quaternion(.4, .2, .1)), 7.67183, 1e-3));
+  EXPECT_TRUE(math::equal(q.Dot(math::Quaterniond(.4, .2, .1)), 7.67183, 1e-3));
 
-  EXPECT_TRUE(math::Quaternion::Squad(1.1, math::Quaternion(.1, 0, .2),
-        math::Quaternion(0, .3, .4), math::Quaternion(.5, .2, 1),
-        math::Quaternion(0, 0, 2), true) ==
-      math::Quaternion(0.346807, -0.0511734, -0.0494723, 0.935232));
+  EXPECT_TRUE(math::Quaterniond::Squad(1.1, math::Quaterniond(.1, 0, .2),
+        math::Quaterniond(0, .3, .4), math::Quaterniond(.5, .2, 1),
+        math::Quaterniond(0, 0, 2), true) ==
+      math::Quaterniond(0.346807, -0.0511734, -0.0494723, 0.935232));
 
-  EXPECT_TRUE(math::Quaternion::EulerToQuaternion(math::Vector3(.1, .2, .3)) ==
-      math::Quaternion(0.983347, 0.0342708, 0.106021, 0.143572));
+  EXPECT_TRUE(math::Quaterniond::EulerToQuaternion(math::Vector3(.1, .2, .3)) ==
+      math::Quaterniond(0.983347, 0.0342708, 0.106021, 0.143572));
 
   q.Round(2);
   EXPECT_TRUE(math::equal(-1.18, q.x));
@@ -157,13 +157,13 @@ TEST_F(QuaternionTest, Quaternion)
 
   q.x = q.y = q.z = q.w = 0.0;
   q.Normalize();
-  EXPECT_TRUE(q == math::Quaternion());
+  EXPECT_TRUE(q == math::Quaterniond());
 
   q.SetFromAxis(0, 0, 0, 0);
-  EXPECT_TRUE(q == math::Quaternion());
+  EXPECT_TRUE(q == math::Quaterniond());
 
-  EXPECT_TRUE(math::Quaternion::EulerToQuaternion(0.1, 0.2, 0.3) ==
-      math::Quaternion(0.983347, 0.0342708, 0.106021, 0.143572));
+  EXPECT_TRUE(math::Quaterniond::EulerToQuaternion(0.1, 0.2, 0.3) ==
+      math::Quaterniond(0.983347, 0.0342708, 0.106021, 0.143572));
 
   q.x = q.y = q.z = q.w = 0.0;
   q.GetAsAxis(axis, angle);
@@ -171,7 +171,7 @@ TEST_F(QuaternionTest, Quaternion)
   EXPECT_TRUE(math::equal(angle, 0.0, 1e-3));
   {
     // simple 180 rotation about yaw, should result in x and y flipping signs
-    q = math::Quaternion(0, 0, M_PI);
+    q = math::Quaterniond(0, 0, M_PI);
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
@@ -186,7 +186,7 @@ TEST_F(QuaternionTest, Quaternion)
   {
     // simple  90 rotation about yaw, should map x to y, y to -x
     // simple -90 rotation about yaw, should map x to -y, y to x
-    q = math::Quaternion(0, 0, 0.5*M_PI);
+    q = math::Quaterniond(0, 0, 0.5*M_PI);
     math::Vector3 v = math::Vector3(1, 2, 3);
     math::Vector3 r1 = q.RotateVector(v);
     math::Vector3 r2 = q.RotateVectorReverse(v);
@@ -244,7 +244,7 @@ TEST_F(QuaternionTest, Quaternion)
     EXPECT_TRUE(r1 == math::Vector3(0.61723, 0.70754, -0.34411));
     EXPECT_TRUE(r2 == math::Vector3(0.61723, -0.58977, 0.52077));
 
-    EXPECT_TRUE(-q == math::Quaternion(-0.891007, -0.121334,
+    EXPECT_TRUE(-q == math::Quaterniond(-0.891007, -0.121334,
                                        -0.242668, -0.364002));
 
     EXPECT_TRUE(q.GetAsMatrix3() == math::Matrix3(

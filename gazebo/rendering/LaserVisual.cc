@@ -100,15 +100,16 @@ void LaserVisual::Update()
   double angle = dPtr->laserMsg->scan().angle_min();
   double verticalAngle = dPtr->laserMsg->scan().vertical_angle_min();
   double r;
-  math::Vector3 pt;
-  math::Pose offset = msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
-                      this->GetWorldPose();
+  ignition::math::Vector3d pt;
+  ignition::math::Pose3d offset =
+    msgs::Convert(dPtr->laserMsg->scan().world_pose()) -
+    this->GetWorldPose();
 
   unsigned int vertCount = dPtr->laserMsg->scan().has_vertical_count() ?
       dPtr->laserMsg->scan().vertical_count() : 1u;
 
-  math::Quaternion ray;
-  math::Vector3 axis;
+  ignition::math::Quaterniond ray;
+  ignition::math::Vector3d axis;
   for (unsigned int j = 0; j < vertCount; ++j)
   {
     if (j+1 > dPtr->rayFans.size())
@@ -116,19 +117,19 @@ void LaserVisual::Update()
       dPtr->rayFans.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_FAN));
       dPtr->rayFans[j]->setMaterial("Gazebo/BlueLaser");
-      dPtr->rayFans[j]->AddPoint(math::Vector3(0, 0, 0));
+      dPtr->rayFans[j]->AddPoint(ignition::math::Vector3d(0, 0, 0));
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
-    dPtr->rayFans[j]->SetPoint(0, offset.pos);
+    dPtr->rayFans[j]->SetPoint(0, offset.Pos());
 
     angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
     for (unsigned int i = 0; i < count; ++i)
     {
       r = dPtr->laserMsg->scan().ranges(j*count + i);
-      ray.SetFromEuler(math::Vector3(0.0, -verticalAngle, angle));
-      axis = offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
-      pt = (axis * r) + offset.pos;
+      ray.SetFromEuler(ignition::math::Vector3d(0.0, -verticalAngle, angle));
+      axis = offset.Rot() * ray * ignition::math::Vector3d(1.0, 0.0, 0.0);
+      pt = (axis * r) + offset.Pos();
 
       if (i+1 >= dPtr->rayFans[j]->GetPointCount())
         dPtr->rayFans[j]->AddPoint(pt);

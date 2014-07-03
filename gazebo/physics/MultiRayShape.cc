@@ -40,7 +40,7 @@ void MultiRayShape::Init()
 {
   math::Vector3 start, end, axis;
   double yawAngle, pitchAngle;
-  math::Quaternion ray;
+  math::Quaterniond ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;

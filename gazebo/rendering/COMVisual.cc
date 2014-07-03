@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
+
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/MeshManager.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -47,7 +45,7 @@ COMVisual::~COMVisual()
 void COMVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->Get<math::Pose>("origin");
+  ignition::math::Pose3d pose = _elem->Get<ignition::math::Pose3d>("origin");
   this->Load(pose);
 }
 
@@ -56,10 +54,10 @@ void COMVisual::Load(ConstLinkPtr &_msg)
 {
   Visual::Load();
 
-  math::Vector3 xyz(_msg->inertial().pose().position().x(),
+  ignition::math::Vector3d xyz(_msg->inertial().pose().position().x(),
                     _msg->inertial().pose().position().y(),
                     _msg->inertial().pose().position().z());
-  math::Quaternion q(_msg->inertial().pose().orientation().w(),
+  ignition::math::Quaterniond q(_msg->inertial().pose().orientation().w(),
                      _msg->inertial().pose().orientation().x(),
                      _msg->inertial().pose().orientation().y(),
                      _msg->inertial().pose().orientation().z());
@@ -73,50 +71,50 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   double Ixx = _msg->inertial().ixx();
   double Iyy = _msg->inertial().iyy();
   double Izz = _msg->inertial().izz();
-  math::Vector3 boxScale;
+  ignition::math::Vector3d boxScale;
   if (mass < 0 || Ixx < 0 || Iyy < 0 || Izz < 0 ||
       Ixx + Iyy < Izz || Iyy + Izz < Ixx || Izz + Ixx < Iyy)
   {
     // Unrealistic inertia, load with default scale
     gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
           << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(math::Pose(xyz, q));
+    this->Load(ignition::math::Pose3d(xyz, q));
   }
   else
   {
     // Compute dimensions of box with uniform density and equivalent inertia.
-    boxScale.x = sqrt(6*(Izz + Iyy - Ixx) / mass);
-    boxScale.y = sqrt(6*(Izz + Ixx - Iyy) / mass);
-    boxScale.z = sqrt(6*(Ixx + Iyy - Izz) / mass);
-    this->Load(math::Pose(xyz, q), boxScale);
+    boxScale.Set(sqrt(6*(Izz + Iyy - Ixx) / mass),
+                 sqrt(6*(Izz + Ixx - Iyy) / mass),
+                 sqrt(6*(Ixx + Iyy - Izz) / mass));
+    this->Load(ignition::math::Pose3d(xyz, q), boxScale);
   }
 }
 
 /////////////////////////////////////////////////
-void COMVisual::Load(const math::Pose &_pose,
-                     const math::Vector3 &_scale)
+void COMVisual::Load(const ignition::math::Pose3d &_pose,
+                     const ignition::math::Vector3d &_scale)
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
-  math::Vector3 p1(0, 0, -2*_scale.z);
-  math::Vector3 p2(0, 0,  2*_scale.z);
-  math::Vector3 p3(0, -2*_scale.y, 0);
-  math::Vector3 p4(0,  2*_scale.y, 0);
-  math::Vector3 p5(-2*_scale.x, 0, 0);
-  math::Vector3 p6(2*_scale.x,  0, 0);
-  p1 += _pose.pos;
-  p2 += _pose.pos;
-  p3 += _pose.pos;
-  p4 += _pose.pos;
-  p5 += _pose.pos;
-  p6 += _pose.pos;
-  p1 = _pose.rot.RotateVector(p1);
-  p2 = _pose.rot.RotateVector(p2);
-  p3 = _pose.rot.RotateVector(p3);
-  p4 = _pose.rot.RotateVector(p4);
-  p5 = _pose.rot.RotateVector(p5);
-  p6 = _pose.rot.RotateVector(p6);
+  ignition::math::Vector3d p1(0, 0, -2*_scale.z());
+  ignition::math::Vector3d p2(0, 0,  2*_scale.z());
+  ignition::math::Vector3d p3(0, -2*_scale.y(), 0);
+  ignition::math::Vector3d p4(0,  2*_scale.y(), 0);
+  ignition::math::Vector3d p5(-2*_scale.x(), 0, 0);
+  ignition::math::Vector3d p6(2*_scale.x(),  0, 0);
+  p1 += _pose.Pos();
+  p2 += _pose.Pos();
+  p3 += _pose.Pos();
+  p4 += _pose.Pos();
+  p5 += _pose.Pos();
+  p6 += _pose.Pos();
+  p1 = _pose.Rot().RotateVector(p1);
+  p2 = _pose.Rot().RotateVector(p2);
+  p3 = _pose.Rot().RotateVector(p3);
+  p4 = _pose.Rot().RotateVector(p4);
+  p5 = _pose.Rot().RotateVector(p5);
+  p6 = _pose.Rot().RotateVector(p6);
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -139,10 +137,9 @@ void COMVisual::Load(const math::Pose &_pose,
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX");
 
   dPtr->boxNode->attachObject(boxObj);
-  dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);
-  dPtr->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-  dPtr->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
-                                                 _pose.rot.y, _pose.rot.z));
+  dPtr->boxNode->setScale(Conversions::Convert(_scale));
+  dPtr->boxNode->setPosition(Conversions::Convert(_pose.Pos()));
+  dPtr->boxNode->setOrientation(Conversions::Convert(_pose.Rot()));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

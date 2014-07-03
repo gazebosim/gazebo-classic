@@ -21,17 +21,19 @@
 #include <vector>
 #include "gazebo/util/system.hh"
 
-namespace gazebo
+namespace ignition
 {
   namespace math
   {
     class Spline;
     class RotationSpline;
   }
+}
 
+namespace gazebo
+{
   /// \ingroup gazebo_common
   /// \brief Common namespace
-
   namespace common
   {
     class KeyFrame;
@@ -153,10 +155,10 @@ namespace gazebo
       protected: void BuildInterpolationSplines() const;
 
       /// \brief smooth interpolation for position
-      private: mutable math::Spline *positionSpline;
+      private: mutable ignition::math::Spline *positionSpline;
 
       /// \brief smooth interpolation for rotation
-      private: mutable math::RotationSpline *rotationSpline;
+      private: mutable ignition::math::RotationSpline *rotationSpline;
     };
     /// \}
 

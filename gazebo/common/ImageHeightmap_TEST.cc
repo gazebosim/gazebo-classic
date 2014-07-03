@@ -74,8 +74,8 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
   // Use FillHeightMap() to retrieve a vector<float> after some transformations
   int subsampling;
   unsigned vertSize;
-  math::Vector3 size;
-  math::Vector3 scale;
+  ignition::math::Vector3d size;
+  ignition::math::Vector3d scale;
   bool flipY;
   std::vector<float> elevations;
 
@@ -86,7 +86,7 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
   size.z = 10;
   scale.x = size.x / vertSize;
   scale.y = size.y / vertSize;
-  if (math::equal(img.GetMaxElevation(), 0.0f))
+  if (ignition::math::equal(img.GetMaxElevation(), 0.0f))
     scale.z = fabs(size.z);
   else
     scale.z = fabs(size.z) / img.GetMaxElevation();

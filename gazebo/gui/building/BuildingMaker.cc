@@ -658,7 +658,7 @@ void BuildingMaker::GenerateSDF()
                 + math::Vector3(subdivisions[i].width()/2, 0,
                     subdivisions[i].height()/2);
             newSubPos.z += wallSize.z/2;
-            math::Pose newPose(newSubPos, math::Quaternion(0, 0, 0));
+            math::Pose newPose(newSubPos, math::Quaterniond(0, 0, 0));
             visualElem->GetElement("pose")->Set(newPose);
             collisionElem->GetElement("pose")->Set(newPose);
             math::Vector3 blockSize(subdivisions[i].width(),
@@ -1022,7 +1022,7 @@ math::Pose BuildingMaker::ConvertPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
   return math::Pose(conversionScale*_x, conversionScale*_y, conversionScale*_z,
-      GZ_DTOR(_roll), GZ_DTOR(_pitch), GZ_DTOR(_yaw));
+      IGN_DTOR(_roll), IGN_DTOR(_pitch), IGN_DTOR(_yaw));
 }
 
 /////////////////////////////////////////////////
@@ -1038,7 +1038,7 @@ math::Pose BuildingMaker::ConvertPose(const QVector3D &_pos,
 {
   QVector3D scaledPos = conversionScale*_pos;
   return math::Pose(scaledPos.x(), scaledPos.y(), scaledPos.z(),
-      GZ_DTOR(_rot.x()), GZ_DTOR(_rot.y()), GZ_DTOR(_rot.z()));
+      IGN_DTOR(_rot.x()), IGN_DTOR(_rot.y()), IGN_DTOR(_rot.z()));
 }
 
 /////////////////////////////////////////////////
@@ -1050,7 +1050,7 @@ double BuildingMaker::Convert(double _value)
 /////////////////////////////////////////////////
 double BuildingMaker::ConvertAngle(double _angle)
 {
-  return GZ_DTOR(_angle);
+  return IGN_DTOR(_angle);
 }
 
 /////////////////////////////////////////////////

@@ -18,7 +18,8 @@
 #ifndef _WIREBOX_HH_
 #define _WIREBOX_HH_
 
-#include "gazebo/math/Box.hh"
+#include <ignition/math/Box.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -38,14 +39,15 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.
       /// \param[in] _parent Parent visual of the box.
-      public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
+      public: explicit WireBox(VisualPtr _parent,
+                  const ignition::math::Box &_box);
 
       /// \brief Destructor.
       public: ~WireBox();
 
       /// \brief Builds the wireframe line list.
       /// \param[in] _box Box to build a wireframe from.
-      public: void Init(const math::Box &_box);
+      public: void Init(const ignition::math::Box &_box);
 
       /// \brief Set the visibility of the box.
       /// \param[in] _visible True to make the box visible, False to hide.
@@ -57,7 +59,7 @@ namespace gazebo
 
       /// \brief Get the wireframe box.
       /// \return The wireframe box.
-      public: math::Box GetBox() const;
+      public: ignition::math::Box GetBox() const;
 
       /// \internal
       /// \brief Pointer to private data.

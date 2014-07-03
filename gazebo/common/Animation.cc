@@ -15,9 +15,8 @@
  *
 */
 #include <algorithm>
+#include <ignition/math.hh>
 
-#include "gazebo/math/Spline.hh"
-#include "gazebo/math/RotationSpline.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
@@ -66,7 +65,7 @@ void Animation::SetLength(double _len)
 /////////////////////////////////////////////////
 void Animation::SetTime(double _time)
 {
-  if (!math::equal(_time, this->timePos))
+  if (!ignition::math::equal(_time, this->timePos))
   {
     this->timePos = _time;
     if (this->loop)
@@ -163,7 +162,7 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
   *_kf1 = *iter;
   t1 = (*_kf1)->GetTime();
 
-  if (math::equal(t1, t2))
+  if (ignition::math::equal(t1, t2))
     return 0.0;
   else
     return (_time - t1) / (t2 - t1);
@@ -208,10 +207,10 @@ PoseKeyFrame *PoseAnimation::CreateKeyFrame(double _time)
 void PoseAnimation::BuildInterpolationSplines() const
 {
   if (!this->positionSpline)
-    this->positionSpline = new math::Spline();
+    this->positionSpline = new ignition::math::Spline();
 
   if (!this->rotationSpline)
-    this->rotationSpline = new math::RotationSpline();
+    this->rotationSpline = new ignition::math::RotationSpline();
 
   this->positionSpline->SetAutoCalculate(false);
   this->rotationSpline->SetAutoCalculate(false);
@@ -253,7 +252,7 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
   k1 = reinterpret_cast<PoseKeyFrame*>(kBase1);
 
-  if (math::equal(t, 0.0))
+  if (ignition::math::equal(t, 0.0))
   {
     _kf.SetTranslation(k1->GetTranslation());
     _kf.SetRotation(k1->GetRotation());
@@ -312,7 +311,7 @@ void NumericAnimation::GetInterpolatedKeyFrame(NumericKeyFrame &_kf) const
   k1 = reinterpret_cast<NumericKeyFrame*>(kBase1);
   k2 = reinterpret_cast<NumericKeyFrame*>(kBase2);
 
-  if (math::equal(t, 0.0))
+  if (ignition::math::equal(t, 0.0))
   {
     // Just use k1
     _kf.SetValue(k1->GetValue());

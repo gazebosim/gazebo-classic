@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
@@ -41,8 +42,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-// Note: The value of GZ_UINT32_MAX is reserved as a flag.
-uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
+// Note: The value of IGN_UINT32_MAX is reserved as a flag.
+uint32_t VisualPrivate::visualIdCount = IGN_UINT32_MAX - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
@@ -115,7 +116,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->dataPtr->id = this->dataPtr->visualIdCount--;
   this->dataPtr->boundingBox = NULL;
   this->dataPtr->useRTShader = _useRTShader;
-  this->dataPtr->scale = math::Vector3::One;
+  this->dataPtr->scale = ignition::math::Vector3d::One;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("visual.sdf", this->dataPtr->sdf);
@@ -325,10 +326,10 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      math::Plane plane = msgs::Convert(_msg->geometry().plane());
+      ignition::math::Planed plane = msgs::Convert(_msg->geometry().plane());
       sdf::ElementPtr elem = geomElem->AddElement("plane");
-      elem->GetElement("normal")->Set(plane.normal);
-      elem->GetElement("size")->Set(plane.size);
+      elem->GetElement("normal")->Set(plane.Normal());
+      elem->GetElement("size")->Set(plane.Size());
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
@@ -352,7 +353,7 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_pose())
   {
     sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("pose");
-    math::Pose p(msgs::Convert(_msg->pose().position()),
+    ignition::math::Pose3d p(msgs::Convert(_msg->pose().position()),
                   msgs::Convert(_msg->pose().orientation()));
 
     elem->Set(p);
@@ -444,7 +445,7 @@ void Visual::Load(sdf::ElementPtr _sdf)
 void Visual::Load()
 {
   std::ostringstream stream;
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = NULL;
 
@@ -452,7 +453,7 @@ void Visual::Load()
     this->dataPtr->parent->AttachVisual(shared_from_this());
 
   // Read the desired position and rotation of the mesh
-  pose = this->dataPtr->sdf->Get<math::Pose>("pose");
+  pose = this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
 
   std::string meshName = this->GetMeshName();
   std::string subMeshName = this->GetSubMeshName();
@@ -502,7 +503,7 @@ void Visual::Load()
     if (geomElem->HasElement("box"))
     {
       this->dataPtr->scale =
-          geomElem->GetElement("box")->Get<math::Vector3>("size");
+          geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
@@ -517,19 +518,19 @@ void Visual::Load()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      this->dataPtr->scale.Set(size.x, size.y, 1);
+      ignition::math::Vector2d size =
+        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      this->dataPtr->scale.Set(size.x(), size.y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
       this->dataPtr->scale =
-          geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+          geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
     }
   }
 
-  this->dataPtr->sceneNode->setScale(this->dataPtr->scale.x,
-      this->dataPtr->scale.y, this->dataPtr->scale.z);
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(this->dataPtr->scale));
 
   // Set the material of the mesh
   if (this->dataPtr->sdf->HasElement("material"))
@@ -783,12 +784,12 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetScale(const math::Vector3 &_scale)
+void Visual::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->dataPtr->scale == _scale)
     return;
 
-  math::Vector3 tmpScale = this->dataPtr->scale;
+  ignition::math::Vector3d tmpScale = this->dataPtr->scale;
   this->dataPtr->scale = _scale;
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
@@ -797,13 +798,13 @@ void Visual::SetScale(const math::Vector3 &_scale)
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
   {
-    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x()/2.0);
   }
   else if (geomElem->HasElement("cylinder"))
   {
     geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x/2.0);
-    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z);
+        ->Set(_scale.x()/2.0);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z());
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
@@ -813,17 +814,17 @@ void Visual::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Visual::GetScale()
+ignition::math::Vector3d Visual::GetScale()
 {
   return this->dataPtr->scale;
-  /*math::Vector3 result(1, 1, 1);
+  /*ignition::math::Vector3d result(1, 1, 1);
   if (this->dataPtr->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
     if (geomElem->HasElement("box"))
     {
-      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
+      result = geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
     }
     else if (geomElem->HasElement("sphere"))
     {
@@ -838,13 +839,13 @@ math::Vector3 Visual::GetScale()
     }
     else if (geomElem->HasElement("plane"))
     {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      result.Set(size.x, size.y, 1);
+      ignition::math::Vector2d size =
+        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
+      result.Set(size.x(), size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
-      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
+      result = geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
     }
   }
 
@@ -1327,7 +1328,7 @@ void Visual::SetWireframe(bool _show)
 //////////////////////////////////////////////////
 void Visual::SetTransparency(float _trans)
 {
-  if (math::equal(_trans, this->dataPtr->transparency))
+  if (ignition::math::equal(_trans, this->dataPtr->transparency))
     return;
 
   this->dataPtr->transparency = std::min(
@@ -1526,92 +1527,92 @@ bool Visual::GetVisible() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPosition(const math::Vector3 &_pos)
+void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 {
   /*if (this->IsStatic() && this->staticGeom)
   {
     this->staticGeom->reset();
     delete this->staticGeom;
     this->staticGeom = NULL;
-    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x, pos.y, pos.z));
+    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x(), pos.y, pos.z));
   }*/
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
-  this->dataPtr->sceneNode->setPosition(_pos.x, _pos.y, _pos.z);
+  this->dataPtr->sceneNode->setPosition(
+      Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
-void Visual::SetRotation(const math::Quaternion &_rot)
+void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 {
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
-  this->dataPtr->sceneNode->setOrientation(
-      Ogre::Quaternion(_rot.w, _rot.x, _rot.y, _rot.z));
+  this->dataPtr->sceneNode->setOrientation(Conversions::Convert(_rot));
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPose(const math::Pose &_pose)
+void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
-  this->SetPosition(_pose.pos);
-  this->SetRotation(_pose.rot);
+  this->SetPosition(_pose.Pos());
+  this->SetRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Visual::GetPosition() const
+ignition::math::Vector3d Visual::GetPosition() const
 {
   return Conversions::Convert(this->dataPtr->sceneNode->getPosition());
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Visual::GetRotation() const
+ignition::math::Quaterniond Visual::GetRotation() const
 {
   return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
 }
 
 //////////////////////////////////////////////////
-math::Pose Visual::GetPose() const
+ignition::math::Pose3d Visual::GetPose() const
 {
-  math::Pose pos;
-  pos.pos = this->GetPosition();
-  pos.rot = this->GetRotation();
+  ignition::math::Pose3d pos;
+  pos.Pos() = this->GetPosition();
+  pos.Rot() = this->GetRotation();
   return pos;
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose &_pose)
+void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
-  this->SetWorldPosition(_pose.pos);
-  this->SetWorldRotation(_pose.rot);
+  this->SetWorldPosition(_pose.Pos());
+  this->SetWorldRotation(_pose.Rot());
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPosition(const math::Vector3 &_pos)
+void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 {
   this->dataPtr->sceneNode->_setDerivedPosition(Conversions::Convert(_pos));
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldRotation(const math::Quaternion &_q)
+void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 {
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
 }
 
 //////////////////////////////////////////////////
-math::Pose Visual::GetWorldPose() const
+ignition::math::Pose3d Visual::GetWorldPose() const
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
 
   Ogre::Vector3 vpos;
   Ogre::Quaternion vquatern;
 
   vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.pos.x = vpos.x;
-  pose.pos.y = vpos.y;
-  pose.pos.z = vpos.z;
+  pose.Pos().x() = vpos.x;
+  pose.Pos().y() = vpos.y;
+  pose.Pos().z() = vpos.z;
 
   vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.rot.w = vquatern.w;
-  pose.rot.x = vquatern.x;
-  pose.rot.y = vquatern.y;
-  pose.rot.z = vquatern.z;
+  pose.Rot().w() = vquatern.w;
+  pose.Rot().x() = vquatern.x;
+  pose.Rot().y() = vquatern.y;
+  pose.Rot().z() = vquatern.z;
 
   return pose;
 }
@@ -1757,7 +1758,7 @@ void Visual::DeleteDynamicLine(DynamicLines *_line)
 void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 {
   this->dataPtr->lineVertices.push_back(std::make_pair(_line, _index));
-  _line->SetPoint(_index, this->GetWorldPose().pos);
+  _line->SetPoint(_index, this->GetWorldPose().Pos());
 }
 
 //////////////////////////////////////////////////
@@ -1767,15 +1768,15 @@ std::string Visual::GetMaterialName() const
 }
 
 //////////////////////////////////////////////////
-math::Box Visual::GetBoundingBox() const
+ignition::math::Box Visual::GetBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
   this->GetBoundsHelper(this->GetSceneNode(), box);
   return box;
 }
 
 //////////////////////////////////////////////////
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
+void Visual::GetBoundsHelper(Ogre::SceneNode *node, ignition::math::Box &box) const
 {
   node->_updateBounds();
 
@@ -1798,22 +1799,22 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       Ogre::AxisAlignedBox bb = obj->getBoundingBox();
 
-      math::Vector3 min;
-      math::Vector3 max;
-      math::Quaternion rotDiff;
-      math::Vector3 posDiff;
+      ignition::math::Vector3d min;
+      ignition::math::Vector3d max;
+      ignition::math::Quaterniond rotDiff;
+      ignition::math::Vector3d posDiff;
 
       rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
-                this->GetWorldPose().rot;
+                this->GetWorldPose().Rot();
 
       posDiff = Conversions::Convert(node->_getDerivedPosition()) -
-                this->GetWorldPose().pos;
+                this->GetWorldPose().Pos();
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
       {
-        min = math::Vector3(-0.5, -0.5, -0.5);
-        max = math::Vector3(0.5, 0.5, 0.5);
+        min = ignition::math::Vector3d(-0.5, -0.5, -0.5);
+        max = ignition::math::Vector3d(0.5, 0.5, 0.5);
       }
       else
       {
@@ -1824,7 +1825,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       }
 
 
-      box.Merge(math::Box(min, max));
+      box.Merge(ignition::math::Box(min, max));
     }
   }
 
@@ -1923,11 +1924,11 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         if (node->GetParent())
           ogreSkeleton->getBone(node->GetParent()->GetName())->addChild(bone);
 
-        math::Matrix4 trans = node->GetTransform();
-        math::Vector3 pos = trans.GetTranslation();
-        math::Quaternion q = trans.GetRotation();
-        bone->setPosition(Ogre::Vector3(pos.x, pos.y, pos.z));
-        bone->setOrientation(Ogre::Quaternion(q.w, q.x, q.y, q.z));
+        ignition::math::Matrix4d trans = node->GetTransform();
+        ignition::math::Vector3d pos = trans.GetTranslation();
+        ignition::math::Quaterniond q = trans.GetRotation();
+        bone->setPosition(Conversions::Convert(pos));
+        bone->setOrientation(Conversions::Convert(q));
         bone->setInheritOrientation(true);
         bone->setManuallyControlled(true);
         bone->setInitialState();
@@ -2055,26 +2056,26 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // Add all the vertices
       for (j = 0; j < subMesh.GetVertexCount(); j++)
       {
-        *vertices++ = subMesh.GetVertex(j).x;
-        *vertices++ = subMesh.GetVertex(j).y;
-        *vertices++ = subMesh.GetVertex(j).z;
+        *vertices++ = subMesh.GetVertex(j).x();
+        *vertices++ = subMesh.GetVertex(j).y();
+        *vertices++ = subMesh.GetVertex(j).z();
 
         if (subMesh.GetNormalCount() > 0)
         {
-          *vertices++ = subMesh.GetNormal(j).x;
-          *vertices++ = subMesh.GetNormal(j).y;
-          *vertices++ = subMesh.GetNormal(j).z;
+          *vertices++ = subMesh.GetNormal(j).x();
+          *vertices++ = subMesh.GetNormal(j).y();
+          *vertices++ = subMesh.GetNormal(j).z();
         }
 
         if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh.GetTexCoord(j).x;
-          *vertices++ = subMesh.GetTexCoord(j).y;
+          *vertices++ = subMesh.GetTexCoord(j).x();
+          *vertices++ = subMesh.GetTexCoord(j).y();
         }
       }
 
       // Add all the indices
-      for (j = 0; j < subMesh.GetIndexCount(); j++)
+      for (j = 0; j < subMesh.GetIndexCount(); ++j)
         *indices++ = subMesh.GetIndex(j);
 
       const common::Material *material;
@@ -2090,13 +2091,13 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       iBuf->unlock();
     }
 
-    math::Vector3 max = _mesh->GetMax();
-    math::Vector3 min = _mesh->GetMin();
+    ignition::math::Vector3d max = _mesh->GetMax();
+    ignition::math::Vector3d min = _mesh->GetMin();
 
     if (_mesh->HasSkeleton())
     {
-      min = math::Vector3(-1, -1, -1);
-      max = math::Vector3(1, 1, 1);
+      min = ignition::math::Vector3d(-1, -1, -1);
+      max = ignition::math::Vector3d(1, 1, 1);
     }
 
     if (!max.IsFinite())
@@ -2105,9 +2106,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
     if (!min.IsFinite())
       gzthrow("Min bounding box is not finite[" << min << "]\n");
 
-    ogreMesh->_setBounds(Ogre::AxisAlignedBox(
-          Ogre::Vector3(min.x, min.y, min.z),
-          Ogre::Vector3(max.x, max.y, max.z)),
+    ogreMesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(min),
+          Conversions::Convert(max)),
           false);
 
     // this line makes clear the mesh is loaded (avoids memory leaks)
@@ -2197,7 +2197,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   // TODO: Make sure this isn't necessary
   if (_msg->has_geometry() && _msg->geometry().has_type())
   {
-    math::Vector3 geomScale(1, 1, 1);
+    ignition::math::Vector3d geomScale(1, 1, 1);
 
     if (_msg->geometry().type() == msgs::Geometry::BOX)
     {
@@ -2205,28 +2205,28 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      geomScale.x = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.y = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.z = _msg->geometry().cylinder().length();
+      geomScale.x() = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.y() = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.z() = _msg->geometry().cylinder().length();
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
-      geomScale.x = geomScale.y = geomScale.z
+      geomScale.x() = geomScale.y() = geomScale.z()
           = _msg->geometry().sphere().radius() * 2.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      geomScale.x = geomScale.y = 1.0;
+      geomScale.x() = geomScale.y() = 1.0;
       if (_msg->geometry().plane().has_size())
       {
-        geomScale.x = _msg->geometry().plane().size().x();
-        geomScale.y = _msg->geometry().plane().size().y();
+        geomScale.x() = _msg->geometry().plane().size().x();
+        geomScale.y() = _msg->geometry().plane().size().y();
       }
-      geomScale.z = 1.0;
+      geomScale.z() = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
     {
-      geomScale.x = geomScale.y = geomScale.z
+      geomScale.x() = geomScale.y() = geomScale.z()
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
@@ -2236,10 +2236,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->geometry().mesh().has_scale())
         geomScale = msgs::Convert(_msg->geometry().mesh().scale());
       else
-        geomScale.x = geomScale.y = geomScale.z = 1.0;
+        geomScale.x() = geomScale.y() = geomScale.z() = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
+      geomScale.x() = geomScale.y() = geomScale.z() = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2369,12 +2369,12 @@ bool Visual::GetCenterSubMesh() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
+void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              double _time,
                              boost::function<void()> _onComplete)
 {
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->GetWorldPose().Pos();
 
   this->dataPtr->onAnimationComplete = _onComplete;
 
@@ -2388,17 +2388,16 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
       this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.x(), start.y(), start.z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
   double tt = 0;
-  for (unsigned int i = 0; i < _pts.size(); i++)
+  for (unsigned int i = 0; i < _pts.size(); ++i)
   {
     key = strack->createNodeKeyFrame(tt);
-    key->setTranslate(Ogre::Vector3(
-          _pts[i].pos.x, _pts[i].pos.y, _pts[i].pos.z));
-    key->setRotation(Conversions::Convert(_pts[i].rot));
+    key->setTranslate(Conversions::Convert(_pts[i].Pos()));
+    key->setRotation(Conversions::Convert(_pts[i].Rot()));
 
     tt += dt;
   }
@@ -2420,13 +2419,13 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPosition(const math::Pose &_pose, double _time)
+void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
 {
   Ogre::TransformKeyFrame *key;
-  math::Vector3 start = this->GetWorldPose().pos;
-  math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d start = this->GetWorldPose().Pos();
+  ignition::math::Vector3d rpy = _pose.Rot().GetAsEuler();
 
-  math::Quaternion rotFinal(0, rpy.y, rpy.z);
+  ignition::math::Quaterniond rotFinal(0, rpy.y(), rpy.z());
 
   std::string animName = this->GetName() + "_animation";
 
@@ -2438,11 +2437,11 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
       anim->createNodeTrack(0, this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Conversions::Convert(start));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(_time);
-  key->setTranslate(Ogre::Vector3(_pose.pos.x, _pose.pos.y, _pose.pos.z));
+  key->setTranslate(Conversions::Convert(_pose.Pos()));
   key->setRotation(Conversions::Convert(rotFinal));
 
   this->dataPtr->animState =
@@ -2572,9 +2571,9 @@ void Visual::SetSkeletonPose(const msgs::PoseAnimation &_pose)
     return;
   }
 
-  for (int i = 0; i < _pose.pose_size(); i++)
+  for (int i = 0; i < _pose.pose_size(); ++i)
   {
-    const msgs::Pose& bonePose = _pose.pose(i);
+    const msgs::Pose &bonePose = _pose.pose(i);
     if (!this->dataPtr->skeleton->hasBone(bonePose.name()))
       continue;
     Ogre::Bone *bone = this->dataPtr->skeleton->getBone(bonePose.name());

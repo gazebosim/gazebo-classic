@@ -43,7 +43,7 @@ MeshMaker::MeshMaker()
   this->visualMsg = new msgs::Visual();
   this->visualMsg->mutable_geometry()->set_type(msgs::Geometry::MESH);
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaternion());
+            math::Quaterniond());
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(),
             math::Vector3());
 }

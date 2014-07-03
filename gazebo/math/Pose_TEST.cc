@@ -32,8 +32,8 @@ TEST_F(PoseTest, Pose)
     // A is the transform from O to P specified in frame O
     // B is the transform from P to Q specified in frame P
     // then, B + A is the transform from O to Q specified in frame O
-    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
-    math::Pose B(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/2.0));
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaterniond(0, 0, M_PI/4.0));
+    math::Pose B(math::Vector3(1, 0, 0), math::Quaterniond(0, 0, M_PI/2.0));
     EXPECT_TRUE(math::equal((B + A).pos.x, 1.0 + 1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((B + A).pos.y,       1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((B + A).pos.z,               0.0));
@@ -46,7 +46,7 @@ TEST_F(PoseTest, Pose)
     // A is the transform from O to P in frame O
     // B is the transform from O to Q in frame O
     // then -A is transform from P to O specified in frame P
-    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaterniond(0, 0, M_PI/4.0));
     EXPECT_TRUE(math::equal((math::Pose() - A).pos.x,      -1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((math::Pose() - A).pos.y,       1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((math::Pose() - A).pos.z,               0.0));
@@ -67,8 +67,8 @@ TEST_F(PoseTest, Pose)
     // A is the transform from O to P in frame O
     // B is the transform from O to Q in frame O
     // B - A is the transform from P to Q in frame P
-    math::Pose A(math::Vector3(1, 0, 0), math::Quaternion(0, 0, M_PI/4.0));
-    math::Pose B(math::Vector3(1, 1, 0), math::Quaternion(0, 0, M_PI/2.0));
+    math::Pose A(math::Vector3(1, 0, 0), math::Quaterniond(0, 0, M_PI/4.0));
+    math::Pose B(math::Vector3(1, 1, 0), math::Quaterniond(0, 0, M_PI/2.0));
     EXPECT_TRUE(math::equal((B - A).pos.x,       1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((B - A).pos.y,       1.0/sqrt(2)));
     EXPECT_TRUE(math::equal((B - A).pos.z,               0.0));
@@ -79,25 +79,25 @@ TEST_F(PoseTest, Pose)
   {
     math::Pose pose;
     EXPECT_TRUE(pose.pos == math::Vector3(0, 0, 0));
-    EXPECT_TRUE(pose.rot == math::Quaternion(0, 0, 0));
+    EXPECT_TRUE(pose.rot == math::Quaterniond(0, 0, 0));
   }
 
-  math::Pose pose(math::Vector3(1, 2, 3), math::Quaternion(.1, .2, .3));
+  math::Pose pose(math::Vector3(1, 2, 3), math::Quaterniond(.1, .2, .3));
   EXPECT_TRUE(pose.pos == math::Vector3(1, 2, 3));
-  EXPECT_TRUE(pose.rot == math::Quaternion(.1, .2, .3));
+  EXPECT_TRUE(pose.rot == math::Quaterniond(.1, .2, .3));
 
   math::Pose pose1(pose);
   EXPECT_TRUE(pose1 == pose);
 
-  pose.Set(math::Vector3(2, 3, 4), math::Quaternion(.3, .4, .5));
+  pose.Set(math::Vector3(2, 3, 4), math::Quaterniond(.3, .4, .5));
   EXPECT_TRUE(pose.pos == math::Vector3(2, 3, 4));
-  EXPECT_TRUE(pose.rot == math::Quaternion(.3, .4, .5));
+  EXPECT_TRUE(pose.rot == math::Quaterniond(.3, .4, .5));
   EXPECT_TRUE(pose.IsFinite());
 
   pose1 = pose.GetInverse();
   EXPECT_TRUE(pose1.pos == math::Vector3(-1.38368, -3.05541, -4.21306));
   EXPECT_TRUE(pose1.rot ==
-      math::Quaternion(0.946281, -0.0933066, -0.226566, -0.210984));
+      math::Quaterniond(0.946281, -0.0933066, -0.226566, -0.210984));
 
   pose = math::Pose(1, 2, 3, .1, .2, .3) + math::Pose(4, 5, 6, .4, .5, .6);
   EXPECT_TRUE(pose ==
@@ -119,17 +119,17 @@ TEST_F(PoseTest, Pose)
 
   EXPECT_TRUE(pose.CoordPositionAdd(pose1) ==
       math::Vector3(2.58141, 2.4262, 3.8013));
-  EXPECT_TRUE(pose.CoordRotationAdd(math::Quaternion(0.1, 0, 0.2)) ==
-      math::Quaternion(0.520975, 0.596586, 0.268194));
+  EXPECT_TRUE(pose.CoordRotationAdd(math::Quaterniond(0.1, 0, 0.2)) ==
+      math::Quaterniond(0.520975, 0.596586, 0.268194));
   EXPECT_TRUE(pose.CoordPoseSolve(pose1) ==
       math::Pose(-0.130957, -11.552, -10.2329,
                  -0.462955, -1.15624, -0.00158047));
 
-  EXPECT_TRUE(pose.RotatePositionAboutOrigin(math::Quaternion(0.1, 0, 0.2)) ==
+  EXPECT_TRUE(pose.RotatePositionAboutOrigin(math::Quaterniond(0.1, 0, 0.2)) ==
       math::Pose(6.09235, 5.56147, 6.47714, 0.4, 0.6, 0));
 
   pose.Reset();
   EXPECT_TRUE(pose.pos == math::Vector3(0, 0, 0));
-  EXPECT_TRUE(pose.rot == math::Quaternion(0, 0, 0));
+  EXPECT_TRUE(pose.rot == math::Quaterniond(0, 0, 0));
 }
 

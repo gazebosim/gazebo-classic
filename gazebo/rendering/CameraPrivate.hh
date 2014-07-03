@@ -58,7 +58,8 @@ namespace gazebo
       public: Ogre::CompositorInstance *ssaoInstance;
 
       /// \brief Queue of move positions.
-      public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
+      public: std::deque<
+              std::pair<ignition::math::Pose3d, double> > moveToPositionQueue;
 
       /// \brief Render period.
       public: common::Time renderPeriod;

@@ -14,17 +14,14 @@
  * limitations under the License.
  *
 */
-/* Desc: Color class
- * Author: Nate Koenig
- * Date: 08 May 2009
- */
 
 #ifndef _GAZEBO_COLOR_HH_
 #define _GAZEBO_COLOR_HH_
 
 #include <iostream>
+#include <ignition/math.hh>
+
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -97,8 +94,8 @@ namespace gazebo
       public: void Set(float _r = 1, float _g = 1 , float _b = 1, float _a = 1);
 
       /// \brief Get the color in HSV colorspace
-      /// \return HSV values in a math::Vector3 format
-      public: math::Vector3 GetAsHSV() const;
+      /// \return HSV values in a ignition::math::Vector3d format
+      public: ignition::math::Vector3d GetAsHSV() const;
 
       /// \brief Set a color based on HSV values
       /// \param[in] _h Hue(0..360)
@@ -108,7 +105,7 @@ namespace gazebo
 
       /// \brief Get the color in YUV colorspace
       /// \return the YUV  color
-      public: math::Vector3 GetAsYUV() const;
+      public: ignition::math::Vector3d GetAsYUV() const;
 
       /// \brief Set from yuv
       /// \param[in] _y value

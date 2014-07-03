@@ -45,7 +45,7 @@ namespace gazebo
 
       /// \brief Initialize with a focus point.
       /// \param[in] _focalPoint The point to look at.
-      public: virtual void Init(const math::Vector3 &_focalPoint);
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.

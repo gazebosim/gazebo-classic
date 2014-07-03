@@ -105,7 +105,7 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   // ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(0);
+  math::Quaterniond axisFrame = this->GetAxisFrame(0);
   math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)

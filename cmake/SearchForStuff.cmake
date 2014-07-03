@@ -65,6 +65,17 @@ else ()
 endif ()
 
 ########################################
+find_package(ignition_math QUIET)
+if (NOT ignition_math_FOUND)
+  BUILD_WARNING ("Missing: Ignition math library. Using deprecated interal math library.")
+  message(STATUS "Looking for ignition_math-config.cmake - not found")
+  set (HAVE_IGN_MATH OFF CACHE BOOL "Have Ignition Math" FORCE)
+else()
+  set (HAVE_IGN_MATH ON CACHE BOOL "Have Ignition Math" FORCE)
+  message(STATUS "Looking for ignition_math-config.cmake - found")
+endif()
+
+########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
 
@@ -127,7 +138,7 @@ if (PKG_CONFIG_FOUND)
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
   #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
-  find_package(Simbody)
+  find_package(Simbody QUIET)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
   else()
@@ -137,7 +148,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore)
+  find_package(DARTCore QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)

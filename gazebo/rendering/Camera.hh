@@ -26,6 +26,11 @@
 #include <deque>
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
@@ -35,10 +40,6 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
-#include "gazebo/math/Vector2i.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -154,39 +155,39 @@ namespace gazebo
 
       /// \brief Get the camera position in the world
       /// \return The world position of the camera
-      public: math::Vector3 GetWorldPosition() const;
+      public: ignition::math::Vector3d GetWorldPosition() const;
 
       /// \brief Get the camera's orientation in the world
-      /// \return The camera's orientation as a math::Quaternion
-      public: math::Quaternion GetWorldRotation() const;
+      /// \return The camera's orientation as a ignition::math::Quaterniond
+      public: ignition::math::Quaterniond GetWorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      /// \param[in] _pose The new math::Pose of the camera
-      public: virtual void SetWorldPose(const math::Pose &_pose);
+      /// \param[in] _pose The new ignition::math::Pose3d of the camera
+      public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the world pose.
       /// \return The pose of the camera in the world coordinate frame.
-      public: math::Pose GetWorldPose() const;
+      public: ignition::math::Pose3d GetWorldPose() const;
 
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
-      public: void SetWorldPosition(const math::Vector3 &_pos);
+      public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the world orientation
       /// \param[in] _quat The new orientation of the camera
-      public: void SetWorldRotation(const math::Quaternion &_quat);
+      public: void SetWorldRotation(const ignition::math::Quaterniond &_quat);
 
       /// \brief Translate the camera
       /// \param[in] _direction The translation vector
-      public: void Translate(const math::Vector3 &_direction);
+      public: void Translate(const ignition::math::Vector3d &_direction);
 
       /// \brief Rotate the camera around the yaw axis
       /// \param[in] _angle Rotation amount
-      public: void RotateYaw(math::Angle _angle);
+      public: void RotateYaw(ignition::math::Angle _angle);
 
       /// \brief Rotate the camera around the pitch axis
       /// \param[in] _angle Pitch amount
-      public: void RotatePitch(math::Angle _angle);
+      public: void RotatePitch(ignition::math::Angle _angle);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
@@ -195,15 +196,15 @@ namespace gazebo
 
       /// \brief Set the camera FOV (horizontal)
       /// \param[in] _radians Horizontal field of view
-      public: void SetHFOV(math::Angle _angle);
+      public: void SetHFOV(ignition::math::Angle _angle);
 
       /// \brief Get the camera FOV (horizontal)
       /// \return The horizontal field of view
-      public: math::Angle GetHFOV() const;
+      public: ignition::math::Angle GetHFOV() const;
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      public: math::Angle GetVFOV() const;
+      public: ignition::math::Angle GetVFOV() const;
 
       /// \brief Set the image size
       /// \param[in] _w Image width
@@ -305,11 +306,11 @@ namespace gazebo
 
       /// \brief Get the viewport up vector
       /// \return The viewport up vector
-      public: math::Vector3 GetUp();
+      public: ignition::math::Vector3d GetUp();
 
       /// \brief Get the viewport right vector
       /// \return The viewport right vector
-      public: math::Vector3 GetRight();
+      public: ignition::math::Vector3d GetRight();
 
       /// \brief Get the average FPS
       /// \return The average frames per second
@@ -373,8 +374,8 @@ namespace gazebo
       /// resulting ray
       /// \param[out] _dir Direction of the resulting ray
       public: void GetCameraToViewportRay(int _screenx, int _screeny,
-                                          math::Vector3 &_origin,
-                                          math::Vector3 &_dir);
+                                          ignition::math::Vector3d &_origin,
+                                          ignition::math::Vector3d &_dir);
 
       /// \brief Set whether to capture data
       /// \param[in] _value Set to true to capture data into a memory buffer.
@@ -398,7 +399,8 @@ namespace gazebo
       /// \param[out] _result Point on the plane
       /// \return True if a valid point was found
       public: bool GetWorldPointOnPlane(int _x, int _y,
-                  const math::Plane &_plane, math::Vector3 &_result);
+                  const ignition::math::Planed &_plane,
+                  ignition::math::Vector3d &_result);
 
       /// \brief Set the camera's render target
       /// \param[in] _target Pointer to the render target
@@ -438,7 +440,7 @@ namespace gazebo
 
       /// \brief Get the camera's direction vector
       /// \return Direction the camera is facing
-      public: math::Vector3 GetDirection() const;
+      public: ignition::math::Vector3d GetDirection() const;
 
       /// \brief Connect to the new image signal
       /// \param[in] _subscriber Callback that is called when a new image is
@@ -490,7 +492,7 @@ namespace gazebo
       /// \sa Camera::MoveToPositions
       /// \param[in] _pose End position of the camera
       /// \param[in] _time Duration of the camera's movement
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
+      public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,
                                           double _time);
 
       /// \brief Move the camera to a series of poses (this is an
@@ -500,7 +502,7 @@ namespace gazebo
       /// \param[in] _time Duration of the entire move
       /// \param[in] _onComplete Callback that is called when the move is
       /// complete
-      public: bool MoveToPositions(const std::vector<math::Pose> &_pts,
+      public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                                    double _time,
                                    boost::function<void()> _onComplete = NULL);
 
