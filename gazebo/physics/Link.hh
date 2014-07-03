@@ -489,6 +489,35 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
+      /// \brief Move Link given source and targe frames specified in
+      /// world coordinates. Assuming link's relative pose to
+      /// source frame (_worldReferenceFrameSrc) remains unchanged relative
+      /// to destination frame (_worldReferenceFrameDst).
+      /// \param[in] _worldReferenceFrameSrc initial reference frame to
+      /// which this link is attached.
+      /// \param[in] _worldReferenceFrameDst final location of the
+      /// reference frame specified in world coordinates.
+      public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                        const math::Pose &_worldReferenceFrameDst);
+
+      /// \brief Helper function to find all connected links of a link
+      /// based on parent/child relations of joints. For example,
+      /// if Link0 --> Link1 --> ... --> LinkN is a kinematic chain
+      /// with Link0 being the base link.  Then, call by Link1:
+      ///   Link1->FindAllConnectedLinksHelper(Link0, _list, true);
+      /// should return true with _list containing Link1 through LinkN.
+      /// In the case the _originalParentLink is part of a loop,
+      /// _connectedLinks is cleared and the function returns false.
+      /// \param[in] _originParentLink if this link is a child link of
+      /// the search, we've found a loop.
+      /// \param[in/out] _connectedLinks aggregate list of connected links.
+      /// \param[in] _fistLink this is the first Link, skip over the parent
+      /// link that matches the _originalParentLink.
+      /// \return true if successfully found a subset of connected links
+      public: bool FindAllConnectedLinksHelper(
+        const LinkPtr &_originalParentLink,
+        Link_V &_connectedLinks, bool _fistLink = false);
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
@@ -506,6 +535,15 @@ namespace gazebo
 
       /// \brief Parse visuals from SDF
       private: void ParseVisuals();
+
+      /// \brief Helper function to see if _value is contained in _vector.
+      /// \param[in] _vector a vector of boost link pointers.
+      /// \param[in] _value a particular link pointer.
+      /// \return true if value is in vector.
+      private: bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+
+      /// \brief Update visual SDFs.
+      private: void UpdateVisualSDF();
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
@@ -564,6 +602,9 @@ namespace gazebo
 
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
+
+      /// \brief scale of the link.
+      private: math::Vector3 scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

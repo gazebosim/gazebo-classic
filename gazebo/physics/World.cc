@@ -668,10 +668,16 @@ void World::Update()
     // do this after physics update as
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
-    for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
-        iter != this->dirtyPoses.end(); ++iter)
     {
-      (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      // block any other pose updates (e.g. Joint::SetPosition)
+      boost::recursive_mutex::scoped_lock lock(
+        *this->physicsEngine->GetPhysicsUpdateMutex());
+
+      for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
+          iter != this->dirtyPoses.end(); ++iter)
+      {
+        (*iter)->SetWorldPose((*iter)->GetDirtyPose(), false);
+      }
     }
 
     this->dirtyPoses.clear();
@@ -1560,7 +1566,6 @@ void World::ProcessFactoryMsgs()
         iter != this->factoryMsgs.end(); ++iter)
     {
       this->factorySDF->root->ClearElements();
-
       if ((*iter).has_sdf() && !(*iter).sdf().empty())
       {
         // SDF Parsing happens here
@@ -2051,7 +2056,7 @@ void World::OnLightMsg(ConstLightPtr &_msg)
     if (this->sceneMsg.light(i).name() == _msg->name())
     {
       lightExists = true;
-      this->sceneMsg.mutable_light(i)->CopyFrom(*_msg);
+      this->sceneMsg.mutable_light(i)->MergeFrom(*_msg);
 
       sdf::ElementPtr childElem = this->sdf->GetElement("light");
       while (childElem && childElem->Get<std::string>("name") != _msg->name())

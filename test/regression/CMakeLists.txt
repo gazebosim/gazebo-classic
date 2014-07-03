@@ -17,8 +17,8 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDE_DIRS} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
+  include_directories ( ${DARTCore_INCLUDE_DIRS} )
+  link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
 set(tests
@@ -29,6 +29,7 @@ set(tests
   978_joint_anchor.cc
   1082_pid_limits.cc
   1112_force_torque_model_removal.cc
+  1124_collision_pose.cc
   1146_collision_bounding_box.cc
 )
 

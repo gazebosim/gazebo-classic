@@ -1367,7 +1367,10 @@ void Camera::AttachToVisual(const std::string &_visualName,
   if (visual)
     track.set_id(visual->GetId());
   else
+  {
+    gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
     track.set_id(GZ_UINT32_MAX);
+  }
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);

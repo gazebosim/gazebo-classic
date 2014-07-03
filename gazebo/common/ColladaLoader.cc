@@ -1287,11 +1287,17 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     std::map<std::string, std::string>::iterator iter;
     std::string matStr = _polylistXml->Attribute("material");
 
+    int matIndex = -1;
     iter = this->dataPtr->materialMap.find(matStr);
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    common::Material *mat = this->LoadMaterial(matStr);
+
+    matIndex = _mesh->GetMaterialIndex(mat);
+    if (matIndex < 0)
+      matIndex = _mesh->AddMaterial(mat);
+
     if (matIndex < 0)
       gzwarn << "Unable to add material[" << matStr << "]\n";
     else
@@ -1579,11 +1585,16 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     std::map<std::string, std::string>::iterator iter;
     std::string matStr = _trianglesXml->Attribute("material");
 
+    int matIndex = -1;
     iter = this->dataPtr->materialMap.find(matStr);
     if (iter != this->dataPtr->materialMap.end())
       matStr = iter->second;
 
-    int matIndex = _mesh->AddMaterial(this->LoadMaterial(matStr));
+    common::Material *mat = this->LoadMaterial(matStr);
+    matIndex = _mesh->GetMaterialIndex(mat);
+    if (matIndex < 0)
+      matIndex = _mesh->AddMaterial(mat);
+
     if (matIndex < 0)
       gzwarn << "Unable to add material[" << matStr << "]\n";
     else

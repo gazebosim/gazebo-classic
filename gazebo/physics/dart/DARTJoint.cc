@@ -38,7 +38,6 @@ DARTJoint::DARTJoint(BasePtr _parent)
 {
   this->dartPhysicsEngine = boost::dynamic_pointer_cast<DARTPhysics>(
                               this->GetWorld()->GetPhysicsEngine());
-
   this->forceApplied[0] = 0.0;
   this->forceApplied[1] = 0.0;
 }
@@ -233,23 +232,16 @@ void DARTJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (this->GetAngleCount() > 2)
+  if (_index < this->GetAngleCount())
   {
-     gzerr << "Incompatible joint type, GetAngleCount() = "
-           << this->GetAngleCount() << " > 2\n";
-     return;
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
+                              _damping);
   }
-
-  this->dissipationCoefficient[_index] = _damping;
-
-  /// \TODO:  this check might not be needed?  attaching an object to a static
-  /// body should not affect damping application.
-  bool parentStatic = this->GetParent() ? this->GetParent()->IsStatic() : false;
-  bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-  if (!parentStatic && !childStatic)
+  else
   {
-    this->dtJoint->setDampingCoefficient(_index, _damping);
+    gzerr << "Index[" << _index << "] is out of bounds (GetAngleCount() = "
+          << this->GetAngleCount() << ").\n";
+    return;
   }
 }
 
@@ -280,16 +272,32 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     this->dissipationCoefficient[_index] = _damping;
     this->springReferencePosition[_index] = _reference;
 
-    /// \TODO: set joint stiffness coefficient
+    /// \TODO: this check might not be needed?  attaching an object to a static
+    /// body should not affect damping application.
+    bool parentStatic =
+        this->GetParent() ? this->GetParent()->IsStatic() : false;
+    bool childStatic =
+        this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-    /// setting joint damping
-    bool parentStatic = this->GetParent() ?
-      this->GetParent()->IsStatic() : false;
-    bool childStatic = this->GetChild() ? this->GetChild()->IsStatic() : false;
-
-    if (!parentStatic && !childStatic)
+    if (!this->applyDamping)
     {
-      this->dtJoint->setDampingCoefficient(_index, _damping);
+      if (!parentStatic && !childStatic)
+      {
+        this->dtJoint->setSpringStiffness(
+              static_cast<int>(_index), _stiffness);
+        this->dtJoint->setRestPosition(
+              static_cast<int>(_index), _reference);
+        this->dtJoint->setDampingCoefficient(
+              static_cast<int>(_index), _damping);
+        this->applyDamping = physics::Joint::ConnectJointUpdate(
+          boost::bind(&DARTJoint::ApplyDamping, this));
+      }
+      else
+      {
+        gzwarn << "Spring Damper for Joint[" << this->GetName()
+               << "] is not initialized because either parent[" << parentStatic
+               << "] or child[" << childStatic << "] is static.\n";
+      }
     }
 
     /// \TODO: add spring force element
@@ -297,7 +305,9 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
            << "] stiffness not implement in DART\n";
   }
   else
+  {
     gzerr << "SetStiffnessDamping _index " << _index << " is too large.\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +318,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
     case 0:
     case 1:
     case 2:
-      this->dtJoint->getGenCoord(_index)->set_qMax(_angle.Radian());
+      this->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
       return true;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
@@ -324,7 +334,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   case 0:
   case 1:
   case 2:
-    this->dtJoint->getGenCoord(_index)->set_qMin(_angle.Radian());
+    this->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
     return true;
   default:
     gzerr << "Invalid index[" << _index << "]\n";
@@ -340,7 +350,7 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getGenCoord(_index)->get_qMax();
+    return this->dtJoint->getPositionUpperLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -356,7 +366,7 @@ math::Angle DARTJoint::GetLowStop(unsigned int _index)
   case 0:
   case 1:
   case 2:
-    return this->dtJoint->getGenCoord(_index)->get_qMin();
+    return this->dtJoint->getPositionLowerLimit(_index);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -598,7 +608,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dtJoint->getNumGenCoords();
+  angleCount = this->dtJoint->getDof();
 
   return angleCount;
 }
@@ -606,7 +616,14 @@ unsigned int DARTJoint::GetAngleCount() const
 /////////////////////////////////////////////////
 void DARTJoint::ApplyDamping()
 {
-  // DART applying damping force inside of DART.
+  // rename ApplyDamping to ApplyStiffnessDamping (below) in gazebo 4.0.
+  // public: virtual void ApplyStiffnessDamping();
+
+  // DART applies stiffness and damping force implicitly itself by setting
+  // the stiffness coefficient and the damping coefficient using
+  // dart::dynamics::Joint::setSpringStiffness(index, stiffnessCoeff) and
+  // dart::dynamics::Joint::setDampingCoefficient(index, dampingCoeff).
+  // Therefore, we do nothing here.
 }
 
 /////////////////////////////////////////////////
