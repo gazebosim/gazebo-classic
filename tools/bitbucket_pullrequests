@@ -21,23 +21,32 @@ class BitbucketPullRequests
     attr_reader :destination
     attr_reader :branch
     attr_reader :createdOn
+    attr_reader :title
 
-    def initialize(jsonHash)
+    def initialize(jsonHash, options)
+      @options     = options
       @id          = jsonHash["id"]
       @source      = " "*12
       @destination = " "*12
       @branch      = ""
+      @title       = ""
       source       = jsonHash["source"]["commit"]
       destination  = jsonHash["destination"]["commit"]
       branch       = jsonHash["source"]["branch"]
+      title        = jsonHash["title"]
       @source      = source["hash"]      if !source.nil?
       @destination = destination["hash"] if !destination.nil?
       @branch      = branch["name"]      if !branch.nil?
+      @title       = title               if !title.nil?
       @createdOn   = jsonHash["created_on"]
     end
 
     def to_s
-      @id.to_s.rjust(5, ' ') + "    " +
+      title = ""
+      title += "\n" + @title + "\n" if @options["title"]
+
+      title +
+        @id.to_s.rjust(5, ' ') + "    " +
         DateTime.parse(@createdOn).strftime("%Y-%m-%d") + "    " +
         @source + "    " +
         @destination + "    " +
@@ -77,14 +86,14 @@ class BitbucketPullRequests
     # Hash of pull requests.
     pullrequests = {}
     jsonHash["values"].each { |pr|
-      date, str = Summary.new(pr).date_and_string
+      date, str = Summary.new(pr, @options).date_and_string
       pullrequests[date] = str
     }
 
     while jsonHash.has_key? "next"
       jsonHash = getJson(jsonHash["next"])
       jsonHash["values"].each { |pr|
-        date, str = Summary.new(pr).date_and_string
+        date, str = Summary.new(pr, @options).date_and_string
         pullrequests[date] = str
       }
     end
@@ -98,7 +107,7 @@ class BitbucketPullRequests
   # summary of one pull request
   def getPullRequestSummary(id)
     jsonHash = getJson(@url_pullrequests + "/" + id.to_s)
-    return Summary.new(jsonHash)
+    return Summary.new(jsonHash, @options)
   end
 
   # diff of pull request
@@ -174,6 +183,7 @@ options["check_id"] = nil
 options["diff"]     = nil
 options["files"]    = nil
 options["show-url"] = false
+options["title"]    = false
 options["verbose"]  = false
 
 opt_parser = OptionParser.new do |o|
@@ -189,6 +199,8 @@ opt_parser = OptionParser.new do |o|
   o.on("-s", "--summary [id]", Integer,
        "Summarize a pull request with fields:\n" + " "*37 +
        "[id] [source] [dest] [branch]")  { |o| options["summary"] = o }
+  o.on("-t", "--title",
+       "Show pull request title with --list, --summary") { |o| options["title"] = o }
   o.on("-u", "--show-url",
        "Show urls accessed") { |o| options["show-url"] = o }
   o.on("-v", "--verbose",

@@ -45,12 +45,6 @@ class JointTestUniversal : public ServerFixture,
 /////////////////////////////////////////////////
 void JointTestUniversal::Limits(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
-    return;
-  }
-
   // Load our universal joint test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
 
@@ -72,6 +66,12 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   ASSERT_TRUE(jointLower);
   physics::LinkPtr linkLower = jointLower->GetChild();
   ASSERT_TRUE(linkLower);
+
+  // check joint limits from sdf
+  EXPECT_NEAR(1.4, jointLower->GetHighStop(0).Radian(), g_tolerance);
+  EXPECT_NEAR(1.27, jointLower->GetHighStop(1).Radian(), g_tolerance);
+  EXPECT_NEAR(-1.4, jointLower->GetLowStop(0).Radian(), g_tolerance);
+  EXPECT_NEAR(-1.27, jointLower->GetLowStop(1).Radian(), g_tolerance);
 
   // freeze upper joint
   jointUpper->SetHighStop(0, 1e-6);

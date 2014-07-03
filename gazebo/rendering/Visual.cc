@@ -224,6 +224,12 @@ void Visual::Fini()
     this->dataPtr->sceneNode = NULL;
   }
 
+  if (this->dataPtr->preRenderConnection)
+  {
+    event::Events::DisconnectPreRender(this->dataPtr->preRenderConnection);
+    this->dataPtr->preRenderConnection.reset();
+  }
+
   RTShaderSystem::Instance()->DetachEntity(this);
 }
 
@@ -237,13 +243,12 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    result->dataPtr->children.push_back(
-        (*iter)->Clone((*iter)->GetName(), result));
+    (*iter)->Clone((*iter)->GetName(), result);
   }
 
-  result->SetWorldPose(this->GetWorldPose());
+  if (_newParent == this->dataPtr->scene->GetWorldVisual())
+    result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
-
   return result;
 }
 
@@ -770,7 +775,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -782,13 +787,30 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (this->dataPtr->scale == _scale)
     return;
 
-  math::Vector3 tmpScale = this->dataPtr->scale;
   this->dataPtr->scale = _scale;
+
+  // update geom size based on scale.
+  this->UpdateGeomSize(_scale);
+
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(this->dataPtr->scale));
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+{
+  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
+       iter != this->dataPtr->children.end(); ++iter)
+  {
+    (*iter)->UpdateGeomSize(_scale);
+  }
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
+  {
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+  }
   else if (geomElem->HasElement("sphere"))
   {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
@@ -801,48 +823,12 @@ void Visual::SetScale(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
   return this->dataPtr->scale;
-  /*math::Vector3 result(1, 1, 1);
-  if (this->dataPtr->sdf->HasElement("geometry"))
-  {
-    sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-
-    if (geomElem->HasElement("box"))
-    {
-      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
-    }
-    else if (geomElem->HasElement("sphere"))
-    {
-      double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      result.Set(r * 2.0, r * 2.0, r * 2.0);
-    }
-    else if (geomElem->HasElement("cylinder"))
-    {
-      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
-      double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      result.Set(r * 2.0, r * 2.0, l);
-    }
-    else if (geomElem->HasElement("plane"))
-    {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      result.Set(size.x, size.y, 1);
-    }
-    else if (geomElem->HasElement("mesh"))
-    {
-      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
-    }
-  }
-
-  return result;*/
 }
 
 //////////////////////////////////////////////////
@@ -1034,7 +1020,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
-      && !this->dataPtr->lighting &&
+      && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
@@ -1723,7 +1709,7 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
-      boost::bind(&Visual::Update, this));
+      boost::bind(&Visual::Update, shared_from_this()));
 
   DynamicLines *line = new DynamicLines(_type);
   this->dataPtr->lines.push_back(line);
@@ -2078,6 +2064,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         rendering::Material::Update(material);
         ogreSubMesh->setMaterialName(material->GetName());
       }
+      else
+      {
+        ogreSubMesh->setMaterialName("Gazebo/White");
+      }
 
       // Unlock
       vBuf->unlock();
@@ -2406,8 +2396,11 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   if (!this->dataPtr->preRenderConnection)
+  {
     this->dataPtr->preRenderConnection =
-      event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+      event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+      shared_from_this()));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2445,7 +2438,8 @@ void Visual::MoveToPosition(const math::Pose &_pose, double _time)
   this->dataPtr->prevAnimTime = common::Time::GetWallTime();
 
   this->dataPtr->preRenderConnection =
-    event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
+    event::Events::ConnectPreRender(boost::bind(&Visual::Update,
+    shared_from_this()));
 }
 
 //////////////////////////////////////////////////

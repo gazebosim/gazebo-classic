@@ -63,8 +63,8 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->dtWorld = new dart::simulation::World;
-  this->dtWorld->getConstraintHandler()->setCollisionDetector(
-        new dart::collision::DARTCollisionDetector());
+//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
+//        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
 //        0.01);
@@ -87,6 +87,9 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 
   // Gravity
   math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  // ODEPhysics checks this, so we will too.
+  if (g == math::Vector3(0, 0, 0))
+    gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
 
   // Time step
@@ -139,20 +142,18 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  dart::constraint::ConstraintDynamics *dtConstraintDynamics =
-      this->dtWorld->getConstraintHandler();
+  dart::constraint::ConstraintSolver *dtConstraintSolver =
+      this->dtWorld->getConstraintSolver();
   dart::collision::CollisionDetector *dtCollisionDetector =
-      dtConstraintDynamics->getCollisionDetector();
+      dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
         dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 =
-        dtContact.collisionNode1->getBodyNode();
-    dart::dynamics::BodyNode *dtBodyNode2 =
-        dtContact.collisionNode2->getBodyNode();
+    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1;
+    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2;
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
@@ -186,10 +187,10 @@ void DARTPhysics::UpdateCollision()
     // calculate torque in world frame
     Eigen::Vector3d torqueA =
         (dtContact.point -
-         dtBodyNode1->getWorldTransform().translation()).cross(force);
+         dtBodyNode1->getTransform().translation()).cross(force);
     Eigen::Vector3d torqueB =
         (dtContact.point -
-         dtBodyNode2->getWorldTransform().translation()).cross(-force);
+         dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
@@ -390,7 +391,7 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
   }
   else
   {
-    gzwarn << _key << " is not supported in ode" << std::endl;
+    gzwarn << _key << " is not supported in dart" << std::endl;
     return 0;
   }
 
@@ -452,29 +453,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     return false;
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
-{
-  boost::any value = 0;
-  switch (_param)
-  {
-    case MAX_CONTACTS:
-    {
-      return this->GetParam("max_contacts");
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->GetParam("min_step_size");
-    }
-    default:
-    {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
-      break;
-    }
-  }
-  return value;
 }
 
 //////////////////////////////////////////////////
