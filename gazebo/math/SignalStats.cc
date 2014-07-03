@@ -159,7 +159,7 @@ void SignalStats::InsertData(double _data)
 }
 
 //////////////////////////////////////////////////
-bool SignalStats::InsertStatistic(std::string _name)
+bool SignalStats::InsertStatistic(const std::string &_name)
 {
   // Check if the statistic is already inserted
   {
@@ -202,5 +202,44 @@ void SignalStats::Reset()
   {
     (*iter)->Reset();
   }
+}
+
+//////////////////////////////////////////////////
+Vector3Stats::Vector3Stats()
+{
+}
+
+//////////////////////////////////////////////////
+Vector3Stats::~Vector3Stats()
+{
+}
+
+//////////////////////////////////////////////////
+void Vector3Stats::InsertData(const Vector3 &_data)
+{
+  this->x.InsertData(_data.x);
+  this->y.InsertData(_data.y);
+  this->z.InsertData(_data.z);
+  this->mag.InsertData(_data.GetLength());
+}
+
+//////////////////////////////////////////////////
+bool Vector3Stats::InsertStatistic(const std::string &_name)
+{
+  bool result = true;
+  result = result && this->x.InsertStatistic(_name);
+  result = result && this->y.InsertStatistic(_name);
+  result = result && this->z.InsertStatistic(_name);
+  result = result && this->mag.InsertStatistic(_name);
+  return result;
+}
+
+//////////////////////////////////////////////////
+void Vector3Stats::Reset()
+{
+  this->x.Reset();
+  this->y.Reset();
+  this->z.Reset();
+  this->mag.Reset();
 }
 

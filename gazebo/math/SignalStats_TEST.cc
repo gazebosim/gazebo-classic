@@ -314,3 +314,88 @@ TEST_F(SignalStatsTest, SignalStats)
   }
 }
 
+TEST_F(SignalStatsTest, Vector3Stats)
+{
+  {
+    // Constructor
+    math::Vector3Stats v3stats;
+    EXPECT_TRUE(v3stats.x.GetMap().empty());
+    EXPECT_TRUE(v3stats.y.GetMap().empty());
+    EXPECT_TRUE(v3stats.z.GetMap().empty());
+    EXPECT_TRUE(v3stats.mag.GetMap().empty());
+    EXPECT_EQ(v3stats.x.GetCount(), 0u);
+    EXPECT_EQ(v3stats.y.GetCount(), 0u);
+    EXPECT_EQ(v3stats.z.GetCount(), 0u);
+    EXPECT_EQ(v3stats.mag.GetCount(), 0u);
+
+    // Reset
+    v3stats.Reset();
+    EXPECT_TRUE(v3stats.x.GetMap().empty());
+    EXPECT_TRUE(v3stats.y.GetMap().empty());
+    EXPECT_TRUE(v3stats.z.GetMap().empty());
+    EXPECT_TRUE(v3stats.mag.GetMap().empty());
+    EXPECT_EQ(v3stats.x.GetCount(), 0u);
+    EXPECT_EQ(v3stats.y.GetCount(), 0u);
+    EXPECT_EQ(v3stats.z.GetCount(), 0u);
+    EXPECT_EQ(v3stats.mag.GetCount(), 0u);
+  }
+
+  {
+    // InsertStatistic
+    math::Vector3Stats v3stats;
+    EXPECT_TRUE(v3stats.x.GetMap().empty());
+    EXPECT_TRUE(v3stats.y.GetMap().empty());
+    EXPECT_TRUE(v3stats.z.GetMap().empty());
+    EXPECT_TRUE(v3stats.mag.GetMap().empty());
+
+    EXPECT_TRUE(v3stats.InsertStatistic("max"));
+    EXPECT_FALSE(v3stats.InsertStatistic("max"));
+    EXPECT_FALSE(v3stats.x.GetMap().empty());
+    EXPECT_FALSE(v3stats.y.GetMap().empty());
+    EXPECT_FALSE(v3stats.z.GetMap().empty());
+    EXPECT_FALSE(v3stats.mag.GetMap().empty());
+
+    // GetMap with no data
+    {
+      std::map<std::string, double> map = v3stats.x.GetMap();
+      EXPECT_EQ(map.size(), 1u);
+      EXPECT_EQ(map.count("max"), 1u);
+    }
+    {
+      std::map<std::string, double> map = v3stats.y.GetMap();
+      EXPECT_EQ(map.size(), 1u);
+      EXPECT_EQ(map.count("max"), 1u);
+    }
+    {
+      std::map<std::string, double> map = v3stats.z.GetMap();
+      EXPECT_EQ(map.size(), 1u);
+      EXPECT_EQ(map.count("max"), 1u);
+    }
+    {
+      std::map<std::string, double> map = v3stats.mag.GetMap();
+      EXPECT_EQ(map.size(), 1u);
+      EXPECT_EQ(map.count("max"), 1u);
+    }
+
+    // Insert some data
+    EXPECT_EQ(v3stats.x.GetCount(), 0u);
+    EXPECT_EQ(v3stats.y.GetCount(), 0u);
+    EXPECT_EQ(v3stats.z.GetCount(), 0u);
+    EXPECT_EQ(v3stats.mag.GetCount(), 0u);
+
+    v3stats.InsertData(math::Vector3::UnitX);
+    v3stats.InsertData(math::Vector3::UnitX);
+    v3stats.InsertData(math::Vector3::UnitY);
+
+    EXPECT_EQ(v3stats.x.GetCount(), 3u);
+    EXPECT_EQ(v3stats.y.GetCount(), 3u);
+    EXPECT_EQ(v3stats.z.GetCount(), 3u);
+    EXPECT_EQ(v3stats.mag.GetCount(), 3u);
+
+    EXPECT_NEAR(v3stats.x.GetMap()["max"], 1.0, 1e-10);
+    EXPECT_NEAR(v3stats.y.GetMap()["max"], 1.0, 1e-10);
+    EXPECT_DOUBLE_EQ(v3stats.z.GetMap()["max"], 0.0);
+    EXPECT_NEAR(v3stats.mag.GetMap()["max"], 1.0, 1e-10);
+  }
+}
+

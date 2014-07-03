@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -64,7 +65,7 @@ namespace gazebo
 
       /// \brief Count of data values in mean.
       protected: unsigned int count;
-   };
+    };
     /// \}
 
     /// \def SignalStatisticPtr
@@ -124,7 +125,7 @@ namespace gazebo
     /// \}
 
     /// \class SignalStats SignalStats.hh math/gzmath.hh
-    /// \brief Collection of signal statistics.
+    /// \brief Collection of statistics for a scalar signal.
     class GAZEBO_VISIBLE SignalStats
     {
       /// \brief Constructor
@@ -149,13 +150,48 @@ namespace gazebo
 
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
-      public: bool InsertStatistic(std::string _name);
+      public: bool InsertStatistic(const std::string &_name);
 
       /// \brief Forget all previous data.
       public: void Reset();
 
       /// \brief Vector of `SignalStatistic`s.
       private: SignalStatistic_V stats;
+    };
+    /// \}
+
+    /// \class Vector3Stats SignalStats.hh math/gzmath.hh
+    /// \brief Collection of statistics for a Vector3 signal.
+    class GAZEBO_VISIBLE Vector3Stats
+    {
+      /// \brief Constructor
+      public: Vector3Stats();
+
+      /// \brief Destructor
+      public: ~Vector3Stats();
+
+      /// \brief Add a new sample to the statistical measures.
+      /// \param[in] _data New signal data point.
+      public: void InsertData(const Vector3 &_data);
+
+      /// \brief Add a new type of statistic.
+      /// \param[in] _name Short name of new statistic.
+      public: bool InsertStatistic(const std::string &_name);
+
+      /// \brief Forget all previous data.
+      public: void Reset();
+
+      /// \brief Statistics for x component of signal.
+      public: SignalStats x;
+
+      /// \brief Statistics for y component of signal.
+      public: SignalStats y;
+
+      /// \brief Statistics for z component of signal.
+      public: SignalStats z;
+
+      /// \brief Statistics for magnitude of signal.
+      public: SignalStats mag;
     };
     /// \}
   }
