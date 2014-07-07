@@ -58,7 +58,7 @@ double SignalMean::Get() const
 //////////////////////////////////////////////////
 std::string SignalMean::GetShortName() const
 {
-  return "mean";
+  return "Mean";
 }
 
 //////////////////////////////////////////////////
@@ -81,7 +81,7 @@ double SignalRootMeanSquare::Get() const
 //////////////////////////////////////////////////
 std::string SignalRootMeanSquare::GetShortName() const
 {
-  return "rms";
+  return "Rms";
 }
 
 //////////////////////////////////////////////////
@@ -100,7 +100,7 @@ double SignalMaxAbsoluteValue::Get() const
 //////////////////////////////////////////////////
 std::string SignalMaxAbsoluteValue::GetShortName() const
 {
-  return "max";
+  return "MaxAbs";
 }
 
 //////////////////////////////////////////////////
@@ -171,17 +171,17 @@ bool SignalStats::InsertStatistic(const std::string &_name)
   }
 
   SignalStatisticPtr stat;
-  if (_name == "max")
+  if (_name == "MaxAbs")
   {
     stat.reset(new SignalMaxAbsoluteValue());
     this->stats.push_back(stat);
   }
-  else if (_name == "mean")
+  else if (_name == "Mean")
   {
     stat.reset(new SignalMean());
     this->stats.push_back(stat);
   }
-  else if (_name == "rms")
+  else if (_name == "Rms")
   {
     stat.reset(new SignalRootMeanSquare());
     this->stats.push_back(stat);
