@@ -139,18 +139,21 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
       // Axis dynamics
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      double reference = 0;
-      double stiffness = 0;
-      if (dynamicsElem->HasElement("spring_reference"))
+      if (dynamicsElem)
       {
-        reference = dynamicsElem->Get<double>("spring_reference");
+        double reference = 0;
+        double stiffness = 0;
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(0, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
       }
-      if (dynamicsElem->HasElement("spring_stiffness"))
-      {
-        stiffness = dynamicsElem->Get<double>("spring_stiffness");
-      }
-      this->SetStiffnessDamping(0, stiffness,
-        dynamicsElem->Get<double>("damping"), reference);
     }
     if (axisElem->HasElement("limit"))
     {
@@ -181,16 +184,19 @@ void Joint::Load(sdf::ElementPtr _sdf)
       double reference = 0;
       double stiffness = 0;
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      if (dynamicsElem->HasElement("spring_reference"))
+      if (dynamicsElem)
       {
-        reference = dynamicsElem->Get<double>("spring_reference");
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(1, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
       }
-      if (dynamicsElem->HasElement("spring_stiffness"))
-      {
-        stiffness = dynamicsElem->Get<double>("spring_stiffness");
-      }
-      this->SetStiffnessDamping(1, stiffness,
-        dynamicsElem->Get<double>("damping"), reference);
     }
     if (axisElem->HasElement("limit"))
     {

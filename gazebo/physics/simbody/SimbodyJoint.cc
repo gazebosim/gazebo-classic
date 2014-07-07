@@ -67,7 +67,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("friction"))
+      if (dynamicsElem && dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
         gzlog << "joint friction not implemented\n";
@@ -82,7 +82,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("friction"))
+      if (dynamicsElem && dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
         gzlog << "joint friction not implemented\n";
