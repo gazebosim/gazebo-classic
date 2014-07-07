@@ -1397,3 +1397,9 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
 }
+
+//////////////////////////////////////////////////
+bool ODEJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
+}

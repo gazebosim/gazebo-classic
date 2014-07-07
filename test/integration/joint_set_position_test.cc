@@ -183,7 +183,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetAngle(0,
+        (*ji)->SetPosition(0,
             static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       }
 
@@ -360,7 +360,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetAngle(0,
+        (*ji)->SetPosition(0,
             static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       }
 
@@ -538,7 +538,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
       for (physics::Joint_V::iterator ji = joints.begin();
                                       ji != joints.end(); ++ji)
       {
-        (*ji)->SetAngle(0,
+        (*ji)->SetPosition(0,
             static_cast<double>(rand_r(&seed))/static_cast<double>(RAND_MAX));
       }
 
