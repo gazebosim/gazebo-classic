@@ -608,7 +608,7 @@ unsigned int DARTJoint::GetAngleCount() const
 {
   unsigned int angleCount = 0;
 
-  angleCount = this->dtJoint->getDof();
+  angleCount = this->dtJoint->getNumDofs();
 
   return angleCount;
 }
