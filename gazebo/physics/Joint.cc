@@ -568,7 +568,7 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
   }
   else
   {
-    gzerr << "model not setup yet, setting staticAngle.\n";
+    gzwarn << "model not setup yet, setting staticAngle.\n";
     this->staticAngle = _position;
   }
   return true;
@@ -588,7 +588,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   /// this Joint as a scalar inside the Joint class in Joint::SetPosition.
   if (!Joint::SetPosition(_index, _position))
   {
-    gzerr << "something is wrong, returning.\n";
+    gzerr << "Joint::SetPosition failed, "
+          << "but it's not possible as implemented.\n";
     return false;
   }
 
