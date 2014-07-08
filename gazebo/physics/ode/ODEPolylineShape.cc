@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,59 +14,53 @@
  * limitations under the License.
  *
 */
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
 
+#include "gazebo/common/Mesh.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/ode/ODEMesh.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
-#include "gazebo/physics/ode/ODEMeshShape.hh"
+#include "gazebo/physics/ode/ODEPolylineShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-ODEMeshShape::ODEMeshShape(CollisionPtr _parent) : MeshShape(_parent)
+ODEPolylineShape::ODEPolylineShape(CollisionPtr _parent)
+: PolylineShape(_parent)
 {
   this->odeMesh = new ODEMesh();
 }
 
 //////////////////////////////////////////////////
-ODEMeshShape::~ODEMeshShape()
+ODEPolylineShape::~ODEPolylineShape()
 {
   delete this->odeMesh;
 }
 
 //////////////////////////////////////////////////
-void ODEMeshShape::Update()
+void ODEPolylineShape::Update()
 {
   this->odeMesh->Update();
 }
 
 //////////////////////////////////////////////////
-void ODEMeshShape::Load(sdf::ElementPtr _sdf)
+void ODEPolylineShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Load(_sdf);
+  PolylineShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void ODEMeshShape::Init()
+void ODEPolylineShape::Init()
 {
-  MeshShape::Init();
+  PolylineShape::Init();
   if (!this->mesh)
+  {
+    gzerr << "Unable to create polyline in ode. Mesh pointer is null.\n";
     return;
+  }
 
-  if (this->submesh)
-  {
-    this->odeMesh->Init(this->submesh,
-        boost::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
-  else
-  {
-    this->odeMesh->Init(this->mesh,
-        boost::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
+  this->odeMesh->Init(this->mesh,
+      boost::static_pointer_cast<ODECollision>(this->collisionParent),
+      math::Vector3(1, 1, 1));
 }

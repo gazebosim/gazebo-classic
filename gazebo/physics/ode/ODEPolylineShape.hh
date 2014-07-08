@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,27 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_ODEPOLYLINESHAPE_HH_
+#define _GAZEBO_ODEPOLYLINESHAPE_HH_
 
-#ifndef _GAZEBO_DARTMESHSHAPE_HH_
-#define _GAZEBO_DARTMESHSHAPE_HH_
-
-#include "gazebo/physics/MeshShape.hh"
+#include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    class DARTMesh;
+    class ODEMesh;
 
-    /// \brief Triangle mesh collision.
-    class GAZEBO_VISIBLE DARTMeshShape : public MeshShape
+    /// \brief ODE polyline shape
+    class GAZEBO_VISIBLE ODEPolylineShape : public PolylineShape
     {
-      /// \brief Constructor.
-      /// \param[in] _parent Parent collision object.
-      public: explicit DARTMeshShape(CollisionPtr _parent);
+      /// \brief Constructor
+      /// \param[in] _parent Collision parent.
+      public: explicit ODEPolylineShape(CollisionPtr _parent);
 
       /// \brief Destructor.
-      public: virtual ~DARTMeshShape();
+      public: virtual ~ODEPolylineShape();
 
       // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
@@ -46,8 +45,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief DART collision mesh helper class
-      private: DARTMesh *dartMesh;
+      /// \brief ODE collsion mesh helper class.
+      private: ODEMesh *odeMesh;
     };
   }
 }

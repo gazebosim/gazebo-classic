@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,58 +15,46 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/common/Console.hh"
-#include "gazebo/common/Exception.hh"
 #include "gazebo/common/Mesh.hh"
-
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/dart/DARTMesh.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTMeshShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/physics/dart/DARTPolylineShape.hh"
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTMeshShape::DARTMeshShape(CollisionPtr _parent) : MeshShape(_parent)
+DARTPolylineShape::DARTPolylineShape(CollisionPtr _parent)
+: PolylineShape(_parent)
 {
   this->dartMesh = new DARTMesh();
 }
 
 //////////////////////////////////////////////////
-DARTMeshShape::~DARTMeshShape()
+DARTPolylineShape::~DARTPolylineShape()
 {
   delete this->dartMesh;
 }
 
 //////////////////////////////////////////////////
-void DARTMeshShape::Update()
+void DARTPolylineShape::Load(sdf::ElementPtr _sdf)
 {
-  MeshShape::Update();
+  PolylineShape::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void DARTMeshShape::Load(sdf::ElementPtr _sdf)
+void DARTPolylineShape::Init()
 {
-  MeshShape::Load(_sdf);
-}
-
-//////////////////////////////////////////////////
-void DARTMeshShape::Init()
-{
-  MeshShape::Init();
-
-  if (this->submesh)
+  PolylineShape::Init();
+  if (!this->mesh)
   {
-    this->dartMesh->Init(this->submesh,
-        boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+    gzerr << "Unable to create polyline in DART. Mesh pointer is null.\n";
+    return;
   }
-  else
-  {
-    this->dartMesh->Init(this->mesh,
-        boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
-  }
+
+  this->dartMesh->Init(this->mesh,
+      boost::static_pointer_cast<DARTCollision>(this->collisionParent),
+      math::Vector3(1, 1, 1));
 }
