@@ -2051,7 +2051,7 @@ void World::RemoveModel(const std::string &_name)
   {
     boost::recursive_mutex::scoped_lock lock2(*this->receiveMutex);
     for (std::set<ModelPtr>::iterator iter = this->publishModelPoses.begin();
-        iter != this->publishModelPoses.end(); iter++)
+        iter != this->publishModelPoses.end(); ++iter)
     {
       if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
       {

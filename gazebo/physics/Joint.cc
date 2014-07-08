@@ -181,11 +181,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
       }
 
       // Axis dynamics
-      double reference = 0;
-      double stiffness = 0;
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
       if (dynamicsElem)
       {
+        double reference = 0;
+        double stiffness = 0;
+
         if (dynamicsElem->HasElement("spring_reference"))
         {
           reference = dynamicsElem->Get<double>("spring_reference");
