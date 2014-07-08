@@ -115,7 +115,7 @@ void DARTMeshShape::Init()
   assimpMesh->mFaces    = new aiFace[assimpMesh->mNumFaces];
   for (unsigned int i = 0; i < assimpMesh->mNumFaces; ++i)
   {
-    aiFace* itAIFace = &assimpMesh->mFaces[i];
+    aiFace *itAIFace = &assimpMesh->mFaces[i];
     itAIFace->mNumIndices = 3;
     itAIFace->mIndices    = new unsigned int[3];
     itAIFace->mIndices[0] = localIndices[i*3 + 0];

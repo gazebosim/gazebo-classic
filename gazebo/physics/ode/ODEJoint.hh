@@ -81,6 +81,9 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
                                         const double _stiffness);
 

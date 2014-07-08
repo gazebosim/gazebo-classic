@@ -118,10 +118,6 @@ void DARTJoint::Init()
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -137,10 +133,6 @@ void DARTJoint::Init()
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -239,8 +231,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
   }
   else
   {
-    gzerr << "DARTJoint::SetDamping: index[" << _index
-          << "] is out of bounds (GetAngleCount() = "
+    gzerr << "Index[" << _index << "] is out of bounds (GetAngleCount() = "
           << this->GetAngleCount() << ").\n";
     return;
   }
