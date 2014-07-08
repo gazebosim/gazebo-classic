@@ -4,6 +4,7 @@ set (sources
   Angle.cc
   Box.cc
   Helpers.cc
+  Kmeans.cc
   Matrix3.cc
   Matrix4.cc
   Plane.cc
@@ -23,6 +24,7 @@ set (headers
   Box.hh
   Filter.hh
   Helpers.hh
+  Kmeans.hh
   MathTypes.hh
   Matrix3.hh
   Matrix4.hh
