@@ -686,7 +686,7 @@ void World::Update()
       boost::recursive_mutex::scoped_lock lock(
         *this->physicsEngine->GetPhysicsUpdateMutex());
 
-      boost::mutex::scoped_lock lock(this->dirtyPoseMutex);
+      boost::mutex::scoped_lock lock2(this->dirtyPoseMutex);
       for (std::list<Entity*>::iterator iter = this->dirtyPoses.begin();
           iter != this->dirtyPoses.end(); ++iter)
       {
