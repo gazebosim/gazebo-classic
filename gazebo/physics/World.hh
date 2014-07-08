@@ -537,6 +537,9 @@ namespace gazebo
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
 
+      // \brief Publishes clock information
+      private: transport::PublisherPtr clockPub;
+
       /// \brief Outgoing world statistics message.
       private: msgs::WorldStatistics worldStatsMsg;
 

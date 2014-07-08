@@ -275,6 +275,7 @@ else (build_errors)
   else()
     message (STATUS "Use default CFlags")
   endif()
+  
   message (STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
   message (STATUS "Install path: ${CMAKE_INSTALL_PREFIX}")
  

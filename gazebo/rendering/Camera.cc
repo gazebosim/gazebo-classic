@@ -1664,7 +1664,8 @@ void Camera::AnimationComplete()
 //////////////////////////////////////////////////
 bool Camera::GetInitialized() const
 {
-  return this->initialized && this->scene->GetInitialized();
+  return this->initialized && this->scene->GetInitialized() &&
+    this->renderTarget && this->renderTarget->getNumViewports() > 0;
 }
 
 //////////////////////////////////////////////////

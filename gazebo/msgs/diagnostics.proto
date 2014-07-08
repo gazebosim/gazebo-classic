@@ -16,8 +16,23 @@ message Diagnostics
     required Time wall = 3;
   }
 
+  message DiagVariable
+  {
+    required string name = 1;
+    required Time wall = 2;
+    required double value = 3;
+  }
+
+  message DiagMarker
+  {
+    required string name = 1;
+    required Time wall = 2;
+  }
+
   repeated DiagTime time = 1;
-  required Time real_time = 2;
-  required Time sim_time = 3;
-  required double real_time_factor = 4;
+  repeated DiagVariable variable = 2;
+  repeated DiagMarker marker = 3;
+  required Time real_time = 4;
+  required Time sim_time = 5;
+  required double real_time_factor = 6;
 }
