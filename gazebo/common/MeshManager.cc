@@ -600,6 +600,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     subMesh->AddIndex(i*2+3+numSides*2);
   }
 
+  if (subMesh->GetNormalCount() != subMesh->GetVertexCount())
+    subMesh->SetNormalCount(subMesh->GetVertexCount());
   subMesh->RecalculateNormals();
 }
 

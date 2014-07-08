@@ -97,9 +97,14 @@ void PolylineShape::SetScale(const math::Vector3 &_scale)
 ////////////////////////////////////////////////////
 void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 {
-  int i;
+  if (!_msg.has_polyline())
+  {
+    gzerr << "Unable to set vertices from message, no polyline shape.\n";
+    return;
+  }
+
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
-  for (i = 0; i < _msg.polyline().point_size(); i++)
+  for (int i = 0; i < _msg.polyline().point_size(); ++i)
   {
     math::Vector2d point(_msg.polyline().point(i).x(),
         _msg.polyline().point(i).y());
@@ -146,6 +151,11 @@ void PolylineShape::FillMsg(msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 void PolylineShape::ProcessMsg(const msgs::Geometry &_msg)
 {
-  this->SetHeight(_msg.polyline().height());
-  this->SetVertices(_msg);
+  if (_msg.has_polyline())
+  {
+    this->SetHeight(_msg.polyline().height());
+    this->SetVertices(_msg);
+  }
+  else
+    gzerr << "Unable to process message, no polyline shape.\n";
 }

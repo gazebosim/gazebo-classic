@@ -94,15 +94,16 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   }
 }
 
-
 /////////////////////////////////////////////////
 TEST_P(PolylineTest, PolylineWorld)
 {
-  PolylineWorld(GetParam());
+  if (GetParam() == "simbody")
+    gzwarn << "Polyline not supported in simbody\n";
+  else
+    PolylineWorld(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, PolylineTest,
-    ::testing::Values("ode", "bullet", "dart"));
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, PolylineTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
