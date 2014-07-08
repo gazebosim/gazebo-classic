@@ -5,6 +5,7 @@
 1. **gazebo/physics/World.hh**
       + void RemoveModel(const std::string &_name);
       + void RemoveModel(ModelPtr _model);
+      + void RunBlocking(unsigned int _iterations = 0);
 
 1. **gazebo/physics/JointController.hh**
     + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);
