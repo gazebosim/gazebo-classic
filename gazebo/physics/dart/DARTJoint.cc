@@ -118,10 +118,6 @@ void DARTJoint::Init()
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -137,10 +133,6 @@ void DARTJoint::Init()
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");

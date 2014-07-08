@@ -63,10 +63,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -82,10 +78,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -567,4 +559,10 @@ math::Angle BulletJoint::GetHighStop(unsigned int _index)
 math::Angle BulletJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

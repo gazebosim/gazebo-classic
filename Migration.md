@@ -55,7 +55,7 @@
           Link_V &_connectedLinks, bool _fistLink = false);
       + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
       + msgs::Visual GetVisualMessage(const std::string &_name) 
-  
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`

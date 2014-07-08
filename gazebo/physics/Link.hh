@@ -494,7 +494,7 @@ namespace gazebo
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
-      /// \brief Move Link given source and targe frames specified in
+      /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to
       /// source frame (_worldReferenceFrameSrc) remains unchanged relative
       /// to destination frame (_worldReferenceFrameDst).
