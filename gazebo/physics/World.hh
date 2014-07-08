@@ -702,9 +702,6 @@ namespace gazebo
       /// \brief Mutex to protect the deleteEntity list.
       private: boost::mutex entityDeleteMutex;
 
-      /// \brief Mutex to protect the dirtyPose list.
-      private: boost::mutex dirtyPoseMutex;
-
       /// \brief Worker thread for logging.
       private: boost::thread *logThread;
 
