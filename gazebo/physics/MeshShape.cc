@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Trimesh shape
- * Author: Nate Koenig
- * Date: 16 Oct 2009
- */
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
