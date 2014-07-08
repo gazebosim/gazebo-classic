@@ -43,7 +43,7 @@ add_executable(gzfactory gzfactory.cc)
 target_link_libraries(gzfactory gazebo_common gazebo_transport pthread)
 gz_install_executable(gzfactory)
 
-if (${GAZEBO_VERSION} VERSION_GREATER 3.0)
+if (${GAZEBO_VERSION} VERSION_LESS 4.0)
   message (WARNING
     "Installing deprecated manpages. This should be removed after Gazebo 3.0")
   manpage(gzfactory 1)
@@ -60,8 +60,6 @@ target_link_libraries(gz
 gz_install_executable(gz)
 
 roffman(gz 1)
-
-install (PROGRAMS gzmodel_create gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
 manpage(gzprop 1)

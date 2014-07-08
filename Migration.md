@@ -311,6 +311,20 @@
 
 ### Additions
 
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
+                       const math::Pose &_worldReferenceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+
 1. **gazebo/physics/JointController.hh**
       + common::Time GetLastUpdateTime() const
       + std::map<std::string, JointPtr> GetJoints() const

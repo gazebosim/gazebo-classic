@@ -112,6 +112,60 @@ TEST_F(WorldTest, ModifyLight)
   EXPECT_EQ(sceneMsg2.light(1).diffuse().g(), 0);
   EXPECT_EQ(sceneMsg2.light(1).diffuse().b(), 1);
   EXPECT_EQ(sceneMsg2.light(1).type(), msgs::Light::POINT);
+
+  // Add a new spot light
+  {
+    msgs::Light lightMsg;
+    lightMsg.set_name("test_spot_light");
+    msgs::Set(lightMsg.mutable_diffuse(), common::Color(1, 1, 0));
+    lightMsg.set_type(msgs::Light::SPOT);
+    lightPub->Publish(lightMsg);
+  }
+
+  // Allow the world time to process the messages
+  world->Step(10);
+
+  {
+    msgs::Scene sceneMsg = world->GetSceneMsg();
+    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_spot_light");
+    EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 1);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 1);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().b(), 0);
+    EXPECT_EQ(sceneMsg.light(2).type(), msgs::Light::SPOT);
+  }
+
+  // Modify spot light pose
+  {
+    msgs::Light lightMsg;
+    lightMsg.set_name("test_spot_light");
+    msgs::Set(lightMsg.mutable_pose(),
+        math::Pose(math::Vector3(3, 2, 1), math::Quaternion(0, 1, 0, 0)));
+    lightPub->Publish(lightMsg);
+  }
+
+  // Allow the world time to process the messages
+  world->Step(10);
+
+  // Verify the light gets the new pose and retains values of other properties
+  {
+    msgs::Scene sceneMsg = world->GetSceneMsg();
+    EXPECT_EQ(sceneMsg.light_size(), 3);
+    EXPECT_STREQ(sceneMsg.light(2).name().c_str(), "test_spot_light");
+    EXPECT_EQ(sceneMsg.light(2).diffuse().r(), 1);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().g(), 1);
+    EXPECT_EQ(sceneMsg.light(2).diffuse().b(), 0);
+
+    EXPECT_EQ(sceneMsg.light(2).pose().position().x(), 3);
+    EXPECT_EQ(sceneMsg.light(2).pose().position().y(), 2);
+    EXPECT_EQ(sceneMsg.light(2).pose().position().z(), 1);
+    EXPECT_EQ(sceneMsg.light(2).pose().orientation().w(), 0);
+    EXPECT_EQ(sceneMsg.light(2).pose().orientation().x(), 1);
+    EXPECT_EQ(sceneMsg.light(2).pose().orientation().y(), 0);
+    EXPECT_EQ(sceneMsg.light(2).pose().orientation().z(), 0);
+
+    EXPECT_EQ(sceneMsg.light(2).type(), msgs::Light::SPOT);
+  }
 }
 
 
