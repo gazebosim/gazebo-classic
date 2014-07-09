@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_DARTSCREWJOINT_HH_
 #define _GAZEBO_DARTSCREWJOINT_HH_
 
+#include <string>
+
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
 #include "gazebo/util/system.hh"
