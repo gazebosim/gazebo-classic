@@ -1235,12 +1235,6 @@ void World::LoadPlugins()
       model->LoadPlugins();
     }
   }
-
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
 }
 
 //////////////////////////////////////////////////
@@ -1262,6 +1256,9 @@ void World::LoadPlugin(const std::string &_filename,
     }
     plugin->Load(shared_from_this(), _sdf);
     this->plugins.push_back(plugin);
+
+    if (this->initialized)
+      plugin->Init();
   }
 }
 
