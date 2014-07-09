@@ -80,9 +80,10 @@ TEST_P(ExamplePlugins, Build)
 
 INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
   "hello_world"
-  , "world_edit"
-  , "model_push"
   , "factory"
+  , "model_push"
+  , "system_gui_plugin"
+  , "world_edit"
 ));
 
 int main(int argc, char **argv)
