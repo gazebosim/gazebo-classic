@@ -23,7 +23,6 @@ namespace gazebo
   {
     public: Issue1208Plugin() : WorldPlugin(), initCount(0)
             {
-              printf("Hello World!\n");
             }
 
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
