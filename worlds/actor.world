@@ -8,7 +8,7 @@
       <include>
          <uri>model://sun</uri>
       </include>
-      <actor name="actor" static="false">
+      <actor name="actor">
          <skin>
             <filename>moonwalk.dae</filename>
             <scale>1.0</scale>
