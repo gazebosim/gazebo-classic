@@ -2099,11 +2099,6 @@ void World::OnLightMsg(ConstLightPtr &_msg)
   }
 }
 
-double randf(double _m)
-{
-  return _m * rand() / (RAND_MAX - .1);
-}
-
 /////////////////////////////////////////////////
 void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
 {
@@ -2122,14 +2117,6 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   }
   sdf::ElementPtr model = _pop->GetElement("model");
   std::string modelName = model->Get<std::string>("name");
-
-  if (!_pop->HasElement("density"))
-  {
-    std::cerr << "Unable to find <density> inside the population tag."
-              << std::endl;
-    return;
-  }
-  double density = _pop->Get<double>("density");
 
   if (!_pop->HasElement("model_count"))
   {
@@ -2340,8 +2327,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
     {
       for (int i = 0; i < modelCount; ++i)
       {
-        double ang = randf(2 * M_PI);
-        double r = randf(radius);
+        double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
+        double r = math::Rand::GetDblUniform(0, radius);
         math::Vector3 p;
         p.x = center.x + r * cos(ang);
         p.y = center.y + r * sin(ang);
@@ -2355,8 +2342,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       unsigned int points = 10000;
       for (size_t i = 0; i < points; ++i)
       {
-        double ang = randf(2 * M_PI);
-        double r = randf(radius);
+        double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
+        double r = math::Rand::GetDblUniform(0, radius);
         math::Vector3 p;
         p.x = center.x + r * cos(ang);
         p.y = center.y + r * sin(ang);
@@ -2382,13 +2369,6 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
     }
   }
 
-  /*std::cout << "Model name: " << modelName << std::endl;
-  std::cout << "Density: " << density << std::endl;
-  std::cout << "Model count: " << modelCount << std::endl;
-  std::cout << "Collisions? " << preventCollisions << std::endl;
-  std::cout << "Distribution: " << distribution << std::endl;
-  std::cout << "Minimum: " << minBoundingBox << std::endl;*/
-
   // Create an sdf containing the model description.
   sdf::SDF modelSdf;
   modelSdf.SetFromString(
@@ -2397,14 +2377,10 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   std::vector<ModelPtr> clonedModels;
   for (size_t i = 0; i < objects.size(); ++i)
   {
-    msgs::Factory msg2;
-
     math::Vector3 p;
     p.x = objects[i].x;
     p.y = objects[i].y;
     p.z = objects[i].z;
-
-    msgs::Set(msg2.mutable_pose(), gazebo::math::Pose(p.x, p.y, p.z, 0, 0, 0));
 
     std::string cloneSdf = modelSdf.ToString();
     std::string delim = "model name='";
@@ -2413,10 +2389,6 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
     std::string newName = modelName + std::string("_clone_") +
       boost::lexical_cast<std::string>(i);
     cloneSdf.replace(first, last - first, newName);
-
-    msg2.set_sdf(cloneSdf);
-
-    //popPub->Publish(msg2);
 
     sdf::SDF model2Sdf;
     model2Sdf.SetFromString(cloneSdf);
@@ -2433,7 +2405,7 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       if (preventCollisions)
       {
         bool collide = false;
-        for (size_t j = 0; j < clonedModels.size(); ++j)
+        /*for (size_t j = 0; j < clonedModels.size(); ++j)
         {
           ModelPtr otherModel = clonedModels[j];
           std::cout << "Model name: " << otherModel->GetName() << std::endl;
@@ -2453,7 +2425,10 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
             std::cout << "OK" << std::endl;
         }
         if (not collide)
-          clonedModels.push_back(newModel);
+          clonedModels.push_back(newModel);*/
+        newModel.reset();
+        std::cout << "Removing beer1_clone_2 model" << std::endl;
+        this->RemoveModel("beer1_clone_2");
       }
     }
     else

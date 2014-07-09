@@ -15,6 +15,7 @@
  *
 */
 
+#include <vector>
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Rand.hh"
@@ -45,7 +46,6 @@ Kmeans::Kmeans(const std::vector<math::Vector3> &_obs, unsigned int _k,
 //////////////////////////////////////////////////
 Kmeans::~Kmeans()
 {
-
 }
 
 //////////////////////////////////////////////////
@@ -90,7 +90,7 @@ void Kmeans::SetNumClusters(unsigned int _k)
 bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
                      std::vector<unsigned int> &_labels)
 {
-  int changed;
+  size_t changed = 0;
   // ToDo(caguero): Use gzerr
   // Sanity check
   if (this->obs.size() == 0)
@@ -107,8 +107,8 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
 
   if (this->k > this->obs.size())
   {
-    std::cerr << "The number of clusters has to be lower or equal to the number of "
-              << " observations." << std::endl;
+    std::cerr << "The number of clusters has to be lower or equal to the number"
+              << " of observations." << std::endl;
     return false;
   }
 
@@ -119,6 +119,7 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
   this->sums.resize(this->k);
   this->counters.resize(this->k);
 
+  // Initialize labels.
   for (size_t i = 0; i < this->obs.size(); ++i)
     this->labels[i] = 0;
 
@@ -159,6 +160,7 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
   return true;
 }
 
+//////////////////////////////////////////////////
 unsigned int Kmeans::ClosestCentroid(Vector3 p)
 {
   double min = HUGE_VAL;

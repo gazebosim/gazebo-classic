@@ -3,6 +3,7 @@ set (files
   camera.world
   cart_demo.world
   contact.world
+  cinder_block_population.world
   depth_camera.world
   empty_1_0.world
   empty_bullet.world

@@ -17,6 +17,7 @@
 #ifndef _KMEANS_HH_
 #define _KMEANS_HH_
 
+#include <vector>
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
