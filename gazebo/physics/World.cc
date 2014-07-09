@@ -1235,12 +1235,6 @@ void World::LoadPlugins()
       model->LoadPlugins();
     }
   }
-
-  for (std::vector<WorldPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Init();
-  }
 }
 
 //////////////////////////////////////////////////
