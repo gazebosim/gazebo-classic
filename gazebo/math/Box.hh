@@ -71,6 +71,11 @@ namespace gazebo
       /// \param[in]  _box Box to add to this box
       public: void Merge(const Box &_box);
 
+      /// \brief Box intersection.
+      /// \param[in] _box Box to check for intersection with this box.
+      /// \return True if this box intersects _box.
+      public: bool Intersects(const Box &_box);
+
       /// \brief Assignment operator. Set this box to the parameter
       /// \param[in]  _b Box to copy
       /// \return The new box.

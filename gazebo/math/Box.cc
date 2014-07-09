@@ -98,6 +98,28 @@ void Box::Merge(const Box &_box)
 }
 
 //////////////////////////////////////////////////
+bool Box::Intersects(const Box &_box)
+{
+  // Check the six separating planes.
+  if (this->max.x < _box.min.x)
+    return false;
+  if (this->max.y < _box.min.y)
+    return false;
+  if (this->max.z < _box.min.z)
+    return false;
+
+  if (this->min.x > _box.min.x)
+    return false;
+  if (this->min.y > _box.min.y)
+    return false;
+  if (this->min.z > _box.min.z)
+    return false;
+
+  // Otherwise the two boxes must intersect.
+  return true;
+}
+
+//////////////////////////////////////////////////
 Box &Box::operator =(const Box &_b)
 {
   this->max = _b.max;

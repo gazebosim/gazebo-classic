@@ -20,7 +20,7 @@
       <region>
         <cuboid>
           <min>3 3 0</min>
-          <max>7 5 0</max>
+          <max>4 4 0.1</max>
         </cuboid>
       </region>
       <density>1.0</density>
@@ -29,7 +29,26 @@
       <distribution>random</distribution>
     </population>
 
-    <!-- Testing the automatic population of objects -->
+    <population name="beer_population1">
+      <model name="beer1">
+        <include>
+          <uri>model://beer</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>-0.25 -0.5 0</min>
+          <rows>5</rows>
+          <cols>3</cols>
+          <step>0.25 0.25 0</step>
+        </cuboid>
+      </region>
+      <density>1.0</density>
+      <model_count>60</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>grid</distribution>
+    </population>
+
     <population name="beer_population2">
       <model name="beer2">
         <include>
@@ -57,8 +76,8 @@
       </model>
       <region>
         <cuboid>
-          <min>3 -3 0</min>
-          <max>7 -5 0</max>
+          <min>1 -2 0</min>
+          <max>5 -4 0.3</max>
         </cuboid>
       </region>
       <density>1.0</density>
@@ -67,7 +86,6 @@
       <distribution>uniform</distribution>
     </population>
 
-    <!-- Testing the automatic population of objects -->
     <population name="beer_population4">
       <model name="beer4">
         <include>

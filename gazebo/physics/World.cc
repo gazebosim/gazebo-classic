@@ -2107,7 +2107,6 @@ double randf(double _m)
 /////////////////////////////////////////////////
 void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
 {
-  std::cout << "Create population" << std::endl;
   std::vector<math::Vector3> obs;
   std::vector<math::Vector3> objects;
   bool preventCollisions = false;
@@ -2160,6 +2159,11 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   sdf::ElementPtr region = _pop->GetElement("region");
   if (region->HasElement("cuboid"))
   {
+    double dx;
+    double dy;
+    double dz;
+    math::Vector3 max;
+
     sdf::ElementPtr cuboid = region->GetElement("cuboid");
     if (!cuboid->HasElement("min"))
     {
@@ -2168,17 +2172,21 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       return;
     }
     math::Vector3 min = cuboid->Get<math::Vector3>("min");
-    if (!cuboid->HasElement("max"))
-    {
-      std::cerr << "Unable to find <max> inside the cuboid tag."
-                << std::endl;
-      return;
-    }
-    math::Vector3 max = cuboid->Get<math::Vector3>("max");
 
-    double dx = fabs(max.x - min.x);
-    double dy = fabs(max.y - min.y);
-    double dz = fabs(max.z - min.z);
+    if (distribution != "grid")
+    {
+      if (!cuboid->HasElement("max"))
+        {
+          std::cerr << "Unable to find <max> inside the cuboid tag."
+                    << std::endl;
+          return;
+        }
+      max = cuboid->Get<math::Vector3>("max");
+
+      dx = fabs(max.x - min.x);
+      dy = fabs(max.y - min.y);
+      dz = fabs(max.z - min.z);
+    }
 
     if (distribution == "random")
     {
@@ -2226,6 +2234,44 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
         p.y = std::min(min.y, max.y) + centroids[i].y;
         p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
         objects.push_back(p);
+      }
+    }
+    else if (distribution == "grid")
+    {
+      if (!cuboid->HasElement("rows"))
+      {
+        std::cerr << "Unable to find <rows> inside the cuboid tag."
+                  << std::endl;
+        return;
+      }
+      int rows = cuboid->Get<int>("rows");
+
+      if (!cuboid->HasElement("cols"))
+      {
+        std::cerr << "Unable to find <cols> inside the cuboid tag."
+                  << std::endl;
+        return;
+      }
+      int cols = cuboid->Get<int>("cols");
+
+      if (!cuboid->HasElement("step"))
+      {
+        std::cerr << "Unable to find <step> inside the cuboid tag."
+                  << std::endl;
+        return;
+      }
+      math::Vector3 step = cuboid->Get<math::Vector3>("step");
+
+      math::Vector3 p = min;
+      for (int i = 0; i < rows; ++i)
+      {
+        for (int j = 0; j < cols; ++j)
+        {
+          objects.push_back(p);
+          p.x += step.x;
+        }
+        p.x = min.x;
+        p.y += step.y;
       }
     }
     else if (distribution == "linear-x")
@@ -2328,9 +2374,9 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       for (int i = 0; i < modelCount; ++i)
       {
         math::Vector3 p;
-        p.x = center.x + centroids[i].x;
-        p.y = center.x + centroids[i].y;
-        p.z = center.z + math::Rand::GetDblUniform(0, height);
+        p.x = centroids[i].x;
+        p.y = centroids[i].y;
+        p.z = math::Rand::GetDblUniform(0, height);
         objects.push_back(p);
       }
     }
@@ -2348,7 +2394,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   modelSdf.SetFromString(
     "<sdf version ='1.5'>" + model->ToString("") + "</sdf>");
 
-  for (int i = 0; i < objects.size(); ++i)
+  std::vector<ModelPtr> clonedModels;
+  for (size_t i = 0; i < objects.size(); ++i)
   {
     msgs::Factory msg2;
 
@@ -2381,21 +2428,36 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       newModel->SetWorldPose(newPose);
       newModel->Init();
       newModel->LoadPlugins();
-      if (newModel)
+      math::Box box = newModel->GetBoundingBox();
+
+      if (preventCollisions)
       {
-        //std::cout << "Name: " << newName << std::endl;
-        //std::cout << newModel->GetBoundingBox() << std::endl;
+        bool collide = false;
+        for (size_t j = 0; j < clonedModels.size(); ++j)
+        {
+          ModelPtr otherModel = clonedModels[j];
+          std::cout << "Model name: " << otherModel->GetName() << std::endl;
+          std::cout << "Checking " << i << "with " << j << ":";
+          if (otherModel->GetBoundingBox().Intersects(box))
+          {
+            collide = true;
+            std::cout << " Collide" << std::endl;
+            // Model not valid.
+            std::cout << "Checking " << otherModel->GetBoundingBox() << "with"
+                      << box << std::endl;
+            std::cout << "collision detected" << std::endl;
+            this->RemoveModel(newName);
+            break;
+          }
+          else
+            std::cout << "OK" << std::endl;
+        }
+        if (not collide)
+          clonedModels.push_back(newModel);
       }
-      else
-        std::cerr << "Model is NULL" << std::endl;
     }
     else
       std::cerr << "ModelEleme is NULL" << std::endl;
-    /*{
-      boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
-      this->factoryMsgs.push_back(msg2);
-      this->ProcessFactoryMsgs();
-    }*/
   }
 }
 
