@@ -79,9 +79,13 @@ TEST_P(ExamplePlugins, Build)
 }
 
 INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
-  "hello_world"
+  "animate_joints"
+  , "animate_pose"
   , "factory"
+  , "hello_world"
   , "model_push"
+  , "parameters"
+  , "projector"
   , "system_gui_plugin"
   , "world_edit"
 ));
