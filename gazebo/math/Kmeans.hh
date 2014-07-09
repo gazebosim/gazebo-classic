@@ -71,14 +71,12 @@ namespace gazebo
       public: void SetNumClusters(unsigned int _k);
 
       /// \brief Executes the algorithm.
-      /// \param[out] _obs The list of observations with the cluster information
       /// \param[out] _centroids Vector of centroids.
       /// \return True when the operation succeed or false otherwise.
-      public: bool Cluster(std::vector<Vector3> &_obs,
-                           std::vector<unsigned int> &_centroids,
+      public: bool Cluster(std::vector<Vector3> &_centroids,
                            std::vector<unsigned int> &_labels);
 
-      private: unsigned int Kmeans::ClosestCentroid(Vector3 p);
+      private: unsigned int ClosestCentroid(Vector3 p);
 
       /// \brief Number of partitions used to cluster.
       private: unsigned int k;
@@ -98,8 +96,9 @@ namespace gazebo
       /// \brief Contains the cluster for each observation.
       private: std::vector<unsigned int> labels;
 
-      /// \brief Distances from an observation to a centroid.
-      private: std::vector<double> distances;
+      private: std::vector<Vector3> sums;
+
+      private: std::vector<unsigned int> counters;
     };
     /// \}
   }

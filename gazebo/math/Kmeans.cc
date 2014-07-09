@@ -30,20 +30,16 @@ Kmeans::Kmeans(const std::vector<math::Vector3> &_obs, unsigned int _k,
   : k(_k),
     seed(_seed)
 {
-	// Initialize observations.
-	this->SetObservations(_obs);
+  // Initialize observations.
+  this->SetObservations(_obs);
 
-	// Initialize distances.
-	for (size_t i = 0; i < _obs.size(); ++i)
-		this->distances.push_back(0.0);
-
-	// Initialize centroids.
-	for (size_t i = 0; i < k; ++i)
-	{
-		// Choose a random observation.
-		Vector3 p = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)].pos;
-		this->newCentroids.push_back(p);
-	}
+  // Initialize centroids.
+  for (size_t i = 0; i < k; ++i)
+  {
+    // Choose a random observation.
+    Vector3 p = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
+    this->centroids.push_back(p);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -55,93 +51,127 @@ Kmeans::~Kmeans()
 //////////////////////////////////////////////////
 uint32_t Kmeans::GetSeed()
 {
-	return this->seed;
+  return this->seed;
 }
 
 //////////////////////////////////////////////////
 void Kmeans::SetSeed(uint32_t _seed)
 {
-	this->seed = _seed;
+  this->seed = _seed;
 }
 
 //////////////////////////////////////////////////
 std::vector<math::Vector3> Kmeans::GetObservations()
 {
-	return this->obs;
+  return this->obs;
 }
 
 //////////////////////////////////////////////////
 void Kmeans::SetObservations(const std::vector<math::Vector3> &_obs)
 {
-	this->obs.clear();
-	for (size_t i = 0; i < _obs.size(); ++i)
-		this->obs.push_back(_obs[i]);
+  this->obs.clear();
+  for (size_t i = 0; i < _obs.size(); ++i)
+    this->obs.push_back(_obs[i]);
 }
 
 //////////////////////////////////////////////////
 unsigned int Kmeans::GetNumClusters()
 {
-	return k;
+  return k;
 }
 
 //////////////////////////////////////////////////
 void Kmeans::SetNumClusters(unsigned int _k)
 {
-	this->k = _k;
+  this->k = _k;
 }
 
 //////////////////////////////////////////////////
-bool Kmeans::Cluster(std::vector<Vector3> &_obs,
-                     std::vector<unsigned int> &_centroids,
+bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
                      std::vector<unsigned int> &_labels)
 {
-	// ToDo(caguero): Use gzerr
-	// Sanity check
-	if (this->obs.size() == 0)
-	{
-		std::cerr << "The set of observations is empty." << std::endl;
-		return false;
-	}
+  int changed;
+  // ToDo(caguero): Use gzerr
+  // Sanity check
+  if (this->obs.size() == 0)
+  {
+    std::cerr << "The set of observations is empty." << std::endl;
+    return false;
+  }
 
-	if (this->k == 0)
-	{
-		std::cerr << "The number of clusters should not be zero." << std::endl;
-		return false;
-	}
+  if (this->k == 0)
+  {
+    std::cerr << "The number of clusters should not be zero." << std::endl;
+    return false;
+  }
 
-	if (this->k > this->obs.size())
-	{
-		std::cerr << "The number of clusters has to be lower or equal to the number of "
-		          << " observations." << std::endl;
-		return false;
-	}
+  if (this->k > this->obs.size())
+  {
+    std::cerr << "The number of clusters has to be lower or equal to the number of "
+              << " observations." << std::endl;
+    return false;
+  }
 
-	do
-	{
-		for (int i = 0; i < this->obs.size(); ++i)
-		{
-			// Update the labels containing the closest centroid for each point.
-			this->labels[i] = ClosestCentroid(this->obs[i]);
-		}
+  // Initialize the size of the vectors;
+  this->centroids.resize(this->k);
+  this->oldCentroids.resize(this->k);
+  this->labels.resize(this->obs.size());
+  this->sums.resize(this->k);
+  this->counters.resize(this->k);
 
-	} while (true);
+  for (size_t i = 0; i < this->obs.size(); ++i)
+    this->labels[i] = 0;
 
-	return true;
+  do
+  {
+    // Reset sums and counters.
+    for (size_t i = 0; i < this->centroids.size(); ++i)
+    {
+      this->sums[i] = math::Vector3(0, 0, 0);
+      this->counters[i] = 0;
+    }
+    changed = 0;
+
+    for (size_t i = 0; i < this->obs.size(); ++i)
+    {
+      // Update the labels containing the closest centroid for each point.
+      unsigned int label = ClosestCentroid(this->obs[i]);
+      if (this->labels[i] != label)
+      {
+        this->labels[i] = label;
+        changed++;
+      }
+      this->sums[label] += this->obs[i];
+      this->counters[label]++;
+    }
+
+    // Save old centroids.
+    this->oldCentroids = centroids;
+
+    // Update the centroids.
+    for (size_t i = 0; i < this->centroids.size(); ++i)
+      this->centroids[i] = this->sums[i] / this->counters[i];
+  }
+  while (changed > (this->obs.size() >> 10));
+
+  _centroids = this->centroids;
+  _labels = this->labels;
+  return true;
 }
 
 unsigned int Kmeans::ClosestCentroid(Vector3 p)
 {
-	double min = HUGE_VAL;
-	unsigned int minIdx;
-	for (int i = 0; i < this->centroids.size(); ++i)
-	{
-		double d = p.Distance(this->centroids[i]);
-		if (d < min)
-		{
-			min = d;
-			minIdx = i;
-		}
-	}
-	return minIdx;
+  double min = HUGE_VAL;
+  unsigned int minIdx = 0;
+  for (size_t i = 0; i < this->centroids.size(); ++i)
+  {
+    double d = p.Distance(this->centroids[i]);
+    if (d < min)
+    {
+      min = d;
+      minIdx = i;
+    }
+  }
+  return minIdx;
 }
 

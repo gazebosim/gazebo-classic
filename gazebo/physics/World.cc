@@ -43,6 +43,9 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/math/Kmeans.hh"
+#include "gazebo/math/Vector3.hh"
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/util/OpenAL.hh"
@@ -229,10 +232,6 @@ void World::Load(sdf::ElementPtr _sdf)
   // This should come before loading of entities
   this->physicsEngine->Load(this->sdf->GetElement("physics"));
 
-  // Check if we have to insert an object population.
-  if (this->sdf->HasElement("population"))
-    this->CreateEnvironmentPopulation(this->sdf->GetElement("population"));
-
   // This should also come before loading of entities
   {
     sdf::ElementPtr spherical = this->sdf->GetElement("spherical_coordinates");
@@ -285,6 +284,8 @@ void World::Load(sdf::ElementPtr _sdf)
     for (unsigned int i = 0; i < this->GetModelCount(); ++i)
       this->GetModel(i)->LoadJoints();
   }
+
+
 
   // TODO: Performance test to see if TBB model updating is necessary
   // Choose threaded or unthreaded model updating depending on the number of
@@ -347,6 +348,18 @@ void World::Init()
 
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
+
+  // Check if we have to insert an object population.
+  if (this->sdf->HasElement("population"))
+  {
+    sdf::ElementPtr populationElem = this->sdf->GetElement("population");
+
+    while (populationElem)
+    {
+      this->CreateEnvironmentPopulation(populationElem);
+      populationElem = populationElem->GetNextElement("population");
+    }
+  }
 
   this->initialized = true;
 
@@ -2086,19 +2099,243 @@ void World::OnLightMsg(ConstLightPtr &_msg)
   }
 }
 
+double randf(double _m)
+{
+  return _m * rand() / (RAND_MAX - .1);
+}
+
 /////////////////////////////////////////////////
 void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
 {
+  std::cout << "Create population" << std::endl;
+  std::vector<math::Vector3> obs;
+  std::vector<math::Vector3> objects;
+  bool preventCollisions = false;
+  transport::PublisherPtr popPub =
+    this->node->Advertise<msgs::Factory>("~/factory");
+
   // Read all the population elements.
+  if (!_pop->HasElement("model"))
+  {
+    std::cerr << "Unable to find the a model inside the population tag."
+              << std::endl;
+    return;
+  }
   sdf::ElementPtr model = _pop->GetElement("model");
-  sdf::ElementPtr region = _pop->GetElement("region");
+  std::string modelName = model->Get<std::string>("name");
+
+  if (!_pop->HasElement("density"))
+  {
+    std::cerr << "Unable to find <density> inside the population tag."
+              << std::endl;
+    return;
+  }
   double density = _pop->Get<double>("density");
+
+  if (!_pop->HasElement("model_count"))
+  {
+    std::cerr << "Unable to find <model_count> inside the population tag."
+              << std::endl;
+    return;
+  }
   int modelCount = _pop->Get<int>("model_count");
-  bool preventCollisions = _pop->Get<bool>("prevent_collisions");
-  math::Vector3 minBoundingBox = region->Get<math::Vector3>("min");
-  math::Vector3 maxBoundingBox = region->Get<math::Vector3>("max");
+
+  if (!_pop->HasElement("distribution"))
+  {
+    std::cerr << "Unable to find <distribution> inside the population tag."
+              << std::endl;
+    return;
+  }
   std::string distribution = _pop->Get<std::string>("distribution");
-  std::string modelName = "model://" + model->Get<std::string>("name");
+
+  if (_pop->HasElement("prevent_collisions"))
+    preventCollisions = _pop->Get<bool>("prevent_collisions");
+
+  if (!_pop->HasElement("region"))
+  {
+    std::cerr << "Unable to find <region> inside the population tag."
+              << std::endl;
+    return;
+  }
+  sdf::ElementPtr region = _pop->GetElement("region");
+  if (region->HasElement("cuboid"))
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    if (!cuboid->HasElement("min"))
+    {
+      std::cerr << "Unable to find <min> inside the cuboid tag."
+                << std::endl;
+      return;
+    }
+    math::Vector3 min = cuboid->Get<math::Vector3>("min");
+    if (!cuboid->HasElement("max"))
+    {
+      std::cerr << "Unable to find <max> inside the cuboid tag."
+                << std::endl;
+      return;
+    }
+    math::Vector3 max = cuboid->Get<math::Vector3>("max");
+
+    double dx = fabs(max.x - min.x);
+    double dy = fabs(max.y - min.y);
+    double dz = fabs(max.z - min.z);
+
+    if (distribution == "random")
+    {
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = std::min(min.x, max.x) + math::Rand::GetDblUniform(0, dx);
+        p.y = std::min(min.y, max.y) + math::Rand::GetDblUniform(0, dy);
+        p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
+
+        objects.push_back(p);
+      }
+    }
+    else if (distribution == "uniform")
+    {
+      // Step1: Sample points in a cuboid.
+      double x = 0.0;
+      double y = 0.0;
+      while (y < dy)
+      {
+        while (x < dx)
+        {
+          math::Vector3 p;
+          p.x = x;
+          p.y = y;
+          p.z = 0;
+          obs.push_back(p);
+          x += .1;
+        }
+        x = 0.0;
+        y += .1;
+      }
+
+      // Step2: Cluster the sampled points in 'modelCount' clusters.
+      std::vector<math::Vector3> centroids;
+      std::vector<unsigned int> labels;
+      math::Kmeans kmeans(obs, modelCount);
+      kmeans.Cluster(centroids, labels);
+
+      // Step3: Create the list of object positions.
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = std::min(min.x, max.x) + centroids[i].x;
+        p.y = std::min(min.y, max.y) + centroids[i].y;
+        p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
+        objects.push_back(p);
+      }
+    }
+    else if (distribution == "linear-x")
+    {
+      // Evenly placed in a row along the global x-axis.
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = std::min(min.x, max.x) + i * dx / static_cast<double>(modelCount);
+        p.y = min.y + max.y / 2.0;
+        p.z = min.z + max.z / 2.0;
+        objects.push_back(p);
+      }
+    }
+    else if (distribution == "linear-y")
+    {
+      // Evenly placed in a row along the global x-axis.
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = min.x + max.x / 2.0;
+        p.y = std::min(min.y, max.y) + i * dy / static_cast<double>(modelCount);
+        p.z = min.z + max.z / 2.0;
+        objects.push_back(p);
+      }
+    }
+    else if (distribution == "linear-z")
+    {
+      // Evenly placed in a row along the global x-axis.
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = min.x + max.x / 2.0;
+        p.y = min.y + max.y / 2.0;
+        p.z = std::min(min.z, max.z) + i * dz / static_cast<double>(modelCount);
+        objects.push_back(p);
+      }
+    }
+  }
+  else if (region->HasElement("cylinder"))
+  {
+    sdf::ElementPtr cylinder = region->GetElement("cylinder");
+    if (!cylinder->HasElement("center"))
+    {
+      std::cerr << "Unable to find <center> inside the cylinder tag."
+                << std::endl;
+      return;
+    }
+    math::Vector3 center = cylinder->Get<math::Vector3>("center");
+    if (!cylinder->HasElement("radius"))
+    {
+      std::cerr << "Unable to find <radius> inside the cylinder tag."
+                << std::endl;
+      return;
+    }
+    double radius = cylinder->Get<double>("radius");
+    if (!cylinder->HasElement("height"))
+    {
+      std::cerr << "Unable to find <height> inside the cylinder tag."
+                << std::endl;
+      return;
+    }
+    double height = cylinder->Get<double>("height");
+
+    if (distribution == "random")
+    {
+      for (int i = 0; i < modelCount; ++i)
+      {
+        double ang = randf(2 * M_PI);
+        double r = randf(radius);
+        math::Vector3 p;
+        p.x = center.x + r * cos(ang);
+        p.y = center.y + r * sin(ang);
+        p.z = center.z + math::Rand::GetDblUniform(0, height);
+        objects.push_back(p);
+      }
+    }
+    else if (distribution == "uniform")
+    {
+      // Step1: Sample points in the cylinder.
+      unsigned int points = 10000;
+      for (size_t i = 0; i < points; ++i)
+      {
+        double ang = randf(2 * M_PI);
+        double r = randf(radius);
+        math::Vector3 p;
+        p.x = center.x + r * cos(ang);
+        p.y = center.y + r * sin(ang);
+        p.z = center.z + math::Rand::GetDblUniform(0, height);
+        obs.push_back(p);
+      }
+
+      // Step2: Cluster the sampled points in 'modelCount' clusters.
+      std::vector<math::Vector3> centroids;
+      std::vector<unsigned int> labels;
+      math::Kmeans kmeans(obs, modelCount);
+      kmeans.Cluster(centroids, labels);
+
+      // Step3: Create the list of object positions.
+      for (int i = 0; i < modelCount; ++i)
+      {
+        math::Vector3 p;
+        p.x = center.x + centroids[i].x;
+        p.y = center.x + centroids[i].y;
+        p.z = center.z + math::Rand::GetDblUniform(0, height);
+        objects.push_back(p);
+      }
+    }
+  }
+
   /*std::cout << "Model name: " << modelName << std::endl;
   std::cout << "Density: " << density << std::endl;
   std::cout << "Model count: " << modelCount << std::endl;
@@ -2111,45 +2348,54 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   modelSdf.SetFromString(
     "<sdf version ='1.5'>" + model->ToString("") + "</sdf>");
 
-  // Create a new model.
-  msgs::Factory msg;
-  double x, y, z, dx, dy, dz;
-  dx = maxBoundingBox.x - minBoundingBox.x;
-  dy = maxBoundingBox.y - minBoundingBox.y;
-  dz = maxBoundingBox.z - minBoundingBox.z;
-  x = minBoundingBox.x + math::Rand::GetDblUniform(0, dx);
-  y = minBoundingBox.y + math::Rand::GetDblUniform(0, dy);
-  z = minBoundingBox.z + math::Rand::GetDblUniform(0, dz);
-  msgs::Set(msg.mutable_pose(), gazebo::math::Pose(x, y, z, 0, 0, 0));
-  msg.set_sdf(modelSdf.ToString());
-
-  // Publish the new model.
-  transport::PublisherPtr popPub =
-    this->node->Advertise<msgs::Factory>("~/factory");
-  popPub->Publish(msg);
-
-  for (int i = 0; i < modelCount - 1; ++i)
+  for (int i = 0; i < objects.size(); ++i)
   {
     msgs::Factory msg2;
 
-    // Random distribution.
-    x = minBoundingBox.x + math::Rand::GetDblUniform(0, dx);
-    y = minBoundingBox.y + math::Rand::GetDblUniform(0, dy);
-    z = minBoundingBox.z + math::Rand::GetDblUniform(0, dz);
+    math::Vector3 p;
+    p.x = objects[i].x;
+    p.y = objects[i].y;
+    p.z = objects[i].z;
 
-    msgs::Set(msg2.mutable_pose(), gazebo::math::Pose(x, y, z, 0, 0, 0));
+    msgs::Set(msg2.mutable_pose(), gazebo::math::Pose(p.x, p.y, p.z, 0, 0, 0));
 
     std::string cloneSdf = modelSdf.ToString();
     std::string delim = "model name='";
     size_t first = cloneSdf.find(delim) + delim.size();
     size_t last = cloneSdf.find("'", first);
-    std::string newName = std::string("beer_clone_") +
+    std::string newName = modelName + std::string("_clone_") +
       boost::lexical_cast<std::string>(i);
     cloneSdf.replace(first, last - first, newName);
 
     msg2.set_sdf(cloneSdf);
 
-    popPub->Publish(msg2);
+    //popPub->Publish(msg2);
+
+    sdf::SDF model2Sdf;
+    model2Sdf.SetFromString(cloneSdf);
+    sdf::ElementPtr modelElem = model2Sdf.root->GetElement("model");
+    if (modelElem)
+    {
+      ModelPtr newModel = this->LoadModel(modelElem, this->rootElement);
+      math::Pose newPose(math::Pose(p.x, p.y, p.z, 0, 0, 0));
+      newModel->SetWorldPose(newPose);
+      newModel->Init();
+      newModel->LoadPlugins();
+      if (newModel)
+      {
+        //std::cout << "Name: " << newName << std::endl;
+        //std::cout << newModel->GetBoundingBox() << std::endl;
+      }
+      else
+        std::cerr << "Model is NULL" << std::endl;
+    }
+    else
+      std::cerr << "ModelEleme is NULL" << std::endl;
+    /*{
+      boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+      this->factoryMsgs.push_back(msg2);
+      this->ProcessFactoryMsgs();
+    }*/
   }
 }
 

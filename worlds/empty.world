@@ -11,24 +11,80 @@
     </include>
 
     <!-- Testing the automatic population of objects -->
-    <population name="beer_population">
-
-      <model name="beer">
+    <population name="beer_population1">
+      <model name="beer1">
         <include>
           <uri>model://beer</uri>
         </include>
       </model>
-
       <region>
-        <min>0 0 0</min>
-        <max>1 1 0</max>
+        <cuboid>
+          <min>3 3 0</min>
+          <max>7 5 0</max>
+        </cuboid>
       </region>
-
       <density>1.0</density>
-
-      <model_count>500</model_count>
+      <model_count>20</model_count>
       <prevent_collisions>false</prevent_collisions>
       <distribution>random</distribution>
+    </population>
+
+    <!-- Testing the automatic population of objects -->
+    <population name="beer_population2">
+      <model name="beer2">
+        <include>
+          <uri>model://beer</uri>
+        </include>
+      </model>
+      <region>
+        <cylinder>
+          <center>-3 3 0</center>
+          <radius>1</radius>
+          <height>0.1</height>
+        </cylinder>
+      </region>
+      <density>1.0</density>
+      <model_count>20</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>random</distribution>
+    </population>
+
+    <population name="beer_population3">
+      <model name="beer3">
+        <include>
+          <uri>model://beer</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>3 -3 0</min>
+          <max>7 -5 0</max>
+        </cuboid>
+      </region>
+      <density>1.0</density>
+      <model_count>20</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>uniform</distribution>
+    </population>
+
+    <!-- Testing the automatic population of objects -->
+    <population name="beer_population4">
+      <model name="beer4">
+        <include>
+          <uri>model://beer</uri>
+        </include>
+      </model>
+      <region>
+        <cylinder>
+          <center>-3 -3 0</center>
+          <radius>1</radius>
+          <height>0.1</height>
+        </cylinder>
+      </region>
+      <density>1.0</density>
+      <model_count>20</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>uniform</distribution>
     </population>
 
   </world>
