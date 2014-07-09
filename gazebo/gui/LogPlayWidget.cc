@@ -20,6 +20,7 @@
 #include "gazebo/util/LogPlay.hh"
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/LogPlayWidget.hh"
 
@@ -128,23 +129,32 @@ LogPlayWidget::LogPlayWidget(QWidget *_parent)
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
   this->layout()->setContentsMargins(0, 0, 0, 0);
 
+  // Create a QueuedConnection. This is used for thread safety.
+  connect(this, SIGNAL(SetRange(unsigned int)),
+          this, SLOT(OnSetRange(unsigned int)), Qt::QueuedConnection);
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
   this->controlPub = this->node->Advertise<msgs::LogPlayControl>(
       "/gazebo/log/play/control");
+
+  this->statusSub = this->node->Subscribe("/gazebo/log/play/status",
+      &LogPlayWidget::OnStatusMsg, this, true);
+
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
 
   this->statsSub = this->node->Subscribe("~/world_stats",
       &LogPlayWidget::OnStats, this);
 
-  this->statusSub = this->node->Subscribe("/gazebo/log/play/status",
-      &LogPlayWidget::OnStatusMsg, this, true);
+  std::cout << "TopicNamespace[" << this->node->GetTopicNamespace() << "]\n";
+}
 
-  // Create a QueuedConnection. This is used for thread safety.
-  connect(this, SIGNAL(SetRange(unsigned int)),
-          this, SLOT(OnSetRange(unsigned int)), Qt::QueuedConnection);
+/////////////////////////////////////////////////
+void LogPlayWidget::Init()
+{
+  this->show();
 }
 
 /////////////////////////////////////////////////
@@ -155,7 +165,15 @@ LogPlayWidget::~LogPlayWidget()
 /////////////////////////////////////////////////
 void LogPlayWidget::OnSetRange(unsigned int _max)
 {
-  this->show();
+  std::list<std::string> list;
+  transport::get_topic_namespaces(list);
+
+  std::cout << "====\n";
+  for (std::list<std::string>::iterator iter = list.begin(); iter != list.end(); ++iter)
+  {
+    std::cout << *iter << "\n";
+  }
+
   this->scrubber->setRange(0, _max);
 }
 

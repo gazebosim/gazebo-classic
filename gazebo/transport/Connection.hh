@@ -345,9 +345,6 @@ namespace gazebo
       /// \return GAZEBO_IP_WHITE_LIST
       public: std::string GetIPWhiteList() const;
 
-      /// \brief Clear all message buffers.
-      public: void ClearBuffers();
-
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
       /// \param[in] _b Buffer of the data that was written.

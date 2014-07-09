@@ -119,6 +119,10 @@ namespace gazebo
                   boost::function<void(uint32_t)> _cb,
                   uint32_t _id);
 
+      /// \brief Remove a publisher.
+      /// \param[in] _pub Pointer to publisher object to remove.
+      public: void RemovePublisher(PublisherPtr _pub);
+
       /// \brief Set the previous message for a publisher.
       /// \param[in] _pubId ID of the publisher.
       /// \param[in] _msg The previous message.
@@ -144,10 +148,6 @@ namespace gazebo
       /// \brief Add a publisher
       /// \param[in,out] _pub Pointer to publisher object to be added
       public: void AddPublisher(PublisherPtr _pub);
-
-      /// \brief Remove a publisher
-      /// \param[in] _pub Pointer to publisher object to remove
-      public: void RemovePublisher(PublisherPtr _pub);
 
       /// \brief Remove nodes that have been marked for removal
       private: void RemoveNodes();

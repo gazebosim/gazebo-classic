@@ -68,10 +68,6 @@ namespace gazebo
       /// \brief Finalize the connection manager
       public: void Fini();
 
-      /// \brief Pause or unpause the conneciton manager.
-      /// \param[in] _pause True to pause, false to unpause.
-      public: void Pause(bool _pause);
-
       /// \brief Stop the conneciton manager
       public: void Stop();
 
@@ -137,9 +133,6 @@ namespace gazebo
       /// \brief Inform the connection manager that it needs an update.
       public: void TriggerUpdate();
 
-      /// \brief Clear all message buffers.
-      public: void ClearBuffers();
-
       /// \brief Callback function called when we have read data from the
       /// master
       /// \param[in] _data String of incoming data
@@ -176,7 +169,6 @@ namespace gazebo
 
       private: bool initialized;
       private: bool stop, stopped;
-      private: bool pause;
 
       private: unsigned int tmpIndex;
       private: boost::recursive_mutex listMutex;
@@ -192,51 +184,6 @@ namespace gazebo
 
       /// \brief Condition used for synchronization
       private: boost::condition_variable namespaceCondition;
-
-      /// \brief A class to hold a pending subscription.
-      private: class PendingSubscription
-               {
-                 /// \brief Constructor.
-                 /// \param[in] _topic Name of the topic.
-                 /// \param[in] _msgType Type of message.
-                 /// \param[in] _latching True for latching topics.
-                 public:PendingSubscription(const std::string &_topic,
-                            const std::string &_msgType, bool _latching) :
-                   topic(_topic), msgType(_msgType), latching(_latching) {}
-
-                 /// \brief Name of the topic.
-                 public: std::string topic;
-
-                 /// \brief Name of the message type.
-                 public: std::string msgType;
-
-                 /// \brief True for latching topics.
-                 public: bool latching;
-               };
-
-      /// \brief A class to hold a pending advertisement.
-      private: class PendingAdvertisement
-               {
-                 /// \brief Constructor.
-                 /// \param[in] _topic Name of the topic.
-                 /// \param[in] _msgType Type of message.
-                 public:PendingAdvertisement(const std::string &_topic,
-                            const std::string &_msgType) :
-                   topic(_topic), msgType(_msgType) {}
-
-                 /// \brief Name of the topic.
-                 public: std::string topic;
-
-                 /// \brief Name of the message type.
-                 public: std::string msgType;
-               };
-
-      /// \brief List of all pending subscriptions.
-      private: std::list<PendingSubscription> pendingSubscriptions;
-
-      /// \brief List of all pending advertisements.
-      private: std::list<PendingAdvertisement> pendingAdvertisements;
-
 
       // Singleton implementation
       private: friend class SingletonT<ConnectionManager>;

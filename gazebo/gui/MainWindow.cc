@@ -324,6 +324,7 @@ void MainWindow::OpenLog()
     msg.set_open_log_filename(filename);
     this->serverControlPub->Publish(msg);
 
+    this->logPlay->Init();
     this->logPlay->show();
   }
 }

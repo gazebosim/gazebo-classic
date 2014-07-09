@@ -23,7 +23,6 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/transport/ConnectionManager.hh"
-#include "gazebo/transport/IOManager.hh"
 #include "gazebo/transport/TransportIface.hh"
 
 using namespace gazebo;
@@ -36,8 +35,6 @@ bool g_minimalComms = false;
 
 std::list<msgs::Request *> g_requests;
 std::list<boost::shared_ptr<msgs::Response> > g_responses;
-
-transport::IOManager *g_iomanager = new transport::IOManager();
 
 /////////////////////////////////////////////////
 void dummy_callback_fn(uint32_t)
@@ -110,11 +107,6 @@ bool transport::init(const std::string &_masterHost, unsigned int _masterPort,
 /////////////////////////////////////////////////
 void transport::run()
 {
-  if (g_iomanager == NULL)
-    g_iomanager = new IOManager();
-
-  g_iomanager->Start();
-
   g_stopped = false;
   g_runThread = new boost::thread(&transport::ConnectionManager::Run,
                                 transport::ConnectionManager::Instance());
@@ -127,24 +119,11 @@ bool transport::is_stopped()
 }
 
 /////////////////////////////////////////////////
-void transport::pause(bool _pause)
-{
-  transport::ConnectionManager::Instance()->Pause(_pause);
-}
-
-/////////////////////////////////////////////////
 void transport::stop()
 {
   g_stopped = true;
   g_responseCondition.notify_all();
   transport::ConnectionManager::Instance()->Stop();
-  // g_iomanager->Stop();
-  if (g_runThread)
-  {
-    g_runThread->join();
-    delete g_runThread;
-    g_runThread = NULL;
-  }
 }
 
 /////////////////////////////////////////////////
@@ -166,7 +145,6 @@ void transport::fini()
 void transport::clear_buffers()
 {
   transport::TopicManager::Instance()->ClearBuffers();
-  transport::ConnectionManager::Instance()->ClearBuffers();
 }
 
 /////////////////////////////////////////////////
@@ -208,7 +186,7 @@ void transport::get_topic_namespaces(std::list<std::string> &_namespaces)
 /////////////////////////////////////////////////
 boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
-    const std::string &_data, const common::Time &_wait)
+    const std::string &_data)
 {
   boost::mutex::scoped_lock lock(requestMutex);
 
@@ -233,14 +211,7 @@ boost::shared_ptr<msgs::Response> transport::request(
   while (!valid)
   {
     // Wait for a response
-    if (_wait == common::Time::Zero)
-      g_responseCondition.wait(lock);
-    else
-    {
-      g_responseCondition.timed_wait(lock,
-          boost::posix_time::milliseconds(_wait.sec * 1e3 + _wait.nsec*1e-6));
-      valid = true;
-    }
+    g_responseCondition.wait(lock);
 
     for (iter = g_responses.begin(); iter != g_responses.end(); ++iter)
     {

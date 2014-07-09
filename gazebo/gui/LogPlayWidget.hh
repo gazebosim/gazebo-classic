@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~LogPlayWidget();
 
+      /// \brief Initialize the log player.
+      public: void Init();
+
       /// \brief A signal used to set the scrubber max range.
       /// \param[in] _max Maximum value for the scrubber.
       signals: void SetRange(unsigned int _max);

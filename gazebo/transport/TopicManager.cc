@@ -268,24 +268,6 @@ void TopicManager::ConnectPubToSub(const std::string &_topic,
 }
 
 //////////////////////////////////////////////////
-void TopicManager::ConnectPubToSub(const msgs::Subscribe &_sub,
-                                   const SubscriptionTransportPtr _sublink)
-{
-  PublicationPtr publication = this->UpdatePublications(_sub.topic(),
-      _sub.msg_type());
-
-  if (publication)
-  {
-    publication->AddSubscription(_sublink);
-  }
-  else
-  {
-    gzerr << "Unable to get or create a publication on topic["
-      << _sub.topic() << "] with message type[" << _sub.msg_type() << "]\n";
-  }
-}
-
-//////////////////////////////////////////////////
 void TopicManager::DisconnectPubFromSub(const std::string &topic,
     const std::string &host, unsigned int port)
 {

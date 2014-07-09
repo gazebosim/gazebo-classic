@@ -38,7 +38,7 @@ using namespace transport;
 extern void dummy_callback_fn(uint32_t);
 
 unsigned int Connection::idCounter = 0;
-extern IOManager *g_iomanager;
+IOManager *Connection::iomanager = NULL;
 
 // Version 1.52 of boost has an address::is_unspecfied function, but
 // Version 1.46.1 (installed on ubuntu) does not. So this helper function
@@ -63,9 +63,12 @@ Connection::Connection()
   this->dropMsgLogged = false;
   this->headerBuffer = new char[HEADER_LENGTH+1];
 
-  this->socket = new boost::asio::ip::tcp::socket(g_iomanager->GetIO());
+  if (iomanager == NULL)
+    iomanager = new IOManager();
 
-  g_iomanager->IncCount();
+  this->socket = new boost::asio::ip::tcp::socket(iomanager->GetIO());
+
+  iomanager->IncCount();
   this->id = idCounter++;
 
   this->acceptor = NULL;
@@ -99,12 +102,14 @@ Connection::~Connection()
 
   this->Shutdown();
 
-  if (g_iomanager)
+  if (iomanager)
   {
-    g_iomanager->DecCount();
-    if (g_iomanager->GetCount() == 0)
+    iomanager->DecCount();
+    if (iomanager->GetCount() == 0)
     {
       this->idCounter = 0;
+      delete iomanager;
+      iomanager = NULL;
     }
   }
 }
@@ -123,7 +128,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
 
   // Resolve the host name into an IP address
   boost::asio::ip::tcp::resolver::iterator end;
-  boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
+  boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
   boost::asio::ip::tcp::resolver::query query(host, service,
       boost::asio::ip::resolver_query_base::numeric_service);
   boost::asio::ip::tcp::resolver::iterator endpointIter;
@@ -187,7 +192,7 @@ void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
 {
   this->acceptCB = _acceptCB;
 
-  this->acceptor = new boost::asio::ip::tcp::acceptor(g_iomanager->GetIO());
+  this->acceptor = new boost::asio::ip::tcp::acceptor(iomanager->GetIO());
   boost::asio::ip::tcp::endpoint endpoint(boost::asio::ip::tcp::v4(), port);
   this->acceptor->open(endpoint.protocol());
   this->acceptor->set_option(
@@ -653,7 +658,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   // First try GAZEBO_HOSTNAME if it is set.
   if (hostname && !std::string(hostname).empty())
   {
-    boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
+    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
     boost::asio::ip::tcp::resolver::query query(hostname, "");
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
     boost::asio::ip::tcp::resolver::iterator end;
@@ -799,7 +804,7 @@ std::string Connection::GetHostname(boost::asio::ip::tcp::endpoint _ep)
   // Otherwise perform a lookup
   else
   {
-    boost::asio::ip::tcp::resolver resolver(g_iomanager->GetIO());
+    boost::asio::ip::tcp::resolver resolver(iomanager->GetIO());
     boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(_ep);
     boost::asio::ip::tcp::resolver::iterator end;
 
@@ -863,13 +868,6 @@ void Connection::OnConnect(const boost::system::error_code &_error,
 unsigned int Connection::GetId() const
 {
   return this->id;
-}
-
-//////////////////////////////////////////////////
-void Connection::ClearBuffers()
-{
-  boost::recursive_mutex::scoped_lock lock(this->writeMutex);
-  this->writeQueue.clear();
 }
 
 //////////////////////////////////////////////////

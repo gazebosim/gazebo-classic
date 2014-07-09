@@ -1957,10 +1957,7 @@ void World::PublishWorldStats()
   this->worldStatsMsg.set_paused(this->IsPaused());
 
   if (this->statPub && this->statPub->HasConnections())
-  {
-    printf("Here\n");
     this->statPub->Publish(this->worldStatsMsg);
-  }
   this->prevStatTime = common::Time::GetWallTime();
 }
 

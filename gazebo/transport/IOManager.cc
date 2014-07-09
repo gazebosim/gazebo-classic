@@ -24,11 +24,10 @@ using namespace transport;
 IOManager::IOManager()
   : count(0)
 {
-  this->work = NULL;
-  this->thread = NULL;
-
   this->io_service = new boost::asio::io_service;
-  this->Start();
+  this->work = new boost::asio::io_service::work(*this->io_service);
+  this->thread = new boost::thread(boost::bind(&boost::asio::io_service::run,
+                                                this->io_service));
 }
 
 /////////////////////////////////////////////////
@@ -44,17 +43,6 @@ IOManager::~IOManager()
 }
 
 /////////////////////////////////////////////////
-void IOManager::Start()
-{
-  if (!this->work && !this->thread)
-  {
-    this->work = new boost::asio::io_service::work(*this->io_service);
-    this->thread = new boost::thread(boost::bind(&boost::asio::io_service::run,
-          this->io_service));
-  }
-}
-
-/////////////////////////////////////////////////
 void IOManager::Stop()
 {
   this->io_service->reset();
@@ -65,9 +53,6 @@ void IOManager::Stop()
     delete this->thread;
     this->thread = NULL;
   }
-
-  delete this->work;
-  this->work = NULL;
 }
 
 /////////////////////////////////////////////////

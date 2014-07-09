@@ -177,12 +177,6 @@ namespace gazebo
       public: void ConnectPubToSub(const std::string &_topic,
                                     const SubscriptionTransportPtr _sublink);
 
-      /// \brief Connection a local Publisher to a remote Subscriber
-      /// \param[in] _sub The subscription information.
-      /// \param[in] _sublink The subscription transport object to use
-      public: void ConnectPubToSub(const msgs::Subscribe &_sub,
-                                    const SubscriptionTransportPtr _sublink);
-
       /// \brief Connect a local Subscriber to a remote Publisher
       /// \param[in] _pub The publish object to use
       public: void ConnectSubToPub(const msgs::Publish &_pub);

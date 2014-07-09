@@ -33,7 +33,6 @@ namespace gazebo
     {
       /// \brief Constructor
       public: IOManager();
-
       /// \brief Destructor
       public: ~IOManager();
 
@@ -50,9 +49,6 @@ namespace gazebo
       /// \brief Get the event count
       /// \return The event count
       public: unsigned int GetCount() const;
-
-      /// \brief Start the IO service
-      public: void Start();
 
       /// \brief Stop the IO service
       public: void Stop();
