@@ -200,15 +200,8 @@ void OculusCamera::Update()
 
   OVR::Quatf q = this->sensorFusion->GetPredictedOrientation();
 
-  math::Quaternion quat(q.w, -q.z, -q.x, q.y);
-
   // Set the orientation, and correct for the oculus coordinate system
-  math::Vector3 rpy = quat.GetAsEuler();
-
-  // Set the roll and yaw for sceneNode
-  math::Quaternion s(rpy.x, rpy.y, rpy.z);
-
-  this->sceneNode->setOrientation(Ogre::Quaternion(s.w, s.x, s.y, s.z));
+  this->sceneNode->setOrientation(Ogre::Quaternion(q.w, -q.z, -q.x, q.y));
 
   this->sceneNode->needUpdate();
 }
