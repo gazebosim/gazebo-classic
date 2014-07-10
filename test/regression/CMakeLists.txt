@@ -29,6 +29,7 @@ set(tests
   1082_pid_limits.cc
   1112_force_torque_model_removal.cc
   1146_collision_bounding_box.cc
+  1208_world_plugin_init.cc
 )
 
 gz_build_tests(${tests})
@@ -44,3 +45,9 @@ set(dri_tests
 )
 
 gz_build_dri_tests(${dri_tests})
+
+if (ENABLE_TESTS_COMPILATION)
+  add_dependencies(${TEST_TYPE}_1112_force_torque_model_removal
+                   ForceTorqueModelRemovalTestPlugin)
+  add_dependencies(${TEST_TYPE}_1208_world_plugin_init Issue1208Plugin)
+endif()
