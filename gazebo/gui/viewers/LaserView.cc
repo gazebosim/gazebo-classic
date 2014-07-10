@@ -19,7 +19,7 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/math/Vector2d.hh"
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/LaserView.hh"
@@ -327,7 +327,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
           << this->indexAngle << " radians";
       else
         stream << std::fixed << std::setprecision(4)
-          << GZ_RTOD(this->indexAngle) << " degrees";
+          << IGN_RTOD(this->indexAngle) << " degrees";
 
       _painter->setPen(QPen(orange));
       _painter->drawText(x1, y1, stream.str().c_str());
@@ -339,7 +339,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
                   rangeMaxScaled * 1.1 * 2.0 + textWidth * 2.0);
 
       _painter->setPen(QPen(orange));
-      _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
+      _painter->drawArc(rect, 0, IGN_RTOD(this->indexAngle) * 16);
 
 
       // Draw the line that marks the start of the arc
@@ -396,7 +396,7 @@ double LaserView::LaserItem::GetHoverRange() const
 double LaserView::LaserItem::GetHoverAngle() const
 {
   boost::mutex::scoped_lock lock(this->mutex);
-  return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
+  return this->radians ? this->indexAngle : IGN_RTOD(this->indexAngle);
 }
 
 /////////////////////////////////////////////////
@@ -448,7 +448,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     // many points
     this->points.resize(this->ranges.size() * 2);
   }
-  else if (math::equal(this->rangeMin, 0.0) &&
+  else if (ignition::math::equal(this->rangeMin, 0.0) &&
       this->ranges.size() + 1 != this->points.size())
   {
     // A min range == 0 mean we just need a closing point at the (0, 0)

@@ -56,7 +56,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
   VisualPtr model = this->GetRootVisual();
   if (model)
   {
-    ignition::math::Quaterniond quat = model->GetRotation();
+    ignition::math::Quaterniond quat = model->Rotation();
     this->GetSceneNode()->_setDerivedOrientation(Conversions::Convert(quat));
   }
 
@@ -65,7 +65,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
   dPtr->axisVisual->Load();
 
   this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(this->GetRotation() *
+  this->SetRotation(this->Rotation() *
       msgs::Convert(_msg->pose().orientation()));
 
   if (ignition::math::equal(_msg->axis1().xyz().x(), 1.0))

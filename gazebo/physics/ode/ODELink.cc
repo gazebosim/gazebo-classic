@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <math.h>
 #include <sstream>
 
@@ -98,7 +93,7 @@ void ODELink::Init()
   if (this->linkId)
   {
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-    math::Vector3 cogVec = this->inertial->GetCoG();
+    ignition::math::Vector3d cogVec = this->inertial->GetCoG();
     Base_V::iterator iter;
     for (iter = this->children.begin(); iter != this->children.end(); ++iter)
     {
@@ -110,19 +105,19 @@ void ODELink::Init()
           dGeomSetBody(g->GetCollisionId(), this->linkId);
 
           // update pose immediately
-          math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cogVec;
+          ignition::math::Pose3d localPose = g->GetRelativePose();
+          localPose.Pos() -= cogVec;
 
           dQuaternion q;
-          q[0] = localPose.rot.w;
-          q[1] = localPose.rot.x;
-          q[2] = localPose.rot.y;
-          q[3] = localPose.rot.z;
+          q[0] = localPose.Rot().w();
+          q[1] = localPose.Rot().x();
+          q[2] = localPose.Rot().y();
+          q[3] = localPose.Rot().z();
 
           // Set the pose of the encapsulated collision; this is always relative
           // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
-              localPose.pos.y, localPose.pos.z);
+          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.Pos().x(),
+              localPose.Pos().y(), localPose.Pos().z());
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
 
           // Set max_vel and min_depth
@@ -176,15 +171,15 @@ void ODELink::MoveCallback(dBodyID _id)
   p = dBodyGetPosition(_id);
   r = dBodyGetQuaternion(_id);
 
-  self->dirtyPose.pos.Set(p[0], p[1], p[2]);
-  self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
+  self->dirtyPose.Pos().Set(p[0], p[1], p[2]);
+  self->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
   GZ_ASSERT(self->inertial != NULL, "Inertial pointer is NULL");
-  math::Vector3 cog = self->dirtyPose.rot.RotateVector(
+  ignition::math::Vector3d cog = self->dirtyPose.Rot().RotateVector(
       self->inertial->GetCoG());
 
-  self->dirtyPose.pos -= cog;
+  self->dirtyPose.Pos() -= cog;
 
   // TODO: this is an ugly line of code. It's like this for speed.
   self->world->dirtyPoses.push_back(self);
@@ -260,22 +255,22 @@ void ODELink::OnPoseChange()
 
   this->SetEnabled(true);
 
-  const math::Pose myPose = this->GetWorldPose();
+  const ignition::math::Pose3d myPose = this->GetWorldPose();
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
+  ignition::math::Vector3d cog = myPose.Rot().RotateVector(this->inertial->GetCoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
-      myPose.pos.x + cog.x,
-      myPose.pos.y + cog.y,
-      myPose.pos.z + cog.z);
+      myPose.Pos().x() + cog.x(),
+      myPose.Pos().y() + cog.y(),
+      myPose.Pos().z() + cog.z());
 
   dQuaternion q;
-  q[0] = myPose.rot.w;
-  q[1] = myPose.rot.x;
-  q[2] = myPose.rot.y;
-  q[3] = myPose.rot.z;
+  q[0] = myPose.Rot().w();
+  q[1] = myPose.Rot().x();
+  q[2] = myPose.Rot().y();
+  q[3] = myPose.Rot().z();
 
   // Set the rotation of the ODE link
   dBodySetQuaternion(this->linkId, q);
@@ -356,19 +351,20 @@ void ODELink::UpdateMass()
   dMassSetZero(&odeMass);
 
   // The CoG must always be (0, 0, 0)
-  math::Vector3 cog(0, 0, 0);
+  ignition::math::Vector3d cog(0, 0, 0);
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
   // give ODE un-rotated inertia
-  math::Matrix3 moi = this->inertial->GetMOI(
-    math::Pose(this->inertial->GetCoG(), math::Quaterniond()));
-  math::Vector3 principals(moi[0][0], moi[1][1], moi[2][2]);
-  math::Vector3 products(moi[0][1], moi[0][2], moi[1][2]);
+  ignition::math::Matrix3d moi = this->inertial->GetMOI(
+    ignition::math::Pose3d(this->inertial->GetCoG(),
+      ignition::math::Quaterniond()));
+  ignition::math::Vector3d principals(moi(0, 0), moi(1, 1), moi(2, 2));
+  ignition::math::Vector3d products(moi(0, 1), moi(0, 2), moi(1, 2));
 
   dMassSetParameters(&odeMass, this->inertial->GetMass(),
-      cog.x, cog.y, cog.z,
-      principals.x, principals.y, principals.z,
-      products.x, products.y, products.z);
+      cog.x(), cog.y(), cog.z(),
+      principals.x(), principals.y(), principals.z(),
+      products.x(), products.y(), products.z());
 
   if (this->inertial->GetMass() > 0)
     dBodySetMass(this->linkId, &odeMass);
@@ -377,11 +373,11 @@ void ODELink::UpdateMass()
 }
 
 //////////////////////////////////////////////////
-void ODELink::SetLinearVel(const math::Vector3 &_vel)
+void ODELink::SetLinearVel(const ignition::math::Vector3d &_vel)
 {
   if (this->linkId)
   {
-    dBodySetLinearVel(this->linkId, _vel.x, _vel.y, _vel.z);
+    dBodySetLinearVel(this->linkId, _vel.x(), _vel.y(), _vel.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -389,17 +385,17 @@ void ODELink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
+ignition::math::Vector3d ODELink::GetWorldLinearVel(const ignition::math::Vector3d &_offset) const
 {
-  math::Vector3 vel;
+  ignition::math::Vector3d vel;
 
   if (this->linkId)
   {
     dVector3 dvel;
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-    math::Vector3 offsetFromCoG = _offset - this->inertial->GetCoG();
-    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
-        offsetFromCoG.z, dvel);
+    ignition::math::Vector3d offsetFromCoG = _offset - this->inertial->GetCoG();
+    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x(), offsetFromCoG.y(),
+        offsetFromCoG.z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
   else if (!this->IsStatic() && this->initialized)
@@ -412,21 +408,21 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
-                                         const math::Quaterniond &_q) const
+ignition::math::Vector3d ODELink::GetWorldLinearVel(const ignition::math::Vector3d &_offset,
+                                         const ignition::math::Quaterniond &_q) const
 {
-  math::Vector3 vel;
+  ignition::math::Vector3d vel;
 
   if (this->linkId)
   {
     dVector3 dvel;
-    math::Pose wPose = this->GetWorldPose();
+    ignition::math::Pose3d wPose = this->GetWorldPose();
     GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-    math::Vector3 offsetFromCoG =
-        wPose.rot.RotateVectorReverse(_q * _offset)
+    ignition::math::Vector3d offsetFromCoG =
+        wPose.Rot().RotateVectorReverse(_q * _offset)
         - this->inertial->GetCoG();
-    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
-        offsetFromCoG.z, dvel);
+    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x(), offsetFromCoG.y(),
+        offsetFromCoG.z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
   else if (!this->IsStatic() && this->initialized)
@@ -440,9 +436,9 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldCoGLinearVel() const
+ignition::math::Vector3d ODELink::GetWorldCoGLinearVel() const
 {
-  math::Vector3 vel;
+  ignition::math::Vector3d vel;
 
   if (this->linkId)
   {
@@ -461,11 +457,11 @@ math::Vector3 ODELink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void ODELink::SetAngularVel(const math::Vector3 &_vel)
+void ODELink::SetAngularVel(const ignition::math::Vector3d &_vel)
 {
   if (this->linkId)
   {
-    dBodySetAngularVel(this->linkId, _vel.x, _vel.y, _vel.z);
+    dBodySetAngularVel(this->linkId, _vel.x(), _vel.y(), _vel.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -473,9 +469,9 @@ void ODELink::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldAngularVel() const
+ignition::math::Vector3d ODELink::GetWorldAngularVel() const
 {
-  math::Vector3 vel;
+  ignition::math::Vector3d vel;
 
   if (this->linkId)
   {
@@ -496,12 +492,12 @@ math::Vector3 ODELink::GetWorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-void ODELink::SetForce(const math::Vector3 &_force)
+void ODELink::SetForce(const ignition::math::Vector3d &_force)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodySetForce(this->linkId, _force.x, _force.y, _force.z);
+    dBodySetForce(this->linkId, _force.x(), _force.y(), _force.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -509,12 +505,12 @@ void ODELink::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-void ODELink::SetTorque(const math::Vector3 &_torque)
+void ODELink::SetTorque(const ignition::math::Vector3d &_torque)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodySetTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+    dBodySetTorque(this->linkId, _torque.x(), _torque.y(), _torque.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -522,12 +518,12 @@ void ODELink::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddForce(const math::Vector3 &_force)
+void ODELink::AddForce(const ignition::math::Vector3d &_force)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForce(this->linkId, _force.x, _force.y, _force.z);
+    dBodyAddForce(this->linkId, _force.x(), _force.y(), _force.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -535,12 +531,12 @@ void ODELink::AddForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddRelativeForce(const math::Vector3 &_force)
+void ODELink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddRelForce(this->linkId, _force.x, _force.y, _force.z);
+    dBodyAddRelForce(this->linkId, _force.x(), _force.y(), _force.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -548,14 +544,14 @@ void ODELink::AddRelativeForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
-                               const math::Vector3 &_relpos)
+void ODELink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
+                               const ignition::math::Vector3d &_relpos)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForceAtRelPos(this->linkId, _force.x, _force.y, _force.z,
-                          _relpos.x, _relpos.y, _relpos.z);
+    dBodyAddForceAtRelPos(this->linkId, _force.x(), _force.y(), _force.z(),
+                          _relpos.x(), _relpos.y(), _relpos.z());
   }
   else if (!this->IsStatic())
   {
@@ -566,14 +562,14 @@ void ODELink::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
-                                      const math::Vector3 &_pos)
+void ODELink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+                                      const ignition::math::Vector3d &_pos)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddForceAtPos(this->linkId, _force.x, _force.y, _force.z,
-                          _pos.x, _pos.y, _pos.z);
+    dBodyAddForceAtPos(this->linkId, _force.x(), _force.y(), _force.z(),
+                          _pos.x(), _pos.y(), _pos.z());
   }
   else if (!this->IsStatic())
   {
@@ -584,12 +580,12 @@ void ODELink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddTorque(const math::Vector3 &_torque)
+void ODELink::AddTorque(const ignition::math::Vector3d &_torque)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+    dBodyAddTorque(this->linkId, _torque.x(), _torque.y(), _torque.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -597,12 +593,12 @@ void ODELink::AddTorque(const math::Vector3 &_torque)
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
+void ODELink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 {
   if (this->linkId)
   {
     this->SetEnabled(true);
-    dBodyAddRelTorque(this->linkId, _torque.x, _torque.y, _torque.z);
+    dBodyAddRelTorque(this->linkId, _torque.x(), _torque.y(), _torque.z());
   }
   else if (!this->IsStatic())
     gzlog << "ODE body for link [" << this->GetScopedName() << "]"
@@ -610,9 +606,9 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldForce() const
+ignition::math::Vector3d ODELink::GetWorldForce() const
 {
-  math::Vector3 force;
+  ignition::math::Vector3d force;
 
   if (this->linkId)
   {
@@ -620,9 +616,9 @@ math::Vector3 ODELink::GetWorldForce() const
 
     dforce = dBodyGetForce(this->linkId);
 
-    force.x = dforce[0];
-    force.y = dforce[1];
-    force.z = dforce[2];
+    force.x() = dforce[0];
+    force.y() = dforce[1];
+    force.z() = dforce[2];
   }
   else if (!this->IsStatic() && this->initialized)
   {
@@ -635,9 +631,9 @@ math::Vector3 ODELink::GetWorldForce() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODELink::GetWorldTorque() const
+ignition::math::Vector3d ODELink::GetWorldTorque() const
 {
-  math::Vector3 torque;
+  ignition::math::Vector3d torque;
 
   if (this->linkId)
   {
@@ -645,9 +641,9 @@ math::Vector3 ODELink::GetWorldTorque() const
 
     dtorque = dBodyGetTorque(this->linkId);
 
-    torque.x = dtorque[0];
-    torque.y = dtorque[1];
-    torque.z = dtorque[2];
+    torque.x() = dtorque[0];
+    torque.y() = dtorque[1];
+    torque.z() = dtorque[2];
   }
   else if (!this->IsStatic() && this->initialized)
   {

@@ -21,8 +21,8 @@
 #include <string>
 #include <list>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -131,7 +131,7 @@ namespace gazebo
       private: ContactMsgs_L incomingContacts;
 
       /// \brief Pose of the sonar shape's midpoint.
-      private: math::Pose sonarMidPose;
+      private: ignition::math::Pose3d sonarMidPose;
 
       /// \brief Minimum range
       private: double rangeMin;

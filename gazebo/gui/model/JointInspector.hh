@@ -50,12 +50,12 @@ namespace gazebo
       /// \brief Get anchor position.
       /// \param[in] _index Index of anchor
       /// \return Anchor position.
-      public: math::Vector3 GetAnchor(unsigned int _index) const;
+      public: ignition::math::Vector3d GetAnchor(unsigned int _index) const;
 
       /// \brief Get axis.
       /// \param[in] _index Index of axis
       /// \return Axis direction.
-      public: math::Vector3 GetAxis(unsigned int _index) const;
+      public: ignition::math::Vector3d GetAxis(unsigned int _index) const;
 
       /// \brief Get axis lower limit.
       /// \param[in] _index Index of axis
@@ -78,12 +78,12 @@ namespace gazebo
       /// \brief Set anchor position.
       /// \param[in] _index Index of anchor.
       /// \param[in] _anchor Anchor position.
-      public: void SetAnchor(unsigned int _index, const math::Vector3 &_anchor);
+      public: void SetAnchor(unsigned int _index, const ignition::math::Vector3d &_anchor);
 
       /// \brief Set axis.
       /// \param[in] _index Index of axis.
       /// \param[in] _axis Axis direction.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis);
 
       /// \brief Set axis lower limit.
       /// \param[in] _index Index of axis.

@@ -107,7 +107,7 @@ void ContactVisual::Update()
       // Scaling factor for the normal line.
       // Eq in the family of Y = 1/(1+exp(-(x^2)))
       double normalScale = (2.0 * vRange) / (1 + exp
-          (-force.GetSquaredLength() / magScale)) - offset;
+          (-force.SquaredLength() / magScale)) - offset;
 
       // Create a new contact visualization point if necessary
       if (c >= dPtr->points.size())

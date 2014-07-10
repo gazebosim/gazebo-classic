@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _SPHEREMAKER_HH_
-#define _SPHEREMAKER_HH_
+#ifndef _GAZEBO_SPHEREMAKER_HH_
+#define _GAZEBO_SPHEREMAKER_HH_
 
 #include <string>
 
-#include "gazebo/math/Vector2i.hh"
+#include <ignition/math/Vector2.hh>
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/util/system.hh"
 
@@ -54,7 +54,7 @@ namespace gazebo
 
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos;
+      private: ignition::math::Vector2i mousePushPos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

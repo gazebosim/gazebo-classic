@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 #include <sdf/sdf.hh>
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -109,8 +109,8 @@ TEST_F(RaySensor_TEST, CreateLaser)
 
   double angleRes = (sensor->GetAngleMax() - sensor->GetAngleMin()).Radian() /
                     sensor->GetRayCount();
-  EXPECT_EQ(sensor->GetAngleMin(), math::Angle(-2.2689));
-  EXPECT_EQ(sensor->GetAngleMax(), math::Angle(2.2689));
+  EXPECT_EQ(sensor->GetAngleMin(), ignition::math::Angle(-2.2689));
+  EXPECT_EQ(sensor->GetAngleMax(), ignition::math::Angle(2.2689));
   EXPECT_NEAR(sensor->GetRangeMin(), 0.08, 1e-6);
   EXPECT_NEAR(sensor->GetRangeMax(), 10.0, 1e-6);
   EXPECT_NEAR(sensor->GetAngleResolution(), angleRes, 1e-3);

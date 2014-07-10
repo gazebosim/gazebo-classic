@@ -677,13 +677,15 @@ void MainWindow::Reset()
 {
   rendering::UserCameraPtr cam = gui::get_active_camera();
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = camPos - lookAt;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  ignition::math::Vector3d delta = camPos - lookAt;
 
-  double yaw = atan2(delta.x, delta.y);
-  double pitch = atan2(delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  cam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+  double yaw = atan2(delta.x(), delta.y());
+  double pitch = atan2(delta.z(), sqrt(delta.x()*delta.x() +
+                       delta.y()*delta.y()));
+  cam->SetWorldPose(ignition::math::Pose3d(camPos,
+        ignition::math::Vector3d(0, pitch, yaw)));
 }
 
 /////////////////////////////////////////////////
@@ -1212,18 +1214,18 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
     {
       const msgs::Pose &msg_pose = _msg->camera().pose();
 
-      math::Vector3 cam_pose_pos = math::Vector3(
+      ignition::math::Vector3d cam_pose_pos = ignition::math::Vector3d(
         msg_pose.position().x(),
         msg_pose.position().y(),
         msg_pose.position().z());
 
-      math::Quaterniond cam_pose_rot = math::Quaterniond(
+      ignition::math::Quaterniond cam_pose_rot = ignition::math::Quaterniond(
         msg_pose.orientation().w(),
         msg_pose.orientation().x(),
         msg_pose.orientation().y(),
         msg_pose.orientation().z());
 
-      math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
+      ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
       cam->SetUseSDFPose(true);

@@ -41,10 +41,10 @@ namespace gazebo
       public: std::string manipMode;
 
       /// \brief Keep track of the mouse start pose before a move action.
-      public: math::Pose mouseMoveVisStartPose;
+      public: ignition::math::Pose3d mouseMoveVisStartPose;
 
       /// \brief Keep track of the mouse start screen position.
-      public: math::Vector2i mouseStart;
+      public: ignition::math::Vector2i mouseStart;
 
       /// \brief The current selected visual.
       public: rendering::VisualPtr selectedVis;
@@ -77,10 +77,10 @@ namespace gazebo
       public: bool initialized;
 
       /// \brief Scale of the visual attached to the mouse.
-      public: math::Vector3 mouseVisualScale;
+      public: ignition::math::Vector3d mouseVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      public: math::Box mouseVisualBbox;
+      public: ignition::math::Box mouseVisualBbox;
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;

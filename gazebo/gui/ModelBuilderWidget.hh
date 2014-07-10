@@ -20,7 +20,7 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -41,14 +41,14 @@ namespace gazebo
       private slots: void CreateSphere();
       private slots: void CreateCylinder();
 
-      private: void OnBoxCreate(const math::Vector3 &pos,
-                                const math::Vector3 &scale);
+      private: void OnBoxCreate(const ignition::math::Vector3d &pos,
+                                const ignition::math::Vector3d &scale);
 
-      private: void OnSphereCreate(const math::Vector3 &pos,
-                                   const math::Vector3 &scale);
+      private: void OnSphereCreate(const ignition::math::Vector3d &pos,
+                                   const ignition::math::Vector3d &scale);
 
-      private: void OnCylinderCreate(const math::Vector3 &pos,
-                                     const math::Vector3 &scale);
+      private: void OnCylinderCreate(const ignition::math::Vector3d &pos,
+                                     const ignition::math::Vector3d &scale);
 
       private: GLWidget *glWidget;
       private: QAction *boxCreateAct, *sphereCreateAct, *cylinderCreateAct;

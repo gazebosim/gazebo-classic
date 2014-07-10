@@ -66,21 +66,21 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->coneXNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
   dPtr->coneXNode->attachObject(coneXObj);
-  q.SetFromAxis(0, 1, 0, IGN_DTOR(-90));
+  q.Axis(0, 1, 0, IGN_DTOR(-90));
   dPtr->coneXNode->setOrientation(Conversions::Convert(q));
   dPtr->coneXNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneYNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
   dPtr->coneYNode->attachObject(coneYObj);
-  q.SetFromAxis(1, 0, 0, IGN_DTOR(90));
+  q.Axis(1, 0, 0, IGN_DTOR(90));
   dPtr->coneYNode->setOrientation(Conversions::Convert(q));
   dPtr->coneYNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneZNode =
     dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
   dPtr->coneZNode->attachObject(coneZObj);
-  q.SetFromAxis(1, 0, 0, IGN_DTOR(180));
+  q.Axis(1, 0, 0, IGN_DTOR(180));
   dPtr->coneZNode->setOrientation(Conversions::Convert(q));
   dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
@@ -155,7 +155,7 @@ void WrenchVisual::Update()
   ignition::math::Vector3d force =
     msgs::Convert(dPtr->wrenchMsg->wrench().force());
   double forceScale = (2.0 * vRange) / (1 +
-      exp(force.GetSquaredLength() / magScale)) - offset;
+      exp(force.SquaredLength() / magScale)) - offset;
 
   dPtr->forceLine->SetPoint(1, force*forceScale);
   dPtr->forceLine->Update();

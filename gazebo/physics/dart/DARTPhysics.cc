@@ -18,7 +18,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -86,8 +86,8 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
-  this->dtWorld->setGravity(Eigen::Vector3d(g.x, g.y, g.z));
+  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
+  this->dtWorld->setGravity(Eigen::Vector3d(g.x(), g.y(), g.z()));
 
   // Time step
   // double timeStep = this->sdf->GetValueDouble("time_step");
@@ -173,12 +173,12 @@ void DARTPhysics::UpdateCollision()
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = dartLink1->GetWorldPose();
-    math::Pose body2Pose = dartLink2->GetWorldPose();
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    ignition::math::Pose3d body1Pose = dartLink1->GetWorldPose();
+    ignition::math::Pose3d body2Pose = dartLink2->GetWorldPose();
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     // calculate force in world frame
     Eigen::Vector3d force = dtContact.force;
@@ -192,13 +192,13 @@ void DARTPhysics::UpdateCollision()
          dtBodyNode2->getWorldTransform().translation()).cross(-force);
 
     // Convert from world to link frame
-    localForce1 = body1Pose.rot.RotateVectorReverse(
+    localForce1 = body1Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3(force));
-    localForce2 = body2Pose.rot.RotateVectorReverse(
+    localForce2 = body2Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3(-force));
-    localTorque1 = body1Pose.rot.RotateVectorReverse(
+    localTorque1 = body1Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3(torqueA));
-    localTorque2 = body2Pose.rot.RotateVectorReverse(
+    localTorque2 = body2Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3(torqueB));
 
     contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
@@ -361,11 +361,11 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dtWorld->setGravity(
-    Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+    Eigen::Vector3d(_gravity.x(), _gravity.y(), _gravity.z()));
 }
 
 //////////////////////////////////////////////////

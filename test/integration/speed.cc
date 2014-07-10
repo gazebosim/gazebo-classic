@@ -36,13 +36,13 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3d pos(0, 0, 5);
 
   for (int i = 0; i < 500; ++i)
   {
-    pos.z += i;
+    pos.z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -76,12 +76,12 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
 
   // Load 500 spheres into the world
   std::string name = "sphere";
-  math::Vector3 pos(0, 0, 5);
+  ignition::math::Vector3d pos(0, 0, 5);
   for (int i = 0; i < 500; ++i)
   {
-    pos.z += i;
+    pos.z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, math::Vector3(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
   }
   common::Time::MSleep(2000);
 

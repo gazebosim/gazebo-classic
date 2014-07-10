@@ -16,7 +16,7 @@
 */
 
 #include <sstream>
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"

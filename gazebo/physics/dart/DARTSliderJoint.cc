@@ -52,7 +52,7 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -62,7 +62,7 @@ math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -85,7 +85,7 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTSliderJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
 {
   if (_index == 0)
   {
@@ -106,14 +106,14 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (_index == 0)
   {
     double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
-    result.SetFromRadian(radianAngle);
+    result.Radian(radianAngle);
   }
   else
   {

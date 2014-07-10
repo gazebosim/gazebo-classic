@@ -239,7 +239,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
       // translate *= this->meter;
-      transform.SetTranslate(translate);
+      transform.Translate(translate);
     }
 
     TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
@@ -254,7 +254,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
       iss >> axis;
       iss >> angle;
-      mat.SetFromAxis(axis, IGN_DTOR(angle));
+      mat.Axis(axis, IGN_DTOR(angle));
 
       transform = transform * mat;
 
@@ -267,7 +267,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       ignition::math::Vector3d scale;
       scale = boost::lexical_cast<ignition::math::Vector3d>(scaleStr);
       ignition::math::Matrix4d scaleMat;
-      scaleMat.SetScale(scale);
+      scaleMat.Scale(scale);
       transform = transform * scaleMat;
     }
   }
@@ -657,7 +657,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
       // translate *= this->meter;
-      transform.SetTranslate(translate);
+      transform.Translate(translate);
 
       NodeTransform nt(transform);
       if (_elem->FirstChildElement("translate")->Attribute("sid"))
@@ -679,7 +679,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
 
       iss >> axis;
       iss >> angle;
-      mat.SetFromAxis(axis, IGN_DTOR(angle));
+      mat.Axis(axis, IGN_DTOR(angle));
 
       NodeTransform nt(mat);
       if (rotateXml->Attribute("sid"))
@@ -699,7 +699,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
       ignition::math::Vector3d scale;
       scale = boost::lexical_cast<ignition::math::Vector3d>(scaleStr);
       ignition::math::Matrix4d scaleMat;
-      scaleMat.SetScale(scale);
+      scaleMat.Scale(scale);
 
       NodeTransform nt(scaleMat);
       if (_elem->FirstChildElement("matrix")->Attribute("sid"))
@@ -852,7 +852,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     std::vector<ignition::math::Vector3d> &_values)
 {
   ignition::math::Matrix4d rotMat = _transform;
-  rotMat.SetTranslate(ignition::math::Vector3d::Zero);
+  rotMat.Translate(ignition::math::Vector3d::Zero);
 
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)

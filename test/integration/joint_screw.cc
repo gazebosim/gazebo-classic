@@ -76,7 +76,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     std::string jointType = "screw";
@@ -111,7 +111,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // Expect constant torque to give quadratic response in position
     {
       // Expected max joint angle (quatratic in time)
-      math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
+      ignition::math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
       // Verify that the joint should make more than 1 revolution
       EXPECT_GT(maxAngle.Radian(), 1.25 * 2 * M_PI);
     }
@@ -126,7 +126,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
       world->Step(1);
       EXPECT_NEAR(joint->GetVelocity(0), vel, 2e-2);
       double time = world->GetSimTime().Double();
-      math::Angle angle(0.5 * torque * time*time / inertia);
+      ignition::math::Angle angle(0.5 * torque * time*time / inertia);
       EXPECT_NEAR(joint->GetAngle(0).Radian(), angle.Radian(), g_tolerance);
     }
     std::cout << "Final time:  " << world->GetSimTime().Double() << std::endl;
@@ -169,7 +169,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -196,11 +196,11 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(1), 0);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3d(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
@@ -209,14 +209,14 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // move child link 45deg about x
   double pitch_00 = joint_00->GetParam("thread_pitch", 0);
-  math::Pose pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
-  math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
+  ignition::math::Pose3d pose_00 = ignition::math::Pose3d(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
+  ignition::math::Pose3d pose_01 = ignition::math::Pose3d(0, 0, -1, 0, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3d(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
@@ -226,17 +226,17 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
 
   // move child link 45deg about y
   double pitch_01 = joint_01->GetParam("thread_pitch", 0);
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
-  pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
-  pose_01 = math::Pose(-0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*M_PI, 0));
+  pose_00 = ignition::math::Pose3d(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
+  pose_01 = ignition::math::Pose3d(-0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
   EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
   EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
   EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
   EXPECT_EQ(joint_01->GetAngle(1), -0.3*M_PI/pitch_01);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3d(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
@@ -254,8 +254,8 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   EXPECT_EQ(joint_00->GetAngle(1), -0.25*M_PI/pitch_00);
   EXPECT_EQ(joint_01->GetAngle(0), 0.3*M_PI);
   EXPECT_EQ(joint_01->GetAngle(1), -0.3*M_PI/pitch_01);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(0), ignition::math::Vector3d(1, 0, 0));
+  EXPECT_EQ(joint_00->GetGlobalAxis(1), ignition::math::Vector3d(1, 0, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
@@ -298,7 +298,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -341,9 +341,9 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
-    math::Pose pose_01 = link_01->GetWorldPose();
+    ignition::math::Pose3d pose_01 = link_01->GetWorldPose();
     EXPECT_EQ(link_00->GetWorldPose(),
-      math::Pose(-angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
+      ignition::math::Pose3d(-angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
 
     if (_physicsEngine == "simbody")
     {
@@ -357,7 +357,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     }
     else
     {
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+      EXPECT_NEAR(pose_01.Pos().x(), angle_00_linear + angle_01_linear, 1e-8);
     }
   }
   gzdbg << "took [" << count << "] steps.\n";
@@ -388,14 +388,14 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     ++count;
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
-    math::Pose pose_01 = link_01->GetWorldPose();
+    ignition::math::Pose3d pose_00 = link_00->GetWorldPose();
+    ignition::math::Pose3d pose_01 = link_01->GetWorldPose();
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_angular = joint_01->GetAngle(0).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(
+    EXPECT_EQ(pose_00, ignition::math::Pose3d(
       -angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
@@ -411,11 +411,11 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     }
     else
     {
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+      EXPECT_NEAR(pose_01.Pos().x(), angle_00_linear + angle_01_linear, 1e-8);
     }
-    EXPECT_NEAR(pose_01.pos.x,
+    EXPECT_NEAR(pose_01.Pos().x(),
       -angle_00_angular / pitch_00 - angle_01_angular / pitch_01, 1e-8);
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
+    EXPECT_NEAR(pose_01.Rot().Euler().x(),
       angle_00_angular + angle_01_angular, 1e-8);
   }
   gzdbg << "took [" << count << "] steps.\n";
@@ -438,14 +438,14 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     ++count;
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
-    math::Pose pose_01 = link_01->GetWorldPose();
+    ignition::math::Pose3d pose_00 = link_00->GetWorldPose();
+    ignition::math::Pose3d pose_01 = link_01->GetWorldPose();
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_angular = joint_01->GetAngle(0).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
 
-    EXPECT_EQ(pose_00, math::Pose(
+    EXPECT_EQ(pose_00, ignition::math::Pose3d(
       -angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
     if (_physicsEngine == "simbody")
     {
@@ -461,11 +461,11 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     }
     else
     {
-      EXPECT_NEAR(pose_01.pos.x, angle_00_linear + angle_01_linear, 1e-8);
+      EXPECT_NEAR(pose_01.Pos().x(), angle_00_linear + angle_01_linear, 1e-8);
     }
-    EXPECT_NEAR(pose_01.pos.x,
+    EXPECT_NEAR(pose_01.Pos().x(),
       -angle_00_angular / pitch_00 - angle_01_angular / pitch_01, 1e-8);
-    EXPECT_NEAR(pose_01.rot.GetAsEuler().x,
+    EXPECT_NEAR(pose_01.Rot().Euler().x(),
       angle_00_angular + angle_01_angular, 1e-8);
   }
   gzdbg << "took [" << count << "] steps.\n";
@@ -516,7 +516,7 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
 
   // drop from some height
-  model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   // +1sec: should have hit the ground
   world->Step(1000);
   // +4sec: should destabilize without patch for issue #1159
@@ -525,11 +525,11 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   for (int n = 0; n < 1000; ++n)
   {
     world->Step(1);
-    math::Vector3 vel_angular = link_00->GetWorldLinearVel();
-    math::Vector3 vel_linear = link_00->GetWorldAngularVel();
+    ignition::math::Vector3d vel_angular = link_00->GetWorldLinearVel();
+    ignition::math::Vector3d vel_linear = link_00->GetWorldAngularVel();
 
-    EXPECT_LT(vel_angular.GetLength(), 0.1);
-    EXPECT_LT(vel_linear.GetLength(), 0.1);
+    EXPECT_LT(vel_angular.Length(), 0.1);
+    EXPECT_LT(vel_linear.Length(), 0.1);
 
     gzlog <<   "va [" << vel_angular
           << "] vl [" << vel_linear

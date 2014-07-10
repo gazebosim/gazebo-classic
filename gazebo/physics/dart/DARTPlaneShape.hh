@@ -44,7 +44,7 @@ namespace gazebo
         DARTCollisionPtr dartCollisionParent =
             boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-        // math::Vector3 n = this->GetNormal();
+        // ignition::math::Vector3d n = this->GetNormal();
 
         dart::dynamics::BodyNode *dtBodyNode =
             dartCollisionParent->GetDARTBodyNode();
@@ -56,7 +56,7 @@ namespace gazebo
       }
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos)
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos)
       {
         PlaneShape::SetAltitude(_pos);
       }

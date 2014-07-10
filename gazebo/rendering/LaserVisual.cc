@@ -127,7 +127,7 @@ void LaserVisual::Update()
     for (unsigned int i = 0; i < count; ++i)
     {
       r = dPtr->laserMsg->scan().ranges(j*count + i);
-      ray.SetFromEuler(ignition::math::Vector3d(0.0, -verticalAngle, angle));
+      ray.Euler(ignition::math::Vector3d(0.0, -verticalAngle, angle));
       axis = offset.Rot() * ray * ignition::math::Vector3d(1.0, 0.0, 0.0);
       pt = (axis * r) + offset.Pos();
 

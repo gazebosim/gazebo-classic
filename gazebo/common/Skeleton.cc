@@ -109,8 +109,8 @@ void Skeleton::Scale(double _scale)
   {
     SkeletonNode *node = iter->second;
     ignition::math::Matrix4d trans = node->GetTransform();
-    ignition::math::Vector3d pos = trans.GetTranslation();
-    trans.SetTranslate(pos * _scale);
+    ignition::math::Vector3d pos = trans.Translation();
+    trans.Translate(pos * _scale);
     node->SetTransform(trans, false);
   }
 
@@ -185,7 +185,7 @@ void Skeleton::PrintTransforms()
     std::cerr << node->GetModelTransform() << "\n";
 
     if (node->IsJoint())
-      std::cerr << node->GetInverseBindTransform() << "\n";
+      std::cerr << node->InverseBindTransform() << "\n";
   }
 }
 
@@ -473,7 +473,7 @@ void SkeletonNode::SetInverseBindTransform(ignition::math::Matrix4d _invBM)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Matrix4d SkeletonNode::GetInverseBindTransform()
+ignition::math::Matrix4d SkeletonNode::InverseBindTransform()
 {
   return this->invBindTransform;
 }
@@ -628,20 +628,20 @@ void NodeTransform::RecalculateMatrix()
   else
     if (this->type == TRANSLATE)
     {
-      this->transform.SetTranslate(ignition::math::Vector3d(this->source[0],
-                                            this->source[1], this->source[2]));
+      this->transform.Translate(ignition::math::Vector3d(this->source[0],
+                                this->source[1], this->source[2]));
     }
     else
       if (this->type == ROTATE)
       {
         ignition::math::Matrix3d mat;
-        mat.SetFromAxis(ignition::math::Vector3d(this->source[0],
+        mat.Axis(ignition::math::Vector3d(this->source[0],
               this->source[1], this->source[2]), IGN_DTOR(this->source[3]));
         this->transform = mat;
       }
       else
       {
-        this->transform.SetScale(ignition::math::Vector3d(
+        this->transform.Scale(ignition::math::Vector3d(
               this->source[0], this->source[1], this->source[2]));
       }
 }

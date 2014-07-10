@@ -338,8 +338,8 @@ void Camera::Update()
     Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
     ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
       localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-    double currPitch = localRot.GetAsEuler().y();
-    double currYaw = localRot.GetAsEuler().z();
+    double currPitch = localRot.Euler().y();
+    double currYaw = localRot.Euler().z();
 
     double pitchError = currPitch - pitch;
 
@@ -358,7 +358,7 @@ void Camera::Update()
           currYaw + yawAdj));
 
     double origDistance = 8.0;
-    double distance = direction.GetLength();
+    double distance = direction.Length();
     double error = origDistance - distance;
 
     double scaling = this->dataPtr->trackVisualPID.Update(error, 0.3);
@@ -568,7 +568,7 @@ void Camera::SetWorldRotation(const ignition::math::Quaterniond &_quant)
   if (this->animState)
     return;
 
-  ignition::math::Vector3d rpy = _quant.GetAsEuler();
+  ignition::math::Vector3d rpy = _quant.Euler();
 
   // Set the roll and yaw for sceneNode
   ignition::math::Quaterniond s(rpy.x(), rpy.y(), rpy.z());
@@ -1533,13 +1533,13 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
   }
 
   Ogre::TransformKeyFrame *key;
-  ignition::math::Vector3d rpy = _pose.Rot().GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
   ignition::math::Vector3d start = this->GetWorldPose().Pos();
 
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
   ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double dyaw =  localRot.GetAsEuler().z() - rpy.z();
+  double dyaw =  localRot.Euler().z() - rpy.z();
 
   if (dyaw > M_PI)
     rpy.z(rpy.z() + 2*M_PI);
@@ -1621,11 +1621,11 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
   Ogre::Quaternion localRotOgre = this->sceneNode->getOrientation();
   ignition::math::Quaterniond localRot = ignition::math::Quaterniond(
     localRotOgre.w, localRotOgre.x, localRotOgre.y, localRotOgre.z);
-  double prevYaw = localRot.GetAsEuler().z();
+  double prevYaw = localRot.Euler().z();
   for (unsigned int j = 0; j < _pts.size(); ++j)
   {
     ignition::math::Vector3d pos = _pts[j].Pos();
-    ignition::math::Vector3d rpy = _pts[j].Rot().GetAsEuler();
+    ignition::math::Vector3d rpy = _pts[j].Rot().Euler();
     double dyaw = prevYaw - rpy.z();
 
     if (dyaw > M_PI)

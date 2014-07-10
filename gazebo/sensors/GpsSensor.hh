@@ -64,11 +64,11 @@ namespace gazebo
 
       /// \brief Accessor for current longitude angle
       /// \return Current longitude angle.
-      public: math::Angle GetLongitude() const;
+      public: ignition::math::Angle GetLongitude() const;
 
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.
-      public: math::Angle GetLatitude() const;
+      public: ignition::math::Angle GetLatitude() const;
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.

@@ -50,10 +50,10 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -69,23 +69,23 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+                  const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited. \sa Joint::GetGlobalAxis
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited. \sa Joint::GetAngleImpl
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited. \sa void BulletJoint::SetForceImpl
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);
@@ -99,7 +99,7 @@ namespace gazebo
 
       /// \brief Initial value of joint axis, expressed as unit vector
       /// in world frame.
-      private: math::Vector3 initialWorldAxis[2];
+      private: ignition::math::Vector3d initialWorldAxis[2];
     };
     /// \}
   }

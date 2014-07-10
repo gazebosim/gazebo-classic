@@ -123,7 +123,7 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;

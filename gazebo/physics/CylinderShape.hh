@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Get length.
       /// \return The cylinder length.
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Set the size of the cylinder.
       /// \param[in] _radius New radius.
@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Set scale of cylinder.
       /// \param[in] _scale Scale to set the cylinder to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

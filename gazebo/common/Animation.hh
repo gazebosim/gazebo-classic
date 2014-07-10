@@ -59,7 +59,7 @@ namespace gazebo
 
       /// \brief Return the duration of the animation
       /// \return Duration of the animation in seconds
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Set the duration of the animation
       /// \param[in] _len The length of the animation in seconds

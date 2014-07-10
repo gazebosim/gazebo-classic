@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Map shape
- * Author: Nate Koenig
-*/
-
 #include <string.h>
 #include <math.h>
 
@@ -108,12 +104,11 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
-  _msg.mutable_image()->set_scale(this->GetScale().x);
+  _msg.mutable_image()->set_scale(this->GetScale().x());
   _msg.mutable_image()->set_threshold(this->GetThreshold());
   _msg.mutable_image()->set_height(this->GetHeight());
   _msg.mutable_image()->set_granularity(this->GetGranularity());
 }
-
 
 //////////////////////////////////////////////////
 std::string MapShape::GetURI() const
@@ -122,7 +117,7 @@ std::string MapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-void MapShape::SetScale(const math::Vector3 &_scale)
+void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -135,10 +130,10 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MapShape::GetScale() const
+ignition::math::Vector3d MapShape::GetScale() const
 {
   double mapScale = this->sdf->Get<double>("scale");
-  return math::Vector3(mapScale, mapScale, mapScale);
+  return ignition::math::Vector3d(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////

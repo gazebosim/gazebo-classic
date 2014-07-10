@@ -55,7 +55,7 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
   // initialize to 0
@@ -66,12 +66,12 @@ math::Vector3 ODEScrewJoint::GetAnchor(unsigned int /*index*/) const
   else
     gzerr << "ODE Joint ID is invalid, returning 0 vector.\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3d &_anchor)
 {
   if (!this->jointId)
   {
@@ -85,11 +85,12 @@ void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetScrewAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetScrewAnchor(this->jointId, _anchor.x(), _anchor.y(), _anchor.z());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEScrewJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
 
@@ -98,11 +99,11 @@ math::Vector3 ODEScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -113,21 +114,24 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3d globalAxis = _axis;
   if (this->parentLink)
     globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+      this->GetParent()->GetModel()->GetWorldPose().Rot().RotateVector(_axis);
 
   if (this->jointId)
-    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  {
+    dJointSetScrewAxis(this->jointId, globalAxis.x(),
+        globalAxis.y(), globalAxis.z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->jointId)
   {
     if (_index < this->GetAngleCount())

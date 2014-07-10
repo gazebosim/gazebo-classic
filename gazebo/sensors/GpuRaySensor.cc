@@ -26,7 +26,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/transport.hh"
 
@@ -377,7 +377,7 @@ double GpuRaySensor::GetRangeCountRatio() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMin() const
+ignition::math::Angle GpuRaySensor::GetAngleMin() const
 {
   return this->horzElem->Get<double>("min_angle");
 }
@@ -389,7 +389,7 @@ void GpuRaySensor::SetAngleMin(double _angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetAngleMax() const
+ignition::math::Angle GpuRaySensor::GetAngleMax() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -464,12 +464,12 @@ int GpuRaySensor::GetVerticalRangeCount() const
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMin() const
+ignition::math::Angle GpuRaySensor::GetVerticalAngleMin() const
 {
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -480,12 +480,12 @@ void GpuRaySensor::SetVerticalAngleMin(double _angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpuRaySensor::GetVerticalAngleMax() const
+ignition::math::Angle GpuRaySensor::GetVerticalAngleMax() const
 {
   if (this->scanElem->HasElement("vertical"))
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle(0);
 }
 
 //////////////////////////////////////////////////
@@ -597,10 +597,10 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       if (!this->noises.empty())
       {
         range = this->noises[0]->Apply(range);
-        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 
-      range = math::isnan(range) ? this->GetRangeMax() : range;
+      range = ignition::math::isnan(range) ? this->GetRangeMax() : range;
 
       if (add)
       {

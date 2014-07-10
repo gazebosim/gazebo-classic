@@ -72,28 +72,31 @@ void TransceiverTest::RxMsg(const ConstWirelessNodesPtr &_msg)
 /////////////////////////////////////////////////
 void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
 {
-  typedef std::map<std::string, sensors::WirelessTransmitterPtr> trans_map_type;
+  typedef std::map<std::string, sensors::WirelessTransmitterPtr>
+    trans_map_type;
   trans_map_type transmitters;
 
   Load("worlds/empty.world", true, _physicsEngine);
 
   // Generate a random number [1-10] of transmitters
-  int nTransmitters = math::Rand::GetIntUniform(1, 10);
+  int nTransmitters = ignition::math::Rand::IntUniform(1, 10);
 
   for (int i = 0; i < nTransmitters; ++i)
   {
-    double txFreq = math::Rand::GetDblUniform(this->MinFreq, this->MaxFreq);
+    double txFreq = ignition::math::Rand::DblUniform(this->MinFreq,
+        this->MaxFreq);
     std::ostringstream convert;
     convert << i;
     std::string txModelName = "tx" + convert.str();
     std::string txSensorName = "wirelessTransmitter" + convert.str();
     std::string txEssid = "osrf" + convert.str();
-    double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-    math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
+    double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+    double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+    ignition::math::Pose3d txPose(ignition::math::Vector3d(x, y, 0.055),
+        ignition::math::Quaterniond(0, 0, 0));
 
-    SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-        txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
+    SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
+        txPose.Rot().Euler(), txEssid, txFreq, this->Power, this->Gain);
 
     sensors::WirelessTransmitterPtr tx =
         boost::static_pointer_cast<sensors::WirelessTransmitter>(
@@ -102,25 +105,25 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     // Store the new transmitter sensor in the map
     transmitters[txEssid] = tx;
 
-    ASSERT_TRUE(tx);
+    ASSERT_TRUE(tx != NULL);
   }
 
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
-  math::Pose rxPose(math::Vector3(0, 2, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d rxPose(ignition::math::Vector3d(0, 2, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn rx
-  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
-      rxPose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.Pos(),
+      rxPose.Rot().Euler(), this->MinFreq, this->MaxFreq, this->Power,
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -178,45 +181,46 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string tx2ModelName = "tx2";
   std::string tx2SensorName = "wirelessTransmitter2";
   std::string txEssid = "osrf";
-  double x = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  double y = math::Rand::GetDblUniform(-this->MaxPos, this->MaxPos);
-  math::Pose txPose(math::Vector3(x, y, 0.055), math::Quaternion(0, 0, 0));
+  double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+  double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
+  ignition::math::Pose3d txPose(ignition::math::Vector3d(x, y, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
+  SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.Pos(),
+      txPose.Rot().Euler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx1 =
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx1SensorName));
 
-  ASSERT_TRUE(tx1);
+  ASSERT_TRUE(tx1 != NULL);
 
   txFreq = this->MaxFreq + 1.0;
-  SpawnWirelessTransmitterSensor(tx2ModelName, tx2SensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), txEssid, txFreq, this->Power, this->Gain);
+  SpawnWirelessTransmitterSensor(tx2ModelName, tx2SensorName, txPose.Pos(),
+      txPose.Rot().Euler(), txEssid, txFreq, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx2 =
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(tx2SensorName));
 
-  ASSERT_TRUE(tx2);
+  ASSERT_TRUE(tx2 != NULL);
 
   // Wireless Receiver - rx
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
-  math::Pose rxPose(math::Vector3(0, 2, 0.055),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d rxPose(ignition::math::Vector3d(0, 2, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn rx
-  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.pos,
-      rxPose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+  SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.Pos(),
+      rxPose.Rot().Euler(), this->MinFreq, this->MaxFreq, this->Power,
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx =
     boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rxSensorName));
 
-  ASSERT_TRUE(rx);
+  ASSERT_TRUE(rx != NULL);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
@@ -254,55 +258,55 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Transmitter - tx
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTx";
-  math::Pose txPose(math::Vector3(0, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d txPose(ignition::math::Vector3d(0, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn tx
-  SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.pos,
-      txPose.rot.GetAsEuler(), "osrf", 2450.0, this->Power, this->Gain);
+  SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
+      txPose.Rot().Euler(), "osrf", 2450.0, this->Power, this->Gain);
 
   sensors::WirelessTransmitterPtr tx =
       boost::static_pointer_cast<sensors::WirelessTransmitter>(
         sensors::SensorManager::Instance()->GetSensor(txSensorName));
 
-  ASSERT_TRUE(tx);
+  ASSERT_TRUE(tx != NULL);
 
   // Wireless Receiver - rx1
   std::string rx1ModelName = "rx1";
   std::string rx1SensorName = "wirelessRx1";
-  math::Pose rx1Pose(math::Vector3(3, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d rx1Pose(ignition::math::Vector3d(3, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn rx1
-  SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.pos,
-      rx1Pose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+  SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.Pos(),
+      rx1Pose.Rot().Euler(), this->MinFreq, this->MaxFreq, this->Power,
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx1 =
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx1SensorName));
 
-  ASSERT_TRUE(rx1);
+  ASSERT_TRUE(rx1 != NULL);
 
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-2, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d rx2Pose(ignition::math::Vector3d(-2, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn rx2
-  SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
-      rx2Pose.rot.GetAsEuler(), this->MinFreq, this->MaxFreq, this->Power,
+  SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.Pos(),
+      rx2Pose.Rot().Euler(), this->MinFreq, this->MaxFreq, this->Power,
       this->Gain, this->Sensitivity);
 
   sensors::WirelessReceiverPtr rx2 =
       boost::static_pointer_cast<sensors::WirelessReceiver>(
         sensors::SensorManager::Instance()->GetSensor(rx2SensorName));
 
-  ASSERT_TRUE(rx2);
+  ASSERT_TRUE(rx2 != NULL);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
-      math::Vector3(0, 0, 0), true);
+  SpawnBox("Box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(-1, 0, 0.5),
+      ignition::math::Vector3d(0, 0, 0), true);
 
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());

@@ -456,7 +456,7 @@ void SubMesh::CopyNormals(const std::vector<ignition::math::Vector3d> &_norms)
   {
     this->normals[i] = _norms[i];
     this->normals[i].Normalize();
-    if (ignition::math::equal(this->normals[i].GetLength(), 0.0))
+    if (ignition::math::equal(this->normals[i].Length(), 0.0))
     {
       this->normals[i].Set(0, 0, 1);
     }
@@ -778,7 +778,7 @@ void SubMesh::RecalculateNormals()
     ignition::math::Vector3d v2 = this->vertices[this->indices[i+1]];
     ignition::math::Vector3d v3 = this->vertices[this->indices[i+2]];
     ignition::math::Vector3d n =
-      ignition::math::Vector3d::GetNormal(v1, v2, v3);
+      ignition::math::Vector3d::Normal(v1, v2, v3);
 
     for (unsigned int j = 0; j< this->vertices.size(); j++)
     {

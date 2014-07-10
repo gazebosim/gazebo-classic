@@ -47,7 +47,7 @@ void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // ignition::math::Pose3d pose = this->GetRelativePose();
   // SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
 
   // bbody->SetCollisionRelativePose(this, pose);
@@ -64,9 +64,9 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-math::Box SimbodyCollision::GetBoundingBox() const
+ignition::math::Box SimbodyCollision::GetBoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   return result;
 }
 

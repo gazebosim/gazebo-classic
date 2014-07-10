@@ -41,8 +41,8 @@ namespace gazebo
       public: virtual void UpdateRays();
 
       /// \brief Add a ray to the collision
-      protected: void AddRay(const math::Vector3 &start,
-                             const math::Vector3 &end);
+      protected: void AddRay(const ignition::math::Vector3d &start,
+                             const ignition::math::Vector3d &end);
 
       private: BulletPhysicsPtr physicsEngine;
     };

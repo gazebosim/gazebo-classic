@@ -92,57 +92,57 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
-      public: void SetLinearVel(const math::Vector3 &_vel);
+      public: void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular velocity of the model, and all its links.
       /// \param[in] _vel The new angular velocity.
-      public: void SetAngularVel(const math::Vector3 &_vel);
+      public: void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
-      public: void SetLinearAccel(const math::Vector3 &_vel);
+      public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
-      public: void SetAngularAccel(const math::Vector3 &_vel);
+      public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Get the linear velocity of the entity.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetRelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the entity in the world frame.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetWorldLinearVel() const;
 
       /// \brief Get the angular velocity of the entity.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetRelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the entity in the world frame.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetWorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the entity.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetRelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetWorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the entity.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetRelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
-      /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      public: virtual ignition::math::Vector3d GetWorldAngularAccel() const;
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box GetBoundingBox() const;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.
@@ -234,7 +234,7 @@ namespace gazebo
       ///
       /// \param[in] _model Pointer to the static model.
       /// \param[in] _offset Offset, relative to this Model, to place _model.
-      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
+      public: void AttachStaticModel(ModelPtr &_model, ignition::math::Pose3d _offset);
 
       /// \brief Detach a static model from this model.
       /// \param[in] _model Name of an attached static model to remove.
@@ -247,7 +247,7 @@ namespace gazebo
 
       /// \brief Set the scale of model.
       /// \param[in] _scale Scale to set the model to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Enable all the links in all the models.
       /// \param[in] _enabled True to enable all the links.
@@ -259,7 +259,7 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _linkName Name of the link to set.
-      public: void SetLinkWorldPose(const math::Pose &_pose,
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
                                     std::string _linkName);
 
       /// \brief Set the Pose of the entire Model by specifying
@@ -268,7 +268,7 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _link Pointer to the link to set.
-      public: void SetLinkWorldPose(const math::Pose &_pose,
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
                                     const LinkPtr &_link);
 
       /// \brief Allow the model the auto disable. This is ignored if the
@@ -351,7 +351,7 @@ namespace gazebo
       protected: std::vector<ModelPtr> attachedModels;
 
       /// used by Model::AttachStaticModel
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief Publisher for joint info.
       protected: transport::PublisherPtr jointPub;

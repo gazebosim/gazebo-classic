@@ -31,23 +31,24 @@ TEST_F(CameraTest, Follow)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(10, 10, 1),
+      ignition::math::Vector3d(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   // Spawn a camera that will do the following
   SpawnCamera("test_camera_model", "test_camera",
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
 
   rendering::CameraPtr camera = scene->GetCamera("test_camera");
-  ASSERT_TRUE(camera);
+  ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
@@ -73,8 +74,8 @@ TEST_F(CameraTest, Follow)
   // Make sure the sensor is at the correct initial pose
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 4.3, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 4.3, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().x(), 4.3, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().y(), 4.3, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -85,28 +86,29 @@ TEST_F(CameraTest, Visible)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Spawn a box.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Vector3d(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   std::string cameraName = "test_camera";
   // Spawn a camera facing the box
   SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  ASSERT_TRUE(sensor);
+  ASSERT_TRUE(sensor != NULL);
   // this makes sure a world step will trigger the camera render update
   sensor->SetUpdateRate(1000);
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
   rendering::CameraPtr camera = scene->GetCamera(cameraName);
-  ASSERT_TRUE(camera);
+  ASSERT_TRUE(camera != NULL);
 
   // Make sure the camera is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
@@ -120,16 +122,16 @@ TEST_F(CameraTest, Visible)
     common::Time::MSleep(100);
     sleep++;
   }
-  ASSERT_TRUE(visual);
+  ASSERT_TRUE(visual != NULL);
 
   // box should be visible to the camera.
   EXPECT_TRUE(camera->IsVisible(visual));
 
   physics::ModelPtr box = world->GetModel("box");
-  ASSERT_TRUE(box);
+  ASSERT_TRUE(box != NULL);
 
   // move the box behind the camera and it should not be visible to the camera
-  math::Pose pose = math::Pose(-1, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose3d pose = ignition::math::Pose3d(-1, 0, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
@@ -145,7 +147,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // move the box to the left of the camera and it should not be visible
-  pose = math::Pose(0, -1, 0.5, 0, 0, 0);
+  pose = ignition::math::Pose3d(0, -1, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
@@ -162,7 +164,7 @@ TEST_F(CameraTest, Visible)
 
   // move the box to the right of the camera with some rotations,
   // it should still not be visible.
-  pose = math::Pose(0, 1, 0.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 0.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
@@ -178,14 +180,14 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // rotate the camera counter-clockwise to see the box
-  camera->RotateYaw(math::Angle(1.57));
+  camera->RotateYaw(ignition::math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
   EXPECT_TRUE(camera->IsVisible(visual->GetName()));
 
   // move the box up and let it drop. The camera should not see the box
   // initially but the box should eventually move into the camera view
   // as it falls
-  pose = math::Pose(0, 1, 5.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 5.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;

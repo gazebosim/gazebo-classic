@@ -21,7 +21,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/rendering/UserCamera.hh"
 
@@ -48,7 +48,7 @@ SphereMaker::SphereMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-      math::Quaterniond());
+      ignition::math::Quaterniond());
 }
 
 /////////////////////////////////////////////////
@@ -118,14 +118,14 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   if (this->state == 0)
     return;
 
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
+  ignition::math::Vector3d norm;
+  ignition::math::Vector3d p1, p2;
 
   norm.Set(0, 0, 1);
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y,
-                                          math::Plane(norm), p1))
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x(),
+                                          this->mousePushPos.y(),
+                                          ignition::math::Planed(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -134,7 +134,7 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.pos.x(), _event.pos.y(), ignition::math::Planed(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -145,11 +145,11 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
-  math::Vector3 p(this->visualMsg->pose().position().x(),
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 
-  p.z = scale;
+  p.z() = scale;
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   this->visualMsg->mutable_geometry()->mutable_sphere()->set_radius(scale);

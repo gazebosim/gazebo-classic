@@ -50,7 +50,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -451,7 +451,7 @@ void SimbodyPhysics::UpdatePhysics()
     {
       physics::SimbodyLinkPtr simbodyLink =
         boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
-      math::Pose pose = SimbodyPhysics::Transform2Pose(
+      ignition::math::Pose3d pose = SimbodyPhysics::Transform2Pose(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dirtyPoses.push_back(
@@ -560,7 +560,7 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void SimbodyPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
 
@@ -656,7 +656,7 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->GetGravity().GetLength(), 0.0))
+  if (!ignition::math::equal(this->GetGravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
       SimbodyPhysics::Vector3ToVec3(this->GetGravity()));
   else
@@ -809,7 +809,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
 
-        if (math::equal(pitch, 0.0))
+        if (ignition::math::equal(pitch, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using pitch = 1.0e6\n";
@@ -925,7 +925,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             gzJoint->GetAxisFrameOffset(0).RotateVector(
             gzJoint->GetLocalAxis(0))));
 
-        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).Euler()
         //       << "] ["
         //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
         //          gzJoint->GetLocalAxis(0)) << "]\n";
@@ -1216,7 +1216,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
           boost::dynamic_pointer_cast<physics::CylinderShape>(
           (*ci)->GetShape());
         double r = c->GetRadius();
-        double len = c->GetLength();
+        double len = c->Length();
 
         // chunky hexagonal shape
         const int resolution = 1;
@@ -1280,52 +1280,52 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 }
 
 /////////////////////////////////////////////////
-SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaterniond &_q)
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(const ignition::math::Quaterniond &_q)
 {
-  return SimTK::Quaternion(_q.w, _q.x, _q.y, _q.z);
+  return SimTK::Quaternion(_q.w, _q.x(), _q.y(), _q.z());
 }
 
 /////////////////////////////////////////////////
-math::Quaterniond SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
+ignition::math::Quaterniond SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 {
-  return math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
+  return ignition::math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
 }
 
 /////////////////////////////////////////////////
-SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
+SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const ignition::math::Vector3d &_v)
 {
-  return SimTK::Vec3(_v.x, _v.y, _v.z);
+  return SimTK::Vec3(_v.x(), _v.y(), _v.z());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
+ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
 {
-  return math::Vector3(_v[0], _v[1], _v[2]);
+  return ignition::math::Vector3d(_v[0], _v[1], _v[2]);
 }
 
 /////////////////////////////////////////////////
-SimTK::Transform SimbodyPhysics::Pose2Transform(const math::Pose &_pose)
+SimTK::Transform SimbodyPhysics::Pose2Transform(const ignition::math::Pose3d &_pose)
 {
-  SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
-                   _pose.rot.z);
-  SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  SimTK::Quaternion q(_pose.Rot().w, _pose.Rot().x(), _pose.Rot().y(),
+                   _pose.Rot().z());
+  SimTK::Vec3 v(_pose.Pos().x(), _pose.Pos().y(), _pose.Pos().z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
 }
 
 /////////////////////////////////////////////////
-math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
+ignition::math::Pose3d SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
 {
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
-  return math::Pose(math::Vector3(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
-    math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
+  return ignition::math::Pose3d(ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
+    ignition::math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
-  const math::Pose pose = _element->Get<math::Pose>("pose");
+  const ignition::math::Pose3d pose = _element->Get<ignition::math::Pose3d>("pose");
   return Pose2Transform(pose);
 }
 

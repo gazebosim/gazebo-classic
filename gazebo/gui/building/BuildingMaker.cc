@@ -25,7 +25,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -205,13 +205,13 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualElem->GetElement("material")->GetElement("script")
       ->GetElement("name")->Set("Gazebo/OrangeTransparent");
   visVisual->Load(visualElem);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ignition::math::Vector3d scaledSize = BuildingMaker::ConvertSize(_size);
   BuildingModelManip *wallManip = new BuildingModelManip();
   wallManip->SetMaker(this);
   wallManip->SetName(linkName);
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  visVisual->SetPosition(ignition::math::Vector3d(0, 0, scaledSize.z()/2.0));
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
@@ -251,9 +251,9 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   windowManip->SetMaker(this);
   windowManip->SetName(linkName);
   windowManip->SetVisual(visVisual);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ignition::math::Vector3d scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  visVisual->SetPosition(ignition::math::Vector3d(0, 0, scaledSize.z()/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = windowManip;
 
@@ -294,9 +294,9 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   doorManip->SetMaker(this);
   doorManip->SetName(linkName);
   doorManip->SetVisual(visVisual);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ignition::math::Vector3d scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  visVisual->SetPosition(ignition::math::Vector3d(0, 0, scaledSize.z()/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = doorManip;
 
@@ -335,10 +335,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ignition::math::Vector3d scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  visVisual->SetPosition(ignition::math::Vector3d(0, 0, scaledSize.z()/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = stairsManip;
 
@@ -352,9 +352,9 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
 
   double rise = 1.0 / dSteps;
   double run = 1.0 / dSteps;
-  baseStepVisual->SetScale(math::Vector3(1, run, rise));
+  baseStepVisual->SetScale(ignition::math::Vector3d(1, run, rise));
 
-  math::Vector3 baseOffset(0, 0.5 - run/2.0,
+  ignition::math::Vector3d baseOffset(0, 0.5 - run/2.0,
       -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
 
@@ -365,9 +365,9 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
     visualStepName << visualName.str() << "step" << i;
     rendering::VisualPtr stepVisual = baseStepVisual->Clone(
         visualStepName.str(), visVisual);
-    stepVisual->SetPosition(math::Vector3(0, baseOffset.y-(run*i),
-        baseOffset.z + rise*i));
-    stepVisual->SetRotation(baseStepVisual->GetRotation());
+    stepVisual->SetPosition(ignition::math::Vector3d(0, baseOffset.y()-(run*i),
+        baseOffset.z() + rise*i));
+    stepVisual->SetRotation(baseStepVisual->Rotation());
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -407,9 +407,9 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   floorManip->SetMaker(this);
   floorManip->SetName(linkName);
   floorManip->SetVisual(visVisual);
-  math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
+  ignition::math::Vector3d scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
-  visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  visVisual->SetPosition(ignition::math::Vector3d(0, 0, scaledSize.z()/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
 
@@ -480,7 +480,7 @@ void BuildingMaker::Reset()
       scene->GetWorldVisual()));
 
   this->modelVisual->Load();
-  this->modelPose = math::Pose::Zero;
+  this->modelPose = ignition::math::Pose3d::Zero;
   this->modelVisual->SetPose(this->modelPose);
   this->modelVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   scene->AddVisual(this->modelVisual);
@@ -602,8 +602,8 @@ void BuildingMaker::GenerateSDF()
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr wallVis = visual;
-          math::Pose wallPose = wallVis->GetParent()->GetWorldPose();
-          math::Vector3 wallSize = wallVis->GetScale();
+          ignition::math::Pose3d wallPose = wallVis->GetParent()->GetWorldPose();
+          ignition::math::Vector3d wallSize = wallVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
           {
@@ -614,21 +614,22 @@ void BuildingMaker::GenerateSDF()
                 || objName.find("Door") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
-                  - wallPose;
-              math::Vector3 size = attachedVis->GetScale();
+              ignition::math::Pose3d offset =
+                attachedVis->GetParent()->GetWorldPose() - wallPose;
+              ignition::math::Vector3d size = attachedVis->GetScale();
 
-              offset.pos.z += attachedVis->GetPosition().z
-                  - wallVis->GetPosition().z;
+              offset.Pos().z() += attachedVis->GetPosition().z()
+                  - wallVis->GetPosition().z();
 
-              math::Vector3 newOffset = offset.pos - (-wallSize/2.0)
-                  - size/2.0;
-              QRectF hole(newOffset.x, newOffset.z, size.x, size.z);
+              ignition::math::Vector3d newOffset =
+                offset.Pos() - (-wallSize/2.0) - size/2.0;
+              QRectF hole(newOffset.x(), newOffset.z(), size.x(), size.z());
               holes.push_back(hole);
             }
           }
           std::vector<QRectF> subdivisions;
-          QRectF surface(0, 0, wallVis->GetScale().x, wallVis->GetScale().z);
+          QRectF surface(0, 0,
+              wallVis->GetScale().x(), wallVis->GetScale().z());
 
           // subdivide the wall into mutiple compositing rectangles in order
           // to create holes for the attached children
@@ -652,17 +653,21 @@ void BuildingMaker::GenerateSDF()
                 << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
-            math::Vector3 newSubPos =
-                math::Vector3(-wallSize.x/2.0, 0, -wallSize.z/2.0)
-                + math::Vector3(subdivisions[i].x(), 0, subdivisions[i].y())
-                + math::Vector3(subdivisions[i].width()/2, 0,
+            ignition::math::Vector3d newSubPos =
+              ignition::math::Vector3d(-wallSize.x()/2.0, 0, -wallSize.z()/2.0)
+              + ignition::math::Vector3d(
+                  subdivisions[i].x(), 0, subdivisions[i].y())
+                + ignition::math::Vector3d(subdivisions[i].width()/2, 0,
                     subdivisions[i].height()/2);
-            newSubPos.z += wallSize.z/2;
-            math::Pose newPose(newSubPos, math::Quaterniond(0, 0, 0));
+
+            newSubPos.z() += wallSize.z()/2;
+
+            ignition::math::Pose3d newPose(newSubPos,
+                ignition::math::Quaterniond(0, 0, 0));
             visualElem->GetElement("pose")->Set(newPose);
             collisionElem->GetElement("pose")->Set(newPose);
-            math::Vector3 blockSize(subdivisions[i].width(),
-                wallVis->GetScale().y, subdivisions[i].height());
+            ignition::math::Vector3d blockSize(subdivisions[i].width(),
+                wallVis->GetScale().y(), subdivisions[i].height());
             visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
@@ -692,8 +697,8 @@ void BuildingMaker::GenerateSDF()
         {
           std::vector<QRectF> holes;
           rendering::VisualPtr floorVis = visual;
-          math::Pose floorPose = floorVis->GetWorldPose();
-          math::Vector3 floorSize = floorVis->GetScale();
+          ignition::math::Pose3d floorPose = floorVis->GetWorldPose();
+          ignition::math::Vector3d floorSize = floorVis->GetScale();
           for (unsigned int i = 0; i <
               buildingModelManip->GetAttachedManipCount(); ++i)
           {
@@ -703,24 +708,28 @@ void BuildingMaker::GenerateSDF()
             if (objName.find("Stairs") != std::string::npos)
             {
               rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-              math::Pose offset = attachedVis->GetParent()->GetWorldPose()
+              ignition::math::Pose3d offset = attachedVis->GetParent()->GetWorldPose()
                   - floorPose;
-              math::Vector3 size = attachedVis->GetScale();
+              ignition::math::Vector3d size = attachedVis->GetScale();
 
-              QRectF rect(0, 0, size.x, size.y);
+              QRectF rect(0, 0, size.x(), size.y());
               QPolygonF polygon(rect);
               QTransform transform;
-              transform.rotate(GZ_RTOD(offset.rot.GetAsEuler().z));
+              transform.rotate(IGN_RTOD(offset.Rot().Euler().z()));
               QRectF bound = transform.map(polygon).boundingRect();
-              math::Vector3 newOffset = offset.pos - (-floorSize/2.0)
-                  - math::Vector3(bound.width(), bound.height(), size.z)/2.0;
-              QRectF hole(newOffset.x, newOffset.y, bound.width(),
+              ignition::math::Vector3d newOffset =
+                offset.Pos() - (-floorSize/2.0)
+                - ignition::math::Vector3d(
+                    bound.width(), bound.height(), size.z())/2.0;
+
+              QRectF hole(newOffset.x(), newOffset.y(), bound.width(),
                   bound.height());
               holes.push_back(hole);
             }
           }
           std::vector<QRectF> subdivisions;
-          QRectF surface(0, 0, floorVis->GetScale().x, floorVis->GetScale().y);
+          QRectF surface(0, 0, floorVis->GetScale().x(),
+              floorVis->GetScale().y());
 
           // subdivide the floor into mutiple compositing rectangles to make an
           // opening for the stairs
@@ -744,17 +753,22 @@ void BuildingMaker::GenerateSDF()
                 << "_Collision_" << i;
             collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
 
-            math::Vector3 newSubPos =
-                math::Vector3(-floorSize.x/2.0, -floorSize.y/2.0, 0)
-                + math::Vector3(subdivisions[i].x(), subdivisions[i].y(), 0)
-                + math::Vector3(subdivisions[i].width()/2,
-                subdivisions[i].height()/2, 0);
-            newSubPos.z += floorVis->GetPosition().z;
-            math::Pose newPose(newSubPos, visual->GetParent()->GetRotation());
+            ignition::math::Vector3d newSubPos =
+              ignition::math::Vector3d(
+                  -floorSize.x()/2.0, -floorSize.y()/2.0, 0)
+              + ignition::math::Vector3d(
+                  subdivisions[i].x(), subdivisions[i].y(), 0)
+              + ignition::math::Vector3d(subdivisions[i].width()/2,
+                  subdivisions[i].height()/2, 0);
+
+            newSubPos.z() += floorVis->GetPosition().z();
+            ignition::math::Pose3d newPose(newSubPos,
+                visual->GetParent()->Rotation());
+
             visualElem->GetElement("pose")->Set(newPose);
             collisionElem->GetElement("pose")->Set(newPose);
-            math::Vector3 blockSize(subdivisions[i].width(),
-                subdivisions[i].height(), floorVis->GetScale().z);
+            ignition::math::Vector3d blockSize(subdivisions[i].width(),
+                subdivisions[i].height(), floorVis->GetScale().z());
             visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
@@ -796,8 +810,8 @@ void BuildingMaker::GenerateSDF()
             << "_Collision_" << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
-        math::Pose newPose(childVisual->GetWorldPose().pos,
-            visual->GetParent()->GetRotation());
+        ignition::math::Pose3d newPose(childVisual->GetWorldPose().Pos(),
+            visual->GetParent()->Rotation());
         visualElem->GetElement("pose")->Set(newPose);
         collisionElem->GetElement("pose")->Set(newPose);
         visualElem->GetElement("geometry")->GetElement("box")->
@@ -875,7 +889,7 @@ void BuildingMaker::GenerateSDFWithCSG()
         && buildingModelManip->GetAttachedManipCount() != 0)
     {
       rendering::VisualPtr wallVis = visual;
-      math::Pose wallPose = wallVis->GetWorldPose();
+      ignition::math::Pose3d wallPose = wallVis->GetWorldPose();
       const common::Mesh *wallMesh = common::MeshManager::Instance()
           ->GetMesh(wallVis->GetMeshName());
       // clone wall mesh to to be used in boolean operation
@@ -896,7 +910,7 @@ void BuildingMaker::GenerateSDFWithCSG()
           m1SubMesh->AddIndex(subMesh->GetIndex(j));
         }
       }
-      m1->SetScale(math::Vector3(wallVis->GetScale()));
+      m1->SetScale(ignition::math::Vector3d(wallVis->GetScale()));
 
       std::string booleanMeshName = buildingModelManip->GetName() + "_Boolean";
       common::Mesh *booleanMesh = NULL;
@@ -916,7 +930,7 @@ void BuildingMaker::GenerateSDFWithCSG()
             || objName.find("Door") != std::string::npos)
         {
           rendering::VisualPtr attachedVis = attachedObj->GetVisual();
-          math::Pose offset = attachedVis->GetWorldPose() - wallPose;
+          ignition::math::Pose3d offset = attachedVis->GetWorldPose() - wallPose;
           const common::Mesh *attachedMesh = common::MeshManager::Instance()->
               GetMesh(attachedVis->GetMeshName());
           // clone attached object mesh
@@ -937,7 +951,7 @@ void BuildingMaker::GenerateSDFWithCSG()
               m2SubMesh->AddIndex(subMesh->GetIndex(j));
             }
           }
-          m2->SetScale(math::Vector3(attachedVis->GetScale()));
+          m2->SetScale(ignition::math::Vector3d(attachedVis->GetScale()));
           // create csg but don't add to mesh manager just yet
           common::MeshCSG csg;
           booleanMesh = csg.CreateBoolean(m1, m2, common::MeshCSG::DIFFERENCE,
@@ -981,8 +995,8 @@ void BuildingMaker::GenerateSDFWithCSG()
             << i;
         collisionElem->GetAttribute("name")->Set(collisionNameStream.str());
         rendering::VisualPtr childVisual = visual->GetChild(i);
-        math::Pose newPose(childVisual->GetWorldPose().pos,
-            visual->GetRotation());
+        ignition::math::Pose3d newPose(childVisual->GetWorldPose().Pos(),
+            visual->Rotation());
         visualElem->GetElement("pose")->Set(newPose);
         collisionElem->GetElement("pose")->Set(newPose);
         visualElem->GetElement("geometry")->GetElement("box")->
@@ -1010,34 +1024,34 @@ void BuildingMaker::CreateTheEntity()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BuildingMaker::ConvertSize(double _width, double _length,
+ignition::math::Vector3d BuildingMaker::ConvertSize(double _width, double _length,
     double _height)
 {
-  return math::Vector3(conversionScale*_width, conversionScale*_length,
+  return ignition::math::Vector3d(conversionScale*_width, conversionScale*_length,
       conversionScale*_height);
 }
 
 /////////////////////////////////////////////////
-math::Pose BuildingMaker::ConvertPose(double _x, double _y, double _z,
+ignition::math::Pose3d BuildingMaker::ConvertPose(double _x, double _y, double _z,
     double _roll, double _pitch, double _yaw)
 {
-  return math::Pose(conversionScale*_x, conversionScale*_y, conversionScale*_z,
+  return ignition::math::Pose3d(conversionScale*_x, conversionScale*_y, conversionScale*_z,
       IGN_DTOR(_roll), IGN_DTOR(_pitch), IGN_DTOR(_yaw));
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BuildingMaker::ConvertSize(const QVector3D &_size)
+ignition::math::Vector3d BuildingMaker::ConvertSize(const QVector3D &_size)
 {
   QVector3D scaledSize = conversionScale*_size;
-  return math::Vector3(scaledSize.x(), scaledSize.y(), scaledSize.z());
+  return ignition::math::Vector3d(scaledSize.x(), scaledSize.y(), scaledSize.z());
 }
 
 /////////////////////////////////////////////////
-math::Pose BuildingMaker::ConvertPose(const QVector3D &_pos,
+ignition::math::Pose3d BuildingMaker::ConvertPose(const QVector3D &_pos,
     const QVector3D &_rot)
 {
   QVector3D scaledPos = conversionScale*_pos;
-  return math::Pose(scaledPos.x(), scaledPos.y(), scaledPos.z(),
+  return ignition::math::Pose3d(scaledPos.x(), scaledPos.y(), scaledPos.z(),
       IGN_DTOR(_rot.x()), IGN_DTOR(_rot.y()), IGN_DTOR(_rot.z()));
 }
 

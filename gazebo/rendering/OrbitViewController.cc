@@ -95,7 +95,7 @@ void OrbitViewController::Init()
     ignition::math::Vector3d cameraPos = this->camera->GetWorldPose().Pos();
     double distOrigin = cameraPos.Distance(origin);
 
-    dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
+    dist = origin.DistToLine(cameraPos, cameraPos + dir * distOrigin);
 
     if (ignition::math::equal(dist, 0.0, 1e-3))
       dist = distOrigin;
@@ -106,7 +106,7 @@ void OrbitViewController::Init()
       // Otherwise, choose a default distance of 10m for the focal point
       cameraPos.z(0);
       distOrigin = cameraPos.Distance(origin);
-      dist = origin.GetDistToLine(cameraPos, cameraPos + dir * distOrigin);
+      dist = origin.DistToLine(cameraPos, cameraPos + dir * distOrigin);
       if (ignition::math::equal(dist, 0.0, 1e-3))
         dist = distOrigin;
       else
@@ -171,8 +171,8 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     this->distance = this->camera->GetWorldPose().Pos().Distance(
         this->focalPoint);
 
-    this->yaw = this->camera->GetWorldRotation().GetAsEuler().z();
-    this->pitch = this->camera->GetWorldRotation().GetAsEuler().y();
+    this->yaw = this->camera->GetWorldRotation().Euler().z();
+    this->pitch = this->camera->GetWorldRotation().Euler().y();
   }
 
   // Turn on the reference visual.

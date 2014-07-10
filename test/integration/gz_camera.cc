@@ -32,23 +32,23 @@ TEST_F(GzCamera, Follow)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(10, 10, 1),
+      ignition::math::Vector3d(0, 0, 0));
 
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
+  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   // Spawn a camera that will do the following
   SpawnCamera("test_camera_model", "test_camera",
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene);
+  ASSERT_TRUE(scene != NULL);
 
   rendering::CameraPtr camera = scene->GetCamera("test_camera");
-  ASSERT_TRUE(camera);
+  ASSERT_TRUE(camera != NULL);
 
   // Make sure the sensor is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);
@@ -63,8 +63,8 @@ TEST_F(GzCamera, Follow)
   // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().pos.x, 9.9, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().pos.y, 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().x(), 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().y(), 9.9, 0.1);
 }
 
 /////////////////////////////////////////////////

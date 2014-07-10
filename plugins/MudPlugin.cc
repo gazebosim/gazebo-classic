@@ -226,7 +226,7 @@ void MudPlugin::OnUpdate()
       if (contactLinkNames.end() != contactLinkNames.find(*iterLinkName))
       {
         // Compute the average contact point position
-        math::Vector3 contactPositionAverage;
+        ignition::math::Vector3d contactPositionAverage;
         {
           // Find the index to the correct contact data structure
           unsigned int i = linkNameIndices[*iterLinkName];
@@ -280,7 +280,8 @@ void MudPlugin::OnUpdate()
             (*iterJoint)->Attach(this->link, *iterLink);
 
             (*iterJoint)->Load(this->link, *iterLink,
-              math::Pose(contactPositionAverage, math::Quaternion()));
+              ignition::math::Pose3d(
+                contactPositionAverage, ignition::math::Quaterniond()));
             // Joint names must be unique
             // name as mud_joint_0, mud_joint_1, etc.
             {

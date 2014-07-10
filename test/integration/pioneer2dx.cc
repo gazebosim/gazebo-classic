@@ -55,12 +55,12 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   gazebo::msgs::Pose msg;
   gazebo::msgs::Set(msg.mutable_position(),
-      gazebo::math::Vector3(0.2, 0, 0));
+      ignition::math::Vector3d(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),
-      gazebo::math::Quaternion(0, 0, 0));
+      ignition::math::Quaterniond(0, 0, 0));
   velPub->Publish(msg);
 
-  math::Pose startPose, endPose;
+  ignition::math::Pose3d startPose, endPose;
   startPose = this->poses["pioneer2dx"];
 
   common::Time startTime = this->simTime;
@@ -82,10 +82,10 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   double dist = (currTime - startTime).Double() * 0.2;
   std::cout << "Dist[" << dist << "]\n";
-  std::cout << "EndPose.x[" << endPose.pos.x << "]\n";
-  EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
-  EXPECT_LT(fabs(endPose.pos.y), 0.5);
-  EXPECT_LT(fabs(endPose.pos.z), 0.01);
+  std::cout << "EndPose.x[" << endPose.Pos().x() << "]\n";
+  EXPECT_LT(fabs(endPose.Pos().x() - dist), 0.1);
+  EXPECT_LT(fabs(endPose.Pos().y()), 0.5);
+  EXPECT_LT(fabs(endPose.Pos().z()), 0.01);
 }
 
 

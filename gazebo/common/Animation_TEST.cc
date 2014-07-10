@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "test/util.hh"
@@ -48,22 +48,22 @@ TEST_F(AnimationTest, PoseAnimation)
   common::PoseAnimation anim("pose_test", 5.0, false);
   common::PoseKeyFrame *key = anim.CreateKeyFrame(0.0);
 
-  EXPECT_DOUBLE_EQ(5.0, anim.GetLength());
+  EXPECT_DOUBLE_EQ(5.0, anim.Length());
   anim.SetLength(10.0);
-  EXPECT_DOUBLE_EQ(10.0, anim.GetLength());
+  EXPECT_DOUBLE_EQ(10.0, anim.Length());
 
   key->SetTranslation(ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(key->GetTranslation() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(key->Translation() == ignition::math::Vector3d(0, 0, 0));
 
   key->SetRotation(ignition::math::Quaterniond(0, 0, 0));
-  EXPECT_TRUE(key->GetRotation() == ignition::math::Quaterniond(0, 0, 0));
+  EXPECT_TRUE(key->Rotation() == ignition::math::Quaterniond(0, 0, 0));
 
   key = anim.CreateKeyFrame(10.0);
   key->SetTranslation(ignition::math::Vector3d(10, 20, 30));
-  EXPECT_TRUE(key->GetTranslation() == ignition::math::Vector3d(10, 20, 30));
+  EXPECT_TRUE(key->Translation() == ignition::math::Vector3d(10, 20, 30));
 
   key->SetRotation(ignition::math::Quaterniond(0.1, 0.2, 0.3));
-  EXPECT_TRUE(key->GetRotation() == ignition::math::Quaterniond(0.1, 0.2, 0.3));
+  EXPECT_TRUE(key->Rotation() == ignition::math::Quaterniond(0.1, 0.2, 0.3));
 
   anim.AddTime(5.0);
   EXPECT_DOUBLE_EQ(5.0, anim.GetTime());
@@ -73,9 +73,9 @@ TEST_F(AnimationTest, PoseAnimation)
 
   common::PoseKeyFrame interpolatedKey(-1.0);
   anim.GetInterpolatedKeyFrame(interpolatedKey);
-  EXPECT_TRUE(interpolatedKey.GetTranslation() ==
+  EXPECT_TRUE(interpolatedKey.Translation() ==
       ignition::math::Vector3d(3.76, 7.52, 11.28));
-  EXPECT_TRUE(interpolatedKey.GetRotation() ==
+  EXPECT_TRUE(interpolatedKey.Rotation() ==
       ignition::math::Quaterniond(0.0302776, 0.0785971, 0.109824));
 }
 

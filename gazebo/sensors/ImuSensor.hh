@@ -63,16 +63,16 @@ namespace gazebo
 
       /// \brief Returns the angular velocity.
       /// \return Angular velocity.
-      public: math::Vector3 GetAngularVelocity() const;
+      public: ignition::math::Vector3d GetAngularVelocity() const;
 
       /// \brief Returns the imu linear acceleration
       /// \return Linear acceleration.
-      public: math::Vector3 GetLinearAcceleration() const;
+      public: ignition::math::Vector3d GetLinearAcceleration() const;
 
       /// \brief get orientation of the IMU relative to the reference pose
       /// \return returns the orientation quaternion of the IMU relative to
       /// the imu reference pose.
-      public: math::Quaterniond GetOrientation() const;
+      public: ignition::math::Quaterniond GetOrientation() const;
 
       /// \brief Sets the current pose as the IMU reference pose
       public: void SetReferencePose();
@@ -85,16 +85,16 @@ namespace gazebo
       private: void OnLinkData(ConstLinkDataPtr &_msg);
 
       /// \brief Imu reference pose
-      private: math::Pose referencePose;
+      private: ignition::math::Pose3d referencePose;
 
       /// \brief Save previous imu linear velocity for computing acceleration.
-      private: math::Vector3 lastLinearVel;
+      private: ignition::math::Vector3d lastLinearVel;
 
       /// \brief Imu linear acceleration
-      private: math::Vector3 linearAcc;
+      private: ignition::math::Vector3d linearAcc;
 
       /// \brief store gravity vector to be added to the imu output.
-      private: math::Vector3 gravity;
+      private: ignition::math::Vector3d gravity;
 
       /// \brief Imu data publisher
       private: transport::PublisherPtr pub;

@@ -407,22 +407,22 @@ bool ModelCommand::RunImpl()
     return false;
   }
 
-  math::Pose pose;
-  math::Vector3 rpy;
+  ignition::math::Pose3d pose;
+  ignition::math::Vector3d rpy;
 
   if (this->vm.count("pose-x"))
-    pose.pos.x = this->vm["pose-x"].as<double>();
+    pose.Pos().x() = this->vm["pose-x"].as<double>();
   if (this->vm.count("pose-y"))
-    pose.pos.y = this->vm["pose-y"].as<double>();
+    pose.Pos().y() = this->vm["pose-y"].as<double>();
   if (this->vm.count("pose-z"))
-    pose.pos.z = this->vm["pose-z"].as<double>();
+    pose.Pos().z() = this->vm["pose-z"].as<double>();
   if (this->vm.count("pose-R"))
-    rpy.x = this->vm["pose-R"].as<double>();
+    rpy.x() = this->vm["pose-R"].as<double>();
   if (this->vm.count("pose-P"))
-    rpy.y = this->vm["pose-P"].as<double>();
+    rpy.y() = this->vm["pose-P"].as<double>();
   if (this->vm.count("pose-Y"))
-    rpy.z = this->vm["pose-Y"].as<double>();
-  pose.rot.SetFromEuler(rpy);
+    rpy.z() = this->vm["pose-Y"].as<double>();
+  pose.Rot().Euler(rpy);
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -504,7 +504,8 @@ bool ModelCommand::RunImpl()
 
 /////////////////////////////////////////////////
 bool ModelCommand::ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
-    const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->root->GetElement("model");
 

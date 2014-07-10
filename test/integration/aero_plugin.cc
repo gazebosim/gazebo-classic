@@ -57,7 +57,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -94,11 +94,11 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < 2400; ++i)
   {
     world->Step(1);
-    body->AddForce(math::Vector3(-1, 0, 0));
+    body->AddForce(ignition::math::Vector3d(-1, 0, 0));
 
     if (i > 2385)
     {
-      double v = body->GetWorldLinearVel().x;
+      double v = body->GetWorldLinearVel().x();
       double q = 0.5 * rho * v * v;
       double cl = cla * a0 * q * area;
       double cd = cda * a0 * q * area;
@@ -106,17 +106,17 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
       physics::JointWrench body_wrench = body_joint->GetForceTorque(0);
       physics::JointWrench wing_1_wrench = wing_1_joint->GetForceTorque(0);
       physics::JointWrench wing_2_wrench = wing_2_joint->GetForceTorque(0);
-      math::Pose wing_1_pose = wing_1->GetWorldPose();
-      math::Vector3 wing_1_force =
-        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Force);
-      math::Vector3 wing_1_torque =
-        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Torque);
+      ignition::math::Pose3d wing_1_pose = wing_1->GetWorldPose();
+      ignition::math::Vector3d wing_1_force =
+        wing_1_pose.Rot().RotateVector(wing_1_wrench.body2Force);
+      ignition::math::Vector3d wing_1_torque =
+        wing_1_pose.Rot().RotateVector(wing_1_wrench.body2Torque);
 
-      math::Pose wing_2_pose = wing_2->GetWorldPose();
-      math::Vector3 wing_2_force =
-        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Force);
-      math::Vector3 wing_2_torque =
-        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Torque);
+      ignition::math::Pose3d wing_2_pose = wing_2->GetWorldPose();
+      ignition::math::Vector3d wing_2_force =
+        wing_2_pose.Rot().RotateVector(wing_2_wrench.body2Force);
+      ignition::math::Vector3d wing_2_torque =
+        wing_2_pose.Rot().RotateVector(wing_2_wrench.body2Torque);
       gzdbg << "body velocity [" << body->GetWorldLinearVel()
             << "] cl [" << cl
             << "] cd [" << cd
@@ -128,7 +128,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
             << "] wing_2 torque [" << wing_2_torque
             << "]\n";
 
-      EXPECT_NEAR(wing_1_force.z, cl * cos(dihedral), TOL);
+      EXPECT_NEAR(wing_1_force.z(), cl * cos(dihedral), TOL);
     }
   }
 }

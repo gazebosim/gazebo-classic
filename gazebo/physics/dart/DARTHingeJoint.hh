@@ -18,8 +18,8 @@
 #ifndef _GAZEBO_DARTHINGEJOINT_HH_
 #define _GAZEBO_DARTHINGEJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
@@ -46,17 +46,17 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _vel);

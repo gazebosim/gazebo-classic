@@ -57,13 +57,13 @@ void CollisionState::Load(const sdf::ElementPtr _elem)
 
   // Set the pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 }
 
 /////////////////////////////////////////////////
-const math::Pose &CollisionState::GetPose() const
+const ignition::math::Pose3d &CollisionState::GetPose() const
 {
   return this->pose;
 }
@@ -71,7 +71,7 @@ const math::Pose &CollisionState::GetPose() const
 /////////////////////////////////////////////////
 bool CollisionState::IsZero() const
 {
-  return this->pose == math::Pose::Zero;
+  return this->pose == ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -89,8 +89,8 @@ CollisionState CollisionState::operator-(const CollisionState &_state) const
   result.name = this->name;
 
   // Subtract the pose
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
 
   return result;
 }
@@ -102,8 +102,8 @@ CollisionState CollisionState::operator+(const CollisionState &_state) const
   result.name = this->name;
 
   // Add the pose
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
 
   return result;
 }

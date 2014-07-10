@@ -290,7 +290,7 @@ namespace gazebo
 
       /// \brief Retrieve the inverse of the bind pose skeletal transform
       /// \return the transform
-      public: ignition::math::Matrix4d GetInverseBindTransform();
+      public: ignition::math::Matrix4d InverseBindTransform();
 
       /// \brief Retrieve the model transform
       /// \return the transform

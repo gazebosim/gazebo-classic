@@ -73,18 +73,18 @@ void EntityMaker::OnMouseMove(const common::MouseEvent &/*_event*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 EntityMaker::GetSnappedPoint(math::Vector3 _p)
+ignition::math::Vector3d EntityMaker::GetSnappedPoint(ignition::math::Vector3d _p)
 {
-  math::Vector3 result = _p;
+  ignition::math::Vector3d result = _p;
 
   if (this->snapToGrid)
   {
-    math::Vector3 rounded = (_p / this->snapGridSize).GetRounded() *
+    ignition::math::Vector3d rounded = (_p / this->snapGridSize).Rounded() *
       this->snapGridSize;
-    if (fabs(_p.x - rounded.x) < this->snapDistance)
-      result.x = rounded.x;
-    if (fabs(_p.y - rounded.y) < this->snapDistance)
-      result.y = rounded.y;
+    if (fabs(_p.x() - rounded.x()) < this->snapDistance)
+      result.x() = rounded.x();
+    if (fabs(_p.y() - rounded.y()) < this->snapDistance)
+      result.y() = rounded.y();
   }
 
   return result;

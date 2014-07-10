@@ -99,7 +99,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const = 0;
+      public: virtual ignition::math::Box GetBoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -116,7 +116,7 @@ namespace gazebo
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Turn contact recording on or off.
       /// Deprecated by?
@@ -136,38 +136,38 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      public: virtual ignition::math::Vector3d GetRelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the collision in the world
       /// frame.
       /// \return The linear velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      public: virtual ignition::math::Vector3d GetWorldLinearVel() const;
 
       /// \brief Get the angular velocity of the collision.
       /// \return The angular velocity of the collision.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      public: virtual ignition::math::Vector3d GetRelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the collision in the world frame.
       /// \return The angular velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      public: virtual ignition::math::Vector3d GetWorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the collision.
       /// \return The linear acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      public: virtual ignition::math::Vector3d GetRelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the collision in the world
       /// frame.
       /// \return The linear acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      public: virtual ignition::math::Vector3d GetWorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the collision.
       /// \return The angular acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      public: virtual ignition::math::Vector3d GetRelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the collision in the
       /// world frame.
       /// \return The angular acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      public: virtual ignition::math::Vector3d GetWorldAngularAccel() const;
 
       /// \brief Get the collision state.
       /// \return The collision state.

@@ -70,8 +70,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
+  ignition::math::Pose3d anchor;
+  ignition::math::Vector3d axis(1, 0, 0);
   double upper = M_PI;
   double lower = -M_PI;
 
@@ -171,8 +171,8 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(ignition::math::Vector3d::UnitX), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(ignition::math::Vector3d::UnitY), 87.50, 1e-2);
   }
 }
 //////////////////////////////////////////////////
@@ -227,7 +227,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkContact != NULL);
 
   physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
-  ASSERT_TRUE(jointPluginImplicit);
+  ASSERT_TRUE(jointPluginImplicit != NULL);
 
   int cyclesPrismatic = 0;
   int cyclesRevolute = 0;
@@ -255,56 +255,56 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     world->Step(1);
 
     // count up and down cycles
-    if (linkPrismatic->GetWorldLinearVel().z > vT && velPrismatic < -vT)
+    if (linkPrismatic->GetWorldLinearVel().z() > vT && velPrismatic < -vT)
     {
       cyclesPrismatic++;
       velPrismatic = 1.0;
     }
-    else if (linkPrismatic->GetWorldLinearVel().z < -vT && velPrismatic > vT)
+    else if (linkPrismatic->GetWorldLinearVel().z() < -vT && velPrismatic > vT)
     {
       cyclesPrismatic++;
       velPrismatic = -1.0;
     }
-    if (-linkRevolute->GetRelativeAngularVel().y > vT && velRevolute < -vT)
+    if (-linkRevolute->GetRelativeAngularVel().y() > vT && velRevolute < -vT)
     {
       cyclesRevolute++;
       velRevolute = 1.0;
     }
-    else if (-linkRevolute->GetRelativeAngularVel().y < -vT && velRevolute > vT)
+    else if (-linkRevolute->GetRelativeAngularVel().y() < -vT && velRevolute > vT)
     {
       cyclesRevolute++;
       velRevolute = -1.0;
     }
-    if (linkPluginExplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginExplicit->GetWorldLinearVel().z() > vT &&
         velPluginExplicit < -vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = 1.0;
     }
-    else if (linkPluginExplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginExplicit->GetWorldLinearVel().z() < -vT &&
              velPluginExplicit > vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = -1.0;
     }
-    if (linkPluginImplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginImplicit->GetWorldLinearVel().z() > vT &&
              velPluginImplicit < -vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = 1.0;
     }
-    else if (linkPluginImplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginImplicit->GetWorldLinearVel().z() < -vT &&
              velPluginImplicit > vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = -1.0;
     }
-    if (linkContact->GetWorldLinearVel().z > vT && velContact < -vT)
+    if (linkContact->GetWorldLinearVel().z() > vT && velContact < -vT)
     {
       cyclesContact++;
       velContact = 1.0;
     }
-    else if (linkContact->GetWorldLinearVel().z < -vT && velContact > vT)
+    else if (linkContact->GetWorldLinearVel().z() < -vT && velContact > vT)
     {
       cyclesContact++;
       velContact = -1.0;
@@ -354,22 +354,22 @@ TEST_F(JointTest, joint_SDF14)
     gzthrow("Unable to get joint14_model");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine);
+  EXPECT_TRUE(physicsEngine != NULL);
   physics::ModelPtr model = world->GetModel("joint14_model");
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
   physics::LinkPtr link1 = model->GetLink("body1");
-  EXPECT_TRUE(link1);
+  EXPECT_TRUE(link1 != NULL);
   physics::LinkPtr link2 = model->GetLink("body2");
-  EXPECT_TRUE(link2);
+  EXPECT_TRUE(link2 != NULL);
 
   EXPECT_EQ(model->GetJointCount(), 1u);
   physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-  EXPECT_TRUE(joint);
+  EXPECT_TRUE(joint != NULL);
 
   physics::LinkPtr parent = joint->GetParent();
-  EXPECT_TRUE(parent);
+  EXPECT_TRUE(parent != NULL);
   physics::LinkPtr child = joint->GetChild();
-  EXPECT_TRUE(child);
+  EXPECT_TRUE(child != NULL);
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }

@@ -74,7 +74,7 @@ namespace gazebo
       protected: boost::weak_ptr<physics::Link> parentEntity;
 
       /// \brief Sensor reference pose
-      protected: math::Pose referencePose;
+      protected: ignition::math::Pose3d referencePose;
     };
     /// \}
   }

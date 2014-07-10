@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -95,8 +95,8 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
   if (this->visualize)
   {
     msgs::PropagationGrid msg;
-    math::Pose pos;
-    math::Pose worldPose;
+    ignition::math::Pose3d pos;
+    ignition::math::Pose3d worldPose;
     double strength;
     msgs::PropagationParticle *p;
 
@@ -110,7 +110,7 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 
         worldPose = pos + this->referencePose;
 
-        if (this->referencePose.pos.Distance(worldPose.pos) <= this->MaxRadius)
+        if (this->referencePose.Pos().Distance(worldPose.Pos()) <= this->MaxRadius)
         {
           // For the propagation model assume the receiver antenna has the same
           // gain as the transmitter
@@ -143,19 +143,19 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
+double WirelessTransmitter::GetSignalStrength(const ignition::math::Pose3d &_receiver,
     const double rxGain)
 {
   std::string entityName;
   double dist;
-  math::Vector3 end = _receiver.pos;
-  math::Vector3 start = this->referencePose.pos;
+  ignition::math::Vector3d end = _receiver.Pos();
+  ignition::math::Vector3d start = this->referencePose.Pos();
 
   // Avoid computing the intersection of coincident points
   // This prevents an assertion in bullet (issue #849)
   if (start == end)
   {
-    end.z += 0.00001;
+    end.z() += 0.00001;
   }
 
   // Acquire the mutex for avoiding race condition with the physics engine
@@ -176,8 +176,8 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   }
 
   double distance = std::max(1.0,
-      this->referencePose.pos.Distance(_receiver.pos));
-  double x = abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
+      this->referencePose.Pos().Distance(_receiver.Pos()));
+  double x = abs(ignition::math::Rand::DblNormal(0.0, ModelStdDesv));
   double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model

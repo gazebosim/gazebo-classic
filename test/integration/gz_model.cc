@@ -31,7 +31,7 @@ TEST_F(GzModel, Spawn)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   std::string cmd;
   boost::filesystem::path path;
@@ -49,7 +49,7 @@ TEST_F(GzModel, Spawn)
 
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("my_model"));
+    EXPECT_TRUE(world->GetModel("my_model") != NULL);
   }
 
   // Spawn another box at a different location
@@ -63,23 +63,23 @@ TEST_F(GzModel, Spawn)
     custom_exec(cmd);
     world->Step(100);
 
-    EXPECT_TRUE(world->GetModel("next_model"));
+    EXPECT_TRUE(world->GetModel("next_model") != NULL);
 
     physics::ModelPtr model = world->GetModel("next_model");
-    ASSERT_TRUE(model);
+    ASSERT_TRUE(model != NULL);
 
     // Check the pose of the spawned model
-    math::Pose pose = model->GetWorldPose();
-    math::Vector3 rpy = pose.rot.GetAsEuler();
+    ignition::math::Pose3d pose = model->GetWorldPose();
+    ignition::math::Vector3d rpy = pose.Rot().Euler();
 
-    EXPECT_NEAR(pose.pos.x, 5, 1e-5);
-    EXPECT_NEAR(pose.pos.y, 2, 1e-5);
-    EXPECT_LT(pose.pos.z, 9000.0);
-    EXPECT_GT(pose.pos.z, 8900.0);
+    EXPECT_NEAR(pose.Pos().x(), 5, 1e-5);
+    EXPECT_NEAR(pose.Pos().y(), 2, 1e-5);
+    EXPECT_LT(pose.Pos().z(), 9000.0);
+    EXPECT_GT(pose.Pos().z(), 8900.0);
 
-    EXPECT_NEAR(rpy.x, 0.1, 1e-5);
-    EXPECT_NEAR(rpy.y, 0.2, 1e-5);
-    EXPECT_NEAR(rpy.z, 0.3, 1e-5);
+    EXPECT_NEAR(rpy.x(), 0.1, 1e-5);
+    EXPECT_NEAR(rpy.y(), 0.2, 1e-5);
+    EXPECT_NEAR(rpy.z(), 0.3, 1e-5);
   }
 }
 
@@ -91,7 +91,7 @@ TEST_F(GzModel, SpawnAndDelete)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "models" / "box.sdf";
@@ -121,7 +121,7 @@ TEST_F(GzModel, SpawnAndMove)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "models" / "box.sdf";
@@ -145,7 +145,7 @@ TEST_F(GzModel, SpawnAndMove)
 
   common::Time::MSleep(1000);
 
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(10, 11, 5, 0.1, 0.2, 0.3));
+  EXPECT_EQ(model->GetWorldPose(), ignition::math::Pose3d(10, 11, 5, 0.1, 0.2, 0.3));
 }
 
 /////////////////////////////////////////////////

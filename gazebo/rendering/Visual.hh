@@ -256,7 +256,7 @@ namespace gazebo
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      public: ignition::math::Quaterniond GetRotation() const;
+      public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.

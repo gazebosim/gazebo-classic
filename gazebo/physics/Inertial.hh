@@ -22,9 +22,9 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Matrix3.hh"
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Matrix3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -87,7 +87,7 @@ namespace gazebo
 
       /// \brief Set the center of gravity.
       /// \param[in] _center Center of the gravity.
-      public: void SetCoG(const math::Vector3 &_center);
+      public: void SetCoG(const ignition::math::Vector3d &_center);
 
       /// \brief Set the center of gravity and rotation offset of inertial
       ///        coordinate frame relative to Link frame.
@@ -102,30 +102,30 @@ namespace gazebo
 
       /// \brief Set the center of gravity.
       /// \param[in] _c Transform to center of gravity.
-      public: void SetCoG(const math::Pose &_c);
+      public: void SetCoG(const ignition::math::Pose3d &_c);
 
       /// \brief Get the center of gravity.
       /// \return The center of gravity.
-      public: inline const math::Vector3 &GetCoG() const
+      public: inline const ignition::math::Vector3d &GetCoG() const
               {
-                return this->cog.pos;
+                return this->cog.Pos();
               }
 
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
-      public: inline const math::Pose GetPose() const
+      public: inline const ignition::math::Pose3d GetPose() const
               {
-                return math::Pose(this->cog);
+                return ignition::math::Pose3d(this->cog);
               }
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
-      public: math::Vector3 GetPrincipalMoments() const;
+      public: ignition::math::Vector3d GetPrincipalMoments() const;
 
       /// \brief Get the products of inertia (Ixy, Ixz, Iyz).
       /// \return The products of inertia.
-      public: math::Vector3 GetProductsofInertia() const;
+      public: ignition::math::Vector3d GetProductsofInertia() const;
 
       /// \brief Get IXX
       /// \return IXX value
@@ -177,7 +177,7 @@ namespace gazebo
 
       /// \brief Rotate this mass.
       /// \param[in] _rot Rotation amount.
-      public: void Rotate(const math::Quaterniond &_rot);
+      public: void Rotate(const ignition::math::Quaterniond &_rot);
 
       /// \brief Equal operator.
       /// \param[in] _inertial Inertial to copy.
@@ -210,7 +210,7 @@ namespace gazebo
       /// in MOI location location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
-      public: math::Matrix3 GetMOI(const math::Pose &_pose)
+      public: ignition::math::Matrix3d GetMOI(const ignition::math::Pose3d &_pose)
         const;
 
       /// \brief Get equivalent Inertia values with the Link frame offset,
@@ -218,7 +218,7 @@ namespace gazebo
       /// \param[in] _frameOffset amount to offset the Link frame by, this
       /// is a transform defined in the Link frame.
       /// \return Inertial parameters with the shifted frame.
-      public: Inertial GetInertial(const math::Pose &_frameOffset) const;
+      public: Inertial GetInertial(const ignition::math::Pose3d &_frameOffset) const;
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.
@@ -228,38 +228,39 @@ namespace gazebo
               {
                 _out << "Mass[" << _inertial.mass << "] CoG["
                     << _inertial.cog << "]\n";
-                _out << "IXX[" << _inertial.principals.x << "] "
-                     << "IYY[" << _inertial.principals.y << "] "
-                     << "IZZ[" << _inertial.principals.z << "]\n";
-                _out << "IXY[" << _inertial.products.x << "] "
-                     << "IXZ[" << _inertial.products.y << "] "
-                     << "IYZ[" << _inertial.products.z << "]\n";
+                _out << "IXX[" << _inertial.principals.x() << "] "
+                     << "IYY[" << _inertial.principals.y() << "] "
+                     << "IZZ[" << _inertial.principals.z() << "]\n";
+                _out << "IXY[" << _inertial.products.x() << "] "
+                     << "IXZ[" << _inertial.products.y() << "] "
+                     << "IYZ[" << _inertial.products.z() << "]\n";
                 return _out;
               }
 
       /// \brief returns Moments of Inertia as a Matrix3
       /// \return Moments of Inertia as a Matrix3
-      public: math::Matrix3 GetMOI() const;
+      public: ignition::math::Matrix3d GetMOI() const;
 
       /// \brief Sets Moments of Inertia (MOI) from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3
-      public: void SetMOI(const math::Matrix3 &_moi);
+      public: void SetMOI(const ignition::math::Matrix3d &_moi);
 
       /// \brief Mass the object. Default is 1.0.
       private: double mass;
 
       /// \brief Center of gravity in the Link frame.
       ///        Default is (0.0 0.0 0.0  0.0 0.0 0.0)
-      private: math::Pose cog;
+      private: ignition::math::Pose3d cog;
 
       /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
       /// These Moments of Inertia are specified in the local Inertial frame.
-      private: math::Vector3 principals;
+      private: ignition::math::Vector3d principals;
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
       /// These MOI off-diagonals are specified in the local Inertial frame.
-      /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
-      private: math::Vector3 products;
+      /// Where products.x(), is Ixy, products.y() is Ixz and
+      /// products.z()is Iyz.
+      private: ignition::math::Vector3d products;
 
       /// \brief Our SDF values.
       private: sdf::ElementPtr sdf;

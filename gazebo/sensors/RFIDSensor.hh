@@ -29,7 +29,7 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -81,12 +81,12 @@ namespace gazebo
       /// \brief Check the range for one RFID tag.
       /// \param[in] _pose Pose of a tag.
       /// \return Checks if tag is in range
-      private: bool CheckTagRange(const math::Pose &_pose);
+      private: bool CheckTagRange(const ignition::math::Pose3d &_pose);
 
       /// \brief Checks if ray intersects RFID sensor.
       /// \param[in] _pose Pose to compare against.
       /// \return True if intersects, false if not.
-      // private: bool CheckRayIntersection(const math::Pose &_pose);
+      // private: bool CheckRayIntersection(const ignition::math::Pose3d &_pose);
 
       /// \brief Parent entity
       private: physics::EntityPtr entity;

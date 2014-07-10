@@ -210,8 +210,9 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
                          diffMax, diffSum, diffAvg);
 
       // use below to construct test for rotated2 left camera offset
-      // math::Quaternion a(1.2, 1.3, 1.4);
-      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
+      // ignition::math::Quaterniond a(1.2, 1.3, 1.4);
+      // gzerr << "test: "
+      // << a.RotateVector(ignition::math::Vector3d(0, 1, 0)) << "\n";
 
       // We expect that there will be some non-zero difference between the two
       // images.
@@ -393,7 +394,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // Get multicamera1's local pose. There is current no GetPose() in Camera,
   // so grab it from it's ogre scene node
   Ogre::SceneNode *cameraNode = multicamera1->GetCamera(0)->GetSceneNode();
-  math::Pose cameraPose(
+  ignition::math::Pose3d cameraPose(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
 
@@ -411,8 +412,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera world pose
   EXPECT_EQ(cameraPose + multicamera1->GetPose() + model1->GetWorldPose(),
     multicamera1->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model1->GetWorldPose().rot * multicamera1->GetPose().rot
-      * cameraPose.rot, multicamera1->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(model1->GetWorldPose().Rot() * multicamera1->GetPose().Rot()
+      * cameraPose.Rot(), multicamera1->GetCamera(0)->GetWorldRotation());
 
   // multicamera1 sensor's camera 1 has zero pose offset from the sensor
   EXPECT_EQ(multicamera1->GetPose() + model1->GetWorldPose(),
@@ -455,7 +456,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
       multicamera3->GetCamera(0)->GetWorldPose());
   // Get multicamera3 sensor's camera 0 local pose
   cameraNode = multicamera3->GetCamera(0)->GetSceneNode();
-  cameraPose = math::Pose(
+  cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
 
@@ -473,8 +474,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera3->GetPose() + model3->GetWorldPose(),
     multicamera3->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model3->GetWorldPose().rot * multicamera3->GetPose().rot
-      * cameraPose.rot, multicamera3->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(model3->GetWorldPose().Rot() * multicamera3->GetPose().Rot()
+      * cameraPose.Rot(), multicamera3->GetCamera(0)->GetWorldRotation());
 
   // multicamera3 sensor's camera 1 has zero pose offset from the sensor
   EXPECT_EQ(multicamera3->GetPose() + model3->GetWorldPose(),
@@ -501,7 +502,7 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(0)->GetWorldPose());
   // Get multicamera4's camera 0 local pose
   cameraNode = multicamera4->GetCamera(0)->GetSceneNode();
-  cameraPose = math::Pose(
+  cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
 
@@ -519,14 +520,14 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera sensor's camera 0 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(0)->GetWorldPose());
-  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
-      * cameraPose.rot, multicamera4->GetCamera(0)->GetWorldRotation());
+  EXPECT_EQ(model4->GetWorldPose().Rot() * multicamera4->GetPose().Rot()
+      * cameraPose.Rot(), multicamera4->GetCamera(0)->GetWorldRotation());
 
   // multicamera4 sensor's camera 1 has a pose offset from the sensor
   EXPECT_NE(model4->GetWorldPose(), multicamera4->GetCamera(1)->GetWorldPose());
   // Get multicamera4 sensor's camera 1 local pose
   cameraNode = multicamera4->GetCamera(1)->GetSceneNode();
-  cameraPose = math::Pose(
+  cameraPose = ignition::math::Pose3d(
       rendering::Conversions::Convert(cameraNode->getPosition()),
       rendering::Conversions::Convert(cameraNode->getOrientation()));
 
@@ -544,8 +545,8 @@ TEST_F(MultiCameraSensor, CameraRotationWorldPoseTest)
   // verify multicamera4 sensor's camera 1 world pose
   EXPECT_EQ(cameraPose + multicamera4->GetPose() + model4->GetWorldPose(),
     multicamera4->GetCamera(1)->GetWorldPose());
-  EXPECT_EQ(model4->GetWorldPose().rot * multicamera4->GetPose().rot
-      * cameraPose.rot, multicamera4->GetCamera(1)->GetWorldRotation());
+  EXPECT_EQ(model4->GetWorldPose().Rot() * multicamera4->GetPose().Rot()
+      * cameraPose.Rot(), multicamera4->GetCamera(1)->GetWorldRotation());
 
   gzdbg << "model4 [" << model4->GetWorldPose() << "]\n"
         << "sensor4 [" << sensor4->GetPose() + model4->GetWorldPose() << "]\n"

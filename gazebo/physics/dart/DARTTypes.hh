@@ -19,7 +19,7 @@
 #define _GAZEBO_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
 
@@ -54,50 +54,50 @@ namespace gazebo
     class GAZEBO_VISIBLE DARTTypes
     {
       /// \brief
-      public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)
+      public: static Eigen::Vector3d ConvVec3(const ignition::math::Vector3d &_vec3)
         {
-            return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
+            return Eigen::Vector3d(_vec3.x(),(), _vec3.y(), _vec3.z());
         }
 
         /// \brief
-      public: static math::Vector3 ConvVec3(const Eigen::Vector3d &_vec3)
+      public: static ignition::math::Vector3d ConvVec3(const Eigen::Vector3d &_vec3)
         {
-            return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
+            return ignition::math::Vector3d(_vec3.x(),(), _vec3.y(), _vec3.z());
         }
 
         /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const math::Quaterniond &_quat)
+      public: static Eigen::Quaterniond ConvQuat(const ignition::math::Quaterniond &_quat)
         {
-            return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
+            return Eigen::Quaterniond(_quat.w, _quat.x(),(), _quat.y(), _quat.z());
         }
 
         /// \brief
-      public: static math::Quaterniond ConvQuat(const Eigen::Quaterniond &_quat)
+      public: static ignition::math::Quaterniond ConvQuat(const Eigen::Quaterniond &_quat)
         {
-            return math::Quaterniond(_quat.w(), _quat.x(), _quat.y(), _quat.z());
+            return ignition::math::Quaterniond(_quat.w(), _quat.x(),(), _quat.y(), _quat.z());
         }
 
         /// \brief
-      public: static Eigen::Isometry3d ConvPose(const math::Pose &_pose)
+      public: static Eigen::Isometry3d ConvPose(const ignition::math::Pose3d &_pose)
         {
             // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
-            // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-            //        ConvQuat(_pose.rot);
+            // return Eigen::Translation3d(ConvVec3(_pose.Pos())) *
+            //        ConvQuat(_pose.Rot());
 
             Eigen::Isometry3d res;
 
-            res.translation() = ConvVec3(_pose.pos);
-            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
+            res.translation() = ConvVec3(_pose.Pos());
+            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.Rot()));
 
             return res;
         }
 
         /// \brief
-      public: static math::Pose ConvPose(const Eigen::Isometry3d &_T)
+      public: static ignition::math::Pose3d ConvPose(const Eigen::Isometry3d &_T)
         {
-            math::Pose pose;
-            pose.pos = ConvVec3(_T.translation());
-            pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
+            ignition::math::Pose3d pose;
+            pose.Pos() = ConvVec3(_T.translation());
+            pose.Rot() = ConvQuat(Eigen::Quaterniond(_T.linear()));
             return pose;
         }
     };

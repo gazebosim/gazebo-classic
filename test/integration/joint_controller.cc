@@ -55,7 +55,7 @@ TEST_F(JointControllerTest, PositionControl)
 
   world->Step(5000);
 
-  math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
+  ignition::math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
 
   EXPECT_NEAR(angle.Radian(), 1.0, 0.1);
 }

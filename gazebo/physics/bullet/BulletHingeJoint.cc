@@ -59,8 +59,8 @@ void BulletHingeJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3d axis = this->initialWorldAxis;
+  if (axis == ignition::math::Vector3d::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
@@ -68,8 +68,8 @@ void BulletHingeJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose3d pose;
 
   // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
@@ -84,8 +84,8 @@ void BulletHingeJoint::Init()
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
-    axisParent = pose.rot.RotateVectorReverse(axis);
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
+    axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
   }
   // Check if childLink exists. If not, the child will be the world.
@@ -96,8 +96,8 @@ void BulletHingeJoint::Init()
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
-    axisChild = pose.rot.RotateVectorReverse(axis);
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
+    axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
   }
 
@@ -171,25 +171,25 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
 {
   btTransform trans = this->bulletHinge->getAFrame();
   trans.getOrigin() +=
     this->bulletHinge->getRigidBodyA().getCenterOfMassTransform().getOrigin();
-  return math::Vector3(trans.getOrigin().getX(),
+  return ignition::math::Vector3d(trans.getOrigin().getX(),
       trans.getOrigin().getY(), trans.getOrigin().getZ());
 }
 
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+    const ignition::math::Vector3d &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (this->bulletHinge == NULL)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    math::Quaterniond axisFrame = this->GetAxisFrame(0);
+    ignition::math::Quaterniond axisFrame = this->GetAxisFrame(0);
     this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
@@ -199,15 +199,15 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
+  /*btignition::math::Vector3d vec(_axis.x(), _axis.y(), _axis.z());
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getHingeAngle() - this->angleOffset;
   return result;
@@ -222,7 +222,7 @@ void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 
   // TODO: Should prescribe the linear velocity of the child link if there is an
   // offset between the child's CG and the joint anchor.
-  math::Vector3 desiredVel;
+  ignition::math::Vector3d desiredVel;
   if (this->parentLink)
     desiredVel = this->parentLink->GetWorldAngularVel();
   desiredVel += _angle * this->GetGlobalAxis(_index);
@@ -234,7 +234,7 @@ void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GetGlobalAxis(0);
   if (this->childLink)
     result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
   if (this->parentLink)
@@ -282,7 +282,7 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 
 //////////////////////////////////////////////////
 bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &_angle)
+                      const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(0, _angle);
   if (this->bulletHinge)
@@ -303,7 +303,7 @@ bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &_angle)
+                     const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(0, _angle);
   if (this->bulletHinge)
@@ -323,9 +323,9 @@ bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
+ignition::math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
@@ -336,9 +336,9 @@ math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
+ignition::math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 {
-  math::Angle result;
+  ignition::math::Angle result;
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
@@ -348,9 +348,9 @@ math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result = this->initialWorldAxis;
+  ignition::math::Vector3d result = this->initialWorldAxis;
 
   if (this->bulletHinge)
   {

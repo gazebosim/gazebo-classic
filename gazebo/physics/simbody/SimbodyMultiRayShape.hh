@@ -42,8 +42,8 @@ namespace gazebo
       public: virtual void UpdateRays();
 
       // Documentation inherited.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+      protected: virtual void AddRay(const ignition::math::Vector3d &_start,
+                             const ignition::math::Vector3d &_end);
 
       /// \brief Pointer to the physics engine.
       private: SimbodyPhysicsPtr physicsEngine;

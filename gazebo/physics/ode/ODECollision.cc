@@ -23,7 +23,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
+#include <ignition/math/Box.hh>
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -169,9 +169,9 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-math::Box ODECollision::GetBoundingBox() const
+ignition::math::Box ODECollision::GetBoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
   dReal aabb[6];
 
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -179,8 +179,8 @@ math::Box ODECollision::GetBoundingBox() const
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  box.min.Set(aabb[0], aabb[2], aabb[4]);
-  box.max.Set(aabb[1], aabb[3], aabb[5]);
+  box.Min().Set(aabb[0], aabb[2], aabb[4]);
+  box.Max().Set(aabb[1], aabb[3], aabb[5]);
 
   return box;
 }
@@ -209,19 +209,19 @@ void ODECollision::OnPoseChangeGlobal()
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
-  math::Pose localPose = this->GetWorldPose();
+  ignition::math::Pose3d localPose = this->GetWorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cog_vec = this->link->GetInertial()->GetCoG();
+  localPose.Pos() = localPose.Pos() - cog_vec;
 
-  q[0] = localPose.rot.w;
-  q[1] = localPose.rot.x;
-  q[2] = localPose.rot.y;
-  q[3] = localPose.rot.z;
+  q[0] = localPose.Rot().w();
+  q[1] = localPose.Rot().x();
+  q[2] = localPose.Rot().y();
+  q[3] = localPose.Rot().z();
 
-  dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-                   localPose.pos.z);
+  dGeomSetPosition(this->collisionId, localPose.Pos().x(), localPose.Pos().y(),
+                   localPose.Pos().z());
   dGeomSetQuaternion(this->collisionId, q);
 }
 
@@ -230,21 +230,21 @@ void ODECollision::OnPoseChangeRelative()
 {
   dQuaternion q;
   // Transform into CoM relative Pose
-  math::Pose localPose = this->GetRelativePose();
+  ignition::math::Pose3d localPose = this->GetRelativePose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cog_vec = this->link->GetInertial()->GetCoG();
+  localPose.Pos() = localPose.Pos() - cog_vec;
 
-  q[0] = localPose.rot.w;
-  q[1] = localPose.rot.x;
-  q[2] = localPose.rot.y;
-  q[3] = localPose.rot.z;
+  q[0] = localPose.Rot().w();
+  q[1] = localPose.Rot().x();
+  q[2] = localPose.Rot().y();
+  q[3] = localPose.Rot().z();
 
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
-  dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-      localPose.pos.z);
+  dGeomSetOffsetPosition(this->collisionId, localPose.Pos().x(),
+      localPose.Pos().y(), localPose.Pos().z());
   dGeomSetOffsetQuaternion(this->collisionId, q);
 }
 

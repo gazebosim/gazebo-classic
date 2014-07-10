@@ -161,7 +161,7 @@ TEST(gz_log, EchoFilter)
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
   echo = custom_exec(
-      std::string("gz log -e --filter pr2.pose.x -f ") +
+      std::string("gz log -e --filter pr2.pose.x() -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   shasum = gazebo::common::get_sha1<std::string>(echo);
   // EXPECT_EQ(pr2PoseXStateLog, echo);
@@ -219,7 +219,7 @@ TEST(gz_log, HzFilter)
 
   // Test Hz filter
   echo = custom_exec(
-      std::string("gz log -e -r -z 1.0 --filter pr2.pose.z -f ") +
+      std::string("gz log -e -r -z 1.0 --filter pr2.pose.z() -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008";
@@ -227,7 +227,7 @@ TEST(gz_log, HzFilter)
 
   // Test zero Hz filter
   echo = custom_exec(
-      std::string("gz log -e -r -z 0 --filter pr2.pose.z -f ") +
+      std::string("gz log -e -r -z 0 --filter pr2.pose.z() -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -235,7 +235,7 @@ TEST(gz_log, HzFilter)
 
   // Test negative Hz filter
   echo = custom_exec(
-      std::string("gz log -e -r -z -1.0 --filter pr2.pose.z -f ") +
+      std::string("gz log -e -r -z -1.0 --filter pr2.pose.z() -f ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "-0.000008 \n-0.000015";
@@ -250,7 +250,7 @@ TEST(gzlog, RawFilterStamp)
 
   // Sim time
   echo = custom_exec(
-      std::string("gzlog echo -r -s sim --filter pr2.pose.x ") +
+      std::string("gzlog echo -r -s sim --filter pr2.pose.x() ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "0.021344 0.000000 \n0.0289582 0.000000";
@@ -258,7 +258,7 @@ TEST(gzlog, RawFilterStamp)
 
   // Real time
   echo = custom_exec(
-      std::string("gzlog echo -r -s real --filter pr2.pose.x ") +
+      std::string("gzlog echo -r -s real --filter pr2.pose.x() ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = "0.001 0.000000 \n0.002 0.000000";
@@ -266,7 +266,7 @@ TEST(gzlog, RawFilterStamp)
 
   // Wall time
   echo = custom_exec(
-      std::string("gzlog echo -r -s wall --filter pr2.pose.x ") +
+      std::string("gzlog echo -r -s wall --filter pr2.pose.x() ") +
       PROJECT_SOURCE_PATH + "/test/data/pr2_state.log");
   boost::trim_right(echo);
   validEcho = std::string("1360301758.939690 0.000000 \n")

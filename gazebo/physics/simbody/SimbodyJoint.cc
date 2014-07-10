@@ -108,13 +108,13 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d childPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+    childPose = _sdf->GetElement("child")->Get<ignition::math::Pose3d>("pose");
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
-  math::Pose parentPose;
+  ignition::math::Pose3d parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
     this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
@@ -268,9 +268,9 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
+void SimbodyJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &/*_axis*/)
 {
-  math::Pose parentModelPose;
+  ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
     parentModelPose = this->parentLink->GetModel()->GetWorldPose();
 
@@ -278,8 +278,8 @@ void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+  ignition::math::Vector3d axis = parentModelPose.Rot().RotateVector(
+    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
@@ -381,7 +381,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 
 //////////////////////////////////////////////////
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+    const ignition::math::Vector3d & /*_anchor*/)
 {
   gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
@@ -449,24 +449,24 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
@@ -505,7 +505,7 @@ double SimbodyJoint::GetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetHighStop(unsigned int _index, const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
@@ -541,7 +541,7 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool SimbodyJoint::SetLowStop(unsigned int _index, const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
@@ -578,57 +578,57 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+    return ignition::math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("upper"));
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+    return ignition::math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("upper"));
   }
   else
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+    return ignition::math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("lower"));
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+    return ignition::math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("lower"));
   }
   else
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
 }

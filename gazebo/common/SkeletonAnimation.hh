@@ -85,14 +85,14 @@ namespace gazebo
 
       /// \brief Returns the duration of the animations
       /// \return the time of the last animation
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Returns a frame transformation at a specific time
       /// if a node does not exist at that time (with tolerance of 1e-6 sec),
       /// the transformation is interpolated.
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
-      /// (see GetLength)
+      /// (see Length)
       public: ignition::math::Matrix4d GetFrameAt(double _time, bool _loop = true) const;
 
       /// \brief Scales each transformation in the key frames. This only affects
@@ -167,7 +167,7 @@ namespace gazebo
       /// \param[in] _node the name of the animation node
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
-      /// (see GetLength)
+      /// (see Length)
       /// \return the transformation
       public: ignition::math::Matrix4d GetNodePoseAt(const std::string& _node,
                       const double _time, const bool _loop = true);
@@ -178,7 +178,7 @@ namespace gazebo
       /// (with tolerance of 1e-6 sec), the transformation is interpolated.
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
-      /// (see GetLength)
+      /// (see Length)
       /// \return the transformation for every node
       public: std::map<std::string, ignition::math::Matrix4d> GetPoseAt(const double _time,
                       const bool _loop = true) const;
@@ -190,7 +190,7 @@ namespace gazebo
       /// valid range.
       /// \param[in] _node the name of the animation node
       /// \param[in] _loop when true, the time is divided by the duration
-      /// (see GetLength)
+      /// (see Length)
       public: std::map<std::string, ignition::math::Matrix4d> GetPoseAtX(const double _x,
                       const std::string& _node, const bool _loop = true) const;
 
@@ -200,7 +200,7 @@ namespace gazebo
 
       /// \brief Returns the duration of the animations
       /// \return the duration in seconds
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief the node name
       protected: std::string name;

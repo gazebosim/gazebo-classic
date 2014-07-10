@@ -27,7 +27,7 @@
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
@@ -92,15 +92,15 @@ namespace gazebo
       /// \param[in] _pose Pose of the box.
       /// \return Name of the box that has been added.
       public: std::string AddBox(
-          const math::Vector3 &_size = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3d &_size = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a sphere to the model.
       /// \param[in] _radius Radius of the sphere.
       /// \param[in] _pose Pose of the sphere.
       /// \return Name of the sphere that has been added.
       public: std::string AddSphere(double _radius = 0.5,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a cylinder to the model.
       /// \param[in] _radius Radius of the cylinder.
@@ -108,7 +108,7 @@ namespace gazebo
       /// \param[in] _pose Pose of the cylinder.
       /// \return Name of the cylinder that has been added.
       public: std::string AddCylinder(double _radius = 0.5,
-          double _length = 1.0, const math::Pose &_pose = math::Pose::Zero);
+          double _length = 1.0, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a custom part to the model
       /// \param[in] _name Name of the custom part.
@@ -116,8 +116,8 @@ namespace gazebo
       /// \param[in] _pose Pose of the custom part.
       /// \return Name of the custom that has been added.
       public: std::string AddCustom(const std::string &_name,
-          const math::Vector3 &_scale = math::Vector3::One,
-          const math::Pose &_pose = math::Pose::Zero);
+          const ignition::math::Vector3d &_scale = ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.
@@ -218,7 +218,7 @@ namespace gazebo
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.
-      private: math::Pose modelPose;
+      private: ignition::math::Pose3d modelPose;
 
       /// \brief True to create a static model.
       private: bool isStatic;
@@ -265,7 +265,7 @@ namespace gazebo
       private: JointMaker *jointMaker;
 
       /// \brief origin of the model.
-      private: math::Pose origin;
+      private: ignition::math::Pose3d origin;
 
       /// \brief Selected partv visual;
       private: rendering::VisualPtr selectedVis;
@@ -283,7 +283,7 @@ namespace gazebo
       public: std::string type;
 
       /// \brief Pose of sensor.
-      public: math::Vector3 pose;
+      public: ignition::math::Vector3d pose;
 
       /// \brief True to visualize sensor.
       public: bool visualize;
@@ -317,7 +317,7 @@ namespace gazebo
       public: bool kinematic;
 
       /// \brief Pose of part.
-      public: math::Pose pose;
+      public: ignition::math::Pose3d pose;
 
       /// \brief Name of part.
       public: physics::Inertial *inertial;

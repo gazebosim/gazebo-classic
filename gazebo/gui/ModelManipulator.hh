@@ -79,7 +79,7 @@ namespace gazebo
       /// \param[in] _axis Axis of rotation.
       /// \param[in] _local True to apply rotation in local frame.
       public: void RotateEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3d &_axis,
           bool _local = false);
 
       /// \brief Translate entity.
@@ -87,7 +87,7 @@ namespace gazebo
       /// \param[in] _axis Axis of translation.
       /// \param[in] _local True to apply translation in local frame.
       public: void TranslateEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3d &_axis,
           bool _local = false);
 
       /// \brief Scale entity.
@@ -95,7 +95,7 @@ namespace gazebo
       /// \param[in] _axis Scaling axis.
       /// \param[in] _local True to apply scaling in local frame.
       public: void ScaleEntity(rendering::VisualPtr &_vis,
-          const math::Vector3 &_axis,
+          const ignition::math::Vector3d &_axis,
           bool _local = false);
 
       /// \brief Snap a point at intervals of a fixed distance. Currently used
@@ -106,7 +106,7 @@ namespace gazebo
       /// \param[in] _sensitivity Sensitivity of point snapping, in terms of a
       /// percentage of the interval.
       /// \return Snapped 3D point.
-      public: static math::Vector3 SnapPoint(const math::Vector3 &_point,
+      public: static ignition::math::Vector3d SnapPoint(const ignition::math::Vector3d &_point,
           double _interval = 1.0, double _sensitivity = 0.4);
 
       /// \brief Helper function to get the 3D position of mouse on ground
@@ -114,7 +114,7 @@ namespace gazebo
       /// param[in] _camera Pointer to user camera.
       /// param[in] _event Mouse event.
       /// return Point of mouse-plane intersection in world coordinates.
-      public: static math::Vector3 GetMousePositionOnPlane(
+      public: static ignition::math::Vector3d GetMousePositionOnPlane(
           rendering::CameraPtr _camera,
           const common::MouseEvent &_event);
 
@@ -124,10 +124,10 @@ namespace gazebo
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
-      public: static math::Vector3 GetMouseMoveDistance(
+      public: static ignition::math::Vector3d GetMouseMoveDistance(
           rendering::CameraPtr _camera,
-          const math::Vector2i &_start, const math::Vector2i &_end,
-          const math::Pose &_pose, const math::Vector3 &_axis,
+          const ignition::math::Vector2i &_start, const ignition::math::Vector2i &_end,
+          const ignition::math::Pose3d &_pose, const ignition::math::Vector3d &_axis,
           bool _local);
 
       /// \brief Helper function to get the distance moved by the mouse.
@@ -135,8 +135,8 @@ namespace gazebo
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
-      private: math::Vector3 GetMouseMoveDistance(const math::Pose &_pose,
-          const math::Vector3 &_axis, bool _local) const;
+      private: ignition::math::Vector3d GetMouseMoveDistance(const ignition::math::Pose3d &_pose,
+          const ignition::math::Vector3d &_axis, bool _local) const;
 
       /// \brief Set the visual being moved by the mouse.
       /// \param[in] _vis Pointer to visual moved by mouse.

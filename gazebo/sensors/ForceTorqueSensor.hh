@@ -54,11 +54,11 @@ namespace gazebo
 
       /// \brief Get the current joint torque.
       /// \return The latested measured torque.
-      public: math::Vector3 GetTorque() const;
+      public: ignition::math::Vector3d GetTorque() const;
 
       /// \brief Get the current joint force.
       /// \return The latested measured force.
-      public: math::Vector3 GetForce() const;
+      public: ignition::math::Vector3d GetForce() const;
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor

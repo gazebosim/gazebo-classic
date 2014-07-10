@@ -42,7 +42,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   this->model = _parent;
   this->world = this->model->GetWorld();
 
-  // this->world->GetPhysicsEngine()->SetGravity(math::Vector3(0,0,0));
+  // this->world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0,0,0));
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)
@@ -62,11 +62,11 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 //       this->model);
 //
 //   this->joint->SetModel(this->model);
-//   math::Pose pose = _link->GetWorldPose();
-//   // math::Pose  pose(math::Vector3(0, 0, 0.2),
-//                       math::Quaternion(1, 0, 0, 0));
+//   ignition::math::Pose3d pose = _link->GetWorldPose();
+//   // ignition::math::Pose3d  pose(ignition::math::Vector3d(0, 0, 0.2),
+//                       ignition::math::Quaternion(1, 0, 0, 0));
 //   this->joint->Load(physics::LinkPtr(), _link, pose);
-//   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
+//   this->joint->SetAxis(0, ignition::math::Vector3d(0, 0, 0));
 //   this->joint->SetHighStop(0, 0);
 //   this->joint->SetLowStop(0, 0);
 //   this->joint->SetAnchor(0, pose.pos);

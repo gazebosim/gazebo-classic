@@ -105,17 +105,17 @@ namespace gazebo
     protected: double alpha;
 
     /// \brief center of pressure in link local coordinates
-    protected: math::Vector3 cp;
+    protected: ignition::math::Vector3d cp;
 
     /// \brief forward flight direction in link local coordinates
-    protected: math::Vector3 forward;
+    protected: ignition::math::Vector3d forward;
 
     /// \brief A vector in the lift/drag plane, anything orthogonal to it
     /// is considered wing sweep.
-    protected: math::Vector3 upward;
+    protected: ignition::math::Vector3d upward;
 
     /// \brief Smooth velocity
-    protected: math::Vector3 velSmooth;
+    protected: ignition::math::Vector3d velSmooth;
 
     /// \brief Names of allowed target links, specified in sdf parameters.
     protected: std::string linkName;

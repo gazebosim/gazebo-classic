@@ -20,8 +20,8 @@
 
 #include <string>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo

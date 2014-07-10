@@ -96,13 +96,13 @@ physics::JointPtr ForceTorqueSensor::GetJoint() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetForce() const
+ignition::math::Vector3d ForceTorqueSensor::GetForce() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().force());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ForceTorqueSensor::GetTorque() const
+ignition::math::Vector3d ForceTorqueSensor::GetTorque() const
 {
   return msgs::Convert(this->wrenchMsg.wrench().torque());
 }

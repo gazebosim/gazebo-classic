@@ -53,7 +53,7 @@ namespace gazebo
                   gzerr << "Sphere shape does not support negative radius\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
@@ -70,15 +70,15 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = math::Vector3(_radius, _radius, _radius);
+                  this->initialSize = ignition::math::Vector3d(_radius, _radius, _radius);
                   bParent->SetCollisionShape(new btSphereShape(_radius));
                 }
                 else
                 {
                   btVector3 sphereScale;
-                  sphereScale.setX(_radius / this->initialSize.x);
-                  sphereScale.setY(_radius / this->initialSize.y);
-                  sphereScale.setZ(_radius / this->initialSize.z);
+                  sphereScale.setX(_radius / this->initialSize.x(),);
+                  sphereScale.setY(_radius / this->initialSize.y());
+                  sphereScale.setZ(_radius / this->initialSize.z());
 
                   shape->setLocalScaling(sphereScale);
 
@@ -97,9 +97,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
+                    ignition::math::Pose3d relativePose =
                         this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    relativePose.Pos() -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }
@@ -107,7 +107,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of sphere.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3d initialSize;
     };
     /// \}
   }

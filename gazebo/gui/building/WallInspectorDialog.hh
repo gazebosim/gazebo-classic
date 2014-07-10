@@ -44,7 +44,7 @@ namespace gazebo
 
       /// \brief Get the length the wall segment.
       /// \return Wall segment length in pixels.
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Get the start position of the wall segment.
       /// \return Wall segment start position in pixel coordinates.

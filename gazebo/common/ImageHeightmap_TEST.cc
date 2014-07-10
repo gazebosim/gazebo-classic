@@ -81,15 +81,15 @@ TEST_F(ImageHeightmapTest, FillHeightmap)
 
   subsampling = 2;
   vertSize = (img.GetWidth() * subsampling) - 1;
-  size.x = 129;
-  size.y = 129;
-  size.z = 10;
-  scale.x = size.x / vertSize;
-  scale.y = size.y / vertSize;
+  size.x() = 129;
+  size.y() = 129;
+  size.z() = 10;
+  scale.x() = size.x() / vertSize;
+  scale.y() = size.y() / vertSize;
   if (ignition::math::equal(img.GetMaxElevation(), 0.0f))
-    scale.z = fabs(size.z);
+    scale.z() = fabs(size.z());
   else
-    scale.z = fabs(size.z) / img.GetMaxElevation();
+    scale.z() = fabs(size.z()) / img.GetMaxElevation();
   flipY = false;
 
   img.FillHeightMap(subsampling, vertSize, size, scale, flipY, elevations);

@@ -169,7 +169,7 @@ namespace gazebo
       /// Disabled for now, manually moving joints doesn't properly update
       /// collisions.
       /// private: void MoveLinks(JointPtr _joint, LinkPtr _link,
-      ///             const math::Vector3 &_anchor, const math::Vector3 &_axis,
+      ///             const ignition::math::Vector3d &_anchor, const ignition::math::Vector3d &_axis,
       ///             double _dposition, bool _updateChildren = false);
 
       /// \internal
@@ -177,7 +177,7 @@ namespace gazebo
       /// Disabled for now, manually moving joints doesn't properly update
       /// collisions.
       /// private: void ComputeAndSetLinkTwist(LinkPtr _link,
-      ///           onst math::Pose &_old, const math::Pose &_new, double dt);
+      ///           onst ignition::math::Pose3d &_old, const ignition::math::Pose3d &_new, double dt);
 
       /// \brief Helper for SetJointPositions
       /// \param[out] _linksOut All the connected links.

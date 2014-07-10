@@ -94,7 +94,7 @@ namespace gazebo
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale to set the link to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Set whether this body is enabled.
       /// \param[in] _enable True to enable the link in the physics engine.
@@ -143,71 +143,71 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the body.
       /// \param[in] _vel Linear velocity.
-      public: virtual void SetLinearVel(const math::Vector3 &_vel) = 0;
+      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel) = 0;
 
       /// \brief Set the angular velocity of the body.
       /// \param[in] _vel Angular velocity.
-      public: virtual void SetAngularVel(const math::Vector3 &_vel) = 0;
+      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel) = 0;
 
       /// \brief Set the linear acceleration of the body.
       /// \param[in] _accel Linear acceleration.
-      public: void SetLinearAccel(const math::Vector3 &_accel);
+      public: void SetLinearAccel(const ignition::math::Vector3d &_accel);
 
       /// \brief Set the angular acceleration of the body.
       /// \param[in] _accel Angular acceleration.
-      public: void SetAngularAccel(const math::Vector3 &_accel);
+      public: void SetAngularAccel(const ignition::math::Vector3d &_accel);
 
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
-      public: virtual void SetForce(const math::Vector3 &_force) = 0;
+      public: virtual void SetForce(const ignition::math::Vector3d &_force) = 0;
 
       /// \brief Set the torque applied to the body.
       /// \param[in] _torque Torque value.
-      public: virtual void SetTorque(const math::Vector3 &_torque) = 0;
+      public: virtual void SetTorque(const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Add a force to the body.
       /// \param[in] _force Force to add.
-      public: virtual void AddForce(const math::Vector3 &_force) = 0;
+      public: virtual void AddForce(const ignition::math::Vector3d &_force) = 0;
 
       /// \brief Add a force to the body, components are relative to the
       /// body's own frame of reference.
       /// \param[in] _force Force to add.
-      public: virtual void AddRelativeForce(const math::Vector3 &_force) = 0;
+      public: virtual void AddRelativeForce(const ignition::math::Vector3d &_force) = 0;
 
       /// \brief Add a force to the body using a global position.
       /// \param[in] _force Force to add.
       /// \param[in] _pos Position in global coord frame to add the force.
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                  const math::Vector3 &_pos) = 0;
+      public: virtual void AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_pos) = 0;
 
       /// \brief Add a force to the body at position expressed to the body's
       /// own frame of reference.
       /// \param[in] _force Force to add.
       /// \param[in] _relPos Position on the link to add the force.
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relPos) = 0;
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_relPos) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
-      public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
+      public: virtual void AddTorque(const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Add a torque to the body, components are relative to the
       /// body's own frame of reference.
       /// \param[in] _torque Torque value to add.
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque) = 0;
+      public: virtual void AddRelativeTorque(const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Get the pose of the body's center of gravity in the world
       ///        coordinate frame.
       /// \return Pose of the body's center of gravity in the world coordinate
       ///         frame.
-      public: math::Pose GetWorldCoGPose() const;
+      public: ignition::math::Pose3d GetWorldCoGPose() const;
 
       /// \brief Get the linear velocity of the origin of the link frame,
       ///        expressed in the world frame.
       /// \return Linear velocity of the link frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const
-              {return this->GetWorldLinearVel(math::Vector3::Zero);}
+      public: virtual ignition::math::Vector3d GetWorldLinearVel() const
+              {return this->GetWorldLinearVel(ignition::math::Vector3d::Zero);}
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in a body-fixed frame. If
@@ -216,8 +216,8 @@ namespace gazebo
       /// \param[in] _offset Offset of the point from the origin of the Link
       ///                    frame, expressed in the body-fixed frame.
       /// \return Linear velocity of the point on the body
-      public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Vector3 &_offset) const = 0;
+      public: virtual ignition::math::Vector3d GetWorldLinearVel(
+                  const ignition::math::Vector3d &_offset) const = 0;
 
       /// \brief Get the linear velocity of a point on the body in the world
       ///        frame, using an offset expressed in an arbitrary frame.
@@ -226,56 +226,56 @@ namespace gazebo
       /// \param[in] _q Describes the rotation of a reference frame relative to
       ///               the world reference frame.
       /// \return Linear velocity of the point on the body in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Vector3 &_offset,
-                  const math::Quaterniond &_q) const = 0;
+      public: virtual ignition::math::Vector3d GetWorldLinearVel(
+                  const ignition::math::Vector3d &_offset,
+                  const ignition::math::Quaterniond &_q) const = 0;
 
       /// \brief Get the linear velocity at the body's center of gravity in the
       ///        world frame.
       /// \return Linear velocity at the body's center of gravity in the world
       ///         frame.
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const = 0;
+      public: virtual ignition::math::Vector3d GetWorldCoGLinearVel() const = 0;
 
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
-      public: math::Vector3 GetRelativeLinearVel() const;
+      public: ignition::math::Vector3d GetRelativeLinearVel() const;
 
       /// \brief Get the angular velocity of the body.
       /// \return Angular velocity of the body.
-      public: math::Vector3 GetRelativeAngularVel() const;
+      public: ignition::math::Vector3d GetRelativeAngularVel() const;
 
       /// \brief Get the linear acceleration of the body.
       /// \return Linear acceleration of the body.
-      public: math::Vector3 GetRelativeLinearAccel() const;
+      public: ignition::math::Vector3d GetRelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the body in the world frame.
       /// \return Linear acceleration of the body in the world frame.
-      public: math::Vector3 GetWorldLinearAccel() const;
+      public: ignition::math::Vector3d GetWorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the body.
       /// \return Angular acceleration of the body.
-      public: math::Vector3 GetRelativeAngularAccel() const;
+      public: ignition::math::Vector3d GetRelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the body in the world
       /// frame.
       /// \return Angular acceleration of the body in the world frame.
-      public: math::Vector3 GetWorldAngularAccel() const;
+      public: ignition::math::Vector3d GetWorldAngularAccel() const;
 
       /// \brief Get the force applied to the body.
       /// \return Force applied to the body.
-      public: math::Vector3 GetRelativeForce() const;
+      public: ignition::math::Vector3d GetRelativeForce() const;
 
       /// \brief Get the force applied to the body in the world frame.
       /// \return Force applied to the body in the world frame.
-      public: virtual math::Vector3 GetWorldForce() const = 0;
+      public: virtual ignition::math::Vector3d GetWorldForce() const = 0;
 
       /// \brief Get the torque applied to the body.
       /// \return Torque applied to the body.
-      public: math::Vector3 GetRelativeTorque() const;
+      public: ignition::math::Vector3d GetRelativeTorque() const;
 
       /// \brief Get the torque applied to the body in the world frame.
       /// \return Torque applied to the body in the world frame.
-      public: virtual math::Vector3 GetWorldTorque() const = 0;
+      public: virtual ignition::math::Vector3d GetWorldTorque() const = 0;
 
       /// \brief Get the model that this body belongs to.
       /// \return Model that this body belongs to.
@@ -294,12 +294,12 @@ namespace gazebo
       /// which returns the cog position in the link frame
       /// (not the Moment of Inertia frame).
       /// \return Inertial pose in world frame.
-      public: math::Pose GetWorldInertialPose() const;
+      public: ignition::math::Pose3d GetWorldInertialPose() const;
 
       /// \brief Get the inertia matrix in the world frame.
       /// \return Inertia matrix in world frame, returns matrix
       /// of zeros if link has no inertia.
-      public: math::Matrix3 GetWorldInertiaMatrix() const;
+      public: ignition::math::Matrix3d GetWorldInertiaMatrix() const;
 
       /// \cond
       /// This is an internal function
@@ -326,7 +326,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box GetBoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.
@@ -419,7 +419,7 @@ namespace gazebo
       /// \param[in] _model Pointer to a static model.
       /// \param[in] _offset Pose relative to this link to place the model.
       public: void AttachStaticModel(ModelPtr &_model,
-                                     const math::Pose &_offset);
+                                     const ignition::math::Pose3d &_offset);
 
       /// \brief Detach a static model from this link.
       /// \param[in] _modelName Name of an attached model to detach.
@@ -521,13 +521,13 @@ namespace gazebo
       protected: Visuals_M visuals;
 
       /// \brief Linear acceleration.
-      protected: math::Vector3 linearAccel;
+      protected: ignition::math::Vector3d linearAccel;
 
       /// \brief Angular acceleration.
-      protected: math::Vector3 angularAccel;
+      protected: ignition::math::Vector3d angularAccel;
 
       /// \brief Offsets for the attached models.
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief This flag is set to true when the link is initialized.
       protected: bool initialized;

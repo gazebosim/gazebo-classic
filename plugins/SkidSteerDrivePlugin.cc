@@ -88,11 +88,11 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
   physics::EntityPtr wheelLink = boost::dynamic_pointer_cast<physics::Entity>(
-                                        this->joints[RIGHT_FRONT]->GetChild() );
+      this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {
-    math::Box bb = wheelLink->GetBoundingBox();
-    this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+    ignition::math::Box bb = wheelLink->GetBoundingBox();
+    this->wheelRadius = bb.Size().Max() * 0.5;
   }
 
   // Validity checks...
@@ -121,13 +121,13 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
 void SkidSteerDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
   // gzmsg << "cmd_vel: " << msg->position().x() << ", "
-  //       << msgs::Convert(msg->orientation()).GetAsEuler().z << std::endl;
+  //       << msgs::Convert(msg->orientation()).GetAsEuler().z() << std::endl;
 
-  for (int i = 0; i < NUMBER_OF_WHEELS; i++)
+  for (int i = 0; i < NUMBER_OF_WHEELS; ++i)
     this->joints[i]->SetMaxForce(0, this->maxForce);
 
   double vel_lin = _msg->position().x() / this->wheelRadius;
-  double vel_rot = -1 * msgs::Convert(_msg->orientation()).GetAsEuler().z
+  double vel_rot = -1 * msgs::Convert(_msg->orientation()).Euler().z()
                    * (this->wheelSeparation / this->wheelRadius);
 
   this->joints[RIGHT_FRONT]->SetVelocity(0, vel_lin - vel_rot);

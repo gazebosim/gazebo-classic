@@ -102,7 +102,7 @@ namespace gazebo
 
       /// \brief Get the rotation of the rect item
       /// \return Rotation in degrees.
-      public: virtual double GetRotation() const;
+      public: virtual double Rotation() const;
 
       // Documentation inherited
       public: virtual QVector3D GetSize() const;

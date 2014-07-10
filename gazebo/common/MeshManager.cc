@@ -313,18 +313,18 @@ void MeshManager::CreatePlane(const std::string &name,
   ignition::math::Vector3d zAxis, yAxis, xAxis;
   zAxis = normal;
   zAxis.Normalize();
-  yAxis = zAxis.GetPerpendicular();
+  yAxis = zAxis.Perpendicular();
   xAxis = yAxis.Cross(zAxis);
 
   ignition::math::Matrix4d xlate, xform, rot;
   xlate = rot = ignition::math::Matrix4d::Identity;
 
   ignition::math::Matrix3d rot3;
-  rot3.SetFromAxes(xAxis, yAxis, zAxis);
+  rot3.Axes(xAxis, yAxis, zAxis);
 
   rot = rot3;
 
-  xlate.SetTranslate(normal * -d);
+  xlate.Translate(normal * -d);
   xform = xlate * rot;
 
   ignition::math::Vector3d vec;

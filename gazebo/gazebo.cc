@@ -24,7 +24,6 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo.hh"
 

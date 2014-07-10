@@ -22,7 +22,7 @@
 #define _COLLISIONSTATE_HH_
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Get the Collision pose
       /// \return The pose of the CollisionState
-      public: const math::Pose &GetPose() const;
+      public: const ignition::math::Pose3d &GetPose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -108,7 +108,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the Collision object.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
     };
     /// \}
   }

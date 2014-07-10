@@ -52,7 +52,7 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
 
   // The following lines cause a seg-fault on revision 031749b
   // This test passes if it doesn't seg-fault.
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3d g = physics->GetGravity();
   physics->SetGravity(g);
 }
 
@@ -87,9 +87,9 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   {
     // Call these functions repeatedly
     // Test passes if it doesn't abort early
-    math::Vector3 vel = link->GetWorldLinearVel();
-    vel += link->GetWorldLinearVel(math::Vector3());
-    vel += link->GetWorldLinearVel(math::Vector3(), math::Quaternion());
+    ignition::math::Vector3d vel = link->GetWorldLinearVel();
+    vel += link->GetWorldLinearVel(ignition::math::Vector3d());
+    vel += link->GetWorldLinearVel(ignition::math::Vector3d(), ignition::math::Quaterniond());
     vel += link->GetWorldCoGLinearVel();
     vel += link->GetWorldAngularVel();
   }

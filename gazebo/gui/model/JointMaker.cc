@@ -209,8 +209,8 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       jointVis->Load();
       rendering::DynamicLines *jointLine =
           jointVis->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
-      jointLine->AddPoint(math::Vector3(0, 0, 0));
-      jointLine->AddPoint(math::Vector3(0, 0, 0.01));
+      jointLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
+      jointLine->AddPoint(ignition::math::Vector3d(0, 0, 0.01));
       jointVis->GetSceneNode()->setInheritScale(false);
       jointVis->GetSceneNode()->setInheritOrientation(false);
 
@@ -228,11 +228,11 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       int axisCount = JointMaker::GetJointAxisCount(jointData->type);
       for (int i = 0; i < axisCount; ++i)
       {
-        jointData->axis[i] = math::Vector3::UnitX;
+        jointData->axis[i] = ignition::math::Vector3d::UnitX;
         jointData->lowerLimit[i] = -1e16;
         jointData->upperLimit[i] = 1e16;
       }
-      jointData->anchor = math::Vector3::Zero;
+      jointData->anchor = ignition::math::Vector3d::Zero;
       this->mouseJoint = jointData;
       jointData->line->setMaterial(this->jointMaterials[jointData->type]);
     }
@@ -348,25 +348,25 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->selectedVis && this->hoverVis
       && this->mouseJoint && this->mouseJoint->line)
   {
-    math::Vector3 parentPos;
+    ignition::math::Vector3d parentPos;
     // Set end point to center of child part
     if (!this->hoverVis->IsPlane())
     {
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+        parentPos = this->mouseJoint->parent->GetWorldPose().Pos();
       this->mouseJoint->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos);
+          this->hoverVis->GetWorldPose().Pos() - parentPos);
     }
     else
     {
       // Set end point to mouse plane intersection
-      math::Vector3 pt;
-      camera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
-          math::Plane(math::Vector3(0, 0, 1)), pt);
+      ignition::math::Vector3d pt;
+      camera->GetWorldPointOnPlane(_event.pos.x(), _event.pos.y(),
+          ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
-        parentPos = this->mouseJoint->parent->GetWorldPose().pos;
+        parentPos = this->mouseJoint->parent->GetWorldPose().Pos();
       this->mouseJoint->line->SetPoint(1,
-          this->hoverVis->GetWorldPose().pos - parentPos + pt);
+          this->hoverVis->GetWorldPose().Pos() - parentPos + pt);
     }
   }
   return true;
@@ -440,7 +440,7 @@ void JointMaker::CreateHotSpot()
 
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial("Gazebo/RedTransparent");
-  hotspotVisual->SetScale(math::Vector3(0.1, 0.1, 0.1));
+  hotspotVisual->SetScale(ignition::math::Vector3d(0.1, 0.1, 0.1));
 
   hotspotVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
@@ -471,13 +471,13 @@ void JointMaker::Update()
       if (joint->child && joint->parent)
       {
         joint->line->SetPoint(1,
-            joint->child->GetWorldPose().pos -
-            joint->parent->GetWorldPose().pos);
+            joint->child->GetWorldPose().Pos() -
+            joint->parent->GetWorldPose().Pos());
 
         joint->hotspot->SetWorldPosition(
-          joint->parent->GetWorldPose().pos +
-          (joint->child->GetWorldPose().pos -
-          joint->parent->GetWorldPose().pos)/2.0);
+          joint->parent->GetWorldPose().Pos() +
+          (joint->child->GetWorldPose().Pos() -
+          joint->parent->GetWorldPose().Pos())/2.0);
       }
     }
   }
@@ -505,7 +505,7 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetParent()->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
+    poseElem->Set(ignition::math::Pose3d(joint->anchor, ignition::math::Vector3d::Zero));
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {

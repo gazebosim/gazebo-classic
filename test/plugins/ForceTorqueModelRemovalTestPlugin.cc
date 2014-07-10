@@ -63,8 +63,8 @@ void ForceTorqueModelRemovalTestPlugin::Load(sensors::SensorPtr _sensor,
 void ForceTorqueModelRemovalTestPlugin::onUpdate(
     const gazebo::common::UpdateInfo & /*_info*/)
 {
-  gazebo::math::Vector3 force;
-  gazebo::math::Vector3 torque;
+  ignition::math::Vector3d force;
+  ignition::math::Vector3d torque;
 
   if ( parentSensor )
   {

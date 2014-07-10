@@ -75,10 +75,11 @@ TEST_F(RenderingSensorTest, Timestamp)
   unsigned int width  = 800;
   unsigned int height = 800;
   double updateRate = 30;
-  math::Pose camPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, camPose.pos,
-      camPose.rot.GetAsEuler(), width, height, updateRate);
+  ignition::math::Pose3d camPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, camPose.Pos(),
+      camPose.Rot().Euler(), width, height, updateRate);
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   EXPECT_TRUE(sensor != NULL);
@@ -89,10 +90,11 @@ TEST_F(RenderingSensorTest, Timestamp)
 
   std::string modelName2 = "camera_model2";
   std::string cameraName2 = "camera_sensor2";
-  math::Pose camPose2(
-      math::Vector3(5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera(modelName2, cameraName2, camPose2.pos,
-      camPose2.rot.GetAsEuler(), width, height, updateRate);
+  ignition::math::Pose3d camPose2(
+      ignition::math::Vector3d(5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName2, cameraName2, camPose2.Pos(),
+      camPose2.Rot().Euler(), width, height, updateRate);
 
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
   EXPECT_TRUE(sensor2 != NULL);
@@ -110,11 +112,11 @@ TEST_F(RenderingSensorTest, Timestamp)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 640;
-  math::Pose testPose(math::Vector3(0, 0, 0.1),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.1),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnGpuRaySensor(modelName3, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
+  SpawnGpuRaySensor(modelName3, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   sensors::SensorPtr sensor3 = sensors::get_sensor(raySensorName);

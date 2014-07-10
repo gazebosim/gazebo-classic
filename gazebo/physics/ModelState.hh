@@ -14,18 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: A model state
- * Author: Nate Koenig
- */
+#ifndef _GAZEBO_MODELSTATE_HH_
+#define _GAZEBO_MODELSTATE_HH_
 
-#ifndef _MODELSTATE_HH_
-#define _MODELSTATE_HH_
-
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
@@ -95,8 +92,8 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The math::Pose of the Model.
-      public: const math::Pose &GetPose() const;
+      /// \return The ignition::math::Pose3d of the Model.
+      public: const ignition::math::Pose3d &GetPose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -210,16 +207,16 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::ModelState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        ignition::math::Vector3d q(_state.pose.Rot().Euler());
         _out << std::fixed <<std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
+          << _state.pose.Pos().x() << " "
+          << _state.pose.Pos().y() << " "
+          << _state.pose.Pos().z() << " "
+          << q.x() << " "
+          << q.y() << " "
+          << q.z() << " "
           << "</pose>";
 
         for (LinkState_M::const_iterator iter =
@@ -243,7 +240,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
 
       /// \brief All the link states.
       private: LinkState_M linkStates;

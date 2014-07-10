@@ -424,7 +424,7 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
   // This generates a warning message
-  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  // EXPECT_THROW(testNode->Advertise<ignition::math::Vector3d>("~/scene"),
   //             common::Exception);
 
   scenePub = testNode->Advertise<msgs::Scene>("~/scene");

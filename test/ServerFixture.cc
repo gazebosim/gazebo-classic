@@ -282,11 +282,11 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
+ignition::math::Pose3d ServerFixture::GetEntityPose(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
 
-  std::map<std::string, math::Pose>::iterator iter;
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   EXPECT_TRUE(iter != this->poses.end());
   return iter->second;
@@ -296,7 +296,7 @@ math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 bool ServerFixture::HasEntity(const std::string &_name)
 {
   boost::mutex::scoped_lock lock(this->receiveMutex);
-  std::map<std::string, math::Pose>::iterator iter;
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   return iter != this->poses.end();
 }
@@ -330,12 +330,12 @@ void ServerFixture::PrintScan(const std::string &_name, double *_scan,
   for (unsigned int i = 0; i < _sampleCount-1; ++i)
   {
     if ((i+1) % 5 == 0)
-      printf("%13.10f,\n", math::precision(_scan[i], 10));
+      printf("%13.10f,\n", ignition::math::precision(_scan[i], 10));
     else
-      printf("%13.10f, ", math::precision(_scan[i], 10));
+      printf("%13.10f, ", ignition::math::precision(_scan[i], 10));
   }
   printf("%13.10f};\n",
-      math::precision(_scan[_sampleCount-1], 10));
+      ignition::math::precision(_scan[_sampleCount-1], 10));
   printf("static double *%s = __%s;\n", _name.c_str(),
       _name.c_str());
 }
@@ -350,8 +350,8 @@ void ServerFixture::FloatCompare(float *_scanA, float *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    double diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -371,8 +371,8 @@ void ServerFixture::DoubleCompare(double *_scanA, double *_scanB,
   _diffAvg = 0;
   for (unsigned int i = 0; i < _sampleCount; ++i)
   {
-    double diff = fabs(math::precision(_scanA[i], 10) -
-                math::precision(_scanB[i], 10));
+    double diff = fabs(ignition::math::precision(_scanA[i], 10) -
+                ignition::math::precision(_scanB[i], 10));
     _diffSum += diff;
     if (diff > _diffMax)
     {
@@ -426,7 +426,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
     unsigned int &_height)
 {
   sensors::SensorPtr sensor = sensors::get_sensor(_cameraName);
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
@@ -456,7 +456,7 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     unsigned int _width, unsigned int _height,
     double _rate,
     const std::string &_noiseType,
@@ -511,7 +511,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
@@ -584,7 +584,7 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
@@ -648,7 +648,7 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     const std::string &_imuSensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     const std::string &_noiseType,
     double _rateNoiseMean, double _rateNoiseStdDev,
     double _rateBiasMean, double _rateBiasStdDev,
@@ -722,8 +722,8 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     const std::string &_sensorName,
-    const std::string &_collisionType, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_collisionType, const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -782,8 +782,8 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
 void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_topic, const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -845,8 +845,8 @@ void ServerFixture::launchTimeoutFailure(const char *_logMsg,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     const std::string &_essid,
     double _freq,
     double _power,
@@ -887,8 +887,8 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     double _minFreq,
     double _maxFreq,
     double _power,
@@ -969,7 +969,7 @@ void ServerFixture::WaitUntilSensorSpawn(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1008,7 +1008,7 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1043,8 +1043,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    const math::Vector3 &_cog, double _radius,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    const ignition::math::Vector3d &_cog, double _radius,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1082,8 +1082,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnBox(const std::string &_name,
-    const math::Vector3 &_size, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1117,8 +1117,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnTrimesh(const std::string &_name,
-    const std::string &_modelPath, const math::Vector3 &_scale,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const std::string &_modelPath, const ignition::math::Vector3d &_scale,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1156,7 +1156,7 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnEmptyLink(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;

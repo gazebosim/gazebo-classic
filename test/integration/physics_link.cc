@@ -51,13 +51,13 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // Get gravity magnitude
-  double g = physics->GetGravity().GetLength();
+  double g = physics->GetGravity().Length();
 
   // Spawn a box
   double z0 = 10.0;
-  math::Vector3 size(1, 1, 1);
-  math::Vector3 pos0(0, 0, z0 + size.z / 2);
-  SpawnBox("box", size, pos0, math::Vector3::Zero, false);
+  ignition::math::Vector3d size(1, 1, 1);
+  ignition::math::Vector3d pos0(0, 0, z0 + size.z() / 2);
+  SpawnBox("box", size, pos0, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
@@ -106,32 +106,32 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_GT(dt, 0);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // Spawn a box
-  math::Vector3 size(1, 1, 1);
-  math::Vector3 pos0(0, 0, 1);
-  SpawnBox("box", size, pos0, math::Vector3::Zero, false);
+  ignition::math::Vector3d size(1, 1, 1);
+  ignition::math::Vector3d pos0(0, 0, 1);
+  SpawnBox("box", size, pos0, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
 
   // Set upward velocity and check
-  math::Vector3 vel(0, 0, 1);
+  ignition::math::Vector3d vel(0, 0, 1);
   link->SetLinearVel(vel);
   world->Step(1);
   EXPECT_EQ(vel, link->GetWorldLinearVel());
-  EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldAngularVel());
 
   // Step forward and check velocity again
   world->Step(44);
   double time = world->GetSimTime().Double();
   EXPECT_EQ(vel, link->GetWorldLinearVel());
-  EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldAngularVel());
 
   // check position
-  math::Vector3 pos = link->GetWorldPose().pos;
+  ignition::math::Vector3d pos = link->GetWorldPose().Pos();
   if (_physicsEngine.compare("bullet") == 0)
   {
     /// \TODO skipping bullet, see issue #1081
@@ -142,15 +142,15 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_EQ(pos0 + time*vel, pos);
 
   // Set velocity to zero
-  link->SetLinearVel(math::Vector3::Zero);
+  link->SetLinearVel(ignition::math::Vector3d::Zero);
   world->Step(1);
-  EXPECT_EQ(math::Vector3::Zero, link->GetWorldLinearVel());
-  EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldLinearVel());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldAngularVel());
   EXPECT_EQ(pos0 + time*vel, pos);
 
   // Start translating and rotating
   vel.Set(1, 1, 0);
-  math::Vector3 vel2(0, 2.0, 0);
+  ignition::math::Vector3d vel2(0, 2.0, 0);
   link->SetLinearVel(vel);
   link->SetAngularVel(vel2);
 
@@ -160,11 +160,12 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_EQ(vel2, link->GetWorldAngularVel());
 
   // test linear velocity at specific point in space
-  math::Vector3 offset(0, 0, -0.5);
-  math::Vector3 vel3 = link->GetWorldLinearVel(offset, math::Quaternion());
-  EXPECT_NEAR(vel3.x, 0.0, g_tolerance);
-  EXPECT_NEAR(vel3.y, 1.0, g_tolerance);
-  EXPECT_NEAR(vel3.z, 0.0, g_tolerance);
+  ignition::math::Vector3d offset(0, 0, -0.5);
+  ignition::math::Vector3d vel3 = link->GetWorldLinearVel(offset,
+      ignition::math::Quaterniond());
+  EXPECT_NEAR(vel3.x(), 0.0, g_tolerance);
+  EXPECT_NEAR(vel3.y(), 1.0, g_tolerance);
+  EXPECT_NEAR(vel3.z(), 0.0, g_tolerance);
 
   // check rotation
   if (_physicsEngine.compare("bullet") == 0)
@@ -173,10 +174,10 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
           << std::endl;
     world->Step(1);
   }
-  math::Vector3 rpy = link->GetWorldPose().rot.GetAsEuler();
-  EXPECT_NEAR(rpy.x, 0.0, g_tolerance);
-  EXPECT_NEAR(rpy.y, vel2.y*dt, g_tolerance);
-  EXPECT_NEAR(rpy.z, 0.0, g_tolerance);
+  ignition::math::Vector3d rpy = link->GetWorldPose().Rot().Euler();
+  EXPECT_NEAR(rpy.x(), 0.0, g_tolerance);
+  EXPECT_NEAR(rpy.y(), vel2.y()*dt, g_tolerance);
+  EXPECT_NEAR(rpy.z(), 0.0, g_tolerance);
 }
 
 /////////////////////////////////////////////////

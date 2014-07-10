@@ -25,7 +25,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -100,8 +100,8 @@ void ModelCreator::AddJoint(JointMaker::JointType _type)
 }
 
 /////////////////////////////////////////////////
-std::string ModelCreator::AddBox(const math::Vector3 &_size,
-    const math::Pose &_pose)
+std::string ModelCreator::AddBox(const ignition::math::Vector3d &_size,
+    const ignition::math::Pose3d &_pose)
 {
   if (!this->modelVisual)
   {
@@ -132,10 +132,11 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose == ignition::math::Pose3d::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _size.z/2));
+    linkVisual->SetPosition(
+        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
+          _pose.Pos().z() + _size.z()/2));
   }
 
   this->CreatePart(visVisual);
@@ -147,7 +148,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddSphere(double _radius,
-    const math::Pose &_pose)
+    const ignition::math::Pose3d &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -176,10 +177,11 @@ std::string ModelCreator::AddSphere(double _radius,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose == ignition::math::Pose3d::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _radius));
+    linkVisual->SetPosition(
+        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
+          _pose.Pos().z() + _radius));
   }
 
   this->CreatePart(visVisual);
@@ -190,7 +192,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddCylinder(double _radius, double _length,
-    const math::Pose &_pose)
+    const ignition::math::Pose3d &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -221,10 +223,11 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose == ignition::math::Pose3d::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _length/2));
+    linkVisual->SetPosition(
+        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
+          _pose.Pos().z() + _length/2));
   }
 
   this->CreatePart(visVisual);
@@ -235,7 +238,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
 /////////////////////////////////////////////////
 std::string ModelCreator::AddCustom(const std::string &_path,
-    const math::Vector3 &_scale, const math::Pose &_pose)
+    const ignition::math::Vector3d &_scale, const ignition::math::Pose3d &_pose)
 {
   if (!this->modelVisual)
     this->Reset();
@@ -267,10 +270,11 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   visVisual->Load(visualElem);
 
   linkVisual->SetPose(_pose);
-  if (_pose == math::Pose::Zero)
+  if (_pose == ignition::math::Pose3d::Zero)
   {
-    linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
-    _pose.pos.z + _scale.z/2));
+    linkVisual->SetPosition(
+        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
+          _pose.Pos().z() + _scale.z()/2));
   }
 
   this->CreatePart(visVisual);
@@ -370,7 +374,7 @@ void ModelCreator::Reset()
       scene->GetWorldVisual()));
 
   this->modelVisual->Load();
-  this->modelPose = math::Pose::Zero;
+  this->modelPose = ignition::math::Pose3d::Zero;
   this->modelVisual->SetPose(this->modelPose);
   scene->AddVisual(this->modelVisual);
 }
@@ -598,15 +602,15 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   if (!gui::get_active_camera())
     return false;
 
-  math::Pose pose = this->mouseVisual->GetWorldPose();
-  pose.pos = ModelManipulator::GetMousePositionOnPlane(
+  ignition::math::Pose3d pose = this->mouseVisual->GetWorldPose();
+  pose.Pos() = ModelManipulator::GetMousePositionOnPlane(
       gui::get_active_camera(), _event);
 
   if (!_event.shift)
   {
-    pose.pos = ModelManipulator::SnapPoint(pose.pos);
+    pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
-  pose.pos.z = this->mouseVisual->GetWorldPose().pos.z;
+  pose.Pos().z() = this->mouseVisual->GetWorldPose().Pos().z();
 
   this->mouseVisual->SetWorldPose(pose);
 
@@ -662,16 +666,16 @@ void ModelCreator::GenerateSDF()
   boost::unordered_map<std::string, PartData *>::iterator partsIt;
 
   // set center of all parts to be origin
-  math::Vector3 mid;
+  ignition::math::Vector3d mid;
   for (partsIt = this->allParts.begin(); partsIt != this->allParts.end();
       ++partsIt)
   {
     PartData *part = partsIt->second;
     rendering::VisualPtr visual = part->visuals[0];
-    mid += visual->GetParent()->GetWorldPose().pos;
+    mid += visual->GetParent()->GetWorldPose().Pos();
   }
   mid /= this->allParts.size();
-  this->origin.pos = mid;
+  this->origin.Pos() = mid;
   modelElem->GetElement("pose")->Set(this->origin);
 
   // loop through all parts and generate sdf
@@ -715,7 +719,7 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
     geomElem->ClearElements();
 
-    math::Vector3 scale = visual->GetScale();
+    ignition::math::Vector3d scale = visual->GetScale();
     if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
     {
       sdf::ElementPtr boxElem = geomElem->AddElement("box");
@@ -725,14 +729,14 @@ void ModelCreator::GenerateSDF()
        != std::string::npos)
     {
       sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-      (cylinderElem->GetElement("radius"))->Set(scale.x/2.0);
-      (cylinderElem->GetElement("length"))->Set(scale.z);
+      (cylinderElem->GetElement("radius"))->Set(scale.x()/2.0);
+      (cylinderElem->GetElement("length"))->Set(scale.z());
     }
     else if (visual->GetParent()->GetName().find("unit_sphere")
         != std::string::npos)
     {
       sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
-      (sphereElem->GetElement("radius"))->Set(scale.x/2.0);
+      (sphereElem->GetElement("radius"))->Set(scale.x()/2.0);
     }
     else if (visual->GetParent()->GetName().find("custom")
         != std::string::npos)

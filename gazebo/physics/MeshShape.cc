@@ -93,15 +93,15 @@ void MeshShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MeshShape::SetScale(const math::Vector3 &_scale)
+void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   this->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MeshShape::GetSize() const
+ignition::math::Vector3d MeshShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("scale");
+  return this->sdf->Get<ignition::math::Vector3d>("scale");
 }
 
 //////////////////////////////////////////////////

@@ -22,7 +22,7 @@
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"
 #include "test/util.hh"
@@ -110,7 +110,7 @@ void NoNoise(sensors::NoisePtr _noise, unsigned int _count)
   // Expect no change in input value
   for (unsigned int i = 0; i < _count; ++i)
   {
-    double x = math::Rand::GetDblUniform(-1e6, 1e6);
+    double x = ignition::math::Rand::DblUniform(-1e6, 1e6);
     EXPECT_NEAR(x, _noise->Apply(x), 1e-6);
   }
 }
@@ -122,7 +122,7 @@ void GaussianNoise(sensors::NoisePtr _noise, unsigned int _count)
   sensors::GaussianNoiseModelPtr noiseModel =
       boost::dynamic_pointer_cast<sensors::GaussianNoiseModel>(_noise);
 
-  ASSERT_TRUE(noiseModel);
+  ASSERT_TRUE(noiseModel != NULL);
 
   // Use constant input and repeatedly add noise to it.
   double x = 42.0;
@@ -358,7 +358,7 @@ TEST_F(NoiseTest, OnApplyNoise)
   // Verify that the custom callback function is called if noise type is
   // set to CUSTOM
   sensors::NoisePtr noise(new sensors::Noise(sensors::Noise::CUSTOM));
-  ASSERT_TRUE(noise);
+  ASSERT_TRUE(noise != NULL);
   EXPECT_TRUE(noise->GetNoiseType() == sensors::Noise::CUSTOM);
 
   noise->SetCustomNoiseCallback(

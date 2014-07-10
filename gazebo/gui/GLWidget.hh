@@ -31,7 +31,7 @@
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Event.hh"
 
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -147,7 +147,7 @@ namespace gazebo
       private: void Paste(const std::string &_object);
 
       private: void PushHistory(const std::string &_visName,
-                                const math::Pose &_pose);
+                                const ignition::math::Pose3d &_pose);
       private: void PopHistory();
 
       /// \brief Set the selected visual, which will highlight the
@@ -190,7 +190,7 @@ namespace gazebo
 
       private: std::string state;
 
-      private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+      private: std::list<std::pair<std::string, ignition::math::Pose3d> > moveHistory;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene

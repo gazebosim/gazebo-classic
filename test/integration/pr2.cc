@@ -59,17 +59,17 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
 
   sensors::SensorPtr sensor =
     sensors::get_sensor("narrow_stereo_gazebo_l_stereo_camera_sensor");
-  EXPECT_TRUE(sensor);
+  EXPECT_TRUE(sensor != NULL);
 
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor);
+  EXPECT_TRUE(camSensor != NULL);
 
   while (!camSensor->SaveFrame(paths->GetDefaultTestPath() + "/frame_10.jpg"))
     common::Time::MSleep(100);
 
   physics::get_world("default")->GetPhysicsEngine()->SetGravity(
-      math::Vector3(-0.5, 0, -0.1));
+      ignition::math::Vector3d(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
@@ -140,7 +140,7 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
   gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
   gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
+  EXPECT_GT(link->GetWorldLinearVel().z(), 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////

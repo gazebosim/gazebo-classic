@@ -126,13 +126,13 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLatitudeReference(const ignition::math::Angle &_angle)
 {
-  this->dataPtr->latitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->latitudeReference.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetLongitudeReference(const ignition::math::Angle &_angle)
 {
-  this->dataPtr->longitudeReference.SetFromRadian(_angle.Radian());
+  this->dataPtr->longitudeReference.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
@@ -144,7 +144,7 @@ void SphericalCoordinates::SetElevationReference(double _elevation)
 //////////////////////////////////////////////////
 void SphericalCoordinates::SetHeadingOffset(const ignition::math::Angle &_angle)
 {
-  this->dataPtr->headingOffset.SetFromRadian(_angle.Radian());
+  this->dataPtr->headingOffset.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////

@@ -45,33 +45,33 @@ TEST_F(SphereShapeTest, Scale)
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = sphereSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("sphere");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   sphere->Load(elem);
 
   // Test scaling with unit size
   double radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 0.5);
 
-  sphere->SetScale(math::Vector3(1.5, 1.5, 1.5));
+  sphere->SetScale(ignition::math::Vector3d(1.5, 1.5, 1.5));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 0.75);
 
-  sphere->SetScale(math::Vector3(2.0, 2.0, 2.0));
+  sphere->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 1.0);
 
   // reset scale
-  sphere->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  sphere->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 0.5);
 
@@ -80,33 +80,33 @@ TEST_F(SphereShapeTest, Scale)
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 2.5);
 
-  sphere->SetScale(math::Vector3(2.0, 2.0, 2.0));
+  sphere->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 5.0);
 
-  sphere->SetScale(math::Vector3(100.0, 100.0, 100.0));
+  sphere->SetScale(ignition::math::Vector3d(100.0, 100.0, 100.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 250.0);
 
-  sphere->SetScale(math::Vector3(0.1, 0.1, 0.1));
+  sphere->SetScale(ignition::math::Vector3d(0.1, 0.1, 0.1));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 0.25);
 
   // reset scale
-  sphere->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  sphere->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   sphere->SetRadius(0.5);
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 0.5);
 
   // Test scaling with different x, y and z components
-  sphere->SetScale(math::Vector3(0.5, 1.0, 2.5));
+  sphere->SetScale(ignition::math::Vector3d(0.5, 1.0, 2.5));
   radius = sphere->GetRadius();
   // radius should be multiplied by max of (0.5, 1.0, 2.5)
   EXPECT_DOUBLE_EQ(radius, 1.25);
 
   // Test scaling with negative components
   // This should fail and radius should remain the same as before
-  sphere->SetScale(math::Vector3(-1.0, -2.0, -3.0));
+  sphere->SetScale(ignition::math::Vector3d(-1.0, -2.0, -3.0));
   radius = sphere->GetRadius();
   EXPECT_DOUBLE_EQ(radius, 1.25);
 }

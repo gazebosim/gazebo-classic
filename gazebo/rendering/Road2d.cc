@@ -112,8 +112,10 @@ void Road2d::Load(VisualPtr _parent)
     }
     else
     {
-      ignition::math::Vector3d v1 = (this->points[i+1] - this->points[i]).Normalize();
-      ignition::math::Vector3d v0 = (this->points[i] - this->points[i-1]).Normalize();
+      ignition::math::Vector3d v1 =
+        (this->points[i+1] - this->points[i]).Normalize();
+      ignition::math::Vector3d v0 =
+        (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
       tangent = (this->points[i+1] - this->points[i-1]).Normalize();
 
@@ -135,11 +137,11 @@ void Road2d::Load(VisualPtr _parent)
     pB.x -= cos(theta) * w;
     pB.y -= sin(theta) * w;
 
-    bounds.min.SetToMin(pA);
-    bounds.min.SetToMin(pB);
+    bounds.min.Min(pA);
+    bounds.min.Min(pB);
 
-    bounds.max.SetToMax(pA);
-    bounds.max.SetToMax(pB);
+    bounds.max.Max(pA);
+    bounds.max.Max(pB);
 
     // Position
     *vertices++ = pA.x;
@@ -316,11 +318,11 @@ void Road2d::Segment::Load(msgs::Road _msg)
     pB.x() -= cos(theta) * w;
     pB.y() -= sin(theta) * w;
 
-    bounds.Min().SetToMin(pA);
-    bounds.Min().SetToMin(pB);
+    bounds.Min().Min(pA);
+    bounds.Min().Min(pB);
 
-    bounds.Max().SetToMax(pA);
-    bounds.Max().SetToMax(pB);
+    bounds.Max().Max(pA);
+    bounds.Max().Max(pB);
 
     // Position
     *vertices++ = pA.x();

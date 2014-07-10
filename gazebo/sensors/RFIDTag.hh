@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Tag
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
 #ifndef _RFIDTAG_HH_
 #define _RFIDTAG_HH_
 
@@ -27,7 +22,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/util/system.hh"
 
@@ -66,7 +60,7 @@ namespace gazebo
 
       /// \brief Returns pose of tag in world coordinate.
       /// \return Pose of object.
-      public: math::Pose GetTagPose() const
+      public: ignition::math::Pose3d GetTagPose() const
               {return entity->GetWorldPose();}
 
       /// \brief Pointer the entity that has the RFID tag.

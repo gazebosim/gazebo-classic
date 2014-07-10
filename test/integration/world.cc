@@ -26,7 +26,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
 {
   Load("worlds/blank.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -39,7 +39,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
   EXPECT_EQ(world->GetModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
@@ -48,7 +48,7 @@ TEST_F(WorldTest, Clear)
 {
   Load("worlds/pioneer2dx.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   EXPECT_EQ(world->GetModelCount(), 2u);
 
@@ -58,7 +58,7 @@ TEST_F(WorldTest, Clear)
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
 
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
@@ -68,7 +68,7 @@ TEST_F(WorldTest, ModifyLight)
 {
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
   msgs::Scene sceneMsg = world->GetSceneMsg();
 
   // Make sure there is only one light, and it is named "sun"

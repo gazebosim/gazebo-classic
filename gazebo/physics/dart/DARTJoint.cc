@@ -225,7 +225,7 @@ void DARTJoint::Detach()
 
 //////////////////////////////////////////////////
 void DARTJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 &/*_anchor*/)
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   // nothing to do here for DART.
 }
@@ -301,7 +301,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetHighStop(unsigned int _index, const ignition::math::Angle &_angle)
 {
   switch (_index)
   {
@@ -317,7 +317,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+bool DARTJoint::SetLowStop(unsigned int _index, const ignition::math::Angle &_angle)
 {
   switch (_index)
   {
@@ -333,7 +333,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle DARTJoint::GetHighStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -349,7 +349,7 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle DARTJoint::GetLowStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -365,9 +365,9 @@ math::Angle DARTJoint::GetLowStop(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::GetLinkForce(unsigned int _index) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3d result;
 
   if (!this->dtJoint)
   {
@@ -392,14 +392,14 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+    F2 = -dart::ignition::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12, F2);
+  F1 = -dart::ignition::math::dAdInvR(T12, F2);
 
   if (_index == 0)
     result.Set(F1(3), F1(4), F1(5));
@@ -410,9 +410,9 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::GetLinkTorque(unsigned int _index) const
 {
-  math::Vector3 result;
+  ignition::math::Vector3d result;
 
   if (!this->dtJoint)
   {
@@ -435,14 +435,14 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(
+    F2 = -dart::ignition::math::dAdT(
       dtJoint->getTransformFromChildBodyNode(), dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12, F2);
+  F1 = -dart::ignition::math::dAdInvR(T12, F2);
 
   if (_index == 0)
     result.Set(F1(0), F1(1), F1(2));
@@ -559,14 +559,14 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->GetDARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is NULL");
-    F2 = -dart::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
+    F2 = -dart::ignition::math::dAdT(dtJoint->getTransformFromChildBodyNode(),
                            dartChildBody->getBodyForce());
   }
 
   // JointWrench.body2Force contains
   // the force applied by the child Link on the Joint specified
   // in the child Link frame.
-  F1 = -dart::math::dAdInvR(T12, F2);
+  F1 = -dart::ignition::math::dAdInvR(T12, F2);
 
   // kind of backwards here, body1 (parent) corresponds go f2, t2
   // and body2 (child) corresponds go f1, t1

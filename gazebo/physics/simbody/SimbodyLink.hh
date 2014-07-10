@@ -63,37 +63,37 @@ namespace gazebo
       public: virtual bool GetEnabled() const;
 
       // Documentation inherited.
-      public: virtual void SetLinearVel(const math::Vector3 &_vel);
+      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetAngularVel(const math::Vector3 &_vel);
+      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetForce(const math::Vector3 &_force);
+      public: virtual void SetForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void SetTorque(const math::Vector3 &_force);
+      public: virtual void SetTorque(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel(
-        const math::Vector3& _vector3) const;
+      public: virtual ignition::math::Vector3d GetWorldLinearVel(
+        const ignition::math::Vector3d& _vector3) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset,
-          const math::Quaterniond &_q) const;
+      public: virtual ignition::math::Vector3d GetWorldLinearVel(
+          const ignition::math::Vector3d &_offset,
+          const ignition::math::Quaterniond &_q) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+      public: virtual ignition::math::Vector3d GetWorldCoGLinearVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      public: virtual ignition::math::Vector3d GetWorldAngularVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldForce() const;
+      public: virtual ignition::math::Vector3d GetWorldForce() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldTorque() const;
+      public: virtual ignition::math::Vector3d GetWorldTorque() const;
 
       // Documentation inherited.
       public: virtual void SetGravityMode(bool _mode);
@@ -111,25 +111,25 @@ namespace gazebo
       public: virtual void SetAngularDamping(double _damping);
 
       // Documentation inherited.
-      public: virtual void AddForce(const math::Vector3 &_force);
+      public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+      public: virtual void AddRelativeForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                                                   const math::Vector3 &_pos);
+      public: virtual void AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+                                                   const ignition::math::Vector3d &_pos);
 
       // Documentation inherited.
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relpos);
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_relpos);
 
       // Documentation inherited.
-      public: virtual void AddTorque(const math::Vector3 &_torque);
+      public: virtual void AddTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
+      public: virtual void AddRelativeTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);
@@ -155,7 +155,7 @@ namespace gazebo
       public: SimTK::MassProperties GetEffectiveMassProps(
         int _numFragments) const;
 
-      public: void SetDirtyPose(const math::Pose &_pose);
+      public: void SetDirtyPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Internal call to change effect of gravity on Link
       /// based on gravityMode if gravityModeDirty is true.

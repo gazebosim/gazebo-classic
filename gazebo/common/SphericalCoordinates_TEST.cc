@@ -133,23 +133,23 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
       xyz.Set(1, 0, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
+      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
 
       xyz.Set(0, 1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
+      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
 
       xyz.Set(1, -1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
+      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
 
       xyz.Set(2243.52334, 556.35, 435.6553);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y, xyz.x, 1e-6);
-      EXPECT_NEAR(enu.x, -xyz.y, 1e-6);
+      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
+      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
     }
 
     // Check SphericalFromLocal
@@ -163,21 +163,21 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       xyz.Set(0, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // latitude
-      EXPECT_NEAR(sph.x, lat.Degree(), 1e-6);
+      EXPECT_NEAR(sph.x(), lat.Degree(), 1e-6);
       // longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.y(), lon.Degree(), 1e-6);
       // elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
+      EXPECT_NEAR(sph.z(), elev, 1e-6);
 
       // 200 km offset in x (pi/2 heading offset means North)
       xyz.Set(2e5, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // increase in latitude about 1.8 degrees
-      EXPECT_NEAR(sph.x, lat.Degree() + 1.8, 0.008);
+      EXPECT_NEAR(sph.x(), lat.Degree() + 1.8, 0.008);
       // no change in longitude
-      EXPECT_NEAR(sph.y, lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.y(), lon.Degree(), 1e-6);
       // no change in elevation
-      EXPECT_NEAR(sph.z, elev, 1e-6);
+      EXPECT_NEAR(sph.z(), elev, 1e-6);
     }
   }
 }
@@ -187,10 +187,10 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 TEST_F(SphericalCoordinatesTest, Distance)
 {
   ignition::math::Angle latA, longA, latB, longB;
-  latA.SetFromDegree(46.250944);
-  longA.SetFromDegree(-122.249972);
-  latB.SetFromDegree(46.124953);
-  longB.SetFromDegree(-122.251683);
+  latA.Degree(46.250944);
+  longA.Degree(-122.249972);
+  latB.Degree(46.124953);
+  longB.Degree(-122.251683);
   double d = common::SphericalCoordinates::Distance(latA, longA, latB, longB);
 
   EXPECT_NEAR(14002, d, 20);

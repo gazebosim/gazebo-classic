@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 
 #include "gazebo/common/PID.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Angle.hh>
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
@@ -40,7 +40,7 @@ class FakeJoint : public physics::Joint
   public: virtual bool AreConnected(physics::LinkPtr, physics::LinkPtr) const
           {return true;}
 
-  public: virtual void SetAxis(unsigned int, const math::Vector3 &)
+  public: virtual void SetAxis(unsigned int, const ignition::math::Vector3d &)
           {}
 
   public: virtual void SetDamping(unsigned int, double)
@@ -53,20 +53,20 @@ class FakeJoint : public physics::Joint
   public: virtual void SetStiffness(unsigned int , double)
           {}
 
-  public: virtual math::Vector3 GetGlobalAxis(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual void SetAnchor(unsigned int, const math::Vector3 &)
+  public: virtual void SetAnchor(unsigned int, const ignition::math::Vector3d &)
           {}
 
-  public: virtual math::Vector3 GetAnchor(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GetAnchor(unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual math::Angle GetHighStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual ignition::math::Angle GetHighStop(unsigned int)
+          {return ignition::math::Angle::Zero;}
 
-  public: virtual math::Angle GetLowStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual ignition::math::Angle GetLowStop(unsigned int)
+          {return ignition::math::Angle::Zero;}
 
   public: virtual void SetVelocity(unsigned int, double)
           {}
@@ -89,11 +89,11 @@ class FakeJoint : public physics::Joint
   public: virtual unsigned int GetAngleCount() const
           {return 0;}
 
-  public: virtual math::Vector3 GetLinkForce(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GetLinkForce(unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual math::Vector3 GetLinkTorque(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GetLinkTorque(unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
   public: virtual void SetAttribute(const std::string &, unsigned int,
               const boost::any &)
@@ -110,9 +110,9 @@ class FakeJoint : public physics::Joint
   public: virtual double GetParam(const std::string &, unsigned int)
           {return 0.0;}
 
-  protected: virtual math::Angle GetAngleImpl(
+  protected: virtual ignition::math::Angle GetAngleImpl(
                  unsigned int) const
-          {return math::Angle::Zero;}
+          {return ignition::math::Angle::Zero;}
 };
 
 /////////////////////////////////////////////////
@@ -120,12 +120,12 @@ TEST_F(JointControllerTest, Construction)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController);
+  EXPECT_TRUE(jointController != NULL);
 
   // All values should be empty
   EXPECT_TRUE(jointController->GetJoints().empty());
@@ -144,12 +144,12 @@ TEST_F(JointControllerTest, AddJoint)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController);
+  EXPECT_TRUE(jointController != NULL);
 
   physics::JointPtr joint(new FakeJoint(model));
   joint->SetName("joint");
@@ -243,12 +243,12 @@ TEST_F(JointControllerTest, SetJointPositions)
 {
   // Create a dummy model
   physics::ModelPtr model(new physics::Model(physics::BasePtr()));
-  EXPECT_TRUE(model);
+  EXPECT_TRUE(model != NULL);
 
   // Create the joint controller
   physics::JointControllerPtr jointController(
       new physics::JointController(model));
-  EXPECT_TRUE(jointController);
+  EXPECT_TRUE(jointController != NULL);
 
   physics::JointPtr joint1(new FakeJoint(model));
   joint1->SetName("joint1");

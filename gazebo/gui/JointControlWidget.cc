@@ -118,7 +118,7 @@ void JointPIDPosControl::SetToDegrees()
   if (this->radians)
   {
     this->radians = false;
-    this->posSpin->setValue(GZ_RTOD(this->posSpin->value()));
+    this->posSpin->setValue(IGN_RTOD(this->posSpin->value()));
   }
 }
 

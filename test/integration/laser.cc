@@ -57,18 +57,18 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   double maxRange = 10.0;
   double rangeResolution = 0.01;
   unsigned int samples = 640;
-  math::Pose testPose(math::Vector3(0, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, 0, 0,
       minRange, maxRange, rangeResolution, samples, 1, 1, 1);
 
   sensors::RaySensorPtr laser =
     boost::static_pointer_cast<sensors::RaySensor>(
         sensors::SensorManager::Instance()->GetSensor(raySensorName));
 
-  ASSERT_TRUE(laser);
+  ASSERT_TRUE(laser != NULL);
   laser->Init();
   laser->Update(true);
 
@@ -88,8 +88,8 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   // Spawn a box and test for proper laser scan
   {
-    SpawnBox("test_box", math::Vector3(1, 1, 1),
-        math::Vector3(2, 0, 0.5), math::Vector3(0, 0, 0));
+    SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1),
+        ignition::math::Vector3d(2, 0, 0.5), ignition::math::Vector3d(0, 0, 0));
     common::Time::MSleep(1000);
 
     laser->Update(true);
@@ -116,12 +116,12 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     common::Time prevTime;
     physics::WorldPtr world = physics::get_world("default");
-    ASSERT_TRUE(world);
+    ASSERT_TRUE(world != NULL);
 
     physics::ModelPtr model = world->GetModel(modelName);
 
     prevTime = laser->GetLastUpdateTime();
-    model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
+    model->SetWorldPose(ignition::math::Pose3d(0, 0, 1.0, 0, M_PI*0.5, 0));
 
     double diffMax, diffSum, diffAvg;
 
@@ -194,16 +194,16 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-  math::Pose testPose(math::Vector3(0, 0, 0),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0),
+      ignition::math::Quaterniond(0, 0, 0));
   if (_physicsEngine == "bullet" && LIBBULLET_VERSION >= 2.82)
   {
-    testPose.pos.z = 0.1;
+    testPose.Pos().z() = 0.1;
     gzwarn << "Raising sensor for bullet as workaround for #934" << std::endl;
   }
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0, minRange, maxRange,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, 0, 0, minRange, maxRange,
       rangeResolution, samples, 1, 1, 1);
 
   std::string box01 = "box_01";
@@ -211,22 +211,25 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   std::string box03 = "box_03";
 
   // box in front of ray sensor
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the right of ray sensor
-  math::Pose box02Pose(math::Vector3(0, -1, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor but out of range
-  math::Pose box03Pose(math::Vector3(0, maxRange + 1, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box03Pose(
+      ignition::math::Vector3d(0, maxRange + 1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
-      box01Pose.rot.GetAsEuler());
+  SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
+      box01Pose.Rot().Euler());
 
   // box02 is static
-  SpawnBox(box02, math::Vector3(1, 1, 1), box02Pose.pos,
-      box02Pose.rot.GetAsEuler(), true);
+  SpawnBox(box02, ignition::math::Vector3d(1, 1, 1), box02Pose.Pos(),
+      box02Pose.Rot().Euler(), true);
 
-  SpawnBox(box03, math::Vector3(1, 1, 1), box03Pose.pos,
-      box03Pose.rot.GetAsEuler());
+  SpawnBox(box03, ignition::math::Vector3d(1, 1, 1), box03Pose.Pos(),
+      box03Pose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
@@ -242,7 +245,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
-  double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2;
+  double expectedRangeAtMidPoint = box01Pose.Pos().x() - unitBoxSize/2;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
@@ -253,10 +256,12 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond(0, 0, 0)));
   world->GetModel(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
+      ignition::math::Quaterniond(0, 0, 0)));
   world->Step(1);
   raySensor->Update(true);
 
@@ -306,20 +311,20 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   unsigned int samples = 640;
   unsigned int vSamples = 3;
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
-  math::Pose testPose(math::Vector3(0.25, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
       minRange, maxRange, rangeResolution, samples, vSamples, 1, 1);
 
   std::string box01 = "box_01";
 
   // box in front of ray sensor
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
-      box01Pose.rot.GetAsEuler());
+  SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
+      box01Pose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::RaySensorPtr raySensor =
@@ -338,8 +343,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   // all vertical laser planes should sense box
   for (unsigned int i = 0; i < vSamples; ++i)
   {
-    double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2
-        - testPose.pos.x;
+    double expectedRangeAtMidPoint = box01Pose.Pos().x() - unitBoxSize/2
+        - testPose.Pos().x();
     expectedRangeAtMidPoint = expectedRangeAtMidPoint / cos(angleStep);
 
     EXPECT_NEAR(raySensor->GetRange(i*samples + mid),
@@ -356,7 +361,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   // Move box out of range
   world->GetModel(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0), ignition::math::Quaterniond(0, 0, 0)));
   world->Step(1);
   raySensor->Update(true);
 
@@ -416,11 +421,11 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
   double hAngleStep = (hMaxAngle - hMinAngle) / (hSamples*hResolution-1);
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples*vResolution-1);
   double z0 = 0.5;
-  math::Pose testPose(math::Vector3(0.25, 0, z0),
-      math::Quaternion(0, vMidAngle, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, z0),
+      ignition::math::Quaterniond(0, vMidAngle, 0));
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
       minRange, maxRange, rangeResolution, hSamples, vSamples,
       hResolution, vResolution);
 
@@ -446,10 +451,11 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
       double y = hMinAngle + h*hAngleStep;
       double R = raySensor->GetRange(v*hSamples*hResolution + h);
 
-      math::Quaternion rot(0.0, -p, y);
-      math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
-      math::Vector3 intersection = (axis * R) + testPose.pos;
-      EXPECT_NEAR(intersection.z, 0.0, rangeResolution);
+      ignition::math::Quaterniond rot(0.0, -p, y);
+      ignition::math::Vector3d axis = testPose.Rot() * rot *
+        ignition::math::Vector3d::UnitX;
+      ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
+      EXPECT_NEAR(intersection.z(), 0.0, rangeResolution);
     }
   }
 }
@@ -497,11 +503,11 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
   double hAngleStep = (hMaxAngle - hMinAngle) / (hSamples-1);
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
   double z0 = 0.5;
-  math::Pose testPose(math::Vector3(0.25, 0, z0),
-      math::Quaternion(0, vMidAngle, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, z0),
+      ignition::math::Quaterniond(0, vMidAngle, 0));
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
       minRange, maxRange, rangeResolution, hSamples, vSamples, 1, 1);
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
@@ -526,10 +532,11 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
       double y = hMinAngle + h*hAngleStep;
       double R = raySensor->GetRange(v*hSamples + h);
 
-      math::Quaternion rot(0.0, -p, y);
-      math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
-      math::Vector3 intersection = (axis * R) + testPose.pos;
-      EXPECT_NEAR(intersection.z, 0.0, rangeResolution);
+      ignition::math::Quaterniond rot(0.0, -p, y);
+      ignition::math::Vector3d axis = testPose.Rot() * rot *
+        ignition::math::Vector3d::UnitX;
+      ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
+      EXPECT_NEAR(intersection.z(), 0.0, rangeResolution);
     }
   }
 }
@@ -566,11 +573,11 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   // would be removed by clamp(minRange,maxRange).
   double noiseMean = -1.0;
   double noiseStdDev = 0.01;
-  math::Pose testPose(math::Vector3(0, 0, 0),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0),
+      ignition::math::Quaterniond(0, 0, 0));
 
-  SpawnRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0, 0,
+  SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, 0, 0,
       minRange, maxRange, rangeResolution, samples, 1, 1, 1,
       noiseType, noiseMean, noiseStdDev);
 
@@ -613,7 +620,7 @@ int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
   // statistically unlikely, but possible results.
-  math::Rand::SetSeed(42);
+  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

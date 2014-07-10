@@ -49,7 +49,7 @@ namespace gazebo
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
+      private: ignition::math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

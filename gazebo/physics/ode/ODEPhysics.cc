@@ -29,8 +29,8 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -138,7 +138,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 }
 
 //////////////////////////////////////////////////
@@ -203,12 +203,12 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
 
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->worldId, g.x, g.y, g.z);
+  dWorldSetGravity(this->worldId, g.x(), g.y(), g.z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -389,7 +389,7 @@ void ODEPhysics::UpdatePhysics()
     // Update the dynamical model
     (*physicsStepFunc)(this->worldId, this->maxStepSize);
 
-    math::Vector3 f1, f2, t1, t2;
+    ignition::math::Vector3d f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->jointFeedbackIndex; ++i)
@@ -411,13 +411,13 @@ void ODEPhysics::UpdatePhysics()
 
         // set force torque in link frame
         this->jointFeedbacks[i]->contact->wrench[j].body1Force =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+             col1->GetLink()->GetWorldPose().Rot().RotateVectorReverse(f1);
         this->jointFeedbacks[i]->contact->wrench[j].body2Force =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+             col2->GetLink()->GetWorldPose().Rot().RotateVectorReverse(f2);
         this->jointFeedbacks[i]->contact->wrench[j].body1Torque =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+             col1->GetLink()->GetWorldPose().Rot().RotateVectorReverse(t1);
         this->jointFeedbacks[i]->contact->wrench[j].body2Torque =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
+             col2->GetLink()->GetWorldPose().Rot().RotateVectorReverse(t2);
       }
     }
   }
@@ -726,10 +726,10 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->worldId, _gravity.x, _gravity.y, _gravity.z);
+  dWorldSetGravity(this->worldId, _gravity.x(), _gravity.y(), _gravity.z());
 }
 
 //////////////////////////////////////////////////
@@ -895,11 +895,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->frictionPyramid.direction1;
-  if (fd != math::Vector3::Zero)
+  ignition::math::Vector3d fd = surf1->frictionPyramid.direction1;
+  if (fd != ignition::math::Vector3d::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = _collision1->GetWorldPose().Rot().RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -909,29 +909,29 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->frictionPyramid.direction1;
-  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+  ignition::math::Vector3d fd2 = surf2->frictionPyramid.direction1;
+  if (fd2 != ignition::math::Vector3d::Zero && (fd == ignition::math::Vector3d::Zero ||
         surf1->frictionPyramid.GetMuPrimary() >
         surf2->frictionPyramid.GetMuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd2 = _collision2->GetWorldPose().Rot().RotateVector(fd2);
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
-    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    /// if (fd2 != ignition::math::Vector3d::Zero && fd != ignition::math::Vector3d::Zero &&
     ///       _collision1->surface->mu1 > _collision2->surface->mu1)
     ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
     ///         << " comparing mu1 from both surfaces, and use fdir1"
     ///         << " from surface with smaller mu1\n";
   }
 
-  if (fd != math::Vector3::Zero)
+  if (fd != ignition::math::Vector3d::Zero)
   {
     contact.surface.mode |= dContactFDir1;
-    contact.fdir1[0] = fd.x;
-    contact.fdir1[1] = fd.y;
-    contact.fdir1[2] = fd.z;
+    contact.fdir1[0] = fd.x();
+    contact.fdir1[1] = fd.y();
+    contact.fdir1[2] = fd.z();
   }
 
   // Set the friction coefficients.
@@ -1057,18 +1057,18 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->GetWorldPose();
+    ignition::math::Pose3d pose = link->GetWorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
-    math::Vector3 dpos(pos[0], pos[1], pos[2]);
-    math::Quaterniond drot(rot[0], rot[1], rot[2], rot[3]);
+    ignition::math::Vector3d dpos(pos[0], pos[1], pos[2]);
+    ignition::math::Quaterniond drot(rot[0], rot[1], rot[2], rot[3]);
 
     std::cout << "Body[" << link->GetScopedName() << "]\n";
     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
-    if (pose.pos != dpos)
-      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
-    if (pose.rot != drot)
-      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
+    if (pose.Pos() != dpos)
+      std::cout << "    Incorrect world pos[" << pose.Pos() << "]\n";
+    if (pose.Rot() != drot)
+      std::cout << "    Incorrect world rot[" << pose.Rot() << "]\n";
 
     dMass mass;
     dBodyGetMass(b, &mass);
@@ -1089,10 +1089,10 @@ void ODEPhysics::DebugPrint() const
       std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
       std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
 
-      if (pose.pos != dpos)
-        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
-      if (pose.rot != drot)
-        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
+      if (pose.Pos() != dpos)
+        std::cout << "      Incorrect world pos[" << pose.Pos() << "]\n";
+      if (pose.Rot() != drot)
+        std::cout << "      Incorrect world rot[" << pose.Rot() << "]\n";
 
       g = dBodyGetNextGeom(g);
     }

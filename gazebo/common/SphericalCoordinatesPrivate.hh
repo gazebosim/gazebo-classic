@@ -18,10 +18,10 @@
 #ifndef _SPHERICALCOORDINATES_PRIVATE_HH_
 #define _SPHERICALCOORDINATES_PRIVATE_HH_
 
-#include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/util/system.hh"
+#include <ignition/math/Angle.hh>
 
+#include "gazebo/common/SphericalCoordinates.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {

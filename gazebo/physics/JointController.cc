@@ -362,15 +362,15 @@ void JointController::SetJointPosition(
   //     // along axis
   //     double dposition = _position - _joint->GetAngle(_index).Radian();
 
-  //     math::Vector3 anchor;
-  //     math::Vector3 axis;
+  //     ignition::math::Vector3d anchor;
+  //     ignition::math::Vector3d axis;
 
   //     if (this->dataPtr->model->IsStatic())
   //     {
-  //       math::Pose linkWorldPose = childLink->GetWorldPose();
+  //       ignition::math::Pose3d linkWorldPose = childLink->GetWorldPose();
   //       /// \TODO: we want to get axis in global frame, but GetGlobalAxis
   //       /// not implemented for static models yet.
-  //       axis = linkWorldPose.rot.RotateVector(_joint->GetLocalAxis(_index));
+  //       axis = linkWorldPose.Rot().RotateVector(_joint->GetLocalAxis(_index));
   //       anchor = linkWorldPose.pos;
   //     }
   //     else
@@ -393,7 +393,7 @@ void JointController::SetJointPosition(
 
 //////////////////////////////////////////////////
 // void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
-//     const math::Vector3 &_anchor, const math::Vector3 &_axis,
+//     const ignition::math::Vector3d &_anchor, const ignition::math::Vector3d &_axis,
 //     double _dposition, bool _updateChildren)
 // {
 //   if (!this->ContainsLink(this->dataPtr->updatedLinks, _link))
@@ -401,23 +401,23 @@ void JointController::SetJointPosition(
 //     if (_joint->HasType(Base::HINGE_JOINT) ||
 //         _joint->HasType(Base::UNIVERSAL_JOINT))
 //     {
-//       math::Pose linkWorldPose = _link->GetWorldPose();
+//       ignition::math::Pose3d linkWorldPose = _link->GetWorldPose();
 //
 //       // relative to anchor point
-//       math::Pose relativePose(linkWorldPose.pos - _anchor,
-//                               linkWorldPose.rot);
+//       ignition::math::Pose3d relativePose(linkWorldPose.Pos() - _anchor,
+//                               linkWorldPose.Rot());
 //
 //       // take axis rotation and turn it int a quaternion
-//       math::Quaterniond rotation(_axis, _dposition);
+//       ignition::math::Quaterniond rotation(_axis, _dposition);
 //
 //       // rotate relative pose by rotation
-//       math::Pose newRelativePose;
+//       ignition::math::Pose3d newRelativePose;
 //
-//       newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-//       newRelativePose.rot = rotation * relativePose.rot;
+//       newRelativePose.Pos() = rotation.RotateVector(relativePose.Pos());
+//       newRelativePose.Rot() = rotation * relativePose.Rot();
 //
-//       math::Pose newWorldPose(newRelativePose.pos + _anchor,
-//                               newRelativePose.rot);
+//       ignition::math::Pose3d newWorldPose(newRelativePose.Pos() + _anchor,
+//                               newRelativePose.Rot());
 //
 //       _link->SetWorldPose(newWorldPose);
 //
@@ -433,19 +433,19 @@ void JointController::SetJointPosition(
 //     }
 //     else if (_joint->HasType(Base::SLIDER_JOINT))
 //     {
-//       math::Pose linkWorldPose = _link->GetWorldPose();
+//       ignition::math::Pose3d linkWorldPose = _link->GetWorldPose();
 //
 //       // relative to anchor point
-//       math::Pose relativePose(linkWorldPose.pos - _anchor,
-//                               linkWorldPose.rot);
+//       ignition::math::Pose3d relativePose(linkWorldPose.Pos() - _anchor,
+//                               linkWorldPose.Rot());
 //
 //       // slide relative pose by dposition along axis
-//       math::Pose newRelativePose;
-//       newRelativePose.pos = relativePose.pos + _axis * _dposition;
-//       newRelativePose.rot = relativePose.rot;
+//       ignition::math::Pose3d newRelativePose;
+//       newRelativePose.Pos() = relativePose.Pos() + _axis * _dposition;
+//       newRelativePose.Rot() = relativePose.Rot();
 //
-//       math::Pose newWorldPose(newRelativePose.pos + _anchor,
-//                               newRelativePose.rot);
+//       ignition::math::Pose3d newWorldPose(newRelativePose.Pos() + _anchor,
+//                               newRelativePose.Rot());
 //
 //       _link->SetWorldPose(newWorldPose);
 //
@@ -479,18 +479,18 @@ void JointController::SetJointPosition(
 
 //////////////////////////////////////////////////
 // void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
-//      const math::Pose &_old, const math::Pose &_new, double _dt)
+//      const ignition::math::Pose3d &_old, const ignition::math::Pose3d &_new, double _dt)
 // {
-//     math::Vector3 linear_vel(0, 0, 0);
-//     math::Vector3 angular_vel(0, 0, 0);
-//     if (math::equal(_dt, 0.0))
+//     ignition::math::Vector3d linear_vel(0, 0, 0);
+//     ignition::math::Vector3d angular_vel(0, 0, 0);
+//     if (ignition::math::equal(_dt, 0.0))
 //     {
 //       gzwarn << "dt is 0, unable to compute velocity, set to 0s\n";
 //     }
 //     else
 //     {
-//       linear_vel = (_new.pos - _old.pos) / _dt;
-//       angular_vel = (_new.rot.GetAsEuler() - _old.rot.GetAsEuler()) / _dt;
+//       linear_vel = (_new.Pos() - _old.Pos()) / _dt;
+//       angular_vel = (_new.Rot().Euler() - _old.Rot().Euler()) / _dt;
 //     }
 //     _link->SetLinearVel(linear_vel);
 //     _link->SetAngularVel(angular_vel);

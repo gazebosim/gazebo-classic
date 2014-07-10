@@ -48,21 +48,21 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+                                      const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -90,10 +90,10 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

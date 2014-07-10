@@ -160,7 +160,7 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       {
         RayShapePtr shape = boost::static_pointer_cast<RayShape>(
             rayCollision->GetShape());
-        if (contact.depth < shape->GetLength())
+        if (contact.depth < shape->Length())
         {
           // gzerr << "ODEMultiRayShape UpdateCallback dSpaceCollide2 "
           //      << " depth[" << contact.depth << "]"
@@ -182,8 +182,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 }
 
 //////////////////////////////////////////////////
-void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

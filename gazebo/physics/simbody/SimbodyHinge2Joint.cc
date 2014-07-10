@@ -47,16 +47,16 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
@@ -75,7 +75,7 @@ void SimbodyHinge2Joint::SetVelocity(unsigned int /*_index*/,
 
 //////////////////////////////////////////////////
 void SimbodyHinge2Joint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -102,15 +102,15 @@ double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  return ignition::math::Angle();
 }

@@ -91,7 +91,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -113,7 +113,7 @@ void Collision::Init()
   this->shape->Init();
 
   this->SetRelativePose(
-    this->sdf->Get<math::Pose>("pose"));
+    this->sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -185,7 +185,7 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
-void Collision::SetScale(const math::Vector3 &_scale)
+void Collision::SetScale(const ignition::math::Vector3d &_scale)
 {
   this->shape->SetScale(_scale);
 }
@@ -207,75 +207,75 @@ void Collision::AddContact(const Contact & /*_contact*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearVel() const
+ignition::math::Vector3d Collision::GetRelativeLinearVel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearVel() const
+ignition::math::Vector3d Collision::GetWorldLinearVel() const
 {
   if (this->link)
     return this->link->GetWorldLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularVel() const
+ignition::math::Vector3d Collision::GetRelativeAngularVel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularVel() const
+ignition::math::Vector3d Collision::GetWorldAngularVel() const
 {
   if (this->link)
     return this->link->GetWorldAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearAccel() const
+ignition::math::Vector3d Collision::GetRelativeLinearAccel() const
 {
   if (this->link)
     return this->link->GetRelativeLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearAccel() const
+ignition::math::Vector3d Collision::GetWorldLinearAccel() const
 {
   if (this->link)
     return this->link->GetWorldLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularAccel() const
+ignition::math::Vector3d Collision::GetRelativeAngularAccel() const
 {
   if (this->link)
     return this->link->GetRelativeAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularAccel() const
+ignition::math::Vector3d Collision::GetWorldAngularAccel() const
 {
   if (this->link)
     return this->link->GetWorldAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////

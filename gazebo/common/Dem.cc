@@ -197,8 +197,8 @@ void Dem::GetGeoReference(double _x, double _y,
 
     cT->Transform(1, &xGeoDeg, &yGeoDeg);
 
-    _latitude.SetFromDegree(yGeoDeg);
-    _longitude.SetFromDegree(xGeoDeg);
+    _latitude.Degree(yGeoDeg);
+    _longitude.Degree(xGeoDeg);
   }
   else
     gzthrow("Unable to obtain the georeferenced values for coordinates ("

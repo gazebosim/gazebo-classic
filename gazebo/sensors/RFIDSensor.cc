@@ -29,7 +29,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -146,27 +146,27 @@ void RFIDSensor::EvaluateTags()
   // iterate through the tags contained given rfid tag manager
   for (ci = this->tags.begin(); ci != this->tags.end(); ++ci)
   {
-    math::Pose pos = (*ci)->GetTagPose();
+    ignition::math::Pose3d pos = (*ci)->GetTagPose();
     // std::cout << "link: " << tagModelPtr->GetName() << std::endl;
-    // std::cout << "link pos: x" << pos.pos.x
-    //     << " y:" << pos.pos.y
-    //     << " z:" << pos.pos.z << std::endl;
+    // std::cout << "link pos: x" << pos.Pos().x
+    //     << " y:" << pos.Pos().y
+    //     << " z:" << pos.Pos().z << std::endl;
     this->CheckTagRange(pos);
   }
 }
 
 //////////////////////////////////////////////////
-bool RFIDSensor::CheckTagRange(const math::Pose &_pose)
+bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var
-  math::Vector3 v;
-  v = _pose.pos - this->entity->GetWorldPose().pos;
+  ignition::math::Vector3d v;
+  v = _pose.Pos() - this->entity->GetWorldPose().Pos();
 
-  // std::cout << v.GetLength() << std::endl;
+  // std::cout << v.Length() << std::endl;
 
-  if (v.GetLength() <= 5.0)
+  if (v.Length() <= 5.0)
   {
-    // std::cout << "detected " <<  v.GetLength() << std::endl;
+    // std::cout << "detected " <<  v.Length() << std::endl;
     return true;
   }
 
@@ -181,13 +181,13 @@ void RFIDSensor::AddTag(RFIDTag *_tag)
 }
 
 //////////////////////////////////////////////////
-/*bool RFIDSensor::CheckRayIntersection(const math::Pose &_pose)
+/*bool RFIDSensor::CheckRayIntersection(const ignition::math::Pose3d &_pose)
 {
-    math::Vector3 d;
+    ignition::math::Vector3d d;
   //calculate direction, by adding 2 vectors?
-  d = _pose.pos + entity->GetWorldPose().pos;
+  d = _pose.Pos() + entity->GetWorldPose().Pos();
 
-  Ogre::Ray ray(rendering::Conversions::Convert(entity->GetWorldPose().pos),rendering::Conversions::Convert(d));
+  Ogre::Ray ray(rendering::Conversions::Convert(entity->GetWorldPose().Pos()),rendering::Conversions::Convert(d));
   query->setRay(ray);
   Ogre::RaySceneQueryResult &result = query->execute();
   return false;

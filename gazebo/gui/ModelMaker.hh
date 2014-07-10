@@ -58,7 +58,7 @@ namespace gazebo
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
+      private: ignition::math::Vector2i mousePushPos, mouseReleasePos;
 
       private: rendering::VisualPtr modelVisual;
       private: std::list<rendering::VisualPtr> visuals;

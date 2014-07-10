@@ -49,14 +49,14 @@ void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 //////////////////////////////////////////////////
 void BulletMotionState::setWorldTransform(const btTransform &_cogWorldTrans)
 {
-  math::Pose pose = BulletTypes::ConvertPose(_cogWorldTrans);
+  ignition::math::Pose3d pose = BulletTypes::ConvertPose(_cogWorldTrans);
 
   // transform pose from cg location to link location
   // cg: pose of cg in link frame, so -cg is transform from cg to
   //     link defined in cg frame.
   // pose: transform from world origin to cg in inertial frame.
   // -cg + pose:  transform from world origin to link frame in inertial frame.
-  math::Pose cg = this->link->GetInertial()->GetPose();
+  ignition::math::Pose3d cg = this->link->GetInertial()->GetPose();
   pose = -cg + pose;
 
   // The second argument is set to false to prevent Entity.cc from propagating

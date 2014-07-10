@@ -209,14 +209,14 @@ namespace gazebo
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
-      public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt);
+      public: ModelPtr GetModelBelowPoint(const ignition::math::Vector3d &_pt);
 
       /// \brief Get the nearest entity below a point.
       /// Projects a Ray down (-Z axis) starting at the given point. The
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Entity, NULL if none is found.
-      public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt);
+      public: EntityPtr GetEntityBelowPoint(const ignition::math::Vector3d &_pt);
 
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.

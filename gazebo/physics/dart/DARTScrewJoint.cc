@@ -48,15 +48,15 @@ void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d DARTScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
   gzerr << "DARTScrewJoint::GetAnchor not implemented, return 0 vector.\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &/*_anchor*/)
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   gzerr << "DARTScrewJoint::SetAnchor not implemented.\n";
 }
@@ -68,7 +68,7 @@ void DARTScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -91,7 +91,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTScrewJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
 {
   if (_index == 0)
   {
@@ -168,14 +168,14 @@ double DARTScrewJoint::GetThreadPitch()
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (_index == 0)
   {
     double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
-    result.SetFromRadian(radianAngle);
+    result.Radian(radianAngle);
   }
   else
   {
@@ -217,7 +217,7 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -227,11 +227,11 @@ math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::Angle();
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
 {
   switch (_index)
   {
@@ -241,5 +241,5 @@ math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
     gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::Angle();
 }

@@ -1562,7 +1562,7 @@ ignition::math::Vector3d Visual::GetPosition() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Quaterniond Visual::GetRotation() const
+ignition::math::Quaterniond Visual::Rotation() const
 {
   return Conversions::Convert(this->dataPtr->sceneNode->getOrientation());
 }
@@ -1572,7 +1572,7 @@ ignition::math::Pose3d Visual::GetPose() const
 {
   ignition::math::Pose3d pos;
   pos.Pos() = this->GetPosition();
-  pos.Rot() = this->GetRotation();
+  pos.Rot() = this->Rotation();
   return pos;
 }
 
@@ -1925,8 +1925,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
           ogreSkeleton->getBone(node->GetParent()->GetName())->addChild(bone);
 
         ignition::math::Matrix4d trans = node->GetTransform();
-        ignition::math::Vector3d pos = trans.GetTranslation();
-        ignition::math::Quaterniond q = trans.GetRotation();
+        ignition::math::Vector3d pos = trans.Translation();
+        ignition::math::Quaterniond q = trans.Rotation();
         bone->setPosition(Conversions::Convert(pos));
         bone->setOrientation(Conversions::Convert(q));
         bone->setInheritOrientation(true);
@@ -2423,7 +2423,7 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
 {
   Ogre::TransformKeyFrame *key;
   ignition::math::Vector3d start = this->GetWorldPose().Pos();
-  ignition::math::Vector3d rpy = _pose.Rot().GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
   ignition::math::Quaterniond rotFinal(0, rpy.y(), rpy.z());
 

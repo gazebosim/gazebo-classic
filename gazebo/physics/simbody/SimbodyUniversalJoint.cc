@@ -45,20 +45,20 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
-                                   const math::Vector3 &/*_axis*/)
+                                   const ignition::math::Vector3d &/*_axis*/)
 {
   /// Universal Joint are built in SimbodyPhysics.cc, so this init block
   /// actually does nothing.
@@ -136,7 +136,7 @@ double SimbodyUniversalJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
+ignition::math::Vector3d SimbodyUniversalJoint::GetGlobalAxis(
     unsigned int _index) const
 {
   if (this->simbodyPhysics &&
@@ -172,7 +172,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
       else
       {
         gzerr << "GetGlobalAxis: internal error, GetAngleCount < 0.\n";
-        return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+        return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
       }
     }
     else
@@ -190,7 +190,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
     if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
@@ -206,7 +206,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -215,14 +215,14 @@ math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
     {
       if (!this->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
+        return ignition::math::Angle(this->mobod.getOneQ(
           this->simbodyPhysics->integ->getState(), _index));
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::Angle(0.0);
       }
     }
     else
@@ -230,12 +230,12 @@ math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
       gzdbg << "GetAngleImpl(): simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return ignition::math::Angle(0.0);
     }
   }
   else
   {
     gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    return ignition::math::Angle(SimTK::NaN);
   }
 }

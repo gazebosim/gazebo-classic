@@ -48,7 +48,7 @@ void SimbodySliderJoint::Load(sdf::ElementPtr _sdf)
 
 //////////////////////////////////////////////////
 void SimbodySliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -113,7 +113,7 @@ void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
@@ -144,7 +144,7 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
     if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
@@ -162,7 +162,7 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -170,14 +170,14 @@ math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
     {
       if (!this->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
+        return ignition::math::Angle(this->mobod.getOneQ(
           this->simbodyPhysics->integ->getState(), _index));
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::Angle(0.0);
       }
     }
     else
@@ -185,12 +185,12 @@ math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
       gzdbg << "Simbody::GetAngleImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return ignition::math::Angle(0.0);
     }
   }
   else
   {
     gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    return ignition::math::Angle(SimTK::NaN);
   }
 }

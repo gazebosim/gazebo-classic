@@ -148,7 +148,7 @@ namespace gazebo
     /// \param[in] _node Node for communication.
     /// \return True if the spawn message was sent.
     private: bool ProcessSpawn(boost::shared_ptr<sdf::SDF> _sdf,
-                 const std::string &_name, const math::Pose &_pose,
+                 const std::string &_name, const ignition::math::Pose3d &_pose,
                  transport::NodePtr _node);
   };
 

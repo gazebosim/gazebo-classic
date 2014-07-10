@@ -187,22 +187,22 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d JointInspector::GetAnchor(unsigned int /*_index*/) const
 {
-  return math::Vector3(this->anchorXSpinBox->value(),
+  return ignition::math::Vector3d(this->anchorXSpinBox->value(),
       this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 JointInspector::GetAxis(unsigned int _index) const
+ignition::math::Vector3d JointInspector::GetAxis(unsigned int _index) const
 {
   if (_index > this->axisXSpinBoxes.size())
   {
     gzerr << "Axis index is out of range" << std::endl;
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  return math::Vector3(this->axisXSpinBoxes[_index]->value(),
+  return ignition::math::Vector3d(this->axisXSpinBoxes[_index]->value(),
       this->axisYSpinBoxes[_index]->value(),
       this->axisZSpinBoxes[_index]->value());
 }
@@ -266,15 +266,15 @@ void JointInspector::SetName(const std::string &_name)
 
 /////////////////////////////////////////////////
 void JointInspector::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3d &_anchor)
 {
-  this->anchorXSpinBox->setValue(_anchor.x);
-  this->anchorYSpinBox->setValue(_anchor.y);
-  this->anchorZSpinBox->setValue(_anchor.z);
+  this->anchorXSpinBox->setValue(_anchor.x());
+  this->anchorYSpinBox->setValue(_anchor.y());
+  this->anchorZSpinBox->setValue(_anchor.z());
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void JointInspector::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
 {
   if (_index > this->axisXSpinBoxes.size())
   {
@@ -282,9 +282,9 @@ void JointInspector::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     return;
   }
 
-  this->axisXSpinBoxes[_index]->setValue(_axis.x);
-  this->axisYSpinBoxes[_index]->setValue(_axis.y);
-  this->axisZSpinBoxes[_index]->setValue(_axis.z);
+  this->axisXSpinBoxes[_index]->setValue(_axis.x());
+  this->axisYSpinBoxes[_index]->setValue(_axis.y());
+  this->axisZSpinBoxes[_index]->setValue(_axis.z());
 }
 
 /////////////////////////////////////////////////

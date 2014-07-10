@@ -88,7 +88,7 @@ void ODESurfaceParams::Load(sdf::ElementPtr _sdf)
           this->frictionPyramid.SetMuSecondary(
             frictionOdeElem->Get<double>("mu2"));
           this->frictionPyramid.direction1 =
-            frictionOdeElem->Get<math::Vector3>("fdir1");
+            frictionOdeElem->Get<ignition::math::Vector3d>("fdir1");
 
           this->slip1 = frictionOdeElem->Get<double>("slip1");
           this->slip2 = frictionOdeElem->Get<double>("slip2");

@@ -49,7 +49,7 @@ void PoseKeyFrame::SetTranslation(const ignition::math::Vector3d &_trans)
   this->translate = _trans;
 }
 
-const ignition::math::Vector3d &PoseKeyFrame::GetTranslation() const
+const ignition::math::Vector3d &PoseKeyFrame::Translation() const
 {
   return this->translate;
 }
@@ -59,7 +59,7 @@ void PoseKeyFrame::SetRotation(const ignition::math::Quaterniond &_rot)
   this->rotate = _rot;
 }
 
-const ignition::math::Quaterniond &PoseKeyFrame::GetRotation() const
+const ignition::math::Quaterniond &PoseKeyFrame::Rotation() const
 {
   return this->rotate;
 }

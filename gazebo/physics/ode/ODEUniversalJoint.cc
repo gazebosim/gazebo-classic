@@ -41,7 +41,7 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -49,24 +49,27 @@ math::Vector3 ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &_anchor)
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->childLink) this->childLink->SetEnabled(true);
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetUniversalAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+  {
+    dJointSetUniversalAnchor(this->jointId, _anchor.x(),
+        _anchor.y(), _anchor.z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
   dVector3 result;
 
@@ -83,11 +86,11 @@ math::Vector3 ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
   else
     gzerr << "ODE Joint ID is invalid\n";
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEUniversalJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -95,18 +98,22 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  math::Quaterniond axisFrame = this->GetAxisFrame(_index);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  ignition::math::Quaterniond axisFrame = this->GetAxisFrame(_index);
+  ignition::math::Vector3d globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
     if (_index == UniversalJoint::AXIS_CHILD)
+    {
       dJointSetUniversalAxis1(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.x(), globalAxis.y(), globalAxis.z());
+    }
     else if (_index == UniversalJoint::AXIS_PARENT)
+    {
       dJointSetUniversalAxis2(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.x(), globalAxis.y(), globalAxis.z());
+    }
     else
       gzerr << "Joint index out of bounds.\n";
   }
@@ -115,9 +122,9 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
+  ignition::math::Angle result;
 
   if (this->jointId)
   {
@@ -223,7 +230,7 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 
 //////////////////////////////////////////////////
 bool ODEUniversalJoint::SetHighStop(
-  unsigned int _index, const math::Angle &_angle)
+  unsigned int _index, const ignition::math::Angle &_angle)
 {
   // Overload because we switched axis orders
   Joint::SetHighStop(_index, _angle);
@@ -243,7 +250,7 @@ bool ODEUniversalJoint::SetHighStop(
 
 //////////////////////////////////////////////////
 bool ODEUniversalJoint::SetLowStop(
-  unsigned int _index, const math::Angle &_angle)
+  unsigned int _index, const ignition::math::Angle &_angle)
 {
   // Overload because we switched axis orders
   Joint::SetLowStop(_index, _angle);

@@ -24,8 +24,8 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
 
@@ -61,10 +61,10 @@ namespace gazebo
                 T::Load(_sdf);
 
                 this->SetAxis(0,
-                    _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+                    _sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
                 this->SetAxis(1,
-                    _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
               }
     };
     /// \}

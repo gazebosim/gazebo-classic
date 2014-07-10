@@ -121,7 +121,7 @@ class ServerFixture : public testing::Test
   /// \brief Get the pose of an entity.
   /// \param[in] _name Name of the entity.
   /// \return Pose of the named entity.
-  protected: math::Pose GetEntityPose(const std::string &_name);
+  protected: ignition::math::Pose3d GetEntityPose(const std::string &_name);
 
   /// \brief Return true if the named entity exists.
   /// \param[in] _name Name of the entity to check for.
@@ -216,7 +216,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _noiseStdDev Standard deviation of the noise.
   protected: void SpawnCamera(const std::string &_modelName,
                  const std::string &_cameraName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  unsigned int _width = 320, unsigned int _height = 240,
                  double _rate = 25,
                  const std::string &_noiseType = "",
@@ -240,7 +241,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _noiseStdDev Standard deviation of the noise.
   protected: void SpawnRaySensor(const std::string &_modelName,
                  const std::string &_raySensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                  double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
                  double _minRange = 0.08, double _maxRange = 10,
@@ -267,7 +269,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _noiseStdDev Standard deviation of the noise.
   protected: void SpawnGpuRaySensor(const std::string &_modelName,
                  const std::string &_raySensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                  double _minRange = 0.08, double _maxRange = 10,
                  double _rangeResolution = 0.01, unsigned int _samples = 640,
@@ -289,7 +292,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _accelBiasStdDev Acceleration standard deviation bias
   protected: void SpawnImuSensor(const std::string &_modelName,
                  const std::string &_imuSensorName,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  const std::string &_noiseType = "",
                  double _rateNoiseMean = 0.0, double _rateNoiseStdDev = 0.0,
                  double _rateBiasMean = 0.0, double _rateBiasStdDev = 0.0,
@@ -305,8 +309,9 @@ class ServerFixture : public testing::Test
   /// \param[in] _static True to make the model static
   protected: void SpawnUnitContactSensor(const std::string &_name,
                  const std::string &_sensorName,
-                 const std::string &_collisionType, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static = false);
+                 const std::string &_collisionType,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy, bool _static = false);
 
   /// \brief Spawn an IMU sensor on a link
   /// \param[in] _name Model name
@@ -319,8 +324,9 @@ class ServerFixture : public testing::Test
   protected: void SpawnUnitImuSensor(const std::string &_name,
                  const std::string &_sensorName,
                  const std::string &_collisionType,
-                 const std::string &_topic, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static = false);
+                 const std::string &_topic,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy, bool _static = false);
 
   /// \brief generate a gtest failure from a timeout error and display a
   /// log message about the problem.
@@ -340,8 +346,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                  const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  const std::string &_essid,
                  double _freq,
                  double _power,
@@ -361,8 +367,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _visualize Enable sensor visualization
   protected: void SpawnWirelessReceiverSensor(const std::string &_name,
                  const std::string &_sensorName,
-                 const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  double _minFreq,
                  double _maxFreq,
                  double _power,
@@ -392,7 +398,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _rpy Roll, pitch, yaw for the model.
   /// \param[in] _static True to make the model static.
   protected: void SpawnCylinder(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  bool _static = false);
 
   /// \brief Spawn a sphere
@@ -403,7 +410,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _wait True to wait for the sphere to spawn before
   /// returning.
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  bool _wait = true, bool _static = false);
 
   /// \brief Spawn a sphere
@@ -416,8 +424,9 @@ class ServerFixture : public testing::Test
   /// \param[in] _wait True to wait for the sphere to spawn before
   /// returning.
   protected: void SpawnSphere(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
-                 const math::Vector3 &_cog, double _radius,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
+                 const ignition::math::Vector3d &_cog, double _radius,
                  bool _wait = true, bool _static = false);
 
   /// \brief Spawn a box.
@@ -427,8 +436,9 @@ class ServerFixture : public testing::Test
   /// \param[in] _rpy Roll, pitch, yaw for the model.
   /// \param[in] _static True to make the model static.
   protected: void SpawnBox(const std::string &_name,
-                 const math::Vector3 &_size, const math::Vector3 &_pos,
-                 const math::Vector3 &_rpy, bool _static = false);
+                 const ignition::math::Vector3d &_size,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy, bool _static = false);
 
   /// \brief Spawn a triangle mesh.
   /// \param[in] _name Name for the model.
@@ -438,8 +448,10 @@ class ServerFixture : public testing::Test
   /// \param[in] _rpy Roll, pitch, yaw for the model.
   /// \param[in] _static True to make the model static.
   protected: void SpawnTrimesh(const std::string &_name,
-                 const std::string &_modelPath, const math::Vector3 &_scale,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const std::string &_modelPath,
+                 const ignition::math::Vector3d &_scale,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  bool _static = false);
 
   /// \brief Spawn an empty link.
@@ -448,7 +460,8 @@ class ServerFixture : public testing::Test
   /// \param[in] _rpy Roll, pitch, yaw for the model.
   /// \param[in] _static True to make the model static.
   protected: void SpawnEmptyLink(const std::string &_name,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  bool _static = false);
 
   /// \brief Spawn a model from file.
@@ -505,7 +518,7 @@ class ServerFixture : public testing::Test
   protected: transport::PublisherPtr requestPub;
 
   /// \brief Map of received poses.
-  protected: std::map<std::string, math::Pose> poses;
+  protected: std::map<std::string, ignition::math::Pose3d> poses;
 
   /// \brief Mutex to protect data structures that store messages.
   protected: boost::mutex receiveMutex;

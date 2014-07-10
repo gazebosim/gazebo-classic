@@ -21,7 +21,7 @@
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/MouseEvent.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/rendering/UserCamera.hh"
 
@@ -46,7 +46,7 @@ CylinderMaker::CylinderMaker()
   this->visualMsg->mutable_material()->mutable_script()->set_name(
       "Gazebo/TurquoiseGlowOutline");
   msgs::Set(this->visualMsg->mutable_pose()->mutable_orientation(),
-            math::Quaterniond());
+            ignition::math::Quaterniond());
 }
 
 CylinderMaker::~CylinderMaker()
@@ -110,22 +110,22 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
   if (this->state < 2)
     return;
 
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
+  ignition::math::Vector3d norm;
+  ignition::math::Vector3d p1, p2;
 
   norm.Set(1, 0, 0);
 
-  math::Vector3 p(this->visualMsg->pose().position().x(),
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 
-  double size = (this->mouseReleasePos.y - _event.pos.y) * 0.01;
+  double size = (this->mouseReleasePos.y() - _event.pos.y()) * 0.01;
   if (!_event.shift)
     size = rint(size);
 
   this->visualMsg->mutable_geometry()->mutable_cylinder()->set_length(size);
 
-  p.z = size / 2.0;
+  p.z() = size / 2.0;
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   this->visPub->Publish(*this->visualMsg);
@@ -137,14 +137,14 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   if (this->state == 0)
     return;
 
-  math::Vector3 norm;
-  math::Vector3 p1, p2;
+  ignition::math::Vector3d norm;
+  ignition::math::Vector3d p1, p2;
 
   norm.Set(0, 0, 1);
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x,
-                                          this->mousePushPos.y,
-                                          math::Plane(norm), p1))
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x(),
+                                          this->mousePushPos.y(),
+                                          ignition::math::Planed(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -153,7 +153,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1.Round();
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x, _event.pos.y, math::Plane(norm), p2))
+        _event.pos.x(), _event.pos.y(), ignition::math::Planed(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -164,7 +164,7 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   if (this->state == 1)
     msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
-  math::Vector3 p(this->visualMsg->pose().position().x(),
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
                   this->visualMsg->pose().position().y(),
                   this->visualMsg->pose().position().z());
 

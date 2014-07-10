@@ -90,7 +90,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
@@ -199,23 +199,23 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   ASSERT_TRUE(child != NULL);
   ASSERT_TRUE(parent != NULL);
 
-  math::Vector3 pos(10, 10, 10);
-  math::Vector3 vel(10, 10, 10);
-  parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+  ignition::math::Vector3d pos(10, 10, 10);
+  ignition::math::Vector3d vel(10, 10, 10);
+  parent->SetWorldPose(ignition::math::Pose3d(pos, ignition::math::Quaterniond()));
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);
     world->Step(10);
   }
   world->Step(50);
-  math::Pose childPose = child->GetWorldPose();
-  math::Pose parentPose = parent->GetWorldPose();
-  EXPECT_TRUE(parentPose.pos != pos);
-  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos == parentPose.pos);
-  EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-  EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+  ignition::math::Pose3d childPose = child->GetWorldPose();
+  ignition::math::Pose3d parentPose = parent->GetWorldPose();
+  EXPECT_TRUE(parentPose.Pos() != pos);
+  EXPECT_TRUE(parentPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() == parentPose.Pos());
+  EXPECT_EQ(joint->GetWorldPose().Pos(), joint->GetParentWorldPose().Pos());
+  EXPECT_EQ(joint->GetAnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -273,12 +273,13 @@ void JointSpawningTest::SpawnJointRotationalWorld(
       link = joint->GetParent();
     EXPECT_TRUE(link != NULL);
 
-    math::Pose initialPose = link->GetWorldPose();
+    ignition::math::Pose3d initialPose = link->GetWorldPose();
     world->Step(100);
-    math::Pose afterPose = link->GetWorldPose();
-    EXPECT_TRUE(initialPose.pos == afterPose.pos);
-    EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-    EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+    ignition::math::Pose3d afterPose = link->GetWorldPose();
+    EXPECT_TRUE(initialPose.Pos() == afterPose.Pos());
+    EXPECT_EQ(joint->GetWorldPose().Pos(), joint->GetParentWorldPose().Pos());
+    EXPECT_EQ(joint->GetAnchorErrorPose().Pos(),
+        ignition::math::Vector3d::Zero);
   }
 }
 
@@ -399,7 +400,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     unsigned int steps = 100;
     double vel = 1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    ignition::math::Angle limit = ignition::math::Angle(steps * dt * vel * 0.5);
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     if (isOde)
@@ -418,7 +419,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     unsigned int steps = 100;
     double vel = -1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    ignition::math::Angle limit = ignition::math::Angle(steps * dt * vel * 0.5);
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     if (isOde)

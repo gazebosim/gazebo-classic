@@ -68,7 +68,7 @@ class JointTest : public ServerFixture,
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
               wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0)),
+              noLinkPose(false), axis(ignition::math::Vector3d(1, 0, 0)),
               useParentModelFrame(false)
             {
             }
@@ -92,22 +92,22 @@ class JointTest : public ServerFixture,
     public: common::Time wait;
 
     /// \brief Model pose for spawned model.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Child link pose for spawned model.
-    public: math::Pose childLinkPose;
+    public: ignition::math::Pose3d childLinkPose;
 
     /// \brief Parent link pose for spawned model.
-    public: math::Pose parentLinkPose;
+    public: ignition::math::Pose3d parentLinkPose;
 
     /// \brief Flag to disable including link pose per issue #978.
     public: bool noLinkPose;
 
     /// \brief Joint pose for spawned joint.
-    public: math::Pose jointPose;
+    public: ignition::math::Pose3d jointPose;
 
     /// \brief Axis value for spawned joint.
-    public: math::Vector3 axis;
+    public: ignition::math::Vector3d axis;
 
     /// \brief Use parent model frame (#494)
     public: bool useParentModelFrame;
@@ -193,7 +193,7 @@ class JointTest : public ServerFixture,
             {
               modelStr
                 << "  <axis2>"
-                << "    <xyz>" << math::Vector3(0, 1, 0) << "</xyz>"
+                << "    <xyz>" << ignition::math::Vector3d(0, 1, 0) << "</xyz>"
                 << "    <use_parent_model_frame>" << _opt.useParentModelFrame
                 << "    </use_parent_model_frame>"
                 << "  </axis2>";

@@ -26,8 +26,8 @@
 #include <string>
 #include <boost/thread/mutex.hpp>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle
-      public: math::Angle GetAngleMin() const;
+      public: ignition::math::Angle GetAngleMin() const;
 
       /// \brief Set the scan minimum angle
       /// \param[in] _angle The minimum angle
@@ -92,7 +92,7 @@ namespace gazebo
 
       /// \brief Get the maximum angle
       /// \return the maximum angle
-      public: math::Angle GetAngleMax() const;
+      public: ignition::math::Angle GetAngleMax() const;
 
       /// \brief Set the scan maximum angle
       /// \param[in] _angle The maximum angle
@@ -136,7 +136,7 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      public: ignition::math::Angle GetVerticalAngleMin() const;
 
       /// \brief Set the vertical scan bottom angle
       /// \param[in] _angle The minimum angle of the scan block
@@ -144,7 +144,7 @@ namespace gazebo
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      public: ignition::math::Angle GetVerticalAngleMax() const;
 
       /// \brief Set the vertical scan line top angle
       /// \param[in] _angle The Maximum angle of the scan block

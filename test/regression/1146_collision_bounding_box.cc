@@ -14,9 +14,9 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Box.hh>
 
 #include "ServerFixture.hh"
-#include "gazebo/math/Box.hh"
 
 using namespace gazebo;
 
@@ -30,26 +30,27 @@ TEST_F(Issue1146Test, Reset)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link);
+  ASSERT_TRUE(link != NULL);
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll);
+  ASSERT_TRUE(coll != NULL);
 
   EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(-0.5, -0.5, 0), math::Vector3(0.5, 0.5, 1)));
+      ignition::math::Box(ignition::math::Vector3d(-0.5, -0.5, 0),
+        ignition::math::Vector3d(0.5, 0.5, 1)));
 
   // Move the box
-  model->SetWorldPose(math::Pose(10, 15, 20, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(10, 15, 20, 0, 0, 0));
 
   EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(9.5, 14.5, 19.5),
-                math::Vector3(10.5, 15.5, 20.5)));
+      ignition::math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
+                ignition::math::Vector3d(10.5, 15.5, 20.5)));
 }
 
 /////////////////////////////////////////////////

@@ -357,7 +357,7 @@ void WallItem::OnApply()
   this->wallHeight = dialog->GetHeight() / this->scale;
   this->WallChanged();
 
-  double newLength = dialog->GetLength() / this->scale;
+  double newLength = dialog->Length() / this->scale;
 
   // The if statement below limits the change to either the length of
   // the wall segment or its start/end pos.

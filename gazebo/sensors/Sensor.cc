@@ -95,7 +95,7 @@ void Sensor::Load(const std::string &_worldName)
 {
   if (this->sdf->HasElement("pose"))
   {
-    this->pose = this->sdf->Get<math::Pose>("pose");
+    this->pose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->sdf->Get<bool>("always_on"))
@@ -291,7 +291,7 @@ bool Sensor::IsActive()
 }
 
 //////////////////////////////////////////////////
-math::Pose Sensor::GetPose() const
+ignition::math::Pose3d Sensor::GetPose() const
 {
   return this->pose;
 }

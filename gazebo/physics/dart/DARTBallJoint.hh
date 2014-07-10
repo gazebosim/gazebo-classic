@@ -43,10 +43,10 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -61,28 +61,28 @@ namespace gazebo
       public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited.
       protected: void SetForceImpl(unsigned int _index, double _torque);
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+                                   const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+                                      const ignition::math::Angle &_angle);
 
       /// \brief
       protected: dart::dynamics::BallJoint *dtBallJoint;

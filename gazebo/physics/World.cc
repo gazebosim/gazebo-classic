@@ -27,7 +27,7 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -233,11 +233,11 @@ void World::Load(sdf::ElementPtr _sdf)
     common::SphericalCoordinates::SurfaceType surfaceType =
       common::SphericalCoordinates::Convert(
         spherical->Get<std::string>("surface_model"));
-    math::Angle latitude, longitude, heading;
+    ignition::math::Angle latitude, longitude, heading;
     double elevation = spherical->Get<double>("elevation");
-    latitude.SetFromDegree(spherical->Get<double>("latitude_deg"));
-    longitude.SetFromDegree(spherical->Get<double>("longitude_deg"));
-    heading.SetFromDegree(spherical->Get<double>("heading_deg"));
+    latitude.Degree(spherical->Get<double>("latitude_deg"));
+    longitude.Degree(spherical->Get<double>("longitude_deg"));
+    heading.Degree(spherical->Get<double>("heading_deg"));
 
     this->sphericalCoordinates.reset(new common::SphericalCoordinates(
       surfaceType, latitude, longitude, elevation, heading));
@@ -961,8 +961,8 @@ void World::Reset()
   {
     boost::recursive_mutex::scoped_lock(*this->worldUpdateMutex);
 
-    math::Rand::SetSeed(math::Rand::GetSeed());
-    this->physicsEngine->SetSeed(math::Rand::GetSeed());
+    ignition::math::Rand::Seed(ignition::math::Rand::Seed());
+    this->physicsEngine->SetSeed(ignition::math::Rand::Seed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
@@ -1126,7 +1126,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_seed())
   {
-    math::Rand::SetSeed(_data->seed());
+    ignition::math::Rand::Seed(_data->seed());
     this->physicsEngine->SetSeed(_data->seed());
   }
 
@@ -1695,7 +1695,7 @@ void World::ProcessFactoryMsgs()
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
+ModelPtr World::GetModelBelowPoint(const ignition::math::Vector3d &_pt)
 {
   ModelPtr model;
   EntityPtr entity = this->GetEntityBelowPoint(_pt);
@@ -1709,14 +1709,14 @@ ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 }
 
 //////////////////////////////////////////////////
-EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
+EntityPtr World::GetEntityBelowPoint(const ignition::math::Vector3d &_pt)
 {
   std::string entityName;
   double dist;
-  math::Vector3 end;
+  ignition::math::Vector3d end;
 
   end = _pt;
-  end.z -= 1000;
+  end.z()-= 1000;
 
   this->physicsEngine->InitForThread();
   this->testRay->SetPoints(_pt, end);

@@ -79,7 +79,7 @@ void SimbodyLink::Init()
 
   Link::Init();
 
-  math::Vector3 cogVec = this->inertial->GetCoG();
+  ignition::math::Vector3d cogVec = this->inertial->GetCoG();
 
   // Set the initial pose of the body
 
@@ -91,8 +91,8 @@ void SimbodyLink::Init()
       SimbodyCollisionPtr collision;
       collision = boost::static_pointer_cast<SimbodyCollision>(*iter);
 
-      math::Pose relativePose = collision->GetRelativePose();
-      relativePose.pos -= cogVec;
+      ignition::math::Pose3d relativePose = collision->GetRelativePose();
+      relativePose.Pos() -= cogVec;
     }
   }
 
@@ -183,7 +183,7 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
   if (_collision == NULL)
     gzthrow("requires SimbodyCollision");
 
-  math::Pose relativePose = _collision->GetRelativePose();
+  ignition::math::Pose3d relativePose = _collision->GetRelativePose();
 }
   */
 
@@ -223,10 +223,10 @@ void SimbodyLink::OnPoseChange()
       /// If the inboard joint is not free, simbody tries to project
       /// target pose into available DOF's.
       /// But first convert to relative pose to parent mobod.
-      math::Pose parentPose = SimbodyPhysics::Transform2Pose(
+      ignition::math::Pose3d parentPose = SimbodyPhysics::Transform2Pose(
         this->masterMobod.getBodyTransform(
         this->simbodyPhysics->integ->updAdvancedState()));
-      math::Pose relPose = this->GetWorldPose() - parentPose;
+      ignition::math::Pose3d relPose = this->GetWorldPose() - parentPose;
       this->masterMobod.setQToFitTransform(
          this->simbodyPhysics->integ->updAdvancedState(),
          SimbodyPhysics::Pose2Transform(relPose));
@@ -330,16 +330,16 @@ void SimbodyLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void SimbodyLink::SetLinearVel(const ignition::math::Vector3d & /*_vel*/)
 {
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Vector3& _offset) const
+ignition::math::Vector3d SimbodyLink::GetWorldLinearVel(
+  const ignition::math::Vector3d& _offset) const
 {
   SimTK::Vec3 station = SimbodyPhysics::Vector3ToVec3(_offset);
-  math::Vector3 v;
+  ignition::math::Vector3d v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
@@ -358,11 +358,11 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldLinearVel(
-  const math::Vector3 &_offset,
-  const math::Quaterniond &_q) const
+ignition::math::Vector3d SimbodyLink::GetWorldLinearVel(
+  const ignition::math::Vector3d &_offset,
+  const ignition::math::Quaterniond &_q) const
 {
-  math::Vector3 v;
+  ignition::math::Vector3d v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
@@ -389,9 +389,9 @@ math::Vector3 SimbodyLink::GetWorldLinearVel(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
+ignition::math::Vector3d SimbodyLink::GetWorldCoGLinearVel() const
 {
-  math::Vector3 v;
+  ignition::math::Vector3d v;
 
   if (this->simbodyPhysics->simbodyPhysicsInitialized)
   {
@@ -412,12 +412,12 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void SimbodyLink::SetAngularVel(const ignition::math::Vector3d &/*_vel*/)
 {
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldAngularVel() const
+ignition::math::Vector3d SimbodyLink::GetWorldAngularVel() const
 {
   // lock physics update mutex to ensure thread safety
   boost::recursive_mutex::scoped_lock lock(
@@ -429,7 +429,7 @@ math::Vector3 SimbodyLink::GetWorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetForce(const math::Vector3 &_force)
+void SimbodyLink::SetForce(const ignition::math::Vector3d &_force)
 {
   SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
 
@@ -439,7 +439,7 @@ void SimbodyLink::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldForce() const
+ignition::math::Vector3d SimbodyLink::GetWorldForce() const
 {
   SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
     this->simbodyPhysics->integ->getState(), this->masterMobod);
@@ -451,7 +451,7 @@ math::Vector3 SimbodyLink::GetWorldForce() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetTorque(const math::Vector3 &_torque)
+void SimbodyLink::SetTorque(const ignition::math::Vector3d &_torque)
 {
   SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
 
@@ -461,7 +461,7 @@ void SimbodyLink::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyLink::GetWorldTorque() const
+ignition::math::Vector3d SimbodyLink::GetWorldTorque() const
 {
   SimTK::SpatialVec sv = this->simbodyPhysics->discreteForces.getOneBodyForce(
     this->simbodyPhysics->integ->getState(), this->masterMobod);
@@ -485,7 +485,7 @@ void SimbodyLink::SetAngularDamping(double /*_damping*/)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForce(const math::Vector3 &_force)
+void SimbodyLink::AddForce(const ignition::math::Vector3d &_force)
 {
   SimTK::Vec3 f(SimbodyPhysics::Vector3ToVec3(_force));
 
@@ -496,33 +496,33 @@ void SimbodyLink::AddForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddRelativeForce(const math::Vector3 &/*_force*/)
+void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
-                                         const math::Vector3 &/*_pos*/)
+void SimbodyLink::AddForceAtWorldPosition(const ignition::math::Vector3d &/*_force*/,
+                                         const ignition::math::Vector3d &/*_pos*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
-                  const math::Vector3 &/*_relpos*/)
+void SimbodyLink::AddForceAtRelativePosition(const ignition::math::Vector3d &/*_force*/,
+                  const ignition::math::Vector3d &/*_relpos*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
+void SimbodyLink::AddTorque(const ignition::math::Vector3d &/*_torque*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
+void SimbodyLink::AddRelativeTorque(const ignition::math::Vector3d &/*_torque*/)
 {
   gzerr << "Not implemented.\n";
 }
@@ -546,7 +546,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
       this->inertial->GetPose());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
-    if (math::equal(mass, 0.0))
+    if (ignition::math::equal(mass, 0.0))
       return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.
@@ -594,7 +594,7 @@ bool SimbodyLink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
+void SimbodyLink::SetDirtyPose(const ignition::math::Pose3d &_pose)
 {
   this->dirtyPose = _pose;
 }

@@ -86,7 +86,7 @@ void SimbodyScrewJoint::SetVelocity(unsigned int _index, double _rate)
 
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -154,7 +154,7 @@ double SimbodyScrewJoint::GetMaxForce(unsigned int /*index*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
@@ -186,7 +186,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
     if (_index >= this->GetAngleCount())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
@@ -203,7 +203,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {
@@ -215,13 +215,13 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
         // simbody screw joint only has one dof
         // _index=0: angular dof
         // _index=1: linear dof
-        math::Angle angle(this->mobod.getOneQ(
+        ignition::math::Angle angle(this->mobod.getOneQ(
           this->simbodyPhysics->integ->getState(), 0));
         if (_index == 1)
         {
           // return linear position
           // thread pitch units rad/m
-          angle /= math::Angle(this->threadPitch);
+          angle /= ignition::math::Angle(this->threadPitch);
         }
         return angle;
       }
@@ -229,7 +229,7 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::Angle(0.0);
       }
     }
     else
@@ -237,13 +237,13 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
       gzdbg << "SimbodyScrewJoint::GetAngleImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return ignition::math::Angle(0.0);
     }
   }
   else
   {
     gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    return ignition::math::Angle(SimTK::NaN);
   }
 }
 
@@ -322,7 +322,7 @@ double SimbodyScrewJoint::GetParam(const std::string &_key,
 
 //////////////////////////////////////////////////
 bool SimbodyScrewJoint::SetHighStop(
-  unsigned int _index, const math::Angle &_angle)
+  unsigned int _index, const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
@@ -340,7 +340,7 @@ bool SimbodyScrewJoint::SetHighStop(
       else if (_index == 1)
       {
         double tp = this->GetThreadPitch();
-        if (math::equal(tp, 0.0))
+        if (ignition::math::equal(tp, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using thread pitch = 1.0e6\n";
@@ -391,7 +391,7 @@ bool SimbodyScrewJoint::SetHighStop(
 
 //////////////////////////////////////////////////
 bool SimbodyScrewJoint::SetLowStop(
-  unsigned int _index, const math::Angle &_angle)
+  unsigned int _index, const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
@@ -410,7 +410,7 @@ bool SimbodyScrewJoint::SetLowStop(
       else if (_index == 1)
       {
         double tp = this->GetThreadPitch();
-        if (math::equal(tp, 0.0))
+        if (ignition::math::equal(tp, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using thread pitch = 1.0e6\n";
@@ -460,14 +460,14 @@ bool SimbodyScrewJoint::SetLowStop(
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
+ignition::math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -476,7 +476,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
   else if (_index == 1)
   {
     double tp = this->GetThreadPitch();
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
             << " using thread pitch = 1.0e6\n";
@@ -495,19 +495,19 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
+ignition::math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
 {
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
   else if (_index == 0)
   {
@@ -516,7 +516,7 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
   else if (_index == 1)
   {
     double tp = this->GetThreadPitch();
-    if (math::equal(tp, 0.0))
+    if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
             << " using thread pitch = 1.0e6\n";
@@ -535,6 +535,6 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
   {
     gzerr << "Should not be here in code, GetAngleCount > 2?\n";
     /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::Angle(0.0);
   }
 }

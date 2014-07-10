@@ -43,19 +43,23 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-        math::Pose pose = oParent->GetWorldPose();
-        double altitude = pose.pos.z;
-        math::Vector3 n = this->GetNormal();
+        ignition::math::Pose3d pose = oParent->GetWorldPose();
+        double altitude = pose.Pos().z();
+        ignition::math::Vector3d n = this->GetNormal();
         if (oParent->GetCollisionId() == NULL)
+        {
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
-                n.x, n.y, n.z, altitude), false);
+                n.x(), n.y(), n.z(), altitude), false);
+        }
         else
+        {
           dGeomPlaneSetParams(oParent->GetCollisionId(),
-                              n.x, n.y, n.z, altitude);
+              n.x(), n.y(), n.z(), altitude);
+        }
       }
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos)
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos)
       {
         PlaneShape::SetAltitude(_pos);
         ODECollisionPtr odeParent;
@@ -67,7 +71,7 @@ namespace gazebo
         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
 
         // Compute "altitude": scalar product of position and normal
-        vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
+        vec4[3] = vec4[0] * _pos.x(), + vec4[1] * _pos.y() + vec4[2] * _pos.z();
 
         dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
                             vec4[2], vec4[3]);

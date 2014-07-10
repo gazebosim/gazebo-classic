@@ -48,8 +48,8 @@ TEST_F(PhysicsTest, State)
 
       std::ostringstream newModelStr;
 
-      math::Pose pose(0, 0, 3, 0, 0, 0);
-      math::Vector3 size(1.0, 0.1, 0.1);
+      ignition::math::Pose3d pose(0, 0, 3, 0, 0, 0);
+      ignition::math::Vector3d size(1.0, 0.1, 0.1);
       newModelStr
         << "<gazebo version='" << SDF_VERSION << "'>\n"
         << "  <model name='model_1'>\n"
@@ -72,8 +72,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -81,8 +81,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -106,8 +106,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -115,8 +115,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -162,8 +162,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -171,8 +171,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -207,8 +207,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -216,8 +216,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -252,8 +252,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -261,8 +261,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x << " " << size.y << " "
-        << size.z << "</size>\n"
+        << "            <size>" << size.x() << " " << size.y() << " "
+        << size.z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -436,11 +436,11 @@ TEST_F(PhysicsTest, State)
         // gzdbg << "setting link poses without violation\n";
         // double cur_time = world->GetSimTime().Double();
         last_update_time = world->GetSimTime().Double();
-        link_1->SetWorldPose(math::Pose(0,    0, 3, 0,        0, 0));
-        link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0,        0, 0));
-        link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0.5*M_PI, 0));
-        link_4->SetWorldPose(math::Pose(2.00, 1, 3, 0, 1.0*M_PI, 0));
-        link_5->SetWorldPose(math::Pose(1.00, 1, 3, 0, 1.5*M_PI, 0));
+        link_1->SetWorldPose(ignition::math::Pose3d(0,    0, 3, 0,        0, 0));
+        link_2->SetWorldPose(ignition::math::Pose3d(1.00, 0, 3, 0,        0, 0));
+        link_3->SetWorldPose(ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
+        link_4->SetWorldPose(ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
+        link_5->SetWorldPose(ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -462,11 +462,11 @@ TEST_F(PhysicsTest, State)
         last_update_time = world->GetSimTime().Double();
         // gzdbg << "setting link poses without violation\n";
         // double cur_time = world->GetSimTime().Double();
-        link_1->SetWorldPose(math::Pose(0,    0, 3, 0, 0, 0));
-        link_2->SetWorldPose(math::Pose(1.00, 0, 3, 0, 0, 0));
-        link_3->SetWorldPose(math::Pose(2.00, 0, 3, 0, 0.5*M_PI, 0));
-        link_4->SetWorldPose(math::Pose(2.00, 1, 3, 0, 1.0*M_PI, 0));
-        link_5->SetWorldPose(math::Pose(1.00, 1, 3, 0, 1.5*M_PI, 0));
+        link_1->SetWorldPose(ignition::math::Pose3d(0,    0, 3, 0, 0, 0));
+        link_2->SetWorldPose(ignition::math::Pose3d(1.00, 0, 3, 0, 0, 0));
+        link_3->SetWorldPose(ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
+        link_4->SetWorldPose(ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
+        link_5->SetWorldPose(ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -490,8 +490,8 @@ TEST_F(PhysicsTest, State)
       // if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
     {
       last_update_time = world->GetSimTime().Double();
-      math::Pose p;
-      p = math::Pose(
+      ignition::math::Pose3d p;
+      p = ignition::math::Pose3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
@@ -499,7 +499,7 @@ TEST_F(PhysicsTest, State)
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_1->SetWorldPose(p);
-      p = math::Pose(
+      p = ignition::math::Pose3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
@@ -507,7 +507,7 @@ TEST_F(PhysicsTest, State)
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_2->SetWorldPose(p);
-      p = math::Pose(
+      p = ignition::math::Pose3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 2.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/
@@ -517,7 +517,7 @@ TEST_F(PhysicsTest, State)
           static_cast<double>(RAND_MAX) + 0.5*M_PI,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_3->SetWorldPose(p);
-      p = math::Pose(
+      p = ignition::math::Pose3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 2.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
@@ -526,7 +526,7 @@ TEST_F(PhysicsTest, State)
           static_cast<double>(RAND_MAX) + M_PI,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_4->SetWorldPose(p);
-      p = math::Pose(
+      p = ignition::math::Pose3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 1.0,
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX) + 3.0,
@@ -536,53 +536,53 @@ TEST_F(PhysicsTest, State)
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_5->SetWorldPose(p);
 
-      math::Vector3 v;
-      v = math::Vector3(
+      ignition::math::Vector3d v;
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_1->SetAngularVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_1->SetLinearVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_2->SetAngularVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_2->SetLinearVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_3->SetAngularVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_3->SetLinearVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_4->SetAngularVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_4->SetLinearVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
       link_5->SetAngularVel(v);
-      v = math::Vector3(
+      v = ignition::math::Vector3d(
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
           static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
@@ -609,8 +609,8 @@ TEST_F(PhysicsTest, State)
       if (world->GetSimTime().Double() - last_update_time >= (1.0/pub_rate))
       {
         last_update_time = world->GetSimTime().Double();
-        math::Pose p;
-        p = math::Pose(
+        ignition::math::Pose3d p;
+        p = ignition::math::Pose3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/
@@ -620,7 +620,7 @@ TEST_F(PhysicsTest, State)
             static_cast<double>(RAND_MAX) + 1.57079,
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_1->SetWorldPose(p);
-        p = math::Pose(
+        p = ignition::math::Pose3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/
@@ -630,7 +630,7 @@ TEST_F(PhysicsTest, State)
             static_cast<double>(RAND_MAX) + 1.57079,
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_2->SetWorldPose(p);
-        p = math::Pose(
+        p = ignition::math::Pose3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/
@@ -640,7 +640,7 @@ TEST_F(PhysicsTest, State)
             static_cast<double>(RAND_MAX) + 1.57079,
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_3->SetWorldPose(p);
-        p = math::Pose(
+        p = ignition::math::Pose3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/
@@ -650,7 +650,7 @@ TEST_F(PhysicsTest, State)
             static_cast<double>(RAND_MAX) + 1.57079,
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_4->SetWorldPose(p);
-        p = math::Pose(
+        p = ignition::math::Pose3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/
@@ -661,53 +661,53 @@ TEST_F(PhysicsTest, State)
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_5->SetWorldPose(p);
 
-        math::Vector3 v;
-        v = math::Vector3(
+        ignition::math::Vector3d v;
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_1->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_1->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_2->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_2->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_3->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_3->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_4->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_4->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_5->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
@@ -734,53 +734,53 @@ TEST_F(PhysicsTest, State)
       {
         last_update_time = world->GetSimTime().Double();
         // gzdbg << "setting link poses with violation\n";
-        math::Vector3 v;
-        v = math::Vector3(
+        ignition::math::Vector3d v;
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_1->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_1->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_2->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_2->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_3->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_3->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_4->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_4->SetLinearVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
         link_5->SetAngularVel(v);
-        v = math::Vector3(
+        v = ignition::math::Vector3d(
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX),
             static_cast<double>(rand_r(seed))/static_cast<double>(RAND_MAX));
@@ -823,7 +823,7 @@ TEST_F(PhysicsTest, State)
       << "]\n";
 
     EXPECT_EQ(link_3->GetWorldPose(),
-        math::Pose(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
+        ignition::math::Pose3d(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
     Unload();
   }
 }

@@ -148,7 +148,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -182,7 +182,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose &ModelState::GetPose() const
+const ignition::math::Pose3d &ModelState::GetPose() const
 {
   return this->pose;
 }
@@ -204,7 +204,7 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero;
+  return result && this->pose == ignition::math::Pose3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -357,8 +357,8 @@ ModelState ModelState::operator-(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
 
   // Insert the link state diffs.
   for (LinkState_M::const_iterator iter =
@@ -411,8 +411,8 @@ ModelState ModelState::operator+(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
 
   // Insert the link state diffs.
   for (LinkState_M::const_iterator iter =

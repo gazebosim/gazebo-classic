@@ -45,31 +45,31 @@ namespace gazebo
       public: virtual ~BulletBoxShape() {}
 
       /// \brief Set the size of the box
-      public: void SetSize(const math::Vector3 &_size)
+      public: void SetSize(const ignition::math::Vector3d &_size)
               {
-                if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+                if (_size.x(), < 0 || _size.y() < 0 || _size.z()< 0)
                 {
                   gzerr << "Box shape does not support negative size\n";
                   return;
                 }
-                math::Vector3 size = _size;
-                if (math::equal(size.x, 0.0))
+                ignition::math::Vector3d size = _size;
+                if (ignition::math::equal(size.x(),(), 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
                   // will not be possible
                   gzwarn << "Setting box shape's x to zero \n";
-                  size.x = 1e-4;
+                  size.x(), = 1e-4;
                 }
-                if (math::equal(size.y, 0.0))
+                if (ignition::math::equal(size.y(), 0.0))
                 {
                   gzwarn << "Setting box shape's y to zero \n";
-                  size.y = 1e-4;
+                  size.y() = 1e-4;
                 }
-                if (math::equal(size.z, 0.0))
+                if (ignition::math::equal(size.z(), 0.0))
                 {
                   gzwarn << "Setting box shape's z to zero \n";
-                  size.z = 1e-4;
+                  size.z()= 1e-4;
                 }
 
                 BoxShape::SetSize(size);
@@ -83,14 +83,14 @@ namespace gazebo
                 {
                   this->initialSize = size;
                   bParent->SetCollisionShape(new btBoxShape(
-                      btVector3(size.x*0.5, size.y*0.5, size.z*0.5)));
+                      btVector3(size.x(),*0.5, size.y*0.5, size.z*0.5)));
                 }
                 else
                 {
                   btVector3 boxScale = shape->getLocalScaling();
-                  boxScale.setX(size.x / this->initialSize.x);
-                  boxScale.setY(size.y / this->initialSize.y);
-                  boxScale.setZ(size.z / this->initialSize.z);
+                  boxScale.setX(size.x(), / this->initialSize.x(),);
+                  boxScale.setY(size.y() / this->initialSize.y());
+                  boxScale.setZ(size.z()/ this->initialSize.z());
 
                   shape->setLocalScaling(boxScale);
 
@@ -109,9 +109,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
+                    ignition::math::Pose3d relativePose =
                         this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    relativePose.Pos() -= bLink->GetInertial()->GetCoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }
@@ -119,7 +119,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of box.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3d initialSize;
     };
     /// \}
   }

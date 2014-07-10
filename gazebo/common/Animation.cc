@@ -51,7 +51,7 @@ Animation::~Animation()
 }
 
 /////////////////////////////////////////////////
-double Animation::GetLength() const
+double Animation::Length() const
 {
   return this->length;
 }
@@ -212,8 +212,8 @@ void PoseAnimation::BuildInterpolationSplines() const
   if (!this->rotationSpline)
     this->rotationSpline = new ignition::math::RotationSpline();
 
-  this->positionSpline->SetAutoCalculate(false);
-  this->rotationSpline->SetAutoCalculate(false);
+  this->positionSpline->AutoCalculate(false);
+  this->rotationSpline->AutoCalculate(false);
 
   this->positionSpline->Clear();
   this->rotationSpline->Clear();
@@ -222,8 +222,8 @@ void PoseAnimation::BuildInterpolationSplines() const
       iter != this->keyFrames.end(); ++iter)
   {
     PoseKeyFrame *pkey = reinterpret_cast<PoseKeyFrame*>(*iter);
-    this->positionSpline->AddPoint(pkey->GetTranslation());
-    this->rotationSpline->AddPoint(pkey->GetRotation());
+    this->positionSpline->AddPoint(pkey->Translation());
+    this->rotationSpline->AddPoint(pkey->Rotation());
   }
 
   this->positionSpline->RecalcTangents();
@@ -254,8 +254,8 @@ void PoseAnimation::GetInterpolatedKeyFrame(double _time,
 
   if (ignition::math::equal(t, 0.0))
   {
-    _kf.SetTranslation(k1->GetTranslation());
-    _kf.SetRotation(k1->GetRotation());
+    _kf.SetTranslation(k1->Translation());
+    _kf.SetRotation(k1->Rotation());
   }
   else
   {

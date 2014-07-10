@@ -27,7 +27,7 @@
 #include <boost/archive/iterators/istream_iterator.hpp>
 #include <boost/archive/iterators/transform_width.hpp>
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -94,7 +94,7 @@ std::string LogPlay::GetHeader() const
 /////////////////////////////////////////////////
 void LogPlay::ReadHeader()
 {
-  this->randSeed = math::Rand::GetSeed();
+  this->randSeed = ignition::math::Rand::Seed();
   TiXmlElement *headerXml, *childXml;
 
   this->logVersion.clear();
@@ -133,7 +133,7 @@ void LogPlay::ReadHeader()
            << GZ_LOG_VERSION << "]\n";
 
   /// Set the random number seed for simulation
-  math::Rand::SetSeed(this->randSeed);
+  ignition::math::Rand::Seed(this->randSeed);
 }
 
 /////////////////////////////////////////////////

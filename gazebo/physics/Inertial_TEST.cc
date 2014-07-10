@@ -44,7 +44,7 @@ TEST_F(Inertial_TEST, InertialWorld)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), "ode");
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -69,8 +69,8 @@ TEST_F(Inertial_TEST, InertialOperators)
   physics::Inertial i2;
   i1.SetMass(1.0);
   i2.SetMass(2.0);
-  i1.SetCoG(math::Pose(0, 0, 0, 0, 0, 0));
-  i2.SetCoG(math::Pose(0, 0, 1, 0, 0, 0));
+  i1.SetCoG(ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
+  i2.SetCoG(ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
 
   i1.SetIXX(0.1);
   i1.SetIYY(0.2);
@@ -79,7 +79,7 @@ TEST_F(Inertial_TEST, InertialOperators)
   i1.SetIXZ(0.0);
   i1.SetIYZ(0.0);
 
-  i2.SetMOI(math::Matrix3(1, 0, 0,
+  i2.SetMOI(ignition::math::Matrix3d(1, 0, 0,
                           0, 2, 0,
                           0, 0, 3));
 
@@ -91,7 +91,7 @@ TEST_F(Inertial_TEST, InertialOperators)
         << i1.GetMOI(isum.GetPose()) << "\n";
   gzdbg << "i2 new cg: \n"
         << i2.GetMOI(isum.GetPose()) << "\n";
-  EXPECT_NEAR(isum.GetPose().pos.z, 2.0/3.0, TOL);
+  EXPECT_NEAR(isum.GetPose().Pos().z(), 2.0/3.0, TOL);
   EXPECT_NEAR(isum.GetIXX(),
     1.0 + 0.1 + 1.0*(2.0/3.0)*(2.0/3.0)
               + 2.0*(1-2.0/3.0)*(1-2.0/3.0), TOL);
@@ -101,30 +101,32 @@ TEST_F(Inertial_TEST, InertialOperators)
   EXPECT_NEAR(isum.GetIZZ(), 3.0 + 0.3, TOL);
 
   // Test GetInertial(offset)
-  physics::Inertial i1Offset = i1.GetInertial(math::Pose(0, 0, 0, 0, 0, 0));
+  physics::Inertial i1Offset = i1.GetInertial(ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
   EXPECT_TRUE(i1.GetMOI() == i1Offset.GetMOI());
   EXPECT_TRUE(i1.GetPose() == i1Offset.GetPose());
-  i1Offset = i1.GetInertial(math::Pose(1, 0, 0, 0, 0, 0));
-  EXPECT_TRUE(i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0)) == i1Offset.GetMOI());
+  i1Offset = i1.GetInertial(ignition::math::Pose3d(1, 0, 0, 0, 0, 0));
+  EXPECT_TRUE(i1.GetMOI(ignition::math::Pose3d(1, 0, 0, 0, 0, 0)) == i1Offset.GetMOI());
   gzdbg << i1.GetPose() << " : " <<  i1Offset.GetPose() << "\n";
-  EXPECT_TRUE(i1.GetPose() == math::Pose(1, 0, 0, 0, 0, 0)+i1Offset.GetPose());
+  EXPECT_TRUE(i1.GetPose() == ignition::math::Pose3d(1, 0, 0, 0, 0, 0)+i1Offset.GetPose());
 
   // Test GetMOI
-  math::Matrix3 i11 = i1.GetMOI(math::Pose(1, 0, 0, 0, 0, 0));
-  EXPECT_NEAR(i11[2][2], 1.3, TOL);
+  ignition::math::Matrix3d i11 =
+    i1.GetMOI(ignition::math::Pose3d(1, 0, 0, 0, 0, 0));
+  EXPECT_NEAR(i11(2, 2), 1.3, TOL);
   gzdbg << "i11:\n" << i11 << "\n";
 
   // Get i2 from origin of link
   physics::Inertial i3;
-  i3.SetMOI(i2.GetMOI(math::Pose()));
+  i3.SetMOI(i2.GetMOI(ignition::math::Pose3d()));
   EXPECT_NEAR(i3.GetIXX(), 1 + 2, TOL);
   EXPECT_NEAR(i3.GetIYY(), 2 + 2, TOL);
   EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
 
   gzdbg << "i2:\n" << i2 << "\n";
-  gzdbg << "R:\n" << math::Quaterniond(0, 0, 0.5*M_PI).GetAsMatrix3() << "\n";
+  gzdbg << "R:\n" << ignition::math::Matrix3d(
+      ignition::math::Quaterniond(0, 0, 0.5*M_PI)) << "\n";
   gzdbg << "I:\n" << i2.GetMOI() << "\n";
-  i2.SetMOI(i2.GetMOI(math::Pose(0, 0, 1, 0, 0, 0.5*M_PI)));
+  i2.SetMOI(i2.GetMOI(ignition::math::Pose3d(0, 0, 1, 0, 0, 0.5*M_PI)));
   gzdbg << "i2:\n" << i2 << "\n";
   EXPECT_NEAR(i2.GetIXX(), 2, TOL);
   EXPECT_NEAR(i2.GetIYY(), 1, TOL);

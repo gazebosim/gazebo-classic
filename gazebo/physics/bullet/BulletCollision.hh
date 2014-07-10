@@ -28,8 +28,8 @@
 
 #include "gazebo/common/Param.hh"
 #include "Entity.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/util/system.hh"
 */
@@ -81,7 +81,7 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       /// \brief Get the bounding box, defined by the physics engine
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box GetBoundingBox() const;
 
       /// \brief Set the collision shape
       /// \param[in] _shape Collision shape

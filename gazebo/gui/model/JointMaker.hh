@@ -26,7 +26,7 @@
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -217,7 +217,7 @@ namespace gazebo
       public: JointMaker::JointType type;
 
       /// \brief Joint axis direction.
-      public: math::Vector3 axis[2];
+      public: ignition::math::Vector3d axis[2];
 
       /// \brief Joint lower limit.
       public: double lowerLimit[2];
@@ -226,7 +226,7 @@ namespace gazebo
       public: double upperLimit[2];
 
       /// \brief Joint anchor point.
-      public: math::Vector3 anchor;
+      public: ignition::math::Vector3d anchor;
 
       /// \brief True if the joint visual needs update.
       public: bool dirty;

@@ -60,7 +60,7 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
+  ignition::math::Pose3d pose = this->GetRelativePose();
   BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
@@ -98,9 +98,9 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-math::Box BulletCollision::GetBoundingBox() const
+ignition::math::Box BulletCollision::GetBoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;
@@ -119,10 +119,10 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   Collision::SetCollision(_placeable);
   this->collisionShape = _shape;
 
-  // btmath::Vector3 vec;
+  // btignition::math::Vector3d vec;
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
-  // this->mass.SetCoG(this->GetRelativePose().pos);
+  // this->mass.SetCoG(this->GetRelativePose().Pos());
 
   // this->collisionShape->setFriction(1.0);
   // this->collisionShape->setAnisotropicFriction(btVector3(0, 0, 0));

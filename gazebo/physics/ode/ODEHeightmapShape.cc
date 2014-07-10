@@ -61,37 +61,37 @@ void ODEHeightmapShape::Init()
       this->odeData,
       &this->heights[0],
       0,
-      this->GetSize().x,  // in meters
-      this->GetSize().y,  // in meters
+      this->GetSize().x(),  // in meters
+      this->GetSize().y(),  // in meters
       this->vertSize,  // width sampling size
       this->vertSize,  // depth sampling size (along height of image)
       1.0,  // vertical (z-axis) scaling
-      this->GetPos().z,  // vertical (z-axis) offset
+      this->GetPos().z(),  // vertical (z-axis) offset
       1.0,  // vertical thickness for closing the height map mesh
       0);  // wrap mode
 
   // Step 4: Restrict the bounds of the AABB to improve efficiency
-  dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().z);
+  dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().z());
 
   oParent->SetCollision(dCreateHeightfield(0, this->odeData, 1), false);
   oParent->SetStatic(true);
 
   // Rotate so Z is up, not Y (which is the default orientation)
-  math::Quaterniond quat;
-  math::Pose pose = oParent->GetWorldPose();
+  ignition::math::Quaterniond quat;
+  ignition::math::Pose3d pose = oParent->GetWorldPose();
 
   // TODO: FIXME:  double check this, if Y is up,
   // rotating by roll of 90 deg will put Z-down.
-  quat.SetFromEuler(math::Vector3(IGN_DTOR(90), 0, 0));
+  quat.Euler(ignition::math::Vector3d(IGN_DTOR(90), 0, 0));
 
-  pose.rot = pose.rot * quat;
+  pose.Rot() = pose.Rot() * quat;
   // this->body->SetPose(pose);
 
   dQuaternion q;
-  q[0] = pose.rot.w;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
+  q[0] = pose.Rot().w();
+  q[1] = pose.Rot().x();
+  q[2] = pose.Rot().y();
+  q[3] = pose.Rot().z();
 
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
 }

@@ -685,7 +685,7 @@ void GpuLaser::CreateCanvas()
 
   ignition::math::Pose3d pose;
   pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
-  pose.Rot().SetFromEuler(ignition::math::Vector3d(0, 0, 0));
+  pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->visual->SetPose(pose);
 

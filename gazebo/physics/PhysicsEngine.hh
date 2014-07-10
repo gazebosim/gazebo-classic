@@ -142,12 +142,12 @@ namespace gazebo
 
       /// \brief Return the gavity vector.
       /// \return The gavity vector.
-      public: virtual math::Vector3 GetGravity() const;
+      public: virtual ignition::math::Vector3d GetGravity() const;
 
       /// \brief Set the gavity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map

@@ -18,7 +18,7 @@
 #define _BOXMAKER_HH_
 
 #include <string>
-#include "gazebo/math/Vector2i.hh"
+#include <ignition/math/Vector2.hh>
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/util/system.hh"
 
@@ -75,7 +75,7 @@ namespace gazebo
       private: virtual void CreateTheEntity();
       private: int state;
       private: bool leftMousePressed;
-      private: math::Vector2i mousePushPos, mouseReleasePos;
+      private: ignition::math::Vector2i mousePushPos, mouseReleasePos;
       private: msgs::Visual *visualMsg;
 
       private: static unsigned int counter;

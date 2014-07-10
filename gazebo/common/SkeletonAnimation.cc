@@ -62,7 +62,7 @@ void NodeAnimation::AddKeyFrame(const double _time,
     const ignition::math::Pose3d &_pose)
 {
   ignition::math::Matrix4d mat(_pose.Rot());
-  mat.SetTranslate(_pose.Pos());
+  mat.Translate(_pose.Pos());
 
   this->AddKeyFrame(_time, mat);
 }
@@ -106,7 +106,7 @@ std::pair<double, ignition::math::Matrix4d> NodeAnimation::GetKeyFrame(
 }
 
 //////////////////////////////////////////////////
-double NodeAnimation::GetLength() const
+double NodeAnimation::Length() const
 {
   return this->length;
 }
@@ -146,20 +146,20 @@ ignition::math::Matrix4d NodeAnimation::GetFrameAt(double _time, bool _loop) con
   double t = (time - prevKey) / (nextKey - prevKey);
   GZ_ASSERT(t >= 0.0 && t <= 1.0, "t is not in the range 0.0..1.0");
 
-  ignition::math::Vector3d nextPos = nextTrans.GetTranslation();
-  ignition::math::Vector3d prevPos = prevTrans.GetTranslation();
+  ignition::math::Vector3d nextPos = nextTrans.Translation();
+  ignition::math::Vector3d prevPos = prevTrans.Translation();
   ignition::math::Vector3d pos = ignition::math::Vector3d(prevPos.x() +
       ((nextPos.x() - prevPos.x()) * t),
       prevPos.y() + ((nextPos.y() - prevPos.y()) * t),
       prevPos.z() + ((nextPos.z() - prevPos.z()) * t));
 
-  ignition::math::Quaterniond nextRot = nextTrans.GetRotation();
-  ignition::math::Quaterniond prevRot = prevTrans.GetRotation();
+  ignition::math::Quaterniond nextRot = nextTrans.Rotation();
+  ignition::math::Quaterniond prevRot = prevTrans.Rotation();
   ignition::math::Quaterniond rot = ignition::math::Quaterniond::Slerp(t,
       prevRot, nextRot, true);
 
   ignition::math::Matrix4d trans(rot);
-  trans.SetTranslate(pos);
+  trans.Translate(pos);
 
   return trans;
 }
@@ -171,8 +171,8 @@ void NodeAnimation::Scale(const double _scale)
         iter != this->keyFrames.end(); ++iter)
   {
     ignition::math::Matrix4d *mat = &iter->second;
-    ignition::math::Vector3d pos = mat->GetTranslation();
-    mat->SetTranslate(pos * _scale);
+    ignition::math::Vector3d pos = mat->Translation();
+    mat->Translate(pos * _scale);
   }
 }
 
@@ -180,16 +180,16 @@ void NodeAnimation::Scale(const double _scale)
 double NodeAnimation::GetTimeAtX(const double _x) const
 {
   std::map<double, ignition::math::Matrix4d>::const_iterator it1 = this->keyFrames.begin();
-  while (it1->second.GetTranslation().x() < _x)
+  while (it1->second.Translation().x() < _x)
     ++it1;
 
   if (it1 == this->keyFrames.begin() ||
-        ignition::math::equal(it1->second.GetTranslation().x(), _x))
+        ignition::math::equal(it1->second.Translation().x(), _x))
     return it1->first;
 
   std::map<double, ignition::math::Matrix4d>::const_iterator it2 = it1--;
-  double x1 = it1->second.GetTranslation().x();
-  double x2 = it2->second.GetTranslation().x();
+  double x1 = it1->second.Translation().x();
+  double x2 = it2->second.Translation().x();
   double t1 = it1->first;
   double t2 = it2->first;
 
@@ -302,10 +302,10 @@ std::map<std::string, ignition::math::Matrix4d> SkeletonAnimation::GetPoseAtX(
   ignition::math::Matrix4d firstPos = nodeAnim->second->GetKeyFrame(0).second;
 
   double x = _x;
-  if (x < firstPos.GetTranslation().x())
-    x = firstPos.GetTranslation().x();
+  if (x < firstPos.Translation().x())
+    x = firstPos.Translation().x();
 
-  double lastX = lastPos.GetTranslation().x();
+  double lastX = lastPos.Translation().x();
   if (x > lastX && !_loop)
     x = lastX;
   while (x > lastX)
@@ -325,7 +325,7 @@ void SkeletonAnimation::Scale(const double _scale)
 }
 
 //////////////////////////////////////////////////
-double SkeletonAnimation::GetLength() const
+double SkeletonAnimation::Length() const
 {
   return this->length;
 }

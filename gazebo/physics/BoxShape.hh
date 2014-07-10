@@ -48,15 +48,15 @@ namespace gazebo
 
       /// \brief Set the size of the box.
       /// \param[in] _size Size of each side of the box.
-      public: virtual void SetSize(const math::Vector3 &_size);
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       /// \brief Set the scale of the box.
       /// \param[in] _scale Scale of the box.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.
-      public: math::Vector3 GetSize() const;
+      public: ignition::math::Vector3d GetSize() const;
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

@@ -20,8 +20,8 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -70,11 +70,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle
       /// \return The minimum angle object
-      public: math::Angle GetAngleMin() const;
+      public: ignition::math::Angle GetAngleMin() const;
 
       /// \brief Get the maximum angle
       /// \return the maximum angle object
-      public: math::Angle GetAngleMax() const;
+      public: ignition::math::Angle GetAngleMax() const;
 
       /// \brief Get the angle in radians between each range
       /// \return Resolution of the angle
@@ -110,11 +110,11 @@ namespace gazebo
 
       /// \brief Get the vertical scan bottom angle
       /// \return The minimum angle of the scan block
-      public: math::Angle GetVerticalAngleMin() const;
+      public: ignition::math::Angle GetVerticalAngleMin() const;
 
       /// \brief Get the vertical scan line top angle
       /// \return The Maximum angle of the scan block
-      public: math::Angle GetVerticalAngleMax() const;
+      public: ignition::math::Angle GetVerticalAngleMax() const;
 
       /// \brief Get the vertical angle in radians between each range
       /// \return Resolution of the angle

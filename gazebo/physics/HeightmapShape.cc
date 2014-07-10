@@ -33,7 +33,6 @@
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/transport/transport.hh"
@@ -87,7 +86,7 @@ int HeightmapShape::LoadImageAsTerrain(const std::string &_filename)
   }
 
   this->heightmapData = static_cast<common::HeightmapData*>(&this->img);
-  this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+  this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
 
   return 0;
 }
@@ -104,13 +103,13 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (this->sdf->HasElement("size"))
   {
-    this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+    this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
   }
   else
   {
-    this->heightmapSize.x = this->dem.GetWorldWidth();
-    this->heightmapSize.y = this->dem.GetWorldHeight();
-    this->heightmapSize.z = this->dem.GetMaxElevation() -
+    this->heightmapSize.x() = this->dem.GetWorldWidth();
+    this->heightmapSize.y() = this->dem.GetWorldHeight();
+    this->heightmapSize.z()= this->dem.GetMaxElevation() -
         std::max(0.0f, this->dem.GetMinElevation());
   }
 
@@ -123,7 +122,7 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
 
   if (sphericalCoordinates)
   {
-    math::Angle latitude, longitude;
+    ignition::math::Angle latitude, longitude;
     double elevation;
 
     this->dem.GetGeoReferenceOrigin(latitude, longitude);
@@ -199,7 +198,7 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
 
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
-      !math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
+      !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
@@ -224,17 +223,17 @@ void HeightmapShape::Init()
 
   this->subSampling = 2;
 
-  math::Vector3 terrainSize = this->GetSize();
+  ignition::math::Vector3d terrainSize = this->GetSize();
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  this->scale.x = terrainSize.x / this->vertSize;
-  this->scale.y = terrainSize.y / this->vertSize;
+  this->scale.x() = terrainSize.x() / this->vertSize;
+  this->scale.y() = terrainSize.y() / this->vertSize;
 
-  if (math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
-    this->scale.z = fabs(terrainSize.z);
+  if (ignition::math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
+    this->scale.z()= fabs(terrainSize.z());
   else
-    this->scale.z = fabs(terrainSize.z) /
+    this->scale.z()= fabs(terrainSize.z()) /
                     this->heightmapData->GetMaxElevation();
 
   // Step 1: Construct the heightmap lookup table
@@ -243,7 +242,7 @@ void HeightmapShape::Init()
 }
 
 //////////////////////////////////////////////////
-void HeightmapShape::SetScale(const math::Vector3 &_scale)
+void HeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -258,15 +257,15 @@ std::string HeightmapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetSize() const
+ignition::math::Vector3d HeightmapShape::GetSize() const
 {
   return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetPos() const
+ignition::math::Vector3d HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -298,9 +297,9 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector2i HeightmapShape::GetVertexCount() const
+ignition::math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->vertSize, this->vertSize);
+  return ignition::math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////
@@ -315,7 +314,7 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
-  float max = GZ_FLT_MIN;
+  float max = IGN_FLT_MIN;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -328,7 +327,7 @@ float HeightmapShape::GetMaxHeight() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMinHeight() const
 {
-  float min = GZ_FLT_MAX;
+  float min = IGN_FLT_MAX;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)

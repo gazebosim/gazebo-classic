@@ -18,14 +18,6 @@
 #define _GAZEBO_CORE_HH_
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/common.hh>
-
-/// \todo Deprecation: Remove this ifndef block
-#ifndef HAVE_IGN_MATH
-  #include <gazebo/math/gzmath.hh>
-#else
-  #include <ignition/math.hh>
-#endif
-
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/Server.hh>

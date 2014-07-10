@@ -19,10 +19,6 @@ endif()
 
 add_subdirectory(msgs)
 
-if (NOT HAVE_IGN_MATH)
-  add_subdirectory(math)
-endif()
-
 add_subdirectory(transport)
 add_subdirectory(common)
 add_subdirectory(rendering)
@@ -97,12 +93,7 @@ target_link_libraries(libgazebo
   pthread
 )
 
-if (NOT HAVE_IGN_MATH)
-  target_link_libraries(libgazebo gazebo_math)
-else()
-  target_link_libraries(libgazebo ignition_math_LIBRARIES)
-endif()
-
+target_link_libraries(libgazebo ${IGNITION_MATH_LIBRARIES})
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)

@@ -59,7 +59,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAnchor(unsigned int _index,
-                  const gazebo::math::Vector3 &_anchor);
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited.
       public: virtual void SetDamping(unsigned int _index,
@@ -74,13 +74,13 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkForce(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkTorque(unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, unsigned int _index,
@@ -119,7 +119,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+                                   const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);
@@ -203,17 +203,17 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+                                       const ignition::math::Angle &_angle);
 
       // Documentation inherited.
       public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+                                      const ignition::math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;

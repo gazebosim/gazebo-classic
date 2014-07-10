@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
@@ -101,7 +101,7 @@ bool WirelessReceiver::UpdateImpl(bool /*_force*/)
   this->referencePose =
       this->pose + this->parentEntity.lock()->GetWorldPose();
 
-  math::Pose myPos = this->referencePose;
+  ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
   for (Sensor_V::iterator it = sensors.begin(); it != sensors.end(); ++it)
   {

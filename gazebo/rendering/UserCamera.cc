@@ -252,7 +252,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     ignition::math::Pose3d origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().Rot().GetAsEuler().z();
+    double yaw = _visual->GetWorldPose().Rot().Euler().z();
 
     double zDiff = origPose.Pos().z() - _visual->GetWorldPose().Pos().z();
     double pitch = 0;

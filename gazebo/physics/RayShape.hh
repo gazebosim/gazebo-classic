@@ -54,21 +54,21 @@ namespace gazebo
       /// the body.
       /// \param[in] _posStart Start position, relative the body.
       /// \param[in] _posEnd End position, relative to the body.
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+      public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
+                                     const ignition::math::Vector3d &_posEnd);
 
 
       /// \brief Get the relative starting and ending points.
       /// \param[in] _posA Returns the starting point.
       /// \param[in] _posB Returns the ending point.
-      public: virtual void GetRelativePoints(math::Vector3 &_posA,
-                                             math::Vector3 &_posB);
+      public: virtual void GetRelativePoints(ignition::math::Vector3d &_posA,
+                                             ignition::math::Vector3d &_posB);
 
       /// \brief Get the global starting and ending points.
       /// \param[out] _posA Returns the starting point.
       /// \param[out] _posB Returns the ending point.
-      public: virtual void GetGlobalPoints(math::Vector3 &_posA,
-                                           math::Vector3 &_posB);
+      public: virtual void GetGlobalPoints(ignition::math::Vector3d &_posA,
+                                           ignition::math::Vector3d &_posB);
 
       /// \brief Set the length of the ray.
       /// \param[in] _len Length of the array.
@@ -76,10 +76,10 @@ namespace gazebo
 
       /// \brief Get the length of the ray.
       /// \return The ray length.
-      public: double GetLength() const;
+      public: double Length() const;
 
       /// \brief Set the scale of the ray
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Update the ray collision.
       public: virtual void Update() = 0;
@@ -129,15 +129,15 @@ namespace gazebo
       protected: int contactFiducial;
 
       /// \brief Start position of the ray, relative to the body
-      protected: math::Vector3 relativeStartPos;
+      protected: ignition::math::Vector3d relativeStartPos;
       /// \brief End position of the ray, relative to the body
-      protected: math::Vector3 relativeEndPos;
+      protected: ignition::math::Vector3d relativeEndPos;
 
       /// \brief Start position of the ray in global cs
-      protected: math::Vector3 globalStartPos;
+      protected: ignition::math::Vector3d globalStartPos;
 
       /// \brief End position of the ray in global cs
-      protected: math::Vector3 globalEndPos;
+      protected: ignition::math::Vector3d globalEndPos;
     };
     /// \}
   }

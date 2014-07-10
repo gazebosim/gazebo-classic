@@ -63,7 +63,7 @@ namespace gazebo
 
       /// \brief Get the translation of the keyframe
       /// \return The translation amount
-      public: const ignition::math::Vector3d &GetTranslation() const;
+      public: const ignition::math::Vector3d &Translation() const;
 
       /// \brief Set the rotation for the keyframe
       /// \param[in] _rot Rotation amount
@@ -71,7 +71,7 @@ namespace gazebo
 
       /// \brief Get the rotation of the keyframe
       /// \return The rotation amount
-      public: const ignition::math::Quaterniond &GetRotation() const;
+      public: const ignition::math::Quaterniond &Rotation() const;
 
       /// \brief the translation vector
       protected: ignition::math::Vector3d translate;

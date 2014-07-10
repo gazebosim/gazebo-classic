@@ -20,8 +20,8 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -91,11 +91,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      public: ignition::math::Angle GetMinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      public: ignition::math::Angle GetMaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -107,11 +107,11 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      public: ignition::math::Angle GetVerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      public: ignition::math::Angle GetVerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();
@@ -144,14 +144,14 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                                     const math::Vector3 &_end);
+      protected: virtual void AddRay(const ignition::math::Vector3d &_start,
+                                     const ignition::math::Vector3d &_end);
 
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
 
       /// \brief Pose offset of all the rays.
-      protected: math::Pose offset;
+      protected: ignition::math::Pose3d offset;
 
       /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;

@@ -46,7 +46,7 @@ namespace gazebo
       public: virtual ~BulletPlaneShape() {}
 
       /// \brief Set the altitude of the plane
-      public: void SetAltitude(const math::Vector3 &pos)
+      public: void SetAltitude(const ignition::math::Vector3d &pos)
               {
                 PlaneShape::SetAltitude(pos);
               }
@@ -59,8 +59,8 @@ namespace gazebo
                 bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
-                math::Vector3 n = this->GetNormal();
-                btVector3 vec(n.x, n.y, n.z);
+                ignition::math::Vector3d n = this->GetNormal();
+                btVector3 vec(n.x(),(), n.y(), n.z());
 
                 bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
                     false);

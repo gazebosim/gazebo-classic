@@ -161,7 +161,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-      math::Rand::SetSeed(this->vm["seed"].as<double>());
+      ignition::math::Rand::Seed(this->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
     {

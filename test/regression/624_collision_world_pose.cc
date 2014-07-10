@@ -108,20 +108,20 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
       if ((*ci)->GetName() == "col1")
       {
         EXPECT_EQ((*ci)->GetWorldPose(),
-          math::Pose(3, 4, 5, 0.7, 0.7, 0.7) +
-          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
-          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
+          ignition::math::Pose3d(3, 4, 5, 0.7, 0.7, 0.7) +
+          ignition::math::Pose3d(2, 3, 4, 0.6, 0.6, 0.6) +
+          ignition::math::Pose3d(1, 2, 3, 0.5, 0.5, 0.5));
         EXPECT_EQ((*ci)->GetRelativePose(),
-          math::Pose(3, 4, 5, 0.7, 0.7, 0.7));
+          ignition::math::Pose3d(3, 4, 5, 0.7, 0.7, 0.7));
       }
       else if ((*ci)->GetName() == "col2")
       {
         EXPECT_EQ((*ci)->GetWorldPose(),
-          math::Pose(6, 7, 8, 0.8, 0.8, 0.8) +
-          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
-          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
+          ignition::math::Pose3d(6, 7, 8, 0.8, 0.8, 0.8) +
+          ignition::math::Pose3d(2, 3, 4, 0.6, 0.6, 0.6) +
+          ignition::math::Pose3d(1, 2, 3, 0.5, 0.5, 0.5));
         EXPECT_EQ((*ci)->GetRelativePose(),
-          math::Pose(6, 7, 8, 0.8, 0.8, 0.8));
+          ignition::math::Pose3d(6, 7, 8, 0.8, 0.8, 0.8));
       }
     }
   }

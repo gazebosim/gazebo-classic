@@ -18,7 +18,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -441,20 +440,21 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 /////////////////////////////////////////////////
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis =
+    this->userCamera->GetVisual(this->mouseEvent.pos);
   if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
   {
     if (vis->IsPlane())
     {
-      math::Pose pose, camPose;
+      ignition::math::Pose3d pose, camPose;
       camPose = this->userCamera->GetWorldPose();
       if (this->scene->GetFirstContact(this->userCamera,
-                                   this->mouseEvent.pos, pose.pos))
+                                   this->mouseEvent.pos, pose.Pos()))
       {
-        this->userCamera->SetFocalPoint(pose.pos);
-        math::Vector3 dir = pose.pos - camPose.pos;
-        pose.pos = camPose.pos + (dir * 0.8);
-        pose.rot = this->userCamera->GetWorldRotation();
+        this->userCamera->SetFocalPoint(pose.Pos());
+        ignition::math::Vector3d dir = pose.Pos() - camPose.Pos();
+        pose.Pos() = camPose.Pos() + (dir * 0.8);
+        pose.Rot() = this->userCamera->GetWorldRotation();
         this->userCamera->MoveToPosition(pose, 0.5);
       }
     }
@@ -475,7 +475,8 @@ void GLWidget::OnMousePressNormal()
   if (!this->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis =
+    this->userCamera->GetVisual(this->mouseEvent.pos);
 
   this->userCamera->HandleMouseEvent(this->mouseEvent);
 }
@@ -493,7 +494,7 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.scroll.y = _event->delta() > 0 ? -1 : 1;
+  this->mouseEvent.scroll.y() = _event->delta() > 0 ? -1 : 1;
   this->mouseEvent.type = common::MouseEvent::SCROLL;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;
@@ -551,7 +552,8 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->userCamera->GetVisual(this->mouseEvent.pos);
+  rendering::VisualPtr vis =
+    this->userCamera->GetVisual(this->mouseEvent.pos);
 
   if (vis && !vis->IsPlane())
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
@@ -676,15 +678,16 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  ignition::math::Vector3d delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y, delta.x);
+  double yaw = atan2(delta.y(), delta.x());
 
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->userCamera->SetWorldPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
+  double pitch = atan2(-delta.z(), sqrt(delta.x()*delta.x() +
+        delta.y()*delta.y()));
+  this->userCamera->SetWorldPose(ignition::math::Pose3d(camPos,
+        ignition::math::Vector3d(0, pitch, yaw)));
 
   if (this->windowId >= 0)
   {
@@ -942,7 +945,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::PushHistory(const std::string &_visName, const math::Pose &_pose)
+void GLWidget::PushHistory(const std::string &_visName, const ignition::math::Pose3d &_pose)
 {
   if (this->moveHistory.empty() ||
       this->moveHistory.back().first != _visName ||

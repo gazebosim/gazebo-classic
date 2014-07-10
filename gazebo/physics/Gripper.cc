@@ -208,23 +208,23 @@ void Gripper::HandleAttach()
     {
       if (!this->attached && cc[iter->first])
       {
-        math::Pose diff = cc[iter->first]->GetLink()->GetWorldPose() -
+        ignition::math::Pose3d diff = cc[iter->first]->GetLink()->GetWorldPose() -
           this->palmLink->GetWorldPose();
 
-        double dd = (diff - this->prevDiff).pos.GetSquaredLength();
+        double dd = (diff - this->prevDiff).Pos().SquaredLength();
 
         this->prevDiff = diff;
 
         this->diffs[this->diffIndex] = dd;
-        double var = math::variance<double>(this->diffs);
-        double max = math::max<double>(this->diffs);
+        double var = ignition::math::variance<double>(this->diffs);
+        double max = ignition::math::max<double>(this->diffs);
 
         if (var < 1e-5 && max < 1e-5)
         {
           this->attached = true;
 
           this->fixedJoint->Load(this->palmLink,
-              cc[iter->first]->GetLink(), math::Pose());
+              cc[iter->first]->GetLink(), ignition::math::Pose3d());
           this->fixedJoint->Init();
           this->fixedJoint->SetHighStop(0, 0);
           this->fixedJoint->SetLowStop(0, 0);
@@ -267,7 +267,7 @@ void Gripper::OnContacts(ConstContactsPtr &_msg)
 void Gripper::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
-    this->diffs[i] = GZ_DBL_MAX;
+    this->diffs[i] = IGN_DBL_MAX;
 }
 
 /////////////////////////////////////////////////

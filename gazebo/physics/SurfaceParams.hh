@@ -78,7 +78,7 @@ namespace gazebo
       /// If undefined, a vector consstrained to be perpendicular
       /// to the contact normal in the global y-z plane is used.
       /// \sa http://www.ode.org/ode-latest-userguide.html#sec_7_3_7
-      public: math::Vector3 direction1;
+      public: ignition::math::Vector3d direction1;
 
       /// \brief Array of dry friction coefficients. mu[0] is in the
       /// primary direction as defined by the friction pyramid.

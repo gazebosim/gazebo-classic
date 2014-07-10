@@ -53,8 +53,8 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -153,14 +153,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->GetWorldPose();
-    math::Pose body2Pose = link2->GetWorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    ignition::math::Pose3d body1Pose = link1->GetWorldPose();
+    ignition::math::Pose3d body2Pose = link2->GetWorldPose();
+    ignition::math::Vector3d cg1Pos = link1->GetInertial()->GetPose().pos;
+    ignition::math::Vector3d cg2Pos = link2->GetInertial()->GetPose().pos;
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
@@ -180,13 +180,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         // Convert from world to link frame
-        localForce1 = body1Pose.rot.RotateVectorReverse(
+        localForce1 = body1Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3(force));
-        localForce2 = body2Pose.rot.RotateVectorReverse(
+        localForce2 = body2Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3(-force));
-        localTorque1 = body1Pose.rot.RotateVectorReverse(
+        localTorque1 = body1Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueA));
-        localTorque2 = body2Pose.rot.RotateVectorReverse(
+        localTorque2 = body2Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueB));
 
         contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
@@ -277,7 +277,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 
   btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }
@@ -306,11 +306,11 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  math::Vector3 g = this->sdf->Get<math::Vector3>("gravity");
+  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
   // ODEPhysics checks this, so we will too.
-  if (g == math::Vector3(0, 0, 0))
+  if (g == ignition::math::Vector3d(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dynamicsWorld->setGravity(btVector3(g.x, g.y, g.z));
+  this->dynamicsWorld->setGravity(btVector3(g.x(), g.y(), g.z()));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 
@@ -976,7 +976,7 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dynamicsWorld->setGravity(

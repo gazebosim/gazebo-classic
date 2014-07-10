@@ -77,7 +77,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   this->sdf = _sdf;
 
   // use default pose (identity) if not specified in sdf
-  math::Pose pose = this->sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d pose = this->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetCoG(pose);
 
   // if (this->sdf->HasElement("inertia"))
@@ -113,7 +113,7 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
+Inertial Inertial::GetInertial(const ignition::math::Pose3d &_frameOffset) const
 {
   // make a copy of the current Inertial
   Inertial result(*this);
@@ -159,13 +159,13 @@ double Inertial::GetMass() const
 //////////////////////////////////////////////////
 void Inertial::SetCoG(double _cx, double _cy, double _cz)
 {
-  this->cog.pos.Set(_cx, _cy, _cz);
+  this->cog.Pos().Set(_cx, _cy, _cz);
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Vector3 &_c)
+void Inertial::SetCoG(const ignition::math::Vector3d &_c)
 {
-  this->cog.pos = _c;
+  this->cog.Pos() = _c;
 }
 
 //////////////////////////////////////////////////
@@ -176,7 +176,7 @@ void Inertial::SetCoG(double _cx, double _cy, double _cz,
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Pose &_c)
+void Inertial::SetCoG(const ignition::math::Pose3d &_c)
 {
   this->cog = _c;
 }
@@ -191,40 +191,40 @@ void Inertial::SetInertiaMatrix(double ixx, double iyy, double izz,
 
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetPrincipalMoments() const
+ignition::math::Vector3d Inertial::GetPrincipalMoments() const
 {
   return this->principals;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetProductsofInertia() const
+ignition::math::Vector3d Inertial::GetProductsofInertia() const
 {
   return this->products;
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetMOI(const math::Matrix3 &_moi)
+void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
 {
   /// \TODO: check symmetry of incoming _moi matrix
-  this->principals.Set(_moi[0][0], _moi[1][1], _moi[2][2]);
-  this->products.Set(_moi[0][1], _moi[0][2], _moi[1][2]);
+  this->principals.Set(_moi(0, 0), _moi(1, 1), _moi(2, 2));
+  this->products.Set(_moi(0, 1), _moi(0, 2), _moi(1, 2));
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI() const
+ignition::math::Matrix3d Inertial::GetMOI() const
 {
-  return math::Matrix3(
-    this->principals.x, this->products.x,   this->products.y,
-    this->products.x,   this->principals.y, this->products.z,
-    this->products.y,   this->products.z,   this->principals.z);
+  return ignition::math::Matrix3d(
+    this->principals.x(), this->products.x(),   this->products.y(),
+    this->products.x(),   this->principals.y(), this->products.z(),
+    this->products.y(),   this->products.z(),   this->principals.z());
 }
 
 //////////////////////////////////////////////////
-void Inertial::Rotate(const math::Quaterniond &_rot)
+void Inertial::Rotate(const ignition::math::Quaterniond &_rot)
 {
   /// \TODO: double check what this does, if needed
-  this->cog.pos = _rot.RotateVector(this->cog.pos);
-  this->cog.rot = _rot * this->cog.rot;
+  this->cog.Pos() = _rot.RotateVector(this->cog.Pos());
+  this->cog.Rot() = _rot * this->cog.Rot();
 }
 
 //////////////////////////////////////////////////
@@ -247,18 +247,18 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   result.mass = this->mass + _inertial.mass;
 
   // compute new center of mass
-  result.cog.pos =
-    (this->cog.pos*this->mass + _inertial.cog.pos * _inertial.mass) /
+  result.cog.Pos() =
+    (this->cog.Pos() * this->mass + _inertial.cog.Pos() * _inertial.mass) /
     result.mass;
 
   // make a decision on the new orientation, set it to identity
-  result.cog.rot = math::Quaterniond(1, 0, 0, 0);
+  result.cog.Rot() = ignition::math::Quaterniond(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
-  math::Matrix3 Ithis = this->GetMOI(result.cog);
+  ignition::math::Matrix3d Ithis = this->GetMOI(result.cog);
 
   // compute equivalent I for _inertial at the new CoG
-  math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
+  ignition::math::Matrix3d Iparam = _inertial.GetMOI(result.cog);
 
   // sum up principals and products now they are at the same location
   result.SetMOI(Ithis + Iparam);
@@ -267,30 +267,30 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
+ignition::math::Matrix3d Inertial::GetMOI(const ignition::math::Pose3d &_pose) const
 {
   // get MOI as a Matrix3
-  math::Matrix3 moi = this->GetMOI();
+  ignition::math::Matrix3d moi = this->GetMOI();
 
   // transform from new _pose to old this->cog, specified in new _pose frame
-  math::Pose new2Old = this->cog - _pose;
+  ignition::math::Pose3d new2Old = this->cog - _pose;
 
   // rotate moi into new cog frame
-  moi = new2Old.rot.GetAsMatrix3() * moi *
-        new2Old.rot.GetInverse().GetAsMatrix3();
+  moi = ignition::math::Matrix3d(new2Old.Rot()) * moi *
+        ignition::math::Matrix3d(new2Old.Rot().Inverse());
 
   // parallel axis theorem to get MOI at the new cog location
   // integrating point mass at some offset
-  math::Vector3 offset = new2Old.pos;
-  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
-  moi[0][1] -= (offset.x * offset.y) * this->mass;
-  moi[0][2] -= (offset.x * offset.z) * this->mass;
-  moi[1][0] -= (offset.y * offset.x) * this->mass;
-  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
-  moi[1][2] -= (offset.y * offset.z) * this->mass;
-  moi[2][0] -= (offset.z * offset.x) * this->mass;
-  moi[2][1] -= (offset.z * offset.y) * this->mass;
-  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
+  ignition::math::Vector3d offset = new2Old.Pos();
+  moi(0, 0) += (offset.y() * offset.y() + offset.z()* offset.z()) * this->mass;
+  moi(0, 1) -= (offset.x() * offset.y()) * this->mass;
+  moi(0, 2) -= (offset.x() * offset.z()) * this->mass;
+  moi(1, 0) -= (offset.y() * offset.x()) * this->mass;
+  moi(1, 1) += (offset.x() * offset.x() + offset.z()* offset.z()) * this->mass;
+  moi(1, 2) -= (offset.y() * offset.z()) * this->mass;
+  moi(2, 0) -= (offset.z() * offset.x()) * this->mass;
+  moi(2, 1) -= (offset.z() * offset.y()) * this->mass;
+  moi(2, 2) += (offset.x() * offset.x() + offset.y() * offset.y()) * this->mass;
 
   return moi;
 }
@@ -305,73 +305,73 @@ const Inertial &Inertial::operator+=(const Inertial &_inertial)
 //////////////////////////////////////////////////
 double Inertial::GetIXX() const
 {
-  return this->principals.x;
+  return this->principals.x();
 }
 
 //////////////////////////////////////////////////
 double Inertial::GetIYY() const
 {
-  return this->principals.y;
+  return this->principals.y();
 }
 
 //////////////////////////////////////////////////
 double Inertial::GetIZZ() const
 {
-  return this->principals.z;
+  return this->principals.z();
 }
 
 //////////////////////////////////////////////////
 double Inertial::GetIXY() const
 {
-  return this->products.x;
+  return this->products.x();
 }
 
 //////////////////////////////////////////////////
 double Inertial::GetIXZ() const
 {
-  return this->products.y;
+  return this->products.y();
 }
 
 //////////////////////////////////////////////////
 double Inertial::GetIYZ() const
 {
-  return this->products.z;
+  return this->products.z();
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIXX(double _v)
 {
-  this->principals.x = _v;
+  this->principals.x() = _v;
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIYY(double _v)
 {
-  this->principals.y = _v;
+  this->principals.y() = _v;
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIZZ(double _v)
 {
-  this->principals.z = _v;
+  this->principals.z()= _v;
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIXY(double _v)
 {
-  this->products.x = _v;
+  this->products.x() = _v;
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIXZ(double _v)
 {
-  this->products.y = _v;
+  this->products.y() = _v;
 }
 
 //////////////////////////////////////////////////
 void Inertial::SetIYZ(double _v)
 {
-  this->products.z = _v;
+  this->products.z()= _v;
 }
 
 //////////////////////////////////////////////////

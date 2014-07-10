@@ -30,7 +30,7 @@ Shape::Shape(CollisionPtr _p)
   if (_p)
     this->collisionParent = _p;
 
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
 }
 
 //////////////////////////////////////////////////
@@ -41,7 +41,7 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Shape::GetScale() const
+ignition::math::Vector3d Shape::GetScale() const
 {
   return this->scale;
 }

@@ -156,8 +156,8 @@ void VehiclePlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
-  math::Box bb = parent->GetBoundingBox();
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  ignition::math::Box bb = parent->GetBoundingBox();
+  this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate
   double steeringRange = this->steeringJoint->GetHighStop(0).Radian() -
@@ -228,12 +228,13 @@ void VehiclePlugin::OnUpdate()
 
   //  aerodynamics
   this->chassis->AddForce(
-      math::Vector3(0, 0, this->aeroLoad * this->velocity.GetSquaredLength()));
+      ignition::math::Vector3d(0, 0, this->aeroLoad *
+        this->velocity.SquaredLength()));
 
   // Sway bars
-  math::Vector3 bodyPoint;
-  math::Vector3 hingePoint;
-  math::Vector3 axis;
+  ignition::math::Vector3d bodyPoint;
+  ignition::math::Vector3d hingePoint;
+  ignition::math::Vector3d axis;
 
   for (int ix = 0; ix < 4; ++ix)
   {
@@ -249,13 +250,13 @@ void VehiclePlugin::OnUpdate()
       if (amt > 15)
         amt = 15;
 
-      math::Pose p = this->joints[ix]->GetChild()->GetWorldPose();
+      ignition::math::Pose3d p = this->joints[ix]->GetChild()->GetWorldPose();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
-      this->chassis->AddForceAtWorldPosition(axis * amt, p.pos);
+      this->chassis->AddForceAtWorldPosition(axis * amt, p.Pos());
 
       p = this->joints[ix^1]->GetChild()->GetWorldPose();
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
-      this->chassis->AddForceAtWorldPosition(axis * -amt, p.pos);
+      this->chassis->AddForceAtWorldPosition(axis * -amt, p.Pos());
     }
   }
 }

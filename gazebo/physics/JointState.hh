@@ -23,9 +23,9 @@
 
 #include <vector>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -81,11 +81,11 @@ namespace gazebo
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
       /// \throw common::Exception When _axis is invalid.
-      public: math::Angle GetAngle(unsigned int _axis) const;
+      public: ignition::math::Angle GetAngle(unsigned int _axis) const;
 
       /// \brief Get the angles.
       /// \return Vector of angles.
-      public: const std::vector<math::Angle> &GetAngles() const;
+      public: const std::vector<ignition::math::Angle> &GetAngles() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -120,7 +120,7 @@ namespace gazebo
         _out << "<joint name='" << _state.GetName() << "'>";
 
         int i = 0;
-        for (std::vector<math::Angle>::const_iterator iter =
+        for (std::vector<ignition::math::Angle>::const_iterator iter =
             _state.angles.begin(); iter != _state.angles.end(); ++iter)
         {
           _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
@@ -131,7 +131,7 @@ namespace gazebo
         return _out;
       }
 
-      private: std::vector<math::Angle> angles;
+      private: std::vector<ignition::math::Angle> angles;
     };
     /// \}
   }

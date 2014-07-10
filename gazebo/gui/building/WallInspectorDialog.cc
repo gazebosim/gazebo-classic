@@ -179,7 +179,7 @@ WallInspectorDialog::~WallInspectorDialog()
 }
 
 /////////////////////////////////////////////////
-double WallInspectorDialog::GetLength() const
+double WallInspectorDialog::Length() const
 {
   return this->lengthSpinBox->value();
 }

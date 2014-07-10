@@ -131,9 +131,9 @@ void CameraSensor::Init()
 
     this->camera->Init();
     this->camera->CreateRenderTexture(this->GetName() + "_RttTex");
-    math::Pose cameraPose = this->pose;
+    ignition::math::Pose3d cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
-      cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+      cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
     this->camera->AttachToVisual(this->parentId, true);

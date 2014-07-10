@@ -104,22 +104,22 @@ class PhysicsFrictionTest : public ServerFixture,
             }
 
     /// \brief Size of box to spawn.
-    public: math::Vector3 size;
+    public: ignition::math::Vector3d size;
 
     /// \brief Mass of box to spawn (inertia computed automatically).
     public: double mass;
 
     /// \brief Model pose.
-    public: math::Pose modelPose;
+    public: ignition::math::Pose3d modelPose;
 
     /// \brief Link pose.
-    public: math::Pose linkPose;
+    public: ignition::math::Pose3d linkPose;
 
     /// \brief Inertial pose.
-    public: math::Pose inertialPose;
+    public: ignition::math::Pose3d inertialPose;
 
     /// \brief Collision pose.
-    public: math::Pose collisionPose;
+    public: ignition::math::Pose3d collisionPose;
 
     /// \brief Friction coefficient in primary direction.
     public: double friction1;
@@ -128,7 +128,7 @@ class PhysicsFrictionTest : public ServerFixture,
     public: double friction2;
 
     /// \brief Primary friction direction.
-    public: math::Vector3 direction1;
+    public: ignition::math::Vector3d direction1;
   };
 
   /// \brief Spawn a box with friction coefficients and direction.
@@ -140,9 +140,9 @@ class PhysicsFrictionTest : public ServerFixture,
             std::ostringstream modelName;
             modelName << "box_model" << this->spawnCount++;
 
-            double dx = _opt.size.x;
-            double dy = _opt.size.y;
-            double dz = _opt.size.z;
+            double dx = _opt.size.x();
+            double dy = _opt.size.y();
+            double dz = _opt.size.z();
             double ixx = _opt.mass/12.0 * (dy*dy + dz*dz);
             double iyy = _opt.mass/12.0 * (dz*dz + dx*dx);
             double izz = _opt.mass/12.0 * (dx*dx + dy*dy);
@@ -271,12 +271,12 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
+  ignition::math::Vector3d g = physics->GetGravity();
 
   // Custom gravity vector for this demo world.
-  EXPECT_DOUBLE_EQ(g.x, 0);
-  EXPECT_DOUBLE_EQ(g.y, -1.0);
-  EXPECT_DOUBLE_EQ(g.z, -1.0);
+  EXPECT_DOUBLE_EQ(g.x(), 0);
+  EXPECT_DOUBLE_EQ(g.y(), -1.0);
+  EXPECT_DOUBLE_EQ(g.z(), -1.0);
 
   std::vector<PhysicsFrictionTest::FrictionDemoBox> boxes;
   std::vector<PhysicsFrictionTest::FrictionDemoBox>::iterator box;
@@ -302,21 +302,21 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine)
 
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
-      math::Vector3 vel = box->model->GetWorldLinearVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.z, 0, g_friction_tolerance);
+      ignition::math::Vector3d vel = box->model->GetWorldLinearVel();
+      EXPECT_NEAR(vel.x(), 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.z(), 0, g_friction_tolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, g_friction_tolerance);
+        EXPECT_NEAR(vel.y(), 0, g_friction_tolerance);
       }
       else
       {
         // Friction is small enough to allow motion
         // Expect velocity = acceleration * time
-        EXPECT_NEAR(vel.y, (g.y + box->friction) * t.Double(),
+        EXPECT_NEAR(vel.y(), (g.y() + box->friction) * t.Double(),
                     g_friction_tolerance);
       }
     }
@@ -366,7 +366,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
 
   // set the gravity vector
   // small positive y component
-  math::Vector3 g(0.0, 1.0, -9.81);
+  ignition::math::Vector3d g(0.0, 1.0, -9.81);
   physics->SetGravity(g);
 
   // Spawn concentric semi-circles of boxes
@@ -390,21 +390,21 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
       // Compute angle for each box
       double radius = 5.0 + ring;
       double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.pos.Set(radius*cos(angle), radius*sin(angle), dz/2);
+      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
 
       if (ring == 0)
-        opt.direction1 = math::Vector3(-sin(angle), cos(angle), 0);
+        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
       else
-        opt.direction1 = math::Vector3(0.0, 1.0, 0.0);
+        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
 
       if (ring == 1)
-        opt.collisionPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 2)
-        opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
 
       if (ring == 3)
-        opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
 
       physics::ModelPtr model = SpawnBox(opt);
       ASSERT_TRUE(model != NULL);
@@ -422,10 +422,10 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    double velMag = g.y * sinAngle * t;
-    math::Vector3 vel = iter->first->GetWorldLinearVel();
-    EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
-    EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
+    double velMag = g.y() * sinAngle * t;
+    ignition::math::Vector3d vel = iter->first->GetWorldLinearVel();
+    EXPECT_NEAR(velMag*cosAngle, vel.x(), 5*g_friction_tolerance);
+    EXPECT_NEAR(velMag*sinAngle, vel.y(), 5*g_friction_tolerance);
   }
 }
 
@@ -468,7 +468,7 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   // set the gravity vector
   // small positive y component
-  math::Vector3 g(0.0, 1.5, -1.0);
+  ignition::math::Vector3d g(0.0, 1.5, -1.0);
   physics->SetGravity(g);
 
   // Spawn a single box
@@ -479,8 +479,8 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   // Set box size and anisotropic friction
   SpawnFrictionBoxOptions opt;
   opt.size.Set(dx, dy, dz);
-  opt.direction1 = math::Vector3(0.0, 0.0, 1.0);
-  opt.modelPose.pos.z = dz/2;
+  opt.direction1 = ignition::math::Vector3d(0.0, 0.0, 1.0);
+  opt.modelPose.Pos().z() = dz/2;
 
   physics::ModelPtr model = SpawnBox(opt);
   ASSERT_TRUE(model != NULL);
@@ -490,10 +490,10 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
   double t = world->GetSimTime().Double();
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
-  double velMag = (g.y+g.z) * t;
-  math::Vector3 vel = model->GetWorldLinearVel();
-  EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
-  EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);
+  double velMag = (g.y()+g.z()) * t;
+  ignition::math::Vector3d vel = model->GetWorldLinearVel();
+  EXPECT_NEAR(0.0, vel.x(), g_friction_tolerance);
+  EXPECT_NEAR(velMag, vel.y(), g_friction_tolerance);
 }
 
 /////////////////////////////////////////////////
@@ -512,7 +512,7 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // Box size
   double dx = 1.0;
@@ -528,32 +528,32 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
     SpawnFrictionBoxOptions opt;
     opt.size.Set(dx, dy, dz);
     opt.mass = mass;
-    opt.modelPose.pos.x = i * dz;
-    opt.modelPose.pos.z = dz;
+    opt.modelPose.Pos().x() = i * dz;
+    opt.modelPose.Pos().z() = dz;
 
     // i=0: rotated model pose
     //  expect inertial pose to match model pose
     if (i == 0)
     {
-      opt.modelPose.rot.SetFromEuler(0.0, 0.0, angle);
+      opt.modelPose.Rot().Euler(0.0, 0.0, angle);
     }
     // i=1: rotated link pose
     //  expect inertial pose to match link pose
     else if (i == 1)
     {
-      opt.linkPose.rot.SetFromEuler(0.0, 0.0, angle);
+      opt.linkPose.Rot().Euler(0.0, 0.0, angle);
     }
     // i=2: rotated inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 2)
     {
-      opt.inertialPose.rot.SetFromEuler(0.0, 0.0, angle);
+      opt.inertialPose.Rot().Euler(0.0, 0.0, angle);
     }
     // i=3: offset inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 3)
     {
-      opt.inertialPose.pos.Set(1, 1, 1);
+      opt.inertialPose.Pos().Set(1, 1, 1);
     }
 
     physics::ModelPtr model = SpawnBox(opt);
@@ -585,40 +585,40 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
     //  expect inertial pose to differ from link pose
     else if (i == 2)
     {
-      EXPECT_EQ(link->GetWorldPose().pos,
-                link->GetWorldInertialPose().pos);
+      EXPECT_EQ(link->GetWorldPose().Pos(),
+                link->GetWorldInertialPose().Pos());
     }
     // i=3: offset inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 3)
     {
-      EXPECT_EQ(link->GetWorldPose().pos + opt.inertialPose.pos,
-                link->GetWorldInertialPose().pos);
+      EXPECT_EQ(link->GetWorldPose().Pos() + opt.inertialPose.Pos(),
+                link->GetWorldInertialPose().Pos());
     }
 
     // Expect rotated inertia matrix
-    math::Matrix3 inertia = link->GetWorldInertiaMatrix();
+    ignition::math::Matrix3d inertia = link->GetWorldInertiaMatrix();
     if (i == 3)
     {
-      EXPECT_NEAR(inertia[0][0], 80.8333, 1e-4);
-      EXPECT_NEAR(inertia[1][1], 68.3333, 1e-4);
-      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      EXPECT_NEAR(inertia(0, 0), 80.8333, 1e-4);
+      EXPECT_NEAR(inertia(1, 1), 68.3333, 1e-4);
+      EXPECT_NEAR(inertia(2, 2), 14.1667, 1e-4);
       for (int row = 0; row < 3; ++row)
         for (int col = 0; col < 3; ++col)
           if (row != col)
-            EXPECT_NEAR(inertia[row][col], 0.0, g_friction_tolerance);
+            EXPECT_NEAR(inertia(row, col), 0.0, g_friction_tolerance);
     }
     else
     {
-      EXPECT_NEAR(inertia[0][0], 71.4583, 1e-4);
-      EXPECT_NEAR(inertia[1][1], 77.7083, 1e-4);
-      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
-      EXPECT_NEAR(inertia[0][1],  5.4126, 1e-4);
-      EXPECT_NEAR(inertia[1][0],  5.4126, 1e-4);
-      EXPECT_NEAR(inertia[0][2], 0, g_friction_tolerance);
-      EXPECT_NEAR(inertia[2][0], 0, g_friction_tolerance);
-      EXPECT_NEAR(inertia[1][2], 0, g_friction_tolerance);
-      EXPECT_NEAR(inertia[2][1], 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia(0, 0), 71.4583, 1e-4);
+      EXPECT_NEAR(inertia(1, 1), 77.7083, 1e-4);
+      EXPECT_NEAR(inertia(2, 2), 14.1667, 1e-4);
+      EXPECT_NEAR(inertia(0, 1),  5.4126, 1e-4);
+      EXPECT_NEAR(inertia(1, 0),  5.4126, 1e-4);
+      EXPECT_NEAR(inertia(0, 2), 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia(2, 0), 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia(1, 2), 0, g_friction_tolerance);
+      EXPECT_NEAR(inertia(2, 1), 0, g_friction_tolerance);
     }
 
     // For 0-2, apply torque and expect equivalent response
@@ -626,7 +626,7 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
     {
       for (int step = 0; step < 50; ++step)
       {
-        link->SetTorque(math::Vector3(100, 0, 0));
+        link->SetTorque(ignition::math::Vector3d(100, 0, 0));
         world->Step(1);
       }
       if (_physicsEngine.compare("dart") == 0)
@@ -635,10 +635,10 @@ void PhysicsFrictionTest::LinkGetWorldInertia(const std::string &_physicsEngine)
       }
       else
       {
-        math::Vector3 vel = link->GetWorldAngularVel();
-        EXPECT_NEAR(vel.x,  0.0703, g_friction_tolerance);
-        EXPECT_NEAR(vel.y, -0.0049, g_friction_tolerance);
-        EXPECT_NEAR(vel.z,  0.0000, g_friction_tolerance);
+        ignition::math::Vector3d vel = link->GetWorldAngularVel();
+        EXPECT_NEAR(vel.x(),  0.0703, g_friction_tolerance);
+        EXPECT_NEAR(vel.y(), -0.0049, g_friction_tolerance);
+        EXPECT_NEAR(vel.z(),  0.0000, g_friction_tolerance);
       }
     }
   }

@@ -29,18 +29,18 @@ TEST_F(GzPhysics, Gravity)
   Load("worlds/empty.world");
 
   // Spawn a box that will eventually float up.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(0, 0, .5),
-      math::Vector3(0, 0, 0));
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(0, 0, .5),
+      ignition::math::Vector3d(0, 0, 0));
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model);
+  ASSERT_TRUE(model != NULL);
 
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(0, 0, .5, 0, 0, 0));
+  EXPECT_EQ(model->GetWorldPose(), ignition::math::Pose3d(0, 0, .5, 0, 0, 0));
 
   SetPause(true);
 
@@ -49,7 +49,7 @@ TEST_F(GzPhysics, Gravity)
 
   world->Step(100);
 
-  EXPECT_GT(model->GetWorldPose().pos.z, 0.5);
+  EXPECT_GT(model->GetWorldPose().Pos().z(), 0.5);
 }
 
 /////////////////////////////////////////////////
@@ -60,8 +60,8 @@ TEST_F(GzPhysics, StepSize)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change step size
   custom_exec("gz physics -s 0.002");
@@ -80,8 +80,8 @@ TEST_F(GzPhysics, Iters)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change iterations
   {
@@ -106,8 +106,8 @@ TEST_F(GzPhysics, UpdateRate)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
-  ASSERT_TRUE(world->GetPhysicsEngine());
+  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world->GetPhysicsEngine() != NULL);
 
   // Change update rate
   custom_exec("gz physics -u 2.0");

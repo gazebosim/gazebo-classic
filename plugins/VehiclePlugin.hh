@@ -14,15 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: A 4-wheeled vehicle
- * Author: Nate Koenig
- */
-
 #ifndef _GAZEBO_VEHICLE_PLUGIN_HH_
 #define _GAZEBO_VEHICLE_PLUGIN_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"
@@ -52,7 +49,7 @@ namespace gazebo
     private: physics::JointPtr gasJoint, brakeJoint;
     private: physics::JointPtr steeringJoint;
 
-    private: math::Vector3 velocity;
+    private: ignition::math::Vector3d velocity;
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;

@@ -26,7 +26,7 @@ namespace gazebo
     public: WorldPluginTutorial() : WorldPlugin()
             {
               common::Color c(0, 0, 0);
-              math::Vector3 v;
+              ignition::math::Vector3d v;
               printf("Hello World!\n");
             }
 

@@ -94,8 +94,9 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
               ignition::math::parseFloat(words[1]) * _scale,
               ignition::math::parseFloat(words[2]) * _scale,
               ignition::math::parseFloat(words[3]) * _scale);
-          ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
-          transform.SetTranslate(offset);
+          ignition::math::Matrix4d transform(
+              ignition::math::Matrix4d::Identity);
+          transform.Translate(offset);
           node->SetTransform(transform);
         }
         else
@@ -189,7 +190,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
     {
       SkeletonNode *node = nodes[i];
       std::vector<std::string> channels = nodeChannels[i];
-      ignition::math::Vector3d translation = node->GetTransform().GetTranslation();
+      ignition::math::Vector3d translation = node->GetTransform().Translation();
       ignition::math::Vector3d xAxis(1, 0, 0);
       ignition::math::Vector3d yAxis(0, 1, 0);
       ignition::math::Vector3d zAxis(0, 0, 1);
@@ -239,7 +240,7 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
         mats.pop_back();
       }
       ignition::math::Matrix4d pos(ignition::math::Matrix4d::Identity);
-      pos.SetTranslate(translation);
+      pos.Translate(translation);
       transform = pos * transform;
       animation->AddKeyFrame(node->GetName(), time, transform);
     }

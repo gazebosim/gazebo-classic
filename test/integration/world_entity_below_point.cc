@@ -44,15 +44,15 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
   modelNames.push_back("sphere");
 
   std::vector<std::string>::iterator iter;
-  math::Vector3 pos, testPos;
+  ignition::math::Vector3d pos, testPos;
   physics::ModelPtr model;
   physics::EntityPtr entity;
   for (iter = modelNames.begin(); iter != modelNames.end(); ++iter)
   {
     model = world->GetModel(*iter);
     ASSERT_TRUE(model != NULL);
-    pos = model->GetWorldPose().pos;
-    pos.z += 10;
+    pos = model->GetWorldPose().Pos();
+    pos.z() += 10;
 
     entity = world->GetEntityBelowPoint(pos);
     if (entity)
@@ -69,7 +69,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     }
 
     testPos = pos;
-    testPos.z = pos.z + 5;
+    testPos.z() = pos.z() + 5;
     entity = world->GetEntityBelowPoint(testPos);
     if (entity)
     {

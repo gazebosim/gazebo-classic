@@ -18,7 +18,6 @@
 #include "gazebo/sensors/SensorFactory.hh"
 
 #include "gazebo/common/common.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/Noise.hh"
 #include "gazebo/transport/transport.hh"
@@ -115,37 +114,41 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
     // Measure position and apply noise
     {
       // Get postion in Cartesian gazebo frame
-      math::Pose gpsPose = this->pose + this->parentLink->GetWorldPose();
+      ignition::math::Pose3d gpsPose =
+        this->pose + this->parentLink->GetWorldPose();
 
       // Apply position noise before converting to global frame
-      gpsPose.pos.x = this->horizontalPositionNoise->Apply(gpsPose.pos.x);
-      gpsPose.pos.y = this->horizontalPositionNoise->Apply(gpsPose.pos.y);
-      gpsPose.pos.z = this->verticalPositionNoise->Apply(gpsPose.pos.z);
+      gpsPose.Pos().x() =
+        this->horizontalPositionNoise->Apply(gpsPose.Pos().x());
+      gpsPose.Pos().y() =
+        this->horizontalPositionNoise->Apply(gpsPose.Pos().y());
+      gpsPose.Pos().z() =
+        this->verticalPositionNoise->Apply(gpsPose.Pos().z());
 
       // Convert to global frames
-      math::Vector3 spherical = this->sphericalCoordinates->
-        SphericalFromLocal(gpsPose.pos);
-      this->lastGpsMsg.set_latitude_deg(spherical.x);
-      this->lastGpsMsg.set_longitude_deg(spherical.y);
-      this->lastGpsMsg.set_altitude(spherical.z);
+      ignition::math::Vector3d spherical = this->sphericalCoordinates->
+        SphericalFromLocal(gpsPose.Pos());
+      this->lastGpsMsg.set_latitude_deg(spherical.x());
+      this->lastGpsMsg.set_longitude_deg(spherical.y());
+      this->lastGpsMsg.set_altitude(spherical.z());
     }
 
     // Measure velocity and apply noise
     {
-      math::Vector3 gpsVelocity =
-        this->parentLink->GetWorldLinearVel(this->pose.pos);
+      ignition::math::Vector3d gpsVelocity =
+        this->parentLink->GetWorldLinearVel(this->pose.Pos());
 
       // Convert to global frame
       gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
-      gpsVelocity.x = this->horizontalVelocityNoise->Apply(gpsVelocity.x);
-      gpsVelocity.y = this->horizontalVelocityNoise->Apply(gpsVelocity.y);
-      gpsVelocity.z = this->verticalVelocityNoise->Apply(gpsVelocity.z);
+      gpsVelocity.x() = this->horizontalVelocityNoise->Apply(gpsVelocity.x());
+      gpsVelocity.y() = this->horizontalVelocityNoise->Apply(gpsVelocity.y());
+      gpsVelocity.z() = this->verticalVelocityNoise->Apply(gpsVelocity.z());
 
-      this->lastGpsMsg.set_velocity_east(gpsVelocity.x);
-      this->lastGpsMsg.set_velocity_north(gpsVelocity.y);
-      this->lastGpsMsg.set_velocity_up(gpsVelocity.z);
+      this->lastGpsMsg.set_velocity_east(gpsVelocity.x());
+      this->lastGpsMsg.set_velocity_north(gpsVelocity.y());
+      this->lastGpsMsg.set_velocity_up(gpsVelocity.z());
     }
   }
   this->lastMeasurementTime = this->world->GetSimTime();
@@ -158,18 +161,18 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLongitude() const
+ignition::math::Angle GpsSensor::GetLongitude() const
 {
-  math::Angle angle;
-  angle.SetFromDegree(this->lastGpsMsg.longitude_deg());
+  ignition::math::Angle angle;
+  angle.Degree(this->lastGpsMsg.longitude_deg());
   return angle;
 }
 
 //////////////////////////////////////////////////
-math::Angle GpsSensor::GetLatitude() const
+ignition::math::Angle GpsSensor::GetLatitude() const
 {
-  math::Angle angle;
-  angle.SetFromDegree(this->lastGpsMsg.latitude_deg());
+  ignition::math::Angle angle;
+  angle.Degree(this->lastGpsMsg.latitude_deg());
   return angle;
 }
 

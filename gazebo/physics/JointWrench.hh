@@ -22,7 +22,7 @@
 #ifndef _JOINT_WRENCH_HH_
 #define _JOINT_WRENCH_HH_
 
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -78,16 +78,16 @@ namespace gazebo
               }
 
       /// \brief Force on the first link.
-      public: math::Vector3 body1Force;
+      public: ignition::math::Vector3d body1Force;
 
       /// \brief Force on the second link.
-      public: math::Vector3 body2Force;
+      public: ignition::math::Vector3d body2Force;
 
       /// \brief Torque on the first link.
-      public: math::Vector3 body1Torque;
+      public: ignition::math::Vector3d body1Torque;
 
       /// \brief Torque on the second link.
-      public: math::Vector3 body2Torque;
+      public: ignition::math::Vector3d body2Torque;
     };
     /// \}
   }

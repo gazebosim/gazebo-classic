@@ -46,41 +46,41 @@ TEST_F(CylinderShapeTest, Scale)
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = cylinderSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("cylinder");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem != NULL);
   cylinder->Load(elem);
 
   // Test scaling with unit size
   double radius = cylinder->GetRadius();
-  double length = cylinder->GetLength();
+  double length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 1.0);
 
-  cylinder->SetScale(math::Vector3(1.5, 1.5, 1.5));
+  cylinder->SetScale(ignition::math::Vector3d(1.5, 1.5, 1.5));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.75);
   EXPECT_DOUBLE_EQ(length, 1.5);
 
-  cylinder->SetScale(math::Vector3(2.0, 2.0, 2.0));
+  cylinder->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 1.0);
   EXPECT_DOUBLE_EQ(length, 2.0);
 
   // reset scale
-  cylinder->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  cylinder->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 1.0);
 
@@ -88,50 +88,50 @@ TEST_F(CylinderShapeTest, Scale)
   cylinder->SetRadius(2.5);
   cylinder->SetLength(3.5);
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 2.5);
   EXPECT_DOUBLE_EQ(length, 3.5);
 
-  cylinder->SetScale(math::Vector3(2.0, 2.0, 2.0));
+  cylinder->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 5.0);
   EXPECT_DOUBLE_EQ(length, 7.0);
 
-  cylinder->SetScale(math::Vector3(100.0, 100.0, 100.0));
+  cylinder->SetScale(ignition::math::Vector3d(100.0, 100.0, 100.0));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 250.0);
   EXPECT_DOUBLE_EQ(length, 350.0);
 
-  cylinder->SetScale(math::Vector3(0.1, 0.1, 0.1));
+  cylinder->SetScale(ignition::math::Vector3d(0.1, 0.1, 0.1));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.25);
   EXPECT_DOUBLE_EQ(length, 0.35);
 
   // reset scale
-  cylinder->SetScale(math::Vector3(1.0, 1.0, 1.0));
+  cylinder->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   cylinder->SetRadius(0.5);
   cylinder->SetLength(1.0);
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 1.0);
 
   // Test scaling with different x, y and z components
-  cylinder->SetScale(math::Vector3(0.5, 1.0, 2.5));
+  cylinder->SetScale(ignition::math::Vector3d(0.5, 1.0, 2.5));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   // radius should be multiplied by max of (0.5, 1.0)
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 2.5);
 
   // Test scaling with negative components
   // This should fail and radius and length should remain the same as before
-  cylinder->SetScale(math::Vector3(-1.0, -2.0, -3.0));
+  cylinder->SetScale(ignition::math::Vector3d(-1.0, -2.0, -3.0));
   radius = cylinder->GetRadius();
-  length = cylinder->GetLength();
+  length = cylinder->Length();
   EXPECT_DOUBLE_EQ(radius, 0.5);
   EXPECT_DOUBLE_EQ(length, 2.5);
 }
