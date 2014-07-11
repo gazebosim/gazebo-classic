@@ -49,8 +49,20 @@ OculusConfig::OculusConfig(QWidget *_parent)
   QLabel *step1Title = new QLabel(Step1Title);
   step1Title->setFont(bigFont);
   QLabel *step1Text = new QLabel(Step1Text);
-  step1LeftLayout->addWidget(step1Title);
+
+  QLabel *image1 = new QLabel;
+  QPixmap pixmap1(":/images/help_icon.png");
+  image1->setPixmap(pixmap1.scaled(25, 25, Qt::KeepAspectRatio));
+  image1->setToolTip("<html><img src=:/images/oculus_position.png/></html>");
+
+  QHBoxLayout *step1TitleLayout = new QHBoxLayout;
+
+  step1TitleLayout->addWidget(step1Title);
+  step1TitleLayout->addWidget(image1);
+
+
   step1LeftLayout->addWidget(step1Text);
+  step1LeftLayout->addLayout(step1TitleLayout);
 
   QGridLayout *step1GridLayout = new QGridLayout;
   step1GridLayout->setContentsMargins(0, 20, 11, 11);
@@ -76,12 +88,12 @@ OculusConfig::OculusConfig(QWidget *_parent)
   step1LeftLayout->addLayout(step1GridLayout);
 
   // Step 1 right side.
-  QVBoxLayout *step1RightLayout = new QVBoxLayout;
+  /*QVBoxLayout *step1RightLayout = new QVBoxLayout;
   QLabel *image1 = new QLabel;
-  QPixmap pixmap1(":/images/oculus_position.png");
-  image1->setPixmap(pixmap1.scaled(350, 350, Qt::KeepAspectRatio));
+  QPixmap pixmap1(":/images/help_icon.png");
+  image1->setPixmap(pixmap1.scaled(35, 35, Qt::KeepAspectRatio));
 
-  step1RightLayout->addWidget(image1);
+  step1RightLayout->addWidget(image1);*/
 
   // Add left and right to the step1 layout.
   //step1Layout->addLayout(step1LeftLayout);
@@ -90,7 +102,7 @@ OculusConfig::OculusConfig(QWidget *_parent)
 
   // Add the step1 layout to the main layout.
   contentLayout->addLayout(step1LeftLayout, 0, 1);
-  contentLayout->addLayout(step1RightLayout, 0, 2, Qt::AlignRight);
+  //contentLayout->addLayout(step1RightLayout, 0, 2, Qt::AlignRight);
 
   // Step 2.
   //QHBoxLayout *step2Layout = new QHBoxLayout;
@@ -143,7 +155,7 @@ OculusConfig::OculusConfig(QWidget *_parent)
   step2RightLayout->setContentsMargins(70, 50, 0, 0);
 
   contentLayout->addLayout(step2LeftLayout, 1, 1);
-  contentLayout->addLayout(step2RightLayout, 1, 2);
+  //contentLayout->addLayout(step2RightLayout, 1, 2);
 
   // Step 3.
   //QHBoxLayout *step3Layout = new QHBoxLayout;
@@ -237,7 +249,7 @@ OculusConfig::OculusConfig(QWidget *_parent)
 
 
   contentLayout->addLayout(step3LeftLayout, 2, 1);
-  contentLayout->addLayout(step3RightLayout, 2, 2);
+  //contentLayout->addLayout(step3RightLayout, 2, 2);
 
   // Create the remaining elements.
   frame->setLayout(contentLayout);
