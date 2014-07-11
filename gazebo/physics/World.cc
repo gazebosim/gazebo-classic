@@ -2025,7 +2025,7 @@ void World::RemoveModel(const std::string &_name)
   if (this->sdf->HasElement("light"))
   {
     sdf::ElementPtr childElem = this->sdf->GetElement("light");
-    while (childElem && childElem->Get<std::string>("name") != (*iter))
+    while (childElem && childElem->Get<std::string>("name") != _name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
