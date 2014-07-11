@@ -49,20 +49,24 @@ namespace gazebo
     // \brief Called once after Load
     private: void Init()
     {
-      // Get a pointer to the active user camera
-      this->userCam = gui::get_active_camera();
-
-      // Enable saving frames
-      this->userCam->EnableSaveFrame(true);
-
-      // Specify the path to save frames into
-      this->userCam->SetSaveFramePathname("/tmp/gazebo_frames");
     }
 
     /////////////////////////////////////////////
     /// \brief Called every PreRender event. See the Load function.
     private: void Update()
     {
+      if (!this->userCam)
+      {
+        // Get a pointer to the active user camera
+        this->userCam = gui::get_active_camera();
+
+        // Enable saving frames
+        this->userCam->EnableSaveFrame(true);
+
+        // Specify the path to save frames into
+        this->userCam->SetSaveFramePathname("/tmp/gazebo_frames");
+      }
+
       // Get scene pointer
       rendering::ScenePtr scene = rendering::get_scene();
 
