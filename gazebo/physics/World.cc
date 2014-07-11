@@ -2033,7 +2033,7 @@ void World::RemoveModel(const std::string &_name)
       // Find the light by name in the scene msg, and remove it.
       for (int i = 0; i < this->sceneMsg.light_size(); ++i)
       {
-        if (this->sceneMsg.light(i).name() == (*iter))
+        if (this->sceneMsg.light(i).name() == _name)
         {
           this->sceneMsg.mutable_light()->SwapElements(i,
               this->sceneMsg.light_size()-1);
