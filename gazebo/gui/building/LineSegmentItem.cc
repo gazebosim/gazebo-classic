@@ -210,7 +210,7 @@ double LineSegmentItem::GetSceneRotation() const
 
 /////////////////////////////////////////////////
 void LineSegmentItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+    const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   _painter->save();
   _painter->setPen(this->pen());

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
-
 #ifndef _BULLETSCREWJOINT_HH_
 #define _BULLETSCREWJOINT_HH_
 
@@ -54,7 +49,8 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(
+                  unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAnchor(unsigned int _index,
@@ -66,7 +62,8 @@ namespace gazebo
       /// \brief Set the axis of motion
       /// \param[in] _index Axis index.
       /// \param[in] _axis Axis value.
-      public: void SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis);
+      public: void SetAxis(unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -111,7 +108,8 @@ namespace gazebo
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
-      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
@@ -122,7 +120,8 @@ namespace gazebo
                   unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
-      protected: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual ignition::math::Angle GetAngleImpl(
+                     unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _force);

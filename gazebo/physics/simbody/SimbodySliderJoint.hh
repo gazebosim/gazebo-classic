@@ -62,10 +62,12 @@ namespace gazebo
       public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);

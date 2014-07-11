@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _GRIPPER_HH_
-#define _GRIPPER_HH_
+#ifndef _GAZEBO_GRIPPER_HH_
+#define _GAZEBO_GRIPPER_HH_
 
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include <ignition/math/Pose3.hh>
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 

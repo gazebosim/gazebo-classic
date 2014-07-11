@@ -96,7 +96,7 @@ double DoorItem::GetSceneRotation() const
 
 /////////////////////////////////////////////////
 void DoorItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+    const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
@@ -169,7 +169,6 @@ void DoorItem::OnApply()
     itemPos.setY(-itemPos.y());
     this->doorPos = itemPos;
     this->setPos(this->doorPos);
-//    this->setParentItem(NULL);
   }
   this->DoorChanged();
 }

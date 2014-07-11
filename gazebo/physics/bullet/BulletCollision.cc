@@ -106,8 +106,8 @@ ignition::math::Box BulletCollision::GetBoundingBox() const
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+    result.min.Set(btMin.X(), btMin.Y(), btMin.Z());
+    result.max.Set(btMax.X(), btMax.Y(), btMax.Z());
   }
   return result;
 }

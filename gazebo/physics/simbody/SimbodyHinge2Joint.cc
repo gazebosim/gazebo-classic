@@ -47,13 +47,15 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetAnchor(
+    unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetAxis(
+    unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
   return ignition::math::Vector3d();
@@ -102,14 +104,16 @@ double SimbodyHinge2Joint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetGlobalAxis not implemented\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle SimbodyHinge2Joint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
   return ignition::math::Angle();

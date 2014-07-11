@@ -82,10 +82,10 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   double dist = (currTime - startTime).Double() * 0.2;
   std::cout << "Dist[" << dist << "]\n";
-  std::cout << "EndPose.x[" << endPose.Pos().x() << "]\n";
-  EXPECT_LT(fabs(endPose.Pos().x() - dist), 0.1);
-  EXPECT_LT(fabs(endPose.Pos().y()), 0.5);
-  EXPECT_LT(fabs(endPose.Pos().z()), 0.01);
+  std::cout << "EndPose.x[" << endPose.Pos().X() << "]\n";
+  EXPECT_LT(fabs(endPose.Pos().X() - dist), 0.1);
+  EXPECT_LT(fabs(endPose.Pos().Y()), 0.5);
+  EXPECT_LT(fabs(endPose.Pos().Z()), 0.01);
 }
 
 

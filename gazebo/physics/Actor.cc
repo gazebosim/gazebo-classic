@@ -106,13 +106,12 @@ void Actor::Load(sdf::ElementPtr _sdf)
     linkSdf->GetElement("gravity")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
 
-//    this->AddSphereInertia(linkSdf, ignition::math::Pose3d(), 1.0, 0.01);
-//    this->AddSphereCollision(linkSdf, actorName + "_pose_col",
-//                                             ignition::math::Pose3d(), 0.02);
-    this->AddBoxVisual(linkSdf, actorName + "_pose_vis", ignition::math::Pose3d(),
-                       ignition::math::Vector3d(0.05, 0.05, 0.05), "Gazebo/White",
-                       Color::White);
-    this->AddActorVisual(linkSdf, actorName + "_visual", ignition::math::Pose3d());
+    this->AddBoxVisual(linkSdf, actorName + "_pose_vis",
+        ignition::math::Pose3d(),
+        ignition::math::Vector3d(0.05, 0.05, 0.05), "Gazebo/White",
+        Color::White);
+    this->AddActorVisual(linkSdf, actorName + "_visual",
+        ignition::math::Pose3d());
 
     this->visualName = actorName + "::" + actorName + "_pose::"
                              + actorName + "_visual";
@@ -145,35 +144,36 @@ void Actor::Load(sdf::ElementPtr _sdf)
       if (bone->IsRootNode())
       {
         this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-                            ignition::math::Pose3d(), 0.02, "Gazebo/Blue", Color::Blue);
+            ignition::math::Pose3d(), 0.02, "Gazebo/Blue", Color::Blue);
       }
       else
         if (bone->GetChildCount() == 0)
         {
             this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", ignition::math::Pose3d(), 0.02,
-                            "Gazebo/Yellow", Color::Yellow);
+                "__SKELETON_VISUAL__", ignition::math::Pose3d(), 0.02,
+                "Gazebo/Yellow", Color::Yellow);
         }
         else
           this->AddSphereVisual(linkSdf, bone->GetName() +
-                            "__SKELETON_VISUAL__", ignition::math::Pose3d(), 0.02,
-                            "Gazebo/Red", Color::Red);
+              "__SKELETON_VISUAL__", ignition::math::Pose3d(), 0.02,
+              "Gazebo/Red", Color::Red);
 
       for (unsigned int i = 0; i < bone->GetChildCount(); i++)
       {
         SkeletonNode *curChild = bone->GetChild(i);
 
-        ignition::math::Vector3d dir = curChild->GetModelTransform().Translation() -
-            bone->GetModelTransform().Translation();
+        ignition::math::Vector3d dir =
+          curChild->GetModelTransform().Translation() -
+          bone->GetModelTransform().Translation();
         double length = dir.Length();
 
         if (!ignition::math::equal(length, 0.0))
         {
           ignition::math::Vector3d r = curChild->GetTransform().Translation();
           ignition::math::Vector3d linkPos =
-            ignition::math::Vector3d(r.x() / 2.0, r.y() / 2.0, r.z()/ 2.0);
-          double theta = atan2(dir.y(), dir.x());
-          double phi = acos(dir.z()/ length);
+            ignition::math::Vector3d(r.X() / 2.0, r.Y() / 2.0, r.Z()/ 2.0);
+          double theta = atan2(dir.Y(), dir.X());
+          double phi = acos(dir.Z()/ length);
 
           ignition::math::Pose3d bonePose(linkPos,
               ignition::math::Quaterniond(0.0, phi, theta));
@@ -247,11 +247,12 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         while (wayptSdf)
         {
           points[wayptSdf->Get<double>("time")] =
-                                          wayptSdf->Get<ignition::math::Pose3d>("pose");
+            wayptSdf->Get<ignition::math::Pose3d>("pose");
           wayptSdf = wayptSdf->GetNextElement("waypoint");
         }
 
-        std::map<double, ignition::math::Pose3d>::reverse_iterator last = points.rbegin();
+        std::map<double, ignition::math::Pose3d>::reverse_iterator last =
+          points.rbegin();
         std::stringstream animName;
         animName << tinfo.type << "_" << tinfo.id;
         common::PoseAnimation *anim = new common::PoseAnimation(animName.str(),
@@ -259,11 +260,12 @@ void Actor::LoadScript(sdf::ElementPtr _sdf)
         this->trajInfo[idx].duration = last->first;
         this->trajInfo[idx].translated = true;
 
-        for (std::map<double, ignition::math::Pose3d>::iterator pIter = points.begin();
-              pIter != points.end(); ++pIter)
+        for (std::map<double, ignition::math::Pose3d>::iterator pIter =
+            points.begin(); pIter != points.end(); ++pIter)
         {
           common::PoseKeyFrame *key;
-          if (pIter == points.begin() && !ignition::math::equal(pIter->first, 0.0))
+          if (pIter == points.begin() &&
+              !ignition::math::equal(pIter->first, 0.0))
           {
             key = anim->CreateKeyFrame(0.0);
             key->SetTranslation(pIter->second.Pos());
@@ -508,7 +510,7 @@ void Actor::Update()
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
 
   if (tinfo.translated)
-    rootPos.x() = 0.0;
+    rootPos.X() = 0.0;
   ignition::math::Pose3d actorPose;
   actorPose.Pos() = modelPose.Pos() + modelPose.Rot().RotateVector(rootPos);
   actorPose.Rot() = modelPose.Rot() *rootRot;
@@ -591,7 +593,8 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
   model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
-  model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.Rot()));
+  model_pose->mutable_orientation()->CopyFrom(
+      msgs::Convert(mainLinkPose.Rot()));
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
     this->bonePosePub->Publish(msg);

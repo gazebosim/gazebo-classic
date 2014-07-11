@@ -16,9 +16,8 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/common/MovingWindowFilter.hh"
-
 #include <ignition/math/Vector3.hh>
+#include "gazebo/common/MovingWindowFilter.hh"
 
 using namespace gazebo;
 

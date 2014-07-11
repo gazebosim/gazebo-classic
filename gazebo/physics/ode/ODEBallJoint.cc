@@ -58,7 +58,7 @@ void ODEBallJoint::SetAnchor(unsigned int /*_index*/,
     const ignition::math::Vector3d &_anchor)
 {
   if (this->jointId)
-    dJointSetBallAnchor(jointId, _anchor.x(), _anchor.y(), _anchor.z());
+    dJointSetBallAnchor(jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -70,7 +70,8 @@ void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }

@@ -171,8 +171,10 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(ignition::math::Vector3d::UnitX), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(ignition::math::Vector3d::UnitY), 87.50, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(
+          ignition::math::Vector3d::UnitX), 3125, 1e-2);
+    EXPECT_NEAR(joint->GetInertiaRatio(
+          ignition::math::Vector3d::UnitY), 87.50, 1e-2);
   }
 }
 //////////////////////////////////////////////////
@@ -255,56 +257,57 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     world->Step(1);
 
     // count up and down cycles
-    if (linkPrismatic->GetWorldLinearVel().z() > vT && velPrismatic < -vT)
+    if (linkPrismatic->GetWorldLinearVel().Z() > vT && velPrismatic < -vT)
     {
       cyclesPrismatic++;
       velPrismatic = 1.0;
     }
-    else if (linkPrismatic->GetWorldLinearVel().z() < -vT && velPrismatic > vT)
+    else if (linkPrismatic->GetWorldLinearVel().Z() < -vT && velPrismatic > vT)
     {
       cyclesPrismatic++;
       velPrismatic = -1.0;
     }
-    if (-linkRevolute->GetRelativeAngularVel().y() > vT && velRevolute < -vT)
+    if (-linkRevolute->GetRelativeAngularVel().Y() > vT && velRevolute < -vT)
     {
       cyclesRevolute++;
       velRevolute = 1.0;
     }
-    else if (-linkRevolute->GetRelativeAngularVel().y() < -vT && velRevolute > vT)
+    else if (-linkRevolute->GetRelativeAngularVel().Y() < -vT &&
+             velRevolute > vT)
     {
       cyclesRevolute++;
       velRevolute = -1.0;
     }
-    if (linkPluginExplicit->GetWorldLinearVel().z() > vT &&
+    if (linkPluginExplicit->GetWorldLinearVel().Z() > vT &&
         velPluginExplicit < -vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = 1.0;
     }
-    else if (linkPluginExplicit->GetWorldLinearVel().z() < -vT &&
+    else if (linkPluginExplicit->GetWorldLinearVel().Z() < -vT &&
              velPluginExplicit > vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = -1.0;
     }
-    if (linkPluginImplicit->GetWorldLinearVel().z() > vT &&
+    if (linkPluginImplicit->GetWorldLinearVel().Z() > vT &&
              velPluginImplicit < -vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = 1.0;
     }
-    else if (linkPluginImplicit->GetWorldLinearVel().z() < -vT &&
+    else if (linkPluginImplicit->GetWorldLinearVel().Z() < -vT &&
              velPluginImplicit > vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = -1.0;
     }
-    if (linkContact->GetWorldLinearVel().z() > vT && velContact < -vT)
+    if (linkContact->GetWorldLinearVel().Z() > vT && velContact < -vT)
     {
       cyclesContact++;
       velContact = 1.0;
     }
-    else if (linkContact->GetWorldLinearVel().z() < -vT && velContact > vT)
+    else if (linkContact->GetWorldLinearVel().Z() < -vT && velContact > vT)
     {
       cyclesContact++;
       velContact = -1.0;

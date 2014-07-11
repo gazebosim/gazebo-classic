@@ -97,9 +97,9 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   ignition::math::Vector3d g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x(), 0);
-  EXPECT_EQ(g.y(), 0);
-  EXPECT_LE(g.z(), -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -192,22 +192,23 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_EQ(vel1.x(), 0);
-      EXPECT_EQ(vel1.y(), 0);
-      EXPECT_NEAR(vel1.z(), g.z()*t, -g.z()*t*PHYSICS_TOL);
+      EXPECT_EQ(vel1.X(), 0);
+      EXPECT_EQ(vel1.Y(), 0);
+      EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->GetWorldPose();
-      x0 = modelPos[name].x();
-      EXPECT_EQ(pose1.Pos().x(), x0);
-      EXPECT_EQ(pose1.Pos().y(), 0);
-      EXPECT_NEAR(pose1.Pos().z(), z0 + g.z()/2*t*t, (z0+g.z()/2*t*t)*PHYSICS_TOL);
+      x0 = modelPos[name].X();
+      EXPECT_EQ(pose1.Pos().X(), x0);
+      EXPECT_EQ(pose1.Pos().Y(), 0);
+      EXPECT_NEAR(pose1.Pos().Z(),
+          z0 + g.Z()/2*t*t, (z0+g.Z()/2*t*t)*PHYSICS_TOL);
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->GetWorldPose();
-      EXPECT_LT(vel2.z(), vel1.z());
-      EXPECT_LT(pose2.Pos().z(), pose1.Pos().z());
+      EXPECT_LT(vel2.Z(), vel1.Z());
+      EXPECT_LT(pose2.Pos().Z(), pose1.Pos().Z());
 
       // if (physics->GetType()  == "bullet")
       // {
@@ -228,7 +229,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5) / (-g.z()));
+  double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
@@ -251,7 +252,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   //           << "] v[" << model->GetWorldLinearVel()
   //           << "]\n";
 
-  //     if (model->GetWorldPose().Pos().z() < 0.6)
+  //     if (model->GetWorldPose().Pos().Z() < 0.6)
   //     {
   //       gzerr << "wait: ";
   //       getchar();
@@ -274,18 +275,18 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check that velocity is small
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_NEAR(vel1.x(), 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.y(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Y(), 0, PHYSICS_TOL);
       if (name == "test_empty")
-        EXPECT_NEAR(vel1.z(), g.z()*t, -g.z()*t*PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       else
-        EXPECT_NEAR(vel1.z(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Z(), 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      x0 = modelPos[name].x();
-      EXPECT_NEAR(pose1.Pos().x(), x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.Pos().y(), 0, PHYSICS_TOL);
+      x0 = modelPos[name].X();
+      EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Y(), 0, PHYSICS_TOL);
 
       // debug
       // if (physics->GetType()  == "bullet")
@@ -301,11 +302,11 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
       if (name == "test_empty")
       {
-        EXPECT_NEAR(pose1.Pos().z(), z0+g.z()/2*t*t,
-            fabs((z0+g.z()/2*t*t)*PHYSICS_TOL));
+        EXPECT_NEAR(pose1.Pos().Z(), z0+g.Z()/2*t*t,
+            fabs((z0+g.Z()/2*t*t)*PHYSICS_TOL));
       }
       else
-        EXPECT_NEAR(pose1.Pos().z(), 0.5, PHYSICS_TOL);
+        EXPECT_NEAR(pose1.Pos().Z(), 0.5, PHYSICS_TOL);
     }
     else
     {
@@ -325,9 +326,9 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   {
     pose1 = model->GetWorldPose();
     pose2 = linkOffsetPose2 + pose1;
-    EXPECT_NEAR(pose2.Pos().x(), linkOffsetPose2.Pos().x(), PHYSICS_TOL);
-    EXPECT_NEAR(pose2.Pos().y(), linkOffsetPose2.Pos().y(), PHYSICS_TOL);
-    EXPECT_NEAR(pose2.Pos().z(), 0.5, PHYSICS_TOL);
+    EXPECT_NEAR(pose2.Pos().X(), linkOffsetPose2.Pos().X(), PHYSICS_TOL);
+    EXPECT_NEAR(pose2.Pos().Y(), linkOffsetPose2.Pos().Y(), PHYSICS_TOL);
+    EXPECT_NEAR(pose2.Pos().Z(), 0.5, PHYSICS_TOL);
     world->Step(1);
   }
 }
@@ -366,9 +367,9 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   ignition::math::Vector3d g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x(), 0);
-  EXPECT_EQ(g.y(), 0);
-  EXPECT_LT(g.z(), 0);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LT(g.Z(), 0);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -476,23 +477,23 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       world->Step(1);
       vel1 = model->GetWorldLinearVel();
       t = world->GetSimTime().Double();
-      EXPECT_NEAR(vel1.x(), 0, 1e-16);
-      EXPECT_NEAR(vel1.y(), 0, 1e-16);
-      EXPECT_NEAR(vel1.z(), g.z()*t, -g.z()*t*PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(), 0, 1e-16);
+      EXPECT_NEAR(vel1.Y(), 0, 1e-16);
+      EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->GetWorldPose();
-      EXPECT_NEAR(pose1.Pos().x(), x0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.Pos().y(), y0, PHYSICS_TOL*PHYSICS_TOL);
-      EXPECT_NEAR(pose1.Pos().z(), z0+radius + g.z()/2*t*t,
-                  (z0+radius+g.z()/2*t*t)*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL*PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Z(), z0+radius + g.Z()/2*t*t,
+                  (z0+radius+g.Z()/2*t*t)*PHYSICS_TOL);
 
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->GetWorldPose();
-      EXPECT_LT(vel2.z(), vel1.z());
-      EXPECT_LT(pose2.Pos().z(), pose1.Pos().z());
+      EXPECT_LT(vel2.Z(), vel1.Z());
+      EXPECT_LT(pose2.Pos().Z(), pose1.Pos().Z());
     }
     else
     {
@@ -502,7 +503,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5) / (-g.z()));
+  double tHit = sqrt(2*(z0-0.5) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
@@ -532,77 +533,77 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       vel2 = model->GetWorldAngularVel();
 
       // vertical component of linear and angular velocity should be small
-      EXPECT_NEAR(vel1.z(), 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel2.z(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Z(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel2.Z(), 0, PHYSICS_TOL);
 
       // expect small values for directions with no offset
-      if (cog.x() == 0)
+      if (cog.X() == 0)
       {
-        EXPECT_NEAR(vel1.x(), 0, PHYSICS_TOL);
-        EXPECT_NEAR(vel2.y(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.X(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.Y(), 0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT(vel1.x()*cog.x(), 0.2*cog.x()*cog.x());
-        EXPECT_GT(vel2.y()*cog.x(), 0.2*cog.x()*cog.x());
+        EXPECT_GT(vel1.X()*cog.X(), 0.2*cog.X()*cog.X());
+        EXPECT_GT(vel2.Y()*cog.X(), 0.2*cog.X()*cog.X());
       }
 
-      if (cog.y() == 0)
+      if (cog.Y() == 0)
       {
-        EXPECT_NEAR(vel1.y(), 0, PHYSICS_TOL);
-        EXPECT_NEAR(vel2.x(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Y(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.X(), 0, PHYSICS_TOL);
       }
       else
       {
-        EXPECT_GT(vel1.y()*cog.y(),  0.2*cog.y()*cog.y());
-        EXPECT_LT(vel2.x()*cog.y(), -0.2*cog.y()*cog.y());
+        EXPECT_GT(vel1.Y()*cog.Y(),  0.2*cog.Y()*cog.Y());
+        EXPECT_LT(vel2.X()*cog.Y(), -0.2*cog.Y()*cog.Y());
       }
 
       // Expect roll without slip
-      EXPECT_NEAR(vel1.x(),  vel2.y()*radius, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.y(), -vel2.x()*radius, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(),  vel2.Y()*radius, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Y(), -vel2.X()*radius, PHYSICS_TOL);
 
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
       ignition::math::Vector3d vel3 = model->GetLink()->GetWorldLinearVel(
           ignition::math::Vector3d(0, 0, -radius),
           ignition::math::Quaterniond(0, 0, 0));
-      EXPECT_NEAR(vel3.x(), 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel3.y(), 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel3.z(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.X(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.Y(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.Z(), 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
       ignition::math::Vector3d vel4 = model->GetLink()->GetWorldLinearVel(
           ignition::math::Vector3d(0, 0, radius),
           ignition::math::Quaterniond(0, 0, 0));
-      EXPECT_NEAR(vel4.y(), 2*vel1.y(), PHYSICS_TOL);
-      EXPECT_NEAR(vel4.x(), 2*vel1.x(), PHYSICS_TOL);
-      EXPECT_NEAR(vel4.z(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel4.Y(), 2*vel1.Y(), PHYSICS_TOL);
+      EXPECT_NEAR(vel4.X(), 2*vel1.X(), PHYSICS_TOL);
+      EXPECT_NEAR(vel4.Z(), 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      EXPECT_NEAR(pose1.Pos().z(), radius, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Z(), radius, PHYSICS_TOL);
 
       // expect no pose change for directions with no offset
-      if (cog.x() == 0)
+      if (cog.X() == 0)
       {
-        EXPECT_NEAR(pose1.Pos().x(), x0, PHYSICS_TOL);
+        EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT((pose1.Pos().x()-x0) * cog.x(), cog.x() * cog.x());
+        EXPECT_GT((pose1.Pos().X()-x0) * cog.X(), cog.X() * cog.X());
       }
 
       // expect no pose change for directions with no offset
-      if (cog.y() == 0)
+      if (cog.Y() == 0)
       {
-        EXPECT_NEAR(pose1.Pos().y(), y0, PHYSICS_TOL);
+        EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT((pose1.Pos().y()-y0) * cog.y(), cog.y() * cog.y());
+        EXPECT_GT((pose1.Pos().Y()-y0) * cog.Y(), cog.Y() * cog.Y());
       }
     }
     else
@@ -729,27 +730,27 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
     ignition::math::Vector3d vel = model->GetLink()->GetWorldCoGLinearVel();
     ignition::math::Pose3d pose = model->GetWorldPose();
 
-    EXPECT_EQ(vel.x(), 0.0);
+    EXPECT_EQ(vel.X(), 0.0);
 
     if (_physicsEngine == "dart")
     {
       // DART needs greater tolerance. The reason is not sure yet.
       // Please see issue #904
-      EXPECT_NEAR(vel.y(), -10.2009, 0.012);
-      EXPECT_NEAR(vel.z(), -6.51755, 0.012);
+      EXPECT_NEAR(vel.Y(), -10.2009, 0.012);
+      EXPECT_NEAR(vel.Z(), -6.51755, 0.012);
     }
     else
     {
-      EXPECT_NEAR(vel.y(), -10.2009, PHYSICS_TOL);
-      EXPECT_NEAR(vel.z(), -6.51755, PHYSICS_TOL);
+      EXPECT_NEAR(vel.Y(), -10.2009, PHYSICS_TOL);
+      EXPECT_NEAR(vel.Z(), -6.51755, PHYSICS_TOL);
     }
 
-    EXPECT_DOUBLE_EQ(pose.Pos().x(), 3.0);
-    EXPECT_NEAR(pose.Pos().y(), 0.0, PHYSICS_TOL);
-    EXPECT_NEAR(pose.Pos().z(), 10.099, PHYSICS_TOL);
-    EXPECT_NEAR(pose.Rot().Euler().x(), 0.567334, PHYSICS_TOL);
-    EXPECT_DOUBLE_EQ(pose.Rot().Euler().y(), 0.0);
-    EXPECT_DOUBLE_EQ(pose.Rot().Euler().z(), 0.0);
+    EXPECT_DOUBLE_EQ(pose.Pos().X(), 3.0);
+    EXPECT_NEAR(pose.Pos().Y(), 0.0, PHYSICS_TOL);
+    EXPECT_NEAR(pose.Pos().Z(), 10.099, PHYSICS_TOL);
+    EXPECT_NEAR(pose.Rot().Euler().X(), 0.567334, PHYSICS_TOL);
+    EXPECT_DOUBLE_EQ(pose.Rot().Euler().Y(), 0.0);
+    EXPECT_DOUBLE_EQ(pose.Rot().Euler().Z(), 0.0);
   }
 }
 
@@ -808,22 +809,22 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //      << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_LT(fabs(vel.z() - v) , 0.0001);
-            EXPECT_LT(fabs(pose.Pos().z() - z) , 0.0001);
+            EXPECT_LT(fabs(vel.Z() - v) , 0.0001);
+            EXPECT_LT(fabs(pose.Pos().Z() - z) , 0.0001);
           }
           else
           {
-            EXPECT_LT(fabs(vel.z()), 0.0101);  // sometimes -0.01, why?
+            EXPECT_LT(fabs(vel.Z()), 0.0101);  // sometimes -0.01, why?
             if (_physicsEngine == "dart")
             {
               // DART needs more tolerance until supports 'correction for
               // penetration' feature.
               // Please see issue #902
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.00410);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.00410);
             }
             else
             {
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.00001);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.00001);
             }
           }
         }
@@ -840,8 +841,8 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //       << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_LT(fabs(vel.z() - v), 0.0001);
-            EXPECT_LT(fabs(pose.Pos().z() - z), 0.0001);
+            EXPECT_LT(fabs(vel.Z() - v), 0.0001);
+            EXPECT_LT(fabs(pose.Pos().Z() - z), 0.0001);
           }
           else
           {
@@ -850,13 +851,13 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
               // DART needs more tolerance until supports 'correction for
               // penetration' feature.
               // Please see issue #902
-              EXPECT_LT(fabs(vel.z()), 0.015);
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.00410);
+              EXPECT_LT(fabs(vel.Z()), 0.015);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.00410);
             }
             else
             {
-              EXPECT_LT(fabs(vel.z()), 3e-5);
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.00001);
+              EXPECT_LT(fabs(vel.Z()), 3e-5);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.00001);
             }
           }
         }
@@ -873,22 +874,22 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //       << "] exact vz [" << v << "]\n";
           if (z > 0.5 || !post_contact_correction)
           {
-            EXPECT_LT(fabs(vel.z() - v), 0.0001);
-            EXPECT_LT(fabs(pose.Pos().z() - z), 0.0001);
+            EXPECT_LT(fabs(vel.Z() - v), 0.0001);
+            EXPECT_LT(fabs(pose.Pos().Z() - z), 0.0001);
           }
           else
           {
-            EXPECT_LT(fabs(vel.z()), 0.011);
+            EXPECT_LT(fabs(vel.Z()), 0.011);
             if (_physicsEngine == "dart")
             {
               // DART needs more tolerance until supports 'correction for
               // penetration' feature.
               // Please see issue #902
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.0041);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.0041);
             }
             else
             {
-              EXPECT_LT(fabs(pose.Pos().z() - 0.5), 0.0001);
+              EXPECT_LT(fabs(pose.Pos().Z() - 0.5), 0.0001);
             }
           }
         }
@@ -975,8 +976,8 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           else
           {
             // collision happened
-            EXPECT_NEAR(pose.Pos().x(), x, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x(), v, PHYSICS_TOL);
+            EXPECT_NEAR(pose.Pos().X(), x, PHYSICS_TOL);
+            EXPECT_NEAR(vel.X(), v, PHYSICS_TOL);
           }
         }
 
@@ -998,14 +999,14 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
           else if (t <= 1.00)
           {
             // no collision
-            EXPECT_EQ(pose.Pos().x(), 2);
-            EXPECT_EQ(vel.x(), 0);
+            EXPECT_EQ(pose.Pos().X(), 2);
+            EXPECT_EQ(vel.X(), 0);
           }
           else
           {
             // collision happened
-            EXPECT_NEAR(pose.Pos().x(), x + 1.0, PHYSICS_TOL);
-            EXPECT_NEAR(vel.x(), v, PHYSICS_TOL);
+            EXPECT_NEAR(pose.Pos().X(), x + 1.0, PHYSICS_TOL);
+            EXPECT_NEAR(vel.X(), v, PHYSICS_TOL);
           }
         }
       }
@@ -1258,19 +1259,19 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
   // A model composed of two overlapping links at fixed y offset from origin
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
               << "<model name ='" << modelName << "'>"
-              << "<pose>" << modelPose.Pos().x() << " "
-                         << modelPose.Pos().y() << " "
-                         << modelPose.Pos().z() << " "
-                         << modelPose.Rot().Euler().x() << " "
-                         << modelPose.Rot().Euler().y() << " "
-                         << modelPose.Rot().Euler().z() << "</pose>"
+              << "<pose>" << modelPose.Pos().X() << " "
+                         << modelPose.Pos().Y() << " "
+                         << modelPose.Pos().Z() << " "
+                         << modelPose.Rot().Euler().X() << " "
+                         << modelPose.Rot().Euler().Y() << " "
+                         << modelPose.Rot().Euler().Z() << "</pose>"
               << "<link name ='link01'>"
-              << "  <pose>" << link01Pose.Pos().x() << " "
-                         << link01Pose.Pos().y() << " "
-                         << link01Pose.Pos().z() << " "
-                         << link01Pose.Rot().Euler().x() << " "
-                         << link01Pose.Rot().Euler().y() << " "
-                         << link01Pose.Rot().Euler().z() << "</pose>"
+              << "  <pose>" << link01Pose.Pos().X() << " "
+                         << link01Pose.Pos().Y() << " "
+                         << link01Pose.Pos().Z() << " "
+                         << link01Pose.Rot().Euler().X() << " "
+                         << link01Pose.Rot().Euler().Y() << " "
+                         << link01Pose.Rot().Euler().Z() << "</pose>"
               << "  <collision name ='geom'>"
               << "    <geometry>"
               << "      <box><size>1 1 1</size></box>"
@@ -1283,12 +1284,12 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
               << "  </visual>"
               << "</link>"
               << "<link name ='link02'>"
-              << "  <pose>" << link02Pose.Pos().x() << " "
-                         << link02Pose.Pos().y() << " "
-                         << link02Pose.Pos().z() << " "
-                         << link02Pose.Rot().Euler().x() << " "
-                         << link02Pose.Rot().Euler().y() << " "
-                         << link02Pose.Rot().Euler().z() << "</pose>"
+              << "  <pose>" << link02Pose.Pos().X() << " "
+                         << link02Pose.Pos().Y() << " "
+                         << link02Pose.Pos().Z() << " "
+                         << link02Pose.Rot().Euler().X() << " "
+                         << link02Pose.Rot().Euler().Y() << " "
+                         << link02Pose.Rot().Euler().Z() << "</pose>"
               << "  <collision name ='geom'>"
               << "    <geometry>"
               << "      <box><size>1 1 1</size></box>"
@@ -1328,11 +1329,11 @@ void PhysicsTest::CollisionFiltering(const std::string &_physicsEngine)
     std::cout << "LinkName[" << (*iter)->GetScopedName() << "]\n";
     // Links should not repel each other hence expecting zero x, y vel
     vel = (*iter)->GetWorldLinearVel();
-    EXPECT_EQ(vel.x(), 0);
-    EXPECT_EQ(vel.y(), 0);
+    EXPECT_EQ(vel.X(), 0);
+    EXPECT_EQ(vel.Y(), 0);
 
     // Model should be falling
-    EXPECT_LT(vel.z(), 0);
+    EXPECT_LT(vel.Z(), 0);
   }
 }
 

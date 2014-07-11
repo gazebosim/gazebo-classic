@@ -115,23 +115,23 @@ namespace gazebo
 
     void Set(msgs::Vector3d *_pt, const ignition::math::Vector3d &_v)
     {
-      _pt->set_x(_v.x());
-      _pt->set_y(_v.y());
-      _pt->set_z(_v.z());
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
+      _pt->set_z(_v.Z());
     }
 
     void Set(msgs::Vector2d *_pt, const ignition::math::Vector2d &_v)
     {
-      _pt->set_x(_v.x());
-      _pt->set_y(_v.y());
+      _pt->set_x(_v.X());
+      _pt->set_y(_v.Y());
     }
 
     void Set(msgs::Quaternion *_q, const ignition::math::Quaterniond &_v)
     {
-      _q->set_x(_v.x());
-      _q->set_y(_v.y());
-      _q->set_z(_v.z());
-      _q->set_w(_v.w());
+      _q->set_x(_v.X());
+      _q->set_y(_v.Y());
+      _q->set_z(_v.Z());
+      _q->set_w(_v.W());
     }
 
     void Set(msgs::Pose *_p, const ignition::math::Pose3d &_v)
@@ -180,8 +180,8 @@ namespace gazebo
     void Set(msgs::PlaneGeom *_p, const ignition::math::Planed &_v)
     {
       Set(_p->mutable_normal(), _v.Normal());
-      _p->mutable_size()->set_x(_v.Size().x());
-      _p->mutable_size()->set_y(_v.Size().y());
+      _p->mutable_size()->set_x(_v.Size().X());
+      _p->mutable_size()->set_y(_v.Size().Y());
       _p->set_d(_v.Offset());
     }
 
@@ -217,19 +217,19 @@ namespace gazebo
     msgs::Vector3d Convert(const ignition::math::Vector3d &_v)
     {
       msgs::Vector3d result;
-      result.set_x(_v.x());
-      result.set_y(_v.y());
-      result.set_z(_v.z());
+      result.set_x(_v.X());
+      result.set_y(_v.Y());
+      result.set_z(_v.Z());
       return result;
     }
 
     msgs::Quaternion Convert(const ignition::math::Quaterniond &_q)
     {
       msgs::Quaternion result;
-      result.set_x(_q.x());
-      result.set_y(_q.y());
-      result.set_z(_q.z());
-      result.set_w(_q.w());
+      result.set_x(_q.X());
+      result.set_y(_q.Y());
+      result.set_z(_q.Z());
+      result.set_w(_q.W());
       return result;
     }
 
@@ -263,8 +263,8 @@ namespace gazebo
     {
       msgs::PlaneGeom result;
       result.mutable_normal()->CopyFrom(Convert(_p.Normal()));
-      result.mutable_size()->set_x(_p.Size().x());
-      result.mutable_size()->set_y(_p.Size().y());
+      result.mutable_size()->set_x(_p.Size().X());
+      result.mutable_size()->set_y(_p.Size().Y());
       result.set_d(_p.Offset());
       return result;
     }
@@ -430,7 +430,8 @@ namespace gazebo
         return result;
       }
 
-        msgs::Set(result.mutable_scale(), _sdf->Get<ignition::math::Vector3d>("scale"));
+        msgs::Set(result.mutable_scale(),
+            _sdf->Get<ignition::math::Vector3d>("scale"));
 
         result.set_filename(_sdf->Get<std::string>("uri"));
 

@@ -73,13 +73,15 @@ namespace gazebo
       /// \param[in] _xyz Cartesian position vector in gazebo's world frame.
       /// \return Cooordinates: geodetic latitude (deg), longitude (deg),
       ///         altitude above sea level (m).
-      public: ignition::math::Vector3d SphericalFromLocal(const ignition::math::Vector3d &_xyz) const;
+      public: ignition::math::Vector3d SphericalFromLocal(
+                  const ignition::math::Vector3d &_xyz) const;
 
       /// \brief Convert a Cartesian velocity vector in the local gazebo frame
       ///        to a global Cartesian frame with components East, North, Up.
       /// \param[in] _xyz Cartesian vector in gazebo's world frame.
       /// \return Rotated vector with components (x,y,z): (East, North, Up).
-      public: ignition::math::Vector3d GlobalFromLocal(const ignition::math::Vector3d &_xyz) const;
+      public: ignition::math::Vector3d GlobalFromLocal(
+                  const ignition::math::Vector3d &_xyz) const;
 
       /// \brief Convert a string to a SurfaceType.
       /// \param[in] _str String to convert.

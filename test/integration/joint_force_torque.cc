@@ -98,19 +98,19 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     world->Step(1);
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Force.x(),    0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Force.y(),    0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Force.z(), 1000.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.x(),   0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.y(),   0.0);
-    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.z(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.X(),    0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.Y(),    0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Force.Z(), 1000.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.X(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.Y(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_01.body1Torque.Z(),   0.0);
 
-    EXPECT_DOUBLE_EQ(wrench_01.body2Force.x(),  -wrench_01.body1Force.x());
-    EXPECT_DOUBLE_EQ(wrench_01.body2Force.y(),  -wrench_01.body1Force.y());
-    EXPECT_DOUBLE_EQ(wrench_01.body2Force.z(),  -wrench_01.body1Force.z());
-    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.x(), -wrench_01.body1Torque.x());
-    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.y(), -wrench_01.body1Torque.y());
-    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z(), -wrench_01.body1Torque.z());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.X(),  -wrench_01.body1Force.X());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.Y(),  -wrench_01.body1Force.Y());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Force.Z(),  -wrench_01.body1Force.Z());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.X(), -wrench_01.body1Torque.X());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.Y(), -wrench_01.body1Torque.Y());
+    EXPECT_DOUBLE_EQ(wrench_01.body2Torque.Z(), -wrench_01.body1Torque.Z());
 
     gzlog << "link_1 pose [" << link_1->GetWorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
@@ -131,19 +131,19 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
 
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Force.x(),    0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Force.y(),    0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Force.z(),  500.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.x(),   0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.y(),   0.0);
-    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.z(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.X(),    0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.Y(),    0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Force.Z(),  500.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.X(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.Y(),   0.0);
+    EXPECT_DOUBLE_EQ(wrench_12.body1Torque.Z(),   0.0);
 
-    EXPECT_DOUBLE_EQ(wrench_12.body2Force.x(),  -wrench_12.body1Force.x());
-    EXPECT_DOUBLE_EQ(wrench_12.body2Force.y(),  -wrench_12.body1Force.y());
-    EXPECT_DOUBLE_EQ(wrench_12.body2Force.z(),  -wrench_12.body1Force.z());
-    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.x(), -wrench_12.body1Torque.x());
-    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.y(), -wrench_12.body1Torque.y());
-    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z(), -wrench_12.body1Torque.z());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.X(),  -wrench_12.body1Force.X());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.Y(),  -wrench_12.body1Force.Y());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Force.Z(),  -wrench_12.body1Force.Z());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.X(), -wrench_12.body1Torque.X());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.Y(), -wrench_12.body1Torque.Y());
+    EXPECT_DOUBLE_EQ(wrench_12.body2Torque.Z(), -wrench_12.body1Torque.Z());
 
     gzlog << "link_1 pose [" << link_1->GetWorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
@@ -226,28 +226,28 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
 
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
-    EXPECT_NEAR(wrench_01.body1Force.x(),   600.0,  6.0);
-    EXPECT_NEAR(wrench_01.body1Force.y(),  -200.0, 10.0);
-    EXPECT_NEAR(wrench_01.body1Force.z(),  1000.0,  2.0);
-    EXPECT_NEAR(wrench_01.body1Torque.x(),  750.0,  7.5);
-    EXPECT_NEAR(wrench_01.body1Torque.y(),    0.0,  4.5);
-    EXPECT_NEAR(wrench_01.body1Torque.z(), -450.0,  0.1);
+    EXPECT_NEAR(wrench_01.body1Force.X(),   600.0,  6.0);
+    EXPECT_NEAR(wrench_01.body1Force.Y(),  -200.0, 10.0);
+    EXPECT_NEAR(wrench_01.body1Force.Z(),  1000.0,  2.0);
+    EXPECT_NEAR(wrench_01.body1Torque.X(),  750.0,  7.5);
+    EXPECT_NEAR(wrench_01.body1Torque.Y(),    0.0,  4.5);
+    EXPECT_NEAR(wrench_01.body1Torque.Z(), -450.0,  0.1);
 
-    EXPECT_NEAR(wrench_01.body2Force.x(),  -600.0,  6.0);
-    EXPECT_NEAR(wrench_01.body2Force.y(),  1000.0, 10.0);
+    EXPECT_NEAR(wrench_01.body2Force.X(),  -600.0,  6.0);
+    EXPECT_NEAR(wrench_01.body2Force.Y(),  1000.0, 10.0);
     if (_physicsEngine == "dart")
     {
       // DART needs greater tolerance due to joint limit violation
       // Please see issue #902
-      EXPECT_NEAR(wrench_01.body2Force.z(),   200.0,  8.6);
+      EXPECT_NEAR(wrench_01.body2Force.Z(),   200.0,  8.6);
     }
     else
     {
-      EXPECT_NEAR(wrench_01.body2Force.z(),   200.0,  2.0);
+      EXPECT_NEAR(wrench_01.body2Force.Z(),   200.0,  2.0);
     }
-    EXPECT_NEAR(wrench_01.body2Torque.x(), -750.0,  7.5);
-    EXPECT_NEAR(wrench_01.body2Torque.y(), -450.0,  4.5);
-    EXPECT_NEAR(wrench_01.body2Torque.z(),    0.0,  0.1);
+    EXPECT_NEAR(wrench_01.body2Torque.X(), -750.0,  7.5);
+    EXPECT_NEAR(wrench_01.body2Torque.Y(), -450.0,  4.5);
+    EXPECT_NEAR(wrench_01.body2Torque.Z(),    0.0,  0.1);
 
     gzlog << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
@@ -265,30 +265,30 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
 
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
-    EXPECT_NEAR(wrench_12.body1Force.x(),   300.0,  3.0);
-    EXPECT_NEAR(wrench_12.body1Force.y(),  -500.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Force.X(),   300.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Force.Y(),  -500.0,  5.0);
     if (_physicsEngine == "dart")
     {
       // DART needs greater tolerance due to joint limit violation
       // Please see issue #902
-      EXPECT_NEAR(wrench_12.body1Force.z(),  -100.0,  4.3);
+      EXPECT_NEAR(wrench_12.body1Force.Z(),  -100.0,  4.3);
     }
     else
     {
-      EXPECT_NEAR(wrench_12.body1Force.z(),  -100.0,  1.0);
+      EXPECT_NEAR(wrench_12.body1Force.Z(),  -100.0,  1.0);
     }
-    EXPECT_NEAR(wrench_12.body1Torque.x(),  250.0,  5.0);
-    EXPECT_NEAR(wrench_12.body1Torque.y(),  150.0,  3.0);
-    EXPECT_NEAR(wrench_12.body1Torque.z(),    0.0,  0.1);
+    EXPECT_NEAR(wrench_12.body1Torque.X(),  250.0,  5.0);
+    EXPECT_NEAR(wrench_12.body1Torque.Y(),  150.0,  3.0);
+    EXPECT_NEAR(wrench_12.body1Torque.Z(),    0.0,  0.1);
 
     // A good check is that
     // the computed body1Torque shoud in fact be opposite of body1Torque
-    EXPECT_NEAR(wrench_12.body2Force.x(),  -wrench_12.body1Force.x(),  1e-1);
-    EXPECT_NEAR(wrench_12.body2Force.y(),  -wrench_12.body1Force.y(),  1e-1);
-    EXPECT_NEAR(wrench_12.body2Force.z(),  -wrench_12.body1Force.z(),  1e-1);
-    EXPECT_NEAR(wrench_12.body2Torque.x(), -wrench_12.body1Torque.x(), 1e-1);
-    EXPECT_NEAR(wrench_12.body2Torque.y(), -wrench_12.body1Torque.y(), 1e-1);
-    EXPECT_NEAR(wrench_12.body2Torque.z(), -wrench_12.body1Torque.z(), 1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.X(),  -wrench_12.body1Force.X(),  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.Y(),  -wrench_12.body1Force.Y(),  1e-1);
+    EXPECT_NEAR(wrench_12.body2Force.Z(),  -wrench_12.body1Force.Z(),  1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.X(), -wrench_12.body1Torque.X(), 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.Y(), -wrench_12.body1Torque.Y(), 1e-1);
+    EXPECT_NEAR(wrench_12.body2Torque.Z(), -wrench_12.body1Torque.Z(), 1e-1);
 
     gzlog << "joint_12 force torque : "
           << "force1 [" << wrench_12.body1Force
@@ -376,19 +376,25 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
 
     if (i == 3387)
     {
-      EXPECT_NEAR(wrench_01.body1Force.x(),     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.y(),     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Force.z(),   300.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.x(),   25.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.y(), -175.0, TOL_CONT);
-      EXPECT_NEAR(wrench_01.body1Torque.z(),    0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.X(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.Y(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Force.Z(),   300.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.X(),   25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.Y(), -175.0, TOL_CONT);
+      EXPECT_NEAR(wrench_01.body1Torque.Z(),    0.0, TOL_CONT);
 
-      EXPECT_NEAR(wrench_01.body2Force.x(),  -wrench_01.body1Force.x(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.y(),  -wrench_01.body1Force.y(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.z(),  -wrench_01.body1Force.z(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.x(), -wrench_01.body1Torque.x(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.y(), -wrench_01.body1Torque.y(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.z(), -wrench_01.body1Torque.z(), TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.X(),
+          -wrench_01.body1Force.X(),  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Y(),
+          -wrench_01.body1Force.Y(),  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Z(),
+          -wrench_01.body1Force.Z(),  TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.X(),
+          -wrench_01.body1Torque.X(), TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Y(),
+          -wrench_01.body1Torque.Y(), TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Z(),
+          -wrench_01.body1Torque.Z(), TOL_CONT);
 
       gzlog << "joint_01 force torque : "
             << "step [" << i
@@ -405,19 +411,19 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
     if (i == 3387)
     {
-      EXPECT_NEAR(wrench_12.body1Force.x(),     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Force.y(),     0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Force.z(),    50.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Torque.x(),   25.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Torque.y(),    0.0, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body1Torque.z(),    0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Force.X(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Force.Y(),     0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Force.Z(),    50.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Torque.X(),   25.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Torque.Y(),    0.0, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body1Torque.Z(),    0.0, TOL_CONT);
 
-      EXPECT_NEAR(wrench_12.body2Force.x(),   -35.355, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body2Force.y(),     0.000, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body2Force.z(),   -35.355, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body2Torque.x(),  -17.678, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body2Torque.y(),    0.000, TOL_CONT);
-      EXPECT_NEAR(wrench_12.body2Torque.z(),   17.678, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Force.X(),   -35.355, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Force.Y(),     0.000, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Force.Z(),   -35.355, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Torque.X(),  -17.678, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Torque.Y(),    0.000, TOL_CONT);
+      EXPECT_NEAR(wrench_12.body2Torque.Z(),   17.678, TOL_CONT);
 
       gzlog << "joint_12 force torque : "
             << "step [" << i

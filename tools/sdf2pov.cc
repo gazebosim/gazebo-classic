@@ -104,7 +104,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const ignition::math::Pose3d _pose)
     {
       ignition::math::Vector3 vert = subMesh->GetVertex(v);
       // vert = _pose.CoordPositionAdd(vert);
-      printf("<%f, %f, %f>, ", vert.x(), vert.y(), vert.z());
+      printf("<%f, %f, %f>, ", vert.X(), vert.Y(), vert.Z());
     }
     printf("  }\n");
 
@@ -113,7 +113,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const ignition::math::Pose3d _pose)
     for (unsigned int n = 0; n < subMesh->GetNormalCount(); n++)
     {
       ignition::math::Vector3 norm = subMesh->GetNormal(n);
-      printf("<%f, %f, %f>, ", norm.x(), norm.y(), norm.z());
+      printf("<%f, %f, %f>, ", norm.X(), norm.Y(), norm.Z());
     }
     printf("  }\n");
 
@@ -121,8 +121,8 @@ void ProcessMesh(sdf::ElementPtr _elem, const ignition::math::Pose3d _pose)
     printf("    %d, \n", subMesh->GetTexCoordCount());
     for (unsigned int j = 0; j < subMesh->GetTexCoordCount(); j++)
     {
-      printf("    <%f, %f>, \n", subMesh->GetTexCoord(j).x(),
-        1.0 - subMesh->GetTexCoord(j).y());
+      printf("    <%f, %f>, \n", subMesh->GetTexCoord(j).X(),
+        1.0 - subMesh->GetTexCoord(j).Y());
     }
     printf("  }\n");
 
@@ -192,8 +192,10 @@ void ProcessMesh(sdf::ElementPtr _elem, const ignition::math::Pose3d _pose)
     */
 
     ignition::math::Vector3 rpy = _pose.rot.Euler();
-    printf("  translate <%f, %f, %f>\n", _pose.pos.x(), _pose.pos.y(), _pose.pos.z());
-    printf("  rotate <%f, %f, %f>\n", RTOD(rpy.x()), RTOD(rpy.y()), RTOD(rpy.z()));
+    printf("  translate <%f, %f, %f>\n",
+        _pose.pos.X(), _pose.pos.Y(), _pose.pos.Z());
+    printf("  rotate <%f, %f, %f>\n",
+        RTOD(rpy.X()), RTOD(rpy.Y()), RTOD(rpy.Z()));
 
     printf("}\n");
   }
@@ -217,7 +219,7 @@ void ProcessLight(sdf::ElementPtr _elem)
 
   printf("light_source {\n");
   printf("  <%f, %f, %f>, rgb <%f, %f, %f>\n",
-      pose.pos.x(), pose.pos.y(), pose.pos.z(),
+      pose.pos.X(), pose.pos.Y(), pose.pos.Z(),
       diffuse.r, diffuse.g, diffuse.b);
 
   std::string type = _elem->GetValueString("type");
@@ -249,9 +251,9 @@ void ProcessLight(sdf::ElementPtr _elem)
 
     double d = plane.Distance(pose.pos, dir);
     double t;
-    t = atan2(dir.x(), dir.z*-1);
+    t = atan2(dir.X(), dir.z*-1);
     double x = sin(t) * d;
-    t = atan2(dir.y(), dir.z*-1);
+    t = atan2(dir.Y(), dir.z*-1);
     double y = sin(t) * d;
     printf("  point_at <%f, %f, 0.0>\n", x, y);
   }
@@ -300,7 +302,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose3d &_pose)
     sdf::ElementPtr planeElem = _elem->GetElement("plane");
     ignition::math::Vector3 normal = planeElem->GetValueVector3("normal");
     printf("plane {\n");
-    printf("  <%f, %f, %f>, 0\n", normal.x(), normal.y(), normal.z());
+    printf("  <%f, %f, %f>, 0\n", normal.X(), normal.Y(), normal.Z());
     printf("  texture {pigment { color Yellow } }\n");
     printf("}\n");
   }
@@ -313,8 +315,9 @@ void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose3d &_pose)
     ignition::math::Vector3 corner2 = _pose.pos + (size/2.0);
     corner1 = _pose.rot.RotateVector(corner1);
     corner2 = _pose.rot.RotateVector(corner2);
-    printf(" <%f, %f, %f, >, <%f, %f, %f>\n", corner1.x(), corner1.y(), corner1.z(),
-                                            corner2.x(), corner2.y(), corner2.z());
+    printf(" <%f, %f, %f, >, <%f, %f, %f>\n",
+        corner1.X(), corner1.Y(), corner1.Z(),
+        corner2.X(), corner2.Y(), corner2.Z());
     printf("}\n");
   }
   else if (_elem->HasElement("cylinder"))
@@ -323,12 +326,12 @@ void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose3d &_pose)
     double radius = cylinderElem->GetValueDouble("radius");
     double length = cylinderElem->GetValueDouble("length");
     ignition::math::Vector3 capPoint = _pose.pos;
-    capPoint.z() += length;
+    capPoint.Z() += length;
     capPoint = _pose.rot.RotateVector(capPoint);
     printf("cylinder {\n");
     printf("  <%f, %f, %f>, <%f, %f, %f>, %f\n",
-        _pose.pos.x(), _pose.pos.y(), _pose.pos.z(),
-        capPoint.x(), capPoint.y(), capPoint.z(), radius);
+        _pose.pos.X(), _pose.pos.Y(), _pose.pos.Z(),
+        capPoint.X(), capPoint.Y(), capPoint.Z(), radius);
     printf("}\n");
   }
   else if (_elem->HasElement("sphere"))
@@ -338,7 +341,7 @@ void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose3d &_pose)
 
     printf("sphere {\n");
     printf("  <%f, %f, %f> %f\n",
-        _pose.pos.x(), _pose.pos.y(), _pose.pos.z(), radius);
+        _pose.pos.X(), _pose.pos.Y(), _pose.pos.Z(), radius);
     printf("}\n");
   }
   else if (_elem->HasElement("mesh"))

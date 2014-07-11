@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for setting joint angles
- * Author: John Hsu
- */
-
 #include <plugins/JointTrajectoryPlugin.hh>
 
 namespace gazebo
@@ -41,8 +36,6 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // Get the world name.
   this->model = _parent;
   this->world = this->model->GetWorld();
-
-  // this->world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0,0,0));
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)

@@ -16,10 +16,11 @@
 */
 
 #include <boost/filesystem.hpp>
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/DataLogger_TEST.hh"
-#include <ignition/math/Rand.hh>
 
 /////////////////////////////////////////////////
 void DataLogger_TEST::RecordButton()

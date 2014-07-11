@@ -171,7 +171,8 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHingeJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   btTransform trans = this->bulletHinge->getAFrame();
   trans.getOrigin() +=
@@ -199,13 +200,14 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btignition::math::Vector3d vec(_axis.x(), _axis.y(), _axis.z());
+  /*btignition::math::Vector3d vec(_axis.X(), _axis.Y(), _axis.Z());
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletHingeJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
   ignition::math::Angle result;
   if (this->bulletHinge)
@@ -348,7 +350,8 @@ ignition::math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   ignition::math::Vector3d result = this->initialWorldAxis;
 

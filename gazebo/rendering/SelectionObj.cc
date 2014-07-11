@@ -115,7 +115,7 @@ void SelectionObj::UpdateSize()
   dPtr->parent = vis;
   dPtr->parent->AttachVisual(shared_from_this());
 
-  double max = std::max(std::max(bboxSize.x(), bboxSize.y()), bboxSize.z());
+  double max = std::max(std::max(bboxSize.X(), bboxSize.Y()), bboxSize.Z());
 
   max = std::min(std::max(dPtr->minScale, max), dPtr->maxScale);
 
@@ -407,9 +407,11 @@ void SelectionObj::CreateTranslateVisual()
   headZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->transXVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->transYVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   dPtr->transXVisual->SetMaterial(dPtr->xAxisMatOverlay);
   dPtr->transYVisual->SetMaterial(dPtr->yAxisMatOverlay);
@@ -488,9 +490,11 @@ void SelectionObj::CreateRotateVisual()
   dPtr->rotZVisual->Load();
 
   dPtr->rotXVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->rotYVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   // By default the visuals are not overlays like translation or scale visuals.
   // This is so that the rings does not block the object it's attached too,
@@ -611,9 +615,11 @@ void SelectionObj::CreateScaleVisual()
   scaleHeadZObj->setRenderQueueGroup(Ogre::RENDER_QUEUE_OVERLAY);
 
   dPtr->scaleXVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(0, 1, 0), IGN_DTOR(90)));
   dPtr->scaleYVisual->SetRotation(
-      ignition::math::Quaterniond(ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
+      ignition::math::Quaterniond(
+        ignition::math::Vector3d(1, 0, 0), IGN_DTOR(-90)));
 
   dPtr->scaleXVisual->SetMaterial(dPtr->xAxisMatOverlay);
   dPtr->scaleYVisual->SetMaterial(dPtr->yAxisMatOverlay);

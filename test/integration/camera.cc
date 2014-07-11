@@ -74,8 +74,8 @@ TEST_F(CameraTest, Follow)
   // Make sure the sensor is at the correct initial pose
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().Pos().x(), 4.3, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().Pos().y(), 4.3, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().X(), 4.3, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().Y(), 4.3, 0.1);
 }
 
 /////////////////////////////////////////////////

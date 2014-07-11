@@ -211,8 +211,8 @@ void WindowDoorInspectorDialog::SetDepth(double _depth)
 /////////////////////////////////////////////////
 void WindowDoorInspectorDialog::SetPosition(const QPointF &_pos)
 {
-  this->positionXSpinBox->setValue(_pos.x());
-  this->positionYSpinBox->setValue(_pos.y());
+  this->positionXSpinBox->setValue(_pos.X());
+  this->positionYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////

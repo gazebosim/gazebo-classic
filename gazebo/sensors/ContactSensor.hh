@@ -27,9 +27,9 @@
 #include <list>
 #include <string>
 
-#include "gazebo/msgs/msgs.hh"
-
 #include <ignition/math/Angle.hh>
+
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/util/system.hh"

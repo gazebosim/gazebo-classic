@@ -301,7 +301,8 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetHighStop(unsigned int _index, const ignition::math::Angle &_angle)
+bool DARTJoint::SetHighStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   switch (_index)
   {
@@ -317,7 +318,8 @@ bool DARTJoint::SetHighStop(unsigned int _index, const ignition::math::Angle &_a
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetLowStop(unsigned int _index, const ignition::math::Angle &_angle)
+bool DARTJoint::SetLowStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   switch (_index)
   {

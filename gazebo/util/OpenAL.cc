@@ -185,7 +185,7 @@ bool OpenALSink::SetPose(const ignition::math::Pose3d &_pose)
   // Clear error state
   alGetError();
 
-  alListener3f(AL_POSITION, _pose.Pos().x(), _pose.Pos().y(), _pose.Pos().z());
+  alListener3f(AL_POSITION, _pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
 
   if ((error = alGetError()) != AL_NO_ERROR)
   {
@@ -226,7 +226,7 @@ bool OpenALSink::SetVelocity(const ignition::math::Vector3d &_vel)
   // Clear error state
   alGetError();
 
-  alListener3f(AL_VELOCITY, _vel.x(), _vel.y(), _vel.z());
+  alListener3f(AL_VELOCITY, _vel.X(), _vel.Y(), _vel.Z());
   if ((error = alGetError()) != AL_NO_ERROR)
   {
     gzerr << " Unable to set velocity. Error code[" <<  error << "]\n";
@@ -304,8 +304,8 @@ bool OpenALSource::Load(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 bool OpenALSource::SetPose(const ignition::math::Pose3d &_pose)
 {
-  ALfloat p[3] = {static_cast<float>(_pose.Pos().x()),
-    static_cast<float>(_pose.Pos().y()), static_cast<float>(_pose.Pos().z())};
+  ALfloat p[3] = {static_cast<float>(_pose.Pos().X()),
+    static_cast<float>(_pose.Pos().Y()), static_cast<float>(_pose.Pos().Z())};
   ALenum error;
 
   // Clear error state
@@ -326,8 +326,8 @@ bool OpenALSource::SetPose(const ignition::math::Pose3d &_pose)
 bool OpenALSource::SetVelocity(const ignition::math::Vector3d &_vel)
 {
   ALenum error;
-  ALfloat v[3] = {static_cast<float>(_vel.x()),
-    static_cast<float>(_vel.y()), static_cast<float>(_vel.z())};
+  ALfloat v[3] = {static_cast<float>(_vel.X()),
+    static_cast<float>(_vel.Y()), static_cast<float>(_vel.Z())};
 
   // Clear error state
   alGetError();

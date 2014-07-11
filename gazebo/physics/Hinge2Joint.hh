@@ -61,10 +61,12 @@ namespace gazebo
                 T::Load(_sdf);
 
                 this->SetAxis(0,
-                    _sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
+                    _sdf->GetElement("axis")->Get<ignition::math::Vector3d>(
+                      "xyz"));
 
                 this->SetAxis(1,
-                    _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
+                    _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>(
+                      "xyz"));
               }
     };
     /// \}

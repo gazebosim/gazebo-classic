@@ -26,10 +26,10 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
-#include <ignition/math/Pose3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -186,24 +186,24 @@ namespace gazebo
         _out << std::fixed << std::setprecision(5)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
-          << _state.pose.Pos().x() << " "
-          << _state.pose.Pos().y() << " "
-          << _state.pose.Pos().z() << " "
-          << q.x() << " "
-          << q.y() << " "
-          << q.z() << " "
+          << _state.pose.Pos().X() << " "
+          << _state.pose.Pos().Y() << " "
+          << _state.pose.Pos().Z() << " "
+          << q.X() << " "
+          << q.Y() << " "
+          << q.Z() << " "
           << "</pose>";
 
         /// Disabling this for efficiency.
         q = _state.velocity.Rot().Euler();
          _out << std::fixed <<std::setprecision(4)
            << "<velocity>"
-           << _state.velocity.Pos().x() << " "
-           << _state.velocity.Pos().y() << " "
-           << _state.velocity.Pos().z() << " "
-           << q.x() << " "
-           << q.y() << " "
-           << q.z() << " "
+           << _state.velocity.Pos().X() << " "
+           << _state.velocity.Pos().Y() << " "
+           << _state.velocity.Pos().Z() << " "
+           << q.X() << " "
+           << q.Y() << " "
+           << q.Z() << " "
            << "</velocity>";
         // << "<acceleration>" << _state.acceleration << "</acceleration>"
         // << "<wrench>" << _state.wrench << "</wrench>";

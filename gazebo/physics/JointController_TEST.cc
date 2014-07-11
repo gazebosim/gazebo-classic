@@ -16,10 +16,10 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/PID.hh"
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Angle.hh>
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"

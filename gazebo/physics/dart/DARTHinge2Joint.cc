@@ -51,7 +51,8 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTHinge2Joint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -61,7 +62,8 @@ ignition::math::Vector3d DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) con
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTHinge2Joint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
 
@@ -92,7 +94,8 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const ignition::math::Vector3
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 

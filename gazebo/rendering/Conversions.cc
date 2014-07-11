@@ -34,7 +34,7 @@ common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 //////////////////////////////////////////////////
 Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &v)
 {
-  return Ogre::Vector3(v.x(), v.y(), v.z());
+  return Ogre::Vector3(v.X(), v.Y(), v.Z());
 }
 
 //////////////////////////////////////////////////
@@ -46,7 +46,7 @@ ignition::math::Vector3d Conversions::Convert(const Ogre::Vector3 &v)
 //////////////////////////////////////////////////
 Ogre::Quaternion Conversions::Convert(const ignition::math::Quaterniond &_v)
 {
-  return Ogre::Quaternion(_v.w(), _v.x(), _v.y(), _v.z());
+  return Ogre::Quaternion(_v.W(), _v.X(), _v.Y(), _v.Z());
 }
 
 //////////////////////////////////////////////////

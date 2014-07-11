@@ -132,13 +132,15 @@ namespace gazebo
       /// \param[out] _center of the bounding box
       /// \param[out] _min_xyz bounding box minimum values
       /// \param[out] _max_xyz bounding box maximum values
-      public: void GetAABB(ignition::math::Vector3d &_center, ignition::math::Vector3d &_min_xyz,
-                           ignition::math::Vector3d &_max_xyz) const;
+      public: void GetAABB(ignition::math::Vector3d &_center,
+                  ignition::math::Vector3d &_min_xyz,
+                  ignition::math::Vector3d &_max_xyz) const;
 
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center the center of the projection
-      public: void GenSphericalTexCoord(const ignition::math::Vector3d &_center);
+      public: void GenSphericalTexCoord(
+                  const ignition::math::Vector3d &_center);
 
       /// \brief Get the skeleton to which this mesh is attached.
       /// \return pointer to skeleton, or NULL if none is present.
@@ -161,7 +163,8 @@ namespace gazebo
       /// \brief Move the center of the mesh to the given coordinate. This
       /// will move all the vertices in all submeshes.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const ignition::math::Vector3d &_center = ignition::math::Vector3d::Zero);
+      public: void Center(const ignition::math::Vector3d &_center =
+                  ignition::math::Vector3d::Zero);
 
       /// \brief Move all vertices in all submeshes by _vec.
       /// \param[in] _vec Amount to translate vertices.
@@ -234,11 +237,13 @@ namespace gazebo
 
       /// \brief Copy vertices from a vector
       /// \param[in] _verts the vertices to copy from
-      public: void CopyVertices(const std::vector<ignition::math::Vector3d> &_verts);
+      public: void CopyVertices(
+                  const std::vector<ignition::math::Vector3d> &_verts);
 
       /// \brief Copy normals from a vector
       /// \param[in] _norms to copy from
-      public: void CopyNormals(const std::vector<ignition::math::Vector3d> &_norms);
+      public: void CopyNormals(
+                  const std::vector<ignition::math::Vector3d> &_norms);
 
       /// \brief Resize the vertex array
       /// \param[in] _count the new size of the array
@@ -300,7 +305,8 @@ namespace gazebo
       /// \brief Set a vertex
       /// \param[in] _i the index
       /// \param[in] _v the position
-      public: void SetVertex(unsigned int _i, const ignition::math::Vector3d &_v);
+      public: void SetVertex(unsigned int _i,
+                  const ignition::math::Vector3d &_v);
 
       /// \brief Get a normal
       /// \param[in] _i the normal index
@@ -310,7 +316,8 @@ namespace gazebo
       /// \brief Set a normal
       /// \param[in] _i the normal index
       /// \param[in] _n the normal direction
-      public: void SetNormal(unsigned int _i, const ignition::math::Vector3d &_n);
+      public: void SetNormal(unsigned int _i,
+                  const ignition::math::Vector3d &_n);
 
       /// \brief Get a tex coord
       /// \param[in] _i the texture index
@@ -324,7 +331,8 @@ namespace gazebo
       /// \brief Set a tex coord
       /// \param[in] _i
       /// \param[in] _t
-      public: void SetTexCoord(unsigned int _i, const ignition::math::Vector2d &_t);
+      public: void SetTexCoord(unsigned int _i,
+                  const ignition::math::Vector2d &_t);
 
       /// \brief Get an index
       /// \param[in] _i
@@ -370,7 +378,8 @@ namespace gazebo
 
       /// \brief Get the index of the vertex
       /// \param[in] _v
-      public: unsigned int GetVertexIndex(const ignition::math::Vector3d &_v) const;
+      public: unsigned int GetVertexIndex(
+                  const ignition::math::Vector3d &_v) const;
 
       /// \brief Put all the data into flat arrays
       /// \param[in] _verArr
@@ -387,7 +396,8 @@ namespace gazebo
       /// \brief Generate texture coordinates using spherical projection
       /// from center
       /// \param[in] _center
-      public: void GenSphericalTexCoord(const ignition::math::Vector3d &_center);
+      public: void GenSphericalTexCoord(
+                  const ignition::math::Vector3d &_center);
 
       /// \brief Scale all vertices by _factor
       /// \param[in] _factor Scaling factor
@@ -396,7 +406,8 @@ namespace gazebo
       /// \brief Move the center of the submesh to the given coordinate. This
       /// will move all the vertices.
       /// \param[in] _center Location of the mesh center.
-      public: void Center(const ignition::math::Vector3d &_center = ignition::math::Vector3d::Zero);
+      public: void Center(const ignition::math::Vector3d &_center =
+                  ignition::math::Vector3d::Zero);
 
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.

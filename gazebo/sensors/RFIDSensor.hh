@@ -25,12 +25,10 @@
 #include <vector>
 #include <string>
 
-#include "gazebo/physics/PhysicsTypes.hh"
-
-#include "gazebo/transport/TransportTypes.hh"
-
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
@@ -86,7 +84,8 @@ namespace gazebo
       /// \brief Checks if ray intersects RFID sensor.
       /// \param[in] _pose Pose to compare against.
       /// \return True if intersects, false if not.
-      // private: bool CheckRayIntersection(const ignition::math::Pose3d &_pose);
+      // private: bool CheckRayIntersection(
+      // const ignition::math::Pose3d &_pose);
 
       /// \brief Parent entity
       private: physics::EntityPtr entity;

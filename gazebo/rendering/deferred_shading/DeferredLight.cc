@@ -20,9 +20,9 @@
 #include <OgreLight.h>
 #include <OgreTechnique.h>
 #include <OgreSceneManager.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Console.hh"
-#include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/Conversions.hh"
 

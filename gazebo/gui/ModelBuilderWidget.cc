@@ -166,11 +166,12 @@ void ModelBuilderWidget::OnBoxCreate(const ignition::math::Vector3d &/*pos*/,
 }
 
 void ModelBuilderWidget::OnSphereCreate(const ignition::math::Vector3d &/*pos*/,
-                                     const ignition::math::Vector3d &/*scale*/)
+    const ignition::math::Vector3d &/*scale*/)
 {
 }
 
-void ModelBuilderWidget::OnCylinderCreate(const ignition::math::Vector3d &/*pos*/,
-                                     const ignition::math::Vector3d &/*scale*/)
+void ModelBuilderWidget::OnCylinderCreate(
+    const ignition::math::Vector3d &/*pos*/,
+    const ignition::math::Vector3d &/*scale*/)
 {
 }

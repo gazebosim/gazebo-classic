@@ -143,11 +143,13 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the body.
       /// \param[in] _vel Linear velocity.
-      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel) = 0;
+      public: virtual void SetLinearVel(
+                  const ignition::math::Vector3d &_vel) = 0;
 
       /// \brief Set the angular velocity of the body.
       /// \param[in] _vel Angular velocity.
-      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel) = 0;
+      public: virtual void SetAngularVel(
+                  const ignition::math::Vector3d &_vel) = 0;
 
       /// \brief Set the linear acceleration of the body.
       /// \param[in] _accel Linear acceleration.
@@ -159,11 +161,13 @@ namespace gazebo
 
       /// \brief Set the force applied to the body.
       /// \param[in] _force Force value.
-      public: virtual void SetForce(const ignition::math::Vector3d &_force) = 0;
+      public: virtual void SetForce(
+                  const ignition::math::Vector3d &_force) = 0;
 
       /// \brief Set the torque applied to the body.
       /// \param[in] _torque Torque value.
-      public: virtual void SetTorque(const ignition::math::Vector3d &_torque) = 0;
+      public: virtual void SetTorque(
+                  const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Add a force to the body.
       /// \param[in] _force Force to add.
@@ -172,12 +176,14 @@ namespace gazebo
       /// \brief Add a force to the body, components are relative to the
       /// body's own frame of reference.
       /// \param[in] _force Force to add.
-      public: virtual void AddRelativeForce(const ignition::math::Vector3d &_force) = 0;
+      public: virtual void AddRelativeForce(
+                  const ignition::math::Vector3d &_force) = 0;
 
       /// \brief Add a force to the body using a global position.
       /// \param[in] _force Force to add.
       /// \param[in] _pos Position in global coord frame to add the force.
-      public: virtual void AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+      public: virtual void AddForceAtWorldPosition(
+                  const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_pos) = 0;
 
       /// \brief Add a force to the body at position expressed to the body's
@@ -190,12 +196,14 @@ namespace gazebo
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
-      public: virtual void AddTorque(const ignition::math::Vector3d &_torque) = 0;
+      public: virtual void AddTorque(
+                  const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Add a torque to the body, components are relative to the
       /// body's own frame of reference.
       /// \param[in] _torque Torque value to add.
-      public: virtual void AddRelativeTorque(const ignition::math::Vector3d &_torque) = 0;
+      public: virtual void AddRelativeTorque(
+                  const ignition::math::Vector3d &_torque) = 0;
 
       /// \brief Get the pose of the body's center of gravity in the world
       ///        coordinate frame.

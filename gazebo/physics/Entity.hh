@@ -14,25 +14,20 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all physical entities
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
-#ifndef _ENTITY_HH_
-#define _ENTITY_HH_
+#ifndef _GAZEBO_ENTITY_HH_
+#define _GAZEBO_ENTITY_HH_
 
 #include <string>
 #include <vector>
+
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
-
-#include <ignition/math/Box.hh>
-#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Base.hh"
@@ -241,7 +236,8 @@ namespace gazebo
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
       /// \return The boundin box for the passed in object.
-      private: ignition::math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;
+      private: ignition::math::Box GetCollisionBoundingBoxHelper(
+                   BasePtr _base) const;
 
       /// \brief Set the world pose for a model.
       /// \param[in] _pose New pose for the entity.
@@ -255,15 +251,16 @@ namespace gazebo
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseCanonicalLink(const ignition::math::Pose3d &_pose,
-                                              bool _notify, bool _publish);
+      private: void SetWorldPoseCanonicalLink(
+                   const ignition::math::Pose3d &_pose,
+                   bool _notify, bool _publish);
 
       /// \brief Set the world pose for a common entity.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseDefault(const ignition::math::Pose3d &_pose, bool _notify,
-                                        bool _publish);
+      private: void SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
+                   bool _notify, bool _publish);
 
       /// \brief Called when a new pose message arrives.
       /// \param[in] _msg The message to set the pose from.
@@ -342,7 +339,8 @@ namespace gazebo
       private: boost::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &, bool, bool);
+      private: void (Entity::*setWorldPoseFunc)(
+                   const ignition::math::Pose3d &, bool, bool);
     };
     /// \}
   }

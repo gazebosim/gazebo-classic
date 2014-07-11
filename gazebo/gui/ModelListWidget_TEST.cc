@@ -90,27 +90,27 @@ void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
       static_cast<QtVariantProperty *>(_properties[0]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("x"));
-  QCOMPARE(property->value().toDouble(), _pose.Pos().x());
+  QCOMPARE(property->value().toDouble(), _pose.Pos().X());
   property = static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("y"));
-  QCOMPARE(property->value().toDouble(), _pose.Pos().y());
+  QCOMPARE(property->value().toDouble(), _pose.Pos().Y());
   property = static_cast<QtVariantProperty *>(_properties[2]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("z"));
-  QCOMPARE(property->value().toDouble(), _pose.Pos().z());
+  QCOMPARE(property->value().toDouble(), _pose.Pos().Z());
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
-  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().x());
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().X());
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
-  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().y());
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().Y());
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
-  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().z());
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().Z());
 }
 
 /////////////////////////////////////////////////
@@ -126,37 +126,37 @@ void ModelListWidget_TEST::SetPoseProperty(
   QCOMPARE(property->propertyName(), tr("x"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Pos().x());
+  property->setValue(_pose.Pos().X());
   property = static_cast<QtVariantProperty *>(_properties[1]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("y"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Pos().y());
+  property->setValue(_pose.Pos().Y());
   property = static_cast<QtVariantProperty *>(_properties[2]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("z"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Pos().z());
+  property->setValue(_pose.Pos().Z());
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Rot().Euler().x());
+  property->setValue(_pose.Rot().Euler().X());
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Rot().Euler().y());
+  property->setValue(_pose.Rot().Euler().Y());
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
   QVERIFY(propTreeBrowser->items(property).size() == 1);
   propTreeBrowser->setCurrentItem(propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.Rot().Euler().z());
+  property->setValue(_pose.Rot().Euler().Z());
   QTest::qWait(1000);
 }
 

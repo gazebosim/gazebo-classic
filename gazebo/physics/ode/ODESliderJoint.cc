@@ -52,7 +52,8 @@ void ODESliderJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODESliderJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -64,7 +65,8 @@ ignition::math::Vector3d ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) 
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle ODESliderJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
   ignition::math::Angle result;
   if (this->jointId)
@@ -94,7 +96,8 @@ void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetAxis(unsigned int /*index*/, const ignition::math::Vector3d &_axis)
+void ODESliderJoint::SetAxis(unsigned int /*index*/,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -108,7 +111,7 @@ void ODESliderJoint::SetAxis(unsigned int /*index*/, const ignition::math::Vecto
   if (this->jointId)
   {
     dJointSetSliderAxis(this->jointId,
-        globalAxis.x(), globalAxis.y(), globalAxis.z());
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -156,7 +159,8 @@ double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODESliderJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
   gzlog << "ODESliderJoint::GetAnchor not implemented.\n";

@@ -14,20 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet ray sensor
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-/*
-#include "World.hh"
-
-#include "BulletPhysics.hh"
-#include "BulletRaySensor.hh"
-*/
-
 using namespace gazebo;
 using namespace physics;
-
 
 //////////////////////////////////////////////////
 BulletRaySensor::BulletRaySensor(Link *_body)
@@ -52,7 +40,8 @@ BulletRaySensor::~BulletRaySensor()
 }
 
 //////////////////////////////////////////////////
-void BulletRaySensor::AddRay(ignition::math::Vector3d start, ignition::math::Vector3d end,
+void BulletRaySensor::AddRay(ignition::math::Vector3d start,
+    ignition::math::Vector3d end,
     double minRange, double maxRange, bool display)
 {
   BulletRayCollision *rayCollision;

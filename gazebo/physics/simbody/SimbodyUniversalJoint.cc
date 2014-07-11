@@ -45,13 +45,15 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::GetAxis(
+    unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }
@@ -153,7 +155,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GetGlobalAxis(
 
         SimTK::Vec3 x_W(
           this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
-          this->simbodyPhysics->integ->getState(), X_IF.x()));
+          this->simbodyPhysics->integ->getState(), X_IF.X()));
 
         return SimbodyPhysics::Vec3ToVector3(x_W);
       }
@@ -165,7 +167,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GetGlobalAxis(
 
         SimTK::Vec3 y_W(
           this->mobod.expressVectorInGroundFrame(
-          this->simbodyPhysics->integ->getState(), X_OM.y()));
+          this->simbodyPhysics->integ->getState(), X_OM.Y()));
 
         return SimbodyPhysics::Vec3ToVector3(y_W);
       }
@@ -206,7 +208,8 @@ ignition::math::Vector3d SimbodyUniversalJoint::GetGlobalAxis(
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodyUniversalJoint::GetAngleImpl(
+    unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {

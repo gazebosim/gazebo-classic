@@ -365,15 +365,15 @@ void Heightmap::Load()
   this->terrainGroup = new Ogre::TerrainGroup(
       this->scene->GetManager(), Ogre::Terrain::ALIGN_X_Y,
       1 + ((this->dataSize - 1) / sqrtN),
-      this->terrainSize.x() / (sqrtN));
+      this->terrainSize.X() / (sqrtN));
 
   this->terrainGroup->setFilenameConvention(
     Ogre::String(prefix.string()), Ogre::String("dat"));
 
   Ogre::Vector3 orig = Conversions::Convert(this->terrainOrigin);
   ignition::math::Vector3d origin(
-      orig.x -0.5 * this->terrainSize.x() + 0.5 * this->terrainSize.x() / sqrtN,
-      orig.y -0.5 * this->terrainSize.x() + 0.5 * this->terrainSize.x() / sqrtN,
+      orig.x -0.5 * this->terrainSize.X() + 0.5 * this->terrainSize.X() / sqrtN,
+      orig.y -0.5 * this->terrainSize.X() + 0.5 * this->terrainSize.X() / sqrtN,
       orig.z);
 
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
@@ -395,9 +395,9 @@ void Heightmap::Load()
       ignition::math::Vector3d lookAt(0, 0, h);
       ignition::math::Vector3d delta = lookAt - camPos;
 
-      double yaw = atan2(delta.y(), delta.x());
-      double pitch = atan2(-delta.z(),
-          sqrt(delta.x() * delta.x() + delta.y() * delta.y()));
+      double yaw = atan2(delta.Y(), delta.X());
+      double pitch = atan2(-delta.Z(),
+          sqrt(delta.X() * delta.X() + delta.Y() * delta.Y()));
 
       userCam->SetWorldPose(
           ignition::math::Pose3d(camPos,
@@ -432,8 +432,8 @@ void Heightmap::Load()
     this->terrainPaging = OGRE_NEW Ogre::TerrainPaging(this->pageManager);
     this->world = pageManager->createWorld();
     this->terrainPaging->createWorldSection(world, this->terrainGroup,
-        this->loadRadiusFactor * this->terrainSize.x(),
-        this->holdRadiusFactor * this->terrainSize.x(),
+        this->loadRadiusFactor * this->terrainSize.X(),
+        this->holdRadiusFactor * this->terrainSize.X(),
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
@@ -522,7 +522,7 @@ void Heightmap::ConfigureTerrainDefaults()
     this->terrainGroup->getDefaultImportSettings();
 
   defaultimp.terrainSize = this->dataSize;
-  defaultimp.worldSize = this->terrainSize.x();
+  defaultimp.worldSize = this->terrainSize.X();
 
   defaultimp.inputScale = 1.0;
 
@@ -672,9 +672,9 @@ Ogre::TerrainGroup::RayResult Heightmap::GetMouseHit(CameraPtr _camera,
     ignition::math::Vector2i _mousePos)
 {
   Ogre::Ray mouseRay = _camera->GetOgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_mousePos.x()) /
+      static_cast<float>(_mousePos.X()) /
       _camera->GetViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.y()) /
+      static_cast<float>(_mousePos.Y()) /
       _camera->GetViewport()->getActualHeight());
 
   // The terrain uses a special ray intersection test.

@@ -231,15 +231,15 @@ void WallInspectorDialog::SetLength(double _length)
 /////////////////////////////////////////////////
 void WallInspectorDialog::SetStartPosition(const QPointF &_pos)
 {
-  this->startXSpinBox->setValue(_pos.x());
-  this->startYSpinBox->setValue(_pos.y());
+  this->startXSpinBox->setValue(_pos.X());
+  this->startYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////
 void WallInspectorDialog::SetEndPosition(const QPointF &_pos)
 {
-  this->endXSpinBox->setValue(_pos.x());
-  this->endYSpinBox->setValue(_pos.y());
+  this->endXSpinBox->setValue(_pos.X());
+  this->endYSpinBox->setValue(_pos.Y());
 }
 
 /////////////////////////////////////////////////

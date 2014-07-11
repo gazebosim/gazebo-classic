@@ -73,10 +73,10 @@ void BulletRayShape::Update()
           this->relativeEndPos);
   }
 
-  btVector3 start(this->globalStartPos.x(), this->globalStartPos.y(),
-      this->globalStartPos.z());
-  btVector3 end(this->globalEndPos.x(), this->globalEndPos.y(),
-      this->globalEndPos.z());
+  btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+      this->globalStartPos.Z());
+  btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+      this->globalEndPos.Z());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
   rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -120,10 +120,10 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 
   if (this->physicsEngine)
   {
-    btVector3 start(this->globalStartPos.x(), this->globalStartPos.y(),
-        this->globalStartPos.z());
-    btVector3 end(this->globalEndPos.x(), this->globalEndPos.y(),
-        this->globalEndPos.z());
+    btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+        this->globalStartPos.Z());
+    btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+        this->globalEndPos.Z());
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
     rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;

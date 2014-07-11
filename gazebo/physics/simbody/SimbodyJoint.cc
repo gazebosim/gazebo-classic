@@ -268,7 +268,8 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &/*_axis*/)
+void SimbodyJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
@@ -456,14 +457,16 @@ ignition::math::Vector3d SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::GetLinkForce(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::GetLinkTorque(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return ignition::math::Vector3d();
@@ -505,7 +508,8 @@ double SimbodyJoint::GetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetHighStop(unsigned int _index, const ignition::math::Angle &_angle)
+bool SimbodyJoint::SetHighStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
@@ -541,7 +545,8 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const ignition::math::Angle 
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetLowStop(unsigned int _index, const ignition::math::Angle &_angle)
+bool SimbodyJoint::SetLowStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
@@ -589,12 +594,14 @@ ignition::math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
   }
   else if (_index == 0)
   {
-    return ignition::math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("upper"));
   }
   else if (_index == 1)
   {
-    return ignition::math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("upper"));
   }
   else
@@ -617,12 +624,14 @@ ignition::math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
   }
   else if (_index == 0)
   {
-    return ignition::math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis")->GetElement("limit")
              ->Get<double>("lower"));
   }
   else if (_index == 1)
   {
-    return ignition::math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
+    return ignition::math::Angle(
+        this->sdf->GetElement("axis2")->GetElement("limit")
              ->Get<double>("lower"));
   }
   else

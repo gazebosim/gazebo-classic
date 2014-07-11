@@ -40,9 +40,9 @@ void onPoseInfo(ConstPose_VPtr &_msg)
     if (_msg->pose(i).name() == "pr2::l_gripper_r_parallel_link")
     {
       if (g_pr2LGripperXStart < 0)
-        g_pr2LGripperXStart = _msg->pose(i).position().x();
+        g_pr2LGripperXStart = _msg->pose(i).position().X();
 
-      g_pr2LGripperXEnd = _msg->pose(i).position().x();
+      g_pr2LGripperXEnd = _msg->pose(i).position().X();
     }
   }
 

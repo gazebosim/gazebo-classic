@@ -94,11 +94,11 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 
   if (_local)
   {
-    if (_axis.x() > 0)
+    if (_axis.X() > 0)
       normal = this->dataPtr->mouseMoveVisStartPose.Rot().XAxis();
-    else if (_axis.y() > 0)
+    else if (_axis.Y() > 0)
       normal = this->dataPtr->mouseMoveVisStartPose.Rot().YAxis();
-    else if (_axis.z() > 0)
+    else if (_axis.Z() > 0)
       normal = this->dataPtr->mouseMoveVisStartPose.Rot().ZAxis();
   }
   else
@@ -108,14 +108,14 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 
   ignition::math::Vector3d pressPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pressPos.x(),
-      this->dataPtr->mouseEvent.pressPos.y(),
+      this->dataPtr->mouseEvent.pressPos.X(),
+      this->dataPtr->mouseEvent.pressPos.Y(),
       ignition::math::Planed(normal, offset), pressPoint);
 
   ignition::math::Vector3d newPoint;
   this->dataPtr->userCamera->GetWorldPointOnPlane(
-      this->dataPtr->mouseEvent.pos.x(),
-      this->dataPtr->mouseEvent.pos.y(),
+      this->dataPtr->mouseEvent.pos.X(),
+      this->dataPtr->mouseEvent.pos.Y(),
       ignition::math::Planed(normal, offset), newPoint);
 
   ignition::math::Vector3d v1 = pressPoint -
@@ -151,7 +151,7 @@ ignition::math::Vector3d ModelManipulator::GetMousePositionOnPlane(
   ignition::math::Vector3d origin1, dir1, p1;
 
   // Cast ray from the camera into the world
-  _camera->GetCameraToViewportRay(_event.pos.x(), _event.pos.y(),
+  _camera->GetCameraToViewportRay(_event.pos.X(), _event.pos.Y(),
       origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -164,7 +164,8 @@ ignition::math::Vector3d ModelManipulator::GetMousePositionOnPlane(
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d ModelManipulator::SnapPoint(const ignition::math::Vector3d &_point,
+ignition::math::Vector3d ModelManipulator::SnapPoint(
+    const ignition::math::Vector3d &_point,
     double _interval, double _sensitivity)
 {
   if (_interval < 0)
@@ -183,26 +184,26 @@ ignition::math::Vector3d ModelManipulator::SnapPoint(const ignition::math::Vecto
   ignition::math::Vector3d point = _point;
   double snap = _interval * _sensitivity;
 
-  double remainder = fmod(point.x(), _interval);
+  double remainder = fmod(point.X(), _interval);
   int sign = remainder >= 0 ? 1 : -1;
   if (fabs(remainder) < snap)
-      point.x() -= remainder;
+      point.X() -= remainder;
   else if (fabs(remainder) > (_interval - snap))
-      point.x() = point.x() - remainder + _interval * sign;
+      point.X() = point.X() - remainder + _interval * sign;
 
-  remainder = fmod(point.y(), _interval);
+  remainder = fmod(point.Y(), _interval);
   sign = remainder >= 0 ? 1 : -1;
   if (fabs(remainder) < snap)
-      point.y() -= remainder;
+      point.Y() -= remainder;
   else if (fabs(remainder) > (_interval - snap))
-      point.y() = point.y() - remainder + _interval * sign;
+      point.Y() = point.Y() - remainder + _interval * sign;
 
-  remainder = fmod(point.z(), _interval);
+  remainder = fmod(point.Z(), _interval);
   sign = remainder >= 0 ? 1 : -1;
   if (fabs(remainder) < snap)
-      point.z() -= remainder;
+      point.Z() -= remainder;
   else if (fabs(remainder) > (_interval - snap))
-      point.z() = point.z() - remainder + _interval * sign;
+      point.Z() = point.Z() - remainder + _interval * sign;
 
   return point;
 }
@@ -210,8 +211,10 @@ ignition::math::Vector3d ModelManipulator::SnapPoint(const ignition::math::Vecto
 /////////////////////////////////////////////////
 ignition::math::Vector3d ModelManipulator::GetMouseMoveDistance(
     rendering::CameraPtr _camera,
-    const ignition::math::Vector2i &_start, const ignition::math::Vector2i &_end,
-    const ignition::math::Pose3d &_pose, const ignition::math::Vector3d &_axis, bool _local)
+    const ignition::math::Vector2i &_start,
+    const ignition::math::Vector2i &_end,
+    const ignition::math::Pose3d &_pose,
+    const ignition::math::Vector3d &_axis, bool _local)
 {
   ignition::math::Pose3d pose = _pose;
 
@@ -219,38 +222,38 @@ ignition::math::Vector3d ModelManipulator::GetMouseMoveDistance(
   ignition::math::Vector3d origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  _camera->GetCameraToViewportRay(_end.x(),
-      _end.y(), origin1, dir1);
-  _camera->GetCameraToViewportRay(_start.x(),
-      _start.y(), origin2, dir2);
+  _camera->GetCameraToViewportRay(_end.X(),
+      _end.Y(), origin1, dir1);
+  _camera->GetCameraToViewportRay(_start.X(),
+      _start.Y(), origin2, dir2);
 
   ignition::math::Vector3d planeNorm(0, 0, 0);
   ignition::math::Vector3d projNorm(0, 0, 0);
 
   ignition::math::Vector3d planeNormOther(0, 0, 0);
 
-  if (_axis.x() > 0 && _axis.y() > 0)
+  if (_axis.X() > 0 && _axis.Y() > 0)
   {
-    planeNorm.z() = 1;
-    projNorm.z() = 1;
+    planeNorm.Z() = 1;
+    projNorm.Z() = 1;
   }
-  else if (_axis.z() > 0)
+  else if (_axis.Z() > 0)
   {
-    planeNorm.y() = 1;
-    projNorm.x() = 1;
-    planeNormOther.x() = 1;
+    planeNorm.Y() = 1;
+    projNorm.X() = 1;
+    planeNormOther.X() = 1;
   }
-  else if (_axis.x() > 0)
+  else if (_axis.X() > 0)
   {
-    planeNorm.z() = 1;
-    projNorm.y() = 1;
-    planeNormOther.y() = 1;
+    planeNorm.Z() = 1;
+    projNorm.Y() = 1;
+    planeNormOther.Y() = 1;
   }
-  else if (_axis.y() > 0)
+  else if (_axis.Y() > 0)
   {
-    planeNorm.z() = 1;
-    projNorm.x() = 1;
-    planeNormOther.x() = 1;
+    planeNorm.Z() = 1;
+    projNorm.X() = 1;
+    planeNormOther.X() = 1;
   }
 
   if (_local)
@@ -294,13 +297,14 @@ ignition::math::Vector3d ModelManipulator::GetMouseMoveDistance(
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d ModelManipulator::GetMouseMoveDistance(const ignition::math::Pose3d &_pose,
+ignition::math::Vector3d ModelManipulator::GetMouseMoveDistance(
+    const ignition::math::Pose3d &_pose,
     const ignition::math::Vector3d &_axis, bool _local) const
 {
   return GetMouseMoveDistance(this->dataPtr->userCamera,
       this->dataPtr->mouseStart,
-      ignition::math::Vector2i(this->dataPtr->mouseEvent.pos.x(),
-      this->dataPtr->mouseEvent.pos.y()), _pose, _axis, _local);
+      ignition::math::Vector2i(this->dataPtr->mouseEvent.pos.X(),
+      this->dataPtr->mouseEvent.pos.Y()), _pose, _axis, _local);
 }
 
 /////////////////////////////////////////////////
@@ -313,39 +317,39 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     this->GetMouseMoveDistance(pose, _axis, _local);
 
   ignition::math::Vector3d bboxSize = bbox.Size();
-  ignition::math::Vector3d scale = (bboxSize + pose.Rot().RotateVectorReverse(distance))
-      / bboxSize;
+  ignition::math::Vector3d scale =
+    (bboxSize + pose.Rot().RotateVectorReverse(distance)) / bboxSize;
 
   // a bit hacky to check for unit sphere and cylinder simple shapes in order
   // to restrict the scaling dimensions.
   if (this->dataPtr->keyEvent.key == Qt::Key_Shift ||
       _vis->GetName().find("unit_sphere") != std::string::npos)
   {
-    if (_axis.x() > 0)
+    if (_axis.X() > 0)
     {
-      scale.y() = scale.x();
-      scale.z() = scale.x();
+      scale.Y() = scale.X();
+      scale.Z() = scale.X();
     }
-    else if (_axis.y() > 0)
+    else if (_axis.Y() > 0)
     {
-      scale.x() = scale.y();
-      scale.z() = scale.y();
+      scale.X() = scale.Y();
+      scale.Z() = scale.Y();
     }
-    else if (_axis.z() > 0)
+    else if (_axis.Z() > 0)
     {
-      scale.x() = scale.z();
-      scale.y() = scale.z();
+      scale.X() = scale.Z();
+      scale.Y() = scale.Z();
     }
   }
   else if (_vis->GetName().find("unit_cylinder") != std::string::npos)
   {
-    if (_axis.x() > 0)
+    if (_axis.X() > 0)
     {
-      scale.y() = scale.x();
+      scale.Y() = scale.X();
     }
-    else if (_axis.y() > 0)
+    else if (_axis.Y() > 0)
     {
-      scale.x() = scale.y();
+      scale.X() = scale.Y();
     }
   }
   else if (_vis->GetName().find("unit_box") != std::string::npos)
@@ -385,8 +389,8 @@ void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     pose.Pos() = SnapPoint(pose.Pos());
   }
 
-  if (!(_axis.z() > 0) && !_local)
-    pose.Pos().z() = _vis->GetWorldPose().Pos().z();
+  if (!(_axis.Z() > 0) && !_local)
+    pose.Pos().Z() = _vis->GetWorldPose().Pos().Z();
 
   _vis->SetWorldPose(pose);
 }
@@ -502,11 +506,11 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
     {
       ignition::math::Vector3d axis = ignition::math::Vector3d::Zero;
       if (this->dataPtr->keyEvent.key == Qt::Key_X)
-        axis.x() = 1;
+        axis.X() = 1;
       else if (this->dataPtr->keyEvent.key == Qt::Key_Y)
-        axis.y() = 1;
+        axis.Y() = 1;
       else if (this->dataPtr->keyEvent.key == Qt::Key_Z)
-        axis.z() = 1;
+        axis.Z() = 1;
 
       if (this->dataPtr->selectionObj->GetMode() ==
           rendering::SelectionObj::TRANS)
@@ -550,22 +554,22 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
             == rendering::SelectionObj::ROT_X
             || this->dataPtr->keyEvent.key == Qt::Key_X)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, ignition::math::Vector3d::UnitX,
-              !this->dataPtr->globalManip);
+          this->RotateEntity(this->dataPtr->mouseMoveVis,
+              ignition::math::Vector3d::UnitX, !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Y
             || this->dataPtr->keyEvent.key == Qt::Key_Y)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, ignition::math::Vector3d::UnitY,
-              !this->dataPtr->globalManip);
+          this->RotateEntity(this->dataPtr->mouseMoveVis,
+              ignition::math::Vector3d::UnitY, !this->dataPtr->globalManip);
         }
         else if (this->dataPtr->selectionObj->GetState()
             == rendering::SelectionObj::ROT_Z
             || this->dataPtr->keyEvent.key == Qt::Key_Z)
         {
-          this->RotateEntity(this->dataPtr->mouseMoveVis, ignition::math::Vector3d::UnitZ,
-              !this->dataPtr->globalManip);
+          this->RotateEntity(this->dataPtr->mouseMoveVis,
+              ignition::math::Vector3d::UnitZ, !this->dataPtr->globalManip);
         }
       }
       else if (this->dataPtr->selectionObj->GetMode()
@@ -779,7 +783,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     ignition::math::Vector3d rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     ignition::math::Vector2i delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double yaw = (delta.x() * 0.01) + rpy.z();
+    double yaw = (delta.X() * 0.01) + rpy.Z();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
@@ -795,7 +799,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     ignition::math::Vector3d rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     ignition::math::Vector2i delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double pitch = (delta.y() * 0.01) + rpy.y();
+    double pitch = (delta.Y() * 0.01) + rpy.Y();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
@@ -804,7 +808,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         pitch = snap;
     }
 
-    _vis->SetWorldRotation(ignition::math::Quaterniond(rpy.x, pitch, rpy.z()));
+    _vis->SetWorldRotation(ignition::math::Quaterniond(rpy.x, pitch, rpy.Z()));
   }
   else if (this->dataPtr->mouseEvent.buttons & common::MouseEvent::LEFT &&
            this->dataPtr->mouseEvent.buttons & common::MouseEvent::RIGHT)
@@ -812,7 +816,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     ignition::math::Vector3d rpy = this->dataPtr->mouseMoveVisStartPose.Rot().Euler();
     ignition::math::Vector2i delta = this->dataPtr->mouseEvent.Pos() -
         this->dataPtr->mouseEvent.pressPos;
-    double roll = (delta.x() * 0.01) + rpy.x();
+    double roll = (delta.X() * 0.01) + rpy.X();
     if (!this->dataPtr->mouseEvent.shift)
     {
       double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
@@ -821,7 +825,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
         roll = snap;
     }
 
-    _vis->SetWorldRotation(ignition::math::Quaterniond(roll, rpy.y, rpy.z()));
+    _vis->SetWorldRotation(ignition::math::Quaterniond(roll, rpy.y, rpy.Z()));
   }
   else
   {

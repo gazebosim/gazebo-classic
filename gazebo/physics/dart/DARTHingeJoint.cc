@@ -62,7 +62,8 @@ ignition::math::Vector3d DARTHingeJoint::GetAnchor(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHingeJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHingeJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -85,7 +86,8 @@ ignition::math::Vector3d DARTHingeJoint::GetGlobalAxis(unsigned int _index) cons
 }
 
 //////////////////////////////////////////////////
-void DARTHingeJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d& _axis)
+void DARTHingeJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d& _axis)
 {
   if (_index == 0)
   {

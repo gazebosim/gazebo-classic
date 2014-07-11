@@ -96,9 +96,9 @@ ignition::math::Vector3d Mesh::GetMax() const
       continue;
 
     ignition::math::Vector3d smax = (*iter)->GetMax();
-    max.x(std::max(max.x(), smax.x()));
-    max.y(std::max(max.y(), smax.y()));
-    max.z(std::max(max.z(), smax.z()));
+    max.x(std::max(max.X(), smax.X()));
+    max.y(std::max(max.Y(), smax.Y()));
+    max.z(std::max(max.Z(), smax.Z()));
   }
 
   return max;
@@ -120,9 +120,9 @@ ignition::math::Vector3d Mesh::GetMin() const
       continue;
 
     ignition::math::Vector3d smin = (*iter)->GetMin();
-    min.x(std::min(min.x(), smin.x()));
-    min.y(std::min(min.y(), smin.y()));
-    min.z(std::min(min.z(), smin.z()));
+    min.x(std::min(min.X(), smin.X()));
+    min.y(std::min(min.Y(), smin.Y()));
+    min.z(std::min(min.Z(), smin.Z()));
   }
 
   return min;
@@ -619,9 +619,9 @@ ignition::math::Vector3d SubMesh::GetMax() const
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    max.x(std::max(max.x(), (*iter).x()));
-    max.y(std::max(max.y(), (*iter).y()));
-    max.z(std::max(max.z(), (*iter).z()));
+    max.x(std::max(max.X(), (*iter).X()));
+    max.y(std::max(max.Y(), (*iter).Y()));
+    max.z(std::max(max.Z(), (*iter).Z()));
   }
 
   return max;
@@ -639,9 +639,9 @@ ignition::math::Vector3d SubMesh::GetMin() const
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    min.x(std::min(min.x(), (*iter).x()));
-    min.y(std::min(min.y(), (*iter).y()));
-    min.z(std::min(min.z(), (*iter).z()));
+    min.x(std::min(min.X(), (*iter).X()));
+    min.y(std::min(min.Y(), (*iter).Y()));
+    min.z(std::min(min.Z(), (*iter).Z()));
   }
 
   return min;
@@ -747,9 +747,9 @@ void SubMesh::FillArrays(float **_vertArr, int **_indArr) const
   for (viter = this->vertices.begin(), i = 0; viter != this->vertices.end();
       ++viter)
   {
-    (*_vertArr)[i++] = static_cast<float>((*viter).x());
-    (*_vertArr)[i++] = static_cast<float>((*viter).y());
-    (*_vertArr)[i++] = static_cast<float>((*viter).z());
+    (*_vertArr)[i++] = static_cast<float>((*viter).X());
+    (*_vertArr)[i++] = static_cast<float>((*viter).Y());
+    (*_vertArr)[i++] = static_cast<float>((*viter).Z());
   }
 
   for (iiter = this->indices.begin(), i = 0;
@@ -819,16 +819,16 @@ void Mesh::GetAABB(ignition::math::Vector3d &_center,
   {
     ignition::math::Vector3d max = (*siter)->GetMax();
     ignition::math::Vector3d min = (*siter)->GetMin();
-    _minXyz.x(std::min(_minXyz.x(), min.x()));
-    _maxXyz.x(std::max(_maxXyz.x(), max.x()));
-    _minXyz.y(std::min(_minXyz.y(), min.y()));
-    _maxXyz.y(std::max(_maxXyz.y(), max.y()));
-    _minXyz.z(std::min(_minXyz.z(), min.z()));
-    _maxXyz.z(std::max(_maxXyz.z(), max.z()));
+    _minXyz.x(std::min(_minXyz.X(), min.X()));
+    _maxXyz.x(std::max(_maxXyz.X(), max.X()));
+    _minXyz.y(std::min(_minXyz.Y(), min.Y()));
+    _maxXyz.y(std::max(_maxXyz.Y(), max.Y()));
+    _minXyz.z(std::min(_minXyz.Z(), min.Z()));
+    _maxXyz.z(std::max(_maxXyz.Z(), max.Z()));
   }
-  _center.x(0.5*(_minXyz.x() + _maxXyz.x()));
-  _center.y(0.5*(_minXyz.y() + _maxXyz.y()));
-  _center.z(0.5*(_minXyz.z() + _maxXyz.z()));
+  _center.x(0.5*(_minXyz.X() + _maxXyz.X()));
+  _center.y(0.5*(_minXyz.Y() + _maxXyz.Y()));
+  _center.z(0.5*(_minXyz.Z() + _maxXyz.Z()));
 }
 
 
@@ -840,9 +840,9 @@ void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
   {
     // generate projected texture coordinates, projected from center
     // get x, y, z for computing texture coordinate projections
-    double x = (*viter).x() - _center.x();
-    double y = (*viter).y() - _center.y();
-    double z = (*viter).z() - _center.z();
+    double x = (*viter).X() - _center.X();
+    double y = (*viter).Y() - _center.Y();
+    double z = (*viter).Z() - _center.Z();
 
     double r = std::max(0.000001, sqrt(x*x+y*y+z*z));
     double s = std::min(1.0, std::max(-1.0, z/r));
@@ -856,8 +856,8 @@ void SubMesh::GenSphericalTexCoord(const ignition::math::Vector3d &_center)
 //////////////////////////////////////////////////
 void SubMesh::Scale(double _factor)
 {
-  for (std::vector<ignition::math::Vector3d>::iterator iter = this->vertices.begin();
-       iter != this->vertices.end(); ++iter)
+  for (std::vector<ignition::math::Vector3d>::iterator iter =
+      this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     (*iter) *= _factor;
   }
@@ -887,8 +887,8 @@ void SubMesh::Center(const ignition::math::Vector3d &_center)
 //////////////////////////////////////////////////
 void SubMesh::Translate(const ignition::math::Vector3d &_vec)
 {
-  for (std::vector<ignition::math::Vector3d>::iterator iter = this->vertices.begin();
-       iter != this->vertices.end(); ++iter)
+  for (std::vector<ignition::math::Vector3d>::iterator iter =
+      this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
     (*iter) += _vec;
   }

@@ -208,7 +208,8 @@ void Gripper::HandleAttach()
     {
       if (!this->attached && cc[iter->first])
       {
-        ignition::math::Pose3d diff = cc[iter->first]->GetLink()->GetWorldPose() -
+        ignition::math::Pose3d diff =
+          cc[iter->first]->GetLink()->GetWorldPose() -
           this->palmLink->GetWorldPose();
 
         double dd = (diff - this->prevDiff).Pos().SquaredLength();

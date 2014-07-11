@@ -91,12 +91,12 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
       double px4 = static_cast<int>(data[y2 * pitch + x2 * bpp]) / 255.0;
       float h2 = (px3 - ((px3 - px4) * dx));
 
-      float h = (h1 - ((h1 - h2) * dy)) * _scale.z();
+      float h = (h1 - ((h1 - h2) * dy)) * _scale.Z();
 
       // invert pixel definition so 1=ground, 0=full height,
       //   if the terrain size has a negative z component
       //   this is mainly for backward compatibility
-      if (_size.z() < 0)
+      if (_size.Z() < 0)
         h = 1.0 - h;
 
       // Store the height for future use

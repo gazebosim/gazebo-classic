@@ -14,11 +14,10 @@
  * limitations under the License.
  *
  */
-
 #include <sstream>
+#include <ignition/math/Box.hh>
 
 #include "gazebo/common/Console.hh"
-#include <ignition/math/Box.hh>
 
 #include "gazebo/physics/SurfaceParams.hh"
 
@@ -75,7 +74,8 @@ void DARTCollision::Init()
     if (!planeShape)
     {
       ignition::math::Pose3d relativePose = this->GetRelativePose();
-      this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.Pos()));
+      this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(
+            relativePose.Pos()));
     }
   }
 }

@@ -89,11 +89,14 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // box in front of ray sensor 1 and 2
-  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the right of ray sensor 1
-  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
   // box on the left of the ray sensor 1 but out of range
-  ignition::math::Pose3d box03Pose(ignition::math::Vector3d(0, maxRange + 1, 0.5),
+  ignition::math::Pose3d box03Pose(
+      ignition::math::Vector3d(0, maxRange + 1, 0.5),
       ignition::math::Quaterniond(0, 0, 0));
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
@@ -141,7 +144,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
-  double expectedRangeAtMidPoint = box01Pose.Pos().x() - unitBoxSize/2;
+  double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize/2;
 
   // ray sensor 1 should see box01 and box02
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
@@ -178,7 +181,8 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Move all boxes out of range
   world->GetModel(box01)->SetWorldPose(
-      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0), ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond(0, 0, 0)));
   world->GetModel(box02)->SetWorldPose(
       ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
       ignition::math::Quaterniond(0, 0, 0)));
@@ -268,7 +272,8 @@ TEST_F(GPURaySensorTest, Heightmap)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
   world->GetModel(gpuLaserModelName)->SetWorldPose(
-      ignition::math::Pose3d(ignition::math::Vector3d(13.2, 0, 0.035), ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(13.2, 0, 0.035),
+        ignition::math::Quaterniond(0, 0, 0)));
 
   // wait for a few laser scans
   i = 0;

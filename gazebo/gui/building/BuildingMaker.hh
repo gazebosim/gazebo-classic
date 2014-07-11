@@ -144,7 +144,8 @@ namespace gazebo
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
       /// \return Size in metric units.
-      public: static ignition::math::Vector3d ConvertSize(const QVector3D &_size);
+      public: static ignition::math::Vector3d ConvertSize(
+                  const QVector3D &_size);
 
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
@@ -152,8 +153,8 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height in pixels.
       /// \return Size in metric units.
-      public: static ignition::math::Vector3d ConvertSize(double _width, double _depth,
-          double _height);
+      public: static ignition::math::Vector3d ConvertSize(
+                  double _width, double _depth, double _height);
 
       /// \brief Helper method to convert pose from editor coordinate system
       /// to Gazebo coordinate system.
@@ -172,8 +173,9 @@ namespace gazebo
       /// \param[in] _pitch Pitch rotation in degrees.
       /// \param[in] _yaw Yaw rotation in degrees.
       /// \return Pose with position in metric units and rotation in radians.
-      public: static ignition::math::Pose3d ConvertPose(double _x, double _y, double _z,
-          double _roll, double _pitch, double _yaw);
+      public: static ignition::math::Pose3d ConvertPose(
+                  double _x, double _y, double _z,
+                  double _roll, double _pitch, double _yaw);
 
       /// \param[in] _value Convert a value from pixels to metric units
       /// \param[in] _value Value in pixels.

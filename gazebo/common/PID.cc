@@ -113,8 +113,11 @@ double PID::Update(double _error, common::Time _dt)
   double pTerm, dTerm, iTerm;
   this->pErr = _error;
 
-  if (_dt == common::Time(0, 0) || ignition::math::isnan(_error) || std::isinf(_error))
+  if (_dt == common::Time(0, 0) || ignition::math::isnan(_error) ||
+      std::isinf(_error))
+  {
     return 0.0;
+  }
 
   // Calculate proportional contribution to command
   pTerm = this->pGain * this->pErr;

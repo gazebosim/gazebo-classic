@@ -334,7 +334,7 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.pressPos.Set(_event->pos().X(), _event->pos().Y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -367,7 +367,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.pressPos.Set(_event->pos().X(), _event->pos().Y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -494,7 +494,7 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.scroll.y() = _event->delta() > 0 ? -1 : 1;
+  this->mouseEvent.scroll.Y() = _event->delta() > 0 ? -1 : 1;
   this->mouseEvent.type = common::MouseEvent::SCROLL;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;
@@ -514,7 +514,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
   this->setFocus(Qt::MouseFocusReason);
 
-  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.pos.Set(_event->pos().X(), _event->pos().Y());
   this->mouseEvent.type = common::MouseEvent::MOVE;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;
@@ -569,7 +569,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
+  this->mouseEvent.pos.Set(_event->pos().X(), _event->pos().Y());
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (_event->button() == Qt::LeftButton)
@@ -682,10 +682,10 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   ignition::math::Vector3d lookAt(0, 0, 0);
   ignition::math::Vector3d delta = lookAt - camPos;
 
-  double yaw = atan2(delta.y(), delta.x());
+  double yaw = atan2(delta.Y(), delta.X());
 
-  double pitch = atan2(-delta.z(), sqrt(delta.x()*delta.x() +
-        delta.y()*delta.y()));
+  double pitch = atan2(-delta.Z(), sqrt(delta.X()*delta.X() +
+        delta.Y()*delta.Y()));
   this->userCamera->SetWorldPose(ignition::math::Pose3d(camPos,
         ignition::math::Vector3d(0, pitch, yaw)));
 
@@ -945,7 +945,8 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
 }
 
 /////////////////////////////////////////////////
-void GLWidget::PushHistory(const std::string &_visName, const ignition::math::Pose3d &_pose)
+void GLWidget::PushHistory(const std::string &_visName,
+    const ignition::math::Pose3d &_pose)
 {
   if (this->moveHistory.empty() ||
       this->moveHistory.back().first != _visName ||

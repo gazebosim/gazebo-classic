@@ -76,11 +76,11 @@ void BulletMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; ++j)
   {
     vertices[j*3+0] = vertices[j*3+0] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").x();
+      this->sdf->Get<ignition::math::Vector3d>("scale").X();
     vertices[j*3+1] = vertices[j*3+1] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").y();
+      this->sdf->Get<ignition::math::Vector3d>("scale").Y();
     vertices[j*3+2] = vertices[j*3+2] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").z();
+      this->sdf->Get<ignition::math::Vector3d>("scale").Z();
   }
 
   // Create the Bullet trimesh

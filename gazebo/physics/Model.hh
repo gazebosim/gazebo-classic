@@ -109,35 +109,43 @@ namespace gazebo
       public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Get the linear velocity of the entity.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetRelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the entity in the world frame.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetWorldLinearVel() const;
 
       /// \brief Get the angular velocity of the entity.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetRelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the entity in the world frame.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetWorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the entity.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetRelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetWorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the entity.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetRelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
-      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has no body.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
       public: virtual ignition::math::Vector3d GetWorldAngularAccel() const;
 
       /// \brief Get the size of the bounding box.
@@ -234,7 +242,8 @@ namespace gazebo
       ///
       /// \param[in] _model Pointer to the static model.
       /// \param[in] _offset Offset, relative to this Model, to place _model.
-      public: void AttachStaticModel(ModelPtr &_model, ignition::math::Pose3d _offset);
+      public: void AttachStaticModel(ModelPtr &_model,
+                  ignition::math::Pose3d _offset);
 
       /// \brief Detach a static model from this model.
       /// \param[in] _model Name of an attached static model to remove.

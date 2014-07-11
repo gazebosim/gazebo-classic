@@ -219,7 +219,8 @@ void BulletJoint::CacheForceTorque()
     // childMomentArm: from child CG to joint location in child link frame
     // moment arm rotated into world frame (given feedback is in world frame)
     ignition::math::Vector3d childMomentArm = childPose.Rot().RotateVector(
-      (this->anchorPose - ignition::math::Pose3d(cgPose.Pos(), ignition::math::Quaterniond())).Pos());
+      (this->anchorPose - ignition::math::Pose3d(cgPose.Pos(),
+        ignition::math::Quaterniond())).Pos());
 
     // gzerr << "anchor [" << anchorPose
     //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
@@ -258,18 +259,21 @@ void BulletJoint::CacheForceTorque()
 
     // get parent CG pose in child link frame
     ignition::math::Pose3d parentCGInChildLink =
-      ignition::math::Pose3d(cgPose.Pos(), ignition::math::Quaterniond()) - (childPose - parentPose);
+      ignition::math::Pose3d(cgPose.Pos(), ignition::math::Quaterniond()) -
+      (childPose - parentPose);
 
     // anchor location in parent CG frame
     // this is the moment arm, but it's in parent CG frame, we need
     // to convert it into world frame
-    ignition::math::Pose3d anchorInParendCGFrame = this->anchorPose - parentCGInChildLink;
+    ignition::math::Pose3d anchorInParendCGFrame =
+      this->anchorPose - parentCGInChildLink;
 
     // paretnCGFrame in world frame
     ignition::math::Pose3d parentCGInWorld = cgPose + parentPose;
 
     // rotate momeent arms into world frame
-    ignition::math::Vector3d parentMomentArm = parentCGInWorld.Rot().RotateVector(
+    ignition::math::Vector3d parentMomentArm =
+      parentCGInWorld.Rot().RotateVector(
       (this->anchorPose - parentCGInChildLink).Pos());
 
     // gzerr << "anchor [" << this->anchorPose
@@ -300,7 +304,8 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in parent link frame, transform them into
       // child link(world) frame.
-      ignition::math::Pose3d parentToWorldTransform = this->parentLink->GetWorldPose();
+      ignition::math::Pose3d parentToWorldTransform =
+        this->parentLink->GetWorldPose();
       this->wrench.body1Force =
         parentToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
@@ -325,7 +330,8 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in child link frame, transform them into
       // parent link frame.  Here, parent link is world, so zero transform.
-      ignition::math::Pose3d childToWorldTransform = this->childLink->GetWorldPose();
+      ignition::math::Pose3d childToWorldTransform =
+        this->childLink->GetWorldPose();
       this->wrench.body1Force =
         childToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
@@ -520,14 +526,16 @@ ignition::math::Vector3d BulletJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::GetLinkForce(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::GetLinkTorque(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return ignition::math::Vector3d();

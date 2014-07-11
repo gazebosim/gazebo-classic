@@ -26,10 +26,10 @@
 #include <boost/shared_ptr.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Event.hh"
@@ -103,14 +103,16 @@ void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetRelativePoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
+void RayShape::GetRelativePoints(
+    ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
 {
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetGlobalPoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
+void RayShape::GetGlobalPoints(
+    ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;

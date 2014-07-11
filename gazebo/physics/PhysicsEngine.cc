@@ -14,11 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: The base class for all physics engines
- * Author: Nate Koenig
- */
-
 #include <sdf/sdf.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
@@ -27,8 +24,6 @@
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
-
-#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"

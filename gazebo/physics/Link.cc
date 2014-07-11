@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-
 #include <sstream>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -25,7 +25,6 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
-#include <ignition/math/Quaternion.hh>
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
@@ -871,7 +870,8 @@ std::string Link::GetSensorName(unsigned int _i) const
 }
 
 //////////////////////////////////////////////////
-void Link::AttachStaticModel(ModelPtr &_model, const ignition::math::Pose3d &_offset)
+void Link::AttachStaticModel(ModelPtr &_model,
+    const ignition::math::Pose3d &_offset)
 {
   if (!_model->IsStatic())
   {

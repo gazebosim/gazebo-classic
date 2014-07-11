@@ -252,9 +252,9 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
   if (_visual)
   {
     ignition::math::Pose3d origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().Rot().Euler().z();
+    double yaw = _visual->GetWorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.Pos().z() - _visual->GetWorldPose().Pos().z();
+    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().Pos().Z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
@@ -269,7 +269,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
 
     ignition::math::Box bb = _visual->GetBoundingBox();
     ignition::math::Vector3d pos = bb.Center();
-    pos.z() = bb.Max().z();
+    pos.Z() = bb.Max().Z();
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }
@@ -397,7 +397,8 @@ void UserCamera::ShowVisual(bool /*_s*/)
 }
 
 //////////////////////////////////////////////////
-bool UserCamera::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
+bool UserCamera::MoveToPosition(const ignition::math::Pose3d &_pose,
+    double _time)
 {
   return Camera::MoveToPosition(_pose, _time);
 }
@@ -438,15 +439,15 @@ void UserCamera::MoveToVisual(VisualPtr _visual)
   double dist = start.Distance(end) - maxSize;
 
   ignition::math::Vector3d mid = start + dir*(dist*.5);
-  mid.z() = box.Center().z() + box.Size().z() + 2.0;
+  mid.Z() = box.Center().Z() + box.Size().Z() + 2.0;
 
   dir = end - mid;
   dir.Correct();
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y(), dir.x());
-  double pitchAngle = atan2(-dir.z(), sqrt(dir.x()*dir.x() + dir.y()*dir.y()));
+  double yawAngle = atan2(dir.Y(), dir.X());
+  double pitchAngle = atan2(-dir.Z(), sqrt(dir.X()*dir.X() + dir.Y()*dir.Y()));
   ignition::math::Quaterniond pitchYawOnly(0, pitchAngle, yawAngle);
   Ogre::Quaternion pitchYawFinal(Conversions::Convert(pitchYawOnly));
 
@@ -546,7 +547,7 @@ VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos,
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(
-        _mousePos.x(), _mousePos.y());
+        _mousePos.X(), _mousePos.Y());
 
   _mod = "";
   if (entity)
@@ -598,7 +599,7 @@ VisualPtr UserCamera::GetVisual(const ignition::math::Vector2i &_mousePos) const
 
   Ogre::Entity *entity =
     this->dataPtr->selectionBuffer->OnSelectionClick(
-        _mousePos.x(), _mousePos.y());
+        _mousePos.X(), _mousePos.Y());
 
   if (entity && !entity->getUserAny().isEmpty())
   {

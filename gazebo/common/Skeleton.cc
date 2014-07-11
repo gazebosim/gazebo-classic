@@ -316,7 +316,8 @@ bool SkeletonNode::IsJoint()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetTransform(ignition::math::Matrix4d _trans, bool _updateChildren)
+void SkeletonNode::SetTransform(ignition::math::Matrix4d _trans,
+    bool _updateChildren)
 {
   this->transform = _trans;
 
@@ -373,7 +374,8 @@ ignition::math::Matrix4d SkeletonNode::GetTransform()
 }
 
 //////////////////////////////////////////////////
-void SkeletonNode::SetModelTransform(ignition::math::Matrix4d _trans, bool _updateChildren)
+void SkeletonNode::SetModelTransform(ignition::math::Matrix4d _trans,
+    bool _updateChildren)
 {
   this->modelTransform = _trans;
 
@@ -381,7 +383,8 @@ void SkeletonNode::SetModelTransform(ignition::math::Matrix4d _trans, bool _upda
     this->transform = _trans;
   else
   {
-    ignition::math::Matrix4d invParentTrans = this->parent->GetModelTransform().Inverse();
+    ignition::math::Matrix4d invParentTrans =
+      this->parent->GetModelTransform().Inverse();
     this->transform = invParentTrans * this->modelTransform;
   }
 
@@ -597,9 +600,9 @@ void NodeTransform::SetSourceValues(ignition::math::Matrix4d _mat)
 void NodeTransform::SetSourceValues(ignition::math::Vector3d _vec)
 {
   this->source.resize(3);
-  this->source[0] = _vec.x();
-  this->source[1] = _vec.y();
-  this->source[2] = _vec.z();
+  this->source[0] = _vec.X();
+  this->source[1] = _vec.Y();
+  this->source[2] = _vec.Z();
 }
 
 //////////////////////////////////////////////////
@@ -607,9 +610,9 @@ void NodeTransform::SetSourceValues(ignition::math::Vector3d _axis,
     double _angle)
 {
   this->source.resize(4);
-  this->source[0] = _axis.x();
-  this->source[1] = _axis.y();
-  this->source[2] = _axis.z();
+  this->source[0] = _axis.X();
+  this->source[1] = _axis.Y();
+  this->source[2] = _axis.Z();
   this->source[3] = _angle;
 }
 

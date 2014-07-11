@@ -102,17 +102,17 @@ void Spawn(po::variables_map &_vm)
   ignition::math::Pose3d pose = modelElem->Get<ignition::math::Pose3d>("pose");
   ignition::math::Vector3d rpy = pose.Rot().Euler();
   if (_vm.count("pose-x"))
-    pose.Pos().x() = _vm["pose-x"].as<double>();
+    pose.Pos().X() = _vm["pose-x"].as<double>();
   if (_vm.count("pose-y"))
-    pose.Pos().y() = _vm["pose-y"].as<double>();
+    pose.Pos().Y() = _vm["pose-y"].as<double>();
   if (_vm.count("pose-z"))
-    pose.Pos().z() = _vm["pose-z"].as<double>();
+    pose.Pos().Z() = _vm["pose-z"].as<double>();
   if (_vm.count("pose-R"))
-    rpy.x() = _vm["pose-R"].as<double>();
+    rpy.X() = _vm["pose-R"].as<double>();
   if (_vm.count("pose-P"))
-    rpy.y() = _vm["pose-P"].as<double>();
+    rpy.Y() = _vm["pose-P"].as<double>();
   if (_vm.count("pose-Y"))
-    rpy.z() = _vm["pose-Y"].as<double>();
+    rpy.Z() = _vm["pose-Y"].as<double>();
   pose.Rot().Euler(rpy);
 
   if (!transport::init())

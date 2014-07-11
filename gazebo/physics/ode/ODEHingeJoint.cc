@@ -76,14 +76,15 @@ void ODEHingeJoint::SetAnchor(unsigned int /*index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetHingeAnchor(this->jointId, _anchor.x(), _anchor.y(), _anchor.z());
+    dJointSetHingeAnchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEHingeJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -95,7 +96,8 @@ ignition::math::Vector3d ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) c
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEHingeJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -110,8 +112,8 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d 
 
   if (this->jointId)
   {
-    dJointSetHingeAxis(this->jointId, globalAxis.x(), globalAxis.y(),
-        globalAxis.z());
+    dJointSetHingeAxis(this->jointId, globalAxis.X(), globalAxis.Y(),
+        globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

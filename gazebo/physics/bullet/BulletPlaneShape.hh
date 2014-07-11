@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
 
 #ifndef _BULLETPLANESHAPE_HH_
 #define _BULLETPLANESHAPE_HH_
@@ -60,7 +56,7 @@ namespace gazebo
                     this->collisionParent);
 
                 ignition::math::Vector3d n = this->GetNormal();
-                btVector3 vec(n.x(),(), n.y(), n.z());
+                btVector3 vec(n.X(), n.Y(), n.Z());
 
                 bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
                     false);

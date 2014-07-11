@@ -16,6 +16,7 @@
 */
 
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
 #include "gazebo/physics/simbody/SimbodyModel.hh"
@@ -50,7 +51,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -1280,13 +1280,15 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 }
 
 /////////////////////////////////////////////////
-SimTK::Quaternion SimbodyPhysics::QuadToQuad(const ignition::math::Quaterniond &_q)
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(
+    const ignition::math::Quaterniond &_q)
 {
-  return SimTK::Quaternion(_q.w, _q.x(), _q.y(), _q.z());
+  return SimTK::Quaternion(_q.w, _q.X(), _q.Y(), _q.Z());
 }
 
 /////////////////////////////////////////////////
-ignition::math::Quaterniond SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
+ignition::math::Quaterniond SimbodyPhysics::QuadToQuad(
+    const SimTK::Quaternion &_q)
 {
   return ignition::math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
 }
@@ -1294,7 +1296,7 @@ ignition::math::Quaterniond SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &
 /////////////////////////////////////////////////
 SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const ignition::math::Vector3d &_v)
 {
-  return SimTK::Vec3(_v.x(), _v.y(), _v.z());
+  return SimTK::Vec3(_v.X(), _v.Y(), _v.Z());
 }
 
 /////////////////////////////////////////////////
@@ -1304,28 +1306,32 @@ ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
 }
 
 /////////////////////////////////////////////////
-SimTK::Transform SimbodyPhysics::Pose2Transform(const ignition::math::Pose3d &_pose)
+SimTK::Transform SimbodyPhysics::Pose2Transform(
+    const ignition::math::Pose3d &_pose)
 {
-  SimTK::Quaternion q(_pose.Rot().w, _pose.Rot().x(), _pose.Rot().y(),
-                   _pose.Rot().z());
-  SimTK::Vec3 v(_pose.Pos().x(), _pose.Pos().y(), _pose.Pos().z());
+  SimTK::Quaternion q(_pose.Rot().w, _pose.Rot().X(), _pose.Rot().Y(),
+                   _pose.Rot().Z());
+  SimTK::Vec3 v(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
 }
 
 /////////////////////////////////////////////////
-ignition::math::Pose3d SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
+ignition::math::Pose3d SimbodyPhysics::Transform2Pose(
+    const SimTK::Transform &_xAB)
 {
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
-  return ignition::math::Pose3d(ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
+  return ignition::math::Pose3d(
+      ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
     ignition::math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
-  const ignition::math::Pose3d pose = _element->Get<ignition::math::Pose3d>("pose");
+  const ignition::math::Pose3d pose =
+    _element->Get<ignition::math::Pose3d>("pose");
   return Pose2Transform(pose);
 }
 

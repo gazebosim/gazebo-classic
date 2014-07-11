@@ -176,9 +176,9 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
     // expected force output, see issue #565
-    // tolX = std::max(tolPercentage*expectedForce.x(), tol);
-    // tolY = std::max(tolPercentage*expectedForce.y(), tol);
-    // tolZ = std::max(tolPercentage*expectedForce.z(), tol);
+    // tolX = std::max(tolPercentage*expectedForce.X(), tol);
+    // tolY = std::max(tolPercentage*expectedForce.Y(), tol);
+    // tolZ = std::max(tolPercentage*expectedForce.Z(), tol);
 
     // loop through contact collision pairs
     for (int i = 0; i < contacts[k].contact_size(); ++i)
@@ -201,65 +201,65 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
       {
         // Contact between the sphere and the contact sensor occurs at z=1.0
         // Skip other contact points with the ground plane
-        if (!ignition::math::equal(contacts[k].contact(i).position(j).z(), 1.0))
+        if (!ignition::math::equal(contacts[k].contact(i).position(j).Z(), 1.0))
           continue;
 
-        EXPECT_NEAR(contacts[k].contact(i).position(j).x(),
-            models[k]->GetLink()->GetWorldCoGPose().Pos().x(), TOL);
-        EXPECT_NEAR(contacts[k].contact(i).position(j).y(),
-            models[k]->GetLink()->GetWorldCoGPose().Pos().y(), TOL);
+        EXPECT_NEAR(contacts[k].contact(i).position(j).X(),
+            models[k]->GetLink()->GetWorldCoGPose().Pos().X(), TOL);
+        EXPECT_NEAR(contacts[k].contact(i).position(j).Y(),
+            models[k]->GetLink()->GetWorldCoGPose().Pos().Y(), TOL);
 
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).x(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).y(), 0, TOL);
-        EXPECT_NEAR(contacts[k].contact(i).normal(j).z(), 1, TOL);
+        EXPECT_NEAR(contacts[k].contact(i).normal(j).X(), 0, TOL);
+        EXPECT_NEAR(contacts[k].contact(i).normal(j).Y(), 0, TOL);
+        EXPECT_NEAR(contacts[k].contact(i).normal(j).Z(), 1, TOL);
 
         if (body1)
         {
-          actualForce.x() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().force().x();
-          actualForce.y() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().force().y();
-          actualForce.z() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().force().z();
+          actualForce.X() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().X();
+          actualForce.Y() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().Y();
+          actualForce.Z() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().force().Z();
 
-          actualTorque.x() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().torque().x();
-          actualTorque.y() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().torque().y();
-          actualTorque.z() =
-            contacts[k].contact(i).wrench(j).body_1_wrench().torque().z();
+          actualTorque.X() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().X();
+          actualTorque.Y() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().Y();
+          actualTorque.Z() =
+            contacts[k].contact(i).wrench(j).body_1_wrench().torque().Z();
         }
         else
         {
-          actualForce.x() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().force().x();
-          actualForce.y() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().force().y();
-          actualForce.z() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().force().z();
+          actualForce.X() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().X();
+          actualForce.Y() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().Y();
+          actualForce.Z() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().force().Z();
 
-          actualTorque.x() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().torque().x();
-          actualTorque.y() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().torque().y();
-          actualTorque.z() =
-            contacts[k].contact(i).wrench(j).body_2_wrench().torque().z();
+          actualTorque.X() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().X();
+          actualTorque.Y() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().Y();
+          actualTorque.Z() =
+            contacts[k].contact(i).wrench(j).body_2_wrench().torque().Z();
         }
 
         // Find the dominant force vector component and verify the value has
         // the correct sign.
         // Force and torque are given in the link frame, see issue #545
-        int vi = (fabs(expectedForce.x()) > fabs(expectedForce.y()))
+        int vi = (fabs(expectedForce.X()) > fabs(expectedForce.Y()))
             ? 0 : 1;
-        vi = (fabs(expectedForce[vi]) > fabs(expectedForce.z()))
+        vi = (fabs(expectedForce[vi]) > fabs(expectedForce.Z()))
             ? vi : 2;
         EXPECT_EQ((expectedForce[vi] < 0), (actualForce[vi] < 0));
 
         // Verify torque with a large tolerance
         double odeTorqueTol = 2;
-        EXPECT_LT(fabs(actualTorque.x()), odeTorqueTol);
-        EXPECT_LT(fabs(actualTorque.y()), odeTorqueTol);
-        EXPECT_LT(fabs(actualTorque.z()), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.X()), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.Y()), odeTorqueTol);
+        EXPECT_LT(fabs(actualTorque.Z()), odeTorqueTol);
 
         // TODO: ODE and bullet produce slightly different results
         // In ODE the force and torque on an object seem to be affected by other
@@ -267,12 +267,12 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
         // exerts non-zero x and y forces on the contact sensor when only
         // negative z forces are expected.
         // The tests below pass in bullet but fail in ode, see issue #565
-        // EXPECT_NEAR(expectedForce.x(), actualForce.x(), tolX);
-        // EXPECT_NEAR(expectedForce.y(), actualForce.y(), tolY);
-        // EXPECT_NEAR(expectedForce.z(), actualForce.z(), tolZ);
-        // EXPECT_NEAR(expectedTorque.x(), actualTorque.x(), tolX);
-        // EXPECT_NEAR(expectedTorque.y(), actualTorque.y(), tolY);
-        // EXPECT_NEAR(expectedTorque.z(), actualTorque.z(), tolZ);
+        // EXPECT_NEAR(expectedForce.X(), actualForce.X(), tolX);
+        // EXPECT_NEAR(expectedForce.Y(), actualForce.Y(), tolY);
+        // EXPECT_NEAR(expectedForce.Z(), actualForce.Z(), tolZ);
+        // EXPECT_NEAR(expectedTorque.X(), actualTorque.X(), tolX);
+        // EXPECT_NEAR(expectedTorque.Y(), actualTorque.Y(), tolY);
+        // EXPECT_NEAR(expectedTorque.Z(), actualTorque.Z(), tolZ);
       }
     }
   }
@@ -384,26 +384,26 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
     // loop through all contact points between the two collisions
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
-      if (contacts.contact(i).position(j).z() < 0.5)
+      if (contacts.contact(i).position(j).Z() < 0.5)
         continue;
 
       if (body1)
       {
-        actualTorque.x() =
-          contacts.contact(i).wrench(j).body_1_wrench().torque().x();
-        actualTorque.y() =
-          contacts.contact(i).wrench(j).body_1_wrench().torque().y();
-        actualTorque.z() =
-          contacts.contact(i).wrench(j).body_1_wrench().torque().z();
+        actualTorque.X() =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().X();
+        actualTorque.Y() =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().Y();
+        actualTorque.Z() =
+          contacts.contact(i).wrench(j).body_1_wrench().torque().Z();
       }
       else
       {
-        actualTorque.x() =
-          contacts.contact(i).wrench(j).body_2_wrench().torque().x();
-        actualTorque.y() =
-          contacts.contact(i).wrench(j).body_2_wrench().torque().y();
-        actualTorque.z() =
-          contacts.contact(i).wrench(j).body_2_wrench().torque().z();
+        actualTorque.X() =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().X();
+        actualTorque.Y() =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().Y();
+        actualTorque.Z() =
+          contacts.contact(i).wrench(j).body_2_wrench().torque().Z();
       }
 
       // dart doesn't pass this portion of the test (#910)
@@ -411,11 +411,11 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
       {
         // contact sensor should have positive x torque and relatively large
         // compared to y and z
-        EXPECT_GT(actualTorque.x(), 0);
-        EXPECT_GT(actualTorque.x(), fabs(actualTorque.y()));
-        EXPECT_GT(actualTorque.x(), fabs(actualTorque.z()));
-        // EXPECT_LT(fabs(actualTorque.y()), tol);
-        // EXPECT_LT(fabs(actualTorque.z()), tol);
+        EXPECT_GT(actualTorque.X(), 0);
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Y()));
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Z()));
+        // EXPECT_LT(fabs(actualTorque.Y()), tol);
+        // EXPECT_LT(fabs(actualTorque.Z()), tol);
       }
     }
   }

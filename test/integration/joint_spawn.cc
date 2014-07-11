@@ -201,7 +201,8 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
 
   ignition::math::Vector3d pos(10, 10, 10);
   ignition::math::Vector3d vel(10, 10, 10);
-  parent->SetWorldPose(ignition::math::Pose3d(pos, ignition::math::Quaterniond()));
+  parent->SetWorldPose(ignition::math::Pose3d(pos,
+        ignition::math::Quaterniond()));
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);

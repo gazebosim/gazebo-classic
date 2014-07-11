@@ -361,7 +361,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     {
       // Set end point to mouse plane intersection
       ignition::math::Vector3d pt;
-      camera->GetWorldPointOnPlane(_event.pos.x(), _event.pos.y(),
+      camera->GetWorldPointOnPlane(_event.pos.X(), _event.pos.Y(),
           ignition::math::Planed(ignition::math::Vector3d(0, 0, 1)), pt);
       if (this->mouseJoint->parent)
         parentPos = this->mouseJoint->parent->GetWorldPose().Pos();
@@ -505,7 +505,8 @@ void JointMaker::GenerateSDF()
     sdf::ElementPtr childElem = jointElem->GetElement("child");
     childElem->Set(joint->child->GetParent()->GetName());
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
-    poseElem->Set(ignition::math::Pose3d(joint->anchor, ignition::math::Vector3d::Zero));
+    poseElem->Set(ignition::math::Pose3d(
+          joint->anchor, ignition::math::Vector3d::Zero));
     int axisCount = GetJointAxisCount(joint->type);
     for (int i = 0; i < axisCount; ++i)
     {

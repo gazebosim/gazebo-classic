@@ -56,7 +56,7 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
   // Spawn a box
   double z0 = 10.0;
   ignition::math::Vector3d size(1, 1, 1);
-  ignition::math::Vector3d pos0(0, 0, z0 + size.z() / 2);
+  ignition::math::Vector3d pos0(0, 0, z0 + size.Z() / 2);
   SpawnBox("box", size, pos0, ignition::math::Vector3d::Zero, false);
   physics::ModelPtr model = world->GetModel("box");
   ASSERT_TRUE(model != NULL);
@@ -163,9 +163,9 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   ignition::math::Vector3d offset(0, 0, -0.5);
   ignition::math::Vector3d vel3 = link->GetWorldLinearVel(offset,
       ignition::math::Quaterniond());
-  EXPECT_NEAR(vel3.x(), 0.0, g_tolerance);
-  EXPECT_NEAR(vel3.y(), 1.0, g_tolerance);
-  EXPECT_NEAR(vel3.z(), 0.0, g_tolerance);
+  EXPECT_NEAR(vel3.X(), 0.0, g_tolerance);
+  EXPECT_NEAR(vel3.Y(), 1.0, g_tolerance);
+  EXPECT_NEAR(vel3.Z(), 0.0, g_tolerance);
 
   // check rotation
   if (_physicsEngine.compare("bullet") == 0)
@@ -175,9 +175,9 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
     world->Step(1);
   }
   ignition::math::Vector3d rpy = link->GetWorldPose().Rot().Euler();
-  EXPECT_NEAR(rpy.x(), 0.0, g_tolerance);
-  EXPECT_NEAR(rpy.y(), vel2.y()*dt, g_tolerance);
-  EXPECT_NEAR(rpy.z(), 0.0, g_tolerance);
+  EXPECT_NEAR(rpy.X(), 0.0, g_tolerance);
+  EXPECT_NEAR(rpy.Y(), vel2.Y()*dt, g_tolerance);
+  EXPECT_NEAR(rpy.Z(), 0.0, g_tolerance);
 }
 
 /////////////////////////////////////////////////

@@ -67,10 +67,10 @@ SphericalCoordinates::SphericalCoordinates(const SurfaceType _type)
 
 //////////////////////////////////////////////////
 SphericalCoordinates::SphericalCoordinates(const SurfaceType _type,
-                                           const ignition::math::Angle &_latitude,
-                                           const ignition::math::Angle &_longitude,
-                                           double _elevation,
-                                           const ignition::math::Angle &_heading)
+    const ignition::math::Angle &_latitude,
+    const ignition::math::Angle &_longitude,
+    double _elevation,
+    const ignition::math::Angle &_heading)
   : dataPtr(new SphericalCoordinatesPrivate)
 {
   this->SetSurfaceType(_type);
@@ -124,13 +124,15 @@ void SphericalCoordinates::SetSurfaceType(const SurfaceType &_type)
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetLatitudeReference(const ignition::math::Angle &_angle)
+void SphericalCoordinates::SetLatitudeReference(
+    const ignition::math::Angle &_angle)
 {
   this->dataPtr->latitudeReference.Radian(_angle.Radian());
 }
 
 //////////////////////////////////////////////////
-void SphericalCoordinates::SetLongitudeReference(const ignition::math::Angle &_angle)
+void SphericalCoordinates::SetLongitudeReference(
+    const ignition::math::Angle &_angle)
 {
   this->dataPtr->longitudeReference.Radian(_angle.Radian());
 }
@@ -178,8 +180,8 @@ ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
   }
 
   ignition::math::Vector3d spherical;
-  double east  = _xyz.x() * headingCosine - _xyz.y() * headingSine;
-  double north = _xyz.x() * headingSine   + _xyz.y() * headingCosine;
+  double east  = _xyz.X() * headingCosine - _xyz.Y() * headingSine;
+  double north = _xyz.X() * headingSine   + _xyz.Y() * headingCosine;
   // Assumes small changes in latitude / longitude.
   // May not work well near the north / south poles.
   ignition::math::Angle deltaLatitude(north / radiusMeridional);
@@ -191,19 +193,19 @@ ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
   spherical.y(this->dataPtr->longitudeReference.Degree() +
               deltaLongitude.Degree());
   // altitude relative to sea level
-  spherical.z(this->dataPtr->elevationReference + _xyz.z());
+  spherical.z(this->dataPtr->elevationReference + _xyz.Z());
   return spherical;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SphericalCoordinates::GlobalFromLocal(const ignition::math::Vector3d &_xyz)
-    const
+ignition::math::Vector3d SphericalCoordinates::GlobalFromLocal(
+    const ignition::math::Vector3d &_xyz) const
 {
   double headingSine = sin(this->dataPtr->headingOffset.Radian());
   double headingCosine = cos(this->dataPtr->headingOffset.Radian());
-  double east  = _xyz.x() * headingCosine - _xyz.y() * headingSine;
-  double north = _xyz.x() * headingSine   + _xyz.y() * headingCosine;
-  return ignition::math::Vector3d(east, north, _xyz.z());
+  double east  = _xyz.X() * headingCosine - _xyz.Y() * headingSine;
+  double north = _xyz.X() * headingSine   + _xyz.Y() * headingCosine;
+  return ignition::math::Vector3d(east, north, _xyz.Z());
 }
 
 //////////////////////////////////////////////////

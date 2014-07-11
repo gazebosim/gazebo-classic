@@ -973,7 +973,8 @@ void Model::SetEnabled(bool _enabled)
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose, std::string _linkName)
+void Model::SetLinkWorldPose(
+    const ignition::math::Pose3d &_pose, std::string _linkName)
 {
   // look for link matching link name
   LinkPtr link = this->GetLink(_linkName);
@@ -985,7 +986,8 @@ void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose, std::string _l
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose, const LinkPtr &_link)
+void Model::SetLinkWorldPose(
+    const ignition::math::Pose3d &_pose, const LinkPtr &_link)
 {
   ignition::math::Pose3d linkPose = _link->GetWorldPose();
   ignition::math::Pose3d currentModelPose = this->GetWorldPose();

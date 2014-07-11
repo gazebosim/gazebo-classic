@@ -52,7 +52,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     model = world->GetModel(*iter);
     ASSERT_TRUE(model != NULL);
     pos = model->GetWorldPose().Pos();
-    pos.z() += 10;
+    pos.Z() += 10;
 
     entity = world->GetEntityBelowPoint(pos);
     if (entity)
@@ -69,7 +69,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     }
 
     testPos = pos;
-    testPos.z() = pos.z() + 5;
+    testPos.Z() = pos.Z() + 5;
     entity = world->GetEntityBelowPoint(testPos);
     if (entity)
     {

@@ -50,7 +50,8 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d DARTUniversalJoint::GetAnchor(
+    unsigned int /*index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -60,7 +61,8 @@ ignition::math::Vector3d DARTUniversalJoint::GetAnchor(unsigned int /*index*/) c
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -127,7 +129,8 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle DARTUniversalJoint::GetAngleImpl(
+    unsigned int _index) const
 {
   ignition::math::Angle result;
 

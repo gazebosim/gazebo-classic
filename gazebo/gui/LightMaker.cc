@@ -117,7 +117,7 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
   ignition::math::Vector3d origin1, dir1, p1;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x(), _event.pos.y(),
+  this->camera->GetCameraToViewportRay(_event.pos.X(), _event.pos.Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -131,17 +131,17 @@ void LightMaker::OnMouseMove(const common::MouseEvent &_event)
 
   if (!_event.shift)
   {
-    if (ceil(p1.x()) - p1.x() <= .4)
-      p1.x() = ceil(p1.x());
-    else if (p1.x() - floor(p1.x()) <= .4)
-      p1.x() = floor(p1.x());
+    if (ceil(p1.X()) - p1.X() <= .4)
+      p1.X() = ceil(p1.X());
+    else if (p1.X() - floor(p1.X()) <= .4)
+      p1.X() = floor(p1.X());
 
-    if (ceil(p1.y()) - p1.y() <= .4)
-      p1.y() = ceil(p1.y());
-    else if (p1.y() - floor(p1.y()) <= .4)
-      p1.y() = floor(p1.y());
+    if (ceil(p1.Y()) - p1.Y() <= .4)
+      p1.Y() = ceil(p1.Y());
+    else if (p1.Y() - floor(p1.Y()) <= .4)
+      p1.Y() = floor(p1.Y());
   }
-  p1.z() = this->light->GetPosition().z();
+  p1.Z() = this->light->GetPosition().Z();
 
   this->light->SetPosition(p1);
 }

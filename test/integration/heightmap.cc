@@ -123,9 +123,9 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y(); ++y)
+  for (y = 0; y < shape->GetVertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x(); ++x)
+    for (x = 0; x < shape->GetVertexCount().X(); ++x)
     {
       EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
@@ -155,9 +155,9 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y(); ++y)
+  for (y = 0; y < shape->GetVertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x(); ++x)
+    for (x = 0; x < shape->GetVertexCount().X(); ++x)
     {
       EXPECT_EQ(shape->GetHeight(x, y), 10.0);
     }
@@ -246,22 +246,22 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 
   float x, y;
 
-  for (y = 0; y < shape->GetSize().y() && y < .3; y += 0.2)
+  for (y = 0; y < shape->GetSize().Y() && y < .3; y += 0.2)
   {
-    for (x = 0; x < shape->GetSize().x() && x < 1; x += 0.2)
+    for (x = 0; x < shape->GetSize().X() && x < 1; x += 0.2)
     {
       // Compute the proper physics test point.
       int xi = rint(x);
-      if (xi >= shape->GetSize().x())
-        xi = shape->GetSize().x() - 1.0;
+      if (xi >= shape->GetSize().X())
+        xi = shape->GetSize().X() - 1.0;
 
       int yi = rint(y);
-      if (yi >= shape->GetSize().y())
-        yi = shape->GetSize().y() - 1.0;
+      if (yi >= shape->GetSize().Y())
+        yi = shape->GetSize().Y() - 1.0;
 
       // Compute the proper render test point.
-      double xd = xi - (shape->GetSize().x()) * 0.5;
-      double yd = (shape->GetSize().y()) * 0.5 - yi;
+      double xd = xi - (shape->GetSize().X()) * 0.5;
+      double yd = (shape->GetSize().Y()) * 0.5 - yi;
 
       // The shape->GetHeight function requires a point relative to the
       // bottom left of the heightmap image
@@ -299,11 +299,11 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   // This will print the heights
   // printf("static float __heights[] = {");
   // unsigned int i=0;
-  // for (y = 0; y < shape->GetVertexCount().y(); ++y)
+  // for (y = 0; y < shape->GetVertexCount().Y(); ++y)
   // {
-  //   for (x = 0; x < shape->GetVertexCount().x(); ++x)
+  //   for (x = 0; x < shape->GetVertexCount().X(); ++x)
   //   {
-  //     if (y == shape->GetVertexCount().y() && x == shape->GetVertexCount().x())
+  //     if (y == shape->GetVertexCount().Y() && x == shape->GetVertexCount().X())
   //       break;
 
   //     if (i % 7 == 0)

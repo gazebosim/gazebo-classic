@@ -190,7 +190,8 @@ namespace gazebo
 
       private: std::string state;
 
-      private: std::list<std::pair<std::string, ignition::math::Pose3d> > moveHistory;
+      private: std::list<std::pair<std::string, ignition::math::Pose3d>>
+               moveHistory;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene

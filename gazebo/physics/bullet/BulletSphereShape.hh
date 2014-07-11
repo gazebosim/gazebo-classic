@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere collisionetry
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
 #ifndef _BULLETSPHERESHAPE_HH_
 #define _BULLETSPHERESHAPE_HH_
 
@@ -70,15 +65,16 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = ignition::math::Vector3d(_radius, _radius, _radius);
+                  this->initialSize = ignition::math::Vector3d(
+                      _radius, _radius, _radius);
                   bParent->SetCollisionShape(new btSphereShape(_radius));
                 }
                 else
                 {
                   btVector3 sphereScale;
-                  sphereScale.setX(_radius / this->initialSize.x(),);
-                  sphereScale.setY(_radius / this->initialSize.y());
-                  sphereScale.setZ(_radius / this->initialSize.z());
+                  sphereScale.setX(_radius / this->initialSize.X());
+                  sphereScale.setY(_radius / this->initialSize.Y());
+                  sphereScale.setZ(_radius / this->initialSize.Z());
 
                   shape->setLocalScaling(sphereScale);
 

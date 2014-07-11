@@ -164,7 +164,8 @@ namespace gazebo
 
       /// \brief Get a visual at a mouse position
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      public: VisualPtr GetVisual(const ignition::math::Vector2i &_mousePos) const;
+      public: VisualPtr GetVisual(
+                  const ignition::math::Vector2i &_mousePos) const;
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point

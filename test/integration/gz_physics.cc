@@ -29,7 +29,8 @@ TEST_F(GzPhysics, Gravity)
   Load("worlds/empty.world");
 
   // Spawn a box that will eventually float up.
-  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(0, 0, .5),
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(0, 0, .5),
       ignition::math::Vector3d(0, 0, 0));
 
   // Get a pointer to the world
@@ -49,7 +50,7 @@ TEST_F(GzPhysics, Gravity)
 
   world->Step(100);
 
-  EXPECT_GT(model->GetWorldPose().Pos().z(), 0.5);
+  EXPECT_GT(model->GetWorldPose().Pos().Z(), 0.5);
 }
 
 /////////////////////////////////////////////////

@@ -211,12 +211,12 @@ namespace gazebo
         _out << std::fixed <<std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.Pos().x() << " "
-          << _state.pose.Pos().y() << " "
-          << _state.pose.Pos().z() << " "
-          << q.x() << " "
-          << q.y() << " "
-          << q.z() << " "
+          << _state.pose.Pos().X() << " "
+          << _state.pose.Pos().Y() << " "
+          << _state.pose.Pos().Z() << " "
+          << q.X() << " "
+          << q.Y() << " "
+          << q.Z() << " "
           << "</pose>";
 
         for (LinkState_M::const_iterator iter =

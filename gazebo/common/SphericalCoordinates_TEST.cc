@@ -120,7 +120,8 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
   {
     // Parameters
-    ignition::math::Angle lat(0.3), lon(-1.2), heading(ignition::math::Angle::HalfPi);
+    ignition::math::Angle lat(0.3), lon(-1.2),
+      heading(ignition::math::Angle::HalfPi);
     double elev = 354.1;
     common::SphericalCoordinates sc(st, lat, lon, elev, heading);
 
@@ -133,23 +134,23 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
 
       xyz.Set(1, 0, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
-      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(0, 1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
-      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(1, -1, 0);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
-      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
 
       xyz.Set(2243.52334, 556.35, 435.6553);
       enu = sc.GlobalFromLocal(xyz);
-      EXPECT_NEAR(enu.y(), xyz.x(), 1e-6);
-      EXPECT_NEAR(enu.x(), -xyz.y(), 1e-6);
+      EXPECT_NEAR(enu.Y(), xyz.X(), 1e-6);
+      EXPECT_NEAR(enu.X(), -xyz.Y(), 1e-6);
     }
 
     // Check SphericalFromLocal
@@ -163,21 +164,21 @@ TEST_F(SphericalCoordinatesTest, CoordinateTransforms)
       xyz.Set(0, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // latitude
-      EXPECT_NEAR(sph.x(), lat.Degree(), 1e-6);
+      EXPECT_NEAR(sph.X(), lat.Degree(), 1e-6);
       // longitude
-      EXPECT_NEAR(sph.y(), lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       // elevation
-      EXPECT_NEAR(sph.z(), elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), elev, 1e-6);
 
       // 200 km offset in x (pi/2 heading offset means North)
       xyz.Set(2e5, 0, 0);
       sph = sc.SphericalFromLocal(xyz);
       // increase in latitude about 1.8 degrees
-      EXPECT_NEAR(sph.x(), lat.Degree() + 1.8, 0.008);
+      EXPECT_NEAR(sph.X(), lat.Degree() + 1.8, 0.008);
       // no change in longitude
-      EXPECT_NEAR(sph.y(), lon.Degree(), 1e-6);
+      EXPECT_NEAR(sph.Y(), lon.Degree(), 1e-6);
       // no change in elevation
-      EXPECT_NEAR(sph.z(), elev, 1e-6);
+      EXPECT_NEAR(sph.Z(), elev, 1e-6);
     }
   }
 }

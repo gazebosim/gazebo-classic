@@ -502,15 +502,17 @@ void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtWorldPosition(const ignition::math::Vector3d &/*_force*/,
-                                         const ignition::math::Vector3d &/*_pos*/)
+void SimbodyLink::AddForceAtWorldPosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_pos*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtRelativePosition(const ignition::math::Vector3d &/*_force*/,
-                  const ignition::math::Vector3d &/*_relpos*/)
+void SimbodyLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_relpos*/)
 {
   gzerr << "Not implemented.\n";
 }

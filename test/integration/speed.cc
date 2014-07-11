@@ -40,7 +40,7 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
 
   for (int i = 0; i < 500; ++i)
   {
-    pos.z() += i;
+    pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
         pos, ignition::math::Vector3d(0, 0, 0), i == 499);
   }
@@ -79,7 +79,7 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   ignition::math::Vector3d pos(0, 0, 5);
   for (int i = 0; i < 500; ++i)
   {
-    pos.z() += i;
+    pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
         pos, ignition::math::Vector3d(0, 0, 0), i == 499);
   }

@@ -14,16 +14,11 @@
  * limitations under the License.
  *
  */
-/* Desc: ODECollision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <sstream>
+#include <ignition/math/Box.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include <ignition/math/Box.hh>
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -215,13 +210,13 @@ void ODECollision::OnPoseChangeGlobal()
   ignition::math::Vector3d cog_vec = this->link->GetInertial()->GetCoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
-  q[0] = localPose.Rot().w();
-  q[1] = localPose.Rot().x();
-  q[2] = localPose.Rot().y();
-  q[3] = localPose.Rot().z();
+  q[0] = localPose.Rot().W();
+  q[1] = localPose.Rot().X();
+  q[2] = localPose.Rot().Y();
+  q[3] = localPose.Rot().Z();
 
-  dGeomSetPosition(this->collisionId, localPose.Pos().x(), localPose.Pos().y(),
-                   localPose.Pos().z());
+  dGeomSetPosition(this->collisionId, localPose.Pos().X(), localPose.Pos().Y(),
+                   localPose.Pos().Z());
   dGeomSetQuaternion(this->collisionId, q);
 }
 
@@ -236,15 +231,15 @@ void ODECollision::OnPoseChangeRelative()
   ignition::math::Vector3d cog_vec = this->link->GetInertial()->GetCoG();
   localPose.Pos() = localPose.Pos() - cog_vec;
 
-  q[0] = localPose.Rot().w();
-  q[1] = localPose.Rot().x();
-  q[2] = localPose.Rot().y();
-  q[3] = localPose.Rot().z();
+  q[0] = localPose.Rot().W();
+  q[1] = localPose.Rot().X();
+  q[2] = localPose.Rot().Y();
+  q[3] = localPose.Rot().Z();
 
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
-  dGeomSetOffsetPosition(this->collisionId, localPose.Pos().x(),
-      localPose.Pos().y(), localPose.Pos().z());
+  dGeomSetOffsetPosition(this->collisionId, localPose.Pos().X(),
+      localPose.Pos().Y(), localPose.Pos().Z());
   dGeomSetOffsetQuaternion(this->collisionId, q);
 }
 

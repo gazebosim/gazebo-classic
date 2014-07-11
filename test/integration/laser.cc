@@ -198,7 +198,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
       ignition::math::Quaterniond(0, 0, 0));
   if (_physicsEngine == "bullet" && LIBBULLET_VERSION >= 2.82)
   {
-    testPose.Pos().z() = 0.1;
+    testPose.Pos().Z() = 0.1;
     gzwarn << "Raising sensor for bullet as workaround for #934" << std::endl;
   }
 
@@ -245,7 +245,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   int mid = samples / 2;
   double unitBoxSize = 1.0;
-  double expectedRangeAtMidPoint = box01Pose.Pos().x() - unitBoxSize/2;
+  double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize/2;
 
   EXPECT_NEAR(raySensor->GetRange(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->GetRange(0), expectedRangeAtMidPoint, LASER_TOL);
@@ -321,7 +321,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   std::string box01 = "box_01";
 
   // box in front of ray sensor
-  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond(0, 0, 0));
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
       box01Pose.Rot().Euler());
@@ -343,8 +344,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   // all vertical laser planes should sense box
   for (unsigned int i = 0; i < vSamples; ++i)
   {
-    double expectedRangeAtMidPoint = box01Pose.Pos().x() - unitBoxSize/2
-        - testPose.Pos().x();
+    double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize/2
+        - testPose.Pos().X();
     expectedRangeAtMidPoint = expectedRangeAtMidPoint / cos(angleStep);
 
     EXPECT_NEAR(raySensor->GetRange(i*samples + mid),
@@ -361,7 +362,8 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   // Move box out of range
   world->GetModel(box01)->SetWorldPose(
-      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0), ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond(0, 0, 0)));
   world->Step(1);
   raySensor->Update(true);
 
@@ -455,7 +457,7 @@ void LaserTest::LaserScanResolution(const std::string &_physicsEngine)
       ignition::math::Vector3d axis = testPose.Rot() * rot *
         ignition::math::Vector3d::UnitX;
       ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
-      EXPECT_NEAR(intersection.z(), 0.0, rangeResolution);
+      EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }
   }
 }
@@ -536,7 +538,7 @@ void LaserTest::GroundPlane(const std::string &_physicsEngine)
       ignition::math::Vector3d axis = testPose.Rot() * rot *
         ignition::math::Vector3d::UnitX;
       ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
-      EXPECT_NEAR(intersection.z(), 0.0, rangeResolution);
+      EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }
   }
 }

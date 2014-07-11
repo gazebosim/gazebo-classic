@@ -37,10 +37,11 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
 {
   this->pose = _link->GetWorldPose();
   this->velocity = ignition::math::Pose3d(_link->GetWorldLinearVel(),
-                   ignition::math::Quaterniond(_link->GetWorldAngularVel()));
+      ignition::math::Quaterniond(_link->GetWorldAngularVel()));
   this->acceleration = ignition::math::Pose3d(_link->GetWorldLinearAccel(),
-                       ignition::math::Quaterniond(_link->GetWorldAngularAccel()));
-  this->wrench = ignition::math::Pose3d(_link->GetWorldForce(), ignition::math::Quaterniond());
+      ignition::math::Quaterniond(_link->GetWorldAngularAccel()));
+  this->wrench = ignition::math::Pose3d(_link->GetWorldForce(),
+      ignition::math::Quaterniond());
 }
 
 /////////////////////////////////////////////////
@@ -50,10 +51,11 @@ LinkState::LinkState(const LinkPtr _link)
 {
   this->pose = _link->GetWorldPose();
   this->velocity = ignition::math::Pose3d(_link->GetWorldLinearVel(),
-                   ignition::math::Quaterniond(_link->GetWorldAngularVel()));
+      ignition::math::Quaterniond(_link->GetWorldAngularVel()));
   this->acceleration = ignition::math::Pose3d(_link->GetWorldLinearAccel(),
-                       ignition::math::Quaterniond(_link->GetWorldAngularAccel()));
-  this->wrench = ignition::math::Pose3d(_link->GetWorldForce(), ignition::math::Quaterniond());
+      ignition::math::Quaterniond(_link->GetWorldAngularAccel()));
+  this->wrench = ignition::math::Pose3d(_link->GetWorldForce(),
+      ignition::math::Quaterniond());
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.

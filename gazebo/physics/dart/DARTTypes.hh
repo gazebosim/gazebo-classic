@@ -54,31 +54,38 @@ namespace gazebo
     class GAZEBO_VISIBLE DARTTypes
     {
       /// \brief
-      public: static Eigen::Vector3d ConvVec3(const ignition::math::Vector3d &_vec3)
+      public: static Eigen::Vector3d ConvVec3(
+                  const ignition::math::Vector3d &_vec3)
         {
-            return Eigen::Vector3d(_vec3.x(),(), _vec3.y(), _vec3.z());
+            return Eigen::Vector3d(_vec3.X(), _vec3.Y(), _vec3.Z());
         }
 
         /// \brief
-      public: static ignition::math::Vector3d ConvVec3(const Eigen::Vector3d &_vec3)
+      public: static ignition::math::Vector3d ConvVec3(
+                  const Eigen::Vector3d &_vec3)
         {
-            return ignition::math::Vector3d(_vec3.x(),(), _vec3.y(), _vec3.z());
+            return ignition::math::Vector3d(_vec3.X(), _vec3.Y(), _vec3.Z());
         }
 
         /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const ignition::math::Quaterniond &_quat)
+      public: static Eigen::Quaterniond ConvQuat(
+                  const ignition::math::Quaterniond &_quat)
         {
-            return Eigen::Quaterniond(_quat.w, _quat.x(),(), _quat.y(), _quat.z());
+            return Eigen::Quaterniond(_quat.w, _quat.X(),
+                _quat.Y(), _quat.Z());
         }
 
         /// \brief
-      public: static ignition::math::Quaterniond ConvQuat(const Eigen::Quaterniond &_quat)
+      public: static ignition::math::Quaterniond ConvQuat(
+                  const Eigen::Quaterniond &_quat)
         {
-            return ignition::math::Quaterniond(_quat.w(), _quat.x(),(), _quat.y(), _quat.z());
+            return ignition::math::Quaterniond(_quat.W(), _quat.X(),
+                _quat.Y(), _quat.Z());
         }
 
         /// \brief
-      public: static Eigen::Isometry3d ConvPose(const ignition::math::Pose3d &_pose)
+      public: static Eigen::Isometry3d ConvPose(
+                  const ignition::math::Pose3d &_pose)
         {
             // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
             // return Eigen::Translation3d(ConvVec3(_pose.Pos())) *
@@ -93,7 +100,8 @@ namespace gazebo
         }
 
         /// \brief
-      public: static ignition::math::Pose3d ConvPose(const Eigen::Isometry3d &_T)
+      public: static ignition::math::Pose3d ConvPose(
+                  const Eigen::Isometry3d &_T)
         {
             ignition::math::Pose3d pose;
             pose.Pos() = ConvVec3(_T.translation());

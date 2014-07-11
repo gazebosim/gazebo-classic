@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include <ignition/math/Vector3.hh>
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -86,8 +86,9 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
-  this->dtWorld->setGravity(Eigen::Vector3d(g.x(), g.y(), g.z()));
+  ignition::math::Vector3d g =
+    this->sdf->Get<ignition::math::Vector3d>("gravity");
+  this->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 
   // Time step
   // double timeStep = this->sdf->GetValueDouble("time_step");
@@ -365,7 +366,7 @@ void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
   this->dtWorld->setGravity(
-    Eigen::Vector3d(_gravity.x(), _gravity.y(), _gravity.z()));
+    Eigen::Vector3d(_gravity.X(), _gravity.Y(), _gravity.Z()));
 }
 
 //////////////////////////////////////////////////
@@ -565,4 +566,3 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
   return res;
 }
-

@@ -135,9 +135,10 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     EXPECT_NEAR(des1, jointLower->GetAngle(1).Radian(), 1e-2);
 
     // Also test expected pose of body, math is approximate
-    ignition::math::Vector3d eulerAngles = linkLower->GetWorldPose().Rot().Euler();
-    EXPECT_NEAR(des0, eulerAngles.x(), 0.05);
-    EXPECT_NEAR(des1, eulerAngles.y(), 0.05);
+    ignition::math::Vector3d eulerAngles =
+      linkLower->GetWorldPose().Rot().Euler();
+    EXPECT_NEAR(des0, eulerAngles.X(), 0.05);
+    EXPECT_NEAR(des1, eulerAngles.Y(), 0.05);
   }
 }
 
@@ -315,8 +316,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     // check link pose
     double angle_00_0 = joint_00->GetAngle(0).Radian();
     ignition::math::Pose3d pose_00 = link_00->GetWorldPose();
-    EXPECT_NEAR(pose_00.Rot().Euler().x(), angle_00_0, 1e-8);
-    EXPECT_LT(pose_00.Rot().Euler().x(), 0.35);
+    EXPECT_NEAR(pose_00.Rot().Euler().X(), angle_00_0, 1e-8);
+    EXPECT_LT(pose_00.Rot().Euler().X(), 0.35);
   }
 
   // push it back to 0 then lock
@@ -331,8 +332,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     // check link pose
     double angle_00_0 = joint_00->GetAngle(0).Radian();
     ignition::math::Pose3d pose_00 = link_00->GetWorldPose();
-    EXPECT_NEAR(pose_00.Rot().Euler().x(), angle_00_0, 1e-8);
-    EXPECT_GT(pose_00.Rot().Euler().x(), -0.05);
+    EXPECT_NEAR(pose_00.Rot().Euler().X(), angle_00_0, 1e-8);
+    EXPECT_GT(pose_00.Rot().Euler().X(), -0.05);
   }
   // lock joint at this location by setting lower limit here too
   joint_00->SetHighStop(0, 0.0);
@@ -355,8 +356,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_00_1 = joint_00->GetAngle(1).Radian();
     double angle_01_1 = joint_01->GetAngle(1).Radian();
 
-    EXPECT_NEAR(pose_01.Rot().Euler().y(), angle_00_1 + angle_01_1, 1e-8);
-    EXPECT_LT(pose_01.Rot().Euler().y(), 2.05);
+    EXPECT_NEAR(pose_01.Rot().Euler().Y(), angle_00_1 + angle_01_1, 1e-8);
+    EXPECT_LT(pose_01.Rot().Euler().Y(), 2.05);
   }
 
   // push joint_01 the other way until -1 is reached
@@ -376,8 +377,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_01_0 = joint_01->GetAngle(0).Radian();
     double angle_01_1 = joint_01->GetAngle(1).Radian();
 
-    EXPECT_NEAR(pose_01.Rot().Euler().x(), angle_00_0 + angle_01_0, 1e-6);
-    EXPECT_NEAR(pose_01.Rot().Euler().y(), angle_00_1 + angle_01_1, 1e-6);
+    EXPECT_NEAR(pose_01.Rot().Euler().X(), angle_00_0 + angle_01_0, 1e-6);
+    EXPECT_NEAR(pose_01.Rot().Euler().Y(), angle_00_1 + angle_01_1, 1e-6);
   }
 }
 

@@ -17,9 +17,10 @@
 #ifndef _ENTITYMAKER_HH_
 #define _ENTITYMAKER_HH_
 
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include <ignition/math/Vector3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -82,7 +83,8 @@ namespace gazebo
       /// \brief Get a point snapped to a grid
       /// \param[in] _p input point to be snapped
       /// \return ignition::math::Vector3d with the point on the grid
-      protected: ignition::math::Vector3d GetSnappedPoint(ignition::math::Vector3d _p);
+      protected: ignition::math::Vector3d GetSnappedPoint(
+                     ignition::math::Vector3d _p);
 
       /// \brief Creates the entity
       protected: virtual void CreateTheEntity() = 0;

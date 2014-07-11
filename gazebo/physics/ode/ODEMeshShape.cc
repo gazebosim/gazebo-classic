@@ -122,11 +122,11 @@ void ODEMeshShape::Init()
   for (unsigned int j = 0;  j < numVertices; j++)
   {
     this->vertices[j*3+0] = this->vertices[j*3+0] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").x();
+      this->sdf->Get<ignition::math::Vector3d>("scale").X();
     this->vertices[j*3+1] = this->vertices[j*3+1] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").y();
+      this->sdf->Get<ignition::math::Vector3d>("scale").Y();
     this->vertices[j*3+2] = this->vertices[j*3+2] *
-      this->sdf->Get<ignition::math::Vector3d>("scale").z();
+      this->sdf->Get<ignition::math::Vector3d>("scale").Z();
   }
 
   // Build the ODE triangle mesh

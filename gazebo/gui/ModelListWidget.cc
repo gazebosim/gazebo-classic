@@ -23,6 +23,9 @@
 #include <boost/thread/mutex.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
@@ -42,9 +45,6 @@
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
-
-#include <ignition/math/Angle.hh>
-#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
@@ -995,19 +995,19 @@ void ModelListWidget::FillPoseMsg(QtProperty *_item,
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("x"),
-      q.x());
+      q.X());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("y"),
-      q.y());
+      q.Y());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("z"),
-      q.z());
+      q.Z());
   orientReflection->SetDouble(
       orientMessage,
       orientDescriptor->FindFieldByName("w"),
-      q.w());
+      q.W());
 }
 
 /////////////////////////////////////////////////
@@ -2117,7 +2117,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   static_cast<QtVariantPropertyManager*>
     (this->variantFactory->propertyManager(item))->setAttribute(
         item, "decimals", 6);
-  item->setValue(value.x());
+  item->setValue(value.X());
 
   // Add Y value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "y"));
@@ -2129,7 +2129,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(value.y());
+  item->setValue(value.Y());
 
   // Add Z value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "z"));
@@ -2141,7 +2141,7 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(value.z());
+  item->setValue(value.Z());
 }
 
 /////////////////////////////////////////////////
@@ -2173,7 +2173,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.x());
+  item->setValue(rpy.X());
 
   // Add Pitch value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "pitch"));
@@ -2185,7 +2185,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.y());
+  item->setValue(rpy.Y());
 
   // Add Yaw value
   item = static_cast<QtVariantProperty*>(this->GetChildItem(_parent, "yaw"));
@@ -2197,7 +2197,7 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
   }
   static_cast<QtVariantPropertyManager*>(this->variantFactory->propertyManager(
     item))->setAttribute(item, "decimals", 6);
-  item->setValue(rpy.z());
+  item->setValue(rpy.Z());
 }
 
 /////////////////////////////////////////////////

@@ -115,7 +115,8 @@ void SimbodyHingeJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodyHingeJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
@@ -128,7 +129,7 @@ ignition::math::Vector3d SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) c
 
       // express Z-axis of X_OM in world frame
       SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.z()));
+        this->simbodyPhysics->integ->getState(), X_OM.Z()));
 
       return SimbodyPhysics::Vec3ToVector3(z_W);
     }

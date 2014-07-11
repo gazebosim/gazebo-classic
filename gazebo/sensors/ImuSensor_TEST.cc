@@ -89,7 +89,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   double z = 3;
-  double gravityZ = physics->GetGravity().z();
+  double gravityZ = physics->GetGravity().Z();
   double stepSize = physics->GetMaxStepSize();
 
   std::string modelName = "imuModel";
@@ -117,13 +117,13 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->Step(200);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Z(), 0, TOL);
   world->Step(1);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Z(), 0, TOL);
 
   // Predict time of contact with ground plane.
   double tHit = sqrt((z-0.5) / (-gravityZ));
@@ -134,9 +134,9 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   EXPECT_GT(steps, 0);
   world->Step(steps);
 
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().x(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().y(), 0, TOL);
-  EXPECT_NEAR(imuSensor->GetLinearAcceleration().z(), -gravityZ, 0.4);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().X(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Y(), 0, TOL);
+  EXPECT_NEAR(imuSensor->GetLinearAcceleration().Z(), -gravityZ, 0.4);
 }
 
 /////////////////////////////////////////////////

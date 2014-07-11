@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -27,9 +29,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Rand.hh>
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SonarSensor.hh"
@@ -247,7 +246,8 @@ bool SonarSensor::UpdateImpl(bool /*_force*/)
   this->lastMeasurementTime = this->world->GetSimTime();
   msgs::Set(this->sonarMsg.mutable_time(), this->lastMeasurementTime);
 
-  ignition::math::Pose3d referencePose = this->pose + this->parentEntity->GetWorldPose();
+  ignition::math::Pose3d referencePose = this->pose +
+    this->parentEntity->GetWorldPose();
   ignition::math::Vector3d pos;
 
   if (!this->incomingContacts.empty())

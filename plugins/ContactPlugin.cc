@@ -68,21 +68,21 @@ void ContactPlugin::OnUpdate()
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
     {
       std::cout << j << "  Position:"
-                << contacts.contact(i).position(j).x() << " "
-                << contacts.contact(i).position(j).y() << " "
-                << contacts.contact(i).position(j).z() << "\n";
+                << contacts.contact(i).position(j).X() << " "
+                << contacts.contact(i).position(j).Y() << " "
+                << contacts.contact(i).position(j).Z() << "\n";
       std::cout << "   Normal:"
-                << contacts.contact(i).normal(j).x() << " "
-                << contacts.contact(i).normal(j).y() << " "
-                << contacts.contact(i).normal(j).z() << "\n";
+                << contacts.contact(i).normal(j).X() << " "
+                << contacts.contact(i).normal(j).Y() << " "
+                << contacts.contact(i).normal(j).Z() << "\n";
       std::cout << "   Depth:" << contacts.contact(i).depth(j) << "\n";
       std::cout << "   Normal force 1: "
-                << contacts.contact(i).normal(j).x() *
-                   contacts.contact(i).wrench(j).body_1_wrench().force().x() +
-                   contacts.contact(i).normal(j).y() *
-                   contacts.contact(i).wrench(j).body_1_wrench().force().y() +
-                   contacts.contact(i).normal(j).z() *
-                   contacts.contact(i).wrench(j).body_1_wrench().force().z()
+                << contacts.contact(i).normal(j).X() *
+                   contacts.contact(i).wrench(j).body_1_wrench().force().X() +
+                   contacts.contact(i).normal(j).Y() *
+                   contacts.contact(i).wrench(j).body_1_wrench().force().Y() +
+                   contacts.contact(i).normal(j).Z() *
+                   contacts.contact(i).wrench(j).body_1_wrench().force().Z()
                    << "\n";
     }
   }*/

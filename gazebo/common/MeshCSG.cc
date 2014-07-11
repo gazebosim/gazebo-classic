@@ -289,8 +289,8 @@ void MeshCSG::ConvertMeshToGTS(const Mesh *_mesh, GtsSurface *_surface)
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
       ignition::math::Vector3d vertex = subMesh->GetVertex(j);
-      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.x(),
-          vertex.y(), vertex.z()));
+      g_ptr_array_add(vertices, gts_vertex_new(gts_vertex_class(), vertex.X(),
+          vertex.Y(), vertex.Z()));
     }
 
     // merge duplicate vertices, otherwise gts produces undesirable results

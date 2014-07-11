@@ -211,10 +211,12 @@ namespace gazebo
       public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkForce(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkTorque(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAttribute(Attribute _attr, unsigned int _index,

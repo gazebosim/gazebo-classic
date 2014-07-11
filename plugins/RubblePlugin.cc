@@ -52,12 +52,12 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     Obj obj;
 
-    obj.pose.Pos().x() =
-      ignition::math::Rand::DblUniform(bottomRight.x(), topLeft.x());
-    obj.pose.Pos().y() =
-      ignition::math::Rand::DblUniform(bottomRight.y(), topLeft.y());
-    obj.pose.Pos().z() =
-      ignition::math::Rand::DblUniform(bottomRight.z(), topLeft.z());
+    obj.pose.Pos().X() =
+      ignition::math::Rand::DblUniform(bottomRight.X(), topLeft.X());
+    obj.pose.Pos().Y() =
+      ignition::math::Rand::DblUniform(bottomRight.Y(), topLeft.Y());
+    obj.pose.Pos().Z() =
+      ignition::math::Rand::DblUniform(bottomRight.Z(), topLeft.Z());
 
     obj.pose.Rot().Euler(ignition::math::Vector3d(
         ignition::math::Rand::DblUniform(0.0, 3.1415),
@@ -71,36 +71,36 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     if (rubbleType == 0)
     {
       // between 2 and 8 feet.
-      obj.size.x() = ignition::math::Rand::DblUniform(0.6096, 2.4384);
+      obj.size.X() = ignition::math::Rand::DblUniform(0.6096, 2.4384);
 
       // 4 inches
-      obj.size.y() = 0.1016;
+      obj.size.Y() = 0.1016;
 
       // 2 inches
-      obj.size.z() = 0.0508;
+      obj.size.Z() = 0.0508;
     }
     // Make a cinder block
     else if (rubbleType == 1)
     {
       // Standard US cinder block size
-      obj.size.x() = 0.2032;
-      obj.size.y() = 0.2032;
-      obj.size.z() = 0.4064;
+      obj.size.X() = 0.2032;
+      obj.size.Y() = 0.2032;
+      obj.size.Z() = 0.4064;
     }
     // Make a cylinder
     else
     {
-      obj.size.x() =
-        ignition::math::Rand::DblUniform(minSize.x(), maxSize.x());
-      obj.size.z() =
-        ignition::math::Rand::DblUniform(minSize.z(), maxSize.z());
-      obj.size.y() = obj.size.x();
+      obj.size.X() =
+        ignition::math::Rand::DblUniform(minSize.X(), maxSize.X());
+      obj.size.Z() =
+        ignition::math::Rand::DblUniform(minSize.Z(), maxSize.Z());
+      obj.size.Y() = obj.size.X();
     }
 
     // Make sure the bottom of the rubble piece is above the bottomRight.z
     // This will prevent ground penetration.
-    if (obj.pose.Pos().z() - obj.size.z() * 0.5 < bottomRight.z())
-      obj.pose.Pos().z() = bottomRight.z() + obj.size.z() * 0.5;
+    if (obj.pose.Pos().Z() - obj.size.Z() * 0.5 < bottomRight.Z())
+      obj.pose.Pos().Z() = bottomRight.Z() + obj.size.Z() * 0.5;
 
     std::ostringstream name;
     name << "rubble_" << i;
@@ -119,12 +119,12 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
        std::vector<CompoundObj>::iterator iter;
        for (iter = objects.begin(); iter != objects.end(); ++iter)
     {
-      bool x = fabs(obj.Pos().x() - (*iter).Pos().x()) <=
-        (*iter).size.x() * 0.5 + obj.size.x() * 0.5;
-      bool y = fabs(obj.Pos().y() - (*iter).Pos().y()) <=
-        (*iter).size.y() * 0.5 + obj.size.y() * 0.5;
-      bool z = fabs(obj.Pos().z() - (*iter).Pos().z()) <=
-        (*iter).size.z() * 0.5 + obj.size.z() * 0.5;
+      bool x = fabs(obj.Pos().X() - (*iter).Pos().X()) <=
+        (*iter).size.X() * 0.5 + obj.size.X() * 0.5;
+      bool y = fabs(obj.Pos().Y() - (*iter).Pos().Y()) <=
+        (*iter).size.Y() * 0.5 + obj.size.Y() * 0.5;
+      bool z = fabs(obj.Pos().Z() - (*iter).Pos().Z()) <=
+        (*iter).size.Z() * 0.5 + obj.size.Z() * 0.5;
 
       if (x && y && z)
       {
@@ -133,34 +133,34 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
         (*iter).Pos().Set(0, 0, 0);
         ignition::math::Vector3d min, max;
-        min.x() = min.y() = min.z() = std::numeric_limits<double>::max();
-        max.x() = max.y() = max.z() = std::numeric_limits<double>::min();
+        min.X() = min.Y() = min.Z() = std::numeric_limits<double>::max();
+        max.X() = max.Y() = max.Z() = std::numeric_limits<double>::min();
 
         for (objIter = (*iter).objects.begin();
              objIter != (*iter).objects.end(); ++objIter)
         {
           (*iter).pos += (*objIter).pos;
-          min.x() = std::min(min.x(),
-          (*objIter).Pos().x() - (*objIter).size.x() * 0.5);
-          min.y() = std::min(min.y(),
-          (*objIter).Pos().y() - (*objIter).size.y() * 0.5);
-          min.z() = std::min(min.z(),
-          (*objIter).Pos().z() - (*objIter).size.z() * 0.5);
+          min.X() = std::min(min.X(),
+          (*objIter).Pos().X() - (*objIter).size.X() * 0.5);
+          min.Y() = std::min(min.Y(),
+          (*objIter).Pos().Y() - (*objIter).size.Y() * 0.5);
+          min.Z() = std::min(min.Z(),
+          (*objIter).Pos().Z() - (*objIter).size.Z() * 0.5);
 
-          max.x() = std::max(max.x(),
-          (*objIter).Pos().x() + (*objIter).size.x() * 0.5);
-          max.y() = std::max(max.y(),
-          (*objIter).Pos().y() + (*objIter).size.y() * 0.5);
-          max.z() = std::max(max.z(),
-          (*objIter).Pos().z() + (*objIter).size.z() * 0.5);
+          max.X() = std::max(max.X(),
+          (*objIter).Pos().X() + (*objIter).size.X() * 0.5);
+          max.Y() = std::max(max.Y(),
+          (*objIter).Pos().Y() + (*objIter).size.Y() * 0.5);
+          max.Z() = std::max(max.Z(),
+          (*objIter).Pos().Z() + (*objIter).size.Z() * 0.5);
         }
 
         // Recalculate the middle position of the compound object
         (*iter).pos /= (*iter).objects.size();
 
         // Recalculate the total size of the compound object
-        (*iter).size.Set(max.x() -min.x(), max.y() -
-        min.y(), max.z() - min.z());
+        (*iter).size.Set(max.X() -min.X(), max.Y() -
+        min.Y(), max.Z() - min.Z());
 
         merged = true;
         break;
@@ -200,9 +200,9 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name,
 {
   std::ostringstream newModelStr;
 
-  float sx = _size.x();
-  float sy = _size.y();
-  float sz = _size.z();
+  float sx = _size.X();
+  float sy = _size.Y();
+  float sz = _size.Z();
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
@@ -246,9 +246,9 @@ void RubblePlugin::MakeBox(const std::string &_name,
 {
   std::ostringstream newModelStr;
 
-  float sx = _size.x();
-  float sy = _size.y();
-  float sz = _size.z();
+  float sx = _size.X();
+  float sy = _size.Y();
+  float sz = _size.Z();
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
@@ -293,8 +293,8 @@ void RubblePlugin::MakeCylinder(const std::string &_name,
 {
   std::ostringstream newModelStr;
 
-  float r = _size.x() * 0.5;
-  float h = _size.z();
+  float r = _size.X() * 0.5;
+  float h = _size.Z();
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
@@ -353,9 +353,9 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
   {
     if ((*iter).type == 0)
     {
-      float h = (*iter).size.z();
-      float w = (*iter).size.y();
-      float d = (*iter).size.x();
+      float h = (*iter).size.Z();
+      float w = (*iter).size.Y();
+      float d = (*iter).size.X();
 
       inertiaStr << "<ixx>" << (1.0/12.0) * mass * (h*h + d*d) << "</ixx>"
                  << "<iyy>" << (1.0/12.0) * mass * (w*w + d*d) << "</iyy>"
@@ -365,7 +365,7 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
     }
     else if ((*iter).type == 1)
     {
-      float radius = (*iter).size.x() * 0.5;
+      float radius = (*iter).size.X() * 0.5;
 
       inertiaStr << "<ixx>" << (2.0/5.0)* mass * radius << "</ixx>"
                  << "<iyy>" << (2.0/5.0)* mass * radius << "</iyy>"
@@ -375,8 +375,8 @@ void RubblePlugin::MakeCompound(const std::string &_name, CompoundObj &_obj)
     }
     else
     {
-      float r = (*iter).size.x() * 0.5;
-      float h = (*iter).size.z();
+      float r = (*iter).size.X() * 0.5;
+      float h = (*iter).size.Z();
       inertiaStr << "<ixx>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</ixx>"
                  << "<iyy>" << (1.0/12.0) * mass * (3*r*r + h*h) << "</iyy>"
                  << "<izz>" << (1.0/12.0) * mass * r * r << "</izz>";

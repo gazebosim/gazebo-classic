@@ -502,9 +502,10 @@ namespace gazebo
       /// \param[in] _time Duration of the entire move
       /// \param[in] _onComplete Callback that is called when the move is
       /// complete
-      public: bool MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
-                                   double _time,
-                                   boost::function<void()> _onComplete = NULL);
+      public: bool MoveToPositions(
+                  const std::vector<ignition::math::Pose3d> &_pts,
+                  double _time,
+                  boost::function<void()> _onComplete = NULL);
 
       /// \brief Get the path to saved screenshots.
       /// \return Path to saved screenshots.

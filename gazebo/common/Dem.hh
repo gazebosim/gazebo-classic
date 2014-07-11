@@ -113,7 +113,8 @@ namespace gazebo
       /// is filled.
       /// \param[out] _heights Vector containing the terrain heights.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale, bool _flipY,
+          const ignition::math::Vector3d &_size,
+          const ignition::math::Vector3d &_scale, bool _flipY,
           std::vector<float> &_heights);
 
       /// \brief Get the georeferenced coordinates (lat, long) of a terrain's

@@ -16,11 +16,11 @@
 */
 
 #include <boost/math/special_functions/round.hpp>
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include <ignition/math/Helpers.hh>
-#include <ignition/math/Rand.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/GaussianNoiseModel.hh"

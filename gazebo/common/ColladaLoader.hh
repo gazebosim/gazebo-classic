@@ -58,7 +58,8 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-                   TiXmlElement *_skelXml, const ignition::math::Matrix4d &_transform,
+                   TiXmlElement *_skelXml,
+                   const ignition::math::Matrix4d &_transform,
                    Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
@@ -122,31 +123,31 @@ namespace gazebo
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       private: void LoadVertices(const std::string &_id,
-                                 const ignition::math::Matrix4d &_transform,
-                                 std::vector<ignition::math::Vector3d> &_verts,
-                                 std::vector<ignition::math::Vector3d> &_norms);
+                   const ignition::math::Matrix4d &_transform,
+                   std::vector<ignition::math::Vector3d> &_verts,
+                   std::vector<ignition::math::Vector3d> &_norms);
 
       /// \brief Load positions
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all positions
       /// \param[out] _values Holds the resulting position values
       private: void LoadPositions(const std::string &_id,
-                                  const ignition::math::Matrix4d &_transform,
-                                  std::vector<ignition::math::Vector3d> &_values);
+                   const ignition::math::Matrix4d &_transform,
+                   std::vector<ignition::math::Vector3d> &_values);
 
       /// \brief Load normals
       /// \param[in] _id String id of the XML node
       /// \param[in] _transform Transform to apply to all normals
       /// \param[out] _values Holds the resulting normal values
       private: void LoadNormals(const std::string &_id,
-                                const ignition::math::Matrix4d &_transform,
-                                std::vector<ignition::math::Vector3d> &_values);
+                   const ignition::math::Matrix4d &_transform,
+                   std::vector<ignition::math::Vector3d> &_values);
 
       /// \brief Load texture coordinates
       /// \param[in] _id String id of the XML node
       /// \param[out] _values Holds the resulting normal values
       private: void LoadTexCoords(const std::string &_id,
-                                 std::vector<ignition::math::Vector2d> &_values);
+                   std::vector<ignition::math::Vector2d> &_values);
 
       /// \brief Load a material
       /// \param _name Name of the material XML element

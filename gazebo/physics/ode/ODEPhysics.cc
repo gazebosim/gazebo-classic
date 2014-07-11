@@ -25,12 +25,13 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Rand.hh>
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -203,12 +204,13 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   dWorldSetAutoDisableAngularThreshold(this->worldId, 0.1);
   dWorldSetAutoDisableSteps(this->worldId, 5);
 
-  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
+  ignition::math::Vector3d g =
+    this->sdf->Get<ignition::math::Vector3d>("gravity");
 
   if (g == ignition::math::Vector3d(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
 
-  dWorldSetGravity(this->worldId, g.x(), g.y(), g.z());
+  dWorldSetGravity(this->worldId, g.X(), g.Y(), g.Z());
 
   if (odeElem->HasElement("constraints"))
   {
@@ -729,7 +731,7 @@ void ODEPhysics::SetStepType(const std::string &_type)
 void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->sdf->GetElement("gravity")->Set(_gravity);
-  dWorldSetGravity(this->worldId, _gravity.x(), _gravity.y(), _gravity.z());
+  dWorldSetGravity(this->worldId, _gravity.X(), _gravity.Y(), _gravity.Z());
 }
 
 //////////////////////////////////////////////////
@@ -910,16 +912,18 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
   ignition::math::Vector3d fd2 = surf2->frictionPyramid.direction1;
-  if (fd2 != ignition::math::Vector3d::Zero && (fd == ignition::math::Vector3d::Zero ||
-        surf1->frictionPyramid.GetMuPrimary() >
-        surf2->frictionPyramid.GetMuPrimary()))
+  if (fd2 != ignition::math::Vector3d::Zero &&
+      (fd == ignition::math::Vector3d::Zero ||
+       surf1->frictionPyramid.GetMuPrimary() >
+       surf2->frictionPyramid.GetMuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
     fd2 = _collision2->GetWorldPose().Rot().RotateVector(fd2);
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
-    /// if (fd2 != ignition::math::Vector3d::Zero && fd != ignition::math::Vector3d::Zero &&
+    /// if (fd2 != ignition::math::Vector3d::Zero &&
+    //      fd != ignition::math::Vector3d::Zero &&
     ///       _collision1->surface->mu1 > _collision2->surface->mu1)
     ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
     ///         << " comparing mu1 from both surfaces, and use fdir1"
@@ -929,9 +933,9 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != ignition::math::Vector3d::Zero)
   {
     contact.surface.mode |= dContactFDir1;
-    contact.fdir1[0] = fd.x();
-    contact.fdir1[1] = fd.y();
-    contact.fdir1[2] = fd.z();
+    contact.fdir1[0] = fd.X();
+    contact.fdir1[1] = fd.Y();
+    contact.fdir1[2] = fd.Z();
   }
 
   // Set the friction coefficients.

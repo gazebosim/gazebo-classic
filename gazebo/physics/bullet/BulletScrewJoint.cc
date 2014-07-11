@@ -116,7 +116,8 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletScrewJoint::GetAnchor(
+    unsigned int /*index*/) const
 {
   gzerr << "BulletScrewJoint::GetAnchor not implemented, return 0 vector.\n";
   return ignition::math::Vector3d();
@@ -174,9 +175,9 @@ void BulletScrewJoint::Init()
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), axis2, axis3);
     frameParent.getBasis().setValue(
-      axisParent.x(), axis2.x(), axis3.x(),
-      axisParent.y(), axis2.y(), axis3.y(),
-      axisParent.z(), axis2.z(), axis3.z());
+      axisParent.X(), axis2.X(), axis3.X(),
+      axisParent.Y(), axis2.Y(), axis3.Y(),
+      axisParent.Z(), axis2.Z(), axis3.Z());
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
@@ -193,9 +194,9 @@ void BulletScrewJoint::Init()
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), axis2, axis3);
     frameChild.getBasis().setValue(
-      axisChild.x(), axis2.x(), axis3.x(),
-      axisChild.y(), axis2.y(), axis3.y(),
-      axisChild.z(), axis2.z(), axis3.z());
+      axisChild.X(), axis2.X(), axis3.X(),
+      axisChild.Y(), axis2.Y(), axis3.Y(),
+      axisChild.Z(), axis2.Z(), axis3.Z());
   }
 
   // If both links exist, then create a joint between the two links.
@@ -561,7 +562,8 @@ bool BulletScrewJoint::SetLowStop(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletScrewJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   ignition::math::Vector3d result = this->initialWorldAxis;
   if (this->bulletScrew)

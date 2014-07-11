@@ -66,8 +66,8 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
     opt.worldParent = true;
     double Am = M_PI / 4;
     opt.modelPose.Rot().Euler(0, 0, Am);
-    opt.childLinkPose.Pos().z() = 3.0;
-    opt.jointPose.Pos().y() = 1.5;
+    opt.childLinkPose.Pos().Z() = 3.0;
+    opt.jointPose.Pos().Y() = 1.5;
     opt.axis.Set(1, 0, 0);
 
     gzdbg << "SpawnJoint " << opt.type << " child world" << std::endl;
@@ -222,9 +222,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
         if (joint)
         {
           ignition::math::Vector3d axis = joint->GetGlobalAxis(0);
-          EXPECT_NEAR(axis.x(), (*axisIter).x(), g_tolerance);
-          EXPECT_NEAR(axis.y(), (*axisIter).y(), g_tolerance);
-          EXPECT_NEAR(axis.z(), (*axisIter).z(), g_tolerance);
+          EXPECT_NEAR(axis.X(), (*axisIter).X(), g_tolerance);
+          EXPECT_NEAR(axis.Y(), (*axisIter).Y(), g_tolerance);
+          EXPECT_NEAR(axis.Z(), (*axisIter).Z(), g_tolerance);
         }
         else
         {
@@ -263,9 +263,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
       {
         // Expect stationary base
         angVel = link->GetWorldAngularVel();
-        EXPECT_NEAR(angVel.x(), 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.y(), 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.z(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.X(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Y(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Z(), 0, g_tolerance*10);
       }
       else
       {
@@ -283,9 +283,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
           // Expect relative angular velocity of pendulum links to be negative
           // and along x axis.
           angVel = link->GetRelativeAngularVel().Normalize();
-          EXPECT_NEAR(angVel.x(), -1, g_tolerance);
-          EXPECT_NEAR(angVel.y(),  0, 2*g_tolerance);
-          EXPECT_NEAR(angVel.z(),  0, 2*g_tolerance);
+          EXPECT_NEAR(angVel.X(), -1, g_tolerance);
+          EXPECT_NEAR(angVel.Y(),  0, 2*g_tolerance);
+          EXPECT_NEAR(angVel.Z(),  0, 2*g_tolerance);
         }
         else
         {
@@ -334,8 +334,8 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
 
           // Expect angle change in direction of joint velocity
           angle2 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle2 - angle1) * ignition::math::clamp(jointVel1*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT((angle2 - angle1) *
+              ignition::math::clamp(jointVel1*1e4, -1.0, 1.0) , 0);
 
           jointVel2 = joint->GetVelocity(0);
           EXPECT_GT(fabs(jointVel2), 1e-1);
@@ -343,8 +343,8 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine)
           // Take 1 step and measure the last angle, expect decrease
           world->Step(1);
           angle3 = joint->GetAngle(0).Radian();
-          EXPECT_GT((angle3 - angle2) * ignition::math::clamp(jointVel2*1e4, -1.0, 1.0)
-                    , 0);
+          EXPECT_GT((angle3 - angle2) *
+              ignition::math::clamp(jointVel2*1e4, -1.0, 1.0) , 0);
         }
         else
         {
@@ -617,8 +617,8 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     // check velocity / energy
     ignition::math::Vector3d vel = link->GetWorldLinearVel();
     ignition::math::Pose3d pos = link->GetWorldPose();
-    double pe = g * m * pos.Pos().z();
-    double ke = 0.5 * m * (vel.x()*vel.x() + vel.y()*vel.y() + vel.z()*vel.z());
+    double pe = g * m * pos.Pos().Z();
+    double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
     e_start = pe + ke;
     // gzdbg << "total energy [" << e_start
     //       << "] pe[" << pe
@@ -642,9 +642,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // check velocity / energy
         ignition::math::Vector3d vel = link->GetWorldLinearVel();
         ignition::math::Pose3d pos = link->GetWorldPose();
-        double pe = g * m * pos.Pos().z();
+        double pe = g * m * pos.Pos().Z();
         double ke = 0.5 * m *
-          (vel.x()*vel.x() + vel.y()*vel.y() + vel.z()*vel.z());
+          (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
@@ -693,9 +693,9 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         // check velocity / energy
         ignition::math::Vector3d vel = link->GetWorldLinearVel();
         ignition::math::Pose3d pos = link->GetWorldPose();
-        double pe = g * m * pos.Pos().z();
+        double pe = g * m * pos.Pos().Z();
         double ke = 0.5 * m *
-          (vel.x()*vel.x() + vel.y()*vel.y() + vel.z()*vel.z());
+          (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);

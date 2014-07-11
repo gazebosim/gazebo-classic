@@ -370,7 +370,8 @@ void JointController::SetJointPosition(
   //       ignition::math::Pose3d linkWorldPose = childLink->GetWorldPose();
   //       /// \TODO: we want to get axis in global frame, but GetGlobalAxis
   //       /// not implemented for static models yet.
-  //       axis = linkWorldPose.Rot().RotateVector(_joint->GetLocalAxis(_index));
+  //       axis = linkWorldPose.Rot().RotateVector(
+  //       _joint->GetLocalAxis(_index));
   //       anchor = linkWorldPose.pos;
   //     }
   //     else
@@ -393,7 +394,8 @@ void JointController::SetJointPosition(
 
 //////////////////////////////////////////////////
 // void JointController::MoveLinks(JointPtr _joint, LinkPtr _link,
-//     const ignition::math::Vector3d &_anchor, const ignition::math::Vector3d &_axis,
+//     const ignition::math::Vector3d &_anchor,
+//     const ignition::math::Vector3d &_axis,
 //     double _dposition, bool _updateChildren)
 // {
 //   if (!this->ContainsLink(this->dataPtr->updatedLinks, _link))
@@ -479,7 +481,8 @@ void JointController::SetJointPosition(
 
 //////////////////////////////////////////////////
 // void JointController::ComputeAndSetLinkTwist(LinkPtr _link,
-//      const ignition::math::Pose3d &_old, const ignition::math::Pose3d &_new, double _dt)
+//      const ignition::math::Pose3d &_old,
+//      const ignition::math::Pose3d &_new, double _dt)
 // {
 //     ignition::math::Vector3d linear_vel(0, 0, 0);
 //     ignition::math::Vector3d angular_vel(0, 0, 0);

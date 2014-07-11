@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Ray proximity sensor
- * Author: Carle Cote
- * Date: 23 february 2004
-*/
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/MultiRayShape.hh"
@@ -32,9 +30,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/msgs/msgs.hh"
-
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Rand.hh>
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/RaySensor.hh"
@@ -467,7 +462,8 @@ bool RaySensor::UpdateImpl(bool /*_force*/)
       {
         // currently supports only one noise model per laser sensor
         range = this->noises[0]->Apply(range);
-        range = ignition::math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range, this->GetRangeMin(),
+            this->GetRangeMax());
       }
 
       scan->add_ranges(range);

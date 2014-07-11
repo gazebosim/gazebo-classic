@@ -277,7 +277,8 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadController(TiXmlElement *_contrXml,
-      TiXmlElement *_skelXml, const ignition::math::Matrix4d &_transform, Mesh *_mesh)
+      TiXmlElement *_skelXml, const ignition::math::Matrix4d &_transform,
+      Mesh *_mesh)
 {
   Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
   _mesh->SetSkeleton(skeleton);
@@ -352,14 +353,22 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   {
     unsigned int id = i * 16;
     ignition::math::Matrix4d mat;
-    mat.Set(ignition::math::parseFloat(strs[id +  0]), ignition::math::parseFloat(strs[id +  1]),
-            ignition::math::parseFloat(strs[id +  2]), ignition::math::parseFloat(strs[id +  3]),
-            ignition::math::parseFloat(strs[id +  4]), ignition::math::parseFloat(strs[id +  5]),
-            ignition::math::parseFloat(strs[id +  6]), ignition::math::parseFloat(strs[id +  7]),
-            ignition::math::parseFloat(strs[id +  8]), ignition::math::parseFloat(strs[id +  9]),
-            ignition::math::parseFloat(strs[id + 10]), ignition::math::parseFloat(strs[id + 11]),
-            ignition::math::parseFloat(strs[id + 12]), ignition::math::parseFloat(strs[id + 13]),
-            ignition::math::parseFloat(strs[id + 14]), ignition::math::parseFloat(strs[id + 15]));
+    mat.Set(ignition::math::parseFloat(strs[id +  0]),
+            ignition::math::parseFloat(strs[id +  1]),
+            ignition::math::parseFloat(strs[id +  2]),
+            ignition::math::parseFloat(strs[id +  3]),
+            ignition::math::parseFloat(strs[id +  4]),
+            ignition::math::parseFloat(strs[id +  5]),
+            ignition::math::parseFloat(strs[id +  6]),
+            ignition::math::parseFloat(strs[id +  7]),
+            ignition::math::parseFloat(strs[id +  8]),
+            ignition::math::parseFloat(strs[id +  9]),
+            ignition::math::parseFloat(strs[id + 10]),
+            ignition::math::parseFloat(strs[id + 11]),
+            ignition::math::parseFloat(strs[id + 12]),
+            ignition::math::parseFloat(strs[id + 13]),
+            ignition::math::parseFloat(strs[id + 14]),
+            ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
   }
@@ -547,7 +556,8 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
         frameTransXml->FirstChildElement("technique_common");
       accessor = accessor->FirstChildElement("accessor");
 
-      unsigned int stride = ignition::math::parseInt(accessor->Attribute("stride"));
+      unsigned int stride =
+        ignition::math::parseInt(accessor->Attribute("stride"));
 
       for (unsigned int i = 0; i < times.size(); i++)
       {
@@ -717,7 +727,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadGeometry(TiXmlElement *_xml,
-                                 const ignition::math::Matrix4d &_transform, Mesh *_mesh)
+    const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   TiXmlElement *meshXml = _xml->FirstChildElement("mesh");
   TiXmlElement *childXml;
@@ -839,7 +849,8 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
-    ignition::math::Vector3d vec(ignition::math::parseFloat(*iter), ignition::math::parseFloat(*(iter+1)),
+    ignition::math::Vector3d vec(ignition::math::parseFloat(*iter),
+        ignition::math::parseFloat(*(iter+1)),
         ignition::math::parseFloat(*(iter+2)));
     vec = _transform * vec;
     _values.push_back(vec);
@@ -885,7 +896,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadTexCoords(const std::string &_id,
-                                  std::vector<ignition::math::Vector2d> &_values)
+    std::vector<ignition::math::Vector2d> &_values)
 {
   int stride = 0;
   int texCount = 0;
@@ -978,7 +989,8 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
   for (int i = 0; i < totCount; i += stride)
   {
     // We only handle 2D texture coordinates right now.
-    _values.push_back(ignition::math::Vector2d(boost::lexical_cast<double>(values[i]),
+    _values.push_back(ignition::math::Vector2d(
+          boost::lexical_cast<double>(values[i]),
           1.0 - boost::lexical_cast<double>(values[i+1])));
   }
 }
@@ -1297,8 +1309,8 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           }
           else if (iter->first == "TEXCOORD")
           {
-            subMesh->AddTexCoord(texcoords[values[iter->second]].x(),
-                texcoords[values[iter->second]].y());
+            subMesh->AddTexCoord(texcoords[values[iter->second]].X(),
+                texcoords[values[iter->second]].Y());
           }
           // else
           // gzerr << "Unhandled semantic[" << iter->first << "]\n";
@@ -1366,7 +1378,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     else if (semantic == "TEXCOORD")
       this->LoadTexCoords(source, texcoords);
 
-    inputs.push_back(std::make_pair(semantic, ignition::math::parseInt(offset)));
+    inputs.push_back(std::make_pair(semantic,
+          ignition::math::parseInt(offset)));
 
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
   }
@@ -1428,8 +1441,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       else if ((*iter).first == "TEXCOORD" && !already)
       {
         already = true;
-        subMesh->AddTexCoord(texcoords[values[(*iter).second]].x(),
-            texcoords[values[(*iter).second]].y());
+        subMesh->AddTexCoord(texcoords[values[(*iter).second]].X(),
+            texcoords[values[(*iter).second]].Y());
       }
       // else
       // gzerr << "Unhandled semantic[" << (*iter).first << "]\n";
@@ -1484,7 +1497,8 @@ float ColladaLoader::LoadFloat(TiXmlElement *_elem)
 
   if (_elem->FirstChildElement("float"))
   {
-    value = ignition::math::parseFloat(_elem->FirstChildElement("float")->GetText());
+    value = ignition::math::parseFloat(
+        _elem->FirstChildElement("float")->GetText());
   }
 
   return value;

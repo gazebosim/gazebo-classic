@@ -78,13 +78,14 @@ void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetHinge2Anchor(this->jointId, _anchor.x(), _anchor.y(), _anchor.z());
+    dJointSetHinge2Anchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEHinge2Joint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -104,10 +105,10 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const ignition::math::Vector3d
   {
     if (_index == 0)
       dJointSetHinge2Axis1(this->jointId,
-        globalAxis.x(), globalAxis.y(), globalAxis.z());
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
     else
       dJointSetHinge2Axis2(this->jointId,
-        globalAxis.x(), globalAxis.y(), globalAxis.z());
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

@@ -219,19 +219,19 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
               if (channel == "Zrotation")
               {
                 zAngle = IGN_DTOR(value);
-                mats.push_back(ignition::math::Quaterniond (zAxis, zAngle));
+                mats.push_back(ignition::math::Quaterniond(zAxis, zAngle));
               }
               else
                 if (channel == "Xrotation")
                 {
                   xAngle = IGN_DTOR(value);
-                  mats.push_back(ignition::math::Quaterniond (xAxis, xAngle));
+                  mats.push_back(ignition::math::Quaterniond(xAxis, xAngle));
                 }
                 else
                   if (channel == "Yrotation")
                   {
                     yAngle = IGN_DTOR(value);
-                    mats.push_back(ignition::math::Quaterniond (yAxis, yAngle));
+                    mats.push_back(ignition::math::Quaterniond(yAxis, yAngle));
                   }
       }
       while (!mats.empty())

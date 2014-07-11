@@ -68,7 +68,8 @@ void DARTScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTScrewJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -91,7 +92,8 @@ ignition::math::Vector3d DARTScrewJoint::GetGlobalAxis(unsigned int _index) cons
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTScrewJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (_index == 0)
   {

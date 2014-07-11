@@ -14,18 +14,12 @@
  * limitations under the License.
  *
 */
-/* Desc: IMU sensor
- * Author: Matt Thompson
- * Date: 6 September 2008
-*/
-
-
-#include "gazebo/transport/Node.hh"
-#include "gazebo/transport/Publisher.hh"
-
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Rand.hh>
+
+#include "gazebo/transport/Node.hh"
+#include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
@@ -254,7 +248,8 @@ bool ImuSensor::UpdateImpl(bool /*_force*/)
 
     msgs::Set(this->imuMsg.mutable_stamp(), timestamp);
 
-    ignition::math::Pose3d parentEntityPose = this->parentEntity->GetWorldPose();
+    ignition::math::Pose3d parentEntityPose =
+      this->parentEntity->GetWorldPose();
     ignition::math::Pose3d imuPose = this->pose + parentEntityPose;
 
     // Set the IMU angular velocity

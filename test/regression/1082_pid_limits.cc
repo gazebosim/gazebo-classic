@@ -45,7 +45,8 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  ignition::math::Pose3d startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  ignition::math::Pose3d startPose =
+    model->GetLink("arm_elbow_pan")->GetWorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -60,7 +61,8 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
 
   world->Step(500);
 
-  ignition::math::Pose3d endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  ignition::math::Pose3d endPose =
+    model->GetLink("arm_elbow_pan")->GetWorldPose();
 
   double diffDist = (startPose - endPose).Pos().Length();
 
@@ -87,7 +89,8 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  ignition::math::Pose3d startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  ignition::math::Pose3d startPose =
+    model->GetLink("arm_elbow_pan")->GetWorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -102,7 +105,8 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
 
   world->Step(500);
 
-  ignition::math::Pose3d endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  ignition::math::Pose3d endPose =
+    model->GetLink("arm_elbow_pan")->GetWorldPose();
 
   gzdbg << "Start Pose[" << startPose << "]\n";
   gzdbg << "End Pose[" << endPose << "]\n";

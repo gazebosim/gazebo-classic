@@ -104,7 +104,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
-  _msg.mutable_image()->set_scale(this->GetScale().x());
+  _msg.mutable_image()->set_scale(this->GetScale().X());
   _msg.mutable_image()->set_threshold(this->GetThreshold());
   _msg.mutable_image()->set_height(this->GetHeight());
   _msg.mutable_image()->set_granularity(this->GetGranularity());

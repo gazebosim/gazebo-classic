@@ -91,29 +91,29 @@ std::string FilterBase::FilterPose(const ignition::math::Pose3d &_pose,
         case 'X':
         case 'x':
           this->Out(result, _state) << std::fixed
-            << _pose.Pos().x() << " ";
+            << _pose.Pos().X() << " ";
           break;
         case 'Y':
         case 'y':
           this->Out(result, _state) << std::fixed
-            << _pose.Pos().y() << " ";
+            << _pose.Pos().Y() << " ";
           break;
         case 'Z':
         case 'z':
           this->Out(result, _state) << std::fixed
-            << _pose.Pos().z() << " ";
+            << _pose.Pos().Z() << " ";
           break;
         case 'R':
         case 'r':
-          this->Out(result, _state) << std::fixed << rpy.x() << " ";
+          this->Out(result, _state) << std::fixed << rpy.X() << " ";
           break;
         case 'P':
         case 'p':
-          this->Out(result, _state) << std::fixed << rpy.y() << " ";
+          this->Out(result, _state) << std::fixed << rpy.Y() << " ";
           break;
         case 'A':
         case 'a':
-          this->Out(result, _state) << std::fixed << rpy.z() << " ";
+          this->Out(result, _state) << std::fixed << rpy.Z() << " ";
           break;
         default:
           std::cerr << "Invalid pose value[" << *elemIter << "]\n";

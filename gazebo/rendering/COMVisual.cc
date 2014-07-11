@@ -97,12 +97,12 @@ void COMVisual::Load(const ignition::math::Pose3d &_pose,
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
-  ignition::math::Vector3d p1(0, 0, -2*_scale.z());
-  ignition::math::Vector3d p2(0, 0,  2*_scale.z());
-  ignition::math::Vector3d p3(0, -2*_scale.y(), 0);
-  ignition::math::Vector3d p4(0,  2*_scale.y(), 0);
-  ignition::math::Vector3d p5(-2*_scale.x(), 0, 0);
-  ignition::math::Vector3d p6(2*_scale.x(),  0, 0);
+  ignition::math::Vector3d p1(0, 0, -2*_scale.Z());
+  ignition::math::Vector3d p2(0, 0,  2*_scale.Z());
+  ignition::math::Vector3d p3(0, -2*_scale.Y(), 0);
+  ignition::math::Vector3d p4(0,  2*_scale.Y(), 0);
+  ignition::math::Vector3d p5(-2*_scale.X(), 0, 0);
+  ignition::math::Vector3d p6(2*_scale.X(),  0, 0);
   p1 += _pose.Pos();
   p2 += _pose.Pos();
   p3 += _pose.Pos();

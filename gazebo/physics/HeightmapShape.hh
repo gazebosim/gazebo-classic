@@ -14,21 +14,16 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
 #ifndef _HEIGHTMAPSHAPE_HH_
 #define _HEIGHTMAPSHAPE_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Dem.hh"
-#include <ignition/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
@@ -79,8 +74,8 @@ namespace gazebo
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
-      /// \return ignition::math::Vector2i, result.x(), = width,
-      /// result.y() = length/height.
+      /// \return ignition::math::Vector2i, result.X(), = width,
+      /// result.Y() = length/height.
       public: ignition::math::Vector2i GetVertexCount() const;
 
       /// \brief Get a height at a position.

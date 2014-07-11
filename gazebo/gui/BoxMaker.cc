@@ -16,11 +16,12 @@
 */
 #include <sstream>
 
+#include <ignition/math/Quaternion.hh>
+
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/gui/GuiEvents.hh"
-#include <ignition/math/Quaternion.hh>
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
@@ -119,10 +120,10 @@ void BoxMaker::OnMouseMove(const common::MouseEvent &_event)
   ignition::math::Vector3d scale = msgs::Convert(
       this->visualMsg->geometry().box().size());
 
-  scale.z() = (this->mouseReleasePos.y() - _event.pos.y())*0.01;
+  scale.Z() = (this->mouseReleasePos.Y() - _event.pos.Y())*0.01;
   if (!_event.shift)
-    scale.z() = rint(scale.z());
-  p.z() = scale.z()/2.0;
+    scale.Z() = rint(scale.Z());
+  p.Z() = scale.Z()/2.0;
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
   msgs::Set(this->visualMsg->mutable_geometry()->mutable_box()->mutable_size(),
@@ -140,8 +141,8 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   ignition::math::Vector3d norm(0, 0, 1);
   ignition::math::Vector3d p1, p2;
 
-  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.x(),
-                                          this->mousePushPos.y(),
+  if (!this->camera->GetWorldPointOnPlane(this->mousePushPos.X(),
+                                          this->mousePushPos.Y(),
                                           ignition::math::Planed(norm), p1))
   {
     gzerr << "Invalid mouse point\n";
@@ -151,7 +152,7 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   p1 = this->GetSnappedPoint(p1);
 
   if (!this->camera->GetWorldPointOnPlane(
-        _event.pos.x(), _event.pos.y() , ignition::math::Planed(norm), p2))
+        _event.pos.X(), _event.pos.Y() , ignition::math::Planed(norm), p2))
   {
     gzerr << "Invalid mouse point\n";
     return;
@@ -162,11 +163,12 @@ void BoxMaker::OnMouseDrag(const common::MouseEvent &_event)
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   ignition::math::Vector3d scale = p1-p2;
-  ignition::math::Vector3d p = msgs::Convert(this->visualMsg->pose().position());
+  ignition::math::Vector3d p = msgs::Convert(
+      this->visualMsg->pose().position());
 
-  scale.z() = 0.01;
-  p.x() = p1.x() - scale.x()/2.0;
-  p.y() = p1.y() - scale.y()/2.0;
+  scale.Z() = 0.01;
+  p.X() = p1.X() - scale.X()/2.0;
+  p.Y() = p1.Y() - scale.Y()/2.0;
 
 
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p);
@@ -216,8 +218,10 @@ void BoxMaker::CreateTheEntity()
 {
   msgs::Factory msg;
 
-  ignition::math::Vector3d p = msgs::Convert(this->visualMsg->pose().position());
-  ignition::math::Vector3d size = msgs::Convert(this->visualMsg->geometry().box().size());
+  ignition::math::Vector3d p = msgs::Convert(
+      this->visualMsg->pose().position());
+  ignition::math::Vector3d size = msgs::Convert(
+      this->visualMsg->geometry().box().size());
 
   msg.set_sdf(this->GetSDFString());
 

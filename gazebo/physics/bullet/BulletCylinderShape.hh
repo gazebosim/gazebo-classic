@@ -81,16 +81,17 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = ignition::math::Vector3d(_radius, _radius, _length);
+                  this->initialSize = ignition::math::Vector3d(_radius,
+                      _radius, _length);
                   bParent->SetCollisionShape(new btCylinderShapeZ(
                       btVector3(_radius, _radius, _length * 0.5)));
                 }
                 else
                 {
                   btVector3 cylinderScale;
-                  cylinderScale.setX(_radius / this->initialSize.x(),);
-                  cylinderScale.setY(_radius / this->initialSize.y());
-                  cylinderScale.setZ(_length / this->initialSize.z());
+                  cylinderScale.setX(_radius / this->initialSize.X());
+                  cylinderScale.setY(_radius / this->initialSize.Y());
+                  cylinderScale.setZ(_length / this->initialSize.Z());
 
                   shape->setLocalScaling(cylinderScale);
 

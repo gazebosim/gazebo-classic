@@ -24,12 +24,12 @@
 
 #include <vector>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
-#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/JointWrench.hh"
 #include "gazebo/util/system.hh"
 

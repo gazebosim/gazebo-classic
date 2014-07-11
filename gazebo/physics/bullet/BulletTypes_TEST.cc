@@ -46,9 +46,9 @@ TEST_F(BulletTypes, ConvertVector3)
   {
     ignition::math::Vector3d vec(100.5, -2.314, 42), vec2;
     btVector3 bt = physics::BulletTypes::ConvertVector3(vec);
-    EXPECT_NEAR(bt.getX(), vec.x(), NEAR_TOL);
-    EXPECT_NEAR(bt.getY(), vec.y(), NEAR_TOL);
-    EXPECT_NEAR(bt.getZ(), vec.z(), NEAR_TOL);
+    EXPECT_NEAR(bt.getX(), vec.X(), NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), vec.Y(), NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), vec.Z(), NEAR_TOL);
     vec2 = physics::BulletTypes::ConvertVector3(bt);
     EXPECT_LT((vec-vec2).SquaredLength(), NEAR_TOL*NEAR_TOL);
   }
@@ -72,9 +72,9 @@ TEST_F(BulletTypes, ConvertVector4)
   {
     ignition::math::Vector4 vec(100.5, -2.314, 42, 848.8), vec2;
     btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
-    EXPECT_NEAR(bt.getX(), vec.x(), NEAR_TOL);
-    EXPECT_NEAR(bt.getY(), vec.y(), NEAR_TOL);
-    EXPECT_NEAR(bt.getZ(), vec.z(), NEAR_TOL);
+    EXPECT_NEAR(bt.getX(), vec.X(), NEAR_TOL);
+    EXPECT_NEAR(bt.getY(), vec.Y(), NEAR_TOL);
+    EXPECT_NEAR(bt.getZ(), vec.Z(), NEAR_TOL);
     EXPECT_NEAR(bt.getW(), vec.w, NEAR_TOL);
     vec2 = physics::BulletTypes::ConvertVector4(bt);
     EXPECT_LT((vec-vec2).SquaredLength(), NEAR_TOL*NEAR_TOL);
@@ -97,27 +97,28 @@ TEST_F(BulletTypes, ConvertPose)
     EXPECT_NEAR(bt.getRotation().getW(), 1, NEAR_TOL);
     pose2 = physics::BulletTypes::ConvertPose(bt);
     EXPECT_LT((pose.pos-pose2.Pos()).SquaredLength(), NEAR_TOL*NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).x(), NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).y(), NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).z(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).X(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).Y(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).Z(), NEAR_TOL);
     EXPECT_LT((pose.Rot()-pose2.Rot()).w, NEAR_TOL);
   }
 
   {
-    ignition::math::Pose3d pose(105.4, 3.1, -0.34, 3.14/8, 3.14/16, -3.14/2), pose2;
+    ignition::math::Pose3d pose(
+        105.4, 3.1, -0.34, 3.14/8, 3.14/16, -3.14/2), pose2;
     btTransform bt = physics::BulletTypes::ConvertPose(pose);
-    EXPECT_NEAR(bt.getOrigin().getX(), pose.Pos().x(), NEAR_TOL);
-    EXPECT_NEAR(bt.getOrigin().getY(), pose.Pos().y(), NEAR_TOL);
-    EXPECT_NEAR(bt.getOrigin().getZ(), pose.Pos().z(), NEAR_TOL);
-    EXPECT_NEAR(bt.getRotation().getX(), pose.Rot().x(), NEAR_TOL);
-    EXPECT_NEAR(bt.getRotation().getY(), pose.Rot().y(), NEAR_TOL);
-    EXPECT_NEAR(bt.getRotation().getZ(), pose.Rot().z(), NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getX(), pose.Pos().X(), NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getY(), pose.Pos().Y(), NEAR_TOL);
+    EXPECT_NEAR(bt.getOrigin().getZ(), pose.Pos().Z(), NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getX(), pose.Rot().X(), NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getY(), pose.Rot().Y(), NEAR_TOL);
+    EXPECT_NEAR(bt.getRotation().getZ(), pose.Rot().Z(), NEAR_TOL);
     EXPECT_NEAR(bt.getRotation().getW(), pose.Rot().w, NEAR_TOL);
     pose2 = physics::BulletTypes::ConvertPose(bt);
     EXPECT_LT((pose.pos-pose2.Pos()).SquaredLength(), NEAR_TOL*NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).x(), NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).y(), NEAR_TOL);
-    EXPECT_LT((pose.Rot()-pose2.Rot()).z(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).X(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).Y(), NEAR_TOL);
+    EXPECT_LT((pose.Rot()-pose2.Rot()).Z(), NEAR_TOL);
     EXPECT_LT((pose.Rot()-pose2.Rot()).w, NEAR_TOL);
   }
 }

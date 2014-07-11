@@ -72,14 +72,14 @@ TEST_F(GzModel, Spawn)
     ignition::math::Pose3d pose = model->GetWorldPose();
     ignition::math::Vector3d rpy = pose.Rot().Euler();
 
-    EXPECT_NEAR(pose.Pos().x(), 5, 1e-5);
-    EXPECT_NEAR(pose.Pos().y(), 2, 1e-5);
-    EXPECT_LT(pose.Pos().z(), 9000.0);
-    EXPECT_GT(pose.Pos().z(), 8900.0);
+    EXPECT_NEAR(pose.Pos().X(), 5, 1e-5);
+    EXPECT_NEAR(pose.Pos().Y(), 2, 1e-5);
+    EXPECT_LT(pose.Pos().Z(), 9000.0);
+    EXPECT_GT(pose.Pos().Z(), 8900.0);
 
-    EXPECT_NEAR(rpy.x(), 0.1, 1e-5);
-    EXPECT_NEAR(rpy.y(), 0.2, 1e-5);
-    EXPECT_NEAR(rpy.z(), 0.3, 1e-5);
+    EXPECT_NEAR(rpy.X(), 0.1, 1e-5);
+    EXPECT_NEAR(rpy.Y(), 0.2, 1e-5);
+    EXPECT_NEAR(rpy.Z(), 0.3, 1e-5);
   }
 }
 
@@ -145,7 +145,8 @@ TEST_F(GzModel, SpawnAndMove)
 
   common::Time::MSleep(1000);
 
-  EXPECT_EQ(model->GetWorldPose(), ignition::math::Pose3d(10, 11, 5, 0.1, 0.2, 0.3));
+  EXPECT_EQ(model->GetWorldPose(),
+      ignition::math::Pose3d(10, 11, 5, 0.1, 0.2, 0.3));
 }
 
 /////////////////////////////////////////////////

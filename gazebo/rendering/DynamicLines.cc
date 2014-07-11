@@ -72,17 +72,18 @@ void DynamicLines::AddPoint(double _x, double _y, double _z,
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int index, const ignition::math::Vector3d &value)
+void DynamicLines::SetPoint(unsigned int _index,
+    const ignition::math::Vector3d &_value)
 {
-  if (index >= this->points.size())
+  if (_index >= this->points.size())
   {
     std::ostringstream stream;
-    stream << "Point index[" << index << "] is out of bounds[0-"
+    stream << "Point index[" << _index << "] is out of bounds[0-"
            << this->points.size()-1 << "]";
     gzthrow(stream.str());
   }
 
-  this->points[index] = value;
+  this->points[_index] = _value;
 
   this->dirty = true;
 }
@@ -154,9 +155,9 @@ void DynamicLines::FillHardwareBuffers()
   {
     for (int i = 0; i < size; i++)
     {
-      *prPos++ = this->points[i].x();
-      *prPos++ = this->points[i].y();
-      *prPos++ = this->points[i].z();
+      *prPos++ = this->points[i].X();
+      *prPos++ = this->points[i].Y();
+      *prPos++ = this->points[i].Z();
 
       this->mBox.merge(Conversions::Convert(this->points[i]));
     }

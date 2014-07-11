@@ -21,11 +21,11 @@
 #include <vector>
 
 #include <boost/any.hpp>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
-#include <ignition/math/Angle.hh>
-#include <ignition/math/Vector3.hh>
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/physics/JointState.hh"
@@ -236,12 +236,13 @@ namespace gazebo
       /// \param[in] _index Indx of the axis.
       /// \param[in] _anchor Anchor value.
       public: virtual void SetAnchor(unsigned int _index,
-                                     const ignition::math::Vector3d &_anchor) = 0;
+                  const ignition::math::Vector3d &_anchor) = 0;
 
       /// \brief Get the anchor point.
       /// \param[in] _index Index of the axis.
       /// \return Anchor value for the axis.
-      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const = 0;
+      public: virtual ignition::math::Vector3d GetAnchor(
+                  unsigned int _index) const = 0;
 
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
@@ -261,7 +262,8 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual ignition::math::Angle GetHighStop(unsigned int _index) = 0;
+      public: virtual ignition::math::Angle GetHighStop(
+                  unsigned int _index) = 0;
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -385,7 +387,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
-      public: virtual ignition::math::Vector3d GetLinkForce(unsigned int _index) const = 0;
+      public: virtual ignition::math::Vector3d GetLinkForce(
+                  unsigned int _index) const = 0;
 
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -459,7 +462,8 @@ namespace gazebo
       /// iterative LCP methods.
       /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(const ignition::math::Vector3d &_axis) const;
+      public: double GetInertiaRatio(
+                  const ignition::math::Vector3d &_axis) const;
 
       /// \brief:  get the joint upper limit
       /// (replaces GetLowStop and GetHighStop)
@@ -477,13 +481,15 @@ namespace gazebo
       /// (replaces SetLowStop and SetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetLowerLimit(unsigned int _index, ignition::math::Angle _limit);
+      public: void SetLowerLimit(unsigned int _index,
+                  ignition::math::Angle _limit);
 
       /// \brief:  set the joint lower limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
-      public: void SetUpperLimit(unsigned int _index, ignition::math::Angle _limit);
+      public: void SetUpperLimit(unsigned int _index,
+                  ignition::math::Angle _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.
@@ -547,7 +553,8 @@ namespace gazebo
       /// is used to determine the appropriate frame.
       /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to world frame.
-      public: ignition::math::Quaterniond GetAxisFrame(unsigned int _index) const;
+      public: ignition::math::Quaterniond GetAxisFrame(
+                  unsigned int _index) const;
 
       /// \brief Get orientation of joint axis reference frame
       /// relative to joint frame. This should always return identity unless
@@ -561,7 +568,8 @@ namespace gazebo
       /// \return Orientation of axis frame relative to joint frame.
       /// If supplied _index is out of range, or use_parent_model_frame
       /// is not true, this function returns identity rotation quaternion.
-      public: ignition::math::Quaterniond GetAxisFrameOffset(unsigned int _index) const;
+      public: ignition::math::Quaterniond GetAxisFrameOffset(
+                  unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.

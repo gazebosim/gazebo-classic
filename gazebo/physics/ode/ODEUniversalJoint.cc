@@ -41,7 +41,8 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEUniversalJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEUniversalJoint::GetAnchor(
+    unsigned int /*index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -61,15 +62,16 @@ void ODEUniversalJoint::SetAnchor(unsigned int /*index*/,
 
   if (this->jointId)
   {
-    dJointSetUniversalAnchor(this->jointId, _anchor.x(),
-        _anchor.y(), _anchor.z());
+    dJointSetUniversalAnchor(this->jointId, _anchor.X(),
+        _anchor.Y(), _anchor.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEUniversalJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   dVector3 result;
 
@@ -90,7 +92,8 @@ ignition::math::Vector3d ODEUniversalJoint::GetGlobalAxis(unsigned int _index) c
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEUniversalJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -107,12 +110,12 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const ignition::math::Vecto
     if (_index == UniversalJoint::AXIS_CHILD)
     {
       dJointSetUniversalAxis1(this->jointId,
-        globalAxis.x(), globalAxis.y(), globalAxis.z());
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
     }
     else if (_index == UniversalJoint::AXIS_PARENT)
     {
       dJointSetUniversalAxis2(this->jointId,
-        globalAxis.x(), globalAxis.y(), globalAxis.z());
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
     }
     else
       gzerr << "Joint index out of bounds.\n";

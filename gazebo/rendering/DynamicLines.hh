@@ -69,7 +69,8 @@ namespace gazebo
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
       /// \param[in] _value ignition::math::Vector3d value to set the point to
-      public: void SetPoint(unsigned int _index, const ignition::math::Vector3d &_value);
+      public: void SetPoint(unsigned int _index,
+                  const ignition::math::Vector3d &_value);
 
       /// \brief Change the color of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -79,7 +80,8 @@ namespace gazebo
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return ignition::math::Vector3d value of the point
-      public: const ignition::math::Vector3d& GetPoint(unsigned int _index) const;
+      public: const ignition::math::Vector3d& GetPoint(
+                  unsigned int _index) const;
 
       /// \brief Return the total number of points in the point list
       /// \return Number of points

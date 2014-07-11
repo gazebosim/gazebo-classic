@@ -82,7 +82,8 @@ void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEGearboxJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   dVector3 result;
 
@@ -97,7 +98,8 @@ ignition::math::Vector3d ODEGearboxJoint::GetGlobalAxis(unsigned int _index) con
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEGearboxJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -112,13 +114,13 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const ignition::math::Vector3
 
   if (_index == 0)
   {
-    dJointSetGearboxAxis1(this->jointId, globalAxis.x(), globalAxis.y(),
-      globalAxis.z());
+    dJointSetGearboxAxis1(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else if (_index == 1)
   {
-    dJointSetGearboxAxis2(this->jointId, globalAxis.x(), globalAxis.y(),
-      globalAxis.z());
+    dJointSetGearboxAxis2(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else
     gzerr << "index [" << _index << "] out of range\n";
@@ -184,7 +186,8 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEGearboxJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   dVector3 result;
   gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";

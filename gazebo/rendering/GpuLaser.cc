@@ -637,12 +637,14 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = ignition::math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        v = ignition::math::equal(phi, 0.0) ?
+          -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = ignition::math::equal(theta, 0.0) ? -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = ignition::math::equal(theta, 0.0) ?
+          -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
       }
       submesh->AddTexCoord(u, v);
     }

@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"
-#include <ignition/math/Quaternion.hh>
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 
@@ -77,7 +77,7 @@ void BuildingModelManip::OnSizeChanged(double _width, double _depth,
     double _height)
 {
   this->size = BuildingMaker::ConvertSize(_width, _depth, _height);
-  double dScaleZ = this->visual->GetScale().z() - this->size.z();
+  double dScaleZ = this->visual->GetScale().Z() - this->size.Z();
   this->visual->SetScale(this->size);
   ignition::math::Vector3d originalPos = this->visual->GetPosition();
   ignition::math::Vector3d newPos = originalPos
@@ -166,8 +166,8 @@ void BuildingModelManip::OnPoseOriginTransformed(double _x, double _y,
     double _z, double _roll, double _pitch, double _yaw)
 {
   // Handle translations, currently used by polylines
-  ignition::math::Pose3d trans = BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch,
-      _yaw);
+  ignition::math::Pose3d trans =
+    BuildingMaker::ConvertPose(_x, -_y, _z, _roll, _pitch, _yaw);
 
   ignition::math::Pose3d oldPose = this->visual->GetParent()->GetWorldPose();
 
@@ -190,7 +190,7 @@ void BuildingModelManip::OnWidthChanged(double _width)
 {
   double scaledWidth = BuildingMaker::Convert(_width);
   this->size = this->visual->GetScale();
-  this->size.x() = scaledWidth;
+  this->size.X() = scaledWidth;
   this->visual->SetScale(this->size);
 }
 
@@ -199,7 +199,7 @@ void BuildingModelManip::OnDepthChanged(double _depth)
 {
   double scaledDepth = BuildingMaker::Convert(_depth);
   this->size = this->visual->GetScale();
-  this->size.y() = scaledDepth;
+  this->size.Y() = scaledDepth;
   this->visual->SetScale(this->size);
 }
 
@@ -208,13 +208,13 @@ void BuildingModelManip::OnHeightChanged(double _height)
 {
   double scaledHeight = BuildingMaker::Convert(_height);
   this->size = this->visual->GetScale();
-  this->size.z() = scaledHeight;
+  this->size.Z() = scaledHeight;
   ignition::math::Vector3d dScale = this->visual->GetScale() - this->size;
   ignition::math::Vector3d originalPos = this->visual->GetPosition();
   this->visual->SetScale(this->size);
 
   ignition::math::Vector3d newPos = originalPos
-      - ignition::math::Vector3d(0, 0, dScale.z()/2.0);
+      - ignition::math::Vector3d(0, 0, dScale.Z()/2.0);
 
   this->visual->SetPosition(newPos);
 }
@@ -224,7 +224,7 @@ void BuildingModelManip::OnPosXChanged(double _posX)
 {
   ignition::math::Pose3d visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledX = BuildingMaker::Convert(_posX);
-  visualPose.Pos().x() = scaledX;
+  visualPose.Pos().X() = scaledX;
   this->visual->GetParent()->SetWorldPosition(visualPose.Pos());
 }
 
@@ -233,7 +233,7 @@ void BuildingModelManip::OnPosYChanged(double _posY)
 {
   ignition::math::Pose3d visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledY = BuildingMaker::Convert(_posY);
-  visualPose.Pos().y() = -scaledY;
+  visualPose.Pos().Y() = -scaledY;
   this->visual->GetParent()->SetWorldPosition(visualPose.Pos());
 }
 
@@ -242,7 +242,7 @@ void BuildingModelManip::OnPosZChanged(double _posZ)
 {
   ignition::math::Pose3d visualPose = this->visual->GetParent()->GetWorldPose();
   double scaledZ = BuildingMaker::Convert(_posZ);
-  visualPose.Pos().z() = scaledZ;
+  visualPose.Pos().Z() = scaledZ;
   this->visual->GetParent()->SetWorldPosition(visualPose.Pos());
 }
 
@@ -251,7 +251,7 @@ void BuildingModelManip::OnYawChanged(double _yaw)
 {
   double newYaw = BuildingMaker::ConvertAngle(_yaw);
   ignition::math::Vector3d angles = this->visual->Rotation().Euler();
-  angles.z() = -newYaw;
+  angles.Z() = -newYaw;
   this->visual->GetParent()->SetRotation(angles);
 }
 
@@ -282,8 +282,8 @@ void BuildingModelManip::SetPosition(double _x, double _y, double _z)
   double scaledX = BuildingMaker::Convert(_x);
   double scaledY = BuildingMaker::Convert(-_y);
   double scaledZ = BuildingMaker::Convert(_z);
-  this->visual->GetParent()->SetWorldPosition(ignition::math::Vector3d(scaledX, scaledY,
-      scaledZ));
+  this->visual->GetParent()->SetWorldPosition(
+      ignition::math::Vector3d(scaledX, scaledY, scaledZ));
 }
 
 /////////////////////////////////////////////////
@@ -310,7 +310,7 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 
   // adjust position due to difference in pivot points
   ignition::math::Vector3d newPos = originalPos
-      - ignition::math::Vector3d(dScale.x()/2.0, dScale.y()/2.0, dScale.z()/2.0);
+    - ignition::math::Vector3d(dScale.X()/2.0, dScale.Y()/2.0, dScale.Z()/2.0);
 
   this->visual->SetPosition(newPos);
 }

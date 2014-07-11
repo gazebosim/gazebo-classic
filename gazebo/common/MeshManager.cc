@@ -172,15 +172,18 @@ bool MeshManager::IsValidFilename(const std::string &_filename)
 
 
 //////////////////////////////////////////////////
-void MeshManager::GetMeshAABB(const Mesh *_mesh, ignition::math::Vector3d &_center,
-    ignition::math::Vector3d &_min_xyz, ignition::math::Vector3d &_max_xyz)
+void MeshManager::GetMeshAABB(const Mesh *_mesh,
+    ignition::math::Vector3d &_center,
+    ignition::math::Vector3d &minXYZ,
+    ignition::math::Vector3d &_maxXYZ)
 {
   if (this->HasMesh(_mesh->GetName()))
-    this->meshes[_mesh->GetName()]->GetAABB(_center, _min_xyz, _max_xyz);
+    this->meshes[_mesh->GetName()]->GetAABB(_center, minXYZ, _maxXYZ);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::GenSphericalTexCoord(const Mesh *_mesh, ignition::math::Vector3d _center)
+void MeshManager::GenSphericalTexCoord(const Mesh *_mesh,
+    ignition::math::Vector3d _center)
 {
   if (this->HasMesh(_mesh->GetName()))
     this->meshes[_mesh->GetName()]->GenSphericalTexCoord(_center);
@@ -329,12 +332,12 @@ void MeshManager::CreatePlane(const std::string &name,
 
   ignition::math::Vector3d vec;
   ignition::math::Vector3d norm(0, 0, 1);
-  double xSpace = size.x() / segments.x();
-  double ySpace = size.y() / segments.y();
-  double halfWidth = size.x() / 2.0;
-  double halfHeight = size.y() / 2.0;
-  double xTex = uvTile.x() / segments.x();
-  double yTex = uvTile.y() / segments.y();
+  double xSpace = size.X() / segments.X();
+  double ySpace = size.Y() / segments.Y();
+  double halfWidth = size.X() / 2.0;
+  double halfHeight = size.Y() / 2.0;
+  double xTex = uvTile.X() / segments.X();
+  double yTex = uvTile.Y() / segments.Y();
 
   // Give it some thickness to reduce shadow artifacts.
   double thickness = 0.01;
@@ -342,9 +345,9 @@ void MeshManager::CreatePlane(const std::string &name,
   for (int i = 0; i <= 1; ++i)
   {
     double z = i*thickness;
-    for (int y = 0; y <= segments.y(); ++y)
+    for (int y = 0; y <= segments.Y(); ++y)
     {
-      for (int x = 0; x <= segments.x(); ++x)
+      for (int x = 0; x <= segments.X(); ++x)
       {
         // Compute the position of the vertex
         vec.x((x * xSpace) - halfWidth);
@@ -363,11 +366,12 @@ void MeshManager::CreatePlane(const std::string &name,
     }
   }
 
-  this->Tesselate2DMesh(subMesh, segments.x() + 1, segments.y() + 1, false);
+  this->Tesselate2DMesh(subMesh, segments.X() + 1, segments.Y() + 1, false);
 }
 
 //////////////////////////////////////////////////
-void MeshManager::CreateBox(const std::string &name, const ignition::math::Vector3d &sides,
+void MeshManager::CreateBox(const std::string &name,
+    const ignition::math::Vector3d &sides,
     const ignition::math::Vector2d &uvCoords)
 {
   int i, k;
@@ -407,7 +411,7 @@ void MeshManager::CreateBox(const std::string &name, const ignition::math::Vecto
   // Texture coords
   double t[4][2] =
   {
-    {uvCoords.x(), 0}, {0, 0}, {0, uvCoords.y()}, {uvCoords.x(), uvCoords.y()}
+    {uvCoords.X(), 0}, {0, 0}, {0, uvCoords.Y()}, {uvCoords.X(), uvCoords.Y()}
   };
 
   // Vertices
@@ -438,9 +442,9 @@ void MeshManager::CreateBox(const std::string &name, const ignition::math::Vecto
   // Compute the vertices
   for (i = 0; i < 8; i++)
   {
-    v[i][0] *= sides.x() * 0.5;
-    v[i][1] *= sides.y() * 0.5;
-    v[i][2] *= sides.z() * 0.5;
+    v[i][0] *= sides.X() * 0.5;
+    v[i][1] *= sides.Y() * 0.5;
+    v[i][2] *= sides.Z() * 0.5;
   }
 
   // For each face
@@ -504,7 +508,7 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   // Texture coords
   /*float t[4][2] =
     {
-    {uvCoords.x(), 0}, {0, 0}, {0, uvCoords.y()}, {uvCoords.x(), uvCoords.y()}
+    {uvCoords.X(), 0}, {0, 0}, {0, uvCoords.Y()}, {uvCoords.X(), uvCoords.Y()}
     };*/
 
   // Vertices
@@ -697,7 +701,7 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   {
     vert.z(ring * height/rings - height/2.0);
 
-    double ringRadius = ((height - (vert.z() + height/2.0)) / height) * radius;
+    double ringRadius = ((height - (vert.Z() + height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)

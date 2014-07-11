@@ -118,19 +118,19 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
         this->pose + this->parentLink->GetWorldPose();
 
       // Apply position noise before converting to global frame
-      gpsPose.Pos().x() =
-        this->horizontalPositionNoise->Apply(gpsPose.Pos().x());
-      gpsPose.Pos().y() =
-        this->horizontalPositionNoise->Apply(gpsPose.Pos().y());
-      gpsPose.Pos().z() =
-        this->verticalPositionNoise->Apply(gpsPose.Pos().z());
+      gpsPose.Pos().X() =
+        this->horizontalPositionNoise->Apply(gpsPose.Pos().X());
+      gpsPose.Pos().Y() =
+        this->horizontalPositionNoise->Apply(gpsPose.Pos().Y());
+      gpsPose.Pos().Z() =
+        this->verticalPositionNoise->Apply(gpsPose.Pos().Z());
 
       // Convert to global frames
       ignition::math::Vector3d spherical = this->sphericalCoordinates->
         SphericalFromLocal(gpsPose.Pos());
-      this->lastGpsMsg.set_latitude_deg(spherical.x());
-      this->lastGpsMsg.set_longitude_deg(spherical.y());
-      this->lastGpsMsg.set_altitude(spherical.z());
+      this->lastGpsMsg.set_latitude_deg(spherical.X());
+      this->lastGpsMsg.set_longitude_deg(spherical.Y());
+      this->lastGpsMsg.set_altitude(spherical.Z());
     }
 
     // Measure velocity and apply noise
@@ -142,13 +142,13 @@ bool GpsSensor::UpdateImpl(bool /*_force*/)
       gpsVelocity = this->sphericalCoordinates->GlobalFromLocal(gpsVelocity);
 
       // Apply noise after converting to global frame
-      gpsVelocity.x() = this->horizontalVelocityNoise->Apply(gpsVelocity.x());
-      gpsVelocity.y() = this->horizontalVelocityNoise->Apply(gpsVelocity.y());
-      gpsVelocity.z() = this->verticalVelocityNoise->Apply(gpsVelocity.z());
+      gpsVelocity.X() = this->horizontalVelocityNoise->Apply(gpsVelocity.X());
+      gpsVelocity.Y() = this->horizontalVelocityNoise->Apply(gpsVelocity.Y());
+      gpsVelocity.Z() = this->verticalVelocityNoise->Apply(gpsVelocity.Z());
 
-      this->lastGpsMsg.set_velocity_east(gpsVelocity.x());
-      this->lastGpsMsg.set_velocity_north(gpsVelocity.y());
-      this->lastGpsMsg.set_velocity_up(gpsVelocity.z());
+      this->lastGpsMsg.set_velocity_east(gpsVelocity.X());
+      this->lastGpsMsg.set_velocity_north(gpsVelocity.Y());
+      this->lastGpsMsg.set_velocity_up(gpsVelocity.Z());
     }
   }
   this->lastMeasurementTime = this->world->GetSimTime();

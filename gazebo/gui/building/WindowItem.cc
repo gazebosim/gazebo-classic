@@ -84,7 +84,7 @@ QVector3D WindowItem::GetSize() const
 /////////////////////////////////////////////////
 QVector3D WindowItem::GetScenePosition() const
 {
-  return QVector3D(this->scenePos().x(), this->scenePos().y(),
+  return QVector3D(this->scenePos().X(), this->scenePos().Y(),
       this->windowElevation);
 }
 
@@ -160,18 +160,18 @@ void WindowItem::OnApply()
      qobject_cast<WindowDoorInspectorDialog *>(QObject::sender());
 
   QPointF itemPos = this->windowPos * this->scale;
-  itemPos.setY(-itemPos.y());
+  itemPos.setY(-itemPos.Y());
   this->SetSize(QSize(dialog->GetWidth() / this->scale,
       dialog->GetDepth() / this->scale));
   this->windowWidth = dialog->GetWidth() / this->scale;
   this->windowHeight = dialog->GetHeight() / this->scale;
   this->windowDepth = dialog->GetDepth() / this->scale;
   this->windowElevation = dialog->GetElevation() / this->scale;
-  if ((fabs(dialog->GetPosition().x() - itemPos.x()) >= 0.01)
-      || (fabs(dialog->GetPosition().y() - itemPos.y()) >= 0.01))
+  if ((fabs(dialog->GetPosition().X() - itemPos.X()) >= 0.01)
+      || (fabs(dialog->GetPosition().Y() - itemPos.Y()) >= 0.01))
   {
     itemPos = dialog->GetPosition() / this->scale;
-    itemPos.setY(-itemPos.y());
+    itemPos.setY(-itemPos.Y());
     this->windowPos = itemPos;
     this->setPos(this->windowPos);
     // this->setParentItem(NULL);
@@ -185,7 +185,7 @@ void WindowItem::WindowChanged()
   emit WidthChanged(this->windowWidth);
   emit DepthChanged(this->windowDepth);
   emit HeightChanged(this->windowHeight);
-  emit PositionChanged(this->windowPos.x(), this->windowPos.y(),
+  emit PositionChanged(this->windowPos.X(), this->windowPos.Y(),
       this->levelBaseHeight + this->windowElevation);
 }
 
@@ -210,7 +210,7 @@ void WindowItem::OnOpenInspector()
   this->inspector->SetDepth(this->windowDepth * this->scale);
 
   QPointF itemPos = this->windowPos * this->scale;
-  itemPos.setY(-itemPos.y());
+  itemPos.setY(-itemPos.Y());
   this->inspector->SetPosition(itemPos);
   this->inspector->show();
 }

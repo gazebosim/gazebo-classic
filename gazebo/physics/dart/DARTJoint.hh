@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(unsigned int /*_index*/,
-                                     const ignition::math::Vector3d &/*_anchor*/);
+                  const ignition::math::Vector3d &/*_anchor*/);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
@@ -92,10 +92,12 @@ namespace gazebo
       public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkForce(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkTorque(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

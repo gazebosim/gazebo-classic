@@ -14,20 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Ray proximity sensor
- * Author: Mihai Emanuel Dolha
- * Date: 29 March 2012
-*/
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
-
-#include <ignition/math/Rand.hh>
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/Scene.hh"
@@ -597,7 +590,8 @@ bool GpuRaySensor::UpdateImpl(bool /*_force*/)
       if (!this->noises.empty())
       {
         range = this->noises[0]->Apply(range);
-        range = ignition::math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
+        range = ignition::math::clamp(range, this->GetRangeMin(),
+            this->GetRangeMax());
       }
 
       range = ignition::math::isnan(range) ? this->GetRangeMax() : range;

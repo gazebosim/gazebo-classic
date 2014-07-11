@@ -216,7 +216,8 @@ namespace gazebo
       /// first entity hit by the Ray is returned.
       /// \param[in] _pt The 3D point to search below
       /// \return A pointer to nearest Entity, NULL if none is found.
-      public: EntityPtr GetEntityBelowPoint(const ignition::math::Vector3d &_pt);
+      public: EntityPtr GetEntityBelowPoint(
+                  const ignition::math::Vector3d &_pt);
 
       /// \brief Set the current world state.
       /// \param _state The state to set the World to.

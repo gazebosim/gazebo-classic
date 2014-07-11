@@ -152,11 +152,11 @@ void GUIOverlay::CreateWindow(const std::string &_type,
 
   parent->addChildWindow(window);
 
-  window->setPosition(CEGUI::UVector2(CEGUI::UDim(_position.x(), 0),
-                                             CEGUI::UDim(_position.y(), 0)));
+  window->setPosition(CEGUI::UVector2(CEGUI::UDim(_position.X(), 0),
+                                             CEGUI::UDim(_position.Y(), 0)));
 
-  window->setSize(CEGUI::UVector2(CEGUI::UDim(_size.x(), 0),
-                                         CEGUI::UDim(_size.y(), 0)));
+  window->setSize(CEGUI::UVector2(CEGUI::UDim(_size.X(), 0),
+                                         CEGUI::UDim(_size.Y(), 0)));
   window->setText(_text);
 }
 #else
@@ -218,7 +218,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   scroll = false;
 
   CEGUI::System *system = CEGUI::System::getSingletonPtr();
-  pos = system->injectMousePosition(_evt.pos.x(), _evt.pos.y());
+  pos = system->injectMousePosition(_evt.pos.X(), _evt.pos.Y());
 
   if (_evt.type == common::MouseEvent::PRESS)
   {
@@ -241,7 +241,7 @@ bool GUIOverlay::HandleMouseEvent(const common::MouseEvent &_evt)
   }
 
   if (_evt.type == common::MouseEvent::SCROLL)
-    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.y());
+    scroll = system->injectMouseWheelChange(-1 * _evt.scroll.Y());
 
   result = pos || release || press || scroll;
 

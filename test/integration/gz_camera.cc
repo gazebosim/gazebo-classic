@@ -35,7 +35,8 @@ TEST_F(GzCamera, Follow)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", ignition::math::Vector3d(1, 1, 1), ignition::math::Vector3d(10, 10, 1),
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(10, 10, 1),
       ignition::math::Vector3d(0, 0, 0));
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
@@ -63,8 +64,8 @@ TEST_F(GzCamera, Follow)
   // Make sure the camera is not at the initial pose.
   EXPECT_TRUE(camera->GetWorldPose() != cameraStartPose);
 
-  EXPECT_NEAR(camera->GetWorldPose().Pos().x(), 9.9, 0.1);
-  EXPECT_NEAR(camera->GetWorldPose().Pos().y(), 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().X(), 9.9, 0.1);
+  EXPECT_NEAR(camera->GetWorldPose().Pos().Y(), 9.9, 0.1);
 }
 
 /////////////////////////////////////////////////

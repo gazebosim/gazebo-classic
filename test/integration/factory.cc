@@ -95,12 +95,12 @@ void FactoryTest::Box(const std::string &_physicsEngine)
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
     testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().x(),
-          setPose.Pos().x(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().y(),
-          setPose.Pos().y(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().z(),
-          setPose.Pos().z(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().X(),
+          setPose.Pos().X(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Y(),
+          setPose.Pos().Y(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Z(),
+          setPose.Pos().Z(), 0.1));
   }
 }
 
@@ -122,12 +122,12 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
         ignition::math::Quaterniond(0, 0, 0));
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().x(),
-          setPose.Pos().x(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().y(),
-          setPose.Pos().y(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().z(),
-          setPose.Pos().z(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().X(),
+          setPose.Pos().X(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Y(),
+          setPose.Pos().Y(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Z(),
+          setPose.Pos().Z(), 0.1));
   }
 }
 
@@ -145,15 +145,16 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
   {
     std::ostringstream name;
     name << "test_cylinder_" << i;
-    setPose.Set(ignition::math::Vector3d(0, 0, i+0.5), ignition::math::Quaterniond(0, 0, 0));
+    setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
+        ignition::math::Quaterniond(0, 0, 0));
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = GetEntityPose(name.str());
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().x(),
-          setPose.Pos().x(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().y(),
-          setPose.Pos().y(), 0.1));
-    EXPECT_TRUE(ignition::math::equal(testPose.Pos().z(),
-          setPose.Pos().z(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().X(),
+          setPose.Pos().X(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Y(),
+          setPose.Pos().Y(), 0.1));
+    EXPECT_TRUE(ignition::math::equal(testPose.Pos().Z(),
+          setPose.Pos().Z(), 0.1));
   }
 }
 

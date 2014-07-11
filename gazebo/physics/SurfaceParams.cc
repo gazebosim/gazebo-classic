@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include <ignition/math/Helpers.hh>
 #include "gazebo/physics/SurfaceParams.hh"
 
 using namespace gazebo;

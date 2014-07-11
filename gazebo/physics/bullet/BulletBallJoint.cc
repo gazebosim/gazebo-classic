@@ -137,7 +137,8 @@ void BulletBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -170,14 +171,16 @@ void BulletBallJoint::SetMaxForce(unsigned int /*_index*/, double /*_t*/)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return ignition::math::Vector3d();
 }
 
 /////////////////////////////////////////////////
-ignition::math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+ignition::math::Angle BulletBallJoint::GetAngleImpl(
+    unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return ignition::math::Angle();

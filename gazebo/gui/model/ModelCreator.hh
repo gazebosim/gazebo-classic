@@ -24,10 +24,10 @@
 #include <boost/unordered/unordered_map.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
-#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/gui/qt.h"
@@ -108,7 +108,8 @@ namespace gazebo
       /// \param[in] _pose Pose of the cylinder.
       /// \return Name of the cylinder that has been added.
       public: std::string AddCylinder(double _radius = 0.5,
-          double _length = 1.0, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
+          double _length = 1.0,
+          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
 
       /// \brief Add a custom part to the model
       /// \param[in] _name Name of the custom part.
@@ -116,8 +117,10 @@ namespace gazebo
       /// \param[in] _pose Pose of the custom part.
       /// \return Name of the custom that has been added.
       public: std::string AddCustom(const std::string &_name,
-          const ignition::math::Vector3d &_scale = ignition::math::Vector3d::One,
-          const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero);
+          const ignition::math::Vector3d &_scale =
+          ignition::math::Vector3d::One,
+          const ignition::math::Pose3d &_pose =
+          ignition::math::Pose3d::Zero);
 
       /// \brief Add a joint to the model.
       /// \param[in] _type Type of joint to add.

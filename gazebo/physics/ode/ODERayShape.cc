@@ -98,9 +98,9 @@ void ODERayShape::Update()
   if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
-        this->globalStartPos.x(), this->globalStartPos.y(),
-        this->globalStartPos.z(),
-        dir.x(), dir.y(), dir.z());
+        this->globalStartPos.X(), this->globalStartPos.Y(),
+        this->globalStartPos.Z(),
+        dir.X(), dir.Y(), dir.Z());
 
     dGeomRaySetLength(this->geomId,
         this->globalStartPos.Distance(this->globalEndPos));
@@ -140,9 +140,9 @@ void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x(),
-              this->globalStartPos.y(), this->globalStartPos.z(),
-              dir.x(), dir.y(), dir.z());
+  dGeomRaySet(this->geomId, this->globalStartPos.X(),
+              this->globalStartPos.Y(), this->globalStartPos.Z(),
+              dir.X(), dir.Y(), dir.Z());
 
   dGeomRaySetLength(this->geomId,
                      this->globalStartPos.Distance(this->globalEndPos));

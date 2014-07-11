@@ -15,6 +15,7 @@
  *
 */
 #include <sstream>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -22,7 +23,6 @@
 #include "gazebo/common/Console.hh"
 
 #include "gazebo/gui/GuiEvents.hh"
-#include <ignition/math/Quaternion.hh>
 #include "gazebo/common/MouseEvent.hh"
 
 #include "gazebo/transport/Publisher.hh"
@@ -115,7 +115,7 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
   ignition::math::Vector3d origin2, dir2, p2;
 
   // Cast two rays from the camera into the world
-  this->camera->GetCameraToViewportRay(_event.pos.x(), _event.pos.y(),
+  this->camera->GetCameraToViewportRay(_event.pos.X(), _event.pos.Y(),
                                        origin1, dir1);
 
   // Compute the distance from the camera to plane of translation
@@ -130,20 +130,20 @@ void MeshMaker::OnMouseMove(const common::MouseEvent &_event)
 
   if (!_event.shift)
   {
-    if (ceil(pose.Pos().x()) - pose.Pos().x() <= .4)
-      pose.Pos().x() = ceil(pose.Pos().x());
-    else if (pose.Pos().x() - floor(pose.Pos().x()) <= .4)
-      pose.Pos().x() = floor(pose.Pos().x());
+    if (ceil(pose.Pos().X()) - pose.Pos().X() <= .4)
+      pose.Pos().X() = ceil(pose.Pos().X());
+    else if (pose.Pos().X() - floor(pose.Pos().X()) <= .4)
+      pose.Pos().X() = floor(pose.Pos().X());
 
-    if (ceil(pose.Pos().y()) - pose.Pos().y() <= .4)
-      pose.Pos().y() = ceil(pose.Pos().y());
-    else if (pose.Pos().y() - floor(pose.Pos().y()) <= .4)
-      pose.Pos().y() = floor(pose.Pos().y());
+    if (ceil(pose.Pos().Y()) - pose.Pos().Y() <= .4)
+      pose.Pos().Y() = ceil(pose.Pos().Y());
+    else if (pose.Pos().Y() - floor(pose.Pos().Y()) <= .4)
+      pose.Pos().Y() = floor(pose.Pos().Y());
 
-    if (ceil(pose.Pos().z()) - pose.Pos().z() <= .4)
-      pose.Pos().z() = ceil(pose.Pos().z());
-    else if (pose.Pos().z() - floor(pose.Pos().z()) <= .4)
-      pose.Pos().z() = floor(pose.Pos().z());
+    if (ceil(pose.Pos().Z()) - pose.Pos().Z() <= .4)
+      pose.Pos().Z() = ceil(pose.Pos().Z());
+    else if (pose.Pos().Z() - floor(pose.Pos().Z()) <= .4)
+      pose.Pos().Z() = floor(pose.Pos().Z());
   }
 
   msgs::Set(this->visualMsg->mutable_pose(), pose);
@@ -165,9 +165,9 @@ void MeshMaker::CreateTheEntity()
 
   newModelStr << "<sdf version ='1.3'>\
     <model name='custom_user_mesh" << counter << "_model'>\
-    <pose>" << this->visualMsg->pose().position().x() << " "
-              << this->visualMsg->pose().position().y() << " "
-              << this->visualMsg->pose().position().z() << " "
+    <pose>" << this->visualMsg->pose().position().X() << " "
+              << this->visualMsg->pose().position().Y() << " "
+              << this->visualMsg->pose().position().Z() << " "
               << " 0 0 0</pose>\
     <link name ='link'>\
       <inertial mass ='1.0'>\

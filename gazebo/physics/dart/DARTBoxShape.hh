@@ -17,9 +17,9 @@
 #ifndef _GAZEBO_DARTBOXSHAPE_HH_
 #define _GAZEBO_DARTBOXSHAPE_HH_
 
-#include "gazebo/common/Console.hh"
-
 #include <ignition/math/Vector3.hh>
+
+#include "gazebo/common/Console.hh"
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
@@ -47,34 +47,34 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetSize(const ignition::math::Vector3d &_size)
       {
-        if (_size.x(), < 0 || _size.y() < 0 || _size.z()< 0)
+        if (_size.X(), < 0 || _size.Y() < 0 || _size.Z()< 0)
         {
           gzerr << "Box shape does not support negative size\n";
           return;
         }
         ignition::math::Vector3d size = _size;
-        if (ignition::math::equal(size.x(),(), 0.0))
+        if (ignition::math::equal(size.X(), 0.0))
         {
           // Warn user, but still create shape with very small value
           // otherwise later resize operations using setLocalScaling
           // will not be possible
           gzwarn << "Setting box shape's x to zero is not supported in DART, "
                  << "using 1e-4.\n";
-          size.x(), = 1e-4;
+          size.X(), = 1e-4;
         }
 
-        if (ignition::math::equal(size.y(), 0.0))
+        if (ignition::math::equal(size.Y(), 0.0))
         {
           gzwarn << "Setting box shape's y to zero is not supported in DART, "
                  << "using 1e-4.\n";
-          size.y() = 1e-4;
+          size.Y() = 1e-4;
         }
 
-        if (ignition::math::equal(size.z(), 0.0))
+        if (ignition::math::equal(size.Z(), 0.0))
         {
           gzwarn << "Setting box shape's z to zero is not supported in DART "
                  << "using 1e-4.\n";
-          size.z()= 1e-4;
+          size.Z()= 1e-4;
         }
 
         BoxShape::SetSize(size);

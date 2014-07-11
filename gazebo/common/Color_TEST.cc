@@ -128,7 +128,8 @@ TEST_F(Color, Color)
   EXPECT_TRUE(ignition::math::equal(0.9064f, clr.b, 1e-3f));
   EXPECT_TRUE(ignition::math::equal(0.04f, clr.a));
 
-  EXPECT_TRUE(clr.GetAsYUV() == ignition::math::Vector3d(0.104985, 0.95227, 0.429305));
+  EXPECT_TRUE(clr.GetAsYUV() ==
+      ignition::math::Vector3d(0.104985, 0.95227, 0.429305));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
   EXPECT_TRUE(ignition::math::equal(0.00431373f, clr.r));

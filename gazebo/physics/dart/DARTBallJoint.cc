@@ -60,7 +60,8 @@ ignition::math::Vector3d DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTBallJoint::GetGlobalAxis(
+    unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }

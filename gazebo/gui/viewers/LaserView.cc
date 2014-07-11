@@ -14,12 +14,12 @@
  * limitations under the License.
  *
  */
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/viewers/ViewFactory.hh"
 #include "gazebo/gui/viewers/LaserView.hh"
@@ -499,7 +499,7 @@ unsigned int LaserView::LaserItem::GetRangeCount()
 /////////////////////////////////////////////////
 void LaserView::LaserItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
+  this->indexAngle = atan2(-_event->pos().Y(), _event->pos().X());
 
   if (this->indexAngle < this->angleMin)
     this->indexAngle = this->angleMin;
@@ -521,7 +521,7 @@ void LaserView::LaserItem::hoverLeaveEvent(
 /////////////////////////////////////////////////
 void LaserView::LaserItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
+  this->indexAngle = atan2(-_event->pos().Y(), _event->pos().X());
 
   if (this->indexAngle < this->angleMin)
     this->indexAngle = this->angleMin;

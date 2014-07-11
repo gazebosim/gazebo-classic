@@ -84,7 +84,8 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const ignition::math::Pose3d &_pose)
+void Joint::Load(LinkPtr _parent, LinkPtr _child,
+    const ignition::math::Pose3d &_pose)
 {
   if (_parent)
   {
@@ -532,7 +533,8 @@ ignition::math::Angle Joint::GetAngle(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetHighStop(unsigned int _index, const ignition::math::Angle &_angle)
+bool Joint::SetHighStop(unsigned int _index,
+    const ignition::math::Angle &_angle)
 {
   this->SetUpperLimit(_index, _angle);
   // switch below to return this->SetUpperLimit when we implement

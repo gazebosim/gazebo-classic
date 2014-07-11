@@ -72,8 +72,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -81,8 +81,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -106,8 +106,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -115,8 +115,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -162,8 +162,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -171,8 +171,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -207,8 +207,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -216,8 +216,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -252,8 +252,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "      </collision>\n"
@@ -261,8 +261,8 @@ TEST_F(PhysicsTest, State)
         << "        <pose>0.5 0 0 0 0 0</pose>\n"
         << "        <geometry>\n"
         << "          <box>\n"
-        << "            <size>" << size.x() << " " << size.y() << " "
-        << size.z() << "</size>\n"
+        << "            <size>" << size.X() << " " << size.Y() << " "
+        << size.Z() << "</size>\n"
         << "          </box>\n"
         << "        </geometry>\n"
         << "        <material><script>Gazebo/Grey</script></material>\n"
@@ -436,11 +436,16 @@ TEST_F(PhysicsTest, State)
         // gzdbg << "setting link poses without violation\n";
         // double cur_time = world->GetSimTime().Double();
         last_update_time = world->GetSimTime().Double();
-        link_1->SetWorldPose(ignition::math::Pose3d(0,    0, 3, 0,        0, 0));
-        link_2->SetWorldPose(ignition::math::Pose3d(1.00, 0, 3, 0,        0, 0));
-        link_3->SetWorldPose(ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
-        link_4->SetWorldPose(ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
-        link_5->SetWorldPose(ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
+        link_1->SetWorldPose(
+            ignition::math::Pose3d(0,    0, 3, 0,        0, 0));
+        link_2->SetWorldPose(
+            ignition::math::Pose3d(1.00, 0, 3, 0,        0, 0));
+        link_3->SetWorldPose(
+            ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
+        link_4->SetWorldPose(
+            ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
+        link_5->SetWorldPose(
+            ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -464,9 +469,12 @@ TEST_F(PhysicsTest, State)
         // double cur_time = world->GetSimTime().Double();
         link_1->SetWorldPose(ignition::math::Pose3d(0,    0, 3, 0, 0, 0));
         link_2->SetWorldPose(ignition::math::Pose3d(1.00, 0, 3, 0, 0, 0));
-        link_3->SetWorldPose(ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
-        link_4->SetWorldPose(ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
-        link_5->SetWorldPose(ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
+        link_3->SetWorldPose(
+            ignition::math::Pose3d(2.00, 0, 3, 0, 0.5*M_PI, 0));
+        link_4->SetWorldPose(
+            ignition::math::Pose3d(2.00, 1, 3, 0, 1.0*M_PI, 0));
+        link_5->SetWorldPose(
+            ignition::math::Pose3d(1.00, 1, 3, 0, 1.5*M_PI, 0));
       }
     elapsed_wall_time = world->GetRealTime().Double() - start_wall_time;
     gzdbg << "  elapsed sim time [" << test_duration
@@ -823,7 +831,8 @@ TEST_F(PhysicsTest, State)
       << "]\n";
 
     EXPECT_EQ(link_3->GetWorldPose(),
-        ignition::math::Pose3d(0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
+        ignition::math::Pose3d(
+          0.292968, 0.612084, 1.43649, -2.07141, 1.50881, -1.19487));
     Unload();
   }
 }

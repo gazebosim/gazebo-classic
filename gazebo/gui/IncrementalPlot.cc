@@ -28,9 +28,9 @@
 #include <qwt/qwt_legend_item.h>
 #include <qwt/qwt_plot_directpainter.h>
 
-#include "gazebo/common/Assert.hh"
-
 #include <ignition/math/Helpers.hh>
+
+#include "gazebo/common/Assert.hh"
 #include "gazebo/gui/IncrementalPlot.hh"
 
 using namespace gazebo;
@@ -226,9 +226,9 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
   }
 
   this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.x() -
+      std::max(0.0, static_cast<double>(lastPoint.X() -
           5.0 * this->magnifier->wheelFactor())),
-      std::max(1.0, static_cast<double>(lastPoint.x())));
+      std::max(1.0, static_cast<double>(lastPoint.X())));
 
   // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
 

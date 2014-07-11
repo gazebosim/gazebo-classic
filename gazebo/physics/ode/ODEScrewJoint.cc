@@ -14,11 +14,6 @@
  * limitations under the License.
  *
  */
-/* Desc: A screw or primastic joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #include <boost/bind.hpp>
 
 #include <string>
@@ -85,7 +80,7 @@ void ODEScrewJoint::SetAnchor(unsigned int /*index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetScrewAnchor(this->jointId, _anchor.x(), _anchor.y(), _anchor.z());
+    dJointSetScrewAnchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
 }
 
 //////////////////////////////////////////////////
@@ -103,7 +98,8 @@ ignition::math::Vector3d ODEScrewJoint::GetGlobalAxis(
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const ignition::math::Vector3d &_axis)
+void ODEScrewJoint::SetAxis(unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -121,8 +117,8 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const ignition::math::Vecto
 
   if (this->jointId)
   {
-    dJointSetScrewAxis(this->jointId, globalAxis.x(),
-        globalAxis.y(), globalAxis.z());
+    dJointSetScrewAxis(this->jointId, globalAxis.X(),
+        globalAxis.Y(), globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

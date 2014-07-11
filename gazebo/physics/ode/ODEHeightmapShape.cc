@@ -61,17 +61,17 @@ void ODEHeightmapShape::Init()
       this->odeData,
       &this->heights[0],
       0,
-      this->GetSize().x(),  // in meters
-      this->GetSize().y(),  // in meters
+      this->GetSize().X(),  // in meters
+      this->GetSize().Y(),  // in meters
       this->vertSize,  // width sampling size
       this->vertSize,  // depth sampling size (along height of image)
       1.0,  // vertical (z-axis) scaling
-      this->GetPos().z(),  // vertical (z-axis) offset
+      this->GetPos().Z(),  // vertical (z-axis) offset
       1.0,  // vertical thickness for closing the height map mesh
       0);  // wrap mode
 
   // Step 4: Restrict the bounds of the AABB to improve efficiency
-  dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().z());
+  dGeomHeightfieldDataSetBounds(this->odeData, 0, this->GetSize().Z());
 
   oParent->SetCollision(dCreateHeightfield(0, this->odeData, 1), false);
   oParent->SetStatic(true);
@@ -88,10 +88,10 @@ void ODEHeightmapShape::Init()
   // this->body->SetPose(pose);
 
   dQuaternion q;
-  q[0] = pose.Rot().w();
-  q[1] = pose.Rot().x();
-  q[2] = pose.Rot().y();
-  q[3] = pose.Rot().z();
+  q[0] = pose.Rot().W();
+  q[1] = pose.Rot().X();
+  q[2] = pose.Rot().Y();
+  q[3] = pose.Rot().Z();
 
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
 }

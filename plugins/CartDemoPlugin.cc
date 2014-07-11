@@ -51,11 +51,11 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->joints[0] = _model->GetJoint(
     _sdf->GetElement("steer")->Get<std::string>());
   this->jointPIDs[0] = common::PID(
-    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().x(),
-    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().y(),
-    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().z(),
-    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().y(),
-    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().x());
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("steer_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("steer_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[0] =
     _sdf->GetElement("steer_pos")->Get<double>();
   this->jointVelocities[0] =
@@ -66,11 +66,11 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->joints[1] = _model->GetJoint(
     _sdf->GetElement("right")->Get<std::string>());
   this->jointPIDs[1] = common::PID(
-    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().x(),
-    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().y(),
-    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().z(),
-    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().y(),
-    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().x());
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("right_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("right_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[1] =
     _sdf->GetElement("right_pos")->Get<double>();
   this->jointVelocities[1] =
@@ -81,11 +81,11 @@ void CartDemoPlugin::Load(physics::ModelPtr _model,
   this->joints[2] = _model->GetJoint(
     _sdf->GetElement("left")->Get<std::string>());
   this->jointPIDs[2] = common::PID(
-    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().x(),
-    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().y(),
-    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().z(),
-    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().y(),
-    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().x());
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().X(),
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().Y(),
+    _sdf->GetElement("left_pid")->Get<ignition::math::Vector3d>().Z(),
+    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().Y(),
+    _sdf->GetElement("left_ilim")->Get<ignition::math::Vector2d>().X());
   this->jointPositions[2] =
     _sdf->GetElement("left_pos")->Get<double>();
   this->jointVelocities[2] =

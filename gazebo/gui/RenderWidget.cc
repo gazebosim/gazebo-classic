@@ -187,30 +187,30 @@ void RenderWidget::update()
 
   // std::ostringstream stream;
 
-  // stream << std::fixed << std::setprecision(2) << pose.Pos().x();
+  // stream << std::fixed << std::setprecision(2) << pose.Pos().X();
   // this->xPosEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
-  // stream << std::fixed << std::setprecision(2) << pose.Pos().y();
+  // stream << std::fixed << std::setprecision(2) << pose.Pos().Y();
   // this->yPosEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
-  // stream << std::fixed << std::setprecision(2) << pose.Pos().z();
+  // stream << std::fixed << std::setprecision(2) << pose.Pos().Z();
   // this->zPosEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << IGN_RTOD(pose.Rot().Euler().x());
+  //        << IGN_RTOD(pose.Rot().Euler().X());
   // this->rollEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << IGN_RTOD(pose.Rot().Euler().y());
+  //        << IGN_RTOD(pose.Rot().Euler().Y());
   // this->pitchEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 
   // stream << std::fixed << std::setprecision(2)
-  //        << IGN_RTOD(pose.Rot().Euler().z());
+  //        << IGN_RTOD(pose.Rot().Euler().Z());
   // this->yawEdit->setText(tr(stream.str().c_str()));
   // stream.str("");
 

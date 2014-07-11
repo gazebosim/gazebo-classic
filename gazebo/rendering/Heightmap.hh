@@ -114,9 +114,10 @@ namespace gazebo
       /// maximum effect (value between 0 and 1).
       /// \param[in] _weight Controls modification magnitude.
       /// \return True if the terrain was modified
-      public: bool Flatten(CameraPtr _camera, ignition::math::Vector2i _mousePos,
-                         double _outsideRadius, double _insideRadius,
-                         double _weight = 0.1);
+      public: bool Flatten(CameraPtr _camera,
+                  ignition::math::Vector2i _mousePos,
+                  double _outsideRadius, double _insideRadius,
+                  double _weight = 0.1);
 
       /// \brief Smooth the terrain based on a mouse press.
       /// \param[in] _camera Camera associated with the mouse press.

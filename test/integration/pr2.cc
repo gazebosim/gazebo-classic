@@ -140,7 +140,7 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
   gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
   gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  EXPECT_GT(link->GetWorldLinearVel().z(), 1e-3);
+  EXPECT_GT(link->GetWorldLinearVel().Z(), 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////

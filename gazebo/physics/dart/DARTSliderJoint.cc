@@ -52,7 +52,8 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTSliderJoint::GetAnchor(
+    unsigned int /*_index*/) const
 {
   Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
@@ -62,7 +63,8 @@ ignition::math::Vector3d DARTSliderJoint::GetAnchor(unsigned int /*_index*/) con
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTSliderJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
@@ -85,7 +87,8 @@ ignition::math::Vector3d DARTSliderJoint::GetGlobalAxis(unsigned int _index) con
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTSliderJoint::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (_index == 0)
   {

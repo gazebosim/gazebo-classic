@@ -59,76 +59,76 @@ TEST_F(BoxShapeTest, Scale)
 
   // Test scaling with unit size
   ignition::math::Vector3d size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 1.0);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 1.0);
+  EXPECT_DOUBLE_EQ(size.X(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 1.0);
 
   box->SetScale(ignition::math::Vector3d(1.5, 1.5, 1.5));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 1.5);
-  EXPECT_DOUBLE_EQ(size.y(), 1.5);
-  EXPECT_DOUBLE_EQ(size.z(), 1.5);
+  EXPECT_DOUBLE_EQ(size.X(), 1.5);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.5);
+  EXPECT_DOUBLE_EQ(size.Z(), 1.5);
 
   box->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 2.0);
-  EXPECT_DOUBLE_EQ(size.y(), 2.0);
-  EXPECT_DOUBLE_EQ(size.z(), 2.0);
+  EXPECT_DOUBLE_EQ(size.X(), 2.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 2.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 2.0);
 
   // reset scale
   box->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 1.0);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 1.0);
+  EXPECT_DOUBLE_EQ(size.X(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 1.0);
 
   // Test scaling with non-unit size
   box->SetSize(ignition::math::Vector3d(0.5, 0.5, 0.5));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 0.5);
-  EXPECT_DOUBLE_EQ(size.y(), 0.5);
-  EXPECT_DOUBLE_EQ(size.z(), 0.5);
+  EXPECT_DOUBLE_EQ(size.X(), 0.5);
+  EXPECT_DOUBLE_EQ(size.Y(), 0.5);
+  EXPECT_DOUBLE_EQ(size.Z(), 0.5);
 
   box->SetScale(ignition::math::Vector3d(2.0, 2.0, 2.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 1.0);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 1.0);
+  EXPECT_DOUBLE_EQ(size.X(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 1.0);
 
   box->SetScale(ignition::math::Vector3d(100.0, 100.0, 100.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 50.0);
-  EXPECT_DOUBLE_EQ(size.y(), 50.0);
-  EXPECT_DOUBLE_EQ(size.z(), 50.0);
+  EXPECT_DOUBLE_EQ(size.X(), 50.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 50.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 50.0);
 
   box->SetScale(ignition::math::Vector3d(0.1, 0.1, 0.1));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 0.05);
-  EXPECT_DOUBLE_EQ(size.y(), 0.05);
-  EXPECT_DOUBLE_EQ(size.z(), 0.05);
+  EXPECT_DOUBLE_EQ(size.X(), 0.05);
+  EXPECT_DOUBLE_EQ(size.Y(), 0.05);
+  EXPECT_DOUBLE_EQ(size.Z(), 0.05);
 
   // reset scale
   box->SetScale(ignition::math::Vector3d(1.0, 1.0, 1.0));
   box->SetSize(ignition::math::Vector3d(1.0, 1.0, 1.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 1.0);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 1.0);
+  EXPECT_DOUBLE_EQ(size.X(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 1.0);
 
   // Test scaling with different x, y and z components
   box->SetScale(ignition::math::Vector3d(0.5, 1.0, 2.5));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 0.5);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 2.5);
+  EXPECT_DOUBLE_EQ(size.X(), 0.5);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 2.5);
 
   // Test scaling with negative components
   // This should fail and size should remain the same as before
   box->SetScale(ignition::math::Vector3d(-1.0, -2.0, -3.0));
   size = box->GetSize();
-  EXPECT_DOUBLE_EQ(size.x(), 0.5);
-  EXPECT_DOUBLE_EQ(size.y(), 1.0);
-  EXPECT_DOUBLE_EQ(size.z(), 2.5);
+  EXPECT_DOUBLE_EQ(size.X(), 0.5);
+  EXPECT_DOUBLE_EQ(size.Y(), 1.0);
+  EXPECT_DOUBLE_EQ(size.Z(), 2.5);
 }
 
 int main(int argc, char **argv)

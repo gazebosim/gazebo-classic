@@ -366,8 +366,9 @@ namespace gazebo
       /// \param[in] _mat the matrix
       /// \param[in] _sid identifier
       /// \param[in] _type the type of transform
-      public: NodeTransform(ignition::math::Matrix4d _mat, std::string _sid = "_default_",
-                                                TransformType _type = MATRIX);
+      public: NodeTransform(ignition::math::Matrix4d _mat,
+                  std::string _sid = "_default_",
+                  TransformType _type = MATRIX);
 
       /// \brief Destructor. It does nothing.
       public: ~NodeTransform();
@@ -411,7 +412,8 @@ namespace gazebo
       /// \brief Sets source matrix values from roation
       /// \param[in] _axis of rotation
       /// \param[in] _angle of rotation
-      public: void SetSourceValues(ignition::math::Vector3d _axis, double _angle);
+      public: void SetSourceValues(ignition::math::Vector3d _axis,
+                  double _angle);
 
       /// \brief Sets the transform matrix from the source according to the type
       public: void RecalculateMatrix();

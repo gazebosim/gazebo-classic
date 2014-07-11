@@ -39,7 +39,8 @@ TEST_F(WorldTest, ClearEmptyWorld)
   EXPECT_EQ(world->GetModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d(0, 0, 0));
   EXPECT_EQ(world->GetModelCount(), 1u);
 }
 
@@ -58,7 +59,8 @@ TEST_F(WorldTest, Clear)
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
-  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1), ignition::math::Vector3d(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d(0, 0, 0));
 
   EXPECT_EQ(world->GetModelCount(), 1u);
 }

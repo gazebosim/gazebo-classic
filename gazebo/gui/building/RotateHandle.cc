@@ -122,8 +122,8 @@ void RotateHandle::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);
 
-  QRectF rotateRect(handleOffset.x() - handleSize/2.0,
-      handleOffset.y() - handleSize, handleSize, handleSize);
+  QRectF rotateRect(handleOffset.X() - handleSize/2.0,
+      handleOffset.Y() - handleSize, handleSize, handleSize);
   _painter->drawLine(origin, handleOffset);
   _painter->drawArc(rotateRect, 0, 16*360);
 }

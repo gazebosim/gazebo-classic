@@ -19,9 +19,11 @@
 
 #include <string>
 #include <vector>
-#include "gazebo/gui/qt.h"
+
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+
+#include "gazebo/gui/qt.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 

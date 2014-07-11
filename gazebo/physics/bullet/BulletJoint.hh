@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(unsigned int _index,
-                                     const ignition::math::Vector3d &_anchor);
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
@@ -78,15 +78,18 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       /// \brief Get the anchor point
-      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(
+                  unsigned int _index) const;
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual ignition::math::Vector3d GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkForce(
+                  unsigned int _index) const;
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual ignition::math::Vector3d GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetLinkTorque(
+                  unsigned int _index) const;
 
       /// \brief Set a parameter for the joint
       public: virtual void SetAttribute(Attribute, unsigned int _index,

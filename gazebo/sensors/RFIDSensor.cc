@@ -14,11 +14,7 @@
  * limitations under the License.
  *
 */
-/* Desc: RFID Sensor
- * Author: Jonas Mellin & Zakiruz Zaman
- * Date: 6th December 2011
- */
-
+#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 
@@ -28,8 +24,6 @@
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/msgs/msgs.hh"
-
-#include <ignition/math/Vector3.hh>
 
 #include "gazebo/sensors/RFIDTag.hh"
 #include "gazebo/sensors/SensorFactory.hh"

@@ -198,7 +198,7 @@ void ModelPropShop::Update()
       // Normalize the size of the visual
       vis->SetScale(ignition::math::Vector3d(scaling, scaling, scaling));
       vis->SetWorldPose(ignition::math::Pose3d(
-            trans.x(), trans.y(), trans.z(), 0, 0, 0));
+            trans.X(), trans.Y(), trans.Z(), 0, 0, 0));
 
       // Place the visual at the origin
       bbox = vis->GetBoundingBox();

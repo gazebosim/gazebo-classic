@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A hinge joint with 2 degrees of freedom
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
@@ -55,14 +50,16 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAnchor(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAxis(unsigned int _index,
                   const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       public: ignition::math::Angle GetAngle(unsigned int _index) const;
@@ -94,10 +91,12 @@ namespace gazebo
       public: virtual ignition::math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GetGlobalAxis(
+                  unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual ignition::math::Angle GetAngleImpl(
+                  unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

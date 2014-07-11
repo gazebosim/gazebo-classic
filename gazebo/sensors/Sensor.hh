@@ -28,6 +28,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -36,7 +37,6 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Time.hh"
-#include <ignition/math/Pose3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/util/system.hh"
 

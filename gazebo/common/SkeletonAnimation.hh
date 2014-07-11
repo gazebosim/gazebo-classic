@@ -55,12 +55,14 @@ namespace gazebo
       /// \brief Adds a key frame at a specific time
       /// \param[in] _time the time of the key frame
       /// \param[in] _trans the transformation
-      public: void AddKeyFrame(const double _time, const ignition::math::Matrix4d &_trans);
+      public: void AddKeyFrame(const double _time,
+                  const ignition::math::Matrix4d &_trans);
 
       /// \brief Adds a key fram at a specific time
       /// \param[in] _time the tiem of the key frame
       /// \param[in] _pose the pose
-      public: void AddKeyFrame(const double _time, const ignition::math::Pose3d &_pose);
+      public: void AddKeyFrame(const double _time,
+                  const ignition::math::Pose3d &_pose);
 
       /// \brief Returns the number of key frames.
       /// \return the count
@@ -93,7 +95,8 @@ namespace gazebo
       /// \param[in] _time the time
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see Length)
-      public: ignition::math::Matrix4d GetFrameAt(double _time, bool _loop = true) const;
+      public: ignition::math::Matrix4d GetFrameAt(double _time,
+                  bool _loop = true) const;
 
       /// \brief Scales each transformation in the key frames. This only affects
       /// the translational values.
@@ -156,9 +159,10 @@ namespace gazebo
       /// \brief Adds or replaces a named key frame at a specific time
       /// \param[in] _node the name of the new or existing node
       /// \param[in] _time the time
-      /// \param[in] _pose the key frame transformation as a ignition::math::Pose
+      /// \param[in] _pose the key frame transformation as an
+      /// ignition::math::Pose
       public: void AddKeyFrame(const std::string& _node, const double _time,
-                      const ignition::math::Pose3d &_pose);
+                  const ignition::math::Pose3d &_pose);
 
       /// \brief Returns the key frame transformation for a named animation at
       /// a specific time
@@ -180,8 +184,8 @@ namespace gazebo
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see Length)
       /// \return the transformation for every node
-      public: std::map<std::string, ignition::math::Matrix4d> GetPoseAt(const double _time,
-                      const bool _loop = true) const;
+      public: std::map<std::string, ignition::math::Matrix4d>
+              GetPoseAt(const double _time, const bool _loop = true) const;
 
       /// \brief Returns a dictionary of transformations indexed by name where
       /// a named node transformation's translational value along the X axis is
@@ -191,8 +195,9 @@ namespace gazebo
       /// \param[in] _node the name of the animation node
       /// \param[in] _loop when true, the time is divided by the duration
       /// (see Length)
-      public: std::map<std::string, ignition::math::Matrix4d> GetPoseAtX(const double _x,
-                      const std::string& _node, const bool _loop = true) const;
+      public: std::map<std::string, ignition::math::Matrix4d>
+              GetPoseAtX(const double _x,
+                  const std::string& _node, const bool _loop = true) const;
 
       /// \brief Scales every animation in the animations list
       /// \param[in] _scale the scaling factor

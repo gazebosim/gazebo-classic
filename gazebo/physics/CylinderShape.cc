@@ -71,17 +71,17 @@ void CylinderShape::SetSize(double _radius, double _length)
 //////////////////////////////////////////////////
 void CylinderShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x() < 0 || _scale.y() < 0 || _scale.z()< 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z()< 0)
     return;
 
   if (_scale == this->scale)
     return;
 
-  double newRadius = std::max(_scale.x(), _scale.y());
-  double oldRadius = std::max(this->scale.x(), this->scale.y());
+  double newRadius = std::max(_scale.X(), _scale.Y());
+  double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
   this->SetRadius((newRadius/oldRadius)*this->GetRadius());
-  this->SetLength((_scale.z()/this->scale.z())*this->Length());
+  this->SetLength((_scale.Z()/this->scale.Z())*this->Length());
 
   this->scale = _scale;
 }

@@ -203,8 +203,9 @@ void DARTLink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
-                                          const ignition::math::Vector3d &_relpos)
+void DARTLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_relpos)
 {
   this->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_relpos),
                                 DARTTypes::ConvVec3(_force),

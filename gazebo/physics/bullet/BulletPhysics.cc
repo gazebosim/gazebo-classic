@@ -18,6 +18,9 @@
 #include <algorithm>
 #include <string>
 
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -53,8 +56,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Rand.hh>
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -306,11 +307,12 @@ void BulletPhysics::Load(sdf::ElementPtr _sdf)
 
   sdf::ElementPtr bulletElem = this->sdf->GetElement("bullet");
 
-  ignition::math::Vector3d g = this->sdf->Get<ignition::math::Vector3d>("gravity");
+  ignition::math::Vector3d g =
+    this->sdf->Get<ignition::math::Vector3d>("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == ignition::math::Vector3d(0, 0, 0))
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
-  this->dynamicsWorld->setGravity(btVector3(g.x(), g.y(), g.z()));
+  this->dynamicsWorld->setGravity(btVector3(g.X(), g.Y(), g.Z()));
 
   btContactSolverInfo& info = this->dynamicsWorld->getSolverInfo();
 

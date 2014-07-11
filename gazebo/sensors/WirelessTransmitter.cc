@@ -110,7 +110,8 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 
         worldPose = pos + this->referencePose;
 
-        if (this->referencePose.Pos().Distance(worldPose.Pos()) <= this->MaxRadius)
+        if (this->referencePose.Pos().Distance(worldPose.Pos()) <=
+            this->MaxRadius)
         {
           // For the propagation model assume the receiver antenna has the same
           // gain as the transmitter
@@ -143,8 +144,8 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const ignition::math::Pose3d &_receiver,
-    const double rxGain)
+double WirelessTransmitter::GetSignalStrength(
+    const ignition::math::Pose3d &_receiver, const double rxGain)
 {
   std::string entityName;
   double dist;
@@ -155,7 +156,7 @@ double WirelessTransmitter::GetSignalStrength(const ignition::math::Pose3d &_rec
   // This prevents an assertion in bullet (issue #849)
   if (start == end)
   {
-    end.z() += 0.00001;
+    end.Z() += 0.00001;
   }
 
   // Acquire the mutex for avoiding race condition with the physics engine

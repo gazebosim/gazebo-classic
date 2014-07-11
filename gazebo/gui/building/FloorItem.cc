@@ -169,7 +169,7 @@ void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 
 /////////////////////////////////////////////////
 void FloorItem::paint(QPainter *_painter,
-    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+    const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
   if (this->isSelected())
     this->DrawBoundingBox(_painter);
@@ -197,8 +197,6 @@ void FloorItem::paint(QPainter *_painter,
   this->floorWidth = this->drawingWidth;
   this->floorDepth = this->drawingHeight;
   this->floorPos = this->scenePos();
-
-//  QGraphicsPolygonItem::paint(_painter, _option, _widget);
 }
 
 /////////////////////////////////////////////////

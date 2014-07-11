@@ -107,9 +107,9 @@ int HeightmapShape::LoadDEMAsTerrain(const std::string &_filename)
   }
   else
   {
-    this->heightmapSize.x() = this->dem.GetWorldWidth();
-    this->heightmapSize.y() = this->dem.GetWorldHeight();
-    this->heightmapSize.z()= this->dem.GetMaxElevation() -
+    this->heightmapSize.X() = this->dem.GetWorldWidth();
+    this->heightmapSize.Y() = this->dem.GetWorldHeight();
+    this->heightmapSize.Z()= this->dem.GetMaxElevation() -
         std::max(0.0f, this->dem.GetMinElevation());
   }
 
@@ -227,13 +227,13 @@ void HeightmapShape::Init()
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
-  this->scale.x() = terrainSize.x() / this->vertSize;
-  this->scale.y() = terrainSize.y() / this->vertSize;
+  this->scale.X() = terrainSize.X() / this->vertSize;
+  this->scale.Y() = terrainSize.Y() / this->vertSize;
 
   if (ignition::math::equal(this->heightmapData->GetMaxElevation(), 0.0f))
-    this->scale.z()= fabs(terrainSize.z());
+    this->scale.Z()= fabs(terrainSize.Z());
   else
-    this->scale.z()= fabs(terrainSize.z()) /
+    this->scale.Z()= fabs(terrainSize.Z()) /
                     this->heightmapData->GetMaxElevation();
 
   // Step 1: Construct the heightmap lookup table

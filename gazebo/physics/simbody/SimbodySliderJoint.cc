@@ -113,7 +113,8 @@ void SimbodySliderJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodySliderJoint::GetGlobalAxis(
+    unsigned int _index) const
 {
   if (this->simbodyPhysics->simbodyPhysicsStepped &&
       _index < this->GetAngleCount())
@@ -125,7 +126,7 @@ ignition::math::Vector3d SimbodySliderJoint::GetGlobalAxis(unsigned int _index) 
 
       // express X-axis of X_OM in world frame
       SimTK::Vec3 x_W(this->mobod.expressVectorInGroundFrame(
-        this->simbodyPhysics->integ->getState(), X_OM.x()));
+        this->simbodyPhysics->integ->getState(), X_OM.X()));
 
       return SimbodyPhysics::Vec3ToVector3(x_W);
     }
@@ -162,7 +163,8 @@ ignition::math::Vector3d SimbodySliderJoint::GetGlobalAxis(unsigned int _index) 
 }
 
 //////////////////////////////////////////////////
-ignition::math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
+ignition::math::Angle SimbodySliderJoint::GetAngleImpl(
+    unsigned int _index) const
 {
   if (_index < this->GetAngleCount())
   {

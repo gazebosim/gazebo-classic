@@ -520,7 +520,7 @@ void Visual::Load()
     {
       ignition::math::Vector2d size =
         geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
-      this->dataPtr->scale.Set(size.x(), size.y(), 1);
+      this->dataPtr->scale.Set(size.X(), size.Y(), 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -798,13 +798,13 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
   else if (geomElem->HasElement("sphere"))
   {
-    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x()/2.0);
+    geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.X()/2.0);
   }
   else if (geomElem->HasElement("cylinder"))
   {
     geomElem->GetElement("cylinder")->GetElement("radius")
-        ->Set(_scale.x()/2.0);
-    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.z());
+        ->Set(_scale.X()/2.0);
+    geomElem->GetElement("cylinder")->GetElement("length")->Set(_scale.Z());
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
@@ -841,7 +841,7 @@ ignition::math::Vector3d Visual::GetScale()
     {
       ignition::math::Vector2d size =
         geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
-      result.Set(size.x(), size.y, 1);
+      result.Set(size.X(), size.y, 1);
     }
     else if (geomElem->HasElement("mesh"))
     {
@@ -1534,7 +1534,7 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
     this->staticGeom->reset();
     delete this->staticGeom;
     this->staticGeom = NULL;
-    // this->staticGeom->setOrigin(Ogre::Vector3(pos.x(), pos.y, pos.z));
+    // this->staticGeom->setOrigin(Ogre::Vector3(pos.X(), pos.y, pos.z));
   }*/
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(
@@ -1604,15 +1604,15 @@ ignition::math::Pose3d Visual::GetWorldPose() const
   Ogre::Quaternion vquatern;
 
   vpos = this->dataPtr->sceneNode->_getDerivedPosition();
-  pose.Pos().x() = vpos.x;
-  pose.Pos().y() = vpos.y;
-  pose.Pos().z() = vpos.z;
+  pose.Pos().X() = vpos.x;
+  pose.Pos().Y() = vpos.y;
+  pose.Pos().Z() = vpos.z;
 
   vquatern = this->dataPtr->sceneNode->_getDerivedOrientation();
-  pose.Rot().w() = vquatern.w;
-  pose.Rot().x() = vquatern.x;
-  pose.Rot().y() = vquatern.y;
-  pose.Rot().z() = vquatern.z;
+  pose.Rot().W() = vquatern.w;
+  pose.Rot().X() = vquatern.x;
+  pose.Rot().Y() = vquatern.y;
+  pose.Rot().Z() = vquatern.z;
 
   return pose;
 }
@@ -1776,7 +1776,8 @@ ignition::math::Box Visual::GetBoundingBox() const
 }
 
 //////////////////////////////////////////////////
-void Visual::GetBoundsHelper(Ogre::SceneNode *node, ignition::math::Box &box) const
+void Visual::GetBoundsHelper(Ogre::SceneNode *node,
+    ignition::math::Box &box) const
 {
   node->_updateBounds();
 
@@ -2056,21 +2057,21 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // Add all the vertices
       for (j = 0; j < subMesh.GetVertexCount(); j++)
       {
-        *vertices++ = subMesh.GetVertex(j).x();
-        *vertices++ = subMesh.GetVertex(j).y();
-        *vertices++ = subMesh.GetVertex(j).z();
+        *vertices++ = subMesh.GetVertex(j).X();
+        *vertices++ = subMesh.GetVertex(j).Y();
+        *vertices++ = subMesh.GetVertex(j).Z();
 
         if (subMesh.GetNormalCount() > 0)
         {
-          *vertices++ = subMesh.GetNormal(j).x();
-          *vertices++ = subMesh.GetNormal(j).y();
-          *vertices++ = subMesh.GetNormal(j).z();
+          *vertices++ = subMesh.GetNormal(j).X();
+          *vertices++ = subMesh.GetNormal(j).Y();
+          *vertices++ = subMesh.GetNormal(j).Z();
         }
 
         if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh.GetTexCoord(j).x();
-          *vertices++ = subMesh.GetTexCoord(j).y();
+          *vertices++ = subMesh.GetTexCoord(j).X();
+          *vertices++ = subMesh.GetTexCoord(j).Y();
         }
       }
 
@@ -2205,28 +2206,28 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::CYLINDER)
     {
-      geomScale.x() = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.y() = _msg->geometry().cylinder().radius() * 2.0;
-      geomScale.z() = _msg->geometry().cylinder().length();
+      geomScale.X() = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.Y() = _msg->geometry().cylinder().radius() * 2.0;
+      geomScale.Z() = _msg->geometry().cylinder().length();
     }
     else if (_msg->geometry().type() == msgs::Geometry::SPHERE)
     {
-      geomScale.x() = geomScale.y() = geomScale.z()
+      geomScale.X() = geomScale.Y() = geomScale.Z()
           = _msg->geometry().sphere().radius() * 2.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::PLANE)
     {
-      geomScale.x() = geomScale.y() = 1.0;
+      geomScale.X() = geomScale.Y() = 1.0;
       if (_msg->geometry().plane().has_size())
       {
-        geomScale.x() = _msg->geometry().plane().size().x();
-        geomScale.y() = _msg->geometry().plane().size().y();
+        geomScale.X() = _msg->geometry().plane().size().x();
+        geomScale.Y() = _msg->geometry().plane().size().y();
       }
-      geomScale.z() = 1.0;
+      geomScale.Z() = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::IMAGE)
     {
-      geomScale.x() = geomScale.y() = geomScale.z()
+      geomScale.X() = geomScale.Y() = geomScale.Z()
           = _msg->geometry().image().scale();
     }
     else if (_msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
@@ -2236,10 +2237,10 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       if (_msg->geometry().mesh().has_scale())
         geomScale = msgs::Convert(_msg->geometry().mesh().scale());
       else
-        geomScale.x() = geomScale.y() = geomScale.z() = 1.0;
+        geomScale.X() = geomScale.Y() = geomScale.Z() = 1.0;
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
-      geomScale.x() = geomScale.y() = geomScale.z() = 1.0;
+      geomScale.X() = geomScale.Y() = geomScale.Z() = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2388,7 +2389,7 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
       this->dataPtr->sceneNode);
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x(), start.y(), start.z()));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->dataPtr->sceneNode->getOrientation());
 
   double dt = _time / (_pts.size()-1);
@@ -2425,7 +2426,7 @@ void Visual::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
   ignition::math::Vector3d start = this->GetWorldPose().Pos();
   ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
-  ignition::math::Quaterniond rotFinal(0, rpy.y(), rpy.z());
+  ignition::math::Quaterniond rotFinal(0, rpy.Y(), rpy.Z());
 
   std::string animName = this->GetName() + "_animation";
 

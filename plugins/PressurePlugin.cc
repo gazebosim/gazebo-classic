@@ -93,9 +93,9 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
             {
               ignition::math::Vector3d size = box->GetSize();
               std::vector<double> sizeVector;
-              sizeVector.push_back(size.x());
-              sizeVector.push_back(size.y());
-              sizeVector.push_back(size.z());
+              sizeVector.push_back(size.X());
+              sizeVector.push_back(size.Y());
+              sizeVector.push_back(size.Z());
               std::sort(sizeVector.begin(), sizeVector.end());
               double area = sizeVector[1] * sizeVector[2];
               if (area > 0.0)
@@ -143,12 +143,12 @@ void PressurePlugin::OnUpdate()
       for (int i = 0; i < iter2->second.count; ++i)
       {
         // TODO: determine whether body1Force or body2Force should be used.
-        normalForce = iter2->second.normals[i].x() *
-                      iter2->second.wrench[i].body1Force.x() +
-                      iter2->second.normals[i].y() *
-                      iter2->second.wrench[i].body1Force.y() +
-                      iter2->second.normals[i].z() *
-                      iter2->second.wrench[i].body1Force.z();
+        normalForce = iter2->second.normals[i].X() *
+                      iter2->second.wrench[i].body1Force.X() +
+                      iter2->second.normals[i].Y() *
+                      iter2->second.wrench[i].body1Force.Y() +
+                      iter2->second.normals[i].Z() *
+                      iter2->second.wrench[i].body1Force.Z();
         normalForceSum += normalForce;
       }
     }

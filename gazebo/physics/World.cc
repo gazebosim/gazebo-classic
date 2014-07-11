@@ -25,9 +25,9 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Rand.hh>
 
 #include "gazebo/sensors/SensorManager.hh"
-#include <ignition/math/Rand.hh>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -1716,7 +1716,7 @@ EntityPtr World::GetEntityBelowPoint(const ignition::math::Vector3d &_pt)
   ignition::math::Vector3d end;
 
   end = _pt;
-  end.z()-= 1000;
+  end.Z()-= 1000;
 
   this->physicsEngine->InitForThread();
   this->testRay->SetPoints(_pt, end);

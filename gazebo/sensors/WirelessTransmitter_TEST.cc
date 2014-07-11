@@ -63,7 +63,9 @@ WirelessTransmitter_TEST::WirelessTransmitter_TEST()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  ignition::math::Pose3d txPose(ignition::math::Vector3d(0.0, 0.0, 0.055), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(0.0, 0.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn a wireless transmitter with sensor visualization
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
@@ -139,8 +141,11 @@ void WirelessTransmitter_TEST::TestSignalStrength()
 {
   int samples = 100;
   double signStrengthAvg = 0.0;
-  ignition::math::Pose3d txPose(ignition::math::Vector3d(3.0, 3.0, 0.055), ignition::math::Quaterniond(0, 0, 0));
-  ignition::math::Pose3d txPoseOccluded(ignition::math::Vector3d(-3.0, -3.0, 0.055),
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(3.0, 3.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d txPoseOccluded(
+      ignition::math::Vector3d(-3.0, -3.0, 0.055),
       ignition::math::Quaterniond(0, 0, 0));
 
   // Take some samples and get the average signal strength
@@ -199,7 +204,9 @@ void WirelessTransmitter_TEST::TestUpdateImplNoVisual()
   double freq = 2442.0;
   double power = 14.5;
   double gain = 2.6;
-  ignition::math::Pose3d txPose(ignition::math::Vector3d(3.0, 3.0, 0.055), ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d txPose(
+      ignition::math::Vector3d(3.0, 3.0, 0.055),
+      ignition::math::Quaterniond(0, 0, 0));
 
   // Spawn a wireless transmitter without sensor visualization
   SpawnWirelessTransmitterSensor(txModelName + "NoVisual",

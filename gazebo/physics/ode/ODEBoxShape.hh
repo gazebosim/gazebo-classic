@@ -54,12 +54,12 @@ namespace gazebo
         if (oParent->GetCollisionId() == NULL)
         {
           oParent->SetCollision(dCreateBox(0,
-                _size.x(), _size.y(), _size.z()), true);
+                _size.X(), _size.Y(), _size.Z()), true);
         }
         else
         {
           dGeomBoxSetLengths(oParent->GetCollisionId(),
-              _size.x(), _size.y(), _size.z());
+              _size.X(), _size.Y(), _size.Z());
         }
       }
     };

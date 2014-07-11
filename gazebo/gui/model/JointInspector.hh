@@ -78,12 +78,14 @@ namespace gazebo
       /// \brief Set anchor position.
       /// \param[in] _index Index of anchor.
       /// \param[in] _anchor Anchor position.
-      public: void SetAnchor(unsigned int _index, const ignition::math::Vector3d &_anchor);
+      public: void SetAnchor(unsigned int _index,
+                  const ignition::math::Vector3d &_anchor);
 
       /// \brief Set axis.
       /// \param[in] _index Index of axis.
       /// \param[in] _axis Axis direction.
-      public: void SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis);
+      public: void SetAxis(unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
       /// \brief Set axis lower limit.
       /// \param[in] _index Index of axis.

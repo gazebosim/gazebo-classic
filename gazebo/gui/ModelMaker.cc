@@ -15,6 +15,7 @@
  *
  */
 #include <sstream>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -26,7 +27,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -293,7 +293,7 @@ void ModelMaker::OnMouseMove(const common::MouseEvent &_event)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
-  pose.Pos().z() = this->modelVisual->GetWorldPose().Pos().z();
+  pose.Pos().Z() = this->modelVisual->GetWorldPose().Pos().Z();
 
   this->modelVisual->SetWorldPose(pose);
 }

@@ -18,6 +18,8 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include <ignition/math/Quaternion.hh>
+
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -25,7 +27,6 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Scene.hh"
 
-#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Node.hh"
@@ -135,8 +136,8 @@ std::string ModelCreator::AddBox(const ignition::math::Vector3d &_size,
   if (_pose == ignition::math::Pose3d::Zero)
   {
     linkVisual->SetPosition(
-        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
-          _pose.Pos().z() + _size.z()/2));
+        ignition::math::Vector3d(_pose.Pos().X(), _pose.Pos().Y(),
+          _pose.Pos().Z() + _size.Z()/2));
   }
 
   this->CreatePart(visVisual);
@@ -180,8 +181,8 @@ std::string ModelCreator::AddSphere(double _radius,
   if (_pose == ignition::math::Pose3d::Zero)
   {
     linkVisual->SetPosition(
-        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
-          _pose.Pos().z() + _radius));
+        ignition::math::Vector3d(_pose.Pos().X(), _pose.Pos().Y(),
+          _pose.Pos().Z() + _radius));
   }
 
   this->CreatePart(visVisual);
@@ -226,8 +227,8 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   if (_pose == ignition::math::Pose3d::Zero)
   {
     linkVisual->SetPosition(
-        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
-          _pose.Pos().z() + _length/2));
+        ignition::math::Vector3d(_pose.Pos().X(), _pose.Pos().Y(),
+          _pose.Pos().Z() + _length/2));
   }
 
   this->CreatePart(visVisual);
@@ -273,8 +274,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   if (_pose == ignition::math::Pose3d::Zero)
   {
     linkVisual->SetPosition(
-        ignition::math::Vector3d(_pose.Pos().x(), _pose.Pos().y(),
-          _pose.Pos().z() + _scale.z()/2));
+        ignition::math::Vector3d(_pose.Pos().X(), _pose.Pos().Y(),
+          _pose.Pos().Z() + _scale.Z()/2));
   }
 
   this->CreatePart(visVisual);
@@ -610,7 +611,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
   {
     pose.Pos() = ModelManipulator::SnapPoint(pose.Pos());
   }
-  pose.Pos().z() = this->mouseVisual->GetWorldPose().Pos().z();
+  pose.Pos().Z() = this->mouseVisual->GetWorldPose().Pos().Z();
 
   this->mouseVisual->SetWorldPose(pose);
 
@@ -729,14 +730,14 @@ void ModelCreator::GenerateSDF()
        != std::string::npos)
     {
       sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-      (cylinderElem->GetElement("radius"))->Set(scale.x()/2.0);
-      (cylinderElem->GetElement("length"))->Set(scale.z());
+      (cylinderElem->GetElement("radius"))->Set(scale.X()/2.0);
+      (cylinderElem->GetElement("length"))->Set(scale.Z());
     }
     else if (visual->GetParent()->GetName().find("unit_sphere")
         != std::string::npos)
     {
       sdf::ElementPtr sphereElem = geomElem->AddElement("sphere");
-      (sphereElem->GetElement("radius"))->Set(scale.x()/2.0);
+      (sphereElem->GetElement("radius"))->Set(scale.X()/2.0);
     }
     else if (visual->GetParent()->GetName().find("custom")
         != std::string::npos)

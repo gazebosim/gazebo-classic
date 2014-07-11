@@ -106,8 +106,9 @@ namespace gazebo
       /// \param[in] _sensitivity Sensitivity of point snapping, in terms of a
       /// percentage of the interval.
       /// \return Snapped 3D point.
-      public: static ignition::math::Vector3d SnapPoint(const ignition::math::Vector3d &_point,
-          double _interval = 1.0, double _sensitivity = 0.4);
+      public: static ignition::math::Vector3d SnapPoint(
+                  const ignition::math::Vector3d &_point,
+                  double _interval = 1.0, double _sensitivity = 0.4);
 
       /// \brief Helper function to get the 3D position of mouse on ground
       /// plane.
@@ -125,18 +126,20 @@ namespace gazebo
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
       public: static ignition::math::Vector3d GetMouseMoveDistance(
-          rendering::CameraPtr _camera,
-          const ignition::math::Vector2i &_start, const ignition::math::Vector2i &_end,
-          const ignition::math::Pose3d &_pose, const ignition::math::Vector3d &_axis,
-          bool _local);
+                  rendering::CameraPtr _camera,
+                  const ignition::math::Vector2i &_start,
+                  const ignition::math::Vector2i &_end,
+                  const ignition::math::Pose3d &_pose,
+                  const ignition::math::Vector3d &_axis, bool _local);
 
       /// \brief Helper function to get the distance moved by the mouse.
       /// \param[in] _pose Pose of origin.
       /// \param[in] _axis Movement axis.
       /// \param[in] _local True to get distance in local frame.
       /// \return Mouse distance moved.
-      private: ignition::math::Vector3d GetMouseMoveDistance(const ignition::math::Pose3d &_pose,
-          const ignition::math::Vector3d &_axis, bool _local) const;
+      private: ignition::math::Vector3d GetMouseMoveDistance(
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_axis, bool _local) const;
 
       /// \brief Set the visual being moved by the mouse.
       /// \param[in] _vis Pointer to visual moved by mouse.

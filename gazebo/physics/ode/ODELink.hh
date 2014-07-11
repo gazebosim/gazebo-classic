@@ -80,11 +80,13 @@ namespace gazebo
       public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited
-      public: virtual void AddRelativeForce(const ignition::math::Vector3d &_force);
+      public: virtual void AddRelativeForce(
+                  const ignition::math::Vector3d &_force);
 
       // Documentation inherited
-      public: virtual void AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
-                                                   const ignition::math::Vector3d &_pos);
+      public: virtual void AddForceAtWorldPosition(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_pos);
 
       // Documentation inherited
       public: virtual void AddForceAtRelativePosition(
@@ -95,7 +97,8 @@ namespace gazebo
       public: virtual void AddTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
-      public: virtual void AddRelativeTorque(const ignition::math::Vector3d &_torque);
+      public: virtual void AddRelativeTorque(
+                  const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
       public: virtual ignition::math::Vector3d GetWorldLinearVel(

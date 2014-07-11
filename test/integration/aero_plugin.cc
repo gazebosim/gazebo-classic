@@ -98,7 +98,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
 
     if (i > 2385)
     {
-      double v = body->GetWorldLinearVel().x();
+      double v = body->GetWorldLinearVel().X();
       double q = 0.5 * rho * v * v;
       double cl = cla * a0 * q * area;
       double cd = cda * a0 * q * area;
@@ -128,7 +128,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
             << "] wing_2 torque [" << wing_2_torque
             << "]\n";
 
-      EXPECT_NEAR(wing_1_force.z(), cl * cos(dihedral), TOL);
+      EXPECT_NEAR(wing_1_force.Z(), cl * cos(dihedral), TOL);
     }
   }
 }

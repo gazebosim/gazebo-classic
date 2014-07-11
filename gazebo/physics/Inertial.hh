@@ -14,17 +14,18 @@
  * limitations under the License.
  *
 */
-#ifndef _INERTIAL_HH_
-#define _INERTIAL_HH_
+#ifndef _GAZEBO_INERTIAL_HH_
+#define _GAZEBO_INERTIAL_HH_
 
 #include <string>
+
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Matrix3.hh>
 
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include <ignition/math/Quaternion.hh>
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Matrix3.hh>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -210,15 +211,16 @@ namespace gazebo
       /// in MOI location location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
-      public: ignition::math::Matrix3d GetMOI(const ignition::math::Pose3d &_pose)
-        const;
+      public: ignition::math::Matrix3d GetMOI(
+                  const ignition::math::Pose3d &_pose) const;
 
       /// \brief Get equivalent Inertia values with the Link frame offset,
       /// while holding the Pose of CoG constant in the world frame.
       /// \param[in] _frameOffset amount to offset the Link frame by, this
       /// is a transform defined in the Link frame.
       /// \return Inertial parameters with the shifted frame.
-      public: Inertial GetInertial(const ignition::math::Pose3d &_frameOffset) const;
+      public: Inertial GetInertial(
+                  const ignition::math::Pose3d &_frameOffset) const;
 
       /// \brief Output operator.
       /// \param[in] _out Output stream.
@@ -228,12 +230,12 @@ namespace gazebo
               {
                 _out << "Mass[" << _inertial.mass << "] CoG["
                     << _inertial.cog << "]\n";
-                _out << "IXX[" << _inertial.principals.x() << "] "
-                     << "IYY[" << _inertial.principals.y() << "] "
-                     << "IZZ[" << _inertial.principals.z() << "]\n";
-                _out << "IXY[" << _inertial.products.x() << "] "
-                     << "IXZ[" << _inertial.products.y() << "] "
-                     << "IYZ[" << _inertial.products.z() << "]\n";
+                _out << "IXX[" << _inertial.principals.X() << "] "
+                     << "IYY[" << _inertial.principals.Y() << "] "
+                     << "IZZ[" << _inertial.principals.Z() << "]\n";
+                _out << "IXY[" << _inertial.products.X() << "] "
+                     << "IXZ[" << _inertial.products.Y() << "] "
+                     << "IYZ[" << _inertial.products.Z() << "]\n";
                 return _out;
               }
 
@@ -258,8 +260,8 @@ namespace gazebo
 
       /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
       /// These MOI off-diagonals are specified in the local Inertial frame.
-      /// Where products.x(), is Ixy, products.y() is Ixz and
-      /// products.z()is Iyz.
+      /// Where products.X(), is Ixy, products.Y() is Ixz and
+      /// products.Z()is Iyz.
       private: ignition::math::Vector3d products;
 
       /// \brief Our SDF values.

@@ -758,9 +758,9 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
   if (vis && visBelow)
   {
     ignition::math::Vector3d pos = vis->GetWorldPose().Pos();
-    double dz = vis->GetBoundingBox().Min().z() -
-      visBelow->GetBoundingBox().Max().z();
-    pos.z() -= dz;
+    double dz = vis->GetBoundingBox().Min().Z() -
+      visBelow->GetBoundingBox().Max().Z();
+    pos.Z() -= dz;
     vis->SetWorldPosition(pos);
   }
 }
@@ -781,9 +781,9 @@ VisualPtr Scene::GetVisualBelow(const std::string &_visualName)
     for (uint32_t i = 0; i < below.size(); ++i)
     {
       if (below[i]->GetName().find(vis->GetName()) != 0
-          && below[i]->GetBoundingBox().Max().z() > maxZ)
+          && below[i]->GetBoundingBox().Max().Z() > maxZ)
       {
-        maxZ = below[i]->GetBoundingBox().Max().z();
+        maxZ = below[i]->GetBoundingBox().Max().Z();
         result = below[i];
       }
     }
@@ -819,7 +819,7 @@ double Scene::GetHeightBelowPoint(const ignition::math::Vector3d &_pt)
       if (iter->movable->getName().substr(0, 15) == "__SELECTION_OBJ")
         continue;
 
-      height = _pt.z() - iter->distance;
+      height = _pt.Z() - iter->distance;
       break;
     }
   }
@@ -828,8 +828,8 @@ double Scene::GetHeightBelowPoint(const ignition::math::Vector3d &_pt)
   // check ourselves.
   if (this->terrain)
   {
-    double terrainHeight = this->terrain->GetHeight(_pt.x(), _pt.y(), _pt.z());
-    if (terrainHeight <= _pt.z())
+    double terrainHeight = this->terrain->GetHeight(_pt.X(), _pt.Y(), _pt.Z());
+    if (terrainHeight <= _pt.Z())
       height = std::max(height, terrainHeight);
   }
 
@@ -918,9 +918,9 @@ Ogre::Entity *Scene::GetOgreEntityAt(CameraPtr _camera,
 
   Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.x()) /
+      static_cast<float>(_mousePos.X()) /
       ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.y()) /
+      static_cast<float>(_mousePos.Y()) /
       ogreCam->getViewport()->getActualHeight());
 
   this->raySceneQuery->setRay(mouseRay);
@@ -1010,9 +1010,9 @@ bool Scene::GetFirstContact(CameraPtr _camera,
 
   // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.x()) /
+      static_cast<float>(_mousePos.X()) /
       ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.y()) /
+      static_cast<float>(_mousePos.Y()) /
       ogreCam->getViewport()->getActualHeight());
 
   this->raySceneQuery->setSortByDistance(true);
@@ -1179,8 +1179,8 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
 
   obj->clear();
   obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_LINE_LIST);
-  obj->position(_start.x(), _start.y(), _start.z());
-  obj->position(_end.x(), _end.y(), _end.z());
+  obj->position(_start.X(), _start.Y(), _start.Z());
+  obj->position(_end.X(), _end.Y(), _end.Z());
   obj->end();
 
   if (!attached)

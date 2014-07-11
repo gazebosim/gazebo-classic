@@ -49,9 +49,9 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   ignition::math::Vector3d g = physics->GetGravity();
 
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x(), 0);
-  EXPECT_EQ(g.y(), 0);
-  EXPECT_LE(g.z(), -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // Set Gravity by publishing to "~/physics"
   transport::PublisherPtr physicsPub =
@@ -119,10 +119,14 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
-  poses.push_back(ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->GetModel(name);
   ASSERT_TRUE(model != NULL);
@@ -326,10 +330,14 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
-  poses.push_back(ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  poses.push_back(ignition::math::Pose3d(
+        123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(ignition::math::Pose3d(
+        -123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(ignition::math::Pose3d(
+        123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(ignition::math::Pose3d(
+        -123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
   physics::ModelPtr model = world->GetModel(name);
@@ -396,9 +404,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   ignition::math::Vector3d g = physics->GetGravity();
   // Assume gravity vector points down z axis only.
-  EXPECT_EQ(g.x(), 0);
-  EXPECT_EQ(g.y(), 0);
-  EXPECT_LE(g.z(), -9.8);
+  EXPECT_EQ(g.X(), 0);
+  EXPECT_EQ(g.Y(), 0);
+  EXPECT_LE(g.Z(), -9.8);
 
   // get physics time step
   double dt = physics->GetMaxStepSize();
@@ -413,7 +421,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"],
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
       ignition::math::Vector3d::Zero);
 
@@ -422,9 +431,10 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   modelPos["test_sphere2"] = ignition::math::Vector3d(4, 9, z0);
   modelPos["test_cylinder2"] = ignition::math::Vector3d(8, 9, z0);
 
-  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1), modelPos["test_box2"],
+  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1),
+      modelPos["test_box2"], ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere2", modelPos["test_sphere2"],
       ignition::math::Vector3d::Zero);
-  SpawnSphere("test_sphere2", modelPos["test_sphere2"], ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder2", modelPos["test_cylinder2"],
       ignition::math::Vector3d::Zero);
 
@@ -442,8 +452,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   world->Step(100);
 
   // Verify the initial model pose is where we set it to be.
-  for (std::map<std::string, ignition::math::Vector3d>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3d>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
@@ -451,18 +461,18 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     EXPECT_TRUE(model != NULL);
 
     pose1 = model->GetWorldPose();
-    x0 = modelPos[name].x();
-    y0 = modelPos[name].y();
+    x0 = modelPos[name].X();
+    y0 = modelPos[name].Y();
 
-    EXPECT_NEAR(pose1.Pos().x(), x0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.Pos().y(), y0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.Pos().z(), z0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Z(), z0, PHYSICS_TOL);
   }
 
   // resize model to half of it's size
   double scaleFactor = 0.5;
-  for (std::map<std::string, ignition::math::Vector3d>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3d>::iterator iter =
+       modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     model = world->GetModel(name);
@@ -472,7 +482,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       msgs::Model msg;
       msg.set_name(name);
       msg.set_id(model->GetId());
-      msgs::Set(msg.mutable_scale(), scaleFactor * ignition::math::Vector3d::One);
+      msgs::Set(msg.mutable_scale(),
+          scaleFactor * ignition::math::Vector3d::One);
       modelPub->Publish(msg);
     }
     else
@@ -483,7 +494,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   }
 
   // Predict time of contact with ground plane.
-  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.z()));
+  double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
   double dtHit = tHit+0.5 - world->GetSimTime().Double();
@@ -502,8 +513,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   // This loop checks the velocity and pose of each model 0.5 seconds
   // after the time of predicted ground contact. The pose is expected to be
   // underneath the initial pose.
-  for (std::map<std::string, ignition::math::Vector3d>::iterator iter = modelPos.begin();
-    iter != modelPos.end(); ++iter)
+  for (std::map<std::string, ignition::math::Vector3d>::iterator iter =
+      modelPos.begin(); iter != modelPos.end(); ++iter)
   {
     std::string name = iter->first;
     // Make sure the model is loaded
@@ -513,11 +524,11 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that model is resting on ground
       pose1 = model->GetWorldPose();
-      x0 = modelPos[name].x();
-      y0 = modelPos[name].y();
-      EXPECT_NEAR(pose1.Pos().x(), x0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.Pos().y(), y0, PHYSICS_TOL);
-      EXPECT_NEAR(pose1.Pos().z(), 0.5*scaleFactor, PHYSICS_TOL);
+      x0 = modelPos[name].X();
+      y0 = modelPos[name].Y();
+      EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().Z(), 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
     {

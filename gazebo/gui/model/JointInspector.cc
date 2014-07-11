@@ -187,7 +187,8 @@ JointInspector::~JointInspector()
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d JointInspector::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d JointInspector::GetAnchor(
+    unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d(this->anchorXSpinBox->value(),
       this->anchorYSpinBox->value(), this->anchorZSpinBox->value());
@@ -268,13 +269,14 @@ void JointInspector::SetName(const std::string &_name)
 void JointInspector::SetAnchor(unsigned int /*_index*/,
     const ignition::math::Vector3d &_anchor)
 {
-  this->anchorXSpinBox->setValue(_anchor.x());
-  this->anchorYSpinBox->setValue(_anchor.y());
-  this->anchorZSpinBox->setValue(_anchor.z());
+  this->anchorXSpinBox->setValue(_anchor.X());
+  this->anchorYSpinBox->setValue(_anchor.Y());
+  this->anchorZSpinBox->setValue(_anchor.Z());
 }
 
 /////////////////////////////////////////////////
-void JointInspector::SetAxis(unsigned int _index, const ignition::math::Vector3d &_axis)
+void JointInspector::SetAxis(unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (_index > this->axisXSpinBoxes.size())
   {
@@ -282,9 +284,9 @@ void JointInspector::SetAxis(unsigned int _index, const ignition::math::Vector3d
     return;
   }
 
-  this->axisXSpinBoxes[_index]->setValue(_axis.x());
-  this->axisYSpinBoxes[_index]->setValue(_axis.y());
-  this->axisZSpinBoxes[_index]->setValue(_axis.z());
+  this->axisXSpinBoxes[_index]->setValue(_axis.X());
+  this->axisYSpinBoxes[_index]->setValue(_axis.Y());
+  this->axisZSpinBoxes[_index]->setValue(_axis.Z());
 }
 
 /////////////////////////////////////////////////

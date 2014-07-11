@@ -183,14 +183,14 @@ ignition::math::Vector3d Color::GetAsYUV() const
   yuv.y(-0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5);
   yuv.z(0.5*this->r - 0.4189*this->g - 0.08105*this->b + 0.5);
 
-  yuv.x(yuv.x() < 0 ? 0: yuv.x());
-  yuv.x(yuv.x() > 255 ? 255.0: yuv.x());
+  yuv.x(yuv.X() < 0 ? 0: yuv.X());
+  yuv.x(yuv.X() > 255 ? 255.0: yuv.X());
 
-  yuv.y(yuv.y() < 0 ? 0: yuv.y());
-  yuv.y(yuv.y() > 255 ? 255.0: yuv.y());
+  yuv.y(yuv.Y() < 0 ? 0: yuv.Y());
+  yuv.y(yuv.Y() > 255 ? 255.0: yuv.Y());
 
-  yuv.z(yuv.z() < 0 ? 0: yuv.z());
-  yuv.z(yuv.z() > 255 ? 255.0: yuv.z());
+  yuv.z(yuv.Z() < 0 ? 0: yuv.Z());
+  yuv.z(yuv.Z() > 255 ? 255.0: yuv.Z());
 
   return yuv;
 }

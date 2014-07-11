@@ -176,7 +176,8 @@ float Dem::GetMaxElevation() const
 
 //////////////////////////////////////////////////
 void Dem::GetGeoReference(double _x, double _y,
-                          ignition::math::Angle &_latitude, ignition::math::Angle &_longitude)
+                          ignition::math::Angle &_latitude,
+                          ignition::math::Angle &_longitude)
 {
   double geoTransf[6];
   if (this->dataPtr->dataSet->GetGeoTransform(geoTransf) == CE_None)
@@ -206,7 +207,8 @@ void Dem::GetGeoReference(double _x, double _y,
 }
 
 //////////////////////////////////////////////////
-void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude, ignition::math::Angle &_longitude)
+void Dem::GetGeoReferenceOrigin(ignition::math::Angle &_latitude,
+    ignition::math::Angle &_longitude)
 {
   return this->GetGeoReference(0, 0, _latitude, _longitude);
 }
@@ -237,7 +239,8 @@ double Dem::GetWorldHeight() const
 
 //////////////////////////////////////////////////
 void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
-                        const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_scale,
+                        const ignition::math::Vector3d &_size,
+                        const ignition::math::Vector3d &_scale,
                         bool _flipY, std::vector<float> &_heights)
 {
   if (_subSampling <= 0)

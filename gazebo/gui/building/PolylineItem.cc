@@ -408,9 +408,9 @@ void PolylineItem::AppendToPath(const QPointF &_point)
 void PolylineItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *_event)
 {
   /// TODO: uncomment to enable snap to grid
-  /*this->origin.setX((static_cast<int>(this->origin.x())
+  /*this->origin.setX((static_cast<int>(this->origin.X())
                       / this->gridSpace) * this->gridSpace);
-  this->origin.setY((static_cast<int>(this->origin.y())
+  this->origin.setY((static_cast<int>(this->origin.Y())
                       / this->gridSpace) * this->gridSpace);*/
 
 //  this->setPos(this->origin);

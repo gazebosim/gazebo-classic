@@ -126,8 +126,8 @@ const std::vector<ignition::math::Angle> &JointState::GetAngles() const
 bool JointState::IsZero() const
 {
   bool result = true;
-  for (std::vector<ignition::math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end() && result; ++iter)
+  for (std::vector<ignition::math::Angle>::const_iterator iter =
+      this->angles.begin(); iter != this->angles.end() && result; ++iter)
   {
     result = result && (*iter) == ignition::math::Angle::Zero;
   }
@@ -144,8 +144,8 @@ JointState &JointState::operator=(const JointState &_state)
   this->angles.clear();
 
   // Copy the angles.
-  for (std::vector<ignition::math::Angle>::const_iterator iter = _state.angles.begin();
-       iter != _state.angles.end(); ++iter)
+  for (std::vector<ignition::math::Angle>::const_iterator iter =
+       _state.angles.begin(); iter != _state.angles.end(); ++iter)
   {
     this->angles.push_back(*iter);
   }
@@ -165,9 +165,10 @@ JointState JointState::operator-(const JointState &_state) const
   /// \TODO: this will produce incorrect results if _state doesn't have the
   /// same set of angles as *this.
   int i = 0;
-  for (std::vector<ignition::math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator iterA =
+      this->angles.begin(),
+      iterB = _state.angles.begin(); iterA != this->angles.end() &&
+      iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
   {
     result.angles.push_back((*iterA) - (*iterB));
   }
@@ -187,9 +188,10 @@ JointState JointState::operator+(const JointState &_state) const
   /// \TODO: this will produce incorrect results if _state doesn't have the
   /// same set of angles as *this.
   int i = 0;
-  for (std::vector<ignition::math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator iterA =
+      this->angles.begin(),
+      iterB = _state.angles.begin(); iterA != this->angles.end() &&
+      iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
   {
     result.angles.push_back((*iterA) + (*iterB));
   }
@@ -205,8 +207,8 @@ void JointState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetAttribute("name")->Set(this->name);
 
   int i = 0;
-  for (std::vector<ignition::math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end(); ++iter, ++i)
+  for (std::vector<ignition::math::Angle>::const_iterator iter =
+      this->angles.begin(); iter != this->angles.end(); ++iter, ++i)
   {
     sdf::ElementPtr elem = _sdf->AddElement("angle");
     elem->GetAttribute("axis")->Set(i);
