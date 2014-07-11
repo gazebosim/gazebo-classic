@@ -55,7 +55,7 @@ void DARTSliderJoint::Init()
 ignition::math::Vector3d DARTSliderJoint::GetAnchor(
     unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
@@ -70,7 +70,7 @@ ignition::math::Vector3d DARTSliderJoint::GetGlobalAxis(
 
   if (_index == 0)
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = this->dtPrismaticJoint->getAxis();
     globalAxis = T.linear() * axis;
@@ -115,7 +115,7 @@ ignition::math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 
   if (_index == 0)
   {
-    double radianAngle = this->dtJoint->getGenCoord(0)->get_q();
+    double radianAngle = this->dtJoint->getPosition(0);
     result.Radian(radianAngle);
   }
   else
@@ -130,7 +130,7 @@ ignition::math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_dq(_vel);
+    this->dtJoint->setVelocity(0, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -141,7 +141,7 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_dq();
+    result = this->dtJoint->getVelocity(0);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -152,9 +152,14 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
 void DARTSliderJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tauMax(_force);
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -163,9 +168,15 @@ double DARTSliderJoint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->get_tauMax();
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
@@ -174,7 +185,7 @@ double DARTSliderJoint::GetMaxForce(unsigned int _index)
 void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->set_tau(_effort);
+    this->dtJoint->setForce(0, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }

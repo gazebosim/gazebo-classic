@@ -47,9 +47,6 @@ set (VCLOUDS_SOURCE_FILES
   src/VClouds/VClouds.cpp
 )
 
-set (CMAKE_C_FLAGS "")
-set (CMAKE_CXX_FLAGS "")
-
 #set_source_files_properties(${SKYX_SOURCE_FILES} ${SKYX_HEADER_FILES}
 #                      ${VCLOUDS_SOURCE_FILES} ${VCLOUDS_HEADER_FILES}
 #                      PROPERTIES COMPILE_FLAGS

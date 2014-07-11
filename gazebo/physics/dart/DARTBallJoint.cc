@@ -52,7 +52,7 @@ void DARTBallJoint::Init()
 //////////////////////////////////////////////////
 ignition::math::Vector3d DARTBallJoint::GetAnchor(unsigned int /*_index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 

@@ -14,10 +14,12 @@ set (sources
   BulletHingeJoint.cc
   BulletJoint.cc
   BulletLink.cc
+  BulletMesh.cc
   BulletMeshShape.cc
   BulletMotionState.cc
   BulletMultiRayShape.cc
   BulletPhysics.cc
+  BulletPolylineShape.cc
   BulletRayShape.cc
   BulletScrewJoint.cc
   BulletSliderJoint.cc
@@ -38,11 +40,13 @@ set (headers
   BulletHingeJoint.hh
   BulletJoint.hh
   BulletLink.hh
+  BulletMesh.hh
   BulletMeshShape.hh
   BulletMotionState.hh
   BulletMultiRayShape.hh
   BulletPhysics.hh
   BulletPlaneShape.hh
+  BulletPolylineShape.hh
   BulletRaySensor.hh
   BulletRayShape.hh
   BulletScrewJoint.hh

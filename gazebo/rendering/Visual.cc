@@ -244,11 +244,11 @@ VisualPtr Visual::Clone(const std::string &_name, VisualPtr _newParent)
   for (iter = this->dataPtr->children.begin();
       iter != this->dataPtr->children.end(); ++iter)
   {
-    result->dataPtr->children.push_back(
-        (*iter)->Clone((*iter)->GetName(), result));
+    (*iter)->Clone((*iter)->GetName(), result);
   }
 
-  result->SetWorldPose(this->GetWorldPose());
+  if (_newParent == this->dataPtr->scene->GetWorldVisual())
+    result->SetWorldPose(this->GetWorldPose());
   result->ShowCollision(false);
 
   return result;
@@ -330,6 +330,16 @@ void Visual::LoadFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       sdf::ElementPtr elem = geomElem->AddElement("plane");
       elem->GetElement("normal")->Set(plane.Normal());
       elem->GetElement("size")->Set(plane.Size());
+    }
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+    {
+      sdf::ElementPtr elem = geomElem->AddElement("polyline");
+      elem->GetElement("height")->Set(_msg->geometry().polyline().height());
+      for (int i = 0; i < _msg->geometry().polyline().point_size(); ++i)
+      {
+        elem->AddElement("point")->Set(
+            msgs::Convert(_msg->geometry().polyline().point(i)));
+      }
     }
     else if (_msg->geometry().type() == msgs::Geometry::MESH)
     {
@@ -777,7 +787,7 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -789,13 +799,30 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
   if (this->dataPtr->scale == _scale)
     return;
 
-  ignition::math::Vector3d tmpScale = this->dataPtr->scale;
   this->dataPtr->scale = _scale;
+
+  // update geom size based on scale.
+  this->UpdateGeomSize(_scale);
+
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(this->dataPtr->scale));
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+{
+  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
+       iter != this->dataPtr->children.end(); ++iter)
+  {
+    (*iter)->UpdateGeomSize(_scale);
+  }
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
+  {
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+  }
   else if (geomElem->HasElement("sphere"))
   {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.X()/2.0);
@@ -808,48 +835,12 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d Visual::GetScale()
 {
   return this->dataPtr->scale;
-  /*ignition::math::Vector3d result(1, 1, 1);
-  if (this->dataPtr->sdf->HasElement("geometry"))
-  {
-    sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-
-    if (geomElem->HasElement("box"))
-    {
-      result = geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
-    }
-    else if (geomElem->HasElement("sphere"))
-    {
-      double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      result.Set(r * 2.0, r * 2.0, r * 2.0);
-    }
-    else if (geomElem->HasElement("cylinder"))
-    {
-      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
-      double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      result.Set(r * 2.0, r * 2.0, l);
-    }
-    else if (geomElem->HasElement("plane"))
-    {
-      ignition::math::Vector2d size =
-        geomElem->GetElement("plane")->Get<ignition::math::Vector2d>("size");
-      result.Set(size.X(), size.y, 1);
-    }
-    else if (geomElem->HasElement("mesh"))
-    {
-      result = geomElem->GetElement("mesh")->Get<ignition::math::Vector3d>("scale");
-    }
-  }
-
-  return result;*/
 }
 
 //////////////////////////////////////////////////
@@ -1041,7 +1032,7 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique)
   }
 
   if (this->dataPtr->useRTShader && this->dataPtr->scene->GetInitialized()
-      && !this->dataPtr->lighting &&
+      && this->dataPtr->lighting &&
       this->GetName().find("__COLLISION_VISUAL__") == std::string::npos)
   {
     RTShaderSystem::Instance()->UpdateShaders();
@@ -2086,6 +2077,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
         rendering::Material::Update(material);
         ogreSubMesh->setMaterialName(material->GetName());
       }
+      else
+      {
+        ogreSubMesh->setMaterialName("Gazebo/White");
+      }
 
       // Unlock
       vBuf->unlock();
@@ -2241,6 +2236,8 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     }
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
       geomScale.X() = geomScale.Y() = geomScale.Z() = 1.0;
+    else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
+      geomScale.x = geomScale.y = geomScale.z = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2307,6 +2304,30 @@ std::string Visual::GetMeshName() const
       return "unit_cylinder";
     else if (geomElem->HasElement("plane"))
       return "unit_plane";
+    else if (geomElem->HasElement("polyline"))
+    {
+      std::string polyLineName = this->GetName();
+      common::MeshManager *meshManager = common::MeshManager::Instance();
+
+      if (!meshManager->IsValidFilename(polyLineName))
+      {
+        std::vector<math::Vector2d> vertices;
+        sdf::ElementPtr pointElem =
+          geomElem->GetElement("polyline")->GetElement("point");
+
+        while (pointElem)
+        {
+          math::Vector2d point = pointElem->Get<math::Vector2d>();
+          vertices.push_back(point);
+          pointElem = pointElem->GetNextElement("point");
+        }
+
+        meshManager->CreateExtrudedPolyline(polyLineName, vertices,
+            geomElem->GetElement("polyline")->Get<double>("height"),
+            math::Vector2d(1, 1));
+       }
+      return polyLineName;
+    }
     else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");

@@ -286,7 +286,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
-    gzerr << "DART Screw Joint not yet implemented.\n";
+    gzerr << "Aborting test for dart, see issues #1096.\n";
     return;
   }
 
@@ -493,12 +493,6 @@ TEST_P(JointTestScrew, ScrewJointForce)
 //////////////////////////////////////////////////
 void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Screw Joint not yet implemented.\n";
-    return;
-  }
-
   // Load pr2 world
   ServerFixture::Load("worlds/pr2.world", true, _physicsEngine);
 

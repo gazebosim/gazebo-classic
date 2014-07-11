@@ -191,21 +191,6 @@ void PhysicsEngine::SetAutoDisableFlag(bool /*_autoDisable*/)
 }
 
 //////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSPreconIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSIters(unsigned int /*_iters*/)
-{
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetSORPGSW(double /*_w*/)
-{
-}
-
-//////////////////////////////////////////////////
 void PhysicsEngine::SetContactMaxCorrectingVel(double /*_vel*/)
 {
 }

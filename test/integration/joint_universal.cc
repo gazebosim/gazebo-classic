@@ -45,12 +45,6 @@ class JointTestUniversal : public ServerFixture,
 /////////////////////////////////////////////////
 void JointTestUniversal::Limits(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
-    return;
-  }
-
   // Load our universal joint test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
 

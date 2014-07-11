@@ -43,14 +43,6 @@ class Issue494Test : public JointTest
 void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
                                   const std::string &_jointType)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "This test doesn't yet work for [" << _physicsEngine
-          << "] with joint type [" << _jointType << "]"
-          << std::endl;
-    return;
-  }
-
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -102,7 +94,21 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
     std::cout << std::endl;
 
+    if (opt.worldChild && _physicsEngine == "dart")
+    {
+      gzerr << "dart seg-faults without a child link, skipping sub-test"
+            << std::endl;
+      break;
+    }
+
     // spawn joint using using parent model frame to define joint axis
+    if (_physicsEngine == "dart")
+    {
+      gzerr << "dart doesn't support parent model frame, skipping sub-test"
+            << " per issue #1143"
+            << std::endl;
+    }
+    else
     {
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;

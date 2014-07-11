@@ -87,12 +87,6 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DARTLink::SetLinearVel, SetAngularVel aren't working (#1079)"
-          << std::endl;
-    return;
-  }
 
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");

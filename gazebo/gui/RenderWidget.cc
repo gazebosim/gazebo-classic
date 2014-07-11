@@ -78,6 +78,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addSeparator();
   toolbar->addAction(g_screenshotAct);
 
+  toolbar->addSeparator();
+  toolbar->addAction(g_copyAct);
+  toolbar->addAction(g_pasteAct);
+
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);
   toolFrame->setLayout(toolLayout);
