@@ -22,6 +22,8 @@
 #include <utility>
 #include <list>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/rendering/RenderTypes.hh"
 
@@ -30,8 +32,6 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/common/Event.hh"
-
-#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 

@@ -499,7 +499,7 @@ unsigned int LaserView::LaserItem::GetRangeCount()
 /////////////////////////////////////////////////
 void LaserView::LaserItem::hoverEnterEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->indexAngle = atan2(-_event->pos().Y(), _event->pos().X());
+  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
 
   if (this->indexAngle < this->angleMin)
     this->indexAngle = this->angleMin;
@@ -521,7 +521,7 @@ void LaserView::LaserItem::hoverLeaveEvent(
 /////////////////////////////////////////////////
 void LaserView::LaserItem::hoverMoveEvent(QGraphicsSceneHoverEvent *_event)
 {
-  this->indexAngle = atan2(-_event->pos().Y(), _event->pos().X());
+  this->indexAngle = atan2(-_event->pos().y(), _event->pos().x());
 
   if (this->indexAngle < this->angleMin)
     this->indexAngle = this->angleMin;

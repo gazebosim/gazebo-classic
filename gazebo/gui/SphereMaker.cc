@@ -145,9 +145,9 @@ void SphereMaker::OnMouseDrag(const common::MouseEvent &_event)
   msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
   double scale = p1.Distance(p2);
-  ignition::math::Vector3d p(this->visualMsg->pose().position().X(),
-                  this->visualMsg->pose().position().Y(),
-                  this->visualMsg->pose().position().Z());
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
 
   p.Z() = scale;
 

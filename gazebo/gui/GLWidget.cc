@@ -334,7 +334,7 @@ void GLWidget::mouseDoubleClickEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().X(), _event->pos().Y());
+  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -367,7 +367,7 @@ void GLWidget::mousePressEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pressPos.Set(_event->pos().X(), _event->pos().Y());
+  this->mouseEvent.pressPos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pressPos;
 
   /// Set the button which cause the press event
@@ -514,7 +514,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent *_event)
 
   this->setFocus(Qt::MouseFocusReason);
 
-  this->mouseEvent.pos.Set(_event->pos().X(), _event->pos().Y());
+  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.type = common::MouseEvent::MOVE;
   this->mouseEvent.buttons |= _event->buttons() & Qt::LeftButton ?
     common::MouseEvent::LEFT : 0x0;
@@ -569,7 +569,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *_event)
   if (!this->scene)
     return;
 
-  this->mouseEvent.pos.Set(_event->pos().X(), _event->pos().Y());
+  this->mouseEvent.pos.Set(_event->pos().x(), _event->pos().y());
   this->mouseEvent.prevPos = this->mouseEvent.pos;
 
   if (_event->button() == Qt::LeftButton)

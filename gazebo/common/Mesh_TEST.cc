@@ -281,7 +281,8 @@ TEST_F(MeshTest, SubMeshCenter)
 
   // The default location of the box_offest is not centered
   EXPECT_EQ(ignition::math::Vector3d(5.46554, 2.18039, 4.8431), mesh->GetMax());
-  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431), mesh->GetMin());
+  EXPECT_EQ(ignition::math::Vector3d(3.46555, 0.180391, 2.8431),
+      mesh->GetMin());
 
   // Get the Cube submesh
   common::SubMesh submesh(mesh->GetSubMesh("Cube"));

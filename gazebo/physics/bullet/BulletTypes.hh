@@ -15,15 +15,15 @@
  *
 */
 
-#ifndef _BULLETTYPES_HH
-#define _BULLETTYPES_HH
+#ifndef _GAZEBO_BULLETTYPES_HH
+#define _GAZEBO_BULLETTYPES_HH
 
 #include <boost/shared_ptr.hpp>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector4.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/bullet/bullet_math_inc.h"
-#include <ignition/math/Pose3.hh>
 #include "gazebo/util/system.hh"
 
 /// \file

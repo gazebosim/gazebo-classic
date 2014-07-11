@@ -116,9 +116,9 @@ void CylinderMaker::OnMouseMove(const common::MouseEvent &_event)
 
   norm.Set(1, 0, 0);
 
-  ignition::math::Vector3d p(this->visualMsg->pose().position().X(),
-                  this->visualMsg->pose().position().Y(),
-                  this->visualMsg->pose().position().Z());
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
 
   double size = (this->mouseReleasePos.Y() - _event.pos.Y()) * 0.01;
   if (!_event.shift)
@@ -165,9 +165,9 @@ void CylinderMaker::OnMouseDrag(const common::MouseEvent &_event)
   if (this->state == 1)
     msgs::Set(this->visualMsg->mutable_pose()->mutable_position(), p1);
 
-  ignition::math::Vector3d p(this->visualMsg->pose().position().X(),
-                  this->visualMsg->pose().position().Y(),
-                  this->visualMsg->pose().position().Z());
+  ignition::math::Vector3d p(this->visualMsg->pose().position().x(),
+                  this->visualMsg->pose().position().y(),
+                  this->visualMsg->pose().position().z());
 
   if (this->state == 1)
   {

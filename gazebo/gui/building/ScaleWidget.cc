@@ -51,14 +51,14 @@ void ScaleWidget::paintEvent(QPaintEvent *)
   rulerPen.setColor(Qt::gray);
   rulerPen.setWidth(3);
   painter.setPen(rulerPen);
-  painter.drawLine(topLeft.X(), midPoint.Y(), bottomRight.X(), midPoint.Y());
-  painter.drawLine(topLeft.X(), topLeft.Y(), topLeft.X(), bottomRight.Y());
-  painter.drawLine(bottomRight.X(), topLeft.Y(), bottomRight.X(),
-    bottomRight.Y());
+  painter.drawLine(topLeft.x(), midPoint.y(), bottomRight.x(), midPoint.y());
+  painter.drawLine(topLeft.x(), topLeft.y(), topLeft.x(), bottomRight.y());
+  painter.drawLine(bottomRight.x(), topLeft.y(), bottomRight.x(),
+    bottomRight.y());
 
-  QPoint textTopLeft(topLeft.X(), 2*topLeft.Y() - bottomRight.Y());
-  QPoint textBottomRight(bottomRight.X(), textTopLeft.Y() +
-    (bottomRight.Y() - topLeft.Y()));
+  QPoint textTopLeft(topLeft.x(), 2*topLeft.y() - bottomRight.y());
+  QPoint textBottomRight(bottomRight.x(), textTopLeft.y() +
+    (bottomRight.y() - topLeft.y()));
   QRect rulerRect(textTopLeft, textBottomRight);
   painter.drawText(rulerRect, Qt::AlignHCenter,
     QString(this->scaleText.c_str()));

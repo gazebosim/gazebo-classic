@@ -1215,15 +1215,15 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       const msgs::Pose &msg_pose = _msg->camera().pose();
 
       ignition::math::Vector3d cam_pose_pos = ignition::math::Vector3d(
-        msg_pose.position().X(),
-        msg_pose.position().Y(),
-        msg_pose.position().Z());
+        msg_pose.position().x(),
+        msg_pose.position().y(),
+        msg_pose.position().z());
 
       ignition::math::Quaterniond cam_pose_rot = ignition::math::Quaterniond(
-        msg_pose.orientation().W(),
-        msg_pose.orientation().X(),
-        msg_pose.orientation().Y(),
-        msg_pose.orientation().Z());
+        msg_pose.orientation().w(),
+        msg_pose.orientation().x(),
+        msg_pose.orientation().y(),
+        msg_pose.orientation().z());
 
       ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 

@@ -126,8 +126,8 @@ bool WallItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
       _grabber->SetMouseState(QEvent::GraphicsSceneMousePress);
       QPointF scenePosition =  _grabber->mapToScene(mouseEvent->pos());
 
-      _grabber->SetMouseDownX(scenePosition.X());
-      _grabber->SetMouseDownY(scenePosition.Y());
+      _grabber->SetMouseDownX(scenePosition.x());
+      _grabber->SetMouseDownY(scenePosition.y());
       break;
     }
     case QEvent::GraphicsSceneMouseRelease:
@@ -188,8 +188,8 @@ bool WallItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
       angle = -range*increment;
       double lineLength = lineToPoint.length();
 
-      newScenePos.setX(startScenePoint.X() + cos(IGN_DTOR(angle))*lineLength);
-      newScenePos.setY(startScenePoint.Y() + sin(IGN_DTOR(angle))*lineLength);
+      newScenePos.setX(startScenePoint.x() + cos(IGN_DTOR(angle))*lineLength);
+      newScenePos.setY(startScenePoint.y() + sin(IGN_DTOR(angle))*lineLength);
     }
 
     this->SetVertexPosition(grabberIndex, newScenePos);
@@ -222,8 +222,8 @@ bool WallItem::SegmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     case QEvent::GraphicsSceneMousePress:
     {
       _segment->SetMouseState(QEvent::GraphicsSceneMousePress);
-      _segment->SetMouseDownX(scenePosition.X());
-      _segment->SetMouseDownY(scenePosition.Y());
+      _segment->SetMouseDownX(scenePosition.x());
+      _segment->SetMouseDownY(scenePosition.y());
 
       this->setSelected(true);
       this->SetSegmentSelected(_segment->GetIndex(), true);
@@ -293,7 +293,7 @@ bool WallItem::SegmentEventFilter(LineSegmentItem *_segment, QEvent *_event)
     // re-align child items when a segment is moved
     QList<QGraphicsItem *> children = _segment->childItems();
     for ( int i = 0; i < children.size(); ++i)
-      children[i]->moveBy(trans.X(), trans.Y());
+      children[i]->moveBy(trans.x(), trans.y());
     for (int i = _segment->GetIndex() - 1; i <= _segment->GetIndex() + 1; i+=2)
     {
       if ((i - this->GetSegmentCount()) != 0 && i >= 0)
@@ -326,10 +326,10 @@ void WallItem::OnOpenInspector()
   this->inspector->SetHeight(this->wallHeight * this->scale);
   this->inspector->SetLength(segmentLength * this->scale);
   QPointF startPos = segmentStartPoint * this->scale;
-  startPos.setY(-startPos.Y());
+  startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
   QPointF endPos = segmentEndPoint * this->scale;
-  endPos.setY(-endPos.Y());
+  endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
   this->inspector->show();
 }
@@ -372,9 +372,9 @@ void WallItem::OnApply()
   else
   {
     QPointF newStartPoint = dialog->GetStartPosition() / this->scale;
-    newStartPoint.setY(-newStartPoint.Y());
+    newStartPoint.setY(-newStartPoint.y());
     QPointF newEndPoint = dialog->GetEndPosition() / this->scale;
-    newEndPoint.setY(-newEndPoint.Y());
+    newEndPoint.setY(-newEndPoint.y());
 
     this->SetVertexPosition(this->selectedSegment->GetIndex(),
       newStartPoint);
@@ -416,7 +416,7 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
       rectItem->SetRotation(-_segment->line().angle());
       QPointF delta = rectItem->pos() - _segment->line().p1();
       QPointF deltaLine = _segment->line().p2() - _segment->line().p1();
-      double deltaRatio = sqrt(delta.X()*delta.X() + delta.Y()*delta.Y())
+      double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
           / _segment->line().length();
       rectItem->setPos(_segment->line().p1() + deltaRatio*deltaLine);
     }

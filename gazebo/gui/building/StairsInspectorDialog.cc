@@ -182,8 +182,8 @@ void StairsInspectorDialog::SetName(const std::string &_name)
 /////////////////////////////////////////////////
 void StairsInspectorDialog::SetStartPosition(const QPointF &_pos)
 {
-  this->startXSpinBox->setValue(_pos.X());
-  this->startYSpinBox->setValue(_pos.Y());
+  this->startXSpinBox->setValue(_pos.x());
+  this->startYSpinBox->setValue(_pos.y());
 }
 
 /////////////////////////////////////////////////

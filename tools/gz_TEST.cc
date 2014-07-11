@@ -313,7 +313,8 @@ TEST_F(gzTest, Model)
 
     gazebo::msgs::Factory msg;
     msg.set_sdf(sdf->ToString());
-    gazebo::msgs::Set(msg.mutable_pose(), ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
+    gazebo::msgs::Set(msg.mutable_pose(),
+        ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
     EXPECT_EQ(g_msgDebugOut, msg.DebugString());
   }

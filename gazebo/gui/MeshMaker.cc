@@ -165,9 +165,9 @@ void MeshMaker::CreateTheEntity()
 
   newModelStr << "<sdf version ='1.3'>\
     <model name='custom_user_mesh" << counter << "_model'>\
-    <pose>" << this->visualMsg->pose().position().X() << " "
-              << this->visualMsg->pose().position().Y() << " "
-              << this->visualMsg->pose().position().Z() << " "
+    <pose>" << this->visualMsg->pose().position().x() << " "
+              << this->visualMsg->pose().position().y() << " "
+              << this->visualMsg->pose().position().z() << " "
               << " 0 0 0</pose>\
     <link name ='link'>\
       <inertial mass ='1.0'>\

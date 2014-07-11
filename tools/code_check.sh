@@ -60,10 +60,10 @@ else
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:93" > $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:104" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:125" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:148" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
@@ -151,8 +151,10 @@ else
   # Performance, style, portability, and information
   $CPPCHECK_BASE $CPPCHECK_CMD1 2>&1
 
-  # Check the configuration
-  $CPPCHECK_BASE $CPPCHECK_CMD3 2>&1
+  # Check the configuration, disabled for now because checking full
+  # configuration takes too long. Renable when ignition libraries
+  # have been integrated.
+  # $CPPCHECK_BASE $CPPCHECK_CMD3 2>&1
 fi
 
 # cpplint
