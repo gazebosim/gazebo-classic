@@ -106,13 +106,8 @@ void Actor::Load(sdf::ElementPtr _sdf)
     linkSdf->GetElement("gravity")->Set(false);
     sdf::ElementPtr linkPose = linkSdf->GetElement("pose");
 
-//    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
-//    this->AddSphereCollision(linkSdf, actorName + "_pose_col",
-//                                             math::Pose(), 0.02);
-    // this->AddBoxVisual(linkSdf, actorName + "_pose_vis", math::Pose(),
-    //                   math::Vector3(0.05, 0.05, 0.05), "Gazebo/White",
-    //                   Color::White);
-    this->AddActorVisual(linkSdf, actorName + "_visual", math::Pose());
+    this->AddActorVisual(linkSdf, actorName + "_visual",
+        ignition::math::Pose3d());
     std::string actorLinkName = actorName + "::" + actorName + "_pose";
     this->visualName = actorLinkName + "::"
                              + actorName + "_visual";

@@ -144,7 +144,7 @@ void OculusCamera::Init()
 
   Camera::Init();
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(IGN_DTOR(60));
 
   // Oculus
   {
@@ -238,25 +238,25 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->GetWorldPose();
-    double yaw = _visual->GetWorldPose().rot.GetAsEuler().z;
+    ignition::math::Pose3d origPose = this->GetWorldPose();
+    double yaw = _visual->GetWorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.pos.z - _visual->GetWorldPose().pos.z;
+    double zDiff = origPose.Pos().Z() - _visual->GetWorldPose().Pos().Z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)
     {
-      double dist = _visual->GetWorldPose().pos.Distance(
-          this->GetWorldPose().pos);
+      double dist = _visual->GetWorldPose().Pos().Distance(
+          this->GetWorldPose().Pos());
       pitch = acos(zDiff/dist);
     }
 
     this->RotateYaw(yaw);
     this->RotatePitch(pitch);
 
-    math::Box bb = _visual->GetBoundingBox();
-    math::Vector3 pos = bb.GetCenter();
-    pos.z = bb.max.z;
+    ignition::math::Box bb = _visual->GetBoundingBox();
+    ignition::math::Vector3d pos = bb.Center();
+    pos.Z() = bb.Max().Z();
   }
 
   return true;
@@ -310,7 +310,8 @@ unsigned int OculusCamera::GetTriangleCount() const
 }
 
 //////////////////////////////////////////////////
-bool OculusCamera::MoveToPosition(const math::Pose &_pose, double _time)
+bool OculusCamera::MoveToPosition(const ignition::math::Pose3d &_pose,
+    double _time)
 {
   return Camera::MoveToPosition(_pose, _time);
 }
@@ -336,30 +337,30 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
     this->scene->GetManager()->destroyAnimation("cameratrack");
   }
 
-  math::Box box = _visual->GetBoundingBox();
-  math::Vector3 size = box.GetSize();
-  double maxSize = std::max(std::max(size.x, size.y), size.z);
+  ignition::math::Box box = _visual->GetBoundingBox();
+  ignition::math::Vector3d size = box.Size();
+  double maxSize = std::max(std::max(size.X(), size.Y()), size.Z());
 
-  math::Vector3 start = this->GetWorldPose().pos;
+  ignition::math::Vector3d start = this->GetWorldPose().Pos();
   start.Correct();
-  math::Vector3 end = box.GetCenter() + _visual->GetWorldPose().pos;
+  ignition::math::Vector3d end = box.Center() + _visual->GetWorldPose().Pos();
   end.Correct();
-  math::Vector3 dir = end - start;
+  ignition::math::Vector3d dir = end - start;
   dir.Correct();
   dir.Normalize();
 
   double dist = start.Distance(end) - maxSize;
 
-  math::Vector3 mid = start + dir*(dist*.5);
-  mid.z = box.GetCenter().z + box.GetSize().z + 2.0;
+  ignition::math::Vector3d mid = start + dir*(dist*.5);
+  mid.Z() = box.Center().Z() + box.Size().Z() + 2.0;
 
   dir = end - mid;
   dir.Correct();
 
   dist = mid.Distance(end) - maxSize;
 
-  double yawAngle = atan2(dir.y, dir.x);
-  double pitchAngle = atan2(-dir.z, sqrt(dir.x*dir.x + dir.y*dir.y));
+  double yawAngle = atan2(dir.Y(), dir.X());
+  double pitchAngle = atan2(-dir.Z(), sqrt(dir.X()*dir.X() + dir.Y()*dir.Y()));
   Ogre::Quaternion yawFinal(Ogre::Radian(yawAngle), Ogre::Vector3(0, 0, 1));
   Ogre::Quaternion pitchFinal(Ogre::Radian(pitchAngle), Ogre::Vector3(0, 1, 0));
 
@@ -382,11 +383,11 @@ void OculusCamera::MoveToVisual(VisualPtr _visual)
   Ogre::TransformKeyFrame *key;
 
   key = strack->createNodeKeyFrame(0);
-  key->setTranslate(Ogre::Vector3(start.x, start.y, start.z));
+  key->setTranslate(Ogre::Vector3(start.X(), start.Y(), start.Z()));
   key->setRotation(this->sceneNode->getOrientation());
 
   key = strack->createNodeKeyFrame(time);
-  key->setTranslate(Ogre::Vector3(end.x, end.y, end.z));
+  key->setTranslate(Ogre::Vector3(end.X(), end.Y(), end.Z()));
   key->setRotation(yawFinal);
 
   this->animState =

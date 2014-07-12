@@ -18,9 +18,9 @@
 #define _GAZEBO_GTSMESHUTILS_HH_
 
 #include <vector>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {
@@ -42,7 +42,7 @@ namespace gazebo
       /// extruded polyline.
       /// \return True on success.
       public: static bool CreateExtrudedPolyline(
-                  const std::vector<math::Vector2d> &_vertices,
+                  const std::vector<ignition::math::Vector2d> &_vertices,
                   const double &_height,
                   SubMesh *_submesh);
     };

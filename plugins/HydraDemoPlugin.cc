@@ -75,7 +75,8 @@ void HydraDemoPlugin::Update(const common::UpdateInfo & /*_info*/)
   double joyY = this->hydraMsgPtr->right().joy_y();
 
   // Move the model.
-  this->model->SetLinearVel(math::Vector3(-joyX * 0.2, joyY * 0.2, 0));
+  this->model->SetLinearVel(
+      ignition::math::Vector3d(-joyX * 0.2, joyY * 0.2, 0));
 
   // Remove the message that has been processed.
   this->hydraMsgPtr.reset();

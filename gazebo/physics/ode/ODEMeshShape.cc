@@ -61,12 +61,12 @@ void ODEMeshShape::Init()
   {
     this->odeMesh->Init(this->submesh,
         boost::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
     this->odeMesh->Init(this->mesh,
         boost::static_pointer_cast<ODECollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-#include "gazebo/math/Vector3.hh"
+#include <ignition/math/Vector3.hh>
 #include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"
@@ -27,7 +27,7 @@ using namespace physics;
 PolylineShape::PolylineShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::POLYLINE_SHAPE);
-  this->scale = math::Vector3::One;
+  this->scale = ignition::math::Vector3d::One;
   sdf::initFile("polyline_shape.sdf", this->sdf);
 }
 
@@ -48,7 +48,7 @@ void PolylineShape::Init()
 
   common::MeshManager::Instance()->CreateExtrudedPolyline(
       meshName, this->GetVertices(),
-      this->GetHeight(), math::Vector2d(1, 1));
+      this->GetHeight(), ignition::math::Vector2d(1, 1));
 
   this->mesh = common::MeshManager::Instance()->GetMesh(meshName);
 
@@ -57,13 +57,13 @@ void PolylineShape::Init()
 }
 
 //////////////////////////////////////////////////
-std::vector<math::Vector2d> PolylineShape::GetVertices() const
+std::vector<ignition::math::Vector2d> PolylineShape::GetVertices() const
 {
-  std::vector<math::Vector2d> vertices;
+  std::vector<ignition::math::Vector2d> vertices;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector2d point = pointElem->Get<math::Vector2d>();
+    ignition::math::Vector2d point = pointElem->Get<ignition::math::Vector2d>();
     pointElem = pointElem->GetNextElement("point");
     vertices.push_back(point);
   }
@@ -83,9 +83,9 @@ double PolylineShape::GetHeight() const
 }
 
 //////////////////////////////////////////////////
-void PolylineShape::SetScale(const math::Vector3 &_scale)
+void PolylineShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)
@@ -106,7 +106,7 @@ void PolylineShape::SetVertices(const msgs::Geometry &_msg)
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   for (int i = 0; i < _msg.polyline().point_size(); ++i)
   {
-    math::Vector2d point(_msg.polyline().point(i).x(),
+    ignition::math::Vector2d point(_msg.polyline().point(i).x(),
         _msg.polyline().point(i).y());
     pointElem->Set(point);
     pointElem = pointElem->GetNextElement("point");
@@ -114,7 +114,8 @@ void PolylineShape::SetVertices(const msgs::Geometry &_msg)
 }
 
 ////////////////////////////////////////////////////
-void PolylineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
+void PolylineShape::SetVertices(
+    const std::vector<ignition::math::Vector2d> &_vertices)
 {
   unsigned int i;
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
@@ -127,7 +128,7 @@ void PolylineShape::SetVertices(const std::vector<math::Vector2d> &_vertices)
 
 //////////////////////////////////////////////////
 void PolylineShape::SetPolylineShape(const double &_height,
-    const std::vector<math::Vector2d> &_vertices)
+    const std::vector<ignition::math::Vector2d> &_vertices)
 {
   this->SetHeight(_height);
   this->SetVertices(_vertices);
@@ -141,7 +142,7 @@ void PolylineShape::FillMsg(msgs::Geometry &_msg)
   sdf::ElementPtr pointElem = this->sdf->GetElement("point");
   while (pointElem)
   {
-    math::Vector2d point = pointElem->Get<math::Vector2d>();
+    ignition::math::Vector2d point = pointElem->Get<ignition::math::Vector2d>();
     pointElem = pointElem->GetNextElement("point");
     msgs::Vector2d *ptMsg = _msg.mutable_polyline()->add_point();
     msgs::Set(ptMsg, point);

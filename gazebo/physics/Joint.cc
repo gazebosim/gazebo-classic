@@ -182,11 +182,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
       }
 
       // Axis dynamics
-      double reference = 0;
-      double stiffness = 0;
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
       if (dynamicsElem)
       {
+        double reference = 0;
+        double stiffness = 0;
+
         if (dynamicsElem->HasElement("spring_reference"))
         {
           reference = dynamicsElem->Get<double>("spring_reference");
@@ -635,9 +636,9 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   double lower = this->GetLowStop(_index).Radian();
   double upper = this->GetHighStop(_index).Radian();
   if (lower < upper)
-    _position = math::clamp(_position, lower, upper);
+    _position = ignition::math::clamp(_position, lower, upper);
   else
-    _position = math::clamp(_position, upper, lower);
+    _position = ignition::math::clamp(_position, upper, lower);
 
   // only deal with hinge, universal, slider joints in the user
   // request joint_names list
@@ -669,10 +670,10 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         // rotate child (childLink) about anchor point,
 
         // Get Child Link Pose
-        math::Pose childLinkPose = this->childLink->GetWorldPose();
+        ignition::math::Pose3d childLinkPose = this->childLink->GetWorldPose();
 
         // Compute new child link pose based on position change
-        math::Pose newChildLinkPose =
+        ignition::math::Pose3d newChildLinkPose =
           this->ComputeChildLinkPose(_index, _position);
 
         // debug
@@ -1178,26 +1179,26 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
-          double _position)
+ignition::math::Pose3d Joint::ComputeChildLinkPose(unsigned int _index,
+    double _position)
 {
   // child link pose
-  math::Pose childLinkPose = this->childLink->GetWorldPose();
+  ignition::math::Pose3d childLinkPose = this->childLink->GetWorldPose();
 
   // default return to current pose
-  math::Pose newRelativePose;
-  math::Pose newWorldPose = childLinkPose;
+  ignition::math::Pose3d newRelativePose;
+  ignition::math::Pose3d newWorldPose = childLinkPose;
 
   // get anchor and axis of the joint
-  math::Vector3 anchor;
-  math::Vector3 axis;
+  ignition::math::Vector3d anchor;
+  ignition::math::Vector3d axis;
 
   if (this->model->IsStatic())
   {
     /// \TODO: we want to get axis in global frame, but GetGlobalAxis
     /// not implemented for static models yet.
-    axis = childLinkPose.rot.RotateVector(this->GetLocalAxis(_index));
-    anchor = childLinkPose.pos;
+    axis = childLinkPose.Rot().RotateVector(this->GetLocalAxis(_index));
+    anchor = childLinkPose.Pos();
   }
   else
   {
@@ -1212,19 +1213,19 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
       this->HasType(Base::UNIVERSAL_JOINT))
   {
     // relative to anchor point
-    math::Pose relativePose(childLinkPose.pos - anchor,
-                            childLinkPose.rot);
+    ignition::math::Pose3d relativePose(childLinkPose.Pos() - anchor,
+        childLinkPose.Rot());
 
     // take axis rotation and turn it into a quaternion
-    math::Quaternion rotation(axis, dposition);
+    ignition::math::Quaterniond rotation(axis, dposition);
 
     // rotate relative pose by rotation
 
-    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-    newRelativePose.rot = rotation * relativePose.rot;
+    newRelativePose.Pos() = rotation.RotateVector(relativePose.Pos());
+    newRelativePose.Rot() = rotation * relativePose.Rot();
 
-    newWorldPose =
-      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+    newWorldPose = ignition::math::Pose3d(
+        newRelativePose.Pos() + anchor, newRelativePose.Rot());
 
     // \TODO: ideally we want to set this according to
     // Joint Trajectory velocity and use time step since last update.
@@ -1237,15 +1238,15 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   else if (this->HasType(Base::SLIDER_JOINT))
   {
     // relative to anchor point
-    math::Pose relativePose(childLinkPose.pos - anchor,
-                            childLinkPose.rot);
+    ignition::math::Pose3d relativePose(childLinkPose.Pos() - anchor,
+        childLinkPose.Rot());
 
     // slide relative pose by dposition along axis
-    newRelativePose.pos = relativePose.pos + axis * dposition;
-    newRelativePose.rot = relativePose.rot;
+    newRelativePose.Pos() = relativePose.Pos() + axis * dposition;
+    newRelativePose.Rot() = relativePose.Rot();
 
-    newWorldPose =
-      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+    newWorldPose = ignition::math::Pose3d(
+        newRelativePose.Pos() + anchor, newRelativePose.Rot());
 
     /// \TODO: ideally we want to set this according to Joint Trajectory
     /// velocity and use time step since last update.

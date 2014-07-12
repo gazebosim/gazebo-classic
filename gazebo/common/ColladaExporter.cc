@@ -17,6 +17,7 @@
 
 #include <tinyxml.h>
 #include <boost/filesystem.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
@@ -166,11 +167,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Positions", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 3;
-    gazebo::math::Vector3 vertex;
+    ignition::math::Vector3d vertex;
     for (unsigned int i = 0; i < count; ++i)
     {
       vertex = _subMesh->GetVertex(i);
-      fillData << vertex.x << " " << vertex.y << " " << vertex.z << " ";
+      fillData << vertex.X() << " " << vertex.Y() << " " << vertex.Z() << " ";
     }
   }
   if (_type == NORMAL)
@@ -178,11 +179,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-Normals", _meshID);
     count = _subMesh->GetNormalCount();
     stride = 3;
-    gazebo::math::Vector3 normal;
+    ignition::math::Vector3d normal;
     for (unsigned int i = 0; i < count; ++i)
     {
       normal = _subMesh->GetNormal(i);
-      fillData << normal.x << " " << normal.y << " " << normal.z << " ";
+      fillData << normal.X() << " " << normal.Y() << " " << normal.Z() << " ";
     }
   }
   if (_type == UVMAP)
@@ -190,11 +191,11 @@ void ColladaExporter::ExportGeometrySource(
     snprintf(sourceId, sizeof(sourceId), "%s-UVMap", _meshID);
     count = _subMesh->GetVertexCount();
     stride = 2;
-    gazebo::math::Vector2d inTexCoord;
+    ignition::math::Vector2d inTexCoord;
     for (unsigned int i = 0; i < count; ++i)
     {
       inTexCoord = _subMesh->GetTexCoord(i);
-      fillData << inTexCoord.x << " " << 1-inTexCoord.y << " ";
+      fillData << inTexCoord.X() << " " << 1-inTexCoord.Y() << " ";
     }
   }
   TiXmlElement *sourceXml = new TiXmlElement("source");

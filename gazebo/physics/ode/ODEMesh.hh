@@ -42,14 +42,14 @@ namespace gazebo
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::SubMesh *_subMesh,
                   ODECollisionPtr _collision,
-                  const math::Vector3 &_scale);
+                  const ignition::math::Vector3d &_scale);
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
-                  const math::Vector3 &_scale);
+                  const ignition::math::Vector3d &_scale);
 
       /// \brief Update the collision mesh.
       public: virtual void Update();
@@ -60,7 +60,7 @@ namespace gazebo
       /// \param[in] _collision Pointer to the collsion object.
       private: void CreateMesh(unsigned int _numVertices,
                    unsigned int _numIndices, ODECollisionPtr _collision,
-                   const math::Vector3 &_scale);
+                   const ignition::math::Vector3d &_scale);
 
       /// \brief Transform matrix.
       private: dReal transform[16*2];

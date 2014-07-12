@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Get the vertices of the polyline
       /// \return The vertex information of the polyline
-      public: std::vector<math::Vector2d> GetVertices() const;
+      public: std::vector<ignition::math::Vector2d> GetVertices() const;
 
       /// \brief Get the height of the polyLine.
       /// \return The height of each side of the polyLine.
@@ -59,13 +59,13 @@ namespace gazebo
 
       /// \brief Set the scale of the polyLine.
       /// \param[in] _scale Scale of the polyLine.
-      private: virtual void SetScale(const math::Vector3 &_scale);
+      private: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Set the vertices of the polyline
-      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// \param[in] _vertices std::vector<ignition::math::Vector2d>
       /// containing the vertex information
       private: virtual void SetVertices(
-                  const std::vector<math::Vector2d> &_vertices);
+                  const std::vector<ignition::math::Vector2d> &_vertices);
 
       /// \brief Set the vertices of the polyline
       /// \param[in] _msg geometry msg containing the vertex information
@@ -73,10 +73,10 @@ namespace gazebo
 
       /// \brief Set the parameters of polyline shape
       /// \param[in] _height Height of the polygon
-      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// \param[in] _vertices std::vector<ignition::math::Vector2d>
       /// containing the vertex information
       private: void SetPolylineShape(const double &_height,
-                  const std::vector<math::Vector2d> &_vertices);
+                  const std::vector<ignition::math::Vector2d> &_vertices);
 
       /// \brief Set the height of the polyLine.
       /// \param[in] _height Height of the polyLine.

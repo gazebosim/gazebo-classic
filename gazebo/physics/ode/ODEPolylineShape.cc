@@ -62,5 +62,5 @@ void ODEPolylineShape::Init()
 
   this->odeMesh->Init(this->mesh,
       boost::static_pointer_cast<ODECollision>(this->collisionParent),
-      math::Vector3(1, 1, 1));
+      ignition::math::Vector3d(1, 1, 1));
 }

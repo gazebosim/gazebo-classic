@@ -45,8 +45,8 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
 
   // verify lateral gravity
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_EQ(g, math::Vector3(0.1, 0, -9.81));
+  ignition::math::Vector3d g = physics->GetGravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0.1, 0, -9.81));
 
   // get model
   physics::ModelPtr model = world->GetModel("inertia_ratio");
@@ -64,17 +64,17 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
 
     // Check out of plane angles
     {
-      math::Pose pose;
+      ignition::math::Pose3d pose;
       pose = upperLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
+      EXPECT_NEAR(pose.Rot().Y(), 0.0, g_angle_y_tol);
+      EXPECT_NEAR(pose.Rot().Z(), 0.0, g_angle_z_tol);
     }
 
     {
-      math::Pose pose;
+      ignition::math::Pose3d pose;
       pose = lowerLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
+      EXPECT_NEAR(pose.Rot().Y(), 0.0, g_angle_y_tol);
+      EXPECT_NEAR(pose.Rot().Z(), 0.0, g_angle_z_tol);
     }
   }
 }

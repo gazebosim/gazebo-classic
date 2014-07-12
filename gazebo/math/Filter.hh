@@ -18,8 +18,8 @@
 #ifndef _GAZEBO_FILTER_HH_
 #define _GAZEBO_FILTER_HH_
 
-#include <gazebo/math/Vector3.hh>
-#include <gazebo/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
 namespace gazebo
 {

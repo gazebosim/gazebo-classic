@@ -31,15 +31,15 @@ TEST_F(Issue346Test, SaveLights)
 {
   Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   std::string spotLightName = "spot_light";
-  math::Vector3 spotLightPos(1, 2, 5);
-  math::Vector3 spotLightRot(0, 0, 0.5);
+  ignition::math::Vector3d spotLightPos(1, 2, 5);
+  ignition::math::Vector3d spotLightRot(0, 0, 0.5);
 
   std::string pointLightName = "point_light";
-  math::Vector3 pointLightPos(4, 3, 8);
-  math::Vector3 pointLightRot(0, 0.8, 0.1);
+  ignition::math::Vector3d pointLightPos(4, 3, 8);
+  ignition::math::Vector3d pointLightRot(0, 0.8, 0.1);
 
   // Spawn two lights: one spot light and one point light
   SpawnLight(spotLightName, "spot", spotLightPos, spotLightRot);
@@ -58,29 +58,30 @@ TEST_F(Issue346Test, SaveLights)
   sdf::SDFPtr sdf(new sdf::SDF);
   ASSERT_TRUE(sdf::init(sdf));
   ASSERT_TRUE(sdf::readFile(common::find_file(filenameOut), sdf));
-  ASSERT_TRUE(sdf->root);
+  ASSERT_TRUE(sdf->root != NULL);
 
   // Verify there is one spot light and one point light
   int hasSpotLight = 0;
   int hasPointLight = 0;
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  ASSERT_TRUE(worldElem);
+  ASSERT_TRUE(worldElem != NULL);
   sdf::ElementPtr lightElem = worldElem->GetElement("light");
   while (lightElem)
   {
     std::string name = lightElem->Get<std::string>("name");
-    math::Pose pose = lightElem->Get<math::Pose>("pose");
+    ignition::math::Pose3d pose =
+      lightElem->Get<ignition::math::Pose3d>("pose");
     if (name == spotLightName)
     {
       hasSpotLight++;
-      EXPECT_TRUE(pose.pos == spotLightPos);
-      EXPECT_TRUE(pose.rot == spotLightRot);
+      EXPECT_TRUE(pose.Pos() == spotLightPos);
+      EXPECT_TRUE(pose.Rot() == spotLightRot);
     }
     else if (name == pointLightName)
     {
       hasPointLight++;
-      EXPECT_TRUE(pose.pos == pointLightPos);
-      EXPECT_TRUE(pose.rot == pointLightRot);
+      EXPECT_TRUE(pose.Pos() == pointLightPos);
+      EXPECT_TRUE(pose.Rot() == pointLightRot);
     }
     lightElem = lightElem->GetNextElement("light");
   }

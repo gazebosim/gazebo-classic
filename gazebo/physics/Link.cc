@@ -1124,14 +1124,14 @@ void Link::UpdateVisualSDF()
       else if (geomElem->HasElement("sphere"))
       {
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
-            this->scale.x/2.0);
+            this->scale.X()/2.0);
       }
       else if (geomElem->HasElement("cylinder"))
       {
         geomElem->GetElement("cylinder")->GetElement("radius")
-            ->Set(this->scale.x/2.0);
+            ->Set(this->scale.X()/2.0);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            this->scale.z);
+            this->scale.Z());
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
@@ -1185,13 +1185,14 @@ double Link::GetWorldEnergy() const
 }
 
 /////////////////////////////////////////////////
-void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
-                     const math::Pose &_worldReferenceFrameDst)
+void Link::MoveFrame(const ignition::math::Pose3d &_worldReferenceFrameSrc,
+                     const ignition::math::Pose3d &_worldReferenceFrameDst)
 {
-  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
-    + _worldReferenceFrameDst;
+  ignition::math::Pose3d targetWorldPose =
+    (this->GetWorldPose() - _worldReferenceFrameSrc) + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+  this->SetWorldTwist(ignition::math::Vector3d(0, 0, 0),
+      ignition::math::Vector3d(0, 0, 0));
 }
 
 /////////////////////////////////////////////////

@@ -18,8 +18,8 @@
 #ifndef _GAZEBO_RAZER_HYDRA_HH_
 #define _GAZEBO_RAZER_HYDRA_HH_
 
-#include <gazebo/math/Filter.hh>
-#include <gazebo/math/Vector3.hh>
+#include <ignition/math/Filter.hh>
+#include <ignition/math/Vector3.hh>
 #include <gazebo/common/Plugin.hh>
 
 namespace gazebo
@@ -63,16 +63,16 @@ namespace gazebo
     private: int hidrawFd;
 
     /// \brief Left and right controller positions.
-    private: math::Vector3 pos[2];
+    private: ignition::math::Vector3d pos[2];
 
     /// \brief Left and right controller orientations.
-    private: math::Quaternion quat[2];
+    private: ignition::math::Quaterniond quat[2];
 
     /// \brief Left and right filtered positions.
-    private: math::OnePoleVector3 filterPos[2];
+    private: ignition::math::OnePoleVector3 filterPos[2];
 
     /// \brief Left and right filtered controller orientations.
-    private: math::OnePoleQuaternion filterQuat[2];
+    private: ignition::math::OnePoleQuaternion filterQuat[2];
 
     /// \brief Analog joysticks
     private: float analog[6];
@@ -81,7 +81,7 @@ namespace gazebo
     private: uint8_t buttons[14];
 
     /// \brief Estimate of the update period.
-    private: math::OnePole<float> periodEstimate;
+    private: ignition::math::OnePole<float> periodEstimate;
 
     /// \brief Time of the last poll cycle.
     private: common::Time lastCycleStart;

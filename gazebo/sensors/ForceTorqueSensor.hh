@@ -122,7 +122,7 @@ namespace gazebo
       /// \brief Rotation matrix than transforms a vector expressed in child
       ///        orientation in a vector expressed in joint orientation.
       ///        Necessary is the measure is specified in joint frame.
-      private: math::Matrix3 rotationSensorChild;
+      private: ignition::math::Matrix3d rotationSensorChild;
     };
     /// \}
   }

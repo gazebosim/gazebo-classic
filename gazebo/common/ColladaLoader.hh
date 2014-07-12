@@ -115,7 +115,7 @@ namespace gazebo
 
       /// \brief Load a transform
       /// \param[in] _elem Pointer to the transform XML instance
-      /// \return A Matrix4 transform
+      /// \return A Matrix4d transform
       private: ignition::math::Matrix4d LoadNodeTransform(TiXmlElement *_elem);
 
       /// \brief Load vertices
@@ -124,9 +124,9 @@ namespace gazebo
       /// \param[out] _verts Holds the resulting vertices
       /// \param[out] _norms Holds the resulting normals
       private: void LoadVertices(const std::string &_id,
-         const ignition::math::Matrix4 &_transform,
-         std::vector<ignition::math::Vector3> &_verts,
-         std::vector<ignition::math::Vector3> &_norms);
+         const ignition::math::Matrix4d &_transform,
+         std::vector<ignition::math::Vector3d> &_verts,
+         std::vector<ignition::math::Vector3d> &_norms);
 
       /// \brief Load vertices
       /// \param[in] _id String id of the vertices XML node
@@ -136,9 +136,9 @@ namespace gazebo
       /// \param[out] _vertDup Holds a map of duplicate position indices
       /// \param[out] _normDup Holds a map of duplicate normal indices
       private: void LoadVertices(const std::string &_id,
-         const ignition::math::Matrix4 &_transform,
-         std::vector<ignition::math::Vector3> &_verts,
-         std::vector<ignition::math::Vector3> &_norms,
+         const ignition::math::Matrix4d &_transform,
+         std::vector<ignition::math::Vector3d> &_verts,
+         std::vector<ignition::math::Vector3d> &_norms,
          std::map<unsigned int, unsigned int> &_vertDup,
          std::map<unsigned int, unsigned int> &_normDup);
 

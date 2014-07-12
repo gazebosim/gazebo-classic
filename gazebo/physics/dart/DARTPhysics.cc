@@ -87,7 +87,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   PhysicsEngine::Load(_sdf);
 
   // Gravity
-  ignition::math::Vector3d g = 
+  ignition::math::Vector3d g =
     this->sdf->Get<ignition::math::Vector3d>("gravity");
   // ODEPhysics checks this, so we will too.
   if (g == ignition::math::Vector3d(0, 0, 0))

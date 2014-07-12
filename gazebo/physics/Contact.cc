@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Specification of a contact
- * Author: Nate Koenig
- * Date: 10 Nov 2009
- */
-
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Contact.hh"

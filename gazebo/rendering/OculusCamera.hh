@@ -108,7 +108,7 @@ namespace gazebo
       public: void MoveToVisual(VisualPtr _visual);
 
       // Doxygen automatically pulls in the correct documentation.
-      public: virtual bool MoveToPosition(const math::Pose &_pose,
+      public: virtual bool MoveToPosition(const ignition::math::Pose3d &_pose,
                                           double _time);
 
       /// \brief Move the camera to focus on a visual.

@@ -36,26 +36,28 @@ using namespace gazebo;
 using namespace common;
 
 /////////////////////////////////////////////////
-struct Vector3Hash : std::unary_function<const math::Vector3, std::size_t>
+struct Vector3Hash :
+  std::unary_function<const ignition::math::Vector3d, std::size_t>
 {
-  std::size_t operator()(const math::Vector3 _v) const
+  std::size_t operator()(const ignition::math::Vector3d _v) const
   {
     std::size_t seed = 0;
-    boost::hash_combine(seed, _v.x);
-    boost::hash_combine(seed, _v.y);
-    boost::hash_combine(seed, _v.z);
+    boost::hash_combine(seed, _v.X());
+    boost::hash_combine(seed, _v.Y());
+    boost::hash_combine(seed, _v.Z());
     return seed;
   }
 };
 
 /////////////////////////////////////////////////
-struct Vector2dHash : std::unary_function<const math::Vector2d, std::size_t>
+struct Vector2dHash :
+  std::unary_function<const ignition::math::Vector2d,std::size_t>
 {
-  std::size_t operator()(const math::Vector2d _v) const
+  std::size_t operator()(const ignition::math::Vector2d _v) const
   {
     std::size_t seed = 0;
-    boost::hash_combine(seed, _v.x);
-    boost::hash_combine(seed, _v.y);
+    boost::hash_combine(seed, _v.X());
+    boost::hash_combine(seed, _v.Y());
     return seed;
   }
 };
@@ -114,7 +116,10 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
   {
     TiXmlElement *unitXml = assetXml->FirstChildElement("unit");
     if (unitXml && unitXml->Attribute("meter"))
-      this->dataPtr->meter = ignition::math::parseFloat(unitXml->Attribute("meter"));
+    {
+      this->dataPtr->meter = ignition::math::parseFloat(
+          unitXml->Attribute("meter"));
+    }
   }
 
   Mesh *mesh = new Mesh();
@@ -849,9 +854,9 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadVertices(const std::string &_id,
-    const math::Matrix4 &_transform,
-    std::vector<math::Vector3> &_verts,
-    std::vector<math::Vector3> &_norms,
+    const ignition::math::Matrix4d &_transform,
+    std::vector<ignition::math::Vector3d> &_verts,
+    std::vector<ignition::math::Vector3d> &_norms,
     std::map<unsigned int, unsigned int> &_vertDups,
     std::map<unsigned int, unsigned int> &_normDups)
 {
@@ -885,7 +890,7 @@ void ColladaLoader::LoadVertices(const std::string &_id,
 /////////////////////////////////////////////////
 void ColladaLoader::LoadPositions(const std::string &_id,
     const ignition::math::Matrix4d &_transform,
-    std::vector<ignition::math::Vector3d> &_values
+    std::vector<ignition::math::Vector3d> &_values,
     std::map<unsigned int, unsigned int> &_duplicates)
 {
   if (this->dataPtr->positionIds.find(_id) != this->dataPtr->positionIds.end())
@@ -904,7 +909,8 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   }
   std::string valueStr = floatArrayXml->GetText();
 
-  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+  boost::unordered_map<ignition::math::Vector3d, unsigned int, Vector3Hash>
+    unique;
 
   std::vector<std::string> strs;
   std::vector<std::string>::iterator iter, end;
@@ -960,7 +966,8 @@ void ColladaLoader::LoadNormals(const std::string &_id,
     return;
   }
 
-  boost::unordered_map<math::Vector3, unsigned int, Vector3Hash> unique;
+  boost::unordered_map<ignition::math::Vector3d, unsigned int, Vector3Hash>
+    unique;
 
   std::string valueStr = floatArrayXml->GetText();
   std::istringstream iss(valueStr);
@@ -1080,7 +1087,8 @@ void ColladaLoader::LoadTexCoords(const std::string &_id,
     return;
   }
 
-  boost::unordered_map<math::Vector2d, unsigned int, Vector2dHash> unique;
+  boost::unordered_map<ignition::math::Vector2d, unsigned int, Vector2dHash>
+    unique;
 
   // Read the raw texture values, and split them on spaces.
   std::string valueStr = floatArrayXml->GetText();
@@ -1343,14 +1351,14 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX] = math::parseInt(offset);
+      inputs[VERTEX] = ignition::math::parseInt(offset);
       hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL] = math::parseInt(offset);
+      inputs[NORMAL] = ignition::math::parseInt(offset);
       hasNormals = true;
     }
     else if (semantic == "TEXCOORD")
@@ -1551,8 +1559,8 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
               inputRemappedTexcoordIndex =
                   texDupMap[inputRemappedTexcoordIndex];
             }
-            subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].x,
-                texcoords[inputRemappedTexcoordIndex].y);
+            subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
+                texcoords[inputRemappedTexcoordIndex].Y());
             input.texcoordIndex = inputRemappedTexcoordIndex;
           }
 
@@ -1636,21 +1644,21 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX] = math::parseInt(offset);
+      inputs[VERTEX] = ignition::math::parseInt(offset);
       hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL] = math::parseInt(offset);
+      inputs[NORMAL] = ignition::math::parseInt(offset);
       hasNormals = true;
     }
     else if (semantic == "TEXCOORD" && !hasTexcoords)
     {
       // we currently only support one set of UVs
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD] = math::parseInt(offset);
+      inputs[TEXCOORD] = ignition::math::parseInt(offset);
       hasTexcoords = true;
     }
     else
@@ -1804,8 +1812,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         unsigned int inputRemappedTexcoordIndex = values[inputs[TEXCOORD]];
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
-        subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].x,
-            texcoords[inputRemappedTexcoordIndex].y);
+        subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
+            texcoords[inputRemappedTexcoordIndex].Y());
         input.texcoordIndex = inputRemappedTexcoordIndex;
       }
 

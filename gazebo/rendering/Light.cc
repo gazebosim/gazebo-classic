@@ -374,15 +374,15 @@ ignition::math::Vector3d Light::GetPosition() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetRotation(const math::Quaternion &_q)
+void Light::SetRotation(const ignition::math::Quaterniond &_q)
 {
   this->visual->SetRotation(_q);
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Light::GetRotation() const
+ignition::math::Quaterniond Light::GetRotation() const
 {
-  return this->visual->GetRotation();
+  return this->visual->Rotation();
 }
 
 //////////////////////////////////////////////////

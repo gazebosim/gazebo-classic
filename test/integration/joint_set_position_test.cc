@@ -88,7 +88,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -203,14 +203,14 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->GetWorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->GetWorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
   double test_duration = world->GetSimTime().Double() - start_time;
@@ -265,7 +265,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -377,14 +377,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->GetWorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->GetWorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
   double test_duration = world->GetSimTime().Double() - start_time;
@@ -439,7 +439,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, 0));
 
   // simulate 1 step
   world->Step(1);
@@ -510,7 +510,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     EXPECT_TRUE((*ji)  != NULL);
   }
 
-  std::vector<math::Pose> linkPoses;
+  std::vector<ignition::math::Pose3d> linkPoses;
   for (physics::Link_V::iterator li = links.begin();
                                  li != links.end(); ++li)
     linkPoses.push_back((*li)->GetWorldPose());
@@ -554,18 +554,18 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     //       << " - " << last_update_wall_time
     //       << " >= " << (1.0/pub_rate) << "\n";
 
-    std::vector<math::Pose>::iterator pi = linkPoses.begin();
+    std::vector<ignition::math::Pose3d>::iterator pi = linkPoses.begin();
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li, ++pi)
     {
-      math::Pose pose = (*li)->GetWorldPose();
-      EXPECT_NEAR(pose.pos.x, pi->pos.x, TOL);
-      EXPECT_NEAR(pose.pos.y, pi->pos.y, TOL);
-      EXPECT_NEAR(pose.pos.z, pi->pos.z, TOL);
-      EXPECT_NEAR(pose.rot.w, pi->rot.w, TOL);
-      EXPECT_NEAR(pose.rot.x, pi->rot.x, TOL);
-      EXPECT_NEAR(pose.rot.y, pi->rot.y, TOL);
-      EXPECT_NEAR(pose.rot.z, pi->rot.z, TOL);
+      ignition::math::Pose3d pose = (*li)->GetWorldPose();
+      EXPECT_NEAR(pose.Pos().X(), pi->Pos().X(), TOL);
+      EXPECT_NEAR(pose.Pos().Y(), pi->Pos().Y(), TOL);
+      EXPECT_NEAR(pose.Pos().Z(), pi->Pos().Z(), TOL);
+      EXPECT_NEAR(pose.Rot().W(), pi->Rot().W(), TOL);
+      EXPECT_NEAR(pose.Rot().X(), pi->Rot().X(), TOL);
+      EXPECT_NEAR(pose.Rot().Y(), pi->Rot().Y(), TOL);
+      EXPECT_NEAR(pose.Rot().Z(), pi->Rot().Z(), TOL);
     }
   }
 

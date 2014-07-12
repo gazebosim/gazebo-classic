@@ -364,7 +364,7 @@ unsigned int Collision::GetMaxContacts()
 }
 
 /////////////////////////////////////////////////
-const math::Pose &Collision::GetWorldPose() const
+const ignition::math::Pose3d &Collision::GetWorldPose() const
 {
   // If true, compute a new world pose value.
   //

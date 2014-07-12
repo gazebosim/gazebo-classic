@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ball joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
 #ifndef _BALLJOINT_HH_
 #define _BALLJOINT_HH_
 

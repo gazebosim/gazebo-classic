@@ -488,8 +488,8 @@ void MeshManager::CreateBox(const std::string &name,
 
 //////////////////////////////////////////////////
 void MeshManager::CreateExtrudedPolyline(const std::string &_name,
-    const std::vector<math::Vector2d> &_vertices,
-    const double &_height, const math::Vector2d & /*_uvCoords*/)
+    const std::vector<ignition::math::Vector2d> &_vertices,
+    const double &_height, const ignition::math::Vector2d & /*_uvCoords*/)
 {
   if (this->HasMesh(_name))
   {
@@ -523,8 +523,8 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
     // Add the vertices
     for (i = 0; i < numSides; ++i)
     {
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-      subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+      subMesh->AddVertex(_vertices[i].X(), _vertices[i].Y(), 0.0);
+      subMesh->AddVertex(_vertices[i].X(), _vertices[i].Y(), _height);
     }
 
     // Euler's Formula: numFaces = numEdges - numVertices + 2
@@ -588,11 +588,11 @@ void MeshManager::CreateExtrudedPolyline(const std::string &_name,
   // for each sideface
   for (i = 0; i < numSides; ++i)
   {
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, 0.0);
-    subMesh->AddVertex(_vertices[i].x, _vertices[i].y, _height);
+    subMesh->AddVertex(_vertices[i].X(), _vertices[i].Y(), 0.0);
+    subMesh->AddVertex(_vertices[i].X(), _vertices[i].Y(), _height);
   }
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, 0.0);
-  subMesh->AddVertex(_vertices[0].x, _vertices[0].y, _height);
+  subMesh->AddVertex(_vertices[0].X(), _vertices[0].Y(), 0.0);
+  subMesh->AddVertex(_vertices[0].X(), _vertices[0].Y(), _height);
 
   for (i = 0; i < numSides; ++i)
   {

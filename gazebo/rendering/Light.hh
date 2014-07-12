@@ -96,11 +96,11 @@ namespace gazebo
 
       /// \brief Set the rotation of the light
       /// \param[in] _q New rotation for the light
-      public: void SetRotation(const math::Quaternion &_q);
+      public: void SetRotation(const ignition::math::Quaterniond &_q);
 
       /// \brief Get the rotation of the light
       /// \return The rotation of the light
-      public: math::Quaternion GetRotation() const;
+      public: ignition::math::Quaterniond GetRotation() const;
 
       /// \brief Set whether this entity has been selected by the user through
       /// the gui.

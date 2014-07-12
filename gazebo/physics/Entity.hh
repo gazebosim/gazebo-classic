@@ -327,7 +327,7 @@ namespace gazebo
       private: bool isCanonicalLink;
 
       /// \brief The initial pose of the entity.
-      private: ignition::math::Pose initialRelativePose;
+      private: ignition::math::Pose3d initialRelativePose;
 
       /// \brief Pose publisher.
       private: transport::PublisherPtr posePub;

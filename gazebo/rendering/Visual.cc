@@ -809,7 +809,7 @@ void Visual::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 {
   for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
        iter != this->dataPtr->children.end(); ++iter)
@@ -2237,7 +2237,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     else if (_msg->geometry().type() == msgs::Geometry::EMPTY)
       geomScale.X() = geomScale.Y() = geomScale.Z() = 1.0;
     else if (_msg->geometry().type() == msgs::Geometry::POLYLINE)
-      geomScale.x = geomScale.y = geomScale.z = 1.0;
+      geomScale.X() = geomScale.Y() = geomScale.Z() = 1.0;
     else
       gzerr << "Unknown geometry type[" << _msg->geometry().type() << "]\n";
 
@@ -2311,20 +2311,21 @@ std::string Visual::GetMeshName() const
 
       if (!meshManager->IsValidFilename(polyLineName))
       {
-        std::vector<math::Vector2d> vertices;
+        std::vector<ignition::math::Vector2d> vertices;
         sdf::ElementPtr pointElem =
           geomElem->GetElement("polyline")->GetElement("point");
 
         while (pointElem)
         {
-          math::Vector2d point = pointElem->Get<math::Vector2d>();
+          ignition::math::Vector2d point =
+            pointElem->Get<ignition::math::Vector2d>();
           vertices.push_back(point);
           pointElem = pointElem->GetNextElement("point");
         }
 
         meshManager->CreateExtrudedPolyline(polyLineName, vertices,
             geomElem->GetElement("polyline")->Get<double>("height"),
-            math::Vector2d(1, 1));
+            ignition::math::Vector2d(1, 1));
        }
       return polyLineName;
     }

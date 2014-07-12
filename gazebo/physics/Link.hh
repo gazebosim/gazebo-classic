@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- */
-
-#ifndef _LINK_HH_
-#define _LINK_HH_
+#ifndef _GAZEBO_LINK_HH_
+#define _GAZEBO_LINK_HH_
 
 #include <map>
 #include <vector>
@@ -510,8 +506,9 @@ namespace gazebo
       /// which this link is attached.
       /// \param[in] _worldReferenceFrameDst final location of the
       /// reference frame specified in world coordinates.
-      public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
-                        const math::Pose &_worldReferenceFrameDst);
+      public: void MoveFrame(
+                  const ignition::math::Pose3d &_worldReferenceFrameSrc,
+                  const ignition::math::Pose3d &_worldReferenceFrameDst);
 
       /// \brief Helper function to find all connected links of a link
       /// based on parent/child relations of joints. For example,
@@ -617,7 +614,7 @@ namespace gazebo
       private: Collision_V collisions;
 
       /// \brief scale of the link.
-      private: math::Vector3 scale;
+      private: ignition::math::Vector3d scale;
 
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources

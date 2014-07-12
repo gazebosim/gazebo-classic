@@ -22,7 +22,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <gazebo/math/Vector3.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -54,7 +54,7 @@ namespace gazebo
 
       /// \brief Get the point that define the road.
       /// \return The vector of points that define the road.
-      public: const std::vector<math::Vector3> &GetPoints() const;
+      public: const std::vector<ignition::math::Vector3d> &GetPoints() const;
 
       /// \brief Get the road width in meters.
       /// \return Road width in meters.

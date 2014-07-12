@@ -409,10 +409,12 @@ class ServerFixture : public testing::Test
   /// \param[in] _spotFallOff Fall off ("spot" only).
   /// \param[in] _castShadows True to cast shadows.
   protected: void SpawnLight(const std::string &_name, const std::string &_type,
-                 const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                 const ignition::math::Vector3d &_pos,
+                 const ignition::math::Vector3d &_rpy,
                  const common::Color &_diffuse = common::Color::White,
                  const common::Color &_specular = common::Color::White,
-                 const math::Vector3 &_direction = -math::Vector3::UnitZ,
+                 const ignition::math::Vector3d &_direction =
+                 -ignition::math::Vector3d::UnitZ,
                  double _attenuationRange = 20,
                  double _attenuationConstant = 0.5,
                  double _attenuationLinear = 0.01,

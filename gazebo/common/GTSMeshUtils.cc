@@ -16,10 +16,10 @@
  */
 #include <vector>
 #include <gts.h>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/common/GTSMeshUtils.hh"
 
 using namespace gazebo;
@@ -68,7 +68,7 @@ static void AddConstraint(GtsConstraint *_c, GtsSurface *_s)
 
 //////////////////////////////////////////////////
 bool GTSMeshUtils::CreateExtrudedPolyline(
-    const std::vector<math::Vector2d> &_vertices,
+    const std::vector<ignition::math::Vector2d> &_vertices,
     const double &_height, SubMesh *_subMesh)
 {
   if (_vertices.size() < 3)
@@ -112,7 +112,7 @@ bool GTSMeshUtils::CreateExtrudedPolyline(
     {
       verticesList = g_slist_append(verticesList,
           gts_vertex_new(gts_vertex_class(),
-            _vertices[i].x, _vertices[i].y, z));
+            _vertices[i].X(), _vertices[i].Y(), z));
       if (i != 0)
       {
         gts_fifo_push(edgeList,

@@ -383,7 +383,7 @@ namespace gazebo
       /// link.
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(unsigned int _index, math::Angle _angle)
+      public: void SetAngle(unsigned int _index, ignition::math::Angle _angle)
               GAZEBO_DEPRECATED(4.0);
 
       /// \brief The child links of this joint are updated based on desired
@@ -604,8 +604,8 @@ namespace gazebo
       /// \param[in] _index axis index
       /// \param[in] _position new joint position
       /// \return new child link pose at new joint position.
-      protected: math::Pose ComputeChildLinkPose(unsigned int _index,
-          double _position);
+      protected: ignition::math::Pose3d ComputeChildLinkPose(
+                     unsigned int _index, double _position);
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.

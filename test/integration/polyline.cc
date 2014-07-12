@@ -35,30 +35,30 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr triangleModel = world->GetModel("triangle");
-  EXPECT_TRUE(triangleModel);
+  EXPECT_TRUE(triangleModel != NULL);
 
   physics::LinkPtr triangleLink = triangleModel->GetLink("link");
-  EXPECT_TRUE(triangleLink);
+  EXPECT_TRUE(triangleLink != NULL);
 
   physics::CollisionPtr triangleColl = triangleLink->GetCollision("collision");
-  EXPECT_TRUE(triangleColl);
+  EXPECT_TRUE(triangleColl != NULL);
 
   physics::ShapePtr shape = triangleColl->GetShape();
-  EXPECT_TRUE(shape);
+  EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::POLYLINE_SHAPE));
 
   physics::PolylineShapePtr polyShape =
     boost::dynamic_pointer_cast<physics::PolylineShape>(shape);
-  EXPECT_TRUE(polyShape);
+  EXPECT_TRUE(polyShape != NULL);
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
 
-  std::vector<math::Vector2d> vertices = polyShape->GetVertices();
-  EXPECT_EQ(vertices[0], math::Vector2d(-0.5, -0.5));
-  EXPECT_EQ(vertices[1], math::Vector2d(-0.5, 0.5));
-  EXPECT_EQ(vertices[2], math::Vector2d(0.5, 0.5));
-  EXPECT_EQ(vertices[3], math::Vector2d(0.0, 0.0));
-  EXPECT_EQ(vertices[4], math::Vector2d(0.5, -0.5));
+  std::vector<ignition::math::Vector2d> vertices = polyShape->GetVertices();
+  EXPECT_EQ(vertices[0], ignition::math::Vector2d(-0.5, -0.5));
+  EXPECT_EQ(vertices[1], ignition::math::Vector2d(-0.5, 0.5));
+  EXPECT_EQ(vertices[2], ignition::math::Vector2d(0.5, 0.5));
+  EXPECT_EQ(vertices[3], ignition::math::Vector2d(0.0, 0.0));
+  EXPECT_EQ(vertices[4], ignition::math::Vector2d(0.5, -0.5));
 
   // Check the FillMsg function
   {
@@ -85,12 +85,12 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // Spawn a sphere over the polyline shape, and check that it doesn't pass
   // through the polyline
   {
-    SpawnSphere("test_sphere", math::Vector3(0, 0, 1.5),
-        math::Vector3(0, 0, 0));
+    SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
+        ignition::math::Vector3d(0, 0, 0));
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);
-    EXPECT_NEAR(sphere->GetWorldPose().pos.z, 1.5, 1e-2);
+    EXPECT_NEAR(sphere->GetWorldPose().Pos().Z(), 1.5, 1e-2);
   }
 }
 

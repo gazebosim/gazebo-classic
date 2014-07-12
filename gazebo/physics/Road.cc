@@ -100,7 +100,7 @@ void Road::Init()
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Vector3> &Road::GetPoints() const
+const std::vector<ignition::math::Vector3d> &Road::GetPoints() const
 {
   return this->points;
 }

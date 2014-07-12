@@ -1836,7 +1836,7 @@ void Scene::PreRender()
             if (!this->selectedVis || this->selectionMode != "move" ||
               iter->first != this->selectedVis->GetId())
             {
-              math::Pose pose = msgs::Convert(pose_msg);
+              ignition::math::Pose3d pose = msgs::Convert(pose_msg);
               iter2->second->SetPose(pose);
             }
           }

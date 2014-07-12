@@ -77,8 +77,8 @@ TEST_F(ColladaLoader, ShareVertices)
     const common::SubMesh *subMesh = mesh->GetSubMesh(i);
     for (unsigned int j = 0; j < subMesh->GetVertexCount(); ++j)
     {
-      math::Vector3 v = subMesh->GetVertex(j);
-      math::Vector3 n = subMesh->GetNormal(j);
+      ignition::math::Vector3d v = subMesh->GetVertex(j);
+      ignition::math::Vector3d n = subMesh->GetNormal(j);
 
       // Verify there is no other vertex with the same position AND normal
       for (unsigned int k = j+1; k < subMesh->GetVertexCount(); ++k)
