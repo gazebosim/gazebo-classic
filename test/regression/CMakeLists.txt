@@ -33,6 +33,7 @@ set(tests
   nondefault_world.cc
   physics.cc
   physics_basic_controller_response.cc
+  physics_inertia_ratio.cc
   pioneer2dx.cc
   transport.cc
   server_fixture.cc
