@@ -1702,7 +1702,7 @@ static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
     }
   }
 
-  // some ratio
+  // initial guess
   dReal moi_ratio = moi_ratio_max;
 
   // fixed point iteration for reducing moi_ratio across constraints
@@ -1752,7 +1752,8 @@ static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
               if (moi_ratio > eq_14_ratio)
               {
                 // criteria requires a smaller ratio, reduce it.
-                moi_ratio = eq_14_ratio;
+                // but this usually make stability worse, so we can safely skip
+                // moi_ratio = eq_14_ratio;
               }
             }
           }
@@ -1783,7 +1784,8 @@ static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
               if (moi_ratio > eq_14_ratio)
               {
                 // criteria requires a smaller ratio, reduce it.
-                moi_ratio = eq_14_ratio;
+                // but this usually make stability worse, so we can safely skip
+                // moi_ratio = eq_14_ratio;
               }
             }
           }
@@ -1825,7 +1827,9 @@ static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
             {
               if (moi_ratio > eq_16_ratio)
               {
-                moi_ratio = eq_16_ratio;
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                // moi_ratio = eq_16_ratio;
               }
             }
           }
@@ -1852,7 +1856,9 @@ static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
             {
               if (moi_ratio > eq_16_ratio)
               {
-                moi_ratio = eq_16_ratio;
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                // moi_ratio = eq_16_ratio;
               }
             }
           }
@@ -1991,7 +1997,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
       /// abs sum of off-diagonals remains smaller than the diagonal
       /// for all rows (see comments below about Gauss-Seidel stability).
       // increase moi_ratio_max to skip checks and increase performance
-      const dReal moi_ratio_max = 10.0;
+      const dReal moi_ratio_max = 100.0;
 
       if (m_large > moi_ratio_max * m_small)
       {
@@ -2001,11 +2007,12 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
         dReal  moi_ratio = FindMaxMOIRatio(m_large, m_small, moi_ratio_max,
                                            MOI_large, MOI_small, SS);
 
+        printf("moi_ratio %f\n", moi_ratio);
         // only do the reduction if we've found a good new moi ratio candidate
         if (moi_ratio > 0.0)
         {
-
-          // compute new m_large and m_small based on updated moi_ratio and moi_sum
+          // compute new m_large and m_small based on updated
+          // moi_ratio and moi_sum
           // (sum of moi along S1 and S2, should stay conserved)
           dReal m_large_new, m_small_new;
           dReal moi_sum = (m_large + m_small);
