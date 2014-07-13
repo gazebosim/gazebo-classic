@@ -31,6 +31,7 @@ using namespace util;
 //////////////////////////////////////////////////
 DiagnosticManager::DiagnosticManager()
 {
+
   this->enabled = false;
 
   // Get the base of the time logging path
@@ -266,22 +267,10 @@ void DiagnosticManager::SetEnabled(bool _enabled)
 
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
         boost::bind(&DiagnosticManager::Update, this, _1));
-
-    _diagStartPtr = &_DiagnosticManager_Start;
-    _diagStopPtr = &_DiagnosticManager_Stop;
-    _diagLapPtr = &_DiagnosticManager_Lap;
-    _diagVariablePtr = &_DiagnosticManager_Variable;
-    _diagMarkerPtr = &_DiagnosticManager_Marker;
   }
   else
   {
     event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-
-    _diagStartPtr = &_DiagnosticManager_Noop1;
-    _diagStopPtr = &_DiagnosticManager_Noop1;
-    _diagLapPtr = &_DiagnosticManager_Noop2;
-    _diagVariablePtr = &_DiagnosticManager_Noop3;
-    _diagMarkerPtr = &_DiagnosticManager_Noop1;
   }
 }
 

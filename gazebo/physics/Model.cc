@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "gazebo/util/OpenAL.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -255,6 +256,11 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
+
+  // diagnostics
+  DIAG_VARIABLE("model potential energy", this->GetWorldEnergyPotential());
+  DIAG_VARIABLE("model kinetic energy", this->GetWorldEnergyKinetic());
+  DIAG_VARIABLE("model total energy", this->GetWorldEnergy());
 }
 
 //////////////////////////////////////////////////

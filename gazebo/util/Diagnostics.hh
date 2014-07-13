@@ -302,27 +302,7 @@ namespace gazebo
     {
       gazebo::util::DiagnosticManager::Instance()->Marker(_name);
     }
-
-    /// \brief Function pointer to start a timer.
-    void (*_diagStartPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
-
-    /// \brief Function pointer to lap a timer.
-    void (*_diagLapPtr)(const std::string &_name, const std::string &_prefix) =
-      &_DiagnosticManager_Noop2;
-
-    /// \brief Function pointer to stop a timer.
-    void (*_diagStopPtr)(const std::string &_name) = &_DiagnosticManager_Noop1;
-
-    /// \brief Function pointer a variable diagnostic information.
-    void (*_diagVariablePtr)(const std::string &_name, double _var) =
-      &_DiagnosticManager_Noop3;
-
-    /// \brief Function pointer for a marker.
-    void (*_diagMarkerPtr)(const std::string &_name) =
-      &_DiagnosticManager_Noop1;
-
     /// \endcond
-
   }
 }
 #endif
