@@ -390,8 +390,8 @@ void ODEPhysics::UpdateCollision()
   dSpaceCollide(this->spaceId, this, CollisionCallback);
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
-  DIAG_VARIABLE("colliders", this->collidersCount);
-  DIAG_VARIABLE("trimesh colliders", this->trimeshCollidersCount);
+  DIAG_VARIABLE("ODE colliders", this->collidersCount);
+  DIAG_VARIABLE("ODE trimesh colliders", this->trimeshCollidersCount);
 
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
@@ -460,6 +460,11 @@ void ODEPhysics::UpdatePhysics()
   }
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
+
+  DIAG_VARIABLE("ODE rms error",
+    boost::any_cast<double*>(this->GetParam("rms_error"))[0]);
+  DIAG_VARIABLE("ODE constraint residual",
+    boost::any_cast<double*>(this->GetParam("constraint_residual"))[0]);
 }
 
 //////////////////////////////////////////////////

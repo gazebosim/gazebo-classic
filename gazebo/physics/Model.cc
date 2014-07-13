@@ -258,9 +258,12 @@ void Model::Update()
   }
 
   // diagnostics
-  DIAG_VARIABLE("model potential energy", this->GetWorldEnergyPotential());
-  DIAG_VARIABLE("model kinetic energy", this->GetWorldEnergyKinetic());
-  DIAG_VARIABLE("model total energy", this->GetWorldEnergy());
+  DIAG_VARIABLE("model ["+this->GetName()+"] potential energy",
+    this->GetWorldEnergyPotential());
+  DIAG_VARIABLE("model ["+this->GetName()+"] kinetic energy",
+    this->GetWorldEnergyKinetic());
+  DIAG_VARIABLE("model ["+this->GetName()+"] total energy",
+    this->GetWorldEnergy());
 }
 
 //////////////////////////////////////////////////
