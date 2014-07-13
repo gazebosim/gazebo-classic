@@ -461,10 +461,22 @@ void ODEPhysics::UpdatePhysics()
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
 
-  DIAG_VARIABLE("ODE rms error",
+  DIAG_VARIABLE("ODE rms error bilateral constraints",
     boost::any_cast<double*>(this->GetParam("rms_error"))[0]);
-  DIAG_VARIABLE("ODE constraint residual",
+  DIAG_VARIABLE("ODE rms error contact normal constraints",
+    boost::any_cast<double*>(this->GetParam("rms_error"))[1]);
+  DIAG_VARIABLE("ODE rms error friction constraints",
+    boost::any_cast<double*>(this->GetParam("rms_error"))[2]);
+  DIAG_VARIABLE("ODE rms error total",
+    boost::any_cast<double*>(this->GetParam("rms_error"))[3]);
+  DIAG_VARIABLE("ODE constraint residual bilateral constraints",
     boost::any_cast<double*>(this->GetParam("constraint_residual"))[0]);
+  DIAG_VARIABLE("ODE constraint residual contact normal constraints",
+    boost::any_cast<double*>(this->GetParam("constraint_residual"))[1]);
+  DIAG_VARIABLE("ODE constraint residual friction constraints",
+    boost::any_cast<double*>(this->GetParam("constraint_residual"))[2]);
+  DIAG_VARIABLE("ODE constraint residual total",
+    boost::any_cast<double*>(this->GetParam("constraint_residual"))[3]);
 }
 
 //////////////////////////////////////////////////
