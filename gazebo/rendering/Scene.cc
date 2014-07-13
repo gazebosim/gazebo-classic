@@ -1825,15 +1825,18 @@ void Scene::PreRender()
       for (int i = 0; i < (*spIter)->pose_size(); i++)
       {
         const msgs::Pose& pose_msg = (*spIter)->pose(i);
-        Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
-        if (iter2 != this->visuals.end())
+        if (pose_msg.has_id())
         {
-          // If an object is selected, don't let the physics engine move it.
-          if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first != this->selectedVis->GetId())
+          Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
+          if (iter2 != this->visuals.end())
           {
-            math::Pose pose = msgs::Convert(pose_msg);
-            iter2->second->SetPose(pose);
+            // If an object is selected, don't let the physics engine move it.
+            if (!this->selectedVis || this->selectionMode != "move" ||
+              iter->first != this->selectedVis->GetId())
+            {
+              math::Pose pose = msgs::Convert(pose_msg);
+              iter2->second->SetPose(pose);
+            }
           }
         }
       }

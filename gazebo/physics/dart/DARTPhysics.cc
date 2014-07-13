@@ -45,6 +45,7 @@
 #include "gazebo/physics/dart/DARTCylinderShape.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPolylineShape.hh"
 #include "gazebo/physics/dart/DARTMultiRayShape.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
@@ -323,6 +324,8 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     shape.reset(new DARTMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new DARTMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new DARTPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new DARTHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
