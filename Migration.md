@@ -1,5 +1,16 @@
 ## Gazebo 3.1 to 4.0
 
+### New Deprecations
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
+    + ***Replacement*** virtual void SetPosition(unsigned int, double)
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
 ### Additions
 
 1. **gazebo/msgs/msgs.hh**
@@ -30,6 +41,21 @@
 1. **gazebo/math/Filter.hh**
     + ***New classes:*** Filter, OnePole, OnePoleQuaternion, OnePoleVector3, BiQuad, and BiQuadVector3
 
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void Move(const math::Pose &_worldRefernceFrameSrc,
+                        const math::Pose &_worldRefernceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+      + msgs::Visual GetVisualMessage(const std::string &_name) 
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
@@ -42,6 +68,10 @@
 ## Gazebo 3.0 to 3.1
 
 ### Additions
+
+1. **gazebo/physics/World.hh**
+      + void RemoveModel(const std::string &_name);
+      + void RemoveModel(ModelPtr _model);
 
 1. **gazebo/physics/JointController.hh**
     + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);

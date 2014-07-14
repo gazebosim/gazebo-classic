@@ -15,6 +15,7 @@ endif()
 
 set (plugins
   ForceTorqueModelRemovalTestPlugin
+  Issue1208Plugin
   ModelTrajectoryTestPlugin
   SpringTestPlugin
 )

@@ -30,6 +30,7 @@
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
 #include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyPolylineShape.hh"
 #include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
@@ -519,6 +520,8 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     shape.reset(new SimbodyCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new SimbodyMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new SimbodyPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new SimbodyHeightmapShape(collision));
   else if (_type == "multiray")

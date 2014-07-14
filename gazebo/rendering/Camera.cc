@@ -265,7 +265,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (!this->TrackVisualImpl((*iter).data()))
+      if (this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
     else if ((*iter).request() == "attach_visual")
@@ -1438,6 +1438,9 @@ bool Camera::TrackVisualImpl(const std::string &_name)
     return this->TrackVisualImpl(visual);
   else
     this->dataPtr->trackedVisual.reset();
+
+  if (_name.empty())
+    return true;
 
   return false;
 }
