@@ -45,7 +45,6 @@ RayQuery::~RayQuery()
 bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
 {
-
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->GetOgreCamera()->getCameraToViewportRay(
@@ -106,7 +105,6 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     }
   }
 
-
   // if we found a new closest raycast for this object, update the
   // closestResult before moving on to the next object.
   if (newClosestFound)
@@ -125,7 +123,6 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   }
   // raycast failed
   return false;
-
 }
 
 /////////////////////////////////////////////////

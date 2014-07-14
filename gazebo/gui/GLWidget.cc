@@ -965,7 +965,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     // deselect 0 to n-1 models.
     if (this->selectedVisuals.size() > 1)
     {
-      for(std::vector<rendering::VisualPtr>::iterator it
+      for (std::vector<rendering::VisualPtr>::iterator it
           = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
       {
          (*it)->SetHighlighted(false);

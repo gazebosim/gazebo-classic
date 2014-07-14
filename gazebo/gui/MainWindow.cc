@@ -644,7 +644,7 @@ void MainWindow::Align()
 void MainWindow::OnAlignMode(QString _mode)
 {
   std::string mode = _mode.toStdString();
-  gui::Events::alignMode(mode.substr(0,1), mode.substr(1));
+  gui::Events::alignMode(mode.substr(0, 1), mode.substr(1));
 }
 
 /////////////////////////////////////////////////

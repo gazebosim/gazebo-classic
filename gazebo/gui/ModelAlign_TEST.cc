@@ -98,7 +98,8 @@ void ModelAlign_TEST::AlignXMin()
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
 
-    double minX = vis->GetWorldPose().pos.x + centerOffsets[i].x - bbox.GetXLength()/2.0;
+    double minX = vis->GetWorldPose().pos.x + centerOffsets[i].x -
+        bbox.GetXLength()/2.0;
     QVERIFY(gazebo::math::equal(minX, targetMinX, 1e-5));
   }
 }

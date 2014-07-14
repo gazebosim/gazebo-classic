@@ -18,6 +18,7 @@
 #define _MODEL_SNAP_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"

@@ -18,6 +18,7 @@
 #define _MODEL_SNAP_PRIVATE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -74,8 +75,6 @@ namespace gazebo
 
       /// \brief Lines to highlight the selected triangle.
       public: rendering::DynamicLines *snapLines;
-
-
     };
   }
 }
