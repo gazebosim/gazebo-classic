@@ -44,10 +44,10 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ModelSnap();
 
-      /// \brief Initialize the model manipulator.
+      /// \brief Initialize the model snapping tool.
       public: void Init();
 
-      /// \brief Reset the model alignment too.
+      /// \brief Reset the model snapping tool.
       public: void Reset();
 
       /// \brief Calculate the translation and rotation needed to snap the

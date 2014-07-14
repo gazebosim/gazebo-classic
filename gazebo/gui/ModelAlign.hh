@@ -44,7 +44,7 @@ namespace gazebo
       /// \brief Destructor
       private: virtual ~ModelAlign();
 
-      /// \brief Initialize the model manipulator.
+      /// \brief Initialize the model alignment tool.
       public: void Init();
 
       /// \brief Callback when a specific alignment configuration is set.
