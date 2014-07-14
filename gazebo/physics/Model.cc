@@ -264,6 +264,13 @@ void Model::Update()
     this->GetWorldEnergyKinetic());
   DIAG_VARIABLE("model ["+this->GetName()+"] total energy",
     this->GetWorldEnergy());
+
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] total energy",
+      (*liter)->GetWorldEnergy());
+  }
 }
 
 //////////////////////////////////////////////////

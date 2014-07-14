@@ -20,6 +20,8 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorsIface.hh"
 
+#include "gazebo/util/Diagnostics.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
@@ -412,6 +414,15 @@ double Joint::GetVelocityLimit(unsigned int _index)
 void Joint::Update()
 {
   this->jointUpdate();
+
+  // diagnostics
+  for(unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  {
+    std::ostringstream stream;
+    stream << "joint [" << this->GetScopedName() << "] ["
+           << i << "] potential spring";
+    DIAG_VARIABLE(stream.str(), this->GetWorldEnergyPotentialSpring(i));
+  }
 }
 
 //////////////////////////////////////////////////
