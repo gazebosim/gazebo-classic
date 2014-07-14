@@ -83,7 +83,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual double Get() const;
 
-      // Documentation inherited.
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return "Mean"
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
@@ -99,7 +100,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual double Get() const;
 
-      // Documentation inherited.
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return "Rms"
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
@@ -116,7 +118,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual double Get() const;
 
-      // Documentation inherited.
+      /// \brief Get a short version of the name of this statistical measure.
+      /// \return "MaxAbs"
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
@@ -150,6 +153,10 @@ namespace gazebo
 
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
+      /// Valid values include:
+      ///  "MaxAbs"
+      ///  "Mean"
+      ///  "Rms"
       public: bool InsertStatistic(const std::string &_name);
 
       /// \brief Forget all previous data.
@@ -176,6 +183,10 @@ namespace gazebo
 
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
+      /// Valid values include:
+      ///  "MaxAbs"
+      ///  "Mean"
+      ///  "Rms"
       public: bool InsertStatistic(const std::string &_name);
 
       /// \brief Forget all previous data.
