@@ -62,7 +62,7 @@ std::string SignalMean::GetShortName() const
 }
 
 //////////////////////////////////////////////////
-void SignalMean::Insert(double _data)
+void SignalMean::InsertData(double _data)
 {
   this->data += _data;
   this->count++;
@@ -85,7 +85,7 @@ std::string SignalRootMeanSquare::GetShortName() const
 }
 
 //////////////////////////////////////////////////
-void SignalRootMeanSquare::Insert(double _data)
+void SignalRootMeanSquare::InsertData(double _data)
 {
   this->data += _data * _data;
   this->count++;
@@ -104,7 +104,7 @@ std::string SignalMaxAbsoluteValue::GetShortName() const
 }
 
 //////////////////////////////////////////////////
-void SignalMaxAbsoluteValue::Insert(double _data)
+void SignalMaxAbsoluteValue::InsertData(double _data)
 {
   double fabsData = fabs(_data);
   if (fabsData > this->data)
@@ -154,7 +154,7 @@ void SignalStats::InsertData(double _data)
   for (SignalStatistic_V::iterator iter = this->stats.begin();
        iter != this->stats.end(); ++iter)
   {
-    (*iter)->Insert(_data);
+    (*iter)->InsertData(_data);
   }
 }
 

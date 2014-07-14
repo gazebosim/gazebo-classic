@@ -53,7 +53,7 @@ TEST_F(SignalStatsTest, SignalMean)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        mean.Insert(value);
+        mean.InsertData(value);
         EXPECT_NEAR(mean.Get(), value, 1e-10);
         EXPECT_EQ(mean.GetCount(), i);
       }
@@ -79,8 +79,8 @@ TEST_F(SignalStatsTest, SignalMean)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        mean.Insert(value * i);
-        mean.Insert(-value * i);
+        mean.InsertData(value * i);
+        mean.InsertData(-value * i);
         EXPECT_NEAR(mean.Get(), 0.0, 1e-10);
         EXPECT_EQ(mean.GetCount(), i*2);
       }
@@ -121,7 +121,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        rms.Insert(value);
+        rms.InsertData(value);
         EXPECT_NEAR(rms.Get(), value, 1e-10);
         EXPECT_EQ(rms.GetCount(), i);
       }
@@ -147,11 +147,11 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        rms.Insert(value);
+        rms.InsertData(value);
         EXPECT_NEAR(rms.Get(), value, 1e-10);
         EXPECT_EQ(rms.GetCount(), i*2-1);
 
-        rms.Insert(-value);
+        rms.InsertData(-value);
         EXPECT_NEAR(rms.Get(), value, 1e-10);
         EXPECT_EQ(rms.GetCount(), i*2);
       }
@@ -192,7 +192,7 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        max.Insert(value);
+        max.InsertData(value);
         EXPECT_NEAR(max.Get(), value, 1e-10);
         EXPECT_EQ(max.GetCount(), i);
       }
@@ -218,11 +218,11 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
     {
       for (unsigned int i = 1; i <= 10; ++i)
       {
-        max.Insert(value * i);
+        max.InsertData(value * i);
         EXPECT_NEAR(max.Get(), value * i, 1e-10);
         EXPECT_EQ(max.GetCount(), i*2-1);
 
-        max.Insert(-value * i);
+        max.InsertData(-value * i);
         EXPECT_NEAR(max.Get(), value * i, 1e-10);
         EXPECT_EQ(max.GetCount(), i*2);
       }

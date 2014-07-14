@@ -55,7 +55,7 @@ namespace gazebo
 
       /// \brief Add a new sample to the statistical measure.
       /// \param[in] _data New signal data point.
-      public: virtual void Insert(double _data) = 0;
+      public: virtual void InsertData(double _data) = 0;
 
       /// \brief Forget all previous data.
       public: virtual void Reset();
@@ -87,7 +87,7 @@ namespace gazebo
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
-      public: virtual void Insert(double _data);
+      public: virtual void InsertData(double _data);
     };
     /// \}
 
@@ -103,7 +103,7 @@ namespace gazebo
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
-      public: virtual void Insert(double _data);
+      public: virtual void InsertData(double _data);
     };
     /// \}
 
@@ -120,7 +120,7 @@ namespace gazebo
       public: virtual std::string GetShortName() const;
 
       // Documentation inherited.
-      public: virtual void Insert(double _data);
+      public: virtual void InsertData(double _data);
     };
     /// \}
 
