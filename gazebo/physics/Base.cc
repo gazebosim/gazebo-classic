@@ -15,12 +15,6 @@
  *
 */
 
-/* Desc: Base class shared by all classes in Gazebo.
- * Author: Nate Koenig
- * Date: 09 Sept. 2008
- */
-
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -298,9 +292,12 @@ BasePtr Base::GetByName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-std::string Base::GetScopedName() const
+std::string Base::GetScopedName(bool _prependWorldName) const
 {
-  return this->scopedName;
+  if (_prependWorldName)
+    return this->world->GetName() + "::" + this->scopedName;
+  else
+    return this->scopedName;
 }
 
 //////////////////////////////////////////////////

@@ -103,6 +103,15 @@ set (headers
   CEGUIOgreRenderer.h
 )
 
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusCamera.cc
+  )
+  set (headers ${headers}
+    OculusCamera.hh
+  )
+endif ()
+
 set (gtest_sources
 )
 
@@ -129,7 +138,7 @@ link_directories(
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering
+target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
   gazebo_skyx
@@ -139,6 +148,12 @@ target_link_libraries( gazebo_rendering
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
+
+if (HAVE_OCULUS)
+  target_link_libraries(gazebo_rendering
+    OculusVR
+  )
+endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)
