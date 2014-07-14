@@ -35,8 +35,7 @@ namespace gazebo
     class ModelAlignPrivate;
 
     /// \class ModelAlign ModelAlign.hh gui/Gui.hh
-    /// \brief Manipulator tool for translating/rotating/scaling models and
-    /// links
+    /// \brief A gui tool for aligning models
     class GAZEBO_VISIBLE ModelAlign : public SingletonT<ModelAlign>
     {
       /// \brief Constructor

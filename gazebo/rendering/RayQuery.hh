@@ -37,9 +37,8 @@ namespace gazebo
     /// \{
 
     /// \class RayQuery RayQuery.hh rendering/rendering.hh
-    /// \brief RayQuery adapted from Ogre3D wiki
-    ///
-    /// Provides the interface to load, initialize the rendering engine.
+    /// \brief A Ray Query class used for retrieving mesh data of a visual,
+    /// adapted from Ogre3D wiki.
     class GAZEBO_VISIBLE RayQuery
     {
       /// \brief Constructor
