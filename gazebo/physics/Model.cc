@@ -67,19 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  // TODO: According to SDF 1.5 there should be a 'static' element for
-  // model. However we don't get it for 'Actor' and it crashes.
-  // So we are checking for null.
-  sdf::ElementPtr sdfStaticElementPtr = this->sdf->GetElement("static");
-  if (sdfStaticElementPtr)
-    sdfStaticElementPtr->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  // TODO: According to SDF 1.5 there should be a 'allow_auto_disable'
-  // element for the model. However we don't get it for 'Actor'. Non
-  // existing element is handled and a default value is assigned by
-  // sdf::Get().
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
