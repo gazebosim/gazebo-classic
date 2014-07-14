@@ -291,10 +291,6 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
                << "] or child[" << childStatic << "] is static.\n";
       }
     }
-
-    /// \TODO: add spring force element
-    gzdbg << "Joint [" << this->GetName()
-           << "] stiffness not implement in DART\n";
   }
   else
   {
