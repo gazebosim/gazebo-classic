@@ -74,9 +74,6 @@ namespace gazebo
       if (!scene || !scene->GetInitialized())
         return;
 
-      // Print out the total number of visuals in the scene
-      std::cout << "Visual Count:" << scene->GetVisualCount() << std::endl;
-
       // Look for a specific visual by name.
       if (scene->GetVisual("ground_plane"))
         std::cout << "Has ground plane visual\n";
