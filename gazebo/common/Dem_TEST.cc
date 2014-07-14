@@ -141,15 +141,15 @@ TEST_F(DemTest, FillHeightmap)
 
   subsampling = 2;
   vertSize = (dem.GetWidth() * subsampling) - 1;
-  size.x = dem.GetWorldWidth();
-  size.y = dem.GetWorldHeight();
-  size.z = dem.GetMaxElevation() - dem.GetMinElevation();
-  scale.x = size.x / vertSize;
-  scale.y = size.y / vertSize;
+  size.X() = dem.GetWorldWidth();
+  size.Y() = dem.GetWorldHeight();
+  size.Z() = dem.GetMaxElevation() - dem.GetMinElevation();
+  scale.X() = size.X() / vertSize;
+  scale.Y() = size.Y() / vertSize;
   if (ignition::math::equal(dem.GetMaxElevation(), 0.0f))
-    scale.z = fabs(size.z);
+    scale.Z() = fabs(size.Z());
   else
-    scale.z = fabs(size.z) / dem.GetMaxElevation();
+    scale.Z() = fabs(size.Z()) / dem.GetMaxElevation();
   flipY = false;
 
   dem.FillHeightMap(subsampling, vertSize, size, scale, flipY, elevations);

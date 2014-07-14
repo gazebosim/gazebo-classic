@@ -43,7 +43,6 @@ if(HAVE_DART)
   add_dependencies(gazebo_physics_dart gazebo_msgs)
 endif()
 
-
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
 
@@ -55,6 +54,7 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
+  ${IGNITION_MATH_LIBRARIES}
   pthread
 )
 
@@ -67,6 +67,7 @@ target_link_libraries(gazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
+  ${IGNITION_MATH_LIBRARIES}
   pthread
 )
 
@@ -90,10 +91,9 @@ target_link_libraries(libgazebo
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
+  ${IGNITION_MATH_LIBRARIES}
   pthread
 )
-
-target_link_libraries(libgazebo ${IGNITION_MATH_LIBRARIES})
 
 add_dependencies(libgazebo gazebo_msgs)
 gz_install_library(libgazebo)

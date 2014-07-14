@@ -280,16 +280,16 @@ void Dem::FillHeightMap(int _subSampling, unsigned int _vertSize,
       float h2 = (px3 - ((px3 - px4) * dx));
 
       float h = (h1 - ((h1 - h2) * dy) - std::max(0.0f,
-          this->GetMinElevation())) * _scale.z;
+          this->GetMinElevation())) * _scale.Z();
 
       // Invert pixel definition so 1=ground, 0=full height,
       // if the terrain size has a negative z component
       // this is mainly for backward compatibility
-      if (_size.z < 0)
+      if (_size.Z() < 0)
         h *= -1;
 
       // Convert to 0 if a NODATA value is found
-      if (_size.z >= 0 && h < 0)
+      if (_size.Z() >= 0 && h < 0)
         h = 0;
 
       // Store the height for future use

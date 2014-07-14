@@ -201,13 +201,13 @@ TEST_F(WorldTest, RemoveModelPaused)
 {
   Load("worlds/shapes.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel);
-  EXPECT_TRUE(boxModel);
+  EXPECT_TRUE(sphereModel != NULL);
+  EXPECT_TRUE(boxModel != NULL);
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
@@ -224,13 +224,13 @@ TEST_F(WorldTest, RemoveModelUnPaused)
 {
   Load("worlds/shapes.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel);
-  EXPECT_TRUE(boxModel);
+  EXPECT_TRUE(sphereModel != NULL);
+  EXPECT_TRUE(boxModel != NULL);
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");

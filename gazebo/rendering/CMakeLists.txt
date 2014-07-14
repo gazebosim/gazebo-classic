@@ -143,6 +143,7 @@ target_link_libraries(gazebo_rendering
   gazebo_skyx
   gazebo_selection_buffer
   gazebo_transport
+  ${IGNITION_MATH_LIBRARIES}
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
