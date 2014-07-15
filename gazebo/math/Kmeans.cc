@@ -93,17 +93,10 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
   // Initialize centroids.
   for (size_t i = 0; i < k; ++i)
   {
-    // centroid.
-    Vector3 c;
-
     // Choose a random observation and make sure it has not been chosen before.
-    do
-    {
-      c = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
-    } while (std::find(this->centroids.begin(), this->centroids.end(), c) !=
-             this->centroids.end());
-
-    this->centroids.push_back(c);
+    // Note: This is not really random but it's faster than choosing a random
+    // one and verifying that it was not taken before.
+    this->centroids.push_back(this->obs[i]);
   }
 
   // Initialize labels.
