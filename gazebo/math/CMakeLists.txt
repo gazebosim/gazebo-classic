@@ -44,6 +44,7 @@ set (gtest_sources
   Angle_TEST.cc
   Box_TEST.cc
   Helpers_TEST.cc
+  Kmeans_TEST.cc
   Matrix3_TEST.cc
   Plane_TEST.cc
   Pose_TEST.cc

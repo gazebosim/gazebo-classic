@@ -38,30 +38,18 @@ namespace gazebo
       /// \brief constructor
       /// \param[in] _obs Set of observations to cluster.
       /// \param[in] _k Number of clusters.
-      /// \param[in] _seed The seed used to initialize the randon number
-      /// generator.
-      public: Kmeans(const std::vector<math::Vector3> &_obs, unsigned int _k,
-                     uint32_t _seed = 0);
+      public: Kmeans(const std::vector<Vector3> &_obs, unsigned int _k);
 
       /// \brief Destructor
       public: virtual ~Kmeans();
 
-      /// \brief Get the seed value.
-      /// \return The seed value used to initialize the random number generator.
-      public: uint32_t GetSeed();
-
-      /// \brief Set the seed value.
-      /// \param[in] _seed The seed used to initialize the randon number
-      /// generator.
-      public: void SetSeed(uint32_t _seed);
-
       /// \brief Get the observations to cluster.
       /// \return The vector of observations.
-      public: std::vector<math::Vector3> GetObservations();
+      public: std::vector<Vector3> GetObservations();
 
       /// \brief Set the observations to cluster.
       /// \param[in] _obs The new vector of observations.
-      public: void SetObservations(const std::vector<math::Vector3> &_obs);
+      public: void SetObservations(const std::vector<Vector3> &_obs);
 
       /// \brief Get the number of partitions used to cluster.
       /// \return The number of partitions.
@@ -71,19 +59,31 @@ namespace gazebo
       /// \param[in] _k The number of partitions.
       public: void SetNumClusters(unsigned int _k);
 
-      /// \brief Executes the algorithm.
-      /// \param[out] _centroids Vector of centroids.
+      /// \brief Executes the k-means algorithm.
+      /// \param[out] _centroids Vector of centroids. Each element contains the
+      /// centroid of one cluster.
+      /// \param[out] _labels Vector of labels. The size of this vector is
+      /// equals to the number of observations. Each element represents the
+      /// cluster to which observation i belongs.
       /// \return True when the operation succeed or false otherwise.
       public: bool Cluster(std::vector<Vector3> &_centroids,
                            std::vector<unsigned int> &_labels);
 
-      private: unsigned int ClosestCentroid(Vector3 p);
+      /// \brief Given an observation, it returns the closest centroid to it.
+      /// \param[in] _p Point to check.
+      /// \return The index of the closest centroid to the point _p.
+      private: unsigned int ClosestCentroid(const Vector3 &_p);
+
+      /// \brief Check if the given number of observations and number of
+      /// clusters is valid. The number of observations has to be positive and
+      /// the number of clusters has to be positive and less or equal to the
+      /// number of observations.
+      /// \return True if the conditions are satisfied and we can run the
+      /// algorithm or false otherwise.
+      private: bool IsDataValid();
 
       /// \brief Number of partitions used to cluster.
       private: unsigned int k;
-
-      /// \brief Seed value used to initialize the random number generator.
-      private: uint32_t seed;
 
       /// \brief Observations.
       private: std::vector<Vector3> obs;
@@ -94,11 +94,15 @@ namespace gazebo
       /// \brief Centroids from the previous iteration.
       private: std::vector<Vector3> oldCentroids;
 
-      /// \brief Contains the cluster for each observation.
+      /// \brief Each element represents the cluster to which observation i
+      /// belongs.
       private: std::vector<unsigned int> labels;
 
+      /// \brief Used to calculate the centroid of each partition.
       private: std::vector<Vector3> sums;
 
+      /// \brief Used to count the number of observations contained in each
+      /// partition.
       private: std::vector<unsigned int> counters;
     };
     /// \}

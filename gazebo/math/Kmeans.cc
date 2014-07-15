@@ -26,10 +26,8 @@ using namespace common;
 using namespace math;
 
 //////////////////////////////////////////////////
-Kmeans::Kmeans(const std::vector<math::Vector3> &_obs, unsigned int _k,
-               uint32_t _seed)
-  : k(_k),
-    seed(_seed)
+Kmeans::Kmeans(const std::vector<Vector3> &_obs, unsigned int _k)
+  : k(_k)
 {
   // Initialize observations.
   this->SetObservations(_obs);
@@ -37,9 +35,17 @@ Kmeans::Kmeans(const std::vector<math::Vector3> &_obs, unsigned int _k,
   // Initialize centroids.
   for (size_t i = 0; i < k; ++i)
   {
-    // Choose a random observation.
-    Vector3 p = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
-    this->centroids.push_back(p);
+    // centroid.
+    Vector3 c;
+
+    // Choose a random observation and make sure it has not been choosen before.
+    do
+    {
+      c = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
+    } while (std::find(this->centroids.begin(), this->centroids.end(), c) !=
+             this->centroids.end());
+
+    this->centroids.push_back(c);
   }
 }
 
@@ -49,29 +55,15 @@ Kmeans::~Kmeans()
 }
 
 //////////////////////////////////////////////////
-uint32_t Kmeans::GetSeed()
-{
-  return this->seed;
-}
-
-//////////////////////////////////////////////////
-void Kmeans::SetSeed(uint32_t _seed)
-{
-  this->seed = _seed;
-}
-
-//////////////////////////////////////////////////
-std::vector<math::Vector3> Kmeans::GetObservations()
+std::vector<Vector3> Kmeans::GetObservations()
 {
   return this->obs;
 }
 
 //////////////////////////////////////////////////
-void Kmeans::SetObservations(const std::vector<math::Vector3> &_obs)
+void Kmeans::SetObservations(const std::vector<Vector3> &_obs)
 {
-  this->obs.clear();
-  for (size_t i = 0; i < _obs.size(); ++i)
-    this->obs.push_back(_obs[i]);
+  this->obs = _obs;
 }
 
 //////////////////////////////////////////////////
@@ -90,27 +82,10 @@ void Kmeans::SetNumClusters(unsigned int _k)
 bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
                      std::vector<unsigned int> &_labels)
 {
+  if (!this->IsDataValid())
+    return false;
+
   size_t changed = 0;
-  // ToDo(caguero): Use gzerr
-  // Sanity check
-  if (this->obs.size() == 0)
-  {
-    std::cerr << "The set of observations is empty." << std::endl;
-    return false;
-  }
-
-  if (this->k == 0)
-  {
-    std::cerr << "The number of clusters should not be zero." << std::endl;
-    return false;
-  }
-
-  if (this->k > this->obs.size())
-  {
-    std::cerr << "The number of clusters has to be lower or equal to the number"
-              << " of observations." << std::endl;
-    return false;
-  }
 
   // Initialize the size of the vectors;
   this->centroids.resize(this->k);
@@ -128,7 +103,7 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
     // Reset sums and counters.
     for (size_t i = 0; i < this->centroids.size(); ++i)
     {
-      this->sums[i] = math::Vector3(0, 0, 0);
+      this->sums[i] = Vector3(0, 0, 0);
       this->counters[i] = 0;
     }
     changed = 0;
@@ -161,13 +136,13 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
 }
 
 //////////////////////////////////////////////////
-unsigned int Kmeans::ClosestCentroid(Vector3 p)
+unsigned int Kmeans::ClosestCentroid(const Vector3 &_p)
 {
   double min = HUGE_VAL;
   unsigned int minIdx = 0;
   for (size_t i = 0; i < this->centroids.size(); ++i)
   {
-    double d = p.Distance(this->centroids[i]);
+    double d = _p.Distance(this->centroids[i]);
     if (d < min)
     {
       min = d;
@@ -177,3 +152,26 @@ unsigned int Kmeans::ClosestCentroid(Vector3 p)
   return minIdx;
 }
 
+//////////////////////////////////////////////////
+bool Kmeans::IsDataValid()
+{
+  if (this->obs.size() == 0)
+  {
+    std::cerr << "The set of observations is empty." << std::endl;
+    return false;
+  }
+
+  if (this->k == 0)
+  {
+    std::cerr << "The number of clusters should not be zero." << std::endl;
+    return false;
+  }
+
+  if (this->k > this->obs.size())
+  {
+    std::cerr << "The number of clusters has to be lower or equal to the number"
+              << " of observations." << std::endl;
+    return false;
+  }
+  return true;
+}
