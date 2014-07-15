@@ -115,9 +115,9 @@ namespace gazebo
       /// \param[in] _z value aling z
       public: inline void Set(double _x = 0, double _y = 0 , double _z = 0)
               {
-                this->x = _x;
-                this->y = _y;
-                this->z = _z;
+                this->data[0] = _x;
+                this->data[1] = _y;
+                this->data[2] = _z;
               }
 
       /// \brief Return the cross product of this vector and pt
@@ -191,7 +191,7 @@ namespace gazebo
       /// \return negative of this vector
       public: inline Vector3 operator-() const
               {
-                return Vector3(-this->x, -this->y, -this->z);
+                return Vector3(-this->X(), -this->Y(), -this->Z());
               }
 
       /// \brief Subtraction operators
@@ -199,9 +199,9 @@ namespace gazebo
       /// \return a vector
       public: inline Vector3 operator-(const Vector3 &_pt) const
               {
-                return Vector3(this->x - _pt.x,
-                               this->y - _pt.y,
-                               this->z - _pt.z);
+                return Vector3(this->X() - _pt.X(),
+                               this->Y() - _pt.Y(),
+                               this->Z() - _pt.Z());
               }
 
       /// \brief Subtraction operators
@@ -247,7 +247,7 @@ namespace gazebo
       /// \return a scaled vector
       public: friend inline Vector3 operator*(double _s,
                                               const Vector3 &_v)
-      { return Vector3(_v.x * _s, _v.y * _s, _v.z * _s); }
+      { return Vector3(_v.X() * _s, _v.Y() * _s, _v.Z() * _s); }
 
       /// \brief Multiplication operators
       /// \param[in] _v the scaling factor
@@ -277,12 +277,12 @@ namespace gazebo
       /// \brief Corrects any nan values
       public: inline void Correct()
               {
-                if (!std::isfinite(this->x))
-                  this->x = 0;
-                if (!std::isfinite(this->y))
-                  this->y = 0;
-                if (!std::isfinite(this->z))
-                  this->z = 0;
+                if (!std::isfinite(this->X()))
+                  this->X() = 0;
+                if (!std::isfinite(this->Y()))
+                  this->Y() = 0;
+                if (!std::isfinite(this->Z()))
+                  this->Z() = 0;
               }
 
       /// \brief [] operator
@@ -299,13 +299,76 @@ namespace gazebo
       public: bool Equal(const Vector3 &_v) const;
 
       /// \brief X location
-      public: double x;
+      public: double x __attribute__((deprecated));
 
       /// \brief Y location
-      public: double y;
+      public: double y __attribute__((deprecated));
 
       /// \brief Z location
-      public: double z;
+      public: double z __attribute__((deprecated));
+
+      /// \brief Get the x value.
+      /// \return The x component of the vector
+      public: inline double X() const
+      {
+        return this->data[0];
+      }
+
+      /// \brief Get the y value.
+      /// \return The y component of the vector
+      public: inline double Y() const
+      {
+        return this->data[1];
+      }
+
+      /// \brief Get the z value.
+      /// \return The z component of the vector
+      public: inline double Z() const
+      {
+        return this->data[2];
+      }
+
+      /// \brief Get a mutable reference to the x value.
+      /// \return The x component of the vector
+      public: inline double &X()
+      {
+        return this->data[0];
+      }
+
+      /// \brief Get a mutable reference to the y value.
+      /// \return The y component of the vector
+      public: inline double &Y()
+      {
+        return this->data[1];
+      }
+
+      /// \brief Get a mutable reference to the z value.
+      /// \return The z component of the vector
+      public: inline double &Z()
+      {
+        return this->data[2];
+      }
+
+      /// \brief Set the x value.
+      /// \param[in] _v Value for the x component.
+      public: inline void X(const double &_v)
+      {
+        this->data[0] = _v;
+      }
+
+      /// \brief Set the y value.
+      /// \param[in] _v Value for the y component.
+      public: inline void Y(const double &_v)
+      {
+        this->data[1] = _v;
+      }
+
+      /// \brief Set the z value.
+      /// \param[in] _v Value for the z component.
+      public: inline void Z(const double &_v)
+      {
+        this->data[2] = _v;
+      }
 
       /// \brief Stream insertion operator
       /// \param _out output stream
@@ -314,8 +377,8 @@ namespace gazebo
       public: friend std::ostream &operator<<(std::ostream &_out,
                                               const gazebo::math::Vector3 &_pt)
       {
-        _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
-             << precision(_pt.z, 6);
+        _out << precision(_pt.X(), 6) << " " << precision(_pt.Y(), 6) << " "
+             << precision(_pt.Z(), 6);
         return _out;
       }
 
@@ -328,9 +391,12 @@ namespace gazebo
       {
         // Skip white spaces
         _in.setf(std::ios_base::skipws);
-        _in >> _pt.x >> _pt.y >> _pt.z;
+        _in >> _pt.X() >> _pt.Y() >> _pt.Z();
         return _in;
       }
+      
+      /// \brief The x, y, and z values
+      private: double data[3];
     };
     /// \}
   }
