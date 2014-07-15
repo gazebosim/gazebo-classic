@@ -187,13 +187,13 @@ ignition::math::Vector3d SphericalCoordinates::SphericalFromLocal(
   ignition::math::Angle deltaLatitude(north / radiusMeridional);
   ignition::math::Angle deltaLongitude(east / radiusNormal);
   // geodetic latitude in degrees
-  spherical.x(this->dataPtr->latitudeReference.Degree() +
+  spherical.X(this->dataPtr->latitudeReference.Degree() +
               deltaLatitude.Degree());
   // geodetic longitude in degrees
-  spherical.y(this->dataPtr->longitudeReference.Degree() +
+  spherical.Y(this->dataPtr->longitudeReference.Degree() +
               deltaLongitude.Degree());
   // altitude relative to sea level
-  spherical.z(this->dataPtr->elevationReference + _xyz.Z());
+  spherical.Z(this->dataPtr->elevationReference + _xyz.Z());
   return spherical;
 }
 

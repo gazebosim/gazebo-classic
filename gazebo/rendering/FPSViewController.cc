@@ -65,21 +65,21 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
   else if (_event.buttons & common::MouseEvent::RIGHT)
   {
     // interactively pan view
-    directionVec.x(0);
-    directionVec.y(drag.X() * _event.moveScale);
-    directionVec.z(drag.Y() * _event.moveScale);
+    directionVec.X(0);
+    directionVec.Y(drag.X() * _event.moveScale);
+    directionVec.Z(drag.Y() * _event.moveScale);
   }
   else if (_event.buttons & common::MouseEvent::MIDDLE)
   {
-    directionVec.x(drag.Y() * _event.moveScale);
-    directionVec.y(0);
-    directionVec.z(0);
+    directionVec.X(drag.Y() * _event.moveScale);
+    directionVec.Y(0);
+    directionVec.Z(0);
   }
   else if (_event.type == common::MouseEvent::SCROLL)
   {
     directionVec.X() -= 50.0 * _event.scroll.Y() * _event.moveScale;
-    directionVec.y(0);
-    directionVec.z(0);
+    directionVec.Y(0);
+    directionVec.Z(0);
   }
 
   this->camera->Translate(directionVec);

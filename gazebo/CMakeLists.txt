@@ -54,7 +54,7 @@ target_link_libraries(gzserver
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  ${IGNITION_MATH_LIBRARIES}
+  ${IGNITION-MATH_LIBRARIES}
   pthread
 )
 
@@ -67,7 +67,7 @@ target_link_libraries(gazebo
   gazebo_rendering
   gazebo_msgs
   gazebo_gui
-  ${IGNITION_MATH_LIBRARIES}
+  ${IGNITION-MATH_LIBRARIES}
   pthread
 )
 
@@ -91,7 +91,7 @@ target_link_libraries(libgazebo
   gazebo_sensors
   gazebo_rendering
   gazebo_msgs
-  ${IGNITION_MATH_LIBRARIES}
+  ${IGNITION-MATH_LIBRARIES}
   pthread
 )
 

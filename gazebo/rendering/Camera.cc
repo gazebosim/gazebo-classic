@@ -1535,9 +1535,9 @@ bool Camera::MoveToPosition(const ignition::math::Pose3d &_pose, double _time)
   double dyaw =  localRot.Euler().Z() - rpy.Z();
 
   if (dyaw > M_PI)
-    rpy.z(rpy.Z() + 2*M_PI);
+    rpy.Z(rpy.Z() + 2*M_PI);
   else if (dyaw < -M_PI)
-    rpy.z(rpy.Z() - 2*M_PI);
+    rpy.Z(rpy.Z() - 2*M_PI);
 
   ignition::math::Quaterniond pitchYawOnly(0, rpy.Y(), rpy.Z());
   Ogre::Quaternion pitchYawFinal(Conversions::Convert(pitchYawOnly));
@@ -1622,9 +1622,9 @@ bool Camera::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
     double dyaw = prevYaw - rpy.Z();
 
     if (dyaw > M_PI)
-      rpy.z(rpy.Z() + 2*M_PI);
+      rpy.Z(rpy.Z() + 2*M_PI);
     else if (dyaw < -M_PI)
-      rpy.z(rpy.Z() - 2*M_PI);
+      rpy.Z(rpy.Z() - 2*M_PI);
 
     prevYaw = rpy.Z();
 

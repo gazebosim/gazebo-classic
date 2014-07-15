@@ -86,9 +86,9 @@ ignition::math::Vector3d Mesh::GetMax() const
   ignition::math::Vector3d max;
   std::vector<SubMesh*>::const_iterator iter;
 
-  max.x(-FLT_MAX);
-  max.y(-FLT_MAX);
-  max.z(-FLT_MAX);
+  max.X(-FLT_MAX);
+  max.Y(-FLT_MAX);
+  max.Z(-FLT_MAX);
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
@@ -96,9 +96,9 @@ ignition::math::Vector3d Mesh::GetMax() const
       continue;
 
     ignition::math::Vector3d smax = (*iter)->GetMax();
-    max.x(std::max(max.X(), smax.X()));
-    max.y(std::max(max.Y(), smax.Y()));
-    max.z(std::max(max.Z(), smax.Z()));
+    max.X(std::max(max.X(), smax.X()));
+    max.Y(std::max(max.Y(), smax.Y()));
+    max.Z(std::max(max.Z(), smax.Z()));
   }
 
   return max;
@@ -110,9 +110,9 @@ ignition::math::Vector3d Mesh::GetMin() const
   ignition::math::Vector3d min;
   std::vector<SubMesh *>::const_iterator iter;
 
-  min.x(FLT_MAX);
-  min.y(FLT_MAX);
-  min.z(FLT_MAX);
+  min.X(FLT_MAX);
+  min.Y(FLT_MAX);
+  min.Z(FLT_MAX);
 
   for (iter = this->submeshes.begin(); iter != this->submeshes.end(); ++iter)
   {
@@ -120,9 +120,9 @@ ignition::math::Vector3d Mesh::GetMin() const
       continue;
 
     ignition::math::Vector3d smin = (*iter)->GetMin();
-    min.x(std::min(min.X(), smin.X()));
-    min.y(std::min(min.Y(), smin.Y()));
-    min.z(std::min(min.Z(), smin.Z()));
+    min.X(std::min(min.X(), smin.X()));
+    min.Y(std::min(min.Y(), smin.Y()));
+    min.Z(std::min(min.Z(), smin.Z()));
   }
 
   return min;
@@ -625,15 +625,15 @@ ignition::math::Vector3d SubMesh::GetMax() const
   ignition::math::Vector3d max;
   std::vector<ignition::math::Vector3d>::const_iterator iter;
 
-  max.x(-FLT_MAX);
-  max.y(-FLT_MAX);
-  max.z(-FLT_MAX);
+  max.X(-FLT_MAX);
+  max.Y(-FLT_MAX);
+  max.Z(-FLT_MAX);
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    max.x(std::max(max.X(), (*iter).X()));
-    max.y(std::max(max.Y(), (*iter).Y()));
-    max.z(std::max(max.Z(), (*iter).Z()));
+    max.X(std::max(max.X(), (*iter).X()));
+    max.Y(std::max(max.Y(), (*iter).Y()));
+    max.Z(std::max(max.Z(), (*iter).Z()));
   }
 
   return max;
@@ -645,15 +645,15 @@ ignition::math::Vector3d SubMesh::GetMin() const
   ignition::math::Vector3d min;
   std::vector<ignition::math::Vector3d>::const_iterator iter;
 
-  min.x(FLT_MAX);
-  min.y(FLT_MAX);
-  min.z(FLT_MAX);
+  min.X(FLT_MAX);
+  min.Y(FLT_MAX);
+  min.Z(FLT_MAX);
 
   for (iter = this->vertices.begin(); iter != this->vertices.end(); ++iter)
   {
-    min.x(std::min(min.X(), (*iter).X()));
-    min.y(std::min(min.Y(), (*iter).Y()));
-    min.z(std::min(min.Z(), (*iter).Z()));
+    min.X(std::min(min.X(), (*iter).X()));
+    min.Y(std::min(min.Y(), (*iter).Y()));
+    min.Z(std::min(min.Z(), (*iter).Z()));
   }
 
   return min;
@@ -816,31 +816,31 @@ void Mesh::GetAABB(ignition::math::Vector3d &_center,
     ignition::math::Vector3d &_maxXyz) const
 {
   // find aabb center
-  _minXyz.x(1e15);
-  _maxXyz.x(-1e15);
-  _minXyz.y(1e15);
-  _maxXyz.y(-1e15);
-  _minXyz.z(1e15);
-  _maxXyz.z(-1e15);
-  _center.x(0);
-  _center.y(0);
-  _center.z(0);
+  _minXyz.X(1e15);
+  _maxXyz.X(-1e15);
+  _minXyz.Y(1e15);
+  _maxXyz.Y(-1e15);
+  _minXyz.Z(1e15);
+  _maxXyz.Z(-1e15);
+  _center.X(0);
+  _center.Y(0);
+  _center.Z(0);
 
   std::vector<SubMesh*>::const_iterator siter;
   for (siter = this->submeshes.begin(); siter != this->submeshes.end(); ++siter)
   {
     ignition::math::Vector3d max = (*siter)->GetMax();
     ignition::math::Vector3d min = (*siter)->GetMin();
-    _minXyz.x(std::min(_minXyz.X(), min.X()));
-    _maxXyz.x(std::max(_maxXyz.X(), max.X()));
-    _minXyz.y(std::min(_minXyz.Y(), min.Y()));
-    _maxXyz.y(std::max(_maxXyz.Y(), max.Y()));
-    _minXyz.z(std::min(_minXyz.Z(), min.Z()));
-    _maxXyz.z(std::max(_maxXyz.Z(), max.Z()));
+    _minXyz.X(std::min(_minXyz.X(), min.X()));
+    _maxXyz.X(std::max(_maxXyz.X(), max.X()));
+    _minXyz.Y(std::min(_minXyz.Y(), min.Y()));
+    _maxXyz.Y(std::max(_maxXyz.Y(), max.Y()));
+    _minXyz.Z(std::min(_minXyz.Z(), min.Z()));
+    _maxXyz.Z(std::max(_maxXyz.Z(), max.Z()));
   }
-  _center.x(0.5*(_minXyz.X() + _maxXyz.X()));
-  _center.y(0.5*(_minXyz.Y() + _maxXyz.Y()));
-  _center.z(0.5*(_minXyz.Z() + _maxXyz.Z()));
+  _center.X(0.5*(_minXyz.X() + _maxXyz.X()));
+  _center.Y(0.5*(_minXyz.Y() + _maxXyz.Y()));
+  _center.Z(0.5*(_minXyz.Z() + _maxXyz.Z()));
 }
 
 

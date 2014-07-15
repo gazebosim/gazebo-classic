@@ -206,14 +206,14 @@ Skeleton *BVHLoader::Load(const std::string &_filename, double _scale)
         cursor++;
         std::string channel = channels[j];
         if (channel == "Xposition")
-          translation.x(value * _scale);
+          translation.X() = value * _scale;
         else
           if (channel == "Yposition")
-            translation.y(value * _scale);
+            translation.Y() = value * _scale;
           else
             if (channel == "Zposition")
             {
-              translation.z(value * _scale);
+              translation.Z() = value * _scale;
             }
             else
               if (channel == "Zrotation")

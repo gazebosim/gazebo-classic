@@ -265,13 +265,13 @@ void MeshManager::CreateSphere(const std::string &name, float radius,
   for (ring = 0; ring <= rings; ring++)
   {
     float r0 = radius * sinf(ring * deltaRingAngle);
-    vert.y(radius * cosf(ring * deltaRingAngle));
+    vert.Y(radius * cosf(ring * deltaRingAngle));
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.x(r0 * sinf(seg * deltaSegAngle));
-      vert.z(r0 * cosf(seg * deltaSegAngle));
+      vert.X(r0 * sinf(seg * deltaSegAngle));
+      vert.Z(r0 * cosf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -368,9 +368,9 @@ void MeshManager::CreatePlane(const std::string &name,
       for (int x = 0; x <= segments.X(); ++x)
       {
         // Compute the position of the vertex
-        vec.x((x * xSpace) - halfWidth);
-        vec.y((y * ySpace) - halfHeight);
-        vec.z(-z);
+        vec.X((x * xSpace) - halfWidth);
+        vec.Y((y * ySpace) - halfHeight);
+        vec.Z(-z);
         vec = xform.TransformAffine(vec);
         subMesh->AddVertex(vec);
 
@@ -733,13 +733,13 @@ void MeshManager::CreateCylinder(const std::string &name, float radius,
   // Generate the group of rings for the sphere
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z(ring * height/rings - height/2.0);
+    vert.Z(ring * height/rings - height/2.0);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y(radius * cosf(seg * deltaSegAngle));
-      vert.x(radius * sinf(seg * deltaSegAngle));
+      vert.Y(radius * cosf(seg * deltaSegAngle));
+      vert.X(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -841,15 +841,15 @@ void MeshManager::CreateCone(const std::string &name, float radius,
   // Generate the group of rings for the cone
   for (ring = 0; ring < rings; ring++)
   {
-    vert.z(ring * height/rings - height/2.0);
+    vert.Z(ring * height/rings - height/2.0);
 
     double ringRadius = ((height - (vert.Z() + height/2.0)) / height) * radius;
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y(ringRadius * cosf(seg * deltaSegAngle));
-      vert.x(ringRadius * sinf(seg * deltaSegAngle));
+      vert.Y(ringRadius * cosf(seg * deltaSegAngle));
+      vert.X(ringRadius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -952,13 +952,13 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   // Generate the group of rings for the outsides of the cylinder
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z(ring * height/rings - height/2.0);
+    vert.Z(ring * height/rings - height/2.0);
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y(radius * cosf(seg * deltaSegAngle));
-      vert.x(radius * sinf(seg * deltaSegAngle));
+      vert.Y(radius * cosf(seg * deltaSegAngle));
+      vert.X(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;
@@ -1011,13 +1011,13 @@ void MeshManager::CreateTube(const std::string &name, float innerRadius,
   radius = innerRadius;
   for (ring = 0; ring <= rings; ring++)
   {
-    vert.z((height/2.0) - (ring * height/rings));
+    vert.Z((height/2.0) - (ring * height/rings));
 
     // Generate the group of segments for the current ring
     for (seg = 0; seg <= segments; seg++)
     {
-      vert.y(radius * cosf(seg * deltaSegAngle));
-      vert.x(radius * sinf(seg * deltaSegAngle));
+      vert.Y(radius * cosf(seg * deltaSegAngle));
+      vert.X(radius * sinf(seg * deltaSegAngle));
 
       // TODO: Don't think these normals are correct.
       norm = vert;

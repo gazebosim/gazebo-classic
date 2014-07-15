@@ -103,9 +103,9 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       // Get the XYZ coordinates of the normal vector to the face.
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
-      normal.x(r1);
-      normal.y(r2);
-      normal.z(r3);
+      normal.X(r1);
+      normal.Y(r2);
+      normal.Z(r3);
 
       if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
       {
@@ -127,9 +127,9 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         if (count != 3)
           break;
 
-        vertex.x(r1);
-        vertex.y(r2);
-        vertex.z(r3);
+        vertex.X(r1);
+        vertex.Y(r2);
+        vertex.Z(r3);
 
         subMesh->AddVertex(vertex);
         subMesh->AddNormal(normal);
@@ -206,32 +206,32 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      normal.x(v);
+      normal.X(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      normal.y(v);
+      normal.Y(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      normal.z(v);
+      normal.Z(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.x(v);
+      vertex.X(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.y(v);
+      vertex.Y(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.z(v);
+      vertex.Z(v);
 
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
@@ -240,17 +240,17 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.x(v);
+      vertex.X(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.y(v);
+      vertex.Y(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.z(v);
+      vertex.Z(v);
 
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);
@@ -259,17 +259,17 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.x(v);
+      vertex.X(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.y(v);
+      vertex.Y(v);
 
     if (!this->FloatRead(_filein, v))
       return false;
     else
-      vertex.z(v);
+      vertex.Z(v);
 
     subMesh->AddVertex(vertex);
     subMesh->AddNormal(normal);

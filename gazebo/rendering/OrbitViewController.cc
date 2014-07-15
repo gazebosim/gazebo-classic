@@ -104,7 +104,7 @@ void OrbitViewController::Init()
       // If camera is not looking at the origin, see if the camera's
       // direction projected on the ground plane interescts the origin.
       // Otherwise, choose a default distance of 10m for the focal point
-      cameraPos.z(0);
+      cameraPos.Z(0);
       distOrigin = cameraPos.Distance(origin);
       dist = origin.DistToLine(cameraPos, cameraPos + dir * distOrigin);
       if (ignition::math::equal(dist, 0.0, 1e-3))

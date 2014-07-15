@@ -166,9 +166,9 @@ ignition::math::Vector3d Color::GetAsHSV() const
   else
     i = 1;
 
-  hsv.x(i - f /(v - x));
-  hsv.y((v - x)/v);
-  hsv.z(v);
+  hsv.X() = i - f /(v - x);
+  hsv.Y() = (v - x)/v;
+  hsv.Z() = v;
 
   return hsv;
 }
@@ -179,18 +179,18 @@ ignition::math::Vector3d Color::GetAsYUV() const
 {
   ignition::math::Vector3d yuv;
 
-  yuv.x(0.299*this->r + 0.587*this->g + 0.114*this->b);
-  yuv.y(-0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5);
-  yuv.z(0.5*this->r - 0.4189*this->g - 0.08105*this->b + 0.5);
+  yuv.X() = 0.299*this->r + 0.587*this->g + 0.114*this->b;
+  yuv.Y() = -0.1679*this->r - 0.332*this->g + 0.5*this->b + 0.5;
+  yuv.Z() = 0.5*this->r - 0.4189*this->g - 0.08105*this->b + 0.5;
 
-  yuv.x(yuv.X() < 0 ? 0: yuv.X());
-  yuv.x(yuv.X() > 255 ? 255.0: yuv.X());
+  yuv.X() = yuv.X() < 0 ? 0: yuv.X();
+  yuv.X() = yuv.X() > 255 ? 255.0: yuv.X();
 
-  yuv.y(yuv.Y() < 0 ? 0: yuv.Y());
-  yuv.y(yuv.Y() > 255 ? 255.0: yuv.Y());
+  yuv.Y() = yuv.Y() < 0 ? 0: yuv.Y();
+  yuv.Y() = yuv.Y() > 255 ? 255.0: yuv.Y();
 
-  yuv.z(yuv.Z() < 0 ? 0: yuv.Z());
-  yuv.z(yuv.Z() > 255 ? 255.0: yuv.Z());
+  yuv.Z() = yuv.Z() < 0 ? 0: yuv.Z();
+  yuv.Z() = yuv.Z() > 255 ? 255.0: yuv.Z();
 
   return yuv;
 }
