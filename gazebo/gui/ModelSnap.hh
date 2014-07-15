@@ -23,6 +23,7 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
