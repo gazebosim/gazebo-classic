@@ -83,8 +83,8 @@ bool Kmeans::SetNumClusters(unsigned int _k)
 {
   if (_k <= 0)
   {
-    std::cerr << "Kmeans::SetNumClusters() error: Num clusters has to be "
-              << "positive but its value its [" << _k << "]" << std::endl;
+    std::cerr << "Kmeans::SetNumClusters() error: The number of clusters has to"
+              << " be positive but its value is [" << _k << "]" << std::endl;
     return false;
   }
   this->k = _k;
@@ -176,7 +176,7 @@ bool Kmeans::IsDataValid()
 
   if (this->k == 0)
   {
-    std::cerr << "Kmeans error: The number of clusters should not be zero."
+    std::cerr << "Kmeans error: The number of clusters cannot be zero."
               << std::endl;
     return false;
   }
