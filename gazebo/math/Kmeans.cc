@@ -53,7 +53,6 @@ bool Kmeans::SetObservations(const std::vector<Vector3> &_obs)
   }
   this->obs = _obs;
   return true;
-
 }
 
 //////////////////////////////////////////////////
@@ -86,7 +85,6 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
 
   // Initialize the size of the vectors;
   this->centroids.clear();
-  this->oldCentroids.clear();
   this->labels.resize(this->obs.size());
   this->sums.resize(this->k);
   this->counters.resize(this->k);
@@ -133,9 +131,6 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
       this->sums[label] += this->obs[i];
       this->counters[label]++;
     }
-
-    // Save old centroids.
-    this->oldCentroids = this->centroids;
 
     // Update the centroids.
     for (size_t i = 0; i < this->centroids.size(); ++i)

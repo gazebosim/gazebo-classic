@@ -87,7 +87,7 @@ namespace gazebo
       /// algorithm or false otherwise.
       private: bool IsDataValid();
 
-      /// \brief Number of partitions used to cluster.
+      /// \brief Number of partitions to group the observations.
       private: unsigned int k;
 
       /// \brief Observations.
@@ -96,18 +96,13 @@ namespace gazebo
       /// \brief Centroids.
       private: std::vector<Vector3> centroids;
 
-      /// \brief Centroids from the previous iteration.
-      private: std::vector<Vector3> oldCentroids;
-
-      /// \brief Each element represents the cluster to which observation i
-      /// belongs.
+      /// \brief Each element stores the cluster to which observation i belongs.
       private: std::vector<unsigned int> labels;
 
       /// \brief Used to calculate the centroid of each partition.
       private: std::vector<Vector3> sums;
 
-      /// \brief Used to count the number of observations contained in each
-      /// partition.
+      /// \brief Counts the number of observations contained in each partition.
       private: std::vector<unsigned int> counters;
     };
     /// \}
