@@ -83,17 +83,17 @@ void Matrix3::SetFromAxis(const Vector3 &_axis, double _angle)
   double s = sin(_angle);
   double C = 1-c;
 
-  this->m[0][0] = _axis.x*_axis.x*C + c;
-  this->m[0][1] = _axis.x*_axis.y*C - _axis.z*s;
-  this->m[0][2] = _axis.x*_axis.z*C + _axis.y*s;
+  this->m[0][0] = _axis.X()*_axis.X()*C + c;
+  this->m[0][1] = _axis.X()*_axis.Y()*C - _axis.Z()*s;
+  this->m[0][2] = _axis.X()*_axis.Z()*C + _axis.Y()*s;
 
-  this->m[1][0] = _axis.y*_axis.x*C + _axis.z*s;
-  this->m[1][1] = _axis.y*_axis.y*C + c;
-  this->m[1][2] = _axis.y*_axis.z*C - _axis.x*s;
+  this->m[1][0] = _axis.Y()*_axis.X()*C + _axis.Z()*s;
+  this->m[1][1] = _axis.Y()*_axis.Y()*C + c;
+  this->m[1][2] = _axis.Y()*_axis.Z()*C - _axis.X()*s;
 
-  this->m[2][0] = _axis.z*_axis.x*C - _axis.y*s;
-  this->m[2][1] = _axis.z*_axis.y*C + _axis.x*s;
-  this->m[2][2] = _axis.z*_axis.z*C + c;
+  this->m[2][0] = _axis.Z()*_axis.X()*C - _axis.Y()*s;
+  this->m[2][1] = _axis.Z()*_axis.Y()*C + _axis.X()*s;
+  this->m[2][2] = _axis.Z()*_axis.Z()*C + c;
 }
 
 //////////////////////////////////////////////////
@@ -102,9 +102,9 @@ void Matrix3::SetCol(unsigned int _i, const Vector3 &_v)
   if (_i >= 3)
     throw(std::string("Invalid column number"));
 
-  m[0][_i] = _v.x;
-  m[1][_i] = _v.y;
-  m[2][_i] = _v.z;
+  m[0][_i] = _v.X();
+  m[1][_i] = _v.Y();
+  m[2][_i] = _v.Z();
 }
 
 //////////////////////////////////////////////////

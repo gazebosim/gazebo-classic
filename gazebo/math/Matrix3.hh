@@ -145,9 +145,9 @@ namespace gazebo
       public: inline math::Vector3 operator*(const math::Vector3 &_v) const
               {
                 return math::Vector3(
-                  this->m[0][0]*_v.x + this->m[0][1]*_v.y + this->m[0][2]*_v.z,
-                  this->m[1][0]*_v.x + this->m[1][1]*_v.y + this->m[1][2]*_v.z,
-                  this->m[2][0]*_v.x + this->m[2][1]*_v.y + this->m[2][2]*_v.z);
+                  this->m[0][0]*_v.X() + this->m[0][1]*_v.Y() + this->m[0][2]*_v.Z(),
+                  this->m[1][0]*_v.X() + this->m[1][1]*_v.Y() + this->m[1][2]*_v.Z(),
+                  this->m[2][0]*_v.X() + this->m[2][1]*_v.Y() + this->m[2][2]*_v.Z());
               }
 
       /// \brief Array subscript operator

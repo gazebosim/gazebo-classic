@@ -218,7 +218,7 @@ void Quaternion::SetFromAxis(double _ax, double _ay, double _az, double _aa)
 //////////////////////////////////////////////////
 void Quaternion::SetFromAxis(const Vector3 &_axis, double _a)
 {
-  this->SetFromAxis(_axis.x, _axis.y, _axis.z, _a);
+  this->SetFromAxis(_axis.X(), _axis.Y(), _axis.Z(), _a);
 }
 
 //////////////////////////////////////////////////
@@ -233,7 +233,7 @@ void Quaternion::Set(double _w, double _x, double _y, double _z)
 //////////////////////////////////////////////////
 void Quaternion::SetFromEuler(const Vector3 &_vec)
 {
-  this->SetFromEuler(_vec.x, _vec.y, _vec.z);
+  this->SetFromEuler(_vec.X(), _vec.Y(), _vec.Z());
 }
 
 //////////////////////////////////////////////////
@@ -272,14 +272,14 @@ Vector3 Quaternion::GetAsEuler() const
   sqz = copy.z * copy.z;
 
   // Roll
-  vec.x = atan2(2 * (copy.y*copy.z + copy.w*copy.x), squ - sqx - sqy + sqz);
+  vec.X() = atan2(2 * (copy.y*copy.z + copy.w*copy.x), squ - sqx - sqy + sqz);
 
   // Pitch
   double sarg = -2 * (copy.x*copy.z - copy.w * copy.y);
-  vec.y = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
+  vec.Y() = sarg <= -1.0 ? -0.5*M_PI : (sarg >= 1.0 ? 0.5*M_PI : asin(sarg));
 
   // Yaw
-  vec.z = atan2(2 * (copy.x*copy.y + copy.w*copy.z), squ + sqx - sqy - sqz);
+  vec.Z() = atan2(2 * (copy.x*copy.y + copy.w*copy.z), squ + sqx - sqy - sqz);
 
   return vec;
 }
@@ -301,19 +301,19 @@ Quaternion Quaternion::EulerToQuaternion(double _x, double _y, double _z)
 //////////////////////////////////////////////////
 double Quaternion::GetRoll()
 {
-  return this->GetAsEuler().x;
+  return this->GetAsEuler().X();
 }
 
 //////////////////////////////////////////////////
 double Quaternion::GetPitch()
 {
-  return this->GetAsEuler().y;
+  return this->GetAsEuler().Y();
 }
 
 //////////////////////////////////////////////////
 double Quaternion::GetYaw()
 {
-  return this->GetAsEuler().z;
+  return this->GetAsEuler().Z();
 }
 
 //////////////////////////////////////////////////
@@ -344,7 +344,7 @@ void Quaternion::Scale(double _scale)
   this->GetAsAxis(axis, angle);
   angle *= _scale;
 
-  this->SetFromAxis(axis.x, axis.y, axis.z, angle);
+  this->SetFromAxis(axis.X(), axis.Y(), axis.Z(), angle);
 }
 
 //////////////////////////////////////////////////
@@ -411,15 +411,15 @@ Vector3 Quaternion::RotateVectorReverse(Vector3 _vec) const
   Vector3 result;
 
   tmp.w = 0.0;
-  tmp.x = _vec.x;
-  tmp.y = _vec.y;
-  tmp.z = _vec.z;
+  tmp.x = _vec.X();
+  tmp.y = _vec.Y();
+  tmp.z = _vec.Z();
 
   tmp =  this->GetInverse() * (tmp * (*this));
 
-  result.x = tmp.x;
-  result.y = tmp.y;
-  result.z = tmp.z;
+  result.X() = tmp.x;
+  result.Y() = tmp.y;
+  result.Z() = tmp.z;
 
   return result;
 }

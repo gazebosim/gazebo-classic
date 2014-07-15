@@ -154,14 +154,14 @@ Vector3 Pose::CoordPositionAdd(const Vector3 &_pos) const
 
   // result = pose.rot + pose.rot * this->_pos * pose.rot!
   tmp.w = 0.0;
-  tmp.x = _pos.x;
-  tmp.y = _pos.y;
-  tmp.z = _pos.z;
+  tmp.x = _pos.X();
+  tmp.y = _pos.Y();
+  tmp.z = _pos.Z();
 
   tmp = this->rot * (tmp * this->rot.GetInverse());
-  result.x = this->pos.x + tmp.x;
-  result.y = this->pos.y + tmp.y;
-  result.z = this->pos.z + tmp.z;
+  result.X() = this->pos.X() + tmp.x;
+  result.Y() = this->pos.Y() + tmp.y;
+  result.Z() = this->pos.Z() + tmp.z;
 
   return result;
 }
@@ -174,15 +174,15 @@ Vector3 Pose::CoordPositionAdd(const Pose &_pose) const
 
   // result = _pose.rot + _pose.rot * this->pos * _pose.rot!
   tmp.w = 0.0;
-  tmp.x = this->pos.x;
-  tmp.y = this->pos.y;
-  tmp.z = this->pos.z;
+  tmp.x = this->pos.X();
+  tmp.y = this->pos.Y();
+  tmp.z = this->pos.Z();
 
   tmp = _pose.rot * (tmp * _pose.rot.GetInverse());
 
-  result.x = _pose.pos.x + tmp.x;
-  result.y = _pose.pos.y + tmp.y;
-  result.z = _pose.pos.z + tmp.z;
+  result.X() = _pose.pos.X() + tmp.x;
+  result.Y() = _pose.pos.Y() + tmp.y;
+  result.Z() = _pose.pos.Z() + tmp.z;
 
   return result;
 }
@@ -209,7 +209,7 @@ Pose Pose::CoordPoseSolve(const Pose &_b) const
   Pose a;
 
   a.rot = this->rot.GetInverse() * _b.rot;
-  q = a.rot * Quaternion(0, this->pos.x, this->pos.y, this->pos.z);
+  q = a.rot * Quaternion(0, this->pos.X(), this->pos.Y(), this->pos.Z());
   q = q * a.rot.GetInverse();
   a.pos = _b.pos - Vector3(q.x, q.y, q.z);
 
@@ -220,15 +220,15 @@ Pose Pose::CoordPoseSolve(const Pose &_b) const
 Pose Pose::RotatePositionAboutOrigin(const Quaternion &_rot) const
 {
   Pose a = *this;
-  a.pos.x =  (1.0 - 2.0*_rot.y*_rot.y - 2.0*_rot.z*_rot.z) * this->pos.x
-            +(2.0*(_rot.x*_rot.y+_rot.w*_rot.z)) * this->pos.y
-            +(2.0*(_rot.x*_rot.z-_rot.w*_rot.y)) * this->pos.z;
-  a.pos.y =  (2.0*(_rot.x*_rot.y-_rot.w*_rot.z)) * this->pos.x
-            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.z*_rot.z) * this->pos.y
-            +(2.0*(_rot.y*_rot.z+_rot.w*_rot.x)) * this->pos.z;
-  a.pos.z =  (2.0*(_rot.x*_rot.z+_rot.w*_rot.y)) * this->pos.x
-            +(2.0*(_rot.y*_rot.z-_rot.w*_rot.x)) * this->pos.y
-            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.y*_rot.y) * this->pos.z;
+  a.pos.X() =  (1.0 - 2.0*_rot.y*_rot.y - 2.0*_rot.z*_rot.z) * this->pos.X()
+            +(2.0*(_rot.x*_rot.y+_rot.w*_rot.z)) * this->pos.Y()
+            +(2.0*(_rot.x*_rot.z-_rot.w*_rot.y)) * this->pos.Z();
+  a.pos.Y() =  (2.0*(_rot.x*_rot.y-_rot.w*_rot.z)) * this->pos.X()
+            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.z*_rot.z) * this->pos.Y()
+            +(2.0*(_rot.y*_rot.z+_rot.w*_rot.x)) * this->pos.Z();
+  a.pos.Z() =  (2.0*(_rot.x*_rot.z+_rot.w*_rot.y)) * this->pos.X()
+            +(2.0*(_rot.y*_rot.z-_rot.w*_rot.x)) * this->pos.Y()
+            +(1.0 - 2.0*_rot.x*_rot.x - 2.0*_rot.y*_rot.y) * this->pos.Z();
   return a;
 }
 

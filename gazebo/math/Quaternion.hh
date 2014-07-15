@@ -260,7 +260,7 @@ namespace gazebo
     /// \return the rotated vector
     public: inline Vector3 RotateVector(const Vector3 &_vec) const
             {
-              Quaternion tmp(0.0, _vec.x, _vec.y, _vec.z);
+              Quaternion tmp(0.0, _vec.X(), _vec.Y(), _vec.Z());
               tmp = (*this) * (tmp * this->GetInverse());
               return Vector3(tmp.x, tmp.y, tmp.z);
             }
@@ -367,8 +367,8 @@ namespace gazebo
                 const gazebo::math::Quaternion &_q)
     {
       Vector3 v(_q.GetAsEuler());
-      _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
-           << precision(v.z, 6);
+      _out << precision(v.X(), 6) << " " << precision(v.Y(), 6) << " "
+           << precision(v.Z(), 6);
       return _out;
     }
 

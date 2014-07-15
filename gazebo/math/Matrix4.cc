@@ -97,9 +97,9 @@ void Matrix4::Set(double _v00, double _v01, double _v02, double _v03,
 //////////////////////////////////////////////////
 void Matrix4::SetTranslate(const Vector3 &_t)
 {
-  this->m[0][3] = _t.x;
-  this->m[1][3] = _t.y;
-  this->m[2][3] = _t.z;
+  this->m[0][3] = _t.X();
+  this->m[1][3] = _t.Y();
+  this->m[2][3] = _t.Z();
 }
 
 //////////////////////////////////////////////////
@@ -164,34 +164,34 @@ Vector3 Matrix4::GetEulerRotation(unsigned int solution_number) const
 
   if (fabs(m31) >= 1.0)
   {
-    euler.z = 0.0;
-    euler2.z = 0.0;
+    euler.Z() = 0.0;
+    euler2.Z() = 0.0;
 
     if (m31 < 0.0)
     {
-      euler.y = M_PI / 2.0;
-      euler2.y = M_PI / 2.0;
-      euler.x = atan2(m12, m13);
-      euler2.x = atan2(m12, m13);
+      euler.Y() = M_PI / 2.0;
+      euler2.Y() = M_PI / 2.0;
+      euler.X() = atan2(m12, m13);
+      euler2.X() = atan2(m12, m13);
     }
     else
     {
-      euler.y = -M_PI / 2.0;
-      euler2.y = -M_PI / 2.0;
-      euler.x = atan2(-m12, -m13);
-      euler2.x = atan2(-m12, -m13);
+      euler.Y() = -M_PI / 2.0;
+      euler2.Y() = -M_PI / 2.0;
+      euler.X() = atan2(-m12, -m13);
+      euler2.X() = atan2(-m12, -m13);
     }
   }
   else
   {
-    euler.y = -asin(m31);
-    euler2.y = M_PI - euler.y;
+    euler.Y() = -asin(m31);
+    euler2.Y() = M_PI - euler.Y();
 
-    euler.x = atan2(m32 / cos(euler.y), m33 / cos(euler.y));
-    euler2.x = atan2(m32 / cos(euler2.y), m33 / cos(euler2.y));
+    euler.X() = atan2(m32 / cos(euler.Y()), m33 / cos(euler.Y()));
+    euler2.X() = atan2(m32 / cos(euler2.Y()), m33 / cos(euler2.Y()));
 
-    euler.z = atan2(m21 / cos(euler.y), m11 / cos(euler.y));
-    euler2.z = atan2(m21 / cos(euler2.y), m11 / cos(euler2.y));
+    euler.Z() = atan2(m21 / cos(euler.Y()), m11 / cos(euler.Y()));
+    euler2.Z() = atan2(m21 / cos(euler2.Y()), m11 / cos(euler2.Y()));
   }
 
   if (solution_number == 1)
@@ -203,9 +203,9 @@ Vector3 Matrix4::GetEulerRotation(unsigned int solution_number) const
 //////////////////////////////////////////////////
 void Matrix4::SetScale(const Vector3 &_s)
 {
-  this->m[0][0] = _s.x;
-  this->m[1][1] = _s.y;
-  this->m[2][2] = _s.z;
+  this->m[0][0] = _s.X();
+  this->m[1][1] = _s.Y();
+  this->m[2][2] = _s.Z();
   this->m[3][3] = 1.0;
 }
 
@@ -349,12 +349,12 @@ Matrix4 Matrix4::operator*(const Matrix4 &m2) const
 Vector3 Matrix4::operator*(const Vector3 &_vec) const
 {
   Vector3 result;
-  result.x = this->m[0][0]*_vec.x + this->m[0][1]*_vec.y +
-             this->m[0][2]*_vec.z + this->m[0][3];
-  result.y = this->m[1][0]*_vec.x + this->m[1][1]*_vec.y +
-             this->m[1][2]*_vec.z + this->m[1][3];
-  result.z = this->m[2][0]*_vec.x + this->m[2][1]*_vec.y +
-             this->m[2][2]*_vec.z + this->m[2][3];
+  result.X() = this->m[0][0]*_vec.X() + this->m[0][1]*_vec.Y() +
+             this->m[0][2]*_vec.Z() + this->m[0][3];
+  result.Y() = this->m[1][0]*_vec.X() + this->m[1][1]*_vec.Y() +
+             this->m[1][2]*_vec.Z() + this->m[1][3];
+  result.Z() = this->m[2][0]*_vec.X() + this->m[2][1]*_vec.Y() +
+             this->m[2][2]*_vec.Z() + this->m[2][3];
   return result;
 }
 
@@ -373,12 +373,12 @@ Vector3 Matrix4::TransformAffine(const Vector3 &_v) const
     throw(std::string("Not and affine matrix"));
   }
 
-  return Vector3(this->m[0][0]*_v.x + this->m[0][1]*_v.y +
-                 this->m[0][2]*_v.z + this->m[0][3],
-                 this->m[1][0]*_v.x + this->m[1][1]*_v.y +
-                 this->m[1][2]*_v.z + this->m[1][3],
-                 this->m[2][0]*_v.x + this->m[2][1]*_v.y +
-                 this->m[2][2]*_v.z + this->m[2][3]);
+  return Vector3(this->m[0][0]*_v.X() + this->m[0][1]*_v.Y() +
+                 this->m[0][2]*_v.Z() + this->m[0][3],
+                 this->m[1][0]*_v.X() + this->m[1][1]*_v.Y() +
+                 this->m[1][2]*_v.Z() + this->m[1][3],
+                 this->m[2][0]*_v.X() + this->m[2][1]*_v.Y() +
+                 this->m[2][2]*_v.Z() + this->m[2][3]);
 }
 
 //////////////////////////////////////////////////
