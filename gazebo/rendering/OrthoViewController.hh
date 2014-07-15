@@ -55,7 +55,7 @@ namespace gazebo
       private: void Zoom(float _amount,
           math::Vector2i _point = math::Vector2i(0, 0));
 
-      /// \brief Scale of the orthographic view window
+      /// \brief Scale used for zooming within the orthographic view
       private: double scale;
     };
     /// \}

@@ -180,12 +180,6 @@ void UserCamera::Init()
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
-
-/*  math::Pose pose(0, 0, 3, 0, 0, 0);
-  Camera::SetWorldPose(_pose);
-  this->camera->setDirection(0,0,-1);
-  std::cerr << " user camera set world pose " << std::endl;*/
-
   this->dataPtr->viewController->Init();
 }
 

@@ -230,15 +230,3 @@ void OrthoViewController::Zoom(float _amount, math::Vector2i _screenPos)
 
   this->UpdateRefVisual();
 }
-/*
-//////////////////////////////////////////////////
-void OrthoViewController::UpdateRefVisual()
-{
-  // Update the pose of the reference visual
-  this->refVisual->SetPosition(this->focalPoint);
-
-  // Update the size of the referenve visual based on the distance to the
-  // focal point.
-  double scale = this->distance * atan(GZ_DTOR(1.0));
-  this->refVisual->SetScale(math::Vector3(scale, scale, scale * 0.5));
-}*/
