@@ -168,7 +168,7 @@ unsigned int Kmeans::ClosestCentroid(const Vector3 &_p)
 //////////////////////////////////////////////////
 bool Kmeans::IsDataValid()
 {
-  if (this->obs.size() == 0)
+  if (this->obs.empty())
   {
     std::cerr << "Kmeans error: The set of observations is empty." << std::endl;
     return false;
