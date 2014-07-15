@@ -26,26 +26,9 @@ using namespace math;
 
 //////////////////////////////////////////////////
 Kmeans::Kmeans(const std::vector<Vector3> &_obs, unsigned int _k)
-  : k(_k)
 {
-  // Initialize observations.
   this->SetObservations(_obs);
-
-  // Initialize centroids.
-  for (size_t i = 0; i < k; ++i)
-  {
-    // centroid.
-    Vector3 c;
-
-    // Choose a random observation and make sure it has not been chosen before.
-    do
-    {
-      c = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
-    } while (std::find(this->centroids.begin(), this->centroids.end(), c) !=
-             this->centroids.end());
-
-    this->centroids.push_back(c);
-  }
+  this->SetNumClusters(_k);
 }
 
 //////////////////////////////////////////////////
@@ -70,6 +53,7 @@ bool Kmeans::SetObservations(const std::vector<Vector3> &_obs)
   }
   this->obs = _obs;
   return true;
+
 }
 
 //////////////////////////////////////////////////
@@ -101,11 +85,27 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
   size_t changed = 0;
 
   // Initialize the size of the vectors;
-  this->centroids.resize(this->k);
-  this->oldCentroids.resize(this->k);
+  this->centroids.clear();
+  this->oldCentroids.clear();
   this->labels.resize(this->obs.size());
   this->sums.resize(this->k);
   this->counters.resize(this->k);
+
+  // Initialize centroids.
+  for (size_t i = 0; i < k; ++i)
+  {
+    // centroid.
+    Vector3 c;
+
+    // Choose a random observation and make sure it has not been chosen before.
+    do
+    {
+      c = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
+    } while (std::find(this->centroids.begin(), this->centroids.end(), c) !=
+             this->centroids.end());
+
+    this->centroids.push_back(c);
+  }
 
   // Initialize labels.
   for (size_t i = 0; i < this->obs.size(); ++i)
