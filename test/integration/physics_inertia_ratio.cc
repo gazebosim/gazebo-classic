@@ -59,10 +59,11 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
 
   math::Vector3Stats upperAngles;
   math::Vector3Stats lowerAngles;
-  upperAngles.InsertStatistic("max");
-  upperAngles.InsertStatistic("rms");
-  lowerAngles.InsertStatistic("max");
-  lowerAngles.InsertStatistic("rms");
+  {
+    const std::string statNames = "MaxAbs,Rms";
+    EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
+    EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
+  }
 
   for (int i = 0; i < 3000; ++i)
   {
@@ -76,7 +77,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   {
     // upper pitch
     std::map<std::string, double> map = upperAngles.y.GetMap();
-    EXPECT_NEAR(map["max"], 0.0, g_angle_y_tol);
+    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_y_tol);
     std::string prefix = "upper_pitch_";
     for (std::map<std::string, double>::iterator iter = map.begin();
          iter != map.end(); ++iter)
@@ -90,7 +91,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   {
     // upper yaw
     std::map<std::string, double> map = upperAngles.z.GetMap();
-    EXPECT_NEAR(map["max"], 0.0, g_angle_z_tol);
+    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_z_tol);
     std::string prefix = "upper_yaw_";
     for (std::map<std::string, double>::iterator iter = map.begin();
          iter != map.end(); ++iter)
@@ -104,7 +105,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   {
     // lower pitch
     std::map<std::string, double> map = lowerAngles.y.GetMap();
-    EXPECT_NEAR(map["max"], 0.0, g_angle_y_tol);
+    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_y_tol);
     std::string prefix = "lower_pitch_";
     for (std::map<std::string, double>::iterator iter = map.begin();
          iter != map.end(); ++iter)
@@ -118,7 +119,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   {
     // lower yaw
     std::map<std::string, double> map = lowerAngles.z.GetMap();
-    EXPECT_NEAR(map["max"], 0.0, g_angle_z_tol);
+    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_z_tol);
     std::string prefix = "lower_yaw_";
     for (std::map<std::string, double>::iterator iter = map.begin();
          iter != map.end(); ++iter)
