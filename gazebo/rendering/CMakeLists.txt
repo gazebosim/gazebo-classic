@@ -36,6 +36,7 @@ set (sources
   Material.cc
   MovableText.cc
   OrbitViewController.cc
+  OrthoViewController.cc
   Projector.cc
   RenderEngine.cc
   RenderEvents.cc
@@ -79,6 +80,7 @@ set (headers
   Material.hh
   MovableText.hh
   OrbitViewController.hh
+  OrthoViewController.hh
   Projector.hh
   RenderEngine.hh
   RenderEvents.hh

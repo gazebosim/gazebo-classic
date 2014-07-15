@@ -56,79 +56,79 @@ namespace gazebo
       /// \param[in] _event The mouse event.
       public: virtual void HandleMouseEvent(const common::MouseEvent &_event);
 
-      /// \brief Get the type name of this view controller.
-      /// \return The view controller name: "orbit".
-      public: static std::string GetTypeString();
-
       /// \brief Set the distance to the focal point
       /// \param[in] _d The distance from the focal point.
-      public: void SetDistance(float _d);
+      public: virtual void SetDistance(float _d);
 
       /// \brief Set the focal point
       /// \param[in] _fp The focal point
-      public: void SetFocalPoint(const math::Vector3 &_fp);
+      public: virtual void SetFocalPoint(const math::Vector3 &_fp);
 
       /// \brief Get the focal point
       /// \return The focal point
-      public: math::Vector3 GetFocalPoint() const;
+      public: virtual math::Vector3 GetFocalPoint() const;
 
       // Documentation inherited from parent
-      public: void HandleKeyReleaseEvent(const std::string &_key);
+      public: virtual void HandleKeyReleaseEvent(const std::string &_key);
 
       // Documentation inherited from parent
       public: virtual void HandleKeyPressEvent(const std::string &_key);
 
+      /// \brief Get the type name of this view controller.
+      /// \return The view controller name: "orbit".
+      public: static std::string GetTypeString();
+
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateLocal(const math::Vector3 &_vec);
+      protected: void TranslateLocal(const math::Vector3 &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      private: void TranslateGlobal(const math::Vector3 &_vec);
-
-      /// \brief Zoom the camera.
-      /// \paramp[in] _amount Zoom quatity.
-      private: void Zoom(float _amount);
+      protected: void TranslateGlobal(const math::Vector3 &_vec);
 
       /// \brief Normalize yaw value.
       /// \paramp[in] _v Normalize a yaw value.
       /// \return The normalized value.
-      private: double NormalizeYaw(double _v);
+      protected: double NormalizeYaw(double _v);
 
       /// \brief Normalize pitch value.
       /// \paramp[in] _v Normalize a pitch value.
       /// \return The normalized value.
-      private: double NormalizePitch(double _v);
+      protected: double NormalizePitch(double _v);
 
       /// \brief Update the reference visual.
-      private: void UpdateRefVisual();
+      protected: void UpdateRefVisual();
 
       /// \brief Update the camera's pose based on a rotation update.
       /// \param[in] _dy Delta yaw movement.
       /// \param[in] _dp Delta pitch movement.
-      private: void Orbit(double _dy, double _dp);
+      protected: void Orbit(double _dy, double _dp);
+
+      /// \brief Zoom the camera.
+      /// \paramp[in] _amount Zoom quatity.
+      protected: void Zoom(float _amount);
 
       /// \brief Yaw value.
-      private: float yaw;
+      protected: float yaw;
 
       /// \brief Pitch value.
-      private: float pitch;
+      protected: float pitch;
 
       /// \brief Distance to the focal point.
-      private: float distance;
+      protected: float distance;
 
       /// \brief The focal point.
-      private: math::Vector3 focalPoint;
+      protected: math::Vector3 focalPoint;
 
       /// \brief A reference visual.
-      private: VisualPtr refVisual;
+      protected: VisualPtr refVisual;
 
       /// \brief Key that is currently pressed.
-      private: std::string key;
+      protected: std::string key;
 
       /// \brief A flag used to inidicate that the view controller has just
       /// been initialized.
-      private: bool init;
+      protected: bool init;
     };
     /// \}
   }

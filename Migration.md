@@ -1,3 +1,25 @@
+## Gazebo 4.0 to 5.0
+
+### Additions
+1. **gazebo/rendering/Camera.hh**
+    + void SetProjectionType(ProjectionType _type)
+    + void SetOrthoWindowSize(double _width, double _height)
+    + double GetOrthoWindowWidth()
+    + double GetOrthoWindowHeight()
+
+1. **gazebo/rendering/OrthoViewController.hh**
+    + ***New class:*** OrthoViewController
+
+### Modifications
+1. **gazebo/rendering/OrbitViewController.hh**
+    + ***Removed:*** void SetDistance()
+    + ***Replacement:***  virtual void SetDistance()
+    + ***Removed:*** void SetFocalPoint()
+    + ***Replacement:***  virtual void SetFocalPoint()
+    + ***Removed:*** math::Vector3 GetFocalPoint()
+    + ***Replacement:***  math::Vector3 virtual void SetFocalPoint()
+    + ***Note:*** Change functions to be virtual
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations
@@ -54,7 +76,7 @@
           const LinkPtr &_originalParentLink,
           Link_V &_connectedLinks, bool _fistLink = false);
       + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
-      + msgs::Visual GetVisualMessage(const std::string &_name) 
+      + msgs::Visual GetVisualMessage(const std::string &_name)
 
 ### Modifications
 1. **gazebo/physics/Model.hh**

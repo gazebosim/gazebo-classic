@@ -34,6 +34,9 @@ namespace gazebo
       /// \brief A FPS view controller.
       public: FPSViewController *fpsViewController;
 
+      /// \brief An orthgraphic camera view controller.
+      public: OrthoViewController *orthoViewController;
+
       /// \brief The GUI overlay.
       public: GUIOverlay *gui;
 

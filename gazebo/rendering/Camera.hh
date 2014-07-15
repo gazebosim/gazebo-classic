@@ -76,6 +76,14 @@ namespace gazebo
     /// This is the base class for all cameras.
     class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
+      public: enum ProjectionType
+      {
+        /// \brief Perspective projection
+        PERSPECTIVE = 0,
+        /// \brief Orthographic projection
+        ORTHOGRAPHIC = 1
+      };
+
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
       /// \param[in] _scene Scene that will contain the camera
@@ -497,6 +505,23 @@ namespace gazebo
       /// \return Path to saved screenshots.
       public: std::string GetScreenshotPath() const;
 
+      /// \brief Set the type of projection to use
+      /// \param[in] _type Projection type: PERSPECTIVE or ORTHOGRAPHIC.
+      public: void SetProjectionType(ProjectionType _type);
+
+      /// \brief Set the size of the orthographic window.
+      /// \param[in] _width Width to set the orthographic window to.
+      /// \param[in] _height Height to set the orthographic window to.
+      public: void SetOrthoWindowSize(double _width, double _height);
+
+      /// \brief Get the width of the orthographic window.
+      /// \return Width of the orthographic window.
+      public: double GetOrthoWindowWidth();
+
+      /// \brief Get the height of the orthographic window.
+      /// \return Height of the orthographic window.
+      public: double GetOrthoWindowHeight();
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 
@@ -679,6 +704,9 @@ namespace gazebo
 
       /// \brief User callback for when an animation completes.
       protected: boost::function<void()> onAnimationComplete;
+
+      /// \brief Camera projection type.
+      protected: ProjectionType projectionType;
 
       /// \internal
       /// \brief Pointer to private data.

@@ -31,6 +31,7 @@
 #include "gazebo/rendering/WindowManager.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/OrbitViewController.hh"
+#include "gazebo/rendering/OrthoViewController.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
@@ -48,6 +49,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->orbitViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
+  this->dataPtr->orthoViewController = NULL;
   this->dataPtr->viewController = NULL;
 
   this->dataPtr->selectionBuffer = NULL;
@@ -63,6 +65,7 @@ UserCamera::~UserCamera()
 {
   delete this->dataPtr->orbitViewController;
   delete this->dataPtr->fpsViewController;
+  delete this->dataPtr->orthoViewController;
 
   delete this->dataPtr->gui;
   this->dataPtr->gui = NULL;
@@ -92,7 +95,10 @@ void UserCamera::Init()
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
   this->dataPtr->fpsViewController = new FPSViewController(
       boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
-  this->dataPtr->viewController = this->dataPtr->orbitViewController;
+  this->dataPtr->orthoViewController = new OrthoViewController(
+      boost::dynamic_pointer_cast<UserCamera>(shared_from_this()));
+//  this->dataPtr->viewController = this->dataPtr->orbitViewController;
+  this->dataPtr->viewController = this->dataPtr->orthoViewController;
 
   Camera::Init();
 
@@ -174,6 +180,12 @@ void UserCamera::Init()
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
+
+/*  math::Pose pose(0, 0, 3, 0, 0, 0);
+  Camera::SetWorldPose(_pose);
+  this->camera->setDirection(0,0,-1);
+  std::cerr << " user camera set world pose " << std::endl;*/
+
   this->dataPtr->viewController->Init();
 }
 
@@ -306,6 +318,8 @@ void UserCamera::SetViewController(const std::string &type)
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
+  else if (type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
   else
     gzthrow("Invalid view controller type: " + type);
 
@@ -323,6 +337,8 @@ void UserCamera::SetViewController(const std::string &type,
     this->dataPtr->viewController = this->dataPtr->orbitViewController;
   else if (type == FPSViewController::GetTypeString())
     this->dataPtr->viewController = this->dataPtr->fpsViewController;
+  else if (type == OrthoViewController::GetTypeString())
+    this->dataPtr->viewController = this->dataPtr->orthoViewController;
   else
     gzthrow("Invalid view controller type: " + type);
 
