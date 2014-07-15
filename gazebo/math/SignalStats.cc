@@ -15,6 +15,7 @@
  *
 */
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 #include "gazebo/math/SignalStats.hh"
 
 using namespace gazebo;
@@ -195,6 +196,23 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+bool SignalStats::InsertStatistics(const std::string &_names)
+{
+  if (_names.empty())
+    return false;
+
+  bool result = true;
+  std::vector<std::string> names;
+  boost::split(names, _names, boost::is_any_of(","));
+  for (std::vector<std::string>::iterator iter = names.begin();
+       iter != names.end(); ++iter)
+  {
+    result = result && this->InsertStatistic(*iter);
+  }
+  return result;
+}
+
+//////////////////////////////////////////////////
 void SignalStats::Reset()
 {
   for (SignalStatistic_V::iterator iter = this->stats.begin();
@@ -231,6 +249,17 @@ bool Vector3Stats::InsertStatistic(const std::string &_name)
   result = result && this->y.InsertStatistic(_name);
   result = result && this->z.InsertStatistic(_name);
   result = result && this->mag.InsertStatistic(_name);
+  return result;
+}
+
+//////////////////////////////////////////////////
+bool Vector3Stats::InsertStatistics(const std::string &_names)
+{
+  bool result = true;
+  result = result && this->x.InsertStatistics(_names);
+  result = result && this->y.InsertStatistics(_names);
+  result = result && this->z.InsertStatistics(_names);
+  result = result && this->mag.InsertStatistics(_names);
   return result;
 }
 

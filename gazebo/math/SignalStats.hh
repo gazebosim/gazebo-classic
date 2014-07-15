@@ -157,7 +157,19 @@ namespace gazebo
       ///  "MaxAbs"
       ///  "Mean"
       ///  "Rms"
+      /// \return True if statistic was successfully added,
+      /// false if name was not recognized or had already
+      /// been inserted.
       public: bool InsertStatistic(const std::string &_name);
+
+      /// \brief Add a new type of statistic.
+      /// \param[in] _names Comma-separated list of new statistics.
+      /// For example, all statistics could be added with:
+      ///  "MaxAbs,Mean,Rms"
+      /// \return True if all statistics were successfully added,
+      /// false if any names were not recognized or had already
+      /// been inserted.
+      public: bool InsertStatistics(const std::string &_names);
 
       /// \brief Forget all previous data.
       public: void Reset();
@@ -187,7 +199,19 @@ namespace gazebo
       ///  "MaxAbs"
       ///  "Mean"
       ///  "Rms"
+      /// \return True if statistic was successfully added,
+      /// false if name was not recognized or had already
+      /// been inserted.
       public: bool InsertStatistic(const std::string &_name);
+
+      /// \brief Add a new type of statistic.
+      /// \param[in] _names Comma-separated list of new statistics.
+      /// For example, all statistics could be added with:
+      ///  "MaxAbs,Mean,Rms"
+      /// \return True if all statistics were successfully added,
+      /// false if any names were not recognized or had already
+      /// been inserted.
+      public: bool InsertStatistics(const std::string &_names);
 
       /// \brief Forget all previous data.
       public: void Reset();

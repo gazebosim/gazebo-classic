@@ -275,15 +275,39 @@ TEST_F(SignalStatsTest, SignalStats)
     EXPECT_EQ(map.count("MaxAbs"), 1u);
     EXPECT_EQ(map.count("Mean"), 1u);
     EXPECT_EQ(map.count("Rms"), 1u);
-    EXPECT_EQ(map.count("fake_statistic"), 0u);
+    EXPECT_EQ(map.count("FakeStatistic"), 0u);
+  }
+
+  {
+    // InsertStatistics
+    math::SignalStats stats;
+    EXPECT_TRUE(stats.GetMap().empty());
+
+    EXPECT_TRUE(stats.InsertStatistics("MaxAbs,Rms"));
+    EXPECT_FALSE(stats.InsertStatistics("MaxAbs,Rms"));
+    EXPECT_FALSE(stats.InsertStatistics("MaxAbs"));
+    EXPECT_FALSE(stats.InsertStatistics("Rms"));
+    EXPECT_FALSE(stats.GetMap().empty());
+
+    EXPECT_FALSE(stats.InsertStatistics("Mean,FakeStatistic"));
+    EXPECT_FALSE(stats.GetMap().empty());
+
+    EXPECT_FALSE(stats.InsertStatistics("FakeStatistic"));
+
+    // GetMap with no data
+    std::map<std::string, double> map = stats.GetMap();
+    EXPECT_FALSE(map.empty());
+    EXPECT_EQ(map.size(), 3u);
+    EXPECT_EQ(map.count("MaxAbs"), 1u);
+    EXPECT_EQ(map.count("Mean"), 1u);
+    EXPECT_EQ(map.count("Rms"), 1u);
+    EXPECT_EQ(map.count("FakeStatistic"), 0u);
   }
 
   {
     // Add some statistics
     math::SignalStats stats;
-    EXPECT_TRUE(stats.InsertStatistic("MaxAbs"));
-    EXPECT_TRUE(stats.InsertStatistic("Mean"));
-    EXPECT_TRUE(stats.InsertStatistic("Rms"));
+    EXPECT_TRUE(stats.InsertStatistics("MaxAbs,Mean,Rms"));
     EXPECT_EQ(stats.GetMap().size(), 3u);
 
     // No data yet
@@ -341,15 +365,15 @@ TEST_F(SignalStatsTest, Vector3Stats)
   }
 
   {
-    // InsertStatistic
+    // InsertStatistics
     math::Vector3Stats v3stats;
     EXPECT_TRUE(v3stats.x.GetMap().empty());
     EXPECT_TRUE(v3stats.y.GetMap().empty());
     EXPECT_TRUE(v3stats.z.GetMap().empty());
     EXPECT_TRUE(v3stats.mag.GetMap().empty());
 
-    EXPECT_TRUE(v3stats.InsertStatistic("MaxAbs"));
-    EXPECT_FALSE(v3stats.InsertStatistic("MaxAbs"));
+    EXPECT_TRUE(v3stats.InsertStatistics("MaxAbs"));
+    EXPECT_FALSE(v3stats.InsertStatistics("MaxAbs"));
     EXPECT_FALSE(v3stats.x.GetMap().empty());
     EXPECT_FALSE(v3stats.y.GetMap().empty());
     EXPECT_FALSE(v3stats.z.GetMap().empty());
