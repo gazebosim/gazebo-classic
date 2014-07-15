@@ -26,6 +26,10 @@
 
 #include <sdf/sdf.hh>
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
@@ -2268,8 +2272,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       {
         math::Vector3 p;
         p.x = std::min(min.x, max.x) + i * dx / static_cast<double>(modelCount);
-        p.y = min.y + max.y / 2.0;
-        p.z = min.z + max.z / 2.0;
+        p.y = (min.y + max.y) / 2.0;
+        p.z = (min.z + max.z) / 2.0;
         objects.push_back(p);
       }
     }
@@ -2279,9 +2283,9 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       for (int i = 0; i < modelCount; ++i)
       {
         math::Vector3 p;
-        p.x = min.x + max.x / 2.0;
+        p.x = (min.x + max.x) / 2.0;
         p.y = std::min(min.y, max.y) + i * dy / static_cast<double>(modelCount);
-        p.z = min.z + max.z / 2.0;
+        p.z = (min.z + max.z) / 2.0;
         objects.push_back(p);
       }
     }
@@ -2291,8 +2295,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       for (int i = 0; i < modelCount; ++i)
       {
         math::Vector3 p;
-        p.x = min.x + max.x / 2.0;
-        p.y = min.y + max.y / 2.0;
+        p.x = (min.x + max.x) / 2.0;
+        p.y = (min.y + max.y) / 2.0;
         p.z = std::min(min.z, max.z) + i * dz / static_cast<double>(modelCount);
         objects.push_back(p);
       }

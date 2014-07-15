@@ -1,0 +1,156 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Testing the automatic population of objects -->
+    <population name="can_population1">
+      <model name="can1">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>3 3 0</min>
+          <max>4 4 0.1</max>
+        </cuboid>
+      </region>
+      <model_count>10</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>random</distribution>
+    </population>
+
+    <population name="can_population2">
+      <model name="can2">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>-0.25 -0.5 0</min>
+          <rows>2</rows>
+          <cols>3</cols>
+          <step>0.25 0.25 0</step>
+        </cuboid>
+      </region>
+      <model_count>6</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>grid</distribution>
+    </population>
+
+    <population name="can_population3">
+      <model name="can3">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cylinder>
+          <center>-3 3 0</center>
+          <radius>1</radius>
+          <height>0.01</height>
+        </cylinder>
+      </region>
+      <model_count>10</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>random</distribution>
+    </population>
+
+    <population name="can_population4">
+      <model name="can4">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>1 -4 0</min>
+          <max>5 -2 0.01</max>
+        </cuboid>
+      </region>
+      <model_count>10</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>uniform</distribution>
+    </population>
+
+    <population name="can_population5">
+      <model name="can5">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cylinder>
+          <center>-3 -3 0</center>
+          <radius>1</radius>
+          <height>0.1</height>
+        </cylinder>
+      </region>
+      <model_count>10</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>uniform</distribution>
+    </population>
+
+    <population name="can_population6">
+      <model name="can6">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>-1 4.5 0</min>
+          <max>1 5.5 0.01</max>
+        </cuboid>
+      </region>
+      <model_count>6</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>linear-x</distribution>
+    </population>
+
+    <population name="can_population7">
+      <model name="can7">
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>-5.5 -1 0</min>
+          <max>-4.5 1 0.01</max>
+        </cuboid>
+      </region>
+      <model_count>6</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>linear-y</distribution>
+    </population>
+
+    <population name="can_population8">
+      <model name="can8">
+        <static>true</static>
+        <include>
+          <uri>model://coke_can</uri>
+        </include>
+      </model>
+      <region>
+        <cuboid>
+          <min>5.4 0.9 0</min>
+          <max>5.6 1.1 1.4</max>
+        </cuboid>
+      </region>
+      <model_count>6</model_count>
+      <prevent_collisions>false</prevent_collisions>
+      <distribution>linear-z</distribution>
+    </population>
+
+  </world>
+</sdf>

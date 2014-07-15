@@ -3,7 +3,6 @@ set (files
   camera.world
   cart_demo.world
   contact.world
-  cinder_block_population.world
   depth_camera.world
   empty_1_0.world
   empty_bullet.world
@@ -26,6 +25,7 @@ set (files
   pioneer2dx.world
   plane_demo.world
   plugin.world
+  population.world
   pr2.world
   presentation.world
   pressure_sensor.world
