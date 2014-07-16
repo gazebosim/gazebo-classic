@@ -70,7 +70,7 @@ if (PKG_CONFIG_FOUND)
 
   pkg_check_modules(SDF sdformat>=2.0.1)
   if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
+    BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
   endif()
 
   pkg_check_modules(CURL libcurl)
