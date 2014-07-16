@@ -1690,18 +1690,12 @@ void Camera::SetProjectionType(ProjectionType _type)
   if (this->projectionType == ORTHOGRAPHIC)
   {
     this->camera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-    // TODO change scale
-    double scale = 10;
-    this->SetProjectionType(Camera::ORTHOGRAPHIC);
-    double ratio = this->GetAspectRatio();
-    this->SetOrthoWindowSize(scale, scale/ratio);
-    this->camera->getNearClipDistance() * 0.01;
-
+    RTShaderSystem::DetachViewport(this->viewport, this->scene);
   }
   else if (this->projectionType == PERSPECTIVE)
   {
     this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
-    this->SetClipDist();
+    RTShaderSystem::AttachViewport(this->viewport, this->scene);
   }
 }
 

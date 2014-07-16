@@ -57,6 +57,9 @@ namespace gazebo
 
       /// \brief Scale used for zooming within the orthographic view
       private: double scale;
+
+      /// \brief Pseudo distance factor used for updating the visual reference
+      private: double pseudoDistanceFactor;
     };
     /// \}
   }

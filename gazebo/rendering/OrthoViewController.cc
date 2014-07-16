@@ -47,10 +47,19 @@ OrthoViewController::~OrthoViewController()
 void OrthoViewController::Init()
 {
   // TODO change scale
-  this->scale = 10;
+  this->scale = 100;
+  this->pseudoDistanceFactor = 1000;
+  this->distance = this->pseudoDistanceFactor/this->scale;
   this->camera->SetProjectionType(Camera::ORTHOGRAPHIC);
-  double ratio = this->camera->GetAspectRatio();
-  this->camera->SetOrthoWindowSize(this->scale, this->scale/ratio);
+
+  int width = this->camera->GetViewportWidth();
+  int height = this->camera->GetViewportHeight();
+
+  if (width > 0 && height > 0)
+  {
+    // set up the view projection
+    this->Zoom(1.0);
+  }
 
   OrbitViewController::Init();
 }
@@ -67,8 +76,10 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   int width = this->camera->GetViewportWidth();
   int height = this->camera->GetViewportHeight();
-  double orthoWidth = this->camera->GetOrthoWindowWidth();
-  double orthoHeight = this->camera->GetOrthoWindowHeight();
+  double orthoWidth = width/this->scale;
+  double orthoHeight = height/this->scale;
+//  double orthoWidth = this->camera->GetOrthoWindowWidth();
+//  double orthoHeight = this->camera->GetOrthoWindowHeight();
 
   // If the event is the initial press of a mouse button, then update
   // the focal point and distance.
@@ -84,7 +95,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     }
 
     // pseudo distance
-    this->distance = this->scale;
+    this->distance = 1000/this->scale;
 
     this->yaw = this->camera->GetWorldRotation().GetAsEuler().z;
     this->pitch = this->camera->GetWorldRotation().GetAsEuler().y;
@@ -173,7 +184,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     }
 
     // pseudo distance
-    this->distance = this->scale;
+    this->distance = 1000/this->scale;
 
     double factor = 1.0;
 
@@ -203,8 +214,11 @@ void OrthoViewController::Zoom(float _amount, math::Vector2i _screenPos)
   math::Vector3 translation;
   int width = this->camera->GetViewportWidth();
   int height = this->camera->GetViewportHeight();
-  double orthoWidth = this->camera->GetOrthoWindowWidth();
-  double orthoHeight = this->camera->GetOrthoWindowHeight();
+
+//  double orthoWidth = this->camera->GetOrthoWindowWidth();
+//  double orthoHeight = this->camera->GetOrthoWindowHeight();
+  double orthoWidth = width / this->scale;
+  double orthoHeight = height / this->scale;
 
   translation.Set(0.0,
       ((width/2.0 - _screenPos.x) / static_cast<float>(width))
@@ -213,13 +227,37 @@ void OrthoViewController::Zoom(float _amount, math::Vector2i _screenPos)
       * orthoHeight);
   this->TranslateLocal(translation);
 
-  this->scale *= _amount;
+  this->scale /= _amount;
 
-  double ratio = this->camera->GetAspectRatio();
-  this->camera->SetOrthoWindowSize(this->scale, this->scale/ratio);
+  // build custrom projection matrix from custom near and far clipping planes,
+  // had to set a negative near clippping plane to workaround a camera
+  // culling issue in orthographic view.
+  double left = width / this->scale / -2.0f;
+  double right = width / this->scale / 2.0f;
+  double bottom = height / this->scale / -2.0f;
+  double top = height / this->scale / 2.0f;
+  double near = -500;
+  double far = 500;
+  double invw = 1 / (right - left);
+  double invh = 1 / (top - bottom);
+  double invd = 1 / (far - near);
+  Ogre::Matrix4 proj = Ogre::Matrix4::ZERO;
+  proj[0][0] = 2 * invw;
+  proj[0][3] = -(right + left) * invw;
+  proj[1][1] = 2 * invh;
+  proj[1][3] = -(top + bottom) * invh;
+  proj[2][2] = -2 * invd;
+  proj[2][3] = -(far + near) * invd;
+  proj[3][3] = 1;
+  this->camera->GetOgreCamera()->setCustomProjectionMatrix(true, proj);
 
-  double newOrthoWidth = this->camera->GetOrthoWindowWidth();
-  double newOrthoHeight = this->camera->GetOrthoWindowHeight();
+//  double ratio = this->camera->GetAspectRatio();
+//  this->camera->SetOrthoWindowSize(this->scale, this->scale / ratio);
+
+//  double newOrthoWidth = this->camera->GetOrthoWindowWidth();
+//  double newOrthoHeight = this->camera->GetOrthoWindowHeight();
+  double newOrthoWidth = width / this->scale;
+  double newOrthoHeight = height / this->scale;
 
   translation.Set(0.0,
       ((_screenPos.x - width/2.0) / static_cast<float>(width))
