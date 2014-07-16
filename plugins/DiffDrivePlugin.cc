@@ -29,7 +29,7 @@ DiffDrivePlugin::DiffDrivePlugin()
 {
   this->wheelSpeed[LEFT] = this->wheelSpeed[RIGHT] = 0;
   // initialize with some default values
-  this->leftPID.Init( 20, 0.001, 0.002, 0.5, -0.5, 5, -5);
+  this->leftPID.Init(20, 0.001, 0.002, 0.5, -0.5, 5, -5);
   this->rightPID.Init(20, 0.001, 0.002, 0.5, -0.5, 5, -5);
   this->leftForce = 0;
   this->rightForce = 0;
@@ -82,6 +82,8 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Init()
 {
+  physics::CollisionPtr collision;
+
   this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
       this->rightJoint->GetAnchor(0));
 
@@ -91,12 +93,23 @@ void DiffDrivePlugin::Init()
   // get wheel radius
   this->wheelRadius = 0.0;
 
-  // assume only one collision
-  physics::CollisionPtr coll = this->leftJoint->GetChild()->GetCollisions()[0];
-
-  if (coll)
+  // Get the first collision
+  if (this->leftJoint && this->leftJoint->GetChild())
   {
-    physics::ShapePtr shape = coll->GetShape();
+    if (!this->leftJoint->GetChild()->GetCollisions().empty())
+    {
+      collision = this->leftJoint->GetChild()->GetCollisions()[0];
+    }
+    else
+    {
+      gzerr << "No collision attached to the left joint\n";
+      return;
+    }
+  }
+
+  if (collision)
+  {
+    physics::ShapePtr shape = collision->GetShape();
 
     if (shape)
     {
@@ -120,10 +133,7 @@ void DiffDrivePlugin::Init()
       gzerr << "wheel collision GetShape failed\n";
   }
   else
-    gzerr << "wheel link GetCollision failed\n";
-
-  gzdbg << "wheel radius [" << this->wheelRadius << "]\n";
-
+    gzerr << "left joint collison is null\n";
 }
 
 /////////////////////////////////////////////////
@@ -141,20 +151,21 @@ void DiffDrivePlugin::OnVelMsg(ConstPosePtr &_msg)
 /////////////////////////////////////////////////
 void DiffDrivePlugin::OnUpdate()
 {
-  /* double d1, d2;
-  double dr, da;
+  // double d1, d2;
+  // double dr, da;
 
-  this->prevUpdateTime = currTime;
+  // this->prevUpdateTime = currTime;
 
-  // Distance travelled by front wheels
-  d1 = stepTime.Double() * this->wheelRadius * this->leftJoint->GetVelocity(0);
-  d2 = stepTime.Double() * this->wheelRadius * this->rightJoint->GetVelocity(0);
+  // // Distance travelled by front wheels
+  // d1 = stepTime.Double() * this->wheelRadius *
+  // this->leftJoint->GetVelocity(0);
+  // d2 = stepTime.Double() * this->wheelRadius *
+  // this->rightJoint->GetVelocity(0);
 
-  dr = (d1 + d2) / 2;
-  da = (d1 - d2) / this->wheelSeparation;
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
-  common::Time stepTime = currTime - this->prevUpdateTime;
-  */
+  // dr = (d1 + d2) / 2;
+  // da = (d1 - d2) / this->wheelSeparation;
+  // common::Time currTime = this->model->GetWorld()->GetSimTime();
+  // common::Time stepTime = currTime - this->prevUpdateTime;
 
   double dt = (this->model->GetWorld()->GetSimTime()
     - this->prevUpdateTime).Double();
