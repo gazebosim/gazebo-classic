@@ -26,6 +26,11 @@
 #include <iostream>
 #include <fstream>
 
+#include "gazebo/gazebo_config.h"
+#ifdef HAVE_IGNITION_MATH
+#include <ignition/math/Vector3.hh>
+#endif  // ifdef HAVE_IGNITION_MATH
+
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/util/system.hh"
 
@@ -33,6 +38,9 @@ namespace gazebo
 {
   namespace math
   {
+#ifdef HAVE_IGNITION_MATH
+    typedef ignition::math::Vector3d Vector3;
+#else
     /// \addtogroup gazebo_math
     /// \{
 
@@ -399,6 +407,7 @@ namespace gazebo
       private: double data[3];
     };
     /// \}
+#endif  // ifdef HAVE_IGNITION_MATH
   }
 }
 #endif
