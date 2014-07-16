@@ -2406,10 +2406,10 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       newModel->LoadPlugins();
       math::Box box = newModel->GetBoundingBox();
 
-      if (preventCollisions)
+      /*if (preventCollisions)
       {
         bool collide = false;
-        /*for (size_t j = 0; j < clonedModels.size(); ++j)
+        for (size_t j = 0; j < clonedModels.size(); ++j)
         {
           ModelPtr otherModel = clonedModels[j];
           std::cout << "Model name: " << otherModel->GetName() << std::endl;
@@ -2429,14 +2429,13 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
             std::cout << "OK" << std::endl;
         }
         if (not collide)
-          clonedModels.push_back(newModel);*/
-        newModel.reset();
-        std::cout << "Removing beer1_clone_2 model" << std::endl;
-        this->RemoveModel("beer1_clone_2");
-      }
+          clonedModels.push_back(newModel);
+      }*/
+      std::cout << "Removing model: " << newModel->GetName() << std::endl;
+      this->RemoveModel(newModel->GetName());
     }
     else
-      std::cerr << "ModelEleme is NULL" << std::endl;
+      std::cerr << "ModelElem is NULL" << std::endl;
   }
 }
 

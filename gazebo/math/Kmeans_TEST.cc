@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,25 +52,25 @@ TEST_F(KmeansTest, Kmeans)
   for (size_t i = 0; i < obsCopy.size(); ++i)
     obsCopy[i] += math::Vector3(0.1, 0.2, 0.0);
 
-  kmeans.SetObservations(obsCopy);
+  EXPECT_TRUE(kmeans.SetObservations(obsCopy));
 
   obsCopy = kmeans.GetObservations();
   for (size_t i = 0; i < obsCopy.size(); ++i)
     EXPECT_EQ(obsCopy[i], obs[i] + math::Vector3(0.1, 0.2, 0.0));
-  kmeans.SetObservations(obs);
+  EXPECT_TRUE(kmeans.SetObservations(obs));
 
   // ::GetClusters()
   EXPECT_EQ(kmeans.GetNumClusters(), 2);
 
   // ::SetClusters()
-  kmeans.SetNumClusters(3);
+  EXPECT_TRUE(kmeans.SetNumClusters(3));
   EXPECT_EQ(kmeans.GetNumClusters(), 3);
-  kmeans.SetNumClusters(2);
+  EXPECT_TRUE(kmeans.SetNumClusters(2));
 
   // ::Cluster()
   std::vector<math::Vector3> centroids;
   std::vector<unsigned int> labels;
-  kmeans.Cluster(centroids, labels);
+  EXPECT_TRUE(kmeans.Cluster(centroids, labels));
 
   // Check that there are two centroids.
   EXPECT_EQ(centroids.size(), 2);
@@ -97,4 +97,15 @@ TEST_F(KmeansTest, Kmeans)
     EXPECT_EQ(centroids[1], expectedCentroid1);
   else
     FAIL();
+
+  // Try to use an invalid k value.
+  EXPECT_FALSE(kmeans.SetNumClusters(0));
+
+  // Try to use an empty observation vector.
+  obsCopy.clear();
+  EXPECT_FALSE(kmeans.SetObservations(obsCopy));
+
+  // Try to use a k > num_observations
+  EXPECT_TRUE(kmeans.SetNumClusters(obs.size() + 1));
+  EXPECT_FALSE(kmeans.Cluster(centroids, labels));
 }

@@ -15,38 +15,21 @@
  *
 */
 
+#include <algorithm>
+#include <iostream>
 #include <vector>
-#include "gazebo/common/Console.hh"
 #include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
-using namespace common;
 using namespace math;
 
 //////////////////////////////////////////////////
 Kmeans::Kmeans(const std::vector<Vector3> &_obs, unsigned int _k)
-  : k(_k)
 {
-  // Initialize observations.
   this->SetObservations(_obs);
-
-  // Initialize centroids.
-  for (size_t i = 0; i < k; ++i)
-  {
-    // centroid.
-    Vector3 c;
-
-    // Choose a random observation and make sure it has not been choosen before.
-    do
-    {
-      c = this->obs[Rand::GetIntUniform(0, this->obs.size() - 1)];
-    } while (std::find(this->centroids.begin(), this->centroids.end(), c) !=
-             this->centroids.end());
-
-    this->centroids.push_back(c);
-  }
+  this->SetNumClusters(_k);
 }
 
 //////////////////////////////////////////////////
@@ -61,21 +44,35 @@ std::vector<Vector3> Kmeans::GetObservations()
 }
 
 //////////////////////////////////////////////////
-void Kmeans::SetObservations(const std::vector<Vector3> &_obs)
+bool Kmeans::SetObservations(const std::vector<Vector3> &_obs)
 {
+  if (_obs.empty())
+  {
+    std::cerr << "Kmeans::SetObservations() error: Observations vector is empty"
+              << std::endl;
+    return false;
+  }
   this->obs = _obs;
+  return true;
 }
 
 //////////////////////////////////////////////////
 unsigned int Kmeans::GetNumClusters()
 {
-  return k;
+  return this->k;
 }
 
 //////////////////////////////////////////////////
-void Kmeans::SetNumClusters(unsigned int _k)
+bool Kmeans::SetNumClusters(unsigned int _k)
 {
+  if (_k <= 0)
+  {
+    std::cerr << "Kmeans::SetNumClusters() error: The number of clusters has to"
+              << " be positive but its value is [" << _k << "]" << std::endl;
+    return false;
+  }
   this->k = _k;
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -88,11 +85,19 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
   size_t changed = 0;
 
   // Initialize the size of the vectors;
-  this->centroids.resize(this->k);
-  this->oldCentroids.resize(this->k);
+  this->centroids.clear();
   this->labels.resize(this->obs.size());
   this->sums.resize(this->k);
   this->counters.resize(this->k);
+
+  // Initialize centroids.
+  for (size_t i = 0; i < k; ++i)
+  {
+    // Choose a random observation and make sure it has not been chosen before.
+    // Note: This is not really random but it's faster than choosing a random
+    // one and verifying that it was not taken before.
+    this->centroids.push_back(this->obs[i]);
+  }
 
   // Initialize labels.
   for (size_t i = 0; i < this->obs.size(); ++i)
@@ -111,7 +116,7 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
     for (size_t i = 0; i < this->obs.size(); ++i)
     {
       // Update the labels containing the closest centroid for each point.
-      unsigned int label = ClosestCentroid(this->obs[i]);
+      unsigned int label = this->ClosestCentroid(this->obs[i]);
       if (this->labels[i] != label)
       {
         this->labels[i] = label;
@@ -120,9 +125,6 @@ bool Kmeans::Cluster(std::vector<Vector3> &_centroids,
       this->sums[label] += this->obs[i];
       this->counters[label]++;
     }
-
-    // Save old centroids.
-    this->oldCentroids = centroids;
 
     // Update the centroids.
     for (size_t i = 0; i < this->centroids.size(); ++i)
@@ -155,22 +157,23 @@ unsigned int Kmeans::ClosestCentroid(const Vector3 &_p)
 //////////////////////////////////////////////////
 bool Kmeans::IsDataValid()
 {
-  if (this->obs.size() == 0)
+  if (this->obs.empty())
   {
-    std::cerr << "The set of observations is empty." << std::endl;
+    std::cerr << "Kmeans error: The set of observations is empty." << std::endl;
     return false;
   }
 
   if (this->k == 0)
   {
-    std::cerr << "The number of clusters should not be zero." << std::endl;
+    std::cerr << "Kmeans error: The number of clusters cannot be zero."
+              << std::endl;
     return false;
   }
 
   if (this->k > this->obs.size())
   {
-    std::cerr << "The number of clusters has to be lower or equal to the number"
-              << " of observations." << std::endl;
+    std::cerr << "Kmeans error: The number of clusters has to be lower or equal"
+              << " to the number of observations." << std::endl;
     return false;
   }
   return true;

@@ -30,7 +30,7 @@ namespace gazebo
 
     /// \class Kmeans Kmeans.hh math/gzmath.hh
     /// \brief K-Means clustering algorithm. Given a set of observations,
-    /// k-means partition the observations into k sets so as to minimize the
+    /// k-means partitions the observations into k sets so as to minimize the
     /// within-cluster sum of squares.
     /// Description based on http://en.wikipedia.org/wiki/K-means_clustering.
     class GAZEBO_VISIBLE Kmeans
@@ -49,7 +49,8 @@ namespace gazebo
 
       /// \brief Set the observations to cluster.
       /// \param[in] _obs The new vector of observations.
-      public: void SetObservations(const std::vector<Vector3> &_obs);
+      /// \return True if the vector is not empty or false otherwise.
+      public: bool SetObservations(const std::vector<Vector3> &_obs);
 
       /// \brief Get the number of partitions used to cluster.
       /// \return The number of partitions.
@@ -57,15 +58,19 @@ namespace gazebo
 
       /// \brief Set the number of partitions to cluster.
       /// \param[in] _k The number of partitions.
-      public: void SetNumClusters(unsigned int _k);
+      /// \return true if _k is a valid number (positive).
+      public: bool SetNumClusters(unsigned int _k);
 
       /// \brief Executes the k-means algorithm.
       /// \param[out] _centroids Vector of centroids. Each element contains the
       /// centroid of one cluster.
       /// \param[out] _labels Vector of labels. The size of this vector is
       /// equals to the number of observations. Each element represents the
-      /// cluster to which observation i belongs.
-      /// \return True when the operation succeed or false otherwise.
+      /// cluster to which observation belongs.
+      /// \return True when the operation succeed or false otherwise. The
+      /// operation will fail if the number of observations is not positive,
+      /// if the number of clusters is non positive, or if the number of
+      /// clusters if greater than the number of observations.
       public: bool Cluster(std::vector<Vector3> &_centroids,
                            std::vector<unsigned int> &_labels);
 
@@ -82,7 +87,7 @@ namespace gazebo
       /// algorithm or false otherwise.
       private: bool IsDataValid();
 
-      /// \brief Number of partitions used to cluster.
+      /// \brief Number of partitions to group the observations.
       private: unsigned int k;
 
       /// \brief Observations.
@@ -91,18 +96,13 @@ namespace gazebo
       /// \brief Centroids.
       private: std::vector<Vector3> centroids;
 
-      /// \brief Centroids from the previous iteration.
-      private: std::vector<Vector3> oldCentroids;
-
-      /// \brief Each element represents the cluster to which observation i
-      /// belongs.
+      /// \brief Each element stores the cluster to which observation i belongs.
       private: std::vector<unsigned int> labels;
 
       /// \brief Used to calculate the centroid of each partition.
       private: std::vector<Vector3> sums;
 
-      /// \brief Used to count the number of observations contained in each
-      /// partition.
+      /// \brief Counts the number of observations contained in each partition.
       private: std::vector<unsigned int> counters;
     };
     /// \}
