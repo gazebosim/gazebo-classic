@@ -269,13 +269,6 @@ double ODEScrewJoint::GetMaxForce(unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAttribute(const std::string &_key,
-  unsigned int _index, const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool ODEScrewJoint::SetParam(const std::string &_key,
   unsigned int _index, const boost::any &_value)
 {
@@ -304,10 +297,4 @@ double ODEScrewJoint::GetParam(const std::string &_key, unsigned int _index)
     return this->threadPitch;
   else
     return ODEJoint::GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
-double ODEScrewJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
 }
