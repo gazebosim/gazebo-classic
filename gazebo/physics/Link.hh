@@ -484,12 +484,17 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// \brief Returns the visual message specified by its name
+      /// \param[in] name of the visual message
+      /// \return visual message
+      public: msgs::Visual GetVisualMessage(const std::string &_name) const;
+
       /// \brief Freeze link to ground (inertial frame).
       /// \param[in] _static if true, freeze link to ground.  Otherwise
       /// unfreeze link.
       public: virtual void SetLinkStatic(bool _static) = 0;
 
-      /// \brief Move Link given source and targe frames specified in
+      /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to
       /// source frame (_worldReferenceFrameSrc) remains unchanged relative
       /// to destination frame (_worldReferenceFrameDst).

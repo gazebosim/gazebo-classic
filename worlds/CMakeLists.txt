@@ -1,4 +1,5 @@
 set (files
+  actor.world
   blank.world
   camera.world
   cart_demo.world
@@ -25,6 +26,7 @@ set (files
   pioneer2dx.world
   plane_demo.world
   plugin.world
+  polyline.world
   population.world
   pr2.world
   presentation.world

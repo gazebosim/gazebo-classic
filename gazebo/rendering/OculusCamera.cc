@@ -199,10 +199,11 @@ void OculusCamera::Update()
   Camera::Update();
 
   OVR::Quatf q = this->sensorFusion->GetPredictedOrientation();
-  math::Quaternion quat(q.w, -q.z, -q.x, q.y);
 
   // Set the orientation, and correct for the oculus coordinate system
-  this->SetWorldRotation(quat);
+  this->sceneNode->setOrientation(Ogre::Quaternion(q.w, -q.z, -q.x, q.y));
+
+  this->sceneNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
