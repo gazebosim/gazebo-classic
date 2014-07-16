@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _KMEANS_HH_
-#define _KMEANS_HH_
+#ifndef _GAZEBO_KMEANS_HH_
+#define _GAZEBO_KMEANS_HH_
 
 #include <vector>
 #include "gazebo/math/Vector3.hh"
@@ -37,31 +37,22 @@ namespace gazebo
     {
       /// \brief constructor
       /// \param[in] _obs Set of observations to cluster.
-      /// \param[in] _k Number of clusters.
-      public: Kmeans(const std::vector<Vector3> &_obs, unsigned int _k);
+      public: Kmeans(const std::vector<Vector3> &_obs);
 
       /// \brief Destructor
       public: virtual ~Kmeans();
 
       /// \brief Get the observations to cluster.
       /// \return The vector of observations.
-      public: std::vector<Vector3> GetObservations();
+      public: std::vector<Vector3> Observations() const;
 
       /// \brief Set the observations to cluster.
       /// \param[in] _obs The new vector of observations.
       /// \return True if the vector is not empty or false otherwise.
-      public: bool SetObservations(const std::vector<Vector3> &_obs);
-
-      /// \brief Get the number of partitions used to cluster.
-      /// \return The number of partitions.
-      public: unsigned int GetNumClusters();
-
-      /// \brief Set the number of partitions to cluster.
-      /// \param[in] _k The number of partitions.
-      /// \return true if _k is a valid number (positive).
-      public: bool SetNumClusters(unsigned int _k);
+      public: bool Observations(const std::vector<Vector3> &_obs);
 
       /// \brief Executes the k-means algorithm.
+      /// \param[in] _k Number of partitions to cluster.
       /// \param[out] _centroids Vector of centroids. Each element contains the
       /// centroid of one cluster.
       /// \param[out] _labels Vector of labels. The size of this vector is
@@ -71,24 +62,14 @@ namespace gazebo
       /// operation will fail if the number of observations is not positive,
       /// if the number of clusters is non positive, or if the number of
       /// clusters if greater than the number of observations.
-      public: bool Cluster(std::vector<Vector3> &_centroids,
+      public: bool Cluster(int _k,
+                           std::vector<Vector3> &_centroids,
                            std::vector<unsigned int> &_labels);
 
       /// \brief Given an observation, it returns the closest centroid to it.
       /// \param[in] _p Point to check.
       /// \return The index of the closest centroid to the point _p.
-      private: unsigned int ClosestCentroid(const Vector3 &_p);
-
-      /// \brief Check if the given number of observations and number of
-      /// clusters is valid. The number of observations has to be positive and
-      /// the number of clusters has to be positive and less or equal to the
-      /// number of observations.
-      /// \return True if the conditions are satisfied and we can run the
-      /// algorithm or false otherwise.
-      private: bool IsDataValid();
-
-      /// \brief Number of partitions to group the observations.
-      private: unsigned int k;
+      private: unsigned int ClosestCentroid(const Vector3 &_p) const;
 
       /// \brief Observations.
       private: std::vector<Vector3> obs;

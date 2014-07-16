@@ -40,11 +40,11 @@ TEST_F(KmeansTest, Kmeans)
   obs.push_back(math::Vector3(5.4, 1.0, 0.0));
 
   // Initialize Kmeans with two partitions.
-  math::Kmeans kmeans(obs, 2);
+  math::Kmeans kmeans(obs);
 
   // ::GetObservations()
   std::vector<math::Vector3> obsCopy;
-  obsCopy = kmeans.GetObservations();
+  obsCopy = kmeans.Observations();
   for (size_t i = 0; i < obsCopy.size(); ++i)
     EXPECT_EQ(obsCopy[i], obs[i]);
 
@@ -52,25 +52,17 @@ TEST_F(KmeansTest, Kmeans)
   for (size_t i = 0; i < obsCopy.size(); ++i)
     obsCopy[i] += math::Vector3(0.1, 0.2, 0.0);
 
-  EXPECT_TRUE(kmeans.SetObservations(obsCopy));
+  EXPECT_TRUE(kmeans.Observations(obsCopy));
 
-  obsCopy = kmeans.GetObservations();
+  obsCopy = kmeans.Observations();
   for (size_t i = 0; i < obsCopy.size(); ++i)
     EXPECT_EQ(obsCopy[i], obs[i] + math::Vector3(0.1, 0.2, 0.0));
-  EXPECT_TRUE(kmeans.SetObservations(obs));
-
-  // ::GetClusters()
-  EXPECT_EQ(kmeans.GetNumClusters(), 2);
-
-  // ::SetClusters()
-  EXPECT_TRUE(kmeans.SetNumClusters(3));
-  EXPECT_EQ(kmeans.GetNumClusters(), 3);
-  EXPECT_TRUE(kmeans.SetNumClusters(2));
+  EXPECT_TRUE(kmeans.Observations(obs));
 
   // ::Cluster()
   std::vector<math::Vector3> centroids;
   std::vector<unsigned int> labels;
-  EXPECT_TRUE(kmeans.Cluster(centroids, labels));
+  EXPECT_TRUE(kmeans.Cluster(2, centroids, labels));
 
   // Check that there are two centroids.
   EXPECT_EQ(centroids.size(), 2);
@@ -98,14 +90,10 @@ TEST_F(KmeansTest, Kmeans)
   else
     FAIL();
 
-  // Try to use an invalid k value.
-  EXPECT_FALSE(kmeans.SetNumClusters(0));
-
   // Try to use an empty observation vector.
   obsCopy.clear();
-  EXPECT_FALSE(kmeans.SetObservations(obsCopy));
+  EXPECT_FALSE(kmeans.Observations(obsCopy));
 
-  // Try to use a k > num_observations
-  EXPECT_TRUE(kmeans.SetNumClusters(obs.size() + 1));
-  EXPECT_FALSE(kmeans.Cluster(centroids, labels));
+  // Try to use a k > num_observations.
+  EXPECT_FALSE(kmeans.Cluster(obs.size() + 1, centroids, labels));
 }
