@@ -2247,8 +2247,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       // Step2: Cluster the sampled points in 'modelCount' clusters.
       std::vector<math::Vector3> centroids;
       std::vector<unsigned int> labels;
-      math::Kmeans kmeans(obs, modelCount);
-      kmeans.Cluster(centroids, labels);
+      math::Kmeans kmeans(obs);
+      kmeans.Cluster(modelCount, centroids, labels);
 
       // Step3: Create the list of object positions.
       for (int i = 0; i < modelCount; ++i)
@@ -2391,8 +2391,8 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       // Step2: Cluster the sampled points in 'modelCount' clusters.
       std::vector<math::Vector3> centroids;
       std::vector<unsigned int> labels;
-      math::Kmeans kmeans(obs, modelCount);
-      kmeans.Cluster(centroids, labels);
+      math::Kmeans kmeans(obs);
+      kmeans.Cluster(modelCount, centroids, labels);
 
       // Step3: Create the list of object positions.
       for (int i = 0; i < modelCount; ++i)
