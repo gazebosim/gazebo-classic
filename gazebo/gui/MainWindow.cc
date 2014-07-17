@@ -1206,7 +1206,15 @@ void MainWindow::CreateActions()
       tr("Z Align Center"), this);
   QAction *zAlignMax = new QAction(QIcon(":/images/z_max.png"),
       tr("Z Align Max"), this);
-
+  this->CreateDisabledIcon(":/images/x_min.png", xAlignMin);
+  this->CreateDisabledIcon(":/images/x_center.png", xAlignCenter);
+  this->CreateDisabledIcon(":/images/x_max.png", xAlignMax);
+  this->CreateDisabledIcon(":/images/y_min.png", yAlignMin);
+  this->CreateDisabledIcon(":/images/y_center.png", yAlignCenter);
+  this->CreateDisabledIcon(":/images/y_max.png", yAlignMax);
+  this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
+  this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
+  this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
   xAlignMin->setCheckable(true);
   xAlignCenter->setCheckable(true);
   xAlignMax->setCheckable(true);

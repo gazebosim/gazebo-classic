@@ -87,13 +87,11 @@ void ModelAlign_TEST::AlignXMin()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "x", "min");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMinX =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.x +
-      centerOffsets[centerOffsets.size()-1].x - targetBbox.GetXLength()/2.0;
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  double targetMinX = modelVisuals[0]->GetWorldPose().pos.x +
+      centerOffsets[0].x - targetBbox.GetXLength()/2.0;
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -165,14 +163,12 @@ void ModelAlign_TEST::AlignXCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "x", "center");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetCenterX =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.x +
-      centerOffsets[centerOffsets.size()-1].x;
+  double targetCenterX = modelVisuals[0]->GetWorldPose().pos.x +
+      centerOffsets[0].x;
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -242,14 +238,12 @@ void ModelAlign_TEST::AlignXMax()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "x", "max");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMaxX =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.x +
-      centerOffsets[centerOffsets.size()-1].x + targetBbox.GetXLength()/2.0;
+  double targetMaxX = modelVisuals[0]->GetWorldPose().pos.x +
+      centerOffsets[0].x + targetBbox.GetXLength()/2.0;
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -320,13 +314,11 @@ void ModelAlign_TEST::AlignYMin()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "y", "min");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMinY =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.y +
-      centerOffsets[centerOffsets.size()-1].y - targetBbox.GetYLength()/2.0;
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  double targetMinY = modelVisuals[0]->GetWorldPose().pos.y +
+      centerOffsets[0].y - targetBbox.GetYLength()/2.0;
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -398,15 +390,13 @@ void ModelAlign_TEST::AlignYCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "y", "center");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetCenterY =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.y +
-      centerOffsets[centerOffsets.size()-1].y;
+  double targetCenterY = modelVisuals[0]->GetWorldPose().pos.y +
+      centerOffsets[0].y;
 
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -476,14 +466,12 @@ void ModelAlign_TEST::AlignYMax()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "y", "max");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMaxY =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.y +
-      centerOffsets[centerOffsets.size()-1].y + targetBbox.GetYLength()/2.0;
+  double targetMaxY = modelVisuals[0]->GetWorldPose().pos.y +
+      centerOffsets[0].y + targetBbox.GetYLength()/2.0;
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -511,7 +499,6 @@ void ModelAlign_TEST::AlignZMin()
   modelNames.push_back("bookshelf");
   modelNames.push_back("table");
   modelNames.push_back("jersey_barrier");
-
 
   gazebo::event::Events::preRender();
 
@@ -555,13 +542,11 @@ void ModelAlign_TEST::AlignZMin()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "z", "min");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMinZ =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.z +
-      centerOffsets[centerOffsets.size()-1].z - targetBbox.GetZLength()/2.0;
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  double targetMinZ = modelVisuals[0]->GetWorldPose().pos.z +
+      centerOffsets[0].z - targetBbox.GetZLength()/2.0;
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -633,14 +618,12 @@ void ModelAlign_TEST::AlignZCenter()
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
       modelVisuals, "z", "center");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetCenterZ =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.z +
-      centerOffsets[centerOffsets.size()-1].z;
+  double targetCenterZ = modelVisuals[0]->GetWorldPose().pos.z +
+      centerOffsets[0].z;
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
@@ -667,7 +650,6 @@ void ModelAlign_TEST::AlignZMax()
   modelNames.push_back("bookshelf");
   modelNames.push_back("table");
   modelNames.push_back("jersey_barrier");
-
 
   gazebo::event::Events::preRender();
 
@@ -711,14 +693,12 @@ void ModelAlign_TEST::AlignZMax()
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "z", "max");
 
-  gazebo::math::Box targetBbox =
-      modelVisuals[modelVisuals.size()-1]->GetBoundingBox();
+  gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
-  double targetMaxZ =
-      modelVisuals[modelVisuals.size()-1]->GetWorldPose().pos.z +
-      centerOffsets[centerOffsets.size()-1].z + targetBbox.GetZLength()/2.0;
+  double targetMaxZ = modelVisuals[0]->GetWorldPose().pos.z +
+      centerOffsets[0].z + targetBbox.GetZLength()/2.0;
 
-  for (unsigned int i = 0; i < modelVisuals.size() - 1; ++i)
+  for (unsigned int i = 1; i < modelVisuals.size(); ++i)
   {
     gazebo::rendering::VisualPtr vis = modelVisuals[i];
     gazebo::math::Box bbox = vis->GetBoundingBox();
