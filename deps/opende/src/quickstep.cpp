@@ -1584,8 +1584,377 @@ struct dJointWithInfo1
 };
 
 //***************************************************************************
+// Modifying inertia without modifying dynamics,
+// Helper function to find max MOI ratio without violating
+// diagonal dominance.
+static dReal FindMaxMOIRatio(dReal m_large, dReal m_small, dReal moi_ratio_max,
+                             dRealMutablePtr MOI_large,
+                             dRealMutablePtr MOI_small,
+                             dRealMutablePtr SS)
+{
+  /// Keep parent/child MOI/invMOI in inertial frame.
+
+  // Stability is presumed maintained by the following condition:
+  //
+  // On a per row basis, sum of absolute values of off-diagonal elements
+  // is less than absolute value of the diagonal element itself.
+  //
+  // @article{Garcia2003,
+  // author = {Garcia, M.V.P. and {Humes Jr.}, C. and Stern, J.M.},
+  // doi = {10.1590/S0101-82052003000100006},
+  // issn = {0101-8205},
+  // journal = {Computational \& Applied Mathematics},
+  // number = {1},
+  // pages = {91--97},
+  // title = {{Generalized line criterion for Gauss-Seidel method}},
+  // url = {http://www.ime.usp.br/~jstern/papers/papersJS/ghs03.pdf},
+  // volume = {22},
+  // year = {2003}
+  // }
+  //
+  // To do this, first compute the sum of the absolute values
+  // of the off diagonal terms and store in sumAbsOffDiags.
+  // Adjust MOI ratio and make sure that each row of new MOI
+  // satisfies the line criterion.
+  //
+  // Terminology:
+  //   S: a unit column vector in the direction of constraint DOF
+  //      for which we want to reduce inertia.
+  //   SS: MOI component matrix constructed by S*S'
+  //   M1: MOI of body 1
+  //   M1_new: MOI of body 1 after adjustment
+  //   m1: scalar MOI of body 1 along a vector S, m1 = S'*M1*S
+  //   M1d: absolute value of M1 diagonal
+  //   M1od: scalar sum of absolute values of M1 off-diagonal row
+  //   M2: MOI of body 2
+  //   M2_new: MOI of body 2 after adjustment
+  //   m2: scalar MOI of body 2 along a vector S, m2 = S'*M2*S
+  //   M2d: absolute value of M2 diagonal
+  //   M2od: sum of absolute values of M2 off-diagonals
+  //   SSd: absolute value of SS diagonal
+  //   SSod: sum of absolute values of SS off-diagonals
+  //   moi_sum: m1 + m2 (this should stay the same after adjustment
+  //                     to ensure dynamics does not change).
+  //   m1_new: desired m1 after adjustment.
+  //   m2_new: desired m2 after adjustment.
+  //   moi_ratio: desired ratio of
+  //              m1_new / m2_new or m2_new / m1_new whichever is > 1
+  //   dm1: m1_new - m1
+  //   dm2: m2_new - m2
+  //
+  // Derivations:
+  //   (find a place to put detailed derivations).
+  //   Key equations:
+  //     Basic adjustment:
+  //       M1_new = M1 + dm1 * SS
+  //       M2_new = M2 + dm2 * SS
+  //     To eliminate dm2, use:
+  //       (eq 4) dm1 + dm2 = 0
+  //     Check for Diagonal Dominance (DD):
+  //     But first define some new variables:
+  //       M1d_new  = M1d  + dm1 * SSd
+  //       M1od_new ≤ M1od + dm1 * SSod
+  //       M2d_new  = M2d  + dm2 * SSd
+  //       M2od_new ≤ M2od + dm2 * SSod
+  //     Where if M1_new_od is the sum of absolute values of
+  //     off diagonal values of M1_new, and M1od_new is as
+  //     defined above, then
+  //       M1_new_od ≤ M1od_new
+  //       M2_new_od ≤ M2od_new
+  //     Hence, below is necessary for DD:
+  //       (eq 5) M1d_new / M1od_new = gamma1 > 1
+  //       (eq 6) M2d_new / M2od_new = gamma2 > 1
+  //     And we know that enforcing eq 5 and eq 6 is sufficient, since:
+  //       M1d_new / M1_new_od ≥ M1d_new / M1od_new
+  //       M2d_new / M2_new_od ≥ M2d_new / M2od_new
+  //     For simplicity, look at the case where m1 > m2:
+  //       (for m2 > m1, one can infer the results.)
+  //     To eliminate dm1, find dm1 as a function of moi_ratio:
+  //       moi_ratio = m1_new / m2_new = (m1 + dm1) / (m2 + dm2)
+  //       moi_ratio = (m1 + dm1) / (m2 - dm1)
+  //       (eq 7) dm1 = (moi_ratio * m2 - m1) / (1 + moi_ratio)
+  //     Substitute eq 4, 7 above into eq 5 and do some algebra:
+  //       (eq 13) (moi_ratio * (M1d + m2 * SSd) + M1d - m1*SSd)
+  //             / (moi_ratio*(M1od + m2*SSod) + M1od - m1*SSod)
+  //             = gamma1 > 1
+  //     Solve eq 13 above for moi_ratio:
+  //       if denominator of lhs of eq 13 is > 0,
+  //         (eq 14a)
+  //         moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod))
+  //         > m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od)
+  //       otherwise,
+  //         (eq 14b)
+  //         moi_ratio * (M1d - gamma1* M1od + m2*(SSd - gamma1* SSod))
+  //         < m1*(SSd - gamma1* SSod) - (M1d - gamma1* M1od)
+  //     Similarly, substitute eq 4, 7 into eq 6:
+  //       (eq 15) (moi_ratio * (M2d - m2 * SSd) + M2d + m1*SSd)
+  //             / (moi_ratio*(M2od - m2*SSod) + M2od + m1*SSod)
+  //             = gamma2 > 1
+  //     Solve eq 15 for moi_ratio:
+  //       if denominator of lhs of eq 15 is > 0,
+  //        (eq 16a)
+  //         moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod))
+  //         > (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd)
+  //       otherwise,
+  //        (eq 16b)
+  //         moi_ratio * (M2d - gamma2* M2od + m2*(SSd - gamma2* SSod))
+  //         < (gamma2* M2od - M2d) + m1*(gamma2* SSod - SSd)
+  //     Lastly, repeat for the case where m2 > m1.
+  //     Similarly, equation numbers 18, 19, 20, 21 are analogs
+  //     of 13-16 for m2 > m1.
+  //       (eq 18) (moi_ratio * (M1d - m1 * SSd) + M1d + m2*SSd)
+  //             / (moi_ratio*(M1od - m1*SSod) + M1od + m2*SSod)
+  //             = gamma1 > 1
+  //     Solve eq 13 for moi_ratio:
+  //       if denominator of lhs of eq 18 is > 0,
+  //         (eq 19a)
+  //         moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod))
+  //         > m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d)
+  //       otherwise,
+  //         (eq 19b)
+  //         moi_ratio * (M1d - gamma1* M1od - m1*(SSd - gamma1* SSod))
+  //         < m2*(gamma1* SSod - SSd) + (gamma1* M1od - M1d)
+  //     Similarly, substitute eq 4, 7 into eq 6:
+  //       (eq 20) (moi_ratio * (M2d + m1 * SSd) + M2d - m2*SSd)
+  //             / (moi_ratio*(M2od + m1*SSod) + M2od - m2*SSod)
+  //             = gamma2 > 1
+  //     Solve eq 20 for moi_ratio:
+  //       if denominator of lhs of eq 20 is > 0,
+  //        (eq 21a)
+  //         moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod))
+  //         > (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod)
+  //       otherwise,
+  //        (eq 21b)
+  //         moi_ratio * (M2d - gamma2* M2od + m1*(SSd - gamma2* SSod))
+  //         < (gamma2* M2od - M2d) + m2*(SSd - gamma2* SSod)
+  //
+  //     Implementation below refers to:
+  //       for m1 > m2, equation numbers 13, 14, 15, 16
+  //       otherwise,   equation numbers 18, 19, 20, 21
+  //     
+  //   Goal:
+  //     select initial moi_ratio (currently set to 10)
+  //     increase moi_ratio as necessary if DD is violated.
+  //     A "problem" flag is introduced, if there are no solutions,
+  //     skip inertia ratio reduction.
+
+  // increase gamma_large or gamma_small to add stability
+  const dReal gamma_large = 1.0;
+  const dReal gamma_small = 1.0;
+
+  // To do this, first compute abs sum of off-diagonals and
+  // store in sumAbsOffDiag.
+  // sum off-diagonals terms (to check diagonal dominance)
+  dReal Mod_large[4];  // abs sum of MOI1 off diagonal elements
+  dReal Mod_small[4];  // abs sum of MOI2 off diagonal elements
+  dReal SSod[4];  // abs sum of SS off diagonal elements
+
+  dReal Md_large[4];  // abs of diagonal of MOI1
+  dReal Md_small[4];  // abs of diagonal of MOI2
+  dReal SSd[4];  // abs of diagonal of SS
+
+  dSetZero(Mod_large,4);
+  dSetZero(Mod_small,4);
+  dSetZero(SSod,4);
+
+  dSetZero(Md_large,4);
+  dSetZero(Md_small,4);
+  dSetZero(SSd,4);
+
+  // compute diagonals and offdiagonals
+  for (int si = 0; si < 12; ++si)
+  {
+    int col = si%4;
+    int row = si/4;
+    if (!(row == col))  // off-diagonal terms
+    {
+      // compute off-diagonal terms
+      Mod_large[row] += dFabs(MOI_large[si]);
+      Mod_small[row] += dFabs(MOI_small[si]);
+      SSod[row] += dFabs(SS[si]);
+    }
+    else if (row == col)
+    {
+      // compute diagonal element
+      Md_large[row] = dFabs(MOI_large[si]);
+      Md_small[row] = dFabs(MOI_small[si]);
+      SSd[row] = dFabs(SS[si]);
+    }
+  }
+
+  // initial guess
+  dReal moi_ratio = moi_ratio_max;
+
+  // fixed point iteration for reducing moi_ratio across constraints
+  const int moi_iterations = 1;
+  for (int moi_iters = 0; moi_iters < moi_iterations; ++moi_iters)
+  {
+    // printf("------ iteration [%d] ------n", moi_iters);
+    for (int row = 0; row < 3; ++row)
+    {
+      if (m_large > m_small)
+      {
+        // check equations 13 and 14 (gamma_large > 1)
+        dReal denom_13 = moi_ratio_max *
+          (Mod_large[row] + m_small*SSod[row]) +
+          Mod_large[row] - m_large*SSod[row];
+        dReal left_14 = Md_large[row] - gamma_large*Mod_large[row] +
+          m_small*(SSd[row] - gamma_large*SSod[row]);
+        dReal right_14 = m_large*(SSd[row] - gamma_large*SSod[row])
+          - (Md_large[row] - gamma_large*Mod_large[row]);
+        // printf("row [%d] denom_13 [%f]>0? nomin_13 [%f]"
+        //        " left_14 [%f]>0? right_14 [%f]\n", row,
+        //        denom_13, nomin_13, left_14, right_14);
+        dReal eq_14_ratio = right_14 / left_14;
+        if (denom_13 > 0)
+        {
+          // (eq 14a)
+          if (left_14 > 0)
+          {
+            // r' > right_14 / left_14
+            if (moi_ratio < eq_14_ratio)
+            {
+              // criteria requires a larger ratio than specified, bump it up
+              moi_ratio = eq_14_ratio;
+            }
+          }
+          else
+          {
+            // r' < right_14 / left_14
+            if (eq_14_ratio < 0)
+            {
+              // criteria requires ratio < 0, not possible, return failed
+              // attempt via negative resulting ratio.
+              return -1.0;
+            }
+            else
+            {
+              if (moi_ratio > eq_14_ratio)
+              {
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                moi_ratio = eq_14_ratio;
+              }
+            }
+          }
+        }
+        else
+        {
+          // (eq 14b)
+          if (left_14 < 0)
+          {
+            // r' > right_14 / left_14
+            if (moi_ratio < eq_14_ratio)
+            {
+              // criteria requires a larger ratio than specified, bump it up
+              moi_ratio = eq_14_ratio;
+            }
+          }
+          else
+          {
+            // r' < right_14 / left_14
+            if (eq_14_ratio < 0)
+            {
+              // criteria requires ratio < 0, not possible, return failed
+              // attempt via negative resulting ratio.
+              return -1.0;
+            }
+            else
+            {
+              if (moi_ratio > eq_14_ratio)
+              {
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                moi_ratio = eq_14_ratio;
+              }
+            }
+          }
+        }
+
+        // check equations 15 and 16 (gamma_small > 1)
+        dReal denom_15 = moi_ratio_max *
+          (Mod_small[row] - m_small*SSod[row]) +
+          Mod_small[row] + m_large*SSod[row];
+        dReal left_16 = Md_small[row] - gamma_small*Mod_small[row] -
+          m_small*(SSd[row] - gamma_small*SSod[row]);
+        dReal right_16 = (gamma_small*Mod_small[row] - Md_small[row]) +
+          m_large*(gamma_small*SSod[row] - SSd[row]);
+        // printf("row [%d] denom_15 [%f]>0? nomin_15 [%f]"
+        //        " left_16 [%f]>0? right_16 [%f]\n", row,
+        //        denom_15, nomin_15, left_16, right_16);
+        dReal eq_16_ratio = right_16 / left_16;
+        if (denom_15 > 0)
+        {
+          // (eq 16a)
+          if (left_16 > 0)
+          {
+            // r' > right_16 / left_16
+            if (moi_ratio < eq_16_ratio)
+            {
+              moi_ratio = eq_16_ratio;
+            }
+          }
+          else
+          {
+            // r' < right_16 / left_16
+            if (eq_16_ratio < 0)
+            {
+              // criteria requires ratio < 0, not possible, return failed
+              // attempt via negative resulting ratio.
+              return -1.0;
+            }
+            else
+            {
+              if (moi_ratio > eq_16_ratio)
+              {
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                moi_ratio = eq_16_ratio;
+              }
+            }
+          }
+        }
+        else
+        {
+          // (eq 16b)
+          if (left_16 < 0)
+          {
+            // r' > right_16 / left_16
+            if (moi_ratio < eq_16_ratio)
+            {
+              moi_ratio = eq_16_ratio;
+            }
+          }
+          else
+          {
+            // r' < right_16 / left_16
+            if (eq_16_ratio < 0)
+            {
+              // criteria requires ratio < 0, not possible, return failed
+              // attempt via negative resulting ratio.
+              return -1.0;
+            }
+            else
+            {
+              if (moi_ratio > eq_16_ratio)
+              {
+                // criteria requires a smaller ratio, reduce it.
+                // but this usually make stability worse, so we can safely skip
+                moi_ratio = eq_16_ratio;
+              }
+            }
+          }
+        }
+      }  // if m_large > m_small
+    }
+  }
+  return moi_ratio;
+}
+
+//***************************************************************************
 // Modifying inertia along constrained axes without modifying dynamics.
-static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const int b1, const int b2,
+static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo,
+                            const int b1, const int b2,
                             const dJointWithInfo1 *jicurr,
                             dRealMutablePtr invMOI, dRealMutablePtr MOI)
 {
@@ -1623,8 +1992,9 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// direction from J1a for hinge joints.
 
 
-      /// get the moment of inertia (MOI) for parent and child bodies constrained by J1a and J2a.
-      /// MOI and invMOI are already in inertial frame (previously rotated by body.posr.R)
+      /// get the moment of inertia (MOI) for parent and child bodies
+      /// constrained by J1a and J2a. MOI and invMOI are already in
+      /// inertial frame (previously rotated by body.posr.R)
       /// get pointers to our invMOI/MOI matrices
       dReal *invMOI_ptr1 = invMOI + b1 * 12;
       dReal *invMOI_ptr2 = invMOI + b2 * 12;
@@ -1701,7 +2071,16 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
       /// for all rows (see comments below about Gauss-Seidel stability).
       // increase moi_ratio_max to skip checks and increase performance
       const dReal moi_ratio_max = 200.0;
-      if (m_large > moi_ratio_max * m_small)
+
+      // given moi_ratio_max as an initial guess, find the smallest moi_ratio
+      // that does not violate diagonal dominance of resulting MOI's.
+      // returns 
+      dReal  moi_ratio = FindMaxMOIRatio(m_large, m_small, moi_ratio_max,
+                                         MOI_large, MOI_small, SS);
+
+      // cannot use _dequal here because sometimes inertias are small (<=1e-6)
+      if (dFabs(m_large) < 1e-12 || dFabs(m_small) < 1e-12 ||
+          (moi_ratio > 0 && m_large > moi_ratio * m_small))
       {
         // Large inertia ratio detected, try reducing it.
         // Increase m_small by dm
@@ -1710,7 +2089,7 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
         // Intermediate math step:
         //   m_large - moi_ratio_max * m_small = dm * (1 + moi_ratio_max)
         // Then:
-        dReal dm = (m_large - moi_ratio_max * m_small) / (1 + moi_ratio_max);
+        dReal dm = (m_large - moi_ratio * m_small) / (1 + moi_ratio);
 
         // This will then be applied to the bodies by multiplying by [S*S']
         //   MOI_large -= dm * SS
@@ -1808,135 +2187,135 @@ static void DYNAMIC_INERTIA(const int infom, const dxJoint::Info2 &Jinfo, const 
           }
         }
 
-          // Update invMOI by inverting analytically (may not be efficient).
-          // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
-          //   (http://math.stackexchange.com/questions/17776)
-          // try taking advantage of symmetry of MOI
-          dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
-                      -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
-                      -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
-                      -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
-                      +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
-                      -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
-          invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
-                                -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
-          invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
-                                -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
-          invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
-                                -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
-          // invMOI_ptr1[0*4+3] = 0.0;
-          invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
-          invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]
-                                -MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
-          invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]
-                                -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
-          // invMOI_ptr1[1*4+3] = 0.0;
-          invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
-          invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
-          invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]
-                                -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
-          // invMOI_ptr1[2*4+3] = 0.0;
+        // Update invMOI by inverting analytically (may not be efficient).
+        // try 1981 Ken Miller (http://www.jstor.org/stable/2690437) or
+        //   (http://math.stackexchange.com/questions/17776)
+        // try taking advantage of symmetry of MOI
+        dReal det1 = MOI_ptr1[0*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
+                    -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])
+                    -MOI_ptr1[1*4+0]*(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
+                    -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])
+                    +MOI_ptr1[2*4+0]*(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
+                    -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2]);
+        invMOI_ptr1[0*4+0] =  (MOI_ptr1[2*4+2]*MOI_ptr1[1*4+1]
+                              -MOI_ptr1[2*4+1]*MOI_ptr1[1*4+2])/det1;
+        invMOI_ptr1[0*4+1] = -(MOI_ptr1[2*4+2]*MOI_ptr1[0*4+1]
+                              -MOI_ptr1[2*4+1]*MOI_ptr1[0*4+2])/det1;
+        invMOI_ptr1[0*4+2] =  (MOI_ptr1[1*4+2]*MOI_ptr1[0*4+1]
+                              -MOI_ptr1[1*4+1]*MOI_ptr1[0*4+2])/det1;
+        // invMOI_ptr1[0*4+3] = 0.0;
+        invMOI_ptr1[1*4+0] = invMOI_ptr1[0*4+1];
+        invMOI_ptr1[1*4+1] =  (MOI_ptr1[2*4+2]*MOI_ptr1[0*4+0]
+                              -MOI_ptr1[2*4+0]*MOI_ptr1[0*4+2])/det1;
+        invMOI_ptr1[1*4+2] = -(MOI_ptr1[1*4+2]*MOI_ptr1[0*4+0]
+                              -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+2])/det1;
+        // invMOI_ptr1[1*4+3] = 0.0;
+        invMOI_ptr1[2*4+0] = invMOI_ptr1[0*4+2];
+        invMOI_ptr1[2*4+1] = invMOI_ptr1[1*4+2];
+        invMOI_ptr1[2*4+2] =  (MOI_ptr1[1*4+1]*MOI_ptr1[0*4+0]
+                              -MOI_ptr1[1*4+0]*MOI_ptr1[0*4+1])/det1;
+        // invMOI_ptr1[2*4+3] = 0.0;
 
-          dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
-                      -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
-                      -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
-                      -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
-                      +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
-                      -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
-          invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
-                                -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
-          invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
-                                -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
-          invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
-                                -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
-          // invMOI_ptr2[0*4+3] = 0.0;
-          invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
-          invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]
-                                -MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
-          invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]
-                                -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
-          // invMOI_ptr2[1*4+3] = 0.0;
-          invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
-          invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
-          invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]
-                                -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
-          // invMOI_ptr2[2*4+3] = 0.0;
+        dReal det2 = MOI_ptr2[0*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
+                    -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])
+                    -MOI_ptr2[1*4+0]*(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
+                    -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])
+                    +MOI_ptr2[2*4+0]*(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
+                    -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2]);
+        invMOI_ptr2[0*4+0] =  (MOI_ptr2[2*4+2]*MOI_ptr2[1*4+1]
+                              -MOI_ptr2[2*4+1]*MOI_ptr2[1*4+2])/det2;
+        invMOI_ptr2[0*4+1] = -(MOI_ptr2[2*4+2]*MOI_ptr2[0*4+1]
+                              -MOI_ptr2[2*4+1]*MOI_ptr2[0*4+2])/det2;
+        invMOI_ptr2[0*4+2] =  (MOI_ptr2[1*4+2]*MOI_ptr2[0*4+1]
+                              -MOI_ptr2[1*4+1]*MOI_ptr2[0*4+2])/det2;
+        // invMOI_ptr2[0*4+3] = 0.0;
+        invMOI_ptr2[1*4+0] = invMOI_ptr2[0*4+1];
+        invMOI_ptr2[1*4+1] =  (MOI_ptr2[2*4+2]*MOI_ptr2[0*4+0]
+                              -MOI_ptr2[2*4+0]*MOI_ptr2[0*4+2])/det2;
+        invMOI_ptr2[1*4+2] = -(MOI_ptr2[1*4+2]*MOI_ptr2[0*4+0]
+                              -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+2])/det2;
+        // invMOI_ptr2[1*4+3] = 0.0;
+        invMOI_ptr2[2*4+0] = invMOI_ptr2[0*4+2];
+        invMOI_ptr2[2*4+1] = invMOI_ptr2[1*4+2];
+        invMOI_ptr2[2*4+2] =  (MOI_ptr2[1*4+1]*MOI_ptr2[0*4+0]
+                              -MOI_ptr2[1*4+0]*MOI_ptr2[0*4+1])/det2;
+        // invMOI_ptr2[2*4+3] = 0.0;
 
-  #ifdef DEBUG_INERTIA_PROPAGATION
+#ifdef DEBUG_INERTIA_PROPAGATION
         printf("---------S Scalars--------\n");
         printf(" original    S1 [%g] S2 [%g]\n", m1, m2);
         printf(" distributed S1 [%g] S2 [%g]\n", m1_new, m2_new);
-          printf("----------new MOI---------\n");
+        printf("----------new MOI---------\n");
 
-          printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
-            b1,
-            MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
-            MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
-            MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
+        printf("new MOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+          b1,
+          MOI_ptr1[0*4+0],MOI_ptr1[0*4+1],MOI_ptr1[0*4+2],MOI_ptr1[0*4+3],
+          MOI_ptr1[1*4+0],MOI_ptr1[1*4+1],MOI_ptr1[1*4+2],MOI_ptr1[1*4+3],
+          MOI_ptr1[2*4+0],MOI_ptr1[2*4+1],MOI_ptr1[2*4+2],MOI_ptr1[2*4+3]);
 
-          // Modify MOI_ptr2
-          printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
-            b2,
-            MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
-            MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
-            MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
+        // Modify MOI_ptr2
+        printf("new MOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n[%f %f %f %f]\n",
+          b2,
+          MOI_ptr2[0*4+0],MOI_ptr2[0*4+1],MOI_ptr2[0*4+2],MOI_ptr2[0*4+3],
+          MOI_ptr2[1*4+0],MOI_ptr2[1*4+1],MOI_ptr2[1*4+2],MOI_ptr2[1*4+3],
+          MOI_ptr2[2*4+0],MOI_ptr2[2*4+1],MOI_ptr2[2*4+2],MOI_ptr2[2*4+3]);
 
-          // double check resulting MOI along s
-          dMultiply0_133(tmp31, S, MOI_ptr1);
-          // scalar body 1 MOI component along vector S
-          m1 = dCalcVectorDot3(tmp31, S);
-          printf("new MOI1 along S [%f]\n", m1);
-          dMultiply0_133(tmp31, S, MOI_ptr2);
-          // scalar body 2 MOI component along vector S
-          m2 = dCalcVectorDot3(tmp31, S);
-          printf("new MOI2 along S [%f]\n", m2);
+        // double check resulting MOI along s
+        dMultiply0_133(tmp31, S, MOI_ptr1);
+        // scalar body 1 MOI component along vector S
+        m1 = dCalcVectorDot3(tmp31, S);
+        printf("new MOI1 along S [%f]\n", m1);
+        dMultiply0_133(tmp31, S, MOI_ptr2);
+        // scalar body 2 MOI component along vector S
+        m2 = dCalcVectorDot3(tmp31, S);
+        printf("new MOI2 along S [%f]\n", m2);
 
-          /// \todo double check resulting MOI along joint axis and
-          /// see that it's the same
+        /// \todo double check resulting MOI along joint axis and
+        /// see that it's the same
 
-          printf("----------new inv---------\n");
-          printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
-                 "[%f %f %f %f]\n", b1,
-                 invMOI_ptr1[0*4+0], invMOI_ptr1[0*4+1],
-                 invMOI_ptr1[0*4+2], invMOI_ptr1[0*4+3],
-                 invMOI_ptr1[1*4+0], invMOI_ptr1[1*4+1],
-                 invMOI_ptr1[1*4+2], invMOI_ptr1[1*4+3],
-                 invMOI_ptr1[2*4+0], invMOI_ptr1[2*4+1],
-                 invMOI_ptr1[2*4+2], invMOI_ptr1[2*4+3]);
+        printf("----------new inv---------\n");
+        printf("new invMOI1[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
+               "[%f %f %f %f]\n", b1,
+               invMOI_ptr1[0*4+0], invMOI_ptr1[0*4+1],
+               invMOI_ptr1[0*4+2], invMOI_ptr1[0*4+3],
+               invMOI_ptr1[1*4+0], invMOI_ptr1[1*4+1],
+               invMOI_ptr1[1*4+2], invMOI_ptr1[1*4+3],
+               invMOI_ptr1[2*4+0], invMOI_ptr1[2*4+1],
+               invMOI_ptr1[2*4+2], invMOI_ptr1[2*4+3]);
 
-          // Modify invMOI_ptr2
-          printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
-                 "[%f %f %f %f]\n", b2,
-                 invMOI_ptr2[0*4+0], invMOI_ptr2[0*4+1],
-                 invMOI_ptr2[0*4+2], invMOI_ptr2[0*4+3],
-                 invMOI_ptr2[1*4+0], invMOI_ptr2[1*4+1],
-                 invMOI_ptr2[1*4+2], invMOI_ptr2[1*4+3],
-                 invMOI_ptr2[2*4+0], invMOI_ptr2[2*4+1],
-                 invMOI_ptr2[2*4+2], invMOI_ptr2[2*4+3]);
-  #endif
+        // Modify invMOI_ptr2
+        printf("new invMOI2[%d]\n[%f %f %f %f]\n[%f %f %f %f]\n"
+               "[%f %f %f %f]\n", b2,
+               invMOI_ptr2[0*4+0], invMOI_ptr2[0*4+1],
+               invMOI_ptr2[0*4+2], invMOI_ptr2[0*4+3],
+               invMOI_ptr2[1*4+0], invMOI_ptr2[1*4+1],
+               invMOI_ptr2[1*4+2], invMOI_ptr2[1*4+3],
+               invMOI_ptr2[2*4+0], invMOI_ptr2[2*4+1],
+               invMOI_ptr2[2*4+2], invMOI_ptr2[2*4+3]);
+#endif
 
-  #ifdef DEBUG_INERTIA_PROPAGATION
-          // check if diagonally-dominant
-          if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
-            printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n",
-                   MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
-          if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
-            printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n",
-                   MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
-          if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
-            printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n",
-                   MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
+#ifdef DEBUG_INERTIA_PROPAGATION
+        // check if diagonally-dominant
+        if (MOI_ptr1[0*4+0] < dFabs(MOI_ptr1[0*4+1])+dFabs(MOI_ptr1[0*4+2]))
+          printf(" * new MOI1 row 1 d[%f] < o[%f, %f]\n",
+                 MOI_ptr1[0*4+0],MOI_ptr1[0*4+1], MOI_ptr1[0*4+2]);
+        if (MOI_ptr1[1*4+1] < dFabs(MOI_ptr1[1*4+0])+dFabs(MOI_ptr1[1*4+2]))
+          printf(" * new MOI1 row 2 d[%f] < o[%f, %f]\n",
+                 MOI_ptr1[1*4+1],MOI_ptr1[1*4+0], MOI_ptr1[1*4+2]);
+        if (MOI_ptr1[2*4+2] < dFabs(MOI_ptr1[2*4+0])+dFabs(MOI_ptr1[2*4+1]))
+          printf(" * new MOI1 row 3 d[%f] < o[%f, %f]\n",
+                 MOI_ptr1[2*4+2],MOI_ptr1[2*4+0], MOI_ptr1[2*4+1]);
 
-          if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
-            printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n",
-                   MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
-          if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
-            printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n",
-                   MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
-          if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
-            printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n",
-                   MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
-  #endif
+        if (MOI_ptr2[0*4+0] < dFabs(MOI_ptr2[0*4+1])+dFabs(MOI_ptr2[0*4+2]))
+          printf(" * new MOI2 row 1 d[%f] < o[%f, %f]\n",
+                 MOI_ptr2[0*4+0],MOI_ptr2[0*4+1], MOI_ptr2[0*4+2]);
+        if (MOI_ptr2[1*4+1] < dFabs(MOI_ptr2[1*4+0])+dFabs(MOI_ptr2[1*4+2]))
+          printf(" * new MOI2 row 2 d[%f] < o[%f, %f]\n",
+                 MOI_ptr2[1*4+1],MOI_ptr2[1*4+0], MOI_ptr2[1*4+2]);
+        if (MOI_ptr2[2*4+2] < dFabs(MOI_ptr2[2*4+0])+dFabs(MOI_ptr2[2*4+1]))
+          printf(" * new MOI2 row 3 d[%f] < o[%f, %f]\n",
+                 MOI_ptr2[2*4+2],MOI_ptr2[2*4+0], MOI_ptr2[2*4+1]);
+#endif
       }
     }
   }
