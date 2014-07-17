@@ -356,13 +356,8 @@ void World::Init()
   // Check if we have to insert an object population.
   if (this->sdf->HasElement("population"))
   {
-    sdf::ElementPtr populationElem = this->sdf->GetElement("population");
-
-    while (populationElem)
-    {
-      this->CreateEnvironmentPopulation(populationElem);
-      populationElem = populationElem->GetNextElement("population");
-    }
+    Population population(this->sdf, this);
+    population.PopulateAll();
   }
 
   this->initialized = true;

@@ -38,6 +38,7 @@
 
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/physics/Population.hh"
 #include "gazebo/physics/WorldState.hh"
 #include "gazebo/util/system.hh"
 
@@ -58,6 +59,8 @@ namespace gazebo
     /// update, model updates, and message processing.
     class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
+      friend class Population;
+
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
       /// \param[in] _name Name of the world.
