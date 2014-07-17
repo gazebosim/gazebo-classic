@@ -1296,6 +1296,7 @@ void MainWindow::CreateActions()
 
   g_alignAct = new QWidgetAction(this);
   g_alignAct->setCheckable(true);
+  g_alignAct->setToolTip(tr("Select 2 objects to align"));
   g_alignAct->setDefaultWidget(alignWidget);
   g_alignAct->setEnabled(false);
   connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
