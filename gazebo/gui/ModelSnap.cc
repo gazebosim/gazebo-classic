@@ -307,7 +307,6 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelSnap::Update()
 {
-
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
   if (this->dataPtr->hoverTriangleDirty)
   {
