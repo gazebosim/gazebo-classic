@@ -26,8 +26,8 @@
 
 using namespace gazebo;
 
-const double g_angle_y_tol = 0.2;
-const double g_angle_z_tol = 0.2;
+const double g_angle_y_tol = 0.21;
+const double g_angle_z_tol = 0.21;
 
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
@@ -65,16 +65,21 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
     EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
   }
 
+  physics->SetRealTimeUpdateRate(0.0);
+  common::Time startTime = common::Time::GetWallTime();
   for (int i = 0; i < 3000; ++i)
   {
     world->Step(1);
 
-    // Record out of plane angles
+    // Get statistics on link rotations
     upperAngles.InsertData(upperLink->GetWorldPose().rot.GetAsEuler());
     lowerAngles.InsertData(lowerLink->GetWorldPose().rot.GetAsEuler());
   }
+  common::Time elapsedTime = common::Time::GetWallTime() - startTime;
+  this->Record("elapsedWallTime", elapsedTime.Double());
+  this->Record("simTime", world->GetSimTime().Double());
 
-  // Expect pitch and yaw to fall within limits
+  // Expect out of plane angles to fall within limits
   EXPECT_NEAR((upperAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
   EXPECT_NEAR((upperAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
   EXPECT_NEAR((lowerAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
