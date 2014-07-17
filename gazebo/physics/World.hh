@@ -495,7 +495,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global x-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the cuboid
+      /// \param[in] _cuboid SDF element containing the SDF properties of the
+      /// cuboid.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: bool PopulateCuboidLinearX(int _modelCount,
@@ -505,7 +506,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global y-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the cuboid
+      /// \param[in] _cuboid SDF element containing the SDF properties of the
+      /// cuboid.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: bool PopulateCuboidLinearY(int _modelCount,
@@ -515,7 +517,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global z-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the cuboid
+      /// \param[in] _cuboid SDF element containing the SDF properties of the
+      /// cuboid.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: bool PopulateCuboidLinearZ(int _modelCount,
@@ -537,8 +540,8 @@ namespace gazebo
       /// uniformly distributed within a cylinder. We use k-means to split the
       /// cylinder in similar subregions.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _cylinder SDF element containing the SDF properties of the
+      /// cylinder.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: bool PopulateCylinderUniform(int _modelCount,

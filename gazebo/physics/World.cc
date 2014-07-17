@@ -2500,10 +2500,7 @@ bool World::PopulateCylinderUniform(int _modelCount,
 /////////////////////////////////////////////////
 void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
 {
-  std::vector<math::Vector3> obs;
   std::vector<math::Vector3> objects;
-  transport::PublisherPtr popPub =
-    this->node->Advertise<msgs::Factory>("~/factory");
 
   // Read all the population elements.
   if (!_pop->HasElement("model"))
