@@ -161,8 +161,12 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
       this->dataPtr->hoverVis = vis;
       this->dataPtr->hoverTriangle = hoverTriangle;
       this->dataPtr->hoverTriangleDirty = true;
-      this->dataPtr->renderConnection = event::Events::ConnectRender(
-          boost::bind(&ModelSnap::Update, this));
+
+      if (!this->dataPtr->renderConnection)
+      {
+        this->dataPtr->renderConnection = event::Events::ConnectRender(
+            boost::bind(&ModelSnap::Update, this));
+      }
     }
   }
   else
@@ -201,6 +205,9 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       {
         this->dataPtr->selectedVis = vis;
         this->dataPtr->selectedTriangleDirty = true;
+      }
+      if (!this->dataPtr->renderConnection)
+      {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
               boost::bind(&ModelSnap::Update, this));
       }
@@ -300,8 +307,8 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 /////////////////////////////////////////////////
 void ModelSnap::Update()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
 
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
   if (this->dataPtr->hoverTriangleDirty)
   {
     if (!this->dataPtr->hoverTriangle.empty())
@@ -343,8 +350,11 @@ void ModelSnap::Update()
         if (this->dataPtr->hoverVis !=
             this->dataPtr->highlightVisual->GetParent())
         {
-          this->dataPtr->highlightVisual->GetParent()->DetachVisual(
-              this->dataPtr->highlightVisual);
+          if (this->dataPtr->highlightVisual->GetParent())
+          {
+            this->dataPtr->highlightVisual->GetParent()->DetachVisual(
+                this->dataPtr->highlightVisual);
+          }
           this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
         }
         this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
@@ -403,8 +413,11 @@ void ModelSnap::Update()
         this->dataPtr->snapVisual->SetVisible(true);
       if (this->dataPtr->selectedVis != this->dataPtr->snapVisual->GetParent())
       {
-        this->dataPtr->snapVisual->GetParent()->DetachVisual(
-            this->dataPtr->snapVisual);
+        if (this->dataPtr->snapVisual->GetParent())
+        {
+          this->dataPtr->snapVisual->GetParent()->DetachVisual(
+              this->dataPtr->snapVisual);
+        }
         this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
       }
       this->dataPtr->snapLines->SetPoint(0, triangle[0]);
