@@ -1126,7 +1126,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void GLWidget::OnAlignMode(std::string _axis, std::string _config)
+void GLWidget::OnAlignMode(const std::string &_axis, std::string _config)
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config);
 }

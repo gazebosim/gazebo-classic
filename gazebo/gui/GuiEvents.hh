@@ -58,7 +58,7 @@ namespace gazebo
       public: template<typename T>
               static event::ConnectionPtr ConnectAlignMode(T _subscriber)
               {return alignMode.Connect(_subscriber);}
-      public: static void DisconnectAignMode(event::ConnectionPtr _subscriber)
+      public: static void DisconnectAlignMode(event::ConnectionPtr _subscriber)
               {alignMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
