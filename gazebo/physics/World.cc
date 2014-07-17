@@ -2137,11 +2137,371 @@ void World::OnLightMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+bool World::PopulateCuboidRandom(int _modelCount,
+                                 const sdf::ElementPtr _cuboid,
+                                 std::vector<math::Vector3> &_poses)
+{
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("max"))
+  {
+    std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 max = _cuboid->Get<math::Vector3>("max");
+
+  double dx = fabs(max.x - min.x);
+  double dy = fabs(max.y - min.y);
+  double dz = fabs(max.z - min.z);
+
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = std::min(min.x, max.x) + math::Rand::GetDblUniform(0, dx);
+    p.y = std::min(min.y, max.y) + math::Rand::GetDblUniform(0, dy);
+    p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
+
+  _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCuboidUniform(int _modelCount,
+                                  const sdf::ElementPtr _cuboid,
+                                  std::vector<math::Vector3> &_poses)
+{
+  std::vector<math::Vector3> obs;
+
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("max"))
+  {
+    std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 max = _cuboid->Get<math::Vector3>("max");
+
+  double dx = fabs(max.x - min.x);
+  double dy = fabs(max.y - min.y);
+  double dz = fabs(max.z - min.z);
+
+  // Step1: Sample points in a cuboid.
+  double x = 0.0;
+  double y = 0.0;
+  while (y < dy)
+  {
+    while (x < dx)
+    {
+      math::Vector3 p;
+      p.x = x;
+      p.y = y;
+      p.z = 0;
+      obs.push_back(p);
+      x += .1;
+    }
+    x = 0.0;
+    y += .1;
+  }
+
+  // Step2: Cluster the sampled points in 'modelCount' clusters.
+  std::vector<math::Vector3> centroids;
+  std::vector<unsigned int> labels;
+  math::Kmeans kmeans(obs);
+  kmeans.Cluster(_modelCount, centroids, labels);
+
+  // Step3: Create the list of object positions.
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = std::min(min.x, max.x) + centroids[i].x;
+    p.y = std::min(min.y, max.y) + centroids[i].y;
+    p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
+    _poses.push_back(p);
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCuboidGrid(const sdf::ElementPtr _cuboid,
+                               std::vector<math::Vector3> &_poses)
+{
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("rows"))
+  {
+    std::cerr << "Unable to find <rows> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  int rows = _cuboid->Get<int>("rows");
+
+  if (!_cuboid->HasElement("cols"))
+  {
+    std::cerr << "Unable to find <cols> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  int cols = _cuboid->Get<int>("cols");
+
+  if (!_cuboid->HasElement("step"))
+  {
+    std::cerr << "Unable to find <step> inside the cuboid tag."
+              << std::endl;
+    return false;
+  }
+  math::Vector3 step = _cuboid->Get<math::Vector3>("step");
+
+  _poses.clear();
+  math::Vector3 p = min;
+  for (int i = 0; i < rows; ++i)
+  {
+    for (int j = 0; j < cols; ++j)
+    {
+      _poses.push_back(p);
+      p.x += step.x;
+    }
+    p.x = min.x;
+    p.y += step.y;
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCuboidLinearX(int _modelCount,
+                                  const sdf::ElementPtr _cuboid,
+                                  std::vector<math::Vector3> &_poses)
+{
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("max"))
+  {
+    std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 max = _cuboid->Get<math::Vector3>("max");
+
+  double dx = fabs(max.x - min.x);
+
+  // Evenly placed in a row along the global x-axis.
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = std::min(min.x, max.x) + i * dx / static_cast<double>(_modelCount);
+    p.y = (min.y + max.y) / 2.0;
+    p.z = (min.z + max.z) / 2.0;
+    _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCuboidLinearY(int _modelCount,
+                                  const sdf::ElementPtr _cuboid,
+                                  std::vector<math::Vector3> &_poses)
+{
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("max"))
+  {
+    std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 max = _cuboid->Get<math::Vector3>("max");
+
+  double dy = fabs(max.y - min.y);
+
+  // Evenly placed in a row along the global x-axis.
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = (min.x + max.x) / 2.0;
+    p.y = std::min(min.y, max.y) + i * dy / static_cast<double>(_modelCount);
+    p.z = (min.z + max.z) / 2.0;
+    _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCuboidLinearZ(int _modelCount,
+                                  const sdf::ElementPtr _cuboid,
+                                  std::vector<math::Vector3> &_poses)
+{
+  if (!_cuboid->HasElement("min"))
+  {
+    std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 min = _cuboid->Get<math::Vector3>("min");
+
+  if (!_cuboid->HasElement("max"))
+  {
+    std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+    return false;
+  }
+  math::Vector3 max = _cuboid->Get<math::Vector3>("max");
+
+  double dz = fabs(max.z - min.z);
+
+  // Evenly placed in a row along the global x-axis.
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = (min.x + max.x) / 2.0;
+    p.y = (min.y + max.y) / 2.0;
+    p.z = std::min(min.z, max.z) + i * dz / static_cast<double>(_modelCount);
+    _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCylinderRandom(int _modelCount,
+                                   const sdf::ElementPtr _cylinder,
+                                   std::vector<math::Vector3> &_poses)
+{
+  if (!_cylinder->HasElement("center"))
+  {
+    std::cerr << "Unable to find <center> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  math::Vector3 center = _cylinder->Get<math::Vector3>("center");
+
+  if (!_cylinder->HasElement("radius"))
+  {
+    std::cerr << "Unable to find <radius> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  double radius = _cylinder->Get<double>("radius");
+
+  if (!_cylinder->HasElement("height"))
+  {
+    std::cerr << "Unable to find <height> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  double height = _cylinder->Get<double>("height");
+
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
+    double r = math::Rand::GetDblUniform(0, radius);
+    math::Vector3 p;
+    p.x = center.x + r * cos(ang);
+    p.y = center.y + r * sin(ang);
+    p.z = center.z + math::Rand::GetDblUniform(0, height);
+    _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool World::PopulateCylinderUniform(int _modelCount,
+                                    const sdf::ElementPtr _cylinder,
+                                    std::vector<math::Vector3> &_poses)
+{
+  std::vector<math::Vector3> obs;
+
+  if (!_cylinder->HasElement("center"))
+  {
+    std::cerr << "Unable to find <center> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  math::Vector3 center = _cylinder->Get<math::Vector3>("center");
+
+  if (!_cylinder->HasElement("radius"))
+  {
+    std::cerr << "Unable to find <radius> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  double radius = _cylinder->Get<double>("radius");
+
+  if (!_cylinder->HasElement("height"))
+  {
+    std::cerr << "Unable to find <height> inside the cylinder tag."
+              << std::endl;
+    return false;
+  }
+  double height = _cylinder->Get<double>("height");
+
+  // Step1: Sample points in the cylinder.
+  unsigned int points = 10000;
+  for (size_t i = 0; i < points; ++i)
+  {
+    double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
+    double r = math::Rand::GetDblUniform(0, radius);
+    math::Vector3 p;
+    p.x = center.x + r * cos(ang);
+    p.y = center.y + r * sin(ang);
+    p.z = center.z + math::Rand::GetDblUniform(0, height);
+    obs.push_back(p);
+  }
+
+  // Step2: Cluster the sampled points in 'modelCount' clusters.
+  std::vector<math::Vector3> centroids;
+  std::vector<unsigned int> labels;
+  math::Kmeans kmeans(obs);
+  kmeans.Cluster(_modelCount, centroids, labels);
+
+  // Step3: Create the list of object positions.
+  _poses.clear();
+  for (int i = 0; i < _modelCount; ++i)
+  {
+    math::Vector3 p;
+    p.x = centroids[i].x;
+    p.y = centroids[i].y;
+    p.z = math::Rand::GetDblUniform(0, height);
+    _poses.push_back(p);
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
 {
   std::vector<math::Vector3> obs;
   std::vector<math::Vector3> objects;
-  bool preventCollisions = false;
   transport::PublisherPtr popPub =
     this->node->Advertise<msgs::Factory>("~/factory");
 
@@ -2171,9 +2531,6 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
   }
   std::string distribution = _pop->Get<std::string>("distribution");
 
-  if (_pop->HasElement("prevent_collisions"))
-    preventCollisions = _pop->Get<bool>("prevent_collisions");
-
   if (!_pop->HasElement("region"))
   {
     std::cerr << "Unable to find <region> inside the population tag."
@@ -2181,229 +2538,47 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
     return;
   }
   sdf::ElementPtr region = _pop->GetElement("region");
-  if (region->HasElement("cuboid"))
+
+  // Generate the population of poses based on the region and distribution.
+  if (region->HasElement("cuboid") && distribution == "random")
   {
-    double dx;
-    double dy;
-    double dz;
-    math::Vector3 max;
-
     sdf::ElementPtr cuboid = region->GetElement("cuboid");
-    if (!cuboid->HasElement("min"))
-    {
-      std::cerr << "Unable to find <min> inside the cuboid tag."
-                << std::endl;
-      return;
-    }
-    math::Vector3 min = cuboid->Get<math::Vector3>("min");
-
-    if (distribution != "grid")
-    {
-      if (!cuboid->HasElement("max"))
-        {
-          std::cerr << "Unable to find <max> inside the cuboid tag."
-                    << std::endl;
-          return;
-        }
-      max = cuboid->Get<math::Vector3>("max");
-
-      dx = fabs(max.x - min.x);
-      dy = fabs(max.y - min.y);
-      dz = fabs(max.z - min.z);
-    }
-
-    if (distribution == "random")
-    {
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = std::min(min.x, max.x) + math::Rand::GetDblUniform(0, dx);
-        p.y = std::min(min.y, max.y) + math::Rand::GetDblUniform(0, dy);
-        p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
-
-        objects.push_back(p);
-      }
-    }
-    else if (distribution == "uniform")
-    {
-      // Step1: Sample points in a cuboid.
-      double x = 0.0;
-      double y = 0.0;
-      while (y < dy)
-      {
-        while (x < dx)
-        {
-          math::Vector3 p;
-          p.x = x;
-          p.y = y;
-          p.z = 0;
-          obs.push_back(p);
-          x += .1;
-        }
-        x = 0.0;
-        y += .1;
-      }
-
-      // Step2: Cluster the sampled points in 'modelCount' clusters.
-      std::vector<math::Vector3> centroids;
-      std::vector<unsigned int> labels;
-      math::Kmeans kmeans(obs);
-      kmeans.Cluster(modelCount, centroids, labels);
-
-      // Step3: Create the list of object positions.
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = std::min(min.x, max.x) + centroids[i].x;
-        p.y = std::min(min.y, max.y) + centroids[i].y;
-        p.z = std::min(min.z, max.z) + math::Rand::GetDblUniform(0, dz);
-        objects.push_back(p);
-      }
-    }
-    else if (distribution == "grid")
-    {
-      if (!cuboid->HasElement("rows"))
-      {
-        std::cerr << "Unable to find <rows> inside the cuboid tag."
-                  << std::endl;
-        return;
-      }
-      int rows = cuboid->Get<int>("rows");
-
-      if (!cuboid->HasElement("cols"))
-      {
-        std::cerr << "Unable to find <cols> inside the cuboid tag."
-                  << std::endl;
-        return;
-      }
-      int cols = cuboid->Get<int>("cols");
-
-      if (!cuboid->HasElement("step"))
-      {
-        std::cerr << "Unable to find <step> inside the cuboid tag."
-                  << std::endl;
-        return;
-      }
-      math::Vector3 step = cuboid->Get<math::Vector3>("step");
-
-      math::Vector3 p = min;
-      for (int i = 0; i < rows; ++i)
-      {
-        for (int j = 0; j < cols; ++j)
-        {
-          objects.push_back(p);
-          p.x += step.x;
-        }
-        p.x = min.x;
-        p.y += step.y;
-      }
-    }
-    else if (distribution == "linear-x")
-    {
-      // Evenly placed in a row along the global x-axis.
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = std::min(min.x, max.x) + i * dx / static_cast<double>(modelCount);
-        p.y = (min.y + max.y) / 2.0;
-        p.z = (min.z + max.z) / 2.0;
-        objects.push_back(p);
-      }
-    }
-    else if (distribution == "linear-y")
-    {
-      // Evenly placed in a row along the global x-axis.
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = (min.x + max.x) / 2.0;
-        p.y = std::min(min.y, max.y) + i * dy / static_cast<double>(modelCount);
-        p.z = (min.z + max.z) / 2.0;
-        objects.push_back(p);
-      }
-    }
-    else if (distribution == "linear-z")
-    {
-      // Evenly placed in a row along the global x-axis.
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = (min.x + max.x) / 2.0;
-        p.y = (min.y + max.y) / 2.0;
-        p.z = std::min(min.z, max.z) + i * dz / static_cast<double>(modelCount);
-        objects.push_back(p);
-      }
-    }
+    this->PopulateCuboidRandom(modelCount, cuboid, objects);
   }
-  else if (region->HasElement("cylinder"))
+  else if (region->HasElement("cuboid") && distribution == "uniform")
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    this->PopulateCuboidUniform(modelCount, cuboid, objects);
+  }
+  else if (region->HasElement("cuboid") && distribution == "grid")
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    this->PopulateCuboidGrid(cuboid, objects);
+  }
+  else if (region->HasElement("cuboid") && distribution == "linear-x")
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    this->PopulateCuboidLinearX(modelCount, cuboid, objects);
+  }
+  else if (region->HasElement("cuboid") && distribution == "linear-y")
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    this->PopulateCuboidLinearY(modelCount, cuboid, objects);
+  }
+  else if (region->HasElement("cuboid") && distribution == "linear-z")
+  {
+    sdf::ElementPtr cuboid = region->GetElement("cuboid");
+    this->PopulateCuboidLinearZ(modelCount, cuboid, objects);
+  }
+  else if (region->HasElement("cylinder") && distribution == "random")
   {
     sdf::ElementPtr cylinder = region->GetElement("cylinder");
-    if (!cylinder->HasElement("center"))
-    {
-      std::cerr << "Unable to find <center> inside the cylinder tag."
-                << std::endl;
-      return;
-    }
-    math::Vector3 center = cylinder->Get<math::Vector3>("center");
-    if (!cylinder->HasElement("radius"))
-    {
-      std::cerr << "Unable to find <radius> inside the cylinder tag."
-                << std::endl;
-      return;
-    }
-    double radius = cylinder->Get<double>("radius");
-    if (!cylinder->HasElement("height"))
-    {
-      std::cerr << "Unable to find <height> inside the cylinder tag."
-                << std::endl;
-      return;
-    }
-    double height = cylinder->Get<double>("height");
-
-    if (distribution == "random")
-    {
-      for (int i = 0; i < modelCount; ++i)
-      {
-        double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-        double r = math::Rand::GetDblUniform(0, radius);
-        math::Vector3 p;
-        p.x = center.x + r * cos(ang);
-        p.y = center.y + r * sin(ang);
-        p.z = center.z + math::Rand::GetDblUniform(0, height);
-        objects.push_back(p);
-      }
-    }
-    else if (distribution == "uniform")
-    {
-      // Step1: Sample points in the cylinder.
-      unsigned int points = 10000;
-      for (size_t i = 0; i < points; ++i)
-      {
-        double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-        double r = math::Rand::GetDblUniform(0, radius);
-        math::Vector3 p;
-        p.x = center.x + r * cos(ang);
-        p.y = center.y + r * sin(ang);
-        p.z = center.z + math::Rand::GetDblUniform(0, height);
-        obs.push_back(p);
-      }
-
-      // Step2: Cluster the sampled points in 'modelCount' clusters.
-      std::vector<math::Vector3> centroids;
-      std::vector<unsigned int> labels;
-      math::Kmeans kmeans(obs);
-      kmeans.Cluster(modelCount, centroids, labels);
-
-      // Step3: Create the list of object positions.
-      for (int i = 0; i < modelCount; ++i)
-      {
-        math::Vector3 p;
-        p.x = centroids[i].x;
-        p.y = centroids[i].y;
-        p.z = math::Rand::GetDblUniform(0, height);
-        objects.push_back(p);
-      }
-    }
+    this->PopulateCylinderRandom(modelCount, cylinder, objects);
+  }
+  else if (region->HasElement("cylinder") && distribution == "uniform")
+  {
+    sdf::ElementPtr cylinder = region->GetElement("cylinder");
+    this->PopulateCylinderUniform(modelCount, cylinder, objects);
   }
 
   // Create an sdf containing the model description.
@@ -2438,27 +2613,6 @@ void World::CreateEnvironmentPopulation(const sdf::ElementPtr _pop)
       newModel->Init();
       newModel->LoadPlugins();
       math::Box box = newModel->GetBoundingBox();
-
-      if (preventCollisions)
-      {
-        bool collide = false;
-        for (size_t j = 0; j < clonedModels.size(); ++j)
-        {
-          ModelPtr otherModel = clonedModels[j];
-          if (otherModel->GetBoundingBox().Intersects(box))
-          {
-            collide = true;
-            // Model not valid.
-            std::cout << "Checking " << otherModel->GetBoundingBox() << "with"
-                      << box << std::endl;
-            std::cout << "collision detected" << std::endl;
-            this->RemoveModel(newName);
-            break;
-          }
-        }
-        if (not collide)
-          clonedModels.push_back(newModel);
-      }
     }
     else
       std::cerr << "ModelElem is NULL" << std::endl;

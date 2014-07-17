@@ -23,12 +23,12 @@
           <max>4 4 0.1</max>
         </cuboid>
       </region>
-      <model_count>8</model_count>
+      <model_count>10</model_count>
       <prevent_collisions>true</prevent_collisions>
       <distribution>random</distribution>
     </population>
 
-    <!--<population name="can_population2">
+    <population name="can_population2">
       <model name="can2">
         <include>
           <uri>model://coke_can</uri>
@@ -150,7 +150,7 @@
       <model_count>6</model_count>
       <prevent_collisions>false</prevent_collisions>
       <distribution>linear-z</distribution>
-    </population>-->
+    </population>
 
   </world>
 </sdf>

@@ -32,7 +32,7 @@ class WorldEnvPopulationTest : public ServerFixture,
 // LoadCuboidRandom: Verify that the number of elements populated is correct
 // and the objects are distributed as expected.
 ////////////////////////////////////////////////////////////////////////
-void WorldEnvPopulationTest::LoadEnvironment(const std::string &_physicsType)
+void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
 {
   Load("worlds/population.world");
   physics::WorldPtr world = physics::get_world("default");

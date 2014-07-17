@@ -460,6 +460,43 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
 
+      /// \brief
+      private: bool PopulateCuboidRandom(int _modelCount,
+                                         const sdf::ElementPtr _cuboid,
+                                         std::vector<math::Vector3> &_poses);
+
+      /// \brief
+      private: bool PopulateCuboidUniform(int _modelCount,
+                                          const sdf::ElementPtr _cuboid,
+                                          std::vector<math::Vector3> &_poses);
+
+      /// \brief
+      private: bool PopulateCuboidGrid(const sdf::ElementPtr _cuboid,
+                                       std::vector<math::Vector3> &_poses);
+
+      private: bool PopulateCuboidLinearX(int _modelCount,
+                                          const sdf::ElementPtr _cuboid,
+                                          std::vector<math::Vector3> &_poses);
+
+      private: bool PopulateCuboidLinearY(int _modelCount,
+                                          const sdf::ElementPtr _cuboid,
+                                          std::vector<math::Vector3> &_poses);
+
+      private: bool PopulateCuboidLinearZ(int _modelCount,
+                                          const sdf::ElementPtr _cuboid,
+                                          std::vector<math::Vector3> &_poses);
+
+       /// \brief
+      private: bool PopulateCylinderRandom(int _modelCount,
+                                           const sdf::ElementPtr _cylinder,
+                                           std::vector<math::Vector3> &_poses);
+
+      /// \brief
+      private: bool PopulateCylinderUniform(int _modelCount,
+                                            const sdf::ElementPtr _cylinder,
+                                            std::vector<math::Vector3> &_poses);
+
+
       /// \brief Insert into the world a population of models.
       /// \param[in] _pop SDF population element.
       private: void CreateEnvironmentPopulation(const sdf::ElementPtr _pop);
