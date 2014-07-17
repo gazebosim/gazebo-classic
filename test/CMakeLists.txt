@@ -35,6 +35,7 @@ set(ServerFixtureSources
   ${PROJECT_SOURCE_DIR}/gazebo/Master.cc
   ${PROJECT_SOURCE_DIR}/gazebo/gazebo.cc
   ${PROJECT_SOURCE_DIR}/test/ServerFixture.cc
+  ${PROJECT_SOURCE_DIR}/test/ServerFixtureRecord.cc
 )
 add_library(server_fixture STATIC ${ServerFixtureSources})
 add_dependencies(server_fixture gazebo_msgs)

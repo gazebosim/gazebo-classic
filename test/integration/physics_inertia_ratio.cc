@@ -74,61 +74,17 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
     lowerAngles.InsertData(lowerLink->GetWorldPose().rot.GetAsEuler());
   }
 
-  {
-    // upper pitch
-    std::map<std::string, double> map = upperAngles.y.GetMap();
-    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_y_tol);
-    std::string prefix = "upper_pitch_";
-    for (std::map<std::string, double>::iterator iter = map.begin();
-         iter != map.end(); ++iter)
-    {
-      std::ostringstream stream;
-      stream << iter->second;
-      RecordProperty(prefix + iter->first, stream.str());
-    }
-  }
+  // Expect pitch and yaw to fall within limits
+  EXPECT_NEAR((upperAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
 
-  {
-    // upper yaw
-    std::map<std::string, double> map = upperAngles.z.GetMap();
-    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_z_tol);
-    std::string prefix = "upper_yaw_";
-    for (std::map<std::string, double>::iterator iter = map.begin();
-         iter != map.end(); ++iter)
-    {
-      std::ostringstream stream;
-      stream << iter->second;
-      RecordProperty(prefix + iter->first, stream.str());
-    }
-  }
-
-  {
-    // lower pitch
-    std::map<std::string, double> map = lowerAngles.y.GetMap();
-    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_y_tol);
-    std::string prefix = "lower_pitch_";
-    for (std::map<std::string, double>::iterator iter = map.begin();
-         iter != map.end(); ++iter)
-    {
-      std::ostringstream stream;
-      stream << iter->second;
-      RecordProperty(prefix + iter->first, stream.str());
-    }
-  }
-
-  {
-    // lower yaw
-    std::map<std::string, double> map = lowerAngles.z.GetMap();
-    EXPECT_NEAR(map["MaxAbs"], 0.0, g_angle_z_tol);
-    std::string prefix = "lower_yaw_";
-    for (std::map<std::string, double>::iterator iter = map.begin();
-         iter != map.end(); ++iter)
-    {
-      std::ostringstream stream;
-      stream << iter->second;
-      RecordProperty(prefix + iter->first, stream.str());
-    }
-  }
+  // Record statistics on pitch and yaw angles
+  this->Record("upper_pitch_", upperAngles.y);
+  this->Record("lower_pitch_", lowerAngles.y);
+  this->Record("upper_yaw_", upperAngles.z);
+  this->Record("lower_yaw_", lowerAngles.z);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)
