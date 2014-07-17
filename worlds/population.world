@@ -24,7 +24,6 @@
         </cuboid>
       </region>
       <model_count>10</model_count>
-      <prevent_collisions>true</prevent_collisions>
       <distribution>random</distribution>
     </population>
 
@@ -43,7 +42,6 @@
         </cuboid>
       </region>
       <model_count>6</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>grid</distribution>
     </population>
 
@@ -61,7 +59,6 @@
         </cylinder>
       </region>
       <model_count>10</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>random</distribution>
     </population>
 
@@ -78,7 +75,6 @@
         </cuboid>
       </region>
       <model_count>10</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>uniform</distribution>
     </population>
 
@@ -96,7 +92,6 @@
         </cylinder>
       </region>
       <model_count>10</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>uniform</distribution>
     </population>
 
@@ -113,7 +108,6 @@
         </cuboid>
       </region>
       <model_count>6</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>linear-x</distribution>
     </population>
 
@@ -130,7 +124,6 @@
         </cuboid>
       </region>
       <model_count>6</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>linear-y</distribution>
     </population>
 
@@ -148,7 +141,6 @@
         </cuboid>
       </region>
       <model_count>6</model_count>
-      <prevent_collisions>false</prevent_collisions>
       <distribution>linear-z</distribution>
     </population>
 
