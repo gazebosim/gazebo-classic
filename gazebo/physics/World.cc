@@ -2001,7 +2001,7 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(g_tempMutexReplaceIn4_0);
+  boost::mutex::scoped_lock lock(g_deprecatedMutexReplaceInGazebo4);
 
   // Remove all the dirty poses from the delete entity.
   {
