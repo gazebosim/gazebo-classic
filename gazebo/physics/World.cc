@@ -66,6 +66,7 @@ using namespace physics;
 /// \brief Flag used to say if/when to clear all models.
 /// This will be replaced with a class member variable in Gazebo 3.0
 bool g_clearModels;
+boost::mutex g_deprecatedMutexReplaceInGazebo4;
 
 class ModelUpdate_TBB
 {
@@ -1667,8 +1668,7 @@ void World::ProcessFactoryMsgs()
   {
     try
     {
-      boost::recursive_mutex::scoped_lock lock(
-          *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+      boost::mutex::scoped_lock lock(g_deprecatedMutexReplaceInGazebo4);
 
       ModelPtr model = this->LoadModel(*iter2, this->rootElement);
       model->Init();
@@ -2001,11 +2001,10 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
+  boost::mutex::scoped_lock lock(g_tempMutexReplaceIn4_0);
+
   // Remove all the dirty poses from the delete entity.
   {
-    boost::recursive_mutex::scoped_lock lock(
-        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
-
     for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
         iter2 != this->dirtyPoses.end();)
     {
