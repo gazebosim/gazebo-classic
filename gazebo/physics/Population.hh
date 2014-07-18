@@ -68,7 +68,7 @@ namespace gazebo
       /// \param[out] _center Center of the cylinder's base containing
       /// the models.
       /// \param[out] _radius Radius of the cylinder's base containing
-      /// the models
+      /// the models.
       /// \param[out] _height Height of the cylinder containing the models.
       /// \param[out] _modelName Name of the model.
       /// \param[out] _modelSdf Contains the sdf representation of the model.

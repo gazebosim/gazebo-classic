@@ -15,12 +15,20 @@
  *
 */
 
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <sdf/sdf.hh>
+#include "gazebo/common/Console.hh"
 #include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Rand.hh"
-#include "gazebo/physics/Population.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Population.hh"
+#include "gazebo/physics/World.hh"
+
 
 using namespace gazebo;
+using namespace common;
 using namespace physics;
 
 //////////////////////////////////////////////////
@@ -44,7 +52,7 @@ bool Population::PopulateAll()
   sdf::ElementPtr popElem = this->populationElem;
   bool result = true;
 
-  // Iterate trough all the population elements in the sdf.
+  // Iterate through all the population elements in the sdf.
   while (popElem)
   {
     if (!this->PopulateOne(popElem))
@@ -96,7 +104,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
     this->PopulateCylinderUniform(modelCount, center, radius, height, objects);
   else
   {
-    std::cerr << "Unrecognized combination of region [" << region << "] and "
+    gzerr << "Unrecognized combination of region [" << region << "] and "
               << "distribution [" << distribution << "]" << std::endl;
     return false;
   }
@@ -109,11 +117,9 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   std::vector<ModelPtr> clonedModels;
   for (size_t i = 0; i < objects.size(); ++i)
   {
-    math::Vector3 p;
-    p.x = objects[i].x;
-    p.y = objects[i].y;
-    p.z = objects[i].z;
+    math::Vector3 p(objects[i].x, objects[i].y, objects[i].z);
 
+    // Create a unique model for each clone.
     std::string cloneSdf = sdf.ToString();
     std::string delim = "model name='";
     size_t first = cloneSdf.find(delim) + delim.size();
@@ -127,16 +133,16 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
     sdf::ElementPtr modelElem = model2Sdf.root->GetElement("model");
     if (modelElem)
     {
+      // Load the model in the desired position.
       ModelPtr newModel = this->world->LoadModel(modelElem,
           this->world->rootElement);
       math::Pose newPose(math::Pose(p.x, p.y, p.z, 0, 0, 0));
       newModel->SetWorldPose(newPose);
       newModel->Init();
       newModel->LoadPlugins();
-      math::Box box = newModel->GetBoundingBox();
     }
     else
-      std::cerr << "ModelElem is NULL" << std::endl;
+      gzerr << "ModelElem is NULL" << std::endl;
   }
 
   return true;
@@ -152,8 +158,8 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   // Read all the population elements.
   if (!_population->HasElement("model"))
   {
-    std::cerr << "Unable to find the a model inside the population tag."
-              << std::endl;
+    gzerr << "Unable to find the a model inside the population tag."
+          << std::endl;
     return false;
   }
   sdf::ElementPtr model = _population->GetElement("model");
@@ -162,24 +168,23 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
 
   if (!_population->HasElement("model_count"))
   {
-    std::cerr << "Unable to find <model_count> inside the population tag."
-              << std::endl;
+    gzerr << "Unable to find <model_count> inside the population tag."
+          << std::endl;
     return false;
   }
   _modelCount = _population->Get<int>("model_count");
 
   if (!_population->HasElement("distribution"))
   {
-    std::cerr << "Unable to find <distribution> inside the population tag."
-              << std::endl;
+    gzerr << "Unable to find <distribution> inside the population tag."
+          << std::endl;
     return false;
   }
   _distribution = _population->Get<std::string>("distribution");
 
   if (!_population->HasElement("region"))
   {
-    std::cerr << "Unable to find <region> inside the population tag."
-              << std::endl;
+    gzerr << "Unable to find <region> inside the population tag." << std::endl;
     return false;
   }
   sdf::ElementPtr region = _population->GetElement("region");
@@ -191,7 +196,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
 
     if (!cuboid->HasElement("min"))
     {
-      std::cerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+      gzerr << "Unable to find <min> inside the cuboid tag." << std::endl;
       return false;
     }
     _min = cuboid->Get<math::Vector3>("min");
@@ -202,7 +207,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
     {
       if (!cuboid->HasElement("max"))
       {
-        std::cerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+        gzerr << "Unable to find <max> inside the cuboid tag." << std::endl;
         return false;
       }
       _max = cuboid->Get<math::Vector3>("max");
@@ -211,30 +216,29 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
     {
       if (!cuboid->HasElement("rows"))
       {
-        std::cerr << "Unable to find <rows> inside the cuboid tag" << std::endl;
+        gzerr << "Unable to find <rows> inside the cuboid tag" << std::endl;
         return false;
       }
       _rows = cuboid->Get<int>("rows");
 
       if (!cuboid->HasElement("cols"))
       {
-        std::cerr << "Unable to find <cols> inside the cuboid tag" << std::endl;
+        gzerr << "Unable to find <cols> inside the cuboid tag" << std::endl;
         return false;
       }
       _cols = cuboid->Get<int>("cols");
 
       if (!cuboid->HasElement("step"))
       {
-        std::cerr << "Unable to find <step> inside the cuboid tag."
-                  << std::endl;
+        gzerr << "Unable to find <step> inside the cuboid tag." << std::endl;
         return false;
       }
       _step = cuboid->Get<math::Vector3>("step");
     }
     else
     {
-      std::cerr << "Unknown distribution type [" << _distribution << "]"
-                << std::endl;
+      gzerr << "Unknown distribution type [" << _distribution << "]"
+            << std::endl;
     }
   }
   else if (region->HasElement("cylinder"))
@@ -244,32 +248,29 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
 
     if (!cylinder->HasElement("center"))
     {
-      std::cerr << "Unable to find <center> inside the cylinder tag."
-                << std::endl;
+      gzerr << "Unable to find <center> inside the cylinder tag." << std::endl;
       return false;
     }
     _center = cylinder->Get<math::Vector3>("center");
 
     if (!cylinder->HasElement("radius"))
     {
-      std::cerr << "Unable to find <radius> inside the cylinder tag."
-                << std::endl;
+      gzerr << "Unable to find <radius> inside the cylinder tag." << std::endl;
       return false;
     }
     _radius = cylinder->Get<double>("radius");
 
     if (!cylinder->HasElement("height"))
     {
-      std::cerr << "Unable to find <height> inside the cylinder tag."
-                << std::endl;
+      gzerr << "Unable to find <height> inside the cylinder tag." << std::endl;
       return false;
     }
     _height = cylinder->Get<double>("height");
   }
   else
   {
-    std::cerr << "I have not found a valid region. 'Cuboid' or 'Cylinder' are"
-              << " the valid region types" << std::endl;
+    gzerr << "I have not found a valid region. 'Cuboid' or 'Cylinder' are"
+          << " the valid region types" << std::endl;
   }
 
   return true;
