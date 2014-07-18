@@ -56,7 +56,26 @@ namespace gazebo
       private: bool PopulateOne(const sdf::ElementPtr _population);
 
       /// \brief Parse the sdf file.
-      /// \param[in] _sdf SDF parameters.
+      /// \param[in] _population SDF parameters.
+      /// \param[out] _min Minimum corner of the cuboid containing the models.
+      /// \param[out] _max Maximum corner of the cuboid containing the models.
+      /// \param[out] _rows Number of rows used when the models are
+      /// distributed as a 2D grid.
+      /// \param[out] _cols Number of columns used when the models are
+      /// distributed as a 2D grid.
+      /// \param[out] _step Distance between the models when the objects are
+      /// distributed as a 2D grid.
+      /// \param[out] _center Center of the cylinder's base containing
+      /// the models.
+      /// \param[out] _radius Radius of the cylinder's base containing
+      /// the models
+      /// \param[out] _height Height of the cylinder containing the models.
+      /// \param[out] _modelName Name of the model.
+      /// \param[out] _modelSdf Contains the sdf representation of the model.
+      /// \param[out] _modelCount Number of models to spawn.
+      /// \param[out] _distribution Object distribution. E.g.: random, grid.
+      /// \param[out] _region Type region in which the objects will be spawned.
+      /// E.g.: cuboid, cylinder.
       /// \return True when the function succeed or false otherwise.
       private: bool ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
         math::Vector3 &_max, int &_rows, int &_cols, math::Vector3 &_step,
@@ -67,8 +86,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// randomly distributed within a cuboid.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidRandom(int _modelCount,
@@ -79,8 +98,8 @@ namespace gazebo
       /// uniformly distributed within a cuboid. We use k-means to split the
       /// cuboid in similar subregions.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidUniform(int _modelCount,
@@ -89,8 +108,13 @@ namespace gazebo
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a 2D grid pattern.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _rows Number of rows used when the models are
+      /// distributed as a 2D grid.
+      /// \param[in] _cols Number of columns used when the models are
+      /// distributed as a 2D grid.
+      /// \param[in] _step Distance between the models when the objects are
+      /// distributed as a 2D grid.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidGrid(const math::Vector3 &_min, int _rows,
@@ -100,8 +124,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global x-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidLinearX(int _modelCount,
@@ -111,8 +135,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global y-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidLinearY(int _modelCount,
@@ -122,8 +146,8 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// evenly placed in a row along the global z-axis.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cuboid SDF element containing the SDF properties of the
-      /// cuboid.
+      /// \param[in] _min Minimum corner of the cuboid containing the models.
+      /// \param[in] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCuboidLinearZ(int _modelCount,
@@ -133,8 +157,11 @@ namespace gazebo
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// randomly distributed within a cylinder.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cylinder SDF element containing the SDF properties of the
-      /// cylinder.
+      /// \param[in] _center Center of the cylinder's base containing
+      /// the models.
+      /// \param[in] _radius Radius of the cylinder's base containing
+      /// the models
+      /// \param[in] _height Height of the cylinder containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCylinderRandom(int _modelCount,
@@ -145,8 +172,11 @@ namespace gazebo
       /// uniformly distributed within a cylinder. We use k-means to split the
       /// cylinder in similar subregions.
       /// \param[in] _modelCount Number of poses.
-      /// \param[in] _cylinder SDF element containing the SDF properties of the
-      /// cylinder.
+      /// \param[in] _center Center of the cylinder's base containing
+      /// the models.
+      /// \param[in] _radius Radius of the cylinder's base containing
+      /// the models
+      /// \param[in] _height Height of the cylinder containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
       private: void PopulateCylinderUniform(int _modelCount,

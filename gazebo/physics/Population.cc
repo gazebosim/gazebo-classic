@@ -73,13 +73,9 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   std::string region;
   std::vector<math::Vector3> objects;
 
-  std::cout << "PopulateOne" << std::endl;
-
   if (!this->ParseSdf(_population, min, max, rows, cols, step, center, radius,
         height, modelName, modelSdf, modelCount, distribution, region))
     return false;
-
-  std::cout << "Parse OK" << std::endl;
 
   // Generate the population of poses based on the region and distribution.
   if (region == "cuboid" && distribution == "random")
@@ -113,7 +109,6 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   std::vector<ModelPtr> clonedModels;
   for (size_t i = 0; i < objects.size(); ++i)
   {
-    std::cout << "Cloning object " << i << std::endl;
     math::Vector3 p;
     p.x = objects[i].x;
     p.y = objects[i].y;
