@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"

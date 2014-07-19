@@ -35,7 +35,7 @@ AlignWidget::AlignWidget(QWidget *_parent)
   this->dataPtr->xAlignBar->addWidget(xAlignLabel);
   this->dataPtr->yAlignBar->addWidget(yAlignLabel);
   this->dataPtr->zAlignBar->addWidget(zAlignLabel);
-   // align action triggered event
+  // align action triggered event
   this->dataPtr->alignSignalMapper = new QSignalMapper(this);
   connect(this->dataPtr->alignSignalMapper, SIGNAL(mapped(QString)),
       this, SLOT(OnAlignMode(QString)));
@@ -51,7 +51,7 @@ AlignWidget::AlignWidget(QWidget *_parent)
 AlignWidget::~AlignWidget()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;;
+  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
