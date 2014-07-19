@@ -156,8 +156,8 @@ namespace gazebo
       /// \param[in] _config Configuration: min, center, or max.
       /// \param[in] _bool True to preview alignment without publishing
       /// to server.
-      private: void OnAlignMode(const std::string &_axis, std::string _config,
-          bool _preview);
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, bool _preview);
 
       /// \brief Copy an entity by name
       /// \param[in] _name Name of entity to be copied.
