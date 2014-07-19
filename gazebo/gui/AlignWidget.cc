@@ -55,16 +55,16 @@ AlignWidget::~AlignWidget()
 }
 
 /////////////////////////////////////////////////
-void AlignWidget::Add(AlignAxis _axis, QAction *_action, AlignConfig _mode)
+void AlignWidget::Add(AlignAxis _axis, AlignConfig _config, QAction *_action)
 {
   std::string axisStr = this->GetAxisAsString(_axis);
-  std::string modeStr = this->GetModeAsString(_mode);
+  std::string configStr = this->GetConfigAsString(_config);
   if (_axis == ALIGN_X)
   {
     this->dataPtr->xAlignBar->addAction(_action);
     QWidget *xAlignWidget = this->dataPtr->xAlignBar->widgetForAction(_action);
     xAlignWidget->setProperty("axis", QVariant(tr(axisStr.c_str())));
-    xAlignWidget->setProperty("mode", QVariant(tr(modeStr.c_str())));
+    xAlignWidget->setProperty("config", QVariant(tr(configStr.c_str())));
     xAlignWidget->installEventFilter(this);
   }
   else if (_axis == ALIGN_Y)
@@ -72,7 +72,7 @@ void AlignWidget::Add(AlignAxis _axis, QAction *_action, AlignConfig _mode)
     this->dataPtr->yAlignBar->addAction(_action);
     QWidget *yAlignWidget = this->dataPtr->yAlignBar->widgetForAction(_action);
     yAlignWidget->setProperty("axis", QVariant(tr(axisStr.c_str())));
-    yAlignWidget->setProperty("mode", QVariant(tr(modeStr.c_str())));
+    yAlignWidget->setProperty("config", QVariant(tr(configStr.c_str())));
     yAlignWidget->installEventFilter(this);
   }
   else if (_axis == ALIGN_Z)
@@ -80,13 +80,13 @@ void AlignWidget::Add(AlignAxis _axis, QAction *_action, AlignConfig _mode)
     this->dataPtr->zAlignBar->addAction(_action);
     QWidget *zAlignWidget = this->dataPtr->zAlignBar->widgetForAction(_action);
     zAlignWidget->setProperty("axis", QVariant(tr(axisStr.c_str())));
-    zAlignWidget->setProperty("mode", QVariant(tr(modeStr.c_str())));
+    zAlignWidget->setProperty("config", QVariant(tr(configStr.c_str())));
     zAlignWidget->installEventFilter(this);
   }
   connect(_action, SIGNAL(triggered()),
       this->dataPtr->alignSignalMapper, SLOT(map()));
   this->dataPtr->alignSignalMapper->setMapping(
-      _action, tr((axisStr+modeStr).c_str()));
+      _action, tr((axisStr+configStr).c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -109,13 +109,13 @@ std::string AlignWidget::GetAxisAsString(AlignAxis _axis)
 }
 
 /////////////////////////////////////////////////
-std::string AlignWidget::GetModeAsString(AlignConfig _mode)
+std::string AlignWidget::GetConfigAsString(AlignConfig _config)
 {
-  if (_mode == ALIGN_MIN)
+  if (_config == ALIGN_MIN)
     return "min";
-  else if (_mode == ALIGN_CENTER)
+  else if (_config == ALIGN_CENTER)
     return "center";
-  else if (_mode == ALIGN_MAX)
+  else if (_config == ALIGN_MAX)
     return "max";
   return "";
 }
@@ -126,12 +126,12 @@ bool AlignWidget::eventFilter(QObject *_obj, QEvent *_event)
   if (this->isEnabled())
   {
     std::string axis = _obj->property("axis").toString().toStdString();
-    std::string mode = _obj->property("mode").toString().toStdString();
-    if (!mode.empty() && !axis.empty())
+    std::string config = _obj->property("config").toString().toStdString();
+    if (!config.empty() && !axis.empty())
     {
       if (_event->type() == QEvent::Enter)
-        gui::Events::alignMode(axis, mode, true);
-      if (_event->type() == QEvent::Leave)
+        gui::Events::alignMode(axis, config, true);
+      else if (_event->type() == QEvent::Leave)
         gui::Events::alignMode("", "reset", true);
     }
   }

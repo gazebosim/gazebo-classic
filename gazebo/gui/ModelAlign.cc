@@ -65,7 +65,7 @@ void ModelAlign::Init()
     return;
 
   this->dataPtr->userCamera = cam;
-  this->dataPtr->scene =  cam->GetScene();
+  this->dataPtr->scene = cam->GetScene();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -160,7 +160,7 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
-    std::string _axis, std::string _config, bool _publish)
+    const std::string &_axis, const std::string &_config, bool _publish)
 {
   if (_config == "reset" || _publish)
   {

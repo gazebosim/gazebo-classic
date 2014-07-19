@@ -50,7 +50,7 @@ namespace gazebo
         ALIGN_MIN,
         /// center
         ALIGN_CENTER,
-        /// max
+        /// maximum
         ALIGN_MAX
       };
 
@@ -61,26 +61,25 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~AlignWidget();
 
-      /// \brief Initialize the alignment widget with Qt actions.
-      /// \param[in] _xAlignActions a list of Qt actions for x alignment.
-      /// \param[in] _yAlignActions a list of Qt actions for y alignment.
-      /// \param[in] _zAlignActions a list of Qt actions for z alignment.
-      public: void Add(AlignAxis _axis, QAction *_action,
-          AlignConfig _mode);
+      /// \brief Add a Qt alignment action to the widget.
+      /// \param[in] _axis Axis of alignment.
+      /// \param[in] _config Alignment configuration.
+      /// \param[in] _action The Qt alignment action to add.
+      public: void Add(AlignAxis _axis, AlignConfig _config, QAction *_action);
 
       /// \brief Qt callback when a specific alignment configuration is
       /// triggered.
       private slots: void OnAlignMode(QString _mode);
 
       /// \brief Helper method to convert axis enum to string;
-      /// \param[in] _axis input axis enum
+      /// \param[in] _axis input alignment axis enum
       /// \return axis string
       private: std::string GetAxisAsString(AlignAxis _axis);
 
-      /// \brief Helper method to convert mode enum to string;
-      /// \param[in] _mode input mode enum
-      /// \return mode string
-      private: std::string GetModeAsString(AlignConfig _axis);
+      /// \brief Helper method to convert config enum to string;
+      /// \param[in] _config input alignment config enum
+      /// \return config string
+      private: std::string GetConfigAsString(AlignConfig _config);
 
       /// \brief Qt event filter currently used for filtering enter and leave
       /// events.

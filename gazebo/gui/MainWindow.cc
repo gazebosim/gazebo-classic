@@ -1239,18 +1239,20 @@ void MainWindow::CreateActions()
   this->alignActionGroups.push_back(zAlignActionGroup);
 
   AlignWidget *alignWidget = new AlignWidget(this);
-  alignWidget->Add(AlignWidget::ALIGN_X, xAlignMin, AlignWidget::ALIGN_MIN);
-  alignWidget->Add(AlignWidget::ALIGN_X, xAlignCenter,
-      AlignWidget::ALIGN_CENTER);
-  alignWidget->Add(AlignWidget::ALIGN_X, xAlignMax, AlignWidget::ALIGN_MAX);
-  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignMin, AlignWidget::ALIGN_MIN);
-  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignCenter,
-      AlignWidget::ALIGN_CENTER);
-  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignMax, AlignWidget::ALIGN_MAX);
-  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignMin, AlignWidget::ALIGN_MIN);
-  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignCenter,
-      AlignWidget::ALIGN_CENTER);
-  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignMax, AlignWidget::ALIGN_MAX);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MIN, xAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_CENTER,
+      xAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MAX, xAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MIN, yAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_CENTER,
+      yAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MAX, yAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MIN, zAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_CENTER,
+      zAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MAX, zAlignMax);
+  alignWidget->adjustSize();
+  alignWidget->setFixedWidth(alignWidget->width()+5);
 
   g_alignAct = new QWidgetAction(this);
   g_alignAct->setCheckable(true);
