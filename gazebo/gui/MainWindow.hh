@@ -109,10 +109,6 @@ namespace gazebo
       /// just resets the child align actions.
       private slots: void Align();
 
-      /// \brief Qt callback when a specific alignment configuration is
-      /// triggered.
-      private slots: void OnAlignMode(QString _mode);
-
       /// \brief Qt callback when the snap mode is triggered.
       private slots: void Snap();
 

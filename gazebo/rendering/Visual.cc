@@ -1768,6 +1768,7 @@ math::Box Visual::GetBoundingBox() const
 void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 {
   node->_updateBounds();
+  node->_update(false, true);
 
   Ogre::Matrix4 invTransform =
       this->dataPtr->sceneNode->_getFullTransform().inverse();
@@ -1785,7 +1786,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       if (any.getType() == typeid(std::string))
       {
         std::string str = Ogre::any_cast<std::string>(any);
-        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans")
+        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
+            || str.substr(0, 5) == "scale")
           continue;
       }
 
@@ -1806,6 +1808,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         bb.transformAffine(invTransform * node->_getFullTransform());
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
+
+
       }
 
       box.Merge(math::Box(min, max));

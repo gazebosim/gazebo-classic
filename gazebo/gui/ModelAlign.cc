@@ -160,8 +160,25 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
-    std::string _axis, std::string _config)
+    std::string _axis, std::string _config, bool _publish)
 {
+  if (_config == "reset" || _publish)
+  {
+    std::map<rendering::VisualPtr, math::Pose>::iterator it =
+        this->dataPtr->originalVisualPose.begin();
+    for (it; it != this->dataPtr->originalVisualPose.end(); ++it)
+    {
+      if (it->first)
+      {
+        it->first->SetWorldPose(it->second);
+        it->first->SetTransparency(it->first->GetTransparency()*2.0 - 1.0);
+      }
+    }
+    this->dataPtr->originalVisualPose.clear();
+    if (!_publish)
+      return;
+  }
+
   this->dataPtr->selectedVisuals = _visuals;
 
   if (this->dataPtr->selectedVisuals.size() <= 1)
@@ -201,6 +218,16 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     else if (_config == "max")
       trans = targetMax - max;
 
+    if (!_publish)
+    {
+      if (this->dataPtr->originalVisualPose.find(vis) ==
+          this->dataPtr->originalVisualPose.end())
+      {
+        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
+        vis->SetTransparency((1.0 - vis->GetTransparency()) * 0.5);
+      }
+    }
+
     if (_axis == "x")
     {
       trans.y = trans.z = 0;
@@ -217,7 +244,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
     }
 
-    this->PublishVisualPose(vis);
+    if (_publish)
+      this->PublishVisualPose(vis);
   }
 }
 

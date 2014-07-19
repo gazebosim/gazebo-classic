@@ -20,6 +20,7 @@ add_subdirectory(viewers)
 
 set (sources
   Actions.cc
+  AlignWidget.cc
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
@@ -52,6 +53,7 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  AlignWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh

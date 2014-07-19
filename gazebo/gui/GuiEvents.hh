@@ -132,7 +132,8 @@ namespace gazebo
       public: static event::EventT<void (std::string)>  manipMode;
 
       ///  that indicates the user is aligning objects
-      public: static event::EventT<void (std::string, std::string)>  alignMode;
+      public: static event::EventT<void (std::string, std::string, bool)>
+          alignMode;
 
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;

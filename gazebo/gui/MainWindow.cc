@@ -43,6 +43,7 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
@@ -638,13 +639,6 @@ void MainWindow::Align()
       this->alignActionGroups[i]->checkedAction()->setChecked(false);
     this->alignActionGroups[i]->setExclusive(true);
   }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::OnAlignMode(QString _mode)
-{
-  std::string mode = _mode.toStdString();
-  gui::Events::alignMode(mode.substr(0, 1), mode.substr(1));
 }
 
 /////////////////////////////////////////////////
@@ -1244,55 +1238,19 @@ void MainWindow::CreateActions()
   this->alignActionGroups.push_back(yAlignActionGroup);
   this->alignActionGroups.push_back(zAlignActionGroup);
 
-  QWidget *alignWidget = new QWidget;
-  QVBoxLayout *alignLayout = new QVBoxLayout;
-  QLabel *xAlignLabel = new QLabel(tr("X: "));
-  QLabel *yAlignLabel = new QLabel(tr("Y: "));
-  QLabel *zAlignLabel = new QLabel(tr("Z: "));
-  QToolBar *xAlignBar = new QToolBar(alignWidget);
-  QToolBar *yAlignBar = new QToolBar(alignWidget);
-  QToolBar *zAlignBar = new QToolBar(alignWidget);
-  xAlignBar->addWidget(xAlignLabel);
-  yAlignBar->addWidget(yAlignLabel);
-  zAlignBar->addWidget(zAlignLabel);
-  xAlignBar->addAction(xAlignMin);
-  xAlignBar->addAction(xAlignCenter);
-  xAlignBar->addAction(xAlignMax);
-  yAlignBar->addAction(yAlignMin);
-  yAlignBar->addAction(yAlignCenter);
-  yAlignBar->addAction(yAlignMax);
-  zAlignBar->addAction(zAlignMin);
-  zAlignBar->addAction(zAlignCenter);
-  zAlignBar->addAction(zAlignMax);
-  alignLayout->addWidget(xAlignBar);
-  alignLayout->addWidget(yAlignBar);
-  alignLayout->addWidget(zAlignBar);
-  alignWidget->setLayout(alignLayout);
-  alignWidget->adjustSize();
-  alignWidget->setFixedWidth(alignWidget->width()+1);
-
-  QSignalMapper *alignSignalMapper = new QSignalMapper(this);
-  connect(alignSignalMapper, SIGNAL(mapped(QString)),
-      this, SLOT(OnAlignMode(QString)));
-
-  connect(xAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(xAlignMin, tr("xmin"));
-  connect(xAlignCenter, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(xAlignCenter, tr("xcenter"));
-  connect(xAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(xAlignMax, tr("xmax"));
-  connect(yAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(yAlignMin, tr("ymin"));
-  connect(yAlignCenter, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(yAlignCenter, tr("ycenter"));
-  connect(yAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(yAlignMax, tr("ymax"));
-  connect(zAlignMin, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(zAlignMin, tr("zmin"));
-  connect(zAlignCenter, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(zAlignCenter, tr("zcenter"));
-  connect(zAlignMax, SIGNAL(triggered()), alignSignalMapper, SLOT(map()));
-  alignSignalMapper->setMapping(zAlignMax, tr("zmax"));
+  AlignWidget *alignWidget = new AlignWidget(this);
+  alignWidget->Add(AlignWidget::ALIGN_X, xAlignMin, AlignWidget::ALIGN_MIN);
+  alignWidget->Add(AlignWidget::ALIGN_X, xAlignCenter,
+      AlignWidget::ALIGN_CENTER);
+  alignWidget->Add(AlignWidget::ALIGN_X, xAlignMax, AlignWidget::ALIGN_MAX);
+  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignMin, AlignWidget::ALIGN_MIN);
+  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignCenter,
+      AlignWidget::ALIGN_CENTER);
+  alignWidget->Add(AlignWidget::ALIGN_Y, yAlignMax, AlignWidget::ALIGN_MAX);
+  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignMin, AlignWidget::ALIGN_MIN);
+  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignCenter,
+      AlignWidget::ALIGN_CENTER);
+  alignWidget->Add(AlignWidget::ALIGN_Z, zAlignMax, AlignWidget::ALIGN_MAX);
 
   g_alignAct = new QWidgetAction(this);
   g_alignAct->setCheckable(true);

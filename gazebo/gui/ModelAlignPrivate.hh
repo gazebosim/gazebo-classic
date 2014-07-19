@@ -62,14 +62,14 @@ namespace gazebo
       public: bool initialized;
 
       /// \brief selected visuals.
-//      public: std::map<rendering::VisualPtr, math::Pose> selectedVisuals;
-
-      /// \brief selected visuals.
       public: std::vector<rendering::VisualPtr> selectedVisuals;
 
       /// \brief A list of connections. Currently used only
       /// to get the align configuration event.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Original model pose used when user resets alignment.
+      public: std::map<rendering::VisualPtr, math::Pose> originalVisualPose;
     };
   }
 }
