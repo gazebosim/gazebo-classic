@@ -29,10 +29,10 @@ namespace gazebo
       /// \brief Toolbar containing x alignment actions.
       public: QToolBar *xAlignBar;
 
-      /// \brief Toolbar containing x alignment actions.
+      /// \brief Toolbar containing y alignment actions.
       public: QToolBar *yAlignBar;
 
-      /// \brief Toolbar containing x alignment actions.
+      /// \brief Toolbar containing z alignment actions.
       public: QToolBar *zAlignBar;
 
       /// \brief Qt Signal mapper for mapping align actions

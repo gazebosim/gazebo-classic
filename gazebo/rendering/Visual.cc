@@ -1808,8 +1808,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
         bb.transformAffine(invTransform * node->_getFullTransform());
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
-
-
       }
 
       box.Merge(math::Box(min, max));
