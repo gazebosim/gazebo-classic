@@ -23,6 +23,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \class AlignWidgetPrivate AlignWidgetPrivate.hh
     /// \brief Private data for the AlignWidget class
     class AlignWidgetPrivate
     {

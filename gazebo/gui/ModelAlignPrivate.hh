@@ -32,6 +32,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \class ModelAlignPrivate ModelAlignPrivate.hh
     /// \brief Private data for the ModelAlign class
     class ModelAlignPrivate
     {
