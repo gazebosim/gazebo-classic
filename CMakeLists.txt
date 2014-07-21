@@ -269,6 +269,7 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
 
+
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
   else()
@@ -351,7 +352,7 @@ else (build_errors)
       COMPATIBILITY SameMajorVersion)
   install(FILES 
             ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file} 
-	    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
+            ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
           DESTINATION 
 	    ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/ 
 	  COMPONENT cmake)
