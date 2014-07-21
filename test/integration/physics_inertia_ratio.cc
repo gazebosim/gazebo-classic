@@ -19,9 +19,11 @@
 #include <string>
 #include <vector>
 
-#include "test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
+#include "test/integration/helper_physics_generator.hh"
+#include "test/ServerFixture.hh"
 
 using namespace gazebo;
 
