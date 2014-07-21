@@ -31,6 +31,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \class ModelSnap ModelSnap.hh
     /// \brief Private data for the ModelSnap class
     class ModelSnapPrivate
     {

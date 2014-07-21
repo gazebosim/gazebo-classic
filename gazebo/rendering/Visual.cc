@@ -1806,6 +1806,7 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       {
         // get oriented bounding box in object's local space
         bb.transformAffine(invTransform * node->_getFullTransform());
+        bb.scale(node->_getDerivedScale());
         min = Conversions::Convert(bb.getMinimum());
         max = Conversions::Convert(bb.getMaximum());
       }
