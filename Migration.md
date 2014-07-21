@@ -1,3 +1,10 @@
+## Gazebo 4.0 to 5.0
+
+### Additions
+
+1. **gazebo/math/SignalStats.hh**
+    + *** New classes:*** SignalStatistic, SignalMaxAbsoluteValue, SignalMean, SignalRootMeanSquare, SignalStats, Vector3Stats
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations
