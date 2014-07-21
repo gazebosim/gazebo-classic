@@ -71,12 +71,12 @@ namespace gazebo
       /// triggered.
       private slots: void OnAlignMode(QString _mode);
 
-      /// \brief Helper method to convert axis enum to string;
+      /// \brief Helper method to convert axis enum to string
       /// \param[in] _axis input alignment axis enum
       /// \return axis string
       private: std::string GetAxisAsString(AlignAxis _axis);
 
-      /// \brief Helper method to convert config enum to string;
+      /// \brief Helper method to convert config enum to string
       /// \param[in] _config input alignment config enum
       /// \return config string
       private: std::string GetConfigAsString(AlignConfig _config);
