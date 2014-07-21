@@ -85,6 +85,8 @@ namespace gazebo
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
     #define DIAG_TIMER_STOP(_name) ((void) 0)
+    #define DIAG_VARIABLE(_name, _value) ((void) 0)
+    #define DIAG_MARKER(_name) ((void) 0)
 #endif
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh
