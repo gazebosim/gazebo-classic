@@ -4,7 +4,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
-find_package(gazebo REQUIRED)
+# Find is using GAZEBO_VERSION and not GAZEBO_VERSION_FULL since
+# probably this way is closer to users implementation, using just
+# two version number.
+find_package(gazebo ${GAZEBO_VERSION} REQUIRED)
 if (NOT gazebo_FOUND)
   message(FATAL_ERROR "Didn't find Gazebo")
 endif()
