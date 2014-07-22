@@ -51,6 +51,11 @@ namespace gazebo
       /// \return True if the vector is not empty or false otherwise.
       public: bool Observations(const std::vector<Vector3> &_obs);
 
+      /// \brief Add observations to the cluster.
+      /// \param[in] _obs Vector of observations.
+      /// \return True if the _obs vector is not empty or false otherwise.
+      public: bool AppendObservations(const std::vector<Vector3> &_obs);
+
       /// \brief Executes the k-means algorithm.
       /// \param[in] _k Number of partitions to cluster.
       /// \param[out] _centroids Vector of centroids. Each element contains the
