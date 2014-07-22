@@ -748,5 +748,38 @@ namespace gazebo
 
       return result;
     }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Friction &_msg)
+    {
+      std::ostringstream stream;
+      stream
+        << "<friction>"
+        << "<ode>";
+      if (_msg.has_mu())
+      {
+        stream << "<mu>" << _msg.mu() << "</mu>";
+      }
+      if (_msg.has_mu2())
+      {
+        stream << "<mu2>" << _msg.mu2() << "</mu2>";
+      }
+      if (_msg.has_slip1())
+      {
+        stream << "<slip1>" << _msg.slip1() << "</slip1>";
+      }
+      if (_msg.has_slip2())
+      {
+        stream << "<slip2>" << _msg.slip2() << "</slip2>";
+      }
+      if (_msg.has_fdir1())
+      {
+        stream << "<fdir1>" << msgs::Convert(_msg.fdir1()) << "</fdir1>";
+      }
+      stream
+        << "</ode>"
+        << "</friction>";
+      return stream.str();
+    }
   }
 }

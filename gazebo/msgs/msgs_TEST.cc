@@ -846,3 +846,50 @@ TEST_F(MsgsTest, MeshFromSDF)
   EXPECT_TRUE(msg.has_center_submesh());
   EXPECT_TRUE(msg.center_submesh());
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, SDFStringFromFriction)
+{
+  const double mu = 1.234;
+  const double mu2 = 2.345;
+  const double slip1 = 0.123;
+  const double slip2 = -0.123;
+  const math::Vector3 fdir1(1, 2, -3);
+
+  msgs::Friction msg;
+  msg.set_mu(mu);
+  msg.set_mu2(mu2);
+  msg.set_slip1(slip1);
+  msg.set_slip2(slip2);
+  msgs::Set(msg.mutable_fdir1(), fdir1);
+
+  std::string sdfString = msgs::ToSDF(msg);
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("surface.sdf", sdf);
+  sdf::readString("<sdf version='" SDF_VERSION "'>"
+    + sdfString + "</sdf>", sdf);
+
+  sdf::ElementPtr odeElem;
+  {
+    ASSERT_TRUE(sdf->HasElement("friction"));
+    sdf::ElementPtr frictionElem = sdf->GetElement("friction");
+
+    ASSERT_TRUE(frictionElem->HasElement("ode"));
+    odeElem = frictionElem->GetElement("ode");
+  }
+
+  EXPECT_TRUE(odeElem->HasElement("mu"));
+  EXPECT_DOUBLE_EQ(odeElem->Get<double>("mu"), mu);
+
+  EXPECT_TRUE(odeElem->HasElement("mu2"));
+  EXPECT_DOUBLE_EQ(odeElem->Get<double>("mu2"), mu2);
+
+  EXPECT_TRUE(odeElem->HasElement("slip1"));
+  EXPECT_DOUBLE_EQ(odeElem->Get<double>("slip1"), slip1);
+
+  EXPECT_TRUE(odeElem->HasElement("slip2"));
+  EXPECT_DOUBLE_EQ(odeElem->Get<double>("slip2"), slip2);
+
+  EXPECT_TRUE(odeElem->HasElement("fdir1"));
+  EXPECT_EQ(odeElem->Get<math::Vector3>("fdir1"), fdir1);
+}

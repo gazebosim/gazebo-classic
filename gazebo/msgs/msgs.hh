@@ -255,6 +255,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF string from msgs::Friction.
+    /// \param[in] _sdf The msgs::Friction object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Friction &_msg);
+
     /// \cond
     GAZEBO_VISIBLE
     const google::protobuf::FieldDescriptor *GetFD(
