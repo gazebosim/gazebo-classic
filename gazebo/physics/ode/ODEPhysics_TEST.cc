@@ -121,6 +121,28 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   contactMaxCorrectingVel = 40;
   contactSurfaceLayer = 0.03;
 
+  int maxContacts = 33;
+  double minStepSize = 0.033;
+  double maxStepSize = 3.3;
+  double sorLcpTolerance = 330.0;
+  double rmsErrorTolerance = 330.0;
+  bool inertiaRatioReduction = false;
+  double contactResidualSmoothing = 0.303;
+  bool experimentalRowReordering = false;
+  double warmStartFactor = 0.33333;
+  int extraFrictionIterations = 3333;
+
+  int maxContactsRet;
+  double minStepSizeRet;
+  double maxStepSizeRet;
+  double sorLcpToleranceRet;
+  double rmsErrorToleranceRet;
+  bool inertiaRatioReductionRet;
+  double contactResidualSmoothingRet;
+  bool experimentalRowReorderingRet;
+  double warmStartFactorRet;
+  int extraFrictionIterationsRet;
+
   odePhysics->SetParam("solver_type", type);
   odePhysics->SetParam("precon_iters", preconIters);
   odePhysics->SetParam("iters", iters);
@@ -131,6 +153,18 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       contactMaxCorrectingVel);
   odePhysics->SetParam("contact_surface_layer",
       contactSurfaceLayer);
+
+  odePhysics->SetParam("max_contacts", maxContacts);
+  odePhysics->SetParam("min_step_size", minStepSize);
+  odePhysics->SetParam("max_step_size", maxStepSize);
+  odePhysics->SetParam("sor_lcp_tolerance", sorLcpTolerance);
+  odePhysics->SetParam("rms_error_tolerance", rmsErrorTolerance);
+  odePhysics->SetParam("inertia_ratio_reduction", inertiaRatioReduction);
+  odePhysics->SetParam("contact_residual_smoothing", contactResidualSmoothing);
+  odePhysics->SetParam("experimental_row_reordering",
+    experimentalRowReordering);
+  odePhysics->SetParam("warm_start_factor", warmStartFactor);
+  odePhysics->SetParam("extra_friction_iterations", extraFrictionIterations);
 
   value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
@@ -156,6 +190,37 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   value = odePhysics->GetParam("contact_surface_layer");
   contactSurfaceLayerRet = boost::any_cast<double>(value);
   EXPECT_DOUBLE_EQ(contactSurfaceLayer, contactSurfaceLayerRet);
+
+  value = odePhysics->GetParam("max_contacts");
+  maxContactsRet = boost::any_cast<int>(value);
+  EXPECT_DOUBLE_EQ(maxContacts, maxContactsRet);
+  value = odePhysics->GetParam("min_step_size");
+  minStepSizeRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(minStepSize, minStepSizeRet);
+  value = odePhysics->GetParam("max_step_size");
+  maxStepSizeRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(maxStepSize, maxStepSizeRet);
+  value = odePhysics->GetParam("sor_lcp_tolerance");
+  sorLcpToleranceRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(sorLcpTolerance, sorLcpToleranceRet);
+  value = odePhysics->GetParam("rms_error_tolerance");
+  rmsErrorToleranceRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(rmsErrorTolerance, rmsErrorToleranceRet);
+  value = odePhysics->GetParam("inertia_ratio_reduction");
+  inertiaRatioReductionRet = boost::any_cast<bool>(value);
+  EXPECT_DOUBLE_EQ(inertiaRatioReduction, inertiaRatioReductionRet);
+  value = odePhysics->GetParam("contact_residual_smoothing");
+  contactResidualSmoothingRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(contactResidualSmoothing, contactResidualSmoothingRet);
+  value = odePhysics->GetParam("experimental_row_reordering");
+  experimentalRowReorderingRet = boost::any_cast<bool>(value);
+  EXPECT_DOUBLE_EQ(experimentalRowReordering, experimentalRowReorderingRet);
+  value = odePhysics->GetParam("warm_start_factor");
+  warmStartFactorRet = boost::any_cast<double>(value);
+  EXPECT_DOUBLE_EQ(warmStartFactor, warmStartFactorRet);
+  value = odePhysics->GetParam("extra_friction_iterations");
+  extraFrictionIterationsRet = boost::any_cast<int>(value);
+  EXPECT_DOUBLE_EQ(extraFrictionIterations, extraFrictionIterationsRet);
 
   EXPECT_EQ(type, odePhysics->GetStepType());
   EXPECT_EQ(preconIters, odePhysics->GetSORPGSPreconIters());
@@ -204,12 +269,12 @@ void ODEPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_max_step_size(0.001);
   physicsPubMsg.set_real_time_update_rate(800);
   physicsPubMsg.set_real_time_factor(1.1);
-  physicsPubMsg.set_iters(60);
-  physicsPubMsg.set_sor(1.5);
-  physicsPubMsg.set_cfm(0.1);
-  physicsPubMsg.set_erp(0.25);
-  physicsPubMsg.set_contact_max_correcting_vel(10);
-  physicsPubMsg.set_contact_surface_layer(0.01);
+  physicsPubMsg.mutable_ode()->set_iters(60);
+  physicsPubMsg.mutable_ode()->set_sor(1.5);
+  physicsPubMsg.mutable_ode()->set_cfm(0.1);
+  physicsPubMsg.mutable_ode()->set_erp(0.25);
+  physicsPubMsg.mutable_ode()->set_contact_max_correcting_vel(10);
+  physicsPubMsg.mutable_ode()->set_contact_surface_layer(0.01);
 
   physicsPubMsg.set_type(msgs::Physics::ODE);
   physicsPubMsg.set_solver_type("quick");
@@ -234,16 +299,16 @@ void ODEPhysics_TEST::PhysicsMsgParam()
       physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
-  EXPECT_EQ(physicsResponseMsg.iters(),
-      physicsPubMsg.iters());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
-      physicsPubMsg.sor());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
-      physicsPubMsg.cfm());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_max_correcting_vel(),
-      physicsPubMsg.contact_max_correcting_vel());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.contact_surface_layer(),
-      physicsPubMsg.contact_surface_layer());
+  EXPECT_EQ(physicsResponseMsg.ode().iters(),
+      physicsPubMsg.ode().iters());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.ode().sor(),
+      physicsPubMsg.ode().sor());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.ode().cfm(),
+      physicsPubMsg.ode().cfm());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.ode().contact_max_correcting_vel(),
+      physicsPubMsg.ode().contact_max_correcting_vel());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.ode().contact_surface_layer(),
+      physicsPubMsg.ode().contact_surface_layer());
 
   phyNode->Fini();
 }

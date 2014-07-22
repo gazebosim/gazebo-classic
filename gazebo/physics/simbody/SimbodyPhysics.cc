@@ -188,6 +188,11 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
+    physicsMsg.mutable_simbody()->set_accuracy(
+      static_cast<double>(this->integ->getAccuracyInUse()));
+    physicsMsg.mutable_simbody()->set_max_transient_velocity(
+      static_cast<double>(this->contact.getTransitionVelocity()));
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -202,38 +207,23 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
-
-  if (_msg->has_real_time_factor())
-    this->SetTargetRealTimeFactor(_msg->real_time_factor());
-
-  if (_msg->has_real_time_update_rate())
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-
-  if (_msg->has_max_step_size())
-    this->SetMaxStepSize(_msg->max_step_size());
-
-  /* below will set accuracy for simbody if the messages exist
-  // Set integrator accuracy (measured with Richardson Extrapolation)
-  if (_msg->has_accuracy())
+  if (_msg->has_simbody())
   {
-    this->integ->setAccuracy(_msg->simbody().accuracy());
-  }
+    const msgs::PhysicsSimbody *msgSimbody = &_msg->simbody();
 
-  // Set stiction max slip velocity to make it less stiff.
-  if (_msg->has_max_transient_velocity())
-  {
-    this->contact.setTransitionVelocity(
-    _msg->simbody().max_transient_velocity());
-  }
-  */
+    // Set integrator accuracy (measured with Richardson Extrapolation)
+    if (msgSimbody->has_accuracy())
+    {
+      this->integ->setAccuracy(_msg->simbody().accuracy());
+    }
 
-  /// Make sure all models get at least on update cycle.
-  this->world->EnableAllModels();
+    // Set stiction max slip velocity to make it less stiff.
+    if (msgSimbody->has_max_transient_velocity())
+    {
+      this->contact.setTransitionVelocity(
+      _msg->simbody().max_transient_velocity());
+    }
+  }
 
   // Parent class handles many generic parameters
   PhysicsEngine::OnPhysicsMsg(_msg);

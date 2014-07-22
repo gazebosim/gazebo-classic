@@ -7,6 +7,10 @@ package gazebo.msgs;
 
 import "vector3d.proto";
 import "header.proto";
+import "physics_bullet.proto";
+import "physics_dart.proto";
+import "physics_ode.proto";
+import "physics_simbody.proto";
 
 message Physics
 {
@@ -20,17 +24,23 @@ message Physics
   optional Type type                         = 1[default=ODE];
 
   optional string solver_type                = 2;
-  optional double min_step_size              = 3;
-  optional int32 precon_iters                = 4;
-  optional int32 iters                       = 5;
-  optional double sor                        = 6;
-  optional double cfm                        = 7;
-  optional double erp                        = 8;
-  optional double contact_max_correcting_vel = 9;
-  optional double contact_surface_layer      = 10;
-  optional Vector3d gravity                  = 11;
-  optional bool enable_physics               = 12;
-  optional double real_time_factor           = 13;
-  optional double real_time_update_rate      = 14;
-  optional double max_step_size              = 15;
+
+  optional double min_step_size              = 3;  // generic param
+  optional int32 precon_iters                = 4;  // engine specific
+  optional int32 iters                       = 5;  // engine specific
+  optional double sor                        = 6;  // engine specific
+  // optional double cfm                        = 7;  // engine specific
+  // optional double erp                        = 8;  // engine specific
+  // optional double contact_max_correcting_vel = 9;  // engine specific
+  // optional double contact_surface_layer      = 10;  // engine specific
+  optional Vector3d gravity                  = 11;  // generic param
+  optional bool enable_physics               = 12;  // generic param
+  optional double real_time_factor           = 13;  // generic param
+  optional double real_time_update_rate      = 14;  // generic param
+  optional double max_step_size              = 15;  // generic param
+
+  optional PhysicsBullet bullet              = 39;
+  optional PhysicsDART dart                  = 40;
+  optional PhysicsODE ode                    = 41;
+  optional PhysicsSimbody simbody            = 42;
 }

@@ -16,7 +16,6 @@
 */
 
 #include <gtest/gtest.h>
-#include <string>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -216,11 +215,13 @@ void BulletPhysics_TEST::PhysicsMsgParam()
   physicsPubMsg.set_max_step_size(0.002);
   physicsPubMsg.set_real_time_update_rate(700);
   physicsPubMsg.set_real_time_factor(1.3);
-  physicsPubMsg.set_iters(555);
-  physicsPubMsg.set_sor(1.4);
-  physicsPubMsg.set_cfm(0.12);
-  physicsPubMsg.set_erp(0.23);
-  physicsPubMsg.set_contact_surface_layer(0.01);
+  physicsPubMsg.mutable_bullet()->set_iters(555);
+  physicsPubMsg.mutable_bullet()->set_sor(1.4);
+  physicsPubMsg.mutable_bullet()->set_cfm(0.12);
+  physicsPubMsg.mutable_bullet()->set_erp(0.23);
+  physicsPubMsg.mutable_bullet()->set_contact_surface_layer(0.01);
+  physicsPubMsg.mutable_bullet()->set_split_impulse(1);
+  physicsPubMsg.mutable_bullet()->set_split_impulse_penetration_threshold(0.0);
   physicsPubMsg.set_type(msgs::Physics::BULLET);
   physicsPubMsg.set_solver_type("sequential_impulse");
   physicsPub->Publish(physicsPubMsg);
@@ -243,12 +244,12 @@ void BulletPhysics_TEST::PhysicsMsgParam()
       physicsPubMsg.solver_type());
   EXPECT_EQ(physicsResponseMsg.enable_physics(),
       physicsPubMsg.enable_physics());
-  EXPECT_EQ(physicsResponseMsg.iters(),
-      physicsPubMsg.iters());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.sor(),
-      physicsPubMsg.sor());
-  EXPECT_DOUBLE_EQ(physicsResponseMsg.cfm(),
-      physicsPubMsg.cfm());
+  EXPECT_EQ(physicsResponseMsg.bullet().iters(),
+      physicsPubMsg.bullet().iters());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.bullet().sor(),
+      physicsPubMsg.bullet().sor());
+  EXPECT_DOUBLE_EQ(physicsResponseMsg.bullet().cfm(),
+      physicsPubMsg.bullet().cfm());
 
   phyNode->Fini();
 }

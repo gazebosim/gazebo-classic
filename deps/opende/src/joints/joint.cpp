@@ -65,7 +65,7 @@ dxJoint::dxJoint( dxWorld *w ) :
 
     // Moved here by OSRF
     // Default to negative value, which means the current global value
-    // will be used. If set non-negative, then this joint-specific 
+    // will be used. If set non-negative, then this joint-specific
     // value will be used.
     erp = -1;  // world->global_erp;
     cfm = -1;  // world->global_cfm;
@@ -192,7 +192,7 @@ void setBall2( dxJoint *joint, dxJoint::Info2 *info,
     if ( joint->node[1].body )
     {
         for ( i = 0; i < 3; i++ ) a2[i] += joint->node[1].body->posr.pos[i];
-        
+
         dVector3 a2_minus_a1;
         dSubtractVectors3(a2_minus_a1, a2, a1);
         info->c[0] = k1 * dCalcVectorDot3( axis, a2_minus_a1 );

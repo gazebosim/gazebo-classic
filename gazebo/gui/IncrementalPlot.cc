@@ -22,6 +22,7 @@
 #include <qwt/qwt_plot_grid.h>
 #include <qwt/qwt_plot_canvas.h>
 #include <qwt/qwt_plot_curve.h>
+#include <qwt/qwt_plot_marker.h>
 #include <qwt/qwt_curve_fitter.h>
 #include <qwt/qwt_symbol.h>
 #include <qwt/qwt_legend.h>
@@ -66,7 +67,7 @@ class CurveData: public QwtArraySeriesData<QPointF>
   public: inline void Add(const QPointF &_point)
           {
             this->d_samples += _point;
-            if (this->d_samples.size() > 6000)
+            if (this->d_samples.size() > 11000)
               this->d_samples.remove(0, 1000);
           }
 
@@ -82,6 +83,7 @@ class CurveData: public QwtArraySeriesData<QPointF>
 IncrementalPlot::IncrementalPlot(QWidget *_parent)
   : QwtPlot(_parent)
 {
+  this->period = 10;
   this->directPainter = new QwtPlotDirectPainter(this);
 
   // panning with the left mouse button
@@ -195,6 +197,18 @@ void IncrementalPlot::Add(const QString &_label, const QPointF &_pt)
 }
 
 /////////////////////////////////////////////////
+void IncrementalPlot::AddVLine(const QString &_label, double _x)
+{
+  QwtPlotMarker *marker = new QwtPlotMarker();
+  marker->setValue(_x, 0.0);
+  marker->setLineStyle(QwtPlotMarker::VLine);
+  marker->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
+  marker->setLinePen(QPen(Qt::green, 0, Qt::DashDotLine));
+  marker->attach(this);
+  marker->setLabel(_label);
+}
+
+/////////////////////////////////////////////////
 void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
 {
   GZ_ASSERT(_curve != NULL, "Curve is NULL");
@@ -226,8 +240,7 @@ void IncrementalPlot::AdjustCurve(QwtPlotCurve *_curve)
   }
 
   this->setAxisScale(this->xBottom,
-      std::max(0.0, static_cast<double>(lastPoint.x() -
-          5.0 * this->magnifier->wheelFactor())),
+      std::max(0.0, static_cast<double>(lastPoint.x() - this->period)),
       std::max(1.0, static_cast<double>(lastPoint.x())));
 
   // this->setAxisScale(_curve->yAxis(), 0.0, _curve->maxYValue() * 2.0);
@@ -353,5 +366,24 @@ void IncrementalPlot::Update()
        iter != this->curves.end(); ++iter)
   {
     this->AdjustCurve(iter->second);
+  }
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::SetPeriod(double _seconds)
+{
+  this->period = _seconds;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::wheelEvent(QWheelEvent *_event)
+{
+  if (_event->modifiers() & Qt::ControlModifier)
+  {
+    double sign = _event->delta() > 0 ? -1.0 : 1.0;
+    double scale = 1 + 0.1*sign;
+    this->period *= scale;
+    this->Update();
+    _event->accept();
   }
 }

@@ -65,6 +65,11 @@ namespace gazebo
       public slots: void Add(const QString &_label,
                              const std::list<QPointF> &_pts);
 
+      /// \brief Add a vertical line to the plot.
+      /// \param[in] _label Label for the line.
+      /// \param[in] _x X position for the vertical line.
+      public: void AddVLine(const QString &_label, double _x);
+
       /// \brief Clear a single curve from the plot.
       /// \param[in] _label Name of the curve to remove.
       public: void Clear(const QString &_label);
@@ -80,6 +85,15 @@ namespace gazebo
       /// \brief Update all the curves in the plot
       public: void Update();
 
+      /// \brief Add a named curve.
+      /// \param[in] _label Name of the curve.
+      /// \return A pointer to the new curve.
+      public: QwtPlotCurve *AddCurve(const QString &_label);
+
+      /// \brief Set the period over which to plot.
+      /// \param[in] _seconds Period duration in seconds.
+      public: void SetPeriod(double _seconds);
+
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
       protected: void dragEnterEvent(QDragEnterEvent *_evt);
@@ -88,14 +102,13 @@ namespace gazebo
       /// \param[in] _evt The drop event.
       protected: void dropEvent(QDropEvent *_evt);
 
+      /// \brief Used to handle Qt mouse wheel events.
+      /// \param[in] _event Mouse wheel event
+      protected: void wheelEvent(QWheelEvent *_event);
+
       /// \brief Adjust a curve to fit new data.
       /// \param[in] _curve Curve to adjust
       private: void AdjustCurve(QwtPlotCurve *_curve);
-
-      /// \brief Add a named curve.
-      /// \param[in] _label Name of the curve.
-      /// \return A pointer to the new curve.
-      private: QwtPlotCurve *AddCurve(const QString &_label);
 
       /// \def DiagnosticTimerPtr
       /// \brief A map of strings to qwt plot curves.
@@ -109,6 +122,9 @@ namespace gazebo
 
       /// \brief Pointer to the plot maginfier
       private: QwtPlotMagnifier *magnifier;
+
+      /// \brief Period duration in seconds.
+      private: double period;
     };
   }
 }

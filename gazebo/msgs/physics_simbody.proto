@@ -1,0 +1,13 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PhysicsSimbody
+/// \brief A message containing description of physics parameters for Simbody
+
+message PhysicsSimbody
+{
+  optional string solver_type                = 1;
+  optional string integrator_type            = 2;
+  optional double accuracy                   = 3;
+  optional double max_transient_velocity     = 4;
+}

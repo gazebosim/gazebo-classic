@@ -746,3 +746,15 @@ QwtScaleWidget
   color: white;
   font-size: 11px;
 }
+
+QwtTextLabel
+{
+  font-size: 10px;
+}
+
+QwtScaleWidget
+{
+  color: white;
+  font-size: 11px;
+}
+
