@@ -232,12 +232,9 @@ if (PKG_CONFIG_FOUND)
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
   # There are some runtime problems to solve with ogre-1.9.
-  # Please read gazebo issues: 994, 995, 996
-  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  elseif (NOT MAX_VALID_OGRE_FOUND)
-    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
