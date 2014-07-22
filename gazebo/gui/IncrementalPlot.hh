@@ -92,7 +92,7 @@ namespace gazebo
 
       /// \brief Set the period over which to plot.
       /// \param[in] _seconds Period duration in seconds.
-      public: void SetPeriod(unsigned int _seconds);
+      public: void SetPeriod(double _seconds);
 
       /// \brief Used to accept drag enter events.
       /// \param[in] _evt The drag event.
@@ -101,6 +101,10 @@ namespace gazebo
       /// \brief Used to accept drop events.
       /// \param[in] _evt The drop event.
       protected: void dropEvent(QDropEvent *_evt);
+
+      /// \brief Used to handle Qt mouse wheel events.
+      /// \param[in] _event Mouse wheel event
+      protected: void wheelEvent(QWheelEvent *_event);
 
       /// \brief Adjust a curve to fit new data.
       /// \param[in] _curve Curve to adjust
@@ -120,7 +124,7 @@ namespace gazebo
       private: QwtPlotMagnifier *magnifier;
 
       /// \brief Period duration in seconds.
-      private: unsigned int period;
+      private: double period;
     };
   }
 }

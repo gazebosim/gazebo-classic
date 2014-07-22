@@ -370,7 +370,20 @@ void IncrementalPlot::Update()
 }
 
 /////////////////////////////////////////////////
-void IncrementalPlot::SetPeriod(unsigned int _seconds)
+void IncrementalPlot::SetPeriod(double _seconds)
 {
   this->period = _seconds;
+}
+
+/////////////////////////////////////////////////
+void IncrementalPlot::wheelEvent(QWheelEvent *_event)
+{
+  if (_event->modifiers() & Qt::ControlModifier)
+  {
+    double sign = _event->delta() > 0 ? -1.0 : 1.0;
+    double scale = 1 + 0.1*sign;
+    this->period *= scale;
+    this->Update();
+    _event->accept();
+  }
 }
