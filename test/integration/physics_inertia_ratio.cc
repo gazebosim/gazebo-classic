@@ -27,8 +27,8 @@
 
 using namespace gazebo;
 
-const double g_angle_y_tol = 0.2;
-const double g_angle_z_tol = 0.2;
+const double g_angle_y_tol = 0.21;
+const double g_angle_z_tol = 0.21;
 
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
@@ -58,25 +58,39 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   ASSERT_TRUE(upperLink != NULL);
   ASSERT_TRUE(lowerLink != NULL);
 
+  math::Vector3Stats upperAngles;
+  math::Vector3Stats lowerAngles;
+  {
+    const std::string statNames = "MaxAbs,Rms";
+    EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
+    EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
+  }
+
+  physics->SetRealTimeUpdateRate(0.0);
+  common::Time startTime = common::Time::GetWallTime();
   for (int i = 0; i < 3000; ++i)
   {
     world->Step(1);
 
-    // Check out of plane angles
-    {
-      math::Pose pose;
-      pose = upperLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
-    }
-
-    {
-      math::Pose pose;
-      pose = lowerLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
-    }
+    // Get statistics on link rotations
+    upperAngles.InsertData(upperLink->GetWorldPose().rot.GetAsEuler());
+    lowerAngles.InsertData(lowerLink->GetWorldPose().rot.GetAsEuler());
   }
+  common::Time elapsedTime = common::Time::GetWallTime() - startTime;
+  this->Record("elapsedWallTime", elapsedTime.Double());
+  this->Record("simTime", world->GetSimTime().Double());
+
+  // Expect out of plane angles to fall within limits
+  EXPECT_NEAR((upperAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+
+  // Record statistics on pitch and yaw angles
+  this->Record("upper_pitch_", upperAngles.y);
+  this->Record("lower_pitch_", lowerAngles.y);
+  this->Record("upper_yaw_", upperAngles.z);
+  this->Record("lower_yaw_", lowerAngles.z);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)
