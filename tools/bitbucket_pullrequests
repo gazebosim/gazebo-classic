@@ -194,10 +194,10 @@ options["check"]    = false
 options["check_id"] = nil
 options["diff"]     = nil
 options["files"]    = nil
+options["range"]    = false
 options["show-url"] = false
 options["title"]    = false
 options["verbose"]  = false
-options["range"]    = false
 
 opt_parser = OptionParser.new do |o|
   o.on("-l", "--list",
