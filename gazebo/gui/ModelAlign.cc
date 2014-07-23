@@ -175,7 +175,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       }
     }
     this->dataPtr->originalVisualPose.clear();
-    this->dataPtr->scene->SelectVisual("", "normal");
+    if (this->dataPtr->scene)
+      this->dataPtr->scene->SelectVisual("", "normal");
     if (!_publish)
       return;
   }
@@ -228,7 +229,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
         vis->SetTransparency((1.0 - vis->GetTransparency()) * 0.5);
       }
       // prevent the visual pose from being updated by the server
-      this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
+      if (this->dataPtr->scene)
+        this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
     }
 
     if (_axis == "x")
