@@ -258,18 +258,37 @@ void Model::Update()
   }
 
   // diagnostics
-  DIAG_VARIABLE("model ["+this->GetName()+"] potential energy",
-    this->GetWorldEnergyPotential());
-  DIAG_VARIABLE("model ["+this->GetName()+"] kinetic energy",
-    this->GetWorldEnergyKinetic());
-  DIAG_VARIABLE("model ["+this->GetName()+"] total energy",
-    this->GetWorldEnergy());
-
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
+  if (DIAG_ENABLED())
   {
-    DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] total energy",
-      (*liter)->GetWorldEnergy());
+    DIAG_VARIABLE("model ["+this->GetName()+"] potential energy",
+      this->GetWorldEnergyPotential());
+    DIAG_VARIABLE("model ["+this->GetName()+"] kinetic energy",
+      this->GetWorldEnergyKinetic());
+    DIAG_VARIABLE("model ["+this->GetName()+"] total energy",
+      this->GetWorldEnergy());
+
+    for (Link_V::iterator liter = this->links.begin();
+         liter != this->links.end(); ++liter)
+    {
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] potential energy",
+        (*liter)->GetWorldEnergyPotential());
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] kinetic energy",
+        (*liter)->GetWorldEnergyKinetic());
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] total energy",
+        (*liter)->GetWorldEnergy());
+    }
+
+    for (Joint_V::iterator jiter = this->joints.begin();
+         jiter != this->joints.end(); ++jiter)
+    {
+      for(unsigned int i = 0; i < (*jiter)->GetAngleCount(); ++i)
+      {
+        std::ostringstream stream;
+        stream << "joint [" << (*jiter)->GetScopedName() << "] ["
+               << i << "] potential spring energy";
+        DIAG_VARIABLE(stream.str(), (*jiter)->GetWorldEnergyPotentialSpring(i));
+      }
+    }
   }
 }
 

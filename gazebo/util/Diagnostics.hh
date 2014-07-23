@@ -73,20 +73,23 @@ namespace gazebo
     /// \param[in] _value Value of the variable. Value must be a double.
     #define DIAG_VARIABLE(_name, _value) \
     gazebo::util::DiagnosticManager::Instance()->Variable(_name, _value);
-    // (*gazebo::util::_diagVariablePtr)(_name, _value);
 
     /// \brief Add a marker at the current time.
     /// \param[in] _name Name of the marker
     #define DIAG_MARKER(_name) \
     gazebo::util::DiagnosticManager::Instance()->Marker(_name);
-    // (*gazebo::util::_diagMarkerPtr)(_name);
 
+    /// \brief Check if diagnostics is active
+    /// \return true if active, false if not
+    #define DIAG_ENABLED() \
+    gazebo::util::DiagnosticManager::Instance()->GetEnabled()
 #else
     #define DIAG_TIMER_START(_name) ((void) 0)
     #define DIAG_TIMER_LAP(_name, _prefix) ((void)0)
     #define DIAG_TIMER_STOP(_name) ((void) 0)
     #define DIAG_VARIABLE(_name, _value) ((void) 0)
     #define DIAG_MARKER(_name) ((void) 0)
+    #define DIAG_ENABLED() false
 #endif
 
     /// \class DiagnosticManager Diagnostics.hh util/util.hh

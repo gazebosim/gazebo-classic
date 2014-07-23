@@ -50,6 +50,9 @@ DiagnosticManager::DiagnosticManager()
 
   this->logPath = this->logPath / "diagnostics" /
     common::Time::GetWallTimeAsISOString();
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      boost::bind(&DiagnosticManager::Update, this, _1));
 }
 
 //////////////////////////////////////////////////
@@ -94,20 +97,24 @@ boost::filesystem::path DiagnosticManager::GetLogPath() const
 //////////////////////////////////////////////////
 void DiagnosticManager::Update(const common::UpdateInfo &_info)
 {
-  if (_info.realTime > common::Time::Zero)
-    this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
-  else
-    this->msg.set_real_time_factor(0.0);
+  if (this->enabled)
+  {
+    if (_info.realTime > common::Time::Zero)
+      this->msg.set_real_time_factor((_info.simTime / _info.realTime).Double());
+    else
+      this->msg.set_real_time_factor(0.0);
 
-  msgs::Set(this->msg.mutable_real_time(), _info.realTime);
-  msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
+    msgs::Set(this->msg.mutable_real_time(), _info.realTime);
+    msgs::Set(this->msg.mutable_sim_time(), _info.simTime);
 
-  if (this->pub && this->pub->HasConnections())
-    this->pub->Publish(this->msg);
+    if (this->pub && this->pub->HasConnections())
+      this->pub->Publish(this->msg);
 
-  this->msg.clear_time();
-  this->msg.clear_variable();
-  this->msg.clear_marker();
+    // always clear message buffer?
+    this->msg.clear_time();
+    this->msg.clear_variable();
+    this->msg.clear_marker();
+  }
 }
 
 //////////////////////////////////////////////////
@@ -123,6 +130,9 @@ void DiagnosticManager::AddTime(const std::string &_name,
 //////////////////////////////////////////////////
 void DiagnosticManager::StartTimer(const std::string &_name)
 {
+  if (!this->enabled)
+    return;
+
   TimerMap::iterator iter = this->timers.find(_name);
   if (iter != this->timers.end())
   {
@@ -138,6 +148,9 @@ void DiagnosticManager::StartTimer(const std::string &_name)
 //////////////////////////////////////////////////
 void DiagnosticManager::StopTimer(const std::string &_name)
 {
+  if (!this->enabled)
+    return;
+
   TimerMap::iterator iter = this->timers.find(_name);
   if (iter != this->timers.end())
   {
@@ -155,6 +168,9 @@ void DiagnosticManager::StopTimer(const std::string &_name)
 void DiagnosticManager::Lap(const std::string &_name,
                             const std::string &_prefix)
 {
+  if (!this->enabled)
+    return;
+
   TimerMap::iterator iter;
   iter = this->timers.find(_name);
 
@@ -264,13 +280,6 @@ void DiagnosticManager::SetEnabled(bool _enabled)
     varLogPath = this->logPath / "variables.log";
     this->varLog.open(varLogPath.string().c_str(),
         std::ios::out | std::ios::app);
-
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&DiagnosticManager::Update, this, _1));
-  }
-  else
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
   }
 }
 
@@ -284,6 +293,9 @@ void DiagnosticManager::OnControl(ConstDiagnosticControlPtr &_msg)
 //////////////////////////////////////////////////
 void DiagnosticManager::Variable(const std::string &_name, double _value)
 {
+  if (!this->enabled)
+    return;
+
   // Get the current elapsed time.
   common::Time currTime = common::Time::GetWallTime();
 
@@ -299,6 +311,9 @@ void DiagnosticManager::Variable(const std::string &_name, double _value)
 //////////////////////////////////////////////////
 void DiagnosticManager::Marker(const std::string &_name)
 {
+  if (!this->enabled)
+    return;
+
   // Get the current elapsed time.
   common::Time currTime = common::Time::GetWallTime();
 

@@ -23,7 +23,6 @@
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Quaternion.hh"
@@ -463,14 +462,6 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
      this->enabled = this->GetEnabled();
      this->enabledSignal(this->enabled);
    }*/
-
-  // diagnostics
-  DIAG_VARIABLE("link ["+this->GetName()+"] potential energy",
-    this->GetWorldEnergyPotential());
-  DIAG_VARIABLE("link ["+this->GetName()+"] kinetic energy",
-    this->GetWorldEnergyKinetic());
-  DIAG_VARIABLE("link ["+this->GetName()+"] total energy",
-    this->GetWorldEnergy());
 }
 
 /////////////////////////////////////////////////

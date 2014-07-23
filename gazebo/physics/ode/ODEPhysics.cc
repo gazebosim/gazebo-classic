@@ -390,9 +390,6 @@ void ODEPhysics::UpdateCollision()
   dSpaceCollide(this->spaceId, this, CollisionCallback);
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "dSpaceCollide");
 
-  DIAG_VARIABLE("ODE colliders", this->collidersCount);
-  DIAG_VARIABLE("ODE trimesh colliders", this->trimeshCollidersCount);
-
   // Generate non-trimesh collisions.
   for (i = 0; i < this->collidersCount; ++i)
   {
@@ -412,6 +409,12 @@ void ODEPhysics::UpdateCollision()
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
 
   DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
+
+  if (DIAG_ENABLED())
+  {
+    DIAG_VARIABLE("ODE colliders", this->collidersCount);
+    DIAG_VARIABLE("ODE trimesh colliders", this->trimeshCollidersCount);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -461,22 +464,25 @@ void ODEPhysics::UpdatePhysics()
 
   DIAG_TIMER_STOP("ODEPhysics::UpdatePhysics");
 
-  DIAG_VARIABLE("ODE rms error bilateral constraints",
-    boost::any_cast<double*>(this->GetParam("rms_error"))[0]);
-  DIAG_VARIABLE("ODE rms error contact normal constraints",
-    boost::any_cast<double*>(this->GetParam("rms_error"))[1]);
-  DIAG_VARIABLE("ODE rms error friction constraints",
-    boost::any_cast<double*>(this->GetParam("rms_error"))[2]);
-  DIAG_VARIABLE("ODE rms error total",
-    boost::any_cast<double*>(this->GetParam("rms_error"))[3]);
-  DIAG_VARIABLE("ODE constraint residual bilateral constraints",
-    boost::any_cast<double*>(this->GetParam("constraint_residual"))[0]);
-  DIAG_VARIABLE("ODE constraint residual contact normal constraints",
-    boost::any_cast<double*>(this->GetParam("constraint_residual"))[1]);
-  DIAG_VARIABLE("ODE constraint residual friction constraints",
-    boost::any_cast<double*>(this->GetParam("constraint_residual"))[2]);
-  DIAG_VARIABLE("ODE constraint residual total",
-    boost::any_cast<double*>(this->GetParam("constraint_residual"))[3]);
+  if (DIAG_ENABLED())
+  {
+    DIAG_VARIABLE("ODE rms error bilateral constraints",
+      boost::any_cast<double*>(this->GetParam("rms_error"))[0]);
+    DIAG_VARIABLE("ODE rms error contact normal constraints",
+      boost::any_cast<double*>(this->GetParam("rms_error"))[1]);
+    DIAG_VARIABLE("ODE rms error friction constraints",
+      boost::any_cast<double*>(this->GetParam("rms_error"))[2]);
+    DIAG_VARIABLE("ODE rms error total",
+      boost::any_cast<double*>(this->GetParam("rms_error"))[3]);
+    DIAG_VARIABLE("ODE constraint residual bilateral constraints",
+      boost::any_cast<double*>(this->GetParam("constraint_residual"))[0]);
+    DIAG_VARIABLE("ODE constraint residual contact normal constraints",
+      boost::any_cast<double*>(this->GetParam("constraint_residual"))[1]);
+    DIAG_VARIABLE("ODE constraint residual friction constraints",
+      boost::any_cast<double*>(this->GetParam("constraint_residual"))[2]);
+    DIAG_VARIABLE("ODE constraint residual total",
+      boost::any_cast<double*>(this->GetParam("constraint_residual"))[3]);
+  }
 }
 
 //////////////////////////////////////////////////
