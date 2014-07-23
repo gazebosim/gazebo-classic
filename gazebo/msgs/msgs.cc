@@ -220,6 +220,15 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
+    msgs::Vector2d Convert(const math::Vector2d &_v)
+    {
+      msgs::Vector2d result;
+      result.set_x(_v.x);
+      result.set_y(_v.y);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
     msgs::Vector3d Convert(const math::Vector3 &_v)
     {
       msgs::Vector3d result;
@@ -273,6 +282,11 @@ namespace gazebo
       result.mutable_size()->set_y(_p.size.y);
       result.set_d(_p.d);
       return result;
+    }
+
+    math::Vector2d Convert(const msgs::Vector2d &_v)
+    {
+      return math::Vector2d(_v.x(), _v.y());
     }
 
     math::Vector3 Convert(const msgs::Vector3d &_v)
@@ -750,6 +764,143 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Geometry &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<geometry>";
+
+      if (!_msg.has_type())
+      {
+        gzerr << "msgs::Geometry missing type" << std::endl;
+        stream << "</geometry>";
+        return stream.str();
+      }
+
+      if (_msg.type() == Geometry_Type_BOX &&
+          _msg.has_box())
+      {
+        stream << msgs::ToSDF(_msg.box());
+      }
+      else if (_msg.type() == Geometry_Type_CYLINDER &&
+          _msg.has_cylinder())
+      {
+        stream << msgs::ToSDF(_msg.cylinder());
+      }
+      else if (_msg.type() == Geometry_Type_HEIGHTMAP &&
+          _msg.has_heightmap())
+      {
+        gzerr << "ToSDF(msgs::HeightmapGeom not implemented" << std::endl;
+        // stream << msgs::ToSDF(_msg.heightmap());
+      }
+      else if (_msg.type() == Geometry_Type_IMAGE &&
+          _msg.has_image())
+      {
+        stream << msgs::ToSDF(_msg.image());
+      }
+      else if (_msg.type() == Geometry_Type_MESH &&
+          _msg.has_mesh())
+      {
+        gzerr << "ToSDF(msgs::MeshGeom not implemented" << std::endl;
+        // stream << msgs::ToSDF(_msg.mesh());
+      }
+      else if (_msg.type() == Geometry_Type_PLANE &&
+          _msg.has_plane())
+      {
+        stream << msgs::ToSDF(_msg.plane());
+      }
+      else if (_msg.type() == Geometry_Type_SPHERE &&
+          _msg.has_sphere())
+      {
+        stream << msgs::ToSDF(_msg.sphere());
+      }
+      else
+      {
+        gzerr << "Unrecognized geometry type" << std::endl;
+      }
+
+      stream << "</geometry>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::BoxGeom &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<box>"
+             << "<size>"
+             << msgs::Convert(_msg.size())
+             << "</size>"
+             << "</box>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::CylinderGeom &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<cylinder>"
+             << "<radius>" << _msg.radius() << "</radius>"
+             << "<length>" << _msg.length() << "</length>"
+             << "</cylinder>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::ImageGeom &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<image>"
+             << "<uri>" << _msg.uri() << "</uri>";
+      if (_msg.has_scale())
+      {
+        stream << "<scale>" << _msg.scale() << "</scale>";
+      }
+      if (_msg.has_threshold())
+      {
+        stream << "<threshold>" << _msg.threshold() << "</threshold>";
+      }
+      if (_msg.has_height())
+      {
+        stream << "<height>" << _msg.height() << "</height>";
+      }
+      if (_msg.has_granularity())
+      {
+        stream << "<granularity>" << _msg.granularity() << "</granularity>";
+      }
+      stream << "</image>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::PlaneGeom &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<plane>"
+             << "<normal>"
+             << msgs::Convert(_msg.normal())
+             << "</normal>"
+             << "<size>"
+             << msgs::Convert(_msg.size())
+             << "</size>";
+      if (_msg.has_d())
+      {
+        gzerr << "sdformat doesn't have Plane.d variable" << std::endl;
+      }
+      stream << "</plane>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::SphereGeom &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<sphere>"
+             << "<radius>" << _msg.radius() << "</radius>"
+             << "</sphere>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
     std::string ToSDF(const msgs::Surface &_msg)
     {
       std::ostringstream stream;
@@ -829,6 +980,7 @@ namespace gazebo
       }
       stream << "</contact>";
 
+      stream << "</surface>";
       return stream.str();
     }
 
