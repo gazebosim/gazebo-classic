@@ -848,7 +848,7 @@ TEST_F(MsgsTest, MeshFromSDF)
 }
 
 /////////////////////////////////////////////////
-TEST_F(MsgsTest, SDFStringFromFriction)
+TEST_F(MsgsTest, FrictionToSDF)
 {
   const double mu = 1.234;
   const double mu2 = 2.345;

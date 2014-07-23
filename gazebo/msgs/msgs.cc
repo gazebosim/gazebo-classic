@@ -750,6 +750,89 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Surface &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<surface>";
+
+      // bounce element block
+      stream << "<bounce>";
+      if (_msg.has_restitution_coefficient())
+      {
+        stream << "<restitution_coefficient>"
+               << _msg.restitution_coefficient()
+               << "</restitution_coefficient>";
+      }
+      if (_msg.has_bounce_threshold())
+      {
+        stream << "<threshold>"
+               << _msg.bounce_threshold()
+               << "</threshold>";
+      }
+      stream << "</bounce>";
+
+      // friction element block
+      if (_msg.has_friction())
+      {
+        stream << msgs::ToSDF(_msg.friction());
+      }
+
+      // contact element block
+      stream << "<contact>";
+      if (_msg.has_collide_without_contact())
+      {
+        stream << "<collide_without_contact>"
+               << _msg.collide_without_contact()
+               << "</collide_without_contact>";
+      }
+      if (_msg.has_collide_without_contact_bitmask())
+      {
+        stream << "<collide_without_contact_bitmask>"
+               << _msg.collide_without_contact_bitmask()
+               << "</collide_without_contact_bitmask>";
+      }
+      {
+        std::ostringstream odeStream, bulletStream;
+        odeStream    << "<ode>";
+        bulletStream << "<bullet>";
+        if (_msg.has_soft_cfm())
+        {
+          odeStream    << "<soft_cfm>" << _msg.soft_cfm() << "</soft_cfm>";
+          bulletStream << "<soft_cfm>" << _msg.soft_cfm() << "</soft_cfm>";
+        }
+        if (_msg.has_soft_erp())
+        {
+          odeStream    << "<soft_erp>" << _msg.soft_erp() << "</soft_erp>";
+          bulletStream << "<soft_erp>" << _msg.soft_erp() << "</soft_erp>";
+        }
+        if (_msg.has_kp())
+        {
+          odeStream    << "<kp>" << _msg.kp() << "</kp>";
+          bulletStream << "<kp>" << _msg.kp() << "</kp>";
+        }
+        if (_msg.has_kd())
+        {
+          odeStream    << "<kd>" << _msg.kd() << "</kd>";
+          bulletStream << "<kd>" << _msg.kd() << "</kd>";
+        }
+        if (_msg.has_max_vel())
+        {
+          odeStream << "<max_vel>" << _msg.max_vel() << "</max_vel>";
+        }
+        if (_msg.has_min_depth())
+        {
+          odeStream << "<min_depth>" << _msg.min_depth() << "</min_depth>";
+        }
+        odeStream    << "</ode>";
+        bulletStream << "</bullet>";
+        stream << odeStream << bulletStream;
+      }
+      stream << "</contact>";
+
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
     std::string ToSDF(const msgs::Friction &_msg)
     {
       std::ostringstream stream;
