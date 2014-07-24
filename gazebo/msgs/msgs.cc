@@ -764,6 +764,44 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Model &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<model name='"
+             << _msg.name()
+             << "'>";
+
+      // ignore the id field, since it's not used in sdformat
+      if (_msg.has_is_static())
+      {
+        stream << "<static>" << _msg.is_static() << "</static>";
+      }
+      if (_msg.has_pose())
+      {
+        stream << "<pose>"
+               << msgs::Convert(_msg.pose())
+               << "</pose>";
+      }
+      if (_msg.joint_size() > 0)
+      {
+        gzerr << "Model joints not yet parsed" << std::endl;
+      }
+      for (int i = 0; i < _msg.link_size(); ++i)
+      {
+        stream << msgs::ToSDF(_msg.link(i));
+      }
+      // ignore the deleted field, since it's not used in sdformat
+      if (_msg.visual_size() > 0)
+      {
+        gzerr << "Model visuals not yet parsed" << std::endl;
+      }
+      // ignore the scale field, since it's not used in sdformat
+
+      stream << "</model>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
     std::string ToSDF(const msgs::Link &_msg)
     {
       std::ostringstream stream;

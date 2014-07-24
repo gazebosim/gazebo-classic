@@ -267,6 +267,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF string from msgs::Model.
+    /// \param[in] _sdf The msgs::Model object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Model &_msg);
+
     /// \brief Create an SDF string from msgs::Link.
     /// \param[in] _sdf The msgs::Link object.
     /// \return sdf string.
