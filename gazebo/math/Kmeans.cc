@@ -60,7 +60,7 @@ bool Kmeans::AppendObservations(const std::vector<Vector3> &_obs)
 {
   if (_obs.empty())
   {
-    std::cerr << "Kmeans::SetObservations() error: Observations vector is empty"
+    std::cerr << "Kmeans::AppendObservations() error: input vector is empty"
               << std::endl;
     return false;
   }
