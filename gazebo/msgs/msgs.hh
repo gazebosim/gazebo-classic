@@ -267,6 +267,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF string from msgs::Collision.
+    /// \param[in] _sdf The msgs::Collision object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Collision &_msg);
+
     /// \brief Create an SDF string from msgs::Geometry.
     /// \param[in] _sdf The msgs::Geometry object.
     /// \return sdf string.
@@ -308,6 +314,12 @@ namespace gazebo
     /// \return sdf string.
     GAZEBO_VISIBLE
     std::string ToSDF(const msgs::Friction &_msg);
+
+    /// \brief Create an SDF string from msgs::Inertial.
+    /// \param[in] _sdf The msgs::Inertial object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Inertial &_msg);
 
     /// \brief Create an SDF string from msgs::Surface.
     /// \param[in] _sdf The msgs::Surface object.

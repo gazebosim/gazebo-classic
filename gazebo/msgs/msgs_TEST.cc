@@ -893,3 +893,62 @@ TEST_F(MsgsTest, FrictionToSDF)
   EXPECT_TRUE(odeElem->HasElement("fdir1"));
   EXPECT_EQ(odeElem->Get<math::Vector3>("fdir1"), fdir1);
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, InertialToSDF)
+{
+  const double mass = 1.234;
+  const math::Pose pose =
+    math::Pose(math::Vector3::UnitX, math::Quaternion());
+  const double ixx = 2.0;
+  const double iyy = 2.5;
+  const double izz = 3.0;
+  const double ixy = 0.0;
+  const double ixz = 0.0;
+  const double iyz = 0.0;
+
+  msgs::Inertial msg;
+  msg.set_mass(mass);
+  msgs::Set(msg.mutable_pose(), pose);
+  msg.set_ixx(ixx);
+  msg.set_ixy(ixy);
+  msg.set_ixz(ixz);
+  msg.set_iyy(iyy);
+  msg.set_iyz(iyz);
+  msg.set_izz(izz);
+
+  std::string sdfString = msgs::ToSDF(msg);
+  sdf::ElementPtr sdf(new sdf::Element());
+  sdf::initFile("inertial.sdf", sdf);
+  sdf::readString("<sdf version='" SDF_VERSION "'>"
+    + sdfString + "</sdf>", sdf);
+
+  EXPECT_TRUE(sdf->HasElement("mass"));
+  EXPECT_DOUBLE_EQ(sdf->Get<double>("mass"), mass);
+
+  EXPECT_TRUE(sdf->HasElement("pose"));
+  EXPECT_EQ(sdf->Get<math::Pose>("pose"), pose);
+
+  {
+    ASSERT_TRUE(sdf->HasElement("inertia"));
+    sdf::ElementPtr inertiaElem = sdf->GetElement("inertia");
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixx"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixx"), ixx);
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixy"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixy"), ixy);
+
+    EXPECT_TRUE(inertiaElem->HasElement("ixz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("ixz"), ixz);
+
+    EXPECT_TRUE(inertiaElem->HasElement("iyy"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyy"), iyy);
+
+    EXPECT_TRUE(inertiaElem->HasElement("iyz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("iyz"), iyz);
+
+    EXPECT_TRUE(inertiaElem->HasElement("izz"));
+    EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("izz"), izz);
+  }
+}

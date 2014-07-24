@@ -764,6 +764,43 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Collision &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<collision name='"
+             << _msg.name()
+             << "'>";
+
+      // ignore the id field, since it's not used in sdformat
+      if (_msg.has_laser_retro())
+      {
+        stream << "<laser_retro>" << _msg.laser_retro() << "</laser_retro>";
+      }
+      if (_msg.has_max_contacts())
+      {
+        stream << "<max_contacts>" << _msg.max_contacts() << "</max_contacts>";
+      }
+      if (_msg.has_pose())
+      {
+        stream << "<pose>"
+               << msgs::Convert(_msg.pose())
+               << "</pose>";
+      }
+      if (_msg.has_geometry())
+      {
+        stream << msgs::ToSDF(_msg.geometry());
+      }
+      if (_msg.has_surface())
+      {
+        stream << msgs::ToSDF(_msg.surface());
+      }
+      // also ignore the visual field, since it's not used in sdformat
+
+      stream << "</collision>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
     std::string ToSDF(const msgs::Geometry &_msg)
     {
       std::ostringstream stream;
@@ -981,6 +1018,52 @@ namespace gazebo
       stream << "</contact>";
 
       stream << "</surface>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Inertial &_msg)
+    {
+      std::ostringstream stream;
+      stream << "<inertial>";
+
+      if (_msg.has_mass())
+      {
+        stream << "<mass>" << _msg.mass() << "</mass>";
+      }
+      if (_msg.has_pose())
+      {
+        stream << "<pose>" << msgs::Convert(_msg.pose()) << "</pose>";
+      }
+
+      stream << "<inertia>";
+      if (_msg.has_ixx())
+      {
+        stream << "<ixx>" << _msg.ixx() << "</ixx>";
+      }
+      if (_msg.has_ixy())
+      {
+        stream << "<ixy>" << _msg.ixy() << "</ixy>";
+      }
+      if (_msg.has_ixz())
+      {
+        stream << "<ixz>" << _msg.ixz() << "</ixz>";
+      }
+      if (_msg.has_iyy())
+      {
+        stream << "<iyy>" << _msg.iyy() << "</iyy>";
+      }
+      if (_msg.has_iyz())
+      {
+        stream << "<iyz>" << _msg.iyz() << "</iyz>";
+      }
+      if (_msg.has_izz())
+      {
+        stream << "<izz>" << _msg.izz() << "</izz>";
+      }
+      stream << "</inertia>";
+
+      stream << "</inertial>";
       return stream.str();
     }
 
