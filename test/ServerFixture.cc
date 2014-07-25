@@ -454,6 +454,34 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 }
 
 /////////////////////////////////////////////////
+physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
+{
+  std::ostringstream stream;
+  stream << "<sdf version='" << SDF_VERSION << "'>"
+         << msgs::ToSDF(_msg)
+         << "</sdf>";
+
+  physics::WorldPtr world = physics::get_world();
+  world->InsertModelString(stream.str());
+
+  common::Time wait(10, 0);
+  common::Time wallStart = common::Time::GetWallTime();
+  unsigned int waitCount = 0;
+  while (wait > (common::Time::GetWallTime() - wallStart) &&
+         !this->HasEntity(_msg.name()))
+  {
+    common::Time::MSleep(10);
+    if (++waitCount % 100 == 0)
+    {
+      gzwarn << "Waiting " << waitCount / 100 << " seconds for "
+             << "box to spawn." << std::endl;
+    }
+  }
+
+  return world->GetModel(_msg.name());
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,

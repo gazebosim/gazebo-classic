@@ -203,6 +203,11 @@ class ServerFixture : public testing::Test
                  unsigned char **_imgData, unsigned int &_width,
                  unsigned int &_height);
 
+  /// \brief Spawn a model from a msgs::Model and return ModelPtr.
+  /// \param[in] _msg Model message.
+  /// \return Pointer to model.
+  protected: physics::ModelPtr SpawnModel(const msgs::Model &_msg);
+
   /// \brief Spawn a camera.
   /// \param[in] _modelName Name of the model.
   /// \param[in] _cameraName Name of the camera.
