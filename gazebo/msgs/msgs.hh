@@ -74,6 +74,12 @@ namespace gazebo
         const google::protobuf::Message &message);
     /// \endcond
 
+    /// \brief Convert a math::Vector2d to a msgs::Vector2d
+    /// \param[in] _v The vector to convert
+    /// \return A msgs::Vector2d object
+    GAZEBO_VISIBLE
+    msgs::Vector2d      Convert(const math::Vector2d &_v);
+
     /// \brief Convert a math::Vector3 to a msgs::Vector3d
     /// \param[in] _v The vector to convert
     /// \return A msgs::Vector3d object
@@ -269,6 +275,89 @@ namespace gazebo
     GAZEBO_VISIBLE
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Add a simple box link to a Model message.
+    /// The size and mass of the box are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to box of uniform density.
+    /// \param[out] _msg The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the box.
+    /// \param[in] _size Size of the box.
+    GAZEBO_VISIBLE
+    void AddBoxLink(msgs::Model &_msg, double _mass,
+                    const math::Vector3 &_size);
+
+    /// \brief Create an SDF string from msgs::Model.
+    /// \param[in] _sdf The msgs::Model object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Model &_msg);
+
+    /// \brief Create an SDF string from msgs::Link.
+    /// \param[in] _sdf The msgs::Link object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Link &_msg);
+
+    /// \brief Create an SDF string from msgs::Collision.
+    /// \param[in] _sdf The msgs::Collision object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Collision &_msg);
+
+    /// \brief Create an SDF string from msgs::Geometry.
+    /// \param[in] _sdf The msgs::Geometry object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Geometry &_msg);
+
+    /// \brief Create an SDF string from msgs::BoxGeom.
+    /// \param[in] _sdf The msgs::BoxGeom object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::BoxGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::CylinderGeom.
+    /// \param[in] _sdf The msgs::CylinderGeom object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::CylinderGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::ImageGeom.
+    /// \param[in] _sdf The msgs::ImageGeom object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::ImageGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::PlaneGeom.
+    /// \param[in] _sdf The msgs::PlaneGeom object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::PlaneGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::SphereGeom.
+    /// \param[in] _sdf The msgs::SphereGeom object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::SphereGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::Friction.
+    /// \param[in] _sdf The msgs::Friction object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Friction &_msg);
+
+    /// \brief Create an SDF string from msgs::Inertial.
+    /// \param[in] _sdf The msgs::Inertial object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Inertial &_msg);
+
+    /// \brief Create an SDF string from msgs::Surface.
+    /// \param[in] _sdf The msgs::Surface object.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Surface &_msg);
 
     /// \cond
     GAZEBO_VISIBLE
