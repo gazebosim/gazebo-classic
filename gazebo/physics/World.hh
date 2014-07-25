@@ -254,11 +254,6 @@ namespace gazebo
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      /// \note Deprecated. Please use World::Step
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
-
-      /// \brief Step the world forward in time.
-      /// \param[in] _steps The number of steps the World should take.
       public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
@@ -707,6 +702,10 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \brief This mutex is used to by the ::RemoveModel and
+      /// ::ProcessFactoryMsgs functions.
+      private: boost::mutex factoryDeleteMutex;
     };
     /// \}
   }

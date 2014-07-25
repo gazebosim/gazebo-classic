@@ -1100,19 +1100,45 @@ void Link::SetScale(const math::Vector3 &_scale)
     }
   }
 
-/*  for (unsigned int i = 0; i < this->visuals.size(); ++i)
+  this->scale = _scale;
+
+  // update the visual sdf to ensure cloning gets the correct values.
+  this->UpdateVisualSDF();
+}
+
+//////////////////////////////////////////////////
+void Link::UpdateVisualSDF()
+{
+  // TODO: this shouldn't be in the physics sim
+  if (this->sdf->HasElement("visual"))
   {
-    msgs::Visual msg;
-    msg.set_name(this->visuals[i]);
-    if (this->parent)
-      msg.set_parent_name(this->parent->GetScopedName());
-    else
-      msg.set_parent_name("");
+    sdf::ElementPtr visualElem = this->sdf->GetElement("visual");
+    while (visualElem)
+    {
+      sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
 
-    msgs::Set(msg.mutable_scale(), _scale);
+      if (geomElem->HasElement("box"))
+      {
+        geomElem->GetElement("box")->GetElement("size")->Set(this->scale);
+      }
+      else if (geomElem->HasElement("sphere"))
+      {
+        geomElem->GetElement("sphere")->GetElement("radius")->Set(
+            this->scale.x/2.0);
+      }
+      else if (geomElem->HasElement("cylinder"))
+      {
+        geomElem->GetElement("cylinder")->GetElement("radius")
+            ->Set(this->scale.x/2.0);
+        geomElem->GetElement("cylinder")->GetElement("length")->Set(
+            this->scale.z);
+      }
+      else if (geomElem->HasElement("mesh"))
+        geomElem->GetElement("mesh")->GetElement("scale")->Set(this->scale);
 
-    this->visPub->Publish(msg);
-  }*/
+      visualElem = visualElem->GetNextElement("visual");
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1290,3 +1316,22 @@ bool Link::ContainsLink(const Link_V &_vector, const LinkPtr &_value)
   }
   return false;
 }
+
+/////////////////////////////////////////////////
+msgs::Visual Link::GetVisualMessage(const std::string &_name) const
+{
+  msgs::Visual result;
+
+  Visuals_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    if (iter->second.name() == _name)
+      break;
+
+  if (iter != this->visuals.end())
+    result = iter->second;
+
+  return result;
+}
+
+
+

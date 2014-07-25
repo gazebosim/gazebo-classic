@@ -83,6 +83,15 @@ set (headers
   SphereMaker.hh
 )
 
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusWindow.cc
+  )
+  set (qt_headers ${qt_headers}
+    OculusWindow.hh
+  )
+endif ()
+
 #if (HAVE_QWT)
 #  set (sources ${sources}
 #    Diagnostics.cc

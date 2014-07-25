@@ -22,8 +22,8 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDE_DIRS} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
+  include_directories ( ${DARTCore_INCLUDE_DIRS} )
+  link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
 set(tests
@@ -51,6 +51,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  model.cc
   model_database.cc
   noise.cc
   nondefault_world.cc
@@ -62,6 +63,9 @@ set(tests
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  polyline.cc
+  road.cc
+  sensor.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc

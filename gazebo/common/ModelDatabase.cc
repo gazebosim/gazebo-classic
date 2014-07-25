@@ -95,8 +95,6 @@ void ModelDatabase::Start(bool _fetchImmediately)
 /////////////////////////////////////////////////
 void ModelDatabase::Fini()
 {
-  this->dataPtr->deprecatedCallbacks.clear();
-
   // Stop the update thread.
   this->dataPtr->stop = true;
   this->dataPtr->updateCacheCompleteCondition.notify_all();
@@ -292,14 +290,6 @@ void ModelDatabase::UpdateModelCache(bool _fetchImmediately)
     else
     {
       boost::mutex::scoped_lock lock2(this->dataPtr->callbacksMutex);
-
-      for (std::list<ModelDatabasePrivate::CallbackFunc>::iterator iter =
-          this->dataPtr->deprecatedCallbacks.begin();
-          iter != this->dataPtr->deprecatedCallbacks.end(); ++iter)
-      {
-        (*iter)(this->dataPtr->modelCache);
-      }
-      this->dataPtr->deprecatedCallbacks.clear();
 
       this->dataPtr->modelDBUpdated(this->dataPtr->modelCache);
     }
