@@ -37,7 +37,7 @@ const double g_friction_tolerance = 1e-3;
 class PhysicsFrictionTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
-  protected: PhysicsFrictionTest() : ServerFixture(), spawnCount(0)
+  protected: PhysicsFrictionTest() : ServerFixture()
              {
              }
 
@@ -135,11 +135,10 @@ class PhysicsFrictionTest : public ServerFixture,
   /// \param[in] _opt Options for friction box.
   public: physics::ModelPtr SpawnBox(const SpawnFrictionBoxOptions &_opt)
           {
-            std::ostringstream modelName;
-            modelName << "box_model" << this->spawnCount++;
+            std::string modelName = this->GetUniqueString("box_model");
 
             msgs::Model model;
-            model.set_name(modelName.str());
+            model.set_name(modelName);
             msgs::Set(model.mutable_pose(), _opt.modelPose);
 
             msgs::AddBoxLink(model, _opt.mass, _opt.size);
@@ -175,9 +174,6 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
-
-  /// \brief Count of spawned models, used to ensure unique model names.
-  private: unsigned int spawnCount;
 };
 
 /////////////////////////////////////////////////
