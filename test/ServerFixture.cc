@@ -54,6 +54,7 @@ ServerFixture::ServerFixture()
   this->gotImage = 0;
   this->imgData = NULL;
   this->serverThread = NULL;
+  this->uniqueCounter = 0;
 
   gzLogInit("test.log");
   gazebo::common::Console::SetQuiet(false);
@@ -1311,4 +1312,12 @@ void ServerFixture::GetMemInfo(double &_resident, double &_share)
   gzerr << "Unsupported architecture\n";
   return;
 #endif
+}
+
+/////////////////////////////////////////////////
+std::string ServerFixture::GetUniqueString(const std::string &_prefix)
+{
+  std::ostringstream stream;
+  stream << _prefix << this->uniqueCounter++;
+  return stream.str();
 }

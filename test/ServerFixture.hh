@@ -488,6 +488,9 @@ class ServerFixture : public testing::Test
   /// \param[out] _share Shared memory.
   protected: void GetMemInfo(double &_resident, double &_share);
 
+  /// \brief Get unique string.
+  protected: std::string GetUniqueString(const std::string &_prefix);
+
   /// \brief Pointer the Gazebo server.
   protected: Server *server;
 
@@ -532,5 +535,8 @@ class ServerFixture : public testing::Test
 
   /// \brief True if server is running.
   private: bool serverRunning;
+
+  /// \brief Counter for unique name generation.
+  private: int uniqueCounter;
 };
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
