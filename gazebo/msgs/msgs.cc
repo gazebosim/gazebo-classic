@@ -1105,7 +1105,7 @@ namespace gazebo
         }
         odeStream    << "</ode>";
         bulletStream << "</bullet>";
-        stream << odeStream << bulletStream;
+        stream << odeStream.str() << bulletStream.str();
       }
       stream << "</contact>";
 
