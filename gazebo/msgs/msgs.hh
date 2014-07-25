@@ -267,6 +267,17 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Add a simple box link to a Model message.
+    /// The size and mass of the box are specified, and a
+    /// single collision is added, along with an inertial
+    /// block corresponding to box of uniform density.
+    /// \param[out] _msg The msgs::Model to which the link is added.
+    /// \param[in] _mass Mass of the box.
+    /// \param[in] _size Size of the box.
+    GAZEBO_VISIBLE
+    void AddBoxLink(msgs::Model &_msg, double _mass,
+                    const math::Vector3 &_size);
+
     /// \brief Create an SDF string from msgs::Model.
     /// \param[in] _sdf The msgs::Model object.
     /// \return sdf string.

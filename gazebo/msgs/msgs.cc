@@ -764,6 +764,45 @@ namespace gazebo
     }
 
     ////////////////////////////////////////////////////////
+    void AddBoxLink(msgs::Model &_msg, double _mass,
+                    const math::Vector3 &_size)
+    {
+      _msg.add_link();
+      int linkCount = _msg.link_size();
+      msgs::Link *link = _msg.mutable_link(linkCount-1);
+      {
+        std::ostringstream linkName;
+        linkName << "link" << linkCount;
+        link->set_name(linkName.str());
+      }
+
+      msgs::Inertial *inertial = link->mutable_inertial();
+      inertial->set_mass(_mass);
+      {
+        double dx = _size.x;
+        double dy = _size.y;
+        double dz = _size.z;
+        double ixx = _mass/12.0 * (dy*dy + dz*dz);
+        double iyy = _mass/12.0 * (dz*dz + dx*dx);
+        double izz = _mass/12.0 * (dx*dx + dy*dy);
+        inertial->set_ixx(ixx);
+        inertial->set_iyy(iyy);
+        inertial->set_izz(izz);
+        inertial->set_ixy(0.0);
+        inertial->set_ixz(0.0);
+        inertial->set_iyz(0.0);
+      }
+
+      link->add_collision();
+      msgs::Collision *collision = link->mutable_collision(0);
+      collision->set_name("collision");
+
+      msgs::Geometry *geometry = collision->mutable_geometry();
+      geometry->set_type(Geometry_Type_BOX);
+      msgs::Set(geometry->mutable_box()->mutable_size(), _size);
+    }
+
+    ////////////////////////////////////////////////////////
     std::string ToSDF(const msgs::Model &_msg)
     {
       std::ostringstream stream;

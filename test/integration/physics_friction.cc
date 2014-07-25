@@ -142,37 +142,18 @@ class PhysicsFrictionTest : public ServerFixture,
             model.set_name(modelName.str());
             msgs::Set(model.mutable_pose(), _opt.modelPose);
 
-            model.add_link();
+            msgs::AddBoxLink(model, _opt.mass, _opt.size);
             msgs::Link *link = model.mutable_link(0);
-            link->set_name("link");
             msgs::Set(link->mutable_pose(), _opt.linkPose);
 
             {
               msgs::Inertial *inertial = link->mutable_inertial();
-              inertial->set_mass(_opt.mass);
               msgs::Set(inertial->mutable_pose(), _opt.inertialPose);
-
-              double dx = _opt.size.x;
-              double dy = _opt.size.y;
-              double dz = _opt.size.z;
-              double ixx = _opt.mass/12.0 * (dy*dy + dz*dz);
-              double iyy = _opt.mass/12.0 * (dz*dz + dx*dx);
-              double izz = _opt.mass/12.0 * (dx*dx + dy*dy);
-
-              inertial->set_ixx(ixx);
-              inertial->set_iyy(iyy);
-              inertial->set_izz(izz);
             }
 
-            link->add_collision();
             msgs::Collision *collision = link->mutable_collision(0);
-            collision->set_name("collision");
             msgs::Set(collision->mutable_pose(), _opt.collisionPose);
 
-            msgs::Geometry *geometry = collision->mutable_geometry();
-            geometry->set_type(msgs::Geometry_Type_BOX);
-            msgs::Set(geometry->mutable_box()->mutable_size(),
-                      _opt.size);
             msgs::Friction *friction =
               collision->mutable_surface()->mutable_friction();
             friction->set_mu(_opt.friction1);

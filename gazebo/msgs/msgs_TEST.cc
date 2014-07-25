@@ -952,3 +952,61 @@ TEST_F(MsgsTest, InertialToSDF)
     EXPECT_DOUBLE_EQ(inertiaElem->Get<double>("izz"), izz);
   }
 }
+
+/////////////////////////////////////////////////
+TEST_F(MsgsTest, AddBoxLink)
+{
+  msgs::Model model;
+  EXPECT_EQ(model.link_size(), 0);
+
+  double mass = 1.0;
+  math::Vector3 size(1, 1, 1);
+  msgs::AddBoxLink(model, mass, size);
+  EXPECT_EQ(model.link_size(), 1);
+  {
+    const msgs::Link link = model.link(0);
+    EXPECT_EQ(link.name(), std::string("link1"));
+
+    const msgs::Inertial inertial = link.inertial();
+    EXPECT_DOUBLE_EQ(inertial.mass(), mass);
+    double ixx = inertial.ixx();
+    double iyy = inertial.iyy();
+    double izz = inertial.izz();
+    double ixy = inertial.ixy();
+    double ixz = inertial.ixz();
+    double iyz = inertial.iyz();
+    EXPECT_GT(ixx, 0.0);
+    EXPECT_GT(iyy, 0.0);
+    EXPECT_GT(izz, 0.0);
+    EXPECT_DOUBLE_EQ(ixy, 0.0);
+    EXPECT_DOUBLE_EQ(ixz, 0.0);
+    EXPECT_DOUBLE_EQ(iyz, 0.0);
+    // triangle inequality
+    EXPECT_GT(ixx + iyy, izz);
+    EXPECT_GT(iyy + izz, ixx);
+    EXPECT_GT(izz + ixx, iyy);
+
+    EXPECT_EQ(link.collision_size(), 1);
+    const msgs::Collision collision = link.collision(0);
+    const msgs::Geometry geometry = collision.geometry();
+    EXPECT_EQ(geometry.type(), msgs::Geometry_Type_BOX);
+    EXPECT_EQ(msgs::Convert(geometry.box().size()), size);
+  }
+
+  mass *= 2.0;
+  msgs::AddBoxLink(model, mass, size);
+  EXPECT_EQ(model.link_size(), 2);
+  {
+    msgs::Link link1 = model.link(0);
+    msgs::Link link2 = model.link(1);
+    EXPECT_EQ(link2.name(), std::string("link2"));
+
+    msgs::Inertial inertial1 = link1.inertial();
+    msgs::Inertial inertial2 = link2.inertial();
+
+    EXPECT_NEAR(inertial1.mass() * 2.0, inertial2.mass(), 1e-6);
+    EXPECT_NEAR(inertial1.ixx() * 2.0, inertial2.ixx(), 1e-6);
+    EXPECT_NEAR(inertial1.iyy() * 2.0, inertial2.iyy(), 1e-6);
+    EXPECT_NEAR(inertial1.izz() * 2.0, inertial2.izz(), 1e-6);
+  }
+}
