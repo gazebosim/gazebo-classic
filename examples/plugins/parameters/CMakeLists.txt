@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 find_package(Boost REQUIRED system)
+include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
 find_package(gazebo REQUIRED)
