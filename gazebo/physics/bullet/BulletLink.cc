@@ -147,6 +147,7 @@ void BulletLink::Init()
   this->rigidLink->setUserPointer(this);
   this->rigidLink->setCollisionFlags(this->rigidLink->getCollisionFlags() |
       btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
+  this->rigidLink->setFlags(BT_ENABLE_GYROPSCOPIC_FORCE);
 
   /// \TODO: get friction from collision object
   this->rigidLink->setAnisotropicFriction(btVector3(1, 1, 1),
