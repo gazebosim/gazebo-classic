@@ -23,19 +23,29 @@
 
 using namespace gazebo;
 
+// physics engine
+// dt
+// repetitions
+typedef std::tr1::tuple<const char *
+                      , double
+                      , int
+                      > char1double1int1;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<const char*>
+                      public testing::WithParamInterface<char1double1int1>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
-  public: void OneBox(const std::string &_physicsEngine);
+  /// \param[in] _dt Max time step size.
+  public: void OneBox(const std::string &_physicsEngine,
+                      double _dt);
 };
 
 /////////////////////////////////////////////////
 // OneBox:
 // Spawn a single box and record accuracy for momentum and enery
 // conservation
-void RigidBodyTest::OneBox(const std::string &_physicsEngine)
+void RigidBodyTest::OneBox(const std::string &_physicsEngine,
+                           double _dt)
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -67,16 +77,26 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine)
   physics::LinkPtr link = model->GetLink();
   ASSERT_TRUE(link != NULL);
 
-  // Give initial impulse to set initial conditions
+  // Give impulses to set initial conditions
+  // This is because SimbodyLink::Set*Vel aren't implemented
   link->SetForce(math::Vector3(1e0, 1e1, 1e2));
   link->SetTorque(math::Vector3(1e4, 1e3, 1e2));
   world->Step(1);
+  gzdbg << "energy0: " << link->GetWorldEnergy() << std::endl;
+
+  // change step size after impulses
+  physics->SetMaxStepSize(_dt);
+  const double simDuration = 10.0;
+  int steps = floor(simDuration / _dt);
 
   // initial time
   common::Time t0 = world->GetSimTime();
 
+  // initial linear position in global frame
+  math::Vector3 p0 = link->GetWorldInertialPose().pos;
+
   // initial linear velocity in global frame
-  math::Vector3 v0 = link->GetWorldAngularVel();
+  math::Vector3 v0 = link->GetWorldCoGLinearVel();
 
   // initial angular momentum in global frame
   math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
@@ -86,11 +106,13 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine)
   double E0 = link->GetWorldEnergy();
 
   // variables to compute statistics on
+  math::Vector3Stats linearPositionError;
   math::Vector3Stats linearVelocityError;
   math::Vector3Stats angularMomentumError;
   math::SignalStats energyError;
   {
-    const std::string statNames = "MaxAbs,Rms";
+    const std::string statNames = "MaxAbs";
+    EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
     EXPECT_TRUE(angularMomentumError.InsertStatistics(statNames));
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
@@ -99,16 +121,26 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine)
   // unthrottle update rate
   physics->SetRealTimeUpdateRate(0.0);
   common::Time startTime = common::Time::GetWallTime();
-  for (int i = 0; i < 15000; ++i)
+  for (int i = 0; i < steps; ++i)
   {
     world->Step(1);
 
+    // current time
+    double t = (world->GetSimTime() - t0).Double();
+
+    // linear velocity error
+    math::Vector3 v = link->GetWorldCoGLinearVel();
+    linearVelocityError.InsertData(v - (v0 + g*t));
+
+    // linear position error
+    math::Vector3 p = link->GetWorldInertialPose().pos;
+    linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
+
     // angular momentum error
-    math::Vector3 H = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
+    math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
     angularMomentumError.InsertData((H - H0) / H0mag);
 
     // energy error
-    gzerr << (link->GetWorldEnergy() - E0) / E0 << std::endl;
     energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
@@ -116,18 +148,38 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine)
   this->Record("simTime", world->GetSimTime().Double());
 
   // Record statistics on pitch and yaw angles
+  this->Record("energy0", E0);
   this->Record("energyError", energyError);
+  this->Record("angMomentum0", H0mag);
   this->Record("angMomentumErr", angularMomentumError.mag);
+  this->Record("linPositionErr", linearPositionError.mag);
+  this->Record("linVelocityErr", linearVelocityError.mag);
 }
 
 /////////////////////////////////////////////////
 TEST_P(RigidBodyTest, OneBox)
 {
-  OneBox(GetParam());
+  std::string physicsEngine = std::tr1::get<0>(GetParam());
+  double dt                 = std::tr1::get<1>(GetParam());
+  int repetitions           = std::tr1::get<2>(GetParam());
+  gzdbg << physicsEngine
+        << ", dt: " << dt
+        << ", repeat: " << repetitions
+        << std::endl;
+  OneBox(physicsEngine, dt);
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, RigidBodyTest,
-                        PHYSICS_ENGINE_VALUES);
+// INSTANTIATE_TEST_CASE_P(Engines, RigidBodyTest,
+//   ::testing::Combine(PHYSICS_ENGINE_VALUES
+//   , ::testing::Values(1e-3)
+//   , ::testing::Values(1)
+//   ));
+
+INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Range(1e-4, 1.01e-3, 4e-4)
+  , ::testing::Range(0, 1)
+  ));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
