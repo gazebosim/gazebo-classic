@@ -37,20 +37,20 @@ class RigidBodyTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
   /// \param[in] _iterations Number of iterations.
-  public: void OneBox(const std::string &_physicsEngine
-                    , double _dt
-                    , int _iterations
-                    );
+  public: void Boxes(const std::string &_physicsEngine
+                   , double _dt
+                   , int _iterations
+                   );
 };
 
 /////////////////////////////////////////////////
-// OneBox:
+// Boxes:
 // Spawn a single box and record accuracy for momentum and enery
 // conservation
-void RigidBodyTest::OneBox(const std::string &_physicsEngine
-                         , double _dt
-                         , int _iterations
-                         )
+void RigidBodyTest::Boxes(const std::string &_physicsEngine
+                        , double _dt
+                        , int _iterations
+                        )
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -176,7 +176,7 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine
 }
 
 /////////////////////////////////////////////////
-TEST_P(RigidBodyTest, OneBox)
+TEST_P(RigidBodyTest, Boxes)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
@@ -185,19 +185,19 @@ TEST_P(RigidBodyTest, OneBox)
         << ", dt: " << dt
         << ", iters: " << iterations
         << std::endl;
-  OneBox(physicsEngine, dt, iterations);
+  Boxes(physicsEngine, dt, iterations);
 }
 
 // INSTANTIATE_TEST_CASE_P(Engines, RigidBodyTest,
 //   ::testing::Combine(PHYSICS_ENGINE_VALUES
 //   , ::testing::Values(1e-3)
-//   , ::testing::Values(1)
+//   , ::testing::Values(50)
 //   ));
 
 INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(1e-4, 1.01e-3, 4e-4)
-  , ::testing::Range(50, 51)
+  , ::testing::Values(50)
   ));
 
 INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
