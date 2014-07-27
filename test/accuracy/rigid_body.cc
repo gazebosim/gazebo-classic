@@ -25,7 +25,7 @@ using namespace gazebo;
 
 // physics engine
 // dt
-// repetitions
+// number of iterations
 typedef std::tr1::tuple<const char *
                       , double
                       , int
@@ -36,16 +36,21 @@ class RigidBodyTest : public ServerFixture,
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
-  public: void OneBox(const std::string &_physicsEngine,
-                      double _dt);
+  /// \param[in] _iterations Number of iterations.
+  public: void OneBox(const std::string &_physicsEngine
+                    , double _dt
+                    , int _iterations
+                    );
 };
 
 /////////////////////////////////////////////////
 // OneBox:
 // Spawn a single box and record accuracy for momentum and enery
 // conservation
-void RigidBodyTest::OneBox(const std::string &_physicsEngine,
-                           double _dt)
+void RigidBodyTest::OneBox(const std::string &_physicsEngine
+                         , double _dt
+                         , int _iterations
+                         )
 {
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
@@ -86,6 +91,20 @@ void RigidBodyTest::OneBox(const std::string &_physicsEngine,
 
   // change step size after impulses
   physics->SetMaxStepSize(_dt);
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    gzdbg << "iters: "
+          << boost::any_cast<int>(physics->GetParam("iters"))
+          << std::endl;
+    physics->SetParam("iters", _iterations);
+  }
+  // else if (_physicsEngine == "simbody")
+  // {
+  //   gzdbg << "accuracy: "
+  //         << boost::any_cast<double>(physics->GetParam("accuracy"))
+  //         << std::endl;
+  //   physics->SetParam("accuracy", 1.0 / static_cast<float>(_iterations));
+  // }
   const double simDuration = 10.0;
   int steps = floor(simDuration / _dt);
 
@@ -161,12 +180,12 @@ TEST_P(RigidBodyTest, OneBox)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
-  int repetitions           = std::tr1::get<2>(GetParam());
+  int iterations            = std::tr1::get<2>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
-        << ", repeat: " << repetitions
+        << ", iters: " << iterations
         << std::endl;
-  OneBox(physicsEngine, dt);
+  OneBox(physicsEngine, dt, iterations);
 }
 
 // INSTANTIATE_TEST_CASE_P(Engines, RigidBodyTest,
@@ -178,7 +197,13 @@ TEST_P(RigidBodyTest, OneBox)
 INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(1e-4, 1.01e-3, 4e-4)
-  , ::testing::Range(0, 1)
+  , ::testing::Range(50, 51)
+  ));
+
+INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode", "bullet")
+  , ::testing::Values(1e-3)
+  , ::testing::Range(10, 151, 20)
   ));
 
 /////////////////////////////////////////////////
