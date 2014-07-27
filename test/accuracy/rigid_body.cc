@@ -26,20 +26,28 @@ using namespace gazebo;
 // physics engine
 // dt
 // number of iterations
+// gravity on / off
+// collision shape on / off
 typedef std::tr1::tuple<const char *
                       , double
                       , int
-                      > char1double1int1;
+                      , bool
+                      , bool
+                      > char1double1int1bool2;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int1>
+                      public testing::WithParamInterface<char1double1int1bool2>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
   /// \param[in] _iterations Number of iterations.
+  /// \param[in] _gravity Flag for turning gravity on / off.
+  /// \param[in] _collision Flag for turning collisions on / off.
   public: void Boxes(const std::string &_physicsEngine
                    , double _dt
                    , int _iterations
+                   , bool _gravity
+                   , bool _collision
                    );
 };
 
@@ -50,6 +58,8 @@ class RigidBodyTest : public ServerFixture,
 void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , double _dt
                         , int _iterations
+                        , bool _gravity
+                        , bool _collision
                         )
 {
   // Load a blank world (no ground plane)
@@ -63,6 +73,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // get gravity value
+  if (!_gravity)
+  {
+    physics->SetGravity(math::Vector3::Zero);
+  }
   math::Vector3 g = physics->GetGravity();
 
   // Box size
@@ -75,6 +89,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   msgs::Model msgModel;
   msgModel.set_name(this->GetUniqueString("model"));
   msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+  if (!_collision)
+  {
+    msgModel.mutable_link(0)->clear_collision();
+  }
 
   physics::ModelPtr model = this->SpawnModel(msgModel);
   ASSERT_TRUE(model != NULL);
@@ -181,29 +199,60 @@ TEST_P(RigidBodyTest, Boxes)
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
   int iterations            = std::tr1::get<2>(GetParam());
+  bool gravity              = std::tr1::get<3>(GetParam());
+  bool collisions           = std::tr1::get<4>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
+        << ", gravity: " << gravity
+        << ", collisions: " << collisions
         << std::endl;
-  Boxes(physicsEngine, dt, iterations);
+  Boxes(physicsEngine
+      , dt
+      , iterations
+      , gravity
+      , collisions
+      );
 }
 
 // INSTANTIATE_TEST_CASE_P(Engines, RigidBodyTest,
 //   ::testing::Combine(PHYSICS_ENGINE_VALUES
 //   , ::testing::Values(1e-3)
 //   , ::testing::Values(50)
+//   , ::testing::Values(true)
+//   , ::testing::Values(true)
 //   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
+// INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
+//   ::testing::Combine(PHYSICS_ENGINE_VALUES
+//   , ::testing::Range(1e-4, 1.01e-3, 4e-4)
+//   , ::testing::Values(50)
+//   , ::testing::Values(true)
+//   , ::testing::Values(true)
+//   ));
+
+// INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
+//   ::testing::Combine(::testing::Values("ode", "bullet")
+//   , ::testing::Values(1e-3)
+//   , ::testing::Range(10, 151, 20)
+//   , ::testing::Values(true)
+//   , ::testing::Values(true)
+//   ));
+
+INSTANTIATE_TEST_CASE_P(EnginesGravity, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(1e-4, 1.01e-3, 4e-4)
+  , ::testing::Values(1e-3)
   , ::testing::Values(50)
+  , ::testing::Bool()
+  , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode", "bullet")
+INSTANTIATE_TEST_CASE_P(EnginesCollision, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(1e-3)
-  , ::testing::Range(10, 151, 20)
+  , ::testing::Values(50)
+  , ::testing::Values(true)
+  , ::testing::Bool()
   ));
 
 /////////////////////////////////////////////////
