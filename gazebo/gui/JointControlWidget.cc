@@ -69,22 +69,22 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  this->pGainSpin->setMinimum(0.0);
   this->pGainSpin->setSingleStep(0.01);
   this->pGainSpin->setDecimals(3);
   this->pGainSpin->setValue(1.000);
+  this->pGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   this->iGainSpin = new QDoubleSpinBox;
-  this->iGainSpin->setMinimum(0.0);
   this->iGainSpin->setSingleStep(0.01);
   this->iGainSpin->setDecimals(3);
   this->iGainSpin->setValue(0.100);
+  this->iGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   this->dGainSpin = new QDoubleSpinBox;
-  this->dGainSpin->setMinimum(0.0);
   this->dGainSpin->setSingleStep(0.01);
   this->dGainSpin->setDecimals(3);
   this->dGainSpin->setValue(0.010);
+  this->dGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   _layout->addWidget(this->posSpin, _index, 2);
   _layout->addWidget(pGainSpin, _index, 3);
@@ -165,28 +165,28 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  posSpin->setRange(-1000, 1000);
-  posSpin->setSingleStep(0.001);
-  posSpin->setDecimals(3);
-  posSpin->setValue(0.000);
+  this->posSpin->setRange(-1000, 1000);
+  this->posSpin->setSingleStep(0.001);
+  this->posSpin->setDecimals(3);
+  this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  pGainSpin->setMinimum(0.0);
-  pGainSpin->setSingleStep(0.01);
-  pGainSpin->setDecimals(3);
-  pGainSpin->setValue(1.000);
+  this->pGainSpin->setSingleStep(0.01);
+  this->pGainSpin->setDecimals(3);
+  this->pGainSpin->setValue(1.000);
+  this->pGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   this->iGainSpin = new QDoubleSpinBox;
-  iGainSpin->setMinimum(0.0);
-  iGainSpin->setSingleStep(0.01);
-  iGainSpin->setDecimals(3);
-  iGainSpin->setValue(0.100);
+  this->iGainSpin->setSingleStep(0.01);
+  this->iGainSpin->setDecimals(3);
+  this->iGainSpin->setValue(0.100);
+  this->iGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   this->dGainSpin = new QDoubleSpinBox;
-  dGainSpin->setMinimum(0.0);
-  dGainSpin->setSingleStep(0.01);
-  dGainSpin->setDecimals(3);
-  dGainSpin->setValue(0.010);
+  this->dGainSpin->setSingleStep(0.01);
+  this->dGainSpin->setDecimals(3);
+  this->dGainSpin->setValue(0.010);
+  this->dGainSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
 
   _layout->addWidget(posSpin, _index, 2);
   _layout->addWidget(pGainSpin, _index, 3);
