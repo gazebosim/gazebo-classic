@@ -15,6 +15,7 @@
  *
 */
 
+#include <vector>
 #include <gtest/gtest.h>
 #include "gazebo/math/Kmeans.hh"
 #include "test/util.hh"
@@ -80,7 +81,7 @@ TEST_F(KmeansTest, Kmeans)
   EXPECT_EQ(labels[7], labels[8]);
   EXPECT_EQ(labels[8], labels[9]);
 
-  // Check the centroids
+  // Check the centroids.
   math::Vector3 expectedCentroid1(1.2, 1.0, 0.0);
   math::Vector3 expectedCentroid2(5.2, 1.0, 0.0);
   if (centroids[0] == expectedCentroid1)
