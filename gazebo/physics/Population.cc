@@ -105,16 +105,14 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   else
   {
     gzerr << "Unrecognized combination of region [" << region << "] and "
-              << "distribution [" << distribution << "]" << std::endl;
+          << "distribution [" << distribution << "]" << std::endl;
     return false;
   }
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
-  sdf.SetFromString(
-    "<sdf version ='1.5'>" + modelSdf + "</sdf>");
+  sdf.SetFromString("<sdf version ='1.5'>" + modelSdf + "</sdf>");
 
-  std::vector<ModelPtr> clonedModels;
   for (size_t i = 0; i < objects.size(); ++i)
   {
     math::Vector3 p(objects[i].x, objects[i].y, objects[i].z);
@@ -388,7 +386,7 @@ void Population::PopulateCuboidLinearY(int _modelCount,
 {
   double dy = fabs(_max.y - _min.y);
 
-  // Evenly placed in a row along the global x-axis.
+  // Evenly placed in a row along the global y-axis.
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
   {
@@ -407,7 +405,7 @@ void Population::PopulateCuboidLinearZ(int _modelCount,
 {
   double dz = fabs(_max.z - _min.z);
 
-  // Evenly placed in a row along the global x-axis.
+  // Evenly placed in a row along the global z-axis.
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
   {

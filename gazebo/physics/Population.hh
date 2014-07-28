@@ -55,8 +55,12 @@ namespace gazebo
       /// otherwise.
       private: bool PopulateOne(const sdf::ElementPtr _population);
 
-      /// \brief Parse the sdf file.
-      /// \param[in] _population SDF parameters.
+      /// \brief Parse the sdf file. Some of the output parameters should be
+      /// ignored depending on the region's population. For example, if the
+      /// region is a cuboid, the parameters '_center', 'radius', and 'height'
+      /// should not be used.
+      /// \param[in] _population SDF element containing the Population
+      /// description.
       /// \param[out] _min Minimum corner of the cuboid containing the models.
       /// \param[out] _max Maximum corner of the cuboid containing the models.
       /// \param[out] _rows Number of rows used when the models are
@@ -106,8 +110,7 @@ namespace gazebo
         const math::Vector3 &_min, const math::Vector3 &_max,
         std::vector<math::Vector3> &_poses);
 
-      /// \brief Populate a vector of poses with '_modelCount' elements,
-      /// evenly placed in a 2D grid pattern.
+      /// \brief Populate a vector of poses evenly placed in a 2D grid pattern.
       /// \param[in] _min Minimum corner of the cuboid containing the models.
       /// \param[in] _rows Number of rows used when the models are
       /// distributed as a 2D grid.
@@ -183,7 +186,7 @@ namespace gazebo
         const math::Vector3 &_center, double _radius, double _height,
         std::vector<math::Vector3> &_poses);
 
-      /// \brief The world's SDF values.
+      /// \brief The Population's SDF values.
       private: sdf::ElementPtr populationElem;
 
       /// \brief Pointer to the world.
