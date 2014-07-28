@@ -56,6 +56,19 @@ bool Kmeans::Observations(const std::vector<Vector3> &_obs)
 }
 
 //////////////////////////////////////////////////
+bool Kmeans::AppendObservations(const std::vector<Vector3> &_obs)
+{
+  if (_obs.empty())
+  {
+    std::cerr << "Kmeans::AppendObservations() error: input vector is empty"
+              << std::endl;
+    return false;
+  }
+  this->obs.insert(this->obs.end(), _obs.begin(), _obs.end());
+  return true;
+}
+
+//////////////////////////////////////////////////
 bool Kmeans::Cluster(int _k,
                      std::vector<Vector3> &_centroids,
                      std::vector<unsigned int> &_labels)

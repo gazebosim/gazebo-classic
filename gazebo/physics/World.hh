@@ -797,6 +797,10 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \brief This mutex is used to by the ::RemoveModel and
+      /// ::ProcessFactoryMsgs functions.
+      private: boost::mutex factoryDeleteMutex;
     };
     /// \}
   }

@@ -5,6 +5,9 @@
 1. **gazebo/physics/Population.hh**
     + ***New class:*** Population
 
+1. **gazebo/math/Kmeans.hh**
+    + ***New class:*** Kmeans
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations

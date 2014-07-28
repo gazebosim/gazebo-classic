@@ -15,6 +15,7 @@
  *
 */
 
+#include <vector>
 #include <gtest/gtest.h>
 #include "gazebo/math/Kmeans.hh"
 #include "test/util.hh"
@@ -80,7 +81,7 @@ TEST_F(KmeansTest, Kmeans)
   EXPECT_EQ(labels[7], labels[8]);
   EXPECT_EQ(labels[8], labels[9]);
 
-  // Check the centroids
+  // Check the centroids.
   math::Vector3 expectedCentroid1(1.2, 1.0, 0.0);
   math::Vector3 expectedCentroid2(5.2, 1.0, 0.0);
   if (centroids[0] == expectedCentroid1)
@@ -96,4 +97,35 @@ TEST_F(KmeansTest, Kmeans)
 
   // Try to use a k > num_observations.
   EXPECT_FALSE(kmeans.Cluster(obs.size() + 1, centroids, labels));
+}
+
+//////////////////////////////////////////////////
+TEST_F(KmeansTest, Append)
+{
+  // Create some observations.
+  std::vector<math::Vector3> obs, obs2, obsTotal;
+  obs.push_back(math::Vector3(1.0, 1.0, 0.0));
+  obs.push_back(math::Vector3(1.1, 1.0, 0.0));
+  obs.push_back(math::Vector3(1.2, 1.0, 0.0));
+  obs.push_back(math::Vector3(1.3, 1.0, 0.0));
+  obs.push_back(math::Vector3(1.4, 1.0, 0.0));
+
+  obs2.push_back(math::Vector3(5.0, 1.0, 0.0));
+  obs2.push_back(math::Vector3(5.1, 1.0, 0.0));
+  obs2.push_back(math::Vector3(5.2, 1.0, 0.0));
+  obs2.push_back(math::Vector3(5.3, 1.0, 0.0));
+  obs2.push_back(math::Vector3(5.4, 1.0, 0.0));
+
+  obsTotal.insert(obsTotal.end(), obs.begin(), obs.end());
+  obsTotal.insert(obsTotal.end(), obs2.begin(), obs2.end());
+
+  // Initialize Kmeans with two partitions.
+  math::Kmeans kmeans(obs);
+
+  kmeans.AppendObservations(obs2);
+
+  std::vector<math::Vector3> obsCopy;
+  obsCopy = kmeans.Observations();
+  for (unsigned int i = 0; i < obsTotal.size(); ++i)
+    EXPECT_EQ(obsTotal[i], obsCopy[i]);
 }

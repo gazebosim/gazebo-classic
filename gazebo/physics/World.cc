@@ -1680,8 +1680,7 @@ void World::ProcessFactoryMsgs()
   {
     try
     {
-      boost::recursive_mutex::scoped_lock lock(
-          *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+      boost::mutex::scoped_lock lock(this->factoryDeleteMutex);
 
       ModelPtr model = this->LoadModel(*iter2, this->rootElement);
       model->Init();
@@ -2014,11 +2013,10 @@ uint32_t World::GetIterations() const
 //////////////////////////////////////////////////
 void World::RemoveModel(const std::string &_name)
 {
+  boost::mutex::scoped_lock flock(this->factoryDeleteMutex);
+
   // Remove all the dirty poses from the delete entity.
   {
-    boost::recursive_mutex::scoped_lock lock(
-        *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
-
     for (std::list<Entity*>::iterator iter2 = this->dirtyPoses.begin();
         iter2 != this->dirtyPoses.end();)
     {
