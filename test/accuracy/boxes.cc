@@ -228,7 +228,7 @@ TEST_P(RigidBodyTest, Boxes)
         << ", collisions: " << collisions
         << std::endl;
   RecordProperty("engine", physicsEngine);
-  RecordProperty("dt", dt);
+  this->Record("dt", dt);
   RecordProperty("iters", iterations);
   RecordProperty("boxCount", boxCount);
   RecordProperty("gravity", gravity);
@@ -251,6 +251,42 @@ INSTANTIATE_TEST_CASE_P(EnginesDtGravity, RigidBodyTest,
   , ::testing::Values(true)
   ));
 
+INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(3.26e-4)
+  , ::testing::Values(50)
+  , ::testing::Range(1, 105, 20)
+  , ::testing::Values(true)
+  , ::testing::Values(true)
+  ));
+
+INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
+  ::testing::Combine(::testing::Values("bullet")
+  , ::testing::Values(3.26e-4)
+  , ::testing::Values(50)
+  , ::testing::Range(1, 105, 20)
+  , ::testing::Values(true)
+  , ::testing::Values(true)
+  ));
+
+INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
+  ::testing::Combine(::testing::Values("simbody")
+  , ::testing::Values(6.52e-4)
+  , ::testing::Values(50)
+  , ::testing::Range(1, 105, 20)
+  , ::testing::Values(true)
+  , ::testing::Values(true)
+  ));
+
+INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
+  ::testing::Combine(::testing::Values("dart")
+  , ::testing::Values(6.10e-4)
+  , ::testing::Values(50)
+  , ::testing::Range(1, 105, 20)
+  , ::testing::Values(true)
+  , ::testing::Values(true)
+  ));
+
 // INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
 //   ::testing::Combine(::testing::Values("ode", "bullet")
 //   , ::testing::Values(1e-3)
@@ -269,14 +305,14 @@ INSTANTIATE_TEST_CASE_P(EnginesDtGravity, RigidBodyTest,
 //   , ::testing::Bool()
 //   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesBoxes, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(1e-3)
-  , ::testing::Values(50)
-  , ::testing::Range(1, 105, 20)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  ));
+// INSTANTIATE_TEST_CASE_P(EnginesBoxes, RigidBodyTest,
+//   ::testing::Combine(PHYSICS_ENGINE_VALUES
+//   , ::testing::Values(1e-3)
+//   , ::testing::Values(50)
+//   , ::testing::Range(1, 105, 20)
+//   , ::testing::Values(true)
+//   , ::testing::Values(true)
+//   ));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
