@@ -199,8 +199,9 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
-  this->Record("elapsedWallTime", elapsedTime.Double());
+  this->Record("wallTime", elapsedTime.Double());
   this->Record("simTime", world->GetSimTime().Double());
+  this->Record("timeRatio", elapsedTime.Double() / world->GetSimTime().Double());
 
   // Record statistics on pitch and yaw angles
   this->Record("energy0", E0);
