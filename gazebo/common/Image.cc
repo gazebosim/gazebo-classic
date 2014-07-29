@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,14 @@
  * Date: 14 July 2008
  */
 
-#include <unistd.h>
-#include <dirent.h>
-#include <string.h>
-
-#include <iostream>
 #include <boost/filesystem.hpp>
+#include <string>
 
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/common/SystemPaths.hh"
+#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -270,7 +266,7 @@ unsigned int Image::GetBPP() const
 }
 
 //////////////////////////////////////////////////
-Color Image::GetPixel(unsigned int _x, unsigned int _y)
+Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 {
   Color clr;
 
@@ -346,7 +342,7 @@ Color Image::GetAvgColor()
 }
 
 //////////////////////////////////////////////////
-Color Image::GetMaxColor()
+Color Image::GetMaxColor() const
 {
   unsigned int x, y;
   Color clr;
@@ -437,4 +433,3 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
 
   return UNKNOWN_PIXEL_FORMAT;
 }
-

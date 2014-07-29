@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,14 @@ Entity::Entity(BasePtr _parent)
 
   this->visualMsg = new msgs::Visual;
   this->visualMsg->set_id(this->id);
-  this->visualMsg->set_parent_name(this->world->GetName());
+
+  if (this->world)
+    this->visualMsg->set_parent_name(this->world->GetName());
+  else
+  {
+    gzerr << "No world set when constructing an Entity.\n";
+    this->visualMsg->set_parent_name("no_world_name");
+  }
 
   if (this->parent && this->parent->HasType(ENTITY))
   {
@@ -96,7 +103,6 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   this->visualMsg->set_name(this->GetScopedName());
 
-  if (this->sdf->HasElement("pose"))
   {
     if (this->parent && this->parentEntity)
       this->worldPose = this->sdf->Get<math::Pose>("pose") +
@@ -144,7 +150,7 @@ void Entity::SetStatic(const bool &_s)
 
   this->isStatic = _s;
 
-  for (iter = this->children.begin(); iter != this->childrenEnd; ++iter)
+  for (iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     EntityPtr e = boost::dynamic_pointer_cast<Entity>(*iter);
     if (e)
@@ -276,7 +282,7 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
     {
       // force an update of all children
       for  (Base_V::iterator iter = this->children.begin();
-            iter != this->childrenEnd; ++iter)
+            iter != this->children.end(); ++iter)
       {
         if ((*iter)->HasType(ENTITY))
         {
@@ -310,7 +316,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
   // update all children pose, moving them with the model.
   // The outer loop updates all the links.
   for (Base_V::iterator iter = this->children.begin();
-      iter != this->childrenEnd; ++iter)
+      iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(ENTITY))
     {
@@ -327,6 +333,19 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
       if (_notify)
         entity->UpdatePhysicsPose(false);
+
+      // Tell collisions that their current world pose is dirty (needs
+      // updating). We set a dirty flag instead of directly updating the
+      // value to improve performance.
+      for (Base_V::iterator iterC = (*iter)->children.begin();
+           iterC != (*iter)->children.end(); ++iterC)
+      {
+        if ((*iterC)->HasType(COLLISION))
+        {
+          CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+          entityC->SetWorldPoseDirty();
+        }
+      }
     }
   }
 }
@@ -355,6 +374,19 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     if (_publish)
       this->parentEntity->PublishPose();
+
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (Base_V::iterator iterC = this->children.begin();
+        iterC != this->children.end(); ++iterC)
+    {
+      if ((*iterC)->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+        entityC->SetWorldPoseDirty();
+      }
+    }
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["
@@ -422,7 +454,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (_updateChildren)
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       if ((*iter)->HasType(LINK))
       {
@@ -438,7 +470,7 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
   if (this->IsStatic())
   {
     for (Base_V::iterator iter = this->children.begin();
-         iter != this->childrenEnd; ++iter)
+         iter != this->children.end(); ++iter)
     {
       CollisionPtr coll = boost::static_pointer_cast<Collision>(*iter);
       if (coll && (*iter)->HasType(COLLISION))
@@ -582,14 +614,8 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  math::Box box;
-  for (Base_V::const_iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    box += this->GetCollisionBoundingBoxHelper(*iter);
-  }
-
-  return box;
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
+  this->GetCollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////

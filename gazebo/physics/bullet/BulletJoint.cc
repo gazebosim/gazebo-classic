@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  * Author: Nate Koenig, Andrew Howard
  * Date: 15 May 2009
  */
+
+#include <string>
 
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
@@ -61,10 +63,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -80,10 +78,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -106,7 +100,7 @@ void BulletJoint::Reset()
 }
 
 //////////////////////////////////////////////////
-LinkPtr BulletJoint::GetJointLink(int _index) const
+LinkPtr BulletJoint::GetJointLink(unsigned int _index) const
 {
   LinkPtr result;
 
@@ -363,12 +357,11 @@ void BulletJoint::SetupJointFeedback()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetDamping(int _index, double _damping)
+void BulletJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      this->stiffnessCoefficient[_index],
+    this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
   }
   else
@@ -381,12 +374,11 @@ void BulletJoint::SetDamping(int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffness(int _index, double _stiffness)
+void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
-    this->SetStiffnessDamping(static_cast<unsigned int>(_index),
-      _stiffness,
+    this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
   }
   else
@@ -436,7 +428,7 @@ void BulletJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetForce(int _index, double _force)
+void BulletJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
   this->SaveForce(_index, force);
@@ -448,11 +440,11 @@ void BulletJoint::SetForce(int _index, double _force)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SaveForce(int _index, double _force)
+void BulletJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index >= 0 && static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (_index < this->GetAngleCount())
   {
     if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
     {
@@ -503,4 +495,74 @@ void BulletJoint::ApplyStiffnessDamping()
 
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetAnchor(unsigned int /*_index*/,
+    const gazebo::math::Vector3 & /*_anchor*/)
+{
+  // nothing to do here for bullet.
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetLinkForce(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
+{
+  gzerr << "Not implement in Bullet\n";
+  return math::Vector3();
+}
+
+//////////////////////////////////////////////////
+void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
+    double /*_value*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/,
+    const boost::any &/*_value*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
+double BulletJoint::GetParam(const std::string &/*_key*/,
+    unsigned int /*_index*/)
+{
+  gzdbg << "Not implement in Bullet\n";
+  return 0;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetHighStop(unsigned int _index)
+{
+  return this->GetUpperLimit(_index);
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetLowStop(unsigned int _index)
+{
+  return this->GetLowerLimit(_index);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

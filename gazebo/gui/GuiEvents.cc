@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,6 @@ event::EventT<void ()> Events::fps;
 event::EventT<void ()> Events::orbit;
 event::EventT<void (std::string)> Events::keyPress;
 event::EventT<void (const msgs::Model &)> Events::modelUpdate;
+event::EventT<void (const msgs::Light &)> Events::lightUpdate;
 event::EventT<void (int)> Events::inputStepSize;
 event::EventT<void (const std::string &)> Events::follow;

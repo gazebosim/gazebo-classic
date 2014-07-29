@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,6 @@ ModelRightMenu::ModelRightMenu()
 {
   KeyEventHandler::Instance()->AddReleaseFilter("ModelRightMenu",
         boost::bind(&ModelRightMenu::OnKeyRelease, this, _1));
-
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->requestSub = this->node->Subscribe("~/request",
-      &ModelRightMenu::OnRequest, this);
 
   this->moveToAct = new QAction(tr("Move To"), this);
   this->moveToAct->setStatusTip(tr("Move camera to the selection"));
@@ -106,6 +101,17 @@ ModelRightMenu::ModelRightMenu()
   //         SLOT(OnSkeleton()));
 }
 
+//////////////////////////////////////////////////
+bool ModelRightMenu::Init()
+{
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->requestSub = this->node->Subscribe("~/request",
+      &ModelRightMenu::OnRequest, this);
+
+  return true;
+}
+
 /////////////////////////////////////////////////
 bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 {
@@ -133,6 +139,7 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
   QMenu menu;
   menu.addAction(this->moveToAct);
   menu.addAction(this->followAct);
+
   // menu.addAction(this->snapBelowAct);
 
   // Create the view menu
@@ -149,6 +156,13 @@ void ModelRightMenu::Run(const std::string &_modelName, const QPoint &_pt)
       (*iter)->action->setChecked((*iter)->globalEnable);
     else
       (*iter)->action->setChecked(modelIter->second);
+  }
+
+  if (g_copyAct && g_pasteAct)
+  {
+    menu.addSeparator();
+    menu.addAction(g_copyAct);
+    menu.addAction(g_pasteAct);
   }
 
   menu.addSeparator();

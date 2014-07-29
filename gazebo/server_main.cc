@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,10 @@ int main(int argc, char **argv)
   {
     // Initialize the informational logger. This will log warnings, and
     // errors.
-    gazebo::common::Console::Instance()->Init("gzserver.log");
+    gzLogInit("gzserver.log");
 
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
-
-    // Output the version of Gazebo.
-    gzlog << GAZEBO_VERSION_HEADER << std::endl;
 
     server = new gazebo::Server();
     if (!server->ParseArgs(argc, argv))
@@ -51,6 +48,7 @@ int main(int argc, char **argv)
 
     server->Fini();
     delete server;
+    return -1;
   }
 
   return 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -52,13 +51,13 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
+  this->initialized = false;
 }
 
 /////////////////////////////////////////////////
 Server::~Server()
 {
   fflush(stdout);
-  delete this->master;
 }
 
 /////////////////////////////////////////////////
@@ -86,11 +85,12 @@ bool Server::ParseArgs(int _argc, char **_argv)
 
   po::options_description visibleDesc("Options");
   visibleDesc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet|simbody).")
+     "Specify a physics engine (ode|bullet|dart|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
@@ -101,7 +101,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
-    ("minimal_comms", "Reduce the messages output by gzserver")
+    ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
@@ -132,6 +132,12 @@ bool Server::ParseArgs(int _argc, char **_argv)
     return false;
   }
 
+  if (this->vm.count("version"))
+  {
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
+    return false;
+  }
+
   if (this->vm.count("help"))
   {
     this->PrintUsage();
@@ -139,10 +145,11 @@ bool Server::ParseArgs(int _argc, char **_argv)
     return false;
   }
 
-  if (this->vm.count("quiet"))
-    gazebo::common::Console::Instance()->SetQuiet(true);
-  else
-    gazebo::print_version();
+  if (this->vm.count("verbose"))
+  {
+    gazebo::printVersion();
+    gazebo::common::Console::SetQuiet(false);
+  }
 
   if (this->vm.count("minimal_comms"))
     gazebo::transport::setMinimalComms(true);
@@ -171,7 +178,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 
@@ -256,7 +263,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
   }
 
   this->ProcessParams();
-  this->Init();
 
   return true;
 }
@@ -264,7 +270,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->stop && !transport::is_stopped();
+  return !this->stop && this->initialized;
 }
 
 /////////////////////////////////////////////////
@@ -320,29 +326,14 @@ bool Server::LoadString(const std::string &_sdfString)
 /////////////////////////////////////////////////
 bool Server::PreLoad()
 {
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
-
-  // Load gazebo
-  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  // setup gazebo
+  return gazebo::setupServer(this->systemPluginsArgc, this->systemPluginsArgv);
 }
 
 /////////////////////////////////////////////////
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
-  /// Load the sensors library
-  sensors::load();
-
-  /// Load the physics library
-  physics::load();
-
   // If a physics engine is specified,
   if (_physics.length())
   {
@@ -390,24 +381,27 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->worldModPub =
     this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
-  // Run the gazebo, starts a new thread
-  gazebo::run();
+  common::Time waitTime(1, 0);
+  int waitCount = 0;
+  int maxWaitCount = 10;
 
-  return true;
-}
+  // Wait for namespaces.
+  while (!gazebo::transport::waitForNamespaces(waitTime) &&
+      (waitCount++) < maxWaitCount)
+  {
+    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
+  }
 
-/////////////////////////////////////////////////
-void Server::Init()
-{
-  // Make sure the model database has started.
-  common::ModelDatabase::Instance()->Start();
-
-  gazebo::init();
-
-  sensors::init();
+  if (waitCount >= maxWaitCount)
+  {
+    gzerr << "Waited " << (waitTime * waitCount).Double()
+      << " seconds for namespaces. Giving up.\n";
+  }
 
   physics::init_worlds();
   this->stop = false;
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -429,20 +423,7 @@ void Server::Stop()
 void Server::Fini()
 {
   this->Stop();
-
-  gazebo::fini();
-
-  physics::fini();
-
-  sensors::fini();
-
-  if (this->master)
-    this->master->Fini();
-  delete this->master;
-  this->master = NULL;
-
-  // Cleanup model database.
-  common::ModelDatabase::Instance()->Fini();
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -484,6 +465,8 @@ void Server::Run()
   // Run each world. Each world starts a new thread
   physics::run_worlds(iterations);
 
+  this->initialized = true;
+
   // Update the sensors.
   while (!this->stop && physics::worlds_running())
   {
@@ -492,16 +475,8 @@ void Server::Run()
     common::Time::MSleep(1);
   }
 
-  // Stop all the worlds
-  physics::stop_worlds();
-
-  sensors::stop();
-
-  // Stop gazebo
-  gazebo::stop();
-
-  // Stop the master
-  this->master->Stop();
+  // Shutdown gazebo
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////

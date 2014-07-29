@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <scene>
+      <ambient>.1 .1 .1 1</ambient>
+      <shadows>false</shadows>
+    </scene>
+    <physics type="bullet">
+      <gravity>0 0 -9.8</gravity>
+      <bullet />
+      <max_step_size>0.001</max_step_size>
+    </physics>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+  </world>
+</sdf>

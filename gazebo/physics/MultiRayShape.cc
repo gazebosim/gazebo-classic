@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ void MultiRayShape::Init()
   int vertSamples = 1;
   // double vertResolution = 1.0;
   double vertMinAngle = 0;
-  double vertMaxAngle = 0;
 
   double minRange, maxRange;
 
@@ -63,7 +62,7 @@ void MultiRayShape::Init()
   {
     this->vertElem = this->scanElem->GetElement("vertical");
     vertMinAngle = this->vertElem->Get<double>("min_angle");
-    vertMaxAngle = this->vertElem->Get<double>("max_angle");
+    double vertMaxAngle = this->vertElem->Get<double>("max_angle");
     vertSamples = this->vertElem->Get<unsigned int>("samples");
     // vertResolution = this->vertElem->Get<double>("resolution");
     pDiff = vertMaxAngle - vertMinAngle;
@@ -119,9 +118,9 @@ void MultiRayShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRange(int _index)
+double MultiRayShape::GetRange(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -134,9 +133,9 @@ double MultiRayShape::GetRange(int _index)
 }
 
 //////////////////////////////////////////////////
-double MultiRayShape::GetRetro(int _index)
+double MultiRayShape::GetRetro(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"
@@ -148,9 +147,9 @@ double MultiRayShape::GetRetro(int _index)
 }
 
 //////////////////////////////////////////////////
-int MultiRayShape::GetFiducial(int _index)
+int MultiRayShape::GetFiducial(unsigned int _index)
 {
-  if (_index < 0 || _index >= static_cast<int>(this->rays.size()))
+  if (_index >= this->rays.size())
   {
     std::ostringstream stream;
     stream << "index[" << _index << "] out of range[0-"

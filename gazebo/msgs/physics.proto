@@ -17,7 +17,7 @@ message Physics
     SIMBODY = 3;
     DART = 4;
   }
-  required Type type                         = 1[default=ODE];
+  optional Type type                         = 1[default=ODE];
 
   optional string solver_type                = 2;
   optional double min_step_size              = 3;

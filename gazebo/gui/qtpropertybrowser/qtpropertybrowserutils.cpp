@@ -39,7 +39,9 @@
 #pragma GCC diagnostic ignored "-Wswitch-default"
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #pragma GCC diagnostic ignored "-Wshadow"
-
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-private-field"
+#endif  // ifdef __clang__
 
 
 #include <QtGui/QApplication>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,11 +67,16 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
           Ogre::MaterialManager::getSingleton().load("gazebo/plain_color",
               Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 
+        // OGRE 1.9 changes the shared pointer definition
+        #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
         // Make sure we keep the same depth properties so that
         // certain overlay objects can be picked by the mouse.
         Ogre::Technique *newTechnique =
             static_cast<Ogre::MaterialPtr>(res)->getTechnique(0);
-
+        #else
+        Ogre::Technique *newTechnique =
+            res.staticCast<Ogre::Material>()->getTechnique(0);
+        #endif
 
         Ogre::Technique *originalTechnique = _originalMaterial->getTechnique(0);
         if (originalTechnique)

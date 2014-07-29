@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *
 */
 /*
- * Desc: Contact Plugin
+ * Desc: Ray Plugin
  * Author: Nate Koenig mod by John Hsu
  */
 
@@ -25,12 +25,12 @@
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/RaySensor.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  /// \brief A Bumper controller
-  class RayPlugin : public SensorPlugin
+  /// \brief A Ray Sensor Plugin
+  class GAZEBO_VISIBLE RayPlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: RayPlugin();

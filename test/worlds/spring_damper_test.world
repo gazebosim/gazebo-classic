@@ -27,6 +27,14 @@
           <contact_surface_layer>0.0</contact_surface_layer>
         </constraints>
       </ode>
+      <simbody>
+        <accuracy>0.01</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>111.111</stiffness>
+          <dissipation>0</dissipation>
+        </contact>
+      </simbody>
       <real_time_update_rate>0</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
@@ -37,15 +45,21 @@
       sprungMass, out float erp, out float cfm)
       {
                   float r = 2.0f * dampingCofficient * (float)Math.Sqrt(sprungMass
-      * springConstant);
+                            * springConstant);
                   float hk = Scene.OdeTimeStep * springConstant;
 
                   erp = hk / (hk + r);
                   cfm = 1.0f / (hk + r);
       }
       in the end,
-      erp = dt * kp / ( dt * kp + kd )
-      cfm = 1 / ( dt * kp + kd )
+
+        erp = dt * kp / ( dt * kp + kd )
+        cfm = 1 / ( dt * kp + kd )
+
+      or
+
+        kp = erp / (cfm * h)
+        kd = (1 - erp) / cfm
     -->
     <model name="model_0">
       <pose>0.0 0.0 1.1 0 0.0 0.0</pose>
@@ -99,6 +113,8 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
+            <stiffness>1.0e6</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
@@ -133,24 +149,26 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <visual name="visual_sphere">
+        <visual name="visual_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
           <material>
             <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/White</name></script>
           </material>
         </visual>
-        <collision name="collision_sphere">
+        <collision name="collision_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
         </collision>
         <gravity>true</gravity>
@@ -165,6 +183,8 @@
           <limit>
             <lower>0.0</lower>
             <upper>0.0</upper>
+            <stiffness>333.3333</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
@@ -231,6 +251,8 @@
           <limit>
             <lower>0.0</lower>
             <upper>0.0</upper>
+            <stiffness>333.3333</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 1.0 0.0</xyz>
         </axis>
@@ -261,24 +283,26 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <visual name="visual_sphere">
+        <visual name="visual_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
           <material>
             <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/FlatBlack</name></script>
           </material>
         </visual>
-        <collision name="collision_sphere">
+        <collision name="collision_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
         </collision>
         <gravity>true</gravity>
@@ -293,6 +317,8 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
+            <stiffness>166.66667</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
@@ -355,6 +381,8 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
+            <stiffness>166.66667</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 1.0 0.0</xyz>
         </axis>
@@ -385,24 +413,26 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <visual name="visual_sphere">
+        <visual name="visual_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
           <material>
             <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Red</name></script>
           </material>
         </visual>
-        <collision name="collision_sphere">
+        <collision name="collision_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
         </collision>
         <gravity>true</gravity>
@@ -417,6 +447,8 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
+            <stiffness>111.1111</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 0.0 1.0</xyz>
         </axis>
@@ -479,6 +511,8 @@
           <limit>
             <lower>0</lower>
             <upper>0</upper>
+            <stiffness>111.1111</stiffness>
+            <dissipation>0</dissipation>
           </limit>
           <xyz>0.0 1.0 0.0</xyz>
         </axis>
@@ -509,24 +543,26 @@
           </inertia>
           <mass>1.0</mass>
         </inertial>
-        <visual name="visual_sphere">
+        <visual name="visual_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
           <material>
             <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script>
           </material>
         </visual>
-        <collision name="collision_sphere">
+        <collision name="collision_cylinder">
           <pose>0.0 0.0 -0.5 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
-            <sphere>
+            <cylinder>
+              <length>0.1</length>
               <radius>0.1</radius>
-            </sphere>
+            </cylinder>
           </geometry>
         </collision>
         <gravity>true</gravity>
@@ -665,6 +701,108 @@
         <kinematic>false</kinematic>
       </link>
       <static>false</static>
+    </model>
+    <model name="model_6_prismatic_sdf">
+      <pose>0.0 1.5 0.6  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <length>0.1</length>
+              <radius>0.1</radius>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/Green</name></script>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <length>0.1</length>
+              <radius>0.1</radius>
+            </cylinder>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="joint" type="prismatic">
+        <parent>world</parent>
+        <child>link</child>
+        <pose>0.0 0.0 0.5  0 0 0</pose>
+        <axis>
+          <limit>
+            <lower>-1.0</lower>
+            <upper>1.0</upper>
+          </limit>
+          <xyz>0.0 0.0 1.0</xyz>
+          <dynamics>
+            <spring_stiffness>111.1111</spring_stiffness>
+            <spring_reference>0.0</spring_reference>
+            <damping>0.0</damping>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+    <model name="model_7_revolute_sdf">
+      <pose>-1.0 1.5 0.6  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <inertia>
+            <ixx>0.01</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>0.01</iyy>
+            <iyz>0.0</iyz>
+            <izz>0.01</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script><uri>file://media/materials/scripts/gazebo.material</uri><name>Gazebo/FlatBlack</name></script>
+          </material>
+        </visual>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.1</radius>
+            </sphere>
+          </geometry>
+        </collision>
+      </link>
+      <joint name="joint" type="revolute">
+        <parent>world</parent>
+        <child>link</child>
+        <pose>-1.0 0.0 0.0  0 0 0</pose>
+        <axis>
+          <limit>
+            <lower>-10</lower>
+            <upper>10</upper>
+          </limit>
+          <xyz>0.0 1.0 0.0</xyz>
+          <dynamics>
+            <spring_stiffness>111.1111</spring_stiffness>
+            <spring_reference>0.0</spring_reference>
+            <damping>0.0</damping>
+          </dynamics>
+        </axis>
+      </joint>
     </model>
   </world>
 </sdf>

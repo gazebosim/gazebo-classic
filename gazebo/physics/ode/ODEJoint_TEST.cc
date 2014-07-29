@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 */
 
 #include <gtest/gtest.h>
+#include "gazebo/physics/ode/ODETypes.hh"
+#include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/ServerFixture.hh"
 
@@ -63,6 +65,11 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   physics::ModelPtr model_1 = world->GetModel("model_1");
   physics::JointPtr joint_0 = model_1->GetJoint("joint_0");
   physics::JointPtr joint_1 = model_1->GetJoint("joint_1");
+
+  EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_0)->
+      UsesImplicitSpringDamper());
+  EXPECT_TRUE(boost::dynamic_pointer_cast<physics::ODEJoint>(joint_1)->
+      UsesImplicitSpringDamper());
 
   gzdbg << "-------------------Test 1 (y)-------------------\n";
   physics->SetGravity(math::Vector3(0, 10, 0));

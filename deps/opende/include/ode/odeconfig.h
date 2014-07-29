@@ -16,11 +16,18 @@
 #endif
 
 /* Define a DLL export symbol for those platforms that need it */
-#if defined(_MSC_VER)
-  #if defined(ODE_DLL)
-    #define ODE_API __declspec(dllexport)
-  #elif !defined(ODE_LIB)
-    #define ODE_DLL_API __declspec(dllimport)
+/* OSRF mofication: add visibility definitions and platform checks */
+#if defined _WIN32 || defined __CYGWIN__
+  #if defined(_MSC_VER)
+    #if defined(ODE_DLL)
+      #define ODE_API __declspec(dllexport)
+    #elif !defined(ODE_LIB)
+      #define ODE_DLL_API __declspec(dllimport)
+    #endif
+  #endif
+#else
+  #if __GNUC__ >= 4
+    #define ODE_API __attribute__ ((visibility ("default")))
   #endif
 #endif
 

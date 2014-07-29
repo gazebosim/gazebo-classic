@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,18 +221,6 @@ void SensorManager::Fini()
 void SensorManager::GetSensorTypes(std::vector<std::string> &_types) const
 {
   sensors::SensorFactory::GetSensorTypes(_types);
-}
-
-//////////////////////////////////////////////////
-std::string SensorManager::CreateSensor(sdf::ElementPtr _elem,
-                                        const std::string &_worldName,
-                                        const std::string &_parentName)
-{
-  SensorPtr parentSensor = sensors::get_sensor(_parentName);
-  GZ_ASSERT(parentSensor, "Unable to get parent sensor");
-
-  return this->CreateSensor(_elem, _worldName, _parentName,
-      parentSensor->GetId());
 }
 
 //////////////////////////////////////////////////
@@ -461,7 +449,8 @@ void SensorManager::SensorContainer::RunLoop()
   boost::mutex::scoped_lock lock2(tmpMutex);
 
   // Wait for a sensor to be added.
-  if (this->sensors.empty())
+  // Use a while loop since world resets will notify the runCondition.
+  while (this->sensors.empty())
   {
     this->runCondition.wait(lock2);
     if (this->stop)
@@ -488,8 +477,14 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
-    if (this->sensors.empty())
+    // If all the sensors get deleted, wait here.
+    // Use a while loop since world resets will notify the runCondition.
+    while (this->sensors.empty())
+    {
       this->runCondition.wait(lock2);
+      if (this->stop)
+        return;
+    }
 
     // Get the start time of the update.
     startTime = world->GetSimTime();
@@ -518,7 +513,11 @@ void SensorManager::SensorContainer::RunLoop()
     SensorManager::Instance()->simTimeEventHandler->AddRelativeEvent(
         eventTime, &this->runCondition);
 
-    this->runCondition.wait(timingLock);
+    // This if statement helps prevent deadlock on osx during teardown.
+    if (!this->stop)
+    {
+      this->runCondition.wait(timingLock);
+    }
   }
 }
 
@@ -647,7 +646,7 @@ void SensorManager::ImageSensorContainer::Update(bool _force)
   event::Events::preRender();
 
   // Tell all the cameras to render
-  // event::Events::render();
+  event::Events::render();
 
   event::Events::postRender();
 

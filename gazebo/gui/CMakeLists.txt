@@ -83,6 +83,15 @@ set (headers
   SphereMaker.hh
 )
 
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusWindow.cc
+  )
+  set (qt_headers ${qt_headers}
+    OculusWindow.hh
+  )
+endif ()
+
 #if (HAVE_QWT)
 #  set (sources ${sources}
 #    Diagnostics.cc
@@ -96,12 +105,13 @@ set (headers
 
 set (qt_tests
   DataLogger_TEST.cc
+  GuiIface_TEST.cc
   TimePanel_TEST.cc
 )
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
@@ -166,3 +176,4 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR
 gz_install_library(gazebo_gui)
 gz_install_includes("gui" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
+manpage(gzclient 1)

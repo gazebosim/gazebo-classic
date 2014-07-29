@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,6 @@
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/physics/BoxShape.hh"
-#include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/MeshShape.hh"
-#include "gazebo/physics/SphereShape.hh"
-#include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -54,7 +49,6 @@ Collision::Collision(LinkPtr _link)
 
   this->placeable = false;
 
-  this->surface.reset(new SurfaceParams());
   sdf::initFile("collision.sdf", this->sdf);
 
   this->collisionVisualId = physics::getUniqueId();
@@ -86,7 +80,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
 {
   Entity::Load(_sdf);
 
-  this->maxContacts = _sdf->Get<int>("max_contacts");
+  this->maxContacts = _sdf->Get<unsigned int>("max_contacts");
   this->SetMaxContacts(this->maxContacts);
 
   if (this->sdf->HasElement("laser_retro"))
@@ -105,13 +99,6 @@ void Collision::Load(sdf::ElementPtr _sdf)
       !this->shape->HasType(Base::RAY_SHAPE))
   {
     this->visPub->Publish(this->CreateCollisionVisual());
-  }
-
-  // Force max correcting velocity to zero for certain collision entities
-  if (this->IsStatic() || this->shape->HasType(Base::HEIGHTMAP_SHAPE) ||
-      this->shape->HasType(Base::MAP_SHAPE))
-  {
-    this->surface->maxVel = 0.0;
   }
 }
 
@@ -196,22 +183,6 @@ ShapePtr Collision::GetShape() const
 void Collision::SetScale(const math::Vector3 &_scale)
 {
   this->shape->SetScale(_scale);
-}
-
-//////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool /*_enable*/)
-{
-}
-
-//////////////////////////////////////////////////
-bool Collision::GetContactsEnabled() const
-{
-  return false;
-}
-
-//////////////////////////////////////////////////
-void Collision::AddContact(const Contact & /*_contact*/)
-{
 }
 
 //////////////////////////////////////////////////
@@ -304,8 +275,12 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->surface->FillMsg(*_msg.mutable_surface());
 
   msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose());
-  _msg.add_visual()->CopyFrom(*this->visualMsg);
-  _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+
+  if (!this->HasType(physics::Base::SENSOR_COLLISION))
+  {
+    _msg.add_visual()->CopyFrom(*this->visualMsg);
+    _msg.add_visual()->CopyFrom(this->CreateCollisionVisual());
+  }
 }
 
 //////////////////////////////////////////////////
@@ -376,14 +351,37 @@ void Collision::SetState(const CollisionState &_state)
 }
 
 /////////////////////////////////////////////////
-void Collision::SetMaxContacts(double _maxContacts)
+void Collision::SetMaxContacts(unsigned int _maxContacts)
 {
-  this->maxContacts = static_cast<int>(_maxContacts);
+  this->maxContacts = _maxContacts;
   this->sdf->GetElement("max_contacts")->GetValue()->Set(_maxContacts);
 }
 
 /////////////////////////////////////////////////
-int Collision::GetMaxContacts()
+unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
+}
+
+/////////////////////////////////////////////////
+const math::Pose &Collision::GetWorldPose() const
+{
+  // If true, compute a new world pose value.
+  //
+  if (this->worldPoseDirty)
+  {
+    this->worldPose = this->GetInitialRelativePose() +
+                      this->link->GetWorldPose();
+    this->worldPoseDirty = false;
+  }
+
+  return this->worldPose;
+}
+
+/////////////////////////////////////////////////
+void Collision::SetWorldPoseDirty()
+{
+  // Tell the collision object that the next call to ::GetWorldPose should
+  // compute a new worldPose value.
+  this->worldPoseDirty = true;
 }
