@@ -134,6 +134,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   }
 }
 
+////////////////////////////////////////////////////////////////////////
 TEST_P(WorldEnvPopulationTest, LoadEnvironment)
 {
   LoadEnvironment(GetParam());
@@ -142,6 +143,7 @@ TEST_P(WorldEnvPopulationTest, LoadEnvironment)
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, WorldEnvPopulationTest,
                         PHYSICS_ENGINE_VALUES);
 
+////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
