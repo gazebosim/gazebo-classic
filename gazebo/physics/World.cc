@@ -26,7 +26,9 @@
 
 #include <sdf/sdf.hh>
 
-#include <algorithm>
+#include <deque>
+#include <list>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -288,8 +290,6 @@ void World::Load(sdf::ElementPtr _sdf)
     for (unsigned int i = 0; i < this->GetModelCount(); ++i)
       this->GetModel(i)->LoadJoints();
   }
-
-
 
   // TODO: Performance test to see if TBB model updating is necessary
   // Choose threaded or unthreaded model updating depending on the number of
@@ -663,7 +663,6 @@ void World::Update()
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
   // This must be called before PhysicsEngine::UpdatePhysics.
-
   this->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
