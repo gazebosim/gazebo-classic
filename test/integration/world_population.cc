@@ -29,7 +29,7 @@ class WorldEnvPopulationTest : public ServerFixture,
 };
 
 ////////////////////////////////////////////////////////////////////////
-// LoadCuboidRandom: Verify that the number of elements populated is correct
+// LoadEnvironment: Verify that the number of elements populated is correct
 // and the objects are distributed as expected.
 ////////////////////////////////////////////////////////////////////////
 void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
@@ -38,7 +38,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
-  // We should have 56 cloned models + the ground plane.
+  // We should have multiple cloned models + the ground plane.
   EXPECT_EQ(world->GetModelCount(), 64 + 1);
 
   // Check elements distributed as a grid.
