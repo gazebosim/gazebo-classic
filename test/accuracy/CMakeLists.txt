@@ -22,10 +22,15 @@ if(HAVE_DART)
 endif()
 
 set(tests
-  rigid_body.cc
+  boxes.cc
 )
 
 gz_build_tests(${tests})
+
+if (ENABLE_TESTS_COMPILATION)
+  # Increase timeout
+  set_tests_properties(${TEST_TYPE}_boxes PROPERTIES TIMEOUT 10000)
+endif()
 
 set(display_tests
 )

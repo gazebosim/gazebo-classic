@@ -227,6 +227,12 @@ TEST_P(RigidBodyTest, Boxes)
         << ", gravity: " << gravity
         << ", collisions: " << collisions
         << std::endl;
+  RecordProperty("engine", physicsEngine);
+  RecordProperty("dt", dt);
+  RecordProperty("iters", iterations);
+  RecordProperty("boxCount", boxCount);
+  RecordProperty("gravity", gravity);
+  RecordProperty("collisions", collisions);
   Boxes(physicsEngine
       , dt
       , iterations
@@ -236,32 +242,14 @@ TEST_P(RigidBodyTest, Boxes)
       );
 }
 
-// INSTANTIATE_TEST_CASE_P(Engines, RigidBodyTest,
-//   ::testing::Combine(PHYSICS_ENGINE_VALUES
-//   , ::testing::Values(1e-3)
-//   , ::testing::Values(50)
-//   , ::testing::Values(1)
-//   , ::testing::Values(true)
-//   , ::testing::Values(true)
-//   ));
-
-INSTANTIATE_TEST_CASE_P(EnginesGravity, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(EnginesDtGravity, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(1e-3)
+  , ::testing::Range(1e-4, 1.1e-3, 1.22e-4)
   , ::testing::Values(50)
   , ::testing::Values(1)
   , ::testing::Bool()
   , ::testing::Values(true)
   ));
-
-// INSTANTIATE_TEST_CASE_P(EnginesDt, RigidBodyTest,
-//   ::testing::Combine(PHYSICS_ENGINE_VALUES
-//   , ::testing::Range(1e-4, 1.01e-3, 4e-4)
-//   , ::testing::Values(50)
-//   , ::testing::Values(1)
-//   , ::testing::Values(true)
-//   , ::testing::Values(true)
-//   ));
 
 // INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
 //   ::testing::Combine(::testing::Values("ode", "bullet")
@@ -285,7 +273,7 @@ INSTANTIATE_TEST_CASE_P(EnginesBoxes, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(1e-3)
   , ::testing::Values(50)
-  , ::testing::Values(1, 10, 100)
+  , ::testing::Range(1, 105, 20)
   , ::testing::Values(true)
   , ::testing::Values(true)
   ));
