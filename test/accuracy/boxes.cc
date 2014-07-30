@@ -85,9 +85,9 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   math::Vector3 g = physics->GetGravity();
 
   // Box size
-  const double dx = 1.0;
-  const double dy = 4.0;
-  const double dz = 9.0;
+  const double dx = 0.1;
+  const double dy = 0.4;
+  const double dz = 0.9;
   const double mass = 10.0;
 
   // Create box with inertia based on box of uniform density
@@ -119,8 +119,8 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 
     // Give impulses to set initial conditions
     // This is because SimbodyLink::Set*Vel aren't implemented
-    link->SetForce(math::Vector3(1e0, 1e1, 1e2));
-    link->SetTorque(math::Vector3(1e4, 1e3, 1e2));
+    link->SetForce(10 * math::Vector3(1e0, 1e1, 1e2));
+    link->SetTorque(math::Vector3(1e0, 1e2, 1e0));
   }
   world->Step(1);
   gzdbg << "energy0: " << link->GetWorldEnergy() << std::endl;
