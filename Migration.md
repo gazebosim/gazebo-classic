@@ -1,11 +1,15 @@
-## Gazebo 4.0 to 5.0
+## Gazebo 4.X to 5.X
 
 ### Additions
+
+1. **gazebo/math/Kmeans.hh**
+    + ***New class:*** Kmeans
+
 1. **gazebo/rendering/Camera.hh**
     + void SetProjectionType(ProjectionType _type)
     + void SetOrthoWindowSize(double _width, double _height)
     + double GetOrthoWindowWidth()
-    + double GetOrthoWindowHeight()
+    + double GetOrthoWindowHeight()    
 
 1. **gazebo/rendering/OrthoViewController.hh**
     + ***New class:*** OrthoViewController
