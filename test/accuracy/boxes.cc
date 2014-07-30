@@ -75,7 +75,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  EXPECT_EQ(physics->GetType(), _physicsEngine);
+  ASSERT_EQ(physics->GetType(), _physicsEngine);
 
   // get gravity value
   if (!_gravity)
@@ -89,6 +89,13 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   const double dy = 0.4;
   const double dz = 0.9;
   const double mass = 10.0;
+  // inertia matrix, recompute if the above change
+  const double Ixx = 0.80833333;
+  const double Iyy = 0.68333333;
+  const double Izz = 0.14166667;
+  const math::Matrix3 I0(Ixx, 0.0, 0.0
+                       , 0.0, Iyy, 0.0
+                       , 0.0, 0.0, Izz);
 
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
@@ -103,8 +110,16 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   ASSERT_GT(_boxCount, 0);
   physics::ModelPtr model;
   physics::LinkPtr link;
-  math::Vector3 linVel0(0.1, 0.4, 0.9);
-  math::Vector3 angVel0(1e-3, 1.5e-1, 1.5e-2);
+
+  // initial linear velocity in global frame
+  const math::Vector3 v0(0.1, 0.4, 0.9);
+
+  // initial angular velocity in global frame
+  const math::Vector3 w0(1e-3, 1.5e-1, 1.5e-2);
+
+  // initial energy value
+  const double E0 = 4.9077038453051394;
+
   for (int i = 0; i < _boxCount; ++i)
   {
     // give models unique names
@@ -120,26 +135,38 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     ASSERT_TRUE(link != NULL);
 
     // Set initial conditions
-    if (_physicsEngine != "simbody")
-    {
-      link->SetLinearVel(linVel0);
-      link->SetAngularVel(angVel0);
-    }
-    else
+    link->SetLinearVel(v0);
+    link->SetAngularVel(w0);
+    if (_physicsEngine == "simbody")
     {
       // Give impulses to set initial conditions
       // This is because SimbodyLink::Set*Vel aren't implemented
-      link->SetForce(mass / 1e-3 * linVel0);
-      link->SetTorque(math::Vector3(1e0, 1e2, 1e0));
+      link->SetForce(mass * v0 / 1e-3);
+      // Need to step in between SetForce and SetTorque
+      // because only one can be called at a time
+      world->Step(1);
+      link->SetTorque(math::Vector3(Ixx, Iyy, Izz) * w0 / 1e-3);
       world->Step(1);
     }
   }
-  ASSERT_NEAR(link->GetWorldCoGLinearVel().x, linVel0.x, 1e-4);
-  ASSERT_NEAR(link->GetWorldCoGLinearVel().y, linVel0.y, 1e-4);
-  ASSERT_NEAR(link->GetWorldCoGLinearVel().z, linVel0.z, 1e-4);
-  ASSERT_NEAR(link->GetWorldEnergy(), 4.907, 1e-3);
+  ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
+  ASSERT_EQ(w0, link->GetWorldAngularVel());
+  ASSERT_EQ(I0, link->GetInertial()->GetMOI());
+  ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
 
-  // change step size after impulses
+  // initial time
+  common::Time t0 = world->GetSimTime();
+
+  // initial linear position in global frame
+  math::Vector3 p0 = link->GetWorldInertialPose().pos;
+
+  // initial angular momentum in global frame
+  math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
+  ASSERT_EQ(H0, math::Vector3(Ixx, Iyy, Izz) * w0);
+  double H0mag = H0.GetLength();
+
+  // change step size after setting initial conditions
+  // since simbody requires a time step
   physics->SetMaxStepSize(_dt);
   if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
@@ -156,23 +183,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   //   physics->SetParam("accuracy", 1.0 / static_cast<float>(_iterations));
   // }
   const double simDuration = 10.0;
-  int steps = floor(simDuration / _dt);
-
-  // initial time
-  common::Time t0 = world->GetSimTime();
-
-  // initial linear position in global frame
-  math::Vector3 p0 = link->GetWorldInertialPose().pos;
-
-  // initial linear velocity in global frame
-  math::Vector3 v0 = link->GetWorldCoGLinearVel();
-
-  // initial angular momentum in global frame
-  math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
-  double H0mag = H0.GetLength();
-
-  // initial energy
-  double E0 = link->GetWorldEnergy();
+  int steps = ceil(simDuration / _dt);
 
   // variables to compute statistics on
   math::Vector3Stats linearPositionError;
@@ -214,8 +225,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
   this->Record("wallTime", elapsedTime.Double());
-  this->Record("simTime", world->GetSimTime().Double());
-  this->Record("timeRatio", elapsedTime.Double() / world->GetSimTime().Double());
+  common::Time simTime = (world->GetSimTime() - t0).Double();
+  ASSERT_NEAR(simTime.Double(), simDuration, _dt);
+  this->Record("simTime", simTime.Double());
+  this->Record("timeRatio", elapsedTime.Double() / simTime.Double());
 
   // Record statistics on pitch and yaw angles
   this->Record("energy0", E0);
