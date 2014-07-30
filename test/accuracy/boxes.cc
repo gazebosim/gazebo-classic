@@ -103,6 +103,8 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   ASSERT_GT(_boxCount, 0);
   physics::ModelPtr model;
   physics::LinkPtr link;
+  math::Vector3 linVel0(0.1, 0.4, 0.9);
+  math::Vector3 angVel0(1e-3, 1.5e-1, 1.5e-2);
   for (int i = 0; i < _boxCount; ++i)
   {
     // give models unique names
@@ -117,13 +119,25 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     link = model->GetLink();
     ASSERT_TRUE(link != NULL);
 
-    // Give impulses to set initial conditions
-    // This is because SimbodyLink::Set*Vel aren't implemented
-    link->SetForce(10 * math::Vector3(1e0, 1e1, 1e2));
-    link->SetTorque(math::Vector3(1e0, 1e2, 1e0));
+    // Set initial conditions
+    if (_physicsEngine != "simbody")
+    {
+      link->SetLinearVel(linVel0);
+      link->SetAngularVel(angVel0);
+    }
+    else
+    {
+      // Give impulses to set initial conditions
+      // This is because SimbodyLink::Set*Vel aren't implemented
+      link->SetForce(mass / 1e-3 * linVel0);
+      link->SetTorque(math::Vector3(1e0, 1e2, 1e0));
+      world->Step(1);
+    }
   }
-  world->Step(1);
-  gzdbg << "energy0: " << link->GetWorldEnergy() << std::endl;
+  ASSERT_NEAR(link->GetWorldCoGLinearVel().x, linVel0.x, 1e-4);
+  ASSERT_NEAR(link->GetWorldCoGLinearVel().y, linVel0.y, 1e-4);
+  ASSERT_NEAR(link->GetWorldCoGLinearVel().z, linVel0.z, 1e-4);
+  ASSERT_NEAR(link->GetWorldEnergy(), 4.907, 1e-3);
 
   // change step size after impulses
   physics->SetMaxStepSize(_dt);
