@@ -283,7 +283,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtGravity, RigidBodyTest,
 
 INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(3.26e-4)
+  , ::testing::Values(2.56e-4)
   , ::testing::Values(50)
   , ::testing::Range(1, 105, 20)
   , ::testing::Values(true)
@@ -292,7 +292,7 @@ INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
 
 INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(3.26e-4)
+  , ::testing::Values(2.60e-4)
   , ::testing::Values(50)
   , ::testing::Range(1, 105, 20)
   , ::testing::Values(true)
@@ -301,7 +301,7 @@ INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
 
 INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(6.52e-4)
+  , ::testing::Values(5.67e-4)
   , ::testing::Values(50)
   , ::testing::Range(1, 105, 20)
   , ::testing::Values(true)
@@ -310,7 +310,7 @@ INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
 
 INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(6.10e-4)
+  , ::testing::Values(5.64e-4)
   , ::testing::Values(50)
   , ::testing::Range(1, 105, 20)
   , ::testing::Values(true)
