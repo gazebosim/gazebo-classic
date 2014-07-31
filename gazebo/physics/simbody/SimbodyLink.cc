@@ -334,8 +334,9 @@ void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
   this->masterMobod.setUToFitLinearVelocity(
     this->simbodyPhysics->integ->updAdvancedState(),
-    //this->simbodyPhysics->integ->getState(),
     SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
@@ -420,8 +421,9 @@ void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
   this->masterMobod.setUToFitAngularVelocity(
     this->simbodyPhysics->integ->updAdvancedState(),
-    //this->simbodyPhysics->integ->getState(),
     SimbodyPhysics::Vector3ToVec3(_vel));
+  this->simbodyPhysics->system.realize(
+    this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
 }
 
 //////////////////////////////////////////////////
