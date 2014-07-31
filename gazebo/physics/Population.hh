@@ -50,7 +50,7 @@ namespace gazebo
       public: bool PopulateAll();
 
       /// \brief Generate and spawn one model population into the world.
-      /// \brief SDF parameter containing the population details.
+      /// \param[in] _population SDF parameter containing the population details
       /// \return True when the population was successfully spawned or false
       /// otherwise.
       private: bool PopulateOne(const sdf::ElementPtr _population);

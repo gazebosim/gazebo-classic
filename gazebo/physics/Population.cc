@@ -156,7 +156,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   // Read the model element.
   if (!_population->HasElement("model"))
   {
-    gzerr << "Unable to find the a model inside the population tag."
+    gzerr << "Unable to find a model inside the population tag."
           << std::endl;
     return false;
   }
