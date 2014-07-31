@@ -139,12 +139,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     // will cause gyroscopic tumbling
     w0.Set(1e-3, 1.5e0, 1.5e-2);
     E0 = 5.668765966704;
-    if (_physicsEngine == "simbody")
-    {
-      E0 = 5.8240771091360184;
-    }
   }
-
 
   for (int i = 0; i < _boxCount; ++i)
   {
@@ -163,17 +158,6 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     // Set initial conditions
     link->SetLinearVel(v0);
     link->SetAngularVel(w0);
-    if (_physicsEngine == "simbody")
-    {
-      // Give impulses to set initial conditions
-      // This is because SimbodyLink::Set*Vel aren't implemented
-      link->SetForce(mass * (v0 / 1e-3 - 2*g));
-      // Need to step in between SetForce and SetTorque
-      // because only one can be called at a time
-      world->Step(1);
-      link->SetTorque(math::Vector3(Ixx, Iyy, Izz) * w0 / 1e-3);
-      world->Step(1);
-    }
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
