@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,11 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world);
 
+  // Wait some time while the models are being loaded.
+  sleep(2);
+
   // We should have multiple cloned models + the ground plane.
-  EXPECT_EQ(world->GetModelCount(), 64 + 1);
+  EXPECT_EQ(world->GetModelCount(), 64u + 1u);
 
   // Check elements distributed as a grid.
   double tolerance = 0.25;
@@ -53,7 +56,9 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     {
       std::string name = std::string("can2_clone_" +
         boost::lexical_cast<std::string>(i * 3 + j));
-      math::Vector3 pos = world->GetModel(name)->GetWorldPose().pos;
+      physics::ModelPtr model = world->GetModel(name);
+      ASSERT_TRUE(model != NULL);
+      math::Vector3 pos = model->GetWorldPose().pos;
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
 
       expectedPos.x += step.x;
@@ -62,7 +67,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     expectedPos.y += step.y;
   }
 
-  // Check that the objects are within the expected cuboid.
+  // Check that the objects are within the expected box.
   std::vector<physics::ModelPtr> models = world->GetModels();
   for (size_t i = 0; i < models.size(); ++i)
   {
