@@ -29,15 +29,17 @@ using namespace gazebo;
 // number of boxes to spawn
 // gravity on / off
 // collision shape on / off
+// linear angular velocity on / off
 typedef std::tr1::tuple<const char *
                       , double
                       , int
                       , int
                       , bool
                       , bool
-                      > char1double1int2bool2;
+                      , bool
+                      > char1double1int2bool3;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int2bool2>
+                      public testing::WithParamInterface<char1double1int2bool3>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
@@ -46,12 +48,14 @@ class RigidBodyTest : public ServerFixture,
   /// \param[in] _boxCount Number of boxes to spawn.
   /// \param[in] _gravity Flag for turning gravity on / off.
   /// \param[in] _collision Flag for turning collisions on / off.
+  /// \param[in] _linear Flag for linear initial angular velocity on / off.
   public: void Boxes(const std::string &_physicsEngine
                    , double _dt
                    , int _iterations
                    , int _boxCount
                    , bool _gravity
                    , bool _collision
+                   , bool _linear
                    );
 };
 
@@ -65,6 +69,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , int _boxCount
                         , bool _gravity
                         , bool _collision
+                        , bool _linear
                         )
 {
   // Load a blank world (no ground plane)
@@ -115,10 +120,31 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   const math::Vector3 v0(0.1, 0.4, 0.9);
 
   // initial angular velocity in global frame
-  const math::Vector3 w0(1e-3, 1.5e-1, 1.5e-2);
+  math::Vector3 w0;
 
   // initial energy value
-  const double E0 = 4.9077038453051394;
+  double E0;
+
+  if (_linear)
+  {
+    // Use angular velocity with one non-zero component
+    // to ensure linear angular trajectory
+    w0.Set(1.5e-1, 0.0, 0.0);
+    E0 = 4.9090937462499999;
+  }
+  else
+  {
+    // Since Ixx > Iyy > Izz,
+    // angular velocity with large y component
+    // will cause gyroscopic tumbling
+    w0.Set(1e-3, 1.5e0, 1.5e-2);
+    E0 = 5.668765966704;
+    if (_physicsEngine == "simbody")
+    {
+      E0 = 5.8240771091360184;
+    }
+  }
+
 
   for (int i = 0; i < _boxCount; ++i)
   {
@@ -152,9 +178,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
   ASSERT_EQ(I0, link->GetInertial()->GetMOI());
-  // Had to turn this off because simbody impulses
-  // cause position offset.
-  // ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
+  ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
 
   // initial time
   common::Time t0 = world->GetSimTime();
@@ -228,7 +252,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
   this->Record("wallTime", elapsedTime.Double());
   common::Time simTime = (world->GetSimTime() - t0).Double();
-  ASSERT_NEAR(simTime.Double(), simDuration, _dt);
+  ASSERT_NEAR(simTime.Double(), simDuration, _dt*1.1);
   this->Record("simTime", simTime.Double());
   this->Record("timeRatio", elapsedTime.Double() / simTime.Double());
 
@@ -250,12 +274,14 @@ TEST_P(RigidBodyTest, Boxes)
   int boxCount              = std::tr1::get<3>(GetParam());
   bool gravity              = std::tr1::get<4>(GetParam());
   bool collisions           = std::tr1::get<5>(GetParam());
+  bool linear               = std::tr1::get<6>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
         << ", boxCount: " << boxCount
         << ", gravity: " << gravity
         << ", collisions: " << collisions
+        << ", linear: " << linear
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
@@ -263,86 +289,82 @@ TEST_P(RigidBodyTest, Boxes)
   RecordProperty("boxCount", boxCount);
   RecordProperty("gravity", gravity);
   RecordProperty("collisions", collisions);
+  RecordProperty("linear", linear);
   Boxes(physicsEngine
       , dt
       , iterations
       , boxCount
       , gravity
       , collisions
+      , linear
       );
 }
 
-INSTANTIATE_TEST_CASE_P(EnginesDtGravity, RigidBodyTest,
+#define DT_MIN 1e-4
+#define DT_MAX 1.01e-3
+#define DT_STEP 3.0e-4
+INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(1e-4, 1.1e-3, 1.22e-4)
+  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(50)
   , ::testing::Values(1)
-  , ::testing::Bool()
+  , ::testing::Values(false)
+  , ::testing::Values(true)
   , ::testing::Values(true)
   ));
 
+INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+  , ::testing::Values(50)
+  , ::testing::Values(1)
+  , ::testing::Values(true)
+  , ::testing::Values(true)
+  , ::testing::Values(false)
+  ));
+
+#define BOXES_MIN 1
+#define BOXES_MAX 105
+#define BOXES_STEP 20
 INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(2.56e-4)
+  , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(1, 105, 20)
+  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
   , ::testing::Values(true)
   , ::testing::Values(true)
+  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(2.60e-4)
+  , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(1, 105, 20)
+  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
   , ::testing::Values(true)
   , ::testing::Values(true)
+  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(5.67e-4)
+  , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(1, 105, 20)
+  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
   , ::testing::Values(true)
   , ::testing::Values(true)
+  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(5.64e-4)
+  , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(1, 105, 20)
+  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
   , ::testing::Values(true)
   , ::testing::Values(true)
+  , ::testing::Values(false)
   ));
-
-// INSTANTIATE_TEST_CASE_P(EnginesIters, RigidBodyTest,
-//   ::testing::Combine(::testing::Values("ode", "bullet")
-//   , ::testing::Values(1e-3)
-//   , ::testing::Range(10, 151, 20)
-//   , ::testing::Values(1)
-//   , ::testing::Values(true)
-//   , ::testing::Values(true)
-//   ));
-
-// INSTANTIATE_TEST_CASE_P(EnginesCollision, RigidBodyTest,
-//   ::testing::Combine(PHYSICS_ENGINE_VALUES
-//   , ::testing::Values(1e-3)
-//   , ::testing::Values(50)
-//   , ::testing::Values(1)
-//   , ::testing::Values(true)
-//   , ::testing::Bool()
-//   ));
-
-// INSTANTIATE_TEST_CASE_P(EnginesBoxes, RigidBodyTest,
-//   ::testing::Combine(PHYSICS_ENGINE_VALUES
-//   , ::testing::Values(1e-3)
-//   , ::testing::Values(50)
-//   , ::testing::Range(1, 105, 20)
-//   , ::testing::Values(true)
-//   , ::testing::Values(true)
-//   ));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
