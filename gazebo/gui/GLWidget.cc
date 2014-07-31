@@ -343,6 +343,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_translateAct->trigger();
     else if (_event->key() == Qt::Key_S)
       g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N)
+      g_snapAct->trigger();
     else if (_event->key() == Qt::Key_Escape)
       g_arrowAct->trigger();
   }

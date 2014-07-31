@@ -1176,7 +1176,7 @@ void MainWindow::CreateActions()
   g_pasteAct->setEnabled(false);
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
-      tr("Snap Mode"), this);
+      tr("Snap Mode (N)"), this);
   g_snapAct->setStatusTip(tr("Snap entity"));
   g_snapAct->setCheckable(true);
   g_snapAct->setToolTip(tr("Snap Mode"));
