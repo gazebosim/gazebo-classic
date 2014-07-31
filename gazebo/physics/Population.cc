@@ -86,18 +86,18 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
     return false;
 
   // Generate the population of poses based on the region and distribution.
-  if (region == "cuboid" && distribution == "random")
-    this->PopulateCuboidRandom(modelCount, min, max, objects);
-  else if (region == "cuboid" && distribution == "uniform")
-    this->PopulateCuboidUniform(modelCount, min, max, objects);
-  else if (region == "cuboid" && distribution == "grid")
-    this->PopulateCuboidGrid(min, rows, cols, step, objects);
-  else if (region == "cuboid" && distribution == "linear-x")
-    this->PopulateCuboidLinearX(modelCount, min, max, objects);
-  else if (region == "cuboid" && distribution == "linear-y")
-    this->PopulateCuboidLinearY(modelCount, min, max, objects);
-  else if (region == "cuboid" && distribution == "linear-z")
-    this->PopulateCuboidLinearZ(modelCount, min, max, objects);
+  if (region == "box" && distribution == "random")
+    this->PopulateBoxRandom(modelCount, min, max, objects);
+  else if (region == "box" && distribution == "uniform")
+    this->PopulateBoxUniform(modelCount, min, max, objects);
+  else if (region == "box" && distribution == "grid")
+    this->PopulateBoxGrid(min, rows, cols, step, objects);
+  else if (region == "box" && distribution == "linear-x")
+    this->PopulateBoxLinearX(modelCount, min, max, objects);
+  else if (region == "box" && distribution == "linear-y")
+    this->PopulateBoxLinearY(modelCount, min, max, objects);
+  else if (region == "box" && distribution == "linear-z")
+    this->PopulateBoxLinearZ(modelCount, min, max, objects);
   else if (region == "cylinder" && distribution == "random")
     this->PopulateCylinderRandom(modelCount, center, radius, height, objects);
   else if (region == "cylinder" && distribution == "uniform")
@@ -151,9 +151,9 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   math::Vector3 &_max, int &_rows, int &_cols, math::Vector3 &_step,
   math::Vector3 &_center, double &_radius, double &_height,
   std::string &_modelName, std::string &_modelSdf, int &_modelCount,
-  std::string &_distribution, std::string &_region)
+  std::string &_distribType, std::string &_region)
 {
-  // Read all the population elements.
+  // Read the model element.
   if (!_population->HasElement("model"))
   {
     gzerr << "Unable to find the a model inside the population tag."
@@ -164,6 +164,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   _modelSdf = model->ToString("");
   _modelName = model->Get<std::string>("name");
 
+  // Read the model_count element.
   if (!_population->HasElement("model_count"))
   {
     gzerr << "Unable to find <model_count> inside the population tag."
@@ -172,14 +173,57 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   }
   _modelCount = _population->Get<int>("model_count");
 
+  // Read the distribution element.
   if (!_population->HasElement("distribution"))
   {
     gzerr << "Unable to find <distribution> inside the population tag."
           << std::endl;
     return false;
   }
-  _distribution = _population->Get<std::string>("distribution");
+  sdf::ElementPtr distribution = _population->GetElement("distribution");
 
+  if (!distribution->HasElement("type"))
+  {
+    gzerr << "Unable to find <type> inside the population tag."
+          << std::endl;
+    return false;
+  }
+  _distribType = distribution->Get<std::string>("type");
+
+  if ((_distribType != "random")   && (_distribType != "uniform")  &&
+      (_distribType != "grid")     && (_distribType != "linear-x") &&
+      (_distribType != "linear-y") && (_distribType != "linear-z"))
+  {
+    gzerr << "Unknown distribution type [" << _distribType << "]"
+          << std::endl;
+    return false;
+  }
+
+  if (_distribType == "grid")
+  {
+    if (!distribution->HasElement("rows"))
+    {
+      gzerr << "Unable to find <rows> inside the distribution tag" << std::endl;
+      return false;
+    }
+    _rows = distribution->Get<int>("rows");
+
+    if (!distribution->HasElement("cols"))
+    {
+      gzerr << "Unable to find <cols> inside the distribution tag" << std::endl;
+      return false;
+    }
+    _cols = distribution->Get<int>("cols");
+
+    if (!distribution->HasElement("step"))
+    {
+      gzerr << "Unable to find <step> inside the distribution tag" << std::endl;
+      return false;
+    }
+    _step = distribution->Get<math::Vector3>("step");
+  }
+
+  // Read the region element.
   if (!_population->HasElement("region"))
   {
     gzerr << "Unable to find <region> inside the population tag." << std::endl;
@@ -187,56 +231,28 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   }
   sdf::ElementPtr region = _population->GetElement("region");
 
-  if (region->HasElement("cuboid"))
+  if (region->HasElement("box"))
   {
-    sdf::ElementPtr cuboid = region->GetElement("cuboid");
-    _region = "cuboid";
+    sdf::ElementPtr box = region->GetElement("box");
+    _region = "box";
 
-    if (!cuboid->HasElement("min"))
+    if (!box->HasElement("min"))
     {
-      gzerr << "Unable to find <min> inside the cuboid tag." << std::endl;
+      gzerr << "Unable to find <min> inside the box tag." << std::endl;
       return false;
     }
-    _min = cuboid->Get<math::Vector3>("min");
+    _min = box->Get<math::Vector3>("min");
 
-    if ((_distribution == "random")   || (_distribution == "uniform")  ||
-        (_distribution == "linear-x") || (_distribution == "linear-y") ||
-        (_distribution == "linear-z"))
+    if ((_distribType == "random")   || (_distribType == "uniform")  ||
+        (_distribType == "linear-x") || (_distribType == "linear-y") ||
+        (_distribType == "linear-z"))
     {
-      if (!cuboid->HasElement("max"))
+      if (!box->HasElement("max"))
       {
-        gzerr << "Unable to find <max> inside the cuboid tag." << std::endl;
+        gzerr << "Unable to find <max> inside the box tag." << std::endl;
         return false;
       }
-      _max = cuboid->Get<math::Vector3>("max");
-    }
-    else if (_distribution == "grid")
-    {
-      if (!cuboid->HasElement("rows"))
-      {
-        gzerr << "Unable to find <rows> inside the cuboid tag" << std::endl;
-        return false;
-      }
-      _rows = cuboid->Get<int>("rows");
-
-      if (!cuboid->HasElement("cols"))
-      {
-        gzerr << "Unable to find <cols> inside the cuboid tag" << std::endl;
-        return false;
-      }
-      _cols = cuboid->Get<int>("cols");
-
-      if (!cuboid->HasElement("step"))
-      {
-        gzerr << "Unable to find <step> inside the cuboid tag." << std::endl;
-        return false;
-      }
-      _step = cuboid->Get<math::Vector3>("step");
-    }
-    else
-    {
-      gzerr << "Unknown distribution type [" << _distribution << "]"
-            << std::endl;
+      _max = box->Get<math::Vector3>("max");
     }
   }
   else if (region->HasElement("cylinder"))
@@ -267,7 +283,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   }
   else
   {
-    gzerr << "I have not found a valid region. 'Cuboid' or 'Cylinder' are"
+    gzerr << "I have not found a valid region. 'box' or 'cylinder' are"
           << " the valid region types" << std::endl;
   }
 
@@ -275,7 +291,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidRandom(int _modelCount,
+void Population::PopulateBoxRandom(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -296,7 +312,7 @@ void Population::PopulateCuboidRandom(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidUniform(int _modelCount,
+void Population::PopulateBoxUniform(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -306,7 +322,7 @@ void Population::PopulateCuboidUniform(int _modelCount,
   double dy = fabs(_max.y - _min.y);
   double dz = fabs(_max.z - _min.z);
 
-  // Step1: Sample points in a cuboid.
+  // Step1: Sample points in a box.
   double x = 0.0;
   double y = 0.0;
   while (y < dy)
@@ -343,7 +359,7 @@ void Population::PopulateCuboidUniform(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidGrid(const math::Vector3 &_min, int _rows,
+void Population::PopulateBoxGrid(const math::Vector3 &_min, int _rows,
   int _cols, const math::Vector3 &_step, std::vector<math::Vector3> &_poses)
 {
   _poses.clear();
@@ -361,7 +377,7 @@ void Population::PopulateCuboidGrid(const math::Vector3 &_min, int _rows,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidLinearX(int _modelCount,
+void Population::PopulateBoxLinearX(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -380,7 +396,7 @@ void Population::PopulateCuboidLinearX(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidLinearY(int _modelCount,
+void Population::PopulateBoxLinearY(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -399,7 +415,7 @@ void Population::PopulateCuboidLinearY(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCuboidLinearZ(int _modelCount,
+void Population::PopulateBoxLinearZ(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
