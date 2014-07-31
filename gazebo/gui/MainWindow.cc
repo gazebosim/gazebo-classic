@@ -1161,14 +1161,15 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
-  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
+      tr("Copy (Ctrl + C)"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste"), this);
+      tr("Paste (Ctrl + V)"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
