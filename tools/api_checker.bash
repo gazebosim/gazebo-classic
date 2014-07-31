@@ -5,10 +5,10 @@
 # default, the latest available).  You'll be prompted as needed for sudo access
 # and to confirm the installation steps.
 #
-# We assume that your system is already configured to use the OSRF apt 
+# We assume that your system is already configured to use the OSRF apt
 # repository (build.osrfoundation.org).  If you haven't done that step yet, read
 # about it here:
-#   http://gazebosim.org/wiki/2.0/install#Ubuntu_Debians
+#   http://gazebosim.org/tutorials/?tut=install
 
 USAGE=$'api_checker.bash [-n] <gazebo_source_dir>
   -n : Do not install latest Gazebo via apt-get (assumes that you have already installed the version that you want to compare against)'
@@ -53,8 +53,8 @@ sudo apt-get update
 if [[ $install_gazebo -eq 1 ]]; then
   sudo apt-get install $gazebo_name
 fi
-sudo apt-get install exuberant-ctags git 
-# Also install things that are needed to build Gazebo.  We want to ensure 
+sudo apt-get install exuberant-ctags git
+# Also install things that are needed to build Gazebo.  We want to ensure
 # that we end up with the same set of system packages, especially the optional
 # ones, that are used in building the Gazebo .deb.  For now, I'm copying in the
 # Build-Depends from precise/debian/control.  That's not ideal, but will
@@ -94,7 +94,7 @@ sudo apt-get install cmake \
 TMPDIR=$(mktemp -d)
 mkdir $TMPDIR/source $TMPDIR/build $TMPDIR/install $TMPDIR/config
 cd $TMPDIR/source
-git clone git://github.com/lvc/abi-compliance-checker.git  
+git clone git://github.com/lvc/abi-compliance-checker.git
 cd abi-compliance-checker
 perl Makefile.pl -install --prefix=$TMPDIR/install
 
@@ -143,17 +143,17 @@ cat > $TMPDIR/config/devel.xml << DEVEL_DELIM
  <version>
      branch: $GAZEBO_BRANCH
  </version>
- 
+
   <headers>
    $TMPDIR/install/include/gazebo-$MAJOR_MINOR/gazebo
  </headers>
- 
+
  <skip_headers>
    $TMPDIR/install/include/gazebo-$MAJOR_MINOR/gazebo/GIMPACT
    $TMPDIR/install/include/gazebo-$MAJOR_MINOR/gazebo/opcode
    $TMPDIR/install/include/gazebo-$MAJOR_MINOR/gazebo/test
  </skip_headers>
- 
+
  <libs>
   $GAZEBO_LIBS_LOCAL
  </libs>
