@@ -126,21 +126,17 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
       boost::lexical_cast<std::string>(i);
     cloneSdf.replace(first, last - first, newName);
 
-    sdf::SDF model2Sdf;
-    model2Sdf.SetFromString(cloneSdf);
-    sdf::ElementPtr modelElem = model2Sdf.root->GetElement("model");
-    if (modelElem)
-    {
-      // Load the model in the desired position.
-      ModelPtr newModel = this->world->LoadModel(modelElem,
-          this->world->rootElement);
-      math::Pose newPose(math::Pose(p.x, p.y, p.z, 0, 0, 0));
-      newModel->SetWorldPose(newPose);
-      newModel->Init();
-      newModel->LoadPlugins();
-    }
-    else
-      gzerr << "ModelElem is NULL" << std::endl;
+    // Insert the <pose> element.
+    std::string endDelim = "'>";
+    first = cloneSdf.find(delim) + delim.size();
+    last = cloneSdf.find(endDelim, first);
+    std::string pose = "\n    <pose>" +
+      boost::lexical_cast<std::string>(p.x) + " " +
+      boost::lexical_cast<std::string>(p.y) + " " +
+      boost::lexical_cast<std::string>(p.z) + " 0 0 0</pose>";
+    cloneSdf.insert(last + endDelim.size(), pose);
+
+    this->world->InsertModelString(cloneSdf);
   }
 
   return true;
