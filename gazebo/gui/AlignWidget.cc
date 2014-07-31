@@ -40,10 +40,22 @@ AlignWidget::AlignWidget(QWidget *_parent)
   connect(this->dataPtr->alignSignalMapper, SIGNAL(mapped(QString)),
       this, SLOT(OnAlignMode(QString)));
 
+  QLabel *coordinateSpaceLabel = new QLabel(tr("Align in World Space"));
+  QLabel *noteLabel = new QLabel(tr("Remember to Pause"));
+  QFont labelFont = coordinateSpaceLabel->font();
+  labelFont.setPointSize(labelFont.pointSize());
+  coordinateSpaceLabel->setFont(labelFont);
+  noteLabel->setFont(labelFont);
+
   QVBoxLayout *alignLayout = new QVBoxLayout;
   alignLayout->addWidget(this->dataPtr->xAlignBar);
   alignLayout->addWidget(this->dataPtr->yAlignBar);
   alignLayout->addWidget(this->dataPtr->zAlignBar);
+  alignLayout->addWidget(coordinateSpaceLabel);
+  alignLayout->addWidget(noteLabel);
+  alignLayout->setAlignment(this->dataPtr->xAlignBar, Qt::AlignHCenter);
+  alignLayout->setAlignment(this->dataPtr->yAlignBar, Qt::AlignHCenter);
+  alignLayout->setAlignment(this->dataPtr->zAlignBar, Qt::AlignHCenter);
   this->setLayout(alignLayout);
 }
 

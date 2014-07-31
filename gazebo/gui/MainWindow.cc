@@ -1210,15 +1210,6 @@ void MainWindow::CreateActions()
   this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
   this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
   this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
-  xAlignMin->setCheckable(true);
-  xAlignCenter->setCheckable(true);
-  xAlignMax->setCheckable(true);
-  yAlignMin->setCheckable(true);
-  yAlignCenter->setCheckable(true);
-  yAlignMax->setCheckable(true);
-  zAlignMin->setCheckable(true);
-  zAlignCenter->setCheckable(true);
-  zAlignMax->setCheckable(true);
 
   QActionGroup *xAlignActionGroup = new QActionGroup(this);
   xAlignActionGroup->addAction(xAlignMin);
