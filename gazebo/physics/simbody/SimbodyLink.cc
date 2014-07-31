@@ -330,8 +330,12 @@ void SimbodyLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetLinearVel(const math::Vector3 & /*_vel*/)
+void SimbodyLink::SetLinearVel(const math::Vector3 & _vel)
 {
+  this->masterMobod.setUToFitLinearVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    //this->simbodyPhysics->integ->getState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
 }
 
 //////////////////////////////////////////////////
@@ -412,8 +416,12 @@ math::Vector3 SimbodyLink::GetWorldCoGLinearVel() const
 }
 
 //////////////////////////////////////////////////
-void SimbodyLink::SetAngularVel(const math::Vector3 &/*_vel*/)
+void SimbodyLink::SetAngularVel(const math::Vector3 &_vel)
 {
+  this->masterMobod.setUToFitAngularVelocity(
+    this->simbodyPhysics->integ->updAdvancedState(),
+    //this->simbodyPhysics->integ->getState(),
+    SimbodyPhysics::Vector3ToVec3(_vel));
 }
 
 //////////////////////////////////////////////////
