@@ -66,13 +66,13 @@ endif ()
 
 ########################################
 # Find packages
+
+find_package(SDFormat 2.0.1)
+if (NOT SDFormat_FOUND)
+  BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
+endif()
+
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=2.0.1)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
