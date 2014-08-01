@@ -40,7 +40,7 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
   {
     std::ios_base::fmtflags flags = _stream.flags();
 
-    _stream.setf(std::ios::fixed);
+    _stream.setf(std::ios::scientific);
     if (this->stamp == "sim")
       _stream << _state.GetSimTime().Double() << " ";
     else if (this->stamp == "real")
@@ -94,30 +94,30 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
       {
         case 'X':
         case 'x':
-          this->Out(result, _state) << std::fixed
+          this->Out(result, _state) << std::scientific
             << _pose.pos.x << " ";
           break;
         case 'Y':
         case 'y':
-          this->Out(result, _state) << std::fixed
+          this->Out(result, _state) << std::scientific
             << _pose.pos.y << " ";
           break;
         case 'Z':
         case 'z':
-          this->Out(result, _state) << std::fixed
+          this->Out(result, _state) << std::scientific
             << _pose.pos.z << " ";
           break;
         case 'R':
         case 'r':
-          this->Out(result, _state) << std::fixed << rpy.x << " ";
+          this->Out(result, _state) << std::scientific << rpy.x << " ";
           break;
         case 'P':
         case 'p':
-          this->Out(result, _state) << std::fixed << rpy.y << " ";
+          this->Out(result, _state) << std::scientific << rpy.y << " ";
           break;
         case 'A':
         case 'a':
-          this->Out(result, _state) << std::fixed << rpy.z << " ";
+          this->Out(result, _state) << std::scientific << rpy.z << " ";
           break;
         default:
           std::cerr << "Invalid pose value[" << *elemIter << "]\n";
@@ -131,7 +131,7 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
     // No filter, so output the whole pose.
     if (!xmlPrefix.empty())
     {
-      result << std::fixed << xmlPrefix << _pose
+      result << std::scientific << xmlPrefix << _pose
         << xmlSuffix << std::endl;
     }
     else
@@ -200,10 +200,10 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         if (this->xmlOutput)
         {
           result << "<angle axis='" << *elemIter << "'>"
-            << std::fixed << angle << "</angle>\n";
+            << std::scientific << angle << "</angle>\n";
         }
         else
-          this->Out(result, _state) << std::fixed << angle << " ";
+          this->Out(result, _state) << std::scientific << angle << " ";
       }
       catch(...)
       {
@@ -254,9 +254,9 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
     else
     {
       if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
-        result << std::fixed << iter->second.GetAngle(0);
+        result << std::scientific << iter->second.GetAngle(0);
       else
-        result << std::fixed << iter->second;
+        result << std::scientific << iter->second;
     }
   }
 
@@ -354,7 +354,7 @@ std::string LinkFilter::Filter(gazebo::physics::ModelState &_state)
         result << "</link>\n";
     }
     else
-      result << std::fixed << iter->second << std::endl;
+      result << std::scientific << iter->second << std::endl;
   }
 
   return result.str();
@@ -481,7 +481,7 @@ std::string ModelFilter::Filter(gazebo::physics::WorldState &_state)
     // whole model state.
     if (!this->linkFilter && !this->jointFilter &&
         partIter == this->parts.end())
-      result << std::fixed << iter->second;
+      result << std::scientific << iter->second;
     else
     {
       if (this->xmlOutput)

@@ -18,6 +18,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
+#include "gazebo/util/LogRecord.hh"
 #include "test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
@@ -72,6 +73,12 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , bool _linear
                         )
 {
+  {
+    gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+    EXPECT_TRUE(recorder->Init("boxes"));
+    EXPECT_TRUE(recorder->Start("zlib"));
+  }
+
   // Load a blank world (no ground plane)
   Load("worlds/blank.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -209,7 +216,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   }
 
   // unthrottle update rate
-  physics->SetRealTimeUpdateRate(0.0);
+  //physics->SetRealTimeUpdateRate(0.0);
   common::Time startTime = common::Time::GetWallTime();
   for (int i = 0; i < steps; ++i)
   {
@@ -247,6 +254,11 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("linPositionErr", linearPositionError.mag);
   this->Record("linVelocityErr", linearVelocityError.mag);
+
+  {
+    gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+    recorder->Stop();
+  }
 }
 
 /////////////////////////////////////////////////
