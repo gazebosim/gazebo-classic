@@ -39,7 +39,14 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
   ASSERT_TRUE(world);
 
   // Wait some time while the models are being loaded.
-  sleep(2);
+  int i = 0;
+  int retries = 200;
+  while (world->GetModelCount() < 65u && i < retries)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+  ASSERT_LT(i, retries);
 
   // We should have multiple cloned models + the ground plane.
   EXPECT_EQ(world->GetModelCount(), 64u + 1u);
