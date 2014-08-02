@@ -24,6 +24,7 @@
 #include "test/ServerFixture.hh"
 
 #include "gazebo/common/Time.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 
 using namespace gazebo;
@@ -31,7 +32,7 @@ using namespace gazebo;
 typedef std::tr1::tuple<const char *, const char *> std_string2;
 
 class JointTest : public ServerFixture,
-                   public ::testing::WithParamInterface<std_string2>
+                  public ::testing::WithParamInterface<std_string2>
 {
   protected: JointTest() : ServerFixture(), spawnCount(0)
              {
@@ -146,60 +147,64 @@ class JointTest : public ServerFixture,
           {
             msgs::Factory msg;
             std::ostringstream modelStr;
-            std::ostringstream modelName;
-            modelName << "joint_model" << this->spawnCount++;
+            std::string modelName;
+            modelName = this->GetUniqueString("joint_model");
 
             modelStr
               << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << modelName.str() << "'>"
+              << "<model name ='" << modelName << "'>"
               << "  <pose>" << _opt.modelPose << "</pose>";
+
             if (!_opt.worldParent)
             {
-              modelStr << "  <link name='parent'>";
+              msgs::Link link;
+              link.set_name("parent");
               if (!_opt.noLinkPose)
               {
-                modelStr << "    <pose>" << _opt.parentLinkPose << "</pose>";
+                msgs::Set(link.mutable_pose(), _opt.parentLinkPose);
               }
-              modelStr << "  </link>";
+              modelStr << msgs::ToSDF(link);
             }
             if (!_opt.worldChild)
             {
-              modelStr << "  <link name='child'>";
+              msgs::Link link;
+              link.set_name("child");
               if (!_opt.noLinkPose)
               {
-                modelStr << "    <pose>" << _opt.childLinkPose << "</pose>";
+                msgs::Set(link.mutable_pose(), _opt.childLinkPose);
               }
-              modelStr << "  </link>";
+              modelStr << msgs::ToSDF(link);
             }
-            modelStr
-              << "  <joint name='joint' type='" << _opt.type << "'>"
-              << "    <pose>" << _opt.jointPose << "</pose>";
+            msgs::Joint jointMsg;
+            jointMsg.set_name("joint");
+            jointMsg.set_type(msgs::Convert(_opt.type));
+            msgs::Set(jointMsg.mutable_pose(), _opt.jointPose);
             if (_opt.worldParent)
-              modelStr << "    <parent>world</parent>";
+            {
+              jointMsg.set_parent("world");
+            }
             else
-              modelStr << "    <parent>parent</parent>";
+            {
+              jointMsg.set_parent("parent");
+            }
             if (_opt.worldChild)
-              modelStr << "    <child>world</child>";
+            {
+              jointMsg.set_child("world");
+            }
             else
-              modelStr << "    <child>child</child>";
-            modelStr
-              << "    <axis>"
-              << "      <xyz>" << _opt.axis << "</xyz>"
-              << "      <use_parent_model_frame>" << _opt.useParentModelFrame
-              << "      </use_parent_model_frame>"
-              << "    </axis>";
+            {
+              jointMsg.set_child("child");
+            }
+            msgs::Set(jointMsg.mutable_axis1()->mutable_xyz(), _opt.axis);
             // Hack: hardcode a second axis for universal joints
             if (_opt.type == "universal")
             {
-              modelStr
-                << "  <axis2>"
-                << "    <xyz>" << math::Vector3(0, 1, 0) << "</xyz>"
-                << "    <use_parent_model_frame>" << _opt.useParentModelFrame
-                << "    </use_parent_model_frame>"
-                << "  </axis2>";
+              msgs::Set(jointMsg.mutable_axis2()->mutable_xyz(),
+                        math::Vector3(0, 1, 0));
             }
             modelStr
-              << "  </joint>"
+              << msgs::ToSDF(jointMsg, _opt.useParentModelFrame,
+                                       _opt.useParentModelFrame)
               << "</model>";
 
             msg.set_sdf(modelStr.str());
@@ -211,7 +216,7 @@ class JointTest : public ServerFixture,
               common::Time wallStart = common::Time::GetWallTime();
               unsigned int waitCount = 0;
               while (_opt.wait > (common::Time::GetWallTime() - wallStart) &&
-                     !this->HasEntity(modelName.str()))
+                     !this->HasEntity(modelName))
               {
                 common::Time::MSleep(100);
                 if (++waitCount % 10 == 0)
@@ -220,13 +225,13 @@ class JointTest : public ServerFixture,
                          << _opt.type << " joint to spawn." << std::endl;
                 }
               }
-              if (this->HasEntity(modelName.str()) && waitCount >= 10)
+              if (this->HasEntity(modelName) && waitCount >= 10)
                 gzwarn << _opt.type << " joint has spawned." << std::endl;
 
               physics::WorldPtr world = physics::get_world("default");
               if (world != NULL)
               {
-                physics::ModelPtr model = world->GetModel(modelName.str());
+                physics::ModelPtr model = world->GetModel(modelName);
                 if (model != NULL)
                   joint = model->GetJoint("joint");
               }

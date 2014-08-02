@@ -116,6 +116,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::PlaneGeom Convert(const math::Plane &_p);
 
+    /// \brief Convert a string to a msgs::Joint::Type enum.
+    /// \param[in] _str Joint type string.
+    /// \return A msgs::Joint::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Joint::Type Convert(const std::string &_str);
+
     /// \brief Convert a msgs::Vector2d to a math::Vector2d
     /// \param[in] _v The plane to convert
     /// \return A math::Vector2d object
@@ -302,6 +308,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     std::string ToSDF(const msgs::Geometry &_msg);
 
+    /// \brief Create an SDF string from msgs::Axis.
+    /// \param[in] _sdf The msgs::Axis object.
+    /// \param[in] _name Name of axis element (axis or axis2).
+    /// \param[in] _useParentModelFrame Flag to use parent model frame,
+    ///   <0 for not set, 0 for false, >0 for true.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Axis &_msg,
+                      const std::string &_name = "axis",
+                      int _useParentModelFrame = -1
+                      );
+
     /// \brief Create an SDF string from msgs::BoxGeom.
     /// \param[in] _sdf The msgs::BoxGeom object.
     /// \return sdf string.
@@ -319,6 +337,18 @@ namespace gazebo
     /// \return sdf string.
     GAZEBO_VISIBLE
     std::string ToSDF(const msgs::ImageGeom &_msg);
+
+    /// \brief Create an SDF string from msgs::Joint.
+    /// \param[in] _sdf The msgs::Joint object.
+    /// \param[in] _useParentModelFrame1 Use parent model frame for axis 1.
+    ///   <0 for not set, 0 for false, >0 for true.
+    /// \param[in] _useParentModelFrame2 Use parent model frame for axis 2.
+    ///   <0 for not set, 0 for false, >0 for true.
+    /// \return sdf string.
+    GAZEBO_VISIBLE
+    std::string ToSDF(const msgs::Joint &_msg,
+                      int _useParentModelFrame1 = -1,
+                      int _useParentModelFrame2 = -1);
 
     /// \brief Create an SDF string from msgs::PlaneGeom.
     /// \param[in] _sdf The msgs::PlaneGeom object.
