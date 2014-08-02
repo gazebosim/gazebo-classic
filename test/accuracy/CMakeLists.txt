@@ -23,6 +23,7 @@ endif()
 
 set(tests
   boxes.cc
+  inertia_ratio.cc
 )
 
 gz_build_tests(${tests})
@@ -30,6 +31,7 @@ gz_build_tests(${tests})
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout
   set_tests_properties(${TEST_TYPE}_boxes PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_inertia_ratio PROPERTIES TIMEOUT 10000)
 endif()
 
 set(display_tests
