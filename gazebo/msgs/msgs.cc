@@ -284,6 +284,40 @@ namespace gazebo
       return result;
     }
 
+    msgs::Joint::Type Convert(const std::string &_str)
+    {
+      msgs::Joint::Type result = msgs::Joint::REVOLUTE;
+      if (_str == "revolute")
+      {
+        result = msgs::Joint::REVOLUTE;
+      }
+      else if (_str == "revolute2")
+      {
+        result = msgs::Joint::REVOLUTE2;
+      }
+      else if (_str == "prismatic")
+      {
+        result = msgs::Joint::PRISMATIC;
+      }
+      else if (_str == "universal")
+      {
+        result = msgs::Joint::UNIVERSAL;
+      }
+      else if (_str == "ball")
+      {
+        result = msgs::Joint::BALL;
+      }
+      else if (_str == "screw")
+      {
+        result = msgs::Joint::SCREW;
+      }
+      else if (_str == "gearbox")
+      {
+        result = msgs::Joint::GEARBOX;
+      }
+      return result;
+    }
+
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
@@ -926,9 +960,9 @@ namespace gazebo
                << msgs::Convert(_msg.pose())
                << "</pose>";
       }
-      if (_msg.joint_size() > 0)
+      for (int i = 0; i < _msg.joint_size(); ++i)
       {
-        gzerr << "Model joints not yet parsed" << std::endl;
+        stream << msgs::ToSDF(_msg.joint(i));
       }
       for (int i = 0; i < _msg.link_size(); ++i)
       {
@@ -1300,6 +1334,188 @@ namespace gazebo
       stream << "</inertia>";
 
       stream << "</inertial>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Joint &_msg,
+                      int _useParentModelFrame1,
+                      int _useParentModelFrame2)
+    {
+      std::ostringstream stream;
+      stream << "<joint name='"
+             << _msg.name();
+      if (_msg.has_type())
+      {
+        if (_msg.type() == Joint::REVOLUTE)
+        {
+          stream << "' type='revolute";
+        }
+        else if (_msg.type() == Joint::REVOLUTE2)
+        {
+          stream << "' type='revolute2";
+        }
+        else if (_msg.type() == Joint::PRISMATIC)
+        {
+          stream << "' type='prismatic";
+        }
+        else if (_msg.type() == Joint::UNIVERSAL)
+        {
+          stream << "' type='universal";
+        }
+        else if (_msg.type() == Joint::BALL)
+        {
+          stream << "' type='ball";
+        }
+        else if (_msg.type() == Joint::SCREW)
+        {
+          stream << "' type='screw";
+        }
+        else if (_msg.type() == Joint::GEARBOX)
+        {
+          stream << "' type='gearbox";
+        }
+      }
+      stream << "'>";
+
+      // ignore the id field, since it's not used in sdformat
+      // ignore the parent_id field, since it's not used in sdformat
+      // ignore the child_id field, since it's not used in sdformat
+      // ignore the angle field, since it's not used in sdformat
+      if (_msg.has_parent())
+      {
+        stream << "<parent>" << _msg.parent() << "</parent>";
+      }
+      if (_msg.has_child())
+      {
+        stream << "<child>" << _msg.child() << "</child>";
+      }
+      if (_msg.has_pose())
+      {
+        stream << "<pose>"
+               << msgs::Convert(_msg.pose())
+               << "</pose>";
+      }
+      if (_msg.has_axis1())
+      {
+        stream << ToSDF(_msg.axis1(), "axis", _useParentModelFrame1);
+      }
+      if (_msg.has_axis2())
+      {
+        stream << ToSDF(_msg.axis2(), "axis2", _useParentModelFrame2);
+      }
+
+      stream << "<physics>"
+             << "<ode>";
+      if (_msg.has_cfm())
+      {
+        stream << "<cfm>" << _msg.cfm() << "</cfm>";
+      }
+      if (_msg.has_bounce())
+      {
+        stream << "<bounce>" << _msg.bounce() << "</bounce>";
+      }
+      if (_msg.has_velocity())
+      {
+        stream << "<velocity>" << _msg.velocity() << "</velocity>";
+      }
+      if (_msg.has_fudge_factor())
+      {
+        stream << "<fudge_factor>" << _msg.fudge_factor() << "</fudge_factor>";
+      }
+
+      stream << "<limit>";
+      if (_msg.has_limit_cfm())
+      {
+        stream << "<cfm>" << _msg.limit_cfm() << "</cfm>";
+      }
+      if (_msg.has_limit_erp())
+      {
+        stream << "<erp>" << _msg.limit_erp() << "</erp>";
+      }
+      stream << "</limit>"
+             << "<suspension>";
+      if (_msg.has_suspension_cfm())
+      {
+        stream << "<cfm>" << _msg.suspension_cfm() << "</cfm>";
+      }
+      if (_msg.has_suspension_erp())
+      {
+        stream << "<erp>" << _msg.suspension_erp() << "</erp>";
+      }
+      stream << "</suspension>"
+             << "</ode>"
+             << "</physics>";
+      // also ignore the sensor field for now
+
+      stream << "</joint>";
+      return stream.str();
+    }
+
+    ////////////////////////////////////////////////////////
+    std::string ToSDF(const msgs::Axis &_msg,
+                      const std::string &_name,
+                      int _useParentModelFrame)
+    {
+      std::ostringstream stream;
+      stream << "<" << _name << ">";
+
+      if (_msg.has_xyz())
+      {
+        stream << "<xyz>"
+               << msgs::Convert(_msg.xyz())
+               << "</xyz>";
+      }
+      if (_useParentModelFrame >= 0)
+      {
+        stream << "<use_parent_model_frame>"
+               << _useParentModelFrame
+               << "</use_parent_model_frame>";
+      }
+
+      stream << "<dynamics>";
+      if (_msg.has_damping())
+      {
+        stream << "<damping>"
+               << _msg.damping()
+               << "</damping>";
+      }
+      if (_msg.has_friction())
+      {
+        stream << "<friction>"
+               << _msg.friction()
+               << "</friction>";
+      }
+      stream << "</dynamics>";
+
+      stream << "<limit>";
+      if (_msg.has_limit_lower())
+      {
+        stream << "<lower>"
+               << _msg.limit_lower()
+               << "</lower>";
+      }
+      if (_msg.has_limit_upper())
+      {
+        stream << "<upper>"
+               << _msg.limit_upper()
+               << "</upper>";
+      }
+      if (_msg.has_limit_effort())
+      {
+        stream << "<effort>"
+               << _msg.limit_effort()
+               << "</effort>";
+      }
+      if (_msg.has_limit_velocity())
+      {
+        stream << "<velocity>"
+               << _msg.limit_velocity()
+               << "</velocity>";
+      }
+      stream << "</limit>";
+
+      stream << "</" << _name << ">";
       return stream.str();
     }
 
