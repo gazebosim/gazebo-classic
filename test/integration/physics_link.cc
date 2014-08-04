@@ -81,12 +81,6 @@ void PhysicsLinkTest::GetWorldEnergy(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "SimbodyLink::SetLinearVel, SetAngularVel aren't working (#1080)"
-          << std::endl;
-    return;
-  }
   if (_physicsEngine == "dart")
   {
     gzerr << "DARTLink::SetLinearVel, SetAngularVel aren't working (#1079)"
