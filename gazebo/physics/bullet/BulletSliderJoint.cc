@@ -266,7 +266,7 @@ bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletSlider not yet created.\n";
+    gzlog << "bulletSlider not yet created.\n";
     return false;
   }
 }
@@ -283,7 +283,7 @@ bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletSlider not yet created.\n";
+    gzlog << "bulletSlider not yet created.\n";
     return false;
   }
 }
@@ -295,7 +295,7 @@ math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
+    gzlog << "Joint must be created before getting high stop\n";
   return result;
 }
 
@@ -306,7 +306,7 @@ math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzerr << "Joint must be created before getting low stop\n";
+    gzlog << "Joint must be created before getting low stop\n";
   return result;
 }
 
@@ -350,6 +350,6 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
   if (this->bulletSlider)
     result = this->bulletSlider->getLinearPos();
   else
-    gzwarn << "bulletSlider does not exist, returning default position\n";
+    gzlog << "bulletSlider does not exist, returning default position\n";
   return result;
 }
