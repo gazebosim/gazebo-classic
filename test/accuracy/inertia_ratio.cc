@@ -30,28 +30,30 @@ using namespace gazebo;
 // gravity applied
 // force on top sphere
 typedef std::tr1::tuple<const char * /* physics engine */
+                      , int          /* number of iterations */
                       , double       /* dt */
-                      , double       /* number of iterations */
                       , double       /* mass of large sphere */
                       , double       /* gravity */
                       , double       /* force on top sphere */
-                      > char1double1int2bool3;
+                      , double       /* stuff */
+                      > char1int1double4;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int2bool3>
+                      public testing::WithParamInterface<char1int1double4>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
-  /// \param[in] _dt Max time step size.
   /// \param[in] _iterations Number of iterations.
+  /// \param[in] _dt Max time step size.
   /// \param[in] _mass Mass of large sphere, all others being 1
   /// \param[in] _gravity gravity applied
   /// \param[in] _force force on top sphere
   public: void InertiaRatio(const std::string &_physicsEngine
+                            , int _iterations
                             , double _dt
-                            , double _iterations
                             , double _mass
                             , double _gravity
                             , double _force
+                            , double _stuff
                             );
 };
 
@@ -60,11 +62,12 @@ class RigidBodyTest : public ServerFixture,
 // Spawn a single box and record accuracy for momentum and enery
 // conservation
 void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
+                                , int _iterations
                                 , double _dt
-                                , double _iterations
                                 , double _mass
                                 , double _gravity
                                 , double _force
+                                , double _stuff
                                 )
 {
   // Load a blank world (no ground plane)
@@ -77,87 +80,14 @@ void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
   ASSERT_TRUE(physics != NULL);
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
+  // get model and link
+  physics::ModelPtr model = world->GetModel("sphere_5");
+  physics::LinkPtr link = model->GetLink("link");
+
   // get gravity value
-  if (!_gravity)
-  {
-    physics->SetGravity(math::Vector3::Zero);
-  }
+  physics->SetGravity(math::Vector3(0, 0, _gravity));
+
   math::Vector3 g = physics->GetGravity();
-
-  // Box size
-  const double dx = 0.1;
-  const double dy = 0.4;
-  const double dz = 0.9;
-  const double mass = 10.0;
-  // inertia matrix, recompute if the above change
-  const double Ixx = 0.80833333;
-  const double Iyy = 0.68333333;
-  const double Izz = 0.14166667;
-  const math::Matrix3 I0(Ixx, 0.0, 0.0
-                       , 0.0, Iyy, 0.0
-                       , 0.0, 0.0, Izz);
-
-  // Create box with inertia based on box of uniform density
-  msgs::Model msgModel;
-  msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
-  if (!_collision)
-  {
-    msgModel.mutable_link(0)->clear_collision();
-  }
-
-  // spawn multiple boxes
-  // compute error statistics only on the last box
-  ASSERT_GT(_boxCount, 0);
-  physics::ModelPtr model;
-  physics::LinkPtr link;
-
-  // initial linear velocity in global frame
-  const math::Vector3 v0(0.1, 0.4, 0.9);
-
-  // initial angular velocity in global frame
-  math::Vector3 w0;
-
-  // initial energy value
-  double E0;
-
-  if (_linear)
-  {
-    // Use angular velocity with one non-zero component
-    // to ensure linear angular trajectory
-    w0.Set(1.5e-1, 0.0, 0.0);
-    E0 = 4.9090937462499999;
-  }
-  else
-  {
-    // Since Ixx > Iyy > Izz,
-    // angular velocity with large y component
-    // will cause gyroscopic tumbling
-    w0.Set(1e-3, 1.5e0, 1.5e-2);
-    E0 = 5.668765966704;
-  }
-
-  for (int i = 0; i < _boxCount; ++i)
-  {
-    // give models unique names
-    msgModel.set_name(this->GetUniqueString("model"));
-    // give models unique positions
-    msgs::Set(msgModel.mutable_pose()->mutable_position(),
-              math::Vector3(dz*2*i, 0.0, 0.0));
-
-    model = this->SpawnModel(msgModel);
-    ASSERT_TRUE(model != NULL);
-
-    link = model->GetLink();
-    ASSERT_TRUE(link != NULL);
-
-    // Set initial conditions
-    link->SetLinearVel(v0);
-    link->SetAngularVel(w0);
-  }
-  ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
-  ASSERT_EQ(w0, link->GetWorldAngularVel());
-  ASSERT_EQ(I0, link->GetInertial()->GetMOI());
-  ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
 
   // initial time
   common::Time t0 = world->GetSimTime();
@@ -165,30 +95,18 @@ void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
   // initial linear position in global frame
   math::Vector3 p0 = link->GetWorldInertialPose().pos;
 
+  // initial linear velocity in global frame
+  const math::Vector3 v0 = link->GetWorldLinearVel();
+
+  // initial angular velocity in global frame
+  math::Vector3 w0 = link->GetWorldAngularVel();
+
   // initial angular momentum in global frame
-  math::Vector3 H0 = link->GetWorldInertiaMatrix() * link->GetWorldAngularVel();
-  ASSERT_EQ(H0, math::Vector3(Ixx, Iyy, Izz) * w0);
+  math::Vector3 H0 = link->GetWorldInertiaMatrix() * w0;
   double H0mag = H0.GetLength();
 
-  // change step size after setting initial conditions
-  // since simbody requires a time step
-  physics->SetMaxStepSize(_dt);
-  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-  {
-    gzdbg << "iters: "
-          << boost::any_cast<int>(physics->GetParam("iters"))
-          << std::endl;
-    physics->SetParam("iters", _iterations);
-  }
-  // else if (_physicsEngine == "simbody")
-  // {
-  //   gzdbg << "accuracy: "
-  //         << boost::any_cast<double>(physics->GetParam("accuracy"))
-  //         << std::endl;
-  //   physics->SetParam("accuracy", 1.0 / static_cast<float>(_iterations));
-  // }
-  const double simDuration = 10.0;
-  int steps = ceil(simDuration / _dt);
+  // initial energy
+  double E0 = link->GetWorldEnergy();
 
   // variables to compute statistics on
   math::Vector3Stats linearPositionError;
@@ -203,6 +121,13 @@ void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
   }
 
+  // set simulation time step size
+  physics->SetMaxStepSize(_dt);
+
+  // setup simulation duration
+  const double simDuration = 10.0;
+  int steps = ceil(simDuration / _dt);
+
   // unthrottle update rate
   physics->SetRealTimeUpdateRate(0.0);
   common::Time startTime = common::Time::GetWallTime();
@@ -211,15 +136,15 @@ void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
     world->Step(1);
 
     // current time
-    double t = (world->GetSimTime() - t0).Double();
+    // double t = (world->GetSimTime() - t0).Double();
 
     // linear velocity error
     math::Vector3 v = link->GetWorldCoGLinearVel();
-    linearVelocityError.InsertData(v - (v0 + g*t));
+    linearVelocityError.InsertData(v - v0);
 
     // linear position error
     math::Vector3 p = link->GetWorldInertialPose().pos;
-    linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
+    linearPositionError.InsertData(p - p0);
 
     // angular momentum error
     math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
@@ -248,34 +173,32 @@ void RigidBodyTest::InertiaRatio(const std::string &_physicsEngine
 TEST_P(RigidBodyTest, InertiaRatio)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
-  double dt                 = std::tr1::get<1>(GetParam());
-  int iterations            = std::tr1::get<2>(GetParam());
-  int boxCount              = std::tr1::get<3>(GetParam());
-  bool gravity              = std::tr1::get<4>(GetParam());
-  bool collisions           = std::tr1::get<5>(GetParam());
-  bool linear               = std::tr1::get<6>(GetParam());
+  int    iterations         = std::tr1::get<1>(GetParam());
+  double dt                 = std::tr1::get<2>(GetParam());
+  double mass               = std::tr1::get<3>(GetParam());
+  double gravity            = std::tr1::get<4>(GetParam());
+  double force              = std::tr1::get<5>(GetParam());
+  double stuff              = std::tr1::get<6>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
-        << ", boxCount: " << boxCount
+        << ", mass: " << mass
         << ", gravity: " << gravity
-        << ", collisions: " << collisions
-        << ", linear: " << linear
+        << ", force: " << force
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
   RecordProperty("iters", iterations);
-  RecordProperty("boxCount", boxCount);
+  RecordProperty("mass", mass);
   RecordProperty("gravity", gravity);
-  RecordProperty("collisions", collisions);
-  RecordProperty("linear", linear);
+  RecordProperty("force", force);
   InertiaRatio(physicsEngine
-      , dt
       , iterations
-      , boxCount
+      , dt
+      , mass
       , gravity
-      , collisions
-      , linear
+      , force
+      , stuff
       );
 }
 
@@ -284,66 +207,55 @@ TEST_P(RigidBodyTest, InertiaRatio)
 #define DT_STEP 3.0e-4
 INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
   , ::testing::Values(50)
-  , ::testing::Values(1)
-  , ::testing::Values(false)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
+  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+  , ::testing::Values(1.0)
+  , ::testing::Values(-1.0) /* gravity */
+  , ::testing::Values(0.0)
+  , ::testing::Values(0.0)
   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Values(50)
-  , ::testing::Values(1)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
-  ));
-
-#define BOXES_MIN 1
-#define BOXES_MAX 105
-#define BOXES_STEP 20
+/*
 INSTANTIATE_TEST_CASE_P(OdeInertiaRatio, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
+  , ::testing::Values(3.0e-4)
+  , ::testing::Values(1.0)
+  , ::testing::Values(-100.0)
+  , ::testing::Values(0.0)
+  , ::testing::Values(0.0)
   ));
 
 INSTANTIATE_TEST_CASE_P(BulletInertiaRatio, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
+  , ::testing::Values(3.0e-4)
+  , ::testing::Values(1.0)
+  , ::testing::Values(-100.0)
+  , ::testing::Values(0.0)
+  , ::testing::Values(0.0)
   ));
 
 INSTANTIATE_TEST_CASE_P(SimbodyInertiaRatio, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
+  , ::testing::Values(3.0e-4)
+  , ::testing::Values(1.0)
+  , ::testing::Values(-100.0)
+  , ::testing::Values(0.0)
+  , ::testing::Values(0.0)
   ));
 
 INSTANTIATE_TEST_CASE_P(DartInertiaRatio, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
+  , ::testing::Values(3.0e-4)
+  , ::testing::Values(1.0)
+  , ::testing::Values(-100.0)
+  , ::testing::Values(0.0)
+  , ::testing::Values(0.0)
   ));
+*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
