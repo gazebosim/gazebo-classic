@@ -23,6 +23,7 @@ endif()
 
 set(tests
   boxes.cc
+  one_dof.cc
 )
 
 gz_build_tests(${tests})
@@ -30,6 +31,7 @@ gz_build_tests(${tests})
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout
   set_tests_properties(${TEST_TYPE}_boxes PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_one_dof PROPERTIES TIMEOUT 10000)
 endif()
 
 set(display_tests

@@ -26,7 +26,7 @@ using namespace gazebo;
 // physics engine
 // dt
 // number of iterations
-// number of boxes to spawn
+// number of models to spawn
 // gravity on / off
 // collision shape on / off
 // linear angular velocity on / off
@@ -45,11 +45,11 @@ class RigidBodyTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
   /// \param[in] _iterations Number of iterations.
-  /// \param[in] _boxCount Number of boxes to spawn.
+  /// \param[in] _boxCount Number of models to spawn.
   /// \param[in] _gravity Flag for turning gravity on / off.
   /// \param[in] _collision Flag for turning collisions on / off.
   /// \param[in] _linear Flag for linear initial angular velocity on / off.
-  public: void Boxes(const std::string &_physicsEngine
+  public: void OneDof(const std::string &_physicsEngine
                    , double _dt
                    , int _iterations
                    , int _boxCount
@@ -60,10 +60,11 @@ class RigidBodyTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-// Boxes:
-// Spawn a single box and record accuracy for momentum and enery
-// conservation
-void RigidBodyTest::Boxes(const std::string &_physicsEngine
+// OneDof:
+// Spawn an array of single degree-of-freedom boxes connected
+// to the world with a slider joint
+// and record accuracy for momentum and enery conservation
+void RigidBodyTest::OneDof(const std::string &_physicsEngine
                         , double _dt
                         , int _iterations
                         , int _boxCount
@@ -90,17 +91,19 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   math::Vector3 g = physics->GetGravity();
 
   // Box size
-  const double dx = 0.1;
-  const double dy = 0.4;
-  const double dz = 0.9;
+  const double dx = 0.5;
+  const double dy = 0.5;
+  const double dz = 0.5;
   const double mass = 10.0;
   // inertia matrix, recompute if the above change
-  const double Ixx = 0.80833333;
-  const double Iyy = 0.68333333;
-  const double Izz = 0.14166667;
+  const double Ixx = 0.41666667;
+  const double Iyy = 0.41666667;
+  const double Izz = 0.41666667;
   const math::Matrix3 I0(Ixx, 0.0, 0.0
                        , 0.0, Iyy, 0.0
                        , 0.0, 0.0, Izz);
+
+  const math::Vector3 axis(0, 1, 0);
 
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
@@ -108,6 +111,15 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   if (!_collision)
   {
     msgModel.mutable_link(0)->clear_collision();
+  }
+  msgModel.add_joint();
+  {
+    msgs::Joint *joint = msgModel.mutable_joint(0);
+    joint->set_name("joint");
+    joint->set_type(msgs::Convert("prismatic"));
+    joint->set_parent("world");
+    joint->set_child(msgModel.link(0).name());
+    msgs::Set(joint->mutable_axis1()->mutable_xyz(), axis);
   }
 
   // spawn multiple boxes
@@ -117,29 +129,29 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   physics::LinkPtr link;
 
   // initial linear velocity in global frame
-  const math::Vector3 v0(0.1, 0.4, 0.9);
+  const math::Vector3 v0(2.5 * axis);
 
   // initial angular velocity in global frame
-  math::Vector3 w0;
+  const math::Vector3 w0(0.0, 0.0, 0.0);
 
   // initial energy value
-  double E0;
+  const double E0 = 31.25;
 
-  if (_linear)
-  {
-    // Use angular velocity with one non-zero component
-    // to ensure linear angular trajectory
-    w0.Set(1.5e-1, 0.0, 0.0);
-    E0 = 4.9090937462499999;
-  }
-  else
-  {
-    // Since Ixx > Iyy > Izz,
-    // angular velocity with large y component
-    // will cause gyroscopic tumbling
-    w0.Set(1e-3, 1.5e0, 1.5e-2);
-    E0 = 5.668765966704;
-  }
+  // if (_linear)
+  // {
+  //   // Use angular velocity with one non-zero component
+  //   // to ensure linear angular trajectory
+  //   w0.Set(1.5e-1, 0.0, 0.0);
+  //   E0 = 4.9090937462499999;
+  // }
+  // else
+  // {
+  //   // Since Ixx > Iyy > Izz,
+  //   // angular velocity with large y component
+  //   // will cause gyroscopic tumbling
+  //   w0.Set(1e-3, 1.5e0, 1.5e-2);
+  //   E0 = 5.668765966704;
+  // }
 
   for (int i = 0; i < _boxCount; ++i)
   {
@@ -155,14 +167,16 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     link = model->GetLink();
     ASSERT_TRUE(link != NULL);
 
+    joint = model->GetJoint("joint");
+    ASSERT_TRUE(joint != NULL);
+
     // Set initial conditions
-    link->SetLinearVel(v0);
-    link->SetAngularVel(w0);
+    link->SetVelocity(v0.GetLength());
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
   ASSERT_EQ(I0, link->GetInertial()->GetMOI());
-  ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
+  ASSERT_NEAR(model->GetWorldEnergy(), E0, 1e-6);
 
   // initial time
   common::Time t0 = world->GetSimTime();
@@ -205,6 +219,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     const std::string statNames = "MaxAbs";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
+    EXPECT_TRUE(angularPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(angularMomentumError.InsertStatistics(statNames));
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
   }
@@ -214,6 +229,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   common::Time startTime = common::Time::GetWallTime();
   for (int i = 0; i < steps; ++i)
   {
+    link->SetTorque(99 * math::Vector3(1, 1, 1));
     world->Step(1);
 
     // current time
@@ -221,26 +237,22 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 
     // linear velocity error
     math::Vector3 v = link->GetWorldCoGLinearVel();
-    linearVelocityError.InsertData(v - (v0 + g*t));
+    linearVelocityError.InsertData(v - v0);
 
     // linear position error
     math::Vector3 p = link->GetWorldInertialPose().pos;
-    linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
+    linearPositionError.InsertData(p - (p0 + v0 * t));
+
+    // angular position error
+    math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
+    angularPositionError.InsertData(a);
 
     // angular momentum error
     math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
     angularMomentumError.InsertData((H - H0) / H0mag);
 
-    // angular position error
-    if (_linear)
-    {
-      math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
-      math::Quaternion angleTrue(w0 * t);
-      angularPositionError.InsertData(a - angleTrue.GetAsEuler());
-    }
-
     // energy error
-    energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
+    energyError.InsertData((model->GetWorldEnergy() - E0) / E0);
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
   this->Record("wallTime", elapsedTime.Double());
@@ -253,14 +265,14 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   this->Record("energy0", E0);
   this->Record("energyError", energyError);
   this->Record("angMomentum0", H0mag);
-  this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("angPositionErr", angularPositionError.mag);
+  this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("linPositionErr", linearPositionError.mag);
   this->Record("linVelocityErr", linearVelocityError.mag);
 }
 
 /////////////////////////////////////////////////
-TEST_P(RigidBodyTest, Boxes)
+TEST_P(RigidBodyTest, OneDof)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
@@ -284,7 +296,7 @@ TEST_P(RigidBodyTest, Boxes)
   RecordProperty("gravity", gravity);
   RecordProperty("collisions", collisions);
   RecordProperty("linear", linear);
-  Boxes(physicsEngine
+  OneDof(physicsEngine
       , dt
       , iterations
       , boxCount
@@ -320,7 +332,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
 #define BOXES_MIN 1
 #define BOXES_MAX 105
 #define BOXES_STEP 20
-INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(OdeOneDof, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
@@ -330,7 +342,7 @@ INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   , ::testing::Values(false)
   ));
 
-INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(BulletOneDof, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(3.0e-4)
   , ::testing::Values(50)
@@ -340,7 +352,7 @@ INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   , ::testing::Values(false)
   ));
 
-INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(SimbodyOneDof, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
   , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
@@ -350,7 +362,7 @@ INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   , ::testing::Values(false)
   ));
 
-INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(DartOneDof, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(7.0e-4)
   , ::testing::Values(50)
