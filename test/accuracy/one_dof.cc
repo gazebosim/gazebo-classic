@@ -173,6 +173,10 @@ void RigidBodyTest::OneDof(const std::string &_physicsEngine
 
     // Set initial conditions
     joint->SetVelocity(0, v0.GetLength());
+    if (_physicsEngine == "ode")
+    {
+      link->SetLinearVel(v0);
+    }
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
