@@ -127,6 +127,7 @@ void RigidBodyTest::OneDof(const std::string &_physicsEngine
   ASSERT_GT(_boxCount, 0);
   physics::ModelPtr model;
   physics::LinkPtr link;
+  physics::JointPtr joint;
 
   // initial linear velocity in global frame
   const math::Vector3 v0(2.5 * axis);
@@ -171,7 +172,7 @@ void RigidBodyTest::OneDof(const std::string &_physicsEngine
     ASSERT_TRUE(joint != NULL);
 
     // Set initial conditions
-    link->SetVelocity(v0.GetLength());
+    joint->SetVelocity(0, v0.GetLength());
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
