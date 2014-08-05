@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'tmpdir'
+require 'zip'
 
 #################################################
 # Display help information
@@ -44,22 +46,23 @@ Dir.mktmpdir { |dir|
   metaDir = File.join(dir, modelName, "meta")
 
   # Copy the model information into a temp directory
-  `cp -r "#{modelDir}" #{dir}`
+  FileUtils.cp_r modelDir, dir
  
   # Create the meta directory
-  if RUBY_VERSION < "1.9"
-    Dir.mkdir(metaDir)
-  else
-    Dir.mkdir(metaDir)
-  end
+  Dir.mkdir(metaDir)
 
   # Create a set of images
   `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
-  
-  # Create a tarball for the model
-  `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
+
+  # Create a zip file for the model
+  zipFilename = File.join(Dir.pwd, modelName + '.zip')
+  Zip::File.open(zipFilename, Zip::File::CREATE) { |zip| 
+    Dir[File.join(dir,'**','**')].each do |file|
+      zip.add(file.sub(dir + '/', ''), file)
+    end
+  }
 }
 
 # Completion message
 puts "Propshop model created.\n"
-puts "Upload [#{modelName}.tar.gz] to thepropshop.org"
+puts "Upload [#{modelName}.zip] to thepropshop.org"
