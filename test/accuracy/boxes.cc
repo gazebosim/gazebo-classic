@@ -205,6 +205,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     const std::string statNames = "MaxAbs";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
+    EXPECT_TRUE(angularPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(angularMomentumError.InsertStatistics(statNames));
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
   }
