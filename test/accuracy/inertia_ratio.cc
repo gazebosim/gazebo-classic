@@ -297,7 +297,7 @@ void RigidBodyTest::InertiaRatioBoxStack(const std::string &_physicsEngine
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
   // get model and link
-  physics::ModelPtr model = world->GetModel("sphere_5");
+  physics::ModelPtr model = world->GetModel("box_5");
   physics::LinkPtr link = model->GetLink("link");
 
   // get gravity value

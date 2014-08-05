@@ -30,6 +30,7 @@
               <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
@@ -69,6 +70,7 @@
               <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
@@ -108,6 +110,7 @@
               <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
@@ -147,6 +150,7 @@
               <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
@@ -186,6 +190,7 @@
               <ode>
                 <soft_erp>1.0</soft_erp>
                 <max_vel>0</max_vel>
+                <min_depth>0.001</min_depth>
               </ode>
             </contact>
           </surface>
