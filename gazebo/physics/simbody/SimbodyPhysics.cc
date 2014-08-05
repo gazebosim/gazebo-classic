@@ -40,6 +40,7 @@
 #include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyScrewJoint.hh"
 
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
@@ -392,6 +393,65 @@ void SimbodyPhysics::InitForThread()
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
+  this->contactManager->ResetCount();
+
+  // Get all contacts from Simbody
+  /// \TODO: get collision data from simbody contacts
+  Collision *collision1 = NULL;
+  Collision *collision2 = NULL;
+
+  const SimTK::State &state = this->integ->getState();
+  int numc = this->contact.getNumContactForces(state);
+
+  // add contacts to the manager. This will return NULL if no one is
+  // listening for contact information.
+  Contact *contactFeedback = this->contactManager->NewContact(collision1,
+      collision2, this->world->GetSimTime());
+
+  if (contactFeedback)
+  {
+    int count = 0;
+    for (int j = 0; j < numc; ++j)
+    {
+      // get contact stuff from Simbody
+      SimTK::ContactPatch patch;
+      const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
+      const SimTK::ContactId     id    = force.getContactId();
+      const bool found =
+        this->contact.calcContactPatchDetailsById(state, id, patch);
+
+      // loop through detials of patch
+      if (found)
+      {
+        for (int i=0; i < patch.getNumDetails(); ++i)
+        {
+          // get detail
+          const SimTK::ContactDetail& detail = patch.getContactDetail(i);
+          // get contact information from simbody and
+          // add them to contactFeedback.
+          // Store the contact depth
+          contactFeedback->depths[count] = detail.getDeformation();
+
+          // Store the contact position
+          contactFeedback->positions[count].Set(
+            detail.getContactPoint()[0],
+            detail.getContactPoint()[1],
+            detail.getContactPoint()[2]);
+
+          // Store the contact normal
+          contactFeedback->normals[j].Set(
+            detail.getContactNormal()[0],
+            detail.getContactNormal()[1],
+            detail.getContactNormal()[2]);
+
+          // Increase the counters
+          ++count;
+          contactFeedback->count = count;
+        }
+      }
+    }
+  }
+
 }
 
 //////////////////////////////////////////////////
