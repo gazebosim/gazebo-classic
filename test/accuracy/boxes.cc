@@ -25,37 +25,25 @@ using namespace gazebo;
 
 // physics engine
 // dt
-// number of iterations
 // number of boxes to spawn
-// gravity on / off
-// collision shape on / off
-// linear angular velocity on / off
+// nonlinear trajectory on / off
 typedef std::tr1::tuple<const char *
                       , double
                       , int
-                      , int
                       , bool
-                      , bool
-                      , bool
-                      > char1double1int2bool3;
+                      > char1double1int1bool1;
 class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int2bool3>
+                      public testing::WithParamInterface<char1double1int1bool1>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
-  /// \param[in] _iterations Number of iterations.
-  /// \param[in] _boxCount Number of boxes to spawn.
-  /// \param[in] _gravity Flag for turning gravity on / off.
-  /// \param[in] _collision Flag for turning collisions on / off.
-  /// \param[in] _linear Flag for linear initial angular velocity on / off.
+  /// \param[in] _modelCount Number of boxes to spawn.
+  /// \param[in] _nonlinear Flag for nonlinear trajectory on / off.
   public: void Boxes(const std::string &_physicsEngine
                    , double _dt
-                   , int _iterations
-                   , int _boxCount
-                   , bool _gravity
-                   , bool _collision
-                   , bool _linear
+                   , int _modelCount
+                   , bool _nonlinear
                    );
 };
 
@@ -65,11 +53,8 @@ class RigidBodyTest : public ServerFixture,
 // conservation
 void RigidBodyTest::Boxes(const std::string &_physicsEngine
                         , double _dt
-                        , int _iterations
-                        , int _boxCount
-                        , bool _gravity
-                        , bool _collision
-                        , bool _linear
+                        , int _modelCount
+                        , bool _nonlinear
                         )
 {
   // Load a blank world (no ground plane)
@@ -83,7 +68,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
   // get gravity value
-  if (!_gravity)
+  if (!_nonlinear)
   {
     physics->SetGravity(math::Vector3::Zero);
   }
@@ -105,14 +90,10 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
   msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
-  if (!_collision)
-  {
-    msgModel.mutable_link(0)->clear_collision();
-  }
 
   // spawn multiple boxes
   // compute error statistics only on the last box
-  ASSERT_GT(_boxCount, 0);
+  ASSERT_GT(_modelCount, 0);
   physics::ModelPtr model;
   physics::LinkPtr link;
 
@@ -125,7 +106,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // initial energy value
   double E0;
 
-  if (_linear)
+  if (!_nonlinear)
   {
     // Use angular velocity with one non-zero component
     // to ensure linear angular trajectory
@@ -141,7 +122,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     E0 = 5.668765966704;
   }
 
-  for (int i = 0; i < _boxCount; ++i)
+  for (int i = 0; i < _modelCount; ++i)
   {
     // give models unique names
     msgModel.set_name(this->GetUniqueString("model"));
@@ -178,20 +159,6 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // change step size after setting initial conditions
   // since simbody requires a time step
   physics->SetMaxStepSize(_dt);
-  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-  {
-    gzdbg << "iters: "
-          << boost::any_cast<int>(physics->GetParam("iters"))
-          << std::endl;
-    physics->SetParam("iters", _iterations);
-  }
-  // else if (_physicsEngine == "simbody")
-  // {
-  //   gzdbg << "accuracy: "
-  //         << boost::any_cast<double>(physics->GetParam("accuracy"))
-  //         << std::endl;
-  //   physics->SetParam("accuracy", 1.0 / static_cast<float>(_iterations));
-  // }
   const double simDuration = 10.0;
   int steps = ceil(simDuration / _dt);
 
@@ -233,7 +200,7 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     angularMomentumError.InsertData((H - H0) / H0mag);
 
     // angular position error
-    if (_linear)
+    if (!_nonlinear)
     {
       math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
       math::Quaternion angleTrue(w0 * t);
@@ -265,33 +232,21 @@ TEST_P(RigidBodyTest, Boxes)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
-  int iterations            = std::tr1::get<2>(GetParam());
-  int boxCount              = std::tr1::get<3>(GetParam());
-  bool gravity              = std::tr1::get<4>(GetParam());
-  bool collisions           = std::tr1::get<5>(GetParam());
-  bool linear               = std::tr1::get<6>(GetParam());
+  int modelCount            = std::tr1::get<2>(GetParam());
+  bool nonlinear            = std::tr1::get<3>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
-        << ", iters: " << iterations
-        << ", boxCount: " << boxCount
-        << ", gravity: " << gravity
-        << ", collisions: " << collisions
-        << ", linear: " << linear
+        << ", modelCount: " << modelCount
+        << ", nonlinear: " << nonlinear
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
-  RecordProperty("iters", iterations);
-  RecordProperty("boxCount", boxCount);
-  RecordProperty("gravity", gravity);
-  RecordProperty("collisions", collisions);
-  RecordProperty("linear", linear);
+  RecordProperty("modelCount", modelCount);
+  RecordProperty("nonlienar", nonlinear);
   Boxes(physicsEngine
       , dt
-      , iterations
-      , boxCount
-      , gravity
-      , collisions
-      , linear
+      , modelCount
+      , nonlinear
       );
 }
 
@@ -301,64 +256,46 @@ TEST_P(RigidBodyTest, Boxes)
 INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Values(50)
   , ::testing::Values(1)
   , ::testing::Values(false)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
   ));
 
 INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Values(50)
   , ::testing::Values(1)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
-#define BOXES_MIN 1
-#define BOXES_MAX 105
-#define BOXES_STEP 20
+#define MODELS_MIN 1
+#define MODELS_MAX 105
+#define MODELS_STEP 20
 INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(3.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
+  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(3.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
+  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("simbody")
   , ::testing::Values(7.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
+  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
 INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(7.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(BOXES_MIN, BOXES_MAX, BOXES_STEP)
+  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
 /////////////////////////////////////////////////
