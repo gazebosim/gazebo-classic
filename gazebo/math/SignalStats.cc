@@ -116,6 +116,36 @@ void SignalMaxAbsoluteValue::InsertData(double _data)
 }
 
 //////////////////////////////////////////////////
+double SignalVarianceValue::Get() const
+{
+  return this->data;
+}
+
+//////////////////////////////////////////////////
+std::string SignalVarianceValue::GetShortName() const
+{
+  return "Variance";
+}
+
+//////////////////////////////////////////////////
+void SignalVarianceValue::InsertData(double _data)
+{
+  // from nfs-uxsup.csx.cam.ac.uk/~fanf2/hermes/doc/antiforgery/stats.pdf
+  double oldMean = this->sum / this->count;
+  this->count++;
+  this->sum += _data;
+  double newMean = this->sum / this->count;
+  this->data += this->count * (this->count - 1.0) * (newMean - oldMean);
+}
+
+//////////////////////////////////////////////////
+void SignalVarianceValue::Reset()
+{
+  SignalStatistic::Reset();
+  this->sum = 0;
+}
+
+//////////////////////////////////////////////////
 SignalStats::SignalStats()
 {
 }
