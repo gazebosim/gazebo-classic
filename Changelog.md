@@ -1,7 +1,63 @@
+## Gazebo 4.0
+
+### Gazebo 4.0.0 (2014-04-11)
+
+1. Added lcov support to cmake
+    * [Pull request #1047](https://bitbucket.org/osrf/gazebo/pull-request/1047)
+1. Fixed memory leak in image conversion
+    * [Pull request #1057](https://bitbucket.org/osrf/gazebo/pull-request/1057)
+1. Removed deprecated function
+    * [Pull request #1067](https://bitbucket.org/osrf/gazebo/pull-request/1067)
+1. Improved collada loading performance
+    * [Pull request #1066](https://bitbucket.org/osrf/gazebo/pull-request/1066)
+    * [Pull request #1082](https://bitbucket.org/osrf/gazebo/pull-request/1082)
+    * [Issue #1134](https://bitbucket.org/osrf/gazebo/issue/1134)
+1. Implemented a collada exporter
+    * [Pull request #1064](https://bitbucket.org/osrf/gazebo/pull-request/1064)
+1. Force torque sensor now makes use of sensor''s pose.
+    * [Pull request #1076](https://bitbucket.org/osrf/gazebo/pull-request/1076)
+    * [Issue #940](https://bitbucket.org/osrf/gazebo/issue/940)
+1. Fix Model::GetLinks segfault
+    * [Pull request #1093](https://bitbucket.org/osrf/gazebo/pull-request/1093)
+1. Fix deleting and saving lights in gzserver
+    * [Pull request #1094](https://bitbucket.org/osrf/gazebo/pull-request/1094)
+    * [Issue #1182](https://bitbucket.org/osrf/gazebo/issue/1182)
+    * [Issue #346](https://bitbucket.org/osrf/gazebo/issue/346)
+
 ## Gazebo 3.0
+
+### Gazebo 3.1.0 (never released)
+
+1. Added SetPositionPID and SetVelocityPID to JointController
+    * [Pull request #1091](https://bitbucket.org/osrf/gazebo/pull-request/1091)
+1. Fix gzclient startup crash with ogre 1.9
+    * [Pull request #1098](https://bitbucket.org/osrf/gazebo/pull-request/1098)
+    * [Issue #996](https://bitbucket.org/osrf/gazebo/issue/996)
 
 ### Gazebo 3.0.0 (2014-04-11)
 
+1. Fix bug when deleting the sun light
+    * [Pull request #1088](https://bitbucket.org/osrf/gazebo/pull-request/1088)
+    * [Issue #1133](https://bitbucket.org/osrf/gazebo/issue/1133)
+1. Fix ODE screw joint
+    * [Pull request #1078](https://bitbucket.org/osrf/gazebo/pull-request/1078)
+    * [Issue #1167](https://bitbucket.org/osrf/gazebo/issue/1167)
+1. Update joint integration tests
+    * [Pull request #1081](https://bitbucket.org/osrf/gazebo/pull-request/1081)
+1. Fixed false positives in cppcheck.
+    * [Pull request #1061](https://bitbucket.org/osrf/gazebo/pull-request/1061)
+1. Made joint axis reference frame relative to child, and updated simbody and dart accordingly.
+    * [Pull request #1069](https://bitbucket.org/osrf/gazebo/pull-request/1069)
+    * [Issue #494](https://bitbucket.org/osrf/gazebo/issue/494)
+    * [Issue #1143](https://bitbucket.org/osrf/gazebo/issue/1143)
+1. Added ability to pass vector of strings to SetupClient and SetupServer
+    * [Pull request #1068](https://bitbucket.org/osrf/gazebo/pull-request/1068)
+    * [Issue #1132](https://bitbucket.org/osrf/gazebo/issue/1132)
+1. Fix error correction in screw constraints for ODE
+    * [Pull request #1159](https://bitbucket.org/osrf/gazebo/pull-request/1159)
+    * [Issue #1159](https://bitbucket.org/osrf/gazebo/issue/1159)
+1. Improved pkgconfig with SDF
+    * [Pull request #1062](https://bitbucket.org/osrf/gazebo/pull-request/1062)
 1. Added a plugin to simulate aero dynamics
     * [Pull request #905](https://bitbucket.org/osrf/gazebo/pull-request/905)
 1. Updated bullet support
@@ -55,6 +111,15 @@
 ## Gazebo 2.0
 
 ### Gazebo 2.2.0 (2014-01-10)
+
+1. Return proper error codes when gazebo exits
+    * [Pull request #1085](https://bitbucket.org/osrf/gazebo/pull-request/1085)
+    * [Issue #1178](https://bitbucket.org/osrf/gazebo/issue/1178)
+1. Fixed Camera::GetWorldRotation().
+    * [Pull request #1071](https://bitbucket.org/osrf/gazebo/pull-request/1071)
+    * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
+1. Fixed memory leak in image conversion
+    * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
 1. Fix compilation when using OGRE-1.9 (full support is being worked on)
     * [Issue #994](https://bitbucket.org/osrf/gazebo/issue/994)
     * [Issue #995](https://bitbucket.org/osrf/gazebo/issue/995)
@@ -263,6 +328,8 @@
 
 ### Gazebo 1.9.3 (2014-01-10)
 
+1. Improved collada loading performance
+    * [Pull request #1075](https://bitbucket.org/osrf/gazebo/pull-request/1075)
 1. Add thickness to plane to remove shadow flickering.
     * [Pull request #886](https://bitbucket.org/osrf/gazebo/pull-request/886)
 1. Temporary GUI shadow toggle fix.
