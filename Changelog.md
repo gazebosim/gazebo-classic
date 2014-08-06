@@ -1,5 +1,46 @@
 ## Gazebo 3.0
 
+### Gazebo 3.0.1 (2014-08-08)
+
+1. Pass argc, argv to system gui plugins (#280)
+    * [Pull request #1162](http://bitbucket.org/osrf/gazebo/pull-request/1162)
+1. Implement Simbody::Link::Set*Vel (#1012)
+    * [Pull request #1160](http://bitbucket.org/osrf/gazebo/pull-request/1160)
+1. Fix build for two example plugins on osx
+    * [Pull request #1155](http://bitbucket.org/osrf/gazebo/pull-request/1155)
+1. Fix deadlock for gazebo 3.1
+    * [Pull request #1152](http://bitbucket.org/osrf/gazebo/pull-request/1152)
+1. Added World::RemoveModel to fix issue #1177
+    * [Pull request #1106](http://bitbucket.org/osrf/gazebo/pull-request/1106)
+1. Remove redundant call of WorldPlugin::Init from gazebo_2.2 branch (#1208)
+    * [Pull request #1107](http://bitbucket.org/osrf/gazebo/pull-request/1107)
+1. Fix exiting camera follow mode
+    * [Pull request #1137](http://bitbucket.org/osrf/gazebo/pull-request/1137)
+1. SDF tags for joint spring stiffness and reference position
+    * [Pull request #1117](http://bitbucket.org/osrf/gazebo/pull-request/1117)
+1. Remove the gzmodel_create script
+    * [Pull request #1130](http://bitbucket.org/osrf/gazebo/pull-request/1130)
+1. Install deprecated manpages still in gazebo-3.X (-> 3.1)
+    * [Pull request #1123](http://bitbucket.org/osrf/gazebo/pull-request/1123)
+1. respect given linker flags (-> 3.1)
+    * [Pull request #1122](http://bitbucket.org/osrf/gazebo/pull-request/1122)
+1. fix issue #1138, SetJointPosition
+    * [Pull request #1096](http://bitbucket.org/osrf/gazebo/pull-request/1096)
+1. Fix updating light properties in world
+    * [Pull request #1110](http://bitbucket.org/osrf/gazebo/pull-request/1110)
+1. Add option to display pull request title to bitbucket_pullrequests tool
+    * [Pull request #1108](http://bitbucket.org/osrf/gazebo/pull-request/1108)
+1. Added vector2 dot product
+    * [Pull request #1101](http://bitbucket.org/osrf/gazebo/pull-request/1101)
+1. Fix gzclient startup crash with ogre 1.9 
+    * [Pull request #1098](http://bitbucket.org/osrf/gazebo/pull-request/1098)
+1. Add SetPositionPID() and SetVelocityPID to the migration guide.
+    * [Pull request #1095](http://bitbucket.org/osrf/gazebo/pull-request/1095)
+1. Minor style fix (extra spaces).
+    * [Pull request #1092](http://bitbucket.org/osrf/gazebo/pull-request/1092)
+1. Adding SetPositionPID and SetVelocityPID to JointController class.
+    * [Pull request #1091](http://bitbucket.org/osrf/gazebo/pull-request/1091)
+
 ### Gazebo 3.0.0 (2014-04-11)
 
 1. Added a plugin to simulate aero dynamics
