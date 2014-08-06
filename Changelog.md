@@ -81,7 +81,7 @@
 
 ## Gazebo 3.0
 
-### Gazebo 3.1.0 (never released)
+### Gazebo 3.1.0 (2014-08-08)
 
 1. Implemented Simbody::Link::Set*Vel
     * [Pull request #1160](https://bitbucket.org/osrf/gazebo/pull-request/1160)
@@ -188,7 +188,7 @@
 
 ## Gazebo 2.0
 
-### Gazebo 2.2.0 (2014-01-10)
+### Gazebo 2.2.3 (2014-04-29)
 
 1. Removed redundant call to World::Init
     * [Pull request #1107](https://bitbucket.org/osrf/gazebo/pull-request/1107)
@@ -201,6 +201,9 @@
     * [Issue #1087](https://bitbucket.org/osrf/gazebo/issue/1087)
 1. Fixed memory leak in image conversion
     * [Pull request #1073](https://bitbucket.org/osrf/gazebo/pull-request/1073)
+
+### Gazebo 2.2.0 (2014-01-10)
+
 1. Fix compilation when using OGRE-1.9 (full support is being worked on)
     * [Issue #994](https://bitbucket.org/osrf/gazebo/issue/994)
     * [Issue #995](https://bitbucket.org/osrf/gazebo/issue/995)
@@ -407,12 +410,15 @@
 
 ## Gazebo 1.9
 
-### Gazebo 1.9.3 (2014-01-10)
+### Gazebo 1.9.6 (2014-04-29)
 
 1. Refactored inertia ratio reduction for ODE
     * [Pull request #1114](https://bitbucket.org/osrf/gazebo/pull-request/1114)
 1. Improved collada loading performance
     * [Pull request #1075](https://bitbucket.org/osrf/gazebo/pull-request/1075)
+
+### Gazebo 1.9.3 (2014-01-10)
+
 1. Add thickness to plane to remove shadow flickering.
     * [Pull request #886](https://bitbucket.org/osrf/gazebo/pull-request/886)
 1. Temporary GUI shadow toggle fix.
