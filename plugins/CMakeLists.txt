@@ -1,7 +1,7 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
 )
 
@@ -9,7 +9,7 @@ include_directories(
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
 link_directories(
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
 

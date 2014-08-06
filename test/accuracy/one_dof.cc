@@ -25,36 +25,52 @@ using namespace gazebo;
 
 // physics engine
 // dt
-// number of boxes to spawn
-// nonlinear trajectory on / off
+// number of iterations
+// number of models to spawn
+// gravity on / off
+// force disturbance on / off
+// torque disturbance on / off
 typedef std::tr1::tuple<const char *
                       , double
                       , int
+                      , int
                       , bool
-                      > char1double1int1bool1;
-class RigidBodyTest : public ServerFixture,
-                      public testing::WithParamInterface<char1double1int1bool1>
+                      , bool
+                      , bool
+                      > char1double1int2bool3;
+class OneDofTest : public ServerFixture,
+                   public testing::WithParamInterface<char1double1int2bool3>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _dt Max time step size.
-  /// \param[in] _modelCount Number of boxes to spawn.
-  /// \param[in] _nonlinear Flag for nonlinear trajectory on / off.
-  public: void Boxes(const std::string &_physicsEngine
+  /// \param[in] _iterations Number of iterations.
+  /// \param[in] _modelCount Number of models to spawn.
+  /// \param[in] _gravity Flag for turning gravity on / off.
+  /// \param[in] _force Flag for force disturbance on / off.
+  /// \param[in] _torque Flag for torque disturbance on / off.
+  public: void Slider(const std::string &_physicsEngine
                    , double _dt
+                   , int _iterations
                    , int _modelCount
-                   , bool _nonlinear
+                   , bool _gravity
+                   , bool _force
+                   , bool _torque
                    );
 };
 
 /////////////////////////////////////////////////
-// Boxes:
-// Spawn a single box and record accuracy for momentum and enery
-// conservation
-void RigidBodyTest::Boxes(const std::string &_physicsEngine
+// OneDof:
+// Spawn an array of single degree-of-freedom boxes connected
+// to the world with a slider joint
+// and record accuracy for momentum and enery conservation
+void OneDofTest::Slider(const std::string &_physicsEngine
                         , double _dt
+                        , int _iterations
                         , int _modelCount
-                        , bool _nonlinear
+                        , bool _gravity
+                        , bool _force
+                        , bool _torque
                         )
 {
   // Load a blank world (no ground plane)
@@ -68,59 +84,55 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
   // get gravity value
-  if (!_nonlinear)
+  if (!_gravity)
   {
     physics->SetGravity(math::Vector3::Zero);
   }
   math::Vector3 g = physics->GetGravity();
 
   // Box size
-  const double dx = 0.1;
-  const double dy = 0.4;
-  const double dz = 0.9;
+  const double dx = 0.5;
+  const double dy = 0.5;
+  const double dz = 0.5;
   const double mass = 10.0;
   // inertia matrix, recompute if the above change
-  const double Ixx = 0.80833333;
-  const double Iyy = 0.68333333;
-  const double Izz = 0.14166667;
+  const double Ixx = 0.41666667;
+  const double Iyy = 0.41666667;
+  const double Izz = 0.41666667;
   const math::Matrix3 I0(Ixx, 0.0, 0.0
                        , 0.0, Iyy, 0.0
                        , 0.0, 0.0, Izz);
 
+  const math::Vector3 axis(0, 1, 0);
+
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
   msgs::AddBoxLink(msgModel, mass, math::Vector3(dx, dy, dz));
+  msgModel.add_joint();
+  {
+    msgs::Joint *joint = msgModel.mutable_joint(0);
+    joint->set_name("joint");
+    joint->set_type(msgs::Convert("prismatic"));
+    joint->set_parent("world");
+    joint->set_child(msgModel.link(0).name());
+    msgs::Set(joint->mutable_axis1()->mutable_xyz(), axis);
+  }
 
   // spawn multiple boxes
   // compute error statistics only on the last box
   ASSERT_GT(_modelCount, 0);
   physics::ModelPtr model;
   physics::LinkPtr link;
+  physics::JointPtr joint;
 
   // initial linear velocity in global frame
-  const math::Vector3 v0(0.1, 0.4, 0.9);
+  const math::Vector3 v0(2.5 * axis);
 
   // initial angular velocity in global frame
-  math::Vector3 w0;
+  const math::Vector3 w0(0.0, 0.0, 0.0);
 
   // initial energy value
-  double E0;
-
-  if (!_nonlinear)
-  {
-    // Use angular velocity with one non-zero component
-    // to ensure linear angular trajectory
-    w0.Set(1.5e-1, 0.0, 0.0);
-    E0 = 4.9090937462499999;
-  }
-  else
-  {
-    // Since Ixx > Iyy > Izz,
-    // angular velocity with large y component
-    // will cause gyroscopic tumbling
-    w0.Set(1e-3, 1.5e0, 1.5e-2);
-    E0 = 5.668765966704;
-  }
+  const double E0 = 31.25;
 
   for (int i = 0; i < _modelCount; ++i)
   {
@@ -136,14 +148,20 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
     link = model->GetLink();
     ASSERT_TRUE(link != NULL);
 
+    joint = model->GetJoint("joint");
+    ASSERT_TRUE(joint != NULL);
+
     // Set initial conditions
-    link->SetLinearVel(v0);
-    link->SetAngularVel(w0);
+    joint->SetVelocity(0, v0.GetLength());
+    if (_physicsEngine == "ode")
+    {
+      link->SetLinearVel(v0);
+    }
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
   ASSERT_EQ(w0, link->GetWorldAngularVel());
   ASSERT_EQ(I0, link->GetInertial()->GetMOI());
-  ASSERT_NEAR(link->GetWorldEnergy(), E0, 1e-6);
+  ASSERT_NEAR(model->GetWorldEnergy(), E0, 1e-6);
 
   // initial time
   common::Time t0 = world->GetSimTime();
@@ -159,6 +177,20 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   // change step size after setting initial conditions
   // since simbody requires a time step
   physics->SetMaxStepSize(_dt);
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    gzdbg << "iters: "
+          << boost::any_cast<int>(physics->GetParam("iters"))
+          << std::endl;
+    physics->SetParam("iters", _iterations);
+  }
+  // else if (_physicsEngine == "simbody")
+  // {
+  //   gzdbg << "accuracy: "
+  //         << boost::any_cast<double>(physics->GetParam("accuracy"))
+  //         << std::endl;
+  //   physics->SetParam("accuracy", 1.0 / static_cast<float>(_iterations));
+  // }
   const double simDuration = 10.0;
   int steps = ceil(simDuration / _dt);
 
@@ -182,6 +214,16 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   common::Time startTime = common::Time::GetWallTime();
   for (int i = 0; i < steps; ++i)
   {
+    if (_force)
+    {
+      math::Vector3 force = 99 * ((i/10) % 2) * math::Vector3(1, 1, 1);
+      force -= axis * axis.Dot(force);
+      link->SetForce(force);
+    }
+    if (_torque)
+    {
+      link->SetTorque(99 * ((i/10) % 2) * math::Vector3(1, 1, 1));
+    }
     world->Step(1);
 
     // current time
@@ -189,26 +231,22 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
 
     // linear velocity error
     math::Vector3 v = link->GetWorldCoGLinearVel();
-    linearVelocityError.InsertData(v - (v0 + g*t));
+    linearVelocityError.InsertData(v - v0);
 
     // linear position error
     math::Vector3 p = link->GetWorldInertialPose().pos;
-    linearPositionError.InsertData(p - (p0 + v0 * t + 0.5*g*t*t));
+    linearPositionError.InsertData(p - (p0 + v0 * t));
+
+    // angular position error
+    math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
+    angularPositionError.InsertData(a);
 
     // angular momentum error
     math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
-    angularMomentumError.InsertData((H - H0) / H0mag);
-
-    // angular position error
-    if (!_nonlinear)
-    {
-      math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
-      math::Quaternion angleTrue(w0 * t);
-      angularPositionError.InsertData(a - angleTrue.GetAsEuler());
-    }
+    angularMomentumError.InsertData(H - H0);
 
     // energy error
-    energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
+    energyError.InsertData((model->GetWorldEnergy() - E0) / E0);
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
   this->Record("wallTime", elapsedTime.Double());
@@ -221,80 +259,98 @@ void RigidBodyTest::Boxes(const std::string &_physicsEngine
   this->Record("energy0", E0);
   this->Record("energyError", energyError);
   this->Record("angMomentum0", H0mag);
-  this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("angPositionErr", angularPositionError.mag);
+  this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("linPositionErr", linearPositionError.mag);
   this->Record("linVelocityErr", linearVelocityError.mag);
 }
 
 /////////////////////////////////////////////////
-TEST_P(RigidBodyTest, Boxes)
+TEST_P(OneDofTest, Slider)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
-  int modelCount            = std::tr1::get<2>(GetParam());
-  bool nonlinear            = std::tr1::get<3>(GetParam());
+  int iterations            = std::tr1::get<2>(GetParam());
+  int modelCount            = std::tr1::get<3>(GetParam());
+  bool gravity              = std::tr1::get<4>(GetParam());
+  bool force                = std::tr1::get<5>(GetParam());
+  bool torque               = std::tr1::get<6>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
+        << ", iters: " << iterations
         << ", modelCount: " << modelCount
-        << ", nonlinear: " << nonlinear
+        << ", gravity: " << gravity
+        << ", force: " << force
+        << ", torque: " << torque
         << std::endl;
   RecordProperty("engine", physicsEngine);
   this->Record("dt", dt);
+  RecordProperty("iters", iterations);
   RecordProperty("modelCount", modelCount);
-  RecordProperty("nonlienar", nonlinear);
-  Boxes(physicsEngine
+  RecordProperty("gravity", gravity);
+  RecordProperty("force", force);
+  RecordProperty("torque", torque);
+  Slider(physicsEngine
       , dt
+      , iterations
       , modelCount
-      , nonlinear
+      , gravity
+      , force
+      , torque
       );
 }
 
-#define DT_MIN 1e-4
-#define DT_MAX 1.01e-3
-#define DT_STEP 3.0e-4
-INSTANTIATE_TEST_CASE_P(EnginesDtLinear, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+// #define DT_MIN 1e-4
+// #define DT_MAX 1.01e-3
+// #define DT_STEP 2.0e-4
+// #define DT_VALUES ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+#define DT_VALUES ::testing::Values(1e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
+// #define ITERS_MIN 5
+// #define ITERS_MAX 51
+// #define ITERS_STEP 5
+// #define ITERS_VALUES ::testing::Range(ITERS_MIN, ITERS_MAX, ITERS_STEP)
+#define ITERS_VALUES ::testing::Values(5, 10, 20, 50)
+INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, OneDofTest,
+    ::testing::Combine(::testing::Values("ode")
+  , DT_VALUES
+  , ITERS_VALUES
   , ::testing::Values(1)
   , ::testing::Values(false)
+  , ::testing::Values(false)
+  , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesDtNonlinear, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, OneDofTest,
+    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+  , DT_VALUES
+  , ::testing::Values(50)
   , ::testing::Values(1)
+  , ::testing::Values(false)
+  , ::testing::Values(false)
   , ::testing::Values(true)
   ));
 
 #define MODELS_MIN 1
 #define MODELS_MAX 105
-#define MODELS_STEP 20
-INSTANTIATE_TEST_CASE_P(OdeBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(3.0e-4)
+#define MODELS_STEP 25
+#define MODELS_DT 3.2e-3
+INSTANTIATE_TEST_CASE_P(SlidersTorqueOde, OneDofTest,
+    ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(MODELS_DT)
+  , ITERS_VALUES
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(false)
+  , ::testing::Values(false)
   , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(BulletBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(3.0e-4)
+INSTANTIATE_TEST_CASE_P(SlidersTorque, OneDofTest,
+    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+  , ::testing::Values(MODELS_DT)
+  , ::testing::Values(50)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(true)
-  ));
-
-INSTANTIATE_TEST_CASE_P(SimbodyBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(true)
-  ));
-
-INSTANTIATE_TEST_CASE_P(DartBoxes, RigidBodyTest,
-  ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(false)
+  , ::testing::Values(false)
   , ::testing::Values(true)
   ));
 
