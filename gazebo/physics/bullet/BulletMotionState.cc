@@ -21,6 +21,7 @@
 
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
+#include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletMotionState.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 
@@ -53,8 +54,8 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   // for now get transform from btRigidBody directly
   physics::BulletLinkPtr bulletLink =
     boost::static_pointer_cast<BulletLink>(this->link);
-  math::Pose pose =
-    BulletTypes::ConvertPose(bulletLink->getCenterOfMassTransform());
+  math::Pose pose = BulletTypes::ConvertPose(
+    bulletLink->GetBulletLink()->getCenterOfMassTransform());
 
   // transform pose from cg location to link location
   // cg: pose of cg in link frame, so -cg is transform from cg to
