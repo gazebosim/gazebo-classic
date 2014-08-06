@@ -131,10 +131,10 @@ std::string SignalVarianceValue::GetShortName() const
 void SignalVarianceValue::InsertData(double _data)
 {
   // from nfs-uxsup.csx.cam.ac.uk/~fanf2/hermes/doc/antiforgery/stats.pdf
-  double oldMean = this->sum / this->count;
+  double oldMean = this->sum / (this->count + 1.0);
   this->count++;
   this->sum += _data;
-  double newMean = this->sum / this->count;
+  double newMean = this->sum / (this->count + 1.0);
   this->data += this->count * (this->count - 1.0) * (newMean - oldMean);
 }
 
