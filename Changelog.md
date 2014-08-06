@@ -40,7 +40,7 @@
 1. Integrated Razer Hydra functionality
     * [Pull request #1083](https://bitbucket.org/osrf/gazebo/pull-request/1083)
     * [Pull request #1109](https://bitbucket.org/osrf/gazebo/pull-request/1109)
-1. Added ability to copy and past models in the GUI
+1. Added ability to copy and paste models in the GUI
     * [Pull request #1103](https://bitbucket.org/osrf/gazebo/pull-request/1103)
 1. Removed unnecessary inclusion of gazebo.hh and common.hh in plugins
     * [Pull request #1111](https://bitbucket.org/osrf/gazebo/pull-request/1111)
@@ -105,7 +105,7 @@
     * [Issue #996](https://bitbucket.org/osrf/gazebo/issue/996)
 1. Update the bitbucket_pullrequests tool
     * [Pull request #1108](https://bitbucket.org/osrf/gazebo/pull-request/1108)
-1. Light properties now remain in place after move by the use via the GUI.
+1. Light properties now remain in place after move by the user via the GUI.
     * [Pull request #1110](https://bitbucket.org/osrf/gazebo/pull-request/1110)
     * [Issue #1211](https://bitbucket.org/osrf/gazebo/issue/1211)
 1. Allow position of joints to be directly set.
