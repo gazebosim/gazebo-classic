@@ -43,10 +43,10 @@ modelName = modelParts[-2]
 ## Make a temporary directory
 Dir.mktmpdir { |dir|
 
-  metaDir = File.join(dir, modelName, "meta")
+  metaDir = File.join(dir, "meta")
 
   # Copy the model information into a temp directory
-  FileUtils.cp_r modelDir, dir
+  FileUtils.cp_r Dir[modelDir + '/*'], dir
  
   # Create the meta directory
   Dir.mkdir(metaDir)
