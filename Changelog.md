@@ -14,7 +14,7 @@
     * [Issue #1134](https://bitbucket.org/osrf/gazebo/issue/1134)
 1. Implemented a collada exporter
     * [Pull request #1064](https://bitbucket.org/osrf/gazebo/pull-request/1064)
-1. Force torque sensor now makes use of sensor''s pose.
+1. Force torque sensor now makes use of sensor's pose.
     * [Pull request #1076](https://bitbucket.org/osrf/gazebo/pull-request/1076)
     * [Issue #940](https://bitbucket.org/osrf/gazebo/issue/940)
 1. Fix Model::GetLinks segfault
