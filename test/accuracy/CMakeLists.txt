@@ -23,7 +23,9 @@ endif()
 
 set(tests
   boxes.cc
-  inertia_ratio.cc
+  inertia_ratio_sphere_stack.cc
+  inertia_ratio_box_stack.cc
+  inertia_ratio_single_box.cc
 )
 
 gz_build_tests(${tests})
@@ -31,7 +33,9 @@ gz_build_tests(${tests})
 if (ENABLE_TESTS_COMPILATION)
   # Increase timeout
   set_tests_properties(${TEST_TYPE}_boxes PROPERTIES TIMEOUT 10000)
-  set_tests_properties(${TEST_TYPE}_inertia_ratio PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_inertia_ratio_sphere_stack PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_inertia_ratio_box_stack PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_inertia_ratio_single_box PROPERTIES TIMEOUT 10000)
 endif()
 
 set(display_tests

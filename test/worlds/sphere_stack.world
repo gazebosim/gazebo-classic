@@ -14,9 +14,9 @@
         <inertial>
           <mass>1.0</mass>
           <inertia>
-            <ixx>0.1666666</ixx>
-            <iyy>0.1666666</iyy>
-            <izz>0.1666666</izz>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -53,9 +53,9 @@
         <inertial>
           <mass>1.0</mass>
           <inertia>
-            <ixx>0.1666666</ixx>
-            <iyy>0.1666666</iyy>
-            <izz>0.1666666</izz>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -92,9 +92,9 @@
         <inertial>
           <mass>1.0</mass>
           <inertia>
-            <ixx>0.1666666</ixx>
-            <iyy>0.1666666</iyy>
-            <izz>0.1666666</izz>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -131,9 +131,9 @@
         <inertial>
           <mass>1.0</mass>
           <inertia>
-            <ixx>0.1666666</ixx>
-            <iyy>0.1666666</iyy>
-            <izz>0.1666666</izz>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
@@ -170,9 +170,9 @@
         <inertial>
           <mass>1.0</mass>
           <inertia>
-            <ixx>0.1666666</ixx>
-            <iyy>0.1666666</iyy>
-            <izz>0.1666666</izz>
+            <ixx>0.1</ixx>
+            <iyy>0.1</iyy>
+            <izz>0.1</izz>
           </inertia>
         </inertial>
         <collision name="collision">
