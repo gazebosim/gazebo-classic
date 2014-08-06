@@ -81,21 +81,65 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
   // get model and link
-  physics::ModelPtr model = world->GetModel("sphere_5");
-  physics::LinkPtr link = model->GetLink("link");
-
-  // modify model link mass and inertia
-  link->GetInertial()->SetMass(_mass);
-  const double radius = 0.5;
-  double ixx = 2.0 * _mass * radius * radius / 5.0;
-  link->GetInertial()->SetIXX(ixx);
-  link->GetInertial()->SetIYY(ixx);
-  link->GetInertial()->SetIZZ(ixx);
+  physics::Model_V models;
 
   // get gravity value
   physics->SetGravity(math::Vector3(0, 0, _gravity));
 
   math::Vector3 g = physics->GetGravity();
+
+  // Create box with inertia based on box of uniform density
+  const int spheres = 5;
+  for (int i = 0; i < spheres; ++i)
+  {
+    msgs::Model msgModel;
+    std::ostringstream modelName;
+    modelName << "sphere_" << i;
+    msgModel.set_name(modelName.str());
+
+    msgModel.add_link();
+    msgs::Link *msgLink = msgModel.mutable_link(0);
+    msgLink->set_name("link");
+    msgs::Inertial *msgInertial = msgLink->mutable_inertial();
+    const double radius = 0.5;
+    double m;
+    if (i == spheres - 1)
+      m = _mass;
+    else
+      m = 1.0;
+    msgInertial->set_mass(m);
+    double ixx = 2.0 * m * radius * radius / 5.0;
+    msgInertial->set_ixx(ixx);
+    msgInertial->set_ixy(0.0);
+    msgInertial->set_ixz(0.0);
+    msgInertial->set_iyy(ixx);
+    msgInertial->set_iyz(0.0);
+    msgInertial->set_izz(ixx);
+
+    msgLink->add_collision();
+    msgs::Collision *msgCollision = msgLink->mutable_collision(0);
+    msgCollision->set_name("collision");
+    msgs::Geometry *msgGeometry = msgCollision->mutable_geometry();
+    msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
+    msgGeometry->mutable_sphere()->set_radius(radius);
+
+    /*
+    msgLink->add_visual();
+    msgs::Visual *msgVisual = msgLink->mutable_visual(0);
+    msgVisual->set_name("visual");
+    msgGeometry = msgVisual->mutable_geometry();
+    msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
+    msgGeometry->mutable_sphere()->set_radius(radius);
+    */
+
+    math::Vector3 pos(0, 0, radius * (1.0 + 2.0 * i));
+    msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
+    models.push_back(this->SpawnModel(msgModel));
+  }
+
+  // get top model and link
+  physics::ModelPtr model = world->GetModel("sphere_4");
+  physics::LinkPtr link = model->GetLink("link");
 
   // initial time
   common::Time t0 = world->GetSimTime();
@@ -229,11 +273,11 @@ TEST_P(RigidBodyTest, InertiaRatioSphereStack)
         << std::endl;
   RecordProperty("engine", physicsEngine);
   RecordProperty("iters", iterations);
-  RecordProperty("dt", dt);
+  this->Record("dt", dt);
   this->Record("mass", mass);
-  RecordProperty("gravity", gravity);
-  RecordProperty("force", force);
-  RecordProperty("tolerance", tolerance);
+  this->Record("gravity", gravity);
+  this->Record("force", force);
+  this->Record("tolerance", tolerance);
   InertiaRatioSphereStack(physicsEngine
       , iterations
       , dt
@@ -251,8 +295,8 @@ INSTANTIATE_TEST_CASE_P(EnginesDtLinearSphereStack, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(50)  /* iterations */
   , ::testing::Values(0.001) /* step size */
-  , ::testing::Values(0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0) /* scale mass */
-  , ::testing::Values(-1.0) /* gravity */
+  , ::testing::Values(0.1, 1.0, 10.0, 100.0, 100000.0, 1000000.0) /* mass */
+  , ::testing::Values(-10.0) /* gravity */
   , ::testing::Values(0.0) /* force */
   , ::testing::Values(0.0) /* tolerance */
   ));
