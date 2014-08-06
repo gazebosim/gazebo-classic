@@ -207,6 +207,11 @@ bool SignalStats::InsertStatistic(const std::string &_name)
     stat.reset(new SignalMaxAbsoluteValue());
     this->stats.push_back(stat);
   }
+  else if (_name == "Variance")
+  {
+    stat.reset(new SignalVarianceValue());
+    this->stats.push_back(stat);
+  }
   else if (_name == "Mean")
   {
     stat.reset(new SignalMean());
