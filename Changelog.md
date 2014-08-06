@@ -1,6 +1,6 @@
 ## Gazebo 4.0
 
-### Gazebo 4.0.0 (2014-04-11)
+### Gazebo 4.0.0 (2014-08-08)
 
 1. Added lcov support to cmake
     * [Pull request #1047](https://bitbucket.org/osrf/gazebo/pull-request/1047)
