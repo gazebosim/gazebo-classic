@@ -243,7 +243,7 @@ void OneDofTest::Slider(const std::string &_physicsEngine
 
     // angular momentum error
     math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
-    angularMomentumError.InsertData((H - H0) / H0mag);
+    angularMomentumError.InsertData(H - H0);
 
     // energy error
     energyError.InsertData((model->GetWorldEnergy() - E0) / E0);
@@ -300,16 +300,30 @@ TEST_P(OneDofTest, Slider)
       );
 }
 
-#define DT_MIN 1e-4
-#define DT_MAX 1.01e-3
-#define DT_STEP 3.0e-4
-#define ITERS_MIN 10
-#define ITERS_MAX 51
-#define ITERS_STEP 20
+// #define DT_MIN 1e-4
+// #define DT_MAX 1.01e-3
+// #define DT_STEP 2.0e-4
+// #define DT_VALUES ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
+#define DT_VALUES ::testing::Values(1e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
+// #define ITERS_MIN 5
+// #define ITERS_MAX 51
+// #define ITERS_STEP 5
+// #define ITERS_VALUES ::testing::Range(ITERS_MIN, ITERS_MAX, ITERS_STEP)
+#define ITERS_VALUES ::testing::Values(5, 10, 20, 50)
+INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, OneDofTest,
+    ::testing::Combine(::testing::Values("ode")
+  , DT_VALUES
+  , ITERS_VALUES
+  , ::testing::Values(1)
+  , ::testing::Values(false)
+  , ::testing::Values(false)
+  , ::testing::Values(true)
+  ));
+
 INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, OneDofTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
-  , ::testing::Range(ITERS_MIN, ITERS_MAX, ITERS_STEP)
+    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+  , DT_VALUES
+  , ::testing::Values(50)
   , ::testing::Values(1)
   , ::testing::Values(false)
   , ::testing::Values(false)
@@ -317,46 +331,27 @@ INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, OneDofTest,
   ));
 
 #define MODELS_MIN 1
-#define MODELS_MAX 85
-#define MODELS_STEP 20
-INSTANTIATE_TEST_CASE_P(OdeSliders, OneDofTest,
-  ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(3.0e-4)
-  , ::testing::Values(50)
+#define MODELS_MAX 105
+#define MODELS_STEP 25
+#define MODELS_DT 3.2e-3
+INSTANTIATE_TEST_CASE_P(SlidersTorqueOde, OneDofTest,
+    ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(MODELS_DT)
+  , ITERS_VALUES
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
   , ::testing::Values(false)
+  , ::testing::Values(false)
+  , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(BulletSliders, OneDofTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(3.0e-4)
+INSTANTIATE_TEST_CASE_P(SlidersTorque, OneDofTest,
+    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+  , ::testing::Values(MODELS_DT)
   , ::testing::Values(50)
   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
   , ::testing::Values(false)
-  ));
-
-INSTANTIATE_TEST_CASE_P(SimbodySliders, OneDofTest,
-  ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(true)
-  , ::testing::Values(true)
   , ::testing::Values(false)
-  ));
-
-INSTANTIATE_TEST_CASE_P(DartSliders, OneDofTest,
-  ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(7.0e-4)
-  , ::testing::Values(50)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
   , ::testing::Values(true)
-  , ::testing::Values(true)
-  , ::testing::Values(false)
   ));
 
 /////////////////////////////////////////////////
