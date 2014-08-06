@@ -293,11 +293,11 @@ TEST_P(RigidBodyTest, InertiaRatioSphereStack)
 #define M_STEP 3.0e-4
 INSTANTIATE_TEST_CASE_P(EnginesDtLinearSphereStack, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(50)  /* iterations */
+  , ::testing::Values(10)  /* iterations */
   , ::testing::Values(0.001) /* step size */
-  , ::testing::Values(0.1, 1.0, 10.0, 100.0, 100000.0, 1000000.0) /* mass */
+  , ::testing::Values(1000.0) /* mass */
   , ::testing::Values(-10.0) /* gravity */
-  , ::testing::Values(0.0) /* force */
+  , ::testing::Values(-100.0, -10000.0) /* force */
   , ::testing::Values(0.0) /* tolerance */
   ));
 
