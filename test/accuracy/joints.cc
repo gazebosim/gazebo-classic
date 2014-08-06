@@ -38,7 +38,7 @@ typedef std::tr1::tuple<const char *
                       , bool
                       , bool
                       > char1double1int2bool3;
-class OneDofTest : public ServerFixture,
+class JointsTest : public ServerFixture,
                    public testing::WithParamInterface<char1double1int2bool3>
 {
   /// \brief Test accuracy of unconstrained rigid body motion.
@@ -60,11 +60,11 @@ class OneDofTest : public ServerFixture,
 };
 
 /////////////////////////////////////////////////
-// OneDof:
+// Joints:
 // Spawn an array of single degree-of-freedom boxes connected
 // to the world with a slider joint
 // and record accuracy for momentum and enery conservation
-void OneDofTest::Slider(const std::string &_physicsEngine
+void JointsTest::Slider(const std::string &_physicsEngine
                         , double _dt
                         , int _iterations
                         , int _modelCount
@@ -266,7 +266,7 @@ void OneDofTest::Slider(const std::string &_physicsEngine
 }
 
 /////////////////////////////////////////////////
-TEST_P(OneDofTest, Slider)
+TEST_P(JointsTest, Slider)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   double dt                 = std::tr1::get<1>(GetParam());
@@ -310,7 +310,7 @@ TEST_P(OneDofTest, Slider)
 // #define ITERS_STEP 5
 // #define ITERS_VALUES ::testing::Range(ITERS_MIN, ITERS_MAX, ITERS_STEP)
 #define ITERS_VALUES ::testing::Values(5, 10, 20, 50)
-INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, OneDofTest,
+INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
   , DT_VALUES
   , ITERS_VALUES
@@ -320,7 +320,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, OneDofTest,
   , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, OneDofTest,
+INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , DT_VALUES
   , ::testing::Values(50)
@@ -334,7 +334,7 @@ INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, OneDofTest,
 #define MODELS_MAX 105
 #define MODELS_STEP 25
 #define MODELS_DT 3.2e-3
-INSTANTIATE_TEST_CASE_P(SlidersTorqueOde, OneDofTest,
+INSTANTIATE_TEST_CASE_P(SlidersTorqueOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(MODELS_DT)
   , ITERS_VALUES
@@ -344,7 +344,7 @@ INSTANTIATE_TEST_CASE_P(SlidersTorqueOde, OneDofTest,
   , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(SlidersTorque, OneDofTest,
+INSTANTIATE_TEST_CASE_P(SlidersTorque, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , ::testing::Values(MODELS_DT)
   , ::testing::Values(50)
