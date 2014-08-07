@@ -154,8 +154,8 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
   math::Vector3 w0 = link->GetWorldAngularVel();
 
   // initial angular momentum in global frame
-  math::Vector3 H0 = link->GetWorldInertiaMatrix() * w0;
-  double H0mag = H0.GetLength();
+  // math::Vector3 H0 = link->GetWorldInertiaMatrix() * w0;
+  // double H0mag = H0.GetLength();
 
   // initial energy
   double E0 = link->GetWorldEnergy();
@@ -163,7 +163,6 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
   // variables to compute statistics on
   math::Vector3Stats linearPositionError;
   math::Vector3Stats linearVelocityError;
-  math::Vector3Stats angularMomentumError;
   math::SignalStats energyError;
   math::SignalStats constraintErrorTotal;
   math::SignalStats constraintResidualTotal;
@@ -171,7 +170,6 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
     const std::string statNames = "MaxAbs,Variance,Mean";
     EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
     EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
-    EXPECT_TRUE(angularMomentumError.InsertStatistics(statNames));
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
     EXPECT_TRUE(constraintErrorTotal.InsertStatistics(statNames));
     EXPECT_TRUE(constraintResidualTotal.InsertStatistics(statNames));
@@ -217,8 +215,9 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
     linearPositionError.InsertData(p - p0);
 
     // angular momentum error
-    math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
-    angularMomentumError.InsertData((H - H0) / H0mag);
+    // math::Vector3 H =
+    //   link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
+    // angularMomentumError.InsertData((H - H0) / H0mag);
 
     // energy error
     energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
@@ -231,8 +230,14 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
       double * residual =
         boost::any_cast<double*>(physics->GetParam("constraint_residual"));
 
-      constraintErrorTotal.InsertData(rmsError[2]);
-      constraintResidualTotal.InsertData(residual[2]);
+      constraintErrorTotal.InsertData(rmsError[3]);
+      constraintResidualTotal.InsertData(residual[3]);
+      // gzerr << "residual "
+      //       << "[" <<  residual[0]
+      //       << ", " <<  residual[1]
+      //       << ", " <<  residual[2]
+      //       << ", " <<  residual[3]
+      //       << "]\n";
     }
   }
   common::Time elapsedTime = common::Time::GetWallTime() - startTime;
@@ -245,8 +250,8 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
   // Record statistics on pitch and yaw angles
   this->Record("energy0", E0);
   this->Record("energyError", energyError);
-  this->Record("angMomentum0", H0mag);
-  this->Record("angMomentumErr", angularMomentumError.mag);
+  // this->Record("angMomentum0", H0mag);
+  // this->Record("angMomentumErr", angularMomentumError.mag);
   this->Record("linPositionErr", linearPositionError.mag);
   this->Record("linVelocityErr", linearVelocityError.mag);
   this->Record("rmsErrorTotal", constraintErrorTotal);
@@ -276,7 +281,7 @@ TEST_P(RigidBodyTest, InertiaRatioSphereStack)
   this->Record("dt", dt);
   this->Record("mass", mass);
   this->Record("gravity", gravity);
-  this->Record("force", force);
+  this->Record("force", -force);  // negate, easier for plotting
   this->Record("tolerance", tolerance);
   InertiaRatioSphereStack(physicsEngine
       , iterations
@@ -288,30 +293,42 @@ TEST_P(RigidBodyTest, InertiaRatioSphereStack)
       );
 }
 
+/*
 #define M_MIN 0.5
 #define M_MAX 1000.0
 #define M_STEP 3.0e-4
-INSTANTIATE_TEST_CASE_P(EnginesDtLinearSphereStack, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(InertiaRatioSphereStackMulti, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(10)  /* iterations */
-  , ::testing::Values(0.001) /* step size */
-  , ::testing::Values(1000.0) /* mass */
-  , ::testing::Values(-10.0) /* gravity */
-  , ::testing::Values(-100.0, -10000.0) /* force */
-  , ::testing::Values(0.0) /* tolerance */
+  , ::testing::Values(50)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(-1.0, -50.0, -100.0, -500.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+*/
+
+INSTANTIATE_TEST_CASE_P(OdeInertiaRatioSphereStack, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(50)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
+  , ::testing::Values(0.0) // gravity
+  , ::testing::Values(-1000.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+
+INSTANTIATE_TEST_CASE_P(BulletInertiaRatioSphereStack, RigidBodyTest,
+  ::testing::Combine(::testing::Values("bullet")
+  , ::testing::Values(50)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
+  , ::testing::Values(0.0) // gravity
+  , ::testing::Values(-1000.0) // force
+  , ::testing::Values(0.0) // tolerance
   ));
 
 /*
-INSTANTIATE_TEST_CASE_P(OdeInertiaRatioSphereStack, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(50)
-  , ::testing::Values(3.0e-4)
-  , ::testing::Values(1.0)
-  , ::testing::Values(-100.0)
-  , ::testing::Values(0.0)
-  , ::testing::Values(0.0)
-  ));
-
 INSTANTIATE_TEST_CASE_P(BulletInertiaRatioSphereStack, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(50)
