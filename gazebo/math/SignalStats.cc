@@ -135,7 +135,8 @@ void SignalVarianceValue::InsertData(double _data)
   this->count++;
   this->sum += _data;
   double newMean = this->sum / (this->count + 1.0);
-  this->data += this->count * (this->count - 1.0) * (newMean - oldMean);
+  this->data += this->count * (this->count - 1.0)
+    * (newMean - oldMean) * (newMean - oldMean);
 }
 
 //////////////////////////////////////////////////
