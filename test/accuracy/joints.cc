@@ -125,7 +125,9 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   physics::LinkPtr link;
   physics::JointPtr joint;
 
-  // initial linear velocity in global frame
+  // initial energy value
+  double E0 = 0.0;
+
   const double velMag = 2.5;
   double v0mag = 0.0;
   double w0mag = 0.0;
@@ -133,19 +135,20 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   {
     v0mag = 0.0;
     w0mag = velMag;
+    E0 =1.302084;
   }
   else if (_jointType == "prismatic")
   {
     v0mag = velMag;
     w0mag = 0.0;
+    E0 = 31.25;
   }
+
+  // initial linear velocity in global frame
   const math::Vector3 v0(v0mag * axis);
 
   // initial angular velocity in global frame
   const math::Vector3 w0(w0mag * axis);
-
-  // initial energy value
-  const double E0 = 31.25;
 
   for (int i = 0; i < _modelCount; ++i)
   {
