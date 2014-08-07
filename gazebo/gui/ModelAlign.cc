@@ -65,7 +65,7 @@ void ModelAlign::Init()
     return;
 
   this->dataPtr->userCamera = cam;
-  this->dataPtr->scene =  cam->GetScene();
+  this->dataPtr->scene = cam->GetScene();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -160,14 +160,33 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
-    std::string _axis, std::string _config)
+    const std::string &_axis, const std::string &_config, bool _publish)
 {
+  if (_config == "reset" || _publish)
+  {
+    std::map<rendering::VisualPtr, math::Pose>::iterator it =
+        this->dataPtr->originalVisualPose.begin();
+    for (it; it != this->dataPtr->originalVisualPose.end(); ++it)
+    {
+      if (it->first)
+      {
+        it->first->SetWorldPose(it->second);
+        it->first->SetTransparency(it->first->GetTransparency()*2.0 - 1.0);
+      }
+    }
+    this->dataPtr->originalVisualPose.clear();
+    if (this->dataPtr->scene)
+      this->dataPtr->scene->SelectVisual("", "normal");
+    if (!_publish)
+      return;
+  }
+
   this->dataPtr->selectedVisuals = _visuals;
 
   if (this->dataPtr->selectedVisuals.size() <= 1)
     return;
 
-  this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
+  this->dataPtr->targetVis = this->dataPtr->selectedVisuals.front();
 
   math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
   math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
@@ -179,7 +198,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
-  for (unsigned i = 0; i < this->dataPtr->selectedVisuals.size() - 1; ++i)
+  for (unsigned i = 1; i < this->dataPtr->selectedVisuals.size(); ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
@@ -201,6 +220,19 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     else if (_config == "max")
       trans = targetMax - max;
 
+    if (!_publish)
+    {
+      if (this->dataPtr->originalVisualPose.find(vis) ==
+          this->dataPtr->originalVisualPose.end())
+      {
+        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose();
+        vis->SetTransparency((1.0 - vis->GetTransparency()) * 0.5);
+      }
+      // prevent the visual pose from being updated by the server
+      if (this->dataPtr->scene)
+        this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
+    }
+
     if (_axis == "x")
     {
       trans.y = trans.z = 0;
@@ -217,7 +249,8 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
     }
 
-    this->PublishVisualPose(vis);
+    if (_publish)
+      this->PublishVisualPose(vis);
   }
 }
 

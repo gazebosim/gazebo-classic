@@ -88,6 +88,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   QToolButton *alignButton = new QToolButton;
   alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
   alignButton->setIcon(QIcon(":/images/align.png"));
+  alignButton->setToolTip(tr("Select 2 objects to align"));
   alignButton->setArrowType(Qt::NoArrow);
   QMenu *alignMenu = new QMenu(alignButton);
   alignMenu->addAction(g_alignAct);

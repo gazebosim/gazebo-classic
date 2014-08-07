@@ -51,8 +51,10 @@ namespace gazebo
       /// \param[in] _visuals Visuals to be aligned.
       /// \param[in] _axis Axis of alignment: x, y, or z.
       /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _publish True to publish new alignment pose
       public: void AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
-          std::string _axis, std::string _config);
+          const std::string &_axis, const std::string &_config,
+          bool _publish = true);
 
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.

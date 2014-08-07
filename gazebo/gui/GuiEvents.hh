@@ -58,7 +58,7 @@ namespace gazebo
       public: template<typename T>
               static event::ConnectionPtr ConnectAlignMode(T _subscriber)
               {return alignMode.Connect(_subscriber);}
-      public: static void DisconnectAignMode(event::ConnectionPtr _subscriber)
+      public: static void DisconnectAlignMode(event::ConnectionPtr _subscriber)
               {alignMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
@@ -132,7 +132,8 @@ namespace gazebo
       public: static event::EventT<void (std::string)>  manipMode;
 
       ///  that indicates the user is aligning objects
-      public: static event::EventT<void (std::string, std::string)>  alignMode;
+      public: static event::EventT<void (std::string, std::string, bool)>
+          alignMode;
 
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;

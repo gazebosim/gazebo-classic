@@ -31,6 +31,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \class ModelSnap ModelSnap.hh
     /// \brief Private data for the ModelSnap class
     class ModelSnapPrivate
     {
@@ -61,8 +62,14 @@ namespace gazebo
       /// \brief Vertices of a mesh triangle used as the basis for alignment.
       public: std::vector<math::Vector3> selectedTriangle;
 
+      /// \brief Vertices of a mesh triangle being hovered.
+      public: std::vector<math::Vector3> hoverTriangle;
+
       /// \brief Currently selected visual.
       public: rendering::VisualPtr selectedVis;
+
+      /// \brief Currently hovered visual.
+      public: rendering::VisualPtr hoverVis;
 
       /// \brief Connection for the render event.
       public: event::ConnectionPtr renderConnection;
@@ -75,6 +82,18 @@ namespace gazebo
 
       /// \brief Lines to highlight the selected triangle.
       public: rendering::DynamicLines *snapLines;
+
+      /// \brief A visual to represent the hovered area.
+      public: rendering::VisualPtr highlightVisual;
+
+      /// \brief A highlight of the hovered triangle.
+      public: rendering::DynamicLines *snapHighlight;
+
+      /// \brief A variable to indicate the selected triangle has changed.
+      public: bool selectedTriangleDirty;
+
+      /// \brief A variable to indicate the hovered triangle has changed.
+      public: bool hoverTriangleDirty;
     };
   }
 }

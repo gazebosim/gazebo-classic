@@ -43,6 +43,8 @@ ModelSnap::ModelSnap()
   : dataPtr(new ModelSnapPrivate)
 {
   this->dataPtr->initialized = false;
+  this->dataPtr->selectedTriangleDirty = false;
+  this->dataPtr->hoverTriangleDirty = false;
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
@@ -101,6 +103,12 @@ void ModelSnap::Reset()
   this->dataPtr->selectedVis.reset();
   this->dataPtr->selectedTriangle.clear();
 
+  this->dataPtr->hoverVis.reset();
+  this->dataPtr->hoverTriangle.clear();
+
+  this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->selectedTriangleDirty = false;
+
   if (this->dataPtr->snapVisual)
   {
     this->dataPtr->snapVisual->SetVisible(false);
@@ -108,6 +116,16 @@ void ModelSnap::Reset()
     {
       this->dataPtr->snapVisual->GetParent()->DetachVisual(
           this->dataPtr->snapVisual);
+    }
+  }
+
+  if (this->dataPtr->highlightVisual)
+  {
+    this->dataPtr->highlightVisual->SetVisible(false);
+    if (this->dataPtr->highlightVisual->GetParent())
+    {
+      this->dataPtr->highlightVisual->GetParent()->DetachVisual(
+          this->dataPtr->highlightVisual);
     }
   }
 
@@ -126,6 +144,40 @@ void ModelSnap::OnMousePressEvent(const common::MouseEvent &_event)
 void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
+
+  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+      this->dataPtr->mouseEvent.pos);
+  if (vis && !vis->IsPlane())
+  {
+    // get the triangle being hovered so that it can be highlighted
+    math::Vector3 intersect;
+    std::vector<math::Vector3> hoverTriangle;
+    this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
+        vis->GetRootVisual(), intersect, hoverTriangle);
+
+    if (!hoverTriangle.empty())
+    {
+      boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+      this->dataPtr->hoverVis = vis;
+      this->dataPtr->hoverTriangle = hoverTriangle;
+      this->dataPtr->hoverTriangleDirty = true;
+
+      if (!this->dataPtr->renderConnection)
+      {
+        this->dataPtr->renderConnection = event::Events::ConnectRender(
+            boost::bind(&ModelSnap::Update, this));
+      }
+    }
+  }
+  else
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
+    this->dataPtr->hoverVis.reset();
+    this->dataPtr->hoverTriangle.clear();
+    this->dataPtr->hoverTriangleDirty = true;
+  }
+
+  this->dataPtr->mouseEvent = _event;
   this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
 }
 
@@ -136,10 +188,14 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
       this->dataPtr->mouseEvent.pos);
+
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    if (!this->dataPtr->selectedVis)
+    // select first triangle on any mesh, if it's on the same mesh, update the
+    // triangle vertices.
+    if (!this->dataPtr->selectedVis ||
+       (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -148,14 +204,17 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       if (!this->dataPtr->selectedTriangle.empty())
       {
         this->dataPtr->selectedVis = vis;
-
+        this->dataPtr->selectedTriangleDirty = true;
+      }
+      if (!this->dataPtr->renderConnection)
+      {
         this->dataPtr->renderConnection = event::Events::ConnectRender(
               boost::bind(&ModelSnap::Update, this));
       }
     }
-    else if (vis->GetRootVisual()
-        != this->dataPtr->selectedVis->GetRootVisual())
+    else
     {
+      // select triangle on the target
       math::Vector3 intersect;
       std::vector<math::Vector3> vertices;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -199,6 +258,7 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
     const math::Pose &_poseSrc, math::Vector3 &_trans,
     math::Quaternion &_rot)
 {
+  // snap the centroid of one triangle to another
   math::Vector3 centroidSrc = (_triangleSrc[0] + _triangleSrc[1] +
       _triangleSrc[2]) / 3.0;
 
@@ -248,14 +308,73 @@ void ModelSnap::PublishVisualPose(rendering::VisualPtr _vis)
 void ModelSnap::Update()
 {
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-
-  if (this->dataPtr->selectedTriangle.empty())
-    return;
-
-  // convert triangle to local coordinates relative to parent visual
-  std::vector<math::Vector3> triangle;
-  if (!this->dataPtr->snapVisual || !this->dataPtr->snapVisual->GetVisible())
+  if (this->dataPtr->hoverTriangleDirty)
   {
+    if (!this->dataPtr->hoverTriangle.empty())
+    {
+      // convert triangle to local coordinates relative to parent visual
+      std::vector<math::Vector3> hoverTriangle;
+      for (unsigned int i = 0; i < this->dataPtr->hoverTriangle.size(); ++i)
+      {
+        hoverTriangle.push_back(
+            this->dataPtr->hoverVis->GetWorldPose().rot.GetInverse() *
+            (this->dataPtr->hoverTriangle[i] -
+            this->dataPtr->hoverVis->GetWorldPose().pos));
+      }
+
+      if (!this->dataPtr->highlightVisual)
+      {
+        // create the highlight
+        std::string highlightVisName = "_SNAP_HIGHLIGHT_";
+        this->dataPtr->highlightVisual.reset(new rendering::Visual(
+            highlightVisName, this->dataPtr->hoverVis, false));
+        this->dataPtr->snapHighlight =
+            this->dataPtr->highlightVisual->CreateDynamicLine(
+            rendering::RENDERING_TRIANGLE_FAN);
+        this->dataPtr->snapHighlight->setMaterial("Gazebo/RedTransparent");
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[1]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[2]);
+        this->dataPtr->snapHighlight->AddPoint(hoverTriangle[0]);
+        this->dataPtr->highlightVisual->SetVisible(true);
+        this->dataPtr->highlightVisual->GetSceneNode()->setInheritScale(false);
+        this->dataPtr->highlightVisual->SetVisibilityFlags(
+            GZ_VISIBILITY_GUI & ~GZ_VISIBILITY_SELECTABLE);
+      }
+      else
+      {
+        // set new highlight position
+        if (!this->dataPtr->highlightVisual->GetVisible())
+          this->dataPtr->highlightVisual->SetVisible(true);
+        if (this->dataPtr->hoverVis !=
+            this->dataPtr->highlightVisual->GetParent())
+        {
+          if (this->dataPtr->highlightVisual->GetParent())
+          {
+            this->dataPtr->highlightVisual->GetParent()->DetachVisual(
+                this->dataPtr->highlightVisual);
+          }
+          this->dataPtr->hoverVis->AttachVisual(this->dataPtr->highlightVisual);
+        }
+        this->dataPtr->snapHighlight->SetPoint(0, hoverTriangle[0]);
+        this->dataPtr->snapHighlight->SetPoint(1, hoverTriangle[1]);
+        this->dataPtr->snapHighlight->SetPoint(2, hoverTriangle[2]);
+        this->dataPtr->snapHighlight->SetPoint(3, hoverTriangle[0]);
+      }
+    }
+    else
+    {
+      // turn of visualization if no mesh triangles are hovered
+      this->dataPtr->highlightVisual->SetVisible(false);
+    }
+    this->dataPtr->hoverTriangleDirty = false;
+  }
+
+  if (this->dataPtr->selectedTriangleDirty &&
+      !this->dataPtr->selectedTriangle.empty())
+  {
+    // convert triangle to local coordinates relative to parent visual
+    std::vector<math::Vector3> triangle;
     for (unsigned int i = 0; i < this->dataPtr->selectedTriangle.size(); ++i)
     {
       triangle.push_back(
@@ -263,38 +382,48 @@ void ModelSnap::Update()
           (this->dataPtr->selectedTriangle[i] -
           this->dataPtr->selectedVis->GetWorldPose().pos));
     }
-  }
 
-  if (!this->dataPtr->snapVisual)
-  {
-    rendering::UserCameraPtr camera = gui::get_active_camera();
+    if (!this->dataPtr->snapVisual)
+    {
+      // draw a border around selected triangle
+      rendering::UserCameraPtr camera = gui::get_active_camera();
 
-    std::string snapVisName = "_SNAP_";
-    this->dataPtr->snapVisual.reset(new rendering::Visual(
-        snapVisName, this->dataPtr->selectedVis, false));
+      std::string snapVisName = "_SNAP_";
+      this->dataPtr->snapVisual.reset(new rendering::Visual(
+          snapVisName, this->dataPtr->selectedVis, false));
 
-    this->dataPtr->snapLines =
-        this->dataPtr->snapVisual->CreateDynamicLine(
-        rendering::RENDERING_LINE_STRIP);
-
-    this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
-    this->dataPtr->snapLines->AddPoint(triangle[0]);
-    this->dataPtr->snapLines->AddPoint(triangle[1]);
-    this->dataPtr->snapLines->AddPoint(triangle[2]);
-    this->dataPtr->snapLines->AddPoint(triangle[0]);
-    this->dataPtr->snapVisual->SetVisible(true);
-    this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
-    return;
-  }
-
-  if (!this->dataPtr->snapVisual->GetVisible())
-  {
-    this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
-    this->dataPtr->snapLines->SetPoint(0, triangle[0]);
-    this->dataPtr->snapLines->SetPoint(1, triangle[1]);
-    this->dataPtr->snapLines->SetPoint(2, triangle[2]);
-    this->dataPtr->snapLines->SetPoint(3, triangle[0]);
-
-    this->dataPtr->snapVisual->SetVisible(true);
+      this->dataPtr->snapLines =
+          this->dataPtr->snapVisual->CreateDynamicLine(
+          rendering::RENDERING_LINE_STRIP);
+      this->dataPtr->snapLines->setMaterial("Gazebo/RedGlow");
+      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapLines->AddPoint(triangle[1]);
+      this->dataPtr->snapLines->AddPoint(triangle[2]);
+      this->dataPtr->snapLines->AddPoint(triangle[0]);
+      this->dataPtr->snapVisual->SetVisible(true);
+      this->dataPtr->snapVisual->GetSceneNode()->setInheritScale(false);
+      this->dataPtr->snapVisual->SetVisibilityFlags(
+          GZ_VISIBILITY_GUI & ~GZ_VISIBILITY_SELECTABLE);
+    }
+    else
+    {
+      // update border if the selected triangle changes
+      if (!this->dataPtr->snapVisual->GetVisible())
+        this->dataPtr->snapVisual->SetVisible(true);
+      if (this->dataPtr->selectedVis != this->dataPtr->snapVisual->GetParent())
+      {
+        if (this->dataPtr->snapVisual->GetParent())
+        {
+          this->dataPtr->snapVisual->GetParent()->DetachVisual(
+              this->dataPtr->snapVisual);
+        }
+        this->dataPtr->selectedVis->AttachVisual(this->dataPtr->snapVisual);
+      }
+      this->dataPtr->snapLines->SetPoint(0, triangle[0]);
+      this->dataPtr->snapLines->SetPoint(1, triangle[1]);
+      this->dataPtr->snapLines->SetPoint(2, triangle[2]);
+      this->dataPtr->snapLines->SetPoint(3, triangle[0]);
+    }
+    this->dataPtr->selectedTriangleDirty = false;
   }
 }

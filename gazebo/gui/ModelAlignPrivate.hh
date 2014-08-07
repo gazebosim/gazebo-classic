@@ -18,6 +18,8 @@
 #define _MODEL_ALIGN_PRIVATE_HH_
 
 #include <string>
+#include <vector>
+#include <map>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -30,6 +32,7 @@ namespace gazebo
 {
   namespace gui
   {
+    /// \class ModelAlignPrivate ModelAlignPrivate.hh
     /// \brief Private data for the ModelAlign class
     class ModelAlignPrivate
     {
@@ -61,14 +64,14 @@ namespace gazebo
       public: bool initialized;
 
       /// \brief selected visuals.
-//      public: std::map<rendering::VisualPtr, math::Pose> selectedVisuals;
-
-      /// \brief selected visuals.
       public: std::vector<rendering::VisualPtr> selectedVisuals;
 
       /// \brief A list of connections. Currently used only
       /// to get the align configuration event.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Original model pose used when user resets alignment.
+      public: std::map<rendering::VisualPtr, math::Pose> originalVisualPose;
     };
   }
 }
