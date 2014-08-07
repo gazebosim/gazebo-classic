@@ -344,12 +344,24 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
-  if (this->bulletSlider)
-    result = this->bulletSlider->getLinearPos();
-  else
-    gzwarn << "bulletSlider does not exist, returning default position\n";
-  return result;
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid axis index [" << _index << "]" << std::endl;
+    return math::Angle();
+  }
+
+  // The getLinearPos function seems to be off by one time-step
+  // Compute slider angle from gazebo's cached poses instead
+  // if (this->bulletSlider)
+  //   result = this->bulletSlider->getLinearPos();
+  // else
+  //   gzwarn << "bulletSlider does not exist, returning default position\n";
+
+  math::Vector3 offset = this->GetWorldPose().pos
+                 - this->GetParentWorldPose().pos;
+  math::Vector3 axis = this->GetGlobalAxis(_index);
+  math::Pose poseParent = this->GetWorldPose();
+  return math::Angle(axis.Dot(offset));
 }
