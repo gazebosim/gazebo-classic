@@ -71,6 +71,11 @@ namespace gazebo
       /// triggered.
       private slots: void OnAlignMode(QString _mode);
 
+      /// \brief Qt callback when the align target reference is changed.
+      /// \param[in] _index Index in a combo box which indicates if alignment
+      /// is now relative to the 'first' or 'last' selected entity.
+      private slots: void OnAlignTargetChanged(int _index);
+
       /// \brief Helper method to convert axis enum to string
       /// \param[in] _axis input alignment axis enum
       /// \return axis string

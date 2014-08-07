@@ -113,7 +113,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3)));
+        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -1132,8 +1132,8 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 
 /////////////////////////////////////////////////
 void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
-    bool _preview)
+    const std::string &_target, bool _preview)
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
-      !_preview);
+      _target, !_preview);
 }
