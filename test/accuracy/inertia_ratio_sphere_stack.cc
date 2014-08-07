@@ -71,7 +71,8 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
                                 )
 {
   // Load a blank world (no ground plane)
-  Load("worlds/sphere_stack.world", true, _physicsEngine);
+  // Load("worlds/sphere_stack.world", true, _physicsEngine);
+  Load("worlds/empty_physics.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -107,6 +108,7 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
       m = _mass;
     else
       m = 1.0;
+    // gzerr << i << " " << m << "\n";
     msgInertial->set_mass(m);
     double ixx = 2.0 * m * radius * radius / 5.0;
     msgInertial->set_ixx(ixx);
@@ -123,17 +125,17 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
     msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
     msgGeometry->mutable_sphere()->set_radius(radius);
 
-    /*
-    msgLink->add_visual();
-    msgs::Visual *msgVisual = msgLink->mutable_visual(0);
-    msgVisual->set_name("visual");
-    msgGeometry = msgVisual->mutable_geometry();
-    msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
-    msgGeometry->mutable_sphere()->set_radius(radius);
-    */
+    // add visual doesn't work
+    // msgLink->add_visual();
+    // msgs::Visual *msgVisual = msgLink->mutable_visual(0);
+    // msgVisual->set_name("visual");
+    // msgGeometry = msgVisual->mutable_geometry();
+    // msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
+    // msgGeometry->mutable_sphere()->set_radius(radius);
 
     math::Vector3 pos(0, 0, radius * (1.0 + 2.0 * i));
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
+
     models.push_back(this->SpawnModel(msgModel));
   }
 
@@ -256,6 +258,7 @@ void RigidBodyTest::InertiaRatioSphereStack(const std::string &_physicsEngine
   this->Record("linVelocityErr", linearVelocityError.mag);
   this->Record("rmsErrorTotal", constraintErrorTotal);
   this->Record("constraintResidualTotal", constraintResidualTotal);
+  // gzerr << "end"; getchar();
 }
 
 /////////////////////////////////////////////////
@@ -310,21 +313,21 @@ INSTANTIATE_TEST_CASE_P(InertiaRatioSphereStackMulti, RigidBodyTest,
 
 INSTANTIATE_TEST_CASE_P(OdeInertiaRatioSphereStack, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(50)  // iterations
+  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
   , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
-  , ::testing::Values(0.0) // gravity
-  , ::testing::Values(-1000.0) // force
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
   ));
 
 INSTANTIATE_TEST_CASE_P(BulletInertiaRatioSphereStack, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(50)  // iterations
+  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
   , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
-  , ::testing::Values(0.0) // gravity
-  , ::testing::Values(-1000.0) // force
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
   ));
 
