@@ -26,12 +26,14 @@ using namespace gazebo;
 // physics engine
 // joint type
 // dt
+// natural frequency (Hz)
 // number of iterations
 // number of models to spawn
 // gravity on / off
 // disturbance on / off
 typedef std::tr1::tuple<const char *
                       , const char *
+                      , double
                       , double
                       , int
                       , int
@@ -45,6 +47,7 @@ class JointsTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _jointType Type of joint to simulate.
   /// \param[in] _dt Max time step size.
+  /// \param[in] _freq Natural frequency (Hz).
   /// \param[in] _iterations Number of iterations.
   /// \param[in] _modelCount Number of models to spawn.
   /// \param[in] _gravity Flag for turning gravity on / off.
@@ -52,6 +55,7 @@ class JointsTest : public ServerFixture,
   public: void OneDof(const std::string &_physicsEngine
                    , const std::string &_jointType
                    , double _dt
+                   , double _freq
                    , int _iterations
                    , int _modelCount
                    , bool _gravity
@@ -67,6 +71,7 @@ class JointsTest : public ServerFixture,
 void JointsTest::OneDof(const std::string &_physicsEngine
                         , const std::string &_jointType
                         , double _dt
+                        , double _freq
                         , int _iterations
                         , int _modelCount
                         , bool _gravity
@@ -103,7 +108,10 @@ void JointsTest::OneDof(const std::string &_physicsEngine
                        , 0.0, Iyy, 0.0
                        , 0.0, 0.0, Izz);
 
-  const math::Vector3 axis(0, 1, 0);
+  const math::Vector3 axis(1, 0, 0);
+
+  // scalar moment of inertia along joint axis
+  const double I = axis.Dot(math::Vector3(Ixx, Iyy, Izz));
 
   // Create box with inertia based on box of uniform density
   msgs::Model msgModel;
@@ -128,20 +136,30 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   // initial energy value
   double E0 = 0.0;
 
+  // spring stiffness
+  double stiffness = 0;
+  const double damping = 0.0;
+  const double springReference = 0.0;
+
   const double velMag = 2.5;
   double v0mag = 0.0;
   double w0mag = 0.0;
-  if (_jointType == "revolute")
   {
-    v0mag = 0.0;
-    w0mag = velMag;
-    E0 =1.302084;
-  }
-  else if (_jointType == "prismatic")
-  {
-    v0mag = velMag;
-    w0mag = 0.0;
-    E0 = 31.25;
+    const double radiansPerSec = 2 * M_PI * _freq;
+    if (_jointType == "revolute")
+    {
+      v0mag = 0.0;
+      w0mag = velMag;
+      stiffness = I * radiansPerSec * radiansPerSec;
+      E0 = 1.302084 + 0.5 * stiffness * springReference * springReference;
+    }
+    else if (_jointType == "prismatic")
+    {
+      v0mag = velMag;
+      w0mag = 0.0;
+      stiffness = mass * radiansPerSec * radiansPerSec;
+      E0 = 31.25 + 0.5 * stiffness * springReference * springReference;
+    }
   }
 
   // initial linear velocity in global frame
@@ -156,7 +174,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
     msgModel.set_name(this->GetUniqueString("model"));
     // give models unique positions
     msgs::Set(msgModel.mutable_pose()->mutable_position(),
-              math::Vector3(dz*2*i, 0.0, 0.0));
+              math::Vector3(0.0, dz*2*i, 0.0));
 
     model = this->SpawnModel(msgModel);
     ASSERT_TRUE(model != NULL);
@@ -166,6 +184,9 @@ void JointsTest::OneDof(const std::string &_physicsEngine
 
     joint = model->GetJoint("joint");
     ASSERT_TRUE(joint != NULL);
+
+    // Set stiffness
+    joint->SetStiffnessDamping(0, stiffness, damping, springReference);
 
     // Set initial conditions
     joint->SetVelocity(0, velMag);
@@ -266,7 +287,8 @@ void JointsTest::OneDof(const std::string &_physicsEngine
 
     // angular position error
     math::Vector3 a = link->GetWorldInertialPose().rot.GetAsEuler();
-    angularPositionError.InsertData(a);
+    math::Quaternion angleTrue(w0 * t);
+    angularPositionError.InsertData(a - angleTrue.GetAsEuler());
 
     // angular momentum error
     math::Vector3 H = link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
@@ -298,13 +320,15 @@ TEST_P(JointsTest, OneDof)
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   std::string jointType     = std::tr1::get<1>(GetParam());
   double dt                 = std::tr1::get<2>(GetParam());
-  int iterations            = std::tr1::get<3>(GetParam());
-  int modelCount            = std::tr1::get<4>(GetParam());
-  bool gravity              = std::tr1::get<5>(GetParam());
-  bool disturbance          = std::tr1::get<6>(GetParam());
+  double freq               = std::tr1::get<3>(GetParam());
+  int iterations            = std::tr1::get<4>(GetParam());
+  int modelCount            = std::tr1::get<5>(GetParam());
+  bool gravity              = std::tr1::get<6>(GetParam());
+  bool disturbance          = std::tr1::get<7>(GetParam());
   gzdbg << physicsEngine
         << ", " << jointType
         << ", dt: " << dt
+        << ", freq: " << freq
         << ", iters: " << iterations
         << ", modelCount: " << modelCount
         << ", gravity: " << gravity
@@ -313,6 +337,7 @@ TEST_P(JointsTest, OneDof)
   RecordProperty("engine", physicsEngine);
   RecordProperty("jointType", jointType);
   this->Record("dt", dt);
+  this->Record("freq", freq);
   RecordProperty("iters", iterations);
   RecordProperty("modelCount", modelCount);
   RecordProperty("gravity", gravity);
@@ -320,6 +345,7 @@ TEST_P(JointsTest, OneDof)
   OneDof(physicsEngine
       , jointType
       , dt
+      , freq
       , iterations
       , modelCount
       , gravity
@@ -339,49 +365,82 @@ TEST_P(JointsTest, OneDof)
 // #define ITERS_STEP 5
 // #define ITERS_VALUES ::testing::Range(ITERS_MIN, ITERS_MAX, ITERS_STEP)
 #define ITERS_VALUES ::testing::Values(5, 10, 20, 50)
-INSTANTIATE_TEST_CASE_P(EnginesDtItersTorqueOde, JointsTest,
+
+// Linear trajectory with disturbances
+// Use multiple dt's (time steps)
+// Use multiple iterations for ODE
+// frequency = 0
+INSTANTIATE_TEST_CASE_P(LinearDtItersOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
   , JOINT_TYPES
   , DT_VALUES
+  , ::testing::Values(0.0)
   , ITERS_VALUES
   , ::testing::Values(1)
   , ::testing::Values(false)
   , ::testing::Values(true)
   ));
-
-INSTANTIATE_TEST_CASE_P(EnginesDtItersTorque, JointsTest,
+INSTANTIATE_TEST_CASE_P(LinearDtIters, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
   , DT_VALUES
+  , ::testing::Values(0.0)
   , ::testing::Values(50)
   , ::testing::Values(1)
   , ::testing::Values(false)
   , ::testing::Values(true)
   ));
 
-#define MODELS_MIN 1
-#define MODELS_MAX 105
-#define MODELS_STEP 25
-#define MODELS_DT 3.2e-3
-INSTANTIATE_TEST_CASE_P(OneDofsTorqueOde, JointsTest,
+// Nonlinear trajectory with disturbances
+// dt = 1e-3
+// Use multiple iterations for ODE
+// frequency = 10 Hz
+INSTANTIATE_TEST_CASE_P(NonlinearDtItersOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values("prismatic")
-  , ::testing::Values(MODELS_DT)
+  , JOINT_TYPES
+  , ::testing::Values(1e-3)
+  , ::testing::Values(10.0)
   , ITERS_VALUES
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+  , ::testing::Values(1)
+  , ::testing::Values(false)
+  , ::testing::Values(true)
+  ));
+INSTANTIATE_TEST_CASE_P(NonlinearDtIters, JointsTest,
+    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+  , JOINT_TYPES
+  , ::testing::Values(1e-3)
+  , ::testing::Values(10.0)
+  , ::testing::Values(50)
+  , ::testing::Values(1)
   , ::testing::Values(false)
   , ::testing::Values(true)
   ));
 
-INSTANTIATE_TEST_CASE_P(OneDofsTorque, JointsTest,
-    ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
-  , ::testing::Values("prismatic")
-  , ::testing::Values(MODELS_DT)
-  , ::testing::Values(50)
-  , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
-  , ::testing::Values(false)
-  , ::testing::Values(true)
-  ));
+// #define MODELS_MIN 1
+// #define MODELS_MAX 105
+// #define MODELS_STEP 25
+// #define MODELS_DT 3.2e-3
+// INSTANTIATE_TEST_CASE_P(OneDofsTorqueOde, JointsTest,
+//     ::testing::Combine(::testing::Values("ode")
+//   , ::testing::Values("prismatic")
+//   , ::testing::Values(MODELS_DT)
+//   , ::testing::Values(0.0)
+//   , ITERS_VALUES
+//   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+//   , ::testing::Values(false)
+//   , ::testing::Values(true)
+//   ));
+// 
+// INSTANTIATE_TEST_CASE_P(OneDofsTorque, JointsTest,
+//     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
+//   , ::testing::Values("prismatic")
+//   , ::testing::Values(MODELS_DT)
+//   , ::testing::Values(0.0)
+//   , ::testing::Values(50)
+//   , ::testing::Range(MODELS_MIN, MODELS_MAX, MODELS_STEP)
+//   , ::testing::Values(false)
+//   , ::testing::Values(true)
+//   ));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
