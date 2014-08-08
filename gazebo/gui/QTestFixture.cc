@@ -144,7 +144,7 @@ void QTestFixture::cleanup()
 
   if (this->server)
   {
-    this->server->Stop();
+    this->server->Fini();
 
     if (this->serverThread)
     {
