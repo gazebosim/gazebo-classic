@@ -1,4 +1,5 @@
 include_directories (
+  ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${ODE_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIR}
   ${OGRE_INCLUDE_DIRS}

@@ -18,19 +18,25 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
+// include this for ODE implicit spring flag
+#include "gazebo/physics/ode/ODEJoint.hh"
 #include "test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
-// physics engine
-// joint type
-// dt
-// natural frequency (Hz)
-// number of iterations
-// number of models to spawn
-// gravity on / off
-// disturbance on / off
+// string
+//  physics engine
+//  joint type
+// double
+//  dt
+//  natural frequency (Hz)
+//  magnitude of disturbance
+// int
+//  number of iterations
+//  number of models to spawn
+// bool
+//  ode implicit spring on / off
 typedef std::tr1::tuple<const char *
                       , const char *
                       , double
@@ -51,7 +57,7 @@ class JointsTest : public ServerFixture,
   /// \param[in] _disturbance Magnitude of disturbance.
   /// \param[in] _iterations Number of iterations.
   /// \param[in] _modelCount Number of models to spawn.
-  /// \param[in] _gravity Flag for turning gravity on / off.
+  /// \param[in] _implicit Flag for turning ODE implicit springs on / off.
   public: void OneDof(const std::string &_physicsEngine
                    , const std::string &_jointType
                    , double _dt
@@ -59,7 +65,7 @@ class JointsTest : public ServerFixture,
                    , double _disturbance
                    , int _iterations
                    , int _modelCount
-                   , bool _gravity
+                   , bool _implicit
                    );
 };
 
@@ -75,7 +81,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
                         , double _disturbance
                         , int _iterations
                         , int _modelCount
-                        , bool _gravity
+                        , bool _implicit
                         )
 {
   // Load a blank world (no ground plane)
@@ -88,8 +94,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   ASSERT_TRUE(physics != NULL);
   ASSERT_EQ(physics->GetType(), _physicsEngine);
 
-  // get gravity value
-  if (!_gravity)
+  // set gravity value to zero
   {
     physics->SetGravity(math::Vector3::Zero);
   }
@@ -199,6 +204,12 @@ void JointsTest::OneDof(const std::string &_physicsEngine
       {
         link->SetLinearVel(v0);
       }
+
+      // Set ODE implicit spring flag
+      physics::ODEJointPtr odeJoint =
+        boost::dynamic_pointer_cast<physics::ODEJoint>(joint);
+      odeJoint->UseImplicitSpringDamper(_implicit);
+      ASSERT_EQ(_implicit, odeJoint->UsesImplicitSpringDamper());
     }
   }
   ASSERT_EQ(v0, link->GetWorldCoGLinearVel());
@@ -341,7 +352,7 @@ TEST_P(JointsTest, OneDof)
   double disturbance        = std::tr1::get<4>(GetParam());
   int iterations            = std::tr1::get<5>(GetParam());
   int modelCount            = std::tr1::get<6>(GetParam());
-  bool gravity              = std::tr1::get<7>(GetParam());
+  bool implicit             = std::tr1::get<7>(GetParam());
   gzdbg << physicsEngine
         << ", " << jointType
         << ", dt: " << dt
@@ -349,7 +360,7 @@ TEST_P(JointsTest, OneDof)
         << ", disturbance: " << disturbance
         << ", iters: " << iterations
         << ", modelCount: " << modelCount
-        << ", gravity: " << gravity
+        << ", implicit: " << implicit
         << std::endl;
   RecordProperty("engine", physicsEngine);
   RecordProperty("jointType", jointType);
@@ -358,7 +369,7 @@ TEST_P(JointsTest, OneDof)
   this->Record("disturbance", disturbance);
   RecordProperty("iters", iterations);
   RecordProperty("modelCount", modelCount);
-  RecordProperty("gravity", gravity);
+  RecordProperty("implicit", implicit);
   OneDof(physicsEngine
       , jointType
       , dt
@@ -366,7 +377,7 @@ TEST_P(JointsTest, OneDof)
       , disturbance
       , iterations
       , modelCount
-      , gravity
+      , implicit
       );
 }
 
@@ -376,7 +387,7 @@ TEST_P(JointsTest, OneDof)
 // #define DT_STEP 2.0e-4
 // #define DT_VALUES ::testing::Range(DT_MIN, DT_MAX, DT_STEP)
 //#define DT_VALUES ::testing::Values(1e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
-#define DT_VALUES ::testing::Values(4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3)
+#define DT_VALUES ::testing::Values(4e-4, 8e-4, 1.6e-3, 3.2e-3, 6.4e-3, 1.28e-2)
 // #define ITERS_MIN 5
 // #define ITERS_MAX 51
 // #define ITERS_STEP 5
@@ -397,7 +408,7 @@ INSTANTIATE_TEST_CASE_P(LinearDtItersOde, JointsTest,
   , ::testing::Values(1)
   , ::testing::Values(false)
   ));
-INSTANTIATE_TEST_CASE_P(LinearDtIters, JointsTest,
+INSTANTIATE_TEST_CASE_P(LinearDt, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
   , DT_VALUES
@@ -415,18 +426,18 @@ INSTANTIATE_TEST_CASE_P(LinearDtIters, JointsTest,
 INSTANTIATE_TEST_CASE_P(NonlinearDtItersOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
   , JOINT_TYPES
-  , ::testing::Values(1e-3)
-  , ::testing::Values(10.0)
+  , DT_VALUES
+  , ::testing::Values(60.0)
   , ::testing::Values(99.0)
   , ITERS_VALUES
   , ::testing::Values(1)
-  , ::testing::Values(false)
+  , ::testing::Bool()
   ));
-INSTANTIATE_TEST_CASE_P(NonlinearDtIters, JointsTest,
+INSTANTIATE_TEST_CASE_P(NonlinearDt, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
-  , ::testing::Values(1e-3)
-  , ::testing::Values(10.0)
+  , DT_VALUES
+  , ::testing::Values(60.0)
   , ::testing::Values(99.0)
   , ::testing::Values(50)
   , ::testing::Values(1)
