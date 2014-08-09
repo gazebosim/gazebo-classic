@@ -423,11 +423,12 @@ INSTANTIATE_TEST_CASE_P(LinearDt, JointsTest,
 // dt = 1e-3
 // Use multiple iterations for ODE
 // frequency = 10 Hz
+#define FREQ_VALUE ::testing::Values(50.0)
 INSTANTIATE_TEST_CASE_P(NonlinearDtItersOde, JointsTest,
     ::testing::Combine(::testing::Values("ode")
   , JOINT_TYPES
   , DT_VALUES
-  , ::testing::Values(60.0)
+  , FREQ_VALUE
   , ::testing::Values(99.0)
   , ITERS_VALUES
   , ::testing::Values(1)
@@ -437,7 +438,7 @@ INSTANTIATE_TEST_CASE_P(NonlinearDt, JointsTest,
     ::testing::Combine(::testing::Values("dart", "bullet", "simbody")
   , JOINT_TYPES
   , DT_VALUES
-  , ::testing::Values(60.0)
+  , FREQ_VALUE
   , ::testing::Values(99.0)
   , ::testing::Values(50)
   , ::testing::Values(1)
