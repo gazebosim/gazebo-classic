@@ -310,9 +310,10 @@ INSTANTIATE_TEST_CASE_P(InertiaRatioBoxMulti, RigidBodyTest,
   ));
 */
 
-INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBox, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode")
-  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
+// this test will vary mass of the box, and check for quality of solution
+INSTANTIATE_TEST_CASE_P(SingleBoxMass, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Values(50)  // iterations
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(1.0) // side
@@ -321,12 +322,13 @@ INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBox, RigidBodyTest,
   , ::testing::Values(0.0) // tolerance
   ));
 
-INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBox, RigidBodyTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
+// this test will vary size of the box, and check for quality of solution
+INSTANTIATE_TEST_CASE_P(SingleBoxSize, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Values(50)  // iterations
   , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
-  , ::testing::Values(1.0) // side
+  , ::testing::Values(1.0) // mass
+  , ::testing::Values(0.01, 0.1, 1.0, 10.0, 100.0) // side
   , ::testing::Values(-10.0) // gravity
   , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance

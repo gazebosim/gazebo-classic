@@ -313,7 +313,27 @@ INSTANTIATE_TEST_CASE_P(InertiaRatioBoxStackMulti, RigidBodyTest,
   ));
 */
 
-INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStack, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterations, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(10000.0) // mass
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+
+INSTANTIATE_TEST_CASE_P(InertiaRatioBoxStackMass, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Values(100)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+
+INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterationsMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
   , ::testing::Values(0.001) // step size
@@ -323,7 +343,7 @@ INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStack, RigidBodyTest,
   , ::testing::Values(0.0) // tolerance
   ));
 
-INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStack, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackIterationsMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
   , ::testing::Values(0.001) // step size
