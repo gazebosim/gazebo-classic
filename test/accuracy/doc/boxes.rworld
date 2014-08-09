@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<%
+  # Three boxes with different angular velocity
+  # SI units (length in meters)
+
+  # Geometry
+  dx   = 0.1
+  dy   = 0.4
+  dz   = 0.9
+
+  # inertia
+  mass = 10
+  ixx  = mass/12.0 * (dy**2 + dz**2)
+  iyy  = mass/12.0 * (dz**2 + dx**2)
+  izz  = mass/12.0 * (dx**2 + dy**2)
+
+  # box locations
+  boxes_y0= {
+    "large_ixx" => -dz*2,
+    "large_iyy" =>  0.0,
+    "large_izz" =>  dz*2,
+  }
+  z0 = dz
+%>
+<sdf version="1.5">
+  <world name="default">
+  <physics type="ode">
+    <gravity>0 0 0</gravity>
+  </physics>
+  <include>
+    <uri>model://sun</uri>
+  </include>
+  <%
+    boxes_y0.keys.each do |k|
+      y0 = boxes_y0[k]
+  %>
+    <%= "<model name=" + '"' + k + '">' %>
+      <pose>0 <%= y0 %> <%= z0 %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  <% end %>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>5.5 0.0 0.9  0 0 3.14159</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>
