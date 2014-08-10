@@ -323,16 +323,6 @@ INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterations, RigidBodyTest,
   , ::testing::Values(0.0) // tolerance
   ));
 
-INSTANTIATE_TEST_CASE_P(InertiaRatioBoxStackMass, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(100)  // iterations
-  , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
-  , ::testing::Values(0.0) // tolerance
-  ));
-
 INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterationsMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
@@ -352,6 +342,45 @@ INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackIterationsMass, RigidBodyTest,
   , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
   ));
+
+INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackMass, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode")
+  , ::testing::Values(100)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackMass, RigidBodyTest,
+  ::testing::Combine(::testing::Values("bullet")
+  , ::testing::Values(100)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+INSTANTIATE_TEST_CASE_P(DartInertiaRatioBoxStackMass, RigidBodyTest,
+  ::testing::Combine(::testing::Values("dart")
+  , ::testing::Values(100)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+/*
+INSTANTIATE_TEST_CASE_P(SimbodyInertiaRatioBoxStackMass, RigidBodyTest,
+  ::testing::Combine(::testing::Values("simbody")
+  , ::testing::Values(100)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  ));
+*/
 
 /*
 INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStack, RigidBodyTest,
