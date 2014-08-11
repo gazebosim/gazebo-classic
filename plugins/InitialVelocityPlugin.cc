@@ -46,6 +46,7 @@ void InitialVelocityPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "_model pointer is NULL");
   this->model = _model;
   this->sdf = _sdf;
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
