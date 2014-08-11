@@ -262,10 +262,10 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
   int    iterations         = std::tr1::get<1>(GetParam());
   double dt                 = std::tr1::get<2>(GetParam());
   double mass               = std::tr1::get<3>(GetParam());
-  double side               = std::tr1::get<3>(GetParam());
-  double gravity            = std::tr1::get<4>(GetParam());
-  double force              = std::tr1::get<5>(GetParam());
-  double tolerance          = std::tr1::get<6>(GetParam());
+  double side               = std::tr1::get<4>(GetParam());
+  double gravity            = std::tr1::get<5>(GetParam());
+  double force              = std::tr1::get<6>(GetParam());
+  double tolerance          = std::tr1::get<7>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
@@ -294,27 +294,12 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
       );
 }
 
-/*
-#define M_MIN 0.5
-#define M_MAX 1000.0
-#define M_STEP 3.0e-4
-INSTANTIATE_TEST_CASE_P(InertiaRatioBoxMulti, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(50)  // iterations
-  , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
-  , ::testing::Values(1.0) // side
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(-1.0, -50.0, -100.0, -500.0) // force
-  , ::testing::Values(0.0) // tolerance
-  ));
-*/
-
 // this test will vary mass of the box, and check for quality of solution
 INSTANTIATE_TEST_CASE_P(SingleBoxMass, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(50)  // iterations
   , ::testing::Values(0.001) // step size
+  // masses
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(1.0) // side
   , ::testing::Values(-10.0) // gravity
