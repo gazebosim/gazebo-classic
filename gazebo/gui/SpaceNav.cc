@@ -45,6 +45,7 @@ bool SpaceNav::Load()
 {
   bool result = true;
 
+#ifdef HAVE_SPNAV
   // Read deadband from [spacenav] in gui.ini
   this->dataPtr->deadbandTrans.x = getINIProperty<double>(
       "spacenav.deadband_x", 0.1);
@@ -64,7 +65,6 @@ bool SpaceNav::Load()
   std::string topic = getINIProperty<std::string>("spacenav.topic",
                                                   "~/spacenav/joy");
 
-#ifdef HAVE_SPNAV
   if (spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());

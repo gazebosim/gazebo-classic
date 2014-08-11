@@ -222,6 +222,8 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
+      /// \brief Handles incoming joystick messages.
+      /// \param[in] _msg New joystick message.
       private: void OnJoy(ConstJoystickPtr &_msg);
 
       /// \internal
@@ -231,6 +233,7 @@ namespace gazebo
       /// \brief Gazebo communication node pointer.
       private: transport::NodePtr node;
 
+      /// \brief Subscribes to joystick messages.
       private: transport::SubscriberPtr joySub;
     };
     /// \}
