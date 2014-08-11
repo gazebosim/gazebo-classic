@@ -14,6 +14,7 @@ set (files
   gripper.world
   heightmap_dem.world
   heightmap.world
+  initial_velocity.world
   joint_damping_demo.world
   joints.world
   lights.world
