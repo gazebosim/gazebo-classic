@@ -37,6 +37,7 @@ typedef std::tr1::tuple<const char * /* physics engine */
                       , double       /* gravity */
                       , double       /* force on top box */
                       , double       /* tolerance */
+                      , double       /* cg x offset */
                       > char1int1double4;
 class RigidBodyTest : public ServerFixture,
                       public testing::WithParamInterface<char1int1double4>
@@ -57,6 +58,7 @@ class RigidBodyTest : public ServerFixture,
                             , double _gravity
                             , double _force
                             , double _tolerance
+                            , double _cgx
                             );
 };
 
@@ -72,6 +74,7 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
                                 , double _gravity
                                 , double _force
                                 , double _tolerance
+                                , double _cgx
                                 )
 {
   // Load a blank world (no ground plane)
@@ -109,6 +112,9 @@ void RigidBodyTest::InertiaRatioBox(const std::string &_physicsEngine
     msgInertial->set_iyy(ixx);
     msgInertial->set_iyz(0.0);
     msgInertial->set_izz(ixx);
+    msgInertial->mutable_pose()->mutable_position()->set_x(_cgx);
+    msgInertial->mutable_pose()->mutable_position()->set_y(0.0);
+    msgInertial->mutable_pose()->mutable_position()->set_z(0.0);
 
     msgLink->add_collision();
     msgs::Collision *msgCollision = msgLink->mutable_collision(0);
@@ -266,6 +272,7 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
   double gravity            = std::tr1::get<5>(GetParam());
   double force              = std::tr1::get<6>(GetParam());
   double tolerance          = std::tr1::get<7>(GetParam());
+  double cgx                = std::tr1::get<8>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
@@ -274,6 +281,7 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
         << ", gravity: " << gravity
         << ", force: " << force
         << ", tolerance: " << tolerance
+        << ", cgx: " << cgx
         << std::endl;
   RecordProperty("engine", physicsEngine);
   RecordProperty("iters", iterations);
@@ -283,6 +291,7 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
   this->Record("gravity", gravity);
   this->Record("force", -force);  // negate, easier for plotting
   this->Record("tolerance", tolerance);
+  this->Record("cgx", cgx);
   InertiaRatioBox(physicsEngine
       , iterations
       , dt
@@ -291,6 +300,7 @@ TEST_P(RigidBodyTest, InertiaRatioBox)
       , gravity
       , force
       , tolerance
+      , cgx
       );
 }
 
@@ -305,6 +315,7 @@ INSTANTIATE_TEST_CASE_P(SingleBoxMass, RigidBodyTest,
   , ::testing::Values(-10.0) // gravity
   , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
+  , ::testing::Values(0.0) // cgx
   ));
 
 // this test will vary size of the box, and check for quality of solution
@@ -317,6 +328,23 @@ INSTANTIATE_TEST_CASE_P(SingleBoxSize, RigidBodyTest,
   , ::testing::Values(-10.0) // gravity
   , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
+  , ::testing::Values(0.0) // cgx
+  ));
+
+#define CGX_MIN 0.0
+#define CGX_MAX 1.0
+#define CGX_STEP 0.05
+// this test will vary size of the box, and check for quality of solution
+INSTANTIATE_TEST_CASE_P(SingleBoxCg, RigidBodyTest,
+  ::testing::Combine(PHYSICS_ENGINE_VALUES
+  , ::testing::Values(50)  // iterations
+  , ::testing::Values(0.001) // step size
+  , ::testing::Values(1.0) // mass
+  , ::testing::Values(1.0) // side
+  , ::testing::Values(-10.0) // gravity
+  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.0) // tolerance
+  , ::testing::Range(CGX_MIN, CGX_MAX, CGX_STEP) // cgx
   ));
 
 /////////////////////////////////////////////////
