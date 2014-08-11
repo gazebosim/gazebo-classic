@@ -27,6 +27,7 @@ set(tests
   inertia_ratio_sphere_stack.cc
   inertia_ratio_box_stack.cc
   inertia_ratio_single_box.cc
+  sphere_impact.cc
 )
 
 gz_build_tests(${tests})
@@ -38,6 +39,7 @@ if (ENABLE_TESTS_COMPILATION)
   set_tests_properties(${TEST_TYPE}_inertia_ratio_sphere_stack PROPERTIES TIMEOUT 10000)
   set_tests_properties(${TEST_TYPE}_inertia_ratio_box_stack PROPERTIES TIMEOUT 10000)
   set_tests_properties(${TEST_TYPE}_inertia_ratio_single_box PROPERTIES TIMEOUT 10000)
+  set_tests_properties(${TEST_TYPE}_sphere_impact PROPERTIES TIMEOUT 10000)
 endif()
 
 set(display_tests
