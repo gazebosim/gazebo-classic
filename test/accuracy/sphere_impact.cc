@@ -29,7 +29,7 @@ using namespace gazebo;
 // inertia of sphere
 // size of sphere
 // gravity applied
-// force on sphere
+// velocity of sphere
 // lcp tolerance
 // cg z offset
 typedef std::tr1::tuple<const char * /* physics engine */
@@ -38,7 +38,7 @@ typedef std::tr1::tuple<const char * /* physics engine */
                       , double       /* mass of sphere */
                       , double       /* radius of sphere */
                       , double       /* gravity */
-                      , double       /* force on sphere */
+                      , double       /* velocity on sphere */
                       , double       /* tolerance */
                       , double       /* cg z offset */
                       > char1int1double4;
@@ -52,7 +52,7 @@ class RigidBodyTest : public ServerFixture,
   /// \param[in] _mass Mass sphere
   /// \param[in] _radius Size of sphere
   /// \param[in] _gravity gravity applied
-  /// \param[in] _force force on sphere
+  /// \param[in] _velocity velocity of sphere
   /// \param[in] _cgz cg offset
   public: void SphereImpact(const std::string &_physicsEngine
                           , int _iterations
@@ -60,7 +60,7 @@ class RigidBodyTest : public ServerFixture,
                           , double _mass
                           , double _radius
                           , double _gravity
-                          , double _force
+                          , double _velocity
                           , double _tolerance
                           , double _cgz
                           );
@@ -76,7 +76,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
                                , double _mass
                                , double _radius
                                , double _gravity
-                               , double _force
+                               , double _velocity
                                , double _tolerance
                                , double _cgz
                                )
@@ -99,17 +99,35 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
 
   math::Vector3 g = physics->GetGravity();
 
-  // Create sphere with inertia based on sphere of uniform density
+  // set simulation time step size
+  //   change step size after setting initial conditions
+  //   since simbody requires a time step
+  physics->SetMaxStepSize(_dt);
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
+    gzdbg << "iters: "
+          << boost::any_cast<int>(physics->GetParam("iters"))
+          << std::endl;
+    physics->SetParam("iters", _iterations);
+    physics->SetParam("sor_lcp_tolerance", _tolerance);
+  }
+
+  // unthrottle update rate
+  physics->SetRealTimeUpdateRate(0.0);
+
+  // Create 2 spheres with inertia based on sphere of uniform density
+  {
+    // first sphere at (-5, 0, 1)m, with mass and radius specified
+    // by test parameters.
     msgs::Model msgModel;
-    msgModel.set_name("sphere");
+    msgModel.set_name("sphere_1");
 
     msgModel.add_link();
     msgs::Link *msgLink = msgModel.mutable_link(0);
     msgLink->set_name("link");
     msgs::Inertial *msgInertial = msgLink->mutable_inertial();
     msgInertial->set_mass(_mass);
-    double ixx = 2.0 * _mass * radius * radius / 5.0;
+    double ixx = 2.0 * _mass * _radius * _radius / 5.0;
     msgInertial->set_ixx(ixx);
     msgInertial->set_ixy(0.0);
     msgInertial->set_ixz(0.0);
@@ -135,75 +153,135 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
     // msgGeometry->mutable_sphere()->set_radius(_radius);
 
-    math::Vector3 pos(0, 0, _radius);
+    // 1m above ground, -5 meters away from origin
+    math::Vector3 pos(-5.0 - _radius, 0.0, 1.0 + _radius);
+    msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
+
+    models.push_back(this->SpawnModel(msgModel));
+  }
+  {
+    msgs::Model msgModel;
+    msgModel.set_name("sphere_2");
+
+    msgModel.add_link();
+    msgs::Link *msgLink = msgModel.mutable_link(0);
+    msgLink->set_name("link");
+    msgs::Inertial *msgInertial = msgLink->mutable_inertial();
+    const double mass2 = 1.0;
+    msgInertial->set_mass(mass2);
+    double ixx = 2.0 * mass2 * _radius * _radius / 5.0;
+    msgInertial->set_ixx(ixx);
+    msgInertial->set_ixy(0.0);
+    msgInertial->set_ixz(0.0);
+    msgInertial->set_iyy(ixx);
+    msgInertial->set_iyz(0.0);
+    msgInertial->set_izz(ixx);
+    msgInertial->mutable_pose()->mutable_position()->set_x(0.0);
+    msgInertial->mutable_pose()->mutable_position()->set_y(0.0);
+    msgInertial->mutable_pose()->mutable_position()->set_z(_cgz);
+
+    msgLink->add_collision();
+    msgs::Collision *msgCollision = msgLink->mutable_collision(0);
+    msgCollision->set_name("collision");
+    msgs::Geometry *msgGeometry = msgCollision->mutable_geometry();
+    msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
+    msgGeometry->mutable_sphere()->set_radius(_radius);
+
+    // add visual doesn't work
+    // msgLink->add_visual();
+    // msgs::Visual *msgVisual = msgLink->mutable_visual(0);
+    // msgVisual->set_name("visual");
+    // msgGeometry = msgVisual->mutable_geometry();
+    // msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
+    // msgGeometry->mutable_sphere()->set_radius(_radius);
+
+    // 1m above ground, 0m way from origin
+    math::Vector3 pos(0.0 + _radius, 0.0, 1.0 + _radius);
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));
   }
 
   // get top model and link
-  physics::ModelPtr model = world->GetModel("sphere");
-  physics::LinkPtr link = model->GetLink("link");
+  physics::ModelPtr model_1 = world->GetModel("sphere_1");
+  physics::LinkPtr link_1 = model_1->GetLink("link");
+  physics::ModelPtr model_2 = world->GetModel("sphere_2");
+  physics::LinkPtr link_2 = model_2->GetLink("link");
+
+
+
+
+  // set things in motion for a few time steps here
+  // e.g. start spheres moving
+  // be sure to stop before collision happens
+
+
+  // setup simulation duration
+  const double startupDuration = 10.0;
+  int startupSteps = ceil(startupDuration / _dt);
+
+  for (int i = 0; i < startupSteps; ++i)
+  {
+    // apply velocity to top link
+    link_1->SetLinearVel(math::Vector3(_velocity, 0.0, 0));
+    // link_2->SetLinearVel(math::Vector3(_velocity, 0.0, 0));
+
+    // step world once
+    world->Step(1);
+  }
+
+
 
   // initial time
   common::Time t0 = world->GetSimTime();
 
-  // initial linear position in global frame
-  math::Vector3 p0 = link->GetWorldInertialPose().pos;
-
   // initial linear velocity in global frame
-  const math::Vector3 v0 = link->GetWorldLinearVel();
+  const math::Vector3 v0_1 = link_1->GetWorldLinearVel();
+  const math::Vector3 v0_2 = link_2->GetWorldLinearVel();
+
+  // initial linear momentum in global frame
+  math::Vector3 P0_1 = link_1->GetInertial()->GetMass() * v0_1;
+  double P0mag_1 = P0_1.GetLength();
+  math::Vector3 P0_2 = link_2->GetInertial()->GetMass() * v0_2;
+  double P0mag_2 = P0_2.GetLength();
 
   // initial angular velocity in global frame
-  math::Vector3 w0 = link->GetWorldAngularVel();
+  math::Vector3 w0_1 = link_1->GetWorldAngularVel();
+  math::Vector3 w0_2 = link_2->GetWorldAngularVel();
 
   // initial angular momentum in global frame
-  // math::Vector3 H0 = link->GetWorldInertiaMatrix() * w0;
-  // double H0mag = H0.GetLength();
+  math::Vector3 H0_1 = link_1->GetWorldInertiaMatrix() * w0_1;
+  double H0mag_1 = H0_1.GetLength();
+  math::Vector3 H0_2 = link_2->GetWorldInertiaMatrix() * w0_2;
+  double H0mag_2 = H0_2.GetLength();
 
   // initial energy
-  double E0 = link->GetWorldEnergy();
+  double E0_1 = link_1->GetWorldEnergy();
+  double E0_2 = link_2->GetWorldEnergy();
 
   // variables to compute statistics on
-  math::Vector3Stats linearPositionError;
-  math::Vector3Stats linearVelocityError;
+  math::Vector3Stats linearMomentumError;
+  math::Vector3Stats angularMomentumError;
   math::SignalStats energyError;
   math::SignalStats constraintErrorTotal;
   math::SignalStats constraintResidualTotal;
   {
     const std::string statNames = "MaxAbs,Variance,Mean";
-    EXPECT_TRUE(linearPositionError.InsertStatistics(statNames));
-    EXPECT_TRUE(linearVelocityError.InsertStatistics(statNames));
+    EXPECT_TRUE(linearMomentumError.InsertStatistics(statNames));
+    EXPECT_TRUE(angularMomentumError.InsertStatistics(statNames));
     EXPECT_TRUE(energyError.InsertStatistics(statNames));
     EXPECT_TRUE(constraintErrorTotal.InsertStatistics(statNames));
     EXPECT_TRUE(constraintResidualTotal.InsertStatistics(statNames));
   }
 
-  // set simulation time step size
-  //   change step size after setting initial conditions
-  //   since simbody requires a time step
-  physics->SetMaxStepSize(_dt);
-  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
-  {
-    gzdbg << "iters: "
-          << boost::any_cast<int>(physics->GetParam("iters"))
-          << std::endl;
-    physics->SetParam("iters", _iterations);
-    physics->SetParam("sor_lcp_tolerance", _tolerance);
-  }
-
   // setup simulation duration
   const double simDuration = 10.0;
-  int steps = ceil(simDuration / _dt);
+  int simSteps = ceil(simDuration / _dt);
 
-  // unthrottle update rate
-  physics->SetRealTimeUpdateRate(0.0);
-  common::Time startTime = common::Time::GetWallTime();
-  for (int i = 0; i < steps; ++i)
+  // record start wall time
+  common::Time startWallTime = common::Time::GetWallTime();
+  for (int i = 0; i < simSteps; ++i)
   {
-    // apply force to top link
-    link->AddForce(math::Vector3(0.0, 0.0, _force));
-
     // step world once
     world->Step(1);
 
@@ -211,20 +289,27 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // double t = (world->GetSimTime() - t0).Double();
 
     // linear velocity error
-    math::Vector3 v = link->GetWorldCoGLinearVel();
-    linearVelocityError.InsertData(v - v0);
+    math::Vector3 v_1 = link_1->GetWorldCoGLinearVel();
+    math::Vector3 v_2 = link_2->GetWorldCoGLinearVel();
 
-    // linear position error
-    math::Vector3 p = link->GetWorldInertialPose().pos;
-    linearPositionError.InsertData(p - p0);
+    // linear momentum error
+    math::Vector3 P_1 = link_1->GetInertial()->GetMass()*v_1;
+    math::Vector3 P_2 = link_2->GetInertial()->GetMass()*v_2;
+    linearMomentumError.InsertData((P_1 + P_2 - P0_1 - P0_2)
+      / (P0mag_1 + P0mag_2));
 
     // angular momentum error
-    // math::Vector3 H =
-    //   link->GetWorldInertiaMatrix()*link->GetWorldAngularVel();
-    // angularMomentumError.InsertData((H - H0) / H0mag);
+    math::Vector3 H_1 =
+      link_1->GetWorldInertiaMatrix()*link_1->GetWorldAngularVel();
+    math::Vector3 H_2 =
+      link_2->GetWorldInertiaMatrix()*link_2->GetWorldAngularVel();
+    angularMomentumError.InsertData((H_1 + H_2 - H0_1 - H0_2)
+      / (H0mag_1 + H0mag_2));
 
     // energy error
-    energyError.InsertData((link->GetWorldEnergy() - E0) / E0);
+    energyError.InsertData(
+      (link_1->GetWorldEnergy() + link_2->GetWorldEnergy() - E0_1 - E0_2)
+      / (E0_1 + E0_2));
 
     // extended test for ode
     if (_physicsEngine == "ode")
@@ -244,7 +329,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
       //       << "]\n";
     }
   }
-  common::Time elapsedTime = common::Time::GetWallTime() - startTime;
+  common::Time elapsedTime = common::Time::GetWallTime() - startWallTime;
   this->Record("wallTime", elapsedTime.Double());
   common::Time simTime = (world->GetSimTime() - t0).Double();
   ASSERT_NEAR(simTime.Double(), simDuration, _dt*1.1);
@@ -252,12 +337,12 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
   this->Record("timeRatio", elapsedTime.Double() / simTime.Double());
 
   // Record statistics on pitch and yaw angles
-  this->Record("energy0", E0);
+  this->Record("linMomentum0", (P0mag_1 + P0mag_2));
+  this->Record("linMomentumError", linearMomentumError.mag);
+  this->Record("angMomentum0", (H0mag_1 + H0mag_2));
+  this->Record("angMomentumError", angularMomentumError.mag);
+  this->Record("energy0", (E0_1 + E0_2));
   this->Record("energyError", energyError);
-  // this->Record("angMomentum0", H0mag);
-  // this->Record("angMomentumErr", angularMomentumError.mag);
-  this->Record("linPositionErr", linearPositionError.mag);
-  this->Record("linVelocityErr", linearVelocityError.mag);
   this->Record("rmsErrorTotal", constraintErrorTotal);
   this->Record("constraintResidualTotal", constraintResidualTotal);
   // gzerr << "end"; getchar();
