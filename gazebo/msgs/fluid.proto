@@ -1,0 +1,14 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Fluid
+/// \brief msg passing fluid particle position
+
+
+import "vector3d.proto";
+
+message Fluid
+{
+  required string name = 1;
+  repeated Vector3d position  = 2;
+}
