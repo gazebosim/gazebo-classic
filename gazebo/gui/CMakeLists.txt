@@ -145,7 +145,6 @@ target_link_libraries(gazebo_gui
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  ${SPNAV_LIBRARY}
   pthread
 )
 
@@ -164,9 +163,14 @@ target_link_libraries(gzclient
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  ${SPNAV_LIBRARY}
   pthread
 )
+
+if (SPNAV_LIBRARY)
+  target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
+  target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
 
 add_definitions(${QT_DEFINITIONS})
 

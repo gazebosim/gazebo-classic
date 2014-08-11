@@ -486,7 +486,6 @@ if (SPNAV_LIBRARY AND SPNAV_HEADER)
 else()
   message(STATUS "Looking for libspnav and spnav.h - not found")
   set(HAVE_SPNAV FALSE)
-  set (SPNAV_LIBRARY STRING "")
 endif()
 
 ########################################
