@@ -222,9 +222,16 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
+      private: void OnJoy(ConstJoystickPtr &_msg);
+
       /// \internal
       /// \brief Pointer to private data.
       private: UserCameraPrivate *dataPtr;
+
+      /// \brief Gazebo communication node pointer.
+      private: transport::NodePtr node;
+
+      private: transport::SubscriberPtr joySub;
     };
     /// \}
   }

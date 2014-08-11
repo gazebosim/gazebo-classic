@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Joystick 
+/// \brief Message for a joystick
+
+import "vector3d.proto";
+
+message Joystick
+{
+  // Translation measurements
+  optional Vector3d translation = 1;
+
+  // Rotation measurements
+  optional Vector3d rotation    = 2;
+
+  // Button measurements
+  repeated int32 buttons        = 3;
+}

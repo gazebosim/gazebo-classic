@@ -477,6 +477,18 @@ include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
 
 ########################################
+# Find Space Navigator header and library
+find_library(SPNAV_LIBRARY NAMES spnav)
+find_file(SPNAV_HEADER NAMES spnav.h)
+if (SPNAV_LIBRARY AND SPNAV_HEADER)
+  message(STATUS "Looking for libspnav and spnav.h - found")
+  set(HAVE_SPNAV TRUE)
+else()
+  message(STATUS "Looking for libspnav and spnav.h - not found")
+  set(HAVE_SPNAV FALSE)
+endif()
+
+########################################
 # Find QWT (QT graphing library)
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
