@@ -85,7 +85,8 @@ void ModelAlign_TEST::AlignXMin()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "x", "min");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "x", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -161,7 +162,7 @@ void ModelAlign_TEST::AlignXCenter()
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "x", "center");
+      modelVisuals, "x", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -236,7 +237,8 @@ void ModelAlign_TEST::AlignXMax()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "x", "max");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "x", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -312,7 +314,8 @@ void ModelAlign_TEST::AlignYMin()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "y", "min");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "y", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -388,7 +391,7 @@ void ModelAlign_TEST::AlignYCenter()
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "y", "center");
+      modelVisuals, "y", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -464,7 +467,8 @@ void ModelAlign_TEST::AlignYMax()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "y", "max");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "y", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -540,7 +544,8 @@ void ModelAlign_TEST::AlignZMin()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "z", "min");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "z", "min", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -616,7 +621,7 @@ void ModelAlign_TEST::AlignZCenter()
 
   gazebo::gui::ModelAlign::Instance()->Init();
   gazebo::gui::ModelAlign::Instance()->AlignVisuals(
-      modelVisuals, "z", "center");
+      modelVisuals, "z", "center", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 
@@ -691,7 +696,8 @@ void ModelAlign_TEST::AlignZMax()
   }
 
   gazebo::gui::ModelAlign::Instance()->Init();
-  gazebo::gui::ModelAlign::Instance()->AlignVisuals(modelVisuals, "z", "max");
+  gazebo::gui::ModelAlign::Instance()->AlignVisuals(
+      modelVisuals, "z", "max", "first");
 
   gazebo::math::Box targetBbox = modelVisuals[0]->GetBoundingBox();
 

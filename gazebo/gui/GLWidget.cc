@@ -113,7 +113,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->connections.push_back(
       gui::Events::ConnectAlignMode(
-        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3)));
+        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
 
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
@@ -343,6 +343,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_translateAct->trigger();
     else if (_event->key() == Qt::Key_S)
       g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N)
+      g_snapAct->trigger();
     else if (_event->key() == Qt::Key_Escape)
       g_arrowAct->trigger();
   }
@@ -451,7 +453,10 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMouseReleaseMakeEntity();
-  else if (this->state == "select")
+  // Auto switch to select mode if control is pressed to allow multi-object
+  // selection. Remove this once multi-object manipulation is implemented in
+  // RTS modes, issue #213
+  else if (this->state == "select"  || this->mouseEvent.control)
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
@@ -1127,8 +1132,8 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 
 /////////////////////////////////////////////////
 void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
-    bool _preview)
+    const std::string &_target, bool _preview)
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
-      !_preview);
+      _target, !_preview);
 }

@@ -38,6 +38,9 @@ namespace gazebo
 
       /// \brief Qt Signal mapper for mapping align actions
       public: QSignalMapper *alignSignalMapper;
+
+      /// \brief Keep track whether to align with first or last selected entity.
+      public: int alignRelativeTarget;
     };
   }
 }

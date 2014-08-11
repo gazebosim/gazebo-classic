@@ -40,11 +40,29 @@ AlignWidget::AlignWidget(QWidget *_parent)
   connect(this->dataPtr->alignSignalMapper, SIGNAL(mapped(QString)),
       this, SLOT(OnAlignMode(QString)));
 
+  QLabel *noteLabel = new QLabel(tr("Remember to Pause"));
+  QFont labelFont = noteLabel->font();
+  labelFont.setPointSize(labelFont.pointSize());
+  noteLabel->setFont(labelFont);
+
+  QComboBox *targetComboBox = new QComboBox(this);
+  targetComboBox->addItem(tr("Relative to First"));
+  targetComboBox->addItem(tr("Relative to Last"));
+  connect(targetComboBox, SIGNAL(currentIndexChanged(int)), this,
+      SLOT(OnAlignTargetChanged(int)));
+
   QVBoxLayout *alignLayout = new QVBoxLayout;
   alignLayout->addWidget(this->dataPtr->xAlignBar);
   alignLayout->addWidget(this->dataPtr->yAlignBar);
   alignLayout->addWidget(this->dataPtr->zAlignBar);
+  alignLayout->addWidget(targetComboBox);
+  alignLayout->addWidget(noteLabel);
+  alignLayout->setAlignment(this->dataPtr->xAlignBar, Qt::AlignHCenter);
+  alignLayout->setAlignment(this->dataPtr->yAlignBar, Qt::AlignHCenter);
+  alignLayout->setAlignment(this->dataPtr->zAlignBar, Qt::AlignHCenter);
   this->setLayout(alignLayout);
+
+  this->dataPtr->alignRelativeTarget = 0;
 }
 
 /////////////////////////////////////////////////
@@ -93,7 +111,8 @@ void AlignWidget::Add(AlignAxis _axis, AlignConfig _config, QAction *_action)
 void AlignWidget::OnAlignMode(QString _mode)
 {
   std::string mode = _mode.toStdString();
-  gui::Events::alignMode(mode.substr(0, 1), mode.substr(1), false);
+  gui::Events::alignMode(mode.substr(0, 1), mode.substr(1),
+      this->dataPtr->alignRelativeTarget ? "last" : "first", false);
 }
 
 /////////////////////////////////////////////////
@@ -121,6 +140,12 @@ std::string AlignWidget::GetConfigAsString(AlignConfig _config)
 }
 
 /////////////////////////////////////////////////
+void AlignWidget::OnAlignTargetChanged(int _index)
+{
+  this->dataPtr->alignRelativeTarget = _index;
+}
+
+/////////////////////////////////////////////////
 bool AlignWidget::eventFilter(QObject *_obj, QEvent *_event)
 {
   if (this->isEnabled())
@@ -130,9 +155,15 @@ bool AlignWidget::eventFilter(QObject *_obj, QEvent *_event)
     if (!config.empty() && !axis.empty())
     {
       if (_event->type() == QEvent::Enter)
-        gui::Events::alignMode(axis, config, true);
+      {
+        gui::Events::alignMode(axis, config,
+            this->dataPtr->alignRelativeTarget ? "last" : "first" , true);
+      }
       else if (_event->type() == QEvent::Leave)
-        gui::Events::alignMode("", "reset", true);
+      {
+        gui::Events::alignMode("", "reset",
+            this->dataPtr->alignRelativeTarget ? "last" : "first", true);
+      }
     }
   }
   return QWidget::eventFilter(_obj, _event);

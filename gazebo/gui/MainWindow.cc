@@ -1161,21 +1161,22 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
-  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
+      tr("Copy (Ctrl + C)"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste"), this);
+      tr("Paste (Ctrl + V)"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
 
   g_snapAct = new QAction(QIcon(":/images/magnet.png"),
-      tr("Snap Mode"), this);
+      tr("Snap Mode (N)"), this);
   g_snapAct->setStatusTip(tr("Snap entity"));
   g_snapAct->setCheckable(true);
   g_snapAct->setToolTip(tr("Snap Mode"));
@@ -1209,15 +1210,6 @@ void MainWindow::CreateActions()
   this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
   this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
   this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
-  xAlignMin->setCheckable(true);
-  xAlignCenter->setCheckable(true);
-  xAlignMax->setCheckable(true);
-  yAlignMin->setCheckable(true);
-  yAlignCenter->setCheckable(true);
-  yAlignMax->setCheckable(true);
-  zAlignMin->setCheckable(true);
-  zAlignCenter->setCheckable(true);
-  zAlignMax->setCheckable(true);
 
   QActionGroup *xAlignActionGroup = new QActionGroup(this);
   xAlignActionGroup->addAction(xAlignMin);

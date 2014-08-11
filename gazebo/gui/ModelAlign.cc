@@ -160,7 +160,8 @@ void ModelAlign::GetMinMax(std::vector<math::Vector3> _vertices,
 
 /////////////////////////////////////////////////
 void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
-    const std::string &_axis, const std::string &_config, bool _publish)
+    const std::string &_axis, const std::string &_config,
+    const std::string &_target, bool _publish)
 {
   if (_config == "reset" || _publish)
   {
@@ -186,7 +187,20 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   if (this->dataPtr->selectedVisuals.size() <= 1)
     return;
 
-  this->dataPtr->targetVis = this->dataPtr->selectedVisuals.front();
+  unsigned int start = 0;
+  unsigned int end = 0;
+  if (_target == "first")
+  {
+    start = 1;
+    end = this->dataPtr->selectedVisuals.size();
+    this->dataPtr->targetVis = this->dataPtr->selectedVisuals.front();
+  }
+  else if (_target == "last")
+  {
+    start = 0;
+    end = this->dataPtr->selectedVisuals.size()-1;
+    this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
+  }
 
   math::Pose targetWorldPose = this->dataPtr->targetVis->GetWorldPose();
   math::Box targetBbox = this->dataPtr->targetVis->GetBoundingBox();
@@ -198,7 +212,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   math::Vector3 targetMax;
   this->GetMinMax(targetVertices, targetMin, targetMax);
 
-  for (unsigned i = 1; i < this->dataPtr->selectedVisuals.size(); ++i)
+  for (unsigned i = start; i < end; ++i)
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
