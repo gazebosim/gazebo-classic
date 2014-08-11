@@ -26,11 +26,13 @@ using namespace gazebo;
 // physics engine
 // dt
 // number of iterations
+// number of sor
 // inertia of large box (all others being 1)
 // gravity applied
 // force on top box
 typedef std::tr1::tuple<const char * /* physics engine */
                       , int          /* number of iterations */
+                      , double       /* number of sor */
                       , double       /* dt */
                       , double       /* mass of large box */
                       , double       /* gravity */
@@ -43,12 +45,14 @@ class RigidBodyTest : public ServerFixture,
   /// \brief Test accuracy of unconstrained rigid body motion.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _iterations Number of iterations.
+  /// \param[in] _sor overrelaxation.
   /// \param[in] _dt Max time step size.
   /// \param[in] _mass Mass of large box, all others being 1
   /// \param[in] _gravity gravity applied
   /// \param[in] _force force on top box
   public: void InertiaRatioBoxStack(const std::string &_physicsEngine
                             , int _iterations
+                            , double _sor
                             , double _dt
                             , double _mass
                             , double _gravity
@@ -63,6 +67,7 @@ class RigidBodyTest : public ServerFixture,
 // conservation
 void RigidBodyTest::InertiaRatioBoxStack(const std::string &_physicsEngine
                                 , int _iterations
+                                , double _sor
                                 , double _dt
                                 , double _mass
                                 , double _gravity
@@ -121,6 +126,9 @@ void RigidBodyTest::InertiaRatioBoxStack(const std::string &_physicsEngine
     msgLink->add_collision();
     msgs::Collision *msgCollision = msgLink->mutable_collision(0);
     msgCollision->set_name("collision");
+    msgs::Surface *msgSurface = msgCollision->mutable_surface();
+    msgSurface->set_max_vel(100000.0);
+    msgSurface->set_min_depth(0.001);
     msgs::Geometry *msgGeometry = msgCollision->mutable_geometry();
     msgGeometry->set_type(msgs::Geometry_Type_BOX);
     msgs::Set(msgGeometry->mutable_box()->mutable_size(),
@@ -188,6 +196,7 @@ void RigidBodyTest::InertiaRatioBoxStack(const std::string &_physicsEngine
     gzdbg << "iters: "
           << boost::any_cast<int>(physics->GetParam("iters"))
           << std::endl;
+    physics->SetParam("sor", _sor);
     physics->SetParam("iters", _iterations);
     physics->SetParam("sor_lcp_tolerance", _tolerance);
   }
@@ -268,14 +277,16 @@ TEST_P(RigidBodyTest, InertiaRatioBoxStack)
 {
   std::string physicsEngine = std::tr1::get<0>(GetParam());
   int    iterations         = std::tr1::get<1>(GetParam());
-  double dt                 = std::tr1::get<2>(GetParam());
-  double mass               = std::tr1::get<3>(GetParam());
-  double gravity            = std::tr1::get<4>(GetParam());
-  double force              = std::tr1::get<5>(GetParam());
-  double tolerance          = std::tr1::get<6>(GetParam());
+  double sor                = std::tr1::get<2>(GetParam());
+  double dt                 = std::tr1::get<3>(GetParam());
+  double mass               = std::tr1::get<4>(GetParam());
+  double gravity            = std::tr1::get<5>(GetParam());
+  double force              = std::tr1::get<6>(GetParam());
+  double tolerance          = std::tr1::get<7>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
+        << ", sor: " << sor
         << ", mass: " << mass
         << ", gravity: " << gravity
         << ", force: " << force
@@ -283,6 +294,7 @@ TEST_P(RigidBodyTest, InertiaRatioBoxStack)
         << std::endl;
   RecordProperty("engine", physicsEngine);
   RecordProperty("iters", iterations);
+  this->Record("sor", sor);
   this->Record("dt", dt);
   this->Record("mass", mass);
   this->Record("gravity", gravity);
@@ -290,6 +302,7 @@ TEST_P(RigidBodyTest, InertiaRatioBoxStack)
   this->Record("tolerance", tolerance);
   InertiaRatioBoxStack(physicsEngine
       , iterations
+      , sor
       , dt
       , mass
       , gravity
@@ -298,24 +311,10 @@ TEST_P(RigidBodyTest, InertiaRatioBoxStack)
       );
 }
 
-/*
-#define M_MIN 0.5
-#define M_MAX 1000.0
-#define M_STEP 3.0e-4
-INSTANTIATE_TEST_CASE_P(InertiaRatioBoxStackMulti, RigidBodyTest,
-  ::testing::Combine(PHYSICS_ENGINE_VALUES
-  , ::testing::Values(50)  // iterations
-  , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 100.0, 10000.0, 1000000.0) // mass
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(-1.0, -50.0, -100.0, -500.0) // force
-  , ::testing::Values(0.0) // tolerance
-  ));
-*/
-
 INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterations, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
+  , ::testing::Values(1.0) // sor
   , ::testing::Values(0.001) // step size
   , ::testing::Values(10000.0) // mass
   , ::testing::Values(-10.0) // gravity
@@ -323,19 +322,10 @@ INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterations, RigidBodyTest,
   , ::testing::Values(0.0) // tolerance
   ));
 
-INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackIterationsMass, RigidBodyTest,
-  ::testing::Combine(::testing::Values("ode")
+INSTANTIATE_TEST_CASE_P(InertiaRatioBoxStackIterationsMass, RigidBodyTest,
+  ::testing::Combine(::testing::Values("ode","bullet")
   , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
-  , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
-  , ::testing::Values(0.0) // tolerance
-  ));
-
-INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackIterationsMass, RigidBodyTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(50, 100, 200, 500, 1000)  // iterations
+  , ::testing::Values(1.0) // sor
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(-10.0) // gravity
@@ -346,6 +336,7 @@ INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackIterationsMass, RigidBodyTest,
 INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("ode")
   , ::testing::Values(100)  // iterations
+  , ::testing::Values(1.0) // sor
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(-10.0) // gravity
@@ -355,6 +346,7 @@ INSTANTIATE_TEST_CASE_P(OdeInertiaRatioBoxStackMass, RigidBodyTest,
 INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("bullet")
   , ::testing::Values(100)  // iterations
+  , ::testing::Values(1.0) // sor
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(-10.0) // gravity
@@ -364,55 +356,13 @@ INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStackMass, RigidBodyTest,
 INSTANTIATE_TEST_CASE_P(DartInertiaRatioBoxStackMass, RigidBodyTest,
   ::testing::Combine(::testing::Values("dart")
   , ::testing::Values(100)  // iterations
+  , ::testing::Values(1.0) // sor
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
   , ::testing::Values(-10.0) // gravity
   , ::testing::Values(0.0) // force
   , ::testing::Values(0.0) // tolerance
   ));
-/*
-INSTANTIATE_TEST_CASE_P(SimbodyInertiaRatioBoxStackMass, RigidBodyTest,
-  ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(100)  // iterations
-  , ::testing::Values(0.001) // step size
-  , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
-  , ::testing::Values(0.0) // tolerance
-  ));
-*/
-
-/*
-INSTANTIATE_TEST_CASE_P(BulletInertiaRatioBoxStack, RigidBodyTest,
-  ::testing::Combine(::testing::Values("bullet")
-  , ::testing::Values(50)
-  , ::testing::Values(3.0e-4)
-  , ::testing::Values(1.0)
-  , ::testing::Values(-100.0)
-  , ::testing::Values(0.0)
-  , ::testing::Values(0.0)
-  ));
-
-INSTANTIATE_TEST_CASE_P(SimbodyInertiaRatioBoxStack, RigidBodyTest,
-  ::testing::Combine(::testing::Values("simbody")
-  , ::testing::Values(50)
-  , ::testing::Values(3.0e-4)
-  , ::testing::Values(1.0)
-  , ::testing::Values(-100.0)
-  , ::testing::Values(0.0)
-  , ::testing::Values(0.0)
-  ));
-
-INSTANTIATE_TEST_CASE_P(DartInertiaRatioBoxStack, RigidBodyTest,
-  ::testing::Combine(::testing::Values("dart")
-  , ::testing::Values(50)
-  , ::testing::Values(3.0e-4)
-  , ::testing::Values(1.0)
-  , ::testing::Values(-100.0)
-  , ::testing::Values(0.0)
-  , ::testing::Values(0.0)
-  ));
-*/
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
