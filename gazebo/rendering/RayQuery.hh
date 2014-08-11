@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _RAYQUERY_HH_
-#define _RAYQUERY_HH_
+#ifndef _GAZEBO_RAYQUERY_HH_
+#define _GAZEBO_RAYQUERY_HH_
 
 #include <vector>
 
