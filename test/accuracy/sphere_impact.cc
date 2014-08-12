@@ -168,8 +168,9 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     msgLink->set_name("link");
     msgs::Inertial *msgInertial = msgLink->mutable_inertial();
     const double mass2 = 1.0;
+    const double radius2 = 0.5;
     msgInertial->set_mass(mass2);
-    double ixx = 2.0 * mass2 * _radius * _radius / 5.0;
+    double ixx = 2.0 * mass2 * radius2 * radius2 / 5.0;
     msgInertial->set_ixx(ixx);
     msgInertial->set_ixy(0.0);
     msgInertial->set_ixz(0.0);
@@ -185,7 +186,7 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     msgCollision->set_name("collision");
     msgs::Geometry *msgGeometry = msgCollision->mutable_geometry();
     msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
-    msgGeometry->mutable_sphere()->set_radius(_radius);
+    msgGeometry->mutable_sphere()->set_radius(radius2);
 
     // add visual doesn't work
     // msgLink->add_visual();
@@ -193,10 +194,10 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
     // msgVisual->set_name("visual");
     // msgGeometry = msgVisual->mutable_geometry();
     // msgGeometry->set_type(msgs::Geometry_Type_SPHERE);
-    // msgGeometry->mutable_sphere()->set_radius(_radius);
+    // msgGeometry->mutable_sphere()->set_radius(radius2);
 
     // 1m above ground, 0m way from origin
-    math::Vector3 pos(0.0 + _radius, 0.0, 1.0 + _radius);
+    math::Vector3 pos(0.0 + radius2, 0.0, 1.0 + _radius);
     msgs::Set(msgModel.mutable_pose()->mutable_position(), pos);
 
     models.push_back(this->SpawnModel(msgModel));
@@ -209,13 +210,9 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
   physics::LinkPtr link_2 = model_2->GetLink("link");
 
 
-
-
   // set things in motion for a few time steps here
   // e.g. start spheres moving
   // be sure to stop before collision happens
-
-
   // setup simulation duration
   const double startupDuration = 10.0;
   int startupSteps = ceil(startupDuration / _dt);
@@ -228,6 +225,12 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
 
     // step world once
     world->Step(1);
+    double dist =
+      (link_1->GetWorldPose() - link_2->GetWorldPose()).pos.GetLength();
+
+    // if spheres are about to collide
+    if (dist < 0.1) // _velocity * _dt)
+      break;
   }
 
 
@@ -345,7 +348,6 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
   this->Record("energyError", energyError);
   this->Record("rmsErrorTotal", constraintErrorTotal);
   this->Record("constraintResidualTotal", constraintResidualTotal);
-  // gzerr << "end"; getchar();
 }
 
 /////////////////////////////////////////////////
@@ -355,18 +357,18 @@ TEST_P(RigidBodyTest, SphereImpact)
   int    iterations         = std::tr1::get<1>(GetParam());
   double dt                 = std::tr1::get<2>(GetParam());
   double mass               = std::tr1::get<3>(GetParam());
-  double side               = std::tr1::get<4>(GetParam());
+  double radius             = std::tr1::get<4>(GetParam());
   double gravity            = std::tr1::get<5>(GetParam());
-  double force              = std::tr1::get<6>(GetParam());
+  double velocity           = std::tr1::get<6>(GetParam());
   double tolerance          = std::tr1::get<7>(GetParam());
   double cgz                = std::tr1::get<8>(GetParam());
   gzdbg << physicsEngine
         << ", dt: " << dt
         << ", iters: " << iterations
         << ", mass: " << mass
-        << ", side: " << side
+        << ", radius: " << radius
         << ", gravity: " << gravity
-        << ", force: " << force
+        << ", velocity: " << velocity
         << ", tolerance: " << tolerance
         << ", cgz: " << cgz
         << std::endl;
@@ -374,18 +376,18 @@ TEST_P(RigidBodyTest, SphereImpact)
   RecordProperty("iters", iterations);
   this->Record("dt", dt);
   this->Record("mass", mass);
-  this->Record("side", side);
+  this->Record("radius", radius);
   this->Record("gravity", gravity);
-  this->Record("force", -force);  // negate, easier for plotting
+  this->Record("velocity", velocity);  // negate, easier for plotting
   this->Record("tolerance", tolerance);
   this->Record("cgz", cgz);
   SphereImpact(physicsEngine
       , iterations
       , dt
       , mass
-      , side
+      , radius
       , gravity
-      , force
+      , velocity
       , tolerance
       , cgz
       );
@@ -398,40 +400,40 @@ INSTANTIATE_TEST_CASE_P(SphereImpactMass, RigidBodyTest,
   , ::testing::Values(0.001) // step size
   // masses
   , ::testing::Values(1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0)
-  , ::testing::Values(1.0) // side
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.5) // radius
+  , ::testing::Values(0.0) // gravity
+  , ::testing::Values(1.0) // velocity
   , ::testing::Values(0.0) // tolerance
   , ::testing::Values(0.0) // cgz
   ));
 
 // this test will vary size of the sphere, and check for quality of solution
-INSTANTIATE_TEST_CASE_P(SphereImpactSize, RigidBodyTest,
+INSTANTIATE_TEST_CASE_P(SphereImpactVelocity, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(50)  // iterations
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0) // mass
-  , ::testing::Values(0.01, 0.1, 1.0, 10.0, 100.0) // side
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
+  , ::testing::Values(0.5) // radius
+  , ::testing::Values(0.0) // gravity
+  , ::testing::Values(1.0, 10.0, 100.0, 1000.0) // velocity
   , ::testing::Values(0.0) // tolerance
   , ::testing::Values(0.0) // cgz
   ));
 
-#define CGX_MIN 0.0
-#define CGX_MAX 1.0
-#define CGX_STEP 0.05
+#define CGZ_MIN 0.0
+#define CGZ_MAX 1.0
+#define CGZ_STEP 0.05
 // this test will vary cg of the sphere, and check for quality of solution
 INSTANTIATE_TEST_CASE_P(SphereImpactCg, RigidBodyTest,
   ::testing::Combine(PHYSICS_ENGINE_VALUES
   , ::testing::Values(50)  // iterations
   , ::testing::Values(0.001) // step size
   , ::testing::Values(1.0) // mass
-  , ::testing::Values(1.0) // side
-  , ::testing::Values(-10.0) // gravity
-  , ::testing::Values(0.0) // force
+  , ::testing::Values(1.5) // radius
+  , ::testing::Values(0.0) // gravity
+  , ::testing::Values(1.0) // velocity
   , ::testing::Values(0.0) // tolerance
-  , ::testing::Range(CGX_MIN, CGX_MAX, CGX_STEP) // cgz
+  , ::testing::Range(CGZ_MIN, CGZ_MAX, CGZ_STEP) // cgz
   ));
 
 /////////////////////////////////////////////////
