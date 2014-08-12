@@ -83,6 +83,8 @@ void ModelSnap_TEST::Snap()
   gazebo::rendering::VisualPtr model03Vis = scene->GetVisual(model03Name);
   QVERIFY(model03Vis != NULL);
 
+  this->SetPause(true);
+
   // set-up the ray query
   gazebo::rendering::RayQuery rayQuery(cam);
 
@@ -104,14 +106,6 @@ void ModelSnap_TEST::Snap()
   // Snap the sphere to the front face of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
       verticesSrc, verticesDest, model03Vis);
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
 
   double xDiff = 0;
   double yDiff = 0;
@@ -151,14 +145,6 @@ void ModelSnap_TEST::Snap()
   // Snap the cylinder to the top of the box.
   gazebo::gui::ModelSnap::Instance()->Snap(
       verticesSrc, verticesDest, model01Vis);
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
 
   // The cylinder should now be on top of the box
   // Given that they are both unit shapes, the height of the cylinder will now
