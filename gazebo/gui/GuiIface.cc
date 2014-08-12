@@ -249,7 +249,7 @@ bool gui::run(int _argc, char **_argv)
   if (!parse_args(_argc, _argv))
     return false;
 
-  if (!gazebo::setupClient())
+  if (!gazebo::setupClient(_argc, _argv))
     return false;
 
   if (!gazebo::gui::load())
