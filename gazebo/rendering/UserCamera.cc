@@ -621,20 +621,29 @@ std::string UserCamera::GetViewControllerTypeString()
 //////////////////////////////////////////////////
 void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 {
+  // Scaling factor applied to rotations.
+  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+
   // This function was establish when integrating the space navigator
   // joystick.
-  if (_msg->has_translation() && _msg->has_rotation())
+  if (_msg->has_translation() || _msg->has_rotation())
   {
+    math::Pose pose = this->GetWorldPose();
+
     // Get the joystick XYZ
-    math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+    if (_msg->has_translation())
+    {
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    }
 
     // Get the jostick RPY. We are disabling rotation around x and y.
-    math::Vector3 rot = msgs::Convert(_msg->rotation()) *
-      math::Vector3(0, 0.01, 0.05);
+    if (_msg->has_rotation())
+    {
+      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    }
 
-    math::Pose pose = this->GetWorldPose();
-    pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
-    pose.pos = pose.rot.RotateVector(trans) + pose.pos;
     this->SetWorldPose(pose);
   }
 }

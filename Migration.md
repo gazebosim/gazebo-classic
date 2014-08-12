@@ -5,6 +5,9 @@
 1. **gazebo/math/Kmeans.hh**
     + ***New class:*** Kmeans
 
+1. **gazebo/gui/SpaceNav.hh**
+    + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations
