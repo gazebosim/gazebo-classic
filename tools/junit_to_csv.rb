@@ -9,6 +9,7 @@ doc.elements.each('testsuites/testsuite/testcase') do |t|
   arrayOfHashes << t.attributes
 end
 sortedKeys = arrayOfHashes.first.keys.sort
+sortedKeys.delete("value_param")
 puts sortedKeys.join(',')
 
 arrayOfHashes.each do |h|
