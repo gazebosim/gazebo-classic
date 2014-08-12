@@ -51,6 +51,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->SetRenderRate(30.0);
 
   this->SetUseSDFPose(false);
+
+  this->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -82,6 +84,8 @@ void UserCamera::Load()
   this->node->Init();
   this->joySub = this->node->Subscribe("~/spacenav/joy",
       &UserCamera::OnJoy, this);
+  this->joySubAbs = this->node->Subscribe("~/polhemus/joy",
+      &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -174,6 +178,13 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
+
+  if (!this->poseSet)
+  {
+    this->initialPose = _pose;
+    std::cout << "initialPose: " << this->initialPose << std::endl;
+    this->poseSet = true;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -635,6 +646,21 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
     math::Pose pose = this->GetWorldPose();
     pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
     pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    this->SetWorldPose(pose);
+  }
+}
+
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->poseSet)
+    return;
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
+    pose.pos += this->initialPose.pos;
+    pose.rot *= this->initialPose.rot;
     this->SetWorldPose(pose);
   }
 }
