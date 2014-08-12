@@ -34,4 +34,5 @@
 #include <google/heap-checker.h>
 #endif
 
-#endif  // define _GAZEBO_CONFIG_H_
+// ifndef _GAZEBO_CONFIG_H_
+#endif
