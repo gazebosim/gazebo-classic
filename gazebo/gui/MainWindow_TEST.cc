@@ -433,30 +433,78 @@ void MainWindow_TEST::UserCameraJoystick()
   gazebo::transport::PublisherPtr joyPub =
     node->Advertise<gazebo::msgs::Joystick>("~/spacenav/joy");
 
-  gazebo::msgs::Joystick joystickMsg;
-
-  joystickMsg.mutable_translation()->set_x(0.1);
-  joystickMsg.mutable_translation()->set_y(0.2);
-  joystickMsg.mutable_translation()->set_z(0.3);
-
-  joystickMsg.mutable_rotation()->set_x(0.0);
-  joystickMsg.mutable_rotation()->set_y(0.1);
-  joystickMsg.mutable_rotation()->set_z(0.2);
-
-  joyPub->Publish(joystickMsg);
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
+  // Test with just translation
   {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
+    gazebo::msgs::Joystick joystickMsg;
+
+    joystickMsg.mutable_translation()->set_x(0.1);
+    joystickMsg.mutable_translation()->set_y(0.2);
+    joystickMsg.mutable_translation()->set_z(0.3);
+
+    joyPub->Publish(joystickMsg);
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
+    gazebo::math::Pose endPose = cam->GetWorldPose();
+    QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
+                                          0, 0.275643, 2.35619));
   }
 
-  gazebo::math::Pose endPose = cam->GetWorldPose();
+  // Test with just rotation
+  {
+    gazebo::msgs::Joystick joystickMsg;
 
-  QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
-                                        0, 0.276643, 2.36619));
+    joystickMsg.mutable_rotation()->set_x(0.0);
+    joystickMsg.mutable_rotation()->set_y(0.1);
+    joystickMsg.mutable_rotation()->set_z(0.2);
+
+    joyPub->Publish(joystickMsg);
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
+    gazebo::math::Pose endPose = cam->GetWorldPose();
+    QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
+                                          0, 0.276643, 2.36619));
+  }
+
+  // Test with both translation and  rotation
+  {
+    gazebo::msgs::Joystick joystickMsg;
+
+    joystickMsg.mutable_translation()->set_x(1.0);
+    joystickMsg.mutable_translation()->set_y(2.1);
+    joystickMsg.mutable_translation()->set_z(3.2);
+
+    joystickMsg.mutable_rotation()->set_x(1.0);
+    joystickMsg.mutable_rotation()->set_y(2.1);
+    joystickMsg.mutable_rotation()->set_z(3.2);
+
+    joyPub->Publish(joystickMsg);
+
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
+
+    gazebo::math::Pose endPose = cam->GetWorldPose();
+    QVERIFY(endPose == gazebo::math::Pose(4.84758, -5.01151, 2.15333,
+                                          0, 0.297643, 2.52619));
+  }
 
   cam->Fini();
   mainWindow->close();
