@@ -61,6 +61,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
+  actionGroup->addAction(g_snapAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
@@ -81,6 +82,24 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addSeparator();
   toolbar->addAction(g_copyAct);
   toolbar->addAction(g_pasteAct);
+
+  toolbar->addSeparator();
+
+  QToolButton *alignButton = new QToolButton;
+  alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  alignButton->setIcon(QIcon(":/images/align.png"));
+  alignButton->setToolTip(
+      tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
+  alignButton->setArrowType(Qt::NoArrow);
+  QMenu *alignMenu = new QMenu(alignButton);
+  alignMenu->addAction(g_alignAct);
+  alignButton->setMenu(alignMenu);
+  alignButton->setPopupMode(QToolButton::InstantPopup);
+  toolbar->addWidget(alignButton);
+  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+
+  toolbar->addSeparator();
+  toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);

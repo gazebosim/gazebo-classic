@@ -20,6 +20,7 @@ add_subdirectory(viewers)
 
 set (sources
   Actions.cc
+  AlignWidget.cc
   BoxMaker.cc
   CylinderMaker.cc
   DataLogger.cc
@@ -34,7 +35,9 @@ set (sources
   KeyEventHandler.cc
   LightMaker.cc
   MainWindow.cc
+  ModelAlign.cc
   ModelManipulator.cc
+  ModelSnap.cc
   MeshMaker.cc
   ModelEditWidget.cc
   ModelListWidget.cc
@@ -50,6 +53,7 @@ set (sources
 
 set (qt_headers
   Actions.hh
+  AlignWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -76,7 +80,9 @@ set (headers
   GuiEvents.hh
   KeyEventHandler.hh
   LightMaker.hh
+  ModelAlign.hh
   ModelManipulator.hh
+  ModelSnap.hh
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
@@ -106,12 +112,13 @@ endif ()
 set (qt_tests
   DataLogger_TEST.cc
   GuiIface_TEST.cc
+  ModelAlign_TEST.cc
   TimePanel_TEST.cc
 )
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc)
+  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc ModelSnap_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
