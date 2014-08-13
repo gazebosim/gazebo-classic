@@ -15,35 +15,18 @@
  *
 */
 
-#ifndef _HELPER_PHYSICS_GENERATOR_HH_
-#define _HELPER_PHYSICS_GENERATOR_HH_
+#ifndef _MODELSNAP_TEST_HH_
+#define _MODELSNAP_TEST_HH_
 
-#include "gazebo/gazebo_config.h"
+#include "gazebo/gui/QTestFixture.hh"
 
-#define BULLET_SUPPORT
+/// \brief A test class for the model snap tool.
+class ModelSnap_TEST : public QTestFixture
+{
+  Q_OBJECT
 
-#ifdef HAVE_BULLET
-# undef BULLET_SUPPORT
-# define BULLET_SUPPORT , "bullet"
-#endif
-
-#define SIMBODY_SUPPORT
-#define DART_SUPPORT
-
-#ifdef HAVE_SIMBODY
-# undef SIMBODY_SUPPORT
-# define SIMBODY_SUPPORT , "simbody"
-#endif
-#ifdef HAVE_DART
-# undef DART_SUPPORT
-# define DART_SUPPORT , "dart"
-#endif
-
-/// \brief Helper macro to instantiate gtest for different physics engines
-#define PHYSICS_ENGINE_VALUES ::testing::Values("ode" \
-  BULLET_SUPPORT \
-  SIMBODY_SUPPORT \
-  DART_SUPPORT \
-  )
+  /// \brief Test snapping models.
+  private slots: void Snap();
+};
 
 #endif
