@@ -392,6 +392,7 @@ if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
   BUILD_ERROR ("Missing: SDF version >=2.0.1. Required for reading and writing SDF files.")
 else()
+  message( STATIS "ASDFASDFASDFASDFASDFASDDASFASDF @SDFormat_INCLUDE_DIRS@")
   message (STATUS "Looking for SDFormat - found")
 endif()
 
