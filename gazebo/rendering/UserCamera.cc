@@ -637,7 +637,7 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
       pose.pos = pose.rot.RotateVector(trans) + pose.pos;
     }
 
-    // Get the jostick RPY. We are disabling rotation around x and y.
+    // Get the jostick RPY. We are disabling rotation around x.
     if (_msg->has_rotation())
     {
       math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
