@@ -32,6 +32,13 @@ boost::condition_variable Command::sigCondition;
 
 std::map<std::string, Command *> g_commandMap;
 
+/*static VALUE defout_write(VALUE self, VALUE str)
+{
+  std::cout << RubyEval::val2str(str);
+  return Qnil;
+}*/
+
+
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
@@ -968,10 +975,20 @@ bool SDFCommand::RunImpl()
     boost::filesystem::path path = this->vm["convert"].as<std::string>();
 
     if (!boost::filesystem::exists(path))
+    {
       std::cerr << "Error: File doesn't exist[" << path.string() << "]\n";
+      return false;
+    }
+
+    std::string result = sdf::erbFile(path.string());
+    if (result.empty())
+    {
+      std::cerr << "Unable to ERB parse file[" << path.string() << "]\n";
+      return false;
+    }
 
     TiXmlDocument xmlDoc;
-    if (xmlDoc.LoadFile(path.string()))
+    if (xmlDoc.Parse(result.c_str()))
     {
       if (sdf::Converter::Convert(&xmlDoc, sdf::SDF::version, true))
       {
@@ -990,7 +1007,7 @@ bool SDFCommand::RunImpl()
     }
     else
     {
-      std::cerr << "Unable to load file[" << path.string() << "]\n";
+      std::cerr << "Unable to parse file[" << path.string() << "]\n";
       return false;
     }
   }
