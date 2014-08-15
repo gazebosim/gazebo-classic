@@ -36,6 +36,16 @@ class PhysicsCollisionTest : public ServerFixture,
 /////////////////////////////////////////////////
 void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "simbody" ||
+      _physicsEngine == "dart")
+  {
+    gzerr << "Bounding boxes not yet working with "
+          << _physicsEngine
+          << ", see issue #1148"
+          << std::endl;
+    return;
+  }
+
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
