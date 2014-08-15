@@ -28,12 +28,12 @@ TEST(PkgConfig, Config)
 }
 
 #ifndef WIN32
-TEST(PkgConfig, GCC)
+TEST(PkgConfig, CC)
 {
   char cmd[1024];
 
   snprintf(cmd, sizeof(cmd),
-     "gcc -fPIC -shared `pkg-config --cflags gazebo`\
+     "cc -fPIC -shared `pkg-config --cflags gazebo`\
      `pkg-config --libs gazebo` -o hello_world.so \
      %s/../../testfiles/hello_world.cc", SOURCE_DIR);
   ASSERT_EQ(system(cmd), 0);
