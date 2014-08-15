@@ -391,7 +391,10 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
   // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
   if (dartElem == NULL)
   {
-    gzerr << "DART SDF element not found" << std::endl;
+    gzerr << "DART SDF element not found"
+          << ", unable to get param ["
+          << _key << "]"
+          << std::endl;
     return 0;
   }
 
