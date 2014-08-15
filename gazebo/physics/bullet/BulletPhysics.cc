@@ -744,6 +744,11 @@ boost::any BulletPhysics::GetParam(const std::string &_key) const
     return bulletElem->GetElement("solver")->Get<double>("min_step_size");
   else if (_key == "max_step_size")
     return this->GetMaxStepSize();
+  else if (_key == "contact_max_correcting_vel")
+  {
+    gzwarn << _key << " is not supported in bullet" << std::endl;
+    return 0.0;
+  }
   else
   {
     gzwarn << _key << " is not supported in bullet" << std::endl;

@@ -385,6 +385,17 @@ boost::any DARTPhysics::GetParam(const std::string &_key) const
   {
     return this->GetMaxStepSize();
   }
+  else if (_key == "sor"
+        || _key == "cfm"
+        || _key == "erp"
+        || _key == "contact_max_correcting_vel"
+        || _key == "contact_surface_layer")
+  {
+    gzerr << "Unable to get param ["
+          << _key << "]"
+          << std::endl;
+    return 0.0;
+  }
 
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
   // physics dart element not yet added to sdformat
