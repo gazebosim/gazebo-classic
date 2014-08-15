@@ -59,6 +59,7 @@ namespace gazebo
       /// \brief Open the space navigator interface, and start polling.
       /// \return True if the space navigator was successfully opened, or
       /// when the space navigator 3rd party library is not installed.
+      /// False otherwise.
       public: bool Load();
 
       /// \brief Method executed in a separate thread to poll the space
