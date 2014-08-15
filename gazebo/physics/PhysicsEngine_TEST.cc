@@ -46,7 +46,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
   physicsPubMsg.Clear();
   physicsResponseMsg.Clear();
 
-  Load("worlds/empty.world", false);
+  Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -92,6 +92,13 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       physicsPubMsg.real_time_update_rate());
   EXPECT_DOUBLE_EQ(physicsResponseMsg.real_time_factor(),
       physicsPubMsg.real_time_factor());
+
+  // Test PhysicsEngine::GetParam()
+  {
+    boost::any dt = world->GetPhysicsEngine()->GetParam("max_step_size");
+    EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
+      physicsPubMsg.max_step_size());
+  }
 
   physicsNode->Fini();
 }
