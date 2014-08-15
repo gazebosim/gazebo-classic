@@ -95,9 +95,12 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   // Test PhysicsEngine::GetParam()
   {
-    boost::any dt = world->GetPhysicsEngine()->GetParam("max_step_size");
+    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    boost::any dt = physics->GetParam("max_step_size");
     EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
       physicsPubMsg.max_step_size());
+
+    EXPECT_NO_THROW(physics->GetParam("fake_param_name"));
   }
 
   physicsNode->Fini();
