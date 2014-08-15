@@ -40,6 +40,7 @@
 #include "gazebo/physics/simbody/SimbodyHinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyScrewJoint.hh"
 
+#include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/World.hh"
@@ -188,6 +189,11 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
     physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
 
+    physicsMsg.mutable_simbody()->set_accuracy(
+      static_cast<double>(this->integ->getAccuracyInUse()));
+    physicsMsg.mutable_simbody()->set_max_transient_velocity(
+      static_cast<double>(this->contact.getTransitionVelocity()));
+
     physicsMsg.mutable_gravity()->CopyFrom(msgs::Convert(this->GetGravity()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
@@ -202,38 +208,23 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
-
-  if (_msg->has_gravity())
-    this->SetGravity(msgs::Convert(_msg->gravity()));
-
-  if (_msg->has_real_time_factor())
-    this->SetTargetRealTimeFactor(_msg->real_time_factor());
-
-  if (_msg->has_real_time_update_rate())
-    this->SetRealTimeUpdateRate(_msg->real_time_update_rate());
-
-  if (_msg->has_max_step_size())
-    this->SetMaxStepSize(_msg->max_step_size());
-
-  /* below will set accuracy for simbody if the messages exist
-  // Set integrator accuracy (measured with Richardson Extrapolation)
-  if (_msg->has_accuracy())
+  if (_msg->has_simbody())
   {
-    this->integ->setAccuracy(_msg->simbody().accuracy());
-  }
+    const msgs::PhysicsSimbody *msgSimbody = &_msg->simbody();
 
-  // Set stiction max slip velocity to make it less stiff.
-  if (_msg->has_max_transient_velocity())
-  {
-    this->contact.setTransitionVelocity(
-    _msg->simbody().max_transient_velocity());
-  }
-  */
+    // Set integrator accuracy (measured with Richardson Extrapolation)
+    if (msgSimbody->has_accuracy())
+    {
+      this->integ->setAccuracy(_msg->simbody().accuracy());
+    }
 
-  /// Make sure all models get at least on update cycle.
-  this->world->EnableAllModels();
+    // Set stiction max slip velocity to make it less stiff.
+    if (msgSimbody->has_max_transient_velocity())
+    {
+      this->contact.setTransitionVelocity(
+      _msg->simbody().max_transient_velocity());
+    }
+  }
 
   // Parent class handles many generic parameters
   PhysicsEngine::OnPhysicsMsg(_msg);
@@ -402,6 +393,65 @@ void SimbodyPhysics::InitForThread()
 //////////////////////////////////////////////////
 void SimbodyPhysics::UpdateCollision()
 {
+  this->contactManager->ResetCount();
+
+  // Get all contacts from Simbody
+  /// \TODO: get collision data from simbody contacts
+  Collision *collision1 = NULL;
+  Collision *collision2 = NULL;
+
+  const SimTK::State &state = this->integ->getState();
+  int numc = this->contact.getNumContactForces(state);
+
+  // add contacts to the manager. This will return NULL if no one is
+  // listening for contact information.
+  Contact *contactFeedback = this->contactManager->NewContact(collision1,
+      collision2, this->world->GetSimTime());
+
+  if (contactFeedback)
+  {
+    int count = 0;
+    for (int j = 0; j < numc; ++j)
+    {
+      // get contact stuff from Simbody
+      SimTK::ContactPatch patch;
+      const SimTK::ContactForce& force = this->contact.getContactForce(state,j);
+      const SimTK::ContactId     id    = force.getContactId();
+      const bool found =
+        this->contact.calcContactPatchDetailsById(state, id, patch);
+
+      // loop through detials of patch
+      if (found)
+      {
+        for (int i=0; i < patch.getNumDetails(); ++i)
+        {
+          // get detail
+          const SimTK::ContactDetail& detail = patch.getContactDetail(i);
+          // get contact information from simbody and
+          // add them to contactFeedback.
+          // Store the contact depth
+          contactFeedback->depths[count] = detail.getDeformation();
+
+          // Store the contact position
+          contactFeedback->positions[count].Set(
+            detail.getContactPoint()[0],
+            detail.getContactPoint()[1],
+            detail.getContactPoint()[2]);
+
+          // Store the contact normal
+          contactFeedback->normals[j].Set(
+            detail.getContactNormal()[0],
+            detail.getContactNormal()[1],
+            detail.getContactNormal()[2]);
+
+          // Increase the counters
+          ++count;
+          contactFeedback->count = count;
+        }
+      }
+    }
+  }
+
 }
 
 //////////////////////////////////////////////////

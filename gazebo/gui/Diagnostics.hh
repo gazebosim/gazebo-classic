@@ -52,6 +52,10 @@ namespace gazebo
       /// \param[in] _event Pointer to the event.
       public: virtual bool eventFilter(QObject *_o, QEvent *_e);
 
+      /// \brief QT close event, used to stop diagnostics.
+      /// \param[in] _evt The close event.
+      protected: virtual void closeEvent(QCloseEvent *_evt);
+
       /// \brief Called when a diagnostic message is received.
       /// \param[in] _msg Diagnostic message.
       private: void OnMsg(ConstDiagnosticsPtr &_msg);

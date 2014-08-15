@@ -1,0 +1,38 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Physics
+/// \brief A message containing a description of the global physics properties
+
+
+import "vector3d.proto";
+import "header.proto";
+import "physics_bullet.proto";
+import "physics_dart.proto";
+import "physics_ode.proto";
+import "physics_simbody.proto";
+
+message PhysicsCustom
+{
+  enum Type
+  {
+    ODE = 1;
+    BULLET = 2;
+    SIMBODY = 3;
+    DART = 4;
+  }
+  optional Type type                         = 1[default=ODE];
+
+  optional string solver_type                = 2;
+  optional Vector3d gravity                  = 3;
+  optional bool enable_physics               = 4;
+  optional double real_time_factor           = 5;
+  optional double real_time_update_rate      = 6;
+  optional double max_step_size              = 7;
+  optional double min_step_size              = 8;
+
+  optional PhysicsBullet bullet              = 9;
+  optional PhysicsDART dart                  = 10;
+  optional PhysicsODE ode                    = 11;
+  optional PhysicsSimbody simbody            = 12;
+}

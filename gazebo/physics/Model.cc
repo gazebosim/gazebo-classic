@@ -23,6 +23,7 @@
 #include <sstream>
 
 #include "gazebo/util/OpenAL.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "gazebo/common/Plugin.hh"
@@ -255,6 +256,40 @@ void Model::Update()
     }
     this->prevAnimationTime = this->world->GetSimTime();
   }
+
+  // diagnostics
+  if (DIAG_ENABLED())
+  {
+    DIAG_VARIABLE("model ["+this->GetName()+"] potential energy",
+      this->GetWorldEnergyPotential());
+    DIAG_VARIABLE("model ["+this->GetName()+"] kinetic energy",
+      this->GetWorldEnergyKinetic());
+    DIAG_VARIABLE("model ["+this->GetName()+"] total energy",
+      this->GetWorldEnergy());
+
+    for (Link_V::iterator liter = this->links.begin();
+         liter != this->links.end(); ++liter)
+    {
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] potential energy",
+        (*liter)->GetWorldEnergyPotential());
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] kinetic energy",
+        (*liter)->GetWorldEnergyKinetic());
+      DIAG_VARIABLE("link ["+(*liter)->GetScopedName()+"] total energy",
+        (*liter)->GetWorldEnergy());
+    }
+
+    for (Joint_V::iterator jiter = this->joints.begin();
+         jiter != this->joints.end(); ++jiter)
+    {
+      for(unsigned int i = 0; i < (*jiter)->GetAngleCount(); ++i)
+      {
+        std::ostringstream stream;
+        stream << "joint [" << (*jiter)->GetScopedName() << "] ["
+               << i << "] potential spring energy";
+        DIAG_VARIABLE(stream.str(), (*jiter)->GetWorldEnergyPotentialSpring(i));
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -371,12 +406,6 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
-  {
-    (*iter)->Reset();
-  }
-
   // reset link velocities when resetting model
   for (Link_V::iterator liter = this->links.begin();
        liter != this->links.end(); ++liter)
@@ -388,6 +417,14 @@ void Model::Reset()
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+
+  // Reset plugins after links and joints,
+  // so that plugins can restore initial conditions
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
+  {
+    (*iter)->Reset();
   }
 }
 

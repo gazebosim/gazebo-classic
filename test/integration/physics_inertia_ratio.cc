@@ -34,6 +34,7 @@ class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
   public: void InertiaRatioPendulum(const std::string &_physicsEngine);
+  public: void InertiaRatioSphereStack(const std::string &_physicsEngine);
 };
 
 // Double pendulum with large inertia ratio and lateral gravity component
@@ -96,6 +97,74 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
 TEST_P(PhysicsTest, InertiaRatioPendulum)
 {
   InertiaRatioPendulum(GetParam());
+}
+
+// Stack of spheres with large inertia ratio under gravity
+// Spheres under resting contact constraints
+void PhysicsTest::InertiaRatioSphereStack(const std::string &_physicsEngine)
+{
+  Load("worlds/sphere_stack.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // verify lateral gravity
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  math::Vector3 g = physics->GetGravity();
+  EXPECT_EQ(g, math::Vector3(0.1, 0, -9.81));
+
+  // get models
+  physics::ModelPtr sphere_1 = world->GetModel("sphere_1");
+  physics::ModelPtr sphere_2 = world->GetModel("sphere_2");
+  physics::ModelPtr sphere_3 = world->GetModel("sphere_3");
+  physics::ModelPtr sphere_4 = world->GetModel("sphere_4");
+  physics::ModelPtr sphere_5 = world->GetModel("sphere_5");
+  ASSERT_TRUE(sphere_1 != NULL);
+  ASSERT_TRUE(sphere_2 != NULL);
+  ASSERT_TRUE(sphere_3 != NULL);
+  ASSERT_TRUE(sphere_4 != NULL);
+  ASSERT_TRUE(sphere_5 != NULL);
+
+  // get links
+  physics::LinkPtr link_1 = sphere_1->GetLink("upper_link");
+  ASSERT_TRUE(link_1 != NULL);
+
+  math::Vector3Stats upperAngles;
+  math::Vector3Stats lowerAngles;
+  {
+    const std::string statNames = "MaxAbs,Rms";
+    EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
+    EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
+  }
+
+  physics->SetRealTimeUpdateRate(0.0);
+  common::Time startTime = common::Time::GetWallTime();
+  for (int i = 0; i < 3000; ++i)
+  {
+    world->Step(1);
+
+    // Get statistics on link rotations
+    upperAngles.InsertData(link_1->GetWorldPose().rot.GetAsEuler());
+  }
+  common::Time elapsedTime = common::Time::GetWallTime() - startTime;
+  this->Record("elapsedWallTime", elapsedTime.Double());
+  this->Record("simTime", world->GetSimTime().Double());
+
+  // Expect out of plane angles to fall within limits
+  EXPECT_NEAR((upperAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+
+  // Record statistics on pitch and yaw angles
+  this->Record("upper_pitch_", upperAngles.y);
+  this->Record("lower_pitch_", lowerAngles.y);
+  this->Record("upper_yaw_", upperAngles.z);
+  this->Record("lower_yaw_", lowerAngles.z);
+}
+
+TEST_P(PhysicsTest, InertiaRatioSphereStack)
+{
+  InertiaRatioSphereStack(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);

@@ -1,0 +1,28 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface PhysicsDART
+/// \brief A message containing description of the physics parameters for DART
+
+message PhysicsDART
+{
+  optional string collision_detector_type          = 1;
+  optional string integrator_type                  = 2;
+  optional bool   reorder                          = 3;
+  optional double sor                              = 4;
+  optional int32  iters                            = 5;
+  optional double contact_erp                      = 6;
+  optional double contact_cfm                      = 7;
+  optional double contact_max_correcting_vel       = 8;
+  optional double contact_error_allowance          = 9;
+  optional int32  max_contacts                     = 10;
+  optional int32  max_contacts_per_mass_pair       = 11;
+  optional double joint_limit_erp                  = 12;
+  optional double joint_limit_cfm                  = 13;
+  optional double joint_limit_max_correcting_vel   = 14;
+  optional double joint_limit_error_allowance      = 15;
+  optional double dynamic_joint_erp                = 16;
+  optional double dynamic_joint_cfm                = 17;
+  optional double dynamic_joint_max_correcting_vel = 18;
+  optional double dynamic_joint_error_allowance    = 19;
+}

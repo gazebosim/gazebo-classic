@@ -121,7 +121,6 @@ namespace gazebo
       /// \return True if a latched subscriber exists.
       public: bool HasLatchedSubscriber(const std::string &_topic) const;
 
-
       /// \brief A convenience function for a one-time publication of
       /// a message. This is inefficient, compared to
       /// Node::Advertise followed by Publisher::Publish. This function
