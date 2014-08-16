@@ -5,6 +5,7 @@ includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
 Name: gazebo
 Description: Gazebo Libraries
 Version: @GAZEBO_VERSION_FULL@
-Requires: sdformat
+Requires.private: sdformat protobuf
 Libs: -Wl,-rpath,${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -L${libdir} -L${prefix}/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_VERSION@/plugins -lgazebo_transport -lgazebo_physics -lgazebo_sensors -lgazebo_rendering -lgazebo_gui -lgazebo_msgs -lgazebo_math -lgazebo_common -lgazebo
-CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@
+Libs.private: @APPLE_PKGCONFIG_LDFLAGS@
+CFlags: -I${includedir}/gazebo-@GAZEBO_VERSION@ @APPLE_PKGCONFIG_CFLAGS@

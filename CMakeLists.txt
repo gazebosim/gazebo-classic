@@ -293,6 +293,25 @@ else (build_errors)
   # Make the package config files
   set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
 
+  if (APPLE)
+    # append boost flags
+    set (APPLE_PKGCONFIG_CFLAGS ${Boost_INCLUDE_DIRS})
+    if (NOT "${APPLE_PKGCONFIG_CFLAGS}" STREQUAL "")
+      set (APPLE_PKGCONFIG_CFLAGS "-I${APPLE_PKGCONFIG_CFLAGS}")
+    endif (NOT "${APPLE_PKGCONFIG_CFLAGS}" STREQUAL "")
+    string (REPLACE ";" " -I" APPLE_PKGCONFIG_CFLAGS "${APPLE_PKGCONFIG_CFLAGS}")
+
+    set (APPLE_PKGCONFIG_LDFLAGS ${Boost_LIBRARY_DIRS})
+    if (NOT "${APPLE_PKGCONFIG_LDFLAGS}" STREQUAL "")
+      set (APPLE_PKGCONFIG_LDFLAGS "-L${APPLE_PKGCONFIG_LDFLAGS}")
+    endif(NOT "${APPLE_PKGCONFIG_LDFLAGS}" STREQUAL "")
+    string (REPLACE ";" " -L" APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS}")
+    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} ${Boost_LIBRARIES}")
+    string (REPLACE ";" " " APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS}")
+    # append stdc++
+    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} -lstdlibc++")
+  ENDIF (APPLE)
+
   foreach (pkgconfig ${pkgconfig_files})
     configure_file(${CMAKE_SOURCE_DIR}/cmake/pkgconfig/${pkgconfig}.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc @ONLY)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cmake/pkgconfig/${pkgconfig}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig COMPONENT pkgconfig)
