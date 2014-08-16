@@ -294,10 +294,6 @@ else (build_errors)
   set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
   # set additional ldflags for osx
   if (APPLE)
-    set (APPLE_LDFLAGS "-lboost_system -lstdc++")
-  endif (APPLE)
-
-  if (APPLE)
     # append boost flags
     set (APPLE_PKGCONFIG_CFLAGS ${Boost_INCLUDE_DIRS})
     if (NOT "${APPLE_PKGCONFIG_CFLAGS}" STREQUAL "")
