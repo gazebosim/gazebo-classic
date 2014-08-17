@@ -28,7 +28,7 @@ JointForceControl::JointForceControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->forceSpin = new QDoubleSpinBox;
-  this->forceSpin->setRange(-1000.0, 1000.0);
+  this->forceSpin->setRange(GZ_INT16_MIN, GZ_INT16_MAX);
   this->forceSpin->setSingleStep(0.001);
   this->forceSpin->setDecimals(3);
   this->forceSpin->setValue(0.000);
