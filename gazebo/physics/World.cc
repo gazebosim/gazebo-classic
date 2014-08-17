@@ -69,6 +69,7 @@
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Population.hh"
 
 using namespace gazebo;
 using namespace physics;
