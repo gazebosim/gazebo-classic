@@ -49,7 +49,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
-#include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/msgs/msgs.hh"
