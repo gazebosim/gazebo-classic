@@ -309,7 +309,7 @@ else (build_errors)
     set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} ${Boost_LIBRARIES}")
     string (REPLACE ";" " " APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS}")
     # append stdc++
-    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} -lstdlibc++")
+    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} -lstdc++")
   ENDIF (APPLE)
 
   foreach (pkgconfig ${pkgconfig_files})
