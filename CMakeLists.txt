@@ -292,24 +292,31 @@ else (build_errors)
   ########################################
   # Make the package config files
   set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
+
+  # set boost pkgconfig cflags
+  set (Boost_PKGCONFIG_CFLAGS ${Boost_INCLUDE_DIRS})
+  if (NOT "${Boost_PKGCONFIG_CFLAGS}" STREQUAL "")
+    set (Boost_PKGCONFIG_CFLAGS "-I${Boost_PKGCONFIG_CFLAGS}")
+  endif (NOT "${Boost_PKGCONFIG_CFLAGS}" STREQUAL "")
+  string (REPLACE ";" " -I" Boost_PKGCONFIG_CFLAGS "${Boost_PKGCONFIG_CFLAGS}")
+
+  # set boost pkgconfig libs
+  set (Boost_PKGCONFIG_LIBS ${Boost_LIBRARY_DIRS})
+  if (NOT "${Boost_PKGCONFIG_LIBS}" STREQUAL "")
+    set (Boost_PKGCONFIG_LIBS "-L${Boost_PKGCONFIG_LIBS}")
+  endif(NOT "${Boost_PKGCONFIG_LIBS}" STREQUAL "")
+  string (REPLACE ";" " -L" Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS}")
+
+  foreach (b ${Boost_LIBRARIES})
+    get_filename_component(bname ${b} NAME_WE)
+    string (REPLACE "lib" "-l" bname "${bname}")
+    set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
+  endforeach(b)
+
   # set additional ldflags for osx
   if (APPLE)
-    # append boost flags
-    set (APPLE_PKGCONFIG_CFLAGS ${Boost_INCLUDE_DIRS})
-    if (NOT "${APPLE_PKGCONFIG_CFLAGS}" STREQUAL "")
-      set (APPLE_PKGCONFIG_CFLAGS "-I${APPLE_PKGCONFIG_CFLAGS}")
-    endif (NOT "${APPLE_PKGCONFIG_CFLAGS}" STREQUAL "")
-    string (REPLACE ";" " -I" APPLE_PKGCONFIG_CFLAGS "${APPLE_PKGCONFIG_CFLAGS}")
-
-    set (APPLE_PKGCONFIG_LDFLAGS ${Boost_LIBRARY_DIRS})
-    if (NOT "${APPLE_PKGCONFIG_LDFLAGS}" STREQUAL "")
-      set (APPLE_PKGCONFIG_LDFLAGS "-L${APPLE_PKGCONFIG_LDFLAGS}")
-    endif(NOT "${APPLE_PKGCONFIG_LDFLAGS}" STREQUAL "")
-    string (REPLACE ";" " -L" APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS}")
-    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} ${Boost_LIBRARIES}")
-    string (REPLACE ";" " " APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS}")
     # append stdc++
-    set (APPLE_PKGCONFIG_LDFLAGS "${APPLE_PKGCONFIG_LDFLAGS} -lstdc++")
+    set (APPLE_PKGCONFIG_LIBS "${APPLE_PKGCONFIG_LIBS} -lstdc++")
   ENDIF (APPLE)
 
   foreach (pkgconfig ${pkgconfig_files})
