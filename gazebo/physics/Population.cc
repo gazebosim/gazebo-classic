@@ -70,6 +70,12 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   std::vector<math::Vector3> objects;
   PopulationParams params;
 
+  if (!_population)
+  {
+    gzerr << "'_population' parameter is NULL" << std::endl;
+    return false;
+  }
+
   if (!this->ParseSdf(_population, params))
     return false;
 
@@ -169,6 +175,12 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
 bool Population::ParseSdf(sdf::ElementPtr _population,
   PopulationParams &_params)
 {
+  if (!_population)
+  {
+    gzerr << "'_population' parameter is NULL" << std::endl;
+    return false;
+  }
+
   // Read the model element.
   if (!_population->HasElement("model"))
   {
