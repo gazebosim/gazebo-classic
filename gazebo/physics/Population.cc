@@ -316,6 +316,9 @@ void Population::CreatePosesBoxRandom(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   double dx = std::abs(_max.x - _min.x);
   double dy = std::abs(_max.y - _min.y);
   double dz = std::abs(_max.z - _min.z);
@@ -337,6 +340,9 @@ void Population::CreatePosesBoxUniform(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   std::vector<math::Vector3> obs;
 
   double dx = std::abs(_max.x - _min.x);
@@ -383,6 +389,9 @@ void Population::CreatePosesBoxUniform(int _modelCount,
 void Population::CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
   int _cols, const math::Vector3 &_step, std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   _poses.clear();
   math::Vector3 p = _min;
   for (int i = 0; i < _rows; ++i)
@@ -402,6 +411,9 @@ void Population::CreatePosesBoxLinearX(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   double dx = std::abs(_max.x - _min.x);
 
   // Evenly placed in a row along the global x-axis.
@@ -421,6 +433,9 @@ void Population::CreatePosesBoxLinearY(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   double dy = std::abs(_max.y - _min.y);
 
   // Evenly placed in a row along the global y-axis.
@@ -440,6 +455,9 @@ void Population::CreatePosesBoxLinearZ(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   double dz = std::abs(_max.z - _min.z);
 
   // Evenly placed in a row along the global z-axis.
@@ -459,6 +477,9 @@ void Population::CreatePosesCylinderRandom(int _modelCount,
   const math::Vector3 &_center, double _radius, double _height,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
   {
@@ -477,6 +498,9 @@ void Population::CreatePosesCylinderUniform(int _modelCount,
   const math::Vector3 &_center, double _radius, double _height,
   std::vector<math::Vector3> &_poses)
 {
+  // _poses should be empty.
+  GZ_ASSERT(!_poses.empty())
+
   std::vector<math::Vector3> obs;
 
   // Step1: Sample points in the cylinder.
