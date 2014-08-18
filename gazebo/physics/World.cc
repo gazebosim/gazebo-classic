@@ -300,6 +300,13 @@ void World::Load(sdf::ElementPtr _sdf, const std::string &_physicsPlugin)
   // Initialize the physics plugin
   if (this->physicsPlugin)
   {
+    // here we want to pass the gazebo model into the physics engine
+    // and setup ways to get back states.
+    // two main mechanisms:
+    //   movedCallback: when physics engine updates, propagate into gazebo
+    //   OnPoseChange: if user changes state in gazebo, propagate to engine
+    // other useful callse:
+    //   step: take a step in simulation
     this->physicsPlugin->init();
   }
 }
