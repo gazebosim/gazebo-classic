@@ -34,10 +34,11 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 Population::Population(sdf::ElementPtr _sdf, World *_world)
-  : world(_world)
+  : dataPtr(new PopulationPrivate)
 {
+  this->dataPtr->world = _world;
   if (_sdf->HasElement("population"))
-    this->populationElem = _sdf->GetElement("population");
+    this->dataPtr->populationElem = _sdf->GetElement("population");
 }
 
 //////////////////////////////////////////////////
@@ -48,9 +49,9 @@ Population::~Population()
 //////////////////////////////////////////////////
 bool Population::PopulateAll()
 {
-  GZ_ASSERT(this->populationElem, "'<population> SDF element' is NULL");
+  GZ_ASSERT(this->dataPtr->populationElem, "<population> SDF element is NULL");
 
-  sdf::ElementPtr popElem = this->populationElem;
+  sdf::ElementPtr popElem = this->dataPtr->populationElem;
   bool result = true;
 
   // Iterate through all the population elements in the sdf.
@@ -161,7 +162,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
       boost::lexical_cast<std::string>(p.z) + " 0 0 0</pose>";
     cloneSdf.insert(last + endDelim.size(), pose);
 
-    this->world->InsertModelString(cloneSdf);
+    this->dataPtr->world->InsertModelString(cloneSdf);
   }
 
   return true;
@@ -324,6 +325,9 @@ void Population::CreatePosesBoxRandom(int _modelCount,
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
+
   double dx = std::abs(_max.x - _min.x);
   double dy = std::abs(_max.y - _min.y);
   double dz = std::abs(_max.z - _min.z);
@@ -347,6 +351,9 @@ void Population::CreatePosesBoxUniform(int _modelCount,
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
+
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   std::vector<math::Vector3> obs;
 
@@ -397,6 +404,12 @@ void Population::CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
+  // _rows should be positive.
+  GZ_ASSERT(_rows > 0, "Argument _rows is nonpositive");
+
+  // _cols should be positive.
+  GZ_ASSERT(_cols > 0, "Argument _cols is nonpositive");
+
   _poses.clear();
   math::Vector3 p = _min;
   for (int i = 0; i < _rows; ++i)
@@ -418,6 +431,9 @@ void Population::CreatePosesBoxLinearX(int _modelCount,
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
+
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   double dx = std::abs(_max.x - _min.x);
 
@@ -441,6 +457,9 @@ void Population::CreatePosesBoxLinearY(int _modelCount,
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
+
   double dy = std::abs(_max.y - _min.y);
 
   // Evenly placed in a row along the global y-axis.
@@ -462,6 +481,9 @@ void Population::CreatePosesBoxLinearZ(int _modelCount,
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
+
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   double dz = std::abs(_max.z - _min.z);
 
@@ -485,6 +507,9 @@ void Population::CreatePosesCylinderRandom(int _modelCount,
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
+
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
   {
@@ -505,6 +530,9 @@ void Population::CreatePosesCylinderUniform(int _modelCount,
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
+
+  // _modelCount should be positive.
+  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   std::vector<math::Vector3> obs;
 

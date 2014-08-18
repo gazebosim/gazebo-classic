@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
+#include "gazebo/physics/PopulationPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
 
@@ -49,52 +50,6 @@ namespace gazebo
       /// otherwise.
       public: bool PopulateAll();
 
-      /// \brief Stores all the posible parameters that define a population.
-      private: struct PopulationParams
-      {
-        /// \brief Minimum corner of the boundign box containing the models.
-        math::Vector3 min;
-
-        /// \brief Maximum corner of the box containing the models.
-        math::Vector3 max;
-
-        /// \brief Number of rows used when the models are distributed as a grid
-        int rows;
-
-        /// \brief Number of columns used when the models are distributed as a
-        /// grid.
-        int cols;
-
-        /// \brief Distance between the models when the objects are distributed
-        /// as a grid.
-        math::Vector3 step;
-
-        /// \brief Center of the cylinder's base containing the models.
-        math::Vector3 center;
-
-        /// \brief Radius of the cylinder's base containing the models.
-        double radius;
-
-        /// \brief Height of the cylinder containing the models.
-        double height;
-
-        /// \brief Name of the model.
-        std::string modelName;
-
-        /// \brief Contains the sdf representation of the model.
-        std::string modelSdf;
-
-        /// \brief Number of models to spawn.
-        int modelCount;
-
-        /// \brief Object distribution. E.g.: random, grid.
-        std::string distribution;
-
-        /// \brief Type region in which the objects will be spawned.
-        /// E.g.: box, cylinder.
-        std::string region;
-      };
-
       /// \brief Generate and spawn one model population into the world.
       /// \param[in] _population SDF parameter containing the population details
       /// \return True when the population was successfully spawned or false
@@ -107,7 +62,7 @@ namespace gazebo
       /// should not be used.
       /// \param[in] _population SDF element containing the Population
       /// description.
-      /// \param[out] _params Population params parsed from the SDF.
+      /// \param[out] _params Population parameters parsed from the SDF.
       /// \return True when the function succeed or false otherwise.
       private: bool ParseSdf(sdf::ElementPtr _population,
         PopulationParams &_params);
@@ -211,11 +166,9 @@ namespace gazebo
         const math::Vector3 &_center, double _radius, double _height,
         std::vector<math::Vector3> &_poses);
 
-      /// \brief The Population's SDF values.
-      private: sdf::ElementPtr populationElem;
-
-      /// \brief Pointer to the world.
-      private: World *world;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: PopulationPrivate *dataPtr;
     };
     /// \}
   }

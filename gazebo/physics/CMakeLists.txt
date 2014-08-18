@@ -90,6 +90,7 @@ set (headers
   PlaneShape.hh
   PolylineShape.hh
   Population.hh
+  PopulationPrivate.hh
   RayShape.hh
   Road.hh
   Shape.hh
