@@ -317,7 +317,7 @@ void Population::CreatePosesBoxRandom(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   double dx = std::abs(_max.x - _min.x);
   double dy = std::abs(_max.y - _min.y);
@@ -341,7 +341,7 @@ void Population::CreatePosesBoxUniform(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   std::vector<math::Vector3> obs;
 
@@ -390,7 +390,7 @@ void Population::CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
   int _cols, const math::Vector3 &_step, std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   _poses.clear();
   math::Vector3 p = _min;
@@ -412,7 +412,7 @@ void Population::CreatePosesBoxLinearX(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   double dx = std::abs(_max.x - _min.x);
 
@@ -434,7 +434,7 @@ void Population::CreatePosesBoxLinearY(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   double dy = std::abs(_max.y - _min.y);
 
@@ -456,7 +456,7 @@ void Population::CreatePosesBoxLinearZ(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   double dz = std::abs(_max.z - _min.z);
 
@@ -478,7 +478,7 @@ void Population::CreatePosesCylinderRandom(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
@@ -499,7 +499,7 @@ void Population::CreatePosesCylinderUniform(int _modelCount,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
-  GZ_ASSERT(!_poses.empty())
+  GZ_ASSERT(!_poses.empty(), "Output parameter '_poses' is not empty");
 
   std::vector<math::Vector3> obs;
 
