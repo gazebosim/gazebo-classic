@@ -67,10 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World

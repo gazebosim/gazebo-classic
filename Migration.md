@@ -1,6 +1,9 @@
-## Gazebo 4.0 to 5.0
+## Gazebo 4.X to 5.X
 
 ### Additions
+
+1. **gazebo/math/Kmeans.hh**
+    + ***New class:*** Kmeans
 
 1. **gazebo/gui/RenderWidget.hh**
       + void InsertWidget(unsigned int _index, QWidget *_widget)
@@ -71,6 +74,7 @@
           const LinkPtr &_originalParentLink,
           Link_V &_connectedLinks, bool _fistLink = false);
       + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+      + msgs::Visual GetVisualMessage(const std::string &_name)
 
 ### Modifications
 1. **gazebo/physics/Model.hh**
@@ -84,6 +88,10 @@
 ## Gazebo 3.0 to 3.1
 
 ### Additions
+
+1. **gazebo/physics/World.hh**
+      + void RemoveModel(const std::string &_name);
+      + void RemoveModel(ModelPtr _model);
 
 1. **gazebo/physics/JointController.hh**
     + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);

@@ -169,7 +169,7 @@ target_link_libraries(gazebo_common
   ${libswscale_LIBRARIES}
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
-  ${SDF_LIBRARIES}
+  ${SDFormat_LIBRARIES}
   pthread
 )
 
