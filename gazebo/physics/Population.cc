@@ -83,42 +83,42 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   // Generate the population of poses based on the region and distribution.
   if (params.region == "box" && params.distribution == "random")
   {
-    this->PopulateBoxRandom(params.modelCount, params.min,
+    this->CreatePosesBoxRandom(params.modelCount, params.min,
       params.max, objects);
   }
   else if (params.region == "box" && params.distribution == "uniform")
   {
-    this->PopulateBoxUniform(params.modelCount, params.min,
+    this->CreatePosesBoxUniform(params.modelCount, params.min,
       params.max, objects);
   }
   else if (params.region == "box" && params.distribution == "grid")
   {
-    this->PopulateBoxGrid(params.min, params.rows, params.cols, params.step,
+    this->CreatePosesBoxGrid(params.min, params.rows, params.cols, params.step,
       objects);
   }
   else if (params.region == "box" && params.distribution == "linear-x")
   {
-    this->PopulateBoxLinearX(params.modelCount, params.min, params.max,
+    this->CreatePosesBoxLinearX(params.modelCount, params.min, params.max,
       objects);
   }
   else if (params.region == "box" && params.distribution == "linear-y")
   {
-    this->PopulateBoxLinearY(params.modelCount, params.min, params.max,
+    this->CreatePosesBoxLinearY(params.modelCount, params.min, params.max,
       objects);
   }
   else if (params.region == "box" && params.distribution == "linear-z")
   {
-    this->PopulateBoxLinearZ(params.modelCount, params.min, params.max,
+    this->CreatePosesBoxLinearZ(params.modelCount, params.min, params.max,
       objects);
   }
   else if (params.region == "cylinder" && params.distribution == "random")
   {
-    this->PopulateCylinderRandom(params.modelCount, params.center, params.radius,
-      params.height, objects);
+    this->CreatePosesCylinderRandom(params.modelCount, params.center,
+      params.radius, params.height, objects);
   }
   else if (params.region == "cylinder" && params.distribution == "uniform")
   {
-    this->PopulateCylinderUniform(params.modelCount, params.center,
+    this->CreatePosesCylinderUniform(params.modelCount, params.center,
       params.radius, params.height, objects);
   }
   else
@@ -312,7 +312,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxRandom(int _modelCount,
+void Population::CreatePosesBoxRandom(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -333,7 +333,7 @@ void Population::PopulateBoxRandom(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxUniform(int _modelCount,
+void Population::CreatePosesBoxUniform(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -380,7 +380,7 @@ void Population::PopulateBoxUniform(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxGrid(const math::Vector3 &_min, int _rows,
+void Population::CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
   int _cols, const math::Vector3 &_step, std::vector<math::Vector3> &_poses)
 {
   _poses.clear();
@@ -398,7 +398,7 @@ void Population::PopulateBoxGrid(const math::Vector3 &_min, int _rows,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxLinearX(int _modelCount,
+void Population::CreatePosesBoxLinearX(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -417,7 +417,7 @@ void Population::PopulateBoxLinearX(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxLinearY(int _modelCount,
+void Population::CreatePosesBoxLinearY(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -436,7 +436,7 @@ void Population::PopulateBoxLinearY(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateBoxLinearZ(int _modelCount,
+void Population::CreatePosesBoxLinearZ(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
@@ -455,7 +455,7 @@ void Population::PopulateBoxLinearZ(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCylinderRandom(int _modelCount,
+void Population::CreatePosesCylinderRandom(int _modelCount,
   const math::Vector3 &_center, double _radius, double _height,
   std::vector<math::Vector3> &_poses)
 {
@@ -473,7 +473,7 @@ void Population::PopulateCylinderRandom(int _modelCount,
 }
 
 /////////////////////////////////////////////////
-void Population::PopulateCylinderUniform(int _modelCount,
+void Population::CreatePosesCylinderUniform(int _modelCount,
   const math::Vector3 &_center, double _radius, double _height,
   std::vector<math::Vector3> &_poses)
 {
