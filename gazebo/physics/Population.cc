@@ -303,9 +303,9 @@ void Population::PopulateBoxRandom(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
-  double dx = fabs(_max.x - _min.x);
-  double dy = fabs(_max.y - _min.y);
-  double dz = fabs(_max.z - _min.z);
+  double dx = std::abs(_max.x - _min.x);
+  double dy = std::abs(_max.y - _min.y);
+  double dz = std::abs(_max.z - _min.z);
 
   _poses.clear();
   for (int i = 0; i < _modelCount; ++i)
@@ -326,9 +326,9 @@ void Population::PopulateBoxUniform(int _modelCount,
 {
   std::vector<math::Vector3> obs;
 
-  double dx = fabs(_max.x - _min.x);
-  double dy = fabs(_max.y - _min.y);
-  double dz = fabs(_max.z - _min.z);
+  double dx = std::abs(_max.x - _min.x);
+  double dy = std::abs(_max.y - _min.y);
+  double dz = std::abs(_max.z - _min.z);
 
   // Step1: Sample points in a box.
   double x = 0.0;
@@ -389,7 +389,7 @@ void Population::PopulateBoxLinearX(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
-  double dx = fabs(_max.x - _min.x);
+  double dx = std::abs(_max.x - _min.x);
 
   // Evenly placed in a row along the global x-axis.
   _poses.clear();
@@ -408,7 +408,7 @@ void Population::PopulateBoxLinearY(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
-  double dy = fabs(_max.y - _min.y);
+  double dy = std::abs(_max.y - _min.y);
 
   // Evenly placed in a row along the global y-axis.
   _poses.clear();
@@ -427,7 +427,7 @@ void Population::PopulateBoxLinearZ(int _modelCount,
   const math::Vector3 &_min, const math::Vector3 &_max,
   std::vector<math::Vector3> &_poses)
 {
-  double dz = fabs(_max.z - _min.z);
+  double dz = std::abs(_max.z - _min.z);
 
   // Evenly placed in a row along the global z-axis.
   _poses.clear();
