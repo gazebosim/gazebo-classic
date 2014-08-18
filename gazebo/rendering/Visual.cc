@@ -665,7 +665,7 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      this->sceneNode->removeChild(childVis->GetSceneNode());
+      this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       childVis->GetParent().reset();
       break;
     }
