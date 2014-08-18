@@ -15,10 +15,10 @@
   izz  = mass/12.0 * (dx**2 + dy**2)
 
   # box locations
-  boxes_y0= {
-    "large_ixx" => -dz*2,
-    "large_iyy" =>  0.0,
-    "large_izz" =>  dz*2,
+  boxes_params= {
+    "large_wx" => { :y0 => -dz*2, :w0 => "5.0 0.1 0.1" },
+    "large_wy" => { :y0 =>  0.0,  :w0 => "0.1 5.0 0.1" },
+    "large_wz" => { :y0 =>  dz*2, :w0 => "0.1 0.1 5.0" },
   }
   z0 = dz
 %>
@@ -31,8 +31,9 @@
     <uri>model://sun</uri>
   </include>
   <%
-    boxes_y0.keys.each do |k|
-      y0 = boxes_y0[k]
+    boxes_params.keys.each do |k|
+      y0 = boxes_params[k][:y0]
+      w0 = boxes_params[k][:w0]
   %>
     <%= "<model name=" + '"' + k + '">' %>
       <pose>0 <%= y0 %> <%= z0 %>  0 0 0</pose>
@@ -69,6 +70,10 @@
           </material>
         </visual>
       </link>
+      <%= "<plugin name=" + '"' + k + '" filename="libInitialVelocityPlugin.so">' %>
+        <linear>0 0 0</linear>
+        <angular><%= w0 %></angular>
+      </plugin>
     </model>
   <% end %>
     <gui fullscreen='0'>
