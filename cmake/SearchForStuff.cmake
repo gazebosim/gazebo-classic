@@ -126,7 +126,7 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find Simbody
   set(SimTK_INSTALL_DIR ${SimTK_INSTALL_PREFIX})
-  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake) 
+  #list(APPEND CMAKE_MODULE_PATH ${SimTK_INSTALL_PREFIX}/share/cmake)
   find_package(Simbody)
   if (SIMBODY_FOUND)
     set (HAVE_SIMBODY TRUE)
@@ -153,17 +153,17 @@ if (PKG_CONFIG_FOUND)
   if (NOT tinyxml_FOUND)
       find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
       find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False) 
+      set (tinyxml_FAIL False)
       if (NOT tinyxml_INCLUDE_DIRS)
         message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
       if (NOT tinyxml_LIBRARIES)
         message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True) 
+        set (tinyxml_FAIL True)
       endif()
   endif()
-        
+
   if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
@@ -236,13 +236,10 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9. 
-  # Please read gazebo issues: 994, 995, 996
-  pkg_check_modules(MAX_VALID_OGRE OGRE<=1.8.9)
+  # There are some runtime problems to solve with ogre-1.9.
+  # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
-  elseif (NOT MAX_VALID_OGRE_FOUND)
-    BUILD_ERROR("Bad Ogre3d version: gazebo using ${OGRE_VERSION} ogre version has known bugs in runtime (issue #996). Please use 1.7 or 1.8 series")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
@@ -368,8 +365,8 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find bullet
-  # First and preferred option is to look for bullet standard pkgconfig, 
-  # so check it first. if it is not present, check for the OSRF 
+  # First and preferred option is to look for bullet standard pkgconfig,
+  # so check it first. if it is not present, check for the OSRF
   # custom bullet2.82.pc file
   pkg_check_modules(BULLET bullet>=2.82)
   if (NOT BULLET_FOUND)
@@ -465,16 +462,16 @@ add_manpage_target()
 #find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
 #  /usr/include
 #  /usr/local/include
-#  "$ENV{LIB_DIR}/include" 
-#  "$ENV{INCLUDE}" 
+#  "$ENV{LIB_DIR}/include"
+#  "$ENV{INCLUDE}"
 #  PATH_SUFFIXES qwt-qt4 qwt qwt5
 #  )
 #
-#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS 
+#find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
 #  /usr/lib
 #  /usr/local/lib
-#  "$ENV{LIB_DIR}/lib" 
-#  "$ENV{LIB}/lib" 
+#  "$ENV{LIB_DIR}/lib"
+#  "$ENV{LIB}/lib"
 #  )
 #
 #if (QWT_INCLUDE_DIR AND QWT_LIBRARY)

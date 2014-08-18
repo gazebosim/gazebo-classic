@@ -58,6 +58,9 @@ Light::~Light()
   if (this->light)
     this->scene->GetManager()->destroyLight(this->GetName());
 
+  this->scene->GetManager()->destroyEntity(
+      this->GetName() + "_selection_sphere");
+
   this->visual->DeleteDynamicLine(this->line);
   delete this->line;
   this->scene->RemoveVisual(this->visual);
@@ -276,11 +279,14 @@ void Light::CreateVisual()
     // Make sure the unit_sphere has been inserted.
     this->visual->InsertMesh("unit_sphere");
 
+    Ogre::Entity *ent =
+        visSceneNode->getCreator()->createEntity(this->GetName() +
+        "_selection_sphere", "unit_sphere");
+
+    ent->setMaterialName("Gazebo/White");
+
     // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>
-      (visSceneNode->getCreator()->createEntity(this->GetName() +
-                                                "_selection_sphere",
-                                                "unit_sphere"));
+    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
 
     // Attach the selection object to the light visual
     visSceneNode->attachObject(obj);
