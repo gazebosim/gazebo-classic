@@ -18,6 +18,8 @@
 #ifndef _HELPER_PHYSICS_GENERATOR_HH_
 #define _HELPER_PHYSICS_GENERATOR_HH_
 
+#include "gazebo/gazebo_config.h"
+
 #define BULLET_SUPPORT
 
 #ifdef HAVE_BULLET

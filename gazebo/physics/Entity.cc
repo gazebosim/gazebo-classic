@@ -333,6 +333,19 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 
       if (_notify)
         entity->UpdatePhysicsPose(false);
+
+      // Tell collisions that their current world pose is dirty (needs
+      // updating). We set a dirty flag instead of directly updating the
+      // value to improve performance.
+      for (Base_V::iterator iterC = (*iter)->children.begin();
+           iterC != (*iter)->children.end(); ++iterC)
+      {
+        if ((*iterC)->HasType(COLLISION))
+        {
+          CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+          entityC->SetWorldPoseDirty();
+        }
+      }
     }
   }
 }
@@ -361,6 +374,19 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     if (_publish)
       this->parentEntity->PublishPose();
+
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (Base_V::iterator iterC = this->children.begin();
+        iterC != this->children.end(); ++iterC)
+    {
+      if ((*iterC)->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+        entityC->SetWorldPoseDirty();
+      }
+    }
   }
   else
     gzerr << "SWP for CB[" << this->GetName() << "] but parent["

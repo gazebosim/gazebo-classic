@@ -260,6 +260,18 @@ const Material *Mesh::GetMaterial(int index) const
 }
 
 //////////////////////////////////////////////////
+int Mesh::GetMaterialIndex(const Material *_mat) const
+{
+  for (unsigned int i = 0; i < this->materials.size(); ++i)
+  {
+    if (this->materials[i] == _mat)
+      return i;
+  }
+
+  return -1;
+}
+
+//////////////////////////////////////////////////
 void Mesh::FillArrays(float **_vertArr, int **_indArr) const
 {
   std::vector<SubMesh *>::const_iterator iter;

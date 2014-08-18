@@ -19,11 +19,13 @@ SimbodyHinge2Joint.cc
 SimbodyHingeJoint.cc
 SimbodyJoint.cc
 SimbodyLink.cc
+SimbodyMesh.cc
 SimbodyMeshShape.cc
 SimbodyModel.cc
 SimbodyMultiRayShape.cc
 SimbodyPhysics.cc
 SimbodyPlaneShape.cc
+SimbodyPolylineShape.cc
 SimbodyRayShape.cc
 SimbodyScrewJoint.cc
 SimbodySliderJoint.cc

@@ -30,6 +30,7 @@
 #include "gazebo/physics/simbody/SimbodyBoxShape.hh"
 #include "gazebo/physics/simbody/SimbodyCylinderShape.hh"
 #include "gazebo/physics/simbody/SimbodyMeshShape.hh"
+#include "gazebo/physics/simbody/SimbodyPolylineShape.hh"
 #include "gazebo/physics/simbody/SimbodyRayShape.hh"
 
 #include "gazebo/physics/simbody/SimbodyHingeJoint.hh"
@@ -519,6 +520,8 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     shape.reset(new SimbodyCylinderShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new SimbodyMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new SimbodyPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new SimbodyHeightmapShape(collision));
   else if (_type == "multiray")
@@ -802,7 +805,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "screw")
       {
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
@@ -855,9 +860,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT)));
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD)));
+          gzJoint->GetAxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -906,8 +914,24 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "revolute")
       {
+        // rotation from axis frame to child link frame
+        // simbody assumes links are in child link frame, but gazebo
+        // sdf 1.4 and earlier assumes joint axis are defined in model frame.
+        // Use function Joint::GetAxisFrame() to remedy this situation.
+        // Joint::GetAxisFrame() returns the frame joint axis is defined:
+        // either model frame or child link frame.
+        // simbody always assumes axis is specified in the child link frame.
+        // \TODO: come up with a test case where we might need to
+        // flip transform based on isReversed flag.
         UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+          SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
+
+        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        //       << "] ["
+        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
+        //          gzJoint->GetLocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -946,8 +970,9 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       }
       else if (type == "prismatic")
       {
-        UnitVec3 axis(
-          SimbodyPhysics::Vector3ToVec3(gzJoint->GetLocalAxis(0)));
+        UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
+            gzJoint->GetAxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -1339,6 +1364,10 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   else if (_key == "max_transient_velocity")
   {
     return this->contact.getTransitionVelocity();
+  }
+  else if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
   }
   else
   {
