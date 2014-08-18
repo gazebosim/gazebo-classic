@@ -49,6 +49,52 @@ namespace gazebo
       /// otherwise.
       public: bool PopulateAll();
 
+      /// \brief Stores all the posible parameters that define a population.
+      private: struct PopulationParams
+      {
+        /// \brief Minimum corner of the boundign box containing the models.
+        math::Vector3 min;
+
+        /// \brief Maximum corner of the box containing the models.
+        math::Vector3 max;
+
+        /// \brief Number of rows used when the models are distributed as a grid
+        int rows;
+
+        /// \brief Number of columns used when the models are distributed as a
+        /// grid.
+        int cols;
+
+        /// \brief Distance between the models when the objects are distributed
+        /// as a grid.
+        math::Vector3 step;
+
+        /// \brief Center of the cylinder's base containing the models.
+        math::Vector3 center;
+
+        /// \brief Radius of the cylinder's base containing the models.
+        double radius;
+
+        /// \brief Height of the cylinder containing the models.
+        double height;
+
+        /// \brief Name of the model.
+        std::string modelName;
+
+        /// \brief Contains the sdf representation of the model.
+        std::string modelSdf;
+
+        /// \brief Number of models to spawn.
+        int modelCount;
+
+        /// \brief Object distribution. E.g.: random, grid.
+        std::string distribution;
+
+        /// \brief Type region in which the objects will be spawned.
+        /// E.g.: box, cylinder.
+        std::string region;
+      };
+
       /// \brief Generate and spawn one model population into the world.
       /// \param[in] _population SDF parameter containing the population details
       /// \return True when the population was successfully spawned or false
@@ -61,31 +107,10 @@ namespace gazebo
       /// should not be used.
       /// \param[in] _population SDF element containing the Population
       /// description.
-      /// \param[out] _min Minimum corner of the box containing the models.
-      /// \param[out] _max Maximum corner of the box containing the models.
-      /// \param[out] _rows Number of rows used when the models are
-      /// distributed as a 2D grid.
-      /// \param[out] _cols Number of columns used when the models are
-      /// distributed as a 2D grid.
-      /// \param[out] _step Distance between the models when the objects are
-      /// distributed as a 2D grid.
-      /// \param[out] _center Center of the cylinder's base containing
-      /// the models.
-      /// \param[out] _radius Radius of the cylinder's base containing
-      /// the models.
-      /// \param[out] _height Height of the cylinder containing the models.
-      /// \param[out] _modelName Name of the model.
-      /// \param[out] _modelSdf Contains the sdf representation of the model.
-      /// \param[out] _modelCount Number of models to spawn.
-      /// \param[out] _distribution Object distribution. E.g.: random, grid.
-      /// \param[out] _region Type region in which the objects will be spawned.
-      /// E.g.: box, cylinder.
+      /// \param[out] _params Population params parsed from the SDF.
       /// \return True when the function succeed or false otherwise.
-      private: bool ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
-        math::Vector3 &_max, int &_rows, int &_cols, math::Vector3 &_step,
-        math::Vector3 &_center, double &_radius, double &_height,
-        std::string &_modelName, std::string &_modelSdf, int &_modelCount,
-        std::string &_distribType, std::string &_region);
+      private: bool ParseSdf(sdf::ElementPtr _population,
+        PopulationParams &_params);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
       /// randomly distributed within a box.

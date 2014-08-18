@@ -67,63 +67,74 @@ bool Population::PopulateAll()
 //////////////////////////////////////////////////
 bool Population::PopulateOne(const sdf::ElementPtr _population)
 {
-  math::Vector3 min;
-  math::Vector3 max;
-  math::Vector3 step;
-  math::Vector3 center;
-  int rows;
-  int cols;
-  int modelCount;
-  double radius;
-  double height;
-  std::string modelName;
-  std::string modelSdf;
-  std::string distribution;
-  std::string region;
   std::vector<math::Vector3> objects;
+  PopulationParams params;
 
-  if (!this->ParseSdf(_population, min, max, rows, cols, step, center, radius,
-        height, modelName, modelSdf, modelCount, distribution, region))
+  if (!this->ParseSdf(_population, params))
     return false;
 
-  if (modelCount <= 0)
+  if (params.modelCount <= 0)
   {
     gzwarn << "Trying to populate a non positive number of models ["
-           << modelCount << "]. Population ignored." << std::endl;
+           << params.modelCount << "]. Population ignored." << std::endl;
     return false;
   }
 
   // Generate the population of poses based on the region and distribution.
-  if (region == "box" && distribution == "random")
-    this->PopulateBoxRandom(modelCount, min, max, objects);
-  else if (region == "box" && distribution == "uniform")
-    this->PopulateBoxUniform(modelCount, min, max, objects);
-  else if (region == "box" && distribution == "grid")
-    this->PopulateBoxGrid(min, rows, cols, step, objects);
-  else if (region == "box" && distribution == "linear-x")
-    this->PopulateBoxLinearX(modelCount, min, max, objects);
-  else if (region == "box" && distribution == "linear-y")
-    this->PopulateBoxLinearY(modelCount, min, max, objects);
-  else if (region == "box" && distribution == "linear-z")
-    this->PopulateBoxLinearZ(modelCount, min, max, objects);
-  else if (region == "cylinder" && distribution == "random")
-    this->PopulateCylinderRandom(modelCount, center, radius, height, objects);
-  else if (region == "cylinder" && distribution == "uniform")
-    this->PopulateCylinderUniform(modelCount, center, radius, height, objects);
+  if (params.region == "box" && params.distribution == "random")
+  {
+    this->PopulateBoxRandom(params.modelCount, params.min,
+      params.max, objects);
+  }
+  else if (params.region == "box" && params.distribution == "uniform")
+  {
+    this->PopulateBoxUniform(params.modelCount, params.min,
+      params.max, objects);
+  }
+  else if (params.region == "box" && params.distribution == "grid")
+  {
+    this->PopulateBoxGrid(params.min, params.rows, params.cols, params.step,
+      objects);
+  }
+  else if (params.region == "box" && params.distribution == "linear-x")
+  {
+    this->PopulateBoxLinearX(params.modelCount, params.min, params.max,
+      objects);
+  }
+  else if (params.region == "box" && params.distribution == "linear-y")
+  {
+    this->PopulateBoxLinearY(params.modelCount, params.min, params.max,
+      objects);
+  }
+  else if (params.region == "box" && params.distribution == "linear-z")
+  {
+    this->PopulateBoxLinearZ(params.modelCount, params.min, params.max,
+      objects);
+  }
+  else if (params.region == "cylinder" && params.distribution == "random")
+  {
+    this->PopulateCylinderRandom(params.modelCount, params.center, params.radius,
+      params.height, objects);
+  }
+  else if (params.region == "cylinder" && params.distribution == "uniform")
+  {
+    this->PopulateCylinderUniform(params.modelCount, params.center,
+      params.radius, params.height, objects);
+  }
   else
   {
-    gzerr << "Unrecognized combination of region [" << region << "] and "
-          << "distribution [" << distribution << "]" << std::endl;
+    gzerr << "Unrecognized combination of region [" << params.region << "] and "
+          << "distribution [" << params.distribution << "]" << std::endl;
     return false;
   }
 
   // Check that we have generated the appropriate number of poses.
-  GZ_ASSERT(modelCount == static_cast<int>(objects.size()),
+  GZ_ASSERT(params.modelCount == static_cast<int>(objects.size()),
     "Unexpected number of objects while generating a population");
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
-  sdf.SetFromString("<sdf version ='1.5'>" + modelSdf + "</sdf>");
+  sdf.SetFromString("<sdf version ='1.5'>" + params.modelSdf + "</sdf>");
 
   for (size_t i = 0; i < objects.size(); ++i)
   {
@@ -134,7 +145,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
     std::string delim = "model name='";
     size_t first = cloneSdf.find(delim) + delim.size();
     size_t last = cloneSdf.find("'", first);
-    std::string newName = modelName + std::string("_clone_") +
+    std::string newName = params.modelName + std::string("_clone_") +
       boost::lexical_cast<std::string>(i);
     cloneSdf.replace(first, last - first, newName);
 
@@ -155,11 +166,8 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
 }
 
 /////////////////////////////////////////////////
-bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
-  math::Vector3 &_max, int &_rows, int &_cols, math::Vector3 &_step,
-  math::Vector3 &_center, double &_radius, double &_height,
-  std::string &_modelName, std::string &_modelSdf, int &_modelCount,
-  std::string &_distribType, std::string &_region)
+bool Population::ParseSdf(sdf::ElementPtr _population,
+  PopulationParams &_params)
 {
   // Read the model element.
   if (!_population->HasElement("model"))
@@ -169,8 +177,8 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
     return false;
   }
   sdf::ElementPtr model = _population->GetElement("model");
-  _modelSdf = model->ToString("");
-  _modelName = model->Get<std::string>("name");
+  _params.modelSdf = model->ToString("");
+  _params.modelName = model->Get<std::string>("name");
 
   // Read the model_count element.
   if (!_population->HasElement("model_count"))
@@ -179,7 +187,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
           << std::endl;
     return false;
   }
-  _modelCount = _population->Get<int>("model_count");
+  _params.modelCount = _population->Get<int>("model_count");
 
   // Read the distribution element.
   if (!_population->HasElement("distribution"))
@@ -196,39 +204,42 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
           << std::endl;
     return false;
   }
-  _distribType = distribution->Get<std::string>("type");
+  _params.distribution = distribution->Get<std::string>("type");
 
-  if ((_distribType != "random")   && (_distribType != "uniform")  &&
-      (_distribType != "grid")     && (_distribType != "linear-x") &&
-      (_distribType != "linear-y") && (_distribType != "linear-z"))
+  if ((_params.distribution != "random")   &&
+      (_params.distribution != "uniform")  &&
+      (_params.distribution != "grid")     &&
+      (_params.distribution != "linear-x") &&
+      (_params.distribution != "linear-y") &&
+      (_params.distribution != "linear-z"))
   {
-    gzerr << "Unknown distribution type [" << _distribType << "]"
+    gzerr << "Unknown distribution type [" << _params.distribution << "]"
           << std::endl;
     return false;
   }
 
-  if (_distribType == "grid")
+  if (_params.distribution == "grid")
   {
     if (!distribution->HasElement("rows"))
     {
       gzerr << "Unable to find <rows> inside the distribution tag" << std::endl;
       return false;
     }
-    _rows = distribution->Get<int>("rows");
+    _params.rows = distribution->Get<int>("rows");
 
     if (!distribution->HasElement("cols"))
     {
       gzerr << "Unable to find <cols> inside the distribution tag" << std::endl;
       return false;
     }
-    _cols = distribution->Get<int>("cols");
+    _params.cols = distribution->Get<int>("cols");
 
     if (!distribution->HasElement("step"))
     {
       gzerr << "Unable to find <step> inside the distribution tag" << std::endl;
       return false;
     }
-    _step = distribution->Get<math::Vector3>("step");
+    _params.step = distribution->Get<math::Vector3>("step");
   }
 
   // Read the region element.
@@ -242,52 +253,54 @@ bool Population::ParseSdf(sdf::ElementPtr _population, math::Vector3 &_min,
   if (region->HasElement("box"))
   {
     sdf::ElementPtr box = region->GetElement("box");
-    _region = "box";
+    _params.region = "box";
 
     if (!box->HasElement("min"))
     {
       gzerr << "Unable to find <min> inside the box tag." << std::endl;
       return false;
     }
-    _min = box->Get<math::Vector3>("min");
+    _params.min = box->Get<math::Vector3>("min");
 
-    if ((_distribType == "random")   || (_distribType == "uniform")  ||
-        (_distribType == "linear-x") || (_distribType == "linear-y") ||
-        (_distribType == "linear-z"))
+    if ((_params.distribution == "random")   ||
+        (_params.distribution == "uniform")  ||
+        (_params.distribution == "linear-x") ||
+        (_params.distribution == "linear-y") ||
+        (_params.distribution == "linear-z"))
     {
       if (!box->HasElement("max"))
       {
         gzerr << "Unable to find <max> inside the box tag." << std::endl;
         return false;
       }
-      _max = box->Get<math::Vector3>("max");
+      _params.max = box->Get<math::Vector3>("max");
     }
   }
   else if (region->HasElement("cylinder"))
   {
     sdf::ElementPtr cylinder = region->GetElement("cylinder");
-    _region = "cylinder";
+    _params.region = "cylinder";
 
     if (!cylinder->HasElement("center"))
     {
       gzerr << "Unable to find <center> inside the cylinder tag." << std::endl;
       return false;
     }
-    _center = cylinder->Get<math::Vector3>("center");
+    _params.center = cylinder->Get<math::Vector3>("center");
 
     if (!cylinder->HasElement("radius"))
     {
       gzerr << "Unable to find <radius> inside the cylinder tag." << std::endl;
       return false;
     }
-    _radius = cylinder->Get<double>("radius");
+    _params.radius = cylinder->Get<double>("radius");
 
     if (!cylinder->HasElement("height"))
     {
       gzerr << "Unable to find <height> inside the cylinder tag." << std::endl;
       return false;
     }
-    _height = cylinder->Get<double>("height");
+    _params.height = cylinder->Get<double>("height");
   }
   else
   {
