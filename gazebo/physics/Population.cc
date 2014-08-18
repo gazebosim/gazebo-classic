@@ -318,6 +318,7 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
   {
     gzerr << "I have not found a valid region. 'box' or 'cylinder' are"
           << " the valid region types" << std::endl;
+    return false;
   }
 
   return true;
