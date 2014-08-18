@@ -36,10 +36,8 @@ using namespace physics;
 Population::Population(sdf::ElementPtr _sdf, World *_world)
   : world(_world)
 {
-  if (!_sdf->HasElement("population"))
-    return;
-
-  this->populationElem = _sdf->GetElement("population");
+  if (_sdf->HasElement("population"))
+    this->populationElem = _sdf->GetElement("population");
 }
 
 //////////////////////////////////////////////////
