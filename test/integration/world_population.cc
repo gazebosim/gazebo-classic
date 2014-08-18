@@ -26,7 +26,31 @@ class WorldEnvPopulationTest : public ServerFixture,
                                public testing::WithParamInterface<const char*>
 {
   public: void LoadEnvironment(const std::string &_physicsType);
+  public: void EmptyPopulation(const std::string &_physicsType);
 };
+
+////////////////////////////////////////////////////////////////////////
+// EmptyPopulation: Try to generate a population with an incorrect 'model_count'
+// value.
+////////////////////////////////////////////////////////////////////////
+void WorldEnvPopulationTest::EmptyPopulation(const std::string &/*_physicsEng*/)
+{
+  Load("test/worlds/empty_population.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  // The models should not load because we are trying to load a population with
+  // a non positive 'model_count' value. In any case. let's wait some time to
+  // verify it. We should only see two models (ground plane and sun).
+  int i = 0;
+  int retries = 20;
+  while (world->GetModelCount() < 2u && i < retries)
+  {
+    common::Time::MSleep(100);
+    ++i;
+  }
+  ASSERT_GE(i, retries);
+}
 
 ////////////////////////////////////////////////////////////////////////
 // LoadEnvironment: Verify that the number of elements populated is correct
@@ -144,6 +168,12 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
       EXPECT_NEAR(model->GetWorldPose().pos.y, 1, tolerance);
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////
+TEST_P(WorldEnvPopulationTest, EmptyPopulation)
+{
+  EmptyPopulation(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Kmeans.hh"
 #include "gazebo/math/Rand.hh"
@@ -85,6 +86,13 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
         height, modelName, modelSdf, modelCount, distribution, region))
     return false;
 
+  if (modelCount <= 0)
+  {
+    gzwarn << "Trying to populate a non positive number of models ["
+           << modelCount << "]. Population ignored." << std::endl;
+    return false;
+  }
+
   // Generate the population of poses based on the region and distribution.
   if (region == "box" && distribution == "random")
     this->PopulateBoxRandom(modelCount, min, max, objects);
@@ -108,6 +116,10 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
           << "distribution [" << distribution << "]" << std::endl;
     return false;
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(modelCount == static_cast<int>(objects.size()),
+    "Unexpected number of objects while generating a population");
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
