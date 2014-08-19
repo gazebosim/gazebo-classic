@@ -632,8 +632,18 @@ std::string ModelDatabase::GetModelFile(const std::string &_uri)
       }
       else
       {
-        gzerr << "Manifest[" << manifestPath << "] doesn't have "
-              << "<model><sdf>...</sdf></model> element.\n";
+        // no valid <sdf> file, try <urdf>
+        TiXmlElement *urdfXML = modelXML->FirstChildElement("urdf");
+        if (urdfXML != NULL)
+        {
+          result = path + "/" + urdfXML->GetText();
+        }
+        else
+        {
+          gzerr << "Manifest[" << manifestPath << "] doesn't have "
+                << "<model><sdf>...</sdf></model> or "
+                << "<model><urdf>...</urdf></model> element.\n";
+        }
       }
     }
     else
