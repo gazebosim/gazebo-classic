@@ -169,47 +169,48 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
 }
 
 /////////////////////////////////////////////////
+bool Population::ElementFromSdf(const sdf::ElementPtr &_sdfElement,
+  const std::string &_element, sdf::ElementPtr &_value)
+{
+  if (_sdfElement->HasElement(_element))
+  {
+    _value = _sdfElement->GetElement(_element);
+    return true;
+  }
+  gzerr << "Unable to find <" << _element << "> inside the population tag"
+        << std::endl;
+  return false;
+}
+
+/////////////////////////////////////////////////
 bool Population::ParseSdf(sdf::ElementPtr _population,
   PopulationParams &_params)
 {
   GZ_ASSERT(_population, "'_population' parameter is NULL");
 
   // Read the model element.
-  if (!_population->HasElement("model"))
-  {
-    gzerr << "Unable to find a model inside the population tag."
-          << std::endl;
+  sdf::ElementPtr model;
+  if (!this->ElementFromSdf(_population, "model", model))
     return false;
-  }
-  sdf::ElementPtr model = _population->GetElement("model");
+
   _params.modelSdf = model->ToString("");
   _params.modelName = model->Get<std::string>("name");
 
   // Read the model_count element.
-  if (!_population->HasElement("model_count"))
-  {
-    gzerr << "Unable to find <model_count> inside the population tag."
-          << std::endl;
+  if (!this->ValueFromSdf<int>(_population, "model_count", _params.modelCount))
     return false;
-  }
-  _params.modelCount = _population->Get<int>("model_count");
 
   // Read the distribution element.
-  if (!_population->HasElement("distribution"))
-  {
-    gzerr << "Unable to find <distribution> inside the population tag."
-          << std::endl;
+  sdf::ElementPtr distribution;
+  if (!this->ElementFromSdf(_population, "distribution", distribution))
     return false;
-  }
-  sdf::ElementPtr distribution = _population->GetElement("distribution");
 
-  if (!distribution->HasElement("type"))
+  // Read the distribution type.
+  if (!this->ValueFromSdf<std::string>(distribution, "type",
+    _params.distribution))
   {
-    gzerr << "Unable to find <type> inside the population tag."
-          << std::endl;
     return false;
   }
-  _params.distribution = distribution->Get<std::string>("type");
 
   if ((_params.distribution != "random")   &&
       (_params.distribution != "uniform")  &&
@@ -223,49 +224,35 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     return false;
   }
 
+  // Models evenly distributed in a 2D grid pattern.
   if (_params.distribution == "grid")
   {
-    if (!distribution->HasElement("rows"))
-    {
-      gzerr << "Unable to find <rows> inside the distribution tag" << std::endl;
+    // Read the number of rows.
+    if (!this->ValueFromSdf<int>(distribution, "rows", _params.rows))
       return false;
-    }
-    _params.rows = distribution->Get<int>("rows");
 
-    if (!distribution->HasElement("cols"))
-    {
-      gzerr << "Unable to find <cols> inside the distribution tag" << std::endl;
+    // Read the number of columns.
+    if (!this->ValueFromSdf<int>(distribution, "cols", _params.cols))
       return false;
-    }
-    _params.cols = distribution->Get<int>("cols");
 
-    if (!distribution->HasElement("step"))
-    {
-      gzerr << "Unable to find <step> inside the distribution tag" << std::endl;
+    // Read the <step> value used to separate each model in the grid.
+    if (!this->ValueFromSdf<math::Vector3>(distribution, "step", _params.step))
       return false;
-    }
-    _params.step = distribution->Get<math::Vector3>("step");
   }
 
   // Read the region element.
-  if (!_population->HasElement("region"))
-  {
-    gzerr << "Unable to find <region> inside the population tag." << std::endl;
+  sdf::ElementPtr region;
+  if (!this->ElementFromSdf(_population, "region", region))
     return false;
-  }
-  sdf::ElementPtr region = _population->GetElement("region");
 
   if (region->HasElement("box"))
   {
     sdf::ElementPtr box = region->GetElement("box");
     _params.region = "box";
 
-    if (!box->HasElement("min"))
-    {
-      gzerr << "Unable to find <min> inside the box tag." << std::endl;
+    // Read the minimim corner of the bounding box.
+    if (!this->ValueFromSdf<math::Vector3>(box, "min", _params.min))
       return false;
-    }
-    _params.min = box->Get<math::Vector3>("min");
 
     if ((_params.distribution == "random")   ||
         (_params.distribution == "uniform")  ||
@@ -273,12 +260,9 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
         (_params.distribution == "linear-y") ||
         (_params.distribution == "linear-z"))
     {
-      if (!box->HasElement("max"))
-      {
-        gzerr << "Unable to find <max> inside the box tag." << std::endl;
+      // Read the maximum corner of the bounding box.
+      if (!this->ValueFromSdf<math::Vector3>(box, "max", _params.max))
         return false;
-      }
-      _params.max = box->Get<math::Vector3>("max");
     }
   }
   else if (region->HasElement("cylinder"))
@@ -286,26 +270,17 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     sdf::ElementPtr cylinder = region->GetElement("cylinder");
     _params.region = "cylinder";
 
-    if (!cylinder->HasElement("center"))
-    {
-      gzerr << "Unable to find <center> inside the cylinder tag." << std::endl;
+    // Read the center of the cylinder's base.
+    if (!this->ValueFromSdf<math::Vector3>(cylinder, "center", _params.center))
       return false;
-    }
-    _params.center = cylinder->Get<math::Vector3>("center");
 
-    if (!cylinder->HasElement("radius"))
-    {
-      gzerr << "Unable to find <radius> inside the cylinder tag." << std::endl;
+    // Read the radius of the cylinder's base.
+    if (!this->ValueFromSdf<double>(cylinder, "radius", _params.radius))
       return false;
-    }
-    _params.radius = cylinder->Get<double>("radius");
 
-    if (!cylinder->HasElement("height"))
-    {
-      gzerr << "Unable to find <height> inside the cylinder tag." << std::endl;
+    // Read the cylinder's height.
+    if (!this->ValueFromSdf<double>(cylinder, "height", _params.height))
       return false;
-    }
-    _params.height = cylinder->Get<double>("height");
   }
   else
   {

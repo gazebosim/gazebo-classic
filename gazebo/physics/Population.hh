@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/PopulationPrivate.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
@@ -55,6 +56,35 @@ namespace gazebo
       /// \return True when the population was successfully spawned or false
       /// otherwise.
       private: bool PopulateOne(const sdf::ElementPtr _population);
+
+      /// \brief Read a value from an SDF element. Before reading the value, it
+      /// checks if the element exists and print an error message if not found.
+      /// \param[in] _sdfElement SDF element containing the value to read.
+      /// \param[in] _element SDF label to read. Ex: "model_count", "min".
+      /// \param[out] _value Requested value.
+      /// \return True if the element was found or false otherwise.
+      private: template<typename T> bool ValueFromSdf(
+        const sdf::ElementPtr &_sdfElement, const std::string &_element,
+        T &_value)
+      {
+        if (_sdfElement->HasElement(_element))
+        {
+          _value = _sdfElement->Get<T>(_element);
+          return true;
+        }
+        gzerr << "Unable to find <" << _element << "> inside the population tag"
+              << std::endl;
+        return false;
+      }
+
+      /// \brief Get a requested SDF element from a SDF. Before returning, it
+      /// checks if the element exists and print an error message if not found.
+      /// \param[in] _sdfElement SDF element containing the requested SDF.
+      /// \param[in] _element SDF label to read. Ex: "model", "box".
+      /// \param[out] _value Requested SDF element.
+      /// \return True if the element was found or false otherwise.
+      private: bool ElementFromSdf(const sdf::ElementPtr &_sdfElement,
+        const std::string &_element, sdf::ElementPtr &_value);
 
       /// \brief Parse the sdf file. Some of the output parameters should be
       /// ignored depending on the region's population. For example, if the
