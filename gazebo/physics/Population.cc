@@ -15,15 +15,14 @@
  *
 */
 
-#include <algorithm>
 #include <string>
 #include <vector>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Kmeans.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/math/Rand.hh"
-#include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Population.hh"
 #include "gazebo/physics/World.hh"
 
@@ -76,64 +75,29 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
   if (!this->ParseSdf(_population, params))
     return false;
 
-  if (params.modelCount <= 0)
-  {
-    gzwarn << "Trying to populate a non positive number of models ["
-           << params.modelCount << "]. Population ignored." << std::endl;
-    return false;
-  }
-
-  // Generate the population of poses based on the region and distribution.
+  // Generate the set of poses based on the region and distribution.
   if (params.region == "box" && params.distribution == "random")
-  {
-    this->CreatePosesBoxRandom(params.modelCount, params.min,
-      params.max, objects);
-  }
+    this->CreatePosesBoxRandom(params, objects);
   else if (params.region == "box" && params.distribution == "uniform")
-  {
-    this->CreatePosesBoxUniform(params.modelCount, params.min,
-      params.max, objects);
-  }
-  else if (params.region == "box" && params.distribution == "grid")
-  {
-    this->CreatePosesBoxGrid(params.min, params.rows, params.cols, params.step,
-      objects);
-  }
+    this->CreatePosesBoxUniform(params, objects);
+  else if (params.distribution == "grid")
+    this->CreatePosesBoxGrid(params, objects);
   else if (params.region == "box" && params.distribution == "linear-x")
-  {
-    this->CreatePosesBoxLinearX(params.modelCount, params.min, params.max,
-      objects);
-  }
+    this->CreatePosesBoxLinearX(params, objects);
   else if (params.region == "box" && params.distribution == "linear-y")
-  {
-    this->CreatePosesBoxLinearY(params.modelCount, params.min, params.max,
-      objects);
-  }
+    this->CreatePosesBoxLinearY(params, objects);
   else if (params.region == "box" && params.distribution == "linear-z")
-  {
-    this->CreatePosesBoxLinearZ(params.modelCount, params.min, params.max,
-      objects);
-  }
+    this->CreatePosesBoxLinearZ(params, objects);
   else if (params.region == "cylinder" && params.distribution == "random")
-  {
-    this->CreatePosesCylinderRandom(params.modelCount, params.center,
-      params.radius, params.height, objects);
-  }
+    this->CreatePosesCylinderRandom(params, objects);
   else if (params.region == "cylinder" && params.distribution == "uniform")
-  {
-    this->CreatePosesCylinderUniform(params.modelCount, params.center,
-      params.radius, params.height, objects);
-  }
+    this->CreatePosesCylinderUniform(params, objects);
   else
   {
     gzerr << "Unrecognized combination of region [" << params.region << "] and "
           << "distribution [" << params.distribution << "]" << std::endl;
     return false;
   }
-
-  // Check that we have generated the appropriate number of poses.
-  GZ_ASSERT(params.modelCount == static_cast<int>(objects.size()),
-    "Unexpected number of objects while generating a population");
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
@@ -196,8 +160,9 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
   _params.modelSdf = model->ToString("");
   _params.modelName = model->Get<std::string>("name");
 
-  // Read the model_count element.
-  if (!this->ValueFromSdf<int>(_population, "model_count", _params.modelCount))
+  // Read the pose.
+  math::Pose pose;
+  if (!this->ValueFromSdf(_population, "pose", _params.pose))
     return false;
 
   // Read the distribution element.
@@ -231,122 +196,168 @@ bool Population::ParseSdf(sdf::ElementPtr _population,
     if (!this->ValueFromSdf<int>(distribution, "rows", _params.rows))
       return false;
 
+    // Sanity check.
+    if (_params.rows <= 0)
+    {
+      gzwarn << "Incorrect number of rows while populating objects ["
+             << _params.rows << "]. Population ignored." << std::endl;
+      return false;
+    }
+
     // Read the number of columns.
     if (!this->ValueFromSdf<int>(distribution, "cols", _params.cols))
       return false;
 
+    // Sanity check.
+    if (_params.cols <= 0)
+    {
+      gzwarn << "Incorrect number of columns while populating objects ["
+             << _params.cols << "]. Population ignored." << std::endl;
+      return false;
+    }
+
     // Read the <step> value used to separate each model in the grid.
     if (!this->ValueFromSdf<math::Vector3>(distribution, "step", _params.step))
       return false;
-  }
 
-  // Read the region element.
-  sdf::ElementPtr region;
-  if (!this->ElementFromSdf(_population, "region", region))
-    return false;
-
-  if (region->HasElement("box"))
-  {
-    sdf::ElementPtr box = region->GetElement("box");
-    _params.region = "box";
-
-    // Read the minimim corner of the bounding box.
-    if (!this->ValueFromSdf<math::Vector3>(box, "min", _params.min))
-      return false;
-
-    if ((_params.distribution == "random")   ||
-        (_params.distribution == "uniform")  ||
-        (_params.distribution == "linear-x") ||
-        (_params.distribution == "linear-y") ||
-        (_params.distribution == "linear-z"))
+    // Align the origin of the grid with 'pose'.
+    if (_params.cols % 2 == 0)
     {
-      // Read the maximum corner of the bounding box.
-      if (!this->ValueFromSdf<math::Vector3>(box, "max", _params.max))
-        return false;
+      _params.pose.pos.x -=
+        (_params.step.x * (_params.cols - 2) / 2.0) + (_params.step.x / 2.0);
     }
-  }
-  else if (region->HasElement("cylinder"))
-  {
-    sdf::ElementPtr cylinder = region->GetElement("cylinder");
-    _params.region = "cylinder";
+    else
+      _params.pose.pos.x -= _params.step.x * (_params.cols - 1) / 2.0;
 
-    // Read the center of the cylinder's base.
-    if (!this->ValueFromSdf<math::Vector3>(cylinder, "center", _params.center))
-      return false;
-
-    // Read the radius of the cylinder's base.
-    if (!this->ValueFromSdf<double>(cylinder, "radius", _params.radius))
-      return false;
-
-    // Read the cylinder's height.
-    if (!this->ValueFromSdf<double>(cylinder, "height", _params.height))
-      return false;
+    if (_params.rows % 2 == 0)
+    {
+      _params.pose.pos.y -=
+        (_params.step.y * (_params.rows - 2) / 2.0) + (_params.step.y / 2.0);
+    }
+    else
+      _params.pose.pos.y -= _params.step.y * (_params.rows - 1) / 2.0;
   }
   else
   {
-    gzerr << "I have not found a valid region. 'box' or 'cylinder' are"
-          << " the valid region types" << std::endl;
-    return false;
+    // Read the model_count element.
+    if (!this->ValueFromSdf<int>(_population, "model_count",
+      _params.modelCount))
+    {
+      return false;
+    }
+
+    // Sanity check.
+    if (_params.modelCount <= 0)
+    {
+      gzwarn << "Trying to populate a non positive number of models ["
+             << _params.modelCount << "]. Population ignored." << std::endl;
+      return false;
+    }
+
+    // Read the region element.
+    if (_population->HasElement("box"))
+    {
+      sdf::ElementPtr box = _population->GetElement("box");
+      _params.region = "box";
+
+      // Read the size of the bounding box.
+      if (!this->ValueFromSdf<math::Vector3>(box, "size", _params.size))
+        return false;
+
+      // Sanity check.
+      if (_params.size.x <= 0 || _params.size.y <= 0 || _params.size.z <= 0)
+      {
+        gzwarn << "Incorrect box size while populating objects ["
+               << _params.size << "]. Population ignored." << std::endl;
+        return false;
+      }
+
+      // Align the origin of the box with 'pose'.
+      _params.pose.pos -= _params.size / 2.0;
+    }
+    else if (_population->HasElement("cylinder"))
+    {
+      sdf::ElementPtr cylinder = _population->GetElement("cylinder");
+      _params.region = "cylinder";
+
+      // Read the radius of the cylinder's base.
+      if (!this->ValueFromSdf<double>(cylinder, "radius", _params.radius))
+        return false;
+
+      // Sanity check.
+      if (_params.radius <= 0)
+      {
+        gzwarn << "Incorrect radius value while populating objects ["
+               << _params.radius << "]. Population ignored." << std::endl;
+        return false;
+      }
+
+      // Read the cylinder's length.
+      if (!this->ValueFromSdf<double>(cylinder, "length", _params.length))
+        return false;
+
+      // Sanity check.
+      if (_params.length <= 0)
+      {
+        gzwarn << "Incorrect length value while populating objects ["
+               << _params.length << "]. Population ignored." << std::endl;
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "I have not found a valid region. 'box' or 'cylinder' are"
+            << " the valid region types" << std::endl;
+      return false;
+    }
   }
 
   return true;
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesBoxRandom(int _modelCount,
-  const math::Vector3 &_min, const math::Vector3 &_max,
+void Population::CreatePosesBoxRandom(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
-
-  double dx = std::abs(_max.x - _min.x);
-  double dy = std::abs(_max.y - _min.y);
-  double dz = std::abs(_max.z - _min.z);
-
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = std::min(_min.x, _max.x) + math::Rand::GetDblUniform(0, dx);
-    p.y = std::min(_min.y, _max.y) + math::Rand::GetDblUniform(0, dy);
-    p.z = std::min(_min.z, _max.z) + math::Rand::GetDblUniform(0, dz);
+    math::Pose offset(math::Rand::GetDblUniform(0, _populParams.size.x),
+                      math::Rand::GetDblUniform(0, _populParams.size.y),
+                      math::Rand::GetDblUniform(0, _populParams.size.z),
+                      0, 0, 0);
 
-  _poses.push_back(p);
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesBoxUniform(int _modelCount,
-  const math::Vector3 &_min, const math::Vector3 &_max,
+void Population::CreatePosesBoxUniform(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
-
   std::vector<math::Vector3> obs;
-
-  double dx = std::abs(_max.x - _min.x);
-  double dy = std::abs(_max.y - _min.y);
-  double dz = std::abs(_max.z - _min.z);
 
   // Step1: Sample points in a box.
   double x = 0.0;
   double y = 0.0;
-  while (y < dy)
+  while (y < _populParams.size.y)
   {
-    while (x < dx)
+    while (x < _populParams.size.x)
     {
       math::Vector3 p;
       p.x = x;
       p.y = y;
-      p.z = 0;
+      p.z = math::Rand::GetDblUniform(0, _populParams.size.z);
       obs.push_back(p);
       x += .1;
     }
@@ -358,156 +369,149 @@ void Population::CreatePosesBoxUniform(int _modelCount,
   std::vector<math::Vector3> centroids;
   std::vector<unsigned int> labels;
   math::Kmeans kmeans(obs);
-  kmeans.Cluster(_modelCount, centroids, labels);
+  kmeans.Cluster(_populParams.modelCount, centroids, labels);
 
   // Step3: Create the list of object positions.
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = std::min(_min.x, _max.x) + centroids[i].x;
-    p.y = std::min(_min.y, _max.y) + centroids[i].y;
-    p.z = std::min(_min.z, _max.z) + math::Rand::GetDblUniform(0, dz);
-    _poses.push_back(p);
+    math::Pose p(centroids[i], math::Quaternion(0, 0, 0));
+    _poses.push_back((p + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
-  int _cols, const math::Vector3 &_step, std::vector<math::Vector3> &_poses)
-{
-  // _poses should be empty.
-  GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
-
-  // _rows should be positive.
-  GZ_ASSERT(_rows > 0, "Argument _rows is nonpositive");
-
-  // _cols should be positive.
-  GZ_ASSERT(_cols > 0, "Argument _cols is nonpositive");
-
-  _poses.clear();
-  math::Vector3 p = _min;
-  for (int i = 0; i < _rows; ++i)
-  {
-    for (int j = 0; j < _cols; ++j)
-    {
-      _poses.push_back(p);
-      p.x += _step.x;
-    }
-    p.x = _min.x;
-    p.y += _step.y;
-  }
-}
-
-/////////////////////////////////////////////////
-void Population::CreatePosesBoxLinearX(int _modelCount,
-  const math::Vector3 &_min, const math::Vector3 &_max,
+void Population::CreatePosesBoxGrid(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
+  _poses.clear();
+  math::Pose offset = math::Pose::Zero;
+  for (int i = 0; i < _populParams.rows; ++i)
+  {
+    for (int j = 0; j < _populParams.cols; ++j)
+    {
+      _poses.push_back((offset + _populParams.pose).pos);
+      offset.pos.x += _populParams.step.x;
+    }
+    offset.pos.x = 0;
+    offset.pos.y += _populParams.step.y;
+  }
 
-  double dx = std::abs(_max.x - _min.x);
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.rows * _populParams.cols ==
+    static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
+}
+
+/////////////////////////////////////////////////
+void Population::CreatePosesBoxLinearX(const PopulationParams &_populParams,
+  std::vector<math::Vector3> &_poses)
+{
+  // _poses should be empty.
+  GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
 
   // Evenly placed in a row along the global x-axis.
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  math::Pose offset = math::Pose::Zero;
+  offset.pos.y = _populParams.size.y / 2.0;
+  offset.pos.z = _populParams.size.z / 2.0;
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = std::min(_min.x, _max.x) + i * dx / static_cast<double>(_modelCount);
-    p.y = (_min.y + _max.y) / 2.0;
-    p.z = (_min.z + _max.z) / 2.0;
-    _poses.push_back(p);
+    offset.pos.x =
+      _populParams.size.x * i / static_cast<double>(_populParams.modelCount);
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesBoxLinearY(int _modelCount,
-  const math::Vector3 &_min, const math::Vector3 &_max,
+void Population::CreatePosesBoxLinearY(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
-
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
-
-  double dy = std::abs(_max.y - _min.y);
 
   // Evenly placed in a row along the global y-axis.
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  math::Pose offset = math::Pose::Zero;
+  offset.pos.x = _populParams.size.x / 2.0;
+  offset.pos.z = _populParams.size.z / 2.0;
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = (_min.x + _max.x) / 2.0;
-    p.y = std::min(_min.y, _max.y) + i * dy / static_cast<double>(_modelCount);
-    p.z = (_min.z + _max.z) / 2.0;
-    _poses.push_back(p);
+    offset.pos.y =
+      _populParams.size.y * i / static_cast<double>(_populParams.modelCount);
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesBoxLinearZ(int _modelCount,
-  const math::Vector3 &_min, const math::Vector3 &_max,
+void Population::CreatePosesBoxLinearZ(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
-
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
-
-  double dz = std::abs(_max.z - _min.z);
 
   // Evenly placed in a row along the global z-axis.
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  math::Pose offset = math::Pose::Zero;
+  offset.pos.x = _populParams.size.x / 2.0;
+  offset.pos.y = _populParams.size.y / 2.0;
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = (_min.x + _max.x) / 2.0;
-    p.y = (_min.y + _max.y) / 2.0;
-    p.z = std::min(_min.z, _max.z) + i * dz / static_cast<double>(_modelCount);
-    _poses.push_back(p);
+    offset.pos.z =
+      _populParams.size.z * i / static_cast<double>(_populParams.modelCount);
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesCylinderRandom(int _modelCount,
-  const math::Vector3 &_center, double _radius, double _height,
+void Population::CreatePosesCylinderRandom(const PopulationParams &_populParams,
   std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
-
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
     double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-    double r = math::Rand::GetDblUniform(0, _radius);
-    math::Vector3 p;
-    p.x = _center.x + r * cos(ang);
-    p.y = _center.y + r * sin(ang);
-    p.z = _center.z + math::Rand::GetDblUniform(0, _height);
-    _poses.push_back(p);
+    double r = math::Rand::GetDblUniform(0, _populParams.radius);
+    math::Pose offset = math::Pose::Zero;
+    offset.pos.x = r * cos(ang);
+    offset.pos.y = r * sin(ang);
+    offset.pos.z = math::Rand::GetDblUniform(0, _populParams.length);
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }
 
 /////////////////////////////////////////////////
-void Population::CreatePosesCylinderUniform(int _modelCount,
-  const math::Vector3 &_center, double _radius, double _height,
-  std::vector<math::Vector3> &_poses)
+void Population::CreatePosesCylinderUniform(
+  const PopulationParams &_populParams, std::vector<math::Vector3> &_poses)
 {
   // _poses should be empty.
   GZ_ASSERT(_poses.empty(), "Output parameter '_poses' is not empty");
-
-  // _modelCount should be positive.
-  GZ_ASSERT(_modelCount > 0, "Argument _modelCount is nonpositive");
 
   std::vector<math::Vector3> obs;
 
@@ -516,11 +520,11 @@ void Population::CreatePosesCylinderUniform(int _modelCount,
   for (size_t i = 0; i < points; ++i)
   {
     double ang = math::Rand::GetDblUniform(0, 2 * M_PI);
-    double r = math::Rand::GetDblUniform(0, _radius);
+    double r = math::Rand::GetDblUniform(0, _populParams.radius);
     math::Vector3 p;
-    p.x = _center.x + r * cos(ang);
-    p.y = _center.y + r * sin(ang);
-    p.z = _center.z + math::Rand::GetDblUniform(0, _height);
+    p.x = r * cos(ang);
+    p.y = r * sin(ang);
+    p.z = math::Rand::GetDblUniform(0, _populParams.length);
     obs.push_back(p);
   }
 
@@ -528,16 +532,18 @@ void Population::CreatePosesCylinderUniform(int _modelCount,
   std::vector<math::Vector3> centroids;
   std::vector<unsigned int> labels;
   math::Kmeans kmeans(obs);
-  kmeans.Cluster(_modelCount, centroids, labels);
+  kmeans.Cluster(_populParams.modelCount, centroids, labels);
 
   // Step3: Create the list of object positions.
   _poses.clear();
-  for (int i = 0; i < _modelCount; ++i)
+  math::Pose offset = math::Pose::Zero;
+  for (int i = 0; i < _populParams.modelCount; ++i)
   {
-    math::Vector3 p;
-    p.x = centroids[i].x;
-    p.y = centroids[i].y;
-    p.z = math::Rand::GetDblUniform(0, _height);
-    _poses.push_back(p);
+    offset.pos = centroids[i];
+    _poses.push_back((offset + _populParams.pose).pos);
   }
+
+  // Check that we have generated the appropriate number of poses.
+  GZ_ASSERT(_populParams.modelCount == static_cast<int>(_poses.size()),
+    "Unexpected number of objects while generating a population");
 }

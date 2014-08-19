@@ -20,6 +20,8 @@
 
 #include <string>
 #include <sdf/sdf.hh>
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/World.hh"
 
 namespace gazebo
@@ -29,13 +31,10 @@ namespace gazebo
     /// \brief Stores all the posible parameters that define a population.
     class PopulationParams
     {
-      /// \brief Minimum corner of the boundign box containing the models.
-      public: math::Vector3 min;
+      /// \brief The three side lengths of the box.
+      public: math::Vector3 size;
 
-      /// \brief Maximum corner of the box containing the models.
-      public: math::Vector3 max;
-
-      /// \brief Number of rows used when the models are distributed as a grid
+      /// \brief Number of rows used when the models are distributed as a grid.
       public: int rows;
 
       /// \brief Number of columns used when the models are distributed as a
@@ -46,14 +45,14 @@ namespace gazebo
       /// as a grid.
       public: math::Vector3 step;
 
-      /// \brief Center of the cylinder's base containing the models.
-      public: math::Vector3 center;
+      /// The reference frame of the population's region.
+      public: math::Pose pose;
 
       /// \brief Radius of the cylinder's base containing the models.
       public: double radius;
 
-      /// \brief Height of the cylinder containing the models.
-      public: double height;
+      /// \brief Length of the cylinder containing the models.
+      public: double length;
 
       /// \brief Name of the model.
       public: std::string modelName;

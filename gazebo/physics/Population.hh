@@ -104,8 +104,7 @@ namespace gazebo
       /// \param[in] _max Maximum corner of the box containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxRandom(int _modelCount,
-        const math::Vector3 &_min, const math::Vector3 &_max,
+      private: void CreatePosesBoxRandom(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -116,8 +115,7 @@ namespace gazebo
       /// \param[in] _max Maximum corner of the box containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxUniform(int _modelCount,
-        const math::Vector3 &_min, const math::Vector3 &_max,
+      private: void CreatePosesBoxUniform(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses evenly placed in a 2D grid pattern.
@@ -130,8 +128,7 @@ namespace gazebo
       /// distributed as a 2D grid.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxGrid(const math::Vector3 &_min, int _rows,
-        int _cols, const math::Vector3 &_step,
+      private: void CreatePosesBoxGrid(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -141,8 +138,7 @@ namespace gazebo
       /// \param[in] _max Maximum corner of the box containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxLinearX(int _modelCount,
-        const math::Vector3 &_min, const math::Vector3 &_max,
+      private: void CreatePosesBoxLinearX(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -152,8 +148,7 @@ namespace gazebo
       /// \param[in] _max Maximum corner of the box containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxLinearY(int _modelCount,
-        const math::Vector3 &_min, const math::Vector3 &_max,
+      private: void CreatePosesBoxLinearY(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -163,8 +158,7 @@ namespace gazebo
       /// \param[in] _max Maximum corner of the box containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesBoxLinearZ(int _modelCount,
-        const math::Vector3 &_min, const math::Vector3 &_max,
+      private: void CreatePosesBoxLinearZ(const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -177,8 +171,8 @@ namespace gazebo
       /// \param[in] _height Height of the cylinder containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesCylinderRandom(int _modelCount,
-        const math::Vector3 &_center, double _radius, double _height,
+      private: void CreatePosesCylinderRandom(
+        const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \brief Populate a vector of poses with '_modelCount' elements,
@@ -192,8 +186,8 @@ namespace gazebo
       /// \param[in] _height Height of the cylinder containing the models.
       /// \param[out] _poses Vector containing the poses that will be used to
       /// populate models.
-      private: void CreatePosesCylinderUniform(int _modelCount,
-        const math::Vector3 &_center, double _radius, double _height,
+      private: void CreatePosesCylinderUniform(
+        const PopulationParams &_populParams,
         std::vector<math::Vector3> &_poses);
 
       /// \internal

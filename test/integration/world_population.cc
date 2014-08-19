@@ -77,7 +77,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
 
   // Check elements distributed as a grid.
   double tolerance = 0.25;
-  math::Vector3 initialPos(-0.25, -0.5, 0);
+  math::Vector3 initialPos(-0.25, -0.25 / 2.0, 0);
   math::Vector3 expectedPos(initialPos);
   math::Vector3 step(0.25, 0.25, 0);
 
@@ -108,12 +108,13 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     // This is not a cloned object, skip it.
     if (model->GetName().find("can1_clone") != std::string::npos)
     {
-      math::Box boundingBox(math::Vector3(3, 3, 0), math::Vector3(4, 4, 0.1));
-      EXPECT_GE(model->GetWorldPose().pos.x, 3 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.y, 3 - tolerance);
+      math::Box boundingBox(math::Vector3(2.5, 2.5, 0),
+        math::Vector3(3.5, 3.5, 0.1));
+      EXPECT_GE(model->GetWorldPose().pos.x, 2.5 - tolerance);
+      EXPECT_GE(model->GetWorldPose().pos.y, 2.5 - tolerance);
       EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.x, 4 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, 4 + tolerance);
+      EXPECT_LE(model->GetWorldPose().pos.x, 3.5 + tolerance);
+      EXPECT_LE(model->GetWorldPose().pos.y, 3.5 + tolerance);
       EXPECT_LE(model->GetWorldPose().pos.z, 0.1 + tolerance);
     }
     else if (model->GetName().find("can3_clone") != std::string::npos)
@@ -124,12 +125,13 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can4_clone") != std::string::npos)
     {
-      math::Box boundingBox(math::Vector3(1, -4, 0), math::Vector3(5, -2, .01));
-      EXPECT_GE(model->GetWorldPose().pos.x, 1 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.y, -4 - tolerance);
+      math::Box boundingBox(math::Vector3(-1, -5, 0),
+        math::Vector3(3, -3, .01));
+      EXPECT_GE(model->GetWorldPose().pos.x, -1 - tolerance);
+      EXPECT_GE(model->GetWorldPose().pos.y, -5 - tolerance);
       EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.x, 5 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, -2 + tolerance);
+      EXPECT_LE(model->GetWorldPose().pos.x, 3 + tolerance);
+      EXPECT_LE(model->GetWorldPose().pos.y, -3 + tolerance);
       EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
     }
     else if (model->GetName().find("can5_clone") != std::string::npos)
@@ -140,32 +142,32 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can6_clone") != std::string::npos)
     {
-      math::Box boundingBox(math::Vector3(-1, 4.5, 0),
-                            math::Vector3(1, 5.5, .01));
+      math::Box boundingBox(math::Vector3(-1, 3.5, 0),
+                            math::Vector3(1, 4.5, .01));
       EXPECT_GE(model->GetWorldPose().pos.x, -1 - tolerance);
       EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
       EXPECT_LE(model->GetWorldPose().pos.x, 1 + tolerance);
       EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.y, 5.0, tolerance);
+      EXPECT_NEAR(model->GetWorldPose().pos.y, 4, tolerance);
     }
     else if (model->GetName().find("can7_clone") != std::string::npos)
     {
-      math::Box boundingBox(math::Vector3(-5.5, -1, 0),
-                            math::Vector3(-4.5, 1, .01));
-      EXPECT_GE(model->GetWorldPose().pos.y, -1 - tolerance);
+      math::Box boundingBox(math::Vector3(-5.5, -2, 0),
+                            math::Vector3(-4.5, 0, .01));
+      EXPECT_GE(model->GetWorldPose().pos.y, -2 - tolerance);
       EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, 1 + tolerance);
+      EXPECT_LE(model->GetWorldPose().pos.y, 0 + tolerance);
       EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.x, -5.0, tolerance);
+      EXPECT_NEAR(model->GetWorldPose().pos.x, -5, tolerance);
     }
     else if (model->GetName().find("can8_clone") != std::string::npos)
     {
-      math::Box boundingBox(math::Vector3(5.4, 0.9, 0),
-                            math::Vector3(5.6, 1.1, 1.4));
+      math::Box boundingBox(math::Vector3(3.9, -0.1, 0),
+                            math::Vector3(4.1, 0.1, 1.4));
       EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
       EXPECT_LE(model->GetWorldPose().pos.z, 1.4 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.x, 5.5, tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.y, 1, tolerance);
+      EXPECT_NEAR(model->GetWorldPose().pos.x, 4.0, tolerance);
+      EXPECT_NEAR(model->GetWorldPose().pos.y, 0, tolerance);
     }
   }
 }
