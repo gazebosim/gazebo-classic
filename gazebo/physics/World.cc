@@ -356,7 +356,7 @@ void World::Init()
   // Check if we have to insert an object population.
   if (this->sdf->HasElement("population"))
   {
-    Population population(this->sdf, this);
+    Population population(this->sdf, shared_from_this());
     population.PopulateAll();
   }
 
