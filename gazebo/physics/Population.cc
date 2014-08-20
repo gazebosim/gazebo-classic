@@ -24,6 +24,7 @@
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Rand.hh"
 #include "gazebo/physics/Population.hh"
+#include "gazebo/physics/PopulationPrivate.hh"
 #include "gazebo/physics/World.hh"
 
 

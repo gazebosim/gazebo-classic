@@ -21,7 +21,8 @@
 #include <vector>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Console.hh"
-#include "gazebo/physics/PopulationPrivate.hh"
+#include "gazebo/math/Pose.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
 
@@ -31,6 +32,49 @@ namespace gazebo
   {
     /// \addtogroup gazebo_physics
     /// \{
+
+    /// \brief Forward declaration of the private data class.
+    class PopulationPrivate;
+
+    /// \brief Stores all the posible parameters that define a population.
+    class GAZEBO_VISIBLE PopulationParams
+    {
+      /// \brief The three side lengths of the box.
+      public: math::Vector3 size;
+
+      /// \brief Number of rows used when models are distributed as a grid.
+      public: int rows;
+
+      /// \brief Number of columns used when models are distributed as a grid.
+      public: int cols;
+
+      /// \brief Distance between models when they are distributed as a grid.
+      public: math::Vector3 step;
+
+      /// The reference frame of the population's region.
+      public: math::Pose pose;
+
+      /// \brief Radius of the cylinder's base containing the models.
+      public: double radius;
+
+      /// \brief Length of the cylinder containing the models.
+      public: double length;
+
+      /// \brief Name of the model.
+      public: std::string modelName;
+
+      /// \brief Contains the sdf representation of the model.
+      public: std::string modelSdf;
+
+      /// \brief Number of models to spawn.
+      public: int modelCount;
+
+      /// \brief Object distribution. E.g.: random, grid.
+      public: std::string distribution;
+
+      /// \brief Type region in which the objects will be spawned. E.g.: box.
+      public: std::string region;
+    };
 
     /// \class Population Population.hh physics/physics.hh
     /// \brief Class that automatically populates an environment with multiple
