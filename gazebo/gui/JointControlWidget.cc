@@ -28,7 +28,7 @@ JointForceControl::JointForceControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->forceSpin = new QDoubleSpinBox;
-  this->forceSpin->setRange(GZ_DBL_MIN, GZ_DBL_MAX);
+  this->forceSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->forceSpin->setSingleStep(0.001);
   this->forceSpin->setDecimals(3);
   this->forceSpin->setValue(0.000);
@@ -63,28 +63,25 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  this->posSpin->setRange(GZ_DBL_MIN, GZ_DBL_MAX);
+  this->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->posSpin->setSingleStep(0.001);
   this->posSpin->setDecimals(3);
   this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  this->pGainSpin->setMinimum(0.0);
-  this->pGainSpin->setMaximum(GZ_DBL_MAX);
+  this->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->pGainSpin->setSingleStep(0.01);
   this->pGainSpin->setDecimals(3);
   this->pGainSpin->setValue(1.000);
 
   this->iGainSpin = new QDoubleSpinBox;
-  this->iGainSpin->setMinimum(0.0);
-  this->iGainSpin->setMaximum(GZ_DBL_MAX);
+  this->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->iGainSpin->setSingleStep(0.01);
   this->iGainSpin->setDecimals(3);
   this->iGainSpin->setValue(0.100);
 
   this->dGainSpin = new QDoubleSpinBox;
-  this->dGainSpin->setMinimum(0.0);
-  this->dGainSpin->setMaximum(GZ_DBL_MAX);
+  this->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->dGainSpin->setSingleStep(0.01);
   this->dGainSpin->setDecimals(3);
   this->dGainSpin->setValue(0.010);
@@ -168,28 +165,25 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   : QWidget(_parent), name(_name)
 {
   this->posSpin = new QDoubleSpinBox;
-  this->posSpin->setRange(GZ_DBL_MIN, GZ_DBL_MAX);
+  this->posSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->posSpin->setSingleStep(0.001);
   this->posSpin->setDecimals(3);
   this->posSpin->setValue(0.000);
 
   this->pGainSpin = new QDoubleSpinBox;
-  this->pGainSpin->setMinimum(0.0);
-  this->pGainSpin->setMaximum(GZ_DBL_MAX);
+  this->pGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->pGainSpin->setSingleStep(0.01);
   this->pGainSpin->setDecimals(3);
   this->pGainSpin->setValue(1.000);
 
   this->iGainSpin = new QDoubleSpinBox;
-  this->iGainSpin->setMinimum(0.0);
-  this->iGainSpin->setMaximum(GZ_DBL_MAX);
+  this->iGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->iGainSpin->setSingleStep(0.01);
   this->iGainSpin->setDecimals(3);
   this->iGainSpin->setValue(0.100);
 
   this->dGainSpin = new QDoubleSpinBox;
-  this->dGainSpin->setMinimum(0.0);
-  this->dGainSpin->setMaximum(GZ_DBL_MAX);
+  this->dGainSpin->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
   this->dGainSpin->setSingleStep(0.01);
   this->dGainSpin->setDecimals(3);
   this->dGainSpin->setValue(0.010);
