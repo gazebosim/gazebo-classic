@@ -54,6 +54,14 @@ namespace gazebo
               {manipMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the align mode signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectAlignMode(T _subscriber)
+              {return alignMode.Connect(_subscriber);}
+      public: static void DisconnectAlignMode(event::ConnectionPtr _subscriber)
+              {alignMode.Disconnect(_subscriber);}
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the fullscreen signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFullScreen(T _subscriber)
@@ -122,6 +130,10 @@ namespace gazebo
 
       ///  that indicates the user is manipulating an object
       public: static event::EventT<void (std::string)>  manipMode;
+
+      ///  that indicates the user is aligning objects
+      public: static event::EventT<void (std::string,
+                  std::string, std::string, bool)> alignMode;
 
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;

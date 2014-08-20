@@ -43,6 +43,7 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
@@ -623,6 +624,24 @@ void MainWindow::Scale()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Align()
+{
+  for (unsigned int i = 0 ; i < this->alignActionGroups.size(); ++i)
+  {
+    this->alignActionGroups[i]->setExclusive(false);
+    if (this->alignActionGroups[i]->checkedAction())
+      this->alignActionGroups[i]->checkedAction()->setChecked(false);
+    this->alignActionGroups[i]->setExclusive(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Snap()
+{
+  gui::Events::manipMode("snap");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -1136,18 +1155,96 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
-  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
+      tr("Copy (Ctrl + C)"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste"), this);
+      tr("Paste (Ctrl + V)"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+
+  g_snapAct = new QAction(QIcon(":/images/magnet.png"),
+      tr("Snap Mode (N)"), this);
+  g_snapAct->setStatusTip(tr("Snap entity"));
+  g_snapAct->setCheckable(true);
+  g_snapAct->setToolTip(tr("Snap Mode"));
+  connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
+
+  // set up align actions and widget
+  QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
+      tr("X Align Min"), this);
+  QAction *xAlignCenter = new QAction(QIcon(":/images/x_center.png"),
+      tr("X Align Center"), this);
+  QAction *xAlignMax = new QAction(QIcon(":/images/x_max.png"),
+      tr("X Align Max"), this);
+  QAction *yAlignMin = new QAction(QIcon(":/images/y_min.png"),
+      tr("Y Align Min"), this);
+  QAction *yAlignCenter = new QAction(QIcon(":/images/y_center.png"),
+      tr("Y Align Center"), this);
+  QAction *yAlignMax = new QAction(QIcon(":/images/y_max.png"),
+      tr("Y Align Max"), this);
+  QAction *zAlignMin = new QAction(QIcon(":/images/z_min.png"),
+      tr("Z Align Min"), this);
+  QAction *zAlignCenter = new QAction(QIcon(":/images/z_center.png"),
+      tr("Z Align Center"), this);
+  QAction *zAlignMax = new QAction(QIcon(":/images/z_max.png"),
+      tr("Z Align Max"), this);
+  this->CreateDisabledIcon(":/images/x_min.png", xAlignMin);
+  this->CreateDisabledIcon(":/images/x_center.png", xAlignCenter);
+  this->CreateDisabledIcon(":/images/x_max.png", xAlignMax);
+  this->CreateDisabledIcon(":/images/y_min.png", yAlignMin);
+  this->CreateDisabledIcon(":/images/y_center.png", yAlignCenter);
+  this->CreateDisabledIcon(":/images/y_max.png", yAlignMax);
+  this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
+  this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
+  this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
+
+  QActionGroup *xAlignActionGroup = new QActionGroup(this);
+  xAlignActionGroup->addAction(xAlignMin);
+  xAlignActionGroup->addAction(xAlignCenter);
+  xAlignActionGroup->addAction(xAlignMax);
+  xAlignActionGroup->setExclusive(true);
+  QActionGroup *yAlignActionGroup = new QActionGroup(this);
+  yAlignActionGroup->addAction(yAlignMin);
+  yAlignActionGroup->addAction(yAlignCenter);
+  yAlignActionGroup->addAction(yAlignMax);
+  yAlignActionGroup->setExclusive(true);
+  QActionGroup *zAlignActionGroup = new QActionGroup(this);
+  zAlignActionGroup->addAction(zAlignMin);
+  zAlignActionGroup->addAction(zAlignCenter);
+  zAlignActionGroup->addAction(zAlignMax);
+  zAlignActionGroup->setExclusive(true);
+  this->alignActionGroups.push_back(xAlignActionGroup);
+  this->alignActionGroups.push_back(yAlignActionGroup);
+  this->alignActionGroups.push_back(zAlignActionGroup);
+
+  AlignWidget *alignWidget = new AlignWidget(this);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MIN, xAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_CENTER,
+      xAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MAX, xAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MIN, yAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_CENTER,
+      yAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MAX, yAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MIN, zAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_CENTER,
+      zAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MAX, zAlignMax);
+  alignWidget->adjustSize();
+  alignWidget->setFixedWidth(alignWidget->width()+5);
+
+  g_alignAct = new QWidgetAction(this);
+  g_alignAct->setCheckable(true);
+  g_alignAct->setDefaultWidget(alignWidget);
+  g_alignAct->setEnabled(false);
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////
