@@ -136,6 +136,24 @@ void Joint::Load(sdf::ElementPtr _sdf)
       {
         this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
       }
+
+      // Axis dynamics
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (dynamicsElem)
+      {
+        double reference = 0;
+        double stiffness = 0;
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(0, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
+      }
     }
     if (axisElem->HasElement("limit"))
     {
@@ -160,6 +178,25 @@ void Joint::Load(sdf::ElementPtr _sdf)
       if (axisElem->HasElement(param))
       {
         this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+      }
+
+      // Axis dynamics
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (dynamicsElem)
+      {
+        double reference = 0;
+        double stiffness = 0;
+
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(1, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
       }
     }
     if (axisElem->HasElement("limit"))
@@ -552,11 +589,139 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 {
-  if (this->model->IsStatic())
-    this->staticAngle = _angle;
+  this->SetPosition(_index, _angle.Radian());
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+{
+  // parent class doesn't do much, derived classes do all the work.
+  if (this->model)
+  {
+    if (this->model->IsStatic())
+    {
+      this->staticAngle = _position;
+    }
+  }
   else
-    this->model->SetJointPosition(
-      this->GetScopedName(), _angle.Radian(), _index);
+  {
+    gzwarn << "model not setup yet, setting staticAngle.\n";
+    this->staticAngle = _position;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPositionMaximal(unsigned int _index, double _position)
+{
+  // check if index is inbound
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index too large.\n";
+    return false;
+  }
+
+  /// If the Joint is static, Gazebo stores the state of
+  /// this Joint as a scalar inside the Joint class in Joint::SetPosition.
+  if (!Joint::SetPosition(_index, _position))
+  {
+    gzerr << "Joint::SetPosition failed, "
+          << "but it's not possible as implemented.\n";
+    return false;
+  }
+
+  // truncate position by joint limits
+  double lower = this->GetLowStop(_index).Radian();
+  double upper = this->GetHighStop(_index).Radian();
+  if (lower < upper)
+    _position = math::clamp(_position, lower, upper);
+  else
+    _position = math::clamp(_position, upper, lower);
+
+  // only deal with hinge, universal, slider joints in the user
+  // request joint_names list
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT) ||
+      this->HasType(Base::SLIDER_JOINT))
+  {
+    if (childLink)
+    {
+      // Get all connected links to this joint
+      Link_V connectedLinks;
+      if (this->FindAllConnectedLinks(this->parentLink, connectedLinks))
+      {
+        // debug
+        // gzerr << "found connected links: ";
+        // for (Link_V::iterator li = connectedLinks.begin();
+        //                       li != connectedLinks.end(); ++li)
+        //   std::cout << (*li)->GetName() << " ";
+        // std::cout << "\n";
+
+        // successfully found a subset of links connected to this joint
+        // (parent link cannot be in this set).  Next, compute transform
+        // to apply to all these links.
+
+        // Everything here must be done within one time step,
+        // Link pose updates need to be synchronized.
+
+        // compute transform about the current anchor, about the axis
+        // rotate child (childLink) about anchor point,
+
+        // Get Child Link Pose
+        math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+        // Compute new child link pose based on position change
+        math::Pose newChildLinkPose =
+          this->ComputeChildLinkPose(_index, _position);
+
+        // debug
+        // gzerr << "child link pose0 [" << childLinkPose
+        //       << "] new child link pose0 [" << newChildLinkPose
+        //       << "]\n";
+
+        // update all connected links
+        {
+          // block any other physics pose updates
+          boost::recursive_mutex::scoped_lock lock(
+            *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+          for (Link_V::iterator li = connectedLinks.begin();
+                                li != connectedLinks.end(); ++li)
+          {
+            // set pose of each link based on child link pose change
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
+
+            // debug
+            // gzerr << "moved " << (*li)->GetName()
+            //       << " p0 [" << childLinkPose
+            //       << "] p1 [" << newChildLinkPose
+            //       << "]\n";
+          }
+        }
+      }
+      else
+      {
+        // if parent Link is found in search, return false
+        gzwarn << "failed to find a clean set of connected links,"
+               << " i.e. this joint is inside a loop, cannot SetPosition"
+               << " kinematically.\n";
+        return false;
+      }
+    }
+    else
+    {
+      gzerr << "child link is null.\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "joint type SetPosition not supported.\n";
+    return false;
+  }
+
+  /// \todo:  Set link and joint "velocities" based on change / time
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -565,7 +730,7 @@ void Joint::SetState(const JointState &_state)
   this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
-    this->SetAngle(i, _state.GetAngle(i));
+    this->SetPosition(i, _state.GetAngle(i).Radian());
 }
 
 //////////////////////////////////////////////////
@@ -601,21 +766,6 @@ double Joint::GetForce(unsigned int /*_index*/)
 {
   gzerr << "Joint::GetForce should be overloaded by physics engines.\n";
   return 0;
-}
-
-//////////////////////////////////////////////////
-double Joint::GetDampingCoefficient() const
-{
-  gzerr << "Joint::GetDampingCoefficient() is deprecated, please switch "
-        << "to Joint::GetDamping(index)\n";
-  return this->dissipationCoefficient[0];
-}
-
-//////////////////////////////////////////////////
-void Joint::ApplyDamping()
-{
-  gzerr << "Joint::ApplyDamping deprecated by Joint::ApplyStiffnessDamping.\n";
-  this->ApplyStiffnessDamping();
 }
 
 //////////////////////////////////////////////////
@@ -987,4 +1137,128 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   double x = this->GetAngle(_index).Radian() -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
+}
+
+//////////////////////////////////////////////////
+void Joint::CacheForceTorque()
+{
+}
+
+//////////////////////////////////////////////////
+bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+  Link_V &_connectedLinks)
+{
+  // debug
+  // std::string pn;
+  // if (_originalParentLink) pn = _originalParentLink->GetName();
+  // gzerr << "first call to find connected links: "
+  //       << " parent " << pn
+  //       << " this joint " << this->GetName() << "\n";
+
+  // unlikely, but check anyways to make sure we don't have a 0-height tree
+  if (this->childLink.get() == _originalParentLink.get())
+  {
+    // if parent is a child
+    gzerr << "we have a zero length loop.\n";
+    _connectedLinks.clear();
+    return false;
+  }
+  else
+  {
+    // add this->childLink to the list of descendent child links (should be
+    // the very first one added).
+    _connectedLinks.push_back(this->childLink);
+
+    // START RECURSIVE SEARCH, start adding child links of this->childLink
+    // to the collection of _connectedLinks.
+    return this->childLink->FindAllConnectedLinksHelper(_originalParentLink,
+      _connectedLinks, true);
+  }
+}
+
+//////////////////////////////////////////////////
+math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
+          double _position)
+{
+  // child link pose
+  math::Pose childLinkPose = this->childLink->GetWorldPose();
+
+  // default return to current pose
+  math::Pose newRelativePose;
+  math::Pose newWorldPose = childLinkPose;
+
+  // get anchor and axis of the joint
+  math::Vector3 anchor;
+  math::Vector3 axis;
+
+  if (this->model->IsStatic())
+  {
+    /// \TODO: we want to get axis in global frame, but GetGlobalAxis
+    /// not implemented for static models yet.
+    axis = childLinkPose.rot.RotateVector(this->GetLocalAxis(_index));
+    anchor = childLinkPose.pos;
+  }
+  else
+  {
+    anchor = this->GetAnchor(_index);
+    axis = this->GetGlobalAxis(_index);
+  }
+
+  // delta-position along an axis
+  double dposition = _position - this->GetAngle(_index).Radian();
+
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // take axis rotation and turn it into a quaternion
+    math::Quaternion rotation(axis, dposition);
+
+    // rotate relative pose by rotation
+
+    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
+    newRelativePose.rot = rotation * relativePose.rot;
+
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+
+    // \TODO: ideally we want to set this according to
+    // Joint Trajectory velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    // relative to anchor point
+    math::Pose relativePose(childLinkPose.pos - anchor,
+                            childLinkPose.rot);
+
+    // slide relative pose by dposition along axis
+    newRelativePose.pos = relativePose.pos + axis * dposition;
+    newRelativePose.rot = relativePose.rot;
+
+    newWorldPose =
+      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+
+    /// \TODO: ideally we want to set this according to Joint Trajectory
+    /// velocity and use time step since last update.
+    /*
+    double dt =
+      this->dataPtr->model->GetWorld()->GetPhysicsEngine()->GetMaxStepTime();
+    this->ComputeAndSetLinkTwist(_link, newWorldPose, newWorldPose, dt);
+    */
+  }
+  else
+  {
+    gzerr << "Setting joint position is only supported for"
+          << " hinge, universal and slider joints right now.\n";
+  }
+
+  return newWorldPose;
 }

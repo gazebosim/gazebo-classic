@@ -265,7 +265,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      if (!this->TrackVisualImpl((*iter).data()))
+      if (this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
     else if ((*iter).request() == "attach_visual")
@@ -370,12 +370,6 @@ void Camera::Update()
 
     this->SetWorldPosition(pos);
   }
-}
-
-//////////////////////////////////////////////////
-void Camera::Render()
-{
-  this->Render(false);
 }
 
 //////////////////////////////////////////////////
@@ -911,14 +905,6 @@ Ogre::SceneNode *Camera::GetSceneNode() const
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneNode *Camera::GetPitchNode() const
-{
-  gzerr << "Camera::GetPitchNode() is deprecated, will return NULL."
-        << " Use GetSceneNode() instead.\n";
-  return NULL;
-}
-
-//////////////////////////////////////////////////
 const unsigned char *Camera::GetImageData(unsigned int _i)
 {
   if (_i != 0)
@@ -1381,7 +1367,10 @@ void Camera::AttachToVisual(const std::string &_visualName,
   if (visual)
     track.set_id(visual->GetId());
   else
+  {
+    gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
     track.set_id(GZ_UINT32_MAX);
+  }
 
   track.set_name(_visualName);
   track.set_min_dist(_minDist);
@@ -1449,6 +1438,9 @@ bool Camera::TrackVisualImpl(const std::string &_name)
     return this->TrackVisualImpl(visual);
   else
     this->dataPtr->trackedVisual.reset();
+
+  if (_name.empty())
+    return true;
 
   return false;
 }

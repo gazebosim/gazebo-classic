@@ -26,6 +26,8 @@ int example_init(void)
   /* Add in any functions required to initialize the physics engine. */
   printf("Initialize the engine\n");
 
+  // what in physics engine needs to be initialized?
+
   return 0;
 }
 
@@ -42,8 +44,13 @@ int example_destroy(void)
 /************************************************/
 PhysicsPlugin *create()
 {
+  // create a pointer to physics plugin
   g_plugin = (PhysicsPlugin*)malloc(sizeof(PhysicsPlugin));
+  // link init to example_init, this function is called at the end
+  // of World::Load
   g_plugin->init = example_init;
+  // link destroy to example_destroy, this function is called
+  // at the beginning of World::Fini
   g_plugin->destroy = example_destroy;
 
   /* Add in any functions required to create the physics engine. */

@@ -90,12 +90,6 @@ namespace gazebo
       /// A value of zero disables run stop.
       public: void Run(unsigned int _iterations = 0);
 
-      /// \brief Run the world. This call blocks.
-      /// Run the update loop.
-      /// \param[in] _iterations Run for this many iterations, then stop.
-      /// A value of zero disables run stop.
-      public: void RunBlocking(unsigned int _iterations = 0);
-
       /// \brief Return the running state of the world.
       /// \return True if the world is running.
       public: bool GetRunning() const;
@@ -264,11 +258,6 @@ namespace gazebo
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      /// \note Deprecated. Please use World::Step
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
-
-      /// \brief Step the world forward in time.
-      /// \param[in] _steps The number of steps the World should take.
       public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
@@ -322,6 +311,24 @@ namespace gazebo
       /// \brief Get the current scene in message form.
       /// \return The scene state as a protobuf message.
       public: msgs::Scene GetSceneMsg() const;
+
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
+
+      /// \brief Remove a model. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _model Pointer to a model to remove.
+      public: void RemoveModel(ModelPtr _model);
+
+      /// \brief Remove a model by name. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _name Name of the model to remove.
+      public: void RemoveModel(const std::string &_name);
 
       /// \cond
       /// This is an internal function.
@@ -437,11 +444,6 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Remove a model from the cached list of models.
-      /// This does not delete the model.
-      /// \param[in] _name Name of the model to remove.
-      private: void RemoveModel(const std::string &_name);
-
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -462,6 +464,9 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
 
+      /// \brief Create a pointer to the dlopen physics plugin
+      /// \param[in] _filename plugin filename
+      /// \return a pointer to the dlopen physics plugin
       private: PhysicsPlugin *CreatePhysicsPlugin(const std::string &_filename);
 
       /// \brief For keeping track of time step throttling.
@@ -706,6 +711,10 @@ namespace gazebo
 
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
+
+      /// \brief This mutex is used to by the ::RemoveModel and
+      /// ::ProcessFactoryMsgs functions.
+      private: boost::mutex factoryDeleteMutex;
 
       /// \brief Pointer to the physics plugin
       private: PhysicsPlugin *physicsPlugin;

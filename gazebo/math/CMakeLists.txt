@@ -4,6 +4,7 @@ set (sources
   Angle.cc
   Box.cc
   Helpers.cc
+  Kmeans.cc
   Matrix3.cc
   Matrix4.cc
   Plane.cc
@@ -21,7 +22,9 @@ set (sources
 set (headers
   Angle.hh
   Box.hh
+  Filter.hh
   Helpers.hh
+  Kmeans.hh
   MathTypes.hh
   Matrix3.hh
   Matrix4.hh
@@ -41,6 +44,7 @@ set (gtest_sources
   Angle_TEST.cc
   Box_TEST.cc
   Helpers_TEST.cc
+  Kmeans_TEST.cc
   Matrix3_TEST.cc
   Plane_TEST.cc
   Pose_TEST.cc
