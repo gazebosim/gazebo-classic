@@ -464,6 +464,9 @@ namespace gazebo
       /// \param[in] _msg Pointer to the light message.
       private: void OnLightMsg(ConstLightPtr &_msg);
 
+      /// \brief Create a pointer to the dlopen physics plugin
+      /// \param[in] _filename plugin filename
+      /// \return a pointer to the dlopen physics plugin
       private: PhysicsPlugin *CreatePhysicsPlugin(const std::string &_filename);
 
       /// \brief For keeping track of time step throttling.
