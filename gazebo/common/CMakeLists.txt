@@ -61,7 +61,6 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
-  DemPrivate.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -83,7 +82,6 @@ set (headers
   Skeleton.hh
   SingletonT.hh
   SphericalCoordinates.hh
-  SphericalCoordinatesPrivate.hh
   STLLoader.hh
   SystemPaths.hh
   Time.hh
@@ -146,6 +144,7 @@ set_property(
   SOURCE SystemPaths.cc SystemPaths_TEST.cc ModelDatabase.cc
   PROPERTY COMPILE_DEFINITIONS
   GAZEBO_PLUGIN_PATH="${GAZEBO_PLUGIN_PATH}"
+  GAZEBO_MODEL_PATH="${GAZEBO_MODEL_PATH}"
   GAZEBO_RESOURCE_PATH="${GAZEBO_RESOURCE_PATH}"
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
