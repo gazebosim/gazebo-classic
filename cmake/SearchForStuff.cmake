@@ -513,6 +513,9 @@ add_manpage_target()
 include("/usr/share/cmake-2.8/Modules/FindCUDA.cmake")
 
 if(CUDA_FOUND)
+  #include the fluidix files
+  include_directories(/opt/fluidix/include)
+
 	#SET(CUDA_NVCC_FLAGS "-arch;sm_30 -use_fast_math -lm -ldl -lrt -Xcompiler \"-fPIC\"")
 	SET(CUDA_NVCC_FLAGS "-arch=sm_30 -Iinclude -use_fast_math -lm -ldl -lrt -Xcompiler=\"-fPIC\" -Xcompiler=\"-O3\" -Xcompiler=\"-fexpensive-optimizations\" -Xcompiler=\"-funroll-loops\" -Xcompiler=\"-ffast-math\"")
 	#SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)

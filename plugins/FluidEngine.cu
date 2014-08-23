@@ -9,7 +9,7 @@
 #include "FluidEngine.hh"
 #include "math_functions.h"
 
-#include "quaternion.h"
+#include "FluidQuaternion.h"
 
 //#define DEBUG
 #define GRAVITY 9.80665f 		// gravity (m/s2)
