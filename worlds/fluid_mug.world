@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="fluid_world">
+
+	<gui>
+	  <camera name="fluid_camera">
+		<pose>-3 0 2 0 0.4 0</pose>
+	  </camera>
+	</gui>
+
+    <include>
+      <uri>model://ground_plane</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </include>
+
+    <include>
+      <uri>model://sun_vertical</uri>
+    </include>
+
+    <include>
+      <uri>model://big_mug</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </include>
+
+
+    <model name="box_grey">
+        <pose>0 0 1.5 0 0 0</pose>
+        <link name="box_grey_link">
+            <pose>0 0 0 0 0 0</pose>
+            <inertial>
+                <pose>0 0 0 0 0 0</pose>
+                <inertia>
+                    <ixx>0.3</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>0.3</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>0.3</izz>
+                </inertia>
+                <mass>30.0</mass>
+            </inertial>
+            <collision name="box_grey_collision">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.2 0.2 0.2</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="box_grey_visual">
+                <pose>0 0 0 0 0 0</pose>
+                <geometry>
+                    <box>
+                        <size>0.2 0.2 0.2</size>
+                    </box>
+                </geometry>
+				<material>
+					<script>
+						<uri>file://media/materials/scripts/gazebo.material</uri>
+						<name>Gazebo/Grey</name>
+					</script>
+				</material>
+            </visual>
+			<gravity>1</gravity>
+        </link>
+		<static>0</static>
+    </model>
+
+	<!-- particle_nr : if 0, computed automatically -->
+    <plugin name="FluidWorldPlugin" filename="libFluidWorldPlugin.so">
+		<world_position>0 0 5.01</world_position>
+		<world_size>100 100 10</world_size>
+		<fluid_position>0 0 0.6</fluid_position>
+		<fluid_volume>0.5 0.5 0.8</fluid_volume>
+		<particle_nr>0</particle_nr> 
+	</plugin>
+
+  </world>
+</sdf>
+

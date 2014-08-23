@@ -506,3 +506,21 @@ add_manpage_target()
 #    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
 #  endif (QWT_FIND_REQUIRED)
 #endif ()
+
+
+####################### CUDA PART #############################
+#TODO cuda path is included hardcoded
+include("/usr/share/cmake-2.8/Modules/FindCUDA.cmake")
+
+if(CUDA_FOUND)
+	#SET(CUDA_NVCC_FLAGS "-arch;sm_30 -use_fast_math -lm -ldl -lrt -Xcompiler \"-fPIC\"")
+	SET(CUDA_NVCC_FLAGS "-arch=sm_30 -Iinclude -use_fast_math -lm -ldl -lrt -Xcompiler=\"-fPIC\" -Xcompiler=\"-O3\" -Xcompiler=\"-fexpensive-optimizations\" -Xcompiler=\"-funroll-loops\" -Xcompiler=\"-ffast-math\"")
+	#SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
+
+	cuda_add_library(FluidEngine SHARED plugins/FluidEngine.cu plugins/FluidSet.cc plugins/FluidObjectSet.cc)
+
+else(CUDA_FOUND)
+    message("CUDA is not installed on this system.")
+endif()
+###############################################################
+

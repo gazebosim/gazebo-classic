@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="fluid_world">
+
+	<gui>
+	  <camera name="fluid_camera">
+		<pose>-3 0 2 0 0.4 0</pose>
+	  </camera>
+	</gui>
+
+    <include>
+      <uri>model://ground_plane</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </include>
+
+    <include>
+      <uri>model://sun_vertical</uri>
+    </include>
+
+    <include>
+      <uri>model://box2</uri>
+      <pose>0 0.0 0.5 0.0 0.0 0.2</pose>
+    </include>
+
+    <plugin name="FluidWorldPlugin" filename="libFluidWorldPlugin.so">
+		<world_position>0 0 5.01</world_position>
+		<world_size>1.5 1 10</world_size>
+		<fluid_position>-0.5 0.0 0.8</fluid_position>
+		<fluid_volume>0.4 0.95 0.5</fluid_volume>
+		<particle_nr>0</particle_nr>
+	</plugin>
+
+  </world>
+</sdf>
+

@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<sdf version="1.5">
+  <world name="fluid_world">
+
+	<gui>
+	  <camera name="fluid_camera">
+		<pose>-3 0 2 0 0.4 0</pose>
+	  </camera>
+	</gui>
+
+    <include>
+      <uri>model://ground_plane</uri>
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+
+    <model name="green_box">
+        <pose>0.0 0.4 0.2 0.0 -0.0 0.0</pose>
+        <link name="green_box_link">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <inertia>
+                    <ixx>3.6</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>3.6</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>3.6</izz>
+                </inertia>
+                <mass>500.0</mass>
+            </inertial>
+
+            <collision name="green_box_collision">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+				<surface>
+				  <friction>
+				    <ode>
+				      <mu>0.1</mu>
+				      <mu2>0.1</mu2>
+				    </ode>
+				  </friction>
+				</surface>
+            </collision>
+
+            <visual name="green_box_visual">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>file://media/materials/scripts/gazebo.material</uri>
+                        <name>Gazebo/Green</name>
+                    </script>
+                </material>
+            </visual>
+			<gravity>1</gravity>
+        </link>
+		<static>0</static>
+    </model>
+
+
+    <model name="blue_box">
+        <pose>0.0 -0.4 0.2 0.0 -0.0 0.0</pose>
+        <link name="blue_box_link">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <inertia>
+                    <ixx>3.6</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>3.6</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>3.6</izz>
+                </inertia>
+                <mass>500.0</mass>
+            </inertial>
+
+            <collision name="blue_box_collision">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+				<surface>
+				  <friction>
+				    <ode>
+				      <mu>0.1</mu>
+				      <mu2>0.1</mu2>
+				    </ode>
+				  </friction>
+				</surface>
+            </collision>
+
+            <visual name="blue_box_visual">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>file://media/materials/scripts/gazebo.material</uri>
+                        <name>Gazebo/Blue</name>
+                    </script>
+                </material>
+            </visual>
+			<gravity>1</gravity>
+        </link>
+		<static>0</static>
+    </model>
+
+
+    <model name="orange_box">
+        <pose>0.4 0.0 0.2 0.0 -0.0 0.0</pose>
+        <link name="green_box_link">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <inertia>
+                    <ixx>3.6</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>3.6</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>3.6</izz>
+                </inertia>
+                <mass>500.0</mass>
+            </inertial>
+
+            <collision name="orange_box_collision">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+				<surface>
+				  <friction>
+				    <ode>
+				      <mu>0.1</mu>
+				      <mu2>0.1</mu2>
+				    </ode>
+				  </friction>
+				</surface>
+            </collision>
+
+            <visual name="orange_box_visual">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>file://media/materials/scripts/gazebo.material</uri>
+                        <name>Gazebo/Orange</name>
+                    </script>
+                </material>
+            </visual>
+			<gravity>1</gravity>
+        </link>
+		<static>0</static>
+    </model>
+
+
+   <model name="yellow_box">
+        <pose>-0.4 0.0 0.2 0.0 -0.0 0.0</pose>
+        <link name="yellow_box_link">
+            <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+            <inertial>
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <inertia>
+                    <ixx>3.6</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>3.6</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>3.6</izz>
+                </inertia>
+                <mass>500.0</mass>
+            </inertial>
+
+            <collision name="yellow_box_collision">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+				<surface>
+				  <friction>
+				    <ode>
+				      <mu>0.1</mu>
+				      <mu2>0.1</mu2>
+				    </ode>
+				  </friction>
+				</surface>
+            </collision>
+
+            <visual name="yellow_box_visual">
+                <pose>0.0 0.0 0.0 0.0 -0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.4 0.4 0.4</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>file://media/materials/scripts/gazebo.material</uri>
+                        <name>Gazebo/Yellow</name>
+                    </script>
+                </material>
+            </visual>
+			<gravity>1</gravity>
+        </link>
+		<static>0</static>
+    </model>
+
+
+
+    <plugin name="FluidWorldPlugin" filename="libFluidWorldPlugin.so">
+		<world_position>0 0 5.01</world_position>
+		<world_size>20 20 10</world_size>
+		<fluid_position>0.0 0.0 0.75</fluid_position>
+		<fluid_volume>0.35 0.35 1.4</fluid_volume>
+		<particle_nr>0</particle_nr> 
+	</plugin>
+
+  </world>
+</sdf>
+

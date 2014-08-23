@@ -60,3 +60,20 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
+
+if(CUDA_FOUND)
+  #include the fluidix files
+  include_directories(/opt/fluidix/include)
+
+  add_library(FluidVisPlugin SHARED FluidVisPlugin.cc)
+  target_link_libraries(FluidVisPlugin FluidProtoMsgs ${OGRE_LIBRARIES})
+
+  add_library(FluidWorldPlugin SHARED FluidWorldPlugin.cc)
+  target_link_libraries(FluidWorldPlugin FluidProtoMsgs FluidEngine ${GAZEBO_libraries})
+endif()
+
+
+
+
+
+

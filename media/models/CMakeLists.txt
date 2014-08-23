@@ -9,6 +9,13 @@ set (files
 	talk_a.dae
 	talk_b.dae
 	walk.dae
+  box.stl
+  box45.stl
+  cone.stl
+  cylinder.stl
+  mug.stl
+  sphere.stl
+  thick_mug.stl
 )
 
 INSTALL(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/models/)
