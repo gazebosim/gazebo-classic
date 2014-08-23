@@ -507,23 +507,15 @@ add_manpage_target()
 #  endif (QWT_FIND_REQUIRED)
 #endif ()
 
-
-####################### CUDA PART #############################
-#TODO cuda path is included hardcoded
-include("/usr/share/cmake-2.8/Modules/FindCUDA.cmake")
-
-if(CUDA_FOUND)
-  #include the fluidix files
-  include_directories(/opt/fluidix/include)
-
-	#SET(CUDA_NVCC_FLAGS "-arch;sm_30 -use_fast_math -lm -ldl -lrt -Xcompiler \"-fPIC\"")
-	SET(CUDA_NVCC_FLAGS "-arch=sm_30 -Iinclude -use_fast_math -lm -ldl -lrt -Xcompiler=\"-fPIC\" -Xcompiler=\"-O3\" -Xcompiler=\"-fexpensive-optimizations\" -Xcompiler=\"-funroll-loops\" -Xcompiler=\"-ffast-math\"")
-	#SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
-
-	cuda_add_library(FluidEngine SHARED plugins/FluidEngine.cu plugins/FluidSet.cc plugins/FluidObjectSet.cc)
-
-else(CUDA_FOUND)
-    message("CUDA is not installed on this system.")
-endif()
-###############################################################
-
+#################################################
+# Find fluidix
+# search for fluidix header in /opt/fluidix/include, hardcoded for now
+find_path (fluidix_INCLUDE_DIRS fluidix.h /opt/fluidix/include)
+if (NOT fluidix_INCLUDE_DIRS)
+  message (STATUS "Looking for fluidix.h - not found, is it outside of /opt/fluidix/include?")
+  set (FLUIDIX_FOUND False)
+else ()
+  message (STATUS "Looking for fluidix.h - found")
+  include_directories(${fluidix_INCLUDE_DIRS})
+  set (FLUIDIX_FOUND True)
+endif ()

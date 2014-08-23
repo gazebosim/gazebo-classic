@@ -49,6 +49,40 @@ endif()
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/
 )
+
+###############################################################
+#TODO cuda path is included hardcoded
+include("/usr/share/cmake-2.8/Modules/FindCUDA.cmake")
+if(CUDA_FOUND AND FLUIDIX_FOUND)
+  #include the fluidix files
+  include_directories(/opt/fluidix/include ${CUDA_INCLUDE_DIRS})
+
+	#SET(CUDA_NVCC_FLAGS "-arch;sm_30 -use_fast_math -lm -ldl -lrt -Xcompiler \"-fPIC\"")
+	SET(CUDA_NVCC_FLAGS "-arch=sm_30 -Iinclude -use_fast_math -lm -ldl -lrt -Xcompiler=\"-fPIC\" -Xcompiler=\"-O3\" -Xcompiler=\"-fexpensive-optimizations\" -Xcompiler=\"-funroll-loops\" -Xcompiler=\"-ffast-math\"")
+	#SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_20,code=sm_20)
+
+	# compile CUDA library
+	cuda_add_library(FluidEngine SHARED FluidEngine.cu FluidSet.cc FluidObjectSet.cc)
+  install (TARGETS FluidEngine DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" FluidEngine.hh)
+
+	# compile client plugin
+  add_library(FluidVisPlugin SHARED FluidVisPlugin.cc)
+  target_link_libraries(FluidVisPlugin gazebo_msgs ${OGRE_LIBRARIES})
+  install (TARGETS FluidVisPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" FluidVisPlugin.hh)
+
+	# compile server plugin
+  add_library(FluidWorldPlugin SHARED FluidWorldPlugin.cc)
+  target_link_libraries(FluidWorldPlugin gazebo_msgs FluidEngine ${GAZEBO_libraries})
+  install (TARGETS FluidWorldPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+  gz_install_includes("plugins" FluidWorldPlugin.hh)
+
+else(CUDA_FOUND)
+    message("CUDA is not installed on this system.")
+endif()
+###############################################################
+
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
@@ -60,20 +94,3 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
-
-if(CUDA_FOUND)
-  #include the fluidix files
-  include_directories(/opt/fluidix/include ${CUDA_INCLUDE_DIRS})
-
-  add_library(FluidVisPlugin SHARED FluidVisPlugin.cc)
-  target_link_libraries(FluidVisPlugin gazebo_msgs ${OGRE_LIBRARIES})
-
-  add_library(FluidWorldPlugin SHARED FluidWorldPlugin.cc)
-  target_link_libraries(FluidWorldPlugin gazebo_msgs FluidEngine ${GAZEBO_libraries})
-endif()
-
-
-
-
-
-
