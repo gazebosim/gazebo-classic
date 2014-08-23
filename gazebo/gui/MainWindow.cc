@@ -469,6 +469,16 @@ void MainWindow::Save()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  // Save the world and create a clone in the server side.
+  msgs::ServerControl msg;
+  msg.set_save_world_name("");
+  msg.set_clone_world(true);
+  this->serverControlPub->Publish(msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::About()
 {
   std::string helpTxt;
@@ -919,6 +929,10 @@ void MainWindow::CreateActions()
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
 
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1294,6 +1308,7 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
@@ -1543,6 +1558,11 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned() && _msg->cloned())
+  {
+    std::cout << "World cloned and available at:\n\t" << _msg->cloned_uri()
+              << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

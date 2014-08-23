@@ -539,7 +539,31 @@ void Server::ProcessControlMsgs()
   for (iter = this->controlMsgs.begin();
        iter != this->controlMsgs.end(); ++iter)
   {
-    if ((*iter).has_save_world_name())
+    if ((*iter).has_clone_world() && (*iter).has_save_world_name())
+    {
+      physics::WorldPtr world = physics::get_world((*iter).save_world_name());
+      world->Save("cloned_world");
+      std::cout << "Saving world..." << std::endl;
+
+      std::cout << "Cloning world..." << std::endl;
+
+      const char *cmd = "GAZEBO_MASTER_URI=http://localhost:11346 gzserver"
+                        " cloned_world&";
+
+      // Spawn a new gzserver process and load the saved world
+      if (std::system(cmd) == 0)
+        gzlog << "Simulation successfully cloned" << std::endl;
+      else
+        gzerr << "Unable to clone a simulation" << std::endl;
+
+      // Notify the result.
+      msgs::WorldModify worldMsg;
+      worldMsg.set_world_name("default");
+      worldMsg.set_cloned(true);
+      worldMsg.set_cloned_uri("http://localhost::11346");
+      this->worldModPub->Publish(worldMsg);
+    }
+    else if ((*iter).has_save_world_name())
     {
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
       if ((*iter).has_save_filename())
