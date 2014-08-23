@@ -21,7 +21,7 @@ FluidVisPlugin::~FluidVisPlugin()
 void FluidVisPlugin::Load(int _argc, char ** _argv)
 {
 	// check for the given arguments
-	for (unsigned int i = 0; i < _argc; ++i)
+	for (int i = 0; i < _argc; ++i)
 	{
 		// look for '--type' characters
 		if(std::string(_argv[i]) == "--type")
@@ -151,7 +151,7 @@ void FluidVisPlugin::OnFluidMsg(
 		// resize position vector regarding to the msg size
 		this->fluidParticlePositions.resize(_msg->position_size());
 
-		for (int i = 0; i < _msg->position_size(); i++)
+		for (int i = 0; i < _msg->position_size(); ++i)
 		{
 			this->fluidParticlePositions[i] = Ogre::Vector3(
 					_msg->position(i).x(),_msg->position(i).y(),_msg->position(i).z());
@@ -173,7 +173,7 @@ void FluidVisPlugin::OnFluidObjMsg(
 		// resize position vector regarding to the msg size
 		this->objNameToPos_M.at(_msg->name()).resize(_msg->position_size());
 
-		for (int i = 0; i < _msg->position_size(); i++)
+		for (int i = 0; i < _msg->position_size(); ++i)
 		{
 			this->objNameToPos_M.at(_msg->name())[i] = Ogre::Vector3(
 					_msg->position(i).x(),_msg->position(i).y(),_msg->position(i).z());
@@ -184,7 +184,7 @@ void FluidVisPlugin::OnFluidObjMsg(
 		// the object has not been mapped yet
 		this->objNameToPos_M[_msg->name()] = std::vector<Ogre::Vector3>(_msg->position_size());
 
-		for (int i = 0; i < _msg->position_size(); i++)
+		for (int i = 0; i < _msg->position_size(); ++i)
 		{
 			this->objNameToPos_M.at(_msg->name())[i] = Ogre::Vector3(
 					_msg->position(i).x(),_msg->position(i).y(),_msg->position(i).z());
@@ -224,7 +224,7 @@ void FluidVisPlugin::RenderParticles(std::vector<Ogre::Vector3> &_particles, std
 	// OT_TRIANGLE_FAN = 6, A fan of triangles, 3 vertices for the first triangle, and 1 per triangle after that
 	obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_POINT_LIST);
 
-	for (int i = 0; i < _particles.size(); i++)
+	for (unsigned int i = 0; i < _particles.size(); ++i)
 	{
 		obj->position(_particles[i]);
 	}
@@ -272,7 +272,7 @@ void FluidVisPlugin::RenderObjectsParticles(
 		// OT_TRIANGLE_FAN = 6, A fan of triangles, 3 vertices for the first triangle, and 1 per triangle after that
 		obj->begin("Gazebo/Red", Ogre::RenderOperation::OT_POINT_LIST);
 
-		for (int i = 0; i < map_iter->second.size(); i++)
+		for (unsigned int i = 0; i < map_iter->second.size(); ++i)
 		{
 			obj->position(map_iter->second[i]);
 		}
@@ -288,7 +288,7 @@ void FluidVisPlugin::RenderObjectsParticles(
 void FluidVisPlugin::RenderParticlesAsEntities(std::vector<Ogre::Vector3> &_particles, std::string _name)
 {
 	//std::cout << "OnUpdate: Rendering new positions.." << std::endl;
-	for (int i = 0; i < _particles.size(); i++)
+	for (unsigned int i = 0; i < _particles.size(); ++i)
 	{
 		Ogre::SceneNode *sceneNode = NULL;
 		Ogre::Entity *entity = NULL;

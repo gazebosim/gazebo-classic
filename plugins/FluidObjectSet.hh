@@ -3,18 +3,20 @@
  * Date: 11 Jul. 2013
  */
 
+#ifndef OBJECT_SET_HH
+#define OBJECT_SET_HH
+
 #include "vector_types.h"
 #include "FluidQuaternion.h"
 
-#ifndef OBJECT_SET_HH
-#define OBJECT_SET_HH
+#include "gazebo/util/system.hh"
 
 /// \brief namespace for fluids
 namespace fluidix
 {
     /// \class ObjectSet ObjectSet.hh
     /// \brief ObjectSet class
-    class ObjectSet
+    class GAZEBO_VISIBLE ObjectSet
     {
         /// \brief Constructor
         public: ObjectSet();

@@ -17,6 +17,7 @@
 #include "FluidObjectSet.hh"
 #include "FluidSet.hh"
 #include "FluidQuaternion.h"
+#include "gazebo/util/system.hh"
 
 namespace fluidix
 {
@@ -26,7 +27,7 @@ namespace fluidix
     typedef std::map<int, fluidix::ObjectSet*> IdToObjectSetMap;
 
     /// \brief FluidEngine class
-	class FluidEngine
+	class GAZEBO_VISIBLE FluidEngine
 	{
 
 	/// \brief Constructor

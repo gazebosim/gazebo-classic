@@ -21,12 +21,12 @@
 
 #include "boost/bind.hpp"
 
-// #include "fluid.pb.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
 	/// \brief FluidWorldPlugin class
-	class FluidWorldPlugin : public WorldPlugin
+	class GAZEBO_VISIBLE FluidWorldPlugin : public WorldPlugin
 	{
 
 	/// \brief Constructor

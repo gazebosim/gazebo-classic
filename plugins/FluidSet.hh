@@ -6,12 +6,14 @@
 #ifndef FLUID_SET_HH
 #define FLUID_SET_HH
 
+#include "gazebo/util/system.hh"
+
 /// \brief namespace for fluids
 namespace fluidix
 {
     /// \class FluidSet FluidSet.hh
     /// \brief FluidSet class
-    class FluidSet
+    class GAZEBO_VISIBLE FluidSet
     {
     	//TODO create constructors so that it initializes min values, and computes the rest
         /// \brief Constructor

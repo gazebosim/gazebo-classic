@@ -13,12 +13,12 @@
 //#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
-// #include "fluid.pb.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
 	/// \brief FluidVisPlugin class
-	class FluidVisPlugin : public SystemPlugin
+	class GAZEBO_VISIBLE FluidVisPlugin : public SystemPlugin
 	{
 
 	/// \brief Constructor

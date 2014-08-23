@@ -111,7 +111,7 @@ void FluidWorldPlugin::OnUpdate()
 	fluid_msg.set_name("fluid1");
 
 	// get the fluid particle positions
-	for (int i = 0; i < this->fluidParticlesPos.size(); i++)
+	for (unsigned int i = 0; i < this->fluidParticlesPos.size(); ++i)
 	{
 		msgs::Set(fluid_msg.add_position(),	math::Vector3(
 				this->fluidParticlesPos[i].x,
@@ -147,7 +147,7 @@ void FluidWorldPlugin::OnUpdate()
 		movable_obj_msg.set_name(coll_iter->first->GetName().append("_fluid_obj"));
 
 		// TODO check for better perfomance (local var of class attr)?
-		for (int i = 0; i < this->collisionToParticlesPos_M.at(coll_iter->first).size(); i++)
+		for (unsigned int i = 0; i < this->collisionToParticlesPos_M.at(coll_iter->first).size(); ++i)
 		{
 			msgs::Set(movable_obj_msg.add_position(),
 					math::Vector3(this->collisionToParticlesPos_M.at(coll_iter->first)[i].x,

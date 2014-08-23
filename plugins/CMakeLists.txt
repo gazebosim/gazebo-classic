@@ -55,7 +55,17 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 include("/usr/share/cmake-2.8/Modules/FindCUDA.cmake")
 if(CUDA_FOUND AND FLUIDIX_FOUND)
   #include the fluidix files
-  include_directories(/opt/fluidix/include ${CUDA_INCLUDE_DIRS})
+  include_directories(/opt/fluidix/include) # ${CUDA_INCLUDE_DIRS})
+
+  # unhide symbols
+  # Windows and MacosX does not handled properly the hidden compilation
+  set (CMAKE_CXX_FLAGS_BAK "${CMAKE_CXX_FLAGS}") # backup flags
+
+  set (CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
+                        -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
+                        -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic")
+
+  set (CMAKE_CXX_FLAGS "-Wno-unused-value")
 
 	#SET(CUDA_NVCC_FLAGS "-arch;sm_30 -use_fast_math -lm -ldl -lrt -Xcompiler \"-fPIC\"")
 	SET(CUDA_NVCC_FLAGS "-arch=sm_30 -Iinclude -use_fast_math -lm -ldl -lrt -Xcompiler=\"-fPIC\" -Xcompiler=\"-O3\" -Xcompiler=\"-fexpensive-optimizations\" -Xcompiler=\"-funroll-loops\" -Xcompiler=\"-ffast-math\"")
@@ -69,14 +79,19 @@ if(CUDA_FOUND AND FLUIDIX_FOUND)
 	# compile client plugin
   add_library(FluidVisPlugin SHARED FluidVisPlugin.cc)
   target_link_libraries(FluidVisPlugin gazebo_msgs ${OGRE_LIBRARIES})
+  set_target_properties(FluidVisPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
   install (TARGETS FluidVisPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" FluidVisPlugin.hh)
 
 	# compile server plugin
   add_library(FluidWorldPlugin SHARED FluidWorldPlugin.cc)
   target_link_libraries(FluidWorldPlugin gazebo_msgs FluidEngine ${GAZEBO_libraries})
+  set_target_properties(FluidWorldPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
+  # set_target_properties(FluidWorldPlugin PROPERTIES INSTALL_RPATH /opt/fluidix/lib)
   install (TARGETS FluidWorldPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" FluidWorldPlugin.hh)
+
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS_BAK}") # recover flags
 
 else(CUDA_FOUND)
     message("CUDA is not installed on this system.")
