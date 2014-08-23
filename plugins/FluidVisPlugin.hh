@@ -12,7 +12,8 @@
 
 //#include "gazebo/msgs/msgs.hh"
 
-#include "fluid.pb.h"
+#include "gazebo/msgs/MessageTypes.hh"
+// #include "fluid.pb.h"
 
 namespace gazebo
 {

@@ -63,13 +63,13 @@ set_target_properties(BreakableJointPlugin PROPERTIES
 
 if(CUDA_FOUND)
   #include the fluidix files
-  include_directories(/opt/fluidix/include)
+  include_directories(/opt/fluidix/include ${CUDA_INCLUDE_DIRS})
 
   add_library(FluidVisPlugin SHARED FluidVisPlugin.cc)
-  target_link_libraries(FluidVisPlugin FluidProtoMsgs ${OGRE_LIBRARIES})
+  target_link_libraries(FluidVisPlugin gazebo_msgs ${OGRE_LIBRARIES})
 
   add_library(FluidWorldPlugin SHARED FluidWorldPlugin.cc)
-  target_link_libraries(FluidWorldPlugin FluidProtoMsgs FluidEngine ${GAZEBO_libraries})
+  target_link_libraries(FluidWorldPlugin gazebo_msgs FluidEngine ${GAZEBO_libraries})
 endif()
 
 

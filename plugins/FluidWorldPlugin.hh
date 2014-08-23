@@ -10,6 +10,7 @@
 #include "FluidObjectSet.hh"
 #include "FluidSet.hh"
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/physics/physics.hh"
@@ -20,7 +21,7 @@
 
 #include "boost/bind.hpp"
 
-#include "fluid.pb.h"
+// #include "fluid.pb.h"
 
 namespace gazebo
 {
