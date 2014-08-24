@@ -1365,6 +1365,10 @@ boost::any SimbodyPhysics::GetParam(const std::string &_key) const
   {
     return this->contact.getTransitionVelocity();
   }
+  else if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
   else
   {
     gzwarn << "key [" << _key

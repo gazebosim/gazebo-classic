@@ -21,12 +21,24 @@ set (qt_headers qtpropertybrowser.h
                 qtpropertybrowserutils_p.h
   )
 
+set (install_headers
+  ${qt_headers}
+)
+
 set (resources qtpropertybrowser.qrc)
 QT4_WRAP_CPP(headers_MOC ${qt_headers})
 QT4_ADD_RESOURCES(resources_RCC ${resources})
 
 add_library(gzqtpropertybrowser STATIC ${sources} ${headers_MOC} ${resources_RCC})
 set_target_properties(gzqtpropertybrowser PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+#foreach (hdr ${install_headers})
+#  APPEND_TO_CACHED_STRING(gui_headers
+#    "GUI Headers" "#include \"gazebo/gui/qtpropertybrowser/${hdr}\"\n")
+#endforeach()
+
+#gz_install_includes("gui/qtpropertybrowser" ${install_headers})
+
 #set(CMAKE_PACKAGE_QTGUI TRUE)
 #
 #add_definitions( ${QT_DEFINITIONS} )

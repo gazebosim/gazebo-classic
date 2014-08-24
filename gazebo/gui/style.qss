@@ -548,11 +548,9 @@ QTabBar::tab:!selected
   margin-top: 2px;
 }
 
-QTabWidget#mainTab::pane,
-QTabWidget#buildingEditorTab::pane,
-QTabWidget#modelEditorTab::pane,
-QTabWidget#terrainEditorTab::pane,
-QTabWidget#partInspectorTab::pane
+
+QTabWidget::pane,
+QTabWidget#mainTab::pane
 {
   border-left: 1px solid #101010;
   border-bottom: 1px solid #101010;
@@ -745,4 +743,25 @@ QwtScaleWidget
 {
   color: white;
   font-size: 11px;
+}
+
+QRadioButton::indicator:unchecked
+{
+  color: #d0d0d0;
+}
+
+QRadioButton::indicator:unchecked:hover
+{
+  color: #f58113;
+}
+
+
+QRadioButton::indicator:checked
+{
+  color: #d0d0d0;
+}
+
+QRadioButton::indicator:checked:hover
+{
+  color: #f58113;
 }
