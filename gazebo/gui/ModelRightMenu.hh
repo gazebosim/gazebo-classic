@@ -51,6 +51,14 @@ namespace gazebo
       /// request.
       public: void Run(const std::string &_modelName, const QPoint &_pt);
 
+      /// \brief Show the right menu with extra menu options.
+      /// \param[in] _modelName Name of the model that is active.
+      /// \param[in] _pt Point on the GUI that has received the right-click
+      /// request.
+      /// \param[in] _customActions Additional menu items to be shown.
+      public: void Run(const std::string &_modelName, const QPoint &_pt,
+          const std::vector<QAction *> &_customActions);
+
       /// \brief QT callback when move to has been selected.
       private slots: void OnMoveTo();
 

@@ -745,23 +745,7 @@ QwtScaleWidget
   font-size: 11px;
 }
 
-QRadioButton::indicator:unchecked
+QRadioButton::indicator
 {
   color: #d0d0d0;
-}
-
-QRadioButton::indicator:unchecked:hover
-{
-  color: #f58113;
-}
-
-
-QRadioButton::indicator:checked
-{
-  color: #d0d0d0;
-}
-
-QRadioButton::indicator:checked:hover
-{
-  color: #f58113;
 }

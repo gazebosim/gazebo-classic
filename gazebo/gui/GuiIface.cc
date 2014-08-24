@@ -342,3 +342,9 @@ gui::MainWindow *gui::get_main_window()
 {
   return g_main_win;
 }
+
+/////////////////////////////////////////////////
+gui::ModelRightMenu *gui::get_context_menu()
+{
+  return g_modelRightMenu;
+}

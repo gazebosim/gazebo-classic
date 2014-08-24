@@ -94,6 +94,7 @@ set (install_headers
   Editor.hh
   MainWindow.hh
   RenderWidget.hh
+  ModelRightMenu.hh
 )
 
 if (HAVE_OCULUS)
