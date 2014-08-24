@@ -83,9 +83,10 @@ TimePanel::TimePanel(QWidget *_parent)
 
   QLabel *emptyLabel = new QLabel(tr("  "));
   playToolbar->addWidget(emptyLabel);
+
   playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(stepToolBarLabel);
-  playToolbar->addWidget(this->stepButton);
+  this->stepToolBarLabelAction = playToolbar->addWidget(stepToolBarLabel);
+  this->stepButtonAction =  playToolbar->addWidget(this->stepButton);
 
   this->percentRealTimeEdit = new QLineEdit;
   this->percentRealTimeEdit->setObjectName("timePanelPercentRealTime");
@@ -117,16 +118,20 @@ TimePanel::TimePanel(QWidget *_parent)
                              QSizePolicy::Minimum));
   frameLayout->addWidget(playToolbar);
 
-  frameLayout->addWidget(new QLabel(tr("Real Time Factor:")));
+  this->realTimeFactorLabel = new QLabel(tr("Real Time Factor:"));
+  frameLayout->addWidget(this->realTimeFactorLabel);
   frameLayout->addWidget(this->percentRealTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Sim Time:")));
+  this->simTimeLabel = new QLabel(tr("Sim Time:"));
+  frameLayout->addWidget(this->simTimeLabel);
   frameLayout->addWidget(this->simTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Real Time:")));
+  this->realTimeLabel = new QLabel(tr("Real Time:"));
+  frameLayout->addWidget(this->realTimeLabel);
   frameLayout->addWidget(this->realTimeEdit);
 
-  frameLayout->addWidget(new QLabel(tr("Iterations:")));
+  this->iterationsLabel = new QLabel(tr("Iterations:"));
+  frameLayout->addWidget(this->iterationsLabel);
   frameLayout->addWidget(this->iterationsEdit);
 
   frameLayout->addWidget(timeResetButton);
@@ -191,6 +196,42 @@ void TimePanel::OnFullScreen(bool & /*_value*/)
 TimePanel::~TimePanel()
 {
   this->node.reset();
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTimeFactor(bool _show)
+{
+  this->realTimeFactorLabel->setVisible(_show);
+  this->percentRealTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowRealTime(bool _show)
+{
+  this->realTimeLabel->setVisible(_show);
+  this->realTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowSimTime(bool _show)
+{
+  this->simTimeLabel->setVisible(_show);
+  this->simTimeEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowIterations(bool _show)
+{
+  this->iterationsLabel->setVisible(_show);
+  this->iterationsEdit->setVisible(_show);
+}
+
+/////////////////////////////////////////////////
+void TimePanel::ShowStepWidget(bool _show)
+{
+  g_stepAct->setVisible(_show);
+  this->stepToolBarLabelAction->setVisible(_show);
+  this->stepButtonAction->setVisible(_show);
 }
 
 /////////////////////////////////////////////////

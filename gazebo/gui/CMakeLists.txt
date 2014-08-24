@@ -93,8 +93,9 @@ set (install_headers
   ${headers}
   Editor.hh
   MainWindow.hh
-  RenderWidget.hh
   ModelRightMenu.hh
+  RenderWidget.hh
+  TimePanel.hh
 )
 
 if (HAVE_OCULUS)
