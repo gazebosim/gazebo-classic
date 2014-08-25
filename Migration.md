@@ -2,6 +2,9 @@
 
 ### Additions
 
+1. **gazebo/physics/Population.hh**
+    + ***New class:*** Population
+
 1. **gazebo/math/Kmeans.hh**
     + ***New class:*** Kmeans
 
