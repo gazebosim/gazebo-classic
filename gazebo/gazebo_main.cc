@@ -40,15 +40,15 @@ void help()
     << "process.\n\n";
 
   std::cerr << "Options:\n"
-  << "  -v [ --version ]             Output version information.\n"
+  << "  -v [ --version ]              Output version information.\n"
   << "  --verbose                     Increase the messages written to the "
   <<                                  "terminal.\n"
-  << "  -h [ --help ]                Produce this help message.\n"
-  << "  -u [ --pause ]               Start the server in a paused state.\n"
-  << "  -e [ --physics ] arg         Specify a physics engine "
+  << "  -h [ --help ]                 Produce this help message.\n"
+  << "  -u [ --pause ]                Start the server in a paused state.\n"
+  << "  -e [ --physics ] arg          Specify a physics engine "
   << "(ode|bullet|dart|simbody).\n"
-  << "  -p [ --play ] arg            Play a log file.\n"
-  << "  -r [ --record ]              Record state data.\n"
+  << "  -p [ --play ] arg             Play a log file.\n"
+  << "  -r [ --record ]               Record state data.\n"
   << "  --record_encoding arg (=zlib) Compression encoding format for log "
   << "data \n"
   << "                                (zlib|bz2|txt).\n"
@@ -58,9 +58,9 @@ void help()
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
   <<                                  "gazebo.\n"
-  << "  -g [ --gui-plugin ] arg      Load a GUI plugin.\n"
+  << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
   << "  --gui-logfile arg             Specify a log file for the GUI.\n"
-  << "  -s [ --server-plugin ] arg   Load a server plugin.\n"
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n"
   << "  --server-logfile arg          Specify a log file for the server.\n\n";
 }
 
