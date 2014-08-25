@@ -340,6 +340,13 @@ void MainWindow::SaveINI()
   setINIProperty("geometry.x", this->x());
   setINIProperty("geometry.y", this->y());
 
+  // Save camera position and look_at
+  rendering::UserCameraPtr camera = gui::get_active_camera();
+  math::Vector3 cameraPos = camera->GetWorldPose().pos;
+  math::Vector3 cameraLook = cameraPos + camera->GetDirection();
+  setINIProperty("camera.look_at", cameraPos);
+  setINIProperty("camera.position", cameraLook);
+
   gui::saveINI(path);
 }
 

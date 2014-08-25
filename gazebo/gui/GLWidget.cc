@@ -676,6 +676,14 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->userCamera);
   this->scene = _scene;
 
+  // Get the size properties from the INI file.
+  math::Vector3 la = getINIProperty<math::Vector3>("camera.look_at",
+      math::Vector3(0, 0, 0));
+  math::Vector3 po  = getINIProperty<math::Vector3>("camera.position",
+      math::Vector3(5, -5, 2));
+
+  std::cout << "LA[" << la << "] PO[" << po << "]\n";
+
   math::Vector3 camPos(5, -5, 2);
   math::Vector3 lookAt(0, 0, 0);
   math::Vector3 delta = lookAt - camPos;
