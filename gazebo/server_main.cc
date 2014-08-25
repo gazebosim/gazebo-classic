@@ -16,6 +16,7 @@
 */
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
 

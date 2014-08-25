@@ -30,6 +30,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
@@ -475,7 +477,7 @@ void MainWindow::Clone()
   boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
   if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
   {
-    // Save the world and create a clone in the server side.
+    // Create a gzserver clone in the server side.
     msgs::ServerControl msg;
     msg.set_save_world_name("");
     msg.set_clone(true);

@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -30,8 +31,11 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/sensors/SensorsIface.hh"
 

@@ -91,7 +91,7 @@ namespace gazebo
       /// \brief Save GUI configuration to INI file.
       private slots: void SaveINI();
 
-      /// \brief Save GUI configuration to INI file.
+      /// \brief Clone a simulation.
       private slots: void Clone();
 
       private slots: void About();

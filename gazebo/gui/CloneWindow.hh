@@ -42,7 +42,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~CloneWindow();
 
-      /// \brief Update the member variables after the user pressed okay.
+      /// \brief Get the port for the new gzserver specified by the user.
+      /// \return The port for the new gzserver.
       public: int GetPort();
 
       /// \brief True if the stored port is a valid one. A valid port is an
@@ -58,7 +59,7 @@ namespace gazebo
       /// \brief Update the member variables after the user pressed okay.
       private: void Update();
 
-      /// \brief Button used to finalize topic selection.
+      /// \brief Button used to finalize port selection.
       private: QPushButton *okayButton;
 
       /// \brief QT widget for reading the port used in the cloned server.

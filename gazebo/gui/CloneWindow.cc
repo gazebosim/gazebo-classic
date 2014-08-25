@@ -41,7 +41,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
     "Select the port that the new server will use for connections.\n"
     "Please, check that the port is not used by any other process.\n");
 
-  // Port layout.
+  // Port widget.
   QHBoxLayout *portLayout = new QHBoxLayout;
   QLabel *portLabel = new QLabel("Cloned server port (1025-65535):");
   this->portEdit = new QLineEdit("11346");
@@ -52,7 +52,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
   portLayout->addWidget(portLabel);
   portLayout->addWidget(this->portEdit);
 
-  // Buttons layout.
+  // Buttons.
   QHBoxLayout *buttonLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton("Cancel");
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -67,8 +67,6 @@ CloneWindow::CloneWindow(QWidget *_parent)
   mainLayout->addWidget(frame);
   mainLayout->addLayout(portLayout);
   mainLayout->addLayout(buttonLayout);
-
-  // Let the stylesheet handle the margin sizes.
   mainLayout->setContentsMargins(4, 8, 4, 4);
 
   // Assign the mainlayout to this widget.
