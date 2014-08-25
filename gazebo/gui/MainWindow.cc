@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -471,11 +472,16 @@ void MainWindow::Save()
 /////////////////////////////////////////////////
 void MainWindow::Clone()
 {
-  // Save the world and create a clone in the server side.
-  msgs::ServerControl msg;
-  msg.set_save_world_name("");
-  msg.set_clone_world(true);
-  this->serverControlPub->Publish(msg);
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Save the world and create a clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1562,6 +1568,8 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   {
     std::cout << "World cloned and available at:\n\t" << _msg->cloned_uri()
               << std::endl;
+    gzlog << "World cloned and available at:\n\t" << _msg->cloned_uri()
+          << std::endl;
   }
 }
 

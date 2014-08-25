@@ -84,6 +84,10 @@ namespace gazebo
     /// \brief Finalize the Server.
     public: void Fini();
 
+    /// \brief Get the parameters.
+    /// \return Map of string parameters.
+    public: gazebo::common::StrStr_M GetParams();
+
     /// \brief Set the parameters.
     /// \param[in] _params Map of string parameters
     public: void SetParams(const common::StrStr_M &_params);

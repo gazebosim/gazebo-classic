@@ -97,13 +97,12 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
      "Absolute path in which to store state data")
-    ("seed",  po::value<double>(),
-     "Start with a given random number seed.")
-    ("iters",  po::value<unsigned int>(),
-     "Number of iterations to simulate.")
+    ("seed",  po::value<double>(), "Start with a given random number seed.")
+    ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
-     "Load a plugin.");
+     "Load a plugin.")
+    ("server-logfile", po::value<std::string>(), "Specify a log file.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -260,6 +259,13 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
+  }
+
+  // Set the name of the file where the informational log will store its data.
+  if (this->vm.count("server-logfile"))
+  {
+    this->params["server-logfile"] =
+        this->vm["server-logfile"].as<std::string>();
   }
 
   this->ProcessParams();
@@ -518,6 +524,12 @@ void Server::ProcessParams()
 }
 
 /////////////////////////////////////////////////
+gazebo::common::StrStr_M Server::GetParams()
+{
+  return this->params;
+}
+
+/////////////////////////////////////////////////
 void Server::SetParams(const common::StrStr_M &_params)
 {
   common::StrStr_M::const_iterator iter;
@@ -539,28 +551,52 @@ void Server::ProcessControlMsgs()
   for (iter = this->controlMsgs.begin();
        iter != this->controlMsgs.end(); ++iter)
   {
-    if ((*iter).has_clone_world() && (*iter).has_save_world_name())
+    if ((*iter).has_clone() &&
+        (*iter).has_save_world_name() &&
+        (*iter).has_new_port())
     {
+      // Get the world to be cloned.
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      world->Save("cloned_world");
-      std::cout << "Saving world..." << std::endl;
 
-      std::cout << "Cloning world..." << std::endl;
+      // Set the host and port of the master for the new server.
+      std::string host;
+      unsigned int port;
+      transport::get_master_uri(host, port);
+      std::string strPort =
+        boost::lexical_cast<std::string>((*iter).new_port());
 
-      const char *cmd = "GAZEBO_MASTER_URI=http://localhost:11346 gzserver"
-                        " cloned_world&";
+      // Save the world's state in a unique temporary file (clone.<PORT>.world)
+      boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
+      boost::filesystem::path worldName = "clone." + strPort + ".world";
+      boost::filesystem::path worldPath = tmpDir / worldName;
+      world->Save(worldPath.string());
 
-      // Spawn a new gzserver process and load the saved world
-      if (std::system(cmd) == 0)
-        gzlog << "Simulation successfully cloned" << std::endl;
+      // Command to be executed for clonning the server. The new server will
+      // have its own log file named clone.<PORT>.log and will load the world
+      // file /tmp/clone.<PORT>.log
+      std::string cmd = "GAZEBO_MASTER_URI=http://" + host + ":" + strPort +
+          " gzserver --server-logfile " + "gzserver." + strPort + ".log " +
+          worldPath.string() + " &";
+
+      // Spawn a new gzserver process and load the saved world.
+      if (std::system(cmd.c_str()) == 0)
+      {
+        gzlog << "Cloning world [" << (*iter).save_world_name()
+              << "]. Contact the server by typing:\n\tGAZEBO_MASTER_URI=http://"
+              << host << ":" << strPort << " gzclient --gui-logfile gzclient."
+              << strPort + ".log" << std::endl;
+      }
       else
-        gzerr << "Unable to clone a simulation" << std::endl;
+      {
+        gzerr << "Unable to clone a simulation running the following command:"
+              << std::endl << "\t[" << cmd << "]" << std::endl;
+      }
 
       // Notify the result.
       msgs::WorldModify worldMsg;
       worldMsg.set_world_name("default");
       worldMsg.set_cloned(true);
-      worldMsg.set_cloned_uri("http://localhost::11346");
+      worldMsg.set_cloned_uri("http://" + host + ":" + strPort);
       this->worldModPub->Publish(worldMsg);
     }
     else if ((*iter).has_save_world_name())
