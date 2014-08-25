@@ -557,23 +557,32 @@ void Server::ProcessControlMsgs()
     {
       // Get the world to be cloned.
       physics::WorldPtr world = physics::get_world((*iter).save_world_name());
+      if (!world)
+        return;
+
+      // World name in string format used for logging.
+      std::string worldName = (*iter).save_world_name();
+      if (worldName.empty())
+        worldName = "default";
 
       // Set the host and port of the master for the new server.
       std::string host;
       unsigned int port;
+      // Get the hostname from the current server's master (and ignore the port)
       transport::get_master_uri(host, port);
+      // Get the port from the client.
       std::string strPort =
         boost::lexical_cast<std::string>((*iter).new_port());
 
       // Save the world's state in a unique temporary file (clone.<PORT>.world)
       boost::filesystem::path tmpDir = boost::filesystem::temp_directory_path();
-      boost::filesystem::path worldName = "clone." + strPort + ".world";
-      boost::filesystem::path worldPath = tmpDir / worldName;
+      boost::filesystem::path worldFilename = "clone." + strPort + ".world";
+      boost::filesystem::path worldPath = tmpDir / worldFilename;
       world->Save(worldPath.string());
 
       // Command to be executed for clonning the server. The new server will
-      // have its own log file named clone.<PORT>.log and will load the world
-      // file /tmp/clone.<PORT>.log
+      // have its own log file named gzserver.<PORT>.log and will load the world
+      // file /tmp/clone.<PORT>.world
       std::string cmd = "GAZEBO_MASTER_URI=http://" + host + ":" + strPort +
           " gzserver --server-logfile " + "gzserver." + strPort + ".log " +
           worldPath.string() + " &";
@@ -581,20 +590,20 @@ void Server::ProcessControlMsgs()
       // Spawn a new gzserver process and load the saved world.
       if (std::system(cmd.c_str()) == 0)
       {
-        gzlog << "Cloning world [" << (*iter).save_world_name()
-              << "]. Contact the server by typing:\n\tGAZEBO_MASTER_URI=http://"
+        gzlog << "Cloning world [" << worldName << "]. "
+              << "Contact the server by typing:\n\tGAZEBO_MASTER_URI=http://"
               << host << ":" << strPort << " gzclient --gui-logfile gzclient."
               << strPort + ".log" << std::endl;
       }
       else
       {
-        gzerr << "Unable to clone a simulation running the following command:"
+        gzerr << "Unable to clone a simulation running the following command:\n"
               << std::endl << "\t[" << cmd << "]" << std::endl;
       }
 
       // Notify the result.
       msgs::WorldModify worldMsg;
-      worldMsg.set_world_name("default");
+      worldMsg.set_world_name(worldName);
       worldMsg.set_cloned(true);
       worldMsg.set_cloned_uri("http://" + host + ":" + strPort);
       this->worldModPub->Publish(worldMsg);
