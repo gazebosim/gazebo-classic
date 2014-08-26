@@ -72,9 +72,6 @@ int main(int _argc, char **_argv)
   gazebo::transport::SubscriberPtr worldModSub =
     node->Subscribe("/gazebo/world/modify", &OnWorldModify);
 
-  // Wait some bit of time since the clone is not immediate.
-  gazebo::common::Time::MSleep(500);
-
   std::cout << "\nPress [ENTER] to clone the current simulation\n" << std::endl;
   getchar();
 
@@ -85,14 +82,10 @@ int main(int _argc, char **_argv)
   msg.set_new_port(11346);
   serverControlPub->Publish(msg);
 
-  // Wait some bit of time since the clone is not immediate.
-  gazebo::common::Time::MSleep(500);
-
   std::cout << "\nPress [ENTER] to exit and kill all the servers." << std::endl;
   getchar();
 
-  std::system("killall gzserver");
-
   // Make sure to shut everything down.
+  std::system("killall gzserver");
   gazebo::shutdown();
 }
