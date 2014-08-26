@@ -1,0 +1,23 @@
+Gazebo Publisher Example
+
+This is very simple example of how to clone an existing simulation.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+
+===================
+Execute Instructions
+===================
+
+ * Launch gazebo as usual then from the build directory above:
+
+  $ ./cloner
