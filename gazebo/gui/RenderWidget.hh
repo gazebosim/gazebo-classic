@@ -72,6 +72,9 @@ namespace gazebo
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
 
+      /// \brief Handle align model user event.
+      private: void OnAlign();
+
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
 

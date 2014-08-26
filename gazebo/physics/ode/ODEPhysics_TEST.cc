@@ -121,7 +121,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   contactMaxCorrectingVel = 40;
   contactSurfaceLayer = 0.03;
 
-  odePhysics->SetParam("type", type);
+  odePhysics->SetParam("solver_type", type);
   odePhysics->SetParam("precon_iters", preconIters);
   odePhysics->SetParam("iters", iters);
   odePhysics->SetParam("sor", sor);
@@ -132,7 +132,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   odePhysics->SetParam("contact_surface_layer",
       contactSurfaceLayer);
 
-  value = odePhysics->GetParam("type");
+  value = odePhysics->GetParam("solver_type");
   typeRet = boost::any_cast<std::string>(value);
   EXPECT_EQ(type, typeRet);
   value = odePhysics->GetParam("iters");

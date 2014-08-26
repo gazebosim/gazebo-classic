@@ -37,6 +37,7 @@ set (sources
   MovableText.cc
   OrbitViewController.cc
   Projector.cc
+  RayQuery.cc
   RenderEngine.cc
   RenderEvents.cc
   RenderingIface.cc
@@ -80,6 +81,7 @@ set (headers
   MovableText.hh
   OrbitViewController.hh
   Projector.hh
+  RayQuery.hh
   RenderEngine.hh
   RenderEvents.hh
   RenderingIface.hh
@@ -101,6 +103,15 @@ set (headers
   ogre_gazebo.h
   cegui.h
 )
+
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusCamera.cc
+  )
+  set (headers ${headers}
+    OculusCamera.hh
+  )
+endif ()
 
 set (gtest_sources
 )
@@ -128,7 +139,7 @@ link_directories(
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering
+target_link_libraries(gazebo_rendering
   gazebo_common
   gazebo_msgs
   gazebo_skyx
@@ -138,6 +149,12 @@ target_link_libraries( gazebo_rendering
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
+
+if (HAVE_OCULUS)
+  target_link_libraries(gazebo_rendering
+    OculusVR
+  )
+endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)

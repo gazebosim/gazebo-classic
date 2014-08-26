@@ -63,7 +63,7 @@ void DARTScrewJoint::Init()
 //////////////////////////////////////////////////
 math::Vector3 DARTScrewJoint::GetAnchor(unsigned int /*index*/) const
 {
-  Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                         this->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
@@ -75,9 +75,9 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
-  if (_index == 0 || _index == 1)
+  if (_index < this->GetAngleCount())
   {
-    Eigen::Isometry3d T = this->dtChildBodyNode->getWorldTransform() *
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
                           this->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = this->dartScrewJoint->getAxis();
     globalAxis = T.linear() * axis;
@@ -120,7 +120,7 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->getVel();
+    result = this->dtJoint->getVelocity(0);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 
@@ -131,7 +131,7 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
 void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->setVel(_vel);
+    this->dtJoint->setVelocity(0, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -139,7 +139,7 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
-  if (_index != 0)
+  if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
   this->SetThreadPitch(_threadPitch);
 }
@@ -154,7 +154,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  if (_index != 0)
+  if (_index >= this->GetAngleCount())
     gzerr << "Invalid index[" << _index << "]\n";
   return this->GetThreadPitch();
 }
@@ -171,6 +171,15 @@ double DARTScrewJoint::GetThreadPitch()
 }
 
 //////////////////////////////////////////////////
+double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_key  == "thread_pitch")
+    return this->GetThreadPitch();
+  else
+    return DARTJoint::GetParam(_key, _index);
+}
+
+//////////////////////////////////////////////////
 math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
@@ -180,12 +189,12 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
     if (_index == 0)
     {
       // angular position
-      result.SetFromRadian(this->dartScrewJoint->getGenCoord(0)->getPos());
+      result.SetFromRadian(this->dartScrewJoint->getPosition(0));
     }
     else if (_index == 1)
     {
       // linear position
-      double angPos = this->dartScrewJoint->getGenCoord(0)->getPos();
+      double angPos = this->dartScrewJoint->getPosition(0);
       result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
     }
     else
@@ -205,9 +214,14 @@ math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 void DARTScrewJoint::SetMaxForce(unsigned int _index, double _force)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->setForceMax(_force);
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -216,9 +230,15 @@ double DARTScrewJoint::GetMaxForce(unsigned int _index)
   double result = 0.0;
 
   if (_index == 0)
-    result = this->dtJoint->getGenCoord(0)->getForceMax();
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
   else
+  {
     gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
@@ -227,7 +247,7 @@ double DARTScrewJoint::GetMaxForce(unsigned int _index)
 void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 {
   if (_index == 0)
-    this->dtJoint->getGenCoord(0)->setForce(_effort);
+    this->dtJoint->setForce(0, _effort);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -238,7 +258,7 @@ math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->getPosMax();
+    return this->dtJoint->getPositionUpperLimit(0);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -252,7 +272,7 @@ math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
   switch (_index)
   {
   case 0:
-    return this->dtJoint->getGenCoord(_index)->getPosMin();
+    return this->dtJoint->getPositionLowerLimit(0);
   default:
     gzerr << "Invalid index[" << _index << "]\n";
   };

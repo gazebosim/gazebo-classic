@@ -60,15 +60,11 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Set the positions of a Joint by name.
-      /// Warning: This function is disabled since collisions are not
-      /// updated correctly. See issue #1138
       /// \sa JointController::SetJointPosition(JointPtr, double)
       public: void SetJointPosition(
         const std::string &_name, double _position, int _index = 0);
 
       /// \brief Set the positions of a set of Joint's.
-      /// Warning: This function is disabled since collisions are not
-      /// updated correctly. See issue #1138
       /// \sa JointController::SetJointPosition(JointPtr, double)
       public: void SetJointPositions(
                   const std::map<std::string, double> &_jointPositions);
@@ -82,12 +78,24 @@ namespace gazebo
       /// be controlled.
       public: std::map<std::string, JointPtr> GetJoints() const;
 
+      /// \brief Set the position PID values for a joint.
+      /// \param[in] _jointName Scoped name of the joint.
+      /// \param[in] _pid New position PID controller.
+      public: void SetPositionPID(const std::string &_jointName,
+                  const common::PID &_pid);
+
       /// \brief Set the target position for the position PID controller.
       /// \param[in] _jointName Scoped name of the joint.
       /// \param[in] _target Position target.
       /// \return False if the joint was not found.
       public: bool SetPositionTarget(const std::string &_jointName,
                   double _target);
+
+      /// \brief Set the velocity PID values for a joint.
+      /// \param[in] _jointName Scoped name of the joint.
+      /// \param[in] _pid New velocity PID controller.
+      public: void SetVelocityPID(const std::string &_jointName,
+                  const common::PID &_pid);
 
       /// \brief Set the target velocity for the velocity PID controller.
       /// \param[in] _jointName Scoped name of the joint.
@@ -140,50 +148,10 @@ namespace gazebo
       ///   if you try to set the joint position of a link inside
       ///   a loop structure.
       /// Warning:
-      /// This function is disabled since collisions are not
-      /// updated correctly. See issue #1138
       /// \param[in] _joint Joint to set.
       /// \param[in] _position Position of the joint.
       public: void SetJointPosition(
         JointPtr _joint, double _position, int _index = 0);
-
-      /// \brief Helper for SetJointPositions.
-      /// \param[in] _joint Joint to move.
-      /// \param[in] _link Link to move.
-      /// \param[in] _anchor Anchor position of the joint.
-      /// \param[in] _axis Axis of the joint.
-      /// \param[in] _dposition Rotation angle.
-      /// \param[in] _updateChildren Update child joints.
-      /// Disabled for now, manually moving joints doesn't properly update
-      /// collisions.
-      /// private: void MoveLinks(JointPtr _joint, LinkPtr _link,
-      ///             const math::Vector3 &_anchor, const math::Vector3 &_axis,
-      ///             double _dposition, bool _updateChildren = false);
-
-      /// \internal
-      /// \TODO: Set Link Velocity based on old and new poses and dt
-      /// Disabled for now, manually moving joints doesn't properly update
-      /// collisions.
-      /// private: void ComputeAndSetLinkTwist(LinkPtr _link,
-      ///           onst math::Pose &_old, const math::Pose &_new, double dt);
-
-      /// \brief Helper for SetJointPositions
-      /// \param[out] _linksOut All the connected links.
-      /// \param[in] _link Link to get the connections from.
-      /// \param[in] _checkParentTree True to recurse down parent link trees.
-      /// Disabled for now, manually moving joints doesn't properly update
-      /// collisions.
-      /// private: void AddConnectedLinks(std::vector<LinkPtr> &_linksOut,
-      ///                                 const LinkPtr &_link,
-      ///                                 bool _checkParentTree = false);
-
-      /// \brief Helper for SetJointPositions.
-      /// \param[in] _vector List of links.
-      /// \param[in] _value Link to check against.
-      /// Disabled for now, manually moving joints doesn't properly update
-      /// collisions.
-      /// private: bool ContainsLink(
-      ///     const Link_V &_vector, const LinkPtr &_value);
 
       /// \brief Private data values.
       private: JointControllerPrivate *dataPtr;

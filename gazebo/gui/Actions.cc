@@ -45,7 +45,6 @@ QAction *gazebo::gui::g_quitAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
-
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_newModelAct = 0;
 GAZEBO_VISIBLE
@@ -98,7 +97,8 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_transparentAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_viewWireframeAct = 0;
-
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_viewOculusAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetAct = 0;
 GAZEBO_VISIBLE
@@ -116,3 +116,15 @@ QAction *gazebo::gui::g_diagnosticsAct = 0;
 
 GAZEBO_VISIBLE
 gazebo::gui::DeleteAction *gazebo::gui::g_deleteAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_copyAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_pasteAct = 0;
+
+GAZEBO_VISIBLE
+QAction *gazebo::gui::g_snapAct = 0;
+
+GAZEBO_VISIBLE
+QWidgetAction *gazebo::gui::g_alignAct = 0;

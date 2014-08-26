@@ -39,7 +39,6 @@
 #include <dart/dynamics/CylinderShape.h>
 #include <dart/dynamics/EllipsoidShape.h>
 #include <dart/dynamics/FreeJoint.h>
-#include <dart/dynamics/GenCoord.h>
 #include <dart/dynamics/Joint.h>
 #include <dart/dynamics/MeshShape.h>
 #include <dart/dynamics/PointMass.h>
@@ -55,6 +54,8 @@
 
 #include <dart/constraint/Constraint.h>
 #include <dart/constraint/ConstraintSolver.h>
+#include <dart/constraint/ContactConstraint.h>
+#include <dart/constraint/JointLimitConstraint.h>
 #include <dart/constraint/WeldJointConstraint.h>
 
 #include <dart/simulation/World.h>

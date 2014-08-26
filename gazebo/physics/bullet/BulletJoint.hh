@@ -70,6 +70,9 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
                   const double _stiffness);
 
@@ -98,18 +101,8 @@ namespace gazebo
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value)
-                                        GAZEBO_DEPRECATED(3.0);
-
-      // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
-                unsigned int _index) GAZEBO_DEPRECATED(3.0);
 
       // Documentation inherited.
       public: virtual math::Angle GetHighStop(unsigned int _index);

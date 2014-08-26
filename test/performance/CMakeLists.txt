@@ -25,8 +25,9 @@ if (NOT APPLE)
     gz_stress.cc
     image_convert_stress.cc
     sensor_stress.cc
+    set_world_pose.cc
     transport_stress.cc
   )
-  
+
   gz_build_tests(${tests})
 endif()

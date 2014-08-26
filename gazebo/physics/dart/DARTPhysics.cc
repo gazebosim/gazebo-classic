@@ -48,6 +48,7 @@
 #include "gazebo/physics/dart/DARTCylinderShape.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPolylineShape.hh"
 #include "gazebo/physics/dart/DARTMultiRayShape.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
@@ -66,7 +67,7 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world)
 {
   this->dtWorld = new dart::simulation::World;
-//  this->dtWorld->getConstraintHandler()->setCollisionDetector(
+//  this->dtWorld->getConstraintSolver()->setCollisionDetector(
 //        new dart::collision::DARTCollisionDetector());
 //  this->dtWorld->getConstraintHandler()->setAllowablePenetration(1e-6);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingPenetrationVelocity(
@@ -201,10 +202,10 @@ void DARTPhysics::UpdateCollision()
     // calculate torque in world frame
     Eigen::Vector3d torqueA =
         (dtContact.point -
-         dtBodyNode1->getWorldTransform().translation()).cross(force);
+         dtBodyNode1->getTransform().translation()).cross(force);
     Eigen::Vector3d torqueB =
         (dtContact.point -
-         dtBodyNode2->getWorldTransform().translation()).cross(-force);
+         dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
@@ -389,6 +390,8 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     shape.reset(new DARTMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new DARTMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new DARTPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new DARTHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
@@ -444,8 +447,22 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
+  if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
+
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // physics dart element not yet added to sdformat
+  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  if (dartElem == NULL)
+  {
+    gzerr << "DART SDF element not found"
+          << ", unable to get param ["
+          << _key << "]"
+          << std::endl;
+    return 0;
+  }
 
   if (_key == "max_contacts")
   {
@@ -519,29 +536,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     return false;
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-boost::any DARTPhysics::GetParam(DARTPhysics::DARTParam _param) const
-{
-  boost::any value = 0;
-  switch (_param)
-  {
-    case MAX_CONTACTS:
-    {
-      return this->GetParam("max_contacts");
-    }
-    case MIN_STEP_SIZE:
-    {
-      return this->GetParam("min_step_size");
-    }
-    default:
-    {
-      gzwarn << "Attribute not supported in bullet" << std::endl;
-      break;
-    }
-  }
-  return value;
 }
 
 //////////////////////////////////////////////////
