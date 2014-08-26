@@ -17,9 +17,12 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread.hpp>
 #include <gazebo/gazebo.hh>
-#include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
+#include <gazebo/transport/transport.hh>
+
 
 /////////////////////////////////////////////////
 void OnWorldModify(ConstWorldModifyPtr &_msg)
@@ -60,7 +63,7 @@ int main(int _argc, char **_argv)
   // Launch a server in a different thread.
   boost::thread serverThread(RunServer);
 
-  // Create our node for communication.
+  // Create a node for communication.
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
 

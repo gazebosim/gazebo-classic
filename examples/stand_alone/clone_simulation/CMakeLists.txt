@@ -13,5 +13,5 @@ find_package(Protobuf REQUIRED)
 include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
-add_executable(cloner  cloner.cc)
-target_link_libraries(cloner ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread)
+add_executable(cloner cloner.cc)
+target_link_libraries(cloner ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})

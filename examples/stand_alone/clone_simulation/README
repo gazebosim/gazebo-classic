@@ -21,3 +21,5 @@ Execute Instructions
  * Launch gazebo as usual then from the build directory above:
 
   $ ./cloner
+
+ * Follow the instructions detailed in the console.
