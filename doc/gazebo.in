@@ -695,8 +695,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/gui \
-                         @CMAKE_SOURCE_DIR@/gazebo/physics/ode \
+EXCLUDE                = @CMAKE_SOURCE_DIR@/gazebo/physics/ode \
                          @CMAKE_SOURCE_DIR@/gazebo/physics/bullet \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/ogretest \
                          @CMAKE_SOURCE_DIR@/gazebo/rendering/skyx \

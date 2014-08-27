@@ -46,6 +46,7 @@
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
@@ -185,6 +186,9 @@ MainWindow::MainWindow()
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
+
+  // Create a pointer to the space navigator interface
+  this->spacenav = new SpaceNav();
 }
 
 /////////////////////////////////////////////////
@@ -217,6 +221,10 @@ void MainWindow::Load()
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
 #endif
+
+  // Load the space navigator
+  if (!this->spacenav->Load())
+    gzerr << "Unable to load space navigator\n";
 }
 
 /////////////////////////////////////////////////
@@ -278,6 +286,10 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
