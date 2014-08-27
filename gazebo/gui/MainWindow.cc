@@ -1566,12 +1566,20 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
-  else if (_msg->has_cloned() && _msg->cloned())
+  else if (_msg->has_cloned())
   {
-    std::cout << "World cloned and available at:\n\t" << _msg->cloned_uri()
-              << std::endl;
-    gzlog << "World cloned and available at:\n\t" << _msg->cloned_uri()
-          << std::endl;
+    if (_msg->cloned())
+    {
+      std::cout << "World cloned and available at:\n\t" << _msg->cloned_uri()
+                << std::endl;
+      gzerr << "World cloned and available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+    {
+      std::cout << "Error cloning a world" << std::endl;
+      gzerr << "Error cloning a world" << std::endl;
+    }
   }
 }
 
