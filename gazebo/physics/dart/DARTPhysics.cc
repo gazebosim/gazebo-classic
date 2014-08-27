@@ -237,7 +237,7 @@ void DARTPhysics::UpdateCollision()
       it != collisionEntities.end(); ++it)
   {
     dart::dynamics::BodyNode *dtBodyNode = it->second->GetDARTBodyNode();
-    for (int j = 0; j < dtBodyNode->getNumCollisionShapes();
+    for (unsigned int j = 0; j < dtBodyNode->getNumCollisionShapes();
         ++j)
     {
       dart::dynamics::Shape *shape = dtBodyNode->getCollisionShape(j);
@@ -247,7 +247,7 @@ void DARTPhysics::UpdateCollision()
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
         this->FillMeshMsg(meshUpdateMsg,
             dynamic_cast<dart::dynamics::SoftBodyNode *>(dtBodyNode));
-        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        std::cerr << meshUpdateMsg.DebugString() << std::endl;
         this->meshUpdatePub->Publish(meshUpdateMsg);
       }
     }
@@ -267,7 +267,7 @@ void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
 
   msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
 
-  for (int i = 0; i < _softBodyNode->getNumPointMasses(); ++i)
+  for (unsigned int i = 0; i < _softBodyNode->getNumPointMasses(); ++i)
   {
     dart::dynamics::PointMass* itPointMass = _softBodyNode->getPointMass(i);
     const Eigen::Vector3d& vertex = itPointMass->getLocalPosition();

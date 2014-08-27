@@ -1925,9 +1925,33 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
     const msgs::SubMesh subMeshMsg = _msg->submeshes(i);
     Ogre::SubMesh *ogreSubMesh = ogreMesh->getSubMesh(i);
 
-    Ogre::HardwareVertexBufferSharedPtr vbuf =
-        ogreSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
+    // resize the buffers if necessary
+    unsigned int vCount = static_cast<unsigned int>(subMeshMsg.vertices_size());
+    unsigned int iCount = static_cast<unsigned int>(subMeshMsg.indices_size());
+    if (vCount > ogreSubMesh->vertexData->vertexCount)
+    {
+      Ogre::HardwareVertexBufferSharedPtr vbuf =
+          Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+          ogreSubMesh->vertexData->vertexDeclaration->getVertexSize(0),
+          vCount, Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+      ogreSubMesh->vertexData->vertexBufferBinding->setBinding(0, vbuf);
+      ogreSubMesh->vertexData->vertexCount = vCount;
 
+      //ogreSubMesh->setVertexCount(subMeshMsg.vertices_size());
+      //for (unsigned int j = 0; j < subMeshMsg.vertices_size(); ++j)
+          //ogreSubMesh->AddVertex(subMeshMsg.vertices(j);
+    }
+    if (iCount > ogreSubMesh->indexData->indexCount)
+    {
+      ogreSubMesh->indexData->indexBuffer =
+        Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+        Ogre::HardwareIndexBuffer::IT_32BIT,
+        iCount, Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        ogreSubMesh->indexData->indexCount = iCount;
+      //ogreSubMesh->setIndexCount(subMeshMsg.indices_size());
+    }
+
+    // check if normal and texcoord declarations exist
     const Ogre::VertexElement *normalVertexElement =
         ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
         Ogre::VES_NORMAL);
@@ -1935,6 +1959,10 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
     const Ogre::VertexElement *texcoordVertexElement =
         ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
         Ogre::VES_TEXTURE_COORDINATES);
+
+    // lock the buffers
+    Ogre::HardwareVertexBufferSharedPtr vbuf =
+        ogreSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
 
     Ogre::Real *vPos =
         static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
