@@ -55,6 +55,92 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void OnWorldModifyNoClone(ConstWorldModifyPtr &_msg)
+{
+  ASSERT_TRUE(_msg->has_cloned());
+  EXPECT_FALSE(_msg->cloned());
+}
+
+/////////////////////////////////////////////////
+TEST_F(WorldClone, CloneUnknownWorld)
+{
+  Load("worlds/camera.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::PublisherPtr serverControlPub =
+    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+
+  transport::SubscriberPtr worldModSub = node->Subscribe("/gazebo/world/modify",
+    &OnWorldModifyNoClone);
+
+  // Clone the server programmatically.
+  msgs::ServerControl msg;
+  msg.set_save_world_name("UnknownWorld");
+  msg.set_clone(true);
+  msg.set_new_port(11346);
+  serverControlPub->Publish(msg);
+
+  // Wait some bit of time since the clone is not immediate.
+  common::Time::MSleep(500);
+
+  // Save the value of GAZEBO_MASTER_URI.
+  char* master = getenv("GAZEBO_MASTER_URI");
+
+  // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
+  setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
+
+  // Check that the world was not cloned by looking for some topics.
+  std::string output = custom_exec_str("gz topic -l");
+  EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
+
+  // Restore GAZEBO_MASTER_URI
+  setenv("GAZEBO_MASTER_URI", master, 1);
+}
+
+/////////////////////////////////////////////////
+TEST_F(WorldClone, CloneEmptyPort)
+{
+  Load("worlds/camera.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world);
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+
+  transport::PublisherPtr serverControlPub =
+    node->Advertise<msgs::ServerControl>("/gazebo/server/control");
+
+  transport::SubscriberPtr worldModSub = node->Subscribe("/gazebo/world/modify",
+    &OnWorldModifyNoClone);
+
+  // Clone the server programmatically.
+  msgs::ServerControl msg;
+  msg.set_save_world_name("");
+  msg.set_clone(true);
+  serverControlPub->Publish(msg);
+
+  // Wait some bit of time since the clone is not immediate.
+  common::Time::MSleep(500);
+
+  // Save the value of GAZEBO_MASTER_URI.
+  char* master = getenv("GAZEBO_MASTER_URI");
+
+  // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
+  setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
+
+  // Check that the world was not cloned by looking for some topics.
+  std::string output = custom_exec_str("gz topic -l");
+  EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
+
+  // Restore GAZEBO_MASTER_URI
+  setenv("GAZEBO_MASTER_URI", master, 1);
+}
+
+/////////////////////////////////////////////////
 TEST_F(WorldClone, Clone)
 {
   Load("worlds/camera.world");

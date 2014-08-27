@@ -560,6 +560,7 @@ void Server::ProcessControlMsgs()
       bool success = true;
       std::string host;
       std::string port;
+      physics::WorldPtr world;
 
       // Get the world name to be cloned.
       std::string worldName = "";
@@ -567,8 +568,11 @@ void Server::ProcessControlMsgs()
         worldName = (*iter).save_world_name();
 
       // Get the world pointer.
-      physics::WorldPtr world = physics::get_world(worldName);
-      if (!world)
+      try
+      {
+        world = physics::get_world(worldName);
+      }
+      catch(const common::Exception &)
       {
         gzwarn << "Unable to clone a server. Unknown world ["
                << (*iter).save_world_name() << "]" << std::endl;
@@ -586,6 +590,9 @@ void Server::ProcessControlMsgs()
 
       if (success)
       {
+        // world should not be NULL at this point.
+        GZ_ASSERT(world, "NULL world pointer");
+
         // Save the world's state in a temporary file (clone.<PORT>.world).
         boost::filesystem::path tmpDir =
             boost::filesystem::temp_directory_path();
