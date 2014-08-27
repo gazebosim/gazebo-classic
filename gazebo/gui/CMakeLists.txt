@@ -79,6 +79,7 @@ set (headers
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
+  GuiPlugin.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh

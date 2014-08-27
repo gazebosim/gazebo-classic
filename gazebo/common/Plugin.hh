@@ -59,7 +59,9 @@ namespace gazebo
     /// \brief A System plugin
     SYSTEM_PLUGIN,
     /// \brief A Visual plugin
-    VISUAL_PLUGIN
+    VISUAL_PLUGIN,
+    /// \brief A GUI plugin
+    GUI_PLUGIN
   };
 
 
@@ -97,16 +99,16 @@ namespace gazebo
     /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
-              return this->handle;
+              return this->name;
             }
 
     /// \brief a class method that creates a plugin from a file name.
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
-    /// \param[in] _handle short name of the handler
+    /// \param[in] _name short name of the plugin
     /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
-                const std::string &_handle)
+                const std::string &_name)
             {
               TPtr result;
               // PluginPtr result;
@@ -166,7 +168,7 @@ namespace gazebo
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
-              result->handle = _handle;
+              result->name = _name;
               result->filename = filename;
 
               return result;
@@ -186,7 +188,7 @@ namespace gazebo
     protected: std::string filename;
 
     /// \brief Short name
-    protected: std::string handle;
+    protected: std::string name;
 
     /// \brief Pointer to shared library registration function definition
     private: typedef union
@@ -337,6 +339,7 @@ namespace gazebo
     public: virtual void Reset() {}
   };
 
+
   /// \}
 
 /// \brief Plugin registration function for model plugin. Part of the shared
@@ -398,6 +401,7 @@ namespace gazebo
   {\
     return new classname();\
   }
+
 }
 
 #endif
