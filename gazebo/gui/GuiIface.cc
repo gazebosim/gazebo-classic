@@ -126,11 +126,9 @@ bool parse_args(int _argc, char **_argv)
   }
 
   // Set the name of the file where the informational log will store its data.
-  std::string logFilename;
+  std::string logFilename = "gzclient.log";
   if (vm.count("gui-logfile"))
     logFilename = vm["gui-logfile"].as<std::string>();
-  else
-    logFilename = "gzclient.log";
 
   // Initialize the informational logger. This will log warnings, and errors.
   gzLogInit(logFilename);

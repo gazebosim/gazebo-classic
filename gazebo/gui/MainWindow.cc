@@ -1570,16 +1570,11 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   {
     if (_msg->cloned())
     {
-      std::cout << "World cloned and available at:\n\t" << _msg->cloned_uri()
-                << std::endl;
-      gzerr << "World cloned and available at:\n\t" << _msg->cloned_uri()
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
             << std::endl;
     }
     else
-    {
-      std::cout << "Error cloning a world" << std::endl;
       gzerr << "Error cloning a world" << std::endl;
-    }
   }
 }
 
