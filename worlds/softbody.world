@@ -7,7 +7,7 @@
     <include>
       <uri>model://sun</uri>
     </include>
-    <model name="box">
+    <!--<model name="box">
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">
@@ -32,6 +32,41 @@
             <box>
               <size>1 1 1</size>
             </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Grey</script>
+          </material>
+        </visual>
+      </link>
+    </model>-->
+
+    <model name="cylinder">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
+          </geometry>
+          <surface>
+          <soft_contact>
+            <dart>
+              <bone_attachment>5000.0</bone_attachment>
+              <stiffness>100.0</stiffness>
+              <damping>50.0</damping>
+              <flesh_mass_fraction>0.5</flesh_mass_fraction>
+            </dart>
+          </soft_contact>
+        </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1</length>
+            </cylinder>
           </geometry>
           <material>
             <script>Gazebo/Grey</script>
