@@ -43,7 +43,7 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
   QLabel *label = new QLabel(tr("Sim Time:"));
 
   // Create a push button, and connect it to the OnButton function
-  QLble *timeLabel = new QLabel(tr("00:00:00.00"));
+  QLabel *timeLabel = new QLabel(tr("00:00:00.00"));
 
   // Add the button to the frame's layout
   frameLayout->addWidget(label);
@@ -87,7 +87,7 @@ void GUIExampleTimeWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-std::string GUIExampleTimeWidget::FormatTime(const msgs::Time &_msg)
+std::string GUIExampleTimeWidget::FormatTime(const msgs::Time &_msg) const
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;
