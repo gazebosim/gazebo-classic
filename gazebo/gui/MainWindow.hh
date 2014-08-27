@@ -41,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -268,6 +269,9 @@ namespace gazebo
 
       /// \brief List of all the align action groups.
       private: std::vector<QActionGroup *> alignActionGroups;
+
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
 
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
