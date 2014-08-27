@@ -48,6 +48,7 @@ namespace gazebo
 
       /// \brief True if the stored port is a valid one. A valid port is an
       /// integer number in the 1025-65535 range.
+      /// \return True when the port is valid or false otherwise.
       public: bool IsValidPort();
 
       /// \brief Callback when okay button is selected.
