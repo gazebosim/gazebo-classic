@@ -117,6 +117,7 @@ namespace gazebo
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
 
+      /// \brief All the gui plugins
       private: std::vector<gazebo::GUIPluginPtr> plugins;
     };
   }
