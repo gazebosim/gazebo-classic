@@ -17,6 +17,8 @@
 #ifndef _GUI_EXAMPLE_TIME_WIDGET_HH_
 #define _GUI_EXAMPLE_TIME_WIDGET_HH_
 
+#include <string>
+
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
@@ -24,31 +26,33 @@
 
 namespace gazebo
 {
-    class GAZEBO_VISIBLE GUIExampleTimeWidget : public GUIPlugin
-    {
-      Q_OBJECT
+  class GAZEBO_VISIBLE GUIExampleTimeWidget : public GUIPlugin
+  {
+    Q_OBJECT
 
-      /// \brief Constructor
-      /// \param[in] _parent Parent widget
-      public: GUIExampleTimeWidget();
+    /// \brief Constructor
+    public: GUIExampleTimeWidget();
 
-      public: virtual ~GUIExampleTimeWidget();
+    /// \brief Destructor
+    public: virtual ~GUIExampleTimeWidget();
 
-      signals: void SetSimTime(QString _string);
+    /// \brief A signal used to set the sim time line edit.
+    /// \param[in] _string String representation of sim time.
+    signals: void SetSimTime(QString _string);
 
-      /// \brief Callback trigged when the button is pressed.
-      protected: void OnStats(ConstWorldStatisticsPtr &_msg);
+    /// \brief Callback trigged when the button is pressed.
+    protected: void OnStats(ConstWorldStatisticsPtr &_msg);
 
-      private: std::string FormatTime(const msgs::Time &_msg);
+    /// \brief Helper function to format time string.
+    /// \param[in] _msg Time message.
+    private: std::string FormatTime(const msgs::Time &_msg) const;
 
-      private: QLabel *timeLabel;
+    /// \brief Node used to establish communication with gzserver.
+    private: transport::NodePtr node;
 
-      /// \brief Node used to establish communication with gzserver.
-      private: transport::NodePtr node;
-
-      /// \brief Publisher of factory messages.
-      private: transport::SubscriberPtr statsSub;
-    };
+    /// \brief Publisher of factory messages.
+    private: transport::SubscriberPtr statsSub;
+  };
 }
 
 #endif
