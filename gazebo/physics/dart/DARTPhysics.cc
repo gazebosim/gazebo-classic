@@ -76,10 +76,6 @@ DARTPhysics::DARTPhysics(WorldPtr _world)
 //        DART_TO_RADIAN*1e-1);
 //  this->dtWorld->getConstraintHandler()->setMaxReducingJointViolationVelocity(
 //        DART_TO_RADIAN*1e-0);
-
-  this->meshUpdatePub =
-    this->node->Advertise<msgs::MeshUpdate>("~/mesh_update");
-
 }
 
 //////////////////////////////////////////////////
@@ -251,7 +247,7 @@ void DARTPhysics::UpdateCollision()
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
         this->FillMeshMsg(meshUpdateMsg,
             dynamic_cast<dart::dynamics::SoftBodyNode *>(dtBodyNode));
-        std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
         this->meshUpdatePub->Publish(meshUpdateMsg);
       }
     }
@@ -267,7 +263,7 @@ void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
   msgs::Mesh *meshMsg = _meshUpdateMsg.mutable_mesh();
   // looking at DARTLink.cc, seems like box is the only supported shape
   // at the moment.
-  meshMsg->set_name("unit_box");
+  meshMsg->set_name("unit_cylinder");
 
   msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
 

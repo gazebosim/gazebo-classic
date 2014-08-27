@@ -57,6 +57,10 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->requestSub = this->node->Subscribe("~/request",
                                            &PhysicsEngine::OnRequest, this);
 
+  // for deformable bodies
+  this->meshUpdatePub =
+    this->node->Advertise<msgs::MeshUpdate>("~/mesh_update");
+
   this->physicsUpdateMutex = new boost::recursive_mutex();
 
   // Create and initialized the contact manager.

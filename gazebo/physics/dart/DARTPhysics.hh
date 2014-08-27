@@ -156,9 +156,6 @@ namespace gazebo
 
       /// \brief Pointer to DART World associated with this DART Physics.
       private: dart::simulation::World *dtWorld;
-
-      /// \brief Publisher for mesh messages.
-      private: transport::PublisherPtr meshUpdatePub;
     };
 
   /// \}
