@@ -27,7 +27,6 @@ CloneWindow::CloneWindow(QWidget *_parent)
     validPort(false)
 {
   // This name is used in the qt style sheet.
-  this->setObjectName("cloneconfig");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Cloning a simulation"));
 
