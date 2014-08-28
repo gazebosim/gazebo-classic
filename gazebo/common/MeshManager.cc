@@ -59,7 +59,7 @@ MeshManager::MeshManager()
       math::Vector2d(0.014, 0.014));
   this->CreateBox("unit_box", math::Vector3(1, 1, 1),
       math::Vector2d(1, 1));
-  this->CreateCylinder("unit_cylinder", 0.5, 1.0, 1, 32);
+  this->CreateCylinder("unit_cylinder", 0.5, 1.0, 4, 32);
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
 
@@ -1123,4 +1123,3 @@ void MeshManager::CreateBoolean(const std::string &_name, const Mesh *_m1,
   this->meshes.insert(std::make_pair(_name, mesh));
 }
 #endif
-

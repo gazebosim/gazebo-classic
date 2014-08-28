@@ -155,7 +155,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       double length = cylinderEle->Get<double>("length");
 //      std::cerr << "got cylinder " << radius << " " << length << std::endl;
       dart::dynamics::SoftBodyNodeHelper::setCylinder(
-            dtSoftBodyNode, radius, length, 2, 4, 16, fleshMassFraction);
+            dtSoftBodyNode, radius, length, 32, 4, 1, fleshMassFraction);
       dtSoftBodyNode->addCollisionShape(
             new dart::dynamics::SoftMeshShape(dtSoftBodyNode));
     }

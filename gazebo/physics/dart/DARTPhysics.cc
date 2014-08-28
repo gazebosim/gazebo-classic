@@ -236,6 +236,10 @@ void DARTPhysics::UpdateCollision()
   for (std::map<int, DARTLinkPtr>::iterator it = collisionEntities.begin();
       it != collisionEntities.end(); ++it)
   {
+
+    unsigned int colIndex = 0;
+    CollisionPtr collisionPtr = it->second->GetCollision(colIndex);
+
     dart::dynamics::BodyNode *dtBodyNode = it->second->GetDARTBodyNode();
     for (unsigned int j = 0; j < dtBodyNode->getNumCollisionShapes();
         ++j)
@@ -245,9 +249,8 @@ void DARTPhysics::UpdateCollision()
       {
         msgs::MeshUpdate meshUpdateMsg;
         meshUpdateMsg.set_parent_name(it->second->GetScopedName());
-        this->FillMeshMsg(meshUpdateMsg,
-            dynamic_cast<dart::dynamics::SoftBodyNode *>(dtBodyNode));
-        std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        this->FillMeshMsg(meshUpdateMsg, collisionPtr);
+        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
         this->meshUpdatePub->Publish(meshUpdateMsg);
       }
     }
@@ -257,28 +260,40 @@ void DARTPhysics::UpdateCollision()
 
 //////////////////////////////////////////////////
 void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
-    dart::dynamics::SoftBodyNode *_softBodyNode)
-    //dart::dynamics::SoftMeshShape *_meshShape)
+    CollisionPtr _collision)
 {
+  DARTCollisionPtr dartCollision =
+      boost::dynamic_pointer_cast<DARTCollision>(_collision);
+
+  dart::dynamics::SoftBodyNode *softBodyNode =
+      dynamic_cast<dart::dynamics::SoftBodyNode *>(
+      dartCollision->GetDARTBodyNode());
+
   msgs::Mesh *meshMsg = _meshUpdateMsg.mutable_mesh();
-  // looking at DARTLink.cc, seems like box is the only supported shape
-  // at the moment.
-  meshMsg->set_name("unit_cylinder");
+
+  std::string meshName = "";
+  if (_collision->GetShapeType() & Base::BOX_SHAPE)
+    meshName = "unit_box";
+  else if (_collision->GetShapeType() & Base::CYLINDER_SHAPE)
+    meshName = "unit_cylinder";
+  else if (_collision->GetShapeType() & Base::SPHERE_SHAPE)
+    meshName = "unit_sphere";
+  meshMsg->set_name(meshName);
 
   msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
 
-  for (unsigned int i = 0; i < _softBodyNode->getNumPointMasses(); ++i)
+  for (unsigned int i = 0; i < softBodyNode->getNumPointMasses(); ++i)
   {
-    dart::dynamics::PointMass* itPointMass = _softBodyNode->getPointMass(i);
+    dart::dynamics::PointMass* itPointMass = softBodyNode->getPointMass(i);
     const Eigen::Vector3d& vertex = itPointMass->getLocalPosition();
     msgs::Vector3d *vMsg = submeshMsg->add_vertices();
     vMsg->set_x(vertex[0]);
     vMsg->set_y(vertex[1]);
     vMsg->set_z(vertex[2]);
   }
-  for (int i = 0; i < _softBodyNode->getNumFaces(); ++i)
+  for (unsigned int i = 0; i < softBodyNode->getNumFaces(); ++i)
   {
-    Eigen::Vector3i itFace = _softBodyNode->getFace(i);
+    Eigen::Vector3i itFace = softBodyNode->getFace(i);
     submeshMsg->add_indices(itFace[0]);
     submeshMsg->add_indices(itFace[1]);
     submeshMsg->add_indices(itFace[2]);

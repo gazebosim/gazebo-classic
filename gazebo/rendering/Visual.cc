@@ -90,6 +90,7 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->animState = NULL;
   this->dataPtr->skeleton = NULL;
   this->dataPtr->meshClone = false;
+
   this->dataPtr->initialized = false;
 
   std::string uniqueName = this->GetName();
@@ -1884,7 +1885,12 @@ void Visual::InsertMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
 {
+  // Perform updates on a clone of the original mesh.
+  // The normals are also recaculated on the fly, and the original material is
+  // used.
+
   Ogre::MeshPtr ogreMesh;
+  // find the mesh to be updated.
   for (unsigned int i = 0; i <
       this->dataPtr->sceneNode->numAttachedObjects(); ++i)
   {
@@ -1903,14 +1909,17 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
       {
         // clone the mesh so that other visuals with the same mesh do not get
         // affected by the changes.
-        this->dataPtr->sceneNode->detachObject(ogreObj);
         ogreMesh = ogreMesh->clone(ogreMesh->getName() + "_CLONE_");
+        this->dataPtr->sceneNode->detachObject(ogreObj);
+        Ogre::Entity *ent =
+            this->dataPtr->sceneNode->getCreator()->createEntity(
+            ogreObj->getName() + "_CLONE_", ogreMesh->getName());
 
-        Ogre::MovableObject *obj = dynamic_cast<Ogre::MovableObject *>
-            (this->dataPtr->sceneNode->getCreator()->createEntity(
-            ogreObj->getName() + "_CLONE_", ogreMesh->getName()));
-
-        this->dataPtr->sceneNode->attachObject(obj);
+        this->dataPtr->sceneNode->attachObject(
+            dynamic_cast<Ogre::MovableObject *>(ent));
+        if (!this->dataPtr->myMaterialName.empty())
+          ent->setMaterialName(this->dataPtr->myMaterialName);
+        ent->setUserAny(Ogre::Any(this->GetName()));
         this->dataPtr->meshClone = true;
       }
       break;
@@ -1920,8 +1929,14 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
   if (ogreMesh.isNull())
     return;
 
+
+  const common::Mesh *origMesh =
+      common::MeshManager::Instance()->GetMesh(_msg->name());
+
+  // mesh submeshes
   for (int i = 0; i < _msg->submeshes_size(); ++i)
   {
+    const common::SubMesh *origSubMesh = origMesh->GetSubMesh(i);
     const msgs::SubMesh subMeshMsg = _msg->submeshes(i);
     Ogre::SubMesh *ogreSubMesh = ogreMesh->getSubMesh(i);
 
@@ -1936,10 +1951,6 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
           vCount, Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
       ogreSubMesh->vertexData->vertexBufferBinding->setBinding(0, vbuf);
       ogreSubMesh->vertexData->vertexCount = vCount;
-
-      //ogreSubMesh->setVertexCount(subMeshMsg.vertices_size());
-      //for (unsigned int j = 0; j < subMeshMsg.vertices_size(); ++j)
-          //ogreSubMesh->AddVertex(subMeshMsg.vertices(j);
     }
     if (iCount > ogreSubMesh->indexData->indexCount)
     {
@@ -1960,6 +1971,18 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
         ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
         Ogre::VES_TEXTURE_COORDINATES);
 
+    // recalculate normals
+    common::SubMesh newSubMesh;
+    if (normalVertexElement)
+    {
+      for (unsigned int j = 0; j < vCount; ++j)
+        newSubMesh.AddVertex(msgs::Convert(subMeshMsg.vertices(j)));
+      for (unsigned int j = 0; j < iCount; ++j)
+        newSubMesh.AddIndex(subMeshMsg.indices(j));
+      newSubMesh.SetNormalCount(vCount);
+      newSubMesh.RecalculateNormals();
+    }
+
     // lock the buffers
     Ogre::HardwareVertexBufferSharedPtr vbuf =
         ogreSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
@@ -1973,57 +1996,48 @@ void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
     uint32_t * indices = static_cast<uint32_t *>(
         ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
-    /// FIXME use indices data to update the vertices!
-    for (int j = 0; j < subMeshMsg.vertices_size(); ++j)
+    for (unsigned int j = 0; j < vCount; ++j)
     {
       const msgs::Vector3d v = subMeshMsg.vertices(j);
-      //msgs::Vector3d n = subMeshMsg->normals(j);
 
       // update vertex pos
       *vPos++ = v.x();
       *vPos++ = v.y();
       *vPos++ = v.z();
 
-      // update normal
       if (normalVertexElement)
       {
-        *vPos++;
-        *vPos++;
-        *vPos++;
-        /**vPos++ = n.x;
+        // update normals
+        math::Vector3 n = newSubMesh.GetNormal(j);
+        *vPos++ = n.x;
         *vPos++ = n.y;
-        *vPos++ = n.z;*/
+        *vPos++ = n.z;
       }
 
       if (texcoordVertexElement)
       {
-        *vPos++;
-        *vPos++;
+        // use the original submesh's uv coordinates.
+        if (origSubMesh->GetTexCoordCount() > 0 &&
+            vCount <= origSubMesh->GetTexCoordCount())
+        {
+          *vPos++ = origSubMesh->GetTexCoord(j).x;
+          *vPos++ = origSubMesh->GetTexCoord(j).y;
+        }
+        else
+        {
+          *vPos++;
+          *vPos++;
+        }
       }
     }
 
-    // Add all the indices
+    // update indices
     for (int j = 0; j < subMeshMsg.indices_size(); ++j)
       *indices++ = subMeshMsg.indices(j);
 
     vbuf->unlock();
     ibuf->unlock();
   }
-
-  // update mesh bounding box.
-  /*math::Vector3 max = _mesh->GetMax();
-  math::Vector3 min = _mesh->GetMin();
-
-  if (!max.IsFinite())
-    gzthrow("Max bounding box is not finite[" << max << "]\n");
-
-  if (!min.IsFinite())
-    gzthrow("Min bounding box is not finite[" << min << "]\n");
-
-  ogreMesh->_setBounds(Ogre::AxisAlignedBox(
-        Ogre::Vector3(min.x, min.y, min.z),
-        Ogre::Vector3(max.x, max.y, max.z)),
-        false);*/
 }
 
 //////////////////////////////////////////////////

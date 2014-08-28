@@ -11,4 +11,5 @@ message MeshUpdate
   required string parent_name  = 1;
   optional uint32 parent_id    = 2;
   required Mesh mesh = 3;
+  optional bool deformable = 4;
 }
