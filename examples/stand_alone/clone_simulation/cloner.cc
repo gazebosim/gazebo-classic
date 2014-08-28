@@ -89,6 +89,6 @@ int main(int _argc, char **_argv)
   getchar();
 
   // Make sure to shut everything down.
-  std::system("killall gzserver");
+  std::system("kill -15 `ps -A | grep -m1 gzserver | awk '{print $1}'`");
   gazebo::shutdown();
 }
