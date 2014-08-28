@@ -42,10 +42,10 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
 
   QLabel *label = new QLabel(tr("Sim Time:"));
 
-  // Create a push button, and connect it to the OnButton function
+  // Create a time label
   QLabel *timeLabel = new QLabel(tr("00:00:00.00"));
 
-  // Add the button to the frame's layout
+  // Add the label to the frame's layout
   frameLayout->addWidget(label);
   frameLayout->addWidget(timeLabel);
   connect(this, SIGNAL(SetSimTime(QString)),

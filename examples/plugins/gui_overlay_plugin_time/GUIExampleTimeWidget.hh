@@ -40,11 +40,13 @@ namespace gazebo
     /// \param[in] _string String representation of sim time.
     signals: void SetSimTime(QString _string);
 
-    /// \brief Callback trigged when the button is pressed.
+    /// \brief Callback that received world statistics messages.
+    /// \param[in] _msg World statistics message that is received.
     protected: void OnStats(ConstWorldStatisticsPtr &_msg);
 
     /// \brief Helper function to format time string.
     /// \param[in] _msg Time message.
+    /// \return Time formatted as a string.
     private: std::string FormatTime(const msgs::Time &_msg) const;
 
     /// \brief Node used to establish communication with gzserver.

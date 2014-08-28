@@ -200,6 +200,8 @@ RenderWidget::RenderWidget(QWidget *_parent)
       }
       else
       {
+        gzlog << "Loaded GUI plugin[" << *iter << "]\n";
+
         // Set the plugin's parent and store the plugin
         plugin->setParent(this->glWidget);
         this->plugins.push_back(plugin);
@@ -211,7 +213,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
-  this->plugins.clear();
   delete this->glWidget;
 }
 
