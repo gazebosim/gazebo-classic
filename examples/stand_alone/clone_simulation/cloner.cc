@@ -85,6 +85,9 @@ int main(int _argc, char **_argv)
   msg.set_new_port(11346);
   serverControlPub->Publish(msg);
 
+  // Wait for the simulation clone before showing the next message.
+  gazebo::common::Time::MSleep(200);
+
   std::cout << "\nPress [ENTER] to exit and kill all the servers." << std::endl;
   getchar();
 
