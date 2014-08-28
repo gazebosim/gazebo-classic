@@ -562,7 +562,7 @@ void Server::ProcessControlMsgs()
       std::string port;
       physics::WorldPtr world;
 
-      // Get the world name to be cloned.
+      // Get the world's name to be cloned.
       std::string worldName = "";
       if ((*iter).has_save_world_name())
         worldName = (*iter).save_world_name();
@@ -579,7 +579,7 @@ void Server::ProcessControlMsgs()
         success = false;
       }
 
-      // Check that the message contains a port for the new server.
+      // Check if the message contains a port for the new server.
       if ((*iter).has_new_port())
         port = boost::lexical_cast<std::string>((*iter).new_port());
       else

@@ -29,7 +29,7 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
 {
   if (_msg->has_cloned() && _msg->cloned() && _msg->has_cloned_uri())
   {
-    std::cout << "World cloned. You can connect a client by tiping\n"
+    std::cout << "World cloned. You can connect a client by typing\n"
               << "\tGAZEBO_MASTER_URI=" << _msg->cloned_uri()
               << " gzclient" << std::endl;
   }

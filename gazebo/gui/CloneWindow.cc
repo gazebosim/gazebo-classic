@@ -27,7 +27,6 @@ CloneWindow::CloneWindow(QWidget *_parent)
     validPort(false)
 {
   // This name is used in the qt style sheet.
-  this->setObjectName("cloneconfig");
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Cloning a simulation"));
 
@@ -39,7 +38,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
   // Port information.
   QLabel *portInfo = new QLabel(
     "Select the port that the new server will use for connections.\n"
-    "Please, check that the port is not used by any other process.\n");
+    "Please check that the port is not used by any other process.\n");
 
   // Port widget.
   QHBoxLayout *portLayout = new QHBoxLayout;
@@ -48,7 +47,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
   this->portEdit->setFixedWidth(50);
   this->portEdit->setMaxLength(5);
   this->portEdit->setValidator(new QIntValidator(1025, 65535, this));
-  portLayout->setContentsMargins(4, 4, 4, 4);
+  portLayout->setContentsMargins(4, 4, 4, 30);
   portLayout->addWidget(portLabel);
   portLayout->addWidget(this->portEdit);
 
@@ -67,7 +66,7 @@ CloneWindow::CloneWindow(QWidget *_parent)
   mainLayout->addWidget(frame);
   mainLayout->addLayout(portLayout);
   mainLayout->addLayout(buttonLayout);
-  mainLayout->setContentsMargins(4, 8, 4, 4);
+  mainLayout->setContentsMargins(8, 8, 4, 4);
 
   // Assign the mainlayout to this widget.
   this->setLayout(mainLayout);
