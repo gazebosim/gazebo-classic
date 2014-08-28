@@ -32,13 +32,6 @@ boost::condition_variable Command::sigCondition;
 
 std::map<std::string, Command *> g_commandMap;
 
-/*static VALUE defout_write(VALUE self, VALUE str)
-{
-  std::cout << RubyEval::val2str(str);
-  return Qnil;
-}*/
-
-
 /////////////////////////////////////////////////
 Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
