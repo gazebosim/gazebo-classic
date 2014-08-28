@@ -35,6 +35,7 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
   }
 }
 
+/////////////////////////////////////////////////
 void RunServer()
 {
   // Initialize gazebo server.
