@@ -17,6 +17,9 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/regex.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -33,6 +36,7 @@ Logger Console::msg("[Msg] ", 32, Logger::STDOUT);
 Logger Console::err("[Err] ", 31, Logger::STDERR);
 Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT);
 Logger Console::warn("[Wrn] ", 33, Logger::STDERR);
+boost::uuids::uuid Console::consoleUuid = boost::uuids::random_generator()();
 
 bool Console::quiet = true;
 
@@ -133,7 +137,7 @@ FileLogger::~FileLogger()
 }
 
 /////////////////////////////////////////////////
-void FileLogger::Init(const std::string &_filename)
+void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 {
   if (!getenv("HOME"))
   {
@@ -146,7 +150,9 @@ void FileLogger::Init(const std::string &_filename)
       this->rdbuf());
 
   boost::filesystem::path logPath(getenv("HOME"));
-  logPath = logPath / ".gazebo/";
+  boost::filesystem::path subdir(
+      _prefix + boost::lexical_cast<std::string>(Console::consoleUuid));
+  logPath = logPath / ".gazebo/" / subdir;
 
   // Create the log directory if it doesn't exist.
   if (!boost::filesystem::exists(logPath))

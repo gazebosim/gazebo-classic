@@ -1,4 +1,4 @@
-Gazebo Publisher Example
+Clone a simulation Example
 
 This is very simple example of how to clone an existing simulation.
 
@@ -18,7 +18,7 @@ Build Instructions
 Execute Instructions
 ===================
 
- * Launch gazebo as usual then from the build directory above:
+ * Launch the example from the build directory above:
 
   $ ./cloner
 

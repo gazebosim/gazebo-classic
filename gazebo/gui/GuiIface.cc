@@ -76,8 +76,7 @@ bool parse_args(int _argc, char **_argv)
     ("version,v", "Output version information.")
     ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
-    ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.")
-    ("gui-logfile", po::value<std::string>(), "Specify a log file.");
+    ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
 
   po::options_description desc("Options");
   desc.add(v_desc);
@@ -124,14 +123,6 @@ bool parse_args(int _argc, char **_argv)
       gazebo::addPlugin(*iter);
     }
   }
-
-  // Set the name of the file where the informational log will store its data.
-  std::string logFilename = "gzclient.log";
-  if (vm.count("gui-logfile"))
-    logFilename = vm["gui-logfile"].as<std::string>();
-
-  // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit(logFilename);
 
   return true;
 }
@@ -252,6 +243,9 @@ unsigned int gui::get_entity_id(const std::string &_name)
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
+  // Initialize the informational logger. This will log warnings, and errors.
+  gzLogInit("client-", "gzclient.log");
+
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
 

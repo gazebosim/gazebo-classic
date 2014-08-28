@@ -31,7 +31,6 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Events.hh"
 
@@ -105,8 +104,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
-     "Load a plugin.")
-    ("server-logfile", po::value<std::string>(), "Specify a log file.");
+     "Load a plugin.");
 
   po::options_description hiddenDesc("Hidden options");
   hiddenDesc.add_options()
@@ -263,13 +261,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // Load the server
     if (!this->LoadFile(configFilename, physics))
       return false;
-  }
-
-  // Set the name of the file where the informational log will store its data.
-  if (this->vm.count("server-logfile"))
-  {
-    this->params["server-logfile"] =
-        this->vm["server-logfile"].as<std::string>();
   }
 
   this->ProcessParams();
@@ -528,12 +519,6 @@ void Server::ProcessParams()
 }
 
 /////////////////////////////////////////////////
-gazebo::common::StrStr_M Server::GetParams()
-{
-  return this->params;
-}
-
-/////////////////////////////////////////////////
 void Server::SetParams(const common::StrStr_M &_params)
 {
   common::StrStr_M::const_iterator iter;
@@ -605,19 +590,16 @@ void Server::ProcessControlMsgs()
         transport::get_master_uri(host, unused);
 
         // Command to be executed for cloning the server. The new server will
-        // have its own log file named gzserver.<PORT>.log and will load the
-        // world file /tmp/clone.<PORT>.world
+        // load the world file /tmp/clone.<PORT>.world
         std::string cmd = "GAZEBO_MASTER_URI=http://" + host + ":" + port +
-            " gzserver --server-logfile " + "gzserver." + port + ".log " +
-            worldPath.string() + " &";
+            " gzserver " + worldPath.string() + " &";
 
         // Spawn a new gzserver process and load the saved world.
         if (std::system(cmd.c_str()) == 0)
         {
           gzlog << "Cloning world [" << worldName << "]. "
                 << "Contact the server by typing:\n\tGAZEBO_MASTER_URI=http://"
-                << host << ":" << port << " gzclient --gui-logfile gzclient."
-                << port + ".log" << std::endl;
+                << host << ":" << port << " gzclient" << std::endl;
         }
         else
         {

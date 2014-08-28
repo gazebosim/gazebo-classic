@@ -16,7 +16,6 @@
 */
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/Server.hh"
 
@@ -27,19 +26,16 @@ int main(int argc, char **argv)
 
   try
   {
+    // Initialize the informational logger. This will log warnings, and
+    // errors.
+    gzLogInit("server-", "gzserver.log");
+
     // Initialize the data logger. This will log state information.
     gazebo::util::LogRecord::Instance()->Init("gzserver");
 
     server = new gazebo::Server();
     if (!server->ParseArgs(argc, argv))
       return -1;
-
-    // Initialize the informational logger. This will log warnings, and errors.
-    gazebo::common::StrStr_M params = server->GetParams();
-    if (params.find("server-logfile") != params.end())
-      gzLogInit(params["server-logfile"]);
-    else
-      gzLogInit("gzserver.log");
 
     server->Run();
     server->Fini();

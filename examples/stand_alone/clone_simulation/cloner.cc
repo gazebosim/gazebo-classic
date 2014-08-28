@@ -23,7 +23,6 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
-
 /////////////////////////////////////////////////
 void OnWorldModify(ConstWorldModifyPtr &_msg)
 {
@@ -46,7 +45,7 @@ void RunServer()
       return;
 
     // Initialize the informational logger. This will log warnings, and errors.
-    gzLogInit("gzserver.log");
+    gzLogInit("server-", "gzserver.log");
 
     server->Run();
     server->Fini();

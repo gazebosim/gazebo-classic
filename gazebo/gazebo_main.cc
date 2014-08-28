@@ -59,9 +59,7 @@ void help()
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
   <<                                  "gazebo.\n"
   << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
-  << "  --gui-logfile arg             Specify a log file for the GUI.\n"
-  << "  -s [ --server-plugin ] arg    Load a server plugin.\n"
-  << "  --server-logfile arg          Specify a log file for the server.\n\n";
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n\n";
 }
 
 /////////////////////////////////////////////////

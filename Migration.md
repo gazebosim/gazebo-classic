@@ -2,12 +2,6 @@
 
 ### Additions
 
-1. **gazebo/Server.hh**
-    + gazebo::common::StrStr_M GetParams()
-
-1. **gazebo/gui/CloneWindow.hh**
-    + ***New class:*** CloneWindow
-
 1. **gazebo/physics/Population.hh**
     + ***New class:*** Population
 

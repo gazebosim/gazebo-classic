@@ -23,6 +23,7 @@
 #include <sstream>
 #include <string>
 
+#include <boost/uuid/uuid.hpp>
 #include <boost/thread.hpp>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -52,8 +53,11 @@ namespace gazebo
     /// \brief Initialize log file with filename given by _str.
     /// If called twice, it will close currently in use and open a new
     /// log file.
+    /// \param[in] _prefix Prefix added to the directory where the log file
+    /// will be created.
     /// \param[in] _str Name of log file for gzlog messages.
-    #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
+    #define gzLogInit(_prefix, _str) \
+        (gazebo::common::Console::log.Init(_prefix, _str))
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
@@ -68,9 +72,12 @@ namespace gazebo
       public: virtual ~FileLogger();
 
       /// \brief Initialize the file logger.
+      /// \param[in] _prefix Prefix added to the directory where the log file
+      /// will be created.
       /// \param[in] _filename Name and path of the log file to write output
       /// into.
-      public: void Init(const std::string &_filename);
+      public: void Init(const std::string &_prefix,
+                        const std::string &_filename);
 
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.
@@ -200,6 +207,9 @@ namespace gazebo
 
       /// \brief Global instance of the file logger.
       public: static FileLogger log;
+
+      /// \brief Global UUID for the console.
+      public: static boost::uuids::uuid consoleUuid;
 
       /// \brief Indicates if console messages should be quiet.
       private: static bool quiet;
