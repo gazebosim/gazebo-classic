@@ -92,11 +92,10 @@ int main(int _argc, char **_argv)
   getchar();
 
   // Make sure to shut everything down.
-  int ret = std::system("kill -15 `ps -A | grep -m1 gzserver | awk '{print $1}'`");
+  std::string cmd = "kill -15 `ps -A | grep -m1 gzserver | awk '{print $1}'`";
+  int ret = std::system(cmd.c_str());
   if (ret != 0)
-  {
-    gzerr << "kill gzserver returned a non zero value: " << ret;
-  }
+    std::cerr << "kill gzserver returned a non zero value:" << ret << std::endl;
 
   gazebo::shutdown();
 }
