@@ -182,8 +182,18 @@ TEST_F(WorldClone, Clone)
   output = custom_exec_str("gz topic -l");
   EXPECT_NE(output.find("/gazebo/default/camera/"), std::string::npos);
 
-  // Kill the cloned server.
-  custom_exec_str("killall gzserver");
+  // Kill the cloned server. In the case of no presence of gzserver ps will
+  // return the own ps process so it probably will do nothing. No effect.
+  // This should work on Linux and Mac
+  std::string get_pid_cmd = "ps -A | grep -m1 gzserver | awk '{print $1}'";
+
+  std::string pid = custom_exec_str(get_pid_cmd);
+  if (pid == "ERROR")
+    FAIL() << "Fail to execute " + get_pid_cmd;
+
+  std::string result = custom_exec_str("kill -15 " + pid);
+  if (result == "ERROR")
+    FAIL() << "Fail to run kill -15 command";
 }
 
 /////////////////////////////////////////////////
