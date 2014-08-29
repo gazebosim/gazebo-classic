@@ -21,6 +21,10 @@
 #include <string>
 #include <vector>
 
+#include <boost/thread.hpp>
+
+#include "gazebo/Server.hh"
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -39,10 +43,13 @@ namespace gazebo
 
     private: void OnUpdate();
 
+    private: void Run();
     private: void OnMsg(ConstPosePtr &_msg);
 
     private: std::vector<event::ConnectionPtr> connections;
 
+    private: gazebo::Server *server;
+    private: boost::thread *serverThread;
     private: physics::WorldPtr world;
     private: physics::ModelPtr model;
 

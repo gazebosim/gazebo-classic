@@ -15,10 +15,6 @@
  *
 */
 
-#include <gazebo/gazebo.hh>
-#include <gazebo/common/common.hh>
-#include <gazebo/physics/physics.hh>
-
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/GazeboPlugin.hh"
@@ -29,24 +25,32 @@ GZ_REGISTER_MODEL_PLUGIN(GazeboPlugin)
 /////////////////////////////////////////////////
 GazeboPlugin::GazeboPlugin()
 {
-  std::vector<std::string> v;
-  v.push_back("--verbose");
-
   // use a different socket/port
   setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
 
   // Initialize gazebo.
-  gazebo::setupServer(v);
+  this->server = new gazebo::Server();
 
-  // Load a world
-  this->world = gazebo::loadWorld("worlds/simple_arm.world");
+  int argc = 0;
+  char** argv = NULL;
+  if (!this->server->ParseArgs(argc, argv))
+    return;
+
+  this->server->LoadFile("worlds/simple_arm.world", "ode");
+  this->serverThread = new boost::thread(boost::bind(&GazeboPlugin::Run, this));
+}
+
+/////////////////////////////////////////////////
+void GazeboPlugin::Run()
+{
+  this->server->Run();
 }
 
 /////////////////////////////////////////////////
 GazeboPlugin::~GazeboPlugin()
 {
-  // Close everything.
-  gazebo::shutdown();
+  this->server->Fini();
+  delete this->server;
 }
 
 /////////////////////////////////////////////////
@@ -72,8 +76,6 @@ void GazeboPlugin::Init()
 /////////////////////////////////////////////////
 void GazeboPlugin::OnUpdate()
 {
-  // Run simulation for 100 steps.
-  gazebo::runWorld(this->world, 100);
 }
 
 /////////////////////////////////////////////////
