@@ -101,6 +101,7 @@ namespace gazebo
       /// \brief True if the distorted image will be cropped to remove the
       /// black pixels at the corners of the image.
       public: bool distortionCrop;
+
       /// \brief Communication Node
       public: transport::NodePtr node;
 

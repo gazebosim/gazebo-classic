@@ -62,6 +62,7 @@ namespace gazebo
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class RayQuery;
     class Distortion;
 
 #ifdef HAVE_OCULUS
@@ -151,15 +152,15 @@ namespace gazebo
     /// \def SelectionObj
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
-       
+
     /// \def RayQueryPtr
     /// \brief Shared pointer to RayQuery
     typedef boost::shared_ptr<RayQuery> RayQueryPtr;
-    
+
     /// \def RayQueryPtr
     /// \brief Shared pointer to RayQuery
     typedef boost::shared_ptr<RayQuery> RayQueryPtr;
-    
+
     /// \def DistortionPtr
     /// \brief Shared pointer to Distortion
     typedef boost::shared_ptr<Distortion> DistortionPtr;

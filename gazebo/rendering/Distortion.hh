@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 #include <sdf/sdf.hh>
 #include "gazebo/rendering/RenderTypes.hh"
-
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
     /// \brief Camera distortion
-    class Distortion
+    class GAZEBO_VISIBLE Distortion
     {
       /// \brief Constructor
       public: Distortion();
