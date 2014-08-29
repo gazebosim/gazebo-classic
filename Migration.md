@@ -1,5 +1,14 @@
 ## Gazebo 4.X to 5.X
 
+### Modifications
+
+1. **Informational logs:** The log files will be created inside
+  ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
+  ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
+  change is to avoid name collisions when cloning a simulation. If the
+  environment variable GAZEBO_MASTER_URI is not present or invalid,
+  <GAZEBO_MASTER_PORT> will be replaced by "default".
+
 ### Additions
 
 1. **gazebo/physics/Population.hh**
