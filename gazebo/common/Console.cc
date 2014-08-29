@@ -17,9 +17,6 @@
 #include <string>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/regex.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <sstream>
 
 #include "gazebo/common/Exception.hh"
@@ -36,7 +33,6 @@ Logger Console::msg("[Msg] ", 32, Logger::STDOUT);
 Logger Console::err("[Err] ", 31, Logger::STDERR);
 Logger Console::dbg("[Dbg] ", 36, Logger::STDOUT);
 Logger Console::warn("[Wrn] ", 33, Logger::STDERR);
-boost::uuids::uuid Console::consoleUuid = boost::uuids::random_generator()();
 
 bool Console::quiet = true;
 
@@ -150,8 +146,12 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
       this->rdbuf());
 
   boost::filesystem::path logPath(getenv("HOME"));
-  boost::filesystem::path subdir(
-      _prefix + boost::lexical_cast<std::string>(Console::consoleUuid));
+
+  // Create a subdirectory for the informational log. The name of the directory
+  // will be <PREFIX><MASTER_PORT>. E.g.: server-11346. If the environment
+  // variable GAZEBO_MASTER_URI is not present or invalid, <MASTER_PORT> will
+  // be replaced by "default".
+  boost::filesystem::path subdir(_prefix + FileLogger::GetMasterPort());
   logPath = logPath / ".gazebo/" / subdir;
 
   // Create the log directory if it doesn't exist.
@@ -205,6 +205,22 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
     << _file.substr(index , _file.size() - index) << ":" << _line << "]";
 
   return (*this);
+}
+
+std::string FileLogger::GetMasterPort()
+{
+  char *charURI = getenv("GAZEBO_MASTER_URI");
+
+  // Set to default port.
+  if (charURI && strlen(charURI) > 0)
+  {
+    std::string masterURI = charURI;
+    size_t lastColon = masterURI.find_last_of(":");
+    if (lastColon != std::string::npos && lastColon != masterURI.size() - 1)
+      return masterURI.substr(lastColon + 1, std::string::npos);
+  }
+
+  return "default";
 }
 
 /////////////////////////////////////////////////

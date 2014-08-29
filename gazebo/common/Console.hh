@@ -23,7 +23,6 @@
 #include <sstream>
 #include <string>
 
-#include <boost/uuid/uuid.hpp>
 #include <boost/thread.hpp>
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -91,6 +90,11 @@ namespace gazebo
       /// \return Reference to this logger.
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
+
+      /// \brief Get the port of the master.
+      /// \return The port of the master or "default" if "GAZEBO_MASTER_URI" is
+      /// not present or not set properly.
+      private: static std::string GetMasterPort();
 
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf
@@ -207,9 +211,6 @@ namespace gazebo
 
       /// \brief Global instance of the file logger.
       public: static FileLogger log;
-
-      /// \brief Global UUID for the console.
-      public: static boost::uuids::uuid consoleUuid;
 
       /// \brief Indicates if console messages should be quiet.
       private: static bool quiet;
