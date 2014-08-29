@@ -25,6 +25,7 @@ set (plugins
   DepthCameraPlugin
   DiffDrivePlugin
   ForceTorquePlugin
+  GazeboPlugin
   GpuRayPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
