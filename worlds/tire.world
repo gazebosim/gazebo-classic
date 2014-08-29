@@ -1,0 +1,217 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="tire_rig">
+      <pose>0 0 0.55 0 0 0</pose>
+      <link name="cylinder_link">
+        <pose>0 0 0.0 1.57 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+
+          <surface>
+            <soft_contact>
+              <dart>
+                <bone_attachment>100.0</bone_attachment>
+                <stiffness>100.0</stiffness>
+                <damping>0.0</damping>
+                <flesh_mass_fraction>0.1</flesh_mass_fraction>
+              </dart>
+            </soft_contact>
+          </surface>
+
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="box_link">
+        <pose>0 0.4 0.5 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <joint type="revolute" name="cylinder_world_joint">
+        <pose>0 0 0 0 0 0</pose>
+        <parent>world</parent>
+        <child>cylinder_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>false</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <joint type="prismatic" name="box_world_joint">
+        <pose>0 0 0 0 0 0</pose>
+        <parent>world</parent>
+        <child>box_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>false</use_parent_model_frame>
+        </axis>
+      </joint>
+
+      <joint type="revolute" name="cylinder_box_joint">
+        <pose>0 0 0 0 0 0</pose>
+        <parent>box_link</parent>
+        <child>cylinder_link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>false</use_parent_model_frame>
+        </axis>
+      </joint>
+    </model>
+
+    <model name="box_plane_01">
+      <pose>0 0 0.025 0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.01 0.01 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="link_01">
+        <pose>0 0 0.0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="link_02">
+        <pose>-9 0 0.0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <plugin name="moving_plane" filename="libMovingPlanePlugin.so">
+        <link>link_01</link>
+        <link>link_02</link>
+        <direction>1 0 0</direction>
+        <distance>9</distance>
+      </plugin>
+    </model>
+<!--
+    <model name="box_plane_02">
+      <pose>10 0 0.025 0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>10 1.5 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name="moving_plane" filename="libMovingPlanePlugin.so" />
+    </model>
+    -->
+
+  </world>
+</sdf>

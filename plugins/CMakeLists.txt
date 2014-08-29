@@ -29,6 +29,7 @@ set (plugins
   JointTrajectoryPlugin
   LiftDragPlugin
   ModelPropShop
+  MovingPlanePlugin
   MudPlugin
   PressurePlugin
   RayPlugin

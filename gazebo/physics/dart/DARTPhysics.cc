@@ -169,8 +169,8 @@ void DARTPhysics::UpdateCollision()
     if (collisionEntities.find(dartLink2->GetId()) == collisionEntities.end())
       collisionEntities[dartLink2->GetId()] = dartLink2;
 
-    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
-    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
+    GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pair is NULL");
+    GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pair is NULL");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
