@@ -1,12 +1,16 @@
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
 )
 
+# Tinyxml are used since the plugins are linking against gazebo_common
+# which uses tinxyml. Not defining the link directory here will end up
+# failures in clang.
 link_directories(
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
+  ${tinyxml_LIBRARY_DIRS}
 )
 
 if (HAVE_BULLET)
@@ -23,6 +27,7 @@ set (plugins
   ForceTorquePlugin
   GpuRayPlugin
   JointTrajectoryPlugin
+  LiftDragPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
@@ -33,6 +38,13 @@ set (plugins
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin)
+
+if (HAVE_USB AND UNIX AND NOT APPLE)
+  set (plugins ${plugins}
+    HydraPlugin
+    HydraDemoPlugin
+  )
+endif()
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_VERSION}/plugins/

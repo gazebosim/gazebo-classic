@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: The world; all models are collected here
- * Author: Andrew Howard and Nate Koenig
- * Date: 3 Apr 2007
- */
-
 #ifndef _WORLD_HH_
 #define _WORLD_HH_
 
@@ -44,6 +39,7 @@
 #include "gazebo/physics/Base.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/WorldState.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -60,7 +56,7 @@ namespace gazebo
     /// (links, joints, sensors, plugins, etc), and WorldPlugin instances.
     /// Many core function are also handled in the World, including physics
     /// update, model updates, and message processing.
-    class World : public boost::enable_shared_from_this<World>
+    class GAZEBO_VISIBLE World : public boost::enable_shared_from_this<World>
     {
       /// \brief Constructor.
       /// Constructor for the World. Must specify a unique name.
@@ -206,7 +202,10 @@ namespace gazebo
       /// \return A pointer to the Entity, or NULL if no Entity was found.
       public: EntityPtr GetEntity(const std::string &_name);
 
-      /// \brief Get the nearest model below a point.
+      /// \brief Get the nearest model below and not encapsulating a point.
+      /// Only objects below the start point can be returned. Any object
+      /// that encapsulates the start point can not be returned from this
+      /// function.
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
@@ -255,11 +254,6 @@ namespace gazebo
 
       /// \brief Step the world forward in time.
       /// \param[in] _steps The number of steps the World should take.
-      /// \note Deprecated. Please use World::Step
-      public: void StepWorld(int _steps) GAZEBO_DEPRECATED(3.0);
-
-      /// \brief Step the world forward in time.
-      /// \param[in] _steps The number of steps the World should take.
       public: void Step(unsigned int _steps);
 
       /// \brief Load a plugin
@@ -296,6 +290,10 @@ namespace gazebo
       /// \return True if World::Load has completed.
       public: bool IsLoaded() const;
 
+      /// \brief Remove all entities from the world. Implementation of
+      /// World::Clear
+      public: void ClearModels();
+
       /// \brief Publish pose updates for a model.
       /// This list of models to publish is processed and cleared once every
       /// iteration.
@@ -305,6 +303,28 @@ namespace gazebo
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
       public: uint32_t GetIterations() const;
+
+      /// \brief Get the current scene in message form.
+      /// \return The scene state as a protobuf message.
+      public: msgs::Scene GetSceneMsg() const;
+
+      /// \brief Run the world. This call blocks.
+      /// Run the update loop.
+      /// \param[in] _iterations Run for this many iterations, then stop.
+      /// A value of zero disables run stop.
+      public: void RunBlocking(unsigned int _iterations = 0);
+
+      /// \brief Remove a model. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _model Pointer to a model to remove.
+      public: void RemoveModel(ModelPtr _model);
+
+      /// \brief Remove a model by name. This function will block until
+      /// the physics engine is not locked. The duration of the block
+      /// is less than the time to complete a simulation iteration.
+      /// \param[in] _name Name of the model to remove.
+      public: void RemoveModel(const std::string &_name);
 
       /// \cond
       /// This is an internal function.
@@ -420,11 +440,6 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessFactoryMsgs();
 
-      /// \brief Remove a model from the cached list of models.
-      /// This does not delete the model.
-      /// \param[in] _name Name of the model to remove.
-      private: void RemoveModel(const std::string &_name);
-
       /// \brief Process all received model messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessModelMsgs();
@@ -441,9 +456,9 @@ namespace gazebo
       /// \brief Thread function for logging state data.
       private: void LogWorker();
 
-      /// \brief Remove all entities from the world. Implementation of
-      /// World::Clear
-      public: void ClearModels();
+      /// \brief Callback when a light message is received.
+      /// \param[in] _msg Pointer to the light message.
+      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief For keeping track of time step throttling.
       private: common::Time prevStepWallTime;
@@ -525,6 +540,9 @@ namespace gazebo
 
       /// \brief Subscriber to joint messages.
       private: transport::SubscriberPtr jointSub;
+
+      /// \brief Subscriber to light messages.
+      private: transport::SubscriberPtr lightSub;
 
       /// \brief Subscriber to model messages.
       private: transport::SubscriberPtr modelSub;
@@ -685,12 +703,9 @@ namespace gazebo
       /// \brief A cached list of models. This is here for performance.
       private: Model_V models;
 
-      /// \todo In gazebo 3.0 this should be move to the proper section.
-      /// \brief Run the world. This call blocks.
-      /// Run the update loop.
-      /// \param[in] _iterations Run for this many iterations, then stop.
-      /// A value of zero disables run stop.
-      public: void RunBlocking(unsigned int _iterations = 0);
+      /// \brief This mutex is used to by the ::RemoveModel and
+      /// ::ProcessFactoryMsgs functions.
+      private: boost::mutex factoryDeleteMutex;
     };
     /// \}
   }

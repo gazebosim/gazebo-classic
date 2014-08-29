@@ -48,7 +48,7 @@ std::string NodeAnimation::GetName() const
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 _trans)
+void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 &_trans)
 {
   if (_time > this->length)
     this->length = _time;
@@ -57,7 +57,7 @@ void NodeAnimation::AddKeyFrame(const double _time, const math::Matrix4 _trans)
 }
 
 //////////////////////////////////////////////////
-void NodeAnimation::AddKeyFrame(const double _time, const math::Pose _pose)
+void NodeAnimation::AddKeyFrame(const double _time, const math::Pose &_pose)
 {
   math::Matrix4 mat(_pose.rot.GetAsMatrix4());
   mat.SetTranslate(_pose.pos);
@@ -230,7 +230,7 @@ bool SkeletonAnimation::HasNode(const std::string& _node) const
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string& _node,
-    const double _time, const math::Matrix4 _mat)
+    const double _time, const math::Matrix4 &_mat)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);
@@ -243,7 +243,7 @@ void SkeletonAnimation::AddKeyFrame(const std::string& _node,
 
 //////////////////////////////////////////////////
 void SkeletonAnimation::AddKeyFrame(const std::string& _node,
-      const double _time, const math::Pose _pose)
+      const double _time, const math::Pose &_pose)
 {
   if (this->animations.find(_node) == this->animations.end())
     this->animations[_node] = new NodeAnimation(_node);

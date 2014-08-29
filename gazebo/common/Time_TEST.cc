@@ -42,12 +42,15 @@ TEST_F(TimeTest, Time)
   time.SetToWallTime();
   EXPECT_TRUE(common::Time::GetWallTime() - time < common::Time(0, 1000000));
 
-  time = common::Time(1, 1000) + common::Time(1.5, 1000000000);
-  EXPECT_TRUE(time == common::Time(3.5, 1000));
+  time = common::Time(1, 1000)
+       + common::Time(1.5)
+       + common::Time(0, 1e9);
+  EXPECT_EQ(time, common::Time(3, 5e8 + 1000));
 
   time.Set(1, 1000);
-  time += common::Time(1.5, 1000000000);
-  EXPECT_TRUE(time == common::Time(3.5, 1000));
+  time += common::Time(1.5);
+  time += common::Time(0, 1e9);
+  EXPECT_EQ(time, common::Time(3, 5e8 + 1000));
 
   time.Set(1, 1000);
   time -= common::Time(1, 1000);

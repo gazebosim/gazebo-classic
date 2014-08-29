@@ -29,6 +29,7 @@
 #include <string>
 
 #include "gazebo/common/Color.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -64,7 +65,7 @@ namespace gazebo
 
     /// \class Image Image.hh common/common.hh
     /// \brief Encapsulates an image
-    class Image
+    class GAZEBO_VISIBLE Image
     {
       /// \brief Pixel formats enumeration
       public: enum PixelFormat

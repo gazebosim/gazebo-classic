@@ -22,20 +22,21 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
 
-#include "gazebo/transport/TransportTypes.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
 
 #include "gazebo/common/SingletonT.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class ModelManipulatorPrivate;
+
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links
-    class ModelManipulator : public SingletonT<ModelManipulator>
+    class GAZEBO_VISIBLE ModelManipulator : public SingletonT<ModelManipulator>
     {
       /// \brief Constructor
       private: ModelManipulator();
@@ -149,60 +150,12 @@ namespace gazebo
       /// \param[in] _vis Pointer to the visual whose scale is to be published.
       private: void PublishVisualScale(rendering::VisualPtr _vis);
 
-      /// \brief Selection object which users can interact with to manipulate
-      /// the model.
-      private: rendering::SelectionObjPtr selectionObj;
-
-      /// \brief The current manipulation mode.
-      private: std::string manipMode;
-
-      /// \brief Keep track of the mouse start pose before a move action.
-      private: math::Pose mouseMoveVisStartPose;
-
-      /// \brief Keep track of the mouse start screen position.
-      private: math::Vector2i mouseStart;
-
-      /// \brief The current selected visual.
-      private: rendering::VisualPtr selectedVis;
-
-      /// \brief The current visual attached to the mouse.
-      private: rendering::VisualPtr mouseMoveVis;
-
-      /// \brief Transportation node.
-      private: transport::NodePtr node;
-
-      /// \brief Model publisher that publishes model pose to the server.
-      private: transport::PublisherPtr modelPub;
-
-      /// \brief Light publisher that publishes light pose to the server.
-      private: transport::PublisherPtr lightPub;
-
-      /// \brief Pointer to the user camera.
-      private: rendering::UserCameraPtr userCamera;
-
-      /// \brief Pointer to the scene where models are in.
-      private: rendering::ScenePtr scene;
-
-      /// \brief Current mouse event.
-      private: common::MouseEvent mouseEvent;
-
-      /// \brief Current key event.
-      private: common::KeyEvent keyEvent;
-
-      /// \brief True if the model manipulator is initialized.
-      private: bool initialized;
-
-      /// \brief Scale of the visual attached to the mouse.
-      private: math::Vector3 mouseVisualScale;
-
-      /// \brief Bounding box of the visual attached to the mouse (for scaling).
-      private: math::Box mouseVisualBbox;
-
-      /// \brief True to manipulate model in global frame.
-      private: bool globalManip;
-
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelManipulator>;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: ModelManipulatorPrivate *dataPtr;
     };
   }
 }

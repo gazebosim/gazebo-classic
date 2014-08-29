@@ -22,11 +22,12 @@
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/sensors/RaySensor.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief A Ray Sensor Noise Plugin
-  class RaySensorNoisePlugin : public SensorPlugin
+  class GAZEBO_VISIBLE RaySensorNoisePlugin : public SensorPlugin
   {
     /// \brief Constructor
     public: RaySensorNoisePlugin();

@@ -18,14 +18,15 @@
 
 // Include Rand.hh first to avoid osx compilation errors
 #include "gazebo/math/Rand.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   /// \brief This plugin will generate 5 pictures of a model: perspective,
   /// top, front, side, back.
-  class ModelPropShop : public SystemPlugin
+  class GAZEBO_VISIBLE ModelPropShop : public SystemPlugin
   {
     /// \brief Destructor
     public: virtual ~ModelPropShop();
@@ -38,11 +39,17 @@ namespace gazebo
     /// \brief Initialize the plugin.
     private: void Init();
 
+    /// \brief Callback triggered when the world has been created.
+    private: void OnWorldCreated();
+
     /// \brief Update the plugin.
     private: void Update();
 
-    /// \brief The connections.
+    /// \brief The update connection.
     private: event::ConnectionPtr updateConn;
+
+    /// \brief The world created connection.
+    private: event::ConnectionPtr worldCreatedConn;
 
     /// \brief Node for communication.
     private: transport::NodePtr node;
@@ -58,6 +65,9 @@ namespace gazebo
 
     /// \brief Pointer to the camera.
     private: rendering::CameraPtr camera;
+
+    /// \brief Pointer to the light.
+    private: rendering::LightPtr light;
 
     /// \brief Pointer to the sdf document.
     private: boost::shared_ptr<sdf::SDF> sdf;

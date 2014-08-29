@@ -18,17 +18,11 @@
 #include <boost/filesystem/path.hpp>
 
 #include <gazebo/gazebo_config.h>
+#include <gazebo/common/ffmpeg_inc.h>
 
-#ifdef HAVE_FFMPEG
-extern "C" {
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-}
-#endif
-
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
-#include "gazebo/common/CommonIface.hh"
 
 using namespace gazebo;
 

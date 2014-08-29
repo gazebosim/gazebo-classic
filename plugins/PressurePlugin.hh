@@ -24,9 +24,10 @@
 #include <string>
 #include <boost/unordered_map.hpp>
 
-#include <gazebo/gazebo.hh>
+#include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -36,7 +37,7 @@ namespace gazebo
   /// measurement occurs on the largest face of the box. All normal forces on
   /// each box shape are summed and divided by the area of the largest face
   /// to compute pressure.
-  class PressurePlugin : public SensorPlugin
+  class GAZEBO_VISIBLE PressurePlugin : public SensorPlugin
   {
     /// \brief Constructor.
     public: PressurePlugin();

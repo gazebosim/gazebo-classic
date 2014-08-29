@@ -27,6 +27,7 @@
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -44,7 +45,7 @@ namespace gazebo
 
     /// \class ModelEditorPalette ModelEditorPalette.hh
     /// \brief A palette of building items which can be added to the editor.
-    class ModelEditorPalette : public QWidget
+    class GAZEBO_VISIBLE ModelEditorPalette : public QWidget
     {
       Q_OBJECT
 

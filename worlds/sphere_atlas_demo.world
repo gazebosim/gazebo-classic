@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
-<sdf version='1.4'>
-  <world name='default'>
+<sdf version="1.5">
+  <world name="default">
     <!-- A ground plane -->
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <gui fullscreen='0'>
-      <camera name='user_camera'>
+    <gui fullscreen="0">
+      <camera name="user_camera">
         <pose>-25 -15 12.0539 7.08002e-18 0.2 0.352194</pose>
       </camera>
     </gui>
@@ -15,8 +15,10 @@
       <background>0.5 0.5 0.5 1</background>
       <shadows>0</shadows>
     </scene>
-    <include><uri>model://sun</uri></include>
-    <physics type='ode'>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <physics type="ode">
       <gravity>0 0 -9.81</gravity>
       <ode>
         <solver>
@@ -38,8 +40,8 @@
     <!-- A copy of atlas robot with all visual and
          collision geoms replaced by spheres.
     -->
-    <model name='sphere_atlas'>
-      <link name='pelvis'>
+    <model name="sphere_atlas">
+      <link name="pelvis">
         <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <pose>0.0113715 0 0.0268706 0 -0 0</pose>
@@ -53,7 +55,7 @@
             <izz>0.117937</izz>
           </inertia>
         </inertial>
-        <collision name='pelvis_collision'>
+        <collision name="pelvis_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -62,7 +64,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -72,7 +74,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='pelvis_visual'>
+        <visual name="pelvis_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -80,7 +82,7 @@
             </sphere>
           </geometry>
         </visual>
-        <visual name='pelvis_visual_imu_link'>
+        <visual name="pelvis_visual_imu_link">
           <pose>0.0599153 0 -0.01415 0 -0 0</pose>
           <geometry>
             <box>
@@ -98,7 +100,7 @@
           <angular>0</angular>
         </velocity_decay>
         <self_collide>0</self_collide>
-        <sensor name='imu_sensor' type='imu'>
+        <sensor name="imu_sensor" type="imu">
           <always_on>1</always_on>
           <update_rate>1000</update_rate>
           <imu>
@@ -121,7 +123,7 @@
           <pose>0.0599153 0 -0.01415 0 -0 0</pose>
         </sensor>
       </link>
-      <link name='ltorso'>
+      <link name="ltorso">
         <pose>-0.0125 0 0 0 -0 0</pose>
         <inertial>
           <pose>-0.0112984 -3.15366e-06 0.0746835 0 -0 0</pose>
@@ -135,7 +137,7 @@
             <izz>0.00174492</izz>
           </inertia>
         </inertial>
-        <collision name='ltorso_collision'>
+        <collision name="ltorso_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -144,7 +146,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -154,7 +156,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='ltorso_visual'>
+        <visual name="ltorso_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -169,7 +171,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='back_bkz' type='revolute'>
+      <joint name="back_bkz" type="revolute">
         <child>ltorso</child>
         <parent>pelvis</parent>
         <axis>
@@ -183,6 +185,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -194,7 +197,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='mtorso'>
+      <link name="mtorso">
         <pose>-0.0125 0 0.16197 0 -0 0</pose>
         <inertial>
           <pose>-0.00816266 -0.0131245 0.0305974 0 -0 0</pose>
@@ -208,7 +211,7 @@
             <izz>0.000444215</izz>
           </inertia>
         </inertial>
-        <collision name='mtorso_collision'>
+        <collision name="mtorso_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -217,7 +220,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -227,7 +230,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='mtorso_visual'>
+        <visual name="mtorso_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -242,7 +245,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='back_bky' type='revolute'>
+      <joint name="back_bky" type="revolute">
         <child>mtorso</child>
         <parent>ltorso</parent>
         <axis>
@@ -256,6 +259,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -267,7 +271,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='utorso'>
+      <link name="utorso">
         <pose>-0.0125 0 0.21197 0 -0 0</pose>
         <inertial>
           <pose>-0.0911174 0 0.300409 0 -0 0</pose>
@@ -281,7 +285,7 @@
             <izz>1.32197</izz>
           </inertia>
         </inertial>
-        <collision name='utorso_collision'>
+        <collision name="utorso_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -290,7 +294,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -300,7 +304,7 @@
             </friction>
           </surface>
         </collision>
-        <collision name='utorso_collision_utorso_1'>
+        <collision name="utorso_collision_utorso_1">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -309,7 +313,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -319,7 +323,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='utorso_visual'>
+        <visual name="utorso_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -327,7 +331,7 @@
             </sphere>
           </geometry>
         </visual>
-        <visual name='utorso_visual_utorso_1'>
+        <visual name="utorso_visual_utorso_1">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -335,7 +339,7 @@
             </sphere>
           </geometry>
         </visual>
-        <visual name='utorso_visual_l_situational_awareness_camera_link'>
+        <visual name="utorso_visual_l_situational_awareness_camera_link">
           <pose>0.216409 0.121799 0.406759 -1.5708 5.55112e-17 1.309</pose>
           <geometry>
             <box>
@@ -343,7 +347,7 @@
             </box>
           </geometry>
         </visual>
-        <visual name='utorso_visual_r_situational_awareness_camera_link'>
+        <visual name="utorso_visual_r_situational_awareness_camera_link">
           <pose>0.216409 -0.121799 0.406759 1.5708 5.55112e-17 -1.309</pose>
           <geometry>
             <box>
@@ -366,7 +370,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='back_bkx' type='revolute'>
+      <joint name="back_bkx" type="revolute">
         <child>utorso</child>
         <parent>mtorso</parent>
         <axis>
@@ -380,6 +384,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -391,7 +396,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_clav'>
+      <link name="l_clav">
         <pose>0.05191 0.13866 0.31915 0 -0 0</pose>
         <inertial>
           <pose>0 0.048 0.084 0 -0 0</pose>
@@ -405,7 +410,7 @@
             <izz>0.004</izz>
           </inertia>
         </inertial>
-        <collision name='l_clav_collision'>
+        <collision name="l_clav_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -414,7 +419,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -424,7 +429,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_clav_visual'>
+        <visual name="l_clav_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -439,7 +444,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_shy' type='revolute'>
+      <joint name="l_arm_shy" type="revolute">
         <child>l_clav</child>
         <parent>utorso</parent>
         <axis>
@@ -453,6 +458,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -464,7 +470,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_scap'>
+      <link name="l_scap">
         <pose>0.05191 0.27901 0.51524 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -478,7 +484,7 @@
             <izz>0.00583</izz>
           </inertia>
         </inertial>
-        <collision name='l_scap_collision'>
+        <collision name="l_scap_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -487,7 +493,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -497,7 +503,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_scap_visual'>
+        <visual name="l_scap_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -512,7 +518,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_shx' type='revolute'>
+      <joint name="l_arm_shx" type="revolute">
         <child>l_scap</child>
         <parent>l_clav</parent>
         <axis>
@@ -526,6 +532,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -537,7 +544,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_uarm'>
+      <link name="l_uarm">
         <pose>0.05191 0.46601 0.53124 0 -0 0</pose>
         <inertial>
           <pose>0 -0.065 0 0 -0 0</pose>
@@ -551,7 +558,7 @@
             <izz>0.00656</izz>
           </inertia>
         </inertial>
-        <collision name='l_uarm_collision'>
+        <collision name="l_uarm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -560,7 +567,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -570,7 +577,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_uarm_visual'>
+        <visual name="l_uarm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -585,7 +592,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_ely' type='revolute'>
+      <joint name="l_arm_ely" type="revolute">
         <child>l_uarm</child>
         <parent>l_scap</parent>
         <axis>
@@ -599,6 +606,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -610,7 +618,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_larm'>
+      <link name="l_larm">
         <pose>0.05191 0.58501 0.54045 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -624,7 +632,7 @@
             <izz>0.00446</izz>
           </inertia>
         </inertial>
-        <collision name='l_larm_collision'>
+        <collision name="l_larm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -633,7 +641,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -643,7 +651,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_larm_visual'>
+        <visual name="l_larm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -658,7 +666,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_elx' type='revolute'>
+      <joint name="l_arm_elx" type="revolute">
         <child>l_larm</child>
         <parent>l_uarm</parent>
         <axis>
@@ -672,6 +680,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -683,7 +692,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_farm'>
+      <link name="l_farm">
         <pose>0.05191 0.77201 0.53124 0 -0 0</pose>
         <inertial>
           <pose>0 -0.065 0 0 -0 0</pose>
@@ -697,7 +706,7 @@
             <izz>0.00656</izz>
           </inertia>
         </inertial>
-        <collision name='l_farm_collision'>
+        <collision name="l_farm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -706,7 +715,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -716,7 +725,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_farm_visual'>
+        <visual name="l_farm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -731,7 +740,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_wry' type='revolute'>
+      <joint name="l_arm_wry" type="revolute">
         <child>l_farm</child>
         <parent>l_larm</parent>
         <axis>
@@ -745,6 +754,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -756,7 +766,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_hand'>
+      <link name="l_hand">
         <pose>0.05191 0.89101 0.54045 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -770,7 +780,7 @@
             <izz>0.00446</izz>
           </inertia>
         </inertial>
-        <collision name='l_hand_collision'>
+        <collision name="l_hand_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -779,7 +789,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -789,7 +799,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_hand_visual'>
+        <visual name="l_hand_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -804,7 +814,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_arm_wrx' type='revolute'>
+      <joint name="l_arm_wrx" type="revolute">
         <child>l_hand</child>
         <parent>l_farm</parent>
         <axis>
@@ -818,6 +828,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <provide_feedback>1</provide_feedback>
@@ -831,7 +842,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='head'>
+      <link name="head">
         <pose>0.20422 0 0.74993 0 -0 0</pose>
         <inertial>
           <pose>-0.0754942 3.38765e-05 0.0277411 0 -0 0</pose>
@@ -845,7 +856,7 @@
             <izz>0.00179047</izz>
           </inertia>
         </inertial>
-        <collision name='head_collision'>
+        <collision name="head_collision">
           <pose>-0.0503 0 -0.00195 0 -0 0</pose>
           <geometry>
             <box>
@@ -854,7 +865,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -864,7 +875,7 @@
             </friction>
           </surface>
         </collision>
-        <collision name='head_collision_head_other'>
+        <collision name="head_collision_head_other">
           <pose>-0.093 0 0.0868 0 -0 0</pose>
           <geometry>
             <box>
@@ -873,7 +884,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -883,7 +894,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='head_visual'>
+        <visual name="head_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -891,7 +902,7 @@
             </sphere>
           </geometry>
         </visual>
-        <visual name='head_visual_head_imu_link'>
+        <visual name="head_visual_head_imu_link">
           <pose>-0.0475 0.035 0 0 -0 0</pose>
           <geometry>
             <box>
@@ -907,7 +918,7 @@
           <linear>0</linear>
           <angular>0</angular>
         </velocity_decay>
-        <sensor name='head_imu_sensor' type='imu'>
+        <sensor name="head_imu_sensor" type="imu">
           <always_on>1</always_on>
           <update_rate>1000</update_rate>
           <imu>
@@ -936,7 +947,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='neck_ry' type='revolute'>
+      <joint name="neck_ry" type="revolute">
         <child>head</child>
         <parent>utorso</parent>
         <axis>
@@ -950,6 +961,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -961,7 +973,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='hokuyo_link'>
+      <link name="hokuyo_link">
         <pose>0.15962 0 0.83793 0 -0 0</pose>
         <inertial>
           <pose>0.0124384 0.0004084 -0.0041783 0 -0 0</pose>
@@ -975,7 +987,7 @@
             <izz>0.00178402</izz>
           </inertia>
         </inertial>
-        <collision name='hokuyo_link_collision'>
+        <collision name="hokuyo_link_collision">
           <pose>0.01885 0 -0.02119 0 -0 0</pose>
           <geometry>
             <box>
@@ -984,7 +996,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -994,7 +1006,7 @@
             </friction>
           </surface>
         </collision>
-        <collision name='hokuyo_link_collision_hokuyo_link_other'>
+        <collision name="hokuyo_link_collision_hokuyo_link_other">
           <pose>0.03 0 0.0235 0 -0 0</pose>
           <geometry>
             <cylinder>
@@ -1004,7 +1016,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1014,7 +1026,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='hokuyo_link_visual'>
+        <visual name="hokuyo_link_visual">
           <pose>0.045 -0.0261018 -0.0834237 -0.314 0 0</pose>
           <geometry>
             <sphere>
@@ -1033,7 +1045,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='hokuyo_joint' type='revolute'>
+      <joint name="hokuyo_joint" type="revolute">
         <child>hokuyo_link</child>
         <parent>head</parent>
         <axis>
@@ -1045,6 +1057,7 @@
           <dynamics>
             <damping>0.01</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1052,7 +1065,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_clav'>
+      <link name="r_clav">
         <pose>0.05191 -0.13866 0.31915 0 -0 0</pose>
         <inertial>
           <pose>0 -0.048 0.084 0 -0 0</pose>
@@ -1066,7 +1079,7 @@
             <izz>0.004</izz>
           </inertia>
         </inertial>
-        <collision name='r_clav_collision'>
+        <collision name="r_clav_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1075,7 +1088,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1085,7 +1098,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_clav_visual'>
+        <visual name="r_clav_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1100,7 +1113,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_shy' type='revolute'>
+      <joint name="r_arm_shy" type="revolute">
         <child>r_clav</child>
         <parent>utorso</parent>
         <axis>
@@ -1114,6 +1127,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1125,7 +1139,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_scap'>
+      <link name="r_scap">
         <pose>0.05191 -0.27901 0.51524 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -1139,7 +1153,7 @@
             <izz>0.00583</izz>
           </inertia>
         </inertial>
-        <collision name='r_scap_collision'>
+        <collision name="r_scap_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1148,7 +1162,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1158,7 +1172,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_scap_visual'>
+        <visual name="r_scap_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1173,7 +1187,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_shx' type='revolute'>
+      <joint name="r_arm_shx" type="revolute">
         <child>r_scap</child>
         <parent>r_clav</parent>
         <axis>
@@ -1187,6 +1201,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1198,7 +1213,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_uarm'>
+      <link name="r_uarm">
         <pose>0.05191 -0.46601 0.53124 0 -0 0</pose>
         <inertial>
           <pose>0 0.065 0 0 -0 0</pose>
@@ -1212,7 +1227,7 @@
             <izz>0.00656</izz>
           </inertia>
         </inertial>
-        <collision name='r_uarm_collision'>
+        <collision name="r_uarm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1221,7 +1236,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1231,7 +1246,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_uarm_visual'>
+        <visual name="r_uarm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1246,7 +1261,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_ely' type='revolute'>
+      <joint name="r_arm_ely" type="revolute">
         <child>r_uarm</child>
         <parent>r_scap</parent>
         <axis>
@@ -1260,6 +1275,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1271,7 +1287,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_larm'>
+      <link name="r_larm">
         <pose>0.05191 -0.58501 0.54045 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -1285,7 +1301,7 @@
             <izz>0.00446</izz>
           </inertia>
         </inertial>
-        <collision name='r_larm_collision'>
+        <collision name="r_larm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1294,7 +1310,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1304,7 +1320,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_larm_visual'>
+        <visual name="r_larm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1319,7 +1335,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_elx' type='revolute'>
+      <joint name="r_arm_elx" type="revolute">
         <child>r_larm</child>
         <parent>r_uarm</parent>
         <axis>
@@ -1333,6 +1349,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1344,7 +1361,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_farm'>
+      <link name="r_farm">
         <pose>0.05191 -0.77201 0.53124 0 -0 0</pose>
         <inertial>
           <pose>0 0.065 0 0 -0 0</pose>
@@ -1358,7 +1375,7 @@
             <izz>0.00656</izz>
           </inertia>
         </inertial>
-        <collision name='r_farm_collision'>
+        <collision name="r_farm_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1367,7 +1384,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1377,7 +1394,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_farm_visual'>
+        <visual name="r_farm_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1392,7 +1409,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_wry' type='revolute'>
+      <joint name="r_arm_wry" type="revolute">
         <child>r_farm</child>
         <parent>r_larm</parent>
         <axis>
@@ -1406,6 +1423,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1417,7 +1435,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_hand'>
+      <link name="r_hand">
         <pose>0.05191 -0.89101 0.54045 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -1431,7 +1449,7 @@
             <izz>0.00446</izz>
           </inertia>
         </inertial>
-        <collision name='r_hand_collision'>
+        <collision name="r_hand_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1440,7 +1458,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1450,7 +1468,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_hand_visual'>
+        <visual name="r_hand_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1465,7 +1483,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_arm_wrx' type='revolute'>
+      <joint name="r_arm_wrx" type="revolute">
         <child>r_hand</child>
         <parent>r_farm</parent>
         <axis>
@@ -1479,6 +1497,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <provide_feedback>1</provide_feedback>
@@ -1492,7 +1511,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_uglut'>
+      <link name="l_uglut">
         <pose>0 0.089 0 0 -0 0</pose>
         <inertial>
           <pose>0.00529262 -0.00344732 0.00313046 0 -0 0</pose>
@@ -1506,7 +1525,7 @@
             <izz>0.00041242</izz>
           </inertia>
         </inertial>
-        <collision name='l_uglut_collision'>
+        <collision name="l_uglut_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1515,7 +1534,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1525,7 +1544,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_uglut_visual'>
+        <visual name="l_uglut_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1540,7 +1559,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_leg_hpz' type='revolute'>
+      <joint name="l_leg_hpz" type="revolute">
         <child>l_uglut</child>
         <parent>pelvis</parent>
         <axis>
@@ -1554,6 +1573,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1565,7 +1585,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_lglut'>
+      <link name="l_lglut">
         <pose>0 0.089 0 0 -0 0</pose>
         <inertial>
           <pose>0.0133341 0.0170484 -0.0312052 0 -0 0</pose>
@@ -1579,7 +1599,7 @@
             <izz>0.00106487</izz>
           </inertia>
         </inertial>
-        <collision name='l_lglut_collision'>
+        <collision name="l_lglut_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1588,7 +1608,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1598,7 +1618,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_lglut_visual'>
+        <visual name="l_lglut_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1613,7 +1633,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_leg_hpx' type='revolute'>
+      <joint name="l_leg_hpx" type="revolute">
         <child>l_lglut</child>
         <parent>l_uglut</parent>
         <axis>
@@ -1627,6 +1647,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1638,7 +1659,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_uleg'>
+      <link name="l_uleg">
         <pose>0.05 0.089 -0.05 0 -0 0</pose>
         <inertial>
           <pose>0 0 -0.21 0 -0 0</pose>
@@ -1652,7 +1673,7 @@
             <izz>0.02</izz>
           </inertia>
         </inertial>
-        <collision name='l_uleg_collision'>
+        <collision name="l_uleg_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1661,7 +1682,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1671,7 +1692,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_uleg_visual'>
+        <visual name="l_uleg_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1686,7 +1707,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_leg_hpy' type='revolute'>
+      <joint name="l_leg_hpy" type="revolute">
         <child>l_uleg</child>
         <parent>l_lglut</parent>
         <axis>
@@ -1700,6 +1721,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1711,7 +1733,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_lleg'>
+      <link name="l_lleg">
         <pose>0 0.089 -0.424 0 -0 0</pose>
         <inertial>
           <pose>0.001 0 -0.187 0 -0 0</pose>
@@ -1725,7 +1747,7 @@
             <izz>0.01</izz>
           </inertia>
         </inertial>
-        <collision name='l_lleg_collision'>
+        <collision name="l_lleg_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1734,7 +1756,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1744,7 +1766,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_lleg_visual'>
+        <visual name="l_lleg_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1759,7 +1781,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_leg_kny' type='revolute'>
+      <joint name="l_leg_kny" type="revolute">
         <child>l_lleg</child>
         <parent>l_uleg</parent>
         <axis>
@@ -1773,6 +1795,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1784,7 +1807,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_talus'>
+      <link name="l_talus">
         <pose>0 0.089 -0.846 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -1798,7 +1821,7 @@
             <izz>1.30101e-05</izz>
           </inertia>
         </inertial>
-        <collision name='l_talus_collision'>
+        <collision name="l_talus_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1807,7 +1830,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1817,7 +1840,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='l_talus_visual'>
+        <visual name="l_talus_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1832,7 +1855,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='l_leg_aky' type='revolute'>
+      <joint name="l_leg_aky" type="revolute">
         <child>l_talus</child>
         <parent>l_lleg</parent>
         <axis>
@@ -1846,6 +1869,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -1857,7 +1881,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='l_foot'>
+      <link name="l_foot">
         <pose>0 0.089 -0.846 0 -0 0</pose>
         <inertial>
           <pose>0.027 0 -0.067 0 -0 0</pose>
@@ -1871,7 +1895,7 @@
             <izz>0.008</izz>
           </inertia>
         </inertial>
-        <collision name='l_foot_collision'>
+        <collision name="l_foot_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1897,14 +1921,14 @@
           </surface>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
-              <ode/>
+              <ode />
             </friction>
           </surface>
         </collision>
-        <visual name='l_foot_visual'>
+        <visual name="l_foot_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1922,7 +1946,7 @@
           <angular>0</angular>
         </velocity_decay>
         <self_collide>0</self_collide>
-        <sensor name='l_foot_contact_sensor' type='contact'>
+        <sensor name="l_foot_contact_sensor" type="contact">
           <update_rate>1000</update_rate>
           <always_on>1</always_on>
           <contact>
@@ -1931,7 +1955,7 @@
           </contact>
         </sensor>
       </link>
-      <joint name='l_leg_akx' type='revolute'>
+      <joint name="l_leg_akx" type="revolute">
         <child>l_foot</child>
         <parent>l_talus</parent>
         <axis>
@@ -1945,6 +1969,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <provide_feedback>1</provide_feedback>
@@ -1958,7 +1983,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_uglut'>
+      <link name="r_uglut">
         <pose>0 -0.089 0 0 -0 0</pose>
         <inertial>
           <pose>0.00529262 0.00344732 0.00313046 0 -0 0</pose>
@@ -1972,7 +1997,7 @@
             <izz>0.00041242</izz>
           </inertia>
         </inertial>
-        <collision name='r_uglut_collision'>
+        <collision name="r_uglut_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -1981,7 +2006,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -1991,7 +2016,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_uglut_visual'>
+        <visual name="r_uglut_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2006,7 +2031,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_leg_hpz' type='revolute'>
+      <joint name="r_leg_hpz" type="revolute">
         <child>r_uglut</child>
         <parent>pelvis</parent>
         <axis>
@@ -2020,6 +2045,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2031,7 +2057,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_lglut'>
+      <link name="r_lglut">
         <pose>0 -0.089 0 0 -0 0</pose>
         <inertial>
           <pose>0.0133341 -0.0170484 -0.0312052 0 -0 0</pose>
@@ -2045,7 +2071,7 @@
             <izz>0.00106487</izz>
           </inertia>
         </inertial>
-        <collision name='r_lglut_collision'>
+        <collision name="r_lglut_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2054,7 +2080,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -2064,7 +2090,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_lglut_visual'>
+        <visual name="r_lglut_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2079,7 +2105,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_leg_hpx' type='revolute'>
+      <joint name="r_leg_hpx" type="revolute">
         <child>r_lglut</child>
         <parent>r_uglut</parent>
         <axis>
@@ -2093,6 +2119,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2104,7 +2131,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_uleg'>
+      <link name="r_uleg">
         <pose>0.05 -0.089 -0.05 0 -0 0</pose>
         <inertial>
           <pose>0 0 -0.21 0 -0 0</pose>
@@ -2118,7 +2145,7 @@
             <izz>0.02</izz>
           </inertia>
         </inertial>
-        <collision name='r_uleg_collision'>
+        <collision name="r_uleg_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2127,7 +2154,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -2137,7 +2164,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_uleg_visual'>
+        <visual name="r_uleg_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2152,7 +2179,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_leg_hpy' type='revolute'>
+      <joint name="r_leg_hpy" type="revolute">
         <child>r_uleg</child>
         <parent>r_lglut</parent>
         <axis>
@@ -2166,6 +2193,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2177,7 +2205,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_lleg'>
+      <link name="r_lleg">
         <pose>0 -0.089 -0.424 0 -0 0</pose>
         <inertial>
           <pose>0.001 0 -0.187 0 -0 0</pose>
@@ -2191,7 +2219,7 @@
             <izz>0.01</izz>
           </inertia>
         </inertial>
-        <collision name='r_lleg_collision'>
+        <collision name="r_lleg_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2200,7 +2228,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -2210,7 +2238,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_lleg_visual'>
+        <visual name="r_lleg_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2225,7 +2253,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_leg_kny' type='revolute'>
+      <joint name="r_leg_kny" type="revolute">
         <child>r_lleg</child>
         <parent>r_uleg</parent>
         <axis>
@@ -2239,6 +2267,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2250,7 +2279,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_talus'>
+      <link name="r_talus">
         <pose>0 -0.089 -0.846 0 -0 0</pose>
         <inertial>
           <pose>0 0 0 0 -0 0</pose>
@@ -2264,7 +2293,7 @@
             <izz>1.30101e-05</izz>
           </inertia>
         </inertial>
-        <collision name='r_talus_collision'>
+        <collision name="r_talus_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2273,7 +2302,7 @@
           </geometry>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
               <ode>
@@ -2283,7 +2312,7 @@
             </friction>
           </surface>
         </collision>
-        <visual name='r_talus_visual'>
+        <visual name="r_talus_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2298,7 +2327,7 @@
         </velocity_decay>
         <self_collide>0</self_collide>
       </link>
-      <joint name='r_leg_aky' type='revolute'>
+      <joint name="r_leg_aky" type="revolute">
         <child>r_talus</child>
         <parent>r_lleg</parent>
         <axis>
@@ -2312,6 +2341,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2323,7 +2353,7 @@
           </ode>
         </physics>
       </joint>
-      <link name='r_foot'>
+      <link name="r_foot">
         <pose>0 -0.089 -0.846 0 -0 0</pose>
         <inertial>
           <pose>0.027 0 -0.067 0 -0 0</pose>
@@ -2337,7 +2367,7 @@
             <izz>0.008</izz>
           </inertia>
         </inertial>
-        <collision name='r_foot_collision'>
+        <collision name="r_foot_collision">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2363,14 +2393,14 @@
           </surface>
           <surface>
             <contact>
-              <ode/>
+              <ode />
             </contact>
             <friction>
-              <ode/>
+              <ode />
             </friction>
           </surface>
         </collision>
-        <visual name='r_foot_visual'>
+        <visual name="r_foot_visual">
           <pose>0 0 0 0 -0 0</pose>
           <geometry>
             <sphere>
@@ -2388,7 +2418,7 @@
           <angular>0</angular>
         </velocity_decay>
         <self_collide>0</self_collide>
-        <sensor name='r_foot_contact_sensor' type='contact'>
+        <sensor name="r_foot_contact_sensor" type="contact">
           <update_rate>1000</update_rate>
           <always_on>1</always_on>
           <contact>
@@ -2397,7 +2427,7 @@
           </contact>
         </sensor>
       </link>
-      <joint name='r_leg_akx' type='revolute'>
+      <joint name="r_leg_akx" type="revolute">
         <child>r_foot</child>
         <parent>r_talus</parent>
         <axis>
@@ -2411,6 +2441,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <provide_feedback>1</provide_feedback>
@@ -2424,7 +2455,7 @@
           </ode>
         </physics>
       </joint>
-      <joint name='r_foot_world_pin' type='revolute'>
+      <joint name="r_foot_world_pin" type="revolute">
         <child>r_foot</child>
         <parent>world</parent>
         <axis>
@@ -2436,6 +2467,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2443,7 +2475,7 @@
           </ode>
         </physics>
       </joint>
-      <joint name='l_foot_world_pin' type='revolute'>
+      <joint name="l_foot_world_pin" type="revolute">
         <child>l_foot</child>
         <parent>world</parent>
         <axis>
@@ -2455,6 +2487,7 @@
           <dynamics>
             <damping>0.1</damping>
           </dynamics>
+          <use_parent_model_frame>true</use_parent_model_frame>
         </axis>
         <physics>
           <ode>
@@ -2464,7 +2497,7 @@
       </joint>
       <pose>0 0 1.1 0 -0 0</pose>
       <!-- test pid controller joints -->
-      <plugin name='sphere_atlas_pid' filename='libSphereAtlasDemoPlugin.so'/>
+      <plugin name="sphere_atlas_pid" filename="libSphereAtlasDemoPlugin.so" />
     </model>
   </world>
 </sdf>

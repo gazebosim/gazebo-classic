@@ -19,6 +19,8 @@
  * Date: 15 May 2009
  */
 
+#include <string>
+
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 
@@ -61,10 +63,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -80,10 +78,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -539,17 +533,36 @@ void BulletJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAttribute(const std::string &/*_key*/,
+bool BulletJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/,
     const boost::any &/*_value*/)
 {
   gzdbg << "Not implement in Bullet\n";
+  return false;
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetAttribute(const std::string &/*_key*/,
+double BulletJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)
 {
   gzdbg << "Not implement in Bullet\n";
   return 0;
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetHighStop(unsigned int _index)
+{
+  return this->GetUpperLimit(_index);
+}
+
+//////////////////////////////////////////////////
+math::Angle BulletJoint::GetLowStop(unsigned int _index)
+{
+  return this->GetLowerLimit(_index);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

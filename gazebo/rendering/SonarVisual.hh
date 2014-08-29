@@ -22,6 +22,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class SonarVisual SonarVisual.hh rendering/rendering.hh
     /// \brief Visualization for sonar data.
-    class SonarVisual : public Visual
+    class GAZEBO_VISIBLE SonarVisual : public Visual
     {
       /// \brief Constructor.
       /// \param[in] _name Name of the visual.

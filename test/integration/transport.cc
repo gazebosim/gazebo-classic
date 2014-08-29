@@ -430,7 +430,6 @@ TEST_F(TransportTest, Errors)
   scenePub = testNode->Advertise<msgs::Scene>("~/scene");
   EXPECT_THROW(testNode->Advertise<msgs::Factory>("~/scene"),
                common::Exception);
-  EXPECT_TRUE(scenePub->GetPrevMsg().empty());
 
   transport::PublisherPtr factoryPub =
     testNode->Advertise<msgs::Factory>("~/factory");

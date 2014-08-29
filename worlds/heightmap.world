@@ -1,19 +1,26 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
     </include>
-
     <model name="box1">
       <pose>-63.0 -63. 10 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
         </collision>
         <visual name="visual">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
           <material>
             <ambient>1 0 0 1</ambient>
             <diffuse>1 0 0 1</diffuse>
@@ -21,15 +28,22 @@
         </visual>
       </link>
     </model>
-
     <model name="box2">
       <pose>-63.0 63.0 10 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
         </collision>
         <visual name="visual">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
           <material>
             <ambient>0 1 0 1</ambient>
             <diffuse>0 1 0 1</diffuse>
@@ -37,15 +51,22 @@
         </visual>
       </link>
     </model>
-
     <model name="box3">
       <pose>63 63.0 10 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
         </collision>
         <visual name="visual">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
           <material>
             <ambient>0 0 1 1</ambient>
             <diffuse>0 0 1 1</diffuse>
@@ -53,19 +74,25 @@
         </visual>
       </link>
     </model>
-
     <model name="box4">
       <pose>63 -63.0 10 0 0 0</pose>
       <link name="link">
         <collision name="collision">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
         </collision>
         <visual name="visual">
-          <geometry> <box> <size>1 1 1</size> </box> </geometry>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
         </visual>
       </link>
     </model>
-
     <model name="heightmap">
       <static>true</static>
       <link name="link">
@@ -78,7 +105,6 @@
             </heightmap>
           </geometry>
         </collision>
-
         <visual name="visual_abcedf">
           <geometry>
             <heightmap>
@@ -112,9 +138,7 @@
             </heightmap>
           </geometry>
         </visual>
-
       </link>
     </model>
-
   </world>
 </sdf>

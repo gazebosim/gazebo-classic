@@ -20,13 +20,13 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/gazebo.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  class SphereAtlasDemoPlugin : public ModelPlugin
+  class GAZEBO_VISIBLE SphereAtlasDemoPlugin : public ModelPlugin
   {
     public: SphereAtlasDemoPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);

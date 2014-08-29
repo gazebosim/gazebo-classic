@@ -172,11 +172,10 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   // Compute the final ray index
   rayOffset *= _msg->scan().count();
 
-  double r;
   for (unsigned int i = 0;
        i < static_cast<unsigned int>(_msg->scan().count()); i++)
   {
-    r = _msg->scan().ranges(i+rayOffset);
+    double r = _msg->scan().ranges(i+rayOffset);
 
     if (i+1 >= this->laserItem->GetRangeCount())
       this->laserItem->AddRange(r);

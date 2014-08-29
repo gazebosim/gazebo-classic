@@ -1,0 +1,505 @@
+.TH "GZ" "1" "March 2014" "" ""
+.
+.SH "NAME"
+\fBgz\fR \- Gazebo command line tool for control and analysis.
+.
+.SH "SYNPOSIS"
+\fBgz\fR \fIcommand\fR [option]\.\.\. [argument]\.\.\.
+.
+.UNINDENT
+.SH COMMANDS
+.UNINDENT
+.SS camera
+.sp
+.nf
+.ft C
+gz camera [options]
+.ft P
+.fi
+.sp
+
+Change properties of a camera. If a name for the world,
+option -w, is not specified, the first world found on
+the Gazebo master will be used.
+A camera name is required.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-c, \-\-camera\-name\fR=\fIarg\fR
+.
+Camera name. Use gz camera \-l to get a list of camera names.
+.TP
+.B \-l, \-\-list
+.
+List all cameras
+.TP
+.B \-f, \-\-follow\fR=\fIarg\fR
+.
+Model to follow.
+.UNINDENT
+.SS debug
+.sp
+.nf
+.ft C
+gz debug [options]
+.ft P
+.fi
+.sp
+
+Used primarily for bash completion, this tool
+return the completion list for a given command.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-o, \-\-option\fR=\fIarg\fR
+.
+Show the command options.
+.UNINDENT
+.SS help
+.sp
+.nf
+.ft C
+gz help [options]
+.ft P
+.fi
+.sp
+
+Output information about a gz command.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.UNINDENT
+.SS joint
+.sp
+.nf
+.ft C
+gz joint [options]
+.ft P
+.fi
+.sp
+
+Change properties of a joint. If a name for the world,
+option -w, is not specified, the first world found on
+the Gazebo master will be used.
+A model name and joint name are required.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-m, \-\-model\-name\fR=\fIarg\fR
+.
+Model name.
+.TP
+.B \-j, \-\-joint\-name\fR=\fIarg\fR
+.
+Joint name.
+.TP
+.B \-d, \-\-delete
+.
+Delete a model.
+.TP
+.B \-f, \-\-force\fR=\fIarg\fR
+.
+Force to apply to a joint.
+.TP
+.B \-\-pos\-t\fR=\fIarg\fR
+.
+Target angle.
+.TP
+.B \-\-pos\-p\fR=\fIarg\fR
+.
+Position proportional gain.
+.TP
+.B \-\-pos\-i\fR=\fIarg\fR
+.
+Position integral gain.
+.TP
+.B \-\-pos\-d\fR=\fIarg\fR
+.
+Position differential gain.
+.TP
+.B \-\-vel\-t\fR=\fIarg\fR
+.
+Target speed.
+.TP
+.B \-\-vel\-p\fR=\fIarg\fR
+.
+Velocity proportional gain.
+.TP
+.B \-\-vel\-i\fR=\fIarg\fR
+.
+Velocity integral gain.
+.TP
+.B \-\-vel\-d\fR=\fIarg\fR
+.
+Velocity differential gain.
+.UNINDENT
+.SS log
+.sp
+.nf
+.ft C
+gz log [options]
+.ft P
+.fi
+.sp
+
+Introspect and manipulate Gazebo log files. The log
+command can also start and stop data log recording from
+an active Gazebo server.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-i, \-\-info
+.
+Output information about a log file. Log filename should be specified using the --file option
+.TP
+.B \-e, \-\-echo
+.
+Output the contents of a log file to screen.
+.TP
+.B \-s, \-\-step
+.
+Step through the contents of a log file.
+.TP
+.B \-d, \-\-record\fR=\fIarg\fR
+.
+Start/stop recording a log file from an active Gazebo server.O=stop record, 1=start recording.
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name, used when starting or stopping recording.
+.TP
+.B \-r, \-\-raw
+.
+Output the data from echo and step without XML formatting.Used in conjuction with --echo or --step.
+.TP
+.B \-\-stamp\fR=\fIarg\fR
+.
+Add a timestamp to each line of output. Valid values are (sim,real,wall)
+.TP
+.B \-z, \-\-hz\fR=\fIarg\fR
+.
+Filter output to the specified Hz rate.Only valid for echo and step commands.
+.TP
+.B \-f, \-\-file\fR=\fIarg\fR
+.
+Path to a log file.
+.TP
+.B \-\-filter\fR=\fIarg\fR
+.
+Filter output. Valid only for the echo and step commands
+.UNINDENT
+.SS model
+.sp
+.nf
+.ft C
+gz model [options]
+.ft P
+.fi
+.sp
+
+Change properties of a model, delete a model, or
+spawn a new model. If a name for the world, option -w, is
+not pecified, the first world found on the Gazebo master
+will be used.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-m, \-\-model\-name\fR=\fIarg\fR
+.
+Model name.
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-d, \-\-delete
+.
+Delete a model.
+.TP
+.B \-f, \-\-spawn\-file\fR=\fIarg\fR
+.
+Spawn model from SDF file.
+.TP
+.B \-s, \-\-spawn\-string
+.
+Spawn model from SDF string, pass by a pipe.
+.TP
+.B \-x, \-\-pose\-x arg x value
+.TP
+.B \-y, \-\-pose\-y arg y value
+.TP
+.B \-z, \-\-pose\-z arg z value
+.TP
+.B \-R, \-\-pose\-R arg roll in radians.
+.TP
+.B \-P, \-\-pose\-P arg pitch in radians.
+.TP
+.B \-Y, \-\-pose\-Y arg yaw in radians.
+.UNINDENT
+.SS physics
+.sp
+.nf
+.ft C
+gz physics [options]
+.ft P
+.fi
+.sp
+
+Change properties of the physics engine on a specific
+world. If a name for the world, option -w, is not specified,
+the first world found on the Gazebo master will be used.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-g, \-\-gravity\fR=\fIarg\fR
+.
+Gravity vector. Comma separated 3\-tuple without whitespace, eg: -g 0,0,-9.8
+.TP
+.B \-s, \-\-step\-size\fR=\fIarg\fR
+.
+Maximum step size (seconds).
+.TP
+.B \-i, \-\-iters\fR=\fIarg\fR
+.
+Number of iterations.
+.TP
+.B \-u, \-\-update\-rate\fR=\fIarg\fR
+.
+Target real\-time update rate.
+.UNINDENT
+.SS sdf
+.sp
+.nf
+.ft C
+gz sdf [options]
+.ft P
+.fi
+.sp
+
+Introspect, convert, and output SDF files.
+Use the -v option to specify the version of
+SDF for use with other options.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-d, \-\-describe
+.
+Print SDF format for given version(\-v).
+.TP
+.B \-c, \-\-convert\fR=\fIarg\fR
+.
+In place conversion of arg to the latest SDF version.
+.TP
+.B \-o, \-\-doc
+.
+Print HTML SDF. Use \-v to specify version.
+.TP
+.B \-k, \-\-check\fR=\fIarg\fR
+.
+Validate arg.
+.TP
+.B \-v, \-\-version\fR=\fIarg\fR
+.
+Version of SDF to use with other options.
+.TP
+.B \-p, \-\-print\fR=\fIarg\fR
+.
+Print arg, useful for debugging and as a conversion tool.
+.UNINDENT
+.SS stats
+.sp
+.nf
+.ft C
+gz stats [options]
+.ft P
+.fi
+.sp
+
+Print gzserver statics to standard out. If a name for the world,
+option -w, is not specified, the first world found on
+the Gazebo master will be used.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-d, \-\-duration\fR=\fIarg\fR
+.
+Duration (seconds) to run.
+.TP
+.B \-p, \-\-plot
+.
+Output comma\-separated values, useful for processing and plotting.
+.UNINDENT
+.SS topic
+.sp
+.nf
+.ft C
+gz topic [options]
+.ft P
+.fi
+.sp
+
+Print topic information to standard out. If a name for the world,
+option -w, is not specified, the first world found on
+the Gazebo master will be used.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-l, \-\-list
+.
+List all topics.
+.TP
+.B \-i, \-\-info\fR=\fIarg\fR
+.
+Get information about a topic.
+.TP
+.B \-e, \-\-echo\fR=\fIarg\fR
+.
+Output topic data to screen.
+.TP
+.B \-v, \-\-view\fR=\fIarg\fR
+.
+View topic data using a QT widget.
+.TP
+.B \-z, \-\-hz\fR=\fIarg\fR
+.
+Get publish frequency.
+.TP
+.B \-b, \-\-bw\fR=\fIarg\fR
+.
+Get topic bandwidth.
+.TP
+.B \-u, \-\-unformatted
+.
+Output data from echo without formatting.
+.TP
+.B \-d, \-\-duration\fR=\fIarg\fR
+.
+Duration (seconds) to run. Applicable with echo, hz, and bw
+.UNINDENT
+.SS world
+.sp
+.nf
+.ft C
+gz world [options]
+.ft P
+.fi
+.sp
+
+Change properties of a Gazebo world on a running
+server. If a name for the world, option -w, is not specified
+the first world found on the Gazebo master will be used.
+
+.sp
+Options:
+.INDENT 0.0
+.TP
+.B \-h, \-\-help
+.
+Print this help message
+.TP
+.B \-w, \-\-world\-name\fR=\fIarg\fR
+.
+World name.
+.TP
+.B \-p, \-\-pause\fR=\fIarg\fR
+.
+Pause/unpause simulation. 0=unpause, 1=pause.
+.TP
+.B \-s, \-\-step
+.
+Step simulation one iteration.
+.TP
+.B \-m, \-\-multi\-step\fR=\fIarg\fR
+.
+Step simulation mulitple iteration.
+.TP
+.B \-r, \-\-reset\-all
+.
+Reset time and model poses
+.TP
+.B \-t, \-\-reset\-time
+.
+Reset time
+.TP
+.B \-o, \-\-reset\-models
+.
+Reset models

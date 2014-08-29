@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.5">
   <world name="default">
     <!-- A ground plane -->
     <include>
@@ -16,8 +16,10 @@
     <model name="sphere">
       <pose>0 0 10.0 0 0 0</pose>
       <link name="link">
-        <collision name="collision">
+        <inertial>
           <mass>1</mass>
+        </inertial>
+        <collision name="collision">
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -39,8 +41,10 @@
     <model name="box">
       <pose>1 0 50.0 0 0 0</pose>
       <link name="link">
-        <collision name="collision">
+        <inertial>
           <mass>1</mass>
+        </inertial>
+        <collision name="collision">
           <geometry>
             <sphere>
               <radius>0.1</radius>
@@ -62,8 +66,10 @@
     <model name="cylinder">
       <pose>5 0 50.0 0 0 0</pose>
       <link name="link">
-        <collision name="collision">
+        <inertial>
           <mass>1</mass>
+        </inertial>
+        <collision name="collision">
           <geometry>
             <sphere>
               <radius>0.2</radius>

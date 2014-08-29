@@ -25,6 +25,7 @@
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -35,7 +36,7 @@ namespace gazebo
 
     /// \class Inertial Inertial.hh physics/physics.hh
     /// \brief A class for inertial information about a link
-    class Inertial
+    class GAZEBO_VISIBLE Inertial
     {
       /// \brief Default Constructor
       public: Inertial();

@@ -20,12 +20,13 @@
 #include <string>
 #include "gazebo/common/Event.hh"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class Events
+    class GAZEBO_VISIBLE Events
     {
       /////////////////////////////////////////////////
       /// \brief Connect a boost::slot the add entity signal
@@ -51,6 +52,14 @@ namespace gazebo
               {return manipMode.Connect(_subscriber);}
       public: static void DisconnectManipMode(event::ConnectionPtr _subscriber)
               {manipMode.Disconnect(_subscriber);}
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the align mode signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectAlignMode(T _subscriber)
+              {return alignMode.Connect(_subscriber);}
+      public: static void DisconnectAlignMode(event::ConnectionPtr _subscriber)
+              {alignMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot to the fullscreen signal
@@ -80,6 +89,15 @@ namespace gazebo
               { return keyPress.Connect(_subscriber); }
       public: static void DisconnectKeyPress(event::ConnectionPtr _subscriber)
               { keyPress.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the light update signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+              { return lightUpdate.Connect(_subscriber); }
+      public: static void DisconnectLightUpdate(
+                  event::ConnectionPtr _subscriber)
+              { lightUpdate.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       public: template<typename T>
@@ -113,10 +131,18 @@ namespace gazebo
       ///  that indicates the user is manipulating an object
       public: static event::EventT<void (std::string)>  manipMode;
 
+      ///  that indicates the user is aligning objects
+      public: static event::EventT<void (std::string,
+                  std::string, std::string, bool)> alignMode;
+
       public: static event::EventT<void (std::string,
                                          std::string)> createEntity;
 
       public: static event::EventT<void (const msgs::Model &)> modelUpdate;
+
+      /// \brief A event to notify light updates.
+      public: static event::EventT<void (const msgs::Light &)> lightUpdate;
+
       public: static event::EventT<void (bool)> fullScreen;
       public: static event::EventT<void ()> fps;
       public: static event::EventT<void ()> orbit;

@@ -26,6 +26,7 @@
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/physics/RayShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     /// \class MultiRayShape MultiRayShape.hh physics/physics.hh
     /// \brief Laser collision contains a set of ray-collisions,
     /// structured to simulate a laser range scanner.
-    class MultiRayShape : public Shape
+    class GAZEBO_VISIBLE MultiRayShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision shape.

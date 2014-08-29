@@ -30,6 +30,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
 #include "gazebo/math/MathTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace boost
 {
@@ -45,7 +46,8 @@ namespace gazebo
 
     /// \class MovableText MovableText.hh rendering/rendering.hh
     /// \brief Movable text
-    class MovableText : public Ogre::MovableObject, public Ogre::Renderable
+    class GAZEBO_VISIBLE MovableText
+      : public Ogre::MovableObject, public Ogre::Renderable
     {
       /// \enum HorizAlign
       /// \brief Horizontal alignment

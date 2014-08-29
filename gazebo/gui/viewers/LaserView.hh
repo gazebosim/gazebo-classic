@@ -28,12 +28,13 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/viewers/TopicView.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class LaserView : public TopicView
+    class GAZEBO_VISIBLE LaserView : public TopicView
     {
       Q_OBJECT
 

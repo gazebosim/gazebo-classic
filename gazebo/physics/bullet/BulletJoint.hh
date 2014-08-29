@@ -27,6 +27,7 @@
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/Joint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all joints
-    class BulletJoint : public Joint
+    class GAZEBO_VISIBLE BulletJoint : public Joint
     {
       /// \brief Constructor
       public: BulletJoint(BasePtr _parent);
@@ -69,6 +70,9 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
                   const double _stiffness);
 
@@ -92,12 +96,19 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
+
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                                           unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
 
       // Documentation inherited.
       public: virtual void CacheForceTorque();

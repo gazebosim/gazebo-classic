@@ -14,14 +14,16 @@
  * limitations under the License.
  *
 */
+
 #include <string.h>
 
+#include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "ServerFixture.hh"
-#include "images_cmp.h"
 #include "heights_cmp.h"
 #include "helper_physics_generator.hh"
+#include "images_cmp.h"
+#include "ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -74,7 +76,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
 
-  testImage.SavePNG("/tmp/test_shape.png");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  testImage.SavePNG(paths->GetTmpPath() + "/test_shape.png");
 
   EXPECT_EQ(trueImage.GetWidth(), testImage.GetWidth());
   EXPECT_EQ(trueImage.GetHeight(), testImage.GetHeight());

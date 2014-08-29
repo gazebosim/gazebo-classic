@@ -20,17 +20,13 @@
 
 #include <string>
 #include <map>
-#include <vector>
+
+#include "gazebo/common/MouseEvent.hh"
+
+#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/cegui.h"
-#include "gazebo/common/MouseEvent.hh"
-#include "gazebo/common/Events.hh"
-
-#include "gazebo/math/MathTypes.hh"
-
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace Ogre
 {
@@ -49,6 +45,8 @@ namespace gazebo
 {
   namespace rendering
   {
+    class GUIOverlayPrivate;
+
     /// \addtogroup gazebo_rendering
     /// \{
 
@@ -139,6 +137,28 @@ namespace gazebo
       /// \brief PreRender function callback
       private: void PreRender();
 
+      /// \brief Get the ASCII keyboard code based on a unicode character.
+      /// \param[in] _unicode Unicode character.
+      /// \return ASCII integer
+      private: int GetKeyCode(const std::string  &_unicode);
+
+#ifdef HAVE_CEGUI
+      /// \brief Get a CEGUI::Window pointer to a named window.
+      /// \param[in] _name Name of the window to retrieve.
+      /// \return Pointer to the window.
+      public: CEGUI::Window *GetWindow(const std::string &_name);
+
+      /// \brief Load a CEGUI layout file.
+      /// \param[in] _filename Name of the layout file.
+      /// \return Pointer to the newly created CEGUI window.
+      private: CEGUI::Window *LoadLayoutImpl(const std::string &_filename);
+
+      /// \brief Button click callback.
+      /// \param[in] _e CEGUI button event.
+      /// \return True if handled.
+      private: bool OnButtonClicked(const CEGUI::EventArgs &_e);
+#endif
+
       /// \brief Register a CEGUI button callback.
       ///
       /// Assign a callback to a name button.
@@ -158,49 +178,20 @@ namespace gazebo
                   CEGUI::Event::Subscriber(&GUIOverlay::OnButtonClicked, this));
 
                 this->callbacks[_buttonName] = boost::bind(_fp, _obj);
+#else
+                if (_buttonName && _fp && _obj)
+                {
+                  gzerr << "CEGUI not installed." << std::endl;
+                }
 #endif
               }
 
-#ifdef HAVE_CEGUI
-      /// \brief Get a CEGUI::Window pointer to a named window.
-      /// \param[in] _name Name of the window to retrieve.
-      /// \return Pointer to the window.
-      public: CEGUI::Window *GetWindow(const std::string &_name);
-
-      /// \brief Load a CEGUI layout file.
-      /// \param[in] _filename Name of the layout file.
-      /// \return Pointer to the newly created CEGUI window.
-      private: CEGUI::Window *LoadLayoutImpl(const std::string &_filename);
-
-      /// \brief Button click callback.
-      /// \param[in] _e CEGUI button event.
-      /// \return True if handled.
-      private: bool OnButtonClicked(const CEGUI::EventArgs &_e);
-
-      /// \brief Get the ASCII keyboard code based on a unicode character.
-      /// \param[in] _unicode Unicode character.
-      /// \return ASCII integer
-      private: int GetKeyCode(const std::string  &_unicode);
-
-      /// \brief Pointer to the CEGUI ogre renderer
-      private: CEGUI::OgreRenderer *guiRenderer;
-#endif
-
-      /// \brief All the connections
-      private: std::vector<event::ConnectionPtr> connections;
-
-      /// \brief The layout file used to create gui elements
-      private: std::string layoutFilename;
-
       /// \brief Map of callback functions to names
-      private: std::map<std::string, boost::function<void()> > callbacks;
+      public: std::map<std::string, boost::function<void()> > callbacks;
 
-      /// \brief Used in the AttachCameraToImage function to create unique
-      /// names
-      private: unsigned int rttImageSetCount;
-
-      /// \brief True if initialized
-      private: bool initialized;
+      /// \internal
+      /// \brief Pointer to private data.
+      private: GUIOverlayPrivate *dataPtr;
     };
     /// \}
   }

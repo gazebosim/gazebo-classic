@@ -22,6 +22,7 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 class QLineEdit;
 class QLabel;
@@ -36,7 +37,7 @@ namespace gazebo
   {
     class BuildingEditorWidget;
 
-    class RenderWidget : public QWidget
+    class GAZEBO_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
       public: RenderWidget(QWidget *_parent = 0);
@@ -70,6 +71,9 @@ namespace gazebo
       /// \brief Handle follow model user event.
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
+
+      /// \brief Handle align model user event.
+      private: void OnAlign();
 
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;

@@ -19,16 +19,11 @@
 
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
-
-#ifdef HAVE_FFMPEG
-extern "C" {
-#include <libavformat/avformat.h>
-}
-#endif
+#include <gazebo/common/ffmpeg_inc.h>
 
 #include "test_config.h"
-#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/AudioDecoder.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
@@ -150,7 +145,10 @@ TEST_F(AudioDecoder, CheerFile)
     EXPECT_EQ(audio.GetSampleRate(), 44100);
 
     audio.Decode(&dataBuffer, &dataBufferSize);
-    EXPECT_EQ(dataBufferSize, 4989184u);
+    // In Ubuntu trusty the buffer size double for ogg decoding.
+    // This check is suitable for both older and newer versions of Ubuntu.
+    EXPECT_TRUE(dataBufferSize == 4989184u ||
+                dataBufferSize == 4989184u * 2u);
   }
 
   // MP3

@@ -42,6 +42,7 @@
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 // Forward Declarations
 namespace Ogre
@@ -74,7 +75,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class Camera : public boost::enable_shared_from_this<Camera>
+    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.
@@ -107,16 +108,9 @@ namespace gazebo
       /// \brief Render the camera.
       /// Called after the pre-render signal. This function will generate
       /// camera images.
-      // \todo Deprecated in Gazebo 2.1. In Gazebo 3.0 remove this function,
-      // and change Render(bool _force) to have a default value of false.
-      public: void Render();
-
-      /// \brief Render the camera.
-      /// Called after the pre-render signal. This function will generate
-      /// camera images.
       /// \param[in] _force Force camera to render. Ignore camera update
       /// rate.
-      public: void Render(bool _force);
+      public: void Render(bool _force = false);
 
       /// \brief Post render
       ///
@@ -313,11 +307,11 @@ namespace gazebo
 
       /// \brief Get the average FPS
       /// \return The average frames per second
-      public: virtual float GetAvgFPS() {return 0;}
+      public: virtual float GetAvgFPS() const {return 0;}
 
       /// \brief Get the triangle count
       /// \return The current triangle count
-      public: virtual unsigned int GetTriangleCount() {return 0;}
+      public: virtual unsigned int GetTriangleCount() const {return 0;}
 
       /// \brief Set the aspect ratio
       /// \param[in] _ratio The aspect ratio (width / height) in pixels
@@ -334,10 +328,6 @@ namespace gazebo
       /// \brief Get the camera's scene node
       /// \return The scene node the camera is attached to
       public: Ogre::SceneNode *GetSceneNode() const;
-
-      /// \brief Deprecated: Get the camera's pitch scene node
-      /// \return NULL. Use GetSceheNode() instead.
-      public: Ogre::SceneNode *GetPitchNode() const GAZEBO_DEPRECATED(3.0);
 
       /// \brief Get a pointer to the image data
       ///

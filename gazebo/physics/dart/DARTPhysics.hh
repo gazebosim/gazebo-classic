@@ -29,6 +29,7 @@
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -39,7 +40,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART physics engine
-    class DARTPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.
@@ -130,10 +131,9 @@ namespace gazebo
       // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(DARTParam _param) const;
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.

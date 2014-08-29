@@ -107,6 +107,10 @@ TEST_F(GpsSensor_TEST, CreateGps)
   EXPECT_DOUBLE_EQ(sensor->GetAltitude(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != NULL);
+  world->Step(100);
 }
 
 /////////////////////////////////////////////////

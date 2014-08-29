@@ -342,6 +342,65 @@ bool transport::getMinimalComms()
 }
 
 /////////////////////////////////////////////////
+transport::ConnectionPtr transport::connectToMaster()
+{
+  std::string data, namespacesData, publishersData;
+  msgs::Packet packet;
+
+  std::string host;
+  unsigned int port;
+  transport::get_master_uri(host, port);
+
+  // Connect to the master
+  transport::ConnectionPtr connection(new transport::Connection());
+
+  if (connection->Connect(host, port))
+  {
+    try
+    {
+      // Read the verification message
+      connection->Read(data);
+      connection->Read(namespacesData);
+      connection->Read(publishersData);
+    }
+    catch(...)
+    {
+      gzerr << "Unable to read from master\n";
+      return transport::ConnectionPtr();
+    }
+
+    packet.ParseFromString(data);
+    if (packet.type() == "version_init")
+    {
+      msgs::GzString msg;
+      msg.ParseFromString(packet.serialized_data());
+      if (msg.data() != std::string("gazebo ") + GAZEBO_VERSION)
+        std::cerr << "Conflicting gazebo versions\n";
+    }
+    else
+    {
+      gzerr  << "Failed to received version_init packet from master. "
+        << "Connection to master failed\n";
+      connection.reset();
+    }
+  }
+  else
+  {
+    gzerr << "Unable to connect to master.\n";
+    connection.reset();
+  }
+
+  if (connection && !connection->IsOpen())
+  {
+    gzerr << "Connection to master instatiated, but socket is not open."
+      << "Connection to master failed\n";
+    connection.reset();
+  }
+
+  return connection;
+}
+
+/////////////////////////////////////////////////
 bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
 {
   std::list<std::string> namespaces;

@@ -20,6 +20,7 @@
 #include <string>
 
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -30,7 +31,7 @@ namespace gazebo
 
     /// \class SelectionObj SelectionObj.hh
     /// \brief Interactive selection object for models and links
-    class SelectionObj : public Visual
+    class GAZEBO_VISIBLE SelectionObj : public Visual
     {
       /// \enum Manipulation modes
       /// \brief Unique identifiers for manipulation modes.

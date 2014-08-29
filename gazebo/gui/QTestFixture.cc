@@ -22,16 +22,14 @@
 
 #include <unistd.h>
 
-#include "gazebo/physics/PhysicsIface.hh"
-
-#include "gazebo/rendering/RenderingIface.hh"
-
-#include "gazebo/common/Time.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/util/LogRecord.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/gazebo.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/QTestFixture.hh"
+#include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()
@@ -110,8 +108,6 @@ void QTestFixture::RunServer(const std::string &_worldFilename,
 
   this->server->Run();
 
-  this->server->Fini();
-
   delete this->server;
   this->server = NULL;
 }
@@ -125,7 +121,20 @@ void QTestFixture::SetPause(bool _pause)
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
-  // gazebo::rendering::fini();
+  if (this->server)
+  {
+    this->server->Stop();
+
+    if (this->serverThread)
+    {
+      this->serverThread->join();
+    }
+  }
+
+  delete this->serverThread;
+  this->serverThread = NULL;
+
+  gazebo::gui::stop();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
@@ -143,19 +152,6 @@ void QTestFixture::cleanup()
   // Make sure the percent change values are reasonable.
   QVERIFY(resPercentChange < this->resMaxPercentChange);
   QVERIFY(sharePercentChange < this->shareMaxPercentChange);
-
-  if (this->server)
-  {
-    this->server->Stop();
-
-    if (this->serverThread)
-    {
-      this->serverThread->join();
-    }
-  }
-
-  delete this->serverThread;
-  this->serverThread = NULL;
 }
 
 /////////////////////////////////////////////////

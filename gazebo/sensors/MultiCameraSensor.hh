@@ -25,6 +25,7 @@
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
     /// \class MultiCameraSensor MultiCameraSensor.hh sensors/sensors.hh
     /// \brief Multiple camera sensor. This sensor type can create one or
     /// more synchronized cameras.
-    class MultiCameraSensor : public Sensor
+    class GAZEBO_VISIBLE MultiCameraSensor : public Sensor
     {
       /// \brief Constructor
       public: MultiCameraSensor();
@@ -108,9 +109,6 @@ namespace gazebo
 
       /// \brief Publishes messages of type msgs::ImagesStamped.
       private: transport::PublisherPtr imagePub;
-
-      /// \brief Pointer to the scene.
-      private: rendering::ScenePtr scene;
 
       /// \brief The images msg.
       private: msgs::ImagesStamped msg;

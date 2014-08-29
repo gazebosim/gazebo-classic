@@ -7,11 +7,11 @@ require 'tmpdir'
 def help
   puts "gzprop -- Create a model tarball for upload to thepropshop.org\n"
   puts "\n"
-  puts "'gzprop' <model_directory>\n"
+  puts "'gzprop' <model_file>\n"
   puts "\n"
   puts "Package an existing model directory into a tarball suitable"
   puts "for upload to thepropshop.org. A working instanstance of"
-  puts "Gazebo >2.0 is required.\n"
+  puts "Gazebo >3.0 is required.\n"
   puts "\n"
 end
 
@@ -24,50 +24,38 @@ if ARGV.empty?
   abort("")
 end
 
-# Get the model directory
-modelDir = ARGV[0]
+# Get the model file name
+modelFile = File.absolute_path(ARGV[0])
 
-# Make sure model directory exists
-if RUBY_VERSION < "1.9"
-  if Dir[modelDir].empty?
-    abort("Model directory[#{modelDir}] doesn't exist")
-  end
-else
-  if !Dir.exists?(modelDir)
-    abort("Model directory[#{modelDir}] doesn't exist")
-  end
-end
+modelParts = modelFile.split('/')
+modelDir = modelParts[0, modelParts.size()-1].join('/')
 
 # Make sure there is a model.sdf file in the model directory
-if !File.exists?(File.join(modelDir,"model.sdf"))
-  abort("Missing model.sdf in directory [#{modelDir}]")
+if !File.exists?(modelFile)
+  abort("Missing model file [#{modelFile}]")
 end
 
 # Get the name of the model (last part of the directory name)
-modelName = modelDir.split('/')[-1]
-
-metaDir = File.join(modelDir, "meta")
-
-# Create the meta directory
-if RUBY_VERSION < "1.9"
-  if Dir[modelDir].empty?
-    Dir.mkdir(metaDir)
-  end
-else
-  if !Dir.exists?(metaDir)
-    Dir.mkdir(metaDir)
-  end
-end
-
-# Create a set of images
-`gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelDir}"/model.sdf`
+modelName = modelParts[-2]
 
 ## Make a temporary directory
 Dir.mktmpdir { |dir|
 
+  metaDir = File.join(dir, modelName, "meta")
+
   # Copy the model information into a temp directory
   `cp -r "#{modelDir}" #{dir}`
+ 
+  # Create the meta directory
+  if RUBY_VERSION < "1.9"
+    Dir.mkdir(metaDir)
+  else
+    Dir.mkdir(metaDir)
+  end
 
+  # Create a set of images
+  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
+  
   # Create a tarball for the model
   `tar czvf #{modelName}.tar.gz -C #{dir} "#{modelName}"`
 }
