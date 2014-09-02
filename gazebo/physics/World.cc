@@ -1180,6 +1180,8 @@ void World::OnControl(ConstWorldControlPtr &_data)
 void World::OnRequest(ConstRequestPtr &_msg)
 {
   boost::recursive_mutex::scoped_lock lock(*this->receiveMutex);
+  std::cerr << "World::OnRequest " << _msg->request() << " " << _msg->data() <<
+      std::endl;
   this->requestMsgs.push_back(*_msg);
 }
 
