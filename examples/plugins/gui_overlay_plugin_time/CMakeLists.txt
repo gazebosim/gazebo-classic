@@ -9,7 +9,6 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
 endif()
 
-include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 
 include (${QT_USE_FILE})
