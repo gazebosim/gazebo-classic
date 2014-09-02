@@ -52,7 +52,7 @@ namespace gazebo
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;
 
-    /// \brief Publisher of factory messages.
+    /// \brief Subscriber to world statistics messages.
     private: transport::SubscriberPtr statsSub;
   };
 }
