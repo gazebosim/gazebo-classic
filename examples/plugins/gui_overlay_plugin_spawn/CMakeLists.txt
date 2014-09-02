@@ -9,6 +9,9 @@ if (PKG_CONFIG_FOUND)
   pkg_check_modules(OGRE-Terrain OGRE-Terrain)
 endif()
 
+include(FindProtobuf)
+find_package(Protobuf REQUIRED)
+
 include (${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
@@ -23,4 +26,7 @@ QT4_WRAP_CPP(headers_MOC GUIExampleSpawnWidget.hh)
 add_library(gui_example_spawn_widget SHARED ${headers_MOC}
   GUIExampleSpawnWidget.cc)
 target_link_libraries(gui_example_spawn_widget ${GAZEBO_LIBRARIES}
-  ${OGRE_LIBRARIES} ${OGRE-Terrain_LIBRARIES} ${QT_LIBRARIES})
+    ${OGRE_LIBRARIES} 
+    ${OGRE-Terrain_LIBRARIES}
+    ${QT_LIBRARIES}
+    ${PROTOBUF_LIBRARIES})
