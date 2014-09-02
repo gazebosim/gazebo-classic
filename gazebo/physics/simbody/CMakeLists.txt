@@ -36,4 +36,4 @@ gz_add_library(gazebo_physics_simbody ${sources})
 target_link_libraries(gazebo_physics_simbody ${Simbody_LIBRARIES})
 
 gz_install_library(gazebo_physics_simbody)
-
+gz_install_includes("physics/simbody" ${headers})
