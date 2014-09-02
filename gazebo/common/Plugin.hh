@@ -99,7 +99,7 @@ namespace gazebo
     /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
-              return this->name;
+              return this->handleName;
             }
 
     /// \brief a class method that creates a plugin from a file name.
@@ -168,7 +168,7 @@ namespace gazebo
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
-              result->name = _name;
+              result->handleName = _name;
               result->filename = filename;
 
               return result;
@@ -188,7 +188,7 @@ namespace gazebo
     protected: std::string filename;
 
     /// \brief Short name
-    protected: std::string name;
+    protected: std::string handleName;
 
     /// \brief Pointer to shared library registration function definition
     private: typedef union
