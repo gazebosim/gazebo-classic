@@ -598,8 +598,8 @@ void Server::ProcessControlMsgs()
         if (std::system(cmd.c_str()) == 0)
         {
           gzlog << "Cloning world [" << worldName << "]. "
-                << "Contact the server by typing:\n\tGAZEBO_MASTER_URI=http://"
-                << host << ":" << port << " gzclient" << std::endl;
+                << "Connect to the server by typing:\n\tGAZEBO_MASTER_URI="
+                << "http://" << host << ":" << port << " gzclient" << std::endl;
         }
         else
         {
