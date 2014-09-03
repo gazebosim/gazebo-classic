@@ -97,8 +97,9 @@ TEST_F(WorldClone, CloneUnknownWorld)
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
 
-  // Restore GAZEBO_MASTER_URI
-  setenv("GAZEBO_MASTER_URI", master, 1);
+  // Restore GAZEBO_MASTER_URI (if needed)
+  if (master)
+    setenv("GAZEBO_MASTER_URI", master, 1);
 }
 
 /////////////////////////////////////////////////
@@ -136,8 +137,9 @@ TEST_F(WorldClone, CloneEmptyPort)
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
 
-  // Restore GAZEBO_MASTER_URI
-  setenv("GAZEBO_MASTER_URI", master, 1);
+  // Restore GAZEBO_MASTER_URI (if needed)
+  if (master)
+    setenv("GAZEBO_MASTER_URI", master, 1);
 }
 
 /////////////////////////////////////////////////
