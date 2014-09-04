@@ -23,6 +23,8 @@ class WorldClone : public ServerFixture
 {
 };
 
+bool worldCloned = false;
+
 /////////////////////////////////////////////////
 std::string custom_exec_str(std::string _cmd)
 {
@@ -51,7 +53,9 @@ void OnWorldModify(ConstWorldModifyPtr &_msg)
   ASSERT_TRUE(_msg->has_cloned());
   EXPECT_TRUE(_msg->cloned());
   ASSERT_TRUE(_msg->has_cloned_uri());
-  EXPECT_EQ(_msg->cloned_uri(), "http://localhost:11346");
+  EXPECT_EQ(_msg->cloned_uri(), "http://localhost:11347");
+
+  worldCloned = _msg->has_cloned_uri() && _msg->cloned();
 }
 
 /////////////////////////////////////////////////
@@ -59,6 +63,8 @@ void OnWorldModifyNoClone(ConstWorldModifyPtr &_msg)
 {
   ASSERT_TRUE(_msg->has_cloned());
   EXPECT_FALSE(_msg->cloned());
+
+  worldCloned = _msg->has_cloned_uri() && _msg->cloned();
 }
 
 /////////////////////////////////////////////////
@@ -84,8 +90,13 @@ TEST_F(WorldClone, CloneUnknownWorld)
   msg.set_new_port(11346);
   serverControlPub->Publish(msg);
 
-  // Wait some bit of time since the clone is not immediate.
-  common::Time::MSleep(500);
+  // Wait until the response from our cloning request is ready.
+  worldCloned = false;
+  int retries = 0;
+  while (!worldCloned && retries++ < 100)
+    common::Time::MSleep(20);
+
+  ASSERT_FALSE(worldCloned);
 
   // Save the value of GAZEBO_MASTER_URI.
   char* master = getenv("GAZEBO_MASTER_URI");
@@ -124,22 +135,13 @@ TEST_F(WorldClone, CloneEmptyPort)
   msg.set_clone(true);
   serverControlPub->Publish(msg);
 
-  // Wait some bit of time since the clone is not immediate.
-  common::Time::MSleep(500);
+  // Wait until the response from our cloning request is ready.
+  worldCloned = false;
+  int retries = 0;
+  while (!worldCloned && retries++ < 100)
+    common::Time::MSleep(20);
 
-  // Save the value of GAZEBO_MASTER_URI.
-  char* master = getenv("GAZEBO_MASTER_URI");
-
-  // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
-  setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
-
-  // Check that the world was not cloned by looking for some topics.
-  std::string output = custom_exec_str("gz topic -l");
-  EXPECT_EQ(output.find("/gazebo/default/"), std::string::npos);
-
-  // Restore GAZEBO_MASTER_URI (if needed)
-  if (master)
-    setenv("GAZEBO_MASTER_URI", master, 1);
+  ASSERT_FALSE(worldCloned);
 }
 
 /////////////////////////////////////////////////
@@ -162,23 +164,33 @@ TEST_F(WorldClone, Clone)
   msgs::ServerControl msg;
   msg.set_save_world_name("");
   msg.set_clone(true);
-  msg.set_new_port(11346);
+  msg.set_new_port(11347);
   serverControlPub->Publish(msg);
 
-  // Wait some bit of time since the clone is not immediate.
-  common::Time::MSleep(500);
+  // Wait until the response from our cloning request is ready.
+  worldCloned = false;
+  int retries = 0;
+  while (!worldCloned && retries++ < 100)
+    common::Time::MSleep(20);
+
+  ASSERT_TRUE(worldCloned);
 
   // Remove all the models from the original world.
   world->Clear();
-  common::Time::MSleep(500);
-  EXPECT_EQ(world->GetModelCount(), 0u);
+
+  // Wait until the world is really cleared.
+  retries = 0;
+  while (world->GetModelCount() != 0u && retries++ < 100)
+    common::Time::MSleep(20);
+
+  ASSERT_EQ(world->GetModelCount(), 0u);
 
   // Check that the original world does not contain the camera topics.
   std::string output = custom_exec_str("gz topic -l");
   EXPECT_EQ(output.find("/gazebo/default/camera/"), std::string::npos);
 
   // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
-  setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);
+  setenv("GAZEBO_MASTER_URI", "http://localhost:11347", 1);
 
   // Check that the cloned world contains the camera topics.
   output = custom_exec_str("gz topic -l");
