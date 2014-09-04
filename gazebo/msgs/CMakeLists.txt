@@ -13,6 +13,7 @@ set (msgs
   cylindergeom.proto
   diagnostics.proto
   factory.proto
+  fluid.proto
   fog.proto
   friction.proto
   geometry.proto
