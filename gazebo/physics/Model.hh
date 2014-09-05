@@ -324,6 +324,34 @@ namespace gazebo
       /// \return this link's total energy
       public: double GetWorldEnergy() const;
 
+      /// New API
+      /// \brief get the velocities of the m degrees-of-freedom
+      /// of the model (for floating bases, velocity is computed in frame P)
+      public: GetIndependentVelocity(const math::Pose& _p, math::Vector3& _v);
+
+      /// \brief get the forces of the m degrees-of-freedom of
+      /// the model (for floating bases, force is computed in
+      /// frame P); forces will include gravity and
+      /// centrifugal/Coriolis forces
+      public: GetIndependentForces(const math::Pose& _p, math::Vector3& _f);
+
+      /// \brief get the m x m inertia matrix of the model
+      /// (for floating bases, inertia is computed in frame P)
+      public: GetIndependentInertia(const math::Pose& _p, math::Matrix& _m);
+
+      /// \brief gets the Jacobian from the start link to the
+      /// end-effector with respect to point p and defined in pose P
+      public: GetJacobian(math::Vector3& _point, LinkPtr _startLink,
+                          LinkPtr _endEffector,
+                          const math::Pose& _p, math::Matrix& _m);
+
+      /// \brief computes the inverse dynamics (solves for tau)
+      /// of the robot under gravity, centrifugal/Coriolis forces,
+      /// and contact forces such that the robot's acceleration
+      /// at the joints will be qdd
+      public: ComputeInverseDynamics(const math::Vector3& _qdd,
+                                     math::Vector3& _tau);
+
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
