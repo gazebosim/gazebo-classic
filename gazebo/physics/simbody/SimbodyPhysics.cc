@@ -1176,7 +1176,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
-#pragma GCC diagnostic pop
     {
       case physics::Entity::PLANE_SHAPE:
       {
@@ -1267,14 +1266,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       }
       break;
       default:
-// Remove these pragmas when non-const GetShapeType is removed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         gzerr << "Collision type [" << (*ci)->GetShapeType()
-#pragma GCC diagnostic pop
               << "] unimplemented\n";
         break;
     }
+#pragma GCC diagnostic pop
   }
 }
 
