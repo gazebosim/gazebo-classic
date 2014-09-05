@@ -16,16 +16,21 @@
 
   # box locations
   boxes_params= {
-    "large_wx" => { :y0 => -dz*2, :w0 => "5.0 0.1 0.1" },
+    "large_wx" => { :y0 => -dz*2, :w0 => "0.1 5.0 0.1" },
     "large_wy" => { :y0 =>  0.0,  :w0 => "0.1 5.0 0.1" },
-    "large_wz" => { :y0 =>  dz*2, :w0 => "0.1 0.1 5.0" },
+    "large_wz" => { :y0 =>  dz*2, :w0 => "0.1 5.0 0.1" },
+    "large_wz0" => { :y0 => -dz*4, :w0 => "0.1 5.0 0.1" },
+    "large_wz1" => { :y0 =>  dz*4, :w0 => "0.1 5.0 0.1" },
+    "large_wz2" => { :y0 =>  dz*6, :w0 => "0.1 5.0 0.1" },
+    "large_wz3" => { :y0 =>  dz*8, :w0 => "0.1 5.0 0.1" },
+    "large_wz4" => { :y0 =>  dz*10, :w0 => "0.1 5.0 0.1" },
   }
   z0 = dz
 %>
 <sdf version="1.5">
   <world name="default">
   <physics type="ode">
-    <gravity>0 0 0</gravity>
+    <gravity>0 0 -9.81</gravity>
   </physics>
   <include>
     <uri>model://sun</uri>
@@ -71,14 +76,14 @@
         </visual>
       </link>
       <%= "<plugin name=" + '"' + k + '" filename="libInitialVelocityPlugin.so">' %>
-        <linear>0 0 0</linear>
+        <linear>-2.0 2.0 8.0</linear>
         <angular><%= w0 %></angular>
       </plugin>
     </model>
   <% end %>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>5.5 0.0 0.9  0 0 3.14159</pose>
+        <pose>8.5 4.5 1.8  0 0 3.14159</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>
