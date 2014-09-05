@@ -1172,12 +1172,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
-    // The following is required until the deprecated, non-const version of
-    // Collision::GetShapeType is removed
-    // Otherwise it could be:
-    // (*ci)->GetShapeType()
-    boost::shared_ptr<const Collision> col = *ci;
-    switch (col->GetShapeType() & (~physics::Entity::SHAPE))
+// Remove these pragmas when non-const GetShapeType is removed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
+#pragma GCC diagnostic pop
     {
       case physics::Entity::PLANE_SHAPE:
       {
@@ -1268,7 +1267,11 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       }
       break;
       default:
-        gzerr << "Collision type [" << col->GetShapeType()
+// Remove these pragmas when non-const GetShapeType is removed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+        gzerr << "Collision type [" << (*ci)->GetShapeType()
+#pragma GCC diagnostic pop
               << "] unimplemented\n";
         break;
     }
