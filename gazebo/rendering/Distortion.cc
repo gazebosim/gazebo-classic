@@ -47,11 +47,11 @@ Distortion::~Distortion()
 void Distortion::Load(sdf::ElementPtr _sdf)
 {
   this->sdf = _sdf;
-  std::string type = this->sdf->Get<std::string>("type");
-  if (type == "barrel")
-    this->dataPtr->distortionType = DistortionPrivate::BARREL;
-  this->dataPtr->radialCoeff = this->sdf->Get<math::Vector3>("radial");
-  this->dataPtr->tangentialCoeff = this->sdf->Get<math::Vector2d>("tangential");
+  this->dataPtr->k1 = this->sdf->Get<double>("k1");
+  this->dataPtr->k2 = this->sdf->Get<double>("k2");
+  this->dataPtr->k3 = this->sdf->Get<double>("k3");
+  this->dataPtr->p1 = this->sdf->Get<double>("p1");
+  this->dataPtr->p2 = this->sdf->Get<double>("p2");
   this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
   this->dataPtr->distortionCrop = this->sdf->Get<bool>("crop");
 }
@@ -64,74 +64,90 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionScale.x = 1.0;
   this->dataPtr->distortionScale.y = 1.0;
 
-  if (this->dataPtr->distortionCrop
-      && this->dataPtr->distortionType == DistortionPrivate::BARREL)
+  if (this->dataPtr->distortionCrop)
   {
-    double tlx = 0;
-    double tly = 0;
-    double brx = 0;
-    double bry = 0;
-    double dtl = GZ_DBL_MAX;
-    double dbr = GZ_DBL_MAX;
+    double trX = 0;
+    double trY = 0;
+    double blX = 0;
+    double blY = 0;
+    double dtr = GZ_DBL_MAX;
+    double dbl = GZ_DBL_MAX;
     double incrU = 1.0 / (_camera->GetImageWidth());
     double incrV = 1.0 / (_camera->GetImageHeight());
-    for (double u = 0; u < 1.0; u+=incrU)
+    for (unsigned int i = 0; i <= _camera->GetImageWidth(); ++i)
     {
-      for (double v = 0; v < 1.0; v+=incrV)
+      double u = i*incrU;
+      for (unsigned int j = 0; j <= _camera->GetImageHeight(); ++j)
       {
+        double v = j*incrV;
         math::Vector2d texCoord(u, v);
         math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
         math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
         double rSq = normalized.x * normalized.x
             + normalized.y * normalized.y;
         math::Vector3 dist = normalized * ( 1.0 +
-            this->dataPtr->radialCoeff.x * rSq +
-            this->dataPtr->radialCoeff.y * rSq * rSq +
-            this->dataPtr->radialCoeff.z * rSq * rSq * rSq);
-        dist.x += this->dataPtr->tangentialCoeff.x
+            this->dataPtr->k1 * rSq +
+            this->dataPtr->k2 * rSq * rSq +
+            this->dataPtr->k3 * rSq * rSq * rSq);
+        dist.x += this->dataPtr->p1
             * (rSq + 2 * (normalized.x*normalized.x)) +
-            2 * this->dataPtr->tangentialCoeff.y
+            2 * this->dataPtr->p2
             * normalized.x * normalized.y;
-        dist.y += this->dataPtr->tangentialCoeff.y
+        dist.y += this->dataPtr->p2
             * (rSq + 2 * (normalized.y*normalized.y)) +
-            2 * this->dataPtr->tangentialCoeff.x
+            2 * this->dataPtr->p1
             * normalized.x * normalized.y;
         math::Vector2d out = this->dataPtr->lensCenter
             + math::Vector2d(dist.x, dist.y);
-        double dx = out.x - 0.0;
-        double dy = out.y - 0.0;
-        if (dx >= 0 && dy >= 0 && (dx + dy) < dtl)
+        double dx = out.x;
+        double dy = out.y;
+
+        // crop by finding corners that would give the largest resolution.
+        // One way to compute this is just to look at (dx + dy) where
+        // dx is the center-to-u distance, and
+        // dy is the center-to-v distance
+        if (dx >= 0 && dy >= 0 && (dx + dy) < dtr)
         {
-          tlx = u;
-          tly = v;
-          dtl = dx + dy;
+          trX = u;
+          trY = v;
+          dtr = dx + dy;
+          std::cerr << " setting dtr " << u << " " << v << std::endl;
+          std::cerr << " dx dy " <<
+              dx << " " << dy << std::endl;
         }
         dx = out.x - 1.0;
         dy = out.y - 1.0;
-        if (dx <= 0 && dy <= 0 && (fabs(dx) + fabs(dy)) < dbr)
+        if (dx <= 0 && dy <= 0 && (fabs(dx) + fabs(dy)) < dbl)
         {
-          brx = u;
-          bry = v;
-          dbr = (fabs(dx) + fabs(dy));
+          blX = u;
+          blY = v;
+          dbl = (fabs(dx) + fabs(dy));
+          std::cerr << " setting dbl " << u << " " << v << std::endl;
+          std::cerr << " dx dy " <<
+              dx << " " << dy << std::endl;
         }
       }
     }
-    this->dataPtr->distortionScale.x = brx - tlx;
-    this->dataPtr->distortionScale.y = bry - tly;
+    std::cerr << " tr bl " <<
+        trX << " " << trY << " " << blX << " " << blY << std::endl;
+
+    this->dataPtr->distortionScale.x = blX - trX;
+    this->dataPtr->distortionScale.y = blY - trY;
   }
+
+  std::cerr << " this->dataPtr->distortionScale " <<
+      this->dataPtr->distortionScale << std::endl;
 
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
       "Gazebo/CameraDistortion");
   Ogre::GpuProgramParametersSharedPtr params =
       distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-  params->setNamedConstant("radial",
-      static_cast<Ogre::Vector3>(
-      Conversions::Convert(this->dataPtr->radialCoeff)));
-  params->setNamedConstant("tangential",
-      static_cast<Ogre::Vector3>(
-      Ogre::Vector3(this->dataPtr->tangentialCoeff.x,
-      this->dataPtr->tangentialCoeff.y, 0.0)));
+  params->setNamedConstant("k1", static_cast<Ogre::Real>(this->dataPtr->k1));
+  params->setNamedConstant("k2", static_cast<Ogre::Real>(this->dataPtr->k2));
+  params->setNamedConstant("k3", static_cast<Ogre::Real>(this->dataPtr->k3));
+  params->setNamedConstant("p1", static_cast<Ogre::Real>(this->dataPtr->p1));
+  params->setNamedConstant("p2", static_cast<Ogre::Real>(this->dataPtr->p2));
   params->setNamedConstant("center",
       static_cast<Ogre::Vector3>(
       Ogre::Vector3(this->dataPtr->lensCenter.x,

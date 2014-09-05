@@ -27,20 +27,20 @@ namespace gazebo
     /// \brief Private data for the Camera class
     class DistortionPrivate
     {
-      /// \brief Which distortion type we support
-      public: enum DistortionModelType
-      {
-        BARREL
-      };
+      /// \brief Radial distortion coefficient k1.
+      public: double k1;
 
-      /// \brief Type of lens distortion we're applying
-      public: DistortionModelType distortionType;
+      /// \brief Radial distortion coefficient k2.
+      public: double k2;
 
-      /// \brief Radial distortion coefficients.
-      public: math::Vector3 radialCoeff;
+      /// \brief Radial distortion coefficient k3.
+      public: double k3;
 
-      /// \brief Tangential distortion coefficients.
-      public: math::Vector2d tangentialCoeff;
+      /// \brief Tangential distortion coefficient p1.
+      public: double p1;
+
+      /// \brief Tangential distortion coefficient p2.
+      public: double p2;
 
       /// \brief Lens center used for distortion
       public: math::Vector2d lensCenter;

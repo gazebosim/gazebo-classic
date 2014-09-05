@@ -36,15 +36,17 @@ unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 int imageCount = 0;
 int imageCount2 = 0;
+std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
-                  const std::string &/*_format*/)
+                  const std::string &_format)
 {
   boost::mutex::scoped_lock lock(mutex);
+  pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
 }
@@ -321,6 +323,90 @@ TEST_F(CameraSensor, CheckNoise)
   EXPECT_NE(diffSum, 0u);
   // We expect that the average difference will be well within 3-sigma.
   EXPECT_NEAR(diffAvg/255., noiseMean, 3*noiseStdDev);
+  delete[] img;
+  delete[] img2;
+}
+
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, CheckDistortion)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn two cameras in the same location, one with noise and one without.
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  std::string modelNameDistorted = "camera_model_distorted";
+  std::string cameraNameDistorted = "camera_sensor_distorted";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+
+  math::Pose setPose(
+      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate);
+  SpawnCamera(modelNameDistorted, cameraNameDistorted, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate,
+      "", 0, 0, true, 3, 0.2, 0.0, -0.001, -0.002, 0.5, 0.5);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  sensor = sensors::get_sensor(cameraNameDistorted);
+  sensors::CameraSensorPtr camSensorDistorted =
+    boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height*3];
+  img2 = new unsigned char[width * height*3];
+  event::ConnectionPtr c =
+    camSensor->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount, img,
+          _1, _2, _3, _4, _5));
+  event::ConnectionPtr c2 =
+    camSensorDistorted->GetCamera()->ConnectNewImageFrame(
+        boost::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          _1, _2, _3, _4, _5));
+
+  // Get some images
+  while (imageCount < 10 || imageCount2 < 10)
+    common::Time::MSleep(10);
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+  this->ImageCompare(img, img2, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+
+  common::Image image;
+  {
+    boost::mutex::scoped_lock lock(mutex);
+    image.SetFromData(img, width, height,
+        common::Image::ConvertPixelFormat(pixelFormat));
+  }
+  image.SavePNG("normal.png");
+
+  common::Image image2;
+  {
+    boost::mutex::scoped_lock lock(mutex);
+    image2.SetFromData(img2, width, height,
+        common::Image::ConvertPixelFormat(pixelFormat));
+  }
+  image2.SavePNG("distorted.png");
+
+
+
+  // We expect that there will be some non-zero difference between the two
+  // images.
+  EXPECT_NE(diffSum, 0u);
   delete[] img;
   delete[] img2;
 }

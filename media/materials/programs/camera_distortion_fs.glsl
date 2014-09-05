@@ -2,8 +2,11 @@
 uniform sampler2D RT;
 
 // distortion coefficients
-uniform vec3 radial;
-uniform vec3 tangential;
+uniform float k1;
+uniform float k2;
+uniform float k3;
+uniform float p1;
+uniform float p2;
 uniform vec2 center;
 uniform vec3 scale;
 uniform vec3 scaleIn;
@@ -16,15 +19,15 @@ vec2 warp(vec2 texCoord)
 
   // radial distortion: k1, k2, k3
   vec2 dist = normalized * ( 1.0 +
-      radial.x * rSq +
-      radial.y * rSq * rSq +
-      radial.z * rSq * rSq * rSq);
+      k1 * rSq +
+      k2 * rSq * rSq +
+      k3 * rSq * rSq * rSq);
 
   // tangential distortion: p1, p2
-  dist.x += tangential.y * (rSq + 2 * (normalized.x*normalized.x)) +
-      2 * tangential.x * normalized.x * normalized.y;
-  dist.y += tangential.x * (rSq + 2 * (normalized.y*normalized.y)) +
-      2 * tangential.y * normalized.x * normalized.y;
+  dist.x += p2 * (rSq + 2 * (normalized.x*normalized.x)) +
+      2 * p1 * normalized.x * normalized.y;
+  dist.y += p1 * (rSq + 2 * (normalized.y*normalized.y)) +
+      2 * p2 * normalized.x * normalized.y;
 
   return center.xy + scale * dist;
 }

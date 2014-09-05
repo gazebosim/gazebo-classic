@@ -1273,8 +1273,11 @@ fragment_program Gazebo/CameraDistortionFS glsl
   default_params
   {
     param_named RT int 0
-    param_named radial float3 0.0 0.0 0.0
-    param_named tangential float3 0.0 0.0 0.0
+    param_named k1 float 0.0
+    param_named k2 float 0.0
+    param_named k3 float 0.0
+    param_named p1 float 0.0
+    param_named p2 float 0.0    
     param_named center float3 0.5 0.5 1.0
     param_named scale float3 1.0 1.0 1.0
     param_named scaleIn float3 1.0 1.0 1.0
