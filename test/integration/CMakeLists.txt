@@ -75,6 +75,7 @@ set(tests
   transport.cc
   world.cc
   world_entity_below_point.cc
+  world_population.cc
   worlds_installed.cc
   )
 

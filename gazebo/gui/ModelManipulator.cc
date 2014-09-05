@@ -360,6 +360,10 @@ void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
   if (this->dataPtr->mouseEvent.control)
   {
     newScale = SnapPoint(newScale);
+    // prevent setting zero scale
+    newScale.x = std::max(1e-4, newScale.x);
+    newScale.y = std::max(1e-4, newScale.y);
+    newScale.z = std::max(1e-4, newScale.z);
   }
 
   _vis->SetScale(newScale);

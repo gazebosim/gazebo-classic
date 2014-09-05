@@ -41,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -104,6 +105,13 @@ namespace gazebo
 
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
+
+      /// \brief Qt callback when the main align action is triggered. Currently
+      /// just resets the child align actions.
+      private slots: void Align();
+
+      /// \brief Qt callback when the snap mode is triggered.
+      private slots: void Snap();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -255,6 +263,12 @@ namespace gazebo
 
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
+
+      /// \brief List of all the align action groups.
+      private: std::vector<QActionGroup *> alignActionGroups;
+
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
 
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;

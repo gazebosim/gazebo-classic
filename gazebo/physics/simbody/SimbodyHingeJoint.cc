@@ -60,9 +60,13 @@ void SimbodyHingeJoint::SetAxis(unsigned int /*_index*/,
 void SimbodyHingeJoint::SetVelocity(unsigned int _index, double _rate)
 {
   if (_index < this->GetAngleCount())
+  {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Velocity);
+  }
   else
     gzerr << "SetVelocity _index too large.\n";
 }
