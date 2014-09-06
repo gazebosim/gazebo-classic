@@ -11,6 +11,11 @@
 1. **gazebo/gui/SpaceNav.hh**
     + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
 
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + unsigned int GetShapeType()
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations

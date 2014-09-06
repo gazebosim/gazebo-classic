@@ -168,12 +168,6 @@ unsigned int Collision::GetShapeType() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Collision::GetShapeType()
-{
-  return this->shape->GetType();
-}
-
-//////////////////////////////////////////////////
 void Collision::SetShape(ShapePtr _shape)
 {
   this->shape = _shape;
