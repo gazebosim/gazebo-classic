@@ -18,7 +18,6 @@
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/Assert.hh"
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -32,6 +31,13 @@ using namespace rendering;
 Distortion::Distortion()
   : dataPtr(new DistortionPrivate)
 {
+  this->dataPtr->k1 = 0;
+  this->dataPtr->k2 = 0;
+  this->dataPtr->k3 = 0;
+  this->dataPtr->p1 = 0;
+  this->dataPtr->p2 = 0;
+  this->dataPtr->lensCenter = math::Vector2d(0.5, 0.5);
+  this->dataPtr->distortionCrop = false;
 }
 
 //////////////////////////////////////////////////
@@ -53,7 +59,11 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->p1 = this->sdf->Get<double>("p1");
   this->dataPtr->p2 = this->sdf->Get<double>("p2");
   this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
-  this->dataPtr->distortionCrop = this->sdf->Get<bool>("crop");
+
+  // for barrel distortion - crop the black pixels surrounding the
+  // distorted image.
+  //if (this->dataPtr->k1 > 0)
+    this->dataPtr->distortionCrop = true;
 }
 
 //////////////////////////////////////////////////
@@ -64,6 +74,24 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionScale.x = 1.0;
   this->dataPtr->distortionScale.y = 1.0;
 
+  unsigned int distortionMapSize =
+      _camera->GetImageHeight()*_camera->GetImageWidth()*2;
+  float *distortionMap = new float[distortionMapSize];
+
+  for (unsigned int i = 0; i < distortionMapSize; ++i)
+    distortionMap[i] = -1;
+
+  std::vector<math::Vector2d> map;
+  map.resize(_camera->GetImageHeight()*_camera->GetImageWidth());
+  for (unsigned int i = 0; i < map.size(); ++i)
+    map[i] = -1;
+
+/*  math::Vector2d remap[_camera->GetImageWidth()][_camera->GetImageHeight()];
+  for (unsigned int i = 0; i < _camera->GetImageWidth(); ++i)
+    for (unsigned int j = 0; j < _camera->GetImageHeight(); ++j)
+      remap[i][j] = -1;*/
+
+  // crop the black borders for barrel distortion
   if (this->dataPtr->distortionCrop)
   {
     double trX = 0;
@@ -99,21 +127,26 @@ void Distortion::SetCamera(CameraPtr _camera)
             * normalized.x * normalized.y;
         math::Vector2d out = this->dataPtr->lensCenter
             + math::Vector2d(dist.x, dist.y);
+
+        //std::cerr << out.x << " " << out.y << std::endl;
+
+        // fill the distortion map
+        int idxU = out.x * _camera->GetImageWidth();
+        int idxV = out.y * _camera->GetImageHeight();
+        std::cerr << " idx " << idxU << " " << idxV << std::endl;
+        map[idxU * _camera->GetImageHeight() + idxV] = math::Vector2d(u, v);
+
+        //distortionMap[i*_camera->GetImageHeight()*2 + j*2] = out.x;
+        //distortionMap[i*_camera->GetImageHeight()*2 + j*2 + 1] = out.y;
+
         double dx = out.x;
         double dy = out.y;
 
-        // crop by finding corners that would give the largest resolution.
-        // One way to compute this is just to look at (dx + dy) where
-        // dx is the center-to-u distance, and
-        // dy is the center-to-v distance
         if (dx >= 0 && dy >= 0 && (dx + dy) < dtr)
         {
           trX = u;
           trY = v;
           dtr = dx + dy;
-          std::cerr << " setting dtr " << u << " " << v << std::endl;
-          std::cerr << " dx dy " <<
-              dx << " " << dy << std::endl;
         }
         dx = out.x - 1.0;
         dy = out.y - 1.0;
@@ -122,21 +155,21 @@ void Distortion::SetCamera(CameraPtr _camera)
           blX = u;
           blY = v;
           dbl = (fabs(dx) + fabs(dy));
-          std::cerr << " setting dbl " << u << " " << v << std::endl;
-          std::cerr << " dx dy " <<
-              dx << " " << dy << std::endl;
         }
       }
     }
-    std::cerr << " tr bl " <<
-        trX << " " << trY << " " << blX << " " << blY << std::endl;
 
     this->dataPtr->distortionScale.x = blX - trX;
     this->dataPtr->distortionScale.y = blY - trY;
   }
 
-  std::cerr << " this->dataPtr->distortionScale " <<
-      this->dataPtr->distortionScale << std::endl;
+  for (unsigned int i = 0; i < map.size(); ++i)
+  {
+    std::cerr<< map[i] << std::endl;
+    distortionMap[i*2] = map[i].x;
+    distortionMap[i*2+1] = map[i].y;
+  }
+
 
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
@@ -159,6 +192,9 @@ void Distortion::SetCamera(CameraPtr _camera)
       static_cast<Ogre::Vector3>(
       Ogre::Vector3(this->dataPtr->distortionScale.x,
       this->dataPtr->distortionScale.y, 0.0)));
+
+  params->setNamedConstant("remap", distortionMap);
+
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->GetViewport(), "CameraDistortion/Default");

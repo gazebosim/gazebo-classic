@@ -34,7 +34,10 @@ namespace gazebo
     /// \{
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
-    /// \brief Camera distortion
+    /// \brief Camera distortion based on Brown's model. Note that the current
+    /// implementation has the limitation that it actually applies undistortion.
+    /// So the distortion coefficients needs to be tweaked to emulate the
+    /// desired barrel or pincushion distortions.
     class GAZEBO_VISIBLE Distortion
     {
       /// \brief Constructor

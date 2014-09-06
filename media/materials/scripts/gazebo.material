@@ -1281,6 +1281,7 @@ fragment_program Gazebo/CameraDistortionFS glsl
     param_named center float3 0.5 0.5 1.0
     param_named scale float3 1.0 1.0 1.0
     param_named scaleIn float3 1.0 1.0 1.0
+    param_named scaleIn float3 1.0 1.0 1.0
   }
 }
 

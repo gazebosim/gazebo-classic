@@ -386,6 +386,30 @@ TEST_F(CameraSensor, CheckDistortion)
   this->ImageCompare(img, img2, width, height, 3,
                      diffMax, diffSum, diffAvg);
 
+  // We expect that there will be some non-zero difference between the two
+  // images.
+  EXPECT_NE(diffSum, 0u);
+
+  // Compare colors. Distorted image should have more darker pixels than the
+  // original as the ground plane has been warped to occupy more of the image.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3)];
+      unsigned int g = img[(y*width*3)+1];
+      unsigned int b = img[(y*width*3)+2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3)];
+      unsigned int g2 = img2[(y*width*3)+1];
+      unsigned int b2 = img2[(y*width*3)+2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
+  EXPECT_GT(colorSum, colorSum2);
+
   common::Image image;
   {
     boost::mutex::scoped_lock lock(mutex);

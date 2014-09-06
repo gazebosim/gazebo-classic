@@ -29,7 +29,9 @@ vec2 warp(vec2 texCoord)
   dist.y += p1 * (rSq + 2 * (normalized.y*normalized.y)) +
       2 * p2 * normalized.x * normalized.y;
 
-  return center.xy + scale * dist;
+  vec2 warped = center.xy + scale * dist;
+  warped = clamp(warped, 0, 1.0);
+  return warped;
 }
 
 void main()
