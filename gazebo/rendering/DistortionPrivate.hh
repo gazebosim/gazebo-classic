@@ -54,6 +54,15 @@ namespace gazebo
 
       /// \brief Lens distortion compositor
       public: Ogre::CompositorInstance *lensDistortionInstance;
+
+      /// \brief Connection for the pre render event.
+      public: event::ConnectionPtr preRenderConnection;
+
+      /// \brief Mapping of distorted to undistorted normalized pixels
+      public: std::vector<math::Vector2d> distortionMap;
+
+      /// \brief Pointer to the camera.
+      public: CameraPtr camera;
     };
   }
 }

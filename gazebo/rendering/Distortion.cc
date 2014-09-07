@@ -17,6 +17,7 @@
 
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/Events.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
@@ -74,12 +75,12 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionScale.x = 1.0;
   this->dataPtr->distortionScale.y = 1.0;
 
-  unsigned int distortionMapSize =
+  /*gned int distortionMapSize =
       _camera->GetImageHeight()*_camera->GetImageWidth()*2;
   float *distortionMap = new float[distortionMapSize];
 
   for (unsigned int i = 0; i < distortionMapSize; ++i)
-    distortionMap[i] = -1;
+    distortionMap[i] = -1;*/
 
   std::vector<math::Vector2d> map;
   map.resize(_camera->GetImageHeight()*_camera->GetImageWidth());
@@ -134,10 +135,8 @@ void Distortion::SetCamera(CameraPtr _camera)
         int idxU = out.x * _camera->GetImageWidth();
         int idxV = out.y * _camera->GetImageHeight();
         std::cerr << " idx " << idxU << " " << idxV << std::endl;
-        map[idxU * _camera->GetImageHeight() + idxV] = math::Vector2d(u, v);
 
-        //distortionMap[i*_camera->GetImageHeight()*2 + j*2] = out.x;
-        //distortionMap[i*_camera->GetImageHeight()*2 + j*2 + 1] = out.y;
+        map[idxU * _camera->GetImageHeight() + idxV] = math::Vector2d(u, v);
 
         double dx = out.x;
         double dy = out.y;
@@ -163,14 +162,6 @@ void Distortion::SetCamera(CameraPtr _camera)
     this->dataPtr->distortionScale.y = blY - trY;
   }
 
-  for (unsigned int i = 0; i < map.size(); ++i)
-  {
-    std::cerr<< map[i] << std::endl;
-    distortionMap[i*2] = map[i].x;
-    distortionMap[i*2+1] = map[i].y;
-  }
-
-
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
       "Gazebo/CameraDistortion");
@@ -192,13 +183,48 @@ void Distortion::SetCamera(CameraPtr _camera)
       static_cast<Ogre::Vector3>(
       Ogre::Vector3(this->dataPtr->distortionScale.x,
       this->dataPtr->distortionScale.y, 0.0)));
-
-  params->setNamedConstant("remap", distortionMap);
-
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->GetViewport(), "CameraDistortion/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
+
+  // Create the render texture
+  std::string texName = _camera->GetName() + "_distortionTex";
+  Ogre::TexturePtr renderTexture = Ogre::TextureManager::getSingleton().createManual(
+      texName,
+      "General",
+      Ogre::TEX_TYPE_2D,
+      _camera->GetImageWidth(),
+      _camera->GetImageHeight(),
+      0,
+      Ogre::PF_FLOAT32_RGB);
+  Ogre::HardwarePixelBufferSharedPtr pixelBuffer = renderTexture->getBuffer();
+
+  // Lock the pixel buffer and get a pixel box
+  pixelBuffer->lock(Ogre::HardwareBuffer::HBL_NORMAL);
+  const Ogre::PixelBox &pixelBox = pixelBuffer->getCurrentLock();
+
+  float *pDest = static_cast<float *>(pixelBox.data);
+
+  for (unsigned int i = 0; i < _camera->GetImageWidth(); ++i)
+  {
+    for(unsigned int j = 0; j < _camera->GetImageHeight(); ++j)
+    {
+      math::Vector2d vec =
+//            this->dataPtr->distortionMap[i*_camera->GetImageHeight()+j];
+          math::Vector2d(1, 0);
+      *pDest++ = 1;//vec.x;
+      *pDest++ = 0;//vec.y;
+      *pDest++ = 0;
+    }
+    //pDest += pixelBox.getRowSkip() * Ogre::PixelUtil::getNumElemBytes(pixelBox.format);
+  }
+
+  // Unlock the pixel buffer
+  pixelBuffer->unlock();
+
+  Ogre::TextureUnitState *textureUnitState =
+      distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
 }
 
 //////////////////////////////////////////////////

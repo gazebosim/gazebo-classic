@@ -1,5 +1,6 @@
 // The input texture, which is set up by the Ogre Compositor infrastructure.
 uniform sampler2D RT;
+uniform sampler2D distortionMap;
 
 // distortion coefficients
 uniform float k1;
@@ -24,18 +25,20 @@ vec2 warp(vec2 texCoord)
       k3 * rSq * rSq * rSq);
 
   // tangential distortion: p1, p2
-  dist.x += p2 * (rSq + 2 * (normalized.x*normalized.x)) +
-      2 * p1 * normalized.x * normalized.y;
-  dist.y += p1 * (rSq + 2 * (normalized.y*normalized.y)) +
-      2 * p2 * normalized.x * normalized.y;
+  dist.x += p2 * (rSq + 2.0 * (normalized.x*normalized.x)) +
+      2.0 * p1 * normalized.x * normalized.y;
+  dist.y += p1 * (rSq + 2.0 * (normalized.y*normalized.y)) +
+      2.0 * p2 * normalized.x * normalized.y;
 
-  vec2 warped = center.xy + scale * dist;
-  warped = clamp(warped, 0, 1.0);
+  vec2 warped = center.xy + scale.xy * dist.xy;
+  clamp(warped, 0.0, 1.0);
   return warped;
 }
 
 void main()
 {
   vec2 uv = warp(gl_TexCoord[0].xy);
-  gl_FragColor = texture2D(RT, uv);
+  //gl_FragColor = texture2D(RT, uv);
+  gl_FragColor = texture2D(distortionMap, uv);
+  //gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
 }

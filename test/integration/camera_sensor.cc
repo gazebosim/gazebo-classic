@@ -356,7 +356,7 @@ TEST_F(CameraSensor, CheckDistortion)
       setPose.rot.GetAsEuler(), width, height, updateRate);
   SpawnCamera(modelNameDistorted, cameraNameDistorted, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate,
-      "", 0, 0, true, 3, 0.2, 0.0, -0.001, -0.002, 0.5, 0.5);
+      "", 0, 0, true, -3, 0.2, 0.0, -0.001, -0.002, 0.5, 0.5);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
