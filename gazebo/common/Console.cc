@@ -16,6 +16,7 @@
  */
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <sstream>
 
@@ -207,6 +208,7 @@ FileLogger &FileLogger::operator()(const std::string &_file, int _line)
   return (*this);
 }
 
+/////////////////////////////////////////////////
 std::string FileLogger::GetMasterPort()
 {
   char *charURI = getenv("GAZEBO_MASTER_URI");
@@ -220,7 +222,7 @@ std::string FileLogger::GetMasterPort()
       return masterURI.substr(lastColon + 1, std::string::npos);
   }
 
-  return "default";
+  return boost::lexical_cast<std::string>(GAZEBO_DEFAULT_MASTER_PORT);
 }
 
 /////////////////////////////////////////////////

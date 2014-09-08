@@ -92,8 +92,7 @@ namespace gazebo
                   const std::string &_file, int _line);
 
       /// \brief Get the port of the master.
-      /// \return The port of the master or "default" if "GAZEBO_MASTER_URI" is
-      /// not present or not set properly.
+      /// \return The port of the master.
       private: static std::string GetMasterPort();
 
       /// \brief String buffer for the file logger.
