@@ -5,6 +5,9 @@
 1. Implemented a simulation cloner
     * [Pull request #1180](https://bitbucket.org/osrf/gazebo/pull-request/1180/clone-a-simulation)
 
+1. Added GUI overlay plugins. Users can now write a Gazebo + QT plugin that displays widgets over the render window.
+  * [Pull request #1181](https://bitbucket.org/osrf/gazebo/pull-request/1181)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.0.0 (2014-08-08)
