@@ -315,7 +315,7 @@ else (build_errors)
     gazebo_transport
     gazebo_util)
     
-  if (NOT HAVE_CCD)
+  if (NOT CCD_FOUND)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
   endif()
     
