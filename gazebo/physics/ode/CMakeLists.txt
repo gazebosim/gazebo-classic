@@ -6,7 +6,6 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
 )
 
-
 set (sources
   ODEBallJoint.cc
   ODECollision.cc
@@ -70,6 +69,7 @@ target_link_libraries(gazebo_physics_ode
 )
 
 gz_install_library(gazebo_physics_ode)
+gz_install_includes("physics/ode" ${headers})
 
 # unit tests
 set (gtest_sources

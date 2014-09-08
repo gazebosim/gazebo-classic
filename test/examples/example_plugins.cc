@@ -88,6 +88,8 @@ INSTANTIATE_TEST_CASE_P(ExamplePlugins, ExamplePlugins, ::testing::Values(
   , "projector"
   , "system_gui_plugin"
   , "world_edit"
+  , "gui_overlay_plugin_spawn"
+  , "gui_overlay_plugin_time"
 ));
 
 int main(int argc, char **argv)

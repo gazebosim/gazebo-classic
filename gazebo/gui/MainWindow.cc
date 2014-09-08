@@ -51,7 +51,6 @@
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
-
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
 #endif
