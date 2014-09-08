@@ -632,7 +632,7 @@ class StateFilter : public FilterBase
             result << this->filter.Filter(state);
 
             if (this->xmlOutput)
-              result << "</sdf></state>\n";
+              result << "</state></sdf>\n";
 
             this->prevTime = state.GetSimTime();
             return result.str();
