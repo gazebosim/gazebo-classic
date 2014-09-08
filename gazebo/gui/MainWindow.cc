@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -28,6 +29,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -476,6 +479,21 @@ void MainWindow::Save()
     msgBox.setText("Unable to save world.\n"
                    "Unable to retrieve SDF world description from server.");
     msgBox.exec();
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Create a gzserver clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
   }
 }
 
@@ -930,6 +948,10 @@ void MainWindow::CreateActions()
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
 
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1305,6 +1327,7 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
@@ -1554,6 +1577,16 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned())
+  {
+    if (_msg->cloned())
+    {
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+      gzerr << "Error cloning a world" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

@@ -55,7 +55,7 @@ namespace gazebo
         this->logDirectory = logPath.string();
 
         // Initialize Console
-        gzLogInit((boost::filesystem::path("test_logs") /
+        gzLogInit("test-", (boost::filesystem::path("test_logs") /
              this->logFilename).string());
         gazebo::common::Console::SetQuiet(false);
       }
