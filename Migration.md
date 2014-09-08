@@ -11,6 +11,12 @@
 1. **gazebo/gui/SpaceNav.hh**
     + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
 
+### Modifications
+
+1. **gazebo/common/Plugin.hh**
+    + ***Removed:*** protected: std::string Plugin::handle
+    + ***Replacement:*** protected: std::string Plugin::handleName
+
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**
