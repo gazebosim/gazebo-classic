@@ -372,6 +372,41 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
   }
 
+  // Test Coloumb friction
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    // set friction to 1.0
+    const double friction = 1.0;
+    _joint->SetParam("friction", _index, friction);
+    EXPECT_NEAR(_joint->GetParam("friction", _index), friction, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with smaller magnitude than friction
+      _joint->SetForce(_index, friction * 0.5);
+      world->Step(1);
+    }
+
+    // Expect no motion
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with larger magnitude than friction
+      _joint->SetForce(_index, friction * 1.5);
+      world->Step(1);
+    }
+
+    // Expect motion
+    EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+  }
+
   if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
   {
     gzerr << "BulletSliderJoint fails the joint limit tests" << std::endl;
@@ -401,6 +436,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     world->Step(steps);
     EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
+    {
+      boost::any value = _joint->GetParam("hi_stop", _index);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), limit.Radian());
+    }
   }
 
   // SetLowStop
@@ -420,6 +459,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     world->Step(steps);
     EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
+    {
+      boost::any value = _joint->GetParam("lo_stop", _index);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), limit.Radian());
+    }
   }
 }
 
