@@ -51,6 +51,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  my_test.cc
   model_database.cc
   noise.cc
   nondefault_world.cc
