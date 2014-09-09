@@ -51,6 +51,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   laser.cc
+  link_wrench_test.cc
   model.cc
   model_database.cc
   my_test.cc

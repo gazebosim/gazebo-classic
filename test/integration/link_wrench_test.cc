@@ -26,19 +26,20 @@
 
 using namespace gazebo;
 
-class MyTest : public ServerFixture,
+class LinkWrenchTest : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
-  /// \brief My custom test.
+  /// \brief Link Wrench test.
+  /// apply force and torque to a link, check its acceleration.
   /// \param[in] _physicsEngine Type of physics engine to use.
-  public: void MyTest1(const std::string &_physicsEngine);
+  public: void LinkWrenchTest1(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
-void MyTest::MyTest1(const std::string &_physicsEngine)
+void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
 {
   // Load our force torque test world
-  Load("worlds/my_test.world", true, _physicsEngine);
+  Load("worlds/link_wrench_test.world", true, _physicsEngine);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -77,12 +78,12 @@ void MyTest::MyTest1(const std::string &_physicsEngine)
   }
 }
 
-TEST_P(MyTest, MyTest1)
+TEST_P(LinkWrenchTest, LinkWrenchTest1)
 {
-  MyTest1(GetParam());
+  LinkWrenchTest1(GetParam());
 }
 
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, MyTest,
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, LinkWrenchTest,
                         PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
