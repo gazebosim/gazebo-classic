@@ -73,7 +73,7 @@ void MyTest::MyTest1(const std::string &_physicsEngine)
   {
     world->Step(1);
     // test joint_01 wrench
-    EXPECT_DOUBLE_EQ(link->GetWorldPose().x, link->GetWorldPose().x);
+    EXPECT_DOUBLE_EQ(link->GetWorldPose().pos.x, link->GetWorldPose().pos.x);
   }
 }
 
