@@ -73,7 +73,6 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < 10; ++i)
   {
     world->Step(1);
-    // test joint_01 wrench
     EXPECT_DOUBLE_EQ(link->GetWorldPose().pos.x, link->GetWorldPose().pos.x);
   }
 }
