@@ -52,8 +52,11 @@ namespace gazebo
     /// \brief Initialize log file with filename given by _str.
     /// If called twice, it will close currently in use and open a new
     /// log file.
+    /// \param[in] _prefix Prefix added to the directory where the log file
+    /// will be created.
     /// \param[in] _str Name of log file for gzlog messages.
-    #define gzLogInit(_str) (gazebo::common::Console::log.Init(_str))
+    #define gzLogInit(_prefix, _str) \
+        (gazebo::common::Console::log.Init(_prefix, _str))
 
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
@@ -68,9 +71,12 @@ namespace gazebo
       public: virtual ~FileLogger();
 
       /// \brief Initialize the file logger.
+      /// \param[in] _prefix Prefix added to the directory where the log file
+      /// will be created.
       /// \param[in] _filename Name and path of the log file to write output
       /// into.
-      public: void Init(const std::string &_filename);
+      public: void Init(const std::string &_prefix,
+                        const std::string &_filename);
 
       /// \brief Output a filename and line number, then return a reference
       /// to the logger.
@@ -84,6 +90,10 @@ namespace gazebo
       /// \return Reference to this logger.
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
+
+      /// \brief Get the port of the master.
+      /// \return The port of the master.
+      private: static std::string GetMasterPort();
 
       /// \brief String buffer for the file logger.
       protected: class Buffer : public std::stringbuf

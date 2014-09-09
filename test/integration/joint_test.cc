@@ -179,16 +179,16 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
 //////////////////////////////////////////////////
 void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 {
-  /// SpringDamper implemented not yet released for dart
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issue #975.\n";
-    return;
-  }
   /// bullet collision parameters needs tweaking
   if (_physicsEngine == "bullet")
   {
     gzerr << "Aborting test for bullet, see issue #887.\n";
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for " << _physicsEngine
+          << ", see issue #975.\n";
     return;
   }
 
@@ -346,7 +346,21 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 
     double energy = linkPluginImplicit->GetWorldEnergy() +
                    jointPluginImplicit->GetWorldEnergyPotentialSpring(0);
-    EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 1e-3);
+    if (_physicsEngine.compare("dart") == 0)
+    {
+      if (i == 0)
+      {
+        gzerr << _physicsEngine
+              << " has reduced accuracy for spring energy conservation"
+              << ", see #975"
+              << std::endl;
+      }
+      EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 2e-2);
+    }
+    else
+    {
+      EXPECT_NEAR(energy / energyPluginImplicit0, 1.0, 1e-3);
+    }
     // gzdbg << i << "\n";
     // gzdbg << cyclesPrismatic << " : "
     //       << linkPrismatic->GetWorldLinearVel() << "\n";
@@ -360,8 +374,18 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     gzdbg << "Extra tests for ode" << std::endl;
     EXPECT_EQ(cyclesContact,        17);
   }
-  EXPECT_EQ(cyclesPrismatic,      17);
-  EXPECT_EQ(cyclesRevolute,       17);
+  if (_physicsEngine.compare("dart") == 0)
+  {
+    gzerr << _physicsEngine
+          << " doesn't support joint limit stiffness"
+          << ", see #975"
+          << std::endl;
+  }
+  else
+  {
+    EXPECT_EQ(cyclesPrismatic,      17);
+    EXPECT_EQ(cyclesRevolute,       17);
+  }
   EXPECT_EQ(cyclesPluginExplicit, 17);
   EXPECT_EQ(cyclesPluginImplicit, 17);
   EXPECT_EQ(cyclesPrismatic2,     17);

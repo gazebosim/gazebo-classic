@@ -419,6 +419,10 @@ void RenderEngine::LoadPlugins()
     plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
     plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
 
+#ifdef HAVE_OCULUS
+    plugins.push_back(path+"/Plugin_CgProgramManager");
+#endif
+
     for (piter = plugins.begin(); piter != plugins.end(); ++piter)
     {
       try

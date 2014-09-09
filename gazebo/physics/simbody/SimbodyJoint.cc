@@ -478,13 +478,6 @@ void SimbodyJoint::SetAttribute(Attribute, unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAttribute(const std::string &_key,
-    unsigned int _index, const boost::any &_value)
-{
-  this->SetParam(_key, _index, _value);
-}
-
-//////////////////////////////////////////////////
 bool SimbodyJoint::SetParam(const std::string &/*_key*/,
     unsigned int /*_index*/, const boost::any &/*_value*/)
 {
@@ -492,11 +485,6 @@ bool SimbodyJoint::SetParam(const std::string &/*_key*/,
   return false;
 }
 
-//////////////////////////////////////////////////
-double SimbodyJoint::GetAttribute(const std::string &_key, unsigned int _index)
-{
-  return this->GetParam(_key, _index);
-}
 //////////////////////////////////////////////////
 double SimbodyJoint::GetParam(const std::string &/*_key*/,
     unsigned int /*_index*/)

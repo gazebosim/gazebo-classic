@@ -1,3 +1,98 @@
+## Gazebo 4.X to 5.X
+
+### Modifications
+
+1. **Informational logs:** The log files will be created inside
+  ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
+  ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
+  change is to avoid name collisions when cloning a simulation. If the
+  environment variable GAZEBO_MASTER_URI is not present or invalid,
+  <GAZEBO_MASTER_PORT> will be replaced by "default".
+
+### Additions
+
+1. **gazebo/physics/Population.hh**
+    + ***New class:*** Population
+
+1. **gazebo/math/Kmeans.hh**
+    + ***New class:*** Kmeans
+
+1. **gazebo/gui/SpaceNav.hh**
+    + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
+
+### Modifications
+
+1. **gazebo/common/Plugin.hh**
+    + ***Removed:*** protected: std::string Plugin::handle
+    + ***Replacement:*** protected: std::string Plugin::handleName
+
+## Gazebo 3.1 to 4.0
+
+### New Deprecations
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
+    + ***Replacement*** virtual void SetPosition(unsigned int, double)
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
+### Additions
+
+1. **gazebo/msgs/msgs.hh**
+    + sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf = sdf::ElementPtr())
+
+1. **gazebo/rendering/Light.hh**
+    + math::Quaternion GetRotation() const
+    + void SetRotation(const math::Quaternion &_q)
+    + LightPtr Clone(const std::string &_name, ScenePtr _scene)
+
+1. **gazebo/rendering/Scene.hh**
+    + void AddLight(LightPtr _light)
+    + void RemoveLight(LightPtr _light)
+
+1. **gazebo/gui/GuiEvents.hh**
+    + template<typename T> static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
+    + static void DisconnectLightUpdate(event::ConnectionPtr _subscriber)
+
+1. **gazebo/gui/ModelMaker.hh**
+    + bool InitFromModel(const std::string & _modelName)
+
+1. **gazebo/gui/LightMaker.hh**
+    + bool InitFromLight(const std::string & _lightName)
+
+1. **gazebo/common/Mesh.hh**
+    + int GetMaterialIndex(const Material *_mat) const
+
+1. **gazebo/math/Filter.hh**
+    + ***New classes:*** Filter, OnePole, OnePoleQuaternion, OnePoleVector3, BiQuad, and BiQuadVector3
+
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void Move(const math::Pose &_worldRefernceFrameSrc,
+                        const math::Pose &_worldRefernceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+      + msgs::Visual GetVisualMessage(const std::string &_name)
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gazebo/physics/Base.cc**
+    + ***Removed*** std::string GetScopedName() const
+    + ***Replaced*** std::string GetScopedName(bool _prependWorldName=false) const
+
 ## Gazebo 3.0 to 3.1
 
 ### Additions
@@ -142,6 +237,9 @@
     + ***Replacement*** virtual bool SetParam(const std::string &_key, unsigned int _index, const boost::any &_value)
 
 ### Modifications
+1. **gazebo/physics/Entity.hh**
+    + ***Removed:*** inline const math::Pose &GetWorldPose() const `ABI change`
+    + ***Replacement:*** inline virutal const math::Pose &GetWorldPose() const
 1. **gazebo/physics/Box.hh**
     + ***Removed:*** bool operator==(const Box &_b) `ABI Change`
     + ***Replacement:***  bool operator==(const Box &_b) const
@@ -324,6 +422,9 @@
           Link_V &_connectedLinks, bool _fistLink = false);
       + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
 
+1. **gazebo/physics/Collision.hh**
+    + void SetWorldPoseDirty()
+    + virtual const math::Pose &GetWorldPose() const
 1. **gazebo/physics/JointController.hh**
       + common::Time GetLastUpdateTime() const
       + std::map<std::string, JointPtr> GetJoints() const
