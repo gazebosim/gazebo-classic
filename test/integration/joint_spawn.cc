@@ -373,6 +373,13 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   // Test Coloumb friction
+  if (!isOde)
+  {
+    gzerr << "Skipping friction test for "
+          << physics->GetType()
+          << std::endl;
+  }
+  else
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
