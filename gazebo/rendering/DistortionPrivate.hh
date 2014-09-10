@@ -60,9 +60,6 @@ namespace gazebo
 
       /// \brief Mapping of distorted to undistorted normalized pixels
       public: std::vector<math::Vector2d> distortionMap;
-
-      /// \brief Pointer to the camera.
-      public: CameraPtr camera;
     };
   }
 }

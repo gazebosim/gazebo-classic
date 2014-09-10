@@ -39,6 +39,12 @@ void main()
 {
   vec2 uv = warp(gl_TexCoord[0].xy);
   //gl_FragColor = texture2D(RT, uv);
-  gl_FragColor = texture2D(distortionMap, uv);
   //gl_FragColor = vec4(1.0, 0.0, 0.0, 0.0);
+
+
+  vec4 mapUV = texture2D(distortionMap, gl_TexCoord[0].xy);
+  if (mapUV.x < 0.0 || mapUV.y < 0.0)
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  else
+    gl_FragColor = texture2D(RT, mapUV.xy);
 }

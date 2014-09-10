@@ -82,18 +82,21 @@ void Distortion::SetCamera(CameraPtr _camera)
   for (unsigned int i = 0; i < distortionMapSize; ++i)
     distortionMap[i] = -1;*/
 
-  std::vector<math::Vector2d> map;
-  map.resize(_camera->GetImageHeight()*_camera->GetImageWidth());
-  for (unsigned int i = 0; i < map.size(); ++i)
-    map[i] = -1;
-
-/*  math::Vector2d remap[_camera->GetImageWidth()][_camera->GetImageHeight()];
-  for (unsigned int i = 0; i < _camera->GetImageWidth(); ++i)
-    for (unsigned int j = 0; j < _camera->GetImageHeight(); ++j)
-      remap[i][j] = -1;*/
+  //std::vector<math::Vector2d> map;
+  unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
+    _camera->GetImageHeight() : _camera->GetImageWidth();
+  unsigned int texWidth = texSide;
+  unsigned int texHeight = texSide;
+  //unsigned int imageSize = _camera->GetImageHeight()*_camera->GetImageWidth();
+  unsigned int imageSize = texWidth * texHeight;
+  std::vector<math::Vector2d> uvMap;
+  uvMap.resize(imageSize);
+  this->dataPtr->distortionMap.resize(imageSize);
+  for (unsigned int i = 0; i < this->dataPtr->distortionMap.size(); ++i)
+    this->dataPtr->distortionMap[i] = -1;
 
   // crop the black borders for barrel distortion
-  if (this->dataPtr->distortionCrop)
+//  if (this->dataPtr->distortionCrop)
   {
     double trX = 0;
     double trY = 0;
@@ -101,14 +104,19 @@ void Distortion::SetCamera(CameraPtr _camera)
     double blY = 0;
     double dtr = GZ_DBL_MAX;
     double dbl = GZ_DBL_MAX;
-    double incrU = 1.0 / (_camera->GetImageWidth());
-    double incrV = 1.0 / (_camera->GetImageHeight());
-    for (unsigned int i = 0; i <= _camera->GetImageWidth(); ++i)
+//    double incrU = 1.0 / (_camera->GetImageWidth());
+//    double incrV = 1.0 / (_camera->GetImageHeight());
+    double incrU = 1.0 / texWidth;
+    double incrV = 1.0 / texHeight;
+
+    //for (unsigned int i = 0; i < _camera->GetImageHeight(); ++i)
+    for (unsigned int i = 0; i < texHeight; ++i)
     {
-      double u = i*incrU;
-      for (unsigned int j = 0; j <= _camera->GetImageHeight(); ++j)
+      double v = i*incrU;
+      //for (unsigned int j = 0; j < _camera->GetImageWidth(); ++j)
+      for (unsigned int j = 0; j < texWidth; ++j)
       {
-        double v = j*incrV;
+        double u = j*incrV;
         math::Vector2d texCoord(u, v);
         math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
         math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
@@ -132,12 +140,19 @@ void Distortion::SetCamera(CameraPtr _camera)
         //std::cerr << out.x << " " << out.y << std::endl;
 
         // fill the distortion map
-        int idxU = out.x * _camera->GetImageWidth();
-        int idxV = out.y * _camera->GetImageHeight();
-        std::cerr << " idx " << idxU << " " << idxV << std::endl;
+        //int idxU = out.x * _camera->GetImageWidth();
+        //int idxV = out.y * _camera->GetImageHeight();
+        int idxU = out.x * texHeight;
+        int idxV = out.y * texWidth;
+        //std::cerr << " idx " << idxU << " " << idxV << std::endl;
+        //std::cerr << " uv " << u << " " << v << std::endl;
+        int mapIdx = idxV * texWidth + idxU;
+        math::Vector2d uv(u, v);
 
-        map[idxU * _camera->GetImageHeight() + idxV] = math::Vector2d(u, v);
+        this->dataPtr->distortionMap[mapIdx] = uv;
+        uvMap[i*texWidth + j] = uv;
 
+      /*
         double dx = out.x;
         double dy = out.y;
 
@@ -154,13 +169,17 @@ void Distortion::SetCamera(CameraPtr _camera)
           blX = u;
           blY = v;
           dbl = (fabs(dx) + fabs(dy));
-        }
+        }*/
       }
     }
 
-    this->dataPtr->distortionScale.x = blX - trX;
-    this->dataPtr->distortionScale.y = blY - trY;
+//    this->dataPtr->distortionScale.x = blX - trX;
+//    this->dataPtr->distortionScale.y = blY - trY;
   }
+  math::Vector2d tl = uvMap[0];
+  math::Vector2d br = uvMap[imageSize -1];
+//  this->dataPtr->distortionScale = br - tl;
+
 
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
@@ -188,14 +207,16 @@ void Distortion::SetCamera(CameraPtr _camera)
       _camera->GetViewport(), "CameraDistortion/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
-  // Create the render texture
+  // Create the ditortion map texture
   std::string texName = _camera->GetName() + "_distortionTex";
   Ogre::TexturePtr renderTexture = Ogre::TextureManager::getSingleton().createManual(
       texName,
       "General",
       Ogre::TEX_TYPE_2D,
-      _camera->GetImageWidth(),
-      _camera->GetImageHeight(),
+      //_camera->GetImageWidth(),
+      //_camera->GetImageHeight(),
+      texWidth,
+      texHeight,
       0,
       Ogre::PF_FLOAT32_RGB);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = renderTexture->getBuffer();
@@ -206,17 +227,19 @@ void Distortion::SetCamera(CameraPtr _camera)
 
   float *pDest = static_cast<float *>(pixelBox.data);
 
-  for (unsigned int i = 0; i < _camera->GetImageWidth(); ++i)
+  for (unsigned int i = 0; i < texHeight; ++i)
   {
-    for(unsigned int j = 0; j < _camera->GetImageHeight(); ++j)
+    for(unsigned int j = 0; j < texWidth; ++j)
     {
       math::Vector2d vec =
-//            this->dataPtr->distortionMap[i*_camera->GetImageHeight()+j];
-          math::Vector2d(1, 0);
-      *pDest++ = 1;//vec.x;
-      *pDest++ = 0;//vec.y;
+          this->dataPtr->distortionMap[i*texWidth+j];
+      //    math::Vector2d(1, 0);
+      *pDest++ = vec.x;
+      *pDest++ = vec.y;
       *pDest++ = 0;
+      std::cerr << vec.x << " " << vec.y << " ";
     }
+    std::cerr << std::endl;
     //pDest += pixelBox.getRowSkip() * Ogre::PixelUtil::getNumElemBytes(pixelBox.format);
   }
 
