@@ -100,12 +100,12 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().x, wX);
   }
 
-  if (_physicsEngine == simbody)
-  {
-    // mysteriously, simbody failed with precision related error
-    // for y and z axis after Reset.  See issue
-    return;
-  }
+  // if (_physicsEngine == simbody)
+  // {
+  //   // mysteriously, simbody failed with precision related error
+  //   // for y and z axis after Reset.  See issue
+  //   return;
+  // }
 
   // test about y-axis
   model->Reset();
