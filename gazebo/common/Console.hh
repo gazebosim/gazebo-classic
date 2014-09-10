@@ -58,6 +58,10 @@ namespace gazebo
     #define gzLogInit(_prefix, _str) \
         (gazebo::common::Console::log.Init(_prefix, _str))
 
+    /// \brief Get the full path of the directory where the log files are stored
+    /// \return Full path of the directory
+    #define gzLogDirectory() (gazebo::common::Console::log.GetLogDirectory())
+
     /// \class FileLogger FileLogger.hh common/common.hh
     /// \brief A logger that outputs messages to a file.
     class GAZEBO_VISIBLE FileLogger : public std::ostream
@@ -91,6 +95,11 @@ namespace gazebo
       public: virtual FileLogger &operator()(
                   const std::string &_file, int _line);
 
+      /// \brief Get the full path of the directory where all the log files
+      /// are stored.
+      /// \return Full path of the directory.
+      public: std::string GetLogDirectory();
+
       /// \brief Get the port of the master.
       /// \return The port of the master.
       private: static std::string GetMasterPort();
@@ -113,6 +122,10 @@ namespace gazebo
                    /// \brief Stream to output information into.
                    public: std::ofstream *stream;
                  };
+
+      /// \brief Stores the full path of the directory where all the log files
+      /// are stored.
+      private: std::string logDirectory;
     };
 
     /// \class Logger Logger.hh common/common.hh
