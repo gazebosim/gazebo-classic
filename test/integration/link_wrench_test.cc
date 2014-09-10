@@ -69,7 +69,9 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
 
   // get joint and get force torque
   physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr modelOffset = world->GetModel("model_with_cg_offset");
   physics::LinkPtr link = model->GetLink("link");
+  physics::LinkPtr linkOffset = modelOffset->GetLink("link");
 
   // this test assumes body frame axis is aligned with inertial
   // world frame axis to begin with
@@ -80,15 +82,23 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
   {
     // initial velocity
     double wX0 = link->GetRelativeAngularVel().x;
+    double wX0Offset = linkOffset->GetRelativeAngularVel().x;
 
     link->AddTorque(torqueX);
     // link->AddForce(math::Vector3(100.0, 0.0, 0.0));
+
+    linkOffset->AddTorque(torqueX);
+    // linkOffset->AddForce(math::Vector3(100.0, 0.0, 0.0));
+
     world->Step(1);
 
     // assuming constant torque is applied over dt, change in velocity
     // dw = dt * accel = dt * torque / Ixx
     double IXX = link->GetInertial()->GetIXX();
     double wX = wX0 + dt * torqueX.x / IXX;
+
+    double IXXOffset = linkOffset->GetInertial()->GetIXX();
+    double wXOffset = wX0Offset + dt * torqueX.x / IXXOffset;
 
     // check rotational velocity against torque added
     // gzerr << "wX0: [" << wX0
@@ -98,6 +108,16 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
     //       << "] link wX: [" << link->GetRelativeAngularVel().x << "]\n";
     // getchar();
     EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().x, wX);
+    if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+    {
+      EXPECT_NEAR(linkOffset->GetRelativeAngularVel().x, wXOffset, TOL);
+      EXPECT_NEAR(linkOffset->GetRelativeAngularVel().x, wXOffset, TOL);
+    }
+    else
+    {
+      EXPECT_DOUBLE_EQ(linkOffset->GetRelativeAngularVel().x, wXOffset);
+      EXPECT_DOUBLE_EQ(linkOffset->GetRelativeAngularVel().x, wXOffset);
+    }
   }
 
   // if (_physicsEngine == simbody)
@@ -124,7 +144,14 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
     double wY = wY0 + dt * torqueY.y / IYY;
 
     // check rotational velocity against torque added
-    EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().y, wY);
+    if (_physicsEngine == "simbody")
+    {
+      EXPECT_NEAR(link->GetRelativeAngularVel().y, wY, TOL);
+    }
+    else
+    {
+      EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().y, wY);
+    }
   }
 
   // test about z-axis
@@ -144,7 +171,14 @@ void LinkWrenchTest::LinkWrenchTest1(const std::string &_physicsEngine)
     double wZ = wZ0 + dt * torqueZ.z / IZZ;
 
     // check rotational velocity against torque added
-    EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().z, wZ);
+    if (_physicsEngine == "simbody")
+    {
+      EXPECT_NEAR(link->GetRelativeAngularVel().z, wZ, TOL);
+    }
+    else
+    {
+      EXPECT_DOUBLE_EQ(link->GetRelativeAngularVel().z, wZ);
+    }
   }
 
 }

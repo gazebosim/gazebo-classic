@@ -107,6 +107,58 @@
       </link>
 
     </model>
+
+    <model name="model_with_cg_offset">
+      <pose>0 2.0 1.0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <min_depth>0.01</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <bullet>
+                <friction>1</friction>
+                <friction2>1</friction2>
+              </bullet>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+        <inertial>
+          <mass>100.0</mass>
+          <pose>3.0 1.0 0 0 0 0</pose>
+          <inertia>
+            <ixx>1.0</ixx>
+            <iyy>0.2</iyy>
+            <izz>0.3</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+      </link>
+
+    </model>
   </world>
 </sdf>
 
