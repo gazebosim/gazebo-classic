@@ -148,9 +148,9 @@
           <mass>100.0</mass>
           <pose>3.0 1.0 0 0 0 0</pose>
           <inertia>
-            <ixx>1.0</ixx>
-            <iyy>0.2</iyy>
-            <izz>0.3</izz>
+            <ixx>1.1</ixx>
+            <iyy>1.2</iyy>
+            <izz>1.3</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
