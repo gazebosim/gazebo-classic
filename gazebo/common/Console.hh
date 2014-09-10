@@ -98,7 +98,7 @@ namespace gazebo
       /// \brief Get the full path of the directory where all the log files
       /// are stored.
       /// \return Full path of the directory.
-      public: std::string GetLogDirectory();
+      public: std::string GetLogDirectory() const;
 
       /// \brief Get the port of the master.
       /// \return The port of the master.

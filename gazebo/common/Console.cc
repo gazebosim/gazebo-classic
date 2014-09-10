@@ -233,7 +233,7 @@ std::string FileLogger::GetMasterPort()
 }
 
 /////////////////////////////////////////////////
-std::string FileLogger::GetLogDirectory()
+std::string FileLogger::GetLogDirectory() const
 {
   return this->logDirectory;
 }
