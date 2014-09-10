@@ -2,6 +2,9 @@
 
 ### Gazebo 5.0.0
 
+1. Added ability to read the directory where the log files are stored.
+    * [Pull request #1277](https://bitbucket.org/osrf/gazebo/pull-request/1277)
+
 1. Implemented a simulation cloner
     * [Pull request #1180](https://bitbucket.org/osrf/gazebo/pull-request/1180/clone-a-simulation)
 
