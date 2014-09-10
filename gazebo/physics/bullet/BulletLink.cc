@@ -577,9 +577,12 @@ void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
+void BulletLink::AddTorque(const math::Vector3 &_torque)
 {
-  gzlog << "BulletLink::AddTorque not yet implemented." << std::endl;
+  if (!this->rigidLink)
+    return;
+
+  this->rigidLink->applyTorque(btVector3(_torque.x, _torque.y, _torque.z));
 }
 
 /////////////////////////////////////////////////

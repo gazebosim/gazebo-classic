@@ -189,6 +189,7 @@ namespace gazebo
                   const math::Vector3 &_relPos) = 0;
 
       /// \brief Add a torque to the body.
+      /// Torque components are defined in the inertial frame.
       /// \param[in] _torque Torque value to add to the link.
       public: virtual void AddTorque(const math::Vector3 &_torque) = 0;
 
@@ -240,7 +241,8 @@ namespace gazebo
       /// \return Linear velocity of the body.
       public: math::Vector3 GetRelativeLinearVel() const;
 
-      /// \brief Get the angular velocity of the body.
+      /// \brief Get the inertial angular velocity of the body relative to the
+      /// link frame.
       /// \return Angular velocity of the body.
       public: math::Vector3 GetRelativeAngularVel() const;
 

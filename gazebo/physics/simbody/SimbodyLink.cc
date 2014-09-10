@@ -528,12 +528,19 @@ void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &_torque)
 {
-  SimTK::Vec3 t(SimbodyPhysics::Vector3ToVec3(_torque));
+  SimTK::SpatialVec spatialForce =
+    this->simbodyPhysics->discreteForces.getOneBodyForce(
+    this->simbodyPhysics->integ->getState(),
+    this->masterMobod);
 
-  this->simbodyPhysics->discreteForces.addForceToBodyPoint(
+  SimTK::Vec3 force = spatialForce[0];
+  SimTK::Vec3 torque = spatialForce[1];
+
+  SimTK::SpatialVec t(torque+SimbodyPhysics::Vector3ToVec3(_torque), force);
+
+  this->simbodyPhysics->discreteForces.setOneBodyForce(
     this->simbodyPhysics->integ->updAdvancedState(),
-    this->masterMobod,
-    t, SimTK::Vec3(0));
+    this->masterMobod, t);
 }
 
 /////////////////////////////////////////////////

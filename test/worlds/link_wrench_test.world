@@ -2,7 +2,7 @@
 <sdf version="1.4">
   <world name="default">
     <physics type="ode">
-      <gravity>0.000000 0.000000 -9.810000</gravity>
+      <gravity>0.0 0.0 0.0</gravity>
       <ode>
         <solver>
           <type>quick</type>
@@ -46,16 +46,18 @@
       <max_step_size>0.001000</max_step_size>
     </physics>
 
+    <!--
     <include>
       <uri>model://ground_plane</uri>
     </include>
+    -->
     <include>
       <uri>model://sun</uri>
     </include>
 
     <!-- test contributed by jesper -->
     <model name="model">
-      <pose>0 0 1.0 0 0 1.57</pose>
+      <pose>0 0 1.0 0 0 0</pose>
       <link name="link">
         <collision name="collision">
           <pose>0 0 0 0 0 0</pose>
@@ -92,11 +94,11 @@
         </visual>
         <inertial>
           <mass>100.0</mass>
-          <pose>0.5 0 0.5 0 0 0</pose>
+          <pose>0 0 0 0 0 0</pose>
           <inertia>
             <ixx>1.0</ixx>
-            <iyy>1.0</iyy>
-            <izz>1.0</izz>
+            <iyy>0.2</iyy>
+            <izz>0.3</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -104,31 +106,6 @@
         </inertial>
       </link>
 
-      <joint name="joint1" type="revolute">
-        <physics>
-          <provide_feedback>true</provide_feedback>
-          <ode>
-            <cfm_damping>true</cfm_damping>
-          </ode>
-        </physics>
-        <axis>
-          <xyz>0 1 0</xyz>
-          <dynamics>
-            <damping>100.000000</damping>
-          </dynamics>
-        </axis>
-        <parent>world</parent>
-        <child>link</child>
-
-        <!--
-        <sensor name="force_torque" type="force_torque">
-          <always_on>true</always_on>
-          <visualize>true</visualize>
-          <update_rate>30</update_rate>
-        </sensor>
-        -->
-
-      </joint>
     </model>
   </world>
 </sdf>
