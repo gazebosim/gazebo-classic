@@ -2,18 +2,25 @@
 
 require 'rubygems'
 require 'tmpdir'
+
+begin
 require 'zip'
+rescue LoadError
+  puts "Requires the rubyzip gem. To install:"
+  puts "    gem install rubyzip"
+  exit
+end
 
 #################################################
 # Display help information
 def help
-  puts "gzprop -- Create a model tarball for upload to thepropshop.org\n"
+  puts "gzprop -- Create a model zip for upload to thepropshop.org\n"
   puts "\n"
   puts "'gzprop' <model_file>\n"
   puts "\n"
-  puts "Package an existing model directory into a tarball suitable"
+  puts "Package an existing model directory into a zip suitable"
   puts "for upload to thepropshop.org. A working instanstance of"
-  puts "Gazebo >3.0 is required.\n"
+  puts "Gazebo >4.0 is required.\n"
   puts "\n"
 end
 
@@ -56,9 +63,9 @@ Dir.mktmpdir { |dir|
 
   # Create a zip file for the model
   zipFilename = File.join(Dir.pwd, modelName + '.zip')
-  Zip::File.open(zipFilename, Zip::File::CREATE) { |zip| 
+  Zip::File.open(zipFilename, Zip::File::CREATE) { |zipfile| 
     Dir[File.join(dir,'**','**')].each do |file|
-      zip.add(file.sub(dir + '/', ''), file)
+      zipfile.add(file.sub(dir + '/', ''), file)
     end
   }
 }
