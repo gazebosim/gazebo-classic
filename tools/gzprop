@@ -4,7 +4,7 @@ require 'rubygems'
 require 'tmpdir'
 
 begin
-require 'zip'
+  require 'zip'
 rescue LoadError
   puts "Requires the rubyzip gem. To install:"
   puts "    gem install rubyzip"
@@ -29,7 +29,7 @@ end
 
 # Make sure there are command line arguments.
 if ARGV.empty?
-  help()
+  help
   abort("")
 end
 
@@ -37,24 +37,22 @@ end
 modelFile = File.absolute_path(ARGV[0])
 
 modelParts = modelFile.split('/')
-modelDir = modelParts[0, modelParts.size()-1].join('/')
+modelDir = modelParts[0, modelParts.size() - 1].join('/')
 
 # Make sure there is a model.sdf file in the model directory
-if !File.exists?(modelFile)
-  abort("Missing model file [#{modelFile}]")
-end
+abort("Missing model file [#{modelFile}]") unless File.exist?(modelFile)
 
 # Get the name of the model (last part of the directory name)
 modelName = modelParts[-2]
 
 ## Make a temporary directory
-Dir.mktmpdir { |dir|
+Dir.mktmpdir do |dir|
 
   metaDir = File.join(dir, "meta")
 
   # Copy the model information into a temp directory
   FileUtils.cp_r Dir[modelDir + '/*'], dir
- 
+
   # Create the meta directory
   Dir.mkdir(metaDir)
 
@@ -63,12 +61,12 @@ Dir.mktmpdir { |dir|
 
   # Create a zip file for the model
   zipFilename = File.join(Dir.pwd, modelName + '.zip')
-  Zip::File.open(zipFilename, Zip::File::CREATE) { |zipfile| 
-    Dir[File.join(dir,'**','**')].each do |file|
+  Zip::File.open(zipFilename, Zip::File::CREATE) do |zipfile|
+    Dir[File.join(dir, '**', '**')].each do |file|
       zipfile.add(file.sub(dir + '/', ''), file)
     end
-  }
-}
+  end
+end
 
 # Completion message
 puts "Propshop model created.\n"
