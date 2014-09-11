@@ -167,10 +167,11 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  if (_index == 0)
-    this->dtJoint->setVelocity(0, _vel);
-  else if (_index == 1)
-    this->dtJoint->setVelocity(1, _vel);
+  if (_index < this->GetAngleCount())
+  {
+    this->dtJoint->setVelocity(_index, _vel);
+    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
