@@ -57,7 +57,8 @@ Dir.mktmpdir do |dir|
   Dir.mkdir(metaDir)
 
   # Create a set of images
-  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
+  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save
+    "#{metaDir}" --propshop-model "#{modelFile}"`
 
   # Create a zip file for the model
   zipFilename = File.join(Dir.pwd, modelName + '.zip')
