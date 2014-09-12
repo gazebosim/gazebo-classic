@@ -1172,9 +1172,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
     Transform X_LC =
       SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
 
-// Remove these pragmas when non-const GetShapeType is removed
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     switch ((*ci)->GetShapeType() & (~physics::Entity::SHAPE))
     {
       case physics::Entity::PLANE_SHAPE:
@@ -1270,7 +1267,6 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
               << "] unimplemented\n";
         break;
     }
-#pragma GCC diagnostic pop
   }
 }
 

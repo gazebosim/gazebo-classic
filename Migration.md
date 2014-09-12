@@ -26,6 +26,11 @@
     + ***Removed:*** protected: std::string Plugin::handle
     + ***Replacement:*** protected: std::string Plugin::handleName
 
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + unsigned int GetShapeType()
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations
