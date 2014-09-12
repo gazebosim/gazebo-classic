@@ -2,6 +2,8 @@
 
 ### Gazebo 4.0.0 (2014-08-08)
 
+1. Added SignalStats class for computing incremental signal statistics.
+    * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
 1. Added lcov support to cmake
     * [Pull request #1047](https://bitbucket.org/osrf/gazebo/pull-request/1047)
 1. Fixed memory leak in image conversion
