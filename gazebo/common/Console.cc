@@ -122,7 +122,8 @@ int Logger::Buffer::sync()
 
 /////////////////////////////////////////////////
 FileLogger::FileLogger(const std::string &_filename)
-  : std::ostream(new Buffer(_filename))
+  : std::ostream(new Buffer(_filename)),
+    logDirectory("")
 {
   this->setf(std::ios_base::unitbuf);
 }
@@ -189,6 +190,12 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 
   // Output the version of gazebo.
   (*buf->stream) << GAZEBO_VERSION_HEADER << std::endl;
+
+  // Update the log directory name.
+  if (boost::filesystem::is_directory(logPath))
+    this->logDirectory = logPath.string();
+  else
+    this->logDirectory = logPath.branch_path().string();
 }
 
 /////////////////////////////////////////////////
@@ -223,6 +230,12 @@ std::string FileLogger::GetMasterPort()
   }
 
   return boost::lexical_cast<std::string>(GAZEBO_DEFAULT_MASTER_PORT);
+}
+
+/////////////////////////////////////////////////
+std::string FileLogger::GetLogDirectory() const
+{
+  return this->logDirectory;
 }
 
 /////////////////////////////////////////////////
