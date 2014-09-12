@@ -29,7 +29,7 @@ end
 
 # Make sure there are command line arguments.
 if ARGV.empty?
-  help
+  help()
   abort("")
 end
 
@@ -46,7 +46,7 @@ abort("Missing model file [#{modelFile}]") unless File.exist?(modelFile)
 modelName = modelParts[-2]
 
 ## Make a temporary directory
-Dir.mktmpdir do |dir|
+Dir.mktmpdir { |dir|
 
   metaDir = File.join(dir, "meta")
 
@@ -57,17 +57,21 @@ Dir.mktmpdir do |dir|
   Dir.mkdir(metaDir)
 
   # Create a set of images
-  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save
-    "#{metaDir}" --propshop-model "#{modelFile}"`
+  `gzserver -s libModelPropShop.so worlds/blank.world --propshop-save "#{metaDir}" --propshop-model "#{modelFile}"`
 
   # Create a zip file for the model
   zipFilename = File.join(Dir.pwd, modelName + '.zip')
-  Zip::File.open(zipFilename, Zip::File::CREATE) do |zipfile|
-    Dir[File.join(dir, '**', '**')].each do |file|
-      zipfile.add(file.sub(dir + '/', ''), file)
-    end
+  if !File.exists?(zipFilename)
+    Zip::File.open(zipFilename, Zip::File::CREATE) { |zipfile|
+      Dir[File.join(dir, '**', '**')].each do |file|
+        zipfile.add(file.sub(dir + '/', ''), file)
+      end
+    }
+  else
+    puts "Error: #{zipFilename} already exists. Please move or rename."
+    exit
   end
-end
+}
 
 # Completion message
 puts "Propshop model created.\n"
