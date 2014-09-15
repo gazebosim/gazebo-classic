@@ -766,8 +766,42 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     }
 
     ModelPtr myself = boost::static_pointer_cast<Model>(shared_from_this());
-    plugin->Load(myself, _sdf);
-    plugin->Init();
+    try
+    {
+      plugin->Load(myself, _sdf);
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured when loading plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run.\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured when loading plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
+    try
+    {
+      plugin->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Exception occured when initializing plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run\n";
+
+      // Log the message. gzerr has problems with this in 1.9. Remove the
+      // gzlog command in gazebo2.
+      gzlog << "Exception occured when initializing plugin with name["
+        << pluginName << "] and filename[" << filename << "]. "
+        << "This plugin will not run." << std::endl;
+      return;
+    }
+
     this->plugins.push_back(plugin);
   }
 }

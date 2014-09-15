@@ -92,6 +92,10 @@ class ServerFixture : public testing::Test
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
                path = TEST_PATH;
+               path += "/plugins";
+               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+
+               path = TEST_PATH;
                gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
              }
 
