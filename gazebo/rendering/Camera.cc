@@ -440,6 +440,8 @@ void Camera::ReadPixelBuffer()
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
       vp->setOverlaysEnabled(false);
+
+      vp->setDrawBuffer(Ogre::CBT_BACK);
     }
 
     // This update is only needed for client side data captures
