@@ -102,14 +102,14 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
 
     // spawn joint using using parent model frame to define joint axis
-    if (_physicsEngine == "dart")
+    /*if (_physicsEngine == "dart")
     {
       gzerr << "dart doesn't support parent model frame, skipping sub-test"
             << " per issue #1143"
             << std::endl;
     }
     else
-    {
+    {*/
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
       physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
@@ -126,7 +126,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
         this->CheckJointProperties(jointUseParentModelFrame,
           math::Vector3(cos(Am), sin(Am), 0));
       }
-    }
+    //}
 
     // spawn joint using using child link frame to define joint axis
     {

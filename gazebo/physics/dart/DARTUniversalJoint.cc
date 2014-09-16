@@ -96,7 +96,8 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 void DARTUniversalJoint::SetAxis(unsigned int _index,
     const math::Vector3 &_axis)
 {
-  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(_axis);
+  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
+      this->GetAxisFrameOffset(_index).RotateVector(_axis));
 
   if (_index == 0)
   {

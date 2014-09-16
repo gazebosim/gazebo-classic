@@ -93,7 +93,8 @@ void DARTHingeJoint::SetAxis(unsigned int _index, const math::Vector3& _axis)
     // TODO: Issue #494
     // See: https://bitbucket.org/osrf/gazebo/issue/494
     // joint-axis-reference-frame-doesnt-match
-    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
+        this->GetAxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
