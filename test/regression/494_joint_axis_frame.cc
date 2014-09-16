@@ -102,21 +102,23 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
 
     // spawn joint using using parent model frame to define joint axis
-    gzdbg << "test case with joint axis specified in parent model frame.\n";
-    opt.useParentModelFrame = true;
-    physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
-    ASSERT_TRUE(jointUseParentModelFrame != NULL);
+    {
+      gzdbg << "test case with joint axis specified in parent model frame.\n";
+      opt.useParentModelFrame = true;
+      physics::JointPtr jointUseParentModelFrame = SpawnJoint(opt);
+      ASSERT_TRUE(jointUseParentModelFrame != NULL);
 
-    if (opt.worldParent)
-    {
-      gzdbg << "  where parent is world.\n";
-      this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
-    }
-    else
-    {
-      gzdbg << "  where parent is another link (not world).\n";
-      this->CheckJointProperties(jointUseParentModelFrame,
-        math::Vector3(cos(Am), sin(Am), 0));
+      if (opt.worldParent)
+      {
+        gzdbg << "  where parent is world.\n";
+        this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
+      }
+      else
+      {
+        gzdbg << "  where parent is another link (not world).\n";
+        this->CheckJointProperties(jointUseParentModelFrame,
+          math::Vector3(cos(Am), sin(Am), 0));
+      }
     }
 
     // spawn joint using using child link frame to define joint axis
