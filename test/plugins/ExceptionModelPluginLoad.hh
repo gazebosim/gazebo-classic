@@ -14,24 +14,26 @@
  * limitations under the License.
  *
 */
-#include "plugins/ExceptionPlugin.hh"
+#ifndef _GAZEBO_EXCEPTION_MODEL_PLUGIN_LOAD_HH_
+#define _GAZEBO_EXCEPTION_MODEL_PLUGIN_LOAD_HH_
 
-using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(ExceptionPlugin)
+#include <string>
 
-/////////////////////////////////////////////////
-ExceptionPlugin::ExceptionPlugin() : ModelPlugin()
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/gazebo.hh"
+
+namespace gazebo
 {
-}
+  class ExceptionModelPluginLoad : public ModelPlugin
+  {
+    /// \brief Constructor
+    public: ExceptionModelPluginLoad();
 
-/////////////////////////////////////////////////
-ExceptionPlugin::~ExceptionPlugin()
-{
-}
+    /// \brief Destructor
+    public: virtual ~ExceptionModelPluginLoad();
 
-/////////////////////////////////////////////////
-void ExceptionPlugin::Load(physics::ModelPtr /*_model*/,
-                           sdf::ElementPtr /*_sdf*/)
-{
-  throw std::runtime_error("Example error");
+    // Documentation inherited
+    public: virtual void Load(physics::ModelPtr _mode, sdf::ElementPtr _sdf);
+  };
 }
+#endif

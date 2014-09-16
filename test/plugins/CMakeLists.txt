@@ -14,7 +14,9 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
-  ExceptionPlugin
+  ExceptionModelPluginConstructor
+  ExceptionModelPluginInit
+  ExceptionModelPluginLoad
 )
 
 foreach (src ${plugins})

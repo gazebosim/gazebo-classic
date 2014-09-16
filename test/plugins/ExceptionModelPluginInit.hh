@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_EXCEPTION_PLUGIN_HH_
-#define _GAZEBO_EXCEPTION_PLUGIN_HH_
+#ifndef _GAZEBO_EXCEPTION_MODEL_PLUGIN_INIT_HH_
+#define _GAZEBO_EXCEPTION_MODEL_PLUGIN_INIT_HH_
 
 #include <string>
 
@@ -24,14 +24,19 @@
 
 namespace gazebo
 {
-  class ExceptionPlugin : public ModelPlugin
+  class ExceptionModelPluginInit : public ModelPlugin
   {
-    public: ExceptionPlugin();
+    /// \brief Constructor
+    public: ExceptionModelPluginInit();
 
     /// \brief Destructor
-    public: virtual ~ExceptionPlugin();
+    public: virtual ~ExceptionModelPluginInit();
 
+    // Documentation inherited
     public: virtual void Load(physics::ModelPtr _mode, sdf::ElementPtr _sdf);
+
+    // Documentation inherited
+    public: virtual void Init();
   };
 }
 #endif

@@ -2,7 +2,7 @@
 <sdf version="1.4">
   <world name="default">
     <model name="box">
-      <plugin filename="libExceptionPlugin.so" name="exception"/>
+      <plugin filename="libExceptionModelPluginInit.so" name="exception"/>
       <pose>0 0 0.5 0 0 0</pose>
       <link name="link">
         <collision name="collision">

@@ -23,11 +23,80 @@ class PluginTest : public ServerFixture
 {
 };
 
+/////////////////////////////////////////////////
+TEST_F(PluginTest, ModelExceptionConstructor)
+{
+  Load("worlds/exception_model_plugin_constructor_test.world", true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  gazebo::physics::ModelPtr model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+
+  world->StepWorld(100);
+
+  char *home = getenv("HOME");
+  ASSERT_TRUE(home);
+
+  boost::filesystem::path path(home);
+  path /= "/.gazebo/test.log";
+
+  // Open the log file, and read back the string
+  std::ifstream ifs(path.string().c_str(), std::ios::in);
+  std::string loggedString;
+
+  while (!ifs.eof())
+  {
+    std::string line;
+    std::getline(ifs, line);
+    loggedString += line;
+  }
+
+  EXPECT_TRUE(loggedString.find(
+        "Exception occured in the constructor of plugin with name") !=
+      std::string::npos);
+}
 
 /////////////////////////////////////////////////
-TEST_F(PluginTest, ModelException)
+TEST_F(PluginTest, ModelExceptionInit)
 {
-  Load("worlds/model_plugin_exception_test.world", true);
+  Load("worlds/exception_model_plugin_init_test.world", true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  gazebo::physics::ModelPtr model = world->GetModel("box");
+  ASSERT_TRUE(model != NULL);
+
+  world->StepWorld(100);
+
+  char *home = getenv("HOME");
+  ASSERT_TRUE(home);
+
+  boost::filesystem::path path(home);
+  path /= "/.gazebo/test.log";
+
+  // Open the log file, and read back the string
+  std::ifstream ifs(path.string().c_str(), std::ios::in);
+  std::string loggedString;
+
+  while (!ifs.eof())
+  {
+    std::string line;
+    std::getline(ifs, line);
+    loggedString += line;
+  }
+
+  EXPECT_TRUE(loggedString.find(
+        "Exception occured in the Init function of plugin with name") !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
+TEST_F(PluginTest, ModelExceptionLoad)
+{
+  Load("worlds/exception_model_plugin_load_test.world", true);
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

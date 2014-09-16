@@ -91,8 +91,8 @@ class ServerFixture : public testing::Test
                path += "/../../build/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
-               path = TEST_PATH;
-               path += "/plugins";
+               path = TEST_REGRESSION_PATH;
+               path += "/../../build/test/plugins";
                gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
 
                path = TEST_PATH;
