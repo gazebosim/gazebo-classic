@@ -54,8 +54,8 @@ TEST_F(PluginTest, ModelException)
     loggedString += line;
   }
 
-  EXPECT_TRUE(
-      loggedString.find("Exception occured when loading plugin with name") !=
+  EXPECT_TRUE(loggedString.find(
+        "Exception occured in the Load function of plugin with name") !=
       std::string::npos);
 }
 
