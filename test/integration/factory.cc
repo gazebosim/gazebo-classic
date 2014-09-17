@@ -218,14 +218,11 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     {
       physics::CollisionPtr collision = collisions[j];
       physics::CollisionPtr collisionClone = collisionClones[j];
-      {
-        boost::shared_ptr<const physics::Collision> const_collision
-          = collision;
-        boost::shared_ptr<const physics::Collision> const_collisionClone
-          = collisionClone;
-        EXPECT_EQ(const_collision->GetShapeType(),
-                  const_collisionClone->GetShapeType());
-      }
+// Remove these pragmas when non-const GetShapeType is removed
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+      EXPECT_EQ(collision->GetShapeType(), collisionClone->GetShapeType());
+#pragma GCC diagnostic pop
       EXPECT_EQ(collision->GetMaxContacts(), collisionClone->GetMaxContacts());
 
       // Check surface
