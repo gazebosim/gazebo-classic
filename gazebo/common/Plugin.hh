@@ -59,7 +59,9 @@ namespace gazebo
     /// \brief A System plugin
     SYSTEM_PLUGIN,
     /// \brief A Visual plugin
-    VISUAL_PLUGIN
+    VISUAL_PLUGIN,
+    /// \brief A GUI plugin
+    GUI_PLUGIN
   };
 
 
@@ -97,16 +99,16 @@ namespace gazebo
     /// \brief Get the short name of the handler
     public: std::string GetHandle() const
             {
-              return this->handle;
+              return this->handleName;
             }
 
     /// \brief a class method that creates a plugin from a file name.
     /// It locates the shared library and loads it dynamically.
     /// \param[in] _filename the path to the shared library.
-    /// \param[in] _handle short name of the handler
+    /// \param[in] _name short name of the plugin
     /// \return Shared Pointer to this class type
     public: static TPtr Create(const std::string &_filename,
-                const std::string &_handle)
+                const std::string &_name)
             {
               TPtr result;
               // PluginPtr result;
@@ -166,7 +168,7 @@ namespace gazebo
               result.reset(registerFunc.func());
               result->dlHandle = dlHandle;
 
-              result->handle = _handle;
+              result->handleName = _name;
               result->filename = filename;
 
               return result;
@@ -186,7 +188,7 @@ namespace gazebo
     protected: std::string filename;
 
     /// \brief Short name
-    protected: std::string handle;
+    protected: std::string handleName;
 
     /// \brief Pointer to shared library registration function definition
     private: typedef union
@@ -201,8 +203,8 @@ namespace gazebo
 
   /// \class WorldPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::World.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials/?tut=plugins_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
@@ -226,8 +228,8 @@ namespace gazebo
   };
 
   /// \brief A plugin with access to physics::Model.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_model
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
@@ -255,8 +257,8 @@ namespace gazebo
 
   /// \class SensorPlugin Plugin.hh common/common.hh
   /// \brief A plugin with access to physics::Sensor.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
@@ -283,8 +285,8 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=system_plugin
+  /// &cat=write_plugin">reference</a>
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
   class GAZEBO_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
   {
@@ -312,8 +314,8 @@ namespace gazebo
   };
 
   /// \brief A plugin loaded within the gzserver on startup.  See
-  ///        <a href="http://gazebosim.org/wiki/tutorials/plugins">
-  ///        reference</a>.
+  /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
+  /// &cat=write_plugin">reference</a>.
   class GAZEBO_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()
@@ -336,6 +338,7 @@ namespace gazebo
     /// \brief Override this method for custom plugin reset behavior.
     public: virtual void Reset() {}
   };
+
 
   /// \}
 

@@ -31,11 +31,6 @@
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/physics/Contact.hh"
 #include "gazebo/physics/Shape.hh"
-#include "gazebo/physics/BoxShape.hh"
-#include "gazebo/physics/CylinderShape.hh"
-#include "gazebo/physics/MeshShape.hh"
-#include "gazebo/physics/SphereShape.hh"
-#include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Link.hh"
@@ -167,7 +162,7 @@ ModelPtr Collision::GetModel() const
 }
 
 //////////////////////////////////////////////////
-unsigned int Collision::GetShapeType()
+unsigned int Collision::GetShapeType() const
 {
   return this->shape->GetType();
 }
@@ -188,22 +183,6 @@ ShapePtr Collision::GetShape() const
 void Collision::SetScale(const math::Vector3 &_scale)
 {
   this->shape->SetScale(_scale);
-}
-
-//////////////////////////////////////////////////
-void Collision::SetContactsEnabled(bool /*_enable*/)
-{
-}
-
-//////////////////////////////////////////////////
-bool Collision::GetContactsEnabled() const
-{
-  return false;
-}
-
-//////////////////////////////////////////////////
-void Collision::AddContact(const Contact & /*_contact*/)
-{
 }
 
 //////////////////////////////////////////////////
@@ -382,4 +361,27 @@ void Collision::SetMaxContacts(unsigned int _maxContacts)
 unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
+}
+
+/////////////////////////////////////////////////
+const math::Pose &Collision::GetWorldPose() const
+{
+  // If true, compute a new world pose value.
+  //
+  if (this->worldPoseDirty)
+  {
+    this->worldPose = this->GetInitialRelativePose() +
+                      this->link->GetWorldPose();
+    this->worldPoseDirty = false;
+  }
+
+  return this->worldPose;
+}
+
+/////////////////////////////////////////////////
+void Collision::SetWorldPoseDirty()
+{
+  // Tell the collision object that the next call to ::GetWorldPose should
+  // compute a new worldPose value.
+  this->worldPoseDirty = true;
 }

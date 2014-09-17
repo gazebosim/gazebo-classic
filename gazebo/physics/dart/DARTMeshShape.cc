@@ -15,32 +15,35 @@
  *
 */
 
-#include "gazebo/common/Mesh.hh"
-#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/Exception.hh"
+#include "gazebo/common/Mesh.hh"
 
+#include "gazebo/physics/dart/DARTMesh.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 DARTMeshShape::DARTMeshShape(CollisionPtr _parent) : MeshShape(_parent)
 {
+  this->dartMesh = new DARTMesh();
 }
 
 //////////////////////////////////////////////////
 DARTMeshShape::~DARTMeshShape()
 {
+  delete this->dartMesh;
 }
 
 //////////////////////////////////////////////////
 void DARTMeshShape::Update()
 {
-  gzwarn << "Not implemented!\n";
+  MeshShape::Update();
 }
 
 //////////////////////////////////////////////////
@@ -52,5 +55,18 @@ void DARTMeshShape::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void DARTMeshShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  MeshShape::Init();
+
+  if (this->submesh)
+  {
+    this->dartMesh->Init(this->submesh,
+        boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
+        this->sdf->Get<math::Vector3>("scale"));
+  }
+  else
+  {
+    this->dartMesh->Init(this->mesh,
+        boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
+        this->sdf->Get<math::Vector3>("scale"));
+  }
 }

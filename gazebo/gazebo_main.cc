@@ -53,12 +53,13 @@ void help()
   << "data \n"
   << "                                (zlib|bz2|txt).\n"
   << "  --record_path arg             Absolute path in which to store "
-  << "state data\n"
+  << "state data.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
-  <<                                  "gazebo\n"
-  << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
+  <<                                  "gazebo.\n"
+  << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -149,12 +150,12 @@ int main(int _argc, char **_argv)
       // return or exit calls.
       // WEXITSTATUS will check the value of the return function, not being
       // zero means problems.
-      if ((WIFEXITED(child_exit_status)   == 0) || 
+      if ((WIFEXITED(child_exit_status)   == 0) ||
           (WEXITSTATUS(child_exit_status) != 0))
         returnValue = -1;
       else
         returnValue = 0;
-        
+
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)

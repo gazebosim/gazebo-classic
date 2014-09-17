@@ -6,12 +6,12 @@ package gazebo.msgs;
 
 
 import "vector3d.proto";
+import "material.proto";
 
 message Road
 {
-  required string name      = 1;
-  required double width     = 2;
-  repeated Vector3d point   = 3;
+  required string name          = 1;
+  required double width         = 2;
+  repeated Vector3d point       = 3;
+  optional Material material    = 4;
 }
-
-
