@@ -60,61 +60,67 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
   gzerr << "model: " << this->model->GetName() << "\n";
 
   // get engine controls
-  sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
-  while (enginePtr)
+  if (_sdf->HasElement("engine"))
   {
-    if (enginePtr->HasElement("joint_name"))
+    sdf::ElementPtr enginePtr = _sdf->GetElement("engine");
+    while (enginePtr)
     {
-      std::string jointName = enginePtr->Get<std::string>("joint_name");
-      gzerr << jointName << "\n";
-      physics::JointPtr joint = this->model->GetJoint(jointName);
-      if (joint.get() != NULL)
+      if (enginePtr->HasElement("joint_name"))
       {
-        EngineControl ec;
-        // ec.name = enginePtr->GetAttribute("name")->GetAsString();
-        ec.joint = joint;
-        if (enginePtr->HasElement("max_torque"))
-          ec.maxTorque = enginePtr->Get<double>("max_torque");
-        if (enginePtr->HasElement("inc_key"))
-          ec.incKey = enginePtr->Get<int>("inc_key");
-        if (enginePtr->HasElement("dec_key"))
-          ec.decKey = enginePtr->Get<int>("dec_key");
-        if (enginePtr->HasElement("inc_val"))
-          ec.incVal = enginePtr->Get<double>("inc_val");
-        ec.torque = 0;
-        this->engineControls.push_back(ec);
+        std::string jointName = enginePtr->Get<std::string>("joint_name");
+        gzerr << jointName << "\n";
+        physics::JointPtr joint = this->model->GetJoint(jointName);
+        if (joint.get() != NULL)
+        {
+          EngineControl ec;
+          // ec.name = enginePtr->GetAttribute("name")->GetAsString();
+          ec.joint = joint;
+          if (enginePtr->HasElement("max_torque"))
+            ec.maxTorque = enginePtr->Get<double>("max_torque");
+          if (enginePtr->HasElement("inc_key"))
+            ec.incKey = enginePtr->Get<int>("inc_key");
+          if (enginePtr->HasElement("dec_key"))
+            ec.decKey = enginePtr->Get<int>("dec_key");
+          if (enginePtr->HasElement("inc_val"))
+            ec.incVal = enginePtr->Get<double>("inc_val");
+          ec.torque = 0;
+          this->engineControls.push_back(ec);
+        }
       }
+      // get next element
+      enginePtr = enginePtr->GetNextElement("engine");
     }
-    // get next element
-    enginePtr = enginePtr->GetNextElement("engine");
   }
 
   // get thruster controls
-  sdf::ElementPtr thrusterPtr = _sdf->GetElement("thruster");
-  while (thrusterPtr)
+  if (_sdf->HasElement("thruster"))
   {
-    if (thrusterPtr->HasElement("link_name"))
+    sdf::ElementPtr thrusterPtr = _sdf->GetElement("thruster");
+    while (thrusterPtr)
     {
-      std::string linkName = thrusterPtr->Get<std::string>("link_name");
-      gzerr << linkName << "\n";
-      physics::LinkPtr link = this->model->GetLink(linkName);
-      if (link.get() != NULL)
+      if (thrusterPtr->HasElement("link_name"))
       {
-        ThrusterControl tc;
-        // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
-        tc.link = link;
-        if (thrusterPtr->HasElement("inc_key"))
-          tc.incKey = thrusterPtr->Get<int>("inc_key");
-        if (thrusterPtr->HasElement("dec_key"))
-          tc.decKey = thrusterPtr->Get<int>("dec_key");
-        if (thrusterPtr->HasElement("inc_val"))
-          tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
-        tc.force = math::Vector3();
-        this->thrusterControls.push_back(tc);
+        std::string linkName = thrusterPtr->Get<std::string>("link_name");
+        gzerr << linkName << "\n";
+        physics::LinkPtr link = this->model->GetLink(linkName);
+        if (link.get() != NULL)
+        {
+          ThrusterControl tc;
+          // tc.name = thrusterPtr->GetAttribute("name")->GetAsString();
+          tc.link = link;
+          if (thrusterPtr->HasElement("inc_key"))
+            tc.incKey = thrusterPtr->Get<int>("inc_key");
+          if (thrusterPtr->HasElement("dec_key"))
+            tc.decKey = thrusterPtr->Get<int>("dec_key");
+          if (thrusterPtr->HasElement("inc_val"))
+            tc.incVal = thrusterPtr->Get<math::Vector3>("inc_val");
+          tc.force = math::Vector3();
+          this->thrusterControls.push_back(tc);
+        }
       }
+      // get next element
+      thrusterPtr = thrusterPtr->GetNextElement("thruster");
     }
-    // get next element
-    thrusterPtr = thrusterPtr->GetNextElement("thruster");
   }
 
   // get controls

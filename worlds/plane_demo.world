@@ -296,7 +296,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -419,7 +419,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -439,7 +439,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -492,7 +492,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -512,7 +512,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -532,7 +532,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -626,7 +626,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -646,7 +646,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -703,7 +703,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -759,7 +759,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
