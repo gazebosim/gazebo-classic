@@ -23,6 +23,7 @@ set (sources
   Actions.cc
   AlignWidget.cc
   BoxMaker.cc
+  CloneWindow.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -57,6 +58,7 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  CloneWindow.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -82,6 +84,7 @@ set (headers
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
+  GuiPlugin.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh

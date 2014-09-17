@@ -56,7 +56,7 @@ ServerFixture::ServerFixture()
   this->serverThread = NULL;
   this->uniqueCounter = 0;
 
-  gzLogInit("test.log");
+  gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);

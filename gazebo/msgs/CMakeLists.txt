@@ -14,6 +14,7 @@ set (msgs
   diagnostics.proto
   diagnostic_control.proto
   factory.proto
+  fluid.proto
   fog.proto
   friction.proto
   geometry.proto
