@@ -11,8 +11,8 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>100</iters>
-          <sor>0.8</sor>
+          <iters>2000</iters>
+          <sor>1.0</sor>
         </solver>
         <constraints>
           <cfm>0.0</cfm>
@@ -295,21 +295,20 @@
       </link>
 
 
-      <!-- propeller
-      -->
+      <!-- propeller -->
       <link name="blade_1">
         <pose>-0.25 0 1.5 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0000465</ixx>
+            <ixx>0.00465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0000006</iyy>
+            <iyy>0.00006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0000470</izz>
+            <izz>0.00470</izz>
           </inertia>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
@@ -337,14 +336,14 @@
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0000465</ixx>
+            <ixx>0.00465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0000006</iyy>
+            <iyy>0.00006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0000470</izz>
+            <izz>0.00470</izz>
           </inertia>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
@@ -383,7 +382,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -403,18 +402,18 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>10.000</cla>
-        <cda>0.001</cda>
+        <cda>0.0001</cda>
         <cma>0.00</cma>
         <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
+        <cla_stall>1.0</cla_stall>
+        <cda_stall>0.001</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
@@ -426,11 +425,11 @@
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>10.000</cla>
-        <cda>0.001</cda>
+        <cda>0.0001</cda>
         <cma>0.00</cma>
         <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
+        <cla_stall>1.0</cla_stall>
+        <cda_stall>0.001</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
@@ -455,7 +454,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -475,7 +474,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -495,7 +494,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -510,12 +509,12 @@
           </limit>
           <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
-            <damping>0.0001</damping>
+            <damping>0.001</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -604,12 +603,12 @@
           </limit>
           <xyz>0.0 0.98 0.198669</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -624,12 +623,12 @@
           </limit>
           <xyz>0.0 -0.98 0.198669</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -643,7 +642,7 @@
             <ixx>0.0465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0006</iyy>
+            <iyy>0.006</iyy>
             <iyz>0.0</iyz>
             <izz>0.0470</izz>
           </inertia>
@@ -686,7 +685,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
@@ -742,7 +741,7 @@
         </axis>
         <physics>
           <ode>
-            <cfm_damping>1</cfm_damping>
+            <implicit_spring_damper>1</implicit_spring_damper>
           </ode>
         </physics>
       </joint>
