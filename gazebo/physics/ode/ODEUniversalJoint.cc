@@ -265,22 +265,26 @@ bool ODEUniversalJoint::SetLowStop(
 bool ODEUniversalJoint::SetParam(
   const std::string &_key, unsigned int _index, const boost::any &_value)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
   if (_key == "stop_erp")
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamStopERP2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -292,18 +296,20 @@ bool ODEUniversalJoint::SetParam(
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamStopCFM2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "friction")
+  {
+    try
+    {
+      this->SetParam(dParamVel | group, 0.0);
+      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -315,18 +321,7 @@ bool ODEUniversalJoint::SetParam(
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamHiStop2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -338,18 +333,7 @@ bool ODEUniversalJoint::SetParam(
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamLoStop2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -369,22 +353,39 @@ bool ODEUniversalJoint::SetParam(
 double ODEUniversalJoint::GetParam(
   const std::string &_key, unsigned int _index)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
   // Overload because we switched axis orders
-  if (_key == "hi_stop")
+  if (_key == "friction")
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          return ODEJoint::GetParam(dParamHiStop);
-        case UniversalJoint::AXIS_PARENT:
-          return ODEJoint::GetParam(dParamHiStop2);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return 0;
-          break;
-      };
+      return ODEJoint::GetParam(dParamFMax | group);
+    }
+    catch(const common::Exception &e)
+    {
+      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      return 0;
+    }
+  }
+  else if (_key == "hi_stop")
+  {
+    try
+    {
+      return ODEJoint::GetParam(dParamHiStop | group);
     }
     catch(const common::Exception &e)
     {
@@ -396,17 +397,7 @@ double ODEUniversalJoint::GetParam(
   {
     try
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          return ODEJoint::GetParam(dParamLoStop);
-        case UniversalJoint::AXIS_PARENT:
-          return ODEJoint::GetParam(dParamLoStop2);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return 0;
-          break;
-      };
+      return ODEJoint::GetParam(dParamLoStop | group);
     }
     catch(const common::Exception &e)
     {

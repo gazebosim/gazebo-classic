@@ -7,15 +7,15 @@
     </include>
     
     <model name='pendulum_1'>
-      <pose>0.5 0 0.9  1.5707963267948966 0 0</pose>
+      <pose>1.05 0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -24,20 +24,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -50,15 +50,15 @@
     </model>
     
     <model name='pendulum_2'>
-      <pose>1.0 0 0.9  1.5707963267948966 0 0</pose>
+      <pose>2.1 0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -67,20 +67,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -93,15 +93,15 @@
     </model>
     
     <model name='pendulum_3'>
-      <pose>1.5 0 0.9  1.5707963267948966 0 0</pose>
+      <pose>3.15 0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -110,20 +110,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -136,15 +136,15 @@
     </model>
     
     <model name='pendulum_4'>
-      <pose>2.0 0 0.9  1.5707963267948966 0 0</pose>
+      <pose>4.2 0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -153,20 +153,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -180,15 +180,15 @@
     
     
     <model name='universal_axis1_1'>
-      <pose>0.5 -1.5 0.9  1.5707963267948966 0 0</pose>
+      <pose>1.05 -1.5 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -197,20 +197,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -229,15 +229,15 @@
     </model>
     
     <model name='universal_axis1_2'>
-      <pose>1.0 -1.5 0.9  1.5707963267948966 0 0</pose>
+      <pose>2.1 -1.5 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -246,20 +246,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -278,15 +278,15 @@
     </model>
     
     <model name='universal_axis1_3'>
-      <pose>1.5 -1.5 0.9  1.5707963267948966 0 0</pose>
+      <pose>3.15 -1.5 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -295,20 +295,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -327,15 +327,15 @@
     </model>
     
     <model name='universal_axis1_4'>
-      <pose>2.0 -1.5 0.9  1.5707963267948966 0 0</pose>
+      <pose>4.2 -1.5 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -344,20 +344,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -377,15 +377,15 @@
     
     
     <model name='universal_axis2_1'>
-      <pose>0.5 -3.0 0.9  1.5707963267948966 0 0</pose>
+      <pose>1.05 -3.0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -394,20 +394,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -426,15 +426,15 @@
     </model>
     
     <model name='universal_axis2_2'>
-      <pose>1.0 -3.0 0.9  1.5707963267948966 0 0</pose>
+      <pose>2.1 -3.0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -443,20 +443,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -475,15 +475,15 @@
     </model>
     
     <model name='universal_axis2_3'>
-      <pose>1.5 -3.0 0.9  1.5707963267948966 0 0</pose>
+      <pose>3.15 -3.0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -492,20 +492,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -524,15 +524,15 @@
     </model>
     
     <model name='universal_axis2_4'>
-      <pose>2.0 -3.0 0.9  1.5707963267948966 0 0</pose>
+      <pose>4.2 -3.0 0.9  0.0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <inertial>
           <mass>3.375</mass>
           <inertia>
             <ixx>0.071015625</ixx>
-            <iyy>0.071015625</iyy>
-            <izz>0.0014062500000000004</izz>
+            <iyy>0.00140625</iyy>
+            <izz>0.071015625</izz>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
             <iyz>0.0</iyz>
@@ -541,20 +541,20 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 0.25  0 0 0</pose>
+        <pose>0 0.25 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -574,26 +574,25 @@
     
     
     <model name='slider_1'>
-      <pose>0.5 1.5 0.9  0 0 0</pose>
+      <pose>1.05 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="prismatic">
-        <pose>0 0 0.25  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -606,26 +605,25 @@
     </model>
     
     <model name='slider_2'>
-      <pose>1.0 1.5 0.9  0 0 0</pose>
+      <pose>2.1 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="prismatic">
-        <pose>0 0 0.25  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -638,26 +636,25 @@
     </model>
     
     <model name='slider_3'>
-      <pose>1.5 1.5 0.9  0 0 0</pose>
+      <pose>3.15 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="prismatic">
-        <pose>0 0 0.25  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -670,26 +667,25 @@
     </model>
     
     <model name='slider_4'>
-      <pose>2.0 1.5 0.9  0 0 0</pose>
+      <pose>4.2 1.5 0.9  0 0 0</pose>
       <link name="link">
         <pose>0 0 -0.25  0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>0.05 0.05 0.5</size>
+              <size>0.05 0.5 0.05</size>
             </box>
           </geometry>
         </visual>
       </link>
       <joint name="joint" type="prismatic">
-        <pose>0 0 0.25  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>

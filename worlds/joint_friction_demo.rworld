@@ -6,16 +6,17 @@
   # Inertial parameters
   # Aluminum 2700 kg/m^3
   density = 2700.0
-  dz = 0.5
-  dx = dz/10
-  dy = dz/10
+  dy = 0.5
+  dx = dy/10
+  dz = dy/10
+  dd = dy
   mass = density * dx * dy * dz 
   ixx = 1.0 / 12 * mass * (dy*dy + dz*dz)
   iyy = 1.0 / 12 * mass * (dz*dz + dx*dx)
   izz = 1.0 / 12 * mass * (dx*dx + dy*dy)
 
   # Initial angle of revolute joints
-  theta = Math::PI / 2
+  theta = 0* Math::PI
 
   revolute_friction = [0.0, 0.1, 1.0, 10.0]
   prismatic_friction = [0.0, 5.0, 9.0, 9.81]
@@ -33,9 +34,9 @@
           name = 'pendulum_' + i.to_s
     %>
     <%= "<model name='#{name}'>" %>
-      <pose><%= dz*i %> 0 <%= dz*1.8 %>  <%= theta %> 0 0</pose>
+      <pose><%= dd*2.1*i %> 0 <%= dd*1.8 %>  <%= theta %> 0 0</pose>
       <link name="link">
-        <pose>0 0 <%= -dz/2 %>  0 0 0</pose>
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
         <inertial>
           <mass><%= mass %></mass>
           <inertia>
@@ -63,7 +64,7 @@
         </visual>
       </link>
       <joint name="joint" type="revolute">
-        <pose>0 0 <%= dz/2 %>  0 0 0</pose>
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -82,9 +83,9 @@
           name = 'universal_axis1_' + i.to_s
     %>
     <%= "<model name='#{name}'>" %>
-      <pose><%= dz*i %> <%= -dz*3 %> <%= dz*1.8 %>  <%= theta %> 0 0</pose>
+      <pose><%= dd*2.1*i %> <%= -dd*3 %> <%= dd*1.8 %>  <%= theta %> 0 0</pose>
       <link name="link">
-        <pose>0 0 <%= -dz/2 %>  0 0 0</pose>
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
         <inertial>
           <mass><%= mass %></mass>
           <inertia>
@@ -112,7 +113,7 @@
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 <%= dz/2 %>  0 0 0</pose>
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -137,9 +138,9 @@
           name = 'universal_axis2_' + i.to_s
     %>
     <%= "<model name='#{name}'>" %>
-      <pose><%= dz*i %> <%= -dz*6 %> <%= dz*1.8 %>  <%= theta %> 0 0</pose>
+      <pose><%= dd*2.1*i %> <%= -dd*6 %> <%= dd*1.8 %>  <%= theta %> 0 0</pose>
       <link name="link">
-        <pose>0 0 <%= -dz/2 %>  0 0 0</pose>
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
         <inertial>
           <mass><%= mass %></mass>
           <inertia>
@@ -167,7 +168,7 @@
         </visual>
       </link>
       <joint name="joint" type="universal">
-        <pose>0 0 <%= dz/2 %>  0 0 0</pose>
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
@@ -192,9 +193,9 @@
           name = 'slider_' + i.to_s
     %>
     <%= "<model name='#{name}'>" %>
-      <pose><%= dz*i %> <%= dz*3 %> <%= dz*1.8 %>  0 0 0</pose>
+      <pose><%= dd*2.1*i %> <%= dd*3 %> <%= dd*1.8 %>  0 0 0</pose>
       <link name="link">
-        <pose>0 0 <%= -dz/2 %>  0 0 0</pose>
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
         <collision name="collision">
           <geometry>
             <box>
@@ -211,7 +212,6 @@
         </visual>
       </link>
       <joint name="joint" type="prismatic">
-        <pose>0 0 <%= dz/2 %>  0 0 0</pose>
         <parent>world</parent>
         <child>link</child>
         <axis>
