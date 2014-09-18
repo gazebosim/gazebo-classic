@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
-#ifndef _USERCAMERA_HH_
-#define _USERCAMERA_HH_
+#ifndef _GAZEBO_USERCAMERA_HH_
+#define _GAZEBO_USERCAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -56,6 +51,9 @@ namespace gazebo
       /// \brief Load the user camera.
       /// \param[in] _sdf Parameters for the camera.
       public: void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited
+      public: virtual void SetClipDist(float _near, float _far);
 
       /// \brief Generic load function
       public: void Load();
@@ -225,6 +223,12 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: UserCameraPrivate *dataPtr;
+
+      /// \brief Ogre camera for the right Oculus screen.
+      protected: Ogre::Camera *rightCamera;
+
+      /// \brief View port for the right camera.
+      protected: Ogre::Viewport *rightViewport;
     };
     /// \}
   }

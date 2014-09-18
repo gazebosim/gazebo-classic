@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -34,6 +29,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
@@ -52,8 +48,9 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
-  // Set default UserCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default UserCamera render rate to 120Hz. This was choosen
+  // for stereo rendering and smooth user interactions.
+  this->SetRenderRate(120.0);
 
   this->SetUseSDFPose(false);
 }
@@ -99,6 +96,22 @@ void UserCamera::Init()
   // Don't yaw along variable axis, causes leaning
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
+  this->camera->setAutoAspectRatio(false);
+
+  // Right camera
+  {
+    this->rightCamera = this->scene->GetManager()->createCamera(
+        "StereoUserRight");
+    this->rightCamera->pitch(Ogre::Degree(90));
+
+    // Don't yaw along variable axis, causes leaning
+    this->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->rightCamera->setDirection(1, 0, 0);
+
+    this->rightCamera->setAutoAspectRatio(false);
+
+    this->sceneNode->attachObject(this->rightCamera);
+  }
 
   this->SetHFOV(GZ_DTOR(60));
 
@@ -356,6 +369,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
+    this->rightCamera->setAspectRatio(ratio);
+    this->rightCamera->setFOVy(Ogre::Radian(vfov));
+
     if (this->dataPtr->gui)
     {
       this->dataPtr->gui->Resize(this->viewport->getActualWidth(),
@@ -514,7 +530,24 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
+  Ogre::Vector2 offset(0.03f, 0.0f);
+  float focalLength = 1.0;
+
+  this->camera->setFocalLength(focalLength);
+  this->camera->setFrustumOffset(offset);
+
+  this->rightCamera->setFocalLength(focalLength);
+  this->rightCamera->setFrustumOffset(-offset);
+
+  this->rightViewport = this->renderTarget->addViewport(this->rightCamera, 1);
+  this->rightViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+
+  this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+  this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   if (this->dataPtr->gui)
     this->dataPtr->gui->Init(this->renderTarget);
@@ -617,4 +650,18 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
   return this->dataPtr->viewController->GetTypeString();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetClipDist(float _near, float _far)
+{
+  Camera::SetClipDist(_near, _far);
+
+  if (this->camera && this->rightCamera)
+  {
+    this->rightCamera->setNearClipDistance(this->camera->getNearClipDistance());
+    this->rightCamera->setFarClipDistance(this->camera->getFarClipDistance());
+    this->rightCamera->setRenderingDistance(
+        this->camera->getRenderingDistance());
+  }
 }
