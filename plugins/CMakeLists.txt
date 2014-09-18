@@ -26,6 +26,7 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
+  GUIAratPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
   ModelPropShop
