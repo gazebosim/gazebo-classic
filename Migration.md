@@ -2,6 +2,10 @@
 
 ### New Deprecations
 
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation*** unsigned int GetShapeType()
+    + ***Replacement*** unsigned int GetShapeType() const
+
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
     + ***Replacement*** virtual void SetPosition(unsigned int, double)
