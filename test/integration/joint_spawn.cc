@@ -296,8 +296,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
       _joint->HasType(physics::Base::GEARBOX_JOINT) ||
-      _joint->HasType(physics::Base::SCREW_JOINT) ||
-      _joint->HasType(physics::Base::UNIVERSAL_JOINT))
+      _joint->HasType(physics::Base::SCREW_JOINT))
   {
     gzerr << "This portion of the test fails for this joint type" << std::endl;
     return;

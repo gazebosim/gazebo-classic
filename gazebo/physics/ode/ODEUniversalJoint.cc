@@ -211,6 +211,19 @@ double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
+double ODEUniversalJoint::GetParam(unsigned int _parameter) const
+{
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetUniversalParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
@@ -373,7 +386,7 @@ double ODEUniversalJoint::GetParam(
   {
     try
     {
-      return ODEJoint::GetParam(dParamFMax | group);
+      return this->GetParam(dParamFMax | group);
     }
     catch(const common::Exception &e)
     {
@@ -385,7 +398,7 @@ double ODEUniversalJoint::GetParam(
   {
     try
     {
-      return ODEJoint::GetParam(dParamHiStop | group);
+      return this->GetParam(dParamHiStop | group);
     }
     catch(const common::Exception &e)
     {
@@ -397,7 +410,7 @@ double ODEUniversalJoint::GetParam(
   {
     try
     {
-      return ODEJoint::GetParam(dParamLoStop | group);
+      return this->GetParam(dParamLoStop | group);
     }
     catch(const common::Exception &e)
     {
