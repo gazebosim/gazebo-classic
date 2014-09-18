@@ -334,6 +334,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     world->Step(50);
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
+  // Set MaxForce to zero to avoid interference with next part of test (#964)
+  if (isOde)
+    _joint->SetMaxForce(_index, 0.0);
 
   // Test SetForce with positive value
   {
