@@ -158,11 +158,21 @@ void BulletSliderJoint::Init()
 
   // Apply joint translation limits here.
   // TODO: velocity and effort limits.
-  GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
-  sdf::ElementPtr limitElem;
-  limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-  this->bulletSlider->setLowerLinLimit(limitElem->Get<double>("lower"));
-  this->bulletSlider->setUpperLinLimit(limitElem->Get<double>("upper"));
+  {
+    GZ_ASSERT(this->sdf != NULL, "Joint sdf member is NULL");
+    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
+    {
+      sdf::ElementPtr dynamicsElem;
+      dynamicsElem = axisElem->GetElement("dynamics");
+      this->SetParam("friction", 0, dynamicsElem->Get<double>("friction"));
+    }
+    {
+      sdf::ElementPtr limitElem;
+      limitElem = axisElem->GetElement("limit");
+      this->SetLowStop(0, limitElem->Get<double>("lower"));
+      this->SetHighStop(0, limitElem->Get<double>("upper"));
+    }
+  }
 
   this->constraint = this->bulletSlider;
 
@@ -352,4 +362,80 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
   else
     gzwarn << "bulletSlider does not exist, returning default position\n";
   return result;
+}
+
+//////////////////////////////////////////////////
+bool BulletSliderJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  if (_key == "friction" && this->bulletSlider)
+  {
+    try
+    {
+      this->bulletSlider->setPoweredLinMotor(true);
+      this->bulletSlider->setTargetLinMotorVelocity(0.0);
+      this->bulletSlider->setMaxLinMotorForce(boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "hi_stop" && this->bulletSlider)
+  {
+    try
+    {
+      this->SetHighStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "lo_stop" && this->bulletSlider)
+  {
+    try
+    {
+      this->SetLowStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "friction" && this->bulletSlider)
+  {
+    return this->bulletSlider->getMaxLinMotorForce();
+  }
+  else if (_key == "hi_stop" && this->bulletSlider)
+  {
+    return this->bulletSlider->getUpperLinLimit();
+  }
+  else if (_key == "lo_stop" && this->bulletSlider)
+  {
+    return this->bulletSlider->getLowerLinLimit();
+  }
+  return BulletJoint::GetParam(_key, _index);
 }
