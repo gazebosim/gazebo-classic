@@ -27,8 +27,6 @@ GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
-  this->counter = 0;
-
   // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
@@ -43,7 +41,7 @@ GUIAratPlugin::GUIAratPlugin()
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
   // Create a push button, and connect it to the OnButton function
-  QPushButton *button = new QPushButton(tr("Spawn Sphere"));
+  QPushButton *button = new QPushButton(tr("Next Test"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
 
   // Add the button to the frame's layout
@@ -68,7 +66,9 @@ GUIAratPlugin::GUIAratPlugin()
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+  this->taskPub = this->node->Advertise<msgs::GzString>("/gazebo/arat/control");
+  this->taskNum = 0;
+  this->maxTaskCount = 10;
 }
 
 /////////////////////////////////////////////////
@@ -79,34 +79,10 @@ GUIAratPlugin::~GUIAratPlugin()
 /////////////////////////////////////////////////
 void GUIAratPlugin::OnButton()
 {
-  std::ostringstream newModelStr;
-  newModelStr << "<sdf version ='" << SDF_VERSION << "'>"
-    << "<model name='plugin_unit_sphere_" << this->counter++ << "'>"
-    << "  <pose>0 0 1.5 0 0 0</pose>"
-    << "  <link name='link'>"
-    << "    <inertial><mass>1.0</mass></inertial>"
-    << "    <collision name='collision'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "    </collision>"
-    << "    <visual name ='visual'>"
-    << "      <geometry>"
-    << "        <sphere><radius>0.5</radius></sphere>"
-    << "      </geometry>"
-    << "      <material>"
-    << "        <script>"
-    << "          <uri>file://media/materials/scripts/gazebo.material</uri>"
-    << "          <name>Gazebo/Grey</name>"
-    << "        </script>"
-    << "      </material>"
-    << "    </visual>"
-    << "  </link>"
-    << "  </model>"
-    << "</sdf>";
+  this->taskNum = (this->taskNum + 1) % this->maxTaskCount;
 
   // Send the model to the gazebo server
-  msgs::Factory msg;
-  msg.set_sdf(newModelStr.str());
-  this->factoryPub->Publish(msg);
+  msgs::GzString msg;
+  msg.set_data("task" + boost::lexical_cast<std::string>(this->taskNum));
+  this->taskPub->Publish(msg);
 }

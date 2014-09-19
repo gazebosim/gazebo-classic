@@ -5,6 +5,9 @@ include_directories(
   ${OGRE_INCLUDE_DIRS}
 )
 
+include (${QT_USE_FILE})
+add_definitions(${QT_DEFINITIONS})
+
 # Tinyxml are used since the plugins are linking against gazebo_common
 # which uses tinxyml. Not defining the link directory here will end up
 # failures in clang.
@@ -26,7 +29,6 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
-  GUIAratPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
   ModelPropShop
@@ -61,3 +63,11 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
+
+QT4_WRAP_CPP(GUIAratPlugin_MOC GUIAratPlugin.hh)
+add_library(GUIAratPlugin SHARED ${GUIAratPlugin_MOC} GUIAratPlugin.cc)
+target_link_libraries(GUIAratPlugin ${GAZEBO_LIBRARIES} ${OGRE_LIBRARIES} 
+    ${OGRE-Terrain_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES})
+install (TARGETS GUIAratPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+gz_install_includes("plugins" GUIAratPlugin.hh)
+

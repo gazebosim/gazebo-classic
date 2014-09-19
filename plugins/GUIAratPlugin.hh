@@ -22,7 +22,7 @@
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
 
-namespace handsim
+namespace gazebo
 {
     class GUIAratPlugin : public gazebo::GUIPlugin
     {
@@ -38,14 +38,18 @@ namespace handsim
       /// \brief Callback trigged when the button is pressed.
       protected slots: void OnButton();
 
-      /// \brief Counter used to create unique model names
-      private: unsigned int counter;
-
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
 
       /// \brief Publisher of factory messages.
-      private: gazebo::transport::PublisherPtr factoryPub;
+      private: gazebo::transport::PublisherPtr taskPub;
+
+      /// \brief Number of the current task.
+      private: int taskNum;
+
+      /// \brief Maximum number tasks.
+      /// \sa taskNum
+      private: int maxTaskCount;
     };
 }
 #endif
