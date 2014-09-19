@@ -37,6 +37,7 @@ set (msgs
   joint_cmd.proto
   joint_wrench.proto
   joint_wrench_stamped.proto
+  joystick.proto
   laserscan.proto
   laserscan_stamped.proto
   light.proto

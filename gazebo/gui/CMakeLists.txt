@@ -42,6 +42,7 @@ set (sources
   ModelRightMenu.cc
   MouseEventHandler.cc
   SaveDialog.cc
+  SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -80,6 +81,7 @@ set (headers
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
+  SpaceNav.hh
   SphereMaker.hh
 )
 
@@ -163,6 +165,12 @@ target_link_libraries(gzclient
   ${Boost_LIBRARIES}
   pthread
 )
+
+if (SPNAV_LIBRARY)
+  target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
+  target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
 
 add_definitions(${QT_DEFINITIONS})
 

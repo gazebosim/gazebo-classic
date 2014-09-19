@@ -53,6 +53,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->SetRenderRate(120.0);
 
   this->SetUseSDFPose(false);
+
+  this->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -80,6 +82,12 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->joySub = this->node->Subscribe("~/spacenav/joy",
+      &UserCamera::OnJoy, this);
+  this->joySubAbs = this->node->Subscribe("~/polhemus/joy",
+      &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -188,6 +196,13 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
+
+  if (!this->poseSet)
+  {
+    this->initialPose = _pose;
+    std::cout << "initialPose: " << this->initialPose << std::endl;
+    this->poseSet = true;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -650,6 +665,42 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
   return this->dataPtr->viewController->GetTypeString();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoy(ConstJoystickPtr &_msg)
+{
+  // This function was establish when integrating the space navigator
+  // joystick.
+  if (_msg->has_translation() && _msg->has_rotation())
+  {
+    // Get the joystick XYZ
+    math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+
+    // Get the jostick RPY. We are disabling rotation around x and y.
+    math::Vector3 rot = msgs::Convert(_msg->rotation()) *
+      math::Vector3(0, 0.01, 0.05);
+
+    math::Pose pose = this->GetWorldPose();
+    pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    this->SetWorldPose(pose);
+  }
+}
+
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->poseSet)
+    return;
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
+    pose.pos += this->initialPose.pos;
+    pose.rot *= this->initialPose.rot;
+    this->SetWorldPose(pose);
+  }
 }
 
 //////////////////////////////////////////////////
