@@ -17,32 +17,59 @@
 
     <include>
       <uri>model://cricket_ball</uri>
-      <pose>0.6 -0.25 1.015 0 0 0</pose>
+      <pose> 0.6 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_block_10_2_1cm</uri>
-      <pose>0.4 -0.25 1.015 0 0 0</pose>
+      <pose> 0.4 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_10cm</uri>
-      <pose>0.2 -0.25 1.015 0 0 0</pose>
+      <pose> 0.2 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_7_5cm</uri>
-      <pose>0 -0.25 1.015 0 0 0</pose>
+      <pose> 0.0 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_5cm</uri>
-      <pose>-0.2 -0.25 1.015 0 0 0</pose>
+      <pose>-0.2 250 1.015 0 0 0</pose>
     </include>
 
     <include>
       <uri>model://wood_cube_2_5cm</uri>
-      <pose>-0.4 -0.25 1.015 0 0 0</pose>
+      <pose>-0.4 250 1.015 0 0 0</pose>
     </include>
+
+    <plugin name="arat_plugin" filename="libARATPlugin.so">
+      <modelName>cricket_ball</modelName>
+      <modelName>wood_block_10_2_1cm</modelName>
+      <modelName>wood_cube_10cm</modelName>
+      <modelName>wood_cube_7_5cm</modelName>
+      <modelName>wood_cube_5cm</modelName>
+      <modelName>wood_cube_2_5cm</modelName>
+      <task name="default">
+        <pose name="cricket_ball"       > 0.6 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_block_10_2_1cm"> 0.4 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_10cm"     > 0.2 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_7_5cm"    > 0.0 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_5cm"      >-0.2 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_2_5cm"    >-0.4 -0.25 1.015 0 0 0</pose>
+      </task>
+      <task name="cricket_ball">
+        <pose name="cricket_ball"       > 0.6 -0.25 1.015 0 0 0</pose>
+      </task>
+      <task name="wood_blocks">
+        <pose name="wood_block_10_2_1cm"> 0.4 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_10cm"     > 0.2 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_7_5cm"    > 0.0 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_5cm"      >-0.2 -0.25 1.015 0 0 0</pose>
+        <pose name="wood_cube_2_5cm"    >-0.4 -0.25 1.015 0 0 0</pose>
+      </task>
+    </plugin>
   </world>
 </sdf>
