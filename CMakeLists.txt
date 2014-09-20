@@ -311,7 +311,10 @@ else (build_errors)
 
   foreach (b ${Boost_LIBRARIES})
     get_filename_component(bname ${b} NAME_WE)
-    string (REPLACE "lib" "-l" bname "${bname}")
+    # Prefix always -l
+    set (bname "-l${bname}")
+    # Remove the prefix lib (not always present, like in pthread)
+    string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
   endforeach(b)
 
