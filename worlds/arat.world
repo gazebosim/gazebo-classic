@@ -52,6 +52,7 @@
       <modelName>wood_cube_7_5cm</modelName>
       <modelName>wood_cube_5cm</modelName>
       <modelName>wood_cube_2_5cm</modelName>
+      <initialTask>wood_blocks</initialTask>
       <task name="default">
         <pose name="cricket_ball"       > 0.6 -0.25 1.015 0 0 0</pose>
         <pose name="wood_block_10_2_1cm"> 0.4 -0.25 1.015 0 0 0</pose>

@@ -45,6 +45,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// \brief Set up the task with name given by input parameter.
     /// \param[in] _task Name of task.
     /// \return True if task was set successfully.
@@ -81,6 +84,12 @@ namespace gazebo
 
     /// \brief Information about tasks.
     protected: Task_M tasks;
+
+    /// \brief Initial task name.
+    protected: std::string initialTaskName;
+
+    /// \brief Initial task name.
+    protected: std::string currentTaskName;
   };
 }
 #endif

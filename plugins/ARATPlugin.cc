@@ -55,6 +55,15 @@ void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
+  // Get initial task name
+  {
+    const std::string elemName = "initialTask";
+    if (this->sdf->HasElement(elemName))
+    {
+      this->initialTaskName = this->sdf->Get<std::string>(elemName);
+    }
+  }
+
   // Get task information
   {
     const std::string elemName = "task";
@@ -107,9 +116,15 @@ void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ARATPlugin::Init()
 {
-  // Set default task
-  gzdbg << "Set wood_blocks task" << std::endl;
-  this->SetTask("wood_blocks");
+  // Set initial task
+  gzdbg << "Set " << this->initialTaskName << " task" << std::endl;
+  this->SetTask(this->initialTaskName);
+}
+
+/////////////////////////////////////////////////
+void ARATPlugin::Reset()
+{
+  this->SetTask(this->currentTaskName);
 }
 
 /////////////////////////////////////////////////
@@ -124,18 +139,25 @@ bool ARATPlugin::SetTask(const std::string &_task)
     return false;
   }
 
+  this->currentTaskName = _task;
   Pose_M task = this->tasks[_task];
 
   for (Object_M::iterator iter = this->objects.begin();
         iter != this->objects.end(); ++iter)
   {
     physics::ModelPtr model = iter->second->model;
-    math::Pose pose = iter->second->pose;
+    math::Pose pose;
     Pose_M::iterator poseIter = task.find(iter->first);
     if (poseIter != task.end())
     {
       // object name found in task
       pose = poseIter->second;
+      iter->second->model->SetEnabled(true);
+    }
+    else
+    {
+      pose = iter->second->pose;
+      iter->second->model->SetEnabled(false);
     }
     model->SetWorldPose(pose);
     model->ResetPhysicsStates();
