@@ -75,28 +75,30 @@ class ServerFixture : public testing::Test
                    TEST_REGRESSION_PATH);
 
                // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
-               path += "/../..";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               boost::filesystem::path path;
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../sdf";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../gazebo";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               path /= "gazebo";
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../build/plugins";
-               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               path /= "sdf";
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../build/test/plugins";
-               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+               path = PROJECT_BINARY_PATH;
+               path /= "plugins";
+               common::SystemPaths::Instance()->AddPluginPaths(path.string());
+
+               path = PROJECT_BINARY_PATH;
+               path /= "test";
+               path /= "plugins";
+               common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
                path = TEST_PATH;
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
              }
 
   protected: virtual void TearDown()
