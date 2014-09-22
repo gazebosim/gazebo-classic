@@ -381,7 +381,7 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
     const gazebo::math::Vector3 & /*_anchor*/)
 {
-  gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
+  gzdbg << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
 }
 
@@ -627,12 +627,29 @@ bool SimbodyJoint::SetPosition(unsigned int _index, double _position)
 {
   if (_index < this->GetAngleCount())
   {
-    this->mobod.setOneQ(
-      this->simbodyPhysics->integ->updAdvancedState(),
-      SimTK::MobilizerUIndex(_index), _position);
-    this->simbodyPhysics->system.realize(
-      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Position);
-    return true;
+    if (this->physicsInitialized)
+    {
+      // truncate position by joint limits
+      double lower = this->GetLowStop(_index).Radian();
+      double upper = this->GetHighStop(_index).Radian();
+      if (lower < upper)
+        _position = math::clamp(_position, lower, upper);
+      else
+        _position = math::clamp(_position, upper, lower);
+
+      this->mobod.setOneQ(
+        this->simbodyPhysics->integ->updAdvancedState(),
+        SimTK::MobilizerUIndex(_index), _position);
+      this->simbodyPhysics->system.realize(
+        this->simbodyPhysics->integ->getAdvancedState(),
+        SimTK::Stage::Position);
+      return true;
+    }
+    else
+    {
+      gzerr << "State not initialized, failed.\n";
+      return false;
+    }
   }
   else
   {

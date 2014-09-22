@@ -70,12 +70,6 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
     return;
   }
 
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Simbody Joint::SetPosition not yet working.\n";
-    return;
-  }
-
   // Load our screw joint test world
   Load("worlds/set_joint_position.world", true, _physicsEngine);
 
@@ -249,7 +243,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
 
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Simbody Joint::SetPosition not yet working.\n";
+    gzerr << "Simbody Joint::SetPosition multi-threaded not yet working.\n";
     return;
   }
 
@@ -423,7 +417,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
 
   if (_physicsEngine == "simbody")
   {
-    gzerr << "Simbody Joint::SetPosition not yet working.\n";
+    gzerr << "Simbody Joint::SetPosition looped models not yet working.\n";
     return;
   }
 
