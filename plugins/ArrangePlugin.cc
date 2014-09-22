@@ -18,26 +18,31 @@
 #include <gazebo/common/Console.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
-#include "ARATPlugin.hh"
+#include "plugins/ArrangePlugin.hh"
 
 using namespace gazebo;
 
-GZ_REGISTER_WORLD_PLUGIN(ARATPlugin)
+GZ_REGISTER_WORLD_PLUGIN(ArrangePlugin)
 
 /////////////////////////////////////////////////
-ARATPlugin::ARATPlugin()
+ArrangePlugin::ArrangePlugin()
 {
 }
 
 /////////////////////////////////////////////////
-void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+ArrangePlugin::~ArrangePlugin()
+{
+}
+
+/////////////////////////////////////////////////
+void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->world = _world;
   this->sdf = _sdf;
 
   // Fill this->objects with initial poses of named models
   {
-    const std::string elemName = "modelName";
+    const std::string elemName = "model_name";
     if (this->sdf->HasElement(elemName))
     {
       sdf::ElementPtr elem = this->sdf->GetElement(elemName);
@@ -55,30 +60,30 @@ void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
-  // Get initial task name
+  // Get initial arrangement name
   {
-    const std::string elemName = "initialTask";
+    const std::string elemName = "initial_arrangement";
     if (this->sdf->HasElement(elemName))
     {
-      this->initialTaskName = this->sdf->Get<std::string>(elemName);
+      this->initialArrangementName = this->sdf->Get<std::string>(elemName);
     }
   }
 
-  // Get task information
+  // Get arrangement information
   {
-    const std::string elemName = "task";
+    const std::string elemName = "arrangement";
     if (this->sdf->HasElement(elemName))
     {
       sdf::ElementPtr elem = this->sdf->GetElement(elemName);
       while (elem)
       {
-        // Read task name attribute
+        // Read arrangement name attribute
         if (!elem->HasAttribute("name"))
         {
-          gzerr << "task element missing name attribute" << std::endl;
+          gzerr << "arrangement element missing name attribute" << std::endl;
           continue;
         }
-        std::string taskName = elem->Get<std::string>("name");
+        std::string arrangementName = elem->Get<std::string>("name");
 
         // Read pose elements into Pose_M
         Pose_M poses;
@@ -87,21 +92,21 @@ void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
           sdf::ElementPtr poseElem = elem->GetElement("pose");
           while (poseElem)
           {
-            // Read pose name attribute
-            if (!poseElem->HasAttribute("name"))
+            // Read pose model attribute
+            if (!poseElem->HasAttribute("model"))
             {
-              gzerr << "pose element missing name attribute" << std::endl;
+              gzerr << "pose element missing model attribute" << std::endl;
               continue;
             }
-            std::string poseName = poseElem->Get<std::string>("name");
+            std::string poseName = poseElem->Get<std::string>("model");
             poses[poseName] = poseElem->Get<math::Pose>();
 
             poseElem = poseElem->GetNextElement("pose");
           }
         }
-        this->tasks[taskName] = poses;
-        gzdbg << "Loaded task ["
-              << taskName
+        this->arrangements[arrangementName] = poses;
+        gzdbg << "Loaded arrangement ["
+              << arrangementName
               << "] with "
               << poses.size()
               << " poses"
@@ -114,43 +119,46 @@ void ARATPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void ARATPlugin::Init()
+void ArrangePlugin::Init()
 {
-  // Set initial task
-  gzdbg << "Set " << this->initialTaskName << " task" << std::endl;
-  this->SetTask(this->initialTaskName);
+  // Set initial arrangement
+  gzdbg << "Set "
+        << this->initialArrangementName
+        << " arrangement"
+        << std::endl;
+  this->SetArrangement(this->initialArrangementName);
 }
 
 /////////////////////////////////////////////////
-void ARATPlugin::Reset()
+void ArrangePlugin::Reset()
 {
-  this->SetTask(this->currentTaskName);
+  this->SetArrangement(this->currentArrangementName);
 }
 
 /////////////////////////////////////////////////
-bool ARATPlugin::SetTask(const std::string &_task)
+bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
 {
-  if (this->tasks.find(_task) == this->tasks.end())
+  if (this->arrangements.find(_arrangement) == this->arrangements.end())
   {
-    gzerr << "Cannot SetTask ["
-          << _task
-          << "], unrecognized task name"
+    gzerr << "Cannot SetArrangement ["
+          << _arrangement
+          << "], unrecognized arrangement name"
           << std::endl;
     return false;
   }
 
-  this->currentTaskName = _task;
-  Pose_M task = this->tasks[_task];
+  this->currentArrangementName = _arrangement;
+  Pose_M arrangement = this->arrangements[_arrangement];
 
   for (Object_M::iterator iter = this->objects.begin();
         iter != this->objects.end(); ++iter)
   {
     physics::ModelPtr model = iter->second->model;
     math::Pose pose;
-    Pose_M::iterator poseIter = task.find(iter->first);
-    if (poseIter != task.end())
+    Pose_M::iterator poseIter = arrangement.find(iter->first);
+    if (poseIter != arrangement.end())
     {
-      // object name found in task
+      // object name found in arrangement
       pose = poseIter->second;
       iter->second->model->SetEnabled(true);
     }

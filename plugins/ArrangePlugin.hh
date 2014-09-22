@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_ARAT_PLUGIN_HH_
-#define _GAZEBO_ARAT_PLUGIN_HH_
+#ifndef _GAZEBO_ARRANGE_PLUGIN_HH_
+#define _GAZEBO_ARRANGE_PLUGIN_HH_
 
 #include <map>
 #include <string>
@@ -32,10 +32,13 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE ARATPlugin : public WorldPlugin
+  class GAZEBO_VISIBLE ArrangePlugin : public WorldPlugin
   {
     /// \brief Constructor.
-    public: ARATPlugin();
+    public: ArrangePlugin();
+
+    /// \brief Destructor.
+    public: ~ArrangePlugin();
 
     /// \brief Load the plugin.
     /// \param[in] _world Pointer to world
@@ -48,10 +51,10 @@ namespace gazebo
     /// \brief Reset the plugin.
     public: virtual void Reset();
 
-    /// \brief Set up the task with name given by input parameter.
-    /// \param[in] _task Name of task.
-    /// \return True if task was set successfully.
-    public: bool SetTask(const std::string &_task);
+    /// \brief Set up the arrangement with name given by input parameter.
+    /// \param[in] _arrangement Name of arrangement.
+    /// \return True if arrangement was set successfully.
+    public: bool SetArrangement(const std::string &_arrangement);
 
     /// \brief World pointer.
     protected: physics::WorldPtr world;
@@ -59,7 +62,7 @@ namespace gazebo
     /// \brief SDF pointer.
     protected: sdf::ElementPtr sdf;
 
-    /// \brief Class to store info about each ARAT object.
+    /// \brief Class to store info about each object.
     protected: class Object
                {
                  /// \brief Model pointer.
@@ -73,23 +76,23 @@ namespace gazebo
     /// \brief Map of strings to model pointers.
     typedef std::map<std::string, ObjectPtr> Object_M;
 
-    /// \brief Collection of ARAT models.
+    /// \brief Collection of models.
     protected: Object_M objects;
 
     /// \brief Map of strings to model poses.
     typedef std::map<std::string, math::Pose> Pose_M;
 
-    /// \brief Map of strings to Pose_M (task map).
-    typedef std::map<std::string, Pose_M> Task_M;
+    /// \brief Map of strings to Pose_M (arrangement map).
+    typedef std::map<std::string, Pose_M> Arrangement_M;
 
-    /// \brief Information about tasks.
-    protected: Task_M tasks;
+    /// \brief Information about arrangements.
+    protected: Arrangement_M arrangements;
 
-    /// \brief Initial task name.
-    protected: std::string initialTaskName;
+    /// \brief Initial arrangement name.
+    protected: std::string initialArrangementName;
 
-    /// \brief Initial task name.
-    protected: std::string currentTaskName;
+    /// \brief Initial arrangement name.
+    protected: std::string currentArrangementName;
   };
 }
 #endif
