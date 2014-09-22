@@ -621,3 +621,22 @@ math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
     return math::Angle(0.0);
   }
 }
+
+//////////////////////////////////////////////////
+bool SimbodyJoint::SetPosition(unsigned int _index, double _position)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->mobod.setOneQ(
+      this->simbodyPhysics->integ->updAdvancedState(),
+      SimTK::MobilizerUIndex(_index), _position);
+    this->simbodyPhysics->system.realize(
+      this->simbodyPhysics->integ->getAdvancedState(), SimTK::Stage::Position);
+    return true;
+  }
+  else
+  {
+    gzerr << "SetVelocity _index too large.\n";
+    return false;
+  }
+}
