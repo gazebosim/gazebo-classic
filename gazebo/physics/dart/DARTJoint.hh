@@ -86,6 +86,9 @@ namespace gazebo
                   const math::Angle &_angle);
 
       // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      // Documentation inherited.
       public: virtual math::Angle GetHighStop(unsigned int _index);
 
       // Documentation inherited.

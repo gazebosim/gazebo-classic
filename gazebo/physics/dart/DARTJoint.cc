@@ -647,3 +647,34 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
           << "] index [" << _index
           << "] out of range.\n";
 }
+
+//////////////////////////////////////////////////
+bool DARTJoint::SetPosition(unsigned int _index, double _position)
+{
+  if (_index < this->GetAngleCount())
+  {
+    if (this->dtJoint)
+    {
+      // truncate position by joint limits
+      double lower = this->GetLowStop(_index).Radian();
+      double upper = this->GetHighStop(_index).Radian();
+      if (lower < upper)
+        _position = math::clamp(_position, lower, upper);
+      else
+        _position = math::clamp(_position, upper, lower);
+
+      this->dtJoint->setPosition(_index, _position);
+      return true;
+    }
+    else
+    {
+      gzerr << "State not initialized, failed.\n";
+      return false;
+    }
+  }
+  else
+  {
+    gzerr << "SetVelocity _index too large.\n";
+    return false;
+  }
+}
