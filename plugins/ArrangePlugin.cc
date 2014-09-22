@@ -84,6 +84,10 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
           continue;
         }
         std::string arrangementName = elem->Get<std::string>("name");
+        if (this->initialArrangementName.empty())
+        {
+          this->initialArrangementName = arrangementName;
+        }
 
         // Read pose elements into Pose_M
         Pose_M poses;
@@ -122,10 +126,6 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 void ArrangePlugin::Init()
 {
   // Set initial arrangement
-  gzdbg << "Set "
-        << this->initialArrangementName
-        << " arrangement"
-        << std::endl;
   this->SetArrangement(this->initialArrangementName);
 }
 
@@ -159,13 +159,14 @@ bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
     if (poseIter != arrangement.end())
     {
       // object name found in arrangement
+      // use arrangement pose
       pose = poseIter->second;
-      iter->second->model->SetEnabled(true);
     }
     else
     {
+      // object name not found in arrangement
+      // use initial pose
       pose = iter->second->pose;
-      iter->second->model->SetEnabled(false);
     }
     model->SetWorldPose(pose);
     model->ResetPhysicsStates();
