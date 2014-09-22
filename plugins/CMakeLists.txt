@@ -18,7 +18,7 @@ if (HAVE_BULLET)
 endif()
 
 set (plugins
-  ARATPlugin
+  ArrangePlugin
   BreakableJointPlugin
   CameraPlugin
   CartDemoPlugin

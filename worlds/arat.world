@@ -45,7 +45,7 @@
       <pose>-0.4 250 1.015 0 0 0</pose>
     </include>
 
-    <plugin name="arat_plugin" filename="libARATPlugin.so">
+    <plugin name="arrange_plugin" filename="libArrangePlugin.so">
       <modelName>cricket_ball</modelName>
       <modelName>wood_block_10_2_1cm</modelName>
       <modelName>wood_cube_10cm</modelName>
