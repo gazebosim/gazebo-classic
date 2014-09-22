@@ -2,6 +2,10 @@
 
 ### New Deprecations
 
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation*** unsigned int GetShapeType()
+    + ***Replacement*** unsigned int GetShapeType() const
+
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
     + ***Replacement*** virtual void SetPosition(unsigned int, double)
@@ -10,6 +14,9 @@
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gzprop command line tool**
+    + The `gzprop` command line tool outputs a zip file instead of a tarball.
 
 ### Additions
 
