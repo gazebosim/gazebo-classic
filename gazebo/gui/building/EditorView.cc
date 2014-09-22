@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
 #include "gazebo/gui/building/EditorItem.hh"
@@ -72,7 +73,7 @@ EditorView::EditorView(QWidget *_parent)
   this->buildingMaker = new BuildingMaker();
   this->currentLevel = 0;
 
-  Level *newLevel = new Level;
+  Level *newLevel = new Level();
   newLevel->level = 0;
   newLevel->height = 0;
   newLevel->name = "Level 1";
@@ -716,6 +717,31 @@ void EditorView::Create3DVisual(EditorItem *_item)
 }
 
 /////////////////////////////////////////////////
+void EditorView::SetBackgroundImage(const std::string &_filename, double _scale)
+{
+  QImage img(QString::fromStdString(_filename));
+  int newHeight = (img.height() * 100) * _scale;
+  img = img.scaledToHeight(newHeight);
+
+  if (!this->levels[this->currentLevel]->backgroundPixmap)
+  {
+    this->levels[this->currentLevel]->backgroundPixmap =
+      new QGraphicsPixmapItem(QPixmap::fromImage(img));
+    this->scene()->addItem(this->levels[this->currentLevel]->backgroundPixmap);
+  }
+  else
+  {
+    this->levels[this->currentLevel]->backgroundPixmap->setPixmap(
+        QPixmap::fromImage(img));
+  }
+
+  this->levels[this->currentLevel]->backgroundPixmap->setX(img.width() * -0.5);
+  this->levels[this->currentLevel]->backgroundPixmap->setY(img.height() * -0.5);
+  this->setSceneRect(img.width() * -0.5, img.height() * -0.5,
+                     img.width(), img.height());
+}
+
+/////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
   if (_type == "wall")
@@ -726,6 +752,12 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->drawMode = DOOR;
   else if (_type == "stairs")
     this->drawMode = STAIRS;
+  else if (_type == "image")
+  {
+    this->drawMode = NONE;
+    ImportImageDialog *importImage = new ImportImageDialog(this);
+    importImage->show();
+  }
   else
     this->drawMode = NONE;
 
@@ -760,7 +792,7 @@ void EditorView::OnDiscardModel()
   this->levels.clear();
   this->currentLevel = 0;
 
-  Level *newLevel = new Level;
+  Level *newLevel = new Level();
   newLevel->level = 0;
   newLevel->height = 0;
   newLevel->name = "Level 1";
@@ -787,7 +819,7 @@ void EditorView::OnAddLevel()
   levelNameStr << "Level " << ++this->levelCounter + 1;
   std::string levelName = levelNameStr.str();
   this->currentLevel = newLevelNum;
-  Level *newlevel = new Level;
+  Level *newlevel = new Level();
   newlevel->name = levelName;
   this->levels.push_back(newlevel);
   emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
@@ -880,6 +912,13 @@ void EditorView::DeleteLevel(int _level)
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
 
+  if (this->levels[_level]->backgroundPixmap)
+  {
+    this->scene()->removeItem(this->levels[_level]->backgroundPixmap);
+    delete this->levels[_level]->backgroundPixmap;
+    this->levels[_level]->backgroundPixmap = NULL;
+  }
+
   this->OnChangeLevel(newLevelIndex);
   std::vector<EditorItem *> toBeDeleted;
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
@@ -951,6 +990,17 @@ void EditorView::DeleteLevel(int _level)
 /////////////////////////////////////////////////
 void EditorView::OnChangeLevel(int _level)
 {
+  // Hide the current background pixmap
+  if (this->levels[this->currentLevel]->backgroundPixmap)
+    this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
+
+  // Show the pixmap for the changed level
+  if (_level < static_cast<int>(this->levels.size()) &&
+      this->levels[_level]->backgroundPixmap)
+  {
+    this->levels[_level]->backgroundPixmap->setVisible(true);
+  }
+
   this->currentLevel = _level;
   for (std::vector<WallItem *>::iterator it = this->wallList.begin();
       it != this->wallList.end(); ++it)
@@ -992,6 +1042,7 @@ void EditorView::OnChangeLevel(int _level)
     else
       (*it)->setVisible(true);
   }
+
 }
 
 /////////////////////////////////////////////////

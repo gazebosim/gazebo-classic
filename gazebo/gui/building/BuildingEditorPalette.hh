@@ -57,6 +57,9 @@ namespace gazebo
       /// \brief Qt callback when the draw door button is pressed.
       private slots: void OnAddDoor();
 
+      /// \brief Qt callback when the import image button is pressed.
+      private slots: void OnImportImage();
+
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 

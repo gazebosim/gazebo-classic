@@ -16,6 +16,7 @@ set (sources
   FloorItem.cc
   GrabberHandle.cc
   GridLines.cc
+  ImportImageDialog.cc
   LevelInspectorDialog.cc
   LevelWidget.cc
   LineSegmentItem.cc
@@ -40,6 +41,7 @@ set (qt_headers
   EditorView.hh
   FinishBuildingDialog.hh
   FloorItem.hh
+  ImportImageDialog.hh
   LevelInspectorDialog.hh
   LevelWidget.hh
   RectItem.hh

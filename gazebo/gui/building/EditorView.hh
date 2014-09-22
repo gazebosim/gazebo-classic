@@ -43,6 +43,8 @@ namespace gazebo
     /// \brief A convenient structure for storing level information
     class GAZEBO_VISIBLE Level
     {
+      public: Level() : backgroundPixmap(NULL) {}
+
       /// \brief Level number
       public: int level;
 
@@ -51,6 +53,9 @@ namespace gazebo
 
       /// \brief Level height from ground
       public: double height;
+
+      /// \brief Background pixmap for a level
+      public: QGraphicsPixmapItem *backgroundPixmap;
     };
 
     /// \addtogroup gazebo_gui
@@ -90,6 +95,12 @@ namespace gazebo
       /// \brief Delete an editor item.
       /// \param[in] _item Item to be deleted.
       public: void DeleteItem(EditorItem *_item);
+
+      /// \brief Set the graphics view background image.
+      /// \param[in] _filename Name of the image file.
+      /// \param[in] _scale Image scale, in meters/pixel.
+      public: void SetBackgroundImage(const std::string &_filename,
+                  double _scale);
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event
