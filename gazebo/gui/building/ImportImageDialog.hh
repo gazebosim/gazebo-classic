@@ -49,8 +49,15 @@ namespace gazebo
 
       private: QLineEdit *fileLineEdit;
       private: QDoubleSpinBox *resolutionSpin;
+      private: QGraphicsView *imageDisplay;
+      private: int imageDisplayWidth;
+      private: int imageDisplayHeight;
 
       private: EditorView *view;
+
+      private: bool eventFilter(QObject *obj, QEvent *event);
+      private: QPointF measureLineStart;
+      private: bool drawingLine;
     };
     /// \}
   }
