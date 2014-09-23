@@ -85,8 +85,11 @@ namespace gazebo
       /// \brief Grid lines drawn on the background of the editor.
       private: GridLines *gridLines;
 
-      /// \brief Currently selected image
-      private: QGraphicsPixmapItem *image;
+      /// \brief Currently selected image item
+      private: QGraphicsPixmapItem *imageItem;
+
+      /// \brief Currently selected image pixmap
+      private: QPixmap *imagePixmap;
 
       /// \brief Text to be dispayed when no image has been selected
       private: QGraphicsTextItem *noImageText;

@@ -36,7 +36,8 @@ ImportImageView::ImportImageView(QWidget *_parent)
 
   this->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
   this->gridLines = NULL;
-  this->image = NULL;
+  this->imageItem = NULL;
+  this->imagePixmap = NULL;
 
   this->viewScale = 1.0;
 
@@ -57,21 +58,22 @@ ImportImageView::~ImportImageView()
 void ImportImageView::SetImage(const std::string &_filename, int _width,
     int _height)
 {
-  if (this->image)
-    this->scene()->removeItem(this->image);
+  if (this->imageItem)
+    this->scene()->removeItem(this->imageItem);
   if (this->gridLines)
     this->scene()->removeItem(this->gridLines);
   this->scene()->removeItem(this->noImageText);
   if (this->measureItem)
     this->scene()->removeItem(this->measureItem);
 
-  this->image = new QGraphicsPixmapItem(QPixmap(
-      QString(_filename.c_str())).scaled(_width, _height,
-                                         Qt::KeepAspectRatio));
+  this->imagePixmap = new QPixmap(QString(_filename.c_str()));
+  this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
+      this->scene()->sceneRect().width(),
+      this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
 
-  if (this->image)
+  if (this->imageItem)
   {
-    this->scene()->addItem(this->image);
+    this->scene()->addItem(this->imageItem);
   }
   else
   {
@@ -84,24 +86,30 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
 {
   if (this->scene())
   {
-    if (!this->image)
-    {
-      this->scene()->addItem(this->noImageText);
-    }
+    this->scene()->setSceneRect(0, 0, _event->size().width(),
+                                      _event->size().height());
 
     if (!this->gridLines)
     {
       this->gridLines = new GridLines(_event->size().width(),
           _event->size().height());
       this->scene()->addItem(this->gridLines);
+      this->scene()->addItem(this->noImageText);
     }
     else
     {
       this->gridLines->SetSize(_event->size().width(),
-          _event->size().height());
+            _event->size().height());
     }
-    this->gridLines->setPos(this->mapToScene(
-        QPoint(_event->size().width()/2, _event->size().height()/2)));
+
+    if (this->imageItem)
+    {
+      this->scene()->removeItem(this->imageItem);
+      this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
+          this->scene()->sceneRect().width(),
+          this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
+      this->scene()->addItem(this->imageItem);
+    }
   }
 }
 
@@ -145,7 +153,7 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void ImportImageView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  if (this->image)
+  if (this->imageItem)
   {
     this->DrawMeasure(_event->pos());
   }
