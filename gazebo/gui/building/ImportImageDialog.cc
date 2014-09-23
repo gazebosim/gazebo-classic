@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/gui/building/EditorView.hh"
+#include "gazebo/gui/building/ImportImageView.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
 
@@ -61,27 +62,26 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   connect(this, SIGNAL(accepted()), this, SLOT(OnAccept()));
 
+  this->importImageView = new ImportImageView();
+  QGraphicsScene *scene = new QGraphicsScene();
+  scene->setBackgroundBrush(Qt::white);
+
   this->imageDisplayWidth = 400;
   this->imageDisplayHeight = 300;
-  QGraphicsScene *imageDisplayScene = new QGraphicsScene();
-  imageDisplayScene->setSceneRect(0, 0, this->imageDisplayWidth,
-                                        this->imageDisplayHeight);
+  scene->setSceneRect(0, 0, this->imageDisplayWidth,
+                                  this->imageDisplayHeight);
 
-  this->imageDisplay = new QGraphicsView(imageDisplayScene);
-  this->imageDisplay->setBackgroundBrush(QBrush(Qt::white, Qt::SolidPattern));
-  this->imageDisplay->setMouseTracking(true);
-  this->imageDisplay->installEventFilter(this);
-
-  QGraphicsTextItem *noImageText = new QGraphicsTextItem;
-  noImageText->setPlainText("No image selected");
-  noImageText->setDefaultTextColor(Qt::gray);
-  this->imageDisplay->scene()->addItem(noImageText);
+  this->importImageView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->importImageView->setScene(scene);
+  this->importImageView->centerOn(QPointF(0, 0));
+  this->importImageView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  this->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addLayout(fileLayout, 0, 0);
   mainLayout->addLayout(resolutionLayout, 1, 0);
   mainLayout->addWidget(okCancelButtons, 2, 0);
-  mainLayout->addWidget(this->imageDisplay, 0, 1, 4, 1);
+  mainLayout->addWidget(this->importImageView, 0, 1, 4, 1);
 
   this->setLayout(mainLayout);
 
@@ -113,80 +113,7 @@ void ImportImageDialog::OnSelectFile()
   if (!filename.empty())
   {
     this->SetFileName(QString::fromStdString(filename));
-
-    QList<QGraphicsItem *> itemsInScene = this->imageDisplay->scene()->items();
-    foreach( QGraphicsItem *item, itemsInScene )
-    {
-      this->imageDisplay->scene()->removeItem(item);
-    }
-
-    QGraphicsPixmapItem *filePixmapItem = new QGraphicsPixmapItem(QPixmap(
-        QString(filename.c_str())).scaled(this->imageDisplayWidth,
-                                          this->imageDisplayHeight,
-                                          Qt::KeepAspectRatio));
-    this->imageDisplay->scene()->addItem(filePixmapItem);
-  }
-}
-
-/////////////////////////////////////////////////
-bool ImportImageDialog::eventFilter(QObject *obj, QEvent *_event)
-{
-  if (_event->type() == QEvent::Enter)
-  {
-    QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-    return true;
-  }
-  else if (_event->type() == QEvent::Leave)
-  {
-    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-    this->drawingLine = false;
-    return true;
-  }
-  else if (_event->type() == QEvent::MouseButtonPress)
-  {std::cout << "Mouse press" << std::endl;
-    QMouseEvent *_mouseEvent = (QMouseEvent *)_event;
-    this->measureLineStart = this->imageDisplay->mapToScene(_mouseEvent->pos());
-
-
-    QGraphicsTextItem *Atext = new QGraphicsTextItem;
-    Atext->setPlainText("AAA");
-    Atext->setDefaultTextColor(QColor(255, 255, 255, 255));
-    Atext->setPos(this->measureLineStart);
-    this->imageDisplay->scene()->addItem(Atext);
-
-    this->drawingLine = true;
-
-    return true;
-  }
-  else if (_event->type() == QEvent::MouseMove)
-  {
-      std::cout << "Mouse move" << std::endl;
-
-
-    if (this->drawingLine)
-    {
-        QMouseEvent *_mouseEvent = (QMouseEvent *)_event;
-
-        QGraphicsLineItem *measureLine = new QGraphicsLineItem;
-        measureLine->setPen(QPen(Qt::red,10));
-        measureLine->setLine(this->measureLineStart.x(),
-                             this->measureLineStart.y(),
-                             this->imageDisplay->mapToScene(_mouseEvent->pos()).x(),
-                             this->imageDisplay->mapToScene(_mouseEvent->pos()).y());
-        this->imageDisplay->scene()->addItem(measureLine);
-     }
-     return true;
-  }
-  else if (_event->type() == QEvent::MouseButtonRelease)
-  {std::cout << "Mouse released" << std::endl;
-
-    this->drawingLine = false;
-
-    return true;
-  }
-  else
-  {
-    // standard event processing
-    return QObject::eventFilter(obj, _event);
+    this->importImageView->SetImage(filename, this->imageDisplayWidth,
+                                    this->imageDisplayHeight);
   }
 }

@@ -17,9 +17,11 @@ set (sources
   GrabberHandle.cc
   GridLines.cc
   ImportImageDialog.cc
+  ImportImageView.cc
   LevelInspectorDialog.cc
   LevelWidget.cc
   LineSegmentItem.cc
+  MeasureItem.cc
   PolylineItem.cc
   RectItem.cc
   RotateHandle.cc
@@ -42,8 +44,10 @@ set (qt_headers
   FinishBuildingDialog.hh
   FloorItem.hh
   ImportImageDialog.hh
+  ImportImageView.hh
   LevelInspectorDialog.hh
   LevelWidget.hh
+  MeasureItem.hh
   RectItem.hh
   ScaleWidget.hh
   StairsInspectorDialog.hh
