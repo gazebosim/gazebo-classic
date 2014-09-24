@@ -104,6 +104,12 @@ namespace gazebo
       /// \brief Width of the scene in pixels
       public: int sceneWidthPx;
 
+      /// \brief Width of the pixmap in pixels
+      public: int pixmapWidthPx;
+
+      /// \brief Height of the pixmap in pixels
+      public: int pixmapHeightPx;
+
       /// \brief Width of the image in pixels
       public: int imageWidthPx;
 

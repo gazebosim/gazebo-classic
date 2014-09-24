@@ -76,6 +76,9 @@ void ImportImageView::SetImage(const std::string &_filename)
       this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
 
+  this->pixmapWidthPx = this->imageItem->pixmap().width();
+  this->pixmapHeightPx = this->imageItem->pixmap().height();
+
   if (this->imageItem)
   {
     this->scene()->addItem(this->imageItem);
@@ -93,7 +96,6 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
   {
     this->scene()->setSceneRect(0, 0, _event->size().width(),
                                       _event->size().height());
-    this->sceneWidthPx = _event->size().width();
 
     if (!this->imageItem)
     {
@@ -121,6 +123,34 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
           this->scene()->sceneRect().width(),
           this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
       this->scene()->addItem(this->imageItem);
+
+      if (this->measureItem)
+      {
+        double scaleWidth = this->imageItem->pixmap().width() /
+            (double)this->pixmapWidthPx;
+        double scaleHeight = this->imageItem->pixmap().height() /
+            (double)this->pixmapHeightPx;
+
+        LineSegmentItem *segment = this->measureItem->GetSegment(0);
+        QPointF p1 = segment->mapToScene(segment->line().p1());
+        QPointF p2 = segment->mapToScene(segment->line().p2());
+
+        p1.setX(p1.x() * scaleWidth);
+        p2.setX(p2.x() * scaleWidth);
+        p1.setY(p1.y() * scaleHeight);
+        p2.setY(p2.y() * scaleHeight);
+
+        this->measureItem->SetVertexPosition(0, p1);
+        this->measureItem->SetVertexPosition(1, p2);
+      }
+    }
+
+    this->sceneWidthPx = _event->size().width();
+
+    if (this->imageItem)
+    {
+      this->pixmapWidthPx = this->imageItem->pixmap().width();
+      this->pixmapHeightPx = this->imageItem->pixmap().height();
     }
   }
 }
@@ -141,18 +171,21 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
     if ((angle < range) || (angle > (360 - range)) ||
         ((angle > (180 - range)) && (angle < (180 + range))))
     {
-      this->measureItem->SetVertexPosition(this->measureItem->GetVertexCount()-1,
+      this->measureItem->SetVertexPosition(
+          this->measureItem->GetVertexCount()-1,
           QPointF(p2.x(), p1.y()));
     }
     else if (((angle > (90 - range)) && (angle < (90 + range))) ||
         ((angle > (270 - range)) && (angle < (270 + range))))
     {
-      this->measureItem->SetVertexPosition(this->measureItem->GetVertexCount()-1,
+      this->measureItem->SetVertexPosition(
+          this->measureItem->GetVertexCount()-1,
           QPointF(p1.x(), p2.y()));
     }
     else
     {
-      this->measureItem->SetVertexPosition(this->measureItem->GetVertexCount()-1, p2);
+      this->measureItem->SetVertexPosition(
+          this->measureItem->GetVertexCount()-1, p2);
     }
   }
 
