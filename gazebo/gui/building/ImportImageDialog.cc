@@ -52,6 +52,8 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   this->distanceSpin->setSingleStep(0.1);
   this->distanceSpin->setDecimals(4);
   this->distanceSpin->setValue(1);
+  this->distanceSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->distanceSpin->setReadOnly(true);
   connect(this->distanceSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnChangeDistance(double)));
 
@@ -61,15 +63,17 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   distanceLayout->addWidget(this->distanceSpin);
 
   this->resolutionSpin = new QDoubleSpinBox;
-  this->resolutionSpin->setRange(0.001, 1000);
-  this->resolutionSpin->setSingleStep(0.001);
-  this->resolutionSpin->setDecimals(4);
-  this->resolutionSpin->setValue(0.1);
+  this->resolutionSpin->setRange(0, 10000);
+  this->resolutionSpin->setSingleStep(10);
+  this->resolutionSpin->setDecimals(3);
+  this->resolutionSpin->setValue(100);
+  this->resolutionSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  this->resolutionSpin->setReadOnly(true);
   connect(this->resolutionSpin, SIGNAL(valueChanged(double)), this,
       SLOT(OnChangeResolution(double)));
 
   QHBoxLayout *resolutionLayout = new QHBoxLayout;
-  resolutionLayout->addWidget(new QLabel("Resolution (m/px):"));
+  resolutionLayout->addWidget(new QLabel("Resolution (px/m):"));
   resolutionLayout->addStretch(1);
   resolutionLayout->addWidget(this->resolutionSpin);
 
@@ -162,17 +166,15 @@ void ImportImageDialog::OnChangeDistance(double _distance)
 {
     double distanceImage = this->importImageView->measureScenePx *
                            this->importImageView->imageWidthPx /
-                           this->importImageView->sceneWidthPx;
-    this->resolutionSpin->setValue(
-        _distance / distanceImage);
+                           this->importImageView->pixmapWidthPx;
+    this->resolutionSpin->setValue(distanceImage / _distance);
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnChangeResolution(double _resolution)
 {
-    double distanceImage = this->importImageView->measureScenePx *
-                           this->importImageView->imageWidthPx /
-                           this->importImageView->sceneWidthPx;
-    this->distanceSpin->setValue(
-        _resolution * distanceImage);
+//    double distanceImage = this->importImageView->measureScenePx *
+//                           this->importImageView->imageWidthPx /
+//                           this->importImageView->pixmapWidthPx;
+//    this->distanceSpin->setValue(_resolution / distanceImage);
 }

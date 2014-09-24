@@ -101,9 +101,6 @@ namespace gazebo
       /// \brief Parent widget
       private: ImportImageDialog *parent;
 
-      /// \brief Width of the scene in pixels
-      public: int sceneWidthPx;
-
       /// \brief Width of the pixmap in pixels
       public: int pixmapWidthPx;
 

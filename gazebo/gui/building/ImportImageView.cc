@@ -82,6 +82,9 @@ void ImportImageView::SetImage(const std::string &_filename)
   if (this->imageItem)
   {
     this->scene()->addItem(this->imageItem);
+    this->parent->resolutionSpin->setButtonSymbols(
+        QAbstractSpinBox::UpDownArrows);
+    this->parent->resolutionSpin->setReadOnly(false);
   }
   else
   {
@@ -144,8 +147,6 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
         this->measureItem->SetVertexPosition(1, p2);
       }
     }
-
-    this->sceneWidthPx = _event->size().width();
 
     if (this->imageItem)
     {
@@ -244,15 +245,17 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
       this->measureItem->PopEndPoint();
 
       this->measureScenePx = this->measureItem->GetDistance();
+
+      this->parent->distanceSpin->setButtonSymbols(
+          QAbstractSpinBox::UpDownArrows);
+      this->parent->distanceSpin->setReadOnly(false);
     }
 
     // Calculate distance
     double distanceImage = this->measureScenePx * this->imageWidthPx
-        / this->sceneWidthPx;
+        / this->pixmapWidthPx;
     this->parent->resolutionSpin->setValue(
-        this->parent->distanceSpin->value() / distanceImage);
-
-    // popup to set distance after 2nd click
+        distanceImage / this->parent->distanceSpin->value());
 
     this->currentMouseItem = NULL;
     this->drawInProgress = false;

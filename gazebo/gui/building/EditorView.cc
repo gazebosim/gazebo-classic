@@ -717,10 +717,11 @@ void EditorView::Create3DVisual(EditorItem *_item)
 }
 
 /////////////////////////////////////////////////
-void EditorView::SetBackgroundImage(const std::string &_filename, double _scale)
+void EditorView::SetBackgroundImage(const std::string &_filename,
+    double _resolution)
 {
   QImage img(QString::fromStdString(_filename));
-  int newHeight = (img.height() * 100) * _scale;
+  int newHeight = (img.height() * 100) / _resolution;
   img = img.scaledToHeight(newHeight);
 
   if (!this->levels[this->currentLevel]->backgroundPixmap)
