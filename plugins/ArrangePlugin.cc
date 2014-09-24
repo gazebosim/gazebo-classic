@@ -99,7 +99,10 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
             // Read pose model attribute
             if (!poseElem->HasAttribute("model"))
             {
-              gzerr << "pose element missing model attribute" << std::endl;
+              gzerr << "In arrangement ["
+                    << arrangementName
+                    << "], a pose element is missing the model attribute"
+                    << std::endl;
               continue;
             }
             std::string poseName = poseElem->Get<std::string>("model");
@@ -109,12 +112,6 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
           }
         }
         this->arrangements[arrangementName] = poses;
-        gzdbg << "Loaded arrangement ["
-              << arrangementName
-              << "] with "
-              << poses.size()
-              << " poses"
-              << std::endl;
 
         elem = elem->GetNextElement(elemName);
       }
