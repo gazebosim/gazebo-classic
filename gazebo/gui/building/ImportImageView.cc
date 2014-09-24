@@ -257,6 +257,8 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     this->currentMouseItem = NULL;
     this->drawInProgress = false;
     this->releaseKeyboard();
+    this->parent->distanceSpin->setFocus();
+    this->parent->distanceSpin->selectAll();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
 }
