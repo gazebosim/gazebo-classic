@@ -50,10 +50,21 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       {
         // Add names to map
         std::string modelName = elem->Get<std::string>();
-        ObjectPtr object(new Object);
-        object->model = world->GetModel(modelName);
-        object->pose = object->model->GetWorldPose();
-        this->objects[modelName] = object;
+        physics::ModelPtr model = world->GetModel(modelName);
+        if (model)
+        {
+          ObjectPtr object(new Object);
+          object->model = model;
+          object->pose = model->GetWorldPose();
+          this->objects[modelName] = object;
+        }
+        else
+        {
+          gzerr << "Unable to get model ["
+                << modelName
+                << "], skipping"
+                << std::endl;
+        }
 
         elem = elem->GetNextElement(elemName);
       }
