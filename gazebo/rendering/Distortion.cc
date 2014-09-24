@@ -61,10 +61,13 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->p2 = this->sdf->Get<double>("p2");
   this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
 
-  // for barrel distortion - crop the black pixels surrounding the
-  // distorted image.
-  //if (this->dataPtr->k1 > 0)
-    this->dataPtr->distortionCrop = true;
+  if (this->dataPtr->k1 > 0)
+  {
+    gzerr << "Pincushion model is currently not supported."
+      << " Please use a negative K1 coefficient" << std::endl;
+  }
+
+  this->dataPtr->distortionCrop = false;
 }
 
 //////////////////////////////////////////////////
@@ -75,13 +78,11 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionScale.x = 1.0;
   this->dataPtr->distortionScale.y = 1.0;
 
-  // seems to work best with a square texture
+  // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
       _camera->GetImageHeight() : _camera->GetImageWidth();
-  unsigned int texWidth = _camera->GetImageWidth();
-  unsigned int texHeight = _camera->GetImageHeight();
-  //unsigned int texWidth = texSide;
-  //unsigned int texHeight = texSide;
+  unsigned int texWidth = texSide;
+  unsigned int texHeight = texSide;
   unsigned int imageSize = texWidth * texHeight;
 
   std::vector<math::Vector2d> uvMap;
@@ -90,95 +91,50 @@ void Distortion::SetCamera(CameraPtr _camera)
   for (unsigned int i = 0; i < this->dataPtr->distortionMap.size(); ++i)
     this->dataPtr->distortionMap[i] = -1;
 
-  // crop the black borders for barrel distortion
-//  if (this->dataPtr->distortionCrop)
+  double incrU = 1.0 / texWidth ;
+  double incrV = 1.0 / texHeight;
+
+  for (unsigned int i = 0; i < texHeight; ++i)
   {
-    double trX = 0;
-    double trY = 0;
-    double blX = 0;
-    double blY = 0;
-    double dtr = GZ_DBL_MAX;
-    double dbl = GZ_DBL_MAX;
-//    double incrU = 1.0 / (_camera->GetImageWidth());
-//    double incrV = 1.0 / (_camera->GetImageHeight());
-    double incrU = 1.0 / texWidth ;
-    double incrV = 1.0 / texHeight;
-
-    //for (unsigned int i = 0; i < _camera->GetImageHeight(); ++i)
-    for (unsigned int i = 0; i < texHeight; ++i)
+    double v = i*incrU;
+    for (unsigned int j = 0; j < texWidth; ++j)
     {
-      double v = i*incrU;
-      //for (unsigned int j = 0; j < _camera->GetImageWidth(); ++j)
-      for (unsigned int j = 0; j < texWidth; ++j)
-      {
-        double u = j*incrV;
-        math::Vector2d texCoord(u, v);
-        math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
-        math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
-        double rSq = normalized.x * normalized.x
-            + normalized.y * normalized.y;
-        math::Vector3 dist = normalized * ( 1.0 +
-            this->dataPtr->k1 * rSq +
-            this->dataPtr->k2 * rSq * rSq +
-            this->dataPtr->k3 * rSq * rSq * rSq);
-        dist.x += this->dataPtr->p1
-            * (rSq + 2 * (normalized.x*normalized.x)) +
-            2 * this->dataPtr->p2
-            * normalized.x * normalized.y;
-        dist.y += this->dataPtr->p2
-            * (rSq + 2 * (normalized.y*normalized.y)) +
-            2 * this->dataPtr->p1
-            * normalized.x * normalized.y;
-        math::Vector2d out = this->dataPtr->lensCenter
-            + math::Vector2d(dist.x, dist.y);
+      double u = j*incrV;
+      math::Vector2d texCoord(u, v);
+      math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
+      math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
+      double rSq = normalized.x * normalized.x
+          + normalized.y * normalized.y;
+      math::Vector3 dist = normalized * ( 1.0 +
+          this->dataPtr->k1 * rSq +
+          this->dataPtr->k2 * rSq * rSq +
+          this->dataPtr->k3 * rSq * rSq * rSq);
+      dist.x += this->dataPtr->p1
+          * (rSq + 2 * (normalized.x*normalized.x)) +
+          2 * this->dataPtr->p2
+          * normalized.x * normalized.y;
+      dist.y += this->dataPtr->p2
+          * (rSq + 2 * (normalized.y*normalized.y)) +
+          2 * this->dataPtr->p1
+          * normalized.x * normalized.y;
+      math::Vector2d out = this->dataPtr->lensCenter
+          + math::Vector2d(dist.x, dist.y);
 
-        //std::cerr << out.x << " " << out.y << std::endl;
+      // fill the distortion map
+      int idxU = out.x * texHeight;
+      int idxV = out.y * texWidth;
+      int mapIdx = idxV * texWidth + idxU;
+      math::Vector2d uv(u, v);
 
-        // fill the distortion map
-        //int idxU = out.x * _camera->GetImageWidth();
-        //int idxV = out.y * _camera->GetImageHeight();
-        int idxU = out.x * texHeight;
-        int idxV = out.y * texWidth;
-        //std::cerr << " idx " << idxU << " " << idxV << std::endl;
-        //std::cerr << " uv " << u << " " << v << std::endl;
-        int mapIdx = idxV * texWidth + idxU;
-        math::Vector2d uv(u, v);
-
-        this->dataPtr->distortionMap[mapIdx] = uv;
-        uvMap[i*texWidth + j] = uv;
-
-      /*
-        double dx = out.x;
-        double dy = out.y;
-
-        if (dx >= 0 && dy >= 0 && (dx + dy) < dtr)
-        {
-          trX = u;
-          trY = v;
-          dtr = dx + dy;
-        }
-        dx = out.x - 1.0;
-        dy = out.y - 1.0;
-        if (dx <= 0 && dy <= 0 && (fabs(dx) + fabs(dy)) < dbl)
-        {
-          blX = u;
-          blY = v;
-          dbl = (fabs(dx) + fabs(dy));
-        }*/
-      }
+      this->dataPtr->distortionMap[mapIdx] = uv;
+      uvMap[i*texWidth + j] = uv;
     }
-
-//    this->dataPtr->distortionScale.x = blX - trX;
-//    this->dataPtr->distortionScale.y = blY - trY;
   }
-  math::Vector2d tl = uvMap[0];
-  math::Vector2d br = uvMap[imageSize -1];
-//  this->dataPtr->distortionScale = br - tl;
 
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
-      "Gazebo/CameraDistortion");
-  Ogre::GpuProgramParametersSharedPtr params =
+      "Gazebo/CameraDistortionMap");
+/*  Ogre::GpuProgramParametersSharedPtr params =
       distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
   params->setNamedConstant("k1", static_cast<Ogre::Real>(this->dataPtr->k1));
   params->setNamedConstant("k2", static_cast<Ogre::Real>(this->dataPtr->k2));
@@ -195,22 +151,23 @@ void Distortion::SetCamera(CameraPtr _camera)
   params->setNamedConstant("scaleIn",
       static_cast<Ogre::Vector3>(
       Ogre::Vector3(this->dataPtr->distortionScale.x,
-      this->dataPtr->distortionScale.y, 0.0)));
+      this->dataPtr->distortionScale.y, 0.0)));*/
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->GetViewport(), "CameraDistortion/Default");
+      _camera->GetViewport(), "CameraDistortionMap/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
   // Create the ditortion map texture
   std::string texName = _camera->GetName() + "_distortionTex";
-  Ogre::TexturePtr renderTexture = Ogre::TextureManager::getSingleton().createManual(
-      texName,
-      "General",
-      Ogre::TEX_TYPE_2D,
-      texWidth,
-      texHeight,
-      0,
-      Ogre::PF_FLOAT32_RGB);
+  Ogre::TexturePtr renderTexture =
+      Ogre::TextureManager::getSingleton().createManual(
+          texName,
+          "General",
+          Ogre::TEX_TYPE_2D,
+          texWidth,
+          texHeight,
+          0,
+          Ogre::PF_FLOAT32_RGB);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = renderTexture->getBuffer();
 
   // Lock the pixel buffer and get a pixel box
@@ -225,20 +182,16 @@ void Distortion::SetCamera(CameraPtr _camera)
     {
       math::Vector2d vec =
           this->dataPtr->distortionMap[i*texWidth+j];
-      //    math::Vector2d(1, 0);
       *pDest++ = vec.x;
       *pDest++ = vec.y;
       *pDest++ = 0;
-      std::cerr << vec.x << " " << vec.y << " ";
     }
-    std::cerr << std::endl;
-    //pDest += pixelBox.getRowSkip() * Ogre::PixelUtil::getNumElemBytes(pixelBox.format);
   }
 
   // Unlock the pixel buffer
   pixelBuffer->unlock();
 
-  Ogre::TextureUnitState *textureUnitState =
+//  Ogre::TextureUnitState *textureUnitState =
       distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
 }
 
