@@ -10,6 +10,7 @@ set (msgs
   contact.proto
   contacts.proto
   contactsensor.proto
+  control_request.proto
   cylindergeom.proto
   diagnostics.proto
   factory.proto

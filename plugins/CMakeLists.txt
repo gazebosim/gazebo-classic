@@ -28,6 +28,7 @@ set (plugins
   GpuRayPlugin
   JointTrajectoryPlugin
   LiftDragPlugin
+  ModelControlPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
