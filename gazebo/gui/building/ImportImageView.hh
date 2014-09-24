@@ -32,6 +32,7 @@ namespace gazebo
     class EditorItem;
     class MeasureItem;
     class GridLines;
+    class ImportImageDialog;
 
     /// \addtogroup gazebo_gui
     /// \{
@@ -44,17 +45,14 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: ImportImageView(QWidget *_parent = 0);
+      public: ImportImageView(ImportImageDialog *_parent = 0);
 
       /// \brief Destructor
       public: ~ImportImageView();
 
       /// \brief Set the currently selected image.
       /// \param[in] _filename Name of the image file.
-      /// \param[in] _width
-      /// \param[in] _height
-      public: void SetImage(const std::string &_filename, int _width,
-                            int _height);
+      public: void SetImage(const std::string &_filename);
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event
@@ -100,8 +98,17 @@ namespace gazebo
       /// \brief Text to be dispayed when an invalid file is selected
       private: MeasureItem *measureItem;
 
-      /// \brief Scale (zoom level) of the editor view.
-      private: double viewScale;
+      /// \brief Parent widget
+      private: ImportImageDialog *parent;
+
+      /// \brief Width of the scene in pixels
+      public: int sceneWidthPx;
+
+      /// \brief Width of the image in pixels
+      public: int imageWidthPx;
+
+      /// \brief Length of the measure on the scene in pixels
+      public: int measureScenePx;
     };
     /// \}
   }

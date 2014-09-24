@@ -30,6 +30,10 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   this->setWindowTitle(tr("Import Image"));
 
+  QLabel *titleWidget = new QLabel(tr(
+          "<b>Import image</b><br>"
+          "Import a building floorplan<br>"));
+
   this->fileLineEdit = new QLineEdit();
   this->fileLineEdit->setPlaceholderText(tr("Image file name"));
   connect(this, SIGNAL(SetFileName(QString)),
@@ -43,11 +47,26 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   fileLayout->addWidget(this->fileLineEdit);
   fileLayout->addWidget(fileButton);
 
+  this->distanceSpin = new QDoubleSpinBox;
+  this->distanceSpin->setRange(0.001, 1000);
+  this->distanceSpin->setSingleStep(0.1);
+  this->distanceSpin->setDecimals(4);
+  this->distanceSpin->setValue(1);
+  connect(this->distanceSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnChangeDistance(double)));
+
+  QHBoxLayout *distanceLayout = new QHBoxLayout;
+  distanceLayout->addWidget(new QLabel("Distance (m):"));
+  distanceLayout->addStretch(1);
+  distanceLayout->addWidget(this->distanceSpin);
+
   this->resolutionSpin = new QDoubleSpinBox;
   this->resolutionSpin->setRange(0.001, 1000);
-  this->resolutionSpin->setSingleStep(0.01);
+  this->resolutionSpin->setSingleStep(0.001);
   this->resolutionSpin->setDecimals(4);
   this->resolutionSpin->setValue(0.1);
+  connect(this->resolutionSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnChangeResolution(double)));
 
   QHBoxLayout *resolutionLayout = new QHBoxLayout;
   resolutionLayout->addWidget(new QLabel("Resolution (m/px):"));
@@ -62,26 +81,47 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   connect(this, SIGNAL(accepted()), this, SLOT(OnAccept()));
 
-  this->importImageView = new ImportImageView();
+  this->importImageView = new ImportImageView(this);
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
 
-  this->imageDisplayWidth = 400;
-  this->imageDisplayHeight = 300;
+  this->imageDisplayWidth = 700;
+  this->imageDisplayHeight = 500;
   scene->setSceneRect(0, 0, this->imageDisplayWidth,
-                                  this->imageDisplayHeight);
+                            this->imageDisplayHeight);
 
-  this->importImageView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  this->importImageView->setSizePolicy(QSizePolicy::Expanding,
+                                       QSizePolicy::Expanding);
   this->importImageView->setScene(scene);
   this->importImageView->centerOn(QPointF(0, 0));
-  this->importImageView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  this->importImageView->setViewportUpdateMode(
+      QGraphicsView::FullViewportUpdate);
   this->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
-  QGridLayout *mainLayout = new QGridLayout;
-  mainLayout->addLayout(fileLayout, 0, 0);
-  mainLayout->addLayout(resolutionLayout, 1, 0);
-  mainLayout->addWidget(okCancelButtons, 2, 0);
-  mainLayout->addWidget(this->importImageView, 0, 1, 4, 1);
+  QWidget *leftColumn = new QWidget();
+  leftColumn->setSizePolicy(QSizePolicy::Fixed,
+                            QSizePolicy::Fixed);
+  QVBoxLayout *leftColumnLayout = new QVBoxLayout();
+  leftColumn->setLayout(leftColumnLayout);
+  leftColumnLayout->addWidget(titleWidget);
+  leftColumnLayout->addWidget(new QLabel(tr(
+      "<b>Step 1: Select Image</b>")));
+  leftColumnLayout->addLayout(fileLayout);
+  leftColumnLayout->addWidget(new QLabel(tr(
+      "<font size=1 color='grey'>Supported formats: .png, .jpg</font><br>")));
+  leftColumnLayout->addWidget(new QLabel(tr(
+      "<b>Step 2: Set Scale</b><br>"
+      "Draw a line on the image to set<br>"
+      "the real world distance between<br>"
+      "the two end points.<br><br>")));
+  leftColumnLayout->addLayout(distanceLayout);
+  leftColumnLayout->addLayout(resolutionLayout);
+  leftColumnLayout->addWidget(okCancelButtons);
+
+  QHBoxLayout *mainLayout = new QHBoxLayout;
+  mainLayout->addWidget(leftColumn);
+  mainLayout->addWidget(this->importImageView);
+
 
   this->setLayout(mainLayout);
 
@@ -113,7 +153,26 @@ void ImportImageDialog::OnSelectFile()
   if (!filename.empty())
   {
     this->SetFileName(QString::fromStdString(filename));
-    this->importImageView->SetImage(filename, this->imageDisplayWidth,
-                                    this->imageDisplayHeight);
+    this->importImageView->SetImage(filename);
   }
+}
+
+/////////////////////////////////////////////////
+void ImportImageDialog::OnChangeDistance(double _distance)
+{
+    double distanceImage = this->importImageView->measureScenePx *
+                           this->importImageView->imageWidthPx /
+                           this->importImageView->sceneWidthPx;
+    this->resolutionSpin->setValue(
+        _distance / distanceImage);
+}
+
+/////////////////////////////////////////////////
+void ImportImageDialog::OnChangeResolution(double _resolution)
+{
+    double distanceImage = this->importImageView->measureScenePx *
+                           this->importImageView->imageWidthPx /
+                           this->importImageView->sceneWidthPx;
+    this->distanceSpin->setValue(
+        _resolution * distanceImage);
 }

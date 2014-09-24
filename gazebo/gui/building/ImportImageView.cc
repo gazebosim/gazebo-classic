@@ -27,10 +27,12 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-ImportImageView::ImportImageView(QWidget *_parent)
+ImportImageView::ImportImageView(ImportImageDialog *_parent)
   : QGraphicsView(_parent), currentMouseItem(0)
 {
   this->setObjectName("importImageView");
+
+  this->parent = _parent;
 
   this->drawInProgress = false;
 
@@ -39,11 +41,7 @@ ImportImageView::ImportImageView(QWidget *_parent)
   this->imageItem = NULL;
   this->imagePixmap = NULL;
 
-  this->viewScale = 1.0;
-
-  this->noImageText = new QGraphicsTextItem;
-  noImageText->setPlainText("No image selected");
-  noImageText->setDefaultTextColor(Qt::gray);
+  this->noImageText = NULL;
 
   this->measureItem = NULL;
 }
@@ -55,18 +53,25 @@ ImportImageView::~ImportImageView()
 
 
 /////////////////////////////////////////////////
-void ImportImageView::SetImage(const std::string &_filename, int _width,
-    int _height)
+void ImportImageView::SetImage(const std::string &_filename)
 {
   if (this->imageItem)
     this->scene()->removeItem(this->imageItem);
   if (this->gridLines)
+  {
     this->scene()->removeItem(this->gridLines);
-  this->scene()->removeItem(this->noImageText);
+    this->gridLines = NULL;
+  }
+  if (this->noImageText)
+  {
+    this->scene()->removeItem(this->noImageText);
+    this->noImageText = NULL;
+  }
   if (this->measureItem)
     this->scene()->removeItem(this->measureItem);
 
   this->imagePixmap = new QPixmap(QString(_filename.c_str()));
+  this->imageWidthPx = this->imagePixmap->width();
   this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
       this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height(), Qt::KeepAspectRatio));
@@ -88,21 +93,28 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
   {
     this->scene()->setSceneRect(0, 0, _event->size().width(),
                                       _event->size().height());
+    this->sceneWidthPx = _event->size().width();
 
-    if (!this->gridLines)
+    if (!this->imageItem)
     {
-      this->gridLines = new GridLines(_event->size().width(),
-          _event->size().height());
-      this->scene()->addItem(this->gridLines);
-      this->scene()->addItem(this->noImageText);
+      if (!this->gridLines)
+      {
+        this->gridLines = new GridLines(_event->size().width(),
+            _event->size().height());
+        this->scene()->addItem(this->gridLines);
+
+        this->noImageText = new QGraphicsTextItem;
+        this->noImageText->setPlainText("No image selected");
+        this->noImageText->setDefaultTextColor(Qt::gray);
+        this->scene()->addItem(this->noImageText);
+      }
+      else
+      {
+        this->gridLines->SetSize(_event->size().width(),
+              _event->size().height());
+      }
     }
     else
-    {
-      this->gridLines->SetSize(_event->size().width(),
-            _event->size().height());
-    }
-
-    if (this->imageItem)
     {
       this->scene()->removeItem(this->imageItem);
       this->imageItem = new QGraphicsPixmapItem(this->imagePixmap->scaled(
@@ -197,7 +209,17 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
           + QPointF(1, 0));
 
       this->measureItem->PopEndPoint();
+
+      this->measureScenePx = this->measureItem->GetDistance();
     }
+
+    // Calculate distance
+    double distanceImage = this->measureScenePx * this->imageWidthPx
+        / this->sceneWidthPx;
+    this->parent->resolutionSpin->setValue(
+        this->parent->distanceSpin->value() / distanceImage);
+
+    // popup to set distance after 2nd click
 
     this->currentMouseItem = NULL;
     this->drawInProgress = false;

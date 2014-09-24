@@ -34,10 +34,18 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
   this->setAcceptHoverEvents(true);
 
   this->SetThickness(10);
-  this->SetColor(Qt::red);
+  this->SetColor(QColor(247, 142, 30));
 }
 
 /////////////////////////////////////////////////
 MeasureItem::~MeasureItem()
 {
+}
+
+/////////////////////////////////////////////////
+double MeasureItem::GetDistance()
+{
+  LineSegmentItem *segment = this->GetSegment(0);
+
+  return segment->line().length();
 }

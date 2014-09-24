@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Destructor
       public: ~MeasureItem();
 
+      /// \brief Get distance between end points
+      public: double GetDistance();
+
       /// \brief Scale for converting pixels to metric units.
       private: double scale;
     };
