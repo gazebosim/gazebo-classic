@@ -1,5 +1,22 @@
 ## Gazebo 4.0
 
+### Gazebo 4.0.2 (2014-09-23)
+1. Fix and improve mechanism to generate pkgconfig libs
+    * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
+    * [Issue #1284](https://bitbucket.org/osrf/gazebo/issue/1284)
+1. Added arat.world
+    * [Pull request #1205](https://bitbucket.org/osrf/gazebo/pull-request/1205)
+1. Update gzprop to output zip files.
+    * [Pull request #1197](https://bitbucket.org/osrf/gazebo/pull-request/1197)
+1. Make Collision::GetShape a const function
+    * [Pull requset #1189](https://bitbucket.org/osrf/gazebo/pull-request/1189)
+1. Install missing physics headers
+    * [Pull requset #1183](https://bitbucket.org/osrf/gazebo/pull-request/1183)
+1. Remove SimbodyLink::AddTorque console message
+    * [Pull requset #1185](https://bitbucket.org/osrf/gazebo/pull-request/1185)
+1. Fix log xml
+    * [Pull requset #1188](https://bitbucket.org/osrf/gazebo/pull-request/1188)
+
 ### Gazebo 4.0.0 (2014-08-08)
 
 1. Added lcov support to cmake
