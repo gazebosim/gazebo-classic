@@ -388,7 +388,6 @@ TEST_F(gzTest, Model)
     EXPECT_NE(g_msgDebugOut.find("simple_arm"), std::string::npos);
   }
 
-
   fini();
 }
 
