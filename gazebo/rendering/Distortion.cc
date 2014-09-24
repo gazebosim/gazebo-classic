@@ -75,20 +75,15 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->distortionScale.x = 1.0;
   this->dataPtr->distortionScale.y = 1.0;
 
-  /*gned int distortionMapSize =
-      _camera->GetImageHeight()*_camera->GetImageWidth()*2;
-  float *distortionMap = new float[distortionMapSize];
-
-  for (unsigned int i = 0; i < distortionMapSize; ++i)
-    distortionMap[i] = -1;*/
-
-  //std::vector<math::Vector2d> map;
+  // seems to work best with a square texture
   unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
-    _camera->GetImageHeight() : _camera->GetImageWidth();
-  unsigned int texWidth = texSide;
-  unsigned int texHeight = texSide;
-  //unsigned int imageSize = _camera->GetImageHeight()*_camera->GetImageWidth();
+      _camera->GetImageHeight() : _camera->GetImageWidth();
+  unsigned int texWidth = _camera->GetImageWidth();
+  unsigned int texHeight = _camera->GetImageHeight();
+  //unsigned int texWidth = texSide;
+  //unsigned int texHeight = texSide;
   unsigned int imageSize = texWidth * texHeight;
+
   std::vector<math::Vector2d> uvMap;
   uvMap.resize(imageSize);
   this->dataPtr->distortionMap.resize(imageSize);
@@ -106,7 +101,7 @@ void Distortion::SetCamera(CameraPtr _camera)
     double dbl = GZ_DBL_MAX;
 //    double incrU = 1.0 / (_camera->GetImageWidth());
 //    double incrV = 1.0 / (_camera->GetImageHeight());
-    double incrU = 1.0 / texWidth;
+    double incrU = 1.0 / texWidth ;
     double incrV = 1.0 / texHeight;
 
     //for (unsigned int i = 0; i < _camera->GetImageHeight(); ++i)
@@ -180,7 +175,6 @@ void Distortion::SetCamera(CameraPtr _camera)
   math::Vector2d br = uvMap[imageSize -1];
 //  this->dataPtr->distortionScale = br - tl;
 
-
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
       "Gazebo/CameraDistortion");
@@ -213,8 +207,6 @@ void Distortion::SetCamera(CameraPtr _camera)
       texName,
       "General",
       Ogre::TEX_TYPE_2D,
-      //_camera->GetImageWidth(),
-      //_camera->GetImageHeight(),
       texWidth,
       texHeight,
       0,
