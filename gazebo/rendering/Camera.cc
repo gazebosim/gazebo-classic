@@ -189,7 +189,6 @@ void Camera::Load()
         "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
   }
 
-
   if (this->sdf->HasElement("distortion"))
   {
     this->dataPtr->distortion.reset(new Distortion());
