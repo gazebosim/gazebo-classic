@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ControlResponse
+/// \brief A control command response
+
+import "vector3d.proto";
+
+message ControlResponse
+{
+  required string name         = 1;
+  optional uint32 id           = 2;
+
+  repeated double torques      = 12;
+}
+
+
