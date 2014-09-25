@@ -77,6 +77,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QPushButton *importImageButton = new QPushButton(tr("Import Image"), this);
   importImageButton->setCheckable(true);
   importImageButton->setChecked(false);
+  this->brushes.push_back(importImageButton);
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
   // Layout to hold the drawing buttons
@@ -176,6 +177,16 @@ void BuildingEditorPalette::OnAddDoor()
 void BuildingEditorPalette::OnImportImage()
 {
   gui::editor::Events::createBuildingEditorItem("image");
+
+  if (_type.empty())
+  {
+    // Uncheck all the buttons
+    for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
+        iter != this->brushes.end(); ++iter)
+    {
+      (*iter)->setChecked(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
