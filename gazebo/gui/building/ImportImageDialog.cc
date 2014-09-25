@@ -69,8 +69,6 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   this->resolutionSpin->setValue(100);
   this->resolutionSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->resolutionSpin->setReadOnly(true);
-  connect(this->resolutionSpin, SIGNAL(valueChanged(double)), this,
-      SLOT(OnChangeResolution(double)));
 
   QHBoxLayout *resolutionLayout = new QHBoxLayout;
   resolutionLayout->addWidget(new QLabel("Resolution (px/m):"));
@@ -169,13 +167,4 @@ void ImportImageDialog::OnChangeDistance(double _distance)
                            this->importImageView->pixmapWidthPx;
     this->resolutionSpin->setValue(distanceImage / _distance);
     this->importImageView->RefreshDistance(_distance);
-}
-
-/////////////////////////////////////////////////
-void ImportImageDialog::OnChangeResolution(double _resolution)
-{
-//    double distanceImage = this->importImageView->measureScenePx *
-//                           this->importImageView->imageWidthPx /
-//                           this->importImageView->pixmapWidthPx;
-//    this->distanceSpin->setValue(_resolution / distanceImage);
 }

@@ -51,7 +51,6 @@ ImportImageView::~ImportImageView()
 {
 }
 
-
 /////////////////////////////////////////////////
 void ImportImageView::SetImage(const std::string &_filename)
 {

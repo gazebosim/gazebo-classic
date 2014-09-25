@@ -48,7 +48,6 @@ namespace gazebo
       private slots: void OnSelectFile();
       private slots: void OnAccept();
       private slots: void OnChangeDistance(double _distance);
-      private slots: void OnChangeResolution(double _resolution);
 
       private: QLineEdit *fileLineEdit;
       public: QDoubleSpinBox *distanceSpin;
