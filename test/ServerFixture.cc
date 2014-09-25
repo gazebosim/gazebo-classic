@@ -505,7 +505,6 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <center>" << _cx << " " << _cy << "</center>"
     << "      </distortion>";
 
-
   newModelStr << "    </camera>"
     << "  </sensor>"
     << "</link>"

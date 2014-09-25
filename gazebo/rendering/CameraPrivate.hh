@@ -75,33 +75,6 @@ namespace gazebo
       /// \brief Yaw PID used to track a visual smoothly.
       public: common::PID trackVisualYawPID;
 
-
-
-      /// \brief Which noise type we support
-      public: enum DistortionModelType
-      {
-        BARREL
-      };
-
-      /// \brief Type of lens distortion we're applying
-      public: DistortionModelType distortionType;
-
-      /// \brief Radial distortion coefficients.
-      public: math::Vector3 radialCoeff;
-
-      /// \brief Tangential distortion coefficients.
-      public: math::Vector2d tangentialCoeff;
-
-      /// \brief Lens center used for distortion
-      public: math::Vector2d lensCenter;
-
-      /// \brief Scale applied to distorted image.
-      public: math::Vector2d distortionScale;
-
-      /// \brief True if the distorted image will be cropped to remove the
-      /// black pixels at the corners of the image.
-      public: bool distortionCrop;
-
       /// \brief Communication Node
       public: transport::NodePtr node;
 

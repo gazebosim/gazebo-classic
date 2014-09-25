@@ -64,7 +64,6 @@ namespace gazebo
     class MouseEvent;
     class ViewController;
     class Scene;
-    class LensDistortionCompositorListener;
     class CameraPrivate;
 
     /// \addtogroup gazebo_rendering Rendering

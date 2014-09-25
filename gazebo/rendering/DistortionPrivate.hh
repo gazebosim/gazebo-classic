@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #define _GAZEBO_RENDERING_DISTORTION_PRIVATE_HH_
 
 #include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector3.hh"
 
 namespace gazebo
 {

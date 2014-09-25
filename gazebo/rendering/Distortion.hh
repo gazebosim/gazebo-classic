@@ -64,6 +64,7 @@ namespace gazebo
       /// \param[in] _k3 Radial distortion coefficient k3.
       /// \param[in] _p1 Tangential distortion coefficient p1.
       /// \param[in] _p2 Tangential distortion coefficient p2.
+      /// \return Distorted coordinate.
       public: static math::Vector2d Distort(const math::Vector2d &_in,
         const math::Vector2d &_center, double _k1, double _k2, double _k3,
         double _p1, double _p2);

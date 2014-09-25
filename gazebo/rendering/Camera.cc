@@ -1334,10 +1334,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
-    }
-
     if (this->dataPtr->distortion)
-    {
       this->dataPtr->distortion->SetCamera(shared_from_this());
 
     if (this->GetScene()->skyx != NULL)

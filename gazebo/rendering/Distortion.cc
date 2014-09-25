@@ -100,6 +100,7 @@ void Distortion::SetCamera(CameraPtr _camera)
   if (this->dataPtr->distortionCrop)
     this->dataPtr->distortionScale = boundB - boundA;
 
+  // fill the distortion map
   for (unsigned int i = 0; i < texHeight; ++i)
   {
     double v = i*incrU;
@@ -110,7 +111,8 @@ void Distortion::SetCamera(CameraPtr _camera)
       math::Vector2d out = Distort(uv, this->dataPtr->lensCenter,
           this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
           this->dataPtr->p1, this->dataPtr->p2);
-      // fill the distortion map
+
+      // compute the index in the distortion map
       unsigned int idxU = out.x * texWidth;
       unsigned int idxV = out.y * texHeight;
       unsigned int mapIdx = idxV * texWidth + idxU;
@@ -199,7 +201,7 @@ void Distortion::SetCamera(CameraPtr _camera)
       _camera->GetViewport(), "CameraDistortionMap/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
-  // Create the ditortion map texture
+  // create the ditortion map texture
   std::string texName = _camera->GetName() + "_distortionTex";
   Ogre::TexturePtr renderTexture =
       Ogre::TextureManager::getSingleton().createManual(
