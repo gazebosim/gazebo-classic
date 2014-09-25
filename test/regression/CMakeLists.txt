@@ -35,6 +35,7 @@ set(tests
   physics_basic_controller_response.cc
   physics_inertia_ratio.cc
   pioneer2dx.cc
+  plugin.cc
   transport.cc
   server_fixture.cc
   speed.cc

@@ -75,24 +75,30 @@ class ServerFixture : public testing::Test
                    TEST_REGRESSION_PATH);
 
                // Add local search paths
-               std::string path = TEST_REGRESSION_PATH;
-               path += "/../..";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               boost::filesystem::path path;
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../sdf";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../gazebo";
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               path /= "gazebo";
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 
-               path = TEST_REGRESSION_PATH;
-               path += "/../../build/plugins";
-               gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
+               path = PROJECT_SOURCE_PATH;
+               path /= "sdf";
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
+
+               path = PROJECT_BINARY_PATH;
+               path /= "plugins";
+               common::SystemPaths::Instance()->AddPluginPaths(path.string());
+
+               path = PROJECT_BINARY_PATH;
+               path /= "test";
+               path /= "plugins";
+               common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
                path = TEST_PATH;
-               gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path);
+               common::SystemPaths::Instance()->AddGazeboPaths(path.string());
              }
 
   protected: virtual void TearDown()
@@ -216,28 +222,33 @@ class ServerFixture : public testing::Test
              {
                ASSERT_NO_THROW(this->server = new Server());
                if (_physics.length())
+               {
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename,
                                                         _physics));
+               }
                else
+               {
                  ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+               }
                ASSERT_NO_THROW(this->server->Init());
 
                if (!rendering::get_scene(
                      gazebo::physics::get_world()->GetName()))
                {
-                 rendering::create_scene(
-                     gazebo::physics::get_world()->GetName(), false);
+                 ASSERT_NO_THROW(rendering::create_scene(
+                     gazebo::physics::get_world()->GetName(), false));
                }
 
-               this->SetPause(_paused);
+               ASSERT_NO_THROW(this->SetPause(_paused));
 
-               this->server->Run();
+               ASSERT_NO_THROW(this->server->Run());
 
-               rendering::remove_scene(gazebo::physics::get_world()->GetName());
+               ASSERT_NO_THROW(rendering::remove_scene(
+                     gazebo::physics::get_world()->GetName()));
 
                ASSERT_NO_THROW(this->server->Fini());
 
-               delete this->server;
+               ASSERT_NO_THROW(delete this->server);
                this->server = NULL;
              }
 
