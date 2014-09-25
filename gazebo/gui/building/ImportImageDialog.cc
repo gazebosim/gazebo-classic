@@ -30,9 +30,17 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   this->setWindowTitle(tr("Import Image"));
 
-  QLabel *titleWidget = new QLabel(tr(
-          "<b>Import image</b><br>"
-          "Import a building floorplan<br>"));
+  // Title
+  QLabel *titleLabel = new QLabel(tr(
+      "<b>Import image</b><br>"
+      "Import a building floorplan<br>"));
+
+  // Step 1
+  QLabel *step1Label = new QLabel(tr(
+      "<b>Step 1: Select Image</b>"));
+
+  QLabel *step1Supports = new QLabel(tr(
+       "<font size=1 color='grey'>Supported formats: .png, .jpg</font><br>"));
 
   this->fileLineEdit = new QLineEdit();
   this->fileLineEdit->setPlaceholderText(tr("Image file name"));
@@ -46,6 +54,19 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   fileLayout->addWidget(new QLabel(tr("File: ")));
   fileLayout->addWidget(this->fileLineEdit);
   fileLayout->addWidget(fileButton);
+
+  QVBoxLayout *step1Layout = new QVBoxLayout;
+  step1Layout->setSpacing(0);
+  step1Layout->addWidget(step1Label);
+  step1Layout->addLayout(fileLayout);
+  step1Layout->addWidget(step1Supports);
+
+  // Step 2
+  QLabel *step2Label = new QLabel(tr(
+      "<b>Step 2: Set Scale</b><br>"
+      "Draw a line on the image to set<br>"
+      "the real world distance between<br>"
+      "the two end points."));
 
   this->distanceSpin = new QDoubleSpinBox;
   this->distanceSpin->setRange(0.001, 1000);
@@ -80,9 +101,25 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   connect(okCancelButtons, SIGNAL(accepted()), this, SLOT(accept()));
   connect(okCancelButtons, SIGNAL(rejected()), this, SLOT(reject()));
-
   connect(this, SIGNAL(accepted()), this, SLOT(OnAccept()));
 
+  QVBoxLayout *step2Layout = new QVBoxLayout;
+  step2Layout->addWidget(step2Label);
+  step2Layout->addLayout(distanceLayout);
+  step2Layout->addLayout(resolutionLayout);
+
+  // Left column
+  QWidget *leftColumn = new QWidget();
+  leftColumn->setSizePolicy(QSizePolicy::Fixed,
+                            QSizePolicy::Fixed);
+  QVBoxLayout *leftColumnLayout = new QVBoxLayout();
+  leftColumn->setLayout(leftColumnLayout);
+  leftColumnLayout->addWidget(titleLabel);
+  leftColumnLayout->addLayout(step1Layout);
+  leftColumnLayout->addLayout(step2Layout);
+  leftColumnLayout->addWidget(okCancelButtons);
+
+  // Image view
   this->importImageView = new ImportImageView(this);
   QGraphicsScene *scene = new QGraphicsScene();
   scene->setBackgroundBrush(Qt::white);
@@ -100,31 +137,10 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
       QGraphicsView::FullViewportUpdate);
   this->importImageView->setDragMode(QGraphicsView::ScrollHandDrag);
 
-  QWidget *leftColumn = new QWidget();
-  leftColumn->setSizePolicy(QSizePolicy::Fixed,
-                            QSizePolicy::Fixed);
-  QVBoxLayout *leftColumnLayout = new QVBoxLayout();
-  leftColumn->setLayout(leftColumnLayout);
-  leftColumnLayout->addWidget(titleWidget);
-  leftColumnLayout->addWidget(new QLabel(tr(
-      "<b>Step 1: Select Image</b>")));
-  leftColumnLayout->addLayout(fileLayout);
-  leftColumnLayout->addWidget(new QLabel(tr(
-      "<font size=1 color='grey'>Supported formats: .png, .jpg</font><br>")));
-  leftColumnLayout->addWidget(new QLabel(tr(
-      "<b>Step 2: Set Scale</b><br>"
-      "Draw a line on the image to set<br>"
-      "the real world distance between<br>"
-      "the two end points.<br><br>")));
-  leftColumnLayout->addLayout(distanceLayout);
-  leftColumnLayout->addLayout(resolutionLayout);
-  leftColumnLayout->addWidget(okCancelButtons);
-
+  // Main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addWidget(leftColumn);
+  mainLayout->addWidget(leftColumn, 0, Qt::AlignTop);
   mainLayout->addWidget(this->importImageView);
-
-
   this->setLayout(mainLayout);
 
   this->drawingLine = false;
@@ -150,7 +166,7 @@ void ImportImageDialog::OnSelectFile()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
       tr("Open Image"), "",
-      tr("Image Files (*.png *.jpg)")).toStdString();
+      tr("Image Files (*.png *.jpg *.jpeg)")).toStdString();
 
   if (!filename.empty())
   {

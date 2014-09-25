@@ -81,6 +81,7 @@ void MeasureItem::paint(QPainter *_painter,
 
   double margin = 10;
   float textWidth = _painter->fontMetrics().width(stream.str().c_str());
+  float textHeight = _painter->fontMetrics().height();
 
   float posX = (p1.x()+p2.x())/2;
   float posY = (p1.y()+p2.y())/2;
@@ -104,6 +105,14 @@ void MeasureItem::paint(QPainter *_painter,
     posY = (p1.y()+p2.y())/2 - margin;
   }
 
+  measurePen.setColor(Qt::white);
+  measurePen.setWidth(textHeight*1.5);
+  _painter->setPen(measurePen);
+  _painter->drawLine(posX+textWidth*0.1, posY-textHeight*0.4,
+                     posX+textWidth*0.9, posY-textHeight*0.4);
+
+  measurePen.setColor(QColor(247, 142, 30));
+  _painter->setPen(measurePen);
   _painter->drawText(posX, posY, stream.str().c_str());
 }
 
