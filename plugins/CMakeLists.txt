@@ -17,6 +17,12 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
+# Find the Ignition_Transport library
+find_package(ignition-transport QUIET REQUIRED)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
+include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
+link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
+
 set (plugins
   BreakableJointPlugin
   CameraPlugin
@@ -52,7 +58,8 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 )
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach (src ${plugins})

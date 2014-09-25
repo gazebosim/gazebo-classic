@@ -15,7 +15,7 @@
  *
 */
 
-#include <gazebo/transport/transport.hh>
+#include <ignition/transport.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/gazebo.hh>
 
@@ -26,8 +26,7 @@
 #include <iostream>
 
 // Create our node for communication
-gazebo::transport::NodePtr node;
-gazebo::transport::PublisherPtr pub;
+boost::shared_ptr<ignition::transport::Node> node;
 
 // task space classes
 using namespace SimTK;
@@ -215,88 +214,74 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
 UR10                 m_modelRobot;
 TasksMeasure<Vector> m_modelTasks(m_modelRobot);
 State                m_modelState;
-Visualizer           *m_viz;
+// Visualizer           *m_viz;
 
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
-void cb(ConstControlRequestPtr &_msg)
+void cb(const std::string &_topic, const gazebo::msgs::ControlRequest &_req,
+  gazebo::msgs::ControlResponse &_res, bool &_result)
 {
   // Dump the message contents to stdout.
-  std::cout << _msg->DebugString();
+  std::cout << _req.DebugString();
 
   // get request data
   for (int i=0; i < UR10::NumCoords; ++i) {
       std::cout << "num coords: " << UR10::NumCoords << "\n";
       const UR10::Coords coord = UR10::Coords(i);
       // skip the world_joint (i+1)
-      m_modelRobot.setJointAngle(m_modelState, coord, _msg->joint_pos(i+1));
-      m_modelRobot.setJointRate(m_modelState, coord, _msg->joint_vel(i+1));
+      m_modelRobot.setJointAngle(m_modelState, coord, _req.joint_pos(i+1));
+      m_modelRobot.setJointRate(m_modelState, coord, _req.joint_vel(i+1));
   }
 
   // get target
-  Vec3 target_pos(_msg->target_pos().x(),
-                  _msg->target_pos().y(),
-                  _msg->target_pos().z());
+  Vec3 target_pos(_req.target_pos().x(),
+                  _req.target_pos().y(),
+                  _req.target_pos().z());
   m_modelTasks.setTarget(target_pos);
 
   // Optional: if real robot end effector location can be sensed, it can
   // be used to improve accuracy. Otherwise, estimate the end effector
   // location using the model robot.
   // const Vec3 sensedEEPos = 
-  //     m_realRobot.getSampledEndEffectorPos(realState); // get from _msg
+  //     m_realRobot.getSampledEndEffectorPos(realState); // get from _req
   // m_modelRobot.setSampledEndEffectorPos(m_modelState, sensedEEPos);
 
   // update state
   m_modelRobot.realize(m_modelState, Stage::Velocity);
 
   // update viz
-  m_viz->report(m_modelState);
+  // m_viz->report(m_modelState);
 
   // compute joint torques
   const Vector& tau = m_modelTasks.getValue(m_modelState);
 
   // publish joint torques
-  gazebo::msgs::ControlResponse res;
-
-  res.set_name("response");
-  res.clear_torques();
-  res.add_torques(0); // for the world_joint
+  _res.set_name("response");
+  _res.clear_torques();
+  _res.add_torques(0); // for the world_joint
   for (unsigned int i = 0; i < UR10::NumCoords; ++i)
   {
     std::cout << i << " : " << tau[i] << "\n";
-    res.add_torques(tau[i]);
+    _res.add_torques(tau[i]);
   }
-  pub->Publish(res);
+  _result = true;
 }
 
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
-  // Load gazebo
-  gazebo::setupClient(_argc, _argv);
-
-  node.reset(new gazebo::transport::Node());
-  node->Init();
-  pub = node->Advertise<gazebo::msgs::ControlResponse>("~/ur10/control_response");
-
+  node.reset(new ignition::transport::Node());
   // initialize model state
   m_modelRobot.initialize(m_modelState);
 
   // visualize
-  m_viz = new Visualizer(m_modelRobot);
-  m_viz->report(m_modelState);
+  // m_viz = new Visualizer(m_modelRobot);
+  // m_viz->report(m_modelState);
 
-  // Listen to Gazebo world_stats topic
-  gazebo::transport::SubscriberPtr sub =
-    node->Subscribe("~/ur10/control_request", cb);
+  node->Advertise("/ur10/control_request", cb);
 
   // Busy wait loop...replace with your own code as needed.
-  while (true)
-  {
-    gazebo::common::Time::MSleep(1000);
-    std::cout << ".";
-  }
-
-  // Make sure to shut everything down.
-  gazebo::shutdown();
+  std::cout << "press any key to exit!";
+  getchar();
+  std::cout << "press any key to exit!";
 }

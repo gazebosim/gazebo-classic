@@ -20,11 +20,13 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport.hh>
+
 #include <boost/thread/condition.hpp>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -44,19 +46,13 @@ namespace gazebo
     /// \param[in] _msg Model message from gazebo
     private: void PubControlRequest();
 
-    private: void OnControlResponse(ConstControlResponsePtr &_msg);
+    private: void OnControlResponse(gazebo::msgs::ControlResponse &_msg);
 
     /// \brief Callback for World Update events.
     private: void OnUpdate();
 
     /// \brief Transport node used for publishing to control requests
-    private: transport::NodePtr node;
-
-    /// \brief Publisher to requests
-    private: transport::PublisherPtr pubControlRequest;
-
-    /// \brief Callback to response
-    private: transport::SubscriberPtr subControlResponse;
+    private: ignition::transport::Node node;
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;

@@ -22,7 +22,6 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/sensors/ContactSensor.hh"
-#include "gazebo/transport/transport.hh"
 #include "plugins/ModelControlPlugin.hh"
 
 using namespace gazebo;
@@ -87,9 +86,7 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void ModelControlPlugin::Init()
 {
-  this->node.reset(new transport::Node());
-  this->node->Init(this->world->GetName());
-
+  /*
   // subscribe to a topic
   std::string topicRequest = std::string("~/") + this->modelName + "/control_request";
   this->pubControlRequest =
@@ -98,27 +95,30 @@ void ModelControlPlugin::Init()
   std::string topicResponse = std::string("~/") + this->modelName + "/control_response";
   this->subControlResponse =
     this->node->Subscribe(topicResponse, &ModelControlPlugin::OnControlResponse, this);
+  */
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&ModelControlPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
-void ModelControlPlugin::OnControlResponse(ConstControlResponsePtr &_msg)
+void ModelControlPlugin::OnControlResponse(gazebo::msgs::ControlResponse &_msg)
 {
-  gzdbg << _msg->DebugString();
+  gzdbg << "Response: [" << _msg.DebugString() << "]" << std::endl;
 
   // pass response efforts to joints
-  for (int i = 0; i < _msg->torques().size(); ++i)
+  for (int i = 0; i < _msg.torques().size(); ++i)
   {
-    this->joints[i]->SetForce(0, _msg->torques(i));
+    this->joints[i]->SetForce(0, _msg.torques(i));
   }
-  
+ 
+  /* 
   {
     // signal to continue simulation
     boost::mutex::scoped_lock lock(this->mutex);
     this->delayCondition.notify_one();
   }
+  */
   
 }
 
@@ -147,7 +147,27 @@ void ModelControlPlugin::PubControlRequest()
   gazebo::msgs::Set(req.mutable_target_pos(),
     this->targetModel->GetWorldPose().pos);
 
-  this->pubControlRequest->Publish(req);
+  gazebo::msgs::ControlResponse res;
+  bool result;
+  const int timeout = 1000;  // in ms
+
+  bool executed = false;
+  while(!executed)
+  {
+    executed = this->node.Request("/" + this->model->GetName() + "/control_request",
+                                  req, timeout, res, result);
+    if (executed)
+    {
+      if (result)
+      {
+        this->OnControlResponse(res);
+      }
+      else
+        gzerr << "Service call failed" << std::endl;
+    }
+    else
+      gzerr << "Service call timed out" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -156,6 +176,7 @@ void ModelControlPlugin::OnUpdate()
   // call every simulation step
   this->PubControlRequest();
 
+  /*
   {
     boost::mutex::scoped_lock lock(this->mutex);
     // block simulation,
@@ -173,4 +194,5 @@ void ModelControlPlugin::OnUpdate()
                "delay budget exhausted.\n";
     }
   }
+  */
 }
