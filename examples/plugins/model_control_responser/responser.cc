@@ -21,12 +21,32 @@
 
 #include <iostream>
 
+// Create our node for communication
+gazebo::transport::NodePtr node;
+gazebo::transport::PublisherPtr pub;
+
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
 void cb(ConstControlRequestPtr &_msg)
 {
   // Dump the message contents to stdout.
   std::cout << _msg->DebugString();
+
+  // get request data
+
+  // compute joint torques
+
+  // publish joint torques
+  gazebo::msgs::ControlResponse res;
+
+  res.set_name("response");
+  res.clear_torques();
+  for (unsigned int i = 0; i < _msg->joint_pos().size(); ++i)
+  {
+    std::cout << i << "\n";
+    res.add_torques(0.1);
+  }
+  pub->Publish(res);
 }
 
 /////////////////////////////////////////////////
@@ -35,9 +55,9 @@ int main(int _argc, char **_argv)
   // Load gazebo
   gazebo::setupClient(_argc, _argv);
 
-  // Create our node for communication
-  gazebo::transport::NodePtr node(new gazebo::transport::Node());
+  node.reset(new gazebo::transport::Node());
   node->Init();
+  pub = node->Advertise<gazebo::msgs::ControlResponse>("~/ur10/control_response");
 
   // Listen to Gazebo world_stats topic
   gazebo::transport::SubscriberPtr sub =
@@ -45,7 +65,10 @@ int main(int _argc, char **_argv)
 
   // Busy wait loop...replace with your own code as needed.
   while (true)
-    gazebo::common::Time::MSleep(10);
+  {
+    gazebo::common::Time::MSleep(1000);
+    std::cout << ".";
+  }
 
   // Make sure to shut everything down.
   gazebo::shutdown();

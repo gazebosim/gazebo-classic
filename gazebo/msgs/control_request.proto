@@ -4,32 +4,18 @@ package gazebo.msgs;
 /// \interface ControlRequest
 /// \brief A control request
 
-import "joint.proto";
-import "link.proto";
 import "vector3d.proto";
 import "quaternion.proto";
 
-message ControlReuqest
+message ControlRequest
 {
   required string name         = 1;
   optional uint32 id           = 2;
-  repeated Joint joint         = 5;
-  repeated Link link           = 6;
-
-  optional Vector3d gravity    = 8;
 
   repeated string joint_names  = 10;
   repeated double joint_pos    = 12;
   repeated double joint_vel    = 14;
 
-  repeated string link_names   = 30;
-  repeated Vector3d link_pos   = 32;
-  repeated Quaternion link_rot = 34;
-
-  // joint command
-  repeated double ref_pos      = 40;
-  repeated double kp_pos       = 42;
-  repeated double ki_pos       = 44;
-  repeated double kd_pos       = 46;
+  required Vector3d target_pos = 32;
 }
 

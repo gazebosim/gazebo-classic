@@ -51,6 +51,9 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
 
   GZ_ASSERT(_sdf, "ModelControlPlugin _sdf pointer is NULL");
 
+  this->joints = this->model->GetJoints();
+  this->links = this->model->GetLinks();
+  /*
   // get a list of links
   if (_sdf->HasElement("link_name"))
   {
@@ -76,6 +79,7 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
       elem = elem->GetNextElement("joint_name");
     }
   }
+  */
 }
 
 /////////////////////////////////////////////////
@@ -85,12 +89,27 @@ void ModelControlPlugin::Init()
   this->node->Init(this->world->GetName());
 
   // subscribe to a topic
-  std::string topic = std::string("~/") + this->modelName + "/control_request";
+  std::string topicRequest = std::string("~/") + this->modelName + "/control_request";
   this->pubControlRequest =
-    this->node->Advertise<msgs::ControlRequest>(topic);
+    this->node->Advertise<msgs::ControlRequest>(topicRequest);
+
+  std::string topicResponse = std::string("~/") + this->modelName + "/control_response";
+  this->subControlResponse =
+    this->node->Subscribe(topicResponse, &ModelControlPlugin::OnControlResponse, this);
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&ModelControlPlugin::OnUpdate, this));
+}
+
+/////////////////////////////////////////////////
+void ModelControlPlugin::OnControlResponse(ConstControlResponsePtr &_msg)
+{
+  gzdbg << _msg->DebugString();
+
+  for (int i = 0; i < _msg->torques().size(); ++i)
+  {
+    this->joints[i]->SetForce(0, _msg->torques(i));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -98,7 +117,30 @@ void ModelControlPlugin::PubControlRequest()
 {
   // boost::mutex::scoped_lock lock(this->mutex); // for threading this...
 
-  // do something with control and publish state and wait for command
+  // TODO: [optional] get end-effector states (for noise rejection tests)
+
+  // get joint states
+
+  // publish request
+  gazebo::msgs::ControlRequest req;
+  req.set_name("request");
+
+  req.clear_joint_names();
+  req.clear_joint_pos();
+  req.clear_joint_vel();
+  for (unsigned int i = 0; i < this->joints.size(); ++i)
+  {
+    req.add_joint_names(this->joints[i]->GetName());
+    req.add_joint_pos(this->joints[i]->GetAngle(0).Radian());
+    req.add_joint_vel(this->joints[i]->GetVelocity(0));
+  }
+  gazebo::msgs::Set(req.mutable_target_pos(), gazebo::math::Vector3(0, 0, 1.5));
+
+  this->pubControlRequest->Publish(req);
+
+  // wait for a response
+
+  // pass response efforts to joints
 }
 
 /////////////////////////////////////////////////

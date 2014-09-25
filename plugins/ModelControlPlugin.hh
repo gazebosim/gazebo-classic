@@ -42,6 +42,8 @@ namespace gazebo
     /// \param[in] _msg Model message from gazebo
     private: void PubControlRequest();
 
+    private: void OnControlResponse(ConstControlResponsePtr &_msg);
+
     /// \brief Callback for World Update events.
     private: void OnUpdate();
 
@@ -50,6 +52,9 @@ namespace gazebo
 
     /// \brief Publisher to requests
     private: transport::PublisherPtr pubControlRequest;
+
+    /// \brief Callback to response
+    private: transport::SubscriberPtr subControlResponse;
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
