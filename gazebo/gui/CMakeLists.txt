@@ -22,6 +22,7 @@ set (sources
   Actions.cc
   AlignWidget.cc
   BoxMaker.cc
+  CloneWindow.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -45,6 +46,7 @@ set (sources
   ModelRightMenu.cc
   MouseEventHandler.cc
   SaveDialog.cc
+  SpaceNav.cc
   SphereMaker.cc
   TimePanel.cc
   ToolsWidget.cc
@@ -54,6 +56,7 @@ set (sources
 set (qt_headers
   Actions.hh
   AlignWidget.hh
+  CloneWindow.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -78,6 +81,7 @@ set (headers
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh
+  GuiPlugin.hh
   KeyEventHandler.hh
   LightMaker.hh
   ModelAlign.hh
@@ -86,6 +90,7 @@ set (headers
   MeshMaker.hh
   MouseEventHandler.hh
   ModelMaker.hh
+  SpaceNav.hh
   SphereMaker.hh
 )
 
@@ -170,6 +175,12 @@ target_link_libraries(gzclient
   ${Boost_LIBRARIES}
   pthread
 )
+
+if (SPNAV_LIBRARY)
+  target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})
+  target_link_libraries(gzclient ${SPNAV_LIBRARY})
+endif()
+
 
 add_definitions(${QT_DEFINITIONS})
 

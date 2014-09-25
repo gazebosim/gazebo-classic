@@ -1,13 +1,43 @@
 ## Gazebo 4.X to 5.X
 
+### Modifications
+
+1. **Informational logs:** The log files will be created inside
+  ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
+  ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
+  change is to avoid name collisions when cloning a simulation. If the
+  environment variable GAZEBO_MASTER_URI is not present or invalid,
+  <GAZEBO_MASTER_PORT> will be replaced by "default".
+
 ### Additions
+
+1. **gazebo/physics/Population.hh**
+    + ***New class:*** Population
 
 1. **gazebo/math/Kmeans.hh**
     + ***New class:*** Kmeans
 
+1. **gazebo/gui/SpaceNav.hh**
+    + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
+
+### Modifications
+
+1. **gazebo/common/Plugin.hh**
+    + ***Removed:*** protected: std::string Plugin::handle
+    + ***Replacement:*** protected: std::string Plugin::handleName
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + unsigned int GetShapeType()
+
 ## Gazebo 3.1 to 4.0
 
 ### New Deprecations
+
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation*** unsigned int GetShapeType()
+    + ***Replacement*** unsigned int GetShapeType() const
 
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
@@ -17,6 +47,9 @@
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gzprop command line tool**
+    + The `gzprop` command line tool outputs a zip file instead of a tarball.
 
 ### Additions
 

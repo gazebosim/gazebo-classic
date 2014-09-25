@@ -55,7 +55,7 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
+  gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);

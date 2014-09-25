@@ -20,6 +20,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -172,6 +173,41 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
+
+
+  // Load all GUI Plugins
+  std::string filenames = getINIProperty<std::string>(
+      "overlay_plugins.filenames", "");
+  std::vector<std::string> pluginFilenames;
+
+  // Split the colon separated libraries
+  boost::split(pluginFilenames, filenames, boost::is_any_of(":"));
+
+  // Load each plugin
+  for (std::vector<std::string>::iterator iter = pluginFilenames.begin();
+       iter != pluginFilenames.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if (!(*iter).empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(*iter, *iter);
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << *iter << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << *iter << "]\n";
+
+        // Set the plugin's parent and store the plugin
+        plugin->setParent(this->glWidget);
+        this->plugins.push_back(plugin);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
