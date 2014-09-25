@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/thread/condition.hpp>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -82,6 +84,8 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;
+
+    private: boost::condition delayCondition;
   };
 }
 #endif

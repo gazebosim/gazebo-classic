@@ -10,13 +10,14 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED system filesystem regex)
 
 find_package(Protobuf REQUIRED)
 
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-
 # find simbody
 find_package(Simbody REQUIRED)
-include_directories(SYSTEM ${Simbody_INCLUDE_DIR})
-link_directories(${Simbody_LIB_DIR})
+include_directories(SYSTEM
+  ${Simbody_INCLUDE_DIR}
+  ${GAZEBO_INCLUDE_DIRS})
+link_directories(
+  ${Simbody_LIB_DIR}
+  ${GAZEBO_LIBRARY_DIRS})
 # add_definitions(${Simbody_CFLAGS})
 
 add_executable(responser responser.cc UR10.h UR10.cpp)

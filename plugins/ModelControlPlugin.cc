@@ -106,10 +106,18 @@ void ModelControlPlugin::OnControlResponse(ConstControlResponsePtr &_msg)
 {
   gzdbg << _msg->DebugString();
 
+  // pass response efforts to joints
   for (int i = 0; i < _msg->torques().size(); ++i)
   {
     this->joints[i]->SetForce(0, _msg->torques(i));
   }
+  
+  {
+    // continue simulation
+    boost::mutex::scoped_lock lock(this->mutex);
+    this->delayCondition.notify_one();
+  }
+  
 }
 
 /////////////////////////////////////////////////
@@ -137,10 +145,6 @@ void ModelControlPlugin::PubControlRequest()
   gazebo::msgs::Set(req.mutable_target_pos(), gazebo::math::Vector3(0, 0, 1.5));
 
   this->pubControlRequest->Publish(req);
-
-  // wait for a response
-
-  // pass response efforts to joints
 }
 
 /////////////////////////////////////////////////
@@ -150,10 +154,26 @@ void ModelControlPlugin::OnUpdate()
   if (dt < 1e-6)
     dt = 1e-6;
 
+  // call every simulation step
+  this->PubControlRequest();
+
   {
     boost::mutex::scoped_lock lock(this->mutex);
 
-    // call every simulation step
-    this->PubControlRequest();
+    // block simulation,
+    // wait for a response from responser (task space controller)
+    // calculate amount of time to wait based on rules
+    boost::system_time timeout = boost::get_system_time();
+    timeout += boost::posix_time::microseconds(1000000);
+
+    if (!this->delayCondition.timed_wait(lock, timeout))
+    {
+      gzerr << "controller synchronization timedout: "
+               "delay budget exhausted.\n";
+    }
+    else
+    {
+      // continue sim
+    }
   }
 }
