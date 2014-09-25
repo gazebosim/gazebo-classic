@@ -354,9 +354,10 @@ TEST_F(CameraSensor, CheckDistortion)
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
+  // spawn a camera with barrel distortion
   SpawnCamera(modelNameDistorted, cameraNameDistorted, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate,
-      "", 0, 0, true, -3, 0.2, 0.0, -0.001, -0.002, 0.5, 0.5);
+      "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
@@ -409,24 +410,6 @@ TEST_F(CameraSensor, CheckDistortion)
     }
   }
   EXPECT_GT(colorSum, colorSum2);
-
-  common::Image image;
-  {
-    boost::mutex::scoped_lock lock(mutex);
-    image.SetFromData(img, width, height,
-        common::Image::ConvertPixelFormat(pixelFormat));
-  }
-  image.SavePNG("normal.png");
-
-  common::Image image2;
-  {
-    boost::mutex::scoped_lock lock(mutex);
-    image2.SetFromData(img2, width, height,
-        common::Image::ConvertPixelFormat(pixelFormat));
-  }
-  image2.SavePNG("distorted.png");
-
-
 
   // We expect that there will be some non-zero difference between the two
   // images.

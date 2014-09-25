@@ -35,9 +35,7 @@ namespace gazebo
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
     /// \brief Camera distortion based on Brown's model. Note that the current
-    /// implementation has the limitation that it actually applies undistortion.
-    /// So the distortion coefficients needs to be tweaked to emulate the
-    /// desired barrel or pincushion distortions.
+    /// implementation only supports barrel distortion.
     class GAZEBO_VISIBLE Distortion
     {
       /// \brief Constructor
@@ -50,12 +48,25 @@ namespace gazebo
       /// \param[in] _sdf The SDF camera info
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief  Set the camera which distortion will be applied to.
+      /// \brief Set the camera which distortion will be applied to.
       /// \param[in] _camera Camera to be distorted
       public: void SetCamera(CameraPtr _camera);
 
-      /// \brief Finalize distortion.
-      public: void Fini();
+      /// \brief Set whether to crop the black border around the distorted
+      /// image points.
+      /// \param[in] _crop True to crop the black border
+      public: void SetCrop(bool _crop);
+
+      /// \brief Apply distortion model
+      /// \param[in] _in Input uv coordinate.
+      /// \param[in] _k1 Radial distortion coefficient k1.
+      /// \param[in] _k2 Radial distortion coefficient k2.
+      /// \param[in] _k3 Radial distortion coefficient k3.
+      /// \param[in] _p1 Tangential distortion coefficient p1.
+      /// \param[in] _p2 Tangential distortion coefficient p2.
+      public: static math::Vector2d Distort(const math::Vector2d &_in,
+        const math::Vector2d &_center, double _k1, double _k2, double _k3,
+        double _p1, double _p2);
 
       /// \brief Distortion SDF values.
       protected: sdf::ElementPtr sdf;

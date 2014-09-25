@@ -17,11 +17,9 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/Events.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
-#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DistortionPrivate.hh"
 #include "gazebo/rendering/Distortion.hh"
 
@@ -38,7 +36,8 @@ Distortion::Distortion()
   this->dataPtr->p1 = 0;
   this->dataPtr->p2 = 0;
   this->dataPtr->lensCenter = math::Vector2d(0.5, 0.5);
-  this->dataPtr->distortionCrop = false;
+  this->dataPtr->distortionScale = math::Vector2d(1.0, 1.0);
+  this->dataPtr->distortionCrop = true;
 }
 
 //////////////////////////////////////////////////
@@ -64,19 +63,15 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   if (this->dataPtr->k1 > 0)
   {
     gzerr << "Pincushion model is currently not supported."
-      << " Please use a negative K1 coefficient" << std::endl;
+      << " Please use a negative k1 coefficient for barrel distortion"
+      << std::endl;
   }
-
-  this->dataPtr->distortionCrop = false;
 }
 
 //////////////////////////////////////////////////
 void Distortion::SetCamera(CameraPtr _camera)
 {
   GZ_ASSERT(_camera, "Unable to apply distortion, camera is NULL");
-
-  this->dataPtr->distortionScale.x = 1.0;
-  this->dataPtr->distortionScale.y = 1.0;
 
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
@@ -85,14 +80,25 @@ void Distortion::SetCamera(CameraPtr _camera)
   unsigned int texHeight = texSide;
   unsigned int imageSize = texWidth * texHeight;
 
-  std::vector<math::Vector2d> uvMap;
-  uvMap.resize(imageSize);
   this->dataPtr->distortionMap.resize(imageSize);
   for (unsigned int i = 0; i < this->dataPtr->distortionMap.size(); ++i)
     this->dataPtr->distortionMap[i] = -1;
 
-  double incrU = 1.0 / texWidth ;
+  double incrU = 1.0 / texWidth;
   double incrV = 1.0 / texHeight;
+
+  // obtain bounds of the distorted image points.
+  math::Vector2d boundA = Distort(math::Vector2d(0, 0),
+      this->dataPtr->lensCenter,
+      this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+      this->dataPtr->p1, this->dataPtr->p2);
+  math::Vector2d boundB = Distort(math::Vector2d(1, 1),
+      this->dataPtr->lensCenter,
+      this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+      this->dataPtr->p1, this->dataPtr->p2);
+
+  if (this->dataPtr->distortionCrop)
+    this->dataPtr->distortionScale = boundB - boundA;
 
   for (unsigned int i = 0; i < texHeight; ++i)
   {
@@ -100,58 +106,94 @@ void Distortion::SetCamera(CameraPtr _camera)
     for (unsigned int j = 0; j < texWidth; ++j)
     {
       double u = j*incrV;
-      math::Vector2d texCoord(u, v);
-      math::Vector2d normalized2d = texCoord - this->dataPtr->lensCenter;
-      math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
-      double rSq = normalized.x * normalized.x
-          + normalized.y * normalized.y;
-      math::Vector3 dist = normalized * ( 1.0 +
-          this->dataPtr->k1 * rSq +
-          this->dataPtr->k2 * rSq * rSq +
-          this->dataPtr->k3 * rSq * rSq * rSq);
-      dist.x += this->dataPtr->p1
-          * (rSq + 2 * (normalized.x*normalized.x)) +
-          2 * this->dataPtr->p2
-          * normalized.x * normalized.y;
-      dist.y += this->dataPtr->p2
-          * (rSq + 2 * (normalized.y*normalized.y)) +
-          2 * this->dataPtr->p1
-          * normalized.x * normalized.y;
-      math::Vector2d out = this->dataPtr->lensCenter
-          + math::Vector2d(dist.x, dist.y);
-
-      // fill the distortion map
-      int idxU = out.x * texHeight;
-      int idxV = out.y * texWidth;
-      int mapIdx = idxV * texWidth + idxU;
       math::Vector2d uv(u, v);
+      math::Vector2d out = Distort(uv, this->dataPtr->lensCenter,
+          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+          this->dataPtr->p1, this->dataPtr->p2);
+      // fill the distortion map
+      unsigned int idxU = out.x * texWidth;
+      unsigned int idxV = out.y * texHeight;
+      unsigned int mapIdx = idxV * texWidth + idxU;
+
+      // this should not happen for barrel distortion as the normalized
+      // distorted coordinate should be within (0, 0) and (1.0, 1.0).
+      if (mapIdx >= imageSize)
+        continue;
 
       this->dataPtr->distortionMap[mapIdx] = uv;
-      uvMap[i*texWidth + j] = uv;
     }
   }
 
+  // Apply interpolation to the resulting distortion map.
+  // This is mostly needed for barrel distortion where the the center of the
+  // distortion texture may contain a few black pixels.
+  unsigned int boundAIdxU = boundA.x * texWidth;
+  unsigned int boundAIdxV = boundA.y * texHeight;
+  unsigned int boundBIdxU = boundB.x * texWidth;
+  unsigned int boundBIdxV = boundB.y * texHeight;
+  // limit interpolation to the boundary formed by the distorted image points.
+  unsigned int roiWidth = boundBIdxU - boundAIdxU;
+  unsigned int roiHeight = boundBIdxV - boundAIdxV;
+  for (unsigned int i  = 0 ; i < roiHeight; ++i)
+  {
+    for (unsigned int j  = 0 ; j < roiWidth; ++j)
+    {
+      unsigned int mapIdx = (boundAIdxV + i)  * texWidth + boundAIdxU + j;
+      // check for empty mapping within the region and correct it by
+      // interpolating four neighboring distortion map values.
+      if (this->dataPtr->distortionMap[mapIdx] == math::Vector2d(-1, -1))
+      {
+        math::Vector2d interpolate(0, 0);
+        int sampleSize = 0;
+        // left
+        if ( (boundAIdxU + j) != 0 &&
+            !(this->dataPtr->distortionMap[mapIdx-1] == math::Vector2d(-1, -1)))
+        {
+          interpolate += this->dataPtr->distortionMap[mapIdx-1];
+          sampleSize++;
+        }
+        // right
+        if ( (boundAIdxU + j+1) < texWidth &&
+            !(this->dataPtr->distortionMap[mapIdx+1] == math::Vector2d(-1, -1)))
+        {
+          interpolate += this->dataPtr->distortionMap[mapIdx+1];
+          sampleSize++;
+        }
+        // top
+        if ( (boundAIdxV + i) != 0)
+        {
+          unsigned int topIdx =
+              (boundAIdxV + i-1) * texWidth + boundAIdxU + j;
+          if (!(this->dataPtr->distortionMap[topIdx]
+              == math::Vector2d(-1, -1)))
+          {
+            interpolate += this->dataPtr->distortionMap[mapIdx-1];
+            sampleSize++;
+          }
+        }
+        // bottom
+        if ( (boundAIdxV + i+1) < texHeight)
+        {
+          unsigned int bottomIdx =
+              (boundAIdxV + i+1) * texWidth + boundAIdxU + j;
+          if (!(this->dataPtr->distortionMap[bottomIdx]
+              == math::Vector2d(-1, -1)))
+          {
+            interpolate += this->dataPtr->distortionMap[mapIdx+1];
+            sampleSize++;
+          }
+        }
+        interpolate.x = interpolate.x / sampleSize;
+        interpolate.y = interpolate.y / sampleSize;
+        this->dataPtr->distortionMap[mapIdx] = interpolate;
+      }
+    }
+  }
+
+  // set up the compositor
   Ogre::MaterialPtr distMat =
       Ogre::MaterialManager::getSingleton().getByName(
       "Gazebo/CameraDistortionMap");
-/*  Ogre::GpuProgramParametersSharedPtr params =
-      distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-  params->setNamedConstant("k1", static_cast<Ogre::Real>(this->dataPtr->k1));
-  params->setNamedConstant("k2", static_cast<Ogre::Real>(this->dataPtr->k2));
-  params->setNamedConstant("k3", static_cast<Ogre::Real>(this->dataPtr->k3));
-  params->setNamedConstant("p1", static_cast<Ogre::Real>(this->dataPtr->p1));
-  params->setNamedConstant("p2", static_cast<Ogre::Real>(this->dataPtr->p2));
-  params->setNamedConstant("center",
-      static_cast<Ogre::Vector3>(
-      Ogre::Vector3(this->dataPtr->lensCenter.x,
-      this->dataPtr->lensCenter.y, 0.0)));
-  params->setNamedConstant("scale",
-      static_cast<Ogre::Vector3>(
-      Ogre::Vector3(1.0, 1.0, 1.0)));
-  params->setNamedConstant("scaleIn",
-      static_cast<Ogre::Vector3>(
-      Ogre::Vector3(this->dataPtr->distortionScale.x,
-      this->dataPtr->distortionScale.y, 0.0)));*/
   this->dataPtr->lensDistortionInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       _camera->GetViewport(), "CameraDistortionMap/Default");
@@ -170,12 +212,10 @@ void Distortion::SetCamera(CameraPtr _camera)
           Ogre::PF_FLOAT32_RGB);
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer = renderTexture->getBuffer();
 
-  // Lock the pixel buffer and get a pixel box
+  // fill the distortion map
   pixelBuffer->lock(Ogre::HardwareBuffer::HBL_NORMAL);
   const Ogre::PixelBox &pixelBox = pixelBuffer->getCurrentLock();
-
   float *pDest = static_cast<float *>(pixelBox.data);
-
   for (unsigned int i = 0; i < texHeight; ++i)
   {
     for(unsigned int j = 0; j < texWidth; ++j)
@@ -187,15 +227,48 @@ void Distortion::SetCamera(CameraPtr _camera)
       *pDest++ = 0;
     }
   }
-
-  // Unlock the pixel buffer
   pixelBuffer->unlock();
 
-//  Ogre::TextureUnitState *textureUnitState =
-      distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
+  // pass a scale param to the pixel shader for scaling the texture in order to
+  // remove black border.
+  Ogre::GpuProgramParametersSharedPtr params =
+      distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+  params->setNamedConstant("scale",
+      Ogre::Vector3(this->dataPtr->distortionScale.x,
+      this->dataPtr->distortionScale.y, 1.0));
+
+  // set up the distortion map texture to be used in the pixel shader.
+  distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
 }
 
 //////////////////////////////////////////////////
-void Distortion::Fini()
+math::Vector2d Distortion::Distort(const math::Vector2d &_in,
+    const math::Vector2d &_center, double _k1, double _k2, double _k3,
+    double _p1, double _p2)
 {
+  math::Vector2d normalized2d = _in - _center;
+  math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
+  double rSq = normalized.x * normalized.x
+      + normalized.y * normalized.y;
+
+  // radial
+  math::Vector3 dist = normalized * ( 1.0 +
+      _k1 * rSq +
+      _k2 * rSq * rSq +
+      _k3 * rSq * rSq * rSq);
+
+  // tangential
+  dist.x += _p1 * (rSq + 2 * (normalized.x*normalized.x)) +
+      2 * _p2 * normalized.x * normalized.y;
+  dist.y += _p2 * (rSq + 2 * (normalized.y*normalized.y)) +
+      2 * _p1 * normalized.x * normalized.y;
+  math::Vector2d out = _center + math::Vector2d(dist.x, dist.y);
+
+  return out;
+}
+
+//////////////////////////////////////////////////
+void Distortion::SetCrop(bool _crop)
+{
+  this->dataPtr->distortionCrop = _crop;
 }

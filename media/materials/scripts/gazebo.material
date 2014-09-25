@@ -1274,6 +1274,7 @@ fragment_program Gazebo/CameraDistortionMapFS glsl
   {
     param_named RT int 0
     param_named distortionMap int 1
+    param_named scale float3 1.0 1.0 1.0
   }
 }
 
