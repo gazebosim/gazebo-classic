@@ -76,12 +76,6 @@ void LevelWidget::OnCurrentLevelChanged(int _level)
 //////////////////////////////////////////////////
 void LevelWidget::OnAddLevel()
 {
-  std::stringstream levelText;
-//  int count = this->levelComboBox->count();
-  levelText << "Level " << (++this->levelCounter + 1);
-
-  this->levelComboBox->addItem(QString(levelText.str().c_str()));
-  this->levelComboBox->setCurrentIndex(this->levelComboBox->count()-1);
   gui::editor::Events::addBuildingLevel();
 }
 

@@ -72,10 +72,12 @@ EditorView::EditorView(QWidget *_parent)
 
   this->buildingMaker = new BuildingMaker();
   this->currentLevel = 0;
+  this->levelDefaultHeight = 250;
 
   Level *newLevel = new Level();
   newLevel->level = 0;
-  newLevel->height = 0;
+  newLevel->baseHeight = 0;
+  newLevel->height = this->levelDefaultHeight;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
 
@@ -566,9 +568,9 @@ void EditorView::DrawWall(const QPoint &_pos)
     QPointF pointStart = mapToScene(_pos);
     QPointF pointEnd = pointStart + QPointF(1, 0);
 
-    wallItem = new WallItem(pointStart, pointEnd);
+    wallItem = new WallItem(pointStart, pointEnd, this->levelDefaultHeight);
     wallItem->SetLevel(this->currentLevel);
-    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(wallItem);
     this->currentMouseItem = wallItem;
     this->drawInProgress = true;
@@ -613,7 +615,8 @@ void EditorView::DrawWindow(const QPoint &_pos)
   {
     windowItem = new WindowItem();
     windowItem->SetLevel(this->currentLevel);
-    windowItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+    windowItem->SetLevelBaseHeight(
+        this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(windowItem);
     this->currentMouseItem = windowItem;
 
@@ -642,7 +645,7 @@ void EditorView::DrawDoor(const QPoint &_pos)
   {
     doorItem = new DoorItem();
     doorItem->SetLevel(this->currentLevel);
-    doorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+    doorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(doorItem);
     this->currentMouseItem = doorItem;
     QVector3D doorPosition = doorItem->GetScenePosition();
@@ -670,7 +673,8 @@ void EditorView::DrawStairs(const QPoint &_pos)
   {
     stairsItem = new StairsItem();
     stairsItem->SetLevel(this->currentLevel);
-    stairsItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+    stairsItem->SetLevelBaseHeight(
+        this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(stairsItem);
     this->currentMouseItem = stairsItem;
 
@@ -736,8 +740,10 @@ void EditorView::SetBackgroundImage(const std::string &_filename,
         QPixmap::fromImage(img));
   }
 
-  this->levels[this->currentLevel]->backgroundPixmap->setX(img.width() * -0.5);
-  this->levels[this->currentLevel]->backgroundPixmap->setY(img.height() * -0.5);
+  this->levels[this->currentLevel]->backgroundPixmap->
+      setX(img.width() * -0.5);
+  this->levels[this->currentLevel]->backgroundPixmap->
+      setY(img.height() * -0.5);
   this->setSceneRect(img.width() * -0.5, img.height() * -0.5,
                      img.width(), img.height());
 }
@@ -795,7 +801,8 @@ void EditorView::OnDiscardModel()
 
   Level *newLevel = new Level();
   newLevel->level = 0;
-  newLevel->height = 0;
+  newLevel->baseHeight = 0;
+  newLevel->height = this->levelDefaultHeight;
   newLevel->name = "Level 1";
   this->levels.push_back(newLevel);
   this->levelCounter = 0;
@@ -815,21 +822,29 @@ void EditorView::OnDiscardModel()
 /////////////////////////////////////////////////
 void EditorView::OnAddLevel()
 {
+  if (this->wallList.empty())
+  {
+    QMessageBox msgBox;
+    msgBox.setText("Create new levels after adding walls.");
+    msgBox.exec();
+    return;
+  }
+
+  if (this->levels[this->currentLevel]->backgroundPixmap)
+    this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
+
   int newLevelNum = this->levels.size();
   std::stringstream levelNameStr;
   levelNameStr << "Level " << ++this->levelCounter + 1;
   std::string levelName = levelNameStr.str();
   this->currentLevel = newLevelNum;
-  Level *newlevel = new Level();
-  newlevel->name = levelName;
-  this->levels.push_back(newlevel);
+  Level *newLevel = new Level();
+  newLevel->name = levelName;
+  newLevel->level = newLevelNum;
+  newLevel->height = this->levelDefaultHeight;
+  this->levels.push_back(newLevel);
   emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
       levelName);
-  if (this->wallList.empty())
-  {
-    newlevel->height = 0;
-    return;
-  }
 
   std::vector<WallItem *>::iterator wallIt = this->wallList.begin();
   double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
@@ -846,7 +861,7 @@ void EditorView::OnAddLevel()
       wallLevel = (*wallIt)->GetLevel();
     }
   }
-  newlevel->height = maxHeight;
+  newLevel->baseHeight = maxHeight;
 
   FloorItem *floorItem = new FloorItem();
   std::vector<WallItem *> newWalls;
@@ -858,7 +873,7 @@ void EditorView::OnAddLevel()
 
     WallItem *wallItem = (*it)->Clone();
     wallItem->SetLevel(newLevelNum);
-    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+    wallItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
     this->scene()->addItem(wallItem);
     newWalls.push_back(wallItem);
     for (unsigned int j = 0; j < wallItem->GetSegmentCount(); ++j)
@@ -881,7 +896,7 @@ void EditorView::OnAddLevel()
       newWalls.end());
 
   floorItem->SetLevel(this->currentLevel);
-  floorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->height);
+  floorItem->SetLevelBaseHeight(this->levels[this->currentLevel]->baseHeight);
   std::string floorName = this->buildingMaker->AddFloor(
       floorItem->GetSize(), floorItem->GetScenePosition(), 0);
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
@@ -921,6 +936,8 @@ void EditorView::DeleteLevel(int _level)
   }
 
   this->OnChangeLevel(newLevelIndex);
+
+  double deletedHeight = this->levels[_level]->height;
   std::vector<EditorItem *> toBeDeleted;
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
@@ -928,7 +945,11 @@ void EditorView::DeleteLevel(int _level)
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
+    {
       (*it)->SetLevel((*it)->GetLevel()-1);
+      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight() - deletedHeight);
+      (*it)->WindowChanged();
+    }
   }
   for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
       it != this->doorList.end(); ++it)
@@ -936,7 +957,11 @@ void EditorView::DeleteLevel(int _level)
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
+    {
       (*it)->SetLevel((*it)->GetLevel()-1);
+      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->DoorChanged();
+    }
   }
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
@@ -944,7 +969,11 @@ void EditorView::DeleteLevel(int _level)
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
+    {
       (*it)->SetLevel((*it)->GetLevel()-1);
+      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->StairsChanged();
+    }
   }
   for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
       it != this->floorList.end(); ++it)
@@ -952,7 +981,11 @@ void EditorView::DeleteLevel(int _level)
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
+    {
       (*it)->SetLevel((*it)->GetLevel()-1);
+      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->FloorChanged();
+    }
   }
   for (std::vector<WallItem *>::iterator it = this->wallList.begin();
       it != this->wallList.end(); ++it)
@@ -960,7 +993,11 @@ void EditorView::DeleteLevel(int _level)
     if ((*it)->GetLevel() == _level)
       toBeDeleted.push_back(*it);
     else if ((*it)->GetLevel() > _level)
+    {
       (*it)->SetLevel((*it)->GetLevel()-1);
+      (*it)->SetLevelBaseHeight((*it)->GetLevelBaseHeight()-deletedHeight);
+      (*it)->WallChanged();
+    }
   }
 
   for (unsigned int i = 0; i < toBeDeleted.size(); ++i)
@@ -975,11 +1012,11 @@ void EditorView::DeleteLevel(int _level)
     {
       delete this->levels[i];
       levelNum = i;
-      break;
     }
     else if (this->levels[i]->level > _level)
     {
       this->levels[i]->level--;
+      this->levels[i]->baseHeight -= deletedHeight;
     }
   }
   this->levels.erase(this->levels.begin() + levelNum);

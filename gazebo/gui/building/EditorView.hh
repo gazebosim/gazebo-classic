@@ -52,6 +52,9 @@ namespace gazebo
       public: std::string name;
 
       /// \brief Level height from ground
+      public: double baseHeight;
+
+      /// \brief Level height
       public: double height;
 
       /// \brief Background pixmap for a level
@@ -245,6 +248,9 @@ namespace gazebo
       /// \brief A counter that holds the total number of levels in the building
       /// model.
       private: int levelCounter;
+
+      /// \brief Default height for levels
+      private: double levelDefaultHeight;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;
