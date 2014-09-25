@@ -19,6 +19,6 @@ include_directories(SYSTEM ${Simbody_INCLUDE_DIR})
 link_directories(${Simbody_LIB_DIR})
 # add_definitions(${Simbody_CFLAGS})
 
-add_executable(responser responser.cc)
+add_executable(responser responser.cc UR10.h UR10.cpp)
 target_link_libraries(responser ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} pthread ${Simbody_LIBRARIES})
 
