@@ -70,6 +70,10 @@ namespace gazebo
       /// \param[in] _pos Start position of the measure in pixel coordinates.
       private: void DrawMeasure(const QPoint &_pos);
 
+      /// \brief Refresh the distance displayed on the scene
+      /// \param[in] _distance Distance in meters
+      public: void RefreshDistance(double _distance);
+
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
 

@@ -20,7 +20,6 @@
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/building/PolylineItem.hh"
-#include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,11 +46,18 @@ namespace gazebo
       /// \brief Destructor
       public: ~MeasureItem();
 
+      // Documentation inherited
+      private: virtual void paint(QPainter *_painter,
+          const QStyleOptionGraphicsItem *_option, QWidget *_widget);
+
       /// \brief Get distance between end points
       public: double GetDistance();
 
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
+      /// \brief Set value in meters
+      public: void SetValue(double _value);
+
+      /// \brief Value measured in meters.
+      private: double value;
     };
     /// \}
   }

@@ -33,8 +33,11 @@ MeasureItem::MeasureItem(const QPointF &_start, const QPointF &_end)
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
 
-  this->SetThickness(10);
+  // Main line (polyline)
+  this->SetThickness(3);
   this->SetColor(QColor(247, 142, 30));
+
+  this->value = 0;
 }
 
 /////////////////////////////////////////////////
@@ -43,9 +46,77 @@ MeasureItem::~MeasureItem()
 }
 
 /////////////////////////////////////////////////
+void MeasureItem::paint(QPainter *_painter,
+    const QStyleOptionGraphicsItem */*_option*/, QWidget */*_widget*/)
+{
+  LineSegmentItem *segment = this->GetSegment(0);
+  QPointF p1 = segment->line().p1();
+  QPointF p2 = segment->line().p2();
+  QLineF line(p1, p2);
+  double PI = acos(-1);
+  double angle = line.angle()*PI/180.0;
+
+  QPen measurePen;
+  measurePen.setStyle(Qt::SolidLine);
+  measurePen.setColor(QColor(247, 142, 30));
+  double tipLength = 10;
+  measurePen.setWidth(3);
+  _painter->setPen(measurePen);
+
+  // End tips
+  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+PI/2),
+                             p1.y()-tipLength*qSin(angle+PI/2)),
+                     QPointF(p1.x()-tipLength*qCos(angle+PI/2),
+                             p1.y()+tipLength*qSin(angle+PI/2)));
+
+  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+PI/2),
+                             p2.y()-tipLength*qSin(angle+PI/2)),
+                     QPointF(p2.x()-tipLength*qCos(angle+PI/2),
+                             p2.y()+tipLength*qSin(angle+PI/2)));
+
+  // Value
+  std::ostringstream stream;
+  stream << std::fixed << std::setprecision(4)
+         << this->value << " m";
+
+  double margin = 10;
+  float textWidth = _painter->fontMetrics().width(stream.str().c_str());
+
+  float posX = (p1.x()+p2.x())/2;
+  float posY = (p1.y()+p2.y())/2;
+  double textAngle = angle;
+  if (textAngle > PI)
+    textAngle = textAngle - PI;
+
+  if (textAngle > 0 && textAngle <= PI/2)
+  {
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+PI/2)-textWidth;
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+PI/2);
+  }
+  else if (textAngle > PI/2 && textAngle < PI)
+  {
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-PI/2);
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-PI/2);
+  }
+  else if (textAngle == 0 || textAngle == PI)
+  {
+    posX = (p1.x()+p2.x())/2 - textWidth/2;
+    posY = (p1.y()+p2.y())/2 - margin;
+  }
+
+  _painter->drawText(posX, posY, stream.str().c_str());
+}
+
+/////////////////////////////////////////////////
 double MeasureItem::GetDistance()
 {
   LineSegmentItem *segment = this->GetSegment(0);
 
   return segment->line().length();
+}
+
+/////////////////////////////////////////////////
+void MeasureItem::SetValue(double _value)
+{
+  this->value = _value;
 }

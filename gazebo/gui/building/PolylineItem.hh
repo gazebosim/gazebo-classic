@@ -183,7 +183,7 @@ namespace gazebo
       /// \param[in] _painter Qt painter object.
       /// \param[in] _option Qt style options for the item.
       /// \param[in] _widget Qt widget being painted on.
-      private: void paint(QPainter *_painter,
+      private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       /// \brief Draw bounding box

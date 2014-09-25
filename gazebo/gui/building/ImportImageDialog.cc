@@ -168,6 +168,7 @@ void ImportImageDialog::OnChangeDistance(double _distance)
                            this->importImageView->imageWidthPx /
                            this->importImageView->pixmapWidthPx;
     this->resolutionSpin->setValue(distanceImage / _distance);
+    this->importImageView->RefreshDistance(_distance);
 }
 
 /////////////////////////////////////////////////

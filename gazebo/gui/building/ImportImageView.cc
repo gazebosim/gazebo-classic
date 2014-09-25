@@ -228,6 +228,7 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     QPointF pointEnd = pointStart + QPointF(1, 0);
 
     this->measureItem = new MeasureItem(pointStart, pointEnd);
+    this->measureItem->SetValue(this->parent->distanceSpin->value());
     this->scene()->addItem(this->measureItem);
     this->currentMouseItem = this->measureItem;
     this->drawInProgress = true;
@@ -264,4 +265,11 @@ void ImportImageView::DrawMeasure(const QPoint &_pos)
     this->parent->distanceSpin->selectAll();
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
   }
+}
+
+/////////////////////////////////////////////////
+void ImportImageView::RefreshDistance(double _distance)
+{
+  this->measureItem->SetValue(_distance);
+  this->scene()->update();
 }
