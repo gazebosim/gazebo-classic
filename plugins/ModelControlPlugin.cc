@@ -51,6 +51,8 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
 
   GZ_ASSERT(_sdf, "ModelControlPlugin _sdf pointer is NULL");
 
+  this->targetModel = this->world->GetModel("box");
+
   this->joints = this->model->GetJoints();
   this->links = this->model->GetLinks();
   /*
@@ -113,7 +115,7 @@ void ModelControlPlugin::OnControlResponse(ConstControlResponsePtr &_msg)
   }
   
   {
-    // continue simulation
+    // signal to continue simulation
     boost::mutex::scoped_lock lock(this->mutex);
     this->delayCondition.notify_one();
   }
@@ -142,7 +144,8 @@ void ModelControlPlugin::PubControlRequest()
     req.add_joint_pos(this->joints[i]->GetAngle(0).Radian());
     req.add_joint_vel(this->joints[i]->GetVelocity(0));
   }
-  gazebo::msgs::Set(req.mutable_target_pos(), gazebo::math::Vector3(0, 0, 1.5));
+  gazebo::msgs::Set(req.mutable_target_pos(),
+    this->targetModel->GetWorldPose().pos);
 
   this->pubControlRequest->Publish(req);
 }
@@ -150,30 +153,24 @@ void ModelControlPlugin::PubControlRequest()
 /////////////////////////////////////////////////
 void ModelControlPlugin::OnUpdate()
 {
-  double dt = this->physics->GetMaxStepSize();
-  if (dt < 1e-6)
-    dt = 1e-6;
-
   // call every simulation step
   this->PubControlRequest();
 
   {
     boost::mutex::scoped_lock lock(this->mutex);
-
     // block simulation,
     // wait for a response from responser (task space controller)
     // calculate amount of time to wait based on rules
     boost::system_time timeout = boost::get_system_time();
-    timeout += boost::posix_time::microseconds(1000000);
+    timeout += boost::posix_time::microseconds(1000);
 
-    if (!this->delayCondition.timed_wait(lock, timeout))
+    while (!this->delayCondition.timed_wait(lock, timeout))
     {
+      this->PubControlRequest();
+      // change delay to 1 sec
+      timeout = boost::get_system_time() + boost::posix_time::microseconds(1000000);
       gzerr << "controller synchronization timedout: "
                "delay budget exhausted.\n";
-    }
-    else
-    {
-      // continue sim
     }
   }
 }

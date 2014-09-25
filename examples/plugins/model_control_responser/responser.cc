@@ -79,6 +79,7 @@ class TasksMeasure<T>::Implementation : public Measure_<T>::Implementation {
 public:
     Implementation(const UR10& modelRobot,
                    Vec3 taskPointInEndEffector=Vec3(0,0,0),
+                   // Real proportionalGain=100, double derivativeGain=20) 
                    Real proportionalGain=225, double derivativeGain=30) 
     :   Measure_<T>::Implementation(T(UR10::NumCoords,NaN), 1),
         m_modelRobot(modelRobot),
@@ -86,7 +87,8 @@ public:
         m_taskPointInEndEffector(taskPointInEndEffector),
         m_proportionalGain(proportionalGain),
         m_derivativeGain(derivativeGain),
-        m_dampingGain(1),
+        // m_dampingGain(0),
+        m_dampingGain(0.2),
         m_compensateForGravity(true),
         m_controlTask(true),
         m_endEffectorSensing(false),
@@ -189,7 +191,7 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
     // damping.
     // Gamma = J1T F1 + N1T J1T F2 + N1T N2T (g - c u)
     const Vector& u = ms.getU();
-    const Real c = m_dampingGain/2;
+    const Real c = m_dampingGain;
     tau.setToZero();
     //tau +=   p1.JT(s) * F1 
     //              + p1.NT(s) * (  p2.JT(s) * F2 
@@ -213,6 +215,7 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
 UR10                 m_modelRobot;
 TasksMeasure<Vector> m_modelTasks(m_modelRobot);
 State                m_modelState;
+Visualizer           *m_viz;
 
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
@@ -223,9 +226,11 @@ void cb(ConstControlRequestPtr &_msg)
 
   // get request data
   for (int i=0; i < UR10::NumCoords; ++i) {
+      std::cout << "num coords: " << UR10::NumCoords << "\n";
       const UR10::Coords coord = UR10::Coords(i);
-      m_modelRobot.setJointAngle(m_modelState, coord, _msg->joint_pos(i));
-      m_modelRobot.setJointRate(m_modelState, coord, _msg->joint_vel(i));
+      // skip the world_joint (i+1)
+      m_modelRobot.setJointAngle(m_modelState, coord, _msg->joint_pos(i+1));
+      m_modelRobot.setJointRate(m_modelState, coord, _msg->joint_vel(i+1));
   }
 
   // get target
@@ -241,17 +246,22 @@ void cb(ConstControlRequestPtr &_msg)
   //     m_realRobot.getSampledEndEffectorPos(realState); // get from _msg
   // m_modelRobot.setSampledEndEffectorPos(m_modelState, sensedEEPos);
 
+  // update state
   m_modelRobot.realize(m_modelState, Stage::Velocity);
-  const Vector& tau = m_modelTasks.getValue(m_modelState);
+
+  // update viz
+  m_viz->report(m_modelState);
 
   // compute joint torques
+  const Vector& tau = m_modelTasks.getValue(m_modelState);
 
   // publish joint torques
   gazebo::msgs::ControlResponse res;
 
   res.set_name("response");
   res.clear_torques();
-  for (unsigned int i = 0; i < _msg->joint_pos().size(); ++i)
+  res.add_torques(0); // for the world_joint
+  for (unsigned int i = 0; i < UR10::NumCoords; ++i)
   {
     std::cout << i << " : " << tau[i] << "\n";
     res.add_torques(tau[i]);
@@ -271,6 +281,10 @@ int main(int _argc, char **_argv)
 
   // initialize model state
   m_modelRobot.initialize(m_modelState);
+
+  // visualize
+  m_viz = new Visualizer(m_modelRobot);
+  m_viz->report(m_modelState);
 
   // Listen to Gazebo world_stats topic
   gazebo::transport::SubscriberPtr sub =

@@ -85,7 +85,12 @@ namespace gazebo
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;
 
-    private: boost::condition delayCondition;
+    /// \brief local copy of response
+    private: gazebo::msgs::ControlResponse controlResponse;
+    private: physics::ModelPtr targetModel;
+
+    /// \brief synchronization mechanism
+    private: boost::condition_variable delayCondition;
   };
 }
 #endif
