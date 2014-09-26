@@ -31,7 +31,18 @@
           <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </bullet>
-      <real_time_update_rate>0.000000</real_time_update_rate>
+      <simbody>
+        <accuracy>0.1</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>10</dissipation>
+          <static_friction>0.15</static_friction>
+          <dynamic_friction>0.1</dynamic_friction>
+          <viscous_friction>0.0</viscous_friction>
+        </contact>
+      </simbody>
+      <real_time_update_rate>200.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <!--
@@ -47,7 +58,7 @@
     </include>
 
     <model name="box">
-      <pose>-0.4 0.1 1.0 0 0 0</pose>
+      <pose>0.4 0.1 1.0 0 0 0</pose>
       <link name="link">
         <gravity>0</gravity>
         <inertial>
@@ -66,7 +77,7 @@
           <pose>0 0 0.0 0 0 0</pose>
           <geometry>
             <box>
-              <size>0.1 0.1 0.1</size>
+              <size>0.02 0.02 0.02</size>
             </box>
           </geometry>
           <material>

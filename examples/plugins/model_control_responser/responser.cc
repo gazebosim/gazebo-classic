@@ -78,7 +78,6 @@ class TasksMeasure<T>::Implementation : public Measure_<T>::Implementation {
 public:
     Implementation(const UR10& modelRobot,
                    Vec3 taskPointInEndEffector=Vec3(0,0,0),
-                   // Real proportionalGain=100, double derivativeGain=20) 
                    Real proportionalGain=225, double derivativeGain=30) 
     :   Measure_<T>::Implementation(T(UR10::NumCoords,NaN), 1),
         m_modelRobot(modelRobot),
@@ -86,8 +85,7 @@ public:
         m_taskPointInEndEffector(taskPointInEndEffector),
         m_proportionalGain(proportionalGain),
         m_derivativeGain(derivativeGain),
-        // m_dampingGain(0),
-        m_dampingGain(0.2),
+        m_dampingGain(0.5),
         m_compensateForGravity(true),
         m_controlTask(true),
         m_endEffectorSensing(false),
@@ -172,7 +170,7 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
     p1.findStationLocationAndVelocityInGround(ms,
             TaskSpace::StationTaskIndex(0),
             m_taskPointInEndEffector, x1, x1d);
-    std::cout << "debug x1: " << x1 << " x1d: " <<  x1d << "\n";
+    // std::cout << "debug x1: " << x1 << " x1d: " <<  x1d << "\n";
 
     if (m_endEffectorSensing)
         x1 = m_modelRobot.getSampledEndEffectorPos(ms);
@@ -214,7 +212,7 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
 UR10                 m_modelRobot;
 TasksMeasure<Vector> m_modelTasks(m_modelRobot);
 State                m_modelState;
-// Visualizer           *m_viz;
+Visualizer           *m_viz;
 
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
@@ -222,11 +220,11 @@ void cb(const std::string &_topic, const gazebo::msgs::ControlRequest &_req,
   gazebo::msgs::ControlResponse &_res, bool &_result)
 {
   // Dump the message contents to stdout.
-  std::cout << _req.DebugString();
+  // std::cout << _req.DebugString();
 
   // get request data
   for (int i=0; i < UR10::NumCoords; ++i) {
-      std::cout << "num coords: " << UR10::NumCoords << "\n";
+      // std::cout << "num coords: " << UR10::NumCoords << "\n";
       const UR10::Coords coord = UR10::Coords(i);
       // skip the world_joint (i+1)
       m_modelRobot.setJointAngle(m_modelState, coord, _req.joint_pos(i+1));
@@ -261,7 +259,7 @@ void cb(const std::string &_topic, const gazebo::msgs::ControlRequest &_req,
   _res.add_torques(0); // for the world_joint
   for (unsigned int i = 0; i < UR10::NumCoords; ++i)
   {
-    std::cout << i << " : " << tau[i] << "\n";
+    // std::cout << i << " : " << tau[i] << "\n";
     _res.add_torques(tau[i]);
   }
   _result = true;
@@ -280,8 +278,14 @@ int main(int _argc, char **_argv)
 
   node->Advertise("/ur10/control_request", cb);
 
+  int c = 0;
   // Busy wait loop...replace with your own code as needed.
-  std::cout << "press any key to exit!";
-  getchar();
-  std::cout << "press any key to exit!";
+  while(c != 'q')
+  {
+    std::cout << "press g to toggle gravity";
+    c = getchar();
+    if (c == 'g')
+      m_modelTasks.toggleGravityComp();
+  }
+  std::cout << "exit!";
 }
