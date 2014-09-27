@@ -15,6 +15,7 @@
  *
 */
 
+#include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
@@ -37,6 +38,8 @@ ArrangePlugin::~ArrangePlugin()
 /////////////////////////////////////////////////
 void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_world, "ArrangePlugin world pointer is NULL");
+  GZ_ASSERT(_sdf, "ArrangePlugin sdf pointer is NULL");
   this->world = _world;
   this->sdf = _sdf;
 

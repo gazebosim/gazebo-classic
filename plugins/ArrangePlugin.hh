@@ -91,7 +91,7 @@ namespace gazebo
     /// \brief Initial arrangement name.
     protected: std::string initialArrangementName;
 
-    /// \brief Initial arrangement name.
+    /// \brief Current arrangement name.
     protected: std::string currentArrangementName;
   };
 }
