@@ -15,6 +15,9 @@
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
     + ***Replacement:***  const Link_V &GetLinks() const
 
+1. **gzprop command line tool**
+    + The `gzprop` command line tool outputs a zip file instead of a tarball.
+
 ### Additions
 
 1. **gazebo/msgs/msgs.hh**
