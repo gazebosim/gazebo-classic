@@ -1,5 +1,9 @@
 ## Gazebo 4.0
 
+### Gazebo 4.?.? (2014-??-??)
+1. Added SignalStats class for computing incremental signal statistics.
+    * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
+
 ### Gazebo 4.0.2 (2014-09-23)
 1. Fix and improve mechanism to generate pkgconfig libs
     * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
@@ -19,8 +23,6 @@
 
 ### Gazebo 4.0.0 (2014-08-08)
 
-1. Added SignalStats class for computing incremental signal statistics.
-    * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
 1. Added lcov support to cmake
     * [Pull request #1047](https://bitbucket.org/osrf/gazebo/pull-request/1047)
 1. Fixed memory leak in image conversion
