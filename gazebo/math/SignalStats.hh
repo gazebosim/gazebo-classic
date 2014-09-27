@@ -43,15 +43,15 @@ namespace gazebo
 
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
-      public: virtual double Get() const = 0;
+      public: virtual double Value() const = 0;
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return Short name of the statistical measure.
-      public: virtual std::string GetShortName() const = 0;
+      public: virtual std::string ShortName() const = 0;
 
       /// \brief Get number of data points in measurement.
       /// \return Number of data points in measurement.
-      public: virtual unsigned int GetCount() const;
+      public: virtual unsigned int Count() const;
 
       /// \brief Add a new sample to the statistical measure.
       /// \param[in] _data New signal data point.
@@ -81,11 +81,11 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalMean : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return "Mean"
-      public: virtual std::string GetShortName() const;
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
       public: virtual void InsertData(double _data);
@@ -98,11 +98,11 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalRootMeanSquare : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return "Rms"
-      public: virtual std::string GetShortName() const;
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
       public: virtual void InsertData(double _data);
@@ -116,11 +116,11 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalMaxAbsoluteValue : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return "MaxAbs"
-      public: virtual std::string GetShortName() const;
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
       public: virtual void InsertData(double _data);
@@ -139,13 +139,13 @@ namespace gazebo
 
       /// \brief Get number of data points in first statistic.
       /// \return Number of data points in first statistic.
-      public: unsigned int GetCount() const;
+      public: unsigned int Count() const;
 
       /// \brief Get the current values of each statistical measure,
       /// stored in a map using the short name as the key.
       /// \return Map with short name of each statistic as key
       /// and value of statistic as the value.
-      public: std::map<std::string, double> GetMap() const;
+      public: std::map<std::string, double> Map() const;
 
       /// \brief Add a new sample to the statistical measures.
       /// \param[in] _data New signal data point.

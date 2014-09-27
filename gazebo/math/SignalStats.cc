@@ -34,7 +34,7 @@ SignalStatistic::~SignalStatistic()
 }
 
 //////////////////////////////////////////////////
-unsigned int SignalStatistic::GetCount() const
+unsigned int SignalStatistic::Count() const
 {
   return this->count;
 }
@@ -47,7 +47,7 @@ void SignalStatistic::Reset()
 }
 
 //////////////////////////////////////////////////
-double SignalMean::Get() const
+double SignalMean::Value() const
 {
   if (this->count == 0)
   {
@@ -57,7 +57,7 @@ double SignalMean::Get() const
 }
 
 //////////////////////////////////////////////////
-std::string SignalMean::GetShortName() const
+std::string SignalMean::ShortName() const
 {
   return "Mean";
 }
@@ -70,7 +70,7 @@ void SignalMean::InsertData(double _data)
 }
 
 //////////////////////////////////////////////////
-double SignalRootMeanSquare::Get() const
+double SignalRootMeanSquare::Value() const
 {
   if (this->count == 0)
   {
@@ -80,7 +80,7 @@ double SignalRootMeanSquare::Get() const
 }
 
 //////////////////////////////////////////////////
-std::string SignalRootMeanSquare::GetShortName() const
+std::string SignalRootMeanSquare::ShortName() const
 {
   return "Rms";
 }
@@ -93,13 +93,13 @@ void SignalRootMeanSquare::InsertData(double _data)
 }
 
 //////////////////////////////////////////////////
-double SignalMaxAbsoluteValue::Get() const
+double SignalMaxAbsoluteValue::Value() const
 {
   return this->data;
 }
 
 //////////////////////////////////////////////////
-std::string SignalMaxAbsoluteValue::GetShortName() const
+std::string SignalMaxAbsoluteValue::ShortName() const
 {
   return "MaxAbs";
 }
@@ -126,25 +126,25 @@ SignalStats::~SignalStats()
 }
 
 //////////////////////////////////////////////////
-unsigned int SignalStats::GetCount() const
+unsigned int SignalStats::Count() const
 {
   unsigned int count = 0;
   SignalStatistic_V::const_iterator iter = this->stats.begin();
   if (iter != this->stats.end())
   {
-    count = (*iter)->GetCount();
+    count = (*iter)->Count();
   }
   return count;
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, double> SignalStats::GetMap() const
+std::map<std::string, double> SignalStats::Map() const
 {
   std::map<std::string, double> map;
   for (SignalStatistic_V::const_iterator iter = this->stats.begin();
        iter != this->stats.end(); ++iter)
   {
-    map[(*iter)->GetShortName()] = (*iter)->Get();
+    map[(*iter)->ShortName()] = (*iter)->Value();
   }
   return map;
 }
@@ -164,7 +164,7 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 {
   // Check if the statistic is already inserted
   {
-    std::map<std::string, double> map = this->GetMap();
+    std::map<std::string, double> map = this->Map();
     if (map.find(_name) != map.end())
     {
       return false;
