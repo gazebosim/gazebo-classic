@@ -309,7 +309,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   double velocityMagnitude = 1.0;
-  double maxForce = velocityMagnitude / dt * 10.1;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
   velocities.push_back(0.0);
@@ -321,16 +320,10 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     double vel = *iter;
     _joint->SetVelocity(_index, vel);
 
-    // ODE requires maxForce to be non-zero for SetVelocity to work
-    // See issue #964 for discussion of consistent API
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
-
-    // Take a step and verify that Joint::GetVelocity returns the same value
-    world->Step(1);
+    // Verify that Joint::GetVelocity returns the same value
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
 
-    // Take more steps and verify that it keeps spinning at same speed
+    // Take some steps and verify that it keeps spinning at same speed
     world->Step(50);
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
@@ -396,8 +389,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     math::Angle limit = math::Angle(steps * dt * vel * 0.5);
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
     world->Step(steps);
     EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
@@ -415,8 +406,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     math::Angle limit = math::Angle(steps * dt * vel * 0.5);
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
     world->Step(steps);
     EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);

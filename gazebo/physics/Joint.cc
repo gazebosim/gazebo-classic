@@ -424,7 +424,6 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   this->staticAngle.SetFromRadian(0);
 }
@@ -727,7 +726,6 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
     this->SetPosition(i, _state.GetAngle(i).Radian());

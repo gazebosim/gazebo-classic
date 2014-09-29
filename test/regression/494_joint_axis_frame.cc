@@ -186,7 +186,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   }
 
   double velocityMagnitude = 1.0;
-  double maxForce = velocityMagnitude / dt * 10.1;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
   velocities.push_back(0.0);
@@ -197,14 +196,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     // Use Joint::SetVelocity with different values
     double vel = *iter;
     _joint->SetVelocity(0, vel);
-
-    // ODE requires maxForce to be non-zero for SetVelocity to work
-    // See issue #964 for discussion of consistent API
-    if (isOde)
-    {
-      _joint->SetMaxForce(0, maxForce);
-      world->Step(1);
-    }
 
     // Verify that Joint::GetVelocity returns the same value
     EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
