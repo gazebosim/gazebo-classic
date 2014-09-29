@@ -125,19 +125,19 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
           { deleteBuildingLevel.Disconnect(_subscriber); }
 
-        /// \brief Connect a boost::slot to the change level name signal
+        /// \brief Connect a boost::slot to the update level widget signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr
-                ConnectChangeBuildingLevelName(T _subscriber)
-          { return changeBuildingLevelName.Connect(_subscriber); }
+                ConnectUpdateLevelWidget(T _subscriber)
+          { return updateLevelWidget.Connect(_subscriber); }
 
-        /// \brief Disconnect a boost::slot to the change level name signal
+        /// \brief Disconnect a boost::slot to the update level widget signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeBuildingLevelName(
+        public: static void DisconnectUpdateLevelWidget(
               event::ConnectionPtr _subscriber)
-          { changeBuildingLevelName.Disconnect(_subscriber); }
+          { updateLevelWidget.Disconnect(_subscriber); }
 
         /// \brief Connect a boost::slot to the change zoom signal
         /// \param[in] _subscriber the subscriber to this event
@@ -226,12 +226,12 @@ namespace gazebo
         /// \brief A new level has been added
         public: static event::EventT<void ()> addBuildingLevel;
 
-        /// \brief A new level has been deleted
-        public: static event::EventT<void (int)> deleteBuildingLevel;
+        /// \brief A level has been deleted
+        public: static event::EventT<void ()> deleteBuildingLevel;
 
-        /// \brief The current level name has been changed
+        /// \brief The levels have been changed
         public: static event::EventT<void (int, std::string)>
-            changeBuildingLevelName;
+            updateLevelWidget;
 
         /// \brief The current zoom level has been changed
         public: static event::EventT<void (double)> changeBuildingEditorZoom;

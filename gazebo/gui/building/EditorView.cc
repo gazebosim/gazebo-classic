@@ -65,6 +65,10 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnAddLevel, this)));
 
   this->connections.push_back(
+  gui::editor::Events::ConnectDeleteBuildingLevel(
+    boost::bind(&EditorView::OnDeleteLevel, this)));
+
+  this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
@@ -843,7 +847,7 @@ void EditorView::OnAddLevel()
   newLevel->level = newLevelNum;
   newLevel->height = this->levelDefaultHeight;
   this->levels.push_back(newLevel);
-  emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
+  emit gui::editor::Events::updateLevelWidget(this->currentLevel,
       levelName);
 
   std::vector<WallItem *>::iterator wallIt = this->wallList.begin();
@@ -1022,7 +1026,8 @@ void EditorView::DeleteLevel(int _level)
   this->levels.erase(this->levels.begin() + levelNum);
   this->currentLevel = newLevelIndex;
 
-  gui::editor::Events::deleteBuildingLevel(_level);
+  //gui::editor::Events::deleteBuildingLevel(_level);
+  emit gui::editor::Events::updateLevelWidget(_level, "");
 }
 
 /////////////////////////////////////////////////
@@ -1098,7 +1103,7 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
     this->levels[this->currentLevel]->name = newLevelName;
-    emit gui::editor::Events::changeBuildingLevelName(this->currentLevel,
+    emit gui::editor::Events::updateLevelWidget(this->currentLevel,
         newLevelName);
 }
 
