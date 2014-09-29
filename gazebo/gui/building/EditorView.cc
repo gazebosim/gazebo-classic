@@ -162,7 +162,7 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
   }
 
   QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
-  if (item)
+  if (item && item != this->levels[this->currentLevel]->backgroundPixmap)
   {
     _event->ignore();
     QGraphicsView::contextMenuEvent(_event);

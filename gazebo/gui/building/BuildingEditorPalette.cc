@@ -67,7 +67,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
   // Add a stair button
-  QPushButton *addStairButton = new QPushButton(tr("Add Stair"), this);
+  QPushButton *addStairButton = new QPushButton(tr("Add Stairs"), this);
   addStairButton->setCheckable(true);
   addStairButton->setChecked(false);
   this->brushes.push_back(addStairButton);
@@ -113,7 +113,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   std::stringstream tipsText;
   tipsText << "<font size=3><p><b> Tips: </b></b>"
-      << "<p>Draw Walls: Click/release to start a wall."
+      << "<p>Add Walls: Click/release to start a wall."
       << "<br>Click again to start a new, attached wall.</br>"
       << "<br>Double-click to stop drawing.</br></p>"
       << "<p>Add Window/Doorway: Click/release in Palette, "
@@ -220,11 +220,12 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
 {
-  if (_type.empty())
+  std::string buttonText;
+  for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
+      iter != this->brushes.end(); ++iter)
   {
-    // Uncheck all the buttons
-    for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
-        iter != this->brushes.end(); ++iter)
+    buttonText = (*iter)->text().toUtf8().constData();
+    if (_type.empty() || buttonText.find(_type.substr(1)) == std::string::npos)
     {
       (*iter)->setChecked(false);
     }
