@@ -200,11 +200,17 @@ namespace gazebo
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();
 
+      /// \brief Hide items in the editor to reveal the background
+      private: void OnHideEditorItems();
+
       /// \brief Current draw mode
       private: int drawMode;
 
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
+
+      /// \brief Indicate whether or not the editor items are visible.
+      private: bool elementsVisible;
 
       /// \brief A list of wall items in the scene.
       private: std::vector<WallItem*> wallList;

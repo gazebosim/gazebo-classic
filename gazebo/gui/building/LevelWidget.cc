@@ -26,25 +26,33 @@ using namespace gui;
 LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
 {
   this->setObjectName("levelWidget");
+  this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
   QHBoxLayout *levelLayout = new QHBoxLayout;
   this->levelCounter = 0;
+
+  this->hideEditorItemsButton = new QPushButton("Hide");
+  this->hideEditorItemsButton->setToolTip("Hide elements (H)");
 
   this->levelComboBox = new QComboBox;
   this->levelComboBox->addItem(QString("Level 1"));
   int comboBoxwidth = levelComboBox->minimumSizeHint().width();
   int comboBoxHeight = levelComboBox->minimumSizeHint().height();
-  this->levelComboBox->setMinimumWidth(comboBoxwidth*2.5);
+  this->levelComboBox->setMinimumWidth(comboBoxwidth*3);
   this->levelComboBox->setMinimumHeight(comboBoxHeight);
+  this->setMinimumWidth(comboBoxwidth*5);
 
   QPushButton *deleteLevelButton = new QPushButton("-");
+  deleteLevelButton->setToolTip("Delete this level");
   QPushButton *addLevelButton = new QPushButton("+");
-  this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+  addLevelButton->setToolTip("Add new level");
 
+  levelLayout->addWidget(hideEditorItemsButton);
   levelLayout->addWidget(this->levelComboBox);
   levelLayout->addWidget(deleteLevelButton);
   levelLayout->addWidget(addLevelButton);
 
+  connect(hideEditorItemsButton, SIGNAL(clicked()), this, SLOT(OnHideEditorItems()));
   connect(this->levelComboBox, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnCurrentLevelChanged(int)));
   connect(deleteLevelButton, SIGNAL(clicked()), this, SLOT(OnDeleteLevel()));
@@ -53,6 +61,10 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   this->connections.push_back(
     gui::editor::Events::ConnectUpdateLevelWidget(
     boost::bind(&LevelWidget::OnUpdateLevelWidget, this, _1, _2)));
+
+  this->connections.push_back(
+    gui::editor::Events::ConnectTriggerHideEditorItems(
+    boost::bind(&LevelWidget::OnHideEditorItems, this)));
 
   this->connections.push_back(
     gui::editor::Events::ConnectDiscardBuildingModel(
@@ -82,6 +94,20 @@ void LevelWidget::OnAddLevel()
 void LevelWidget::OnDeleteLevel()
 {
   gui::editor::Events::deleteBuildingLevel();
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnHideEditorItems()
+{
+  if (this->hideEditorItemsButton->text() == QString("Hide"))
+  {
+    this->hideEditorItemsButton->setText("Show");
+  }
+  else
+  {
+    this->hideEditorItemsButton->setText("Hide");
+  }
+  gui::editor::Events::hideEditorItems();
 }
 
 //////////////////////////////////////////////////

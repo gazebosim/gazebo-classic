@@ -125,6 +125,35 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
           { deleteBuildingLevel.Disconnect(_subscriber); }
 
+        /// \brief Connect a boost::slot to the hide editor items signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectHideEditorItems(T _subscriber)
+          { return hideEditorItems.Connect(_subscriber); }
+
+        /// \brief Disconnect a boost::slot to the hide editor items signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectHideEditorItems(
+              event::ConnectionPtr _subscriber)
+          { hideEditorItems.Disconnect(_subscriber); }
+
+        /// \brief Connect a boost::slot to the trigger hide editor items
+        /// signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+            ConnectTriggerHideEditorItems(T _subscriber)
+          { return triggerHideEditorItems.Connect(_subscriber); }
+
+        /// \brief Disconnect a boost::slot to the trigger hide editor items
+        /// signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectTriggerHideEditorItems(
+              event::ConnectionPtr _subscriber)
+          { triggerHideEditorItems.Disconnect(_subscriber); }
+
         /// \brief Connect a boost::slot to the update level widget signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -228,6 +257,12 @@ namespace gazebo
 
         /// \brief A level has been deleted
         public: static event::EventT<void ()> deleteBuildingLevel;
+
+        /// \brief Hide editor items to reveal background
+        public: static event::EventT<void ()> hideEditorItems;
+
+        /// \brief Key pressed to hide editor items to reveal background
+        public: static event::EventT<void ()> triggerHideEditorItems;
 
         /// \brief The levels have been changed
         public: static event::EventT<void (int, std::string)>

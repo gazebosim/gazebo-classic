@@ -43,6 +43,7 @@ EditorView::EditorView(QWidget *_parent)
 
   this->drawMode = NONE;
   this->drawInProgress = false;
+  this->elementsVisible = true;
 
   this->connections.push_back(
   gui::editor::Events::ConnectCreateBuildingEditorItem(
@@ -71,6 +72,10 @@ EditorView::EditorView(QWidget *_parent)
   this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&EditorView::OnChangeLevel, this, _1)));
+
+  this->connections.push_back(
+  gui::editor::Events::ConnectHideEditorItems(
+    boost::bind(&EditorView::OnHideEditorItems, this)));
 
   this->mousePressRotation = 0;
 
@@ -471,6 +476,10 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     this->CancelDrawMode();
     this->releaseKeyboard();
   }
+  else if (_event->key() == Qt::Key_H)
+  {
+    emit gui::editor::Events::triggerHideEditorItems();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -784,6 +793,9 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
   if (this->drawMode == WALL)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
+  if (!this->elementsVisible)
+    emit gui::editor::Events::triggerHideEditorItems();
+
   // this->grabKeyboard();
 }
 
@@ -1045,6 +1057,12 @@ void EditorView::OnChangeLevel(int _level)
   }
 
   this->currentLevel = _level;
+
+  if (!this->elementsVisible)
+  {
+    return;
+  }
+
   for (std::vector<WallItem *>::iterator it = this->wallList.begin();
       it != this->wallList.end(); ++it)
   {
@@ -1147,4 +1165,30 @@ void EditorView::CancelDrawMode()
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
     gui::editor::Events::createBuildingEditorItem(std::string());
   }
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnHideEditorItems()
+{
+  this->elementsVisible = !this->elementsVisible;
+
+  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
+      it != this->wallList.end(); ++it)
+    (*it)->setVisible(this->elementsVisible);
+
+  for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
+      it != this->windowList.end(); ++it)
+    (*it)->setVisible(this->elementsVisible);
+
+  for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
+      it != this->doorList.end(); ++it)
+    (*it)->setVisible(this->elementsVisible);
+
+  for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
+      it != this->stairsList.end(); ++it)
+    (*it)->setVisible(this->elementsVisible);
+
+  for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
+      it != this->floorList.end(); ++it)
+    (*it)->setVisible(this->elementsVisible);
 }
