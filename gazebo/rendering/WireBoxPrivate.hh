@@ -17,6 +17,7 @@
 #ifndef _WIREBOX_PRIVATE_HH_
 #define _WIREBOX_PRIVATE_HH_
 
+#include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/DynamicLines.hh"
 
@@ -27,6 +28,9 @@ namespace gazebo
     /// \brief Private data for the WireBox class
     class WireBoxPrivate
     {
+      /// \brief Copy of bounding box.
+      public: math::Box box;
+
       /// \brief The lines which outline the box.
       public: DynamicLines *lines;
 
