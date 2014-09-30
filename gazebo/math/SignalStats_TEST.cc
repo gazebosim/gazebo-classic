@@ -281,6 +281,7 @@ TEST_F(SignalStatsTest, SignalStats)
   {
     // InsertStatistics
     math::SignalStats stats;
+    EXPECT_FALSE(stats.InsertStatistics(""));
     EXPECT_TRUE(stats.Map().empty());
 
     EXPECT_TRUE(stats.InsertStatistics("MaxAbs,Rms"));

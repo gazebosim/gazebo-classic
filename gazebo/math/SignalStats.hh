@@ -138,6 +138,9 @@ namespace gazebo
       public: ~SignalStats();
 
       /// \brief Get number of data points in first statistic.
+      /// Technically you can have different numbers of data points
+      /// in each statistic if you call InsertStatistic after InsertData,
+      /// but this is not a recommended use case.
       /// \return Number of data points in first statistic.
       public: unsigned int Count() const;
 
@@ -162,7 +165,7 @@ namespace gazebo
       /// been inserted.
       public: bool InsertStatistic(const std::string &_name);
 
-      /// \brief Add a new type of statistic.
+      /// \brief Add multiple statistics.
       /// \param[in] _names Comma-separated list of new statistics.
       /// For example, all statistics could be added with:
       ///  "MaxAbs,Mean,Rms"
@@ -204,7 +207,7 @@ namespace gazebo
       /// been inserted.
       public: bool InsertStatistic(const std::string &_name);
 
-      /// \brief Add a new type of statistic.
+      /// \brief Add multiple statistics.
       /// \param[in] _names Comma-separated list of new statistics.
       /// For example, all statistics could be added with:
       ///  "MaxAbs,Mean,Rms"

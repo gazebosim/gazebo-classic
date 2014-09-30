@@ -107,10 +107,10 @@ std::string SignalMaxAbsoluteValue::ShortName() const
 //////////////////////////////////////////////////
 void SignalMaxAbsoluteValue::InsertData(double _data)
 {
-  double fabsData = fabs(_data);
-  if (fabsData > this->data)
+  double absData = std::abs(_data);
+  if (absData > this->data)
   {
-    this->data = fabsData;
+    this->data = absData;
   }
   this->count++;
 }
@@ -129,10 +129,9 @@ SignalStats::~SignalStats()
 unsigned int SignalStats::Count() const
 {
   unsigned int count = 0;
-  SignalStatistic_V::const_iterator iter = this->stats.begin();
-  if (iter != this->stats.end())
+  if (!this->stats.empty())
   {
-    count = (*iter)->Count();
+    count = this->stats.front()->Count();
   }
   return count;
 }
@@ -167,6 +166,10 @@ bool SignalStats::InsertStatistic(const std::string &_name)
     std::map<std::string, double> map = this->Map();
     if (map.find(_name) != map.end())
     {
+      std::cerr << "Unable to InsertStatistic ["
+                << _name
+                << "] since it has already been inserted."
+                << std::endl;
       return false;
     }
   }
@@ -190,6 +193,10 @@ bool SignalStats::InsertStatistic(const std::string &_name)
   else
   {
     // Unrecognized name string
+    std::cerr << "Unable to InsertStatistic ["
+              << _name
+              << "] since it is an unrecognized name."
+              << std::endl;
     return false;
   }
   return true;
@@ -199,7 +206,12 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 bool SignalStats::InsertStatistics(const std::string &_names)
 {
   if (_names.empty())
+  {
+    std::cerr << "Unable to InsertStatistics "
+              << "since no names were supplied."
+              << std::endl;
     return false;
+  }
 
   bool result = true;
   std::vector<std::string> names;
