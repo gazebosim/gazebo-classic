@@ -39,7 +39,8 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      /// param[in] _start Start position of the measure item in pixel coordinates.
+      /// param[in] _start Start position of the measure item in pixel
+      /// coordinates.
       /// param[in] _end End position of the measure item in pixel coordinates.
       public: MeasureItem(const QPointF &_start, const QPointF &_end);
 

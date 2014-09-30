@@ -200,8 +200,11 @@ namespace gazebo
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();
 
-      /// \brief Hide items in the editor to reveal the background
+      /// \brief Toggle visibility of editor items.
       private: void OnHideEditorItems();
+
+      /// \brief Show current level items if not currently hiding.
+      private: void ShowCurrentLevelItems();
 
       /// \brief Current draw mode
       private: int drawMode;

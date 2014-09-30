@@ -1038,18 +1038,15 @@ void EditorView::DeleteLevel(int _level)
   this->levels.erase(this->levels.begin() + levelNum);
   this->currentLevel = newLevelIndex;
 
-  //gui::editor::Events::deleteBuildingLevel(_level);
   emit gui::editor::Events::updateLevelWidget(_level, "");
 }
 
 /////////////////////////////////////////////////
 void EditorView::OnChangeLevel(int _level)
 {
-  // Hide the current background pixmap
   if (this->levels[this->currentLevel]->backgroundPixmap)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
 
-  // Show the pixmap for the changed level
   if (_level < static_cast<int>(this->levels.size()) &&
       this->levels[_level]->backgroundPixmap)
   {
@@ -1057,53 +1054,7 @@ void EditorView::OnChangeLevel(int _level)
   }
 
   this->currentLevel = _level;
-
-  if (!this->elementsVisible)
-  {
-    return;
-  }
-
-  for (std::vector<WallItem *>::iterator it = this->wallList.begin();
-      it != this->wallList.end(); ++it)
-  {
-    if ((*it)->GetLevel() != _level)
-      (*it)->setVisible(false);
-    else
-      (*it)->setVisible(true);
-  }
-  for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
-      it != this->windowList.end(); ++it)
-  {
-    if ((*it)->GetLevel() != _level)
-      (*it)->setVisible(false);
-    else
-      (*it)->setVisible(true);
-  }
-  for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
-      it != this->doorList.end(); ++it)
-  {
-    if ((*it)->GetLevel() != _level)
-      (*it)->setVisible(false);
-    else
-      (*it)->setVisible(true);
-  }
-  for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
-      it != this->stairsList.end(); ++it)
-  {
-    if ((*it)->GetLevel() != _level && (*it)->GetLevel() != (_level - 1))
-      (*it)->setVisible(false);
-    else
-      (*it)->setVisible(true);
-  }
-  for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
-      it != this->floorList.end(); ++it)
-  {
-    if ((*it)->GetLevel() != _level)
-      (*it)->setVisible(false);
-    else
-      (*it)->setVisible(true);
-  }
-
+  this->ShowCurrentLevelItems();
 }
 
 /////////////////////////////////////////////////
@@ -1172,23 +1123,51 @@ void EditorView::OnHideEditorItems()
 {
   this->elementsVisible = !this->elementsVisible;
 
+  this->ShowCurrentLevelItems();
+}
+
+/////////////////////////////////////////////////
+void EditorView::ShowCurrentLevelItems()
+{
   for (std::vector<WallItem *>::iterator it = this->wallList.begin();
       it != this->wallList.end(); ++it)
-    (*it)->setVisible(this->elementsVisible);
-
+  {
+    if ((*it)->GetLevel() != this->currentLevel)
+      (*it)->setVisible(false);
+    else
+      (*it)->setVisible(this->elementsVisible);
+  }
   for (std::vector<WindowItem *>::iterator it = this->windowList.begin();
       it != this->windowList.end(); ++it)
-    (*it)->setVisible(this->elementsVisible);
-
+  {
+    if ((*it)->GetLevel() != this->currentLevel)
+      (*it)->setVisible(false);
+    else
+      (*it)->setVisible(this->elementsVisible);
+  }
   for (std::vector<DoorItem *>::iterator it = this->doorList.begin();
       it != this->doorList.end(); ++it)
-    (*it)->setVisible(this->elementsVisible);
-
+  {
+    if ((*it)->GetLevel() != this->currentLevel)
+      (*it)->setVisible(false);
+    else
+      (*it)->setVisible(this->elementsVisible);
+  }
   for (std::vector<StairsItem *>::iterator it = this->stairsList.begin();
       it != this->stairsList.end(); ++it)
-    (*it)->setVisible(this->elementsVisible);
-
+  {
+    if ((*it)->GetLevel() != this->currentLevel && (*it)->GetLevel() !=
+        (this->currentLevel - 1))
+      (*it)->setVisible(false);
+    else
+      (*it)->setVisible(this->elementsVisible);
+  }
   for (std::vector<FloorItem *>::iterator it = this->floorList.begin();
       it != this->floorList.end(); ++it)
-    (*it)->setVisible(this->elementsVisible);
+  {
+    if ((*it)->GetLevel() != this->currentLevel)
+      (*it)->setVisible(false);
+    else
+      (*it)->setVisible(this->elementsVisible);
+  }
 }

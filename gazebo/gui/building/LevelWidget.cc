@@ -52,7 +52,8 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   levelLayout->addWidget(deleteLevelButton);
   levelLayout->addWidget(addLevelButton);
 
-  connect(hideEditorItemsButton, SIGNAL(clicked()), this, SLOT(OnHideEditorItems()));
+  connect(hideEditorItemsButton, SIGNAL(clicked()), this,
+      SLOT(OnHideEditorItems()));
   connect(this->levelComboBox, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnCurrentLevelChanged(int)));
   connect(deleteLevelButton, SIGNAL(clicked()), this, SLOT(OnDeleteLevel()));

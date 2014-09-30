@@ -194,7 +194,6 @@ void ImportImageDialog::OnAccept()
 /////////////////////////////////////////////////
 void ImportImageDialog::OnNext()
 {
-
   this->stackedStepLayout->setCurrentIndex(1);
 }
 

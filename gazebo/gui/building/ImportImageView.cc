@@ -20,7 +20,6 @@
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/LineSegmentItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
-//#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/ImportImageView.hh"
 
 using namespace gazebo;
@@ -129,9 +128,9 @@ void ImportImageView::resizeEvent(QResizeEvent *_event)
       if (this->measureItem)
       {
         double scaleWidth = this->imageItem->pixmap().width() /
-            (double)this->pixmapWidthPx;
+            static_cast<double>(this->pixmapWidthPx);
         double scaleHeight = this->imageItem->pixmap().height() /
-            (double)this->pixmapHeightPx;
+            static_cast<double>(this->pixmapHeightPx);
 
         LineSegmentItem *segment = this->measureItem->GetSegment(0);
         QPointF p1 = segment->mapToScene(segment->line().p1());
