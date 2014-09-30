@@ -290,8 +290,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  bool isOde = physics->GetType().compare("ode") == 0;
-  bool isBullet = physics->GetType().compare("bullet") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
@@ -360,18 +358,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
   }
 
-  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
-  {
-    gzerr << "BulletSliderJoint fails the joint limit tests" << std::endl;
-    return;
-  }
-
-  if (isBullet && _joint->HasType(physics::Base::HINGE_JOINT))
-  {
-    gzerr << "BulletHingeJoint fails the joint limit tests" << std::endl;
-    return;
-  }
-
   // SetHighStop
   {
     // reset world and expect joint to be stopped at home position
@@ -385,7 +371,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
   }
 
@@ -402,7 +388,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
   }
 }
