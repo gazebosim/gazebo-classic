@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://table</uri>
+    </include>
+
+    <include>
+      <uri>model://cricket_ball</uri>
+      <pose>0.6 -0.25 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_block_10_2_1cm</uri>
+      <pose>0.4 -0.25 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_10cm</uri>
+      <pose>0.2 -0.25 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_7_5cm</uri>
+      <pose>0 -0.25 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_5cm</uri>
+      <pose>-0.2 -0.25 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://wood_cube_2_5cm</uri>
+      <pose>-0.4 -0.25 1.015 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

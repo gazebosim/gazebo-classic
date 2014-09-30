@@ -27,6 +27,7 @@ set (files
   plane_demo.world
   plugin.world
   polyline.world
+  population.world
   pr2.world
   presentation.world
   pressure_sensor.world

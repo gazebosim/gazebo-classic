@@ -26,6 +26,12 @@
 
 #include <sdf/sdf.hh>
 
+#include <deque>
+#include <list>
+#include <set>
+#include <string>
+#include <vector>
+
 #include "gazebo/sensors/SensorManager.hh"
 #include "gazebo/math/Rand.hh"
 
@@ -43,6 +49,10 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/math/Vector3.hh"
+
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
@@ -59,6 +69,7 @@
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/ContactManager.hh"
+#include "gazebo/physics/Population.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -341,6 +352,13 @@ void World::Init()
 
   util::LogRecord::Instance()->Add(this->GetName(), "state.log",
       boost::bind(&World::OnLog, this, _1));
+
+  // Check if we have to insert an object population.
+  if (this->sdf->HasElement("population"))
+  {
+    Population population(this->sdf, shared_from_this());
+    population.PopulateAll();
+  }
 
   this->initialized = true;
 
