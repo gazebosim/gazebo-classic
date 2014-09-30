@@ -73,10 +73,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->brushes.push_back(addStairButton);
   connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
 
-  // Add a texture button
+  // Add an import image button
   QPushButton *importImageButton = new QPushButton(tr("Import Image"), this);
-  importImageButton->setCheckable(false);
-  importImageButton->setChecked(false);
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
   // Layout to hold the drawing buttons
