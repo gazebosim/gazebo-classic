@@ -283,6 +283,10 @@ namespace gazebo
       public: virtual double GetVelocityLimit(unsigned int _index);
 
       /// \brief Set the velocity of an axis(index).
+      /// In ODE and Bullet, the SetVelocityMaximal function is used to
+      /// set the velocity of the child link relative to the parent.
+      /// In Simbody and DART, this function updates the velocity state,
+      /// which has a recursive effect on the rest of the chain.
       /// \param[in] _index Index of the axis.
       /// \param[in] _vel Velocity.
       public: virtual void SetVelocity(unsigned int _index, double _vel) = 0;
@@ -352,7 +356,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
-      public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
+      public: virtual void SetMaxForce(unsigned int _index, double _force) = 0
+              GAZEBO_DEPRECATED(5.0);
 
       /// \brief Get the max allowed force of an axis(index) when using
       /// Joint::SetVelocity.
@@ -360,7 +365,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
-      public: virtual double GetMaxForce(unsigned int _index) = 0;
+      public: virtual double GetMaxForce(unsigned int _index) = 0
+              GAZEBO_DEPRECATED(5.0);
 
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
@@ -407,7 +413,7 @@ namespace gazebo
       /// \brief Helper function for maximal coordinate solver SetVelocity.
       /// The velocity of the child link of this joint is updated relative
       /// to the current parent velocity.
-      /// It is currently does not act recursively.
+      /// It currently does not act recursively.
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _velocity Velocity to set at this joint.
       /// \return returns true if operation succeeds, 0 if it fails.

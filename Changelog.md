@@ -11,6 +11,9 @@
 1. Added GUI overlay plugins. Users can now write a Gazebo + QT plugin that displays widgets over the render window.
   * [Pull request #1181](https://bitbucket.org/osrf/gazebo/pull-request/1181)
 
+1. Change behavior of Joint::SetVelocity
+  * [Pull request]()
+
 ## Gazebo 4.0
 
 ### Gazebo 4.0.2 (2014-09-23)

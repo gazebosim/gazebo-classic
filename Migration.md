@@ -11,6 +11,9 @@
 
 ### Additions
 
+1. **gazebo/physics/Joint.hh**
+    + bool SetVelocityMaximal(unsigned int, double)
+
 1. **gazebo/physics/Population.hh**
     + ***New class:*** Population
 
