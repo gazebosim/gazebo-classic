@@ -613,7 +613,7 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 //////////////////////////////////////////////////
 bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 {
-  // check if index is inbound
+  // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
     gzerr << "Joint axis index too large.\n";
@@ -720,6 +720,63 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   }
 
   /// \todo:  Set link and joint "velocities" based on change / time
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
+{
+  // check if index is within bounds
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index too large.\n";
+    return false;
+  }
+
+  // Set child link relative to parent for now.
+  // TODO: recursive velocity setting on trees.
+  if (!this->childLink)
+  {
+    gzerr << "SetVelocityMaximal failed for joint ["
+          << this->GetScopedName()
+          << "] since a child link was not found."
+          << std::endl;
+    return false;
+  }
+
+  // only deal with hinge, universal, slider joints for now
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+    math::Vector3 desiredVel;
+    if (this->parentLink)
+    {
+      desiredVel = this->parentLink->GetWorldAngularVel();
+    }
+    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    this->childLink->SetAngularVel(desiredVel);
+
+    // TODO: Should prescribe the linear velocity of the child link if there is an
+    // offset between the child's CG and the joint anchor.
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    math::Vector3 desiredVel;
+    if (this->parentLink)
+    {
+      desiredVel = this->parentLink->GetWorldLinearVel();
+    }
+    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    this->childLink->SetLinearVel(desiredVel);
+  }
+  else
+  {
+    gzerr << "SetVelocityMaximal does not yet support"
+          << " this joint type."
+          << std::endl;
+    return false;
+  }
+
   return true;
 }
 
