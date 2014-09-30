@@ -47,7 +47,14 @@ namespace gazebo
 
       private slots: void OnSelectFile();
       private slots: void OnAccept();
+      private slots: void OnNext();
+      private slots: void OnBack();
       private slots: void OnChangeDistance(double _distance);
+      private slots: void OnChangeResolution(double _resolution);
+
+      private: QStackedLayout *stackedStepLayout;
+      private: QPushButton *nextButton;
+      private: QPushButton *okButton;
 
       private: QLineEdit *fileLineEdit;
       public: QDoubleSpinBox *distanceSpin;

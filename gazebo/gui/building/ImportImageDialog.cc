@@ -55,11 +55,25 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   fileLayout->addWidget(this->fileLineEdit);
   fileLayout->addWidget(fileButton);
 
+  QPushButton *cancelButton1 = new QPushButton(tr("Cancel"));
+  this->nextButton = new QPushButton(tr("Next"));
+  this->nextButton->setEnabled(false);
+  connect(cancelButton1, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(this->nextButton, SIGNAL(clicked()), this, SLOT(OnNext()));
+
+  QHBoxLayout *step1Buttons = new QHBoxLayout;
+  step1Buttons->addWidget(cancelButton1);
+  step1Buttons->addWidget(this->nextButton);
+
   QVBoxLayout *step1Layout = new QVBoxLayout;
   step1Layout->setSpacing(0);
   step1Layout->addWidget(step1Label);
   step1Layout->addLayout(fileLayout);
   step1Layout->addWidget(step1Supports);
+  step1Layout->addLayout(step1Buttons);
+
+  QWidget *step1Widget = new QWidget();
+  step1Widget->setLayout(step1Layout);
 
   // Step 2
   QLabel *step2Label = new QLabel(tr(
@@ -90,34 +104,50 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   this->resolutionSpin->setValue(100);
   this->resolutionSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
   this->resolutionSpin->setReadOnly(true);
+  connect(this->resolutionSpin, SIGNAL(valueChanged(double)), this,
+      SLOT(OnChangeResolution(double)));
 
   QHBoxLayout *resolutionLayout = new QHBoxLayout;
   resolutionLayout->addWidget(new QLabel("Resolution (px/m):"));
   resolutionLayout->addStretch(1);
   resolutionLayout->addWidget(this->resolutionSpin);
 
-  QDialogButtonBox *okCancelButtons = new QDialogButtonBox(
-      QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  this->okButton = new QPushButton(tr("Ok"));
+  this->okButton->setEnabled(false);
+  QPushButton *backButton = new QPushButton(tr("Back"));
+  QPushButton *cancelButton2 = new QPushButton(tr("Cancel"));
 
-  connect(okCancelButtons, SIGNAL(accepted()), this, SLOT(accept()));
-  connect(okCancelButtons, SIGNAL(rejected()), this, SLOT(reject()));
-  connect(this, SIGNAL(accepted()), this, SLOT(OnAccept()));
+  connect(this->okButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
+  connect(backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
+  connect(cancelButton2, SIGNAL(clicked()), this, SLOT(reject()));
+
+  QHBoxLayout *step2Buttons = new QHBoxLayout;
+  step2Buttons->addWidget(backButton);
+  step2Buttons->addWidget(cancelButton2);
+  step2Buttons->addWidget(this->okButton);
 
   QVBoxLayout *step2Layout = new QVBoxLayout;
   step2Layout->addWidget(step2Label);
   step2Layout->addLayout(distanceLayout);
   step2Layout->addLayout(resolutionLayout);
+  step2Layout->addLayout(step2Buttons);
+
+  QWidget *step2Widget = new QWidget();
+  step2Widget->setLayout(step2Layout);
 
   // Left column
+  this->stackedStepLayout = new QStackedLayout;
+  this->stackedStepLayout->addWidget(step1Widget);
+  this->stackedStepLayout->addWidget(step2Widget);
+
   QWidget *leftColumn = new QWidget();
   leftColumn->setSizePolicy(QSizePolicy::Fixed,
                             QSizePolicy::Fixed);
   QVBoxLayout *leftColumnLayout = new QVBoxLayout();
   leftColumn->setLayout(leftColumnLayout);
   leftColumnLayout->addWidget(titleLabel);
-  leftColumnLayout->addLayout(step1Layout);
-  leftColumnLayout->addLayout(step2Layout);
-  leftColumnLayout->addWidget(okCancelButtons);
+  leftColumnLayout->addLayout(this->stackedStepLayout);
 
   // Image view
   this->importImageView = new ImportImageView(this);
@@ -162,6 +192,19 @@ void ImportImageDialog::OnAccept()
 }
 
 /////////////////////////////////////////////////
+void ImportImageDialog::OnNext()
+{
+
+  this->stackedStepLayout->setCurrentIndex(1);
+}
+
+/////////////////////////////////////////////////
+void ImportImageDialog::OnBack()
+{
+  this->stackedStepLayout->setCurrentIndex(0);
+}
+
+/////////////////////////////////////////////////
 void ImportImageDialog::OnSelectFile()
 {
   std::string filename = QFileDialog::getOpenFileName(this,
@@ -172,15 +215,27 @@ void ImportImageDialog::OnSelectFile()
   {
     this->SetFileName(QString::fromStdString(filename));
     this->importImageView->SetImage(filename);
+
+    this->nextButton->setEnabled(true);
   }
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnChangeDistance(double _distance)
 {
-    double distanceImage = this->importImageView->measureScenePx *
-                           this->importImageView->imageWidthPx /
-                           this->importImageView->pixmapWidthPx;
-    this->resolutionSpin->setValue(distanceImage / _distance);
-    this->importImageView->RefreshDistance(_distance);
+  double distanceImage = this->importImageView->measureScenePx *
+                         this->importImageView->imageWidthPx /
+                         this->importImageView->pixmapWidthPx;
+  this->resolutionSpin->setValue(distanceImage / _distance);
+  this->importImageView->RefreshDistance(_distance);
+
+  this->okButton->setEnabled(true);
+}
+
+/////////////////////////////////////////////////
+void ImportImageDialog::OnChangeResolution(double _resolution)
+{
+  // change distance without re-changing resolution
+
+  this->okButton->setEnabled(true);
 }
