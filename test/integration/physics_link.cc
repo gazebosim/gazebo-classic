@@ -119,13 +119,6 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
 
   // check position
   math::Vector3 pos = link->GetWorldPose().pos;
-  if (_physicsEngine.compare("bullet") == 0)
-  {
-    /// \TODO skipping bullet, see issue #1081
-    gzerr << "Bullet seems to be off by one time step (#1081)"
-          << std::endl;
-    time -= dt;
-  }
   EXPECT_EQ(pos0 + time*vel, pos);
 
   // Set velocity to zero
@@ -154,12 +147,6 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_NEAR(vel3.z, 0.0, g_tolerance);
 
   // check rotation
-  if (_physicsEngine.compare("bullet") == 0)
-  {
-    gzerr << "Bullet seems to be off by one time step (#1081)"
-          << std::endl;
-    world->Step(1);
-  }
   math::Vector3 rpy = link->GetWorldPose().rot.GetAsEuler();
   EXPECT_NEAR(rpy.x, 0.0, g_tolerance);
   EXPECT_NEAR(rpy.y, vel2.y*dt, g_tolerance);
