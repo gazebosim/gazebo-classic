@@ -135,6 +135,8 @@ endif()
 gz_install_library(gazebo_physics)
 gz_install_includes("physics" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
+add_subdirectory(plugin)
+
 # unit tests
 set (gtest_sources
   BoxShape_TEST.cc

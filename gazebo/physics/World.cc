@@ -219,6 +219,7 @@ void World::Load(sdf::ElementPtr _sdf, const std::string &_physicsPlugin)
   this->lightPub = this->node->Advertise<msgs::Light>("~/light");
 
   std::string type = this->sdf->GetElement("physics")->Get<std::string>("type");
+
   this->physicsEngine = PhysicsFactory::NewPhysicsEngine(type,
       shared_from_this());
 
@@ -306,7 +307,7 @@ void World::Load(sdf::ElementPtr _sdf, const std::string &_physicsPlugin)
     //   OnPoseChange: if user changes state in gazebo, propagate to engine
     // other useful callse:
     //   step: take a step in simulation
-    this->physicsPlugin->init();
+    this->physicsPlugin->initPhysics();
   }
 }
 
@@ -730,7 +731,7 @@ void World::Fini()
   this->Stop();
   if (this->physicsPlugin)
   {
-    this->physicsPlugin->destroy();
+    this->physicsPlugin->destroyPhysics();
     this->physicsPlugin = NULL;
   }
 
