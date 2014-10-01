@@ -973,8 +973,8 @@ bool SDFCommand::RunImpl()
       return false;
     }
 
-    std::string result = sdf::erbFile(path.string());
-    if (result.empty())
+    std::string result;
+    if (sdf::erbFile(path.string(), result) || result.empty())
     {
       std::cerr << "Unable to ERB parse file[" << path.string() << "]\n";
       return false;
