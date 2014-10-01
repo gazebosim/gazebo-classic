@@ -390,6 +390,21 @@ void Joint::SetEffortLimit(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
+void Joint::SetVelocityLimit(unsigned int _index, double _velocity)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->velocityLimit[_index] = _velocity;
+    return;
+  }
+
+  gzerr << "SetVelocityLimit index["
+        << _index
+        << "] out of range"
+        << std::endl;
+}
+
+//////////////////////////////////////////////////
 double Joint::GetEffortLimit(unsigned int _index)
 {
   if (_index < this->GetAngleCount())

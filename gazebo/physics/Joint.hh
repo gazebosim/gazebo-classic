@@ -282,6 +282,11 @@ namespace gazebo
       /// \return Velocity limit specified in SDF
       public: virtual double GetVelocityLimit(unsigned int _index);
 
+      /// \brief Set the velocity limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _velocity Velocity limit for the axis.
+      public: virtual void SetVelocityLimit(unsigned int _index, double _velocity);
+
       /// \brief Set the velocity of an axis(index).
       /// In ODE and Bullet, the SetVelocityMaximal function is used to
       /// set the velocity of the child link relative to the parent.
