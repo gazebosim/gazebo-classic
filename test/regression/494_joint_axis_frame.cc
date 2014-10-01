@@ -152,8 +152,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  bool isOde = physics->GetType().compare("ode") == 0;
-  double dt = physics->GetMaxStepSize();
 
   // Check that Joint::GetGlobalAxis matches _axis
   EXPECT_EQ(_axis, _joint->GetGlobalAxis(0));

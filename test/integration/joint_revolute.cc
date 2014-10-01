@@ -113,7 +113,6 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  bool isOde = physics->GetType().compare("ode") == 0;
 
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);

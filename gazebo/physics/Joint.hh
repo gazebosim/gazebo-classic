@@ -356,8 +356,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
-      public: virtual void SetMaxForce(unsigned int _index, double _force) = 0
-              GAZEBO_DEPRECATED(5.0);
+      public: virtual void SetMaxForce(unsigned int _index, double _force)
+              GAZEBO_DEPRECATED(5.0) = 0;
 
       /// \brief Get the max allowed force of an axis(index) when using
       /// Joint::SetVelocity.
@@ -365,8 +365,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
-      public: virtual double GetMaxForce(unsigned int _index) = 0
-              GAZEBO_DEPRECATED(5.0);
+      public: virtual double GetMaxForce(unsigned int _index)
+              GAZEBO_DEPRECATED(5.0) = 0;
 
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.

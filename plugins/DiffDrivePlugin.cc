@@ -121,7 +121,4 @@ void DiffDrivePlugin::OnUpdate()
 
   this->leftJoint->SetVelocity(0, leftVelDesired);
   this->rightJoint->SetVelocity(0, rightVelDesired);
-
-  this->leftJoint->SetMaxForce(0, this->torque);
-  this->rightJoint->SetMaxForce(0, this->torque);
 }
