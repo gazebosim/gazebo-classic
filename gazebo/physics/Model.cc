@@ -433,25 +433,29 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
+  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
+       iter != this->plugins.end(); ++iter)
   {
-    (*liter)->ResetPhysicsStates();
+    (*iter)->Reset();
   }
+
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
   }
+}
 
-  // Reset plugins after links and joints,
-  // so that plugins can restore initial conditions
-  for (std::vector<ModelPluginPtr>::iterator iter = this->plugins.begin();
-       iter != this->plugins.end(); ++iter)
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
   {
-    (*iter)->Reset();
+    (*liter)->ResetPhysicsStates();
   }
 }
 

@@ -13,6 +13,12 @@
 
 ## Gazebo 4.0
 
+### Gazebo 4.?.? (2014-??-??)
+1. Add ArrangePlugin for arranging groups of models.
+   Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
+   recursively on all links in model.
+    * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
+
 ### Gazebo 4.0.2 (2014-09-23)
 1. Fix and improve mechanism to generate pkgconfig libs
     * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
