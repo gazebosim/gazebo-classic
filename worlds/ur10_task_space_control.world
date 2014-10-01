@@ -6,7 +6,7 @@
       <ode>
         <solver>
           <type>quick</type>
-          <iters>1000</iters>
+          <iters>50</iters>
           <precon_iters>0</precon_iters>
           <sor>1.000000</sor>
         </solver>
@@ -42,7 +42,7 @@
           <viscous_friction>0.0</viscous_friction>
         </contact>
       </simbody>
-      <real_time_update_rate>200.000000</real_time_update_rate>
+      <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <!--
@@ -56,7 +56,7 @@
     <include>
       <uri>model://ur10_description</uri>
       <plugin name='ign_transport_controller' filename='libModelControlPlugin.so'/>
-      <pose>0 0 0 0 0 0</pose>
+      <pose>0 0 -1 0 0 0</pose>
     </include>
 
     <model name="box">

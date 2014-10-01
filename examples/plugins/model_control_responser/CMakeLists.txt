@@ -28,7 +28,7 @@ link_directories(
 add_executable(responser responser.cc UR10.h UR10.cpp)
 target_link_libraries(responser
   ${IGNITION-TRANSPORT_LIBRARIES}
-  ${GAZEBO_LIBRARIES}
+  gazebo_msgs #${GAZEBO_LIBRARIES}
   ${Boost_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   pthread

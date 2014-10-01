@@ -104,7 +104,7 @@ void ModelControlPlugin::Init()
 /////////////////////////////////////////////////
 void ModelControlPlugin::OnControlResponse(gazebo::msgs::ControlResponse &_msg)
 {
-  gzdbg << "Response: [" << _msg.DebugString() << "]" << std::endl;
+  // gzdbg << "Response: [" << _msg.DebugString() << "]" << std::endl;
 
   // pass response efforts to joints
   for (int i = 0; i < _msg.torques().size(); ++i)
