@@ -296,16 +296,43 @@ void Model::Update()
 void Model::SetJointPosition(
   const std::string &_jointName, double _position, int _index)
 {
-  if (this->jointController)
-    this->jointController->SetJointPosition(_jointName, _position, _index);
+  JointPtr joint = this->GetJoint(_jointName);
+  if (joint)
+  {
+    joint->SetPosition(_index, _position);
+  }
+  else
+  {
+    gzerr << "Joint [" << _jointName << "] not found.\n";
+  }
 }
 
 //////////////////////////////////////////////////
 void Model::SetJointPositions(
     const std::map<std::string, double> &_jointPositions)
 {
-  if (this->jointController)
-    this->jointController->SetJointPositions(_jointPositions);
+  // go through all joints in this model and update each one
+  //   for each joint update, recursively update all children
+  Joint_V::iterator iter;
+  std::map<std::string, double>::const_iterator jiter;
+
+  for (iter = this->joints.begin();
+      iter != this->joints.end(); ++iter)
+  {
+    // First try name without scope, i.e. joint_name
+    jiter = _jointPositions.find((*iter)->GetName());
+
+    if (jiter == _jointPositions.end())
+    {
+      // Second try name with scope, i.e. model_name::joint_name
+      jiter = _jointPositions.find((*iter)->GetScopedName());
+      if (jiter == _jointPositions.end())
+        continue;
+    }
+
+    // assume joint index is 0 (i.e. for multi dof joints, only set first dof)
+    (*iter)->SetPosition(0, jiter->second);
+  }
 }
 
 //////////////////////////////////////////////////
