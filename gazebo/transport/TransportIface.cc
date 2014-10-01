@@ -189,7 +189,6 @@ boost::shared_ptr<msgs::Response> transport::request(
     const std::string &_worldName, const std::string &_request,
     const std::string &_data)
 {
-
   msgs::Request *request = msgs::CreateRequest(_request, _data);
 
   g_requests.push_back(request);
