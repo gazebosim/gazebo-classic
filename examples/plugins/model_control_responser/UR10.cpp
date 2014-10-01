@@ -114,6 +114,7 @@ UR10::UR10()
     Body endEffectorInfo(MassProperties(.1, Vec3(0),
                             UnitInertia::brick(eeHdims)));
 
+/*
     // Geometry
     PolygonalMesh baseMesh, shoulderMesh, upperArmMesh, forearmMesh,
                   wrist1Mesh, wrist2Mesh, wrist3Mesh;
@@ -139,6 +140,7 @@ UR10::UR10()
 
     endEffectorInfo.addDecoration(DecorativeBrick(eeHdims)
                                   .setColor(Purple).setOpacity(.5));
+*/
 
     //--------------------------------------------------------------------------
     //                         Mobilized Bodies

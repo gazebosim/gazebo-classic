@@ -17,7 +17,7 @@
 
 #include <ignition/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/gazebo.hh>
+// #include <gazebo/gazebo.hh>
 
 #include <Simbody.h>
 
@@ -212,7 +212,7 @@ void TasksMeasure<T>::Implementation::calcCachedValueVirtual
 UR10                 m_modelRobot;
 TasksMeasure<Vector> m_modelTasks(m_modelRobot);
 State                m_modelState;
-Visualizer           *m_viz;
+// Visualizer           *m_viz;
 
 /////////////////////////////////////////////////
 // Function is called everytime a message is received.
