@@ -404,6 +404,21 @@ void Joint::SetEffortLimit(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
+void Joint::SetVelocityLimit(unsigned int _index, double _velocity)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->velocityLimit[_index] = _velocity;
+    return;
+  }
+
+  gzerr << "SetVelocityLimit index["
+        << _index
+        << "] out of range"
+        << std::endl;
+}
+
+//////////////////////////////////////////////////
 double Joint::GetEffortLimit(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
@@ -737,9 +752,65 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 }
 
 //////////////////////////////////////////////////
+bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
+{
+  // check if index is within bounds
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index too large.\n";
+    return false;
+  }
+
+  // Set child link relative to parent for now.
+  // TODO: recursive velocity setting on trees.
+  if (!this->childLink)
+  {
+    gzerr << "SetVelocityMaximal failed for joint ["
+          << this->GetScopedName()
+          << "] since a child link was not found."
+          << std::endl;
+    return false;
+  }
+
+  // only deal with hinge, universal, slider joints for now
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+    math::Vector3 desiredVel;
+    if (this->parentLink)
+    {
+      desiredVel = this->parentLink->GetWorldAngularVel();
+    }
+    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    this->childLink->SetAngularVel(desiredVel);
+
+    // TODO: Should prescribe the linear velocity of the child link if there is
+    // an offset between the child's CG and the joint anchor.
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    math::Vector3 desiredVel;
+    if (this->parentLink)
+    {
+      desiredVel = this->parentLink->GetWorldLinearVel();
+    }
+    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    this->childLink->SetLinearVel(desiredVel);
+  }
+  else
+  {
+    gzerr << "SetVelocityMaximal does not yet support"
+          << " this joint type."
+          << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
     this->SetPosition(i, _state.GetAngle(i).Radian());

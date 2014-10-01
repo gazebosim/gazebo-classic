@@ -53,7 +53,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  if (_physicsEngine == "dart")
   {
     gzerr << "Skipping this test for " << _physicsEngine
           << " since it consistently gives"

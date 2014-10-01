@@ -291,7 +291,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   bool isOde = physics->GetType().compare("ode") == 0;
-  bool isBullet = physics->GetType().compare("bullet") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
@@ -309,7 +308,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   double velocityMagnitude = 1.0;
-  double maxForce = velocityMagnitude / dt * 10.1;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
   velocities.push_back(0.0);
@@ -321,32 +319,18 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     double vel = *iter;
     _joint->SetVelocity(_index, vel);
 
-    // ODE requires maxForce to be non-zero for SetVelocity to work
-    // See issue #964 for discussion of consistent API
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
-
-    // Take a step and verify that Joint::GetVelocity returns the same value
-    world->Step(1);
+    // Verify that Joint::GetVelocity returns the same value
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
 
-    // Take more steps and verify that it keeps spinning at same speed
+    // Take some steps and verify that it keeps spinning at same speed
     world->Step(50);
     EXPECT_NEAR(_joint->GetVelocity(_index), vel, g_tolerance);
   }
-  // Set MaxForce to zero to avoid interference with next part of test (#964)
-  if (isOde)
-    _joint->SetMaxForce(_index, 0.0);
 
   // Test SetForce with positive value
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
-    {
-      gzerr << "Bullet is off by one time step (#1081)" << std::endl;
-      world->Step(1);
-    }
     EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
@@ -417,18 +401,6 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
   }
 
-  if (isBullet && _joint->HasType(physics::Base::SLIDER_JOINT))
-  {
-    gzerr << "BulletSliderJoint fails the joint limit tests" << std::endl;
-    return;
-  }
-
-  if (isBullet && _joint->HasType(physics::Base::HINGE_JOINT))
-  {
-    gzerr << "BulletHingeJoint fails the joint limit tests" << std::endl;
-    return;
-  }
-
   // SetHighStop
   {
     // reset world and expect joint to be stopped at home position
@@ -441,10 +413,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     math::Angle limit = math::Angle(steps * dt * vel * 0.5);
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
     world->Step(steps);
-    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
@@ -464,10 +434,8 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     math::Angle limit = math::Angle(steps * dt * vel * 0.5);
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
-    if (isOde)
-      _joint->SetMaxForce(_index, maxForce);
     world->Step(steps);
-    EXPECT_NEAR(limit.Radian(), _joint->GetAngle(_index).Radian(), g_tolerance);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
     {
       boost::any value = _joint->GetParam("lo_stop", _index);
