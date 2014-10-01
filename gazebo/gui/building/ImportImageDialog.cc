@@ -195,12 +195,14 @@ void ImportImageDialog::OnAccept()
 void ImportImageDialog::OnNext()
 {
   this->stackedStepLayout->setCurrentIndex(1);
+  this->importImageView->EnableDrawDistance(true);
 }
 
 /////////////////////////////////////////////////
 void ImportImageDialog::OnBack()
 {
   this->stackedStepLayout->setCurrentIndex(0);
+  this->importImageView->EnableDrawDistance(false);
 }
 
 /////////////////////////////////////////////////

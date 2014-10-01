@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ ImportImageView::ImportImageView(ImportImageDialog *_parent)
   this->noImageText = NULL;
 
   this->measureItem = NULL;
+  this->drawDistanceEnabled = false;
 }
 
 /////////////////////////////////////////////////
@@ -213,6 +214,9 @@ void ImportImageView::mouseReleaseEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void ImportImageView::DrawMeasure(const QPoint &_pos)
 {
+  if (!this->drawDistanceEnabled)
+    return;
+
   if (!this->drawInProgress)
   {
     if (this->measureItem)
@@ -270,4 +274,10 @@ void ImportImageView::RefreshDistance(double _distance)
 {
   this->measureItem->SetValue(_distance);
   this->scene()->update();
+}
+
+/////////////////////////////////////////////////
+void ImportImageView::EnableDrawDistance(bool _enable)
+{
+  this->drawDistanceEnabled = _enable;
 }

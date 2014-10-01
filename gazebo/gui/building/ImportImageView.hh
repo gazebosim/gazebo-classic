@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,8 +54,16 @@ namespace gazebo
       /// \param[in] _filename Name of the image file.
       public: void SetImage(const std::string &_filename);
 
+      /// \brief Refresh the distance displayed on the scene.
+      /// \param[in] _distance Distance in meters.
+      public: void RefreshDistance(double _distance);
+
+      /// \brief Set whether or not it is allowed to draw on the view.
+      /// \param[in] _enable Enable or not.
+      public: void EnableDrawDistance(bool _enable);
+
       /// \brief Qt resize event received when the parent widget changes size.
-      /// \param[in] _event Qt resize event
+      /// \param[in] _event Qt resize event.
       private: void resizeEvent(QResizeEvent *_event);
 
       /// \brief Qt mouse move event.
@@ -70,9 +78,17 @@ namespace gazebo
       /// \param[in] _pos Start position of the measure in pixel coordinates.
       private: void DrawMeasure(const QPoint &_pos);
 
-      /// \brief Refresh the distance displayed on the scene
-      /// \param[in] _distance Distance in meters
-      public: void RefreshDistance(double _distance);
+      /// \brief Width of the pixmap in pixels.
+      public: int pixmapWidthPx;
+
+      /// \brief Height of the pixmap in pixels.
+      public: int pixmapHeightPx;
+
+      /// \brief Width of the image in pixels.
+      public: int imageWidthPx;
+
+      /// \brief Length of the measure on the scene in pixels.
+      public: int measureScenePx;
 
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
@@ -80,42 +96,33 @@ namespace gazebo
       /// \brief A list of gui editor events connected to this view.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Editor item currently attached to the mouse during a drawing
+      /// \brief Editor item currently attached to the mouse during a drawing.
       /// operation.
       private: QGraphicsItem *currentMouseItem;
 
       /// \brief Grid lines drawn on the background of the editor.
       private: GridLines *gridLines;
 
-      /// \brief Currently selected image item
+      /// \brief Currently selected image item.
       private: QGraphicsPixmapItem *imageItem;
 
-      /// \brief Currently selected image pixmap
+      /// \brief Currently selected image pixmap.
       private: QPixmap *imagePixmap;
 
-      /// \brief Text to be dispayed when no image has been selected
+      /// \brief Text to be dispayed when no image has been selected.
       private: QGraphicsTextItem *noImageText;
 
-      /// \brief Text to be dispayed when an invalid file is selected
+      /// \brief Text to be dispayed when an invalid file is selected.
       private: QGraphicsTextItem *invalidImageText;
 
-      /// \brief Text to be dispayed when an invalid file is selected
+      /// \brief Text to be dispayed when an invalid file is selected.
       private: MeasureItem *measureItem;
 
-      /// \brief Parent widget
+      /// \brief Parent widget.
       private: ImportImageDialog *parent;
 
-      /// \brief Width of the pixmap in pixels
-      public: int pixmapWidthPx;
-
-      /// \brief Height of the pixmap in pixels
-      public: int pixmapHeightPx;
-
-      /// \brief Width of the image in pixels
-      public: int imageWidthPx;
-
-      /// \brief Length of the measure on the scene in pixels
-      public: int measureScenePx;
+      /// \brief Indicates if it is allowed to draw on the view or not.
+      private: bool drawDistanceEnabled;
     };
     /// \}
   }

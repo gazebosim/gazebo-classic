@@ -478,7 +478,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   }
   else if (_event->key() == Qt::Key_H)
   {
-    emit gui::editor::Events::triggerHideEditorItems();
+    gui::editor::Events::triggerHideEditorItems();
   }
 }
 
@@ -794,7 +794,7 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
   if (!this->elementsVisible)
-    emit gui::editor::Events::triggerHideEditorItems();
+    gui::editor::Events::triggerHideEditorItems();
 
   // this->grabKeyboard();
 }
@@ -846,6 +846,9 @@ void EditorView::OnAddLevel()
     return;
   }
 
+  if (!this->elementsVisible)
+    gui::editor::Events::triggerHideEditorItems();
+
   if (this->levels[this->currentLevel]->backgroundPixmap)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
 
@@ -859,8 +862,7 @@ void EditorView::OnAddLevel()
   newLevel->level = newLevelNum;
   newLevel->height = this->levelDefaultHeight;
   this->levels.push_back(newLevel);
-  emit gui::editor::Events::updateLevelWidget(this->currentLevel,
-      levelName);
+  gui::editor::Events::updateLevelWidget(this->currentLevel, levelName);
 
   std::vector<WallItem *>::iterator wallIt = this->wallList.begin();
   double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
@@ -1038,7 +1040,7 @@ void EditorView::DeleteLevel(int _level)
   this->levels.erase(this->levels.begin() + levelNum);
   this->currentLevel = newLevelIndex;
 
-  emit gui::editor::Events::updateLevelWidget(_level, "");
+  gui::editor::Events::updateLevelWidget(_level, "");
 }
 
 /////////////////////////////////////////////////
@@ -1068,12 +1070,11 @@ void EditorView::OnOpenLevelInspector()
 void EditorView::OnLevelApply()
 {
   LevelInspectorDialog *dialog =
-     qobject_cast<LevelInspectorDialog *>(QObject::sender());
+      qobject_cast<LevelInspectorDialog *>(QObject::sender());
 
   std::string newLevelName = dialog->GetLevelName();
-    this->levels[this->currentLevel]->name = newLevelName;
-    emit gui::editor::Events::updateLevelWidget(this->currentLevel,
-        newLevelName);
+  this->levels[this->currentLevel]->name = newLevelName;
+  gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
 /////////////////////////////////////////////////

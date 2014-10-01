@@ -43,6 +43,7 @@ namespace gazebo
     /// \brief A convenient structure for storing level information
     class GAZEBO_VISIBLE Level
     {
+      /// \brief Constructor
       public: Level() : backgroundPixmap(NULL) {}
 
       /// \brief Level number
