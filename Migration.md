@@ -12,6 +12,7 @@
 ### Additions
 
 1. **gazebo/physics/Joint.hh**
+    + void SetVelocityLimit(unsigned int, double)
     + bool SetVelocityMaximal(unsigned int, double)
 
 1. **gazebo/physics/Population.hh**
