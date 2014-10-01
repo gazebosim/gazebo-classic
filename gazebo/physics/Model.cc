@@ -313,25 +313,25 @@ void Model::SetJointPositions(
 {
   // go through all joints in this model and update each one
   //   for each joint update, recursively update all children
-  Joint_V::iterator iter;
-  std::map<std::string, double>::const_iterator jiter;
-
-  for (iter = this->joints.begin();
-      iter != this->joints.end(); ++iter)
+  for (std::map<std::string, double>::const_iterator
+       jiter = _jointPositions.begin();
+       jiter != _jointPositions.end();
+       ++jiter)
   {
     // First try name without scope, i.e. joint_name
-    jiter = _jointPositions.find((*iter)->GetName());
+    JointPtr joint = this->GetJoint(jiter->first);
 
-    if (jiter == _jointPositions.end())
+    if (joint)
     {
-      // Second try name with scope, i.e. model_name::joint_name
-      jiter = _jointPositions.find((*iter)->GetScopedName());
-      if (jiter == _jointPositions.end())
-        continue;
+      // assume joint index is 0
+      // FIXME: get index from user for multi dof joints.
+      const unsigned int id = 0;
+      joint->SetPosition(id, jiter->second);
     }
-
-    // assume joint index is 0 (i.e. for multi dof joints, only set first dof)
-    (*iter)->SetPosition(0, jiter->second);
+    else
+    {
+      gzerr << "Joint [" << jiter->first << "] not found.\n";
+    }
   }
 }
 
