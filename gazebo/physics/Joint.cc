@@ -771,8 +771,8 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     desiredVel += _velocity * this->GetGlobalAxis(_index);
     this->childLink->SetAngularVel(desiredVel);
 
-    // TODO: Should prescribe the linear velocity of the child link if there is an
-    // offset between the child's CG and the joint anchor.
+    // TODO: Should prescribe the linear velocity of the child link if there is
+    // an offset between the child's CG and the joint anchor.
   }
   else if (this->HasType(Base::SLIDER_JOINT))
   {
