@@ -2,6 +2,10 @@
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
 
+1. Add ArrangePlugin for arranging groups of models.
+   Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
+   recursively on all links in model.
+    * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
 1. Added ERB parsing to the `gz sdf` command line tool.
     * [Pull request #1182](https://bitbucket.org/osrf/gazebo/pull-request/1182)
 
