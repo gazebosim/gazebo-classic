@@ -44,12 +44,33 @@ namespace gazebo
       /// \brief Publisher of factory messages.
       private: gazebo::transport::PublisherPtr taskPub;
 
+      /// \brief Subscriber to finger contact sensors.
+      private: gazebo::transport::SubscriberPtr contactSub;
+
       /// \brief Number of the current task.
       private: int taskNum;
 
       /// \brief Maximum number tasks.
       /// \sa taskNum
       private: int maxTaskCount;
+
+      private: QGraphicsScene *handScene;
+
+      //TODO: get rid of these const declarations
+      private: const int handImgX = 250;
+      private: const int handImgY = 250;
+
+      private: const char* handImgFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
+
+      private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
+      
+      private: std::vector<transport::SubscriberPtr> contactSubscribers;
+
+      private: YAML::Node finger_points;
+
+      private: void OnFingerContact(ConstContactsPtr &msg);
+
+
     };
 }
 #endif

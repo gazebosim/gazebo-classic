@@ -44,8 +44,24 @@ GUIAratPlugin::GUIAratPlugin()
   QPushButton *button = new QPushButton(tr("Next Test"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
 
+  // Create a QGraphicsView to draw the finger force contacts
+  this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
+  QGraphicsView *handView = new QGraphicsView(handScene);
+
+  // Add the GraphicsView to the layout
+  frameLayout->addWidget(handView);
+
+  // Load the hand image
+  QPixmap* handImg = new QPixmap(QString(handImgFilename));
+  QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(*handImg);
+
+  // Draw the hand on the canvas
+  handScene->addItem(handItem);
+  handScene->update();
+  handView->show();
+
   // Add the button to the frame's layout
-  frameLayout->addWidget(button);
+  //frameLayout->addWidget(button);
 
   // Add frameLayout to the frame
   mainFrame->setLayout(frameLayout);
@@ -60,8 +76,8 @@ GUIAratPlugin::GUIAratPlugin()
   this->setLayout(mainLayout);
 
   // Position and resize this widget
-  this->move(10, 10);
-  this->resize(120, 30);
+  this->move(0, 0);
+  this->resize(handImgX+10, handImgY+10);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
@@ -69,11 +85,32 @@ GUIAratPlugin::GUIAratPlugin()
   this->taskPub = this->node->Advertise<msgs::GzString>("/gazebo/arat/control");
   this->taskNum = 0;
   this->maxTaskCount = 10;
+
+  finger_points = YAML::LoadFile("fingerpts.yaml");
+
+  // Set up an array of subscribers for each contact sensor
+  for(int i = 0; i < 6; i++){
+    std::string topicName = "/gazebo/default/mpl/r"+this->fingerNames[i]+
+                            "/r"+ this->fingerNames[i]+"_contact_sensor";
+    contactSubscribers.push_back(this->node->Subscribe( topicName,
+                                 &GUIAratPlugin::OnFingerContact, this ));
+  }
+
+  
+
+
 }
 
 /////////////////////////////////////////////////
 GUIAratPlugin::~GUIAratPlugin()
 {
+}
+
+void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
+  // Lock
+  // Parse the contact object and get the topic name
+  // Draw on the corresponding spot
+  // Unlock
 }
 
 /////////////////////////////////////////////////
