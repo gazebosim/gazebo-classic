@@ -97,6 +97,17 @@
       <pose>-2.0 250 1.015 0 0 0</pose>
     </include>
 
+    <include>
+      <uri>model://round_tin_base</uri>
+      <pose>-2.2 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://round_tin_top</uri>
+      <pose>-2.4 250 1.015 0 0 0</pose>
+    </include>
+
+
     <plugin name="arrange_plugin" filename="libArrangePlugin.so">
       <model_name>cricket_ball</model_name>
       <model_name>wood_cube_10cm</model_name>
@@ -116,6 +127,9 @@
       <model_name>ball_bearing</model_name>
       <model_name>marble_1_5cm</model_name>
 
+      <model_name>round_tin_top</model_name>
+      <model_name>round_tin_base</model_name>
+
       <initial_arrangement>pinch_2</initial_arrangement>
       <arrangement name="grasp_1">
         <pose model="wood_cube_10cm"> 0.2 -0.34 1.036 0 0 0</pose>
@@ -130,7 +144,9 @@
         <pose model="wood_cube_7_5cm"> 0.2 -0.34 1.035 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_5"> 
-        <pose model="cricket_ball"> 0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
+        <pose model="cricket_ball"> 0.2 -0.34 1.038 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_6">
         <pose model="stone_10_2_5_1cm">0.2 -0.34 1.0475 -1.571074 0 -1.14</pose>
@@ -148,14 +164,19 @@
           <pose model="tube_9_5mm">0.2 -0.34 1.0375 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_4">
-        <pose model="washer">0.2 0 1.385 0 0 0</pose>
+        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
+        <pose model="washer">0.2 0 1.388 0 0 0</pose>
         <pose model="metal_peg_board">0 -0.117 1.035 0 0 -1.571074</pose>
       </arrangement>
       <arrangement name="pinch_1">
-          <pose model="ball_bearing">0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
+        <pose model="ball_bearing">0.2 -0.34 1.038 0 0 0</pose>
       </arrangement>
       <arrangement name="pinch_2">
-          <pose model="marble_1_5cm">0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
+        <pose model="marble_1_5cm">0.2 -0.34 1.038 0 0 0</pose>
       </arrangement>
 
     </plugin>
