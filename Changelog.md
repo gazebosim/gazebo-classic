@@ -8,7 +8,7 @@
     * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
 1. The `gz model` command line tool will output model info using either `-i` for complete info, or `-p` for just the model pose.
     * [Pull request #1212](https://bitbucket.org/osrf/gazebo/pull-request/1212)
-    * [DRCSim Issue #389](https://bitbucket.org/osrf/gazebo/issue/389)
+    * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
