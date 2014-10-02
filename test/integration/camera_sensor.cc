@@ -501,14 +501,17 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     while (imageCount < 1 || imageCount2 < 1)
       common::Time::MSleep(10);
 
-    unsigned int diffMax = 0, diffSum = 0;
-    double diffAvg = 0.0;
-    unsigned int diffMax2 = 0, diffSum2 = 0;
-    double diffAvg2 = 0.0;
-    unsigned int diffMax12 = 0, diffSum12 = 0;
+    unsigned int diffMax12 = 0;
+    unsigned int diffSum12 = 0;
+    unsigned int diffSum = 0;
+    unsigned int diffSum2 = 0;
     double diffAvg12 = 0.0;
-
     {
+      unsigned int diffMax = 0;
+      double diffAvg = 0.0;
+      unsigned int diffMax2 = 0;
+      double diffAvg2 = 0.0;
+
       boost::mutex::scoped_lock lock(mutex);
       this->ImageCompare(img, prevImg, width, height, 3,
                          diffMax, diffSum, diffAvg);

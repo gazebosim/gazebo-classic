@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_RENDERING_DISTORTION_PRIVATE_HH_
 #define _GAZEBO_RENDERING_DISTORTION_PRIVATE_HH_
 
+#include <vector>
+
 #include "gazebo/math/Vector2d.hh"
 
 namespace gazebo

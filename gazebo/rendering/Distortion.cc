@@ -88,11 +88,11 @@ void Distortion::SetCamera(CameraPtr _camera)
   double incrV = 1.0 / texHeight;
 
   // obtain bounds of the distorted image points.
-  math::Vector2d boundA = Distort(math::Vector2d(0, 0),
+  math::Vector2d boundA = this->Distort(math::Vector2d(0, 0),
       this->dataPtr->lensCenter,
       this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
       this->dataPtr->p1, this->dataPtr->p2);
-  math::Vector2d boundB = Distort(math::Vector2d(1, 1),
+  math::Vector2d boundB = this->Distort(math::Vector2d(1, 1),
       this->dataPtr->lensCenter,
       this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
       this->dataPtr->p1, this->dataPtr->p2);
@@ -108,7 +108,7 @@ void Distortion::SetCamera(CameraPtr _camera)
     {
       double u = j*incrV;
       math::Vector2d uv(u, v);
-      math::Vector2d out = Distort(uv, this->dataPtr->lensCenter,
+      math::Vector2d out = this->Distort(uv, this->dataPtr->lensCenter,
           this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
           this->dataPtr->p1, this->dataPtr->p2);
 
@@ -148,21 +148,21 @@ void Distortion::SetCamera(CameraPtr _camera)
         math::Vector2d interpolate(0, 0);
         int sampleSize = 0;
         // left
-        if ( (boundAIdxU + j) != 0 &&
+        if ((boundAIdxU + j) != 0 &&
             !(this->dataPtr->distortionMap[mapIdx-1] == math::Vector2d(-1, -1)))
         {
           interpolate += this->dataPtr->distortionMap[mapIdx-1];
           sampleSize++;
         }
         // right
-        if ( (boundAIdxU + j+1) < texWidth &&
+        if ((boundAIdxU + j+1) < texWidth &&
             !(this->dataPtr->distortionMap[mapIdx+1] == math::Vector2d(-1, -1)))
         {
           interpolate += this->dataPtr->distortionMap[mapIdx+1];
           sampleSize++;
         }
         // top
-        if ( (boundAIdxV + i) != 0)
+        if ((boundAIdxV + i) != 0)
         {
           unsigned int topIdx =
               (boundAIdxV + i-1) * texWidth + boundAIdxU + j;
@@ -174,7 +174,7 @@ void Distortion::SetCamera(CameraPtr _camera)
           }
         }
         // bottom
-        if ( (boundAIdxV + i+1) < texHeight)
+        if ((boundAIdxV + i+1) < texHeight)
         {
           unsigned int bottomIdx =
               (boundAIdxV + i+1) * texWidth + boundAIdxU + j;
@@ -220,7 +220,7 @@ void Distortion::SetCamera(CameraPtr _camera)
   float *pDest = static_cast<float *>(pixelBox.data);
   for (unsigned int i = 0; i < texHeight; ++i)
   {
-    for(unsigned int j = 0; j < texWidth; ++j)
+    for (unsigned int j = 0; j < texWidth; ++j)
     {
       math::Vector2d vec =
           this->dataPtr->distortionMap[i*texWidth+j];
@@ -254,7 +254,7 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
       + normalized.y * normalized.y;
 
   // radial
-  math::Vector3 dist = normalized * ( 1.0 +
+  math::Vector3 dist = normalized * (1.0 +
       _k1 * rSq +
       _k2 * rSq * rSq +
       _k3 * rSq * rSq * rSq);
