@@ -388,8 +388,10 @@ else (build_errors)
             ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}
             ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
           DESTINATION
-	    ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
-	  COMPONENT cmake)
+            ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
+          COMPONENT
+            cmake)
+
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
   # for example, by the Ubuntu overlay (in the gazebo-release repo), to
