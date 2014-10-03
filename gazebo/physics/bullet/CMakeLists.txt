@@ -7,26 +7,30 @@ link_directories(${BULLET_LIBRARY_DIRS})
 add_definitions(${BULLET_CFLAGS})
 
 set (sources
-  BulletPhysics.cc
-  BulletLink.cc
-  BulletCollision.cc
-  BulletMotionState.cc
-  BulletMeshShape.cc
-  BulletJoint.cc
-  BulletHingeJoint.cc
-  BulletSliderJoint.cc
-  BulletUniversalJoint.cc
   BulletBallJoint.cc
-  BulletHinge2Joint.cc
-  BulletScrewJoint.cc
-  BulletRayShape.cc
-  BulletMultiRayShape.cc
+  BulletCollision.cc
   BulletHeightmapShape.cc
+  BulletHinge2Joint.cc
+  BulletHingeJoint.cc
+  BulletJoint.cc
+  BulletLink.cc
+  BulletMesh.cc
+  BulletMeshShape.cc
+  BulletMotionState.cc
+  BulletMultiRayShape.cc
+  BulletPhysics.cc
+  BulletPolylineShape.cc
+  BulletRayShape.cc
+  BulletScrewJoint.cc
+  BulletSliderJoint.cc
+  BulletSurfaceParams.cc
+  BulletUniversalJoint.cc
+  gzBtUniversalConstraint.cc
 )
 
 set (headers
   bullet_inc.h
-  bullet_math.h
+  bullet_math_inc.h
   BulletBallJoint.hh
   BulletBoxShape.hh
   BulletCollision.hh
@@ -36,18 +40,22 @@ set (headers
   BulletHingeJoint.hh
   BulletJoint.hh
   BulletLink.hh
+  BulletMesh.hh
+  BulletMeshShape.hh
   BulletMotionState.hh
   BulletMultiRayShape.hh
   BulletPhysics.hh
   BulletPlaneShape.hh
+  BulletPolylineShape.hh
   BulletRaySensor.hh
   BulletRayShape.hh
   BulletScrewJoint.hh
   BulletSliderJoint.hh
   BulletSphereShape.hh
-  BulletMeshShape.hh
+  BulletSurfaceParams.hh
   BulletTypes.hh
   BulletUniversalJoint.hh
+  gzBtUniversalConstraint.hh
 )
 
 set (gtest_sources
@@ -61,3 +69,4 @@ gz_add_library(gazebo_physics_bullet ${sources})
 target_link_libraries(gazebo_physics_bullet ${BULLET_LIBRARIES})
 
 gz_install_library(gazebo_physics_bullet)
+gz_install_includes("physics/bullet" ${headers})

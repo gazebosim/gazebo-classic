@@ -4,6 +4,7 @@ set (msgs
   axis.proto
   boxgeom.proto
   camerasensor.proto
+  camera_cmd.proto
   collision.proto
   color.proto
   contact.proto
@@ -12,6 +13,7 @@ set (msgs
   cylindergeom.proto
   diagnostics.proto
   factory.proto
+  fluid.proto
   fog.proto
   friction.proto
   geometry.proto
@@ -23,6 +25,7 @@ set (msgs
   gz_string_v.proto
   header.proto
   heightmapgeom.proto
+  hydra.proto
   imagegeom.proto
   image.proto
   image_stamped.proto
@@ -35,6 +38,7 @@ set (msgs
   joint_cmd.proto
   joint_wrench.proto
   joint_wrench_stamped.proto
+  joystick.proto
   laserscan.proto
   laserscan_stamped.proto
   light.proto
@@ -53,6 +57,7 @@ set (msgs
   pid.proto
   plugin.proto
   pointcloud.proto
+  polylinegeom.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto
@@ -78,6 +83,7 @@ set (msgs
   shadows.proto
   sky.proto
   spheregeom.proto
+  spherical_coordinates.proto
   subscribe.proto
   surface.proto
   tactile.proto
@@ -112,6 +118,20 @@ target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRA
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)
 
+###########################################################
+# Append str to a string property of a target.
+# target: string: target name.
+# property: name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# str: string: string to be appended to the property
+macro(my_append_target_property target property str)
+  get_target_property(current_property ${target} ${property})
+  if(NOT current_property) # property non-existent or empty
+      set_target_properties(${target} PROPERTIES GENERATED TRUE ${property} ${str})
+  else()
+      set_target_properties(${target} PROPERTIES ${property} "${current_property} ${str}")
+  endif()
+endmacro(my_append_target_property)
+
 set(PROTO_SRCS)
 set(PROTO_HDRS)
 foreach(FIL ${msgs})
@@ -133,8 +153,14 @@ foreach(FIL ${msgs})
 endforeach()
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
-
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
+# Need to add default visibility to gazebo_msgs
+get_target_property(current_property gazebo_msgs COMPILE_FLAGS)
+if(NOT current_property) # property non-existent or empty
+  set_target_properties(gazebo_msgs PROPERTIES GENERATED TRUE COMPILE_FLAGS "-fvisibility=default")
+else()
+  set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
+endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math

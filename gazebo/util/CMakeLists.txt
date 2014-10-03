@@ -17,6 +17,7 @@ set (headers
   LogRecord.hh
   OpenAL.hh
   UtilTypes.hh
+  system.hh
 )
 
 set (gtest_sources

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -29,11 +30,14 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
 
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/Scene.hh"
 
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -42,15 +46,20 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
 
-
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
+#endif
+
+#ifdef HAVE_OCULUS
+#include "gazebo/gui/OculusWindow.hh"
 #endif
 
 
@@ -76,6 +85,7 @@ MainWindow::MainWindow()
 
   this->inputStepSize = 1;
   this->requestMsg = NULL;
+
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   gui::set_world(this->node->GetTopicNamespace());
@@ -113,6 +123,7 @@ MainWindow::MainWindow()
   splitter->addWidget(this->leftColumn);
   splitter->addWidget(this->renderWidget);
   splitter->addWidget(this->toolsWidget);
+  splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -134,15 +145,17 @@ MainWindow::MainWindow()
   mainLayout->addLayout(centerLayout, 1);
   mainLayout->addWidget(new QSizeGrip(mainWidget), 0,
                         Qt::AlignBottom | Qt::AlignRight);
-
   mainWidget->setLayout(mainLayout);
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
 
-  std::string title = "Gazebo : ";
-  title += gui::get_world();
+  std::string title = "Gazebo";
   this->setWindowIconText(tr(title.c_str()));
   this->setWindowTitle(tr(title.c_str()));
+
+#ifdef HAVE_OCULUS
+  this->oculusWindow = NULL;
+#endif
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -175,6 +188,9 @@ MainWindow::MainWindow()
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
+
+  // Create a pointer to the space navigator interface
+  this->spacenav = new SpaceNav();
 }
 
 /////////////////////////////////////////////////
@@ -186,6 +202,31 @@ MainWindow::~MainWindow()
 void MainWindow::Load()
 {
   this->guiSub = this->node->Subscribe("~/gui", &MainWindow::OnGUI, this, true);
+#ifdef HAVE_OCULUS
+  int oculusAutoLaunch = getINIProperty<int>("oculus.autolaunch", 0);
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
+
+  if (oculusAutoLaunch == 1)
+  {
+    if (!visual.empty())
+    {
+      this->oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+
+      if (this->oculusWindow->CreateCamera())
+        this->oculusWindow->show();
+    }
+    else
+      gzlog << "Oculus: No visual link specified in for attaching the camera. "
+            << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
+
+  // Load the space navigator
+  if (!this->spacenav->Load())
+    gzerr << "Unable to load space navigator\n";
 }
 
 /////////////////////////////////////////////////
@@ -193,13 +234,21 @@ void MainWindow::Init()
 {
   this->renderWidget->show();
 
-  // Set the initial size of the window to 0.75 the desktop size,
-  // with a minimum value of 1024x768.
-  QSize winSize = QApplication::desktop()->size() * 0.75;
-  winSize.setWidth(std::max(1024, winSize.width()));
-  winSize.setHeight(std::max(768, winSize.height()));
+  // Default window size is entire desktop.
+  QSize winSize = QApplication::desktop()->size();
 
-  this->resize(winSize);
+  // Get the size properties from the INI file.
+  int winWidth = getINIProperty<int>("geometry.width", winSize.width());
+  int winHeight = getINIProperty<int>("geometry.height", winSize.height());
+
+  winWidth = winWidth < 0 ? winSize.width() : winWidth;
+  winHeight = winHeight < 0 ? winSize.height() : winHeight;
+
+  // Get the position properties from the INI file.
+  int winXPos = getINIProperty<int>("geometry.x", 0);
+  int winYPos = getINIProperty<int>("geometry.y", 0);
+
+  this->setGeometry(winXPos, winYPos, winWidth, winHeight);
 
   this->worldControlPub =
     this->node->Advertise<msgs::WorldControl>("~/world_control");
@@ -213,6 +262,8 @@ void MainWindow::Init()
   this->newEntitySub = this->node->Subscribe("~/model/info",
       &MainWindow::OnModel, this, true);
 
+  this->lightSub = this->node->Subscribe("~/light", &MainWindow::OnLight, this);
+
   this->statsSub =
     this->node->Subscribe("~/world_stats", &MainWindow::OnStats, this);
 
@@ -223,14 +274,13 @@ void MainWindow::Init()
   this->worldModSub = this->node->Subscribe("/gazebo/world/modify",
                                             &MainWindow::OnWorldModify, this);
 
-  this->requestMsg = msgs::CreateRequest("entity_list");
+  this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
 }
 
 /////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent * /*_event*/)
 {
-  gazebo::stop();
   this->renderWidget->hide();
   this->tabWidget->hide();
   this->toolsWidget->hide();
@@ -238,6 +288,20 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
+
+#ifdef HAVE_OCULUS
+  if (this->oculusWindow)
+  {
+    delete this->oculusWindow;
+    this->oculusWindow = NULL;
+  }
+#endif
+
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -307,6 +371,31 @@ void MainWindow::Import()
     else
       gzerr << "Unable to import mesh[" << filename << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SaveINI()
+{
+  char *home = getenv("HOME");
+  if (!home)
+  {
+    gzerr << "HOME environment variable not found. "
+      "Unable to save configuration file\n";
+    return;
+  }
+
+  boost::filesystem::path path = home;
+  path = path / ".gazebo" / "gui.ini";
+
+  // When/if the configuration gets more complex, create a
+  // configuration manager class so that all key-value pairs are kept
+  // in a centralized place with error checking.
+  setINIProperty("geometry.width", this->width());
+  setINIProperty("geometry.height", this->height());
+  setINIProperty("geometry.x", this->x());
+  setINIProperty("geometry.y", this->y());
+
+  gui::saveINI(path);
 }
 
 /////////////////////////////////////////////////
@@ -394,6 +483,21 @@ void MainWindow::Save()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Create a gzserver clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::About()
 {
   std::string helpTxt;
@@ -410,15 +514,9 @@ void MainWindow::About()
     "<table>"
       "<tr>"
         "<td style='padding-right: 10px;'>Tutorials:</td>"
-        "<td><a href='http://gazebosim.org/wiki/tutorials' "
+        "<td><a href='http://gazebosim.org/tutorials' "
         "style='text-decoration: none; color: #f58113'>"
-        "http://gazebosim.org/wiki/tutorials</a></td>"
-      "</tr>"
-      "<tr>"
-        "<td style='padding-right: 10px;'>User Guide:</td>"
-        "<td><a href='http://gazebosim.org/user_guide' "
-        "style='text-decoration: none; color: #f58113'>"
-        "http://gazebosim.org/user_guide</a></td>"
+        "http://gazebosim.org/tutorials</a></td>"
       "</tr>"
       "<tr>"
         "<td style='padding-right: 10px;'>API:</td>"
@@ -555,6 +653,24 @@ void MainWindow::Scale()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Align()
+{
+  for (unsigned int i = 0 ; i < this->alignActionGroups.size(); ++i)
+  {
+    this->alignActionGroups[i]->setExclusive(false);
+    if (this->alignActionGroups[i]->checkedAction())
+      this->alignActionGroups[i]->checkedAction()->setChecked(false);
+    this->alignActionGroups[i]->setExclusive(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Snap()
+{
+  gui::Events::manipMode("snap");
+}
+
+/////////////////////////////////////////////////
 void MainWindow::CreateBox()
 {
   g_arrowAct->setChecked(true);
@@ -623,15 +739,15 @@ void MainWindow::OnFullScreen(bool _value)
   if (_value)
   {
     this->showFullScreen();
-    this->renderWidget->showFullScreen();
     this->leftColumn->hide();
     this->toolsWidget->hide();
     this->menuBar->hide();
+    this->setContentsMargins(0, 0, 0, 0);
+    this->centralWidget()->layout()->setContentsMargins(0, 0, 0, 0);
   }
   else
   {
     this->showNormal();
-    this->renderWidget->showNormal();
     this->leftColumn->show();
     this->toolsWidget->show();
     this->menuBar->show();
@@ -747,6 +863,37 @@ void MainWindow::Orbit()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::ViewOculus()
+{
+#ifdef HAVE_OCULUS
+  rendering::ScenePtr scene = rendering::get_scene();
+  if (scene->GetOculusCameraCount() != 0)
+  {
+    gzlog << "Oculus camera already exists." << std::endl;
+    return;
+  }
+
+  int oculusX = getINIProperty<int>("oculus.x", 0);
+  int oculusY = getINIProperty<int>("oculus.y", 0);
+  std::string visual = getINIProperty<std::string>("oculus.visual", "");
+
+  if (!visual.empty())
+  {
+    this->oculusWindow = new gui::OculusWindow(
+        oculusX, oculusY, visual);
+
+    if (this->oculusWindow->CreateCamera())
+      this->oculusWindow->show();
+  }
+  else
+  {
+    gzlog << "Oculus: No visual link specified in for attaching the camera. "
+          << "Did you forget to set ~/.gazebo/gui.ini?\n";
+  }
+#endif
+}
+
+/////////////////////////////////////////////////
 void MainWindow::DataLogger()
 {
   gui::DataLogger *dataLogger = new gui::DataLogger(this);
@@ -796,6 +943,14 @@ void MainWindow::CreateActions()
   g_saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
   g_saveAsAct->setStatusTip(tr("Save world to new file"));
   connect(g_saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
+
+  g_saveCfgAct = new QAction(tr("Save &Configuration"), this);
+  g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
+  connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
+
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
@@ -863,6 +1018,7 @@ void MainWindow::CreateActions()
   g_arrowAct->setStatusTip(tr("Move camera"));
   g_arrowAct->setCheckable(true);
   g_arrowAct->setChecked(true);
+  g_arrowAct->setToolTip(tr("Selection Mode (Esc)"));
   connect(g_arrowAct, SIGNAL(triggered()), this, SLOT(Arrow()));
 
   g_translateAct = new QAction(QIcon(":/images/translate.png"),
@@ -1014,6 +1170,13 @@ void MainWindow::CreateActions()
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
 
+  g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
+  g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
+  connect(g_viewOculusAct, SIGNAL(triggered()), this, SLOT(ViewOculus()));
+#ifndef HAVE_OCULUS
+  g_viewOculusAct->setEnabled(false);
+#endif
+
   g_dataLoggerAct = new QAction(tr("&Log Data"), this);
   g_dataLoggerAct->setShortcut(tr("Ctrl+D"));
   g_dataLoggerAct->setStatusTip(tr("Data Logging Utility"));
@@ -1024,6 +1187,97 @@ void MainWindow::CreateActions()
   g_screenshotAct->setStatusTip(tr("Take a screenshot"));
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
+
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
+      tr("Copy (Ctrl + C)"), this);
+  g_copyAct->setStatusTip(tr("Copy Entity"));
+  g_copyAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
+  g_copyAct->setEnabled(false);
+
+  g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
+      tr("Paste (Ctrl + V)"), this);
+  g_pasteAct->setStatusTip(tr("Paste Entity"));
+  g_pasteAct->setCheckable(false);
+  this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
+  g_pasteAct->setEnabled(false);
+
+  g_snapAct = new QAction(QIcon(":/images/magnet.png"),
+      tr("Snap Mode (N)"), this);
+  g_snapAct->setStatusTip(tr("Snap entity"));
+  g_snapAct->setCheckable(true);
+  g_snapAct->setToolTip(tr("Snap Mode"));
+  connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
+
+  // set up align actions and widget
+  QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
+      tr("X Align Min"), this);
+  QAction *xAlignCenter = new QAction(QIcon(":/images/x_center.png"),
+      tr("X Align Center"), this);
+  QAction *xAlignMax = new QAction(QIcon(":/images/x_max.png"),
+      tr("X Align Max"), this);
+  QAction *yAlignMin = new QAction(QIcon(":/images/y_min.png"),
+      tr("Y Align Min"), this);
+  QAction *yAlignCenter = new QAction(QIcon(":/images/y_center.png"),
+      tr("Y Align Center"), this);
+  QAction *yAlignMax = new QAction(QIcon(":/images/y_max.png"),
+      tr("Y Align Max"), this);
+  QAction *zAlignMin = new QAction(QIcon(":/images/z_min.png"),
+      tr("Z Align Min"), this);
+  QAction *zAlignCenter = new QAction(QIcon(":/images/z_center.png"),
+      tr("Z Align Center"), this);
+  QAction *zAlignMax = new QAction(QIcon(":/images/z_max.png"),
+      tr("Z Align Max"), this);
+  this->CreateDisabledIcon(":/images/x_min.png", xAlignMin);
+  this->CreateDisabledIcon(":/images/x_center.png", xAlignCenter);
+  this->CreateDisabledIcon(":/images/x_max.png", xAlignMax);
+  this->CreateDisabledIcon(":/images/y_min.png", yAlignMin);
+  this->CreateDisabledIcon(":/images/y_center.png", yAlignCenter);
+  this->CreateDisabledIcon(":/images/y_max.png", yAlignMax);
+  this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
+  this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
+  this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
+
+  QActionGroup *xAlignActionGroup = new QActionGroup(this);
+  xAlignActionGroup->addAction(xAlignMin);
+  xAlignActionGroup->addAction(xAlignCenter);
+  xAlignActionGroup->addAction(xAlignMax);
+  xAlignActionGroup->setExclusive(true);
+  QActionGroup *yAlignActionGroup = new QActionGroup(this);
+  yAlignActionGroup->addAction(yAlignMin);
+  yAlignActionGroup->addAction(yAlignCenter);
+  yAlignActionGroup->addAction(yAlignMax);
+  yAlignActionGroup->setExclusive(true);
+  QActionGroup *zAlignActionGroup = new QActionGroup(this);
+  zAlignActionGroup->addAction(zAlignMin);
+  zAlignActionGroup->addAction(zAlignCenter);
+  zAlignActionGroup->addAction(zAlignMax);
+  zAlignActionGroup->setExclusive(true);
+  this->alignActionGroups.push_back(xAlignActionGroup);
+  this->alignActionGroups.push_back(yAlignActionGroup);
+  this->alignActionGroups.push_back(zAlignActionGroup);
+
+  AlignWidget *alignWidget = new AlignWidget(this);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MIN, xAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_CENTER,
+      xAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MAX, xAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MIN, yAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_CENTER,
+      yAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MAX, yAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MIN, zAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_CENTER,
+      zAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MAX, zAlignMax);
+  alignWidget->adjustSize();
+  alignWidget->setFixedWidth(alignWidget->width()+5);
+
+  g_alignAct = new QWidgetAction(this);
+  g_alignAct->setCheckable(true);
+  g_alignAct->setDefaultWidget(alignWidget);
+  g_alignAct->setEnabled(false);
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////
@@ -1072,6 +1326,9 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAct);
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
+  fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
+  fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
   this->editMenu = this->menuBar->addMenu(tr("&Edit"));
@@ -1108,6 +1365,8 @@ void MainWindow::CreateMenuBar()
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
+
+  windowMenu->addAction(g_viewOculusAct);
 
 #ifdef HAVE_QWT
   // windowMenu->addAction(g_diagnosticsAct);
@@ -1185,6 +1444,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       math::Pose cam_pose(cam_pose_pos, cam_pose_rot);
 
       cam->SetWorldPose(cam_pose);
+      cam->SetUseSDFPose(true);
     }
 
     if (_msg->camera().has_view_controller())
@@ -1228,33 +1488,44 @@ void MainWindow::OnModel(ConstModelPtr &_msg)
 }
 
 /////////////////////////////////////////////////
+void MainWindow::OnLight(ConstLightPtr &_msg)
+{
+  gui::Events::lightUpdate(*_msg);
+}
+
+/////////////////////////////////////////////////
 void MainWindow::OnResponse(ConstResponsePtr &_msg)
 {
   if (!this->requestMsg || _msg->id() != this->requestMsg->id())
     return;
 
-  msgs::Model_V modelVMsg;
+  msgs::Scene sceneMsg;
 
-  if (_msg->has_type() && _msg->type() == modelVMsg.GetTypeName())
+  if (_msg->has_type() && _msg->type() == sceneMsg.GetTypeName())
   {
-    modelVMsg.ParseFromString(_msg->serialized_data());
+    sceneMsg.ParseFromString(_msg->serialized_data());
 
-    for (int i = 0; i < modelVMsg.models_size(); i++)
+    for (int i = 0; i < sceneMsg.model_size(); ++i)
     {
-      this->entities[modelVMsg.models(i).name()] = modelVMsg.models(i).id();
+      this->entities[sceneMsg.model(i).name()] = sceneMsg.model(i).id();
 
-      for (int j = 0; j < modelVMsg.models(i).link_size(); j++)
+      for (int j = 0; j < sceneMsg.model(i).link_size(); ++j)
       {
-        this->entities[modelVMsg.models(i).link(j).name()] =
-          modelVMsg.models(i).link(j).id();
+        this->entities[sceneMsg.model(i).link(j).name()] =
+          sceneMsg.model(i).link(j).id();
 
-        for (int k = 0; k < modelVMsg.models(i).link(j).collision_size(); k++)
+        for (int k = 0; k < sceneMsg.model(i).link(j).collision_size(); ++k)
         {
-          this->entities[modelVMsg.models(i).link(j).collision(k).name()] =
-            modelVMsg.models(i).link(j).collision(k).id();
+          this->entities[sceneMsg.model(i).link(j).collision(k).name()] =
+            sceneMsg.model(i).link(j).collision(k).id();
         }
       }
-      gui::Events::modelUpdate(modelVMsg.models(i));
+      gui::Events::modelUpdate(sceneMsg.model(i));
+    }
+
+    for (int i = 0; i < sceneMsg.light_size(); ++i)
+    {
+      gui::Events::lightUpdate(sceneMsg.light(i));
     }
   }
 
@@ -1301,11 +1572,21 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   if (_msg->has_create() && _msg->create())
   {
     this->renderWidget->CreateScene(_msg->world_name());
-    this->requestMsg = msgs::CreateRequest("entity_list");
+    this->requestMsg = msgs::CreateRequest("scene_info");
     this->requestPub->Publish(*this->requestMsg);
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned())
+  {
+    if (_msg->cloned())
+    {
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+      gzerr << "Error cloning a world" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1404,9 +1685,11 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 {
   QIcon icon = _act->icon();
   QPixmap pixmap(_pixmap.c_str());
-  QPainter p(&pixmap);
-  p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
-  p.fillRect(pixmap.rect(), QColor(0, 0, 0, 100));
-  icon.addPixmap(pixmap, QIcon::Disabled);
+  QPixmap disabledPixmap(pixmap.size());
+  disabledPixmap.fill(Qt::transparent);
+  QPainter p(&disabledPixmap);
+  p.setOpacity(0.4);
+  p.drawPixmap(0, 0, pixmap);
+  icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
 }

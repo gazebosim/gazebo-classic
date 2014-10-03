@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,6 +169,7 @@ TEST_P(SurfaceTest, CollideWithoutContact)
 }
 
 // This test doesn't yet work in bullet, so we'll declare it only for ode.
+// Issue #1038
 // INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
 INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
 

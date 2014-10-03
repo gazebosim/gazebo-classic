@@ -21,12 +21,14 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
+      server_fixture
       )
 
 
     target_link_libraries(${BINARY_NAME}
       libgtest.a
       libgtest_main.a
+      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
       gazebo_common
       gazebo_math
       gazebo_physics

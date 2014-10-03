@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
@@ -286,7 +287,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-3, 0, 0.5), math::Quaternion(0, 0, 0));
+  math::Pose rx2Pose(math::Vector3(-2, 0, 0.5), math::Quaternion(0, 0, 0));
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
@@ -300,7 +301,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.5),
+  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
       math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
@@ -392,6 +393,19 @@ TEST_P(TransceiverTest, EmptyWorld)
 /////////////////////////////////////////////////
 TEST_P(TransceiverTest, Obstacle)
 {
+  if (std::string(GetParam()) == "simbody")
+  {
+    gzerr << "Abort test since this test frequently fails with simbody, "
+          << " see (issues #867)" << std::endl;
+    return;
+  }
+  if (std::string(GetParam()) == "dart")
+  {
+    gzerr << "Abort test since this test frequently fails with dart, "
+          << " see (issues #911)" << std::endl;
+    return;
+  }
+
   TxRxObstacle(GetParam());
 }
 
@@ -402,14 +416,8 @@ TEST_P(TransceiverTest, FreqOutOfBounds)
 }
 
 /////////////////////////////////////////////////
-INSTANTIATE_TEST_CASE_P(TestTransceiverODE, TransceiverTest,
-    ::testing::Values("ode"));
-
-/////////////////////////////////////////////////
-#ifdef HAVE_BULLET
-INSTANTIATE_TEST_CASE_P(TestTransceiverBullet, TransceiverTest,
-    ::testing::Values("bullet"));
-#endif  // HAVE_BULLET
+INSTANTIATE_TEST_CASE_P(PhysicsEngines, TransceiverTest,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,22 +40,26 @@ void help()
     << "process.\n\n";
 
   std::cerr << "Options:\n"
-  << "  -q [ --quiet ]                Reduce output to stdout.\n"
+  << "  -v [ --version ]              Output version information.\n"
+  << "  --verbose                     Increase the messages written to the "
+  <<                                  "terminal.\n"
   << "  -h [ --help ]                 Produce this help message.\n"
   << "  -u [ --pause ]                Start the server in a paused state.\n"
   << "  -e [ --physics ] arg          Specify a physics engine "
-  << "(ode|bullet|simbody).\n"
+  << "(ode|bullet|dart|simbody).\n"
   << "  -p [ --play ] arg             Play a log file.\n"
   << "  -r [ --record ]               Record state data.\n"
   << "  --record_encoding arg (=zlib) Compression encoding format for log "
   << "data \n"
   << "                                (zlib|bz2|txt).\n"
   << "  --record_path arg             Absolute path in which to store "
-  << "state data\n"
+  << "state data.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
-  << "  --minimal_comms               Reduce the messages output by gzserver\n"
-  << "  -s [ --server-plugin ] arg    Load a plugin.\n\n";
+  << "  --minimal_comms               Reduce the TCP/IP traffic output by "
+  <<                                  "gazebo.\n"
+  << "  -g [ --gui-plugin ] arg       Load a GUI plugin.\n"
+  << "  -s [ --server-plugin ] arg    Load a server plugin.\n\n";
 }
 
 /////////////////////////////////////////////////
@@ -64,8 +68,10 @@ void sig_handler(int /*signo*/)
   sig_killed = true;
   kill(pid1, SIGINT);
   kill(pid2, SIGINT);
-  // wait some time and if not dead, escalate to SIGKILL
-  for (unsigned int i = 0; i < 5; ++i)
+  double sleepSecs = 0.001;
+  double totalWaitSecs = 5.0;
+  // Wait some time and if not dead, escalate to SIGKILL
+  for (unsigned int i = 0; i < (unsigned int)(totalWaitSecs*1/sleepSecs); ++i)
   {
     if (!killed1)
     {
@@ -81,8 +87,8 @@ void sig_handler(int /*signo*/)
     }
     if (killed1 && killed2)
       break;
-    /// @todo: fix hardcoded timeout
-    sleep(1);
+    // Sleep briefly
+    gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
   }
   if (!killed1)
   {
@@ -106,7 +112,9 @@ int main(int _argc, char **_argv)
     return 0;
   }
 
-  if (signal(SIGINT, sig_handler) == SIG_ERR)
+  struct sigaction sigact;
+  sigact.sa_handler = sig_handler;
+  if (sigaction(SIGINT, &sigact, NULL))
   {
     gzerr << "Stopping. Unable to catch SIGINT.\n"
           << " Please visit http://gazebosim.org/support.html for help.\n";
@@ -115,17 +123,39 @@ int main(int _argc, char **_argv)
 
   pid1 = fork();
 
-  char** myargv = new char*[_argc+1];
-  for (int i = 0; i < _argc; ++i)
-    myargv[i] = _argv[i];
-  myargv[_argc] = static_cast<char*>(NULL);
+  char **argvServer = new char*[_argc+1];
+  char **argvClient = new char*[_argc+1];
+  argvServer[0] = const_cast<char*>("gzserver");
+  argvClient[0] = const_cast<char*>("gzclient");
+  for (int i = 1; i < _argc; ++i)
+  {
+    argvServer[i] = _argv[i];
+    argvClient[i] = _argv[i];
+  }
+  argvServer[_argc] = static_cast<char*>(NULL);
+  argvClient[_argc] = static_cast<char*>(NULL);
+
+  // Need to check the return of wait function (8 lines below) to know
+  // what should be returned by the process
+  int returnValue = 0;
 
   if (pid1)
   {
     pid2 = fork();
     if (pid2)
     {
-      pid_t dead_child = wait(&status1);
+      int child_exit_status;
+      pid_t dead_child = wait(&child_exit_status);
+      // WIFEXITED will return zero if the process finished not reaching
+      // return or exit calls.
+      // WEXITSTATUS will check the value of the return function, not being
+      // zero means problems.
+      if ((WIFEXITED(child_exit_status)   == 0) ||
+          (WEXITSTATUS(child_exit_status) != 0))
+        returnValue = -1;
+      else
+        returnValue = 0;
+
       if (dead_child == pid1)
         killed1 = true;
       else if (dead_child == pid2)
@@ -138,7 +168,7 @@ int main(int _argc, char **_argv)
     {
       // gazebo::gui::run(_argc, _argv);
       // gzclient argv
-      execvp("gzclient", myargv);
+      execvp(argvClient[0], argvClient);
     }
   }
   else
@@ -150,10 +180,11 @@ int main(int _argc, char **_argv)
     // server->Fini();
     // delete server;
     // server = NULL;
-    execvp("gzserver", myargv);
+    execvp(argvServer[0], argvServer);
   }
 
-  delete[] myargv;
+  delete[] argvServer;
+  delete[] argvClient;
 
-  return 0;
+  return returnValue;
 }

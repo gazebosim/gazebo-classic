@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -149,70 +149,6 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // Expect at least 50% of specified update rate
   EXPECT_GT(static_cast<double>(hokuyoMsgCount),
               updateRate*(now-then) * 0.5);
-}
-
-/////////////////////////////////////////////////
-/// \brief Reset world a bunch of times and verify that no assertions happen
-/// The assert "SensorManager.cc(479): Took negative time to update a sensor."
-/// has been observed in Jenkins testing.
-TEST_F(Sensor_TEST, ResetWorldStressTest)
-{
-  // Load in a world with lasers
-  Load("worlds/ray_test.world");
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-
-  // get the sensor manager
-  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
-  EXPECT_TRUE(mgr->SensorsInitialized());
-
-  // get the hokuyo sensor
-  sensors::SensorPtr sensor;
-  sensor = mgr->GetSensor("default::hokuyo::link::laser");
-  ASSERT_TRUE(sensor != NULL);
-
-  // set update rate to unlimited
-  double updateRate = 0.0;
-  sensor->SetUpdateRate(updateRate);
-  gzdbg << sensor->GetScopedName() << " loaded with update rate of "
-        << sensor->GetUpdateRate() << " Hz\n";
-
-  g_hokuyoMsgCount = 0;
-
-  // Subscribe to hokuyo laser scan messages
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sceneSub = node->Subscribe(
-      "~/hokuyo/link/laser/scan", &ReceiveHokuyoMsg);
-
-  // Wait for messages to arrive
-  {
-    boost::mutex countMutex;
-    boost::mutex::scoped_lock lock(countMutex);
-    g_countCondition.wait(lock);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
-  }
-
-  EXPECT_GT(g_hokuyoMsgCount, 19u);
-
-  // Send reset world message
-  transport::PublisherPtr worldControlPub =
-    node->Advertise<msgs::WorldControl>("~/world_control");
-
-  // Copied from MainWindow::OnResetWorld
-  msgs::WorldControl msg;
-  msg.mutable_reset()->set_all(true);
-  worldControlPub->Publish(msg);
-
-  common::Time::MSleep(300);
-
-  int i;
-  for (i = 0; i < 20; ++i)
-  {
-    worldControlPub->Publish(msg);
-    gzdbg << "counted " << g_hokuyoMsgCount << " hokuyo messages\n";
-    common::Time::MSleep(200);
-  }
 }
 
 /////////////////////////////////////////////////

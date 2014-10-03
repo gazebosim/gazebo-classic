@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,11 @@
 int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::load(_argc, _argv);
+  gazebo::setupClient(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
   node->Init();
-
-  // Start transport
-  gazebo::transport::run();
 
   // Publish to a Gazebo topic
   gazebo::transport::PublisherPtr pub =
@@ -60,5 +57,5 @@ int main(int _argc, char **_argv)
   }
 
   // Make sure to shut everything down.
-  gazebo::transport::fini();
+  gazebo::shutdown();
 }

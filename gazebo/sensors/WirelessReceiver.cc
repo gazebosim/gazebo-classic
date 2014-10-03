@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
-void WirelessReceiver::UpdateImpl(bool /*_force*/)
+bool WirelessReceiver::UpdateImpl(bool /*_force*/)
 {
   std::string txEssid;
   msgs::WirelessNodes msg;
@@ -134,6 +134,8 @@ void WirelessReceiver::UpdateImpl(bool /*_force*/)
   {
     this->pub->Publish(msg);
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////

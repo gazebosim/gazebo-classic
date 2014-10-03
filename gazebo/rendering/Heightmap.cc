@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
       "Invalid number of terrain divisions (it should be 4 or 16)");
 
   int count = 0;
-  int tileIndex = 0;
   int width = sqrt(_heightmap.size());
   int newWidth = 1 + (width - 1) / sqrt(_n);
 
@@ -188,7 +187,7 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap, int _n,
 
   for (int tileR = 0; tileR < sqrt(_n); ++tileR)
   {
-    tileIndex = tileR * sqrt(_n);
+    int tileIndex = tileR * sqrt(_n);
     for (int row = 0; row < newWidth - 1; ++row)
     {
       for (int tileC = 0; tileC < sqrt(_n); ++tileC)
@@ -296,6 +295,13 @@ void Heightmap::Load()
 
   this->terrainGlobals = new Ogre::TerrainGlobalOptions();
 
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
+
   msgs::Geometry geomMsg;
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
@@ -310,13 +316,12 @@ void Heightmap::Load()
     geomMsg.ParseFromString(response->serialized_data());
 
     // Copy the height data.
+    this->terrainSize = msgs::Convert(geomMsg.heightmap().size());
     this->heights.resize(geomMsg.heightmap().heights().size());
     memcpy(&this->heights[0], geomMsg.heightmap().heights().data(),
         sizeof(this->heights[0])*geomMsg.heightmap().heights().size());
 
     this->dataSize = geomMsg.heightmap().width();
-
-    this->useTerrainPaging = false;
 
     if (geomMsg.heightmap().has_filename())
     {
@@ -378,6 +383,29 @@ void Heightmap::Load()
   this->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
   this->SetupShadows(true);
+
+  if (!this->heights.empty())
+  {
+    UserCameraPtr userCam = this->scene->GetUserCamera(0);
+
+    // Move the camera above the terrain only if the user did not modify the
+    // camera position in the world file
+    if (userCam && !userCam->IsCameraSetInWorldFile())
+    {
+      double h = *std::max_element(
+        &this->heights[0], &this->heights[0] + this->heights.size());
+
+      math::Vector3 camPos(5, -5, h + 200);
+      math::Vector3 lookAt(0, 0, h);
+      math::Vector3 delta = lookAt - camPos;
+
+      double yaw = atan2(delta.y, delta.x);
+      double pitch = atan2(-delta.z,
+                           sqrt(delta.x * delta.x + delta.y * delta.y));
+
+      userCam->SetWorldPose(math::Pose(camPos, math::Vector3(0, pitch, yaw)));
+    }
+  }
 
   if (this->useTerrainPaging)
   {
@@ -451,6 +479,13 @@ void Heightmap::ConfigureTerrainDefaults()
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
   this->terrainGlobals->setCompositeMapDistance(2000);
+
+#if (OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 8) || \
+    OGRE_VERSION_MAJOR > 1
+  // Vertex compression breaks anything, e.g. Gpu laser, that tries to build
+  // a depth map.
+  this->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
+#endif
 
   // Get the first directional light
   LightPtr directionalLight;
@@ -2786,4 +2821,3 @@ GzTerrainMatGen::SM2Profile::ShaderHelperCg::generateFragmentProgram(
 
   return ret;
 }
-

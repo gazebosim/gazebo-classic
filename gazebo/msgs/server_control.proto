@@ -14,4 +14,6 @@ message ServerControl
   optional string open_filename   = 3;
   optional bool new_world         = 4;
   optional bool stop              = 5;
+  optional bool clone             = 6;
+  optional uint32 new_port        = 7;
 }

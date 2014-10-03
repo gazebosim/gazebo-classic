@@ -3,13 +3,13 @@ include_directories(SYSTEM
   ${OGRE_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
 )
 
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
   ${PROJECT_BINARY_DIR}/test
 )
 
@@ -39,6 +39,10 @@ endif()
 if (HAVE_SIMBODY)
   add_dependencies(gazebo_physics_simbody gazebo_msgs)
 endif()
+if(HAVE_DART)
+  add_dependencies(gazebo_physics_dart gazebo_msgs)
+endif()
+
 
 gz_add_executable(gzserver server_main.cc Server.cc Master.cc gazebo.cc)
 gz_add_executable(gazebo gazebo_main.cc Server.cc Master.cc gazebo.cc)
@@ -72,6 +76,8 @@ endif()
 
 gz_install_executable(gzserver)
 gz_install_executable(gazebo)
+manpage(gzserver 1)
+manpage(gazebo 1)
 
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,9 +87,9 @@ BuildingEditorWidget::~BuildingEditorWidget()
 /////////////////////////////////////////////////
 void BuildingEditorWidget::resizeEvent(QResizeEvent *_event)
 {
-  double boundingWidth = std::max(this->minimumWidth, _event->size().width());
+  qreal boundingWidth = std::max(this->minimumWidth, _event->size().width());
   boundingWidth = std::max(boundingWidth, this->scene->sceneRect().width());
-  double boundingHeight = std::max(this->minimumHeight,
+  qreal boundingHeight = std::max(this->minimumHeight,
       _event->size().height());
   boundingHeight = std::max(boundingHeight, this->scene->sceneRect().height());
   this->scene->setSceneRect(-boundingWidth/2, -boundingHeight/2,

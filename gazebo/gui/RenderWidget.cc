@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
@@ -61,6 +62,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   actionGroup->addAction(g_translateAct);
   actionGroup->addAction(g_rotateAct);
   actionGroup->addAction(g_scaleAct);
+  actionGroup->addAction(g_snapAct);
 
   toolbar->addAction(g_arrowAct);
   toolbar->addAction(g_translateAct);
@@ -77,6 +79,28 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolbar->addAction(g_dirLghtCreateAct);
   toolbar->addSeparator();
   toolbar->addAction(g_screenshotAct);
+
+  toolbar->addSeparator();
+  toolbar->addAction(g_copyAct);
+  toolbar->addAction(g_pasteAct);
+
+  toolbar->addSeparator();
+
+  QToolButton *alignButton = new QToolButton;
+  alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+  alignButton->setIcon(QIcon(":/images/align.png"));
+  alignButton->setToolTip(
+      tr("In Selection Mode, hold Ctrl and select 2 objects to align"));
+  alignButton->setArrowType(Qt::NoArrow);
+  QMenu *alignMenu = new QMenu(alignButton);
+  alignMenu->addAction(g_alignAct);
+  alignButton->setMenu(alignMenu);
+  alignButton->setPopupMode(QToolButton::InstantPopup);
+  toolbar->addWidget(alignButton);
+  connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
+
+  toolbar->addSeparator();
+  toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(toolbar);
@@ -104,66 +128,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->bottomFrame->setSizePolicy(QSizePolicy::Expanding,
       QSizePolicy::Minimum);
 
-  QSpinBox *stepSpinBox = new QSpinBox;
-  stepSpinBox->setRange(1, 9999);
-  connect(stepSpinBox, SIGNAL(valueChanged(int)), this,
-      SLOT(OnStepValueChanged(int)));
-
-  QWidget *stepWidget = new QWidget;
-  QLabel *stepLabel = new QLabel(tr("Steps:"));
-  QVBoxLayout *stepLayout = new QVBoxLayout;
-  stepLayout->addWidget(stepLabel);
-  stepLayout->addWidget(stepSpinBox);
-  stepWidget->setLayout(stepLayout);
-
-  QLabel *stepToolBarLabel = new QLabel(tr("Steps:"));
-
-  QMenu *stepMenu = new QMenu;
-  this->stepButton = new QToolButton;
-  this->stepButton->setMaximumSize(35, stepButton->height());
-  QWidgetAction *stepAction = new QWidgetAction(stepMenu);
-  stepAction->setDefaultWidget(stepWidget);
-  stepMenu->addAction(stepAction);
-  this->stepButton->setMenu(stepMenu);
-  this->stepButton->setPopupMode(QToolButton::InstantPopup);
-  this->stepButton->setToolButtonStyle(Qt::ToolButtonTextOnly);
-  this->stepButton->setContentsMargins(0, 0, 0, 0);
-  this->OnStepValueChanged(1);
-
-  connect(stepSpinBox, SIGNAL(editingFinished()), stepMenu,
-      SLOT(hide()));
-
-  QFrame *playFrame = new QFrame;
-  playFrame->setFrameShape(QFrame::NoFrame);
-  playFrame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  playFrame->setFixedHeight(25);
-  QToolBar *playToolbar = new QToolBar;
-  playToolbar->addAction(g_playAct);
-  playToolbar->addAction(g_pauseAct);
-
-  QLabel *emptyLabel = new QLabel(tr("  "));
-  playToolbar->addWidget(emptyLabel);
-  playToolbar->addAction(g_stepAct);
-  playToolbar->addWidget(stepToolBarLabel);
-  playToolbar->addWidget(this->stepButton);
-
-  QHBoxLayout *playControlLayout = new QHBoxLayout;
-  playControlLayout->setContentsMargins(0, 0, 0, 0);
-  playControlLayout->addWidget(playToolbar);
-  playControlLayout->addItem(new QSpacerItem(15, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  playFrame->setLayout(playControlLayout);
-
-  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
-  bottomPanelLayout->addWidget(playFrame, 0);
   bottomPanelLayout->addWidget(timePanel, 0);
-  bottomPanelLayout->addItem(new QSpacerItem(-1, -1, QSizePolicy::Expanding,
-                             QSizePolicy::Minimum));
   bottomPanelLayout->setSpacing(0);
   bottomPanelLayout->setContentsMargins(0, 0, 0, 0);
   this->bottomFrame->setLayout(bottomPanelLayout);
-
 
   QFrame *render3DFrame = new QFrame;
   render3DFrame->setObjectName("render3DFrame");
@@ -205,6 +173,41 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
+
+
+  // Load all GUI Plugins
+  std::string filenames = getINIProperty<std::string>(
+      "overlay_plugins.filenames", "");
+  std::vector<std::string> pluginFilenames;
+
+  // Split the colon separated libraries
+  boost::split(pluginFilenames, filenames, boost::is_any_of(":"));
+
+  // Load each plugin
+  for (std::vector<std::string>::iterator iter = pluginFilenames.begin();
+       iter != pluginFilenames.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if (!(*iter).empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(*iter, *iter);
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << *iter << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << *iter << "]\n";
+
+        // Set the plugin's parent and store the plugin
+        plugin->setParent(this->glWidget);
+        this->plugins.push_back(plugin);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -344,20 +347,6 @@ std::string RenderWidget::GetOverlayMsg() const
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::OnStepValueChanged(int _value)
-{
-  // text formating and resizing for better presentation
-  std::string numStr = QString::number(_value).toStdString();
-  QFont stepFont = this->stepButton->font();
-  stepFont.setPointSizeF(11 - numStr.size()/2.0);
-  this->stepButton->setFont(stepFont);
-  numStr.insert(numStr.end(), 4 - numStr.size(), ' ');
-  this->stepButton->setText(tr(numStr.c_str()));
-
-  emit gui::Events::inputStepSize(_value);
 }
 
 /////////////////////////////////////////////////

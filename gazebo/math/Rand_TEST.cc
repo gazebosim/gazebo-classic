@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,14 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 
+class RandTest : public gazebo::testing::AutoLogFixture { };
+
 //////////////////////////////////////////////////
-TEST(RandTest, Rand)
+TEST_F(RandTest, Rand)
 {
   double d;
   int i;
@@ -50,7 +53,7 @@ TEST(RandTest, Rand)
 }
 
 //////////////////////////////////////////////////
-TEST(RandTest, SetSeed)
+TEST_F(RandTest, SetSeed)
 {
   int N = 10;
   std::vector<int> first;
