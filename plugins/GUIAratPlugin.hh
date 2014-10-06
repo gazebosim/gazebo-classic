@@ -69,6 +69,8 @@ namespace gazebo
       private: YAML::Node finger_points;
 
       private: void OnFingerContact(ConstContactsPtr &msg);
+  
+      private: boost::mutex contactLock;
 
 
     };
