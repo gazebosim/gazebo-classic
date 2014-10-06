@@ -21,6 +21,7 @@
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
+//#include <yaml-cpp/yaml.h>
 
 namespace gazebo
 {
@@ -56,21 +57,28 @@ namespace gazebo
 
       private: QGraphicsScene *handScene;
 
-      //TODO: get rid of these const declarations
+      //TODO: get rid of these const declarations and put in a config file
       private: const int handImgX = 250;
       private: const int handImgY = 250;
 
       private: const char* handImgFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
 
+      private: const int circleSize = 5;
+      private: const unsigned char colorMin[3] = {255, 255, 0};
+      private: const unsigned char colorMax[3] = {255, 0, 0};
       private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
+
+      private: std::string handSide;
       
       private: std::vector<transport::SubscriberPtr> contactSubscribers;
 
-      private: YAML::Node finger_points;
+      //private: YAML::Node finger_points;
+      private: std::map<std::string, std::pair<int, int> > finger_points;
 
       private: void OnFingerContact(ConstContactsPtr &msg);
   
       private: boost::mutex contactLock;
+
 
 
     };

@@ -86,12 +86,32 @@ GUIAratPlugin::GUIAratPlugin()
   this->taskNum = 0;
   this->maxTaskCount = 10;
 
-  finger_points = YAML::LoadFile("fingerpts.yaml");
+  //finger_points = YAML::LoadFile("fingerpts.yaml");
+  std::filebuf fb;
+  fb.open("fingerpts.csv", std::ios::in);
+  std::stringstream inputStream;
+  while(!inputStream.eof() && !inputStream.fail()){
+    char buffer[256];
+    inputStream.getline(buffer, 256);
+    std::istringstream ss(std::string(buffer));
+    std::vector<std::string> tokens;
+    for(int i = 0; i < 3; i++){
+      std::string token;
+      std::getline(ss, token, ',');
+      tokens.push_back(token);
+    }
+    
+    this->finger_points[tokens[0]] = std::pair<int, int>(atoi(tokens[1].c_str()), atoi(tokens[2].c_str())) ;
+  }
 
   // Set up an array of subscribers for each contact sensor
+
+  //TODO: set up configurable handedness
+  this->handSide = "r";
   for(int i = 0; i < 6; i++){
-    std::string topicName = "/gazebo/default/mpl/r"+this->fingerNames[i]+
-                            "/r"+ this->fingerNames[i]+"_contact_sensor";
+    std::string topicName = this->handSide+this->fingerNames[i]+"Distal";
+    topicName = "/gazebo/default/mpl/"+topicName+
+                            "/"+topicName+"_contact_sensor";
     contactSubscribers.push_back(this->node->Subscribe( topicName,
                                  &GUIAratPlugin::OnFingerContact, this ));
   }
@@ -108,9 +128,30 @@ GUIAratPlugin::~GUIAratPlugin()
 
 void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
   // Lock
+  contactLock.lock();
   // Parse the contact object and get the topic name
-  // Draw on the corresponding spot
+  int numContacts = msg->contact_size();
+  if(numContacts > 0){
+    for(int i = 0; i < numContacts; i++){
+      std::string contactName = msg->contact(0).collision1();
+
+      std::size_t beginIndex = ("mpl::"+this->handSide).length() - 1;
+      std::size_t endIndex = contactName.find_first_of("Distal");
+
+      std::string fingerName = contactName.substr(beginIndex, endIndex - beginIndex );
+      
+      std::pair<int, int> point = finger_points[fingerName];
+        
+      std::cout << "Drawing on " << point.first << ", " << point.second << std::endl;
+
+      // Draw on the corresponding spot
+      this->handScene->addEllipse(point.first, point.second, circleSize, circleSize);
+    }
+
+    this->handScene->update();
+  }
   // Unlock
+  contactLock.unlock();
 }
 
 /////////////////////////////////////////////////
