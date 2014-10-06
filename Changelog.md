@@ -6,6 +6,9 @@
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
    recursively on all links in model.
     * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
+1. The `gz model` command line tool will output model info using either `-i` for complete info, or `-p` for just the model pose.
+    * [Pull request #1212](https://bitbucket.org/osrf/gazebo/pull-request/1212)
+    * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
 1. Added ERB parsing to the `gz sdf` command line tool.
     * [Pull request #1182](https://bitbucket.org/osrf/gazebo/pull-request/1182)
 
