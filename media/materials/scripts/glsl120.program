@@ -15,6 +15,6 @@ fragment_program gazebo/glsl120/warpWithChromeAb.frag glsl
     param_named Scale float2 0.3 0.3
     param_named ScaleIn float2 2.0 2.0
     param_named HmdWarpParam float4 1.0 0.22 0.24 0.0
-    param_named ChromAbParam float4 0.996, -0.004, 1.014, 0
+    param_named ChromAbParam float4 0.996 -0.004 1.014 0.0
   }
 }
