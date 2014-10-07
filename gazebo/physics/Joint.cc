@@ -779,6 +779,14 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       desiredVel = this->parentLink->GetWorldAngularVel();
     }
     desiredVel += _velocity * this->GetGlobalAxis(_index);
+
+    if (this->HasType(Base::UNIVERSAL_JOINT))
+    {
+      unsigned int otherIndex = (_index + 1) % 2;
+      desiredVel += this->GetVelocity(otherIndex)
+                  * this->GetGlobalAxis(otherIndex);
+    }
+
     this->childLink->SetAngularVel(desiredVel);
 
     // TODO: Should prescribe the linear velocity of the child link if there is
