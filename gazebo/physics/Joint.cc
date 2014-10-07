@@ -631,7 +631,12 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Joint axis index too large.\n";
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
     return false;
   }
 
@@ -744,7 +749,12 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
   // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Joint axis index too large.\n";
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
     return false;
   }
 
