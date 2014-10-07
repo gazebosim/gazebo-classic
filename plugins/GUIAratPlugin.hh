@@ -69,17 +69,21 @@ namespace gazebo
 
       private: QGraphicsScene *handScene;
 
-      //TODO: get rid of these const declarations and put in a config file
+      //TODO: config file
       private: const int handImgX = 250;
       private: const int handImgY = 250;
 
-      private: const char* handImgFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
-      private: const char* fingerPtsFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
+      private: std::string handImgFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
+      private: std::string fingerPtsFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
 
+      private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
+
+      //TODO: tune these values
       private: const int circleSize = 5;
       private: const unsigned char colorMin[3] = {255, 255, 0};
       private: const unsigned char colorMax[3] = {255, 0, 0};
-      private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
+      private: const float forceMin = 0;
+      private: const float forceMax = 50;
 
       private: std::string handSide;
       
@@ -87,7 +91,7 @@ namespace gazebo
 
       private: std::map<std::string, std::pair<int, int> > finger_points;
 
-      private: std::map<std::string, QGraphicsItem*> contactGraphicsItems;
+      private: std::map<std::string, QGraphicsEllipseItem*> contactGraphicsItems;
 
       private: void OnFingerContact(ConstContactsPtr &msg, std::string);
 

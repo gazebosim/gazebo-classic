@@ -26,6 +26,11 @@ GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
+  common::SystemPaths* paths = common::SystemPaths::Instance();
+  this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
+  this->fingerPtsFilename = paths->FindFileURI("file://media/gui/etc/fingerpts.csv");
+  std::cout << "img filename: " << this->handImgFilename << std::endl;
+
   // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
@@ -51,7 +56,7 @@ GUIAratPlugin::GUIAratPlugin()
   frameLayout->addWidget(handView);
 
   // Load the hand image
-  QPixmap* handImg = new QPixmap(QString(handImgFilename));
+  QPixmap* handImg = new QPixmap(QString(handImgFilename.c_str()));
   QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(*handImg);
 
   // Draw the hand on the canvas
@@ -87,7 +92,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   //Parse the finger names and point where we will draw a contact
   
-  std::ifstream fileinput(this->fingerPtsFilename);
+  std::ifstream fileinput(this->fingerPtsFilename.c_str());
   std::stringstream inputStream;
   inputStream << fileinput.rdbuf();
   char buffer[256];
@@ -99,7 +104,6 @@ GUIAratPlugin::GUIAratPlugin()
     for(int i = 0; i < 3; i++){
       char token[256];
       ss.getline(token, 256, ',');
-      //std::getline(ss, token, ',');
       tokens.push_back(std::string(token));
     }
     this->finger_points[tokens[0]] = std::pair<int, int>(atoi(tokens[1].c_str()), atoi(tokens[2].c_str())) ;
@@ -108,7 +112,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   fileinput.close();
 
-  // Preallocate some QGraphicsItems
+  // Preallocate QGraphicsItems for each contact point
   for(int i = 0; i < 5; i++){
     int xpos = finger_points[fingerNames[i]].first;
     int ypos = finger_points[fingerNames[i]].second;
@@ -174,6 +178,7 @@ void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg, std::string fingerNam
 }
 
 void GUIAratPlugin::PreRender(){
+  //Remove items from the scene
   for(int i = 0; i < 5; i ++){
     std::string fingerName = this->fingerNames[i];
 
@@ -181,9 +186,9 @@ void GUIAratPlugin::PreRender(){
       this->handScene->removeItem(this->contactGraphicsItems[fingerName]);
     }
   }
-  //TODO: color, position offset
+  //TODO: color, position offset, multiple contacts
 
-  // Parse the contact object and get the topic name
+  //Clear queued messages and draw them
   while( !this->msgQueue.empty()){
     ContactsWrapper wrapper = msgQueue.front();
     ConstContactsPtr msg = wrapper.msg;
@@ -191,7 +196,25 @@ void GUIAratPlugin::PreRender(){
     msgQueue.pop();
     int numContacts = msg->contact_size();
     if(numContacts > 0){
-        
+      // Calculate contact force
+      msgs::Vector3d forceVector = msg->contact(0).wrench(0).body_1_wrench().force();
+      float f = math::Vector3(forceVector.x(), forceVector.y(), forceVector.z()).GetLength();
+      float colorArray[3];
+      float forceRange = this->forceMax - this->forceMin;
+      for(int i = 0; i < 3; i++){
+        float colorRange = this->colorMax[i] - this->colorMin[i];
+        colorArray[i] = colorRange/forceRange*f + colorMin[i];
+        if(colorArray[i] > colorMin[i]){
+          colorArray[i] = colorMin[i];
+        } else if (colorArray[i] < colorMax[i]){
+
+          colorArray[i] = colorMax[i];
+        }
+      }
+      QBrush color(QColor(colorArray[0], colorArray[1], colorArray[2]));
+      
+      this->contactGraphicsItems[fingerName]->setBrush(color);
+      this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
       // Draw on the corresponding spot
       if(!this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
         this->handScene->addItem(this->contactGraphicsItems[fingerName]);
@@ -200,8 +223,6 @@ void GUIAratPlugin::PreRender(){
 
   }
 
-  //Clear the queue
-  /**/
 }
 
 /////////////////////////////////////////////////
