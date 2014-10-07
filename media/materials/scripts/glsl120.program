@@ -9,7 +9,7 @@ fragment_program gazebo/glsl120/warpWithChromeAb.frag glsl
   source warpWithChromeAb.frag
   default_params
   {
-    param_named WarpTexture int 0.0
+    param_named WarpTexture int 0
     param_named ScreenCenter float2 0.5 0.5
     param_named LensCenter float2 0.5 0.5
     param_named Scale float2 0.3 0.3
