@@ -15,7 +15,6 @@
  *
 */
 #include <sstream>
-#include <gazebo/msgs/msgs.hh>
 #include "GUIAratPlugin.hh"
 
 using namespace gazebo;
@@ -86,38 +85,54 @@ GUIAratPlugin::GUIAratPlugin()
   this->taskNum = 0;
   this->maxTaskCount = 10;
 
-  //finger_points = YAML::LoadFile("fingerpts.yaml");
-  std::filebuf fb;
-  fb.open("fingerpts.csv", std::ios::in);
+  //Parse the finger names and point where we will draw a contact
+  
+  std::ifstream fileinput(this->fingerPtsFilename);
   std::stringstream inputStream;
+  inputStream << fileinput.rdbuf();
+  char buffer[256];
+  inputStream.getline(buffer, 256);
   while(!inputStream.eof() && !inputStream.fail()){
-    char buffer[256];
-    inputStream.getline(buffer, 256);
-    std::istringstream ss(std::string(buffer));
+    std::stringstream ss;
+    ss << buffer;
     std::vector<std::string> tokens;
     for(int i = 0; i < 3; i++){
-      std::string token;
-      std::getline(ss, token, ',');
-      tokens.push_back(token);
+      char token[256];
+      ss.getline(token, 256, ',');
+      //std::getline(ss, token, ',');
+      tokens.push_back(std::string(token));
     }
-    
     this->finger_points[tokens[0]] = std::pair<int, int>(atoi(tokens[1].c_str()), atoi(tokens[2].c_str())) ;
+    inputStream.getline(buffer, 256);
   }
+
+  fileinput.close();
+
+  // Preallocate some QGraphicsItems
+  for(int i = 0; i < 5; i++){
+    int xpos = finger_points[fingerNames[i]].first;
+    int ypos = finger_points[fingerNames[i]].second;
+    this->contactGraphicsItems[fingerNames[i]] = new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
+  }
+
 
   // Set up an array of subscribers for each contact sensor
 
   //TODO: set up configurable handedness
   this->handSide = "r";
-  for(int i = 0; i < 6; i++){
-    std::string topicName = this->handSide+this->fingerNames[i]+"Distal";
-    topicName = "/gazebo/default/mpl/"+topicName+
-                            "/"+topicName+"_contact_sensor";
-    contactSubscribers.push_back(this->node->Subscribe( topicName,
-                                 &GUIAratPlugin::OnFingerContact, this ));
-  }
-
   
+  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Th"),
+                              &GUIAratPlugin::OnThumbContact, this));
+  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Ind"),
+                              &GUIAratPlugin::OnIndexContact, this));
+  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Mid"),
+                              &GUIAratPlugin::OnMiddleContact, this));
+  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Ring"),
+                              &GUIAratPlugin::OnRingContact, this));
+  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Little"),
+                              &GUIAratPlugin::OnLittleContact, this));
 
+  this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
 
 }
 
@@ -126,32 +141,67 @@ GUIAratPlugin::~GUIAratPlugin()
 {
 }
 
-void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
-  // Lock
-  contactLock.lock();
+std::string GUIAratPlugin::getTopicName(std::string fingerName){
+  std::string topicName = this->handSide+fingerName+"Distal";
+  return "/gazebo/default/mpl/"+topicName+"/"+topicName+"_contact_sensor";
+}
+
+void GUIAratPlugin::OnThumbContact(ConstContactsPtr &msg){
+  this->OnFingerContact(msg, "Th");
+}
+
+void GUIAratPlugin::OnIndexContact(ConstContactsPtr &msg){
+  this->OnFingerContact(msg, "Ind");
+}
+
+void GUIAratPlugin::OnMiddleContact(ConstContactsPtr &msg){
+  this->OnFingerContact(msg, "Mid");
+}
+
+
+void GUIAratPlugin::OnRingContact(ConstContactsPtr &msg){
+  this->OnFingerContact(msg, "Ring");
+}
+
+
+void GUIAratPlugin::OnLittleContact(ConstContactsPtr &msg){
+  this->OnFingerContact(msg, "Little");
+}
+
+
+void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg, std::string fingerName){
+  this->msgQueue.push(ContactsWrapper(msg, fingerName));
+}
+
+void GUIAratPlugin::PreRender(){
+  for(int i = 0; i < 5; i ++){
+    std::string fingerName = this->fingerNames[i];
+
+    if(this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
+      this->handScene->removeItem(this->contactGraphicsItems[fingerName]);
+    }
+  }
+  //TODO: color, position offset
+
   // Parse the contact object and get the topic name
-  int numContacts = msg->contact_size();
-  if(numContacts > 0){
-    for(int i = 0; i < numContacts; i++){
-      std::string contactName = msg->contact(0).collision1();
-
-      std::size_t beginIndex = ("mpl::"+this->handSide).length() - 1;
-      std::size_t endIndex = contactName.find_first_of("Distal");
-
-      std::string fingerName = contactName.substr(beginIndex, endIndex - beginIndex );
-      
-      std::pair<int, int> point = finger_points[fingerName];
+  while( !this->msgQueue.empty()){
+    ContactsWrapper wrapper = msgQueue.front();
+    ConstContactsPtr msg = wrapper.msg;
+    std::string fingerName = wrapper.name;
+    msgQueue.pop();
+    int numContacts = msg->contact_size();
+    if(numContacts > 0){
         
-      std::cout << "Drawing on " << point.first << ", " << point.second << std::endl;
-
       // Draw on the corresponding spot
-      this->handScene->addEllipse(point.first, point.second, circleSize, circleSize);
+      if(!this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
+        this->handScene->addItem(this->contactGraphicsItems[fingerName]);
+      }
     }
 
-    this->handScene->update();
   }
-  // Unlock
-  contactLock.unlock();
+
+  //Clear the queue
+  /**/
 }
 
 /////////////////////////////////////////////////

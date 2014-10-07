@@ -21,10 +21,22 @@
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
+#include <gazebo/msgs/msgs.hh>
+#include "gazebo/common/Events.hh"
+
+#include <queue>
 //#include <yaml-cpp/yaml.h>
 
 namespace gazebo
 {
+
+    class ContactsWrapper
+    {
+      public: ConstContactsPtr msg;
+      public: std::string name;
+      public: ContactsWrapper(ConstContactsPtr m, std::string n) : msg(m), name(n){}
+    };
+
     class GUIAratPlugin : public gazebo::GUIPlugin
     {
       Q_OBJECT
@@ -62,6 +74,7 @@ namespace gazebo
       private: const int handImgY = 250;
 
       private: const char* handImgFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
+      private: const char* fingerPtsFilename = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
 
       private: const int circleSize = 5;
       private: const unsigned char colorMin[3] = {255, 255, 0};
@@ -72,14 +85,31 @@ namespace gazebo
       
       private: std::vector<transport::SubscriberPtr> contactSubscribers;
 
-      //private: YAML::Node finger_points;
       private: std::map<std::string, std::pair<int, int> > finger_points;
 
-      private: void OnFingerContact(ConstContactsPtr &msg);
-  
+      private: std::map<std::string, QGraphicsItem*> contactGraphicsItems;
+
+      private: void OnFingerContact(ConstContactsPtr &msg, std::string);
+
+      private: void OnThumbContact(ConstContactsPtr &msg);
+
+      private: void OnIndexContact(ConstContactsPtr &msg);
+
+      private: void OnMiddleContact(ConstContactsPtr &msg);
+
+      private: void OnRingContact(ConstContactsPtr &msg);
+
+      private: void OnLittleContact(ConstContactsPtr &msg);
+
+      private: std::string getTopicName(std::string fingerName);
+
       private: boost::mutex contactLock;
 
+      private: std::vector<event::ConnectionPtr> connections;
 
+      private: std::queue<ContactsWrapper> msgQueue;
+
+      private: void PreRender();
 
     };
 }
