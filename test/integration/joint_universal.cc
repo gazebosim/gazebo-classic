@@ -157,12 +157,8 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
   // get model and joints
   physics::ModelPtr model = world->GetModel("model_1");
   ASSERT_TRUE(model);
-  physics::JointPtr jointUpper = model->GetJoint("joint_00");
   physics::JointPtr jointLower = model->GetJoint("joint_01");
-  ASSERT_TRUE(jointUpper);
   ASSERT_TRUE(jointLower);
-  physics::LinkPtr linkLower = jointLower->GetChild();
-  ASSERT_TRUE(linkLower);
 
   // Call SetVelocity on both axes of lower joint
   const double vel = 1.0;
@@ -172,6 +168,23 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
   // Expect GetVelocity to match
   EXPECT_NEAR(jointLower->GetVelocity(0), vel, g_tolerance);
   EXPECT_NEAR(jointLower->GetVelocity(1), vel, g_tolerance);
+
+  // Expect child link velocity to match parent at joint anchor
+  {
+    math::Vector3 childOffset = jointLower->GetWorldPose().pos -
+      jointLower->GetChild()->GetWorldPose().pos;
+    math::Vector3 parentOffset = jointLower->GetWorldPose().pos -
+      jointLower->GetParent()->GetWorldPose().pos;
+    math::Quaternion q;
+
+    math::Vector3 childVel =
+      jointLower->GetChild()->GetWorldLinearVel(childOffset, q);
+    math::Vector3 parentVel =
+      jointLower->GetParent()->GetWorldLinearVel(parentOffset, q);
+    EXPECT_NEAR(childVel.x, parentVel.x, g_tolerance);
+    EXPECT_NEAR(childVel.y, parentVel.y, g_tolerance);
+    EXPECT_NEAR(childVel.z, parentVel.z, g_tolerance);
+  }
 }
 
 /////////////////////////////////////////////////
