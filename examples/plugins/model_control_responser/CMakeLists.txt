@@ -25,7 +25,7 @@ link_directories(
   ${DARTCore_LIB_DIR}
   ${GAZEBO_LIBRARY_DIRS})
 
-add_executable(responser responser.cc UR10.h UR10.cpp)
+add_executable(responser responser.cc)
 target_link_libraries(responser
   ${IGNITION-TRANSPORT_LIBRARIES}
   gazebo_msgs #${GAZEBO_LIBRARIES}

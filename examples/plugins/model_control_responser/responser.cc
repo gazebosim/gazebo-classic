@@ -70,7 +70,9 @@ int main(int _argc, char **_argv)
 
   // initialize model state (internal copy to controller)
 
-  node->Advertise("/ur10/control_request", cb);
+  /// \TODO: change ur10 to your model name
+  const std::string modelName = "ur10";
+  node->Advertise("/" + modelName + "/control_request", cb);
 
   int c = 0;
   // Busy wait loop...replace with your own code as needed.
