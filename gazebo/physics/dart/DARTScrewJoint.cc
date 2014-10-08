@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,112 +28,254 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
-    : ScrewJoint<DARTJoint>(_parent)
+    : ScrewJoint<DARTJoint>(_parent),
+      dartScrewJoint(new dart::dynamics::ScrewJoint())
 {
+  this->dtJoint = dartScrewJoint;
 }
 
 //////////////////////////////////////////////////
 DARTScrewJoint::~DARTScrewJoint()
 {
+  delete dartScrewJoint;
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::Load(sdf::ElementPtr /*_sdf*/)
+void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
 {
-  gzwarn << "Not implemented!\n";
+  ScrewJoint<DARTJoint>::Load(_sdf);
+  this->SetThreadPitch(0, this->threadPitch);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTScrewJoint::GetGlobalAxis(int /*index*/) const
+void DARTScrewJoint::SetAnchor(unsigned int /*index*/,
+    const math::Vector3 &/*_anchor*/)
 {
-  gzwarn << "Not implemented!\n";
-
-  return math::Vector3(0, 0, 0);
+  gzerr << "DARTScrewJoint::SetAnchor not implemented.\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetAngleImpl(int /*_index*/) const
+void DARTScrewJoint::Init()
 {
-  math::Angle result;
+  ScrewJoint<DARTJoint>::Init();
+}
 
-  gzwarn << "Not implemented!\n";
+//////////////////////////////////////////////////
+math::Vector3 DARTScrewJoint::GetAnchor(unsigned int /*index*/) const
+{
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
+
+  return DARTTypes::ConvVec3(worldOrigin);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
+{
+  Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  if (_index < this->GetAngleCount())
+  {
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dartScrewJoint->getAxis();
+    globalAxis = T.linear() * axis;
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  // TODO: Issue #494
+  // See: https://bitbucket.org/osrf/gazebo/issue/494
+  // joint-axis-reference-frame-doesnt-match
+  return DARTTypes::ConvVec3(globalAxis);
+}
+
+//////////////////////////////////////////////////
+void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+{
+  if (_index == 0)
+  {
+    // TODO: Issue #494
+    // See: https://bitbucket.org/osrf/gazebo/issue/494
+    // joint-axis-reference-frame-doesnt-match
+    Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
+    Eigen::Isometry3d dartTransfJointLeftToParentLink
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
+    dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
+
+    this->dartScrewJoint->setAxis(dartVec3);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
+double DARTScrewJoint::GetVelocity(unsigned int _index) const
+{
+  double result = 0.0;
+
+  if (_index == 0)
+    result = this->dtJoint->getVelocity(0);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-double DARTScrewJoint::GetVelocity(int /*index*/) const
+void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  gzwarn << "Not implemented!\n";
-
-  return 0;
+  if (_index == 0)
+    this->dtJoint->setVelocity(0, _vel);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetVelocity(int /*index*/, double /*_angle*/)
+void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index >= this->GetAngleCount())
+    gzerr << "Invalid index[" << _index << "]\n";
+  this->SetThreadPitch(_threadPitch);
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetAxis(int /*index*/, const math::Vector3& /*_axis*/)
+void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 {
-  gzwarn << "Not implemented!\n";
+  this->threadPitch = _threadPitch;
+  this->dartScrewJoint->setPitch(_threadPitch * 2.0 * M_PI);
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetDamping(int /*index*/, double /*_damping*/)
+double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index >= this->GetAngleCount())
+    gzerr << "Invalid index[" << _index << "]\n";
+  return this->GetThreadPitch();
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetThreadPitch(int /*_index*/, double /*_threadPitch*/)
+double DARTScrewJoint::GetThreadPitch()
 {
-  gzwarn << "Not implemented!\n";
+  double result = this->threadPitch;
+  if (this->dartScrewJoint)
+    result = this->dartScrewJoint->getPitch() * 0.5 / M_PI;
+  else
+    gzwarn << "dartScrewJoint not created yet, returning cached threadPitch.\n";
+  return result;
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::ApplyDamping()
+double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  if (_key  == "thread_pitch")
+    return this->GetThreadPitch();
+  else
+    return DARTJoint::GetParam(_key, _index);
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetForce(int /*index*/, double /*_force*/)
+math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  gzwarn << "Not implemented!\n";
+  math::Angle result;
+
+  if (this->dartScrewJoint)
+  {
+    if (_index == 0)
+    {
+      // angular position
+      result.SetFromRadian(this->dartScrewJoint->getPosition(0));
+    }
+    else if (_index == 1)
+    {
+      // linear position
+      double angPos = this->dartScrewJoint->getPosition(0);
+      result = dartScrewJoint->getPitch() * angPos * 0.5 / M_PI;
+    }
+    else
+    {
+      gzerr << "Invalid index[" << _index << "]\n";
+    }
+  }
+  else
+  {
+    gzerr << "dartScrewJoint not created yet\n";
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetParam(int /*_parameter*/, double /*_value*/)
+void DARTScrewJoint::SetMaxForce(unsigned int _index, double _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-double DARTScrewJoint::GetParam(int /*_parameter*/) const
+double DARTScrewJoint::GetMaxForce(unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  double result = 0.0;
 
-  return 0;
+  if (_index == 0)
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+    this->dtJoint->setForce(0, _effort);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-double DARTScrewJoint::GetMaxForce(int /*_index*/)
+math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  switch (_index)
+  {
+  case 0:
+    return this->dtJoint->getPositionUpperLimit(0);
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
 
-  return 0;
+  return math::Angle();
 }
 
+//////////////////////////////////////////////////
+math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
+{
+  switch (_index)
+  {
+  case 0:
+    return this->dtJoint->getPositionLowerLimit(0);
+  default:
+    gzerr << "Invalid index[" << _index << "]\n";
+  };
 
-
-
-
+  return math::Angle();
+}

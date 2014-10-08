@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,12 +109,12 @@ void Actor::Load(sdf::ElementPtr _sdf)
 //    this->AddSphereInertia(linkSdf, math::Pose(), 1.0, 0.01);
 //    this->AddSphereCollision(linkSdf, actorName + "_pose_col",
 //                                             math::Pose(), 0.02);
-    this->AddBoxVisual(linkSdf, actorName + "_pose_vis", math::Pose(),
-                       math::Vector3(0.05, 0.05, 0.05), "Gazebo/White",
-                       Color::White);
+    // this->AddBoxVisual(linkSdf, actorName + "_pose_vis", math::Pose(),
+    //                   math::Vector3(0.05, 0.05, 0.05), "Gazebo/White",
+    //                   Color::White);
     this->AddActorVisual(linkSdf, actorName + "_visual", math::Pose());
-
-    this->visualName = actorName + "::" + actorName + "_pose::"
+    std::string actorLinkName = actorName + "::" + actorName + "_pose";
+    this->visualName = actorLinkName + "::"
                              + actorName + "_visual";
 
     for (NodeMapIter iter = nodes.begin(); iter != nodes.end(); ++iter)
@@ -195,6 +195,20 @@ void Actor::Load(sdf::ElementPtr _sdf)
 
     /// we are ready to load the links
     Model::Load(_sdf);
+    LinkPtr actorLinkPtr = Model::GetLink(actorLinkName);
+    if (actorLinkPtr)
+    {
+       msgs::Visual actorVisualMsg = actorLinkPtr->GetVisualMessage(
+         this->visualName);
+       if (actorVisualMsg.has_id())
+         this->visualId = actorVisualMsg.id();
+       else
+         gzerr << "No actor visual message found.";
+    }
+    else
+    {
+      gzerr << "No actor link found.";
+    }
     this->bonePosePub = this->node->Advertise<msgs::PoseAnimation>(
                                        "~/skeleton_pose/info", 10);
   }
@@ -426,7 +440,11 @@ void Actor::Update()
   common::Time currentTime = this->world->GetSimTime();
 
   /// do not refresh animation more faster the 30 Hz sim time
-  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
+  /// TODO: Reducing to 20 Hz. Because there were memory corruption
+  /// and segmentation faults. Possibly due to some dangling pointers
+  /// in pose message processing. This will need a proper fix. Just a
+  /// workaround for now.
+  if ((currentTime - this->prevFrameTime).Double() < (1.0 / 20.0))
     return;
 
   double scriptTime = currentTime.Double() - this->startDelay -
@@ -524,6 +542,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 {
   msgs::PoseAnimation msg;
   msg.set_model_name(this->visualName);
+  msg.set_model_id(this->visualId);
 
   math::Matrix4 modelTrans(math::Matrix4::IDENTITY);
   math::Pose mainLinkPose;
@@ -571,10 +590,10 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
     msgs::Pose *link_pose = msg.add_pose();
     link_pose->set_name(currentLink->GetScopedName());
+    link_pose->set_id(currentLink->GetId());
     math::Pose linkPose = transform.GetAsPose() - mainLinkPose;
     link_pose->mutable_position()->CopyFrom(msgs::Convert(linkPose.pos));
     link_pose->mutable_orientation()->CopyFrom(msgs::Convert(linkPose.rot));
-
     currentLink->SetWorldPose(transform.GetAsPose(), true, false);
   }
 
@@ -583,6 +602,7 @@ void Actor::SetPose(std::map<std::string, math::Matrix4> _frame,
 
   msgs::Pose *model_pose = msg.add_pose();
   model_pose->set_name(this->GetScopedName());
+  model_pose->set_id(this->GetId());
   model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.pos));
   model_pose->mutable_orientation()->CopyFrom(msgs::Convert(mainLinkPose.rot));
 
@@ -689,7 +709,14 @@ void Actor::AddActorVisual(sdf::ElementPtr _linkSdf, const std::string &_name,
   visualPoseSdf->Set(_pose);
   sdf::ElementPtr geomVisSdf = visualSdf->GetElement("geometry");
   sdf::ElementPtr meshSdf = geomVisSdf->GetElement("mesh");
-  meshSdf->GetElement("filename")->Set(this->skinFile);
+  meshSdf->GetElement("uri")->Set(this->skinFile);
   meshSdf->GetElement("scale")->Set(math::Vector3(this->skinScale,
       this->skinScale, this->skinScale));
+}
+
+//////////////////////////////////////////////////
+TrajectoryInfo::TrajectoryInfo()
+  : id(0), type(""), duration(0.0), startTime(0.0), endTime(0.0),
+  translated(false)
+{
 }

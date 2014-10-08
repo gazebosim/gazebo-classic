@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,12 +218,6 @@ Time Time::MSleep(unsigned int _ms)
 Time Time::NSleep(unsigned int _ns)
 {
   return Time::Sleep(Time(0, _ns));
-}
-
-/////////////////////////////////////////////////
-Time Time::NSleep(Time _time)
-{
-  return Time::Sleep(_time);
 }
 
 /////////////////////////////////////////////////

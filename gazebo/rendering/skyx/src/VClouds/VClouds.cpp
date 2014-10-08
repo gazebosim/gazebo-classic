@@ -53,8 +53,6 @@ VClouds::VClouds(Ogre::SceneManager *sm)
     , mGeometryManager(new GeometryManager(this))
     , mLightningManager(new LightningManager(this))
     , mCamerasData(std::vector<CameraData>())
-    , mVolCloudsMaterial(Ogre::MeshPtr())
-    , mVolCloudsLightningMaterial(Ogre::MeshPtr())
 {
 }
 

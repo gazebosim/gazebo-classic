@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include "gazebo/transport/Publisher.hh"
 #include "gazebo/transport/Publication.hh"
 #include "gazebo/transport/Subscriber.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -47,7 +48,7 @@ namespace gazebo
 
     /// \class TopicManager TopicManager.hh transport/transport.hh
     /// \brief Manages topics and their subscriptions
-    class TopicManager : public SingletonT<TopicManager>
+    class GAZEBO_VISIBLE TopicManager : public SingletonT<TopicManager>
     {
       private: TopicManager();
       private: virtual ~TopicManager();
@@ -158,6 +159,10 @@ namespace gazebo
       /// \param[in] _topic The topic to be unadvertised
       public: void Unadvertise(const std::string &_topic);
 
+      /// \brief Unadvertise a publisher.
+      /// \param[in] _pub Publisher to unadvertise.
+      public: void Unadvertise(PublisherPtr _pub);
+
       /// \brief Send a message. Use a Publisher instead of calling this
       ///        function directly.
       /// \param [in] _topic Name of the topic
@@ -212,13 +217,6 @@ namespace gazebo
       /// \brief Get all the topic namespaces
       /// \param[out] _namespaces The list of namespaces will be written here
       public: void GetTopicNamespaces(std::list<std::string> &_namespaces);
-
-      /// \brief Get a list of all the topics.
-      /// \return A map where keys are message types, and values are a list
-      /// of topic names.
-      /// \sa transport::GetAdvertisedTopics
-      public: std::map<std::string, std::list<std::string> >
-              GetAdvertisedTopics() const GAZEBO_DEPRECATED(1.5);
 
       /// \brief Clear all buffers
       public: void ClearBuffers();

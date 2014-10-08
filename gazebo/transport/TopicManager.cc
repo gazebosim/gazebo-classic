@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -355,7 +355,6 @@ void TopicManager::ConnectSubToPub(const msgs::Publish &_pub)
   this->ConnectSubscribers(_pub.topic());
 }
 
-
 //////////////////////////////////////////////////
 PublicationPtr TopicManager::UpdatePublications(const std::string &_topic,
                                                 const std::string &_msgType)
@@ -396,6 +395,21 @@ void TopicManager::Unadvertise(const std::string &_topic)
 }
 
 //////////////////////////////////////////////////
+void TopicManager::Unadvertise(PublisherPtr _pub)
+{
+  GZ_ASSERT(_pub, "Unadvertising a NULL Publisher");
+
+  if (_pub)
+  {
+    PublicationPtr publication = this->FindPublication(_pub->GetTopic());
+    if (publication)
+      publication->RemovePublisher(_pub);
+
+    this->Unadvertise(_pub->GetTopic());
+  }
+}
+
+//////////////////////////////////////////////////
 void TopicManager::RegisterTopicNamespace(const std::string &_name)
 {
   ConnectionManager::Instance()->RegisterTopicNamespace(_name);
@@ -405,24 +419,6 @@ void TopicManager::RegisterTopicNamespace(const std::string &_name)
 void TopicManager::GetTopicNamespaces(std::list<std::string> &_namespaces)
 {
   ConnectionManager::Instance()->GetTopicNamespaces(_namespaces);
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, std::list<std::string> >
-TopicManager::GetAdvertisedTopics() const
-{
-  std::map<std::string, std::list<std::string> > result;
-  std::list<msgs::Publish> publishers;
-
-  ConnectionManager::Instance()->GetAllPublishers(publishers);
-
-  for (std::list<msgs::Publish>::iterator iter = publishers.begin();
-      iter != publishers.end(); ++iter)
-  {
-    result[(*iter).msg_type()].push_back((*iter).topic());
-  }
-
-  return result;
 }
 
 //////////////////////////////////////////////////

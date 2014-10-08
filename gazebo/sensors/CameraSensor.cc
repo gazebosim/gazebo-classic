@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,8 @@
 
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/CameraSensor.hh"
+#include "gazebo/sensors/Noise.hh"
+
 
 using namespace gazebo;
 using namespace sensors;
@@ -45,17 +47,15 @@ GZ_REGISTER_STATIC_SENSOR("camera", CameraSensor)
 CameraSensor::CameraSensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&CameraSensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
 CameraSensor::~CameraSensor()
 {
-}
-
-//////////////////////////////////////////////////
-void CameraSensor::SetParent(const std::string &_name)
-{
-  Sensor::SetParent(_name);
 }
 
 //////////////////////////////////////////////////
@@ -134,8 +134,18 @@ void CameraSensor::Init()
     math::Pose cameraPose = this->pose;
     if (cameraSdf->HasElement("pose"))
       cameraPose = cameraSdf->Get<math::Pose>("pose") + cameraPose;
+
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->parentName, true);
+    this->camera->AttachToVisual(this->parentId, true);
+
+    if (cameraSdf->HasElement("noise"))
+    {
+      NoisePtr noise =
+          NoiseFactory::NewNoiseModel(cameraSdf->GetElement("noise"),
+        this->GetType());
+      this->noises.push_back(noise);
+      noise->SetCamera(this->camera);
+    }
   }
   else
     gzerr << "No world name\n";
@@ -156,40 +166,55 @@ void CameraSensor::Fini()
   Sensor::Fini();
 
   if (this->camera)
+  {
     this->scene->RemoveCamera(this->camera->GetName());
+  }
 
   this->camera.reset();
   this->scene.reset();
 }
 
 //////////////////////////////////////////////////
-void CameraSensor::UpdateImpl(bool /*_force*/)
+void CameraSensor::Render()
 {
-  if (this->camera)
+  if (!this->camera || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  // Update all the cameras
+  this->camera->Render();
+
+  this->rendered = true;
+  this->lastMeasurementTime = this->scene->GetSimTime();
+}
+
+//////////////////////////////////////////////////
+bool CameraSensor::UpdateImpl(bool /*_force*/)
+{
+  if (!this->rendered)
+    return false;
+
+  this->camera->PostRender();
+
+  if (this->imagePub && this->imagePub->HasConnections())
   {
-    this->camera->Render();
-    this->camera->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
+    msgs::ImageStamped msg;
+    msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
+    msg.mutable_image()->set_width(this->camera->GetImageWidth());
+    msg.mutable_image()->set_height(this->camera->GetImageHeight());
+    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+          this->camera->GetImageFormat()));
 
-    if (this->imagePub->HasConnections())
-    {
-      msgs::ImageStamped msg;
-      msgs::Set(msg.mutable_time(), this->scene->GetSimTime());
-      msg.mutable_image()->set_width(this->camera->GetImageWidth());
-      msg.mutable_image()->set_height(this->camera->GetImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-            this->camera->GetImageFormat()));
+    msg.mutable_image()->set_step(this->camera->GetImageWidth() *
+        this->camera->GetImageDepth());
+    msg.mutable_image()->set_data(this->camera->GetImageData(),
+        msg.image().width() * this->camera->GetImageDepth() *
+        msg.image().height());
 
-      msg.mutable_image()->set_step(this->camera->GetImageWidth() *
-          this->camera->GetImageDepth());
-      msg.mutable_image()->set_data(this->camera->GetImageData(),
-          msg.image().width() * this->camera->GetImageDepth() *
-          msg.image().height());
-
-      if (this->imagePub && this->imagePub->HasConnections())
-        this->imagePub->Publish(msg);
-    }
+    this->imagePub->Publish(msg);
   }
+
+  this->rendered = false;
+  return true;
 }
 
 //////////////////////////////////////////////////

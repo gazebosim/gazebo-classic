@@ -80,6 +80,73 @@ ODE_API dReal dMaxDifference (const dReal *A, const dReal *B, int n, int m);
  * n*n matrices */
 ODE_API dReal dMaxDifferenceLowerTriangle (const dReal *A, const dReal *B, int n);
 
+/*!
+ * \brief dNormalizeAnglePositive
+ *
+ *        Normalizes the angle to be 0 to 2*M_PI
+ *        It takes and returns radians.
+ */
+ODE_API static inline dReal dNormalizeAnglePositive(dReal angle)
+{
+  return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
+}
+
+
+/*!
+ * \brief normalize
+ *
+ * Normalizes the angle from [0, 2*M_PI] to [-M_PI, +M_PI] circle
+ * It takes and returns radians.
+ *
+ */    
+ODE_API static inline dReal dNormalizeAngle(dReal angle)
+{
+  dReal a = dNormalizeAnglePositive(angle);
+  if (a > M_PI)
+    a -= 2.0 *M_PI;
+  return a;
+}
+
+  
+/*!
+ * \function
+ * \brief dShortestAngularDistance
+ *
+ * Given 2 angles, this returns the shortest angular
+ * difference.  The inputs and ouputs are of course radians.
+ *
+ * The result
+ * would always be -pi <= result <= pi.  Adding the result
+ * to "from" will always get you an equivelent angle to "to".
+ */
+ODE_API static inline dReal dShortestAngularDistance(dReal from, dReal to)
+{
+  dReal result = dNormalizeAngle(dNormalizeAnglePositive(dNormalizeAnglePositive(to) -
+    dNormalizeAnglePositive(from)));
+
+  return result;
+}
+
+/*!
+ * \function
+ * \brief dShortestAngularDistanceUpdate
+ *
+ * Given 2 angles, this returns the shortest angular
+ * difference.  The inputs and ouputs are radians.
+ *
+ * This function returns (from + delta) where delta is in the range of [-pi, pi].
+ * However, if |delta| > tol, then this function simply returns incoming parameter "to".
+ *
+ */
+ODE_API static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.3)
+{
+  dReal result = dShortestAngularDistance(from, to);
+
+  if (dFabs(result) > tol)
+    return to;
+  else
+    return from + result;
+}
 
 #ifdef __cplusplus
 }

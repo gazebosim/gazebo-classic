@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _DARTMODEL_HH_
-#define _DARTMODEL_HH_
+#ifndef _GAZEBO_DARTMODEL_HH_
+#define _GAZEBO_DARTMODEL_HH_
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +34,7 @@ namespace gazebo
 
     /// \class DARTModel
     /// \brief DART model class
-    class DARTModel : public Model
+    class GAZEBO_VISIBLE DARTModel : public Model
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
@@ -42,55 +43,41 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTModel();
 
-      /// \brief Load the model.
-      /// \param[in] _sdf SDF parameters to load from.
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      /// \brief Initialize the model.
+      // Documentation inherited.
       public: virtual void Init();
 
-      /// \brief Update the model.
+      // Documentation inherited.
       public: virtual void Update();
 
-      /// \brief Finalize the model.
+      // Documentation inherited.
       public: virtual void Fini();
 
-      // Documentation inherited.
-      // public: virtual void Reset();
+      /// \brief
+      public: void BackupState();
 
       /// \brief
-      public: dart::dynamics::Skeleton* GetSkeleton()
-      { return dartSkeleton; }
+      public: void RestoreState();
 
       /// \brief
-      public: void SetCanonicalJoint(dart::dynamics::Joint* _joint) {
-        dartCanonicalJoint = _joint;
-      }
-
-      /// \brief
-      public: dart::dynamics::Joint* GetCanonicalJoint(void) const {
-        return dartCanonicalJoint;
-      }
+      public: dart::dynamics::Skeleton *GetDARTSkeleton();
 
       /// \brief
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
       /// \brief
-      public: dart::simulation::World* GetDARTWorld(void) const;
+      public: dart::simulation::World *GetDARTWorld(void) const;
 
       /// \brief
-      protected: dart::dynamics::Skeleton* dartSkeleton;
+      protected: dart::dynamics::Skeleton *dtSkeleton;
 
-      /// \brief Parent joint of the canonical link.
-      /// When the canonical link of this model is free floating link, this link
-      /// does not have the parent joint to the world. However, all DART's link
-      /// must have a parent joint. For free floating link, DART connect the
-      /// link with a 6dof joint to the world.
-      /// A) If the canonical link has its parent joint, then just store it in
-      /// this member variable.
-      /// B) If the canonical link does not have its parent joint, then create
-      /// 6dof joint and store the joint in this member variable.
-      protected: dart::dynamics::Joint* dartCanonicalJoint;
+      /// \brief
+      protected: Eigen::VectorXd dtConfig;
+
+      /// \brief
+      protected: Eigen::VectorXd dtVelocity;
     };
     /// \}
   }

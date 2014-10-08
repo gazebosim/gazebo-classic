@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
 #include "gazebo/common/ModelDatabase.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -44,6 +43,7 @@
 #include "gazebo/Master.hh"
 #include "gazebo/Server.hh"
 
+namespace po = boost::program_options;
 using namespace gazebo;
 
 bool Server::stop = true;
@@ -51,18 +51,13 @@ bool Server::stop = true;
 /////////////////////////////////////////////////
 Server::Server()
 {
-  this->receiveMutex = new boost::mutex();
-
-  if (signal(SIGINT, Server::SigInt) == SIG_ERR)
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+  this->initialized = false;
 }
 
 /////////////////////////////////////////////////
 Server::~Server()
 {
   fflush(stdout);
-  delete this->receiveMutex;
-  delete this->master;
 }
 
 /////////////////////////////////////////////////
@@ -76,25 +71,26 @@ void Server::PrintUsage()
 }
 
 /////////////////////////////////////////////////
-bool Server::ParseArgs(int argc, char **argv)
+bool Server::ParseArgs(int _argc, char **_argv)
 {
-  // save a copy of argc and argv for consumption by system plugins
-  this->systemPluginsArgc = argc;
-  this->systemPluginsArgv = new char*[argc];
-  for (int i = 0; i < argc; ++i)
+  // Save a copy of argc and argv for consumption by system plugins
+  this->systemPluginsArgc = _argc;
+  this->systemPluginsArgv = new char*[_argc];
+  for (int i = 0; i < _argc; ++i)
   {
-    int argvLen = strlen(argv[i]) + 1;
+    int argvLen = strlen(_argv[i]) + 1;
     this->systemPluginsArgv[i] = new char[argvLen];
-    snprintf(this->systemPluginsArgv[i], argvLen, "%s", argv[i]);
+    snprintf(this->systemPluginsArgv[i], argvLen, "%s", _argv[i]);
   }
 
-  po::options_description v_desc("Options");
-  v_desc.add_options()
-    ("quiet,q", "Reduce output to stdout.")
+  po::options_description visibleDesc("Options");
+  visibleDesc.add_options()
+    ("version,v", "Output version information.")
+    ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
     ("pause,u", "Start the server in a paused state.")
     ("physics,e", po::value<std::string>(),
-     "Specify a physics engine (ode|bullet).")
+     "Specify a physics engine (ode|bullet|dart|simbody).")
     ("play,p", po::value<std::string>(), "Play a log file.")
     ("record,r", "Record state data.")
     ("record_encoding", po::value<std::string>()->default_value("zlib"),
@@ -105,27 +101,26 @@ bool Server::ParseArgs(int argc, char **argv)
      "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(),
      "Number of iterations to simulate.")
+    ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
     ("server-plugin,s", po::value<std::vector<std::string> >(),
      "Load a plugin.");
 
-  po::options_description h_desc("Hidden options");
-  h_desc.add_options()
-    ("world_file", po::value<std::string>(), "SDF world to load.");
-
-  h_desc.add_options()
+  po::options_description hiddenDesc("Hidden options");
+  hiddenDesc.add_options()
+    ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
 
   po::options_description desc("Options");
-  desc.add(v_desc).add(h_desc);
+  desc.add(visibleDesc).add(hiddenDesc);
 
-  po::positional_options_description p_desc;
-  p_desc.add("world_file", 1).add("pass_through", -1);
+  po::positional_options_description positionalDesc;
+  positionalDesc.add("world_file", 1).add("pass_through", -1);
 
   try
   {
-    po::store(po::command_line_parser(argc, argv).options(desc).positional(
-          p_desc).allow_unregistered().run(), this->vm);
+    po::store(po::command_line_parser(_argc, _argv).options(desc).positional(
+          positionalDesc).allow_unregistered().run(), this->vm);
 
     po::notify(this->vm);
   }
@@ -137,17 +132,29 @@ bool Server::ParseArgs(int argc, char **argv)
     return false;
   }
 
-  if (this->vm.count("help"))
+  if (this->vm.count("version"))
   {
-    this->PrintUsage();
-    std::cerr << v_desc << "\n";
+    std::cout << GAZEBO_VERSION_HEADER << std::endl;
     return false;
   }
 
-  if (this->vm.count("quiet"))
-    gazebo::common::Console::Instance()->SetQuiet(true);
+  if (this->vm.count("help"))
+  {
+    this->PrintUsage();
+    std::cerr << visibleDesc << "\n";
+    return false;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::printVersion();
+    gazebo::common::Console::SetQuiet(false);
+  }
+
+  if (this->vm.count("minimal_comms"))
+    gazebo::transport::setMinimalComms(true);
   else
-    gazebo::print_version();
+    gazebo::transport::setMinimalComms(false);
 
   // Set the random number seed if present on the command line.
   if (this->vm.count("seed"))
@@ -171,7 +178,7 @@ bool Server::ParseArgs(int argc, char **argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::add_plugin(*iter);
+      gazebo::addPlugin(*iter);
     }
   }
 
@@ -256,7 +263,6 @@ bool Server::ParseArgs(int argc, char **argv)
   }
 
   this->ProcessParams();
-  this->Init();
 
   return true;
 }
@@ -264,7 +270,7 @@ bool Server::ParseArgs(int argc, char **argv)
 /////////////////////////////////////////////////
 bool Server::GetInitialized() const
 {
-  return !this->stop && !transport::is_stopped();
+  return !this->stop && this->initialized;
 }
 
 /////////////////////////////////////////////////
@@ -320,29 +326,14 @@ bool Server::LoadString(const std::string &_sdfString)
 /////////////////////////////////////////////////
 bool Server::PreLoad()
 {
-  std::string host = "";
-  unsigned int port = 0;
-
-  gazebo::transport::get_master_uri(host, port);
-
-  this->master = new gazebo::Master();
-  this->master->Init(port);
-  this->master->RunThread();
-
-  // Load gazebo
-  return gazebo::load(this->systemPluginsArgc, this->systemPluginsArgv);
+  // setup gazebo
+  return gazebo::setupServer(this->systemPluginsArgc, this->systemPluginsArgv);
 }
 
 /////////////////////////////////////////////////
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
-  /// Load the sensors library
-  sensors::load();
-
-  /// Load the physics library
-  physics::load();
-
   // If a physics engine is specified,
   if (_physics.length())
   {
@@ -390,24 +381,27 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
   this->worldModPub =
     this->node->Advertise<msgs::WorldModify>("/gazebo/world/modify");
 
-  // Run the gazebo, starts a new thread
-  gazebo::run();
+  common::Time waitTime(1, 0);
+  int waitCount = 0;
+  int maxWaitCount = 10;
 
-  return true;
-}
+  // Wait for namespaces.
+  while (!gazebo::transport::waitForNamespaces(waitTime) &&
+      (waitCount++) < maxWaitCount)
+  {
+    gzwarn << "Waited " << waitTime.Double() << "seconds for namespaces.\n";
+  }
 
-/////////////////////////////////////////////////
-void Server::Init()
-{
-  // Make sure the model database has started.
-  common::ModelDatabase::Instance()->Start();
-
-  gazebo::init();
-
-  sensors::init();
+  if (waitCount >= maxWaitCount)
+  {
+    gzerr << "Waited " << (waitTime * waitCount).Double()
+      << " seconds for namespaces. Giving up.\n";
+  }
 
   physics::init_worlds();
   this->stop = false;
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -429,25 +423,19 @@ void Server::Stop()
 void Server::Fini()
 {
   this->Stop();
-
-  gazebo::fini();
-
-  physics::fini();
-
-  sensors::fini();
-
-  if (this->master)
-    this->master->Fini();
-  delete this->master;
-  this->master = NULL;
-
-  // Cleanup model database.
-  common::ModelDatabase::Instance()->Fini();
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  // Now that we're about to run, install a signal handler to allow for
+  // graceful shutdown on Ctrl-C.
+  struct sigaction sigact;
+  sigact.sa_handler = Server::SigInt;
+  if (sigaction(SIGINT, &sigact, NULL))
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
   if (this->stop)
     return;
 
@@ -477,6 +465,8 @@ void Server::Run()
   // Run each world. Each world starts a new thread
   physics::run_worlds(iterations);
 
+  this->initialized = true;
+
   // Update the sensors.
   while (!this->stop && physics::worlds_running())
   {
@@ -485,16 +475,8 @@ void Server::Run()
     common::Time::MSleep(1);
   }
 
-  // Stop all the worlds
-  physics::stop_worlds();
-
-  sensors::stop();
-
-  // Stop gazebo
-  gazebo::stop();
-
-  // Stop the master
-  this->master->Stop();
+  // Shutdown gazebo
+  gazebo::shutdown();
 }
 
 /////////////////////////////////////////////////
@@ -546,7 +528,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  boost::mutex::scoped_lock lock(this->receiveMutex);
   this->controlMsgs.push_back(*_msg);
 }
 
@@ -572,6 +554,10 @@ void Server::ProcessControlMsgs()
     else if ((*iter).has_open_filename())
     {
       this->OpenWorld((*iter).open_filename());
+    }
+    else if ((*iter).has_stop() && (*iter).stop())
+    {
+      this->Stop();
     }
   }
   this->controlMsgs.clear();

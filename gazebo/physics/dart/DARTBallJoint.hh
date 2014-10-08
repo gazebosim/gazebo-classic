@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  *
 */
 
-#ifndef _DARTBALLJOINT_HH_
-#define _DARTBALLJOINT_HH_
+#ifndef _GAZEBO_DARTBALLJOINT_HH_
+#define _GAZEBO_DARTBALLJOINT_HH_
 
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief An DARTBallJoint
-    class DARTBallJoint : public BallJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTBallJoint : public BallJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
@@ -35,34 +36,56 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~DARTBallJoint();
 
-      // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int /*_index*/) const
-              {return math::Vector3();}
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited
-      public: virtual void SetVelocity(int /*index*/, double /*angle*/) {}
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetVelocity(int /*index*/) const {return 0;}
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
-      public: virtual double GetMaxForce(int /*index*/) {return 0;}
+      public: virtual void SetMaxForce(unsigned int _index, double _t);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int /*index*/, double /*t*/) {}
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
-      // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int /*index*/) const
-              {return math::Angle(0);}
+      // Documentation inherited.
+      protected: void SetForceImpl(unsigned int _index, double _torque);
+
+      // Documentation inherited.
+      public: virtual void SetAxis(unsigned int _index,
+                                   const math::Vector3 &_axis);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetHighStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual math::Angle GetLowStop(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual bool SetHighStop(unsigned int _index,
+                                       const math::Angle &_angle);
+
+      // Documentation inherited.
+      public: virtual bool SetLowStop(unsigned int _index,
+                                      const math::Angle &_angle);
+
+      /// \brief
+      protected: dart::dynamics::BallJoint *dtBallJoint;
     };
   }
 }

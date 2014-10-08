@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,9 +79,13 @@ TEST_F(RenderingSensorTest, Timestamp)
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, camPose.pos,
       camPose.rot.GetAsEuler(), width, height, updateRate);
+
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  EXPECT_TRUE(sensor != NULL);
+
   sensors::CameraSensorPtr camSensor1 =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor1 != NULL);
 
   std::string modelName2 = "camera_model2";
   std::string cameraName2 = "camera_sensor2";
@@ -89,9 +93,13 @@ TEST_F(RenderingSensorTest, Timestamp)
       math::Vector3(5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
   SpawnCamera(modelName2, cameraName2, camPose2.pos,
       camPose2.rot.GetAsEuler(), width, height, updateRate);
+
   sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
+  EXPECT_TRUE(sensor2 != NULL);
+
   sensors::CameraSensorPtr camSensor2 =
     boost::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+  EXPECT_TRUE(camSensor2 != NULL);
 
   // spawn gpu ray sensor
   std::string modelName3 = "gpu_ray_model";
@@ -110,14 +118,10 @@ TEST_F(RenderingSensorTest, Timestamp)
       rangeResolution, samples);
 
   sensors::SensorPtr sensor3 = sensors::get_sensor(raySensorName);
+  ASSERT_TRUE(sensor3 != NULL);
+
   sensors::GpuRaySensorPtr gpuRaySensor =
     boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor3);
-
-  common::Time::MSleep(1000);
-
-  // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(camSensor1 != NULL);
-  EXPECT_TRUE(camSensor2 != NULL);
   EXPECT_TRUE(gpuRaySensor != NULL);
 
   camSensor1->SetActive(true);
@@ -144,10 +148,10 @@ TEST_F(RenderingSensorTest, Timestamp)
       cam1TimeStamps.size() < numTimestamps ||
       cam2TimeStamps.size() < numTimestamps) && i < 500)
   {
-    common::Time::MSleep(10);
+    common::Time::MSleep(100);
     i++;
   }
-  EXPECT_LT(i, 500);
+  ASSERT_LT(i, 500);
 
   // Verify that there are no duplicate timestamps
   for (unsigned int j = 0; j < numTimestamps - 1; ++j)

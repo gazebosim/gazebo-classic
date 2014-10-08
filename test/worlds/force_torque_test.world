@@ -17,6 +17,20 @@
           <contact_surface_layer>0.01000</contact_surface_layer>
         </constraints>
       </ode>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>1000</iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+          <contact_surface_layer>0.00000</contact_surface_layer>
+        </constraints>
+      </bullet>
       <real_time_update_rate>0.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
@@ -120,6 +134,9 @@
           <visualize>true</visualize>
           <update_rate>30</update_rate>
         </sensor>
+        <physics>
+          <provide_feedback>true</provide_feedback>
+        </physics>
       </joint>
 
       <joint name="joint_12" type="revolute">
@@ -131,8 +148,8 @@
         <pose>0 0 0 0 0 0</pose>
         <axis>
           <limit>
-            <lower>-0.0</lower>
-            <upper>0.0</upper>
+            <lower>-0.000001</lower>
+            <upper>0.000001</upper>
             <effort>1000.000000</effort>
             <velocity>1000.000000</velocity>
           </limit>
@@ -147,6 +164,9 @@
           <visualize>true</visualize>
           <update_rate>30</update_rate>
         </sensor>
+        <physics>
+          <provide_feedback>true</provide_feedback>
+        </physics>
       </joint>
     </model>
   </world>

@@ -102,14 +102,24 @@ set (headers
   cegui.h
 )
 
+if (HAVE_OCULUS)
+  set (sources ${sources}
+    OculusCamera.cc
+  )
+  set (headers ${headers}
+    OculusCamera.hh
+  )
+endif ()
+
 set (gtest_sources
-  Heightmap_TEST.cc
 )
 
 gz_build_tests(${gtest_sources})
 
 set (gtest_sources_dri
-  GpuLaser_TEST.cc)
+  GpuLaser_TEST.cc
+  Heightmap_TEST.cc
+)
 
 gz_build_dri_tests(${gtest_sources_dri})
 
@@ -127,14 +137,22 @@ link_directories(
 
 gz_add_library(gazebo_rendering ${sources})
 
-target_link_libraries( gazebo_rendering
+target_link_libraries(gazebo_rendering
   gazebo_common
+  gazebo_msgs
   gazebo_skyx
   gazebo_selection_buffer
+  gazebo_transport
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
 )
+
+if (HAVE_OCULUS)
+  target_link_libraries(gazebo_rendering
+    OculusVR
+  )
+endif()
 
 if (NOT APPLE)
   target_link_libraries(gazebo_rendering X11)
@@ -146,6 +164,3 @@ endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)
-
-# Deprecated Rendering.hh
-gz_issue_775("Rendering")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ using namespace physics;
 DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
   : RayShape(_physicsEngine)
 {
-  this->SetName("DART Ray Shape");
-
+  this->SetName("DART_ray_shape");
   this->physicsEngine =
     boost::static_pointer_cast<DARTPhysics>(_physicsEngine);
 }
@@ -42,6 +41,9 @@ DARTRayShape::DARTRayShape(PhysicsEnginePtr _physicsEngine)
 DARTRayShape::DARTRayShape(CollisionPtr _parent)
     : RayShape(_parent)
 {
+  this->SetName("DART_ray_shape");
+  this->physicsEngine = boost::static_pointer_cast<DARTPhysics>(
+      this->collisionParent->GetWorld()->GetPhysicsEngine());
 }
 
 //////////////////////////////////////////////////
@@ -52,76 +54,20 @@ DARTRayShape::~DARTRayShape()
 //////////////////////////////////////////////////
 void DARTRayShape::Update()
 {
-  if (this->collisionParent)
-  {
-    DARTCollisionPtr collision =
-        boost::static_pointer_cast<DARTCollision>(this->collisionParent);
-
-    LinkPtr link = this->collisionParent->GetLink();
-    GZ_ASSERT(link != NULL, "DART link is NULL");
-
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
-
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
-  }
-
-  Eigen::Vector3d start(this->globalStartPos.x, this->globalStartPos.y,
-      this->globalStartPos.z);
-  Eigen::Vector3d end(this->globalEndPos.x, this->globalEndPos.y,
-      this->globalEndPos.z);
-
-//  btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
-//  rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
-//  rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
-
-  boost::recursive_mutex::scoped_lock lock(
-      *this->physicsEngine->GetPhysicsUpdateMutex());
-
-//  this->physicsEngine->GetDynamicsWorld()->rayTest(
-//      start, end, rayCallback);
-
-//  if (rayCallback.hasHit())
-//  {
-//    math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
-//                         rayCallback.m_hitPointWorld.getY(),
-//                         rayCallback.m_hitPointWorld.getZ());
-//    this->SetLength(this->globalStartPos.Distance(result));
-//  }
+  // Not implemented yet, please see issue #911
 }
 
 //////////////////////////////////////////////////
-void DARTRayShape::GetIntersection(double& _dist, std::string& _entity)
+void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 {
   _dist = 0;
   _entity = "";
 
   if (this->physicsEngine)
   {
-    Eigen::Vector3d start(this->globalStartPos.x, this->globalStartPos.y,
-        this->globalStartPos.z);
-    Eigen::Vector3d end(this->globalEndPos.x, this->globalEndPos.y,
-        this->globalEndPos.z);
-
-    //btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
-    //rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
-    //rayCallback.m_collisionFilterMask = ~GZ_SENSOR_COLLIDE;
-    //this->physicsEngine->GetDynamicsWorld()->rayTest(
-    //    start, end, rayCallback);
-//    if (rayCallback.hasHit())
-//    {
-//      math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
-//                           rayCallback.m_hitPointWorld.getY(),
-//                           rayCallback.m_hitPointWorld.getZ());
-//      _dist = this->globalStartPos.Distance(result);
-
-//      DARTLink* link = static_cast<DARTLink*>(
-//          rayCallback.m_collisionObject->getUserPointer());
-//      GZ_ASSERT(link != NULL, "DART link is NULL");
-//      _entity = link->GetScopedName();
-//    }
   }
+
+  // Not implemented yet, please see issue #911
 }
 
 //////////////////////////////////////////////////
@@ -129,4 +75,6 @@ void DARTRayShape::SetPoints(const math::Vector3& _posStart,
                              const math::Vector3& _posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
+
+  // Not implemented yet, please see issue #911
 }

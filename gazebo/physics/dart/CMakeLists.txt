@@ -1,66 +1,69 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-include_directories(${DART_INCLUDE_DIRS}
-                    ${FCL_INCLUDEDIR}
-                    ${ASSIMP_INCLUDEDIR})
+include_directories(${DARTCore_INCLUDE_DIRS})
 
-link_directories(${DART_LIBRARY_DIRS}
-                 ${FCL_LIBRARY_DIRS}
-                 ${ASSIMP_LIBRARY_DIRS})
-
-add_definitions(${DART_DEFINITIONS})
+link_directories(${DARTCore_LIBRARY_DIRS})
 
 set (sources
-    DARTPhysics.cc
+    DARTBallJoint.cc
     DARTCollision.cc
     DARTLink.cc
-    DARTJoint.cc
-    DARTSliderJoint.cc
+    DARTHeightmapShape.cc
     DARTHingeJoint.cc
     DARTHinge2Joint.cc
-    DARTUniversalJoint.cc
-    DARTBallJoint.cc
+    DARTJoint.cc
+    DARTMesh.cc
     DARTMeshShape.cc
-    DARTRayShape.cc
-    DARTMultiRayShape.cc
-    DARTHeightmapShape.cc
-    DARTScrewJoint.cc
     DARTModel.cc
+    DARTMultiRayShape.cc
+    DARTPhysics.cc
+    DARTPolylineShape.cc
+    DARTRayShape.cc
+    DARTScrewJoint.cc
+    DARTSliderJoint.cc
+    DARTUniversalJoint.cc
 )
 
 SET (headers
-    DART_inc.h
-    DARTPhysics.hh
+    DARTBallJoint.hh
+    DARTBoxShape.hh
     DARTCollision.hh
-    DARTLink.hh
-    DARTJoint.hh
-    DARTSliderJoint.hh
+    DARTCylinderShape.hh
+    DARTHeightmapShape.hh
     DARTHingeJoint.hh
     DARTHinge2Joint.hh
-    DARTUniversalJoint.hh
-    DARTBallJoint.hh
+    DARTJoint.hh
+    DARTLink.hh
+    DARTMesh.hh
     DARTMeshShape.hh
-    DARTRayShape.hh
-    DARTMultiRayShape.hh
-    DARTHeightmapShape.hh
-    DARTSphereShape.hh
-    DARTBoxShape.hh
-    DARTPlaneShape.hh
-    DARTCylinderShape.hh
-    DARTTypes.hh
-    DARTScrewJoint.hh
     DARTModel.hh
+    DARTMultiRayShape.hh
+    DARTPhysics.hh
+    DARTPlaneShape.hh
+    DARTPolylineShape.hh
+    DARTRayShape.hh
+    DARTScrewJoint.hh
+    DARTSliderJoint.hh
+    DARTSphereShape.hh
+    DARTTypes.hh
+    DARTUniversalJoint.hh
+    dart_inc.h
 )
 
-gz_add_library(gazebo_physics_dart ${sources})
-
-# these flags should probably go into dart.pc
-target_link_libraries(gazebo_physics_dart ${DART_LIBRARIES} -ldart_dynamics -ldart_simulation -lfcl -lassimp)
-
-gz_install_library(gazebo_physics_dart)
-
-# unit tests
 set (gtest_sources
-  DARTJoint_TEST.cc
+  #DARTPhysics_TEST.cc
 )
 gz_build_tests(${gtest_sources})
+
+gz_add_library(gazebo_physics_dart ${headers} ${sources})
+
+target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
+
+gz_install_library(gazebo_physics_dart)
+gz_install_includes("physics/dart" ${headers})
+
+# unit tests
+#set (gtest_sources
+#  DARTJoint_TEST.cc
+#)
+#gz_build_tests(${gtest_sources})

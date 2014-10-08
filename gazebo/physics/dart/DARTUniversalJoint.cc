@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,113 +17,203 @@
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
-
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTUniversalJoint.hh"
 
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
-    : UniversalJoint<DARTJoint>(_parent)
+    : UniversalJoint<DARTJoint>(_parent),
+      dtUniveralJoint(new dart::dynamics::UniversalJoint())
 {
+  this->dtJoint = dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
 DARTUniversalJoint::~DARTUniversalJoint()
 {
+  delete dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetAnchor(int /*index*/) const
+void DARTUniversalJoint::Load(sdf::ElementPtr _sdf)
 {
-  gzwarn << "Not implemented!\n";
-
-  return math::Vector3(0, 0, 0);
+  UniversalJoint<DARTJoint>::Load(_sdf);
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAnchor(int /*index*/, const math::Vector3& /*_anchor*/)
+void DARTUniversalJoint::Init()
 {
-  gzwarn << "Not implemented!\n";
+  UniversalJoint<DARTJoint>::Init();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetGlobalAxis(int /*_index*/) const
+math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int /*index*/) const
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
 
-  return math::Vector3(0, 0, 0);
+  return DARTTypes::ConvVec3(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAxis(int /*_index*/, const math::Vector3& /*_axis*/)
+math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  if (_index == 0)
+  {
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                          this->dtJoint->getLocalTransform().inverse() *
+                          this->dtJoint->getTransformFromParentBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis1();
+
+    globalAxis = T.linear() * axis;
+  }
+  else if (_index == 1)
+  {
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis2();
+
+    globalAxis = T.linear() * axis;
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetDamping(int /*_index*/, double /*_damping*/)
+void DARTUniversalJoint::SetAxis(unsigned int _index,
+    const math::Vector3 &_axis)
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
+      this->GetAxisFrameOffset(_index).RotateVector(_axis));
+  Eigen::Isometry3d dtTransfJointLeftToParentLink
+      = this->dtJoint->getTransformFromParentBodyNode().inverse();
+  dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
+
+  if (_index == 0)
+  {
+    this->dtUniveralJoint->setAxis1(dtAxis);
+  }
+  else if (_index == 1)
+  {
+    this->dtUniveralJoint->setAxis2(dtAxis);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTUniversalJoint::GetAngleImpl(int /*_index*/) const
+math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+  {
+    double radianAngle = this->dtJoint->getPosition(0);
+    result.SetFromRadian(radianAngle);
+  }
+  else if (_index == 1)
+  {
+    double radianAngle = this->dtJoint->getPosition(1);
+    result.SetFromRadian(radianAngle);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
   return result;
 }
 
 //////////////////////////////////////////////////
-double DARTUniversalJoint::GetVelocity(int /*_index*/) const
+double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 {
-  double result = 0;
+  double result = 0.0;
 
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+    result = this->dtJoint->getVelocity(0);
+  else if (_index == 1)
+    result = this->dtJoint->getVelocity(1);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetVelocity(int /*_index*/, double /*_angle*/)
+void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index < this->GetAngleCount())
+  {
+    this->dtJoint->setVelocity(_index, _vel);
+    this->dtJoint->getSkeleton()->computeForwardKinematics(false, true, false);
+  }
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetForce(int /*_index*/, double /*_torque*/)
+void DARTUniversalJoint::SetMaxForce(unsigned int _index, double _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
+  else if (_index == 1)
+  {
+    this->dtJoint->setForceLowerLimit(1, -_force);
+    this->dtJoint->setForceUpperLimit(1, _force);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetMaxForce(int /*_index*/, double /*_t*/)
+double DARTUniversalJoint::GetMaxForce(unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  double result = 0.0;
+
+  if (_index == 0)
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
+  else if (_index == 1)
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(1);
+    result = this->dtJoint->getForceUpperLimit(1);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
-double DARTUniversalJoint::GetMaxForce(int /*_index*/)
+void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 {
-  gzwarn << "Not implemented!\n";
-
-  return 0;
+  if (_index == 0)
+    this->dtJoint->setForce(0, _effort);
+  else if (_index == 1)
+    this->dtJoint->setForce(1, _effort);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
-
-//////////////////////////////////////////////////
-void DARTUniversalJoint::SetParam(int /*_parameter*/, double /*_value*/)
-{
-  gzwarn << "Not implemented!\n";
-}
-
-
-
-
-
-
-

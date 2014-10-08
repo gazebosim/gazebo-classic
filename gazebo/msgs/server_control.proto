@@ -13,6 +13,5 @@ message ServerControl
   optional string save_filename   = 2;
   optional string open_filename   = 3;
   optional bool new_world         = 4;
+  optional bool stop              = 5;
 }
-
-

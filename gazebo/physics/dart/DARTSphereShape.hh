@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef _DARTSPHERESHAPE_HH_
-#define _DARTSPHERESHAPE_HH_
+#ifndef _GAZEBO_DARTSPHERESHAPE_HH_
+#define _GAZEBO_DARTSPHERESHAPE_HH_
 
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/SphereShape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A DART sphere shape
-    class DARTSphereShape : public SphereShape
+    class GAZEBO_VISIBLE DARTSphereShape : public SphereShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -38,18 +39,48 @@ namespace gazebo
       public: virtual ~DARTSphereShape() {}
 
       // Documentation inherited.
-      public: virtual void SetRadius(double /*_radius*/)
+      public: virtual void SetRadius(double _radius)
       {
-//         SphereShape::SetRadius(_radius);
-//         DARTCollisionPtr oParent;
-//         oParent =
-//           boost::shared_dynamic_cast<DARTCollision>(this->collisionParent);
-// 
-//         // Create the sphere geometry
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreateSphere(0, _radius), true);
-//         else
-//           dGeomSphereSetRadius(oParent->GetCollisionId(), _radius);
+        if (_radius < 0)
+        {
+          gzerr << "Sphere shape does not support negative radius.\n";
+          return;
+        }
+        if (math::equal(_radius, 0.0))
+        {
+          // Warn user, but still create shape with very small value
+          // otherwise later resize operations using setLocalScaling
+          // will not be possible
+          gzwarn << "Setting sphere shape's radius to zero is not supported "
+                 << "in DART, using 1e-4.\n";
+          _radius = 1e-4;
+        }
+
+        SphereShape::SetRadius(_radius);
+
+        DARTCollisionPtr dartCollisionParent =
+            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+
+        if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+        {
+          dart::dynamics::BodyNode *dtBodyNode =
+              dartCollisionParent->GetDARTBodyNode();
+          dart::dynamics::EllipsoidShape *dtEllisoidShape =
+              new dart::dynamics::EllipsoidShape(Eigen::Vector3d(_radius*2.0,
+                                                                 _radius*2.0,
+                                                                 _radius*2.0));
+          dtBodyNode->addCollisionShape(dtEllisoidShape);
+          dartCollisionParent->SetDARTCollisionShape(dtEllisoidShape);
+        }
+        else
+        {
+          dart::dynamics::EllipsoidShape *dtEllipsoidShape =
+              dynamic_cast<dart::dynamics::EllipsoidShape*>(
+                dartCollisionParent->GetDARTCollisionShape());
+          dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,
+                                                    _radius*2.0,
+                                                    _radius*2.0));
+        }
       }
     };
   }

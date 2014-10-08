@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _DARTTYPES_H_
-#define _DARTTYPES_H_
+#ifndef _GAZEBO_DARTTYPES_HH_
+#define _GAZEBO_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_physics
@@ -50,37 +51,37 @@ namespace gazebo
     /// \class DARTTypes DARTTypes.hh
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and dart.
-    class DARTTypes
+    class GAZEBO_VISIBLE DARTTypes
     {
       /// \brief
-      public: static Eigen::Vector3d ConvVec3(const math::Vector3& _vec3)
+      public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)
         {
             return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
         }
 
         /// \brief
-      public: static math::Vector3 ConvVec3(const Eigen::Vector3d& _vec3)
+      public: static math::Vector3 ConvVec3(const Eigen::Vector3d &_vec3)
         {
             return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
         }
 
         /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion& _quat)
+      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
         {
             return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
         }
 
         /// \brief
-      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond& _quat)
+      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
         {
             return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
         }
 
         /// \brief
-      public: static Eigen::Isometry3d ConvPose(const math::Pose& _pose)
+      public: static Eigen::Isometry3d ConvPose(const math::Pose &_pose)
         {
             // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
-            //return Eigen::Translation3d(ConvVec3(_pose.pos)) *
+            // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
             //        ConvQuat(_pose.rot);
 
             Eigen::Isometry3d res;
@@ -92,7 +93,7 @@ namespace gazebo
         }
 
         /// \brief
-      public: static math::Pose ConvPose(const Eigen::Isometry3d& _T)
+      public: static math::Pose ConvPose(const Eigen::Isometry3d &_T)
         {
             math::Pose pose;
             pose.pos = ConvVec3(_T.translation());

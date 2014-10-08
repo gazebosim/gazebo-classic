@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  *
 */
 
-#ifndef _DARTUNIVERSALJOINT_HH_
-#define _DARTUNIVERSALJOINT_HH_
+#ifndef _GAZEBO_DARTUNIVERSALJOINT_HH_
+#define _GAZEBO_DARTUNIVERSALJOINT_HH_
 
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A universal joint.
-    class DARTUniversalJoint : public UniversalJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTUniversalJoint : public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -35,41 +36,42 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~DARTUniversalJoint();
 
-      // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      // Documentation inherited.
+      public: virtual void Load(sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3 &_anchor);
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3 &_axis);
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _angle);
+      public: virtual void SetMaxForce(unsigned int _index, double _force);
 
       // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
+      public: virtual double GetMaxForce(unsigned int _index);
 
       // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _t);
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
-      // Documentation inherited
-      public: virtual double GetMaxForce(int _index);
-
-      // Documentation inherited
-      public: virtual void SetParam(int _parameter, double _value);
+      /// \brief Universal joint of DART
+      protected: dart::dynamics::UniversalJoint *dtUniveralJoint;
     };
   }
 }

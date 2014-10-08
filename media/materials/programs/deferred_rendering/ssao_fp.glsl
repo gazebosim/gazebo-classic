@@ -84,7 +84,7 @@ void main()
 
     // this is a sample occlusion function, you can always play with
     // other ones, like 1.0 / (1.0 + zd * zd) and stuff
-    occ += clamp(pow(1.0 - zd, 11) + zd, 0.0, 1.0);
+    occ += clamp(pow(1.0 - zd, 11.0) + zd, 0.0, 1.0);
   }
 
   occ /= 6.0;

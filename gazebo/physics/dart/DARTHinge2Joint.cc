@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,18 @@
 using namespace gazebo;
 using namespace physics;
 
-
 //////////////////////////////////////////////////
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
-    : Hinge2Joint<DARTJoint>(_parent)
+    : Hinge2Joint<DARTJoint>(_parent),
+      dtUniveralJoint(new dart::dynamics::UniversalJoint())
 {
+  this->dtJoint = dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
 DARTHinge2Joint::~DARTHinge2Joint()
 {
+  delete dtUniveralJoint;
 }
 
 //////////////////////////////////////////////////
@@ -42,92 +44,186 @@ void DARTHinge2Joint::Load(sdf::ElementPtr _sdf)
   Hinge2Joint<DARTJoint>::Load(_sdf);
 }
 
+//////////////////////////////////////////////////
 void DARTHinge2Joint::Init()
 {
-
+  Hinge2Joint<DARTJoint>::Init();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetAnchor(int /*_index*/) const
+math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int /*_index*/) const
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                        this->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
 
-  return math::Vector3(0, 0, 0);
+  return DARTTypes::ConvVec3(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAnchor(int /*index*/, const math::Vector3 &/*_anchor*/)
+void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(_axis);
+
+  if (_index == 0)
+  {
+    // TODO: Issue #494
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
+    Eigen::Isometry3d dartTransfJointLeftToParentLink
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
+    dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
+
+    this->dtUniveralJoint->setAxis1(dartAxis);
+  }
+  else if (_index == 1)
+  {
+    // TODO: Issue #494
+    // See: https://bitbucket.org/osrf/gazebo/issue/494/joint-axis-reference
+    Eigen::Isometry3d dartTransfJointLeftToParentLink
+        = this->dtJoint->getTransformFromParentBodyNode().inverse();
+    dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;
+
+    this->dtUniveralJoint->setAxis2(dartAxis);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(int /*_index*/, const math::Vector3 &/*_axis*/)
+math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
 {
-  gzwarn << "Not implemented!\n";
+  Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  if (_index == 0)
+  {
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                          this->dtJoint->getLocalTransform().inverse() *
+                          this->dtJoint->getTransformFromParentBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis1();
+
+    globalAxis = T.linear() * axis;
+  }
+  else if (_index == 1)
+  {
+    Eigen::Isometry3d T = this->dtChildBodyNode->getTransform() *
+                          this->dtJoint->getTransformFromChildBodyNode();
+    Eigen::Vector3d axis = this->dtUniveralJoint->getAxis2();
+
+    globalAxis = T.linear() * axis;
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  // TODO: Issue #494
+  // See: https://bitbucket.org/osrf/gazebo/issue/494/
+  // joint-axis-reference-frame-doesnt-match
+  return DARTTypes::ConvVec3(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetDamping(int /*_index*/, double /*_damping*/)
-{
-  gzwarn << "Not implemented!\n";
-}
-
-//////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetGlobalAxis(int /*_index*/) const
-{
-  gzwarn << "Not implemented!\n";
-
-  return math::Vector3(0, 0, 0);
-}
-
-//////////////////////////////////////////////////
-math::Angle DARTHinge2Joint::GetAngleImpl(int _index) const
+math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
 {
   math::Angle result;
 
   if (_index == 0)
-    result = this->dartJoint->getGenCoord(0)->get_q();
+  {
+    double radianAngle = this->dtJoint->getPosition(0);
+    result.SetFromRadian(radianAngle);
+  }
+  else if (_index == 1)
+  {
+    double radianAngle = this->dtJoint->getPosition(1);
+    result.SetFromRadian(radianAngle);
+  }
   else
-    result = this->dartJoint->getGenCoord(1)->get_q();
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 
   return result;
 }
 
 //////////////////////////////////////////////////
-double DARTHinge2Joint::GetVelocity(int /*_index*/) const
+double DARTHinge2Joint::GetVelocity(unsigned int _index) const
 {
-  double result = 0;
+  double result = 0.0;
 
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+    result = this->dtJoint->getVelocity(0);
+  else if (_index == 1)
+    result = this->dtJoint->getVelocity(1);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetVelocity(int /*_index*/, double /*_angle*/)
+void DARTHinge2Joint::SetVelocity(unsigned int _index, double _vel)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+    this->dtJoint->setVelocity(0, _vel);
+  else if (_index == 1)
+    this->dtJoint->setVelocity(1, _vel);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }
 
 //////////////////////////////////////////////////
-double DARTHinge2Joint::GetMaxForce(int /*_index*/)
+double DARTHinge2Joint::GetMaxForce(unsigned int _index)
 {
-  gzwarn << "Not implemented!\n";
+  double result = 0.0;
 
-  return 0;
+  if (_index == 0)
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(0);
+    result = this->dtJoint->getForceUpperLimit(0);
+  }
+  else if (_index == 1)
+  {
+    // Assume that the lower limit and upper limit has equal magnitute
+    // result = this->dtJoint->getForceLowerLimit(1);
+    result = this->dtJoint->getForceUpperLimit(1);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
+
+  return result;
 }
 
-
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetMaxForce(int /*_index*/, double /*_t*/)
+void DARTHinge2Joint::SetMaxForce(unsigned int _index, double _force)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+  {
+    this->dtJoint->setForceLowerLimit(0, -_force);
+    this->dtJoint->setForceUpperLimit(0, _force);
+  }
+  else if (_index == 1)
+  {
+    this->dtJoint->setForceLowerLimit(1, -_force);
+    this->dtJoint->setForceUpperLimit(1, _force);
+  }
+  else
+  {
+    gzerr << "Invalid index[" << _index << "]\n";
+  }
 }
 
-
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetForce(int /*_index*/, double /*_torque*/)
+void DARTHinge2Joint::SetForceImpl(unsigned int _index, double _effort)
 {
-  gzwarn << "Not implemented!\n";
+  if (_index == 0)
+    this->dtJoint->setForce(0, _effort);
+  else if (_index == 1)
+    this->dtJoint->setForce(1, _effort);
+  else
+    gzerr << "Invalid index[" << _index << "]\n";
 }

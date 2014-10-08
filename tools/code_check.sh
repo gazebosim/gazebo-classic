@@ -14,6 +14,11 @@ else
   builddir=./build
 fi
 
+# Identify cppcheck version
+CPPCHECK_VERSION=`cppcheck --version | sed -e 's@Cppcheck @@'`
+CPPCHECK_LT_157=`echo "$CPPCHECK_VERSION 1.57" | \
+                 awk '{if ($1 < $2) print 1; else print 0}'`
+
 QUICK_CHECK=0
 if test "$1" = "--quick"
 then
@@ -33,7 +38,7 @@ then
   CHECK_FILES=""
   while read line; do
     for f in $line; do
-      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$'`"
+      CHECK_FILES="$CHECK_FILES `echo $f | grep '\.[ch][ch]*$' | grep -v '^deps'`"
     done
   done
   CPPCHECK_FILES="$CHECK_FILES"
@@ -42,37 +47,64 @@ then
 else
   CHECK_DIRS="./plugins ./gazebo ./tools ./examples ./test/integration"\
 " ./test/regression ./interfaces ./test/performance"\
+" ./test/examples ./test/plugins"\
 " ./test/cmake ./test/pkgconfig ./test/ServerFixture.*"
-  CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+  if [ $CPPCHECK_LT_157 -eq 1 ]; then
+    # cppcheck is older than 1.57, so don't check header files (issue #907)
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc"`
+  else
+    CPPCHECK_FILES=`find $CHECK_DIRS -name "*.cc" -o -name "*.hh"`
+  fi
   CPPLINT_FILES=`\
     find $CHECK_DIRS -name "*.cc" -o -name "*.hh" -o -name "*.c" -o -name "*.h"`
 fi
 
 SUPPRESS=/tmp/gazebo_cpp_check.suppress
-echo "*:gazebo/sdf/interface/parser.cc:544" > $SUPPRESS
-echo "*:gazebo/common/STLLoader.cc:94" >> $SUPPRESS
+echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:145" >> $SUPPRESS
-echo "*:gazebo/common/Plugin.hh:118" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 # Not defined FREEIMAGE_COLORORDER
 echo "*:gazebo/common/Image.cc:1" >> $SUPPRESS
 
-#cppcheck
-CPPCHECK_BASE="cppcheck -q --suppressions-list=$SUPPRESS"
+# The follow suppression is useful when checking for missing includes.
+# It's disable for now because checking for missing includes is very
+# time consuming. See CPPCHECK_CMD3.
+# Only precise (12.04) and raring (13.04) need this. Fixed from Saucy on.
+if [ -n "$(which lsb_release)" ]; then
+   case `lsb_release -s -d | sed 's:Ubuntu ::' | cut -c1-5` in
+       "12.04" | "13.04" )
+         echo "missingIncludeSystem" >> $SUPPRESS
+       ;;
+   esac
+fi
+
+#cppcheck.
+# MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
+[ -z $MAKE_JOBS ] && MAKE_JOBS=1
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+if [ $CPPCHECK_LT_157 -eq 0 ]; then
+  # use --language argument if 1.57 or greater (issue #907)
+  CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"
+fi
 CPPCHECK_INCLUDES="-I gazebo/rendering/skyx/include -I . -I $builddir"\
 " -I $builddir/gazebo/msgs -I deps -I deps/opende/include -I test"
-CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"
+CPPCHECK_RULES="--rule-file=./tools/cppcheck_rules/issue_581.rule"\
+" --rule-file=./tools/cppcheck_rules/issue_906.rule"
 CPPCHECK_CMD1A="-j 4 --enable=style,performance,portability,information"
 CPPCHECK_CMD1B="$CPPCHECK_RULES $CPPCHECK_FILES"
 CPPCHECK_CMD1="$CPPCHECK_CMD1A $CPPCHECK_CMD1B"
 # This command used to be part of the script but was removed since our API
 # provides many functions that Gazebo does not use internally
 CPPCHECK_CMD2="--enable=unusedFunction $CPPCHECK_FILES"
-CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
-" $CPPCHECK_INCLUDES --check-config"
+
+# Checking for missing includes is very time consuming. This is disabled
+# for now
+# CPPCHECK_CMD3="-j 4 --enable=missingInclude $CPPCHECK_FILES"\
+# " $CPPCHECK_INCLUDES"
+CPPCHECK_CMD3=""
+
 if [ $xmlout -eq 1 ]; then
   # Performance, style, portability, and information
   ($CPPCHECK_BASE --xml $CPPCHECK_CMD1) 2> $xmldir/cppcheck.xml
@@ -87,11 +119,26 @@ elif [ $QUICK_CHECK -eq 1 ]; then
     tmp2base=`basename "$QUICK_TMP"`
     hg cat -r $QUICK_SOURCE $hg_root/$f > $tmp2
 
-    if test $ext = "cc"; then
+    # Fix suppressions for tmp files
+    sed -i -e "s@$f@$tmp2@" $SUPPRESS
+
+    # Skip cppcheck for header files if cppcheck is old
+    DO_CPPCHECK=0
+    if [ $ext = 'cc' ]; then
+      DO_CPPCHECK=1
+    elif [ $CPPCHECK_LT_157 -eq 0 ]; then
+      DO_CPPCHECK=1
+    fi 
+
+    if [ $DO_CPPCHECK -eq 1 ]; then
       $CPPCHECK_BASE $CPPCHECK_CMD1A $CPPCHECK_RULES $tmp2 2>&1 \
         | sed -e "s@$tmp2@$f@g" \
-        | grep -v 'use --check-config for details'
+        | grep -v 'use --check-config for details' \
+        | grep -v 'Include file: .*not found'
     fi
+
+    # Undo changes to suppression file
+    sed -i -e "s@$tmp2@$f@" $SUPPRESS
 
     python $hg_root/tools/cpplint.py $tmp2 2>&1 \
       | sed -e "s@$tmp2@$f@g" -e "s@$tmp2base@$prefix@g" \

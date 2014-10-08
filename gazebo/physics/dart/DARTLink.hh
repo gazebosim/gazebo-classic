@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *
 */
 
-#ifndef _DARTLINK_HH_
-#define _DARTLINK_HH_
+#ifndef _GAZEBO_DARTLINK_HH_
+#define _GAZEBO_DARTLINK_HH_
+
+#include <vector>
 
 #include "gazebo/physics/Link.hh"
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -33,7 +36,7 @@ namespace gazebo
     /// \{
 
     /// \brief DART Link class
-    class DARTLink : public Link
+    class GAZEBO_VISIBLE DARTLink : public Link
     {
       /// \brief Constructor
       public: explicit DARTLink(EntityPtr _parent);
@@ -137,44 +140,55 @@ namespace gazebo
       // Documentation inherited
       public: virtual void SetAutoDisable(bool _disable);
 
-      // TODO: (in test)
+      // Documentation inherited
+      public: virtual void SetLinkStatic(bool _static);
+
+      /// \brief Store DART Transformation to Entity::dirtyPose and add this
+      ///        link to World::dirtyPoses so that World::Update() trigger
+      ///        Entity::SetWorldPose() for this link.
       public: void updateDirtyPoseFromDARTTransformation();
 
-      /// \brief
-      public: dart::dynamics::BodyNode* GetBodyNode() const
-      {return dartBodyNode;}
-
-      /// \brief
+      /// \brief Get pointer to DART Physics engine associated with this link.
+      /// \return Pointer to the DART Physics engine.
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
-      /// \brief
-      public: dart::simulation::World* GetDARTWorld(void) const;
+      /// \brief Get pointer to DART World associated with this link.
+      /// \return Pointer to the DART World.
+      public: dart::simulation::World *GetDARTWorld(void) const;
 
-      /// \brief
+      /// \brief Get pointer to DART Model associated with this link.
+      /// \return Pointer to the DART Model.
       public: DARTModelPtr GetDARTModel() const;
 
-      /// \brief
-      public: dart::dynamics::BodyNode* getDARTBodyNode() const
-      { return dartBodyNode; }
+      /// \brief Get pointer to DART BodyNode associated with this link.
+      /// \return Pointer to DART BodyNode.
+      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
 
-      /// \brief
+      /// \brief Set parent joint of this link.
+      /// \param[in] _dartParentJoint Pointer to the parent joint.
       public: void SetDARTParentJoint(DARTJointPtr _dartParentJoint);
 
-      /// \brief
+      /// \brief Set child joint of this link.
+      /// \param[in] _dartChildJoint Pointer to the child joint.
       public: void AddDARTChildJoint(DARTJointPtr _dartChildJoint);
 
       /// \brief Pointer to the DART physics engine.
       private: DARTPhysicsPtr dartPhysics;
 
-      /// \brief
-      private: dart::dynamics::BodyNode* dartBodyNode;
+      /// \brief Pointer to the DART BodyNode.
+      private: dart::dynamics::BodyNode *dtBodyNode;
 
-      /// \brief
+      /// \brief Pointer to the parent joint.
       private: DARTJointPtr dartParentJoint;
 
-      /// \brief
+      /// \brief List of pointers to the child joints.
       private: std::vector<DARTJointPtr> dartChildJoints;
 
+      /// \brief If true, freeze link to world (inertial) frame.
+      private: bool staticLink;
+
+      /// \brief Weld joint constraint for SetLinkStatic()
+      private: dart::constraint::WeldJointConstraint *weldJointConst;
     };
     /// \}
   }

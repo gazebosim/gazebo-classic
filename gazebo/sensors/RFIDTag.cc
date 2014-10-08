@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ RFIDTag::~RFIDTag()
 }
 
 /////////////////////////////////////////////////
-void RFIDTag::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void RFIDTag::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
@@ -91,7 +91,7 @@ void RFIDTag::Init()
 }
 
 //////////////////////////////////////////////////
-void RFIDTag::UpdateImpl(bool /*_force*/)
+bool RFIDTag::UpdateImpl(bool /*_force*/)
 {
   if (this->scanPub)
   {
@@ -120,4 +120,6 @@ void RFIDTag::UpdateImpl(bool /*_force*/)
     this->scanPub->Publish(msg);
     // std::cout << "update impl for rfidtag called" << std::endl;
   }
+
+  return true;
 }

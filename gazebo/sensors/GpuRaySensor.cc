@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,11 @@
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/GpuLaser.hh"
 
+#include "gazebo/sensors/Noise.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/GpuRaySensor.hh"
-#include "gazebo/rendering/GpuLaser.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -47,7 +48,11 @@ GZ_REGISTER_STATIC_SENSOR("gpu_ray", GpuRaySensor)
 GpuRaySensor::GpuRaySensor()
     : Sensor(sensors::IMAGE)
 {
+  this->rendered = false;
   this->active = false;
+  this->connections.push_back(
+      event::Events::ConnectRender(
+        boost::bind(&GpuRaySensor::Render, this)));
 }
 
 //////////////////////////////////////////////////
@@ -66,7 +71,7 @@ std::string GpuRaySensor::GetTopic() const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr &_sdf)
+void GpuRaySensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
 }
@@ -99,23 +104,11 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->vertRangeCount = this->GetVerticalRangeCount();
 
   // Handle noise model settings.
-  this->noiseActive = false;
   if (rayElem->HasElement("noise"))
   {
-    sdf::ElementPtr noiseElem = rayElem->GetElement("noise");
-    std::string type = noiseElem->Get<std::string>("type");
-    if (type == "gaussian")
-    {
-      this->noiseType = GAUSSIAN;
-      this->noiseMean = noiseElem->Get<double>("mean");
-      this->noiseStdDev = noiseElem->Get<double>("stddev");
-      this->noiseActive = true;
-      gzlog << "applying Gaussian noise model with mean " << this->noiseMean <<
-        " and stddev " << this->noiseStdDev << std::endl;
-    }
-    else
-      gzwarn << "ignoring unknown noise model type \"" << type << "\"" <<
-        std::endl;
+    this->noises.push_back(
+        NoiseFactory::NewNoiseModel(rayElem->GetElement("noise"),
+        this->GetType()));
   }
 
   this->parentEntity = this->world->GetEntity(this->parentName);
@@ -284,7 +277,7 @@ void GpuRaySensor::Init()
     this->laserCam->CreateRenderTexture(
         this->GetScopedName() + "_RttTex_Image");
     this->laserCam->SetWorldPose(this->pose);
-    this->laserCam->AttachToVisual(this->parentName, true);
+    this->laserCam->AttachToVisual(this->parentId, true);
 
     this->laserMsg.mutable_scan()->set_frame(this->parentName);
   }
@@ -496,6 +489,13 @@ math::Angle GpuRaySensor::GetVerticalAngleMax() const
 }
 
 //////////////////////////////////////////////////
+double GpuRaySensor::GetVerticalAngleResolution() const
+{
+  return (this->GetVerticalAngleMax() - this->GetVerticalAngleMin()).Radian() /
+    (this->GetVerticalRangeCount()-1);
+}
+
+//////////////////////////////////////////////////
 void GpuRaySensor::SetVerticalAngleMax(double _angle)
 {
   if (this->scanElem->HasElement("vertical"))
@@ -543,65 +543,85 @@ int GpuRaySensor::GetFiducial(int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::UpdateImpl(bool /*_force*/)
+void GpuRaySensor::Render()
 {
-  if (this->laserCam)
+  if (!this->laserCam || !this->IsActive() || !this->NeedsUpdate())
+    return;
+
+  this->lastMeasurementTime = this->scene->GetSimTime();
+
+  this->laserCam->Render();
+  this->rendered = true;
+}
+
+//////////////////////////////////////////////////
+bool GpuRaySensor::UpdateImpl(bool /*_force*/)
+{
+  if (!this->rendered)
+    return false;
+
+  this->laserCam->PostRender();
+
+  boost::mutex::scoped_lock lock(this->mutex);
+
+  msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
+
+  msgs::LaserScan *scan = this->laserMsg.mutable_scan();
+
+  // Store the latest laser scans into laserMsg
+  msgs::Set(scan->mutable_world_pose(),
+      this->pose + this->parentEntity->GetWorldPose());
+  scan->set_angle_min(this->GetAngleMin().Radian());
+  scan->set_angle_max(this->GetAngleMax().Radian());
+  scan->set_angle_step(this->GetAngleResolution());
+  scan->set_count(this->GetRayCount());
+
+  scan->set_vertical_angle_min(this->GetVerticalAngleMin().Radian());
+  scan->set_vertical_angle_max(this->GetVerticalAngleMax().Radian());
+  scan->set_vertical_angle_step(this->GetVerticalAngleResolution());
+  scan->set_vertical_count(this->GetVerticalRayCount());
+
+  scan->set_range_min(this->GetRangeMin());
+  scan->set_range_max(this->GetRangeMax());
+
+  bool add = scan->ranges_size() == 0;
+
+  // todo: add loop for vertical range count
+  for (int j = 0; j < this->GetVerticalRayCount(); ++j)
   {
-    this->laserCam->Render();
-    this->laserCam->PostRender();
-    this->lastMeasurementTime = this->scene->GetSimTime();
-
-    boost::mutex::scoped_lock lock(this->mutex);
-
-    msgs::Set(this->laserMsg.mutable_time(), this->lastMeasurementTime);
-
-    msgs::LaserScan *scan = this->laserMsg.mutable_scan();
-
-    // Store the latest laser scans into laserMsg
-    msgs::Set(scan->mutable_world_pose(),
-              this->pose + this->parentEntity->GetWorldPose());
-    scan->set_angle_min(this->GetAngleMin().Radian());
-    scan->set_angle_max(this->GetAngleMax().Radian());
-    scan->set_angle_step(this->GetAngleResolution());
-
-    scan->set_range_min(this->GetRangeMin());
-    scan->set_range_max(this->GetRangeMax());
-
-    scan->clear_ranges();
-    scan->clear_intensities();
-
-    // todo: add loop for vertical range count
-    for (int j = 0; j < this->GetVerticalRayCount(); ++j)
     for (int i = 0; i < this->GetRayCount(); ++i)
     {
-      double range = this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3];
+      int index = j * this->GetRayCount() + i;
+      double range = this->laserCam->GetLaserData()[index * 3];
 
-      if (this->noiseActive)
+      if (!this->noises.empty())
       {
-        switch (this->noiseType)
-        {
-          case GAUSSIAN:
-            // Add independent (uncorrelated) Gaussian noise to each beam.
-            range += math::Rand::GetDblNormal(this->noiseMean,
-                this->noiseStdDev);
-            // No real laser would return a range outside its stated limits.
-            range = math::clamp(range, this->GetRangeMin(),
-                this->GetRangeMax());
-            break;
-          default:
-            GZ_ASSERT(false, "Invalid noise model type");
-        }
+        range = this->noises[0]->Apply(range);
+        range = math::clamp(range, this->GetRangeMin(), this->GetRangeMax());
       }
 
-      scan->add_ranges(range);
-      scan->add_intensities(this->laserCam->GetLaserData()[
-          (j * this->GetRayCount() + i) * 3 + 1]);
-    }
+      range = math::isnan(range) ? this->GetRangeMax() : range;
 
-    if (this->scanPub && this->scanPub->HasConnections())
-      this->scanPub->Publish(this->laserMsg);
+      if (add)
+      {
+        scan->add_ranges(range);
+        scan->add_intensities(this->laserCam->GetLaserData()[index * 3 + 1]);
+      }
+      else
+      {
+        scan->set_ranges(index, range);
+        scan->set_intensities(index,
+            this->laserCam->GetLaserData()[index * 3 + 1]);
+      }
+    }
   }
+
+  if (this->scanPub && this->scanPub->HasConnections())
+    this->scanPub->Publish(this->laserMsg);
+
+  this->rendered = false;
+
+  return true;
 }
 
 //////////////////////////////////////////////////

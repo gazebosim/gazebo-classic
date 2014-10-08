@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/common/Event.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -32,7 +33,7 @@ namespace gazebo
 
     /// \class Events Events.hh common/common.hh
     /// \brief An Event class to get notifications for simulator events
-    class Events
+    class GAZEBO_VISIBLE Events
     {
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the pause signal
@@ -127,27 +128,6 @@ namespace gazebo
       /// \param[in] _subscriber the subscriber to this event
       public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
               { addEntity.Disconnect(_subscriber); }
-
-
-      //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the world update start signal
-      /// \param[in] _subscriber the subscriber to this event
-      /// \return a connection
-      public: template<typename T>
-              static ConnectionPtr ConnectWorldUpdateStart(T _subscriber)
-              {
-                // Putting in this comment so the deprecation message
-                // will be found easier: GAZEBO_DEPRECATED(1.5).
-                gzerr << "Events::ConnectWorldUpdateStart is deprecated "
-                      << "in v 1.5.0. Please use "
-                      << "Events::ConnectWorldUpdateBegin\n";
-                 return worldUpdateStart.Connect(_subscriber);
-              }
-
-      /// \brief Disconnect a boost::slot the the world update start signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldUpdateStart(ConnectionPtr _subscriber)
-              GAZEBO_DEPRECATED(1.5);
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a boost::slot the the world update start signal
@@ -268,9 +248,6 @@ namespace gazebo
 
       /// \brief An entity has been deleted
       public: static EventT<void (std::string)> deleteEntity;
-
-      /// \brief World update has started
-      public: static EventT<void ()> worldUpdateStart;
 
       /// \brief World update has started
       public: static EventT<void (const common::UpdateInfo &)> worldUpdateBegin;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
  *
 */
 
-#ifndef _DARTHEIGHTMAPSHAPE_HH_
-#define _DARTHEIGHTMAPSHAPE_HH_
+#ifndef _GAZEBO_DARTHEIGHTMAPSHAPE_HH_
+#define _GAZEBO_DARTHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 #include "gazebo/physics/Collision.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief DART Height map collision.
-    class DARTHeightmapShape : public HeightmapShape
+    class GAZEBO_VISIBLE DARTHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
@@ -45,10 +46,10 @@ namespace gazebo
       /// \param[in] _data Pointer to the heightmap data.
       /// \param[in] _x X location.
       /// \param[in] _y Y location.
-      //private: static dReal GetHeightCallback(void *_data, int _x, int _y);
+      // private: static dReal GetHeightCallback(void *_data, int _x, int _y);
 
       /// \brief The heightmap data.
-      //private: dHeightfieldDataID odeData;
+      // private: dHeightfieldDataID odeData;
     };
   }
 }

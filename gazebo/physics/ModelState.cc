@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -243,20 +243,6 @@ JointState_M ModelState::GetJointStates(const boost::regex &_regex) const
   }
 
   return result;
-}
-
-/////////////////////////////////////////////////
-LinkState ModelState::GetLinkState(unsigned int _index) const
-{
-  if (_index < this->linkStates.size())
-  {
-    LinkState_M::const_iterator iter = this->linkStates.begin();
-    std::advance(iter, _index);
-    return iter->second;
-  }
-
-  gzthrow("Index is out of range");
-  return LinkState();
 }
 
 /////////////////////////////////////////////////

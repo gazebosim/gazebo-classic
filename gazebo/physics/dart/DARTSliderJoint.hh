@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,19 @@
  *
 */
 
-#ifndef _DARTSLIDERJOINT_HH_
-#define _DARTSLIDERJOINT_HH_
+#ifndef _GAZEBO_DARTSLIDERJOINT_HH_
+#define _GAZEBO_DARTSLIDERJOINT_HH_
 
 #include "gazebo/physics/SliderJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief A slider joint
-    class DARTSliderJoint : public SliderJoint<DARTJoint>
+    class GAZEBO_VISIBLE DARTSliderJoint : public SliderJoint<DARTJoint>
     {
       /// \brief Constructor
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -35,44 +36,42 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DARTSliderJoint();
 
-      // Documentation inherited
+      // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(int _index) const;
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAnchor(int _index, const math::Vector3& _anchor);
+      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetGlobalAxis(int _index) const;
+      public: virtual void SetAxis(unsigned int _index,
+                  const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetAxis(int _index, const math::Vector3& _axis);
+      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetDamping(int _index, double _damping);
+      public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(int _index) const;
+      public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetVelocity(int _index, double _vel);
+      public: virtual void SetMaxForce(unsigned int _index, double _force);
 
       // Documentation inherited
-      public: virtual double GetVelocity(int _index) const;
+      public: virtual double GetMaxForce(unsigned int _index);
 
-      // Documentation inherited
-      public: virtual void SetMaxForce(int _index, double _torque);
+      // Documentation inherited.
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
-      // Documentation inherited
-      public: virtual double GetMaxForce(int _index);
-
-      // Documentation inherited
-      public: virtual void SetForce(int _index, double _torque);
+      /// \brief Prismatic joint of DART
+      protected: dart::dynamics::PrismaticJoint *dtPrismaticJoint;
     };
   }
 }

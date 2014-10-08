@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,14 @@ void BandwidthMsg(const std::string &_msg)
 
 void BandwidthTest::Bandwidth(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support closed loops in PR2, "
+          << "Please see issue #913. "
+          << "(https://bitbucket.org/osrf/gazebo/issue/913)\n";
+    return;
+  }
+
   Load("worlds/pr2.world", false, _physicsEngine);
 
   transport::NodePtr node(new transport::Node());

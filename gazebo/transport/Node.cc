@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,14 @@ void Node::Fini()
   if (!this->initialized)
     return;
 
+  // Unadvertise all the publishers.
+  for (std::vector<PublisherPtr>::iterator iter = this->publishers.begin();
+       iter != this->publishers.end(); ++iter)
+  {
+    (*iter)->Fini();
+    TopicManager::Instance()->Unadvertise(*iter);
+  }
+
   this->initialized = false;
   TopicManager::Instance()->RemoveNode(this->id);
 
@@ -77,13 +85,17 @@ void Node::Init(const std::string &_space)
   if (_space.empty())
   {
     this->topicNamespace = "default";
-    std::list<std::string> namespaces;
-    TopicManager::Instance()->GetTopicNamespaces(namespaces);
 
-    if (namespaces.empty())
-      gzerr << "No namespace found\n";
+    // wait at most 1 second for namespaces to appear.
+    if (transport::waitForNamespaces(common::Time(1, 0)))
+    {
+      std::list<std::string> namespaces;
+      TopicManager::Instance()->GetTopicNamespaces(namespaces);
+      this->topicNamespace = namespaces.empty() ? this->topicNamespace :
+        namespaces.front();
+    }
     else
-      this->topicNamespace = namespaces.front();
+      gzerr << "No namespace found\n";
   }
   else
     TopicManager::Instance()->RegisterTopicNamespace(_space);
@@ -127,6 +139,9 @@ unsigned int Node::GetId() const
 /////////////////////////////////////////////////
 void Node::ProcessPublishers()
 {
+  if (!this->initialized)
+    return;
+
   int start, end;
   boost::mutex::scoped_lock lock(this->publisherDeleteMutex);
 
@@ -260,7 +275,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, const std::string &_msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleData(_msg, boost::bind(&dummy_callback_fn, _1), 0);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -278,7 +296,10 @@ void Node::InsertLatchedMsg(const std::string &_topic, MessagePtr _msg)
          liter != cbIter->second.end(); ++liter)
     {
       if ((*liter)->GetLatching())
+      {
         (*liter)->HandleMessage(_msg);
+        (*liter)->SetLatching(false);
+      }
     }
   }
 }
@@ -306,6 +327,9 @@ bool Node::HasLatchedSubscriber(const std::string &_topic) const
 /////////////////////////////////////////////////
 void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
 {
+  if (!this->initialized)
+    return;
+
   boost::recursive_mutex::scoped_lock lock(this->incomingMutex);
 
   // Find the topic list in the map.

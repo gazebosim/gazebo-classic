@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ void WirelessTransmitter::Init()
 }
 
 //////////////////////////////////////////////////
-void WirelessTransmitter::UpdateImpl(bool /*_force*/)
+bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   this->referencePose =
       this->pose + this->parentEntity.lock()->GetWorldPose();
@@ -126,6 +126,8 @@ void WirelessTransmitter::UpdateImpl(bool /*_force*/)
     }
     this->pub->Publish(msg);
   }
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -148,6 +150,13 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   double dist;
   math::Vector3 end = _receiver.pos;
   math::Vector3 start = this->referencePose.pos;
+
+  // Avoid computing the intersection of coincident points
+  // This prevents an assertion in bullet (issue #849)
+  if (start == end)
+  {
+    end.z += 0.00001;
+  }
 
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(world->GetPhysicsEngine()->

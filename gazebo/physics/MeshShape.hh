@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \class MeshShape MeshShape.hh physics/physics.hh
     /// \brief Triangle mesh collision shape
-    class MeshShape : public Shape
+    class GAZEBO_VISIBLE MeshShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent collision.
@@ -56,18 +57,9 @@ namespace gazebo
       /// \return The size of the triangle mesh.
       public: virtual math::Vector3 GetSize() const;
 
-      /// Deprecated
-      /// \sa GetMeshURI
-      public: std::string GetFilename() const GAZEBO_DEPRECATED(1.5);
-
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
       public: std::string GetMeshURI() const;
-
-      /// Deprecated.
-      /// \sa SetMesh
-      public: void SetFilename(
-                  const std::string &_filename) GAZEBO_DEPRECATED(1.5);
 
       /// \brief Set the mesh uri and submesh name.
       /// \param[in] _uri Filename of the mesh file to load from.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,19 @@
  * limitations under the License.
  *
 */
-#ifndef _DARTPLANESHAPE_HH_
-#define _DARTPLANESHAPE_HH_
+#ifndef _GAZEBO_DARTPLANESHAPE_HH_
+#define _GAZEBO_DARTPLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
     /// \brief An DART Plane shape.
-    class DARTPlaneShape : public PlaneShape
+    class GAZEBO_VISIBLE DARTPlaneShape : public PlaneShape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
@@ -38,39 +39,26 @@ namespace gazebo
       // Documentation inherited
       public: virtual void CreatePlane()
       {
-//         PlaneShape::CreatePlane();
-//         DARTCollisionPtr oParent;
-//         oParent =
-//           boost::shared_dynamic_cast<DARTCollision>(this->collisionParent);
-// 
-//         double altitude = 0;
-// 
-//         math::Vector3 n = this->GetNormal();
-//         if (oParent->GetCollisionId() == NULL)
-//           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),
-//                 n.x, n.y, n.z, altitude), false);
-//         else
-//           dGeomPlaneSetParams(oParent->GetCollisionId(),
-//                               n.x, n.y, n.z, altitude);
+        PlaneShape::CreatePlane();
+
+        DARTCollisionPtr dartCollisionParent =
+            boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
+
+        // math::Vector3 n = this->GetNormal();
+
+        dart::dynamics::BodyNode *dtBodyNode =
+            dartCollisionParent->GetDARTBodyNode();
+        dart::dynamics::BoxShape *dtBoxShape =
+            new dart::dynamics::BoxShape(Eigen::Vector3d(2100, 2100, 0.01));
+        dtBodyNode->addCollisionShape(dtBoxShape);
+        dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -0.005));
+        dartCollisionParent->SetDARTCollisionShape(dtBoxShape, false);
       }
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &/*_pos*/)
+      public: virtual void SetAltitude(const math::Vector3 &_pos)
       {
-//         PlaneShape::SetAltitude(_pos);
-//         DARTCollisionPtr odeParent;
-//         odeParent =
-//           boost::shared_dynamic_cast<DARTCollision>(this->collisionParent);
-// 
-//         dVector4 vec4;
-// 
-//         dGeomPlaneGetParams(odeParent->GetCollisionId(), vec4);
-// 
-//         // Compute "altitude": scalar product of position and normal
-//         vec4[3] = vec4[0] * _pos.x + vec4[1] * _pos.y + vec4[2] * _pos.z;
-// 
-//         dGeomPlaneSetParams(odeParent->GetCollisionId(), vec4[0], vec4[1],
-//                             vec4[2], vec4[3]);
+        PlaneShape::SetAltitude(_pos);
       }
     };
   }

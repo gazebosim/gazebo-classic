@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _DARTPHYSICS_HH_
-#define _DARTPHYSICS_HH_
+#ifndef _GAZEBO_DARTPHYSICS_HH_
+#define _GAZEBO_DARTPHYSICS_HH_
 
 #include <string>
 
@@ -29,19 +29,18 @@
 
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
-    //class Entity;
-
     /// \ingroup gazebo_physics
     /// \addtogroup gazebo_physics_dart DART Physics
     /// \{
 
     /// \brief DART physics engine
-    class DARTPhysics : public PhysicsEngine
+    class GAZEBO_VISIBLE DARTPhysics : public PhysicsEngine
     {
       /// \enum DARTParam
       /// \brief DART physics parameter types.
@@ -74,22 +73,22 @@ namespace gazebo
 
       /// \brief Constructor
       public: DARTPhysics(WorldPtr _world);
- 
+
       /// \brief Destructor
       public: virtual ~DARTPhysics();
-       
-      /// \brief Load the DART engine
+
+      // Documentation inherited
       public: virtual void Load(sdf::ElementPtr _sdf);
- 
-      /// \brief Initialize the DART engine
+
+      // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Finilize the DART engine.
+      // Documentation inherited
       public: virtual void Fini();
-       
-      /// \brief Rest the DART engine.
+
+      // Documentation inherited
       public: virtual void Reset();
- 
+
       // Documentation inherited
       public: virtual void InitForThread();
 
@@ -107,35 +106,38 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
-      
+
       // Documentation inherited
       public: virtual LinkPtr CreateLink(ModelPtr _parent);
 
       // Documentation inherited
-      public: virtual CollisionPtr CreateCollision(const std::string& _type,
+      public: virtual CollisionPtr CreateCollision(const std::string &_type,
                                                    LinkPtr _body);
 
       // Documentation inherited
-      public: virtual JointPtr CreateJoint(const std::string& _type,
+      public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent);
-      
+
       // Documentation inherited
-      public: virtual ShapePtr CreateShape(const std::string& _shapeType,
+      public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3& gravity);
+      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
 
-      /// Documentation inherited
+      // Documentation inherited
       public: virtual boost::any GetParam(const std::string &_key) const;
 
-      /// \brief Get an parameter of the physics engine
-      /// \param[in] _param A parameter listed in the ODEParam enum
-      /// \return The value of the parameter
-      public: virtual boost::any GetParam(DARTParam _param) const;
+      // Documentation inherited
+      public: virtual bool SetParam(const std::string &_key,
+                  const boost::any &_value);
+
+      /// \brief Get pointer to DART World associated with this DART Physics.
+      /// \return The pointer to DART World.
+      public: dart::simulation::World *GetDARTWorld();
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -143,15 +145,14 @@ namespace gazebo
       // Documentation inherited
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);
 
-      // Documentation inherited
-      void virtual SetMaxStepSize(double _stepSize);
+      /// \brief Find DART Link corresponding to DART BodyNode.
+      /// \param[in] _dtBodyNode The DART BodyNode.
+      /// \return Pointer to the DART Link.
+      private: DARTLinkPtr FindDARTLink(
+          const dart::dynamics::BodyNode *_dtBodyNode);
 
-      /// \brief
-      public: dart::simulation::World* GetDARTWorld() {return dartWorld;}
-
-      /// \brief 
-      private: dart::simulation::World* dartWorld;
-      
+      /// \brief Pointer to DART World associated with this DART Physics.
+      private: dart::simulation::World *dtWorld;
     };
 
   /// \}

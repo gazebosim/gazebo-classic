@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/math/Box.hh"
 
+#include "gazebo/physics/SurfaceParams.hh"
+
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTLink.hh"
 #include "gazebo/physics/dart/DARTCollision.hh"
-#include "gazebo/physics/dart/DARTUtils.hh"
+#include "gazebo/physics/dart/DARTPlaneShape.hh"
 
 using namespace gazebo;
 using namespace physics;
@@ -31,9 +33,12 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTCollision::DARTCollision(LinkPtr _link)
   : Collision(_link),
-    dartBodyNode(NULL),
-    dartCollShape(NULL)
+    dtCollisionShape(NULL)
 {
+  this->SetName("DART_Collision");
+  this->surface.reset(new SurfaceParams());
+  this->dtBodyNode
+      = boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -46,6 +51,11 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
 {
   Collision::Load(_sdf);
 
+  if (this->IsStatic())
+  {
+    this->SetCategoryBits(GZ_FIXED_COLLIDE);
+    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -53,62 +63,28 @@ void DARTCollision::Init()
 {
   Collision::Init();
 
-  this->dartBodyNode
-      = boost::shared_static_cast<DARTLink>(this->link)->GetBodyNode();
-
-  // Geometry
-  sdf::ElementPtr geometryElem = this->sdf->GetElement("geometry");
-  std::string geomType = geometryElem->GetFirstElement()->GetName();
-
-  if (geomType == "sphere")
-  {
-    double radius = geometryElem->GetFirstElement()->Get<double>("radius");
-    Eigen::Vector3d eigenSize(radius*2, radius*2, radius*2);
-    dartCollShape = new dart::dynamics::EllipsoidShape(eigenSize);
-    dartBodyNode->addCollisionShape(dartCollShape);
-  }
-  else if (geomType == "plane")
-  {
-    // TODO: dart does not support plane!!!
-    //      math::Vector3 normal
-    //          = geometryElem->GetFirstElement()->GetValueVector3("normal");
-    math::Vector2d size
-        = geometryElem->GetFirstElement()->Get<math::Vector2d>("size");
-    Eigen::Vector3d eigenSize(2100, 2100, 0.001);
-    dartCollShape = new dart::dynamics::BoxShape(eigenSize);
-    dartBodyNode->addCollisionShape(dartCollShape);
-  }
-  else if (geomType == "box")
-  {
-    math::Vector3 mathSize
-        = geometryElem->GetFirstElement()->Get<math::Vector3>("size");
-    Eigen::Vector3d eigenSize(mathSize.x, mathSize.y, mathSize.z);
-    dartCollShape = new dart::dynamics::BoxShape(eigenSize);
-    dartBodyNode->addCollisionShape(dartCollShape);
-  }
-  else if (geomType == "cylinder")
-  {
-    double radius = geometryElem->GetFirstElement()->Get<double>("radius");
-    double length = geometryElem->GetFirstElement()->Get<double>("length");
-    dartCollShape = new dart::dynamics::CylinderShape(radius, length);
-    dartBodyNode->addCollisionShape(dartCollShape);
-  }
-  else if (geomType == "multiray")
-    gzerr << "Not implemented yet...";
-  else if (geomType == "mesh" || geomType == "trimesh")
-    gzerr << "Not implemented yet...";
-  else if (geomType == "heightmap")
-    gzerr << "Not implemented yet...";
-  else if (geomType == "map" || geomType == "image")
-    gzerr << "Not implemented yet...";
-  else if (geomType == "ray")
-    gzerr << "Not implemented yet...";
-  else
-    gzerr << "Unknown visual type[" << geomType << "]\n";
-
   // Offset
-  math::Pose relativePose = this->GetRelativePose();
-  this->dartCollShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+  if (this->dtCollisionShape)
+  {
+    // TODO: Don't change offset of shape until dart supports plane shape.
+    boost::shared_ptr<DARTPlaneShape> planeShape =
+        boost::dynamic_pointer_cast<DARTPlaneShape>(this->shape);
+
+    if (!planeShape)
+    {
+      math::Pose relativePose = this->GetRelativePose();
+      this->dtCollisionShape->setOffset(DARTTypes::ConvVec3(relativePose.pos));
+    }
+    else
+    {
+      // change ground plane to be near semi-infinite.
+      dart::dynamics::BoxShape *dtBoxShape =
+        dynamic_cast<dart::dynamics::BoxShape *>(this->dtCollisionShape);
+      dtBoxShape->setSize(Eigen::Vector3d(2100, 2100, 2100.0));
+      dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100.0/2.0));
+      // gzerr << "plane box modified\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -118,37 +94,61 @@ void DARTCollision::Fini()
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCollision(bool _placeable)
-{
-  Collision::SetCollision(_placeable);
-
-  // Nothing to do in dart.
-}
-
-//////////////////////////////////////////////////
 void DARTCollision::OnPoseChange()
 {
   // Nothing to do in dart.
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCategoryBits(unsigned int /*_bits*/)
+void DARTCollision::SetCategoryBits(unsigned int _bits)
 {
-  // Nothing to do in dart.
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetCollideBits(unsigned int /*_bits*/)
+void DARTCollision::SetCollideBits(unsigned int _bits)
 {
-  // Nothing to do in dart.
+  this->collideBits = _bits;
+}
+
+//////////////////////////////////////////////////
+unsigned int DARTCollision::GetCategoryBits() const
+{
+  return this->categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int DARTCollision::GetCollideBits() const
+{
+  return this->collideBits;
 }
 
 //////////////////////////////////////////////////
 gazebo::math::Box DARTCollision::GetBoundingBox() const
 {
-  gazebo::math::Box box;
+  math::Box result;
 
-  gzwarn << "Not implemented!\n";
+  gzerr << "DART does not provide bounding box info.\n";
 
-  return box;
+  return result;
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
+{
+  return dtBodyNode;
+}
+
+//////////////////////////////////////////////////
+void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape *_shape,
+                                          bool _placeable)
+{
+  Collision::SetCollision(_placeable);
+  this->dtCollisionShape = _shape;
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
+{
+  return dtCollisionShape;
 }

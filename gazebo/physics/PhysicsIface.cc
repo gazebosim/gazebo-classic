@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <boost/thread/mutex.hpp>
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
@@ -25,6 +26,9 @@
 using namespace gazebo;
 
 std::vector<physics::WorldPtr> g_worlds;
+
+boost::mutex g_uniqueIdMutex;
+uint32_t g_uniqueId = 0;
 
 /////////////////////////////////////////////////
 bool physics::load()
@@ -167,4 +171,11 @@ bool physics::worlds_running()
   }
 
   return false;
+}
+
+/////////////////////////////////////////////////
+uint32_t physics::getUniqueId()
+{
+  boost::mutex::scoped_lock lock(g_uniqueIdMutex);
+  return ++g_uniqueId;
 }

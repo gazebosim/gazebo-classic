@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,6 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Class to manager all sensors
- * Author: Nate Koenig
- * Date: 18 Dec 2009
- */
-
 #ifndef _SENSORMANAGER_HH_
 #define _SENSORMANAGER_HH_
 
@@ -34,6 +28,7 @@
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/UpdateInfo.hh"
 #include "gazebo/sensors/SensorTypes.hh"
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -43,7 +38,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief A simulation time event
-    class SimTimeEvent
+    class GAZEBO_VISIBLE SimTimeEvent
     {
       /// \brief The time at which to trigger the condition.
       public: common::Time time;
@@ -54,7 +49,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class SimTimeEventHandler
+    class GAZEBO_VISIBLE SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -89,7 +84,7 @@ namespace gazebo
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
-    class SensorManager : public SingletonT<SensorManager>
+    class GAZEBO_VISIBLE SensorManager : public SingletonT<SensorManager>
     {
       /// \brief This is a singletone class. Use SensorManager::Instance()
       /// to get a pointer to this class.
@@ -107,10 +102,6 @@ namespace gazebo
 
       /// \brief Init all the sensors
       public: void Init();
-
-      /// \brief Deprecated
-      /// \sa RunThreads
-      public: void Run() GAZEBO_DEPRECATED(1.5);
 
       /// \brief Run sensor updates in separate threads.
       /// This will only run non-image based sensor updates.
@@ -135,7 +126,8 @@ namespace gazebo
       /// \return The name of the sensor
       public: std::string CreateSensor(sdf::ElementPtr _elem,
                                        const std::string &_worldName,
-                                       const std::string &_parentName);
+                                       const std::string &_parentName,
+                                       uint32_t _parentId);
 
       /// \brief Get a sensor
       /// \param[in] _name The name of a sensor to find.
@@ -270,7 +262,7 @@ namespace gazebo
       private: Sensor_V initSensors;
 
       /// \brief List of sensors that require initialization.
-      private: Sensor_V removeSensors;
+      private: std::vector<std::string> removeSensors;
 
       /// \brief A vector of SensorContainer pointers.
       private: typedef std::vector<SensorContainer*> SensorContainer_V;

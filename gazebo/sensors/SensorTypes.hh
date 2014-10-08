@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Open Source Robotics Foundation
+ * Copyright (C) 2012-2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "gazebo/util/system.hh"
 
 /// \file
 /// \ingroup gazebo_sensors
@@ -32,6 +33,7 @@ namespace gazebo
     class Sensor;
     class RaySensor;
     class CameraSensor;
+    class MultiCameraSensor;
     class DepthCameraSensor;
     class ContactSensor;
     class ImuSensor;
@@ -42,6 +44,8 @@ namespace gazebo
     class ForceTorqueSensor;
     class GpsSensor;
     class Noise;
+    class GaussianNoiseModel;
+    class ImageGaussianNoiseModel;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
@@ -57,6 +61,10 @@ namespace gazebo
     /// \def CameraSensorPtr
     /// \brief Shared pointer to CameraSensor
     typedef boost::shared_ptr<CameraSensor> CameraSensorPtr;
+
+    /// \def MultiCameraSensorPtr
+    /// \brief Shared pointer to MultiCameraSensor
+    typedef boost::shared_ptr<MultiCameraSensor> MultiCameraSensorPtr;
 
     /// \def DepthCameraSensorPtr
     /// \brief Shared pointer to DepthCameraSensor
@@ -98,6 +106,14 @@ namespace gazebo
     /// \brief Shared pointer to Noise
     typedef boost::shared_ptr<Noise> NoisePtr;
 
+    /// \def GaussianNoisePtr
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<GaussianNoiseModel> GaussianNoiseModelPtr;
+
+    /// \brief Shared pointer to Noise
+    typedef boost::shared_ptr<ImageGaussianNoiseModel>
+        ImageGaussianNoiseModelPtr;
+
     /// \def WirelessTransceiverPtr
     /// \brief Shared pointer to WirelessTransceiver
     typedef boost::shared_ptr<WirelessTransceiver> WirelessTransceiverPtr;
@@ -121,6 +137,10 @@ namespace gazebo
     /// \def CameraSensor_V
     /// \brief Vector of CameraSensor shared pointers
     typedef std::vector<CameraSensorPtr> CameraSensor_V;
+
+    /// \def MultiCameraSensor_V
+    /// \brief Vector of MultiCameraSensor shared pointers
+    typedef std::vector<MultiCameraSensorPtr> MultiCameraSensor_V;
 
     /// \def DepthCameraSensor_V
     /// \brief Vector of DepthCameraSensor shared pointers

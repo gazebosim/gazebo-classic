@@ -205,6 +205,9 @@ src/joints/plane2d.cpp
 src/joints/pr.cpp
 src/joints/pu.cpp
 src/joints/screw.cpp
+src/joints/dhinge.cpp
+src/joints/dball.cpp
+src/joints/gearbox.cpp
 src/joints/slider.cpp
 src/joints/universal.cpp
 )
@@ -240,7 +243,7 @@ if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
 endif()
 
-set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
+set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
 gz_add_library(gazebo_ode ${sources})
 target_link_libraries(gazebo_ode
