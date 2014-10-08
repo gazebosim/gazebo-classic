@@ -26,10 +26,36 @@ GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
+
+  // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
   this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
-  this->fingerPtsFilename = paths->FindFileURI("file://media/gui/etc/fingerpts.csv");
+  this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
   std::cout << "img filename: " << this->handImgFilename << std::endl;
+
+  sdf::SDF parameters;
+  
+  std::ifstream fileinput(this->configFilename.c_str());
+  std::stringstream inputStream;
+  inputStream << fileinput.rdbuf();
+  std::string sdfString = inputStream.str();
+  
+  fileinput.close();
+  
+  parameters.SetFromString(sdfString);
+  parameters.root->GetAttribute("circleSize")->Get(circleSize);
+  parameters.root->GetAttribute("forceMin")->Get(forceMin);
+  parameters.root->GetAttribute("forceMax")->Get(forceMax);
+  handSide = parameters.root->GetAttribute("handSide")->GetAsString();
+  parameters.root->GetAttribute("colorMin")->Get(colorMin);
+  parameters.root->GetAttribute("colorMax")->Get(colorMax);
+
+  for(int i = 0; i < 5; i++){
+    std::string keyName = fingerNames[i]+"Pos";
+    parameters.root->GetAttribute(keyName)->Get(finger_points[fingerNames[i]]);
+  }
+
+  
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
@@ -45,8 +71,10 @@ GUIAratPlugin::GUIAratPlugin()
   QVBoxLayout *frameLayout = new QVBoxLayout();
 
   // Create a push button, and connect it to the OnButton function
-  QPushButton *button = new QPushButton(tr("Next Test"));
-  connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));
+  /*QPushButton *button = new QPushButton(tr("Next Test"));
+  connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));*/
+  // Add the button to the frame's layout
+  //frameLayout->addWidget(button);
 
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
@@ -63,9 +91,6 @@ GUIAratPlugin::GUIAratPlugin()
   handScene->addItem(handItem);
   handScene->update();
   handView->show();
-
-  // Add the button to the frame's layout
-  //frameLayout->addWidget(button);
 
   // Add frameLayout to the frame
   mainFrame->setLayout(frameLayout);
@@ -92,7 +117,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   //Parse the finger names and point where we will draw a contact
   
-  std::ifstream fileinput(this->fingerPtsFilename.c_str());
+  /*std::ifstream fileinput(this->fingerPtsFilename.c_str());
   std::stringstream inputStream;
   inputStream << fileinput.rdbuf();
   char buffer[256];
@@ -110,12 +135,12 @@ GUIAratPlugin::GUIAratPlugin()
     inputStream.getline(buffer, 256);
   }
 
-  fileinput.close();
+  fileinput.close();*/
 
   // Preallocate QGraphicsItems for each contact point
   for(int i = 0; i < 5; i++){
-    int xpos = finger_points[fingerNames[i]].first;
-    int ypos = finger_points[fingerNames[i]].second;
+    int xpos = finger_points[fingerNames[i]][0];
+    int ypos = finger_points[fingerNames[i]][1];
     this->contactGraphicsItems[fingerNames[i]] = new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
   }
 

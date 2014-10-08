@@ -23,9 +23,9 @@
 #include <gazebo/gui/gui.hh>
 #include <gazebo/msgs/msgs.hh>
 #include "gazebo/common/Events.hh"
+#include "gazebo/math/gzmath.hh"
 
 #include <queue>
-//#include <yaml-cpp/yaml.h>
 
 namespace gazebo
 {
@@ -69,27 +69,29 @@ namespace gazebo
 
       private: QGraphicsScene *handScene;
 
-      //TODO: config file
-      private: const int handImgX = 250;
-      private: const int handImgY = 250;
-
-      private: std::string handImgFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/handsim.png";
-      private: std::string fingerPtsFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
-
       private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
 
+      //TODO: config file
+      private: int handImgX; //= 250;
+      private: int handImgY; //= 250;
+
+      private: std::string handImgFilename;
+      private: std::string configFilename;
+      //private: std::string fingerPtsFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
+
+
       //TODO: tune these values
-      private: const int circleSize = 5;
-      private: const unsigned char colorMin[3] = {255, 255, 0};
-      private: const unsigned char colorMax[3] = {255, 0, 0};
-      private: const float forceMin = 0;
-      private: const float forceMax = 50;
+      private: int circleSize;// = 10;
+      private: math::Vector3 colorMin;// = {255, 255, 0};
+      private: math::Vector3 colorMax;// = {255, 0, 0};
+      private: float forceMin;// = 0;
+      private: float forceMax;// = 50;
 
       private: std::string handSide;
       
       private: std::vector<transport::SubscriberPtr> contactSubscribers;
 
-      private: std::map<std::string, std::pair<int, int> > finger_points;
+      private: std::map<std::string, math::Vector2d > finger_points;
 
       private: std::map<std::string, QGraphicsEllipseItem*> contactGraphicsItems;
 
