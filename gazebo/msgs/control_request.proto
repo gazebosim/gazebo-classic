@@ -1,0 +1,21 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface ControlRequest
+/// \brief A control request
+
+import "vector3d.proto";
+import "quaternion.proto";
+
+message ControlRequest
+{
+  required string name         = 1;
+  optional uint32 id           = 2;
+
+  repeated string joint_names  = 10;
+  repeated double joint_pos    = 12;
+  repeated double joint_vel    = 14;
+
+  required Vector3d target_pos = 32;
+}
+
