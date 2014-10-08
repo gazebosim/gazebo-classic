@@ -14,13 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _SIGNAL_STATS_HH_
-#define _SIGNAL_STATS_HH_
+#ifndef _GAZEBO_SIGNAL_STATS_HH_
+#define _GAZEBO_SIGNAL_STATS_HH_
 
 #include <map>
 #include <string>
-#include <vector>
-#include <boost/shared_ptr.hpp>
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
@@ -30,6 +28,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
+
+    /// \brief Forward declare private data class.
+    class SignalStatisticPrivate;
 
     /// \class SignalStatistic SignalStats.hh math/gzmath.hh
     /// \brief Statistical properties of a discrete time scalar signal.
@@ -60,21 +61,10 @@ namespace gazebo
       /// \brief Forget all previous data.
       public: virtual void Reset();
 
-      /// \brief Scalar representation of signal data.
-      protected: double data;
-
-      /// \brief Count of data values in mean.
-      protected: unsigned int count;
+      /// \brief Pointer to private data.
+      protected: SignalStatisticPrivate *dataPtr;
     };
     /// \}
-
-    /// \def SignalStatisticPtr
-    /// \brief Boost shared pointer to SignalStatistic object
-    typedef boost::shared_ptr<SignalStatistic> SignalStatisticPtr;
-
-    /// \def SignalStatistic_V
-    /// \brief Vector of SignalStatisticPtr
-    typedef std::vector<SignalStatisticPtr> SignalStatistic_V;
 
     /// \class SignalMean SignalStats.hh math/gzmath.hh
     /// \brief Computing the mean value of a discretely sampled signal.
@@ -127,6 +117,9 @@ namespace gazebo
     };
     /// \}
 
+    /// \brief Forward declare private data class.
+    class SignalStatsPrivate;
+
     /// \class SignalStats SignalStats.hh math/gzmath.hh
     /// \brief Collection of statistics for a scalar signal.
     class GAZEBO_VISIBLE SignalStats
@@ -177,8 +170,8 @@ namespace gazebo
       /// \brief Forget all previous data.
       public: void Reset();
 
-      /// \brief Vector of `SignalStatistic`s.
-      private: SignalStatistic_V stats;
+      /// \brief Pointer to private data.
+      protected: SignalStatsPrivate *dataPtr;
     };
     /// \}
 
