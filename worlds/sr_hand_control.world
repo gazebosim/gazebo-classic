@@ -56,7 +56,7 @@
     <include>
       <uri>model://sr_description</uri>
       <plugin name='ign_transport_controller' filename='libModelControlPlugin.so'/>
-      <pose>0 0 -1 0 0 0</pose>
+      <pose>0 0 0 0 0 0</pose>
     </include>
 
     <model name="box">
