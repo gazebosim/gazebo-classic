@@ -14,15 +14,15 @@ find_package(Protobuf REQUIRED)
 find_package(ignition-transport QUIET REQUIRED)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
 
-# find simbody
-find_package(Simbody REQUIRED)
+# find DART
+find_package(DARTCore 4.1 REQUIRED)
 include_directories(SYSTEM
   ${IGNITION-TRANSPORT_INCLUDE_DIRS}
-  ${Simbody_INCLUDE_DIR}
+  ${DARTCore_INCLUDE_DIR}
   ${GAZEBO_INCLUDE_DIRS})
 link_directories(
   ${IGNITION-TRANSPORT_LIBRARY_DIRS}
-  ${Simbody_LIB_DIR}
+  ${DARTCore_LIB_DIR}
   ${GAZEBO_LIBRARY_DIRS})
 
 add_executable(responser responser.cc UR10.h UR10.cpp)
@@ -32,5 +32,5 @@ target_link_libraries(responser
   ${Boost_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
   pthread
-  ${Simbody_LIBRARIES})
+  ${DARTCore_LIBRARIES})
 
