@@ -40,9 +40,9 @@ GUIAratPlugin::GUIAratPlugin()
   std::stringstream inputStream;
   inputStream << fileinput.rdbuf();
   std::string sdfString = inputStream.str();
-  
   fileinput.close();
   
+  //Parameters for sensor contact visualization
   parameters.SetFromString(sdfString);
   sdf::ElementPtr elem = parameters.root->GetElement("world");
   elem = elem->GetElement("plugin");
@@ -63,7 +63,7 @@ GUIAratPlugin::GUIAratPlugin()
     elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
   }
 
-  
+  // Task menu
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
@@ -75,21 +75,26 @@ GUIAratPlugin::GUIAratPlugin()
   // Create the frame to hold all the widgets
   QFrame *mainFrame = new QFrame();
 
-  // Create the layout that sits inside the frame
-  QVBoxLayout *frameLayout = new QVBoxLayout();
-
   // Create a push button, and connect it to the OnButton function
   /*QPushButton *button = new QPushButton(tr("Next Test"));
   connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));*/
   // Add the button to the frame's layout
   //frameLayout->addWidget(button);
 
+  QBoxLayout *taskLayout = new QBoxLayout();
+  QTabWidget *tabWidget = new QTabWidget();
+  
+
+
+  // Create the layout that sits inside the frame
+  QVBoxLayout *handLayout = new QVBoxLayout();
+
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
   QGraphicsView *handView = new QGraphicsView(handScene);
 
   // Add the GraphicsView to the layout
-  frameLayout->addWidget(handView);
+  handLayout->addWidget(handView);
 
   // Load the hand image
   QPixmap* handImg = new QPixmap(QString(handImgFilename.c_str()));
@@ -100,14 +105,14 @@ GUIAratPlugin::GUIAratPlugin()
   handScene->update();
   handView->show();
 
-  // Add frameLayout to the frame
-  mainFrame->setLayout(frameLayout);
+  // Add handLayout to the frame
+  mainFrame->setLayout(handLayout);
 
   // Add the frame to the main layout
   mainLayout->addWidget(mainFrame);
 
   // Remove margins to reduce space
-  frameLayout->setContentsMargins(0, 0, 0, 0);
+  handLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);

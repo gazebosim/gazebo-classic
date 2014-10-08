@@ -15,6 +15,16 @@
       <MidPos>127 13</MidPos>
       <RingPos>165 22</RingPos>
       <LittlePos>207 53</LittlePos>
+
+      <tasks>
+        <grasp>
+        </grasp>
+        <grip>
+        </grip>
+        <pinch>
+        </pinch>
+      </tasks>
+
     </plugin>
   </world>
 </sdf>
