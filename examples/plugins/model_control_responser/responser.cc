@@ -78,10 +78,12 @@ int main(int _argc, char **_argv)
   // Busy wait loop...replace with your own code as needed.
   while(c != 'q')
   {
-    std::cout << "enter q to quit, g to toggle gravity: ";
+    std::cout << "enter q to quit, g to do something interesting: ";
     c = getchar();
     if (c == 'g')
-      m_modelTasks.toggleGravityComp();
+    {
+      // do something interesting
+    }
   }
   std::cout << "exit!";
 }
