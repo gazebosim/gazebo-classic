@@ -148,6 +148,17 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
       dtSoftBodyNode->addCollisionShape(
             new dart::dynamics::SoftMeshShape(dtSoftBodyNode));
     }
+    else if (softGeomElem->HasElement("cylinder"))
+    {
+      sdf::ElementPtr cylinderEle = softGeomElem->GetElement("cylinder");
+      double radius = cylinderEle->Get<double>("radius");
+      double length = cylinderEle->Get<double>("length");
+//      std::cerr << "got cylinder " << radius << " " << length << std::endl;
+      dart::dynamics::SoftBodyNodeHelper::setCylinder(
+            dtSoftBodyNode, radius, length, 32, 4, 1, fleshMassFraction);
+      dtSoftBodyNode->addCollisionShape(
+            new dart::dynamics::SoftMeshShape(dtSoftBodyNode));
+    }
 //    else if (geomElem->HasElement("ellipsoid"))
 //    {
 //      sdf::ElementPtr ellipsoidEle = geomElem->GetElement("ellipsoid");

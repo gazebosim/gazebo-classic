@@ -20,6 +20,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
 
+#include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
 #include "gazebo/physics/Collision.hh"
@@ -31,6 +32,8 @@
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/SurfaceParams.hh"
 #include "gazebo/physics/World.hh"
+
+#include "gazebo/physics/dart/dart_inc.h"
 
 #include "gazebo/physics/dart/DARTScrewJoint.hh"
 #include "gazebo/physics/dart/DARTHingeJoint.hh"
@@ -149,6 +152,8 @@ void DARTPhysics::UpdateCollision()
       dtConstraintSolver->getCollisionDetector();
   int numContacts = dtCollisionDetector->getNumContacts();
 
+  std::map<int, DARTLinkPtr> collisionEntities;
+
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
@@ -158,6 +163,11 @@ void DARTPhysics::UpdateCollision()
 
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
+
+    if (collisionEntities.find(dartLink1->GetId()) == collisionEntities.end())
+      collisionEntities[dartLink1->GetId()] = dartLink1;
+    if (collisionEntities.find(dartLink2->GetId()) == collisionEntities.end())
+      collisionEntities[dartLink2->GetId()] = dartLink2;
 
     GZ_ASSERT(dartLink1.get() != NULL, "dartLink1 in collision pare is NULL");
     GZ_ASSERT(dartLink2.get() != NULL, "dartLink2 in collision pare is NULL");
@@ -220,6 +230,73 @@ void DARTPhysics::UpdateCollision()
     }
 
     ++contactFeedback->count;
+  }
+
+  // publish soft body mesh data
+  for (std::map<int, DARTLinkPtr>::iterator it = collisionEntities.begin();
+      it != collisionEntities.end(); ++it)
+  {
+
+    unsigned int colIndex = 0;
+    CollisionPtr collisionPtr = it->second->GetCollision(colIndex);
+
+    dart::dynamics::BodyNode *dtBodyNode = it->second->GetDARTBodyNode();
+    for (unsigned int j = 0; j < dtBodyNode->getNumCollisionShapes();
+        ++j)
+    {
+      dart::dynamics::Shape *shape = dtBodyNode->getCollisionShape(j);
+      if (shape->getShapeType() == dart::dynamics::Shape::SOFT_MESH)
+      {
+        msgs::MeshUpdate meshUpdateMsg;
+        meshUpdateMsg.set_parent_name(it->second->GetScopedName());
+        this->FillMeshMsg(meshUpdateMsg, collisionPtr);
+        //std::cerr << meshUpdateMsg.DebugString() << std::endl;
+        this->meshUpdatePub->Publish(meshUpdateMsg);
+      }
+    }
+  }
+  collisionEntities.clear();
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::FillMeshMsg(msgs::MeshUpdate &_meshUpdateMsg,
+    CollisionPtr _collision)
+{
+  DARTCollisionPtr dartCollision =
+      boost::dynamic_pointer_cast<DARTCollision>(_collision);
+
+  dart::dynamics::SoftBodyNode *softBodyNode =
+      dynamic_cast<dart::dynamics::SoftBodyNode *>(
+      dartCollision->GetDARTBodyNode());
+
+  msgs::Mesh *meshMsg = _meshUpdateMsg.mutable_mesh();
+
+  std::string meshName = "";
+  if (_collision->GetShapeType() & Base::BOX_SHAPE)
+    meshName = "unit_box";
+  else if (_collision->GetShapeType() & Base::CYLINDER_SHAPE)
+    meshName = "unit_cylinder";
+  else if (_collision->GetShapeType() & Base::SPHERE_SHAPE)
+    meshName = "unit_sphere";
+  meshMsg->set_name(meshName);
+
+  msgs::SubMesh *submeshMsg = meshMsg->add_submeshes();
+
+  for (unsigned int i = 0; i < softBodyNode->getNumPointMasses(); ++i)
+  {
+    dart::dynamics::PointMass* itPointMass = softBodyNode->getPointMass(i);
+    const Eigen::Vector3d& vertex = itPointMass->getLocalPosition();
+    msgs::Vector3d *vMsg = submeshMsg->add_vertices();
+    vMsg->set_x(vertex[0]);
+    vMsg->set_y(vertex[1]);
+    vMsg->set_z(vertex[2]);
+  }
+  for (unsigned int i = 0; i < softBodyNode->getNumFaces(); ++i)
+  {
+    Eigen::Vector3i itFace = softBodyNode->getFace(i);
+    submeshMsg->add_indices(itFace[0]);
+    submeshMsg->add_indices(itFace[1]);
+    submeshMsg->add_indices(itFace[2]);
   }
 }
 
@@ -560,4 +637,3 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
 
   return res;
 }
-

@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Mesh
+/// \brief Message for a mesh
+
+
+import "vector3d.proto";
+import "submesh.proto";
+import "material.proto";
+
+message Mesh
+{
+  required string name = 1;
+  repeated SubMesh submeshes = 2;
+  repeated Material materials = 3;
+}

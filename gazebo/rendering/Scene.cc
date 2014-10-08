@@ -157,6 +157,10 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
       &Scene::OnResponse, this, true);
   this->sceneSub = this->node->Subscribe("~/scene", &Scene::OnScene, this);
 
+  // mesh update msg, currently used for rendering soft bodies
+  this->meshUpdateSub = this->node->Subscribe("~/mesh_update",
+      &Scene::OnMeshUpdate, this);
+
   this->sdf.reset(new sdf::Element);
   sdf::initFile("scene.sdf", this->sdf);
 
@@ -1644,6 +1648,7 @@ void Scene::PreRender()
   static JointMsgs_L::iterator jointIter;
   static SensorMsgs_L::iterator sensorIter;
   static LinkMsgs_L::iterator linkIter;
+  static MeshUpdateMsgs_L::iterator meshUpdateIter;
 
   SceneMsgs_L sceneMsgsCopy;
   ModelMsgs_L modelMsgsCopy;
@@ -1652,6 +1657,7 @@ void Scene::PreRender()
   VisualMsgs_L visualMsgsCopy;
   JointMsgs_L jointMsgsCopy;
   LinkMsgs_L linkMsgsCopy;
+  MeshUpdateMsgs_L meshUpdateMsgsCopy;
 
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
@@ -1684,6 +1690,10 @@ void Scene::PreRender()
     std::copy(this->linkMsgs.begin(), this->linkMsgs.end(),
               std::back_inserter(linkMsgsCopy));
     this->linkMsgs.clear();
+
+    std::copy(this->meshUpdateMsgs.begin(), this->meshUpdateMsgs.end(),
+              std::back_inserter(meshUpdateMsgsCopy));
+    this->meshUpdateMsgs.clear();
   }
 
   // Process the scene messages. DO THIS FIRST
@@ -1763,6 +1773,16 @@ void Scene::PreRender()
   this->requestMsgs.clear();
 
 
+  // Process the mesh dupdate messages.
+  for (meshUpdateIter = meshUpdateMsgsCopy.begin();
+      meshUpdateIter != meshUpdateMsgsCopy.end();)
+  {
+    if (this->ProcessMeshUpdateMsg(*meshUpdateIter))
+      meshUpdateMsgsCopy.erase(meshUpdateIter++);
+    else
+      ++meshUpdateIter;
+  }
+
   {
     boost::mutex::scoped_lock lock(*this->receiveMutex);
 
@@ -1786,6 +1806,9 @@ void Scene::PreRender()
 
     std::copy(linkMsgsCopy.begin(), linkMsgsCopy.end(),
         std::front_inserter(this->linkMsgs));
+
+    std::copy(meshUpdateMsgsCopy.begin(), meshUpdateMsgsCopy.end(),
+        std::front_inserter(this->meshUpdateMsgs));
   }
 
   {
@@ -2403,6 +2426,42 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg)
   }
 
   return result;
+}
+
+/////////////////////////////////////////////////
+void Scene::OnMeshUpdate(ConstMeshUpdatePtr &_msg)
+{
+  boost::mutex::scoped_lock lock(*this->receiveMutex);
+  this->meshUpdateMsgs.push_back(_msg);
+}
+
+
+/////////////////////////////////////////////////
+bool Scene::ProcessMeshUpdateMsg(ConstMeshUpdatePtr &_msg)
+{
+  std::string visualName = _msg->parent_name();
+  const msgs::Mesh meshMsg = _msg->mesh();
+
+  VisualPtr vis = this->GetVisual(visualName);
+  if (vis)
+  {
+    if (vis->GetMeshName() == meshMsg.name())
+    {
+      vis->UpdateMeshFromMsg(&meshMsg);
+    }
+    else
+    {
+      for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
+      {
+        if (vis->GetChild(i)->GetMeshName() == meshMsg.name())
+        {
+          vis->GetChild(i)->UpdateMeshFromMsg(&meshMsg);
+          break;
+        }
+      }
+    }
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////

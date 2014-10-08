@@ -295,6 +295,9 @@ namespace gazebo
       /// \brief Subscribe to the request topic.
       protected: transport::SubscriberPtr requestSub;
 
+      /// \brief Publisher for mesh messages.
+      protected: transport::PublisherPtr meshUpdatePub;
+
       /// \brief Mutex to protect the update cycle.
       protected: boost::recursive_mutex *physicsUpdateMutex;
 

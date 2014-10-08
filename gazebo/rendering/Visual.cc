@@ -89,6 +89,8 @@ void Visual::Init(const std::string &_name, ScenePtr _scene,
   this->dataPtr->sceneNode = NULL;
   this->dataPtr->animState = NULL;
   this->dataPtr->skeleton = NULL;
+  this->dataPtr->meshClone = false;
+
   this->dataPtr->initialized = false;
 
   std::string uniqueName = this->GetName();
@@ -123,6 +125,7 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
   this->SetName(_name);
   this->dataPtr->sceneNode = NULL;
   this->dataPtr->animState = NULL;
+  this->dataPtr->meshClone = false;
   this->dataPtr->initialized = false;
   this->dataPtr->lighting = true;
 
@@ -725,6 +728,22 @@ unsigned int Visual::GetAttachedObjectCount() const
 void Visual::DetachObjects()
 {
   this->dataPtr->sceneNode->detachAllObjects();
+
+  if (this->dataPtr->meshClone)
+  {
+    for (unsigned int i = 0; i <
+        this->dataPtr->sceneNode->numAttachedObjects(); ++i)
+    {
+      Ogre::MovableObject *ogreObj =
+        this->dataPtr->sceneNode->getAttachedObject(i);
+      if (ogreObj->getName().find("_CLONE_") != std::string::npos)
+      {
+        this->dataPtr->sceneNode->getCreator()->destroyEntity(
+            dynamic_cast<Ogre::Entity *>(ogreObj));
+      }
+    }
+    this->dataPtr->meshClone = false;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1861,6 +1880,164 @@ void Visual::InsertMesh(const std::string &_meshName,
       common::MeshManager::Instance()->GetMesh(_meshName);
     this->InsertMesh(mesh);
   }*/
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateMeshFromMsg(const msgs::Mesh *_msg)
+{
+  // Perform updates on a clone of the original mesh.
+  // The normals are also recaculated on the fly, and the original material is
+  // used.
+
+  Ogre::MeshPtr ogreMesh;
+  // find the mesh to be updated.
+  for (unsigned int i = 0; i <
+      this->dataPtr->sceneNode->numAttachedObjects(); ++i)
+  {
+    Ogre::MovableObject *ogreObj =
+        this->dataPtr->sceneNode->getAttachedObject(i);
+    Ogre::Entity *ogreEnt = dynamic_cast<Ogre::Entity *>(ogreObj);
+
+    if (ogreEnt)
+    {
+      ogreMesh = ogreEnt->getMesh();
+
+      if (ogreMesh.isNull())
+        continue;
+
+      if (!this->dataPtr->meshClone)
+      {
+        // clone the mesh so that other visuals with the same mesh do not get
+        // affected by the changes.
+        ogreMesh = ogreMesh->clone(ogreMesh->getName() + "_CLONE_");
+        this->dataPtr->sceneNode->detachObject(ogreObj);
+        Ogre::Entity *ent =
+            this->dataPtr->sceneNode->getCreator()->createEntity(
+            ogreObj->getName() + "_CLONE_", ogreMesh->getName());
+
+        this->dataPtr->sceneNode->attachObject(
+            dynamic_cast<Ogre::MovableObject *>(ent));
+        if (!this->dataPtr->myMaterialName.empty())
+          ent->setMaterialName(this->dataPtr->myMaterialName);
+        ent->setUserAny(Ogre::Any(this->GetName()));
+        this->dataPtr->meshClone = true;
+      }
+      break;
+    }
+  }
+
+  if (ogreMesh.isNull())
+    return;
+
+
+  const common::Mesh *origMesh =
+      common::MeshManager::Instance()->GetMesh(_msg->name());
+
+  // mesh submeshes
+  for (int i = 0; i < _msg->submeshes_size(); ++i)
+  {
+    const common::SubMesh *origSubMesh = origMesh->GetSubMesh(i);
+    const msgs::SubMesh subMeshMsg = _msg->submeshes(i);
+    Ogre::SubMesh *ogreSubMesh = ogreMesh->getSubMesh(i);
+
+    // resize the buffers if necessary
+    unsigned int vCount = static_cast<unsigned int>(subMeshMsg.vertices_size());
+    unsigned int iCount = static_cast<unsigned int>(subMeshMsg.indices_size());
+    if (vCount > ogreSubMesh->vertexData->vertexCount)
+    {
+      Ogre::HardwareVertexBufferSharedPtr vbuf =
+          Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+          ogreSubMesh->vertexData->vertexDeclaration->getVertexSize(0),
+          vCount, Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+      ogreSubMesh->vertexData->vertexBufferBinding->setBinding(0, vbuf);
+      ogreSubMesh->vertexData->vertexCount = vCount;
+    }
+    if (iCount > ogreSubMesh->indexData->indexCount)
+    {
+      ogreSubMesh->indexData->indexBuffer =
+        Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
+        Ogre::HardwareIndexBuffer::IT_32BIT,
+        iCount, Ogre::HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        ogreSubMesh->indexData->indexCount = iCount;
+      //ogreSubMesh->setIndexCount(subMeshMsg.indices_size());
+    }
+
+    // check if normal and texcoord declarations exist
+    const Ogre::VertexElement *normalVertexElement =
+        ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
+        Ogre::VES_NORMAL);
+
+    const Ogre::VertexElement *texcoordVertexElement =
+        ogreSubMesh->vertexData->vertexDeclaration->findElementBySemantic(
+        Ogre::VES_TEXTURE_COORDINATES);
+
+    // recalculate normals
+    common::SubMesh newSubMesh;
+    if (normalVertexElement)
+    {
+      for (unsigned int j = 0; j < vCount; ++j)
+        newSubMesh.AddVertex(msgs::Convert(subMeshMsg.vertices(j)));
+      for (unsigned int j = 0; j < iCount; ++j)
+        newSubMesh.AddIndex(subMeshMsg.indices(j));
+      newSubMesh.SetNormalCount(vCount);
+      newSubMesh.RecalculateNormals();
+    }
+
+    // lock the buffers
+    Ogre::HardwareVertexBufferSharedPtr vbuf =
+        ogreSubMesh->vertexData->vertexBufferBinding->getBuffer(0);
+
+    Ogre::Real *vPos =
+        static_cast<Ogre::Real*>(vbuf->lock(Ogre::HardwareBuffer::HBL_NORMAL));
+
+    Ogre::HardwareIndexBufferSharedPtr ibuf =
+        ogreSubMesh->indexData->indexBuffer;
+
+    uint32_t * indices = static_cast<uint32_t *>(
+        ibuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
+
+    for (unsigned int j = 0; j < vCount; ++j)
+    {
+      const msgs::Vector3d v = subMeshMsg.vertices(j);
+
+      // update vertex pos
+      *vPos++ = v.x();
+      *vPos++ = v.y();
+      *vPos++ = v.z();
+
+      if (normalVertexElement)
+      {
+        // update normals
+        math::Vector3 n = newSubMesh.GetNormal(j);
+        *vPos++ = n.x;
+        *vPos++ = n.y;
+        *vPos++ = n.z;
+      }
+
+      if (texcoordVertexElement)
+      {
+        // use the original submesh's uv coordinates.
+        if (origSubMesh->GetTexCoordCount() > 0 &&
+            vCount <= origSubMesh->GetTexCoordCount())
+        {
+          *vPos++ = origSubMesh->GetTexCoord(j).x;
+          *vPos++ = origSubMesh->GetTexCoord(j).y;
+        }
+        else
+        {
+          *vPos++;
+          *vPos++;
+        }
+      }
+    }
+
+    // update indices
+    for (int j = 0; j < subMeshMsg.indices_size(); ++j)
+      *indices++ = subMeshMsg.indices(j);
+
+    vbuf->unlock();
+    ibuf->unlock();
+  }
 }
 
 //////////////////////////////////////////////////

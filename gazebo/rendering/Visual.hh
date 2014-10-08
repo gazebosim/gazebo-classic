@@ -355,6 +355,10 @@ namespace gazebo
                   const std::string &_subMesh = "",
                   bool _centerSubmesh = false);
 
+      /// \brief Update the mesh of the visual
+      /// \param[in] _msg Mesh message containing new mesh data.
+      public: void UpdateMeshFromMsg(const msgs::Mesh *_msg);
+
       /// \brief Update a visual based on a message.
       /// \param[in] _msg The visual message.
       public: void UpdateFromMsg(ConstVisualPtr &_msg);

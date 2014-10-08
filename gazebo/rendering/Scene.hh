@@ -556,6 +556,10 @@ namespace gazebo
       /// \param[in] _msg The message data.
       private: bool ProcessLightMsg(ConstLightPtr &_msg);
 
+      /// \brief Process a model update message.
+      /// \param[in] _msg The message data.
+      private: bool ProcessMeshUpdateMsg(ConstMeshUpdatePtr &_msg);
+
       /// \brief Process a request message.
       /// \param[in] _msg The message data.
       private: void ProcessRequestMsg(ConstRequestPtr &_msg);
@@ -579,6 +583,10 @@ namespace gazebo
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.
       private: void OnSkeletonPoseMsg(ConstPoseAnimationPtr &_msg);
+
+      /// \brief Mesh update callback.
+      /// \param[in] _msg The message data.
+      private: void OnMeshUpdate(ConstMeshUpdatePtr &_msg);
 
       /// \brief Create a new center of mass visual.
       /// \param[in] _msg Message containing the link data.
@@ -687,6 +695,13 @@ namespace gazebo
       /// \brief List of request message to process.
       private: RequestMsgs_L requestMsgs;
 
+      /// \def MeshUpdateMsgs_L
+      /// \brief List of mesh update messages.
+      typedef std::list<boost::shared_ptr<msgs::MeshUpdate const> >
+          MeshUpdateMsgs_L;
+      /// \brief List of mesh update messages to process.
+      private: MeshUpdateMsgs_L meshUpdateMsgs;
+
       /// \def Visual_M
       /// \brief Map of visuals and their names.
       typedef std::map<uint32_t, VisualPtr> Visual_M;
@@ -755,6 +770,9 @@ namespace gazebo
 
       /// \brief Subscribe to model info updates
       private: transport::SubscriberPtr modelInfoSub;
+
+      /// \brief Subscribe to mesh updates.
+      private: transport::SubscriberPtr meshUpdateSub;
 
       /// \brief Publish light updates.
       private: transport::PublisherPtr lightPub;

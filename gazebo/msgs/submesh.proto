@@ -1,0 +1,19 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface SubMesh
+/// \brief Message for a submesh
+
+
+import "vector3d.proto";
+import "vector2d.proto";
+
+message SubMesh
+{
+  optional string name = 1;
+  optional Vector3d scale  = 2;
+  repeated Vector3d vertices = 3;
+  repeated Vector3d normals = 4;
+  repeated Vector2d texcoords = 5;
+  repeated uint32 indices = 6;
+}
