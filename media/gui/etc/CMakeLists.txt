@@ -1,5 +1,6 @@
 set (files handsim.png
-           fingerpts.csv
+           GUIAratPlugin.sdf
+          
 )
 
 

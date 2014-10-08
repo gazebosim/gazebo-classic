@@ -32,6 +32,7 @@ GUIAratPlugin::GUIAratPlugin()
   this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
   this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
   std::cout << "img filename: " << this->handImgFilename << std::endl;
+  std::cout << "config filename: " << this->configFilename << std::endl;
 
   sdf::SDF parameters;
   
@@ -43,16 +44,23 @@ GUIAratPlugin::GUIAratPlugin()
   fileinput.close();
   
   parameters.SetFromString(sdfString);
-  parameters.root->GetAttribute("circleSize")->Get(circleSize);
-  parameters.root->GetAttribute("forceMin")->Get(forceMin);
-  parameters.root->GetAttribute("forceMax")->Get(forceMax);
-  handSide = parameters.root->GetAttribute("handSide")->GetAsString();
-  parameters.root->GetAttribute("colorMin")->Get(colorMin);
-  parameters.root->GetAttribute("colorMax")->Get(colorMax);
+  sdf::ElementPtr elem = parameters.root->GetElement("world");
+  elem = elem->GetElement("plugin");
+  elem->GetElement("circleSize")->GetValue()->Get(circleSize);
+  elem->GetElement("forceMin")->GetValue()->Get(forceMin);
+  elem->GetElement("forceMax")->GetValue()->Get(forceMax);
+  elem->GetElement("colorMin")->GetValue()->Get(colorMin);
+  elem->GetElement("colorMax")->GetValue()->Get(colorMax);
+  elem->GetElement("handSide")->GetValue()->Get(handSide);
+
+  math::Vector2d handImgDims;
+  elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
+  handImgX = handImgDims[0];
+  handImgY = handImgDims[1];
 
   for(int i = 0; i < 5; i++){
     std::string keyName = fingerNames[i]+"Pos";
-    parameters.root->GetAttribute(keyName)->Get(finger_points[fingerNames[i]]);
+    elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
   }
 
   
@@ -115,28 +123,6 @@ GUIAratPlugin::GUIAratPlugin()
   this->taskNum = 0;
   this->maxTaskCount = 10;
 
-  //Parse the finger names and point where we will draw a contact
-  
-  /*std::ifstream fileinput(this->fingerPtsFilename.c_str());
-  std::stringstream inputStream;
-  inputStream << fileinput.rdbuf();
-  char buffer[256];
-  inputStream.getline(buffer, 256);
-  while(!inputStream.eof() && !inputStream.fail()){
-    std::stringstream ss;
-    ss << buffer;
-    std::vector<std::string> tokens;
-    for(int i = 0; i < 3; i++){
-      char token[256];
-      ss.getline(token, 256, ',');
-      tokens.push_back(std::string(token));
-    }
-    this->finger_points[tokens[0]] = std::pair<int, int>(atoi(tokens[1].c_str()), atoi(tokens[2].c_str())) ;
-    inputStream.getline(buffer, 256);
-  }
-
-  fileinput.close();*/
-
   // Preallocate QGraphicsItems for each contact point
   for(int i = 0; i < 5; i++){
     int xpos = finger_points[fingerNames[i]][0];
@@ -147,8 +133,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Set up an array of subscribers for each contact sensor
 
-  //TODO: set up configurable handedness
-  this->handSide = "r";
+  //this->handSide = "r";
   
   contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Th"),
                               &GUIAratPlugin::OnThumbContact, this));
