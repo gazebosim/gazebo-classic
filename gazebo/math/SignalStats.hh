@@ -212,17 +212,73 @@ namespace gazebo
       /// \brief Forget all previous data.
       public: void Reset();
 
+      /// \brief Get statistics for x component of signal.
+      /// \return Statistics for x component of signal.
+      public: inline SignalStats X() const
+      {
+        return this->x;
+      }
+
+      /// \brief Get statistics for y component of signal.
+      /// \return Statistics for y component of signal.
+      public: inline SignalStats Y() const
+      {
+        return this->y;
+      }
+
+      /// \brief Get statistics for z component of signal.
+      /// \return Statistics for z component of signal.
+      public: inline SignalStats Z() const
+      {
+        return this->z;
+      }
+
+      /// \brief Get statistics for magnitude of signal.
+      /// \return Statistics for magnitude of signal.
+      public: inline SignalStats Mag() const
+      {
+        return this->mag;
+      }
+
+      /// \brief Get mutable reference to statistics for x component of signal.
+      /// \return Statistics for x component of signal.
+      public: inline SignalStats &X()
+      {
+        return this->x;
+      }
+
+      /// \brief Get mutable reference to statistics for y component of signal.
+      /// \return Statistics for y component of signal.
+      public: inline SignalStats &Y()
+      {
+        return this->y;
+      }
+
+      /// \brief Get mutable reference to statistics for z component of signal.
+      /// \return Statistics for z component of signal.
+      public: inline SignalStats &Z()
+      {
+        return this->z;
+      }
+
+      /// \brief Get mutable reference to statistics for magnitude of signal.
+      /// \return Statistics for magnitude of signal.
+      public: inline SignalStats &Mag()
+      {
+        return this->mag;
+      }
+
       /// \brief Statistics for x component of signal.
-      public: SignalStats x;
+      private: SignalStats x;
 
       /// \brief Statistics for y component of signal.
-      public: SignalStats y;
+      private: SignalStats y;
 
       /// \brief Statistics for z component of signal.
-      public: SignalStats z;
+      private: SignalStats z;
 
       /// \brief Statistics for magnitude of signal.
-      public: SignalStats mag;
+      private: SignalStats mag;
     };
     /// \}
   }
