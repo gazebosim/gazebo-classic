@@ -113,8 +113,12 @@ GUIAratPlugin::GUIAratPlugin()
     // Insert this widget into the tabWidget
     QGroupBox *buttonGroup = new QGroupBox();
     QGridLayout *buttonLayout = new QGridLayout();
+
+    buttonLayout->setContentsMargins(2, 2, 2, 2);
+    buttonLayout->setSpacing(2);
     
     sdf::ElementPtr task = taskGroup->GetElement("task");
+    int i = 0;
 
     while(task){
       std::string id;
@@ -131,9 +135,13 @@ GUIAratPlugin::GUIAratPlugin()
         taskButton = new QPushButton(QString(name.c_str()));
       }
       connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton()));
-      buttonLayout->addWidget(taskButton);
+      taskButton->resize(handImgX/3, handImgX/3);
+      int col = i%3;
+      int row = i/3;
+      buttonLayout->addWidget(taskButton, row, col);
 
       task = task->GetNextElement();
+      i++;
     }
     buttonGroup->setLayout(buttonLayout);
 
