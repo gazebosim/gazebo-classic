@@ -16,14 +16,26 @@
       <RingPos>165 22</RingPos>
       <LittlePos>207 53</LittlePos>
 
-      <tasks>
-        <grasp>
-        </grasp>
-        <grip>
-        </grip>
-        <pinch>
-        </pinch>
-      </tasks>
+      <taskGroup name="Grasp">
+        <task id="grasp_1" icon="none" name="Block 10cm"></task>
+        <task id="grasp_2" icon="none" name="Block 2.5cm"></task>
+        <task id="grasp_3" icon="none" name="Block 5cm"></task>
+        <task id="grasp_4" icon="none" name="Block 7.5cm"></task>
+        <task id="grasp_5" icon="none" name="Cricket ball"></task>
+        <task id="grasp_6" icon="none" name="Stone"></task>
+      </taskGroup>
+
+      <taskGroup name="Grip">
+        <task id="grip_1" icon="none" name="Cups"></task>
+        <task id="grip_2" icon="none" name="Tube 2.25cm"></task>
+        <task id="grip_3" icon="none" name="Tube 9.5mm"></task>
+        <task id="grip_4" icon="none" name="Washer"></task>
+      </taskGroup>
+      
+      <taskGroup name="Pinch">
+        <task id="pinch_1" icon="none" name="Ball bearing"></task>
+        <task id="pinch_2" icon="none" name="Washer"></task>
+      </taskGroup>
 
     </plugin>
   </world>

@@ -31,8 +31,6 @@ GUIAratPlugin::GUIAratPlugin()
   common::SystemPaths* paths = common::SystemPaths::Instance();
   this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
   this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
-  std::cout << "img filename: " << this->handImgFilename << std::endl;
-  std::cout << "config filename: " << this->configFilename << std::endl;
 
   sdf::SDF parameters;
   
@@ -63,35 +61,23 @@ GUIAratPlugin::GUIAratPlugin()
     elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
   }
 
-  // Task menu
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
 
   // Create the main layout
-  QHBoxLayout *mainLayout = new QHBoxLayout;
+  QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  // Create the frame to hold all the widgets
-  QFrame *mainFrame = new QFrame();
-
-  // Create a push button, and connect it to the OnButton function
-  /*QPushButton *button = new QPushButton(tr("Next Test"));
-  connect(button, SIGNAL(clicked()), this, SLOT(OnButton()));*/
-  // Add the button to the frame's layout
-  //frameLayout->addWidget(button);
-
-  QBoxLayout *taskLayout = new QBoxLayout();
-  QTabWidget *tabWidget = new QTabWidget();
-  
-
-
-  // Create the layout that sits inside the frame
+  // Create the layout for the hand that sits inside the frame
   QVBoxLayout *handLayout = new QVBoxLayout();
 
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
   QGraphicsView *handView = new QGraphicsView(handScene);
+
+  // Create the frame to hold the hand widget
+  QFrame *handFrame = new QFrame();
 
   // Add the GraphicsView to the layout
   handLayout->addWidget(handView);
@@ -106,10 +92,61 @@ GUIAratPlugin::GUIAratPlugin()
   handView->show();
 
   // Add handLayout to the frame
-  mainFrame->setLayout(handLayout);
+  handFrame->setLayout(handLayout);
 
   // Add the frame to the main layout
-  mainLayout->addWidget(mainFrame);
+  mainLayout->addWidget(handFrame);
+
+  QVBoxLayout *taskLayout = new QVBoxLayout();
+  
+
+  //TODO: sizing
+  QTabWidget *tabWidget = new QTabWidget();
+  
+  // Populate the tabWidget by parsing out SDF
+    
+  sdf::ElementPtr taskGroup = elem->GetElement("taskGroup");
+  while(taskGroup){
+    std::string taskGroupName;
+    taskGroup->GetAttribute("name")->Get(taskGroupName);
+    // Create a QWidget for the task group
+    // Insert this widget into the tabWidget
+    QGroupBox *buttonGroup = new QGroupBox();
+    QGridLayout *buttonLayout = new QGridLayout();
+    
+    sdf::ElementPtr task = taskGroup->GetElement("task");
+
+    while(task){
+      std::string id;
+      std::string name;
+      std::string icon_path;
+      task->GetAttribute("id")->Get(id);
+      task->GetAttribute("name")->Get(name);
+      task->GetAttribute("icon")->Get(icon_path);
+      QPushButton *taskButton;
+      if(icon_path.compare("none") != 0){
+        QPixmap icon(QString(icon_path.c_str()));
+        taskButton = new QPushButton(QIcon(icon), QString(name.c_str()));
+      } else {
+        taskButton = new QPushButton(QString(name.c_str()));
+      }
+      connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton()));
+      buttonLayout->addWidget(taskButton);
+
+      task = task->GetNextElement();
+    }
+    buttonGroup->setLayout(buttonLayout);
+
+    tabWidget->addTab((QWidget*) buttonGroup, QString(taskGroupName.c_str()));
+
+    taskGroup = taskGroup->GetNextElement();
+  }
+
+  QFrame *taskFrame = new QFrame();
+  taskLayout->addWidget(tabWidget);
+  taskFrame->setLayout(taskLayout);
+
+  mainLayout->addWidget(taskFrame);
 
   // Remove margins to reduce space
   handLayout->setContentsMargins(0, 0, 0, 0);
@@ -118,8 +155,7 @@ GUIAratPlugin::GUIAratPlugin()
   this->setLayout(mainLayout);
 
   // Position and resize this widget
-  this->move(0, 0);
-  this->resize(handImgX+10, handImgY+10);
+  this->resize(handImgX+10, this->frameSize().rheight());
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());

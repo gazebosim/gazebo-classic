@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <uri>file://media/gui/etc/handsim.png</uri>
+  <uri>file://media/gui/etc/fingerpts.csv</uri>
+</sdf>
