@@ -644,7 +644,12 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Joint axis index too large.\n";
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
     return false;
   }
 
@@ -757,7 +762,12 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
   // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Joint axis index too large.\n";
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
     return false;
   }
 
@@ -776,16 +786,42 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
   if (this->HasType(Base::HINGE_JOINT) ||
       this->HasType(Base::UNIVERSAL_JOINT))
   {
-    math::Vector3 desiredVel;
+    // Desired angular and linear velocity in world frame for child link
+    math::Vector3 angularVel, linearVel;
     if (this->parentLink)
     {
-      desiredVel = this->parentLink->GetWorldAngularVel();
-    }
-    desiredVel += _velocity * this->GetGlobalAxis(_index);
-    this->childLink->SetAngularVel(desiredVel);
+      // Use parent link velocity as reference (if parent exists)
+      angularVel = this->parentLink->GetWorldAngularVel();
 
-    // TODO: Should prescribe the linear velocity of the child link if there is
-    // an offset between the child's CG and the joint anchor.
+      // Get parent linear velocity at joint anchor
+      // Passing unit quaternion q ensures that parentOffset will be
+      //  interpreted in world frame.
+      math::Quaternion q;
+      math::Vector3 parentOffset =
+        this->GetParentWorldPose().pos - this->parentLink->GetWorldPose().pos;
+      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
+    }
+
+    // Add desired velocity along specified axis
+    angularVel += _velocity * this->GetGlobalAxis(_index);
+
+    if (this->HasType(Base::UNIVERSAL_JOINT))
+    {
+      // For multi-axis joints, retain velocity of other axis.
+      unsigned int otherIndex = (_index + 1) % 2;
+      angularVel += this->GetVelocity(otherIndex)
+                  * this->GetGlobalAxis(otherIndex);
+    }
+
+    this->childLink->SetAngularVel(angularVel);
+
+    // Compute desired linear velocity of the child link based on
+    //  offset between the child's CG and the joint anchor
+    //  and the desired angular velocity.
+    math::Vector3 childCoGOffset =
+      this->childLink->GetWorldCoGPose().pos - this->GetWorldPose().pos;
+    linearVel += angularVel.Cross(childCoGOffset);
+    this->childLink->SetLinearVel(linearVel);
   }
   else if (this->HasType(Base::SLIDER_JOINT))
   {
