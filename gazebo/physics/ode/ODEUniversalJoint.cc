@@ -205,6 +205,19 @@ double ODEUniversalJoint::GetMaxForce(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
+double ODEUniversalJoint::GetParam(unsigned int _parameter) const
+{
+  double result = 0;
+
+  if (this->jointId)
+    result = dJointGetUniversalParam(this->jointId, _parameter);
+  else
+    gzerr << "ODE Joint ID is invalid\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 {
   ODEJoint::SetParam(_parameter, _value);
@@ -259,6 +272,21 @@ bool ODEUniversalJoint::SetLowStop(
 bool ODEUniversalJoint::SetParam(
   const std::string &_key, unsigned int _index, const boost::any &_value)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
   if (_key == "stop_erp")
   {
     try
@@ -298,6 +326,12 @@ bool ODEUniversalJoint::SetParam(
           gzerr << "Invalid index[" << _index << "]\n";
           return false;
       };
+  else if (_key == "friction")
+  {
+    try
+    {
+      this->SetParam(dParamVel | group, 0.0);
+      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -363,8 +397,35 @@ bool ODEUniversalJoint::SetParam(
 double ODEUniversalJoint::GetParam(
   const std::string &_key, unsigned int _index)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case UniversalJoint::AXIS_CHILD:
+      group = dParamGroup1;
+      break;
+    case UniversalJoint::AXIS_PARENT:
+      group = dParamGroup2;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
   // Overload because we switched axis orders
-  if (_key == "hi_stop")
+  if (_key == "friction")
+  {
+    try
+    {
+      return this->GetParam(dParamFMax | group);
+    }
+    catch(const common::Exception &e)
+    {
+      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      return 0;
+    }
+  }
+  else if (_key == "hi_stop")
   {
     try
     {

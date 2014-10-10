@@ -18,6 +18,7 @@ set (files
   heightmap.world
   hydra_demo.world
   joint_damping_demo.world
+  joint_friction_demo.world
   joints.world
   lights.world
   mud_bitmask.world
