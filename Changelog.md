@@ -11,10 +11,19 @@
 1. Added GUI overlay plugins. Users can now write a Gazebo + QT plugin that displays widgets over the render window.
   * [Pull request #1181](https://bitbucket.org/osrf/gazebo/pull-request/1181)
 
+1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
+  * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
+
 1. Implemented camera lens distortion.
   * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
 
 ## Gazebo 4.0
+
+### Gazebo 4.?.? (2014-??-??)
+1. Add ArrangePlugin for arranging groups of models.
+   Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
+   recursively on all links in model.
+    * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
 
 ### Gazebo 4.0.2 (2014-09-23)
 1. Fix and improve mechanism to generate pkgconfig libs
