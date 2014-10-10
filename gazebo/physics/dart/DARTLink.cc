@@ -173,6 +173,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     dtBodyNode = new dart::dynamics::BodyNode();
   }
 
+  dtBodyNode->setFrictionCoeff(1.0);
   Link::Load(_sdf);
 }
 
