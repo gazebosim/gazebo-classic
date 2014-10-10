@@ -417,7 +417,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
-      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), limit.Radian());
+      EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
     }
   }
 

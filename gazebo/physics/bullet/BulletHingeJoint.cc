@@ -19,6 +19,7 @@
 #include "gazebo/common/Exception.hh"
 
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/World.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletHingeJoint.hh"
@@ -352,4 +353,84 @@ math::Vector3 BulletHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+bool BulletHingeJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  if (_key == "friction" && this->bulletHinge)
+  {
+    try
+    {
+      // enableAngularMotor takes max impulse as a parameter
+      // instead of max force.
+      // this means the friction will change when the step size changes.
+      double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      this->bulletHinge->enableAngularMotor(true, 0.0,
+        dt * boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "hi_stop" && this->bulletHinge)
+  {
+    try
+    {
+      this->SetHighStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "lo_stop" && this->bulletHinge)
+  {
+    try
+    {
+      this->SetLowStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletHingeJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "friction" && this->bulletHinge)
+  {
+    double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+    return this->bulletHinge->getMaxMotorImpulse() / dt;
+  }
+  else if (_key == "hi_stop" && this->bulletHinge)
+  {
+    return this->bulletHinge->getUpperLimit();
+  }
+  else if (_key == "lo_stop" && this->bulletHinge)
+  {
+    return this->bulletHinge->getLowerLimit();
+  }
+  return BulletJoint::GetParam(_key, _index);
 }

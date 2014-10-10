@@ -361,3 +361,79 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   math::Pose poseParent = this->GetWorldPose();
   return math::Angle(axis.Dot(offset));
 }
+
+//////////////////////////////////////////////////
+bool BulletSliderJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  if (_key == "friction" && this->bulletSlider)
+  {
+    try
+    {
+      this->bulletSlider->setPoweredLinMotor(true);
+      this->bulletSlider->setTargetLinMotorVelocity(0.0);
+      this->bulletSlider->setMaxLinMotorForce(boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "hi_stop" && this->bulletSlider)
+  {
+    try
+    {
+      this->SetHighStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "lo_stop" && this->bulletSlider)
+  {
+    try
+    {
+      this->SetLowStop(0, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "friction" && this->bulletSlider)
+  {
+    return this->bulletSlider->getMaxLinMotorForce();
+  }
+  else if (_key == "hi_stop" && this->bulletSlider)
+  {
+    return this->bulletSlider->getUpperLinLimit();
+  }
+  else if (_key == "lo_stop" && this->bulletSlider)
+  {
+    return this->bulletSlider->getLowerLinLimit();
+  }
+  return BulletJoint::GetParam(_key, _index);
+}

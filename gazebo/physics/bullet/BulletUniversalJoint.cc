@@ -447,3 +447,62 @@ math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+bool BulletUniversalJoint::SetParam(const std::string &_key,
+    unsigned int _index,
+    const boost::any &_value)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return false;
+  }
+
+  if (_key == "hi_stop" && this->bulletUniversal)
+  {
+    try
+    {
+      this->SetHighStop(_index, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "lo_stop" && this->bulletUniversal)
+  {
+    try
+    {
+      this->SetLowStop(_index, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  return BulletJoint::SetParam(_key, _index, _value);
+}
+
+//////////////////////////////////////////////////
+double BulletUniversalJoint::GetParam(const std::string &_key,
+                                      unsigned int _index)
+{
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid index [" << _index << "]" << std::endl;
+    return 0;
+  }
+
+  if (_key == "hi_stop" && this->bulletUniversal)
+  {
+    return this->GetHighStop(_index).Radian();
+  }
+  else if (_key == "lo_stop" && this->bulletUniversal)
+  {
+    return this->GetLowStop(_index).Radian();
+  }
+  return BulletJoint::GetParam(_key, _index);
+}
