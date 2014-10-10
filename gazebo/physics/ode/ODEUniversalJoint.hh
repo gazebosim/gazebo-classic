@@ -82,15 +82,18 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
-                                        unsigned int _index,
-                                        const boost::any &_value);
+                                    unsigned int _index,
+                                    const boost::any &_value);
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
-                                                unsigned int _index);
+                                      unsigned int _index);
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
+
+      // Documentation inherited
+      public: virtual double GetParam(unsigned int _parameter) const;
     };
   }
 }
