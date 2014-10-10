@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
-      public slots: void OnTaskSent(std::string task_id);
+      public slots: void OnTaskSent(std::string id, QTextDocument* instructions);
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
@@ -73,7 +73,6 @@ namespace gazebo
 
       private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
 
-      //TODO: config file
       private: int handImgX;
       private: int handImgY;
 
@@ -82,6 +81,7 @@ namespace gazebo
 
       //TODO: tune these values
       private: int circleSize;
+      private: math::Vector2d iconSize;
       private: math::Vector3 colorMin;
       private: math::Vector3 colorMax;
       private: float forceMin;
@@ -94,6 +94,8 @@ namespace gazebo
       private: std::map<std::string, math::Vector2d > finger_points;
 
       private: std::map<std::string, QGraphicsEllipseItem*> contactGraphicsItems;
+
+      private: QTextEdit* instructionsView;
 
       private: void OnFingerContact(ConstContactsPtr &msg, std::string);
 
@@ -125,12 +127,14 @@ namespace gazebo
       public: QTaskButton();
 
       public: void SetTaskId(std::string task_id);
+      public: void SetTaskInstructionsDocument(QTextDocument* instr);
 
       public slots: void OnButton();
 
       private: std::string id;
+      private: QTextDocument* instructions;
 
-      signals: void SendTask(std::string id);
+      signals: void SendTask(std::string id, QTextDocument* instructions);
     };
 }
 #endif

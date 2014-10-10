@@ -1,6 +1,6 @@
 set (files handsim.png
+           icon_placeholder.png
            GUIAratPlugin.sdf
-          
 )
 
 

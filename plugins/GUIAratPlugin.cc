@@ -30,8 +30,12 @@ void QTaskButton::SetTaskId(std::string task_id){
   this->id = task_id;
 }
 
+void QTaskButton::SetTaskInstructionsDocument(QTextDocument* instr){
+  this->instructions = instr;
+}
+
 void QTaskButton::OnButton(){
-  emit SendTask(this->id);
+  emit SendTask(this->id, this->instructions);
 }
 
 /////////////////////////////////////////////////
@@ -68,6 +72,8 @@ GUIAratPlugin::GUIAratPlugin()
   handImgX = handImgDims[0];
   handImgY = handImgDims[1];
 
+  elem->GetElement("iconDimensions")->GetValue()->Get(iconSize);
+
   for(int i = 0; i < 5; i++){
     std::string keyName = fingerNames[i]+"Pos";
     elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
@@ -82,17 +88,13 @@ GUIAratPlugin::GUIAratPlugin()
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   // Create the layout for the hand that sits inside the frame
-  QVBoxLayout *handLayout = new QVBoxLayout();
 
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
   QGraphicsView *handView = new QGraphicsView(handScene);
 
-  // Create the frame to hold the hand widget
-  QFrame *handFrame = new QFrame();
 
   // Add the GraphicsView to the layout
-  handLayout->addWidget(handView);
 
   // Load the hand image
   QPixmap* handImg = new QPixmap(QString(handImgFilename.c_str()));
@@ -103,18 +105,19 @@ GUIAratPlugin::GUIAratPlugin()
   handScene->update();
   handView->show();
 
-  // Add handLayout to the frame
-  handFrame->setLayout(handLayout);
-
   // Add the frame to the main layout
-  mainLayout->addWidget(handFrame);
+  handView->setMaximumSize(handImgX+10, handImgY+10);
+  mainLayout->addWidget(handView);
 
   QVBoxLayout *taskLayout = new QVBoxLayout();
   
   QTabWidget *tabWidget = new QTabWidget();
   
   // Populate the tabWidget by parsing out SDF
-    
+  instructionsView = new QTextEdit();
+  instructionsView->setReadOnly(true);
+  instructionsView->setMaximumHeight(handImgY/3);
+   
   sdf::ElementPtr taskGroup = elem->GetElement("taskGroup");
   while(taskGroup){
     std::string taskGroupName;
@@ -123,9 +126,6 @@ GUIAratPlugin::GUIAratPlugin()
     // Insert this widget into the tabWidget
     QGroupBox *buttonGroup = new QGroupBox();
     QGridLayout *buttonLayout = new QGridLayout();
-
-    buttonLayout->setContentsMargins(0, 0, 0, 0);
-    buttonLayout->setSpacing(0);
     
     sdf::ElementPtr task = taskGroup->GetElement("task");
     int i = 0;
@@ -134,48 +134,61 @@ GUIAratPlugin::GUIAratPlugin()
       std::string id;
       std::string name;
       std::string icon_path;
+      std::string instructions;
       task->GetAttribute("id")->Get(id);
       task->GetAttribute("name")->Get(name);
       task->GetAttribute("icon")->Get(icon_path);
+      task->GetAttribute("instructions")->Get(instructions);
+
       QTaskButton *taskButton = new QTaskButton();
-      taskButton->setText(QString(name.c_str()));
-      if(icon_path.compare("none") != 0){
-        QPixmap icon(QString(icon_path.c_str()));
-        taskButton->setIcon(QIcon(icon));
-      }
+      taskButton->setMaximumSize(handImgX/3, handImgY/3);
+      //taskButton->setText(QString(name.c_str()));
 			//Need to add a new signal to PushButton for this to work
       taskButton->SetTaskId(id);
-      connect(taskButton, SIGNAL(SendTask(std::string)), this, SLOT(OnTaskSent(std::string)));
+      QTextDocument* instructionsDocument = new QTextDocument(QString(instructions.c_str()));
+      taskButton->SetTaskInstructionsDocument(instructionsDocument);
+      if(id.compare("grasp_1")==0){ //TODO: better representation of canonical ordering
+        instructionsView->setDocument(instructionsDocument);
+      }
+      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*)), this, SLOT(OnTaskSent(std::string, QTextDocument*)));
 
       int col = i%3;
       int row = i/3;
       buttonLayout->addWidget(taskButton, row, col);
 
+      if(icon_path.compare("none") != 0){
+        QPixmap icon_picture(QString(paths->FindFileURI(icon_path).c_str()));
+        
+        taskButton->setIcon(QIcon(icon_picture));
+        taskButton->setIconSize(QSize(iconSize[0], iconSize[1])));
+      }
+
       task = task->GetNextElement();
       i++;
     }
     buttonGroup->setLayout(buttonLayout);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->setSpacing(0);
 
     tabWidget->addTab((QWidget*) buttonGroup, QString(taskGroupName.c_str()));
 
     taskGroup = taskGroup->GetNextElement();
   }
-
   QFrame *taskFrame = new QFrame();
   taskLayout->addWidget(tabWidget);
+  taskLayout->addWidget(instructionsView);
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
 	
 
   // Remove margins to reduce space
-  handLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
 
   // Position and resize this widget
-  this->resize(handImgX+10, this->frameSize().rheight());
+  this->setMaximumWidth(handImgX+10);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
@@ -300,8 +313,11 @@ void GUIAratPlugin::PreRender(){
 
 }*/
 
-void GUIAratPlugin::OnTaskSent(std::string id)
+void GUIAratPlugin::OnTaskSent(std::string id, QTextDocument* instructions)
 {
+  // Show the instructions to the user
+  instructionsView->setDocument(instructions);
+
   // Send the model to the gazebo server
   msgs::GzString msg;
   
