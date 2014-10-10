@@ -34,9 +34,14 @@ void QTaskButton::SetTaskInstructionsDocument(QTextDocument* instr){
   this->instructions = instr;
 }
 
-void QTaskButton::OnButton(){
-  emit SendTask(this->id, this->instructions);
+void QTaskButton::SetIndex(int i){
+  this->index = i;
 }
+
+void QTaskButton::OnButton(){
+  emit SendTask(this->id, this->instructions, this->index);
+}
+
 
 /////////////////////////////////////////////////
 GUIAratPlugin::GUIAratPlugin()
@@ -87,14 +92,9 @@ GUIAratPlugin::GUIAratPlugin()
   // Create the main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  // Create the layout for the hand that sits inside the frame
-
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
   QGraphicsView *handView = new QGraphicsView(handScene);
-
-
-  // Add the GraphicsView to the layout
 
   // Load the hand image
   QPixmap* handImg = new QPixmap(QString(handImgFilename.c_str()));
@@ -147,10 +147,9 @@ GUIAratPlugin::GUIAratPlugin()
       taskButton->SetTaskId(id);
       QTextDocument* instructionsDocument = new QTextDocument(QString(instructions.c_str()));
       taskButton->SetTaskInstructionsDocument(instructionsDocument);
-      if(id.compare("grasp_1")==0){ //TODO: better representation of canonical ordering
-        instructionsView->setDocument(instructionsDocument);
-      }
-      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*)), this, SLOT(OnTaskSent(std::string, QTextDocument*)));
+      taskButton->SetIndex(taskList.size());
+
+      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*, int)), this, SLOT(OnTaskSent(std::string, QTextDocument*, int)));
 
       int col = i%3;
       int row = i/3;
@@ -160,8 +159,13 @@ GUIAratPlugin::GUIAratPlugin()
         QPixmap icon_picture(QString(paths->FindFileURI(icon_path).c_str()));
         
         taskButton->setIcon(QIcon(icon_picture));
-        taskButton->setIconSize(QSize(iconSize[0], iconSize[1])));
+        taskButton->setIconSize(QSize(iconSize[0], iconSize[1]));
       }
+      if(taskList.empty()){
+        instructionsView->setDocument(instructionsDocument);
+      }
+      taskList.push_back(id);
+      this->instructionsList.push_back(instructionsDocument);
 
       task = task->GetNextElement();
       i++;
@@ -174,9 +178,26 @@ GUIAratPlugin::GUIAratPlugin()
 
     taskGroup = taskGroup->GetNextElement();
   }
+
+  currentTaskIndex = 0;
+
   QFrame *taskFrame = new QFrame();
   taskLayout->addWidget(tabWidget);
   taskLayout->addWidget(instructionsView);
+
+  QHBoxLayout* cycleButtonLayout = new QHBoxLayout();
+  QPushButton *resetButton = new QPushButton(QString("Reset Test"));
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(OnResetClicked()));
+  cycleButtonLayout->addWidget(resetButton);
+  resetButton->setMaximumWidth(handImgX/2);
+  QPushButton *nextButton = new QPushButton(QString("Next Test"));
+  connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
+  cycleButtonLayout->addWidget(nextButton);
+  nextButton->setMaximumWidth(handImgX/2);
+  QFrame* cycleButtonFrame = new QFrame;
+  cycleButtonFrame->setLayout(cycleButtonLayout);
+  taskLayout->addWidget(cycleButtonFrame);
+
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
@@ -307,20 +328,31 @@ void GUIAratPlugin::PreRender(){
 
 }
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////
 
-/*void GUIAratPlugin::OnButton(){
+void GUIAratPlugin::PublishTaskMessage(std::string task_name)
+{
+  msgs::GzString msg;
+  msg.set_data(task_name);
+  this->taskPub->Publish(msg);
 
-}*/
+}
 
-void GUIAratPlugin::OnTaskSent(std::string id, QTextDocument* instructions)
+void GUIAratPlugin::OnResetClicked(){
+  // Signal to the ArrangePlugin to set up the current task
+  PublishTaskMessage(this->taskList[currentTaskIndex]);
+}
+
+void GUIAratPlugin::OnNextClicked(){
+  this->currentTaskIndex = (this->currentTaskIndex+1) % this->taskList.size();
+  PublishTaskMessage(this->taskList[currentTaskIndex]);
+  this->instructionsView->setDocument(this->instructionsList[currentTaskIndex]);
+}
+
+void GUIAratPlugin::OnTaskSent(std::string id, QTextDocument* instructions, int index)
 {
   // Show the instructions to the user
-  instructionsView->setDocument(instructions);
-
-  // Send the model to the gazebo server
-  msgs::GzString msg;
-  
-  msg.set_data(id);
-  this->taskPub->Publish(msg);
+  this->instructionsView->setDocument(instructions);
+  PublishTaskMessage(id);
+  this->currentTaskIndex = index;
 }

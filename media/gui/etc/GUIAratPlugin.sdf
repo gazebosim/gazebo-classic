@@ -4,7 +4,7 @@
     <plugin name="GUIAratPlugin" filename="libGUIAratPlugin.so">
       <circleSize>10</circleSize>
       <handImgDimensions>250 250</handImgDimensions>
-      <iconDimensions>250 250</iconDimensions>
+      <iconDimensions>60 60</iconDimensions>
       <forceMin>0</forceMin>
       <forceMax>100</forceMax>
       <colorMin>255 255 0</colorMin>

@@ -51,7 +51,10 @@ namespace gazebo
 
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
-      public slots: void OnTaskSent(std::string id, QTextDocument* instructions);
+      protected slots: void OnTaskSent(std::string id, QTextDocument* instructions, int index);
+      protected slots: void OnResetClicked(); 
+      protected slots: void OnNextClicked(); 
+      private: void PublishTaskMessage(std::string task_name); 
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
@@ -116,6 +119,10 @@ namespace gazebo
       private: std::vector<event::ConnectionPtr> connections;
 
       private: std::queue<ContactsWrapper> msgQueue;
+  
+      private: std::vector<std::string> taskList;
+      private: std::vector<QTextDocument*> instructionsList;
+      private: int currentTaskIndex;
 
       private: void PreRender();
 
@@ -128,13 +135,15 @@ namespace gazebo
 
       public: void SetTaskId(std::string task_id);
       public: void SetTaskInstructionsDocument(QTextDocument* instr);
+      public: void SetIndex(int i);
 
       public slots: void OnButton();
 
       private: std::string id;
       private: QTextDocument* instructions;
+      private: int index; //The canonical index at which this task is stored
 
-      signals: void SendTask(std::string id, QTextDocument* instructions);
+      signals: void SendTask(std::string id, QTextDocument* instructions, int index);
     };
 }
 #endif
