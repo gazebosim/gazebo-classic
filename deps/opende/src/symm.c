@@ -2558,7 +2558,7 @@ static real c_b9 = 1.f;
   static integer jb, jj, kk, jp, kp, kw, kkw, imax, jmax;
   static real alpha;
   extern logical lsame_(char *, char *, ftnlen, ftnlen);
-  extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
+  extern /* Subroutine */ int ode_sscal_(integer *, real *, real *, integer *), 
          sgemm_(char *, char *, integer *, integer *, integer *, real *, 
              real *, integer *, real *, integer *, real *, real *, integer *, 
              ftnlen, ftnlen), sgemv_(char *, integer *, integer *, real *, 
@@ -2854,7 +2854,7 @@ L10:
             c__1);
         r1 = 1.f / a[k + k * a_dim1];
         i__1 = k - 1;
-        sscal_(&i__1, &r1, &a[k * a_dim1 + 1], &c__1);
+        ode_sscal_(&i__1, &r1, &a[k * a_dim1 + 1], &c__1);
       } else {
 
         /*              2-by-2 pivot block D(k): columns KW and KW-1 of W now */
@@ -3124,7 +3124,7 @@ L70:
         if (k < *n) {
           r1 = 1.f / a[k + k * a_dim1];
           i__1 = *n - k;
-          sscal_(&i__1, &r1, &a[k + 1 + k * a_dim1], &c__1);
+          ode_sscal_(&i__1, &r1, &a[k + 1 + k * a_dim1], &c__1);
         }
       } else {
 
@@ -3257,7 +3257,7 @@ L120:
 http://www.netlib.org/f2c/libf2c.zip
 */
 
-/* Subroutine */ int sscal_(integer *n, real *sa, real *sx, integer *incx)
+/* Subroutine */ int ode_sscal_(integer *n, real *sa, real *sx, integer *incx)
 {
   /* System generated locals */
   integer i__1, i__2;
@@ -3341,7 +3341,7 @@ L40:
     /* L50: */
   }
   return 0;
-} /* sscal_ */
+} /* ode_sscal_ */
 
 /* ../BLAS/SRC/sswap.f -- translated by f2c (version 20090411).
    You must link the resulting object file with libf2c:
@@ -3946,7 +3946,7 @@ http://www.netlib.org/f2c/libf2c.zip
       integer *, real *, integer *, ftnlen);
   static real alpha;
   extern logical lsame_(char *, char *, ftnlen, ftnlen);
-  extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *);
+  extern /* Subroutine */ int ode_sscal_(integer *, real *, real *, integer *);
   static integer kstep;
   static logical upper;
   extern /* Subroutine */ int sswap_(integer *, real *, integer *, real *, 
@@ -4252,7 +4252,7 @@ L10:
         /*              Store U(k) in column k */
 
         i__1 = k - 1;
-        sscal_(&i__1, &r1, &a[k * a_dim1 + 1], &c__1);
+        ode_sscal_(&i__1, &r1, &a[k * a_dim1 + 1], &c__1);
       } else {
 
         /*              2-by-2 pivot block D(k): columns k and k-1 now hold */
@@ -4446,7 +4446,7 @@ L40:
           /*                 Store L(k) in column K */
 
           i__1 = *n - k;
-          sscal_(&i__1, &d11, &a[k + 1 + k * a_dim1], &c__1);
+          ode_sscal_(&i__1, &d11, &a[k + 1 + k * a_dim1], &c__1);
         }
       } else {
 
@@ -4891,7 +4891,7 @@ static real c_b19 = 1.f;
   static real akm1k;
   extern logical lsame_(char *, char *, ftnlen, ftnlen);
   static real denom;
-  extern /* Subroutine */ int sscal_(integer *, real *, real *, integer *), 
+  extern /* Subroutine */ int ode_sscal_(integer *, real *, real *, integer *), 
          sgemv_(char *, integer *, integer *, real *, real *, integer *, 
              real *, integer *, real *, real *, integer *, ftnlen);
   static logical upper;
@@ -5042,7 +5042,7 @@ L10:
       /*           Multiply by the inverse of the diagonal block. */
 
       r__1 = 1.f / a[k + k * a_dim1];
-      sscal_(nrhs, &r__1, &b[k + b_dim1], ldb);
+      ode_sscal_(nrhs, &r__1, &b[k + b_dim1], ldb);
       --k;
     } else {
 
@@ -5188,7 +5188,7 @@ L60:
       /*           Multiply by the inverse of the diagonal block. */
 
       r__1 = 1.f / a[k + k * a_dim1];
-      sscal_(nrhs, &r__1, &b[k + b_dim1], ldb);
+      ode_sscal_(nrhs, &r__1, &b[k + b_dim1], ldb);
       ++k;
     } else {
 
