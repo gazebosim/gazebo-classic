@@ -22,6 +22,18 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 
+QTaskButton::QTaskButton(){
+  connect(this, SIGNAL(clicked()), this, SLOT(OnButton()));
+}
+
+void QTaskButton::SetTaskId(std::string task_id){
+  this->id = task_id;
+}
+
+void QTaskButton::OnButton(){
+  emit SendTask(this->id);
+}
+
 /////////////////////////////////////////////////
 GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
@@ -125,17 +137,16 @@ GUIAratPlugin::GUIAratPlugin()
       task->GetAttribute("id")->Get(id);
       task->GetAttribute("name")->Get(name);
       task->GetAttribute("icon")->Get(icon_path);
-      QPushButton *taskButton;
+      QTaskButton *taskButton = new QTaskButton();
+      taskButton->setText(QString(name.c_str()));
       if(icon_path.compare("none") != 0){
         QPixmap icon(QString(icon_path.c_str()));
-        taskButton = new QPushButton(QIcon(icon), QString(name.c_str()));
-      } else {
-        taskButton = new QPushButton(QString(name.c_str()));
+        taskButton->setIcon(QIcon(icon));
       }
 			//Need to add a new signal to PushButton for this to work
-      //connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton(std::string)));
+      taskButton->SetTaskId(id);
+      connect(taskButton, SIGNAL(SendTask(std::string)), this, SLOT(OnTaskSent(std::string)));
 
-      taskButtons[id] = taskButton;
       int col = i%3;
       int row = i/3;
       buttonLayout->addWidget(taskButton, row, col);
@@ -155,9 +166,7 @@ GUIAratPlugin::GUIAratPlugin()
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
-	for(std::map<std::string, QPushButton*>::iterator it = this->taskButtons.begin(); it != this->taskButtons.end(); it++){
-		it->second->resize(this->handImgX/3, this->handImgX/3);
-	}
+	
 
   // Remove margins to reduce space
   handLayout->setContentsMargins(0, 0, 0, 0);
@@ -286,12 +295,16 @@ void GUIAratPlugin::PreRender(){
 }
 
 /////////////////////////////////////////////////
-void GUIAratPlugin::OnButton(std::string id)
-{
 
+/*void GUIAratPlugin::OnButton(){
+
+}*/
+
+void GUIAratPlugin::OnTaskSent(std::string id)
+{
   // Send the model to the gazebo server
   msgs::GzString msg;
   
-  msg.set_data("task " + id);
+  msg.set_data(id);
   this->taskPub->Publish(msg);
 }

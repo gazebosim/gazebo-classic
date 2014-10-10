@@ -37,6 +37,7 @@ namespace gazebo
       public: ContactsWrapper(ConstContactsPtr m, std::string n) : msg(m), name(n){}
     };
 
+
     class GUIAratPlugin : public gazebo::GUIPlugin
     {
       Q_OBJECT
@@ -49,7 +50,8 @@ namespace gazebo
       public: virtual ~GUIAratPlugin();
 
       /// \brief Callback trigged when the button is pressed.
-      protected slots: void OnButton(std::string id);
+      //protected slots: void OnButton();
+      public slots: void OnTaskSent(std::string task_id);
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
@@ -77,8 +79,6 @@ namespace gazebo
 
       private: std::string handImgFilename;
       private: std::string configFilename;
-
-      private: std::map<std::string, QPushButton*> taskButtons;
 
       //TODO: tune these values
       private: int circleSize;
@@ -117,6 +117,20 @@ namespace gazebo
 
       private: void PreRender();
 
+    };
+
+    class QTaskButton : public QPushButton
+    {
+      Q_OBJECT
+      public: QTaskButton();
+
+      public: void SetTaskId(std::string task_id);
+
+      public slots: void OnButton();
+
+      private: std::string id;
+
+      signals: void SendTask(std::string id);
     };
 }
 #endif
