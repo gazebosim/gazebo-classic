@@ -49,7 +49,7 @@ namespace gazebo
       public: virtual ~GUIAratPlugin();
 
       /// \brief Callback trigged when the button is pressed.
-      protected slots: void OnButton();
+      protected slots: void OnButton(std::string id);
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
@@ -72,20 +72,20 @@ namespace gazebo
       private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
 
       //TODO: config file
-      private: int handImgX; //= 250;
-      private: int handImgY; //= 250;
+      private: int handImgX;
+      private: int handImgY;
 
       private: std::string handImgFilename;
       private: std::string configFilename;
-      //private: std::string fingerPtsFilename; // = "/home/jackie/gazebo_ws/src/gazebo/plugins/fingerpts.csv";
 
+      private: std::vector<QPushButton*> taskButtons;
 
       //TODO: tune these values
-      private: int circleSize;// = 10;
-      private: math::Vector3 colorMin;// = {255, 255, 0};
-      private: math::Vector3 colorMax;// = {255, 0, 0};
-      private: float forceMin;// = 0;
-      private: float forceMax;// = 50;
+      private: int circleSize;
+      private: math::Vector3 colorMin;
+      private: math::Vector3 colorMax;
+      private: float forceMin;
+      private: float forceMax;
 
       private: std::string handSide;
       

@@ -99,8 +99,6 @@ GUIAratPlugin::GUIAratPlugin()
 
   QVBoxLayout *taskLayout = new QVBoxLayout();
   
-
-  //TODO: sizing
   QTabWidget *tabWidget = new QTabWidget();
   
   // Populate the tabWidget by parsing out SDF
@@ -114,8 +112,8 @@ GUIAratPlugin::GUIAratPlugin()
     QGroupBox *buttonGroup = new QGroupBox();
     QGridLayout *buttonLayout = new QGridLayout();
 
-    buttonLayout->setContentsMargins(2, 2, 2, 2);
-    buttonLayout->setSpacing(2);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->setSpacing(0);
     
     sdf::ElementPtr task = taskGroup->GetElement("task");
     int i = 0;
@@ -134,8 +132,8 @@ GUIAratPlugin::GUIAratPlugin()
       } else {
         taskButton = new QPushButton(QString(name.c_str()));
       }
-      connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton()));
-      taskButton->resize(handImgX/3, handImgX/3);
+      connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton(id)));
+      taskButtons.push_back(taskButton);
       int col = i%3;
       int row = i/3;
       buttonLayout->addWidget(taskButton, row, col);
@@ -181,8 +179,6 @@ GUIAratPlugin::GUIAratPlugin()
 
 
   // Set up an array of subscribers for each contact sensor
-
-  //this->handSide = "r";
   
   contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Th"),
                               &GUIAratPlugin::OnThumbContact, this));
@@ -285,12 +281,12 @@ void GUIAratPlugin::PreRender(){
 }
 
 /////////////////////////////////////////////////
-void GUIAratPlugin::OnButton()
+void GUIAratPlugin::OnButton(std::string id)
 {
-  this->taskNum = (this->taskNum + 1) % this->maxTaskCount;
 
   // Send the model to the gazebo server
   msgs::GzString msg;
-  msg.set_data("task" + boost::lexical_cast<std::string>(this->taskNum));
+  
+  msg.set_data("task " + id);
   this->taskPub->Publish(msg);
 }
