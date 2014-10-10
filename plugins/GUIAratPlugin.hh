@@ -78,7 +78,7 @@ namespace gazebo
       private: std::string handImgFilename;
       private: std::string configFilename;
 
-      private: std::vector<QPushButton*> taskButtons;
+      private: std::map<std::string, QPushButton*> taskButtons;
 
       //TODO: tune these values
       private: int circleSize;

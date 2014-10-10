@@ -132,8 +132,10 @@ GUIAratPlugin::GUIAratPlugin()
       } else {
         taskButton = new QPushButton(QString(name.c_str()));
       }
-      connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton(id)));
-      taskButtons.push_back(taskButton);
+			//Need to add a new signal to PushButton for this to work
+      //connect(taskButton, SIGNAL(clicked()), this, SLOT(OnButton(std::string)));
+
+      taskButtons[id] = taskButton;
       int col = i%3;
       int row = i/3;
       buttonLayout->addWidget(taskButton, row, col);
@@ -153,6 +155,9 @@ GUIAratPlugin::GUIAratPlugin()
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
+	for(std::map<std::string, QPushButton*>::iterator it = this->taskButtons.begin(); it != this->taskButtons.end(); it++){
+		it->second->resize(this->handImgX/3, this->handImgX/3);
+	}
 
   // Remove margins to reduce space
   handLayout->setContentsMargins(0, 0, 0, 0);
