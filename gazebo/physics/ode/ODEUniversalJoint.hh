@@ -90,10 +90,10 @@ namespace gazebo
                                       unsigned int _index);
 
       // Documentation inherited
-      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
+      public: virtual double GetParam(unsigned int _parameter) const;
 
       // Documentation inherited
-      public: virtual double GetParam(unsigned int _parameter) const;
+      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
   }
 }
