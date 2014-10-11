@@ -130,7 +130,7 @@
       <model_name>round_tin_top</model_name>
       <model_name>round_tin_base</model_name>
 
-      <initial_arrangement>grip_2</initial_arrangement>
+      <initial_arrangement>pinch_2</initial_arrangement>
       <arrangement name="grasp_1">
         <pose model="wood_cube_10cm"> 0.217 -0.265 1.034 0 0 0</pose>
       </arrangement>
@@ -156,27 +156,27 @@
         <pose model="cup_2">-0.00 -0.20 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_2">
-          <pose model="wooden_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
-          <pose model="tube_2_25cm">0.216 -0.328 1.034 0 0 0</pose>
+        <pose model="wooden_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_2_25cm">0.216 -0.328 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_3">
-        <pose model="metal_peg_board">0 -0.117 1.034 0 0 -1.571074</pose>
-          <pose model="tube_9_5mm">0.2 -0.34 1.034 0 0 0</pose>
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_9_5mm">0.216 -0.328 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_4">
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="washer">0.2 0 1.388 0 0 0</pose>
-        <pose model="metal_peg_board">0 -0.117 1.034 0 0 -1.571074</pose>
+        <pose model="round_tin_top">0.244 -0.281 1.033 0 0 0</pose>
+        <pose model="washer">0.244 -0.281 1.036 0 0 0</pose>
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
       </arrangement>
       <arrangement name="pinch_1">
-        <pose model="round_tin_base">0.2 -0.34 1.034 0 0 0</pose>
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="ball_bearing">0.2 -0.34 1.038 0 0 0</pose>
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="ball_bearing">0.217 -0.270 1.038 0 0 0</pose>
       </arrangement>
       <arrangement name="pinch_2">
-        <pose model="round_tin_base">0.2 -0.34 1.034 0 0 0</pose>
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="marble_1_5cm">0.2 -0.34 1.038 0 0 0</pose>
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="marble_1_5cm">0.217 -0.274 1.036 0 0 0</pose>
       </arrangement>
 
     </plugin>
