@@ -326,6 +326,13 @@ bool ODEUniversalJoint::SetParam(
           gzerr << "Invalid index[" << _index << "]\n";
           return false;
       };
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
   else if (_key == "friction")
   {
     try
