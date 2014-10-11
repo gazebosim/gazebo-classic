@@ -29,6 +29,8 @@
 #include <gazebo/math/Pose.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 #include "gazebo/util/system.hh"
+#include <gazebo/transport/transport.hh>
+#include <gazebo/msgs/msgs.hh>
 
 namespace gazebo
 {
@@ -54,7 +56,9 @@ namespace gazebo
     /// \brief Set up the arrangement with name given by input parameter.
     /// \param[in] _arrangement Name of arrangement.
     /// \return True if arrangement was set successfully.
-    public: bool SetArrangement(const std::string &_arrangement);
+    public: bool SetArrangement(std::string _arrangement);
+
+    public: void ArrangementCallback(ConstGzStringPtr msg);
 
     /// \brief World pointer.
     protected: physics::WorldPtr world;
@@ -93,6 +97,9 @@ namespace gazebo
 
     /// \brief Current arrangement name.
     protected: std::string currentArrangementName;
+
+    /// \brief Topic to listen on for changing arrangments.
+    protected: std::string eventTopicName;
   };
 }
 #endif

@@ -74,6 +74,14 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
+  // Get name of topic to listen on
+  {
+    const std::string elemName = "topic_name";
+    if (this->sdf->HasElement(elemName)){
+      this->eventTopicName = this->sdf->Get<std::string>(elemName);
+    }
+  }
+
   // Get initial arrangement name
   {
     const std::string elemName = "initial_arrangement";
@@ -131,6 +139,11 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
       }
     }
   }
+
+
+  transport::NodePtr node(new transport::Node());
+  node->Init();
+  transport::SubscriberPtr sub = node->Subscribe(this->eventTopicName.c_str(), &ArrangePlugin::ArrangementCallback, this);
 }
 
 /////////////////////////////////////////////////
@@ -146,8 +159,13 @@ void ArrangePlugin::Reset()
   this->SetArrangement(this->currentArrangementName);
 }
 
+void ArrangePlugin::ArrangementCallback(ConstGzStringPtr msg)
+{
+  this->SetArrangement(msg->data());
+}
+
 /////////////////////////////////////////////////
-bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
+bool ArrangePlugin::SetArrangement(const std::string _arrangement)
 {
   if (this->arrangements.find(_arrangement) == this->arrangements.end())
   {
