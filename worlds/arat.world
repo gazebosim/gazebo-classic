@@ -17,7 +17,7 @@
 
     <include>
       <uri>model://wooden_case</uri>
-      <pose>0 0.099 1.015 0 0 -1.570796</pose>
+      <pose>0 0.037 1.015 0 0 -1.570796</pose>
     </include>
 
     <include>
@@ -132,51 +132,51 @@
 
       <initial_arrangement>pinch_2</initial_arrangement>
       <arrangement name="grasp_1">
-        <pose model="wood_cube_10cm"> 0.2 -0.34 1.036 0 0 0</pose>
+        <pose model="wood_cube_10cm"> 0.217 -0.265 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_2">
-        <pose model="wood_cube_2_5cm"> 0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="wood_cube_2_5cm"> 0.217 -0.298 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_3">
-        <pose model="wood_cube_5cm"> 0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="wood_cube_5cm"> 0.217 -0.284 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_4">
-        <pose model="wood_cube_7_5cm"> 0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="wood_cube_7_5cm"> 0.217 -0.268 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_5"> 
-        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="cricket_ball"> 0.2 -0.34 1.038 0 0 0</pose>
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="cricket_ball"> 0.217 -0.274 1.038 0 0 0</pose>
       </arrangement>
       <arrangement name="grasp_6">
-        <pose model="stone_10_2_5_1cm">0.2 -0.34 1.0475 -1.571074 0 -1.14</pose>
+        <pose model="stone_10_2_5_1cm">0.242 -0.34 1.0475 -1.571074 0 -1.14</pose>
       </arrangement>
       <arrangement name="grip_1">
-        <pose model="cup_1">0.2 -0.34 1.035 0 0 0</pose>
-        <pose model="cup_2">-0.2 -0.34 1.035 0 0 0</pose>
+        <pose model="cup_1"> 0.00 -0.20 1.034 0 0 0</pose>
+        <pose model="cup_2">-0.00 -0.20 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_2">
-          <pose model="wooden_peg_board">0 -0.117 1.035 0 0 -1.571074</pose>
-          <pose model="tube_2_25cm">0.2 -0.34 1.0375 0 0 0</pose>
+        <pose model="wooden_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_2_25cm">0.216 -0.328 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_3">
-        <pose model="metal_peg_board">0 -0.117 1.035 0 0 -1.571074</pose>
-          <pose model="tube_9_5mm">0.2 -0.34 1.0375 0 0 0</pose>
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
+        <pose model="tube_9_5mm">0.216 -0.328 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_4">
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="washer">0.2 0 1.388 0 0 0</pose>
-        <pose model="metal_peg_board">0 -0.117 1.035 0 0 -1.571074</pose>
+        <pose model="round_tin_top">0.244 -0.281 1.033 0 0 0</pose>
+        <pose model="washer">0.244 -0.281 1.036 0 0 0</pose>
+        <pose model="metal_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
       </arrangement>
       <arrangement name="pinch_1">
-        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="ball_bearing">0.2 -0.34 1.038 0 0 0</pose>
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="ball_bearing">0.217 -0.270 1.038 0 0 0</pose>
       </arrangement>
       <arrangement name="pinch_2">
-        <pose model="round_tin_base">0.2 -0.34 1.035 0 0 0</pose>
-        <pose model="round_tin_top">0.2 0 1.385 0 0 0 </pose>
-        <pose model="marble_1_5cm">0.2 -0.34 1.038 0 0 0</pose>
+        <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
+        <pose model="marble_1_5cm">0.217 -0.274 1.036 0 0 0</pose>
       </arrangement>
 
     </plugin>
