@@ -62,7 +62,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   math::Vector3Stats upperAngles;
   math::Vector3Stats lowerAngles;
   {
-    const std::string statNames = "MaxAbs";
+    const std::string statNames = "maxAbs";
     EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
     EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
   }
@@ -77,10 +77,10 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   }
 
   // Expect out of plane angles to fall within limits
-  EXPECT_NEAR((upperAngles.y.Map())["MaxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((upperAngles.z.Map())["MaxAbs"], 0.0, g_angle_z_tol);
-  EXPECT_NEAR((lowerAngles.y.Map())["MaxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((lowerAngles.z.Map())["MaxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((upperAngles.y.Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.z.Map())["maxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.y.Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.z.Map())["maxAbs"], 0.0, g_angle_z_tol);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)

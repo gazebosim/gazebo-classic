@@ -52,11 +52,11 @@ namespace gazebo
 
       /// \brief Get number of data points in measurement.
       /// \return Number of data points in measurement.
-      public: virtual unsigned int Count() const;
+      public: virtual size_t Count() const;
 
       /// \brief Add a new sample to the statistical measure.
       /// \param[in] _data New signal data point.
-      public: virtual void InsertData(double _data) = 0;
+      public: virtual void InsertData(const double _data) = 0;
 
       /// \brief Forget all previous data.
       public: virtual void Reset();
@@ -74,11 +74,11 @@ namespace gazebo
       public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "Mean"
+      /// \return "mean"
       public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
 
@@ -91,11 +91,11 @@ namespace gazebo
       public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "Rms"
+      /// \return "rms"
       public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
 
@@ -109,11 +109,11 @@ namespace gazebo
       public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "MaxAbs"
+      /// \return "maxAbs"
       public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
 
@@ -135,7 +135,7 @@ namespace gazebo
       /// in each statistic if you call InsertStatistic after InsertData,
       /// but this is not a recommended use case.
       /// \return Number of data points in first statistic.
-      public: unsigned int Count() const;
+      public: size_t Count() const;
 
       /// \brief Get the current values of each statistical measure,
       /// stored in a map using the short name as the key.
@@ -145,14 +145,14 @@ namespace gazebo
 
       /// \brief Add a new sample to the statistical measures.
       /// \param[in] _data New signal data point.
-      public: void InsertData(double _data);
+      public: void InsertData(const double _data);
 
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
       /// Valid values include:
-      ///  "MaxAbs"
-      ///  "Mean"
-      ///  "Rms"
+      ///  "maxAbs"
+      ///  "mean"
+      ///  "rms"
       /// \return True if statistic was successfully added,
       /// false if name was not recognized or had already
       /// been inserted.
@@ -161,7 +161,7 @@ namespace gazebo
       /// \brief Add multiple statistics.
       /// \param[in] _names Comma-separated list of new statistics.
       /// For example, all statistics could be added with:
-      ///  "MaxAbs,Mean,Rms"
+      ///  "maxAbs,mean,rms"
       /// \return True if all statistics were successfully added,
       /// false if any names were not recognized or had already
       /// been inserted.
@@ -192,9 +192,9 @@ namespace gazebo
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
       /// Valid values include:
-      ///  "MaxAbs"
-      ///  "Mean"
-      ///  "Rms"
+      ///  "maxAbs"
+      ///  "mean"
+      ///  "rms"
       /// \return True if statistic was successfully added,
       /// false if name was not recognized or had already
       /// been inserted.
@@ -203,7 +203,7 @@ namespace gazebo
       /// \brief Add multiple statistics.
       /// \param[in] _names Comma-separated list of new statistics.
       /// For example, all statistics could be added with:
-      ///  "MaxAbs,Mean,Rms"
+      ///  "maxAbs,mean,rms"
       /// \return True if all statistics were successfully added,
       /// false if any names were not recognized or had already
       /// been inserted.

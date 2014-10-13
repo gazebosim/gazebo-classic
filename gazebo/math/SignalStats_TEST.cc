@@ -32,7 +32,7 @@ TEST_F(SignalStatsTest, SignalMean)
     math::SignalMean mean;
     EXPECT_DOUBLE_EQ(mean.Value(), 0.0);
     EXPECT_EQ(mean.Count(), 0u);
-    EXPECT_EQ(mean.ShortName(), std::string("Mean"));
+    EXPECT_EQ(mean.ShortName(), std::string("mean"));
 
     // Reset
     mean.Reset();
@@ -100,7 +100,7 @@ TEST_F(SignalStatsTest, SignalRootMeanSquare)
     math::SignalRootMeanSquare rms;
     EXPECT_DOUBLE_EQ(rms.Value(), 0.0);
     EXPECT_EQ(rms.Count(), 0u);
-    EXPECT_EQ(rms.ShortName(), std::string("Rms"));
+    EXPECT_EQ(rms.ShortName(), std::string("rms"));
 
     // Reset
     rms.Reset();
@@ -171,7 +171,7 @@ TEST_F(SignalStatsTest, SignalMaxAbsoluteValue)
     math::SignalMaxAbsoluteValue max;
     EXPECT_DOUBLE_EQ(max.Value(), 0.0);
     EXPECT_EQ(max.Count(), 0u);
-    EXPECT_EQ(max.ShortName(), std::string("MaxAbs"));
+    EXPECT_EQ(max.ShortName(), std::string("maxAbs"));
 
     // Reset
     max.Reset();
@@ -254,16 +254,16 @@ TEST_F(SignalStatsTest, SignalStats)
     math::SignalStats stats;
     EXPECT_TRUE(stats.Map().empty());
 
-    EXPECT_TRUE(stats.InsertStatistic("MaxAbs"));
-    EXPECT_FALSE(stats.InsertStatistic("MaxAbs"));
+    EXPECT_TRUE(stats.InsertStatistic("maxAbs"));
+    EXPECT_FALSE(stats.InsertStatistic("maxAbs"));
     EXPECT_FALSE(stats.Map().empty());
 
-    EXPECT_TRUE(stats.InsertStatistic("Mean"));
-    EXPECT_FALSE(stats.InsertStatistic("Mean"));
+    EXPECT_TRUE(stats.InsertStatistic("mean"));
+    EXPECT_FALSE(stats.InsertStatistic("mean"));
     EXPECT_FALSE(stats.Map().empty());
 
-    EXPECT_TRUE(stats.InsertStatistic("Rms"));
-    EXPECT_FALSE(stats.InsertStatistic("Rms"));
+    EXPECT_TRUE(stats.InsertStatistic("rms"));
+    EXPECT_FALSE(stats.InsertStatistic("rms"));
     EXPECT_FALSE(stats.Map().empty());
 
     EXPECT_FALSE(stats.InsertStatistic("FakeStatistic"));
@@ -272,9 +272,9 @@ TEST_F(SignalStatsTest, SignalStats)
     std::map<std::string, double> map = stats.Map();
     EXPECT_FALSE(map.empty());
     EXPECT_EQ(map.size(), 3u);
-    EXPECT_EQ(map.count("MaxAbs"), 1u);
-    EXPECT_EQ(map.count("Mean"), 1u);
-    EXPECT_EQ(map.count("Rms"), 1u);
+    EXPECT_EQ(map.count("maxAbs"), 1u);
+    EXPECT_EQ(map.count("mean"), 1u);
+    EXPECT_EQ(map.count("rms"), 1u);
     EXPECT_EQ(map.count("FakeStatistic"), 0u);
   }
 
@@ -284,13 +284,13 @@ TEST_F(SignalStatsTest, SignalStats)
     EXPECT_FALSE(stats.InsertStatistics(""));
     EXPECT_TRUE(stats.Map().empty());
 
-    EXPECT_TRUE(stats.InsertStatistics("MaxAbs,Rms"));
-    EXPECT_FALSE(stats.InsertStatistics("MaxAbs,Rms"));
-    EXPECT_FALSE(stats.InsertStatistics("MaxAbs"));
-    EXPECT_FALSE(stats.InsertStatistics("Rms"));
+    EXPECT_TRUE(stats.InsertStatistics("maxAbs,rms"));
+    EXPECT_FALSE(stats.InsertStatistics("maxAbs,rms"));
+    EXPECT_FALSE(stats.InsertStatistics("maxAbs"));
+    EXPECT_FALSE(stats.InsertStatistics("rms"));
     EXPECT_FALSE(stats.Map().empty());
 
-    EXPECT_FALSE(stats.InsertStatistics("Mean,FakeStatistic"));
+    EXPECT_FALSE(stats.InsertStatistics("mean,FakeStatistic"));
     EXPECT_FALSE(stats.Map().empty());
 
     EXPECT_FALSE(stats.InsertStatistics("FakeStatistic"));
@@ -299,16 +299,16 @@ TEST_F(SignalStatsTest, SignalStats)
     std::map<std::string, double> map = stats.Map();
     EXPECT_FALSE(map.empty());
     EXPECT_EQ(map.size(), 3u);
-    EXPECT_EQ(map.count("MaxAbs"), 1u);
-    EXPECT_EQ(map.count("Mean"), 1u);
-    EXPECT_EQ(map.count("Rms"), 1u);
+    EXPECT_EQ(map.count("maxAbs"), 1u);
+    EXPECT_EQ(map.count("mean"), 1u);
+    EXPECT_EQ(map.count("rms"), 1u);
     EXPECT_EQ(map.count("FakeStatistic"), 0u);
   }
 
   {
     // Add some statistics
     math::SignalStats stats;
-    EXPECT_TRUE(stats.InsertStatistics("MaxAbs,Mean,Rms"));
+    EXPECT_TRUE(stats.InsertStatistics("maxAbs,mean,rms"));
     EXPECT_EQ(stats.Map().size(), 3u);
 
     // No data yet
@@ -322,9 +322,9 @@ TEST_F(SignalStatsTest, SignalStats)
 
     {
       std::map<std::string, double> map = stats.Map();
-      EXPECT_NEAR(map["MaxAbs"], value, 1e-10);
-      EXPECT_NEAR(map["Rms"], value, 1e-10);
-      EXPECT_NEAR(map["Mean"], 0.0, 1e-10);
+      EXPECT_NEAR(map["maxAbs"], value, 1e-10);
+      EXPECT_NEAR(map["rms"], value, 1e-10);
+      EXPECT_NEAR(map["mean"], 0.0, 1e-10);
     }
 
     stats.Reset();
@@ -332,9 +332,9 @@ TEST_F(SignalStatsTest, SignalStats)
     EXPECT_EQ(stats.Count(), 0u);
     {
       std::map<std::string, double> map = stats.Map();
-      EXPECT_DOUBLE_EQ(map["MaxAbs"], 0.0);
-      EXPECT_DOUBLE_EQ(map["Rms"], 0.0);
-      EXPECT_DOUBLE_EQ(map["Mean"], 0.0);
+      EXPECT_DOUBLE_EQ(map["maxAbs"], 0.0);
+      EXPECT_DOUBLE_EQ(map["rms"], 0.0);
+      EXPECT_DOUBLE_EQ(map["mean"], 0.0);
     }
   }
 }
@@ -373,8 +373,8 @@ TEST_F(SignalStatsTest, Vector3Stats)
     EXPECT_TRUE(v3stats.z.Map().empty());
     EXPECT_TRUE(v3stats.mag.Map().empty());
 
-    EXPECT_TRUE(v3stats.InsertStatistics("MaxAbs"));
-    EXPECT_FALSE(v3stats.InsertStatistics("MaxAbs"));
+    EXPECT_TRUE(v3stats.InsertStatistics("maxAbs"));
+    EXPECT_FALSE(v3stats.InsertStatistics("maxAbs"));
     EXPECT_FALSE(v3stats.x.Map().empty());
     EXPECT_FALSE(v3stats.y.Map().empty());
     EXPECT_FALSE(v3stats.z.Map().empty());
@@ -384,22 +384,22 @@ TEST_F(SignalStatsTest, Vector3Stats)
     {
       std::map<std::string, double> map = v3stats.x.Map();
       EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("MaxAbs"), 1u);
+      EXPECT_EQ(map.count("maxAbs"), 1u);
     }
     {
       std::map<std::string, double> map = v3stats.y.Map();
       EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("MaxAbs"), 1u);
+      EXPECT_EQ(map.count("maxAbs"), 1u);
     }
     {
       std::map<std::string, double> map = v3stats.z.Map();
       EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("MaxAbs"), 1u);
+      EXPECT_EQ(map.count("maxAbs"), 1u);
     }
     {
       std::map<std::string, double> map = v3stats.mag.Map();
       EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("MaxAbs"), 1u);
+      EXPECT_EQ(map.count("maxAbs"), 1u);
     }
 
     // Insert some data
@@ -417,10 +417,10 @@ TEST_F(SignalStatsTest, Vector3Stats)
     EXPECT_EQ(v3stats.z.Count(), 3u);
     EXPECT_EQ(v3stats.mag.Count(), 3u);
 
-    EXPECT_NEAR(v3stats.x.Map()["MaxAbs"], 1.0, 1e-10);
-    EXPECT_NEAR(v3stats.y.Map()["MaxAbs"], 1.0, 1e-10);
-    EXPECT_DOUBLE_EQ(v3stats.z.Map()["MaxAbs"], 0.0);
-    EXPECT_NEAR(v3stats.mag.Map()["MaxAbs"], 1.0, 1e-10);
+    EXPECT_NEAR(v3stats.x.Map()["maxAbs"], 1.0, 1e-10);
+    EXPECT_NEAR(v3stats.y.Map()["maxAbs"], 1.0, 1e-10);
+    EXPECT_DOUBLE_EQ(v3stats.z.Map()["maxAbs"], 0.0);
+    EXPECT_NEAR(v3stats.mag.Map()["maxAbs"], 1.0, 1e-10);
   }
 }
 
