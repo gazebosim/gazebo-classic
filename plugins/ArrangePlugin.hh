@@ -26,10 +26,10 @@
 #include <sdf/sdf.hh>
 
 #include <gazebo/common/Plugin.hh>
+#include <gazebo/transport/transport.hh>
 #include <gazebo/math/Pose.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
-#include "gazebo/util/system.hh"
-#include <gazebo/transport/transport.hh>
+#include <gazebo/util/system.hh>
 #include <gazebo/msgs/msgs.hh>
 
 namespace gazebo

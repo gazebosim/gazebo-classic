@@ -19,9 +19,9 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
 
-int main(int _argc, char** _argv){
-
-  gazebo::setupClient(_argc, _argv); 
+int main(int _argc, char** _argv)
+{
+  gazebo::setupClient(_argc, _argv);
 
   std::vector<std::string> arrangementNames;
   /*for(int i = 1; i <= 6; i++){
@@ -42,12 +42,12 @@ int main(int _argc, char** _argv){
   node->Init();
 
   // Publish to a Gazebo topic
-  gazebo::transport::PublisherPtr pub = node->Advertise<gazebo::msgs::GzString>("/gazebo/arat/control");
-
-  //pub->WaitForConnection();
+  gazebo::transport::PublisherPtr pub = node->Advertise<gazebo::msgs::GzString>
+                                                      ("/gazebo/arat/control");
 
   int i = 0;
-  while(true){
+  while (true)
+  {
     std::cout << "Setting arrangement to: " << arrangementNames[i] << std::endl;
     gazebo::msgs::GzString msg;
     msg.set_data(arrangementNames[i]);
@@ -58,5 +58,4 @@ int main(int _argc, char** _argv){
   }
 
   gazebo::shutdown();
-
 }

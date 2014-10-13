@@ -78,7 +78,8 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Get name of topic to listen on
   {
     const std::string elemName = "topic_name";
-    if (this->sdf->HasElement(elemName)){
+    if (this->sdf->HasElement(elemName))
+    {
       this->eventTopicName = this->sdf->Get<std::string>(elemName);
     }
   }
@@ -146,8 +147,8 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_world->GetName());
 
-  sub = this->node->Subscribe(this->eventTopicName, &ArrangePlugin::ArrangementCallback, this);
-
+  sub = this->node->Subscribe(this->eventTopicName,
+                              &ArrangePlugin::ArrangementCallback, this);
 }
 
 /////////////////////////////////////////////////
@@ -155,7 +156,6 @@ void ArrangePlugin::Init()
 {
   // Set initial arrangement
   this->SetArrangement(this->initialArrangementName);
-
 }
 
 /////////////////////////////////////////////////
@@ -166,7 +166,7 @@ void ArrangePlugin::Reset()
 
 void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &msg)
 {
-  //Set arrangement to the requested id
+  // Set arrangement to the requested id
   this->SetArrangement(msg->data());
 }
 
