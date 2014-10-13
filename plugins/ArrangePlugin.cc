@@ -15,6 +15,7 @@
  *
 */
 
+#include <gazebo/gazebo.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
 #include <gazebo/physics/Model.hh>
@@ -140,10 +141,13 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
+  // Subscribe to the topic specified in the world file
 
-  transport::NodePtr node(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sub = node->Subscribe(this->eventTopicName.c_str(), &ArrangePlugin::ArrangementCallback, this);
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_world->GetName());
+
+  sub = this->node->Subscribe(this->eventTopicName, &ArrangePlugin::ArrangementCallback, this);
+
 }
 
 /////////////////////////////////////////////////
@@ -151,6 +155,7 @@ void ArrangePlugin::Init()
 {
   // Set initial arrangement
   this->SetArrangement(this->initialArrangementName);
+
 }
 
 /////////////////////////////////////////////////
@@ -159,8 +164,9 @@ void ArrangePlugin::Reset()
   this->SetArrangement(this->currentArrangementName);
 }
 
-void ArrangePlugin::ArrangementCallback(ConstGzStringPtr msg)
+void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &msg)
 {
+  //Set arrangement to the requested id
   this->SetArrangement(msg->data());
 }
 

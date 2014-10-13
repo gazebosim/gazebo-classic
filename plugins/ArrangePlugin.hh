@@ -58,7 +58,8 @@ namespace gazebo
     /// \return True if arrangement was set successfully.
     public: bool SetArrangement(std::string _arrangement);
 
-    public: void ArrangementCallback(ConstGzStringPtr msg);
+    /// \brief Callback function which receives a requested arrangement name.
+    public: void ArrangementCallback(ConstGzStringPtr &msg);
 
     /// \brief World pointer.
     protected: physics::WorldPtr world;
@@ -100,6 +101,12 @@ namespace gazebo
 
     /// \brief Topic to listen on for changing arrangments.
     protected: std::string eventTopicName;
+
+    /// \brief Node for Gazebo transport.
+    protected: transport::NodePtr node;
+
+    /// \brief Subscriber for listening to changing arrangements.
+    protected: transport::SubscriberPtr sub;
   };
 }
 #endif
