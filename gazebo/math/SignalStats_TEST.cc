@@ -17,7 +17,6 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/math/SignalStats.hh"
 #include "test/util.hh"
 
@@ -336,91 +335,6 @@ TEST_F(SignalStatsTest, SignalStats)
       EXPECT_DOUBLE_EQ(map["rms"], 0.0);
       EXPECT_DOUBLE_EQ(map["mean"], 0.0);
     }
-  }
-}
-
-TEST_F(SignalStatsTest, Vector3Stats)
-{
-  {
-    // Constructor
-    math::Vector3Stats v3stats;
-    EXPECT_TRUE(v3stats.x.Map().empty());
-    EXPECT_TRUE(v3stats.y.Map().empty());
-    EXPECT_TRUE(v3stats.z.Map().empty());
-    EXPECT_TRUE(v3stats.mag.Map().empty());
-    EXPECT_EQ(v3stats.x.Count(), 0u);
-    EXPECT_EQ(v3stats.y.Count(), 0u);
-    EXPECT_EQ(v3stats.z.Count(), 0u);
-    EXPECT_EQ(v3stats.mag.Count(), 0u);
-
-    // Reset
-    v3stats.Reset();
-    EXPECT_TRUE(v3stats.x.Map().empty());
-    EXPECT_TRUE(v3stats.y.Map().empty());
-    EXPECT_TRUE(v3stats.z.Map().empty());
-    EXPECT_TRUE(v3stats.mag.Map().empty());
-    EXPECT_EQ(v3stats.x.Count(), 0u);
-    EXPECT_EQ(v3stats.y.Count(), 0u);
-    EXPECT_EQ(v3stats.z.Count(), 0u);
-    EXPECT_EQ(v3stats.mag.Count(), 0u);
-  }
-
-  {
-    // InsertStatistics
-    math::Vector3Stats v3stats;
-    EXPECT_TRUE(v3stats.x.Map().empty());
-    EXPECT_TRUE(v3stats.y.Map().empty());
-    EXPECT_TRUE(v3stats.z.Map().empty());
-    EXPECT_TRUE(v3stats.mag.Map().empty());
-
-    EXPECT_TRUE(v3stats.InsertStatistics("maxAbs"));
-    EXPECT_FALSE(v3stats.InsertStatistics("maxAbs"));
-    EXPECT_FALSE(v3stats.x.Map().empty());
-    EXPECT_FALSE(v3stats.y.Map().empty());
-    EXPECT_FALSE(v3stats.z.Map().empty());
-    EXPECT_FALSE(v3stats.mag.Map().empty());
-
-    // Map with no data
-    {
-      std::map<std::string, double> map = v3stats.x.Map();
-      EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("maxAbs"), 1u);
-    }
-    {
-      std::map<std::string, double> map = v3stats.y.Map();
-      EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("maxAbs"), 1u);
-    }
-    {
-      std::map<std::string, double> map = v3stats.z.Map();
-      EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("maxAbs"), 1u);
-    }
-    {
-      std::map<std::string, double> map = v3stats.mag.Map();
-      EXPECT_EQ(map.size(), 1u);
-      EXPECT_EQ(map.count("maxAbs"), 1u);
-    }
-
-    // Insert some data
-    EXPECT_EQ(v3stats.x.Count(), 0u);
-    EXPECT_EQ(v3stats.y.Count(), 0u);
-    EXPECT_EQ(v3stats.z.Count(), 0u);
-    EXPECT_EQ(v3stats.mag.Count(), 0u);
-
-    v3stats.InsertData(math::Vector3::UnitX);
-    v3stats.InsertData(math::Vector3::UnitX);
-    v3stats.InsertData(math::Vector3::UnitY);
-
-    EXPECT_EQ(v3stats.x.Count(), 3u);
-    EXPECT_EQ(v3stats.y.Count(), 3u);
-    EXPECT_EQ(v3stats.z.Count(), 3u);
-    EXPECT_EQ(v3stats.mag.Count(), 3u);
-
-    EXPECT_NEAR(v3stats.x.Map()["maxAbs"], 1.0, 1e-10);
-    EXPECT_NEAR(v3stats.y.Map()["maxAbs"], 1.0, 1e-10);
-    EXPECT_DOUBLE_EQ(v3stats.z.Map()["maxAbs"], 0.0);
-    EXPECT_NEAR(v3stats.mag.Map()["maxAbs"], 1.0, 1e-10);
   }
 }
 

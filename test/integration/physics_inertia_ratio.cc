@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "gazebo/math/Pose.hh"
-#include "gazebo/math/SignalStats.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "test/ServerFixture.hh"
@@ -77,10 +77,10 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   }
 
   // Expect out of plane angles to fall within limits
-  EXPECT_NEAR((upperAngles.y.Map())["maxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((upperAngles.z.Map())["maxAbs"], 0.0, g_angle_z_tol);
-  EXPECT_NEAR((lowerAngles.y.Map())["maxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((lowerAngles.z.Map())["maxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((upperAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)

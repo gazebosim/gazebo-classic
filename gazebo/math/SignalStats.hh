@@ -19,7 +19,6 @@
 
 #include <map>
 #include <string>
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -172,57 +171,6 @@ namespace gazebo
 
       /// \brief Pointer to private data.
       protected: SignalStatsPrivate *dataPtr;
-    };
-    /// \}
-
-    /// \class Vector3Stats SignalStats.hh math/gzmath.hh
-    /// \brief Collection of statistics for a Vector3 signal.
-    class GAZEBO_VISIBLE Vector3Stats
-    {
-      /// \brief Constructor
-      public: Vector3Stats();
-
-      /// \brief Destructor
-      public: ~Vector3Stats();
-
-      /// \brief Add a new sample to the statistical measures.
-      /// \param[in] _data New signal data point.
-      public: void InsertData(const Vector3 &_data);
-
-      /// \brief Add a new type of statistic.
-      /// \param[in] _name Short name of new statistic.
-      /// Valid values include:
-      ///  "maxAbs"
-      ///  "mean"
-      ///  "rms"
-      /// \return True if statistic was successfully added,
-      /// false if name was not recognized or had already
-      /// been inserted.
-      public: bool InsertStatistic(const std::string &_name);
-
-      /// \brief Add multiple statistics.
-      /// \param[in] _names Comma-separated list of new statistics.
-      /// For example, all statistics could be added with:
-      ///  "maxAbs,mean,rms"
-      /// \return True if all statistics were successfully added,
-      /// false if any names were not recognized or had already
-      /// been inserted.
-      public: bool InsertStatistics(const std::string &_names);
-
-      /// \brief Forget all previous data.
-      public: void Reset();
-
-      /// \brief Statistics for x component of signal.
-      public: SignalStats x;
-
-      /// \brief Statistics for y component of signal.
-      public: SignalStats y;
-
-      /// \brief Statistics for z component of signal.
-      public: SignalStats z;
-
-      /// \brief Statistics for magnitude of signal.
-      public: SignalStats mag;
     };
     /// \}
   }
