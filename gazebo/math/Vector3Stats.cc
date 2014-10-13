@@ -43,23 +43,21 @@ void Vector3Stats::InsertData(const Vector3 &_data)
 //////////////////////////////////////////////////
 bool Vector3Stats::InsertStatistic(const std::string &_name)
 {
-  bool result = true;
-  result = result && this->dataPtr->x.InsertStatistic(_name);
-  result = result && this->dataPtr->y.InsertStatistic(_name);
-  result = result && this->dataPtr->z.InsertStatistic(_name);
-  result = result && this->dataPtr->mag.InsertStatistic(_name);
-  return result;
+  bool x = this->dataPtr->x.InsertStatistic(_name);
+  bool y = this->dataPtr->y.InsertStatistic(_name);
+  bool z = this->dataPtr->z.InsertStatistic(_name);
+  bool mag = this->dataPtr->mag.InsertStatistic(_name);
+  return x && y && z && mag;
 }
 
 //////////////////////////////////////////////////
 bool Vector3Stats::InsertStatistics(const std::string &_names)
 {
-  bool result = true;
-  result = result && this->dataPtr->x.InsertStatistics(_names);
-  result = result && this->dataPtr->y.InsertStatistics(_names);
-  result = result && this->dataPtr->z.InsertStatistics(_names);
-  result = result && this->dataPtr->mag.InsertStatistics(_names);
-  return result;
+  bool x = this->dataPtr->x.InsertStatistics(_names);
+  bool y = this->dataPtr->y.InsertStatistics(_names);
+  bool z = this->dataPtr->z.InsertStatistics(_names);
+  bool mag = this->dataPtr->mag.InsertStatistics(_names);
+  return x && y && z && mag;
 }
 
 //////////////////////////////////////////////////
