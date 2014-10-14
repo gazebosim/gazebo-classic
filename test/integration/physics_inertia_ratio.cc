@@ -21,14 +21,15 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "test/ServerFixture.hh"
 
 using namespace gazebo;
 
-const double g_angle_y_tol = 0.2;
-const double g_angle_z_tol = 0.2;
+const double g_angle_y_tol = 0.21;
+const double g_angle_z_tol = 0.21;
 
 class PhysicsTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
@@ -58,25 +59,28 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   ASSERT_TRUE(upperLink != NULL);
   ASSERT_TRUE(lowerLink != NULL);
 
+  math::Vector3Stats upperAngles;
+  math::Vector3Stats lowerAngles;
+  {
+    const std::string statNames = "maxAbs";
+    EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
+    EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
+  }
+
   for (int i = 0; i < 3000; ++i)
   {
     world->Step(1);
 
-    // Check out of plane angles
-    {
-      math::Pose pose;
-      pose = upperLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
-    }
-
-    {
-      math::Pose pose;
-      pose = lowerLink->GetWorldPose();
-      EXPECT_NEAR(pose.rot.y, 0.0, g_angle_y_tol);
-      EXPECT_NEAR(pose.rot.z, 0.0, g_angle_z_tol);
-    }
+    // Get statistics on link rotations
+    upperAngles.InsertData(upperLink->GetWorldPose().rot.GetAsEuler());
+    lowerAngles.InsertData(lowerLink->GetWorldPose().rot.GetAsEuler());
   }
+
+  // Expect out of plane angles to fall within limits
+  EXPECT_NEAR((upperAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
 }
 
 TEST_P(PhysicsTest, InertiaRatioPendulum)
