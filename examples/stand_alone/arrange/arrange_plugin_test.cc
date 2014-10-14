@@ -18,21 +18,28 @@
 #include <gazebo/gazebo.hh>
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
+#include <stdlib.h>
 
 int main(int _argc, char** _argv)
 {
   gazebo::setupClient(_argc, _argv);
 
-  std::vector<std::string> arrangementNames;
-  /*for(int i = 1; i <= 6; i++){
-    arrangementNames.push_back("grasp_"+std::string(i));
+  /*std::vector<std::string> arrangementNames;
+  for(int i = 1; i <= 6; i++){
+    std::stringstream ss;
+    ss << i;
+    arrangementNames.push_back("grasp_"+ss.str());
   }
   for(int i = 1; i <= 4; i++){
-    arrangementNames.push_back("grip_"+std::string(i));
+    std::stringstream ss;
+    ss << i;
+    arrangementNames.push_back("grip_"+ss.str());
   }
   for(int i = 1; i <= 2; i++){
-    arrangementNames.push_back("pinch_"+std::string(i));
-  }*/
+    std::stringstream ss;
+    ss << i;
+    arrangementNames.push_back("pinch_"+ss.str());
+  */}
   arrangementNames.push_back("default");
   arrangementNames.push_back("cricket_ball");
   arrangementNames.push_back("wood_blocks");
