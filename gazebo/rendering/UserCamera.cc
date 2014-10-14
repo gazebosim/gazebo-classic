@@ -200,7 +200,6 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
   if (!this->poseSet)
   {
     this->initialPose = _pose;
-    std::cout << "initialPose: " << this->initialPose << std::endl;
     this->poseSet = true;
   }
 }
@@ -672,7 +671,8 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 {
   // This function was establish when integrating the space navigator
   // joystick.
-  if (_msg->has_translation() && _msg->has_rotation())
+  if (_msg->has_translation() && _msg->has_rotation() &&
+      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
     // Get the joystick XYZ
     math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
@@ -697,8 +697,6 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
     // Get the XYZ
     math::Pose pose(msgs::Convert(_msg->position()),
                     msgs::Convert(_msg->orientation()));
-    pose.pos += this->initialPose.pos;
-    pose.rot *= this->initialPose.rot;
     this->SetWorldPose(pose);
   }
 }

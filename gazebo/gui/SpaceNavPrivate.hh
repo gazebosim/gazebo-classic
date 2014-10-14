@@ -63,6 +63,9 @@ namespace gazebo
 
       /// \brief Rotation values below which joystick values return zero.
       public: math::Vector3 deadbandRot;
+
+      /// \brief button states
+      public: int buttons[2];
     };
   }
 }
