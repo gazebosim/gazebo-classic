@@ -24,22 +24,8 @@ int main(int _argc, char** _argv)
 {
   gazebo::setupClient(_argc, _argv);
 
-  /*std::vector<std::string> arrangementNames;
-  for(int i = 1; i <= 6; i++){
-    std::stringstream ss;
-    ss << i;
-    arrangementNames.push_back("grasp_"+ss.str());
-  }
-  for(int i = 1; i <= 4; i++){
-    std::stringstream ss;
-    ss << i;
-    arrangementNames.push_back("grip_"+ss.str());
-  }
-  for(int i = 1; i <= 2; i++){
-    std::stringstream ss;
-    ss << i;
-    arrangementNames.push_back("pinch_"+ss.str());
-  */}
+  std::vector<std::string> arrangementNames;
+
   arrangementNames.push_back("default");
   arrangementNames.push_back("cricket_ball");
   arrangementNames.push_back("wood_blocks");
