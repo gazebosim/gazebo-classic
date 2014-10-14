@@ -216,18 +216,7 @@ math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // The following call should work, but doesn't:
-  // this->bulletHinge->enableAngularMotor(true, _angle,
-  // this->GetMaxForce(_index));
-
-  // TODO: Should prescribe the linear velocity of the child link if there is an
-  // offset between the child's CG and the joint anchor.
-  math::Vector3 desiredVel;
-  if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldAngularVel();
-  desiredVel += _angle * this->GetGlobalAxis(_index);
-  if (this->childLink)
-    this->childLink->SetAngularVel(desiredVel);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

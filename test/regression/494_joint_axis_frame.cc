@@ -102,13 +102,6 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
     }
 
     // spawn joint using using parent model frame to define joint axis
-    if (_physicsEngine == "dart")
-    {
-      gzerr << "dart doesn't support parent model frame, skipping sub-test"
-            << " per issue #1143"
-            << std::endl;
-    }
-    else
     {
       gzdbg << "test case with joint axis specified in parent model frame.\n";
       opt.useParentModelFrame = true;
@@ -159,8 +152,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
-  bool isOde = physics->GetType().compare("ode") == 0;
-  double dt = physics->GetMaxStepSize();
 
   // Check that Joint::GetGlobalAxis matches _axis
   EXPECT_EQ(_axis, _joint->GetGlobalAxis(0));
@@ -193,7 +184,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   }
 
   double velocityMagnitude = 1.0;
-  double maxForce = velocityMagnitude / dt * 10.1;
   std::vector<double> velocities;
   velocities.push_back(velocityMagnitude);
   velocities.push_back(0.0);
@@ -204,14 +194,6 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     // Use Joint::SetVelocity with different values
     double vel = *iter;
     _joint->SetVelocity(0, vel);
-
-    // ODE requires maxForce to be non-zero for SetVelocity to work
-    // See issue #964 for discussion of consistent API
-    if (isOde)
-    {
-      _joint->SetMaxForce(0, maxForce);
-      world->Step(1);
-    }
 
     // Verify that Joint::GetVelocity returns the same value
     EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
