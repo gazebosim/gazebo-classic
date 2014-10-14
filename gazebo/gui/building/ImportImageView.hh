@@ -74,6 +74,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseReleaseEvent(QMouseEvent *_event);
 
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
+
       /// \brief Draw a measure in the scene.
       /// \param[in] _pos Start position of the measure in pixel coordinates.
       private: void DrawMeasure(const QPoint &_pos);
@@ -109,13 +113,13 @@ namespace gazebo
       /// \brief Currently selected image pixmap.
       private: QPixmap *imagePixmap;
 
-      /// \brief Text to be dispayed when no image has been selected.
+      /// \brief Text to be displayed when no image has been selected.
       private: QGraphicsTextItem *noImageText;
 
-      /// \brief Text to be dispayed when an invalid file is selected.
+      /// \brief Text to be displayed when an invalid file is selected.
       private: QGraphicsTextItem *invalidImageText;
 
-      /// \brief Text to be dispayed when an invalid file is selected.
+      /// \brief Text to be displayed when an invalid file is selected.
       private: MeasureItem *measureItem;
 
       /// \brief Parent widget.

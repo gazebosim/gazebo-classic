@@ -160,33 +160,31 @@ void ImportImageView::mouseMoveEvent(QMouseEvent *_event)
 {
   if (this->drawInProgress && this->measureItem)
   {
-    // snap to 0/90/180 degrees
-    LineSegmentItem *segment = this->measureItem->GetSegment(
-        this->measureItem->GetSegmentCount()-1);
-    QPointF p1 = segment->mapToScene(segment->line().p1());
     QPointF p2 = this->mapToScene(_event->pos());
-    QLineF line(p1, p2);
-    double angle = line.angle();
-    double range = 10;
-    if ((angle < range) || (angle > (360 - range)) ||
-        ((angle > (180 - range)) && (angle < (180 + range))))
+
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
-      this->measureItem->SetVertexPosition(
-          this->measureItem->GetVertexCount()-1,
-          QPointF(p2.x(), p1.y()));
+      // snap to 0/90/180 degrees
+      LineSegmentItem *segment = this->measureItem->GetSegment(
+        this->measureItem->GetSegmentCount()-1);
+      QPointF p1 = segment->mapToScene(segment->line().p1());
+      QLineF line(p1, p2);
+      double angle = line.angle();
+      double range = 10;
+      if ((angle < range) || (angle > (360 - range)) ||
+          ((angle > (180 - range)) && (angle < (180 + range))))
+      {
+        p2 = QPointF(p2.x(), p1.y());
+      }
+      else if (((angle > (90 - range)) && (angle < (90 + range))) ||
+          ((angle > (270 - range)) && (angle < (270 + range))))
+      {
+        p2 = QPointF(p1.x(), p2.y());
+      }
     }
-    else if (((angle > (90 - range)) && (angle < (90 + range))) ||
-        ((angle > (270 - range)) && (angle < (270 + range))))
-    {
-      this->measureItem->SetVertexPosition(
-          this->measureItem->GetVertexCount()-1,
-          QPointF(p1.x(), p2.y()));
-    }
-    else
-    {
-      this->measureItem->SetVertexPosition(
-          this->measureItem->GetVertexCount()-1, p2);
-    }
+
+    this->measureItem->SetVertexPosition(
+        this->measureItem->GetVertexCount()-1, p2);
   }
 
   if (!drawInProgress)
@@ -209,6 +207,22 @@ void ImportImageView::mouseReleaseEvent(QMouseEvent *_event)
   }
 
   QGraphicsView::mouseReleaseEvent(_event);
+}
+
+/////////////////////////////////////////////////
+void ImportImageView::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Escape)
+  {
+    this->drawInProgress = false;
+    if (this->measureItem)
+    {
+      this->scene()->removeItem(this->measureItem);
+    }
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    return;
+  }
+  _event->ignore();
 }
 
 /////////////////////////////////////////////////

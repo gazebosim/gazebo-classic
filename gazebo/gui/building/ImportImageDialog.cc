@@ -117,7 +117,6 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   QPushButton *backButton = new QPushButton(tr("Back"));
   QPushButton *cancelButton2 = new QPushButton(tr("Cancel"));
 
-  connect(this->okButton, SIGNAL(clicked()), this, SLOT(accept()));
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
   connect(backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
   connect(cancelButton2, SIGNAL(clicked()), this, SLOT(reject()));
@@ -189,6 +188,7 @@ void ImportImageDialog::OnAccept()
   {
     this->view->SetBackgroundImage(filename, this->resolutionSpin->value());
   }
+  this->accept();
 }
 
 /////////////////////////////////////////////////

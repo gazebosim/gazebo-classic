@@ -223,7 +223,7 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
   for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
       iter != this->brushes.end(); ++iter)
   {
-    buttonText = (*iter)->text().toUtf8().constData();
+    buttonText = (*iter)->text().toStdString();
     if (_type.empty() || buttonText.find(_type.substr(1)) == std::string::npos)
     {
       (*iter)->setChecked(false);
