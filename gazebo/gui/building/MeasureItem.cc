@@ -99,7 +99,7 @@ void MeasureItem::paint(QPainter *_painter,
     posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-PI/2);
     posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-PI/2);
   }
-  else if (textAngle == 0 || textAngle == PI)
+  else if (fabs(textAngle) < 0.01 || fabs(textAngle - PI) < 0.01)
   {
     posX = (p1.x()+p2.x())/2 - textWidth/2;
     posY = (p1.y()+p2.y())/2 - margin;

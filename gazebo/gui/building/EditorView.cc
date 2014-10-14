@@ -43,6 +43,7 @@ EditorView::EditorView(QWidget *_parent)
 
   this->drawMode = NONE;
   this->drawInProgress = false;
+  this->floorplanVisible = true;
   this->elementsVisible = true;
 
   this->connections.push_back(
@@ -58,24 +59,28 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnDone, this)));*/
 
   this->connections.push_back(
-  gui::editor::Events::ConnectDiscardBuildingModel(
-    boost::bind(&EditorView::OnDiscardModel, this)));
+      gui::editor::Events::ConnectDiscardBuildingModel(
+      boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectAddBuildingLevel(
-    boost::bind(&EditorView::OnAddLevel, this)));
+      gui::editor::Events::ConnectAddBuildingLevel(
+      boost::bind(&EditorView::OnAddLevel, this)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectDeleteBuildingLevel(
-    boost::bind(&EditorView::OnDeleteLevel, this)));
+      gui::editor::Events::ConnectDeleteBuildingLevel(
+      boost::bind(&EditorView::OnDeleteLevel, this)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectChangeBuildingLevel(
-    boost::bind(&EditorView::OnChangeLevel, this, _1)));
+      gui::editor::Events::ConnectChangeBuildingLevel(
+      boost::bind(&EditorView::OnChangeLevel, this, _1)));
 
   this->connections.push_back(
-  gui::editor::Events::ConnectHideEditorItems(
-    boost::bind(&EditorView::OnHideEditorItems, this)));
+      gui::editor::Events::ConnectShowFloorplan(
+      boost::bind(&EditorView::OnShowFloorplan, this)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectShowElements(
+      boost::bind(&EditorView::OnShowElements, this)));
 
   this->mousePressRotation = 0;
 
@@ -476,10 +481,6 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
     this->CancelDrawMode();
     this->releaseKeyboard();
   }
-  else if (_event->key() == Qt::Key_H)
-  {
-    gui::editor::Events::triggerHideEditorItems();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -759,6 +760,12 @@ void EditorView::SetBackgroundImage(const std::string &_filename,
       setY(img.height() * -0.5);
   this->setSceneRect(img.width() * -0.5, img.height() * -0.5,
                      img.width(), img.height());
+
+  if (!this->floorplanVisible)
+  {
+    this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
+    gui::editor::Events::triggerShowFloorplan();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -794,7 +801,7 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 
   if (!this->elementsVisible)
-    gui::editor::Events::triggerHideEditorItems();
+    gui::editor::Events::triggerShowElements();
 
   // this->grabKeyboard();
 }
@@ -847,7 +854,7 @@ void EditorView::OnAddLevel()
   }
 
   if (!this->elementsVisible)
-    gui::editor::Events::triggerHideEditorItems();
+    gui::editor::Events::triggerShowElements();
 
   if (this->levels[this->currentLevel]->backgroundPixmap)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
@@ -1050,7 +1057,8 @@ void EditorView::OnChangeLevel(int _level)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
 
   if (_level < static_cast<int>(this->levels.size()) &&
-      this->levels[_level]->backgroundPixmap)
+      this->levels[_level]->backgroundPixmap &&
+      this->floorplanVisible)
   {
     this->levels[_level]->backgroundPixmap->setVisible(true);
   }
@@ -1120,7 +1128,17 @@ void EditorView::CancelDrawMode()
 }
 
 /////////////////////////////////////////////////
-void EditorView::OnHideEditorItems()
+void EditorView::OnShowFloorplan()
+{
+  this->floorplanVisible = !this->floorplanVisible;
+
+  if (this->levels[this->currentLevel]->backgroundPixmap)
+    this->levels[this->currentLevel]->backgroundPixmap->setVisible(
+        !this->levels[this->currentLevel]->backgroundPixmap->isVisible());
+}
+
+/////////////////////////////////////////////////
+void EditorView::OnShowElements()
 {
   this->elementsVisible = !this->elementsVisible;
 

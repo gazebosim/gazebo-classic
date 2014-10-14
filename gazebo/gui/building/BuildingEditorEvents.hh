@@ -125,34 +125,63 @@ namespace gazebo
               event::ConnectionPtr _subscriber)
           { deleteBuildingLevel.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the hide editor items signal
+        /// \brief Connect a Gazebo event to the show floorplan signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
-            static event::ConnectionPtr ConnectHideEditorItems(T _subscriber)
-          { return hideEditorItems.Connect(_subscriber); }
+            static event::ConnectionPtr ConnectShowFloorplan(T _subscriber)
+          { return showFloorplan.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the hide editor items signal
+        /// \brief Disconnect a Gazebo event from the show floorplan signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectHideEditorItems(
+        public: static void DisconnectShowFloorplan(
               event::ConnectionPtr _subscriber)
-          { hideEditorItems.Disconnect(_subscriber); }
+          { showFloorplan.Disconnect(_subscriber); }
 
-        /// \brief Connect a Gazebo event to the trigger hide editor items
+        /// \brief Connect a Gazebo event to the trigger show floorplan
         /// signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr
-            ConnectTriggerHideEditorItems(T _subscriber)
-          { return triggerHideEditorItems.Connect(_subscriber); }
+            ConnectTriggerShowFloorplan(T _subscriber)
+          { return triggerShowFloorplan.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the trigger hide editor items
+        /// \brief Disconnect a Gazebo event from the trigger show floorplan
         /// signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectTriggerHideEditorItems(
+        public: static void DisconnectTriggerShowFloorplan(
               event::ConnectionPtr _subscriber)
-          { triggerHideEditorItems.Disconnect(_subscriber); }
+          { triggerShowFloorplan.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the show elements signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectShowElements(T _subscriber)
+          { return showElements.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the show elements signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectShowElements(
+              event::ConnectionPtr _subscriber)
+          { showElements.Disconnect(_subscriber); }
+
+        /// \brief Connect a Gazebo event to the trigger show elements
+        /// signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr
+            ConnectTriggerShowElements(T _subscriber)
+          { return triggerShowElements.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the trigger show elements
+        /// signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void DisconnectTriggerShowElements(
+              event::ConnectionPtr _subscriber)
+          { triggerShowElements.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the update level widget signal
         /// \param[in] _subscriber the subscriber to this event
@@ -258,11 +287,17 @@ namespace gazebo
         /// \brief A level has been deleted
         public: static event::EventT<void ()> deleteBuildingLevel;
 
-        /// \brief Hide editor items to reveal background
-        public: static event::EventT<void ()> hideEditorItems;
+        /// \brief Show or hide floorplan
+        public: static event::EventT<void ()> showFloorplan;
 
-        /// \brief Key pressed to hide editor items to reveal background
-        public: static event::EventT<void ()> triggerHideEditorItems;
+        /// \brief Trigger show floorplan
+        public: static event::EventT<void ()> triggerShowFloorplan;
+
+        /// \brief Show or hide building elements
+        public: static event::EventT<void ()> showElements;
+
+        /// \brief Trigger show elements
+        public: static event::EventT<void ()> triggerShowElements;
 
         /// \brief The levels have been changed
         public: static event::EventT<void (int, std::string)>

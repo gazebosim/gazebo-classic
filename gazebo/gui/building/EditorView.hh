@@ -201,8 +201,11 @@ namespace gazebo
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();
 
+      /// \brief Toggle visibility of background floorplan.
+      private: void OnShowFloorplan();
+
       /// \brief Toggle visibility of editor items.
-      private: void OnHideEditorItems();
+      private: void OnShowElements();
 
       /// \brief Show current level items if not currently hiding.
       private: void ShowCurrentLevelItems();
@@ -212,6 +215,9 @@ namespace gazebo
 
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
+
+      /// \brief Indicate whether or not the floorplan is visible.
+      private: bool floorplanVisible;
 
       /// \brief Indicate whether or not the editor items are visible.
       private: bool elementsVisible;

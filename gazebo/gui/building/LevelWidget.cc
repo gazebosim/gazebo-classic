@@ -31,8 +31,24 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   QHBoxLayout *levelLayout = new QHBoxLayout;
   this->levelCounter = 0;
 
-  this->hideEditorItemsButton = new QPushButton("Hide");
-  this->hideEditorItemsButton->setToolTip("Hide elements (H)");
+  this->showFloorplanAct = new QAction("Floorplan", this);
+  this->showElementsAct = new QAction("Features", this);
+  this->showFloorplanAct->setCheckable(true);
+  this->showElementsAct->setCheckable(true);
+  this->showFloorplanAct->setChecked(true);
+  this->showElementsAct->setChecked(true);
+  this->showFloorplanAct->setShortcut(tr("F"));
+  this->showElementsAct->setShortcut(tr("G"));
+  connect(this->showFloorplanAct, SIGNAL(triggered()), this, SLOT(
+      OnShowFloorplan()));
+  connect(this->showElementsAct, SIGNAL(triggered()), this, SLOT(
+      OnShowElements()));
+
+  QMenu *showMenu = new QMenu(this);
+  showMenu->addAction(this->showFloorplanAct);
+  showMenu->addAction(this->showElementsAct);
+  QPushButton *showButton = new QPushButton("View", this);
+  showButton->setMenu(showMenu);
 
   this->levelComboBox = new QComboBox;
   this->levelComboBox->addItem(QString("Level 1"));
@@ -40,36 +56,38 @@ LevelWidget::LevelWidget(QWidget *_parent) : QWidget(_parent)
   int comboBoxHeight = levelComboBox->minimumSizeHint().height();
   this->levelComboBox->setMinimumWidth(comboBoxwidth*3);
   this->levelComboBox->setMinimumHeight(comboBoxHeight);
-  this->setMinimumWidth(comboBoxwidth*5);
+  this->setMinimumWidth(comboBoxwidth*6);
 
   QPushButton *deleteLevelButton = new QPushButton("-");
   deleteLevelButton->setToolTip("Delete this level");
   QPushButton *addLevelButton = new QPushButton("+");
   addLevelButton->setToolTip("Add new level");
 
-  levelLayout->addWidget(hideEditorItemsButton);
+  levelLayout->addWidget(showButton);
   levelLayout->addWidget(this->levelComboBox);
   levelLayout->addWidget(deleteLevelButton);
   levelLayout->addWidget(addLevelButton);
 
-  connect(hideEditorItemsButton, SIGNAL(clicked()), this,
-      SLOT(OnHideEditorItems()));
   connect(this->levelComboBox, SIGNAL(currentIndexChanged(int)),
       this, SLOT(OnCurrentLevelChanged(int)));
   connect(deleteLevelButton, SIGNAL(clicked()), this, SLOT(OnDeleteLevel()));
   connect(addLevelButton, SIGNAL(clicked()), this, SLOT(OnAddLevel()));
 
   this->connections.push_back(
-    gui::editor::Events::ConnectUpdateLevelWidget(
-    boost::bind(&LevelWidget::OnUpdateLevelWidget, this, _1, _2)));
+      gui::editor::Events::ConnectUpdateLevelWidget(
+      boost::bind(&LevelWidget::OnUpdateLevelWidget, this, _1, _2)));
 
   this->connections.push_back(
-    gui::editor::Events::ConnectTriggerHideEditorItems(
-    boost::bind(&LevelWidget::OnHideEditorItems, this)));
+      gui::editor::Events::ConnectTriggerShowFloorplan(
+      boost::bind(&LevelWidget::OnTriggerShowFloorplan, this)));
 
   this->connections.push_back(
-    gui::editor::Events::ConnectDiscardBuildingModel(
-    boost::bind(&LevelWidget::OnDiscard, this)));
+      gui::editor::Events::ConnectTriggerShowElements(
+      boost::bind(&LevelWidget::OnTriggerShowElements, this)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectDiscardBuildingModel(
+      boost::bind(&LevelWidget::OnDiscard, this)));
 
   this->setLayout(levelLayout);
 }
@@ -95,20 +113,6 @@ void LevelWidget::OnAddLevel()
 void LevelWidget::OnDeleteLevel()
 {
   gui::editor::Events::deleteBuildingLevel();
-}
-
-//////////////////////////////////////////////////
-void LevelWidget::OnHideEditorItems()
-{
-  if (this->hideEditorItemsButton->text() == QString("Hide"))
-  {
-    this->hideEditorItemsButton->setText("Show");
-  }
-  else
-  {
-    this->hideEditorItemsButton->setText("Hide");
-  }
-  gui::editor::Events::hideEditorItems();
 }
 
 //////////////////////////////////////////////////
@@ -143,4 +147,30 @@ void LevelWidget::OnDiscard()
   this->levelComboBox->clear();
   this->levelComboBox->addItem(QString("Level 1"));
   this->levelCounter = 0;
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnShowFloorplan()
+{
+  gui::editor::Events::showFloorplan();
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnTriggerShowFloorplan()
+{
+  this->OnShowFloorplan();
+  this->showFloorplanAct->setChecked(!this->showFloorplanAct->isChecked());
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnShowElements()
+{
+  gui::editor::Events::showElements();
+}
+
+//////////////////////////////////////////////////
+void LevelWidget::OnTriggerShowElements()
+{
+  this->OnShowElements();
+  this->showElementsAct->setChecked(!this->showElementsAct->isChecked());
 }

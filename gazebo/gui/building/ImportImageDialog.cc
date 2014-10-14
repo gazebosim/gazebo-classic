@@ -234,7 +234,7 @@ void ImportImageDialog::OnChangeDistance(double _distance)
 }
 
 /////////////////////////////////////////////////
-void ImportImageDialog::OnChangeResolution(double _resolution)
+void ImportImageDialog::OnChangeResolution(double /*_resolution*/)
 {
   // change distance without re-changing resolution
 

@@ -54,9 +54,17 @@ namespace gazebo
       /// \brief Qt callback when the delete level button has been pressed.
       public slots: void OnDeleteLevel();
 
-      /// \brief Qt callback when the hide editor items button has been
-      /// pressed.
-      public slots: void OnHideEditorItems();
+      /// \brief Qt callback when the show floorplan button has been pressed.
+      public slots: void OnShowFloorplan();
+
+      /// \brief Trigger show floorplan.
+      public slots: void OnTriggerShowFloorplan();
+
+      /// \brief Qt callback when the show elements button has been pressed.
+      public slots: void OnShowElements();
+
+      /// \brief Trigger show elements.
+      public slots: void OnTriggerShowElements();
 
       /// \brief Callback received when levels are changed externally.
       private: void OnUpdateLevelWidget(int _level,
@@ -64,9 +72,6 @@ namespace gazebo
 
       /// \brief Callback received when the widget must be reset.
       private: void OnDiscard();
-
-      /// \brief Button for hiding editor items.
-      private: QPushButton *hideEditorItemsButton;
 
       /// \brief Combo box for selecting the current level.
       private: QComboBox *levelComboBox;
@@ -76,6 +81,12 @@ namespace gazebo
 
       /// \brief Counter for the total number of levels.
       private: int levelCounter;
+
+      /// \brief Action to show floorplan.
+      private: QAction *showFloorplanAct;
+
+      /// \brief Action to show elements.
+      private: QAction *showElementsAct;
     };
     /// \}
   }

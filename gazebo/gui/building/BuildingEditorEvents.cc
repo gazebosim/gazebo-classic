@@ -28,8 +28,10 @@ event::EventT<void ()> editor::Events::discardBuildingModel;
 event::EventT<void (int)> editor::Events::changeBuildingLevel;
 event::EventT<void ()> editor::Events::addBuildingLevel;
 event::EventT<void ()> editor::Events::deleteBuildingLevel;
-event::EventT<void ()> editor::Events::hideEditorItems;
-event::EventT<void ()> editor::Events::triggerHideEditorItems;
+event::EventT<void ()> editor::Events::showFloorplan;
+event::EventT<void ()> editor::Events::triggerShowFloorplan;
+event::EventT<void ()> editor::Events::showElements;
+event::EventT<void ()> editor::Events::triggerShowElements;
 event::EventT<void (int, std::string)> editor::Events::updateLevelWidget;
 event::EventT<void (double)> editor::Events::changeBuildingEditorZoom;
 
