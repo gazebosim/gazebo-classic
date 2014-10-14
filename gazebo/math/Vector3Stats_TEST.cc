@@ -22,8 +22,49 @@
 
 using namespace gazebo;
 
-class Vector3StatsTest : public gazebo::testing::AutoLogFixture { };
+class Vector3StatsTest : public gazebo::testing::AutoLogFixture
+{
+  /// \brief Get X value of statistic _name.
+  public: double X(const std::string &_name) const;
 
+  /// \brief Get Y value of statistic _name.
+  public: double Y(const std::string &_name) const;
+
+  /// \brief Get Z value of statistic _name.
+  public: double Z(const std::string &_name) const;
+
+  /// \brief Get Mag value of statistic _name.
+  public: double Mag(const std::string &_name) const;
+
+  /// \brief Stats instance.
+  public: math::Vector3Stats stats;
+};
+
+//////////////////////////////////////////////////
+double Vector3StatsTest::X(const std::string &_name) const
+{
+  return this->stats.X().Map()[_name];
+}
+
+//////////////////////////////////////////////////
+double Vector3StatsTest::Y(const std::string &_name) const
+{
+  return this->stats.Y().Map()[_name];
+}
+
+//////////////////////////////////////////////////
+double Vector3StatsTest::Z(const std::string &_name) const
+{
+  return this->stats.Z().Map()[_name];
+}
+
+//////////////////////////////////////////////////
+double Vector3StatsTest::Mag(const std::string &_name) const
+{
+  return this->stats.Mag().Map()[_name];
+}
+
+//////////////////////////////////////////////////
 TEST_F(Vector3StatsTest, Vector3Stats)
 {
   {
@@ -107,6 +148,36 @@ TEST_F(Vector3StatsTest, Vector3Stats)
     EXPECT_NEAR(v3stats.Y().Map()["maxAbs"], 1.0, 1e-10);
     EXPECT_DOUBLE_EQ(v3stats.Z().Map()["maxAbs"], 0.0);
     EXPECT_NEAR(v3stats.Mag().Map()["maxAbs"], 1.0, 1e-10);
+  }
+
+  // Const accessors
+  {
+    EXPECT_TRUE(this->stats.X().Map().empty());
+    EXPECT_TRUE(this->stats.Y().Map().empty());
+    EXPECT_TRUE(this->stats.Z().Map().empty());
+    EXPECT_TRUE(this->stats.Mag().Map().empty());
+
+    const std::string name("maxAbs");
+    EXPECT_TRUE(this->stats.InsertStatistics(name));
+
+    this->stats.InsertData(math::Vector3::UnitX);
+    this->stats.InsertData(math::Vector3::UnitX);
+    this->stats.InsertData(math::Vector3::UnitY);
+
+    EXPECT_EQ(this->stats.X().Count(), 3u);
+    EXPECT_EQ(this->stats.Y().Count(), 3u);
+    EXPECT_EQ(this->stats.Z().Count(), 3u);
+    EXPECT_EQ(this->stats.Mag().Count(), 3u);
+
+    EXPECT_NEAR(this->stats.X().Map()[name], 1.0, 1e-10);
+    EXPECT_NEAR(this->stats.Y().Map()[name], 1.0, 1e-10);
+    EXPECT_DOUBLE_EQ(this->stats.Z().Map()[name], 0.0);
+    EXPECT_NEAR(this->stats.Mag().Map()[name], 1.0, 1e-10);
+
+    EXPECT_NEAR(this->X(name), 1.0, 1e-10);
+    EXPECT_NEAR(this->Y(name), 1.0, 1e-10);
+    EXPECT_DOUBLE_EQ(this->Z(name), 0.0);
+    EXPECT_NEAR(this->Mag(name), 1.0, 1e-10);
   }
 }
 
