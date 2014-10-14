@@ -102,6 +102,18 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Draw the hand on the canvas
   handScene->addItem(handItem);
+
+  // Preallocate QGraphicsItems for each contact point
+  for(int i = 0; i < 5; i++){
+    int xpos = finger_points[fingerNames[i]][0];
+    int ypos = finger_points[fingerNames[i]][1];
+    this->contactGraphicsItems[fingerNames[i]] = new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
+    this->handScene->addItem(this->contactGraphicsItems[fingerNames[i]]);
+
+    this->contactGraphicsItems[fingerNames[i]]->setBrush(QBrush(QColor(255, 255, 255, 0)));
+    this->contactGraphicsItems[fingerNames[i]]->setPen(QPen(QColor(153, 153, 153, 255)));
+  }
+
   handScene->update();
   handView->show();
 
@@ -110,6 +122,7 @@ GUIAratPlugin::GUIAratPlugin()
   mainLayout->addWidget(handView);
 
   QVBoxLayout *taskLayout = new QVBoxLayout();
+  taskLayout->setContentsMargins(0, 0, 0, 0);
   
   QTabWidget *tabWidget = new QTabWidget();
   
@@ -141,9 +154,11 @@ GUIAratPlugin::GUIAratPlugin()
       task->GetAttribute("instructions")->Get(instructions);
 
       QTaskButton *taskButton = new QTaskButton();
-      taskButton->setMaximumSize(handImgX/3, handImgY/3);
-      //taskButton->setText(QString(name.c_str()));
-			//Need to add a new signal to PushButton for this to work
+      taskButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+      taskButton->setMaximumWidth(handImgX/3);
+      taskButton->setMaximumHeight(handImgX/3);
+      taskButton->resize(handImgX/3, handImgY/3);
+      taskButton->setText(QString(name.c_str()));
       taskButton->SetTaskId(id);
       QTextDocument* instructionsDocument = new QTextDocument(QString(instructions.c_str()));
       taskButton->SetTaskInstructionsDocument(instructionsDocument);
@@ -160,6 +175,7 @@ GUIAratPlugin::GUIAratPlugin()
         
         taskButton->setIcon(QIcon(icon_picture));
         taskButton->setIconSize(QSize(iconSize[0], iconSize[1]));
+        taskButton->setMinimumSize(iconSize[0]+20, iconSize[1]+30);
       }
       if(taskList.empty()){
         instructionsView->setDocument(instructionsDocument);
@@ -170,6 +186,8 @@ GUIAratPlugin::GUIAratPlugin()
       task = task->GetNextElement();
       i++;
     }
+    buttonGroup->setMinimumWidth(handImgX);
+    buttonGroup->setContentsMargins(0, 0, 0, 0);
     buttonGroup->setLayout(buttonLayout);
     buttonLayout->setContentsMargins(0, 0, 0, 0);
     buttonLayout->setSpacing(0);
@@ -182,15 +200,18 @@ GUIAratPlugin::GUIAratPlugin()
   currentTaskIndex = 0;
 
   QFrame *taskFrame = new QFrame();
+  tabWidget->setContentsMargins(0, 0, 0, 0);
   taskLayout->addWidget(tabWidget);
   taskLayout->addWidget(instructionsView);
 
   QHBoxLayout* cycleButtonLayout = new QHBoxLayout();
-  QPushButton *resetButton = new QPushButton(QString("Reset Test"));
+  QToolButton *resetButton = new QToolButton();
+  resetButton->setText(QString("Reset Test"));
   connect(resetButton, SIGNAL(clicked()), this, SLOT(OnResetClicked()));
   cycleButtonLayout->addWidget(resetButton);
   resetButton->setMaximumWidth(handImgX/2);
-  QPushButton *nextButton = new QPushButton(QString("Next Test"));
+  QToolButton *nextButton = new QToolButton();
+  nextButton->setText(QString("Next Test"));
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
   cycleButtonLayout->addWidget(nextButton);
   nextButton->setMaximumWidth(handImgX/2);
@@ -217,13 +238,6 @@ GUIAratPlugin::GUIAratPlugin()
   this->taskPub = this->node->Advertise<msgs::GzString>("/gazebo/arat/control");
   this->taskNum = 0;
   this->maxTaskCount = 10;
-
-  // Preallocate QGraphicsItems for each contact point
-  for(int i = 0; i < 5; i++){
-    int xpos = finger_points[fingerNames[i]][0];
-    int ypos = finger_points[fingerNames[i]][1];
-    this->contactGraphicsItems[fingerNames[i]] = new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
-  }
 
 
   // Set up an array of subscribers for each contact sensor
@@ -285,11 +299,14 @@ void GUIAratPlugin::PreRender(){
   for(int i = 0; i < 5; i ++){
     std::string fingerName = this->fingerNames[i];
 
-    if(this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
+    this->contactGraphicsItems[fingerName]->setBrush(QBrush(QColor(255, 255, 255, 1)));
+    this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(153, 153, 153, 255)));
+    /*if(this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
       this->handScene->removeItem(this->contactGraphicsItems[fingerName]);
-    }
+    }*/
   }
-  //TODO: color, position offset, multiple contacts
+
+  //TODO: position offset, multiple contacts
 
   //Clear queued messages and draw them
   while( !this->msgQueue.empty()){
@@ -319,9 +336,9 @@ void GUIAratPlugin::PreRender(){
       this->contactGraphicsItems[fingerName]->setBrush(color);
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
       // Draw on the corresponding spot
-      if(!this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
+      /*if(!this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
         this->handScene->addItem(this->contactGraphicsItems[fingerName]);
-      }
+      }*/
     }
 
   }

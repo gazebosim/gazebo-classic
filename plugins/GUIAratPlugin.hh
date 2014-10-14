@@ -128,7 +128,7 @@ namespace gazebo
 
     };
 
-    class QTaskButton : public QPushButton
+    class QTaskButton : public QToolButton
     {
       Q_OBJECT
       public: QTaskButton();

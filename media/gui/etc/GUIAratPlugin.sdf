@@ -4,18 +4,18 @@
     <plugin name="GUIAratPlugin" filename="libGUIAratPlugin.so">
       <circleSize>10</circleSize>
       <handImgDimensions>250 250</handImgDimensions>
-      <iconDimensions>60 60</iconDimensions>
+      <iconDimensions>50 50</iconDimensions>
       <forceMin>0</forceMin>
       <forceMax>100</forceMax>
       <colorMin>255 255 0</colorMin>
       <colorMax>255 0 0</colorMax>
       <handSide>r</handSide>
 
-      <ThPos>29 157</ThPos>
-      <IndPos>82 37</IndPos>
-      <MidPos>127 13</MidPos>
-      <RingPos>165 22</RingPos>
-      <LittlePos>207 53</LittlePos>
+      <ThPos>155 119</ThPos>
+      <IndPos>130 45</IndPos>
+      <MidPos>89 31</MidPos>
+      <RingPos>50 46</RingPos>
+      <LittlePos>20 82</LittlePos>
 
       <taskGroup name="Grasp">
         <task id="grasp_1" icon="file://media/gui/etc/icon_placeholder.png" name="Block 10cm" instructions="Pick up the 10 cm block and place it on top of the box."></task>
