@@ -170,7 +170,7 @@ void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-bool ArrangePlugin::SetArrangement(const std::string _arrangement)
+bool ArrangePlugin::SetArrangement(const std::string &_arrangement)
 {
   if (this->arrangements.find(_arrangement) == this->arrangements.end())
   {
