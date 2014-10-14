@@ -25,7 +25,7 @@ namespace gazebo
 {
   namespace rendering
   {
-    /// \brief Private data for the Camera class
+    /// \brief Private data for the Distortion class
     class DistortionPrivate
     {
       /// \brief Radial distortion coefficient k1.

@@ -43,8 +43,6 @@ Distortion::Distortion()
 //////////////////////////////////////////////////
 Distortion::~Distortion()
 {
-  this->sdf.reset();
-
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -71,7 +69,11 @@ void Distortion::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Distortion::SetCamera(CameraPtr _camera)
 {
-  GZ_ASSERT(_camera, "Unable to apply distortion, camera is NULL");
+  if (!_camera)
+  {
+    gzerr << "Unable to apply distortion, camera is NULL" << std::endl;
+    return;
+  }
 
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
@@ -120,7 +122,12 @@ void Distortion::SetCamera(CameraPtr _camera)
       // this should not happen for barrel distortion as the normalized
       // distorted coordinate should be within (0, 0) and (1.0, 1.0).
       if (mapIdx >= imageSize)
+      {
+        gzlog << "Warning: Normalized distorted coordinate is out of range."
+            << " Index: '" << mapIdx << "' vs Image Size: '" << imageSize << "'"
+            << " This should not happen for barrel distortion" << std::endl;
         continue;
+      }
 
       this->dataPtr->distortionMap[mapIdx] = uv;
     }
@@ -201,7 +208,7 @@ void Distortion::SetCamera(CameraPtr _camera)
       _camera->GetViewport(), "CameraDistortionMap/Default");
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 
-  // create the ditortion map texture
+  // create the distortion map texture
   std::string texName = _camera->GetName() + "_distortionTex";
   Ogre::TexturePtr renderTexture =
       Ogre::TextureManager::getSingleton().createManual(
@@ -248,6 +255,9 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
     const math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
+  // apply distortion, see
+  // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
+
   math::Vector2d normalized2d = _in - _center;
   math::Vector3 normalized(normalized2d.x, normalized2d.y, 0);
   double rSq = normalized.x * normalized.x

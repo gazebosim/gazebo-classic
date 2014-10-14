@@ -9,9 +9,9 @@ uniform vec3 scale;
 
 void main()
 {
-  vec2 scaleCenter = vec2(0.5f, 0.5f);
-  vec2 input = (gl_TexCoord[0].xy - scaleCenter) * scale.xy + scaleCenter;
-  vec4 mapUV = texture2D(distortionMap, input);
+  vec2 scaleCenter = vec2(0.5, 0.5);
+  vec2 inputUV = (gl_TexCoord[0].xy - scaleCenter) * scale.xy + scaleCenter;
+  vec4 mapUV = texture2D(distortionMap, inputUV);
 
   if (mapUV.x < 0.0 || mapUV.y < 0.0)
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);

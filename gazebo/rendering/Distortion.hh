@@ -59,6 +59,7 @@ namespace gazebo
 
       /// \brief Apply distortion model
       /// \param[in] _in Input uv coordinate.
+      /// \param[in] _center Normalized distortion center.
       /// \param[in] _k1 Radial distortion coefficient k1.
       /// \param[in] _k2 Radial distortion coefficient k2.
       /// \param[in] _k3 Radial distortion coefficient k3.
