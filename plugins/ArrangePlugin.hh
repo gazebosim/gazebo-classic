@@ -56,10 +56,10 @@ namespace gazebo
     /// \brief Set up the arrangement with name given by input parameter.
     /// \param[in] _arrangement Name of arrangement.
     /// \return True if arrangement was set successfully.
-    public: bool SetArrangement(std::string _arrangement);
+    public: bool SetArrangement(const std::string _arrangement);
 
     /// \brief Callback function which receives a requested arrangement name.
-    public: void ArrangementCallback(ConstGzStringPtr &msg);
+    public: void ArrangementCallback(ConstGzStringPtr &_msg);
 
     /// \brief World pointer.
     protected: physics::WorldPtr world;

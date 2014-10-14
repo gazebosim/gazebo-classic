@@ -43,7 +43,7 @@ int main(int _argc, char** _argv)
 
   // Publish to a Gazebo topic
   gazebo::transport::PublisherPtr pub = node->Advertise<gazebo::msgs::GzString>
-                                                      ("/gazebo/arat/control");
+                                                      ("~/control");
 
   int i = 0;
   while (true)

@@ -15,7 +15,6 @@
  *
 */
 
-#include <gazebo/gazebo.hh>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Console.hh>
 #include <gazebo/physics/Model.hh>
@@ -164,10 +163,10 @@ void ArrangePlugin::Reset()
   this->SetArrangement(this->currentArrangementName);
 }
 
-void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &msg)
+void ArrangePlugin::ArrangementCallback(ConstGzStringPtr &_msg)
 {
   // Set arrangement to the requested id
-  this->SetArrangement(msg->data());
+  this->SetArrangement(_msg->data());
 }
 
 /////////////////////////////////////////////////
