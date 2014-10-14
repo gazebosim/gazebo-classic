@@ -60,6 +60,7 @@ TEST_F(Vector3StatsTest, Vector3Stats)
 
     EXPECT_TRUE(v3stats.InsertStatistics("maxAbs"));
     EXPECT_FALSE(v3stats.InsertStatistics("maxAbs"));
+    EXPECT_FALSE(v3stats.InsertStatistic("maxAbs"));
     EXPECT_FALSE(v3stats.X().Map().empty());
     EXPECT_FALSE(v3stats.Y().Map().empty());
     EXPECT_FALSE(v3stats.Z().Map().empty());
