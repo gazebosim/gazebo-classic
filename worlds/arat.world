@@ -130,7 +130,7 @@
       <model_name>round_tin_top</model_name>
       <model_name>round_tin_base</model_name>
 
-      <initial_arrangement>grip_1</initial_arrangement>
+      <initial_arrangement>grasp_1</initial_arrangement>
       <arrangement name="grasp_1">
         <pose model="wood_cube_10cm"> 0.217 -0.265 1.04 0 0 0</pose>
       </arrangement>
@@ -152,8 +152,8 @@
         <pose model="stone_10_2_5_1cm">0.242 -0.34 1.0475 -1.571074 0 -1.14</pose>
       </arrangement>
       <arrangement name="grip_1">
-        <pose model="cup_1"> 0.00 0.20 1.034 0 0 0</pose>
-        <pose model="cup_2"> 0.217 0.20 1.034 0 0 0</pose>
+        <pose model="cup_1"> 0.00 -0.20 1.034 0 0 0</pose>
+        <pose model="cup_2"> 0.217 -0.20 1.034 0 0 0</pose>
       </arrangement>
       <arrangement name="grip_2">
         <pose model="wooden_peg_board">0.128 -0.08 1.034 0 0 -1.571074</pose>
