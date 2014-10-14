@@ -190,14 +190,9 @@ double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  math::Vector3 desiredVel;
-  if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldLinearVel();
-  desiredVel += _angle * this->GetGlobalAxis(0);
-  if (this->childLink)
-    this->childLink->SetLinearVel(desiredVel);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
