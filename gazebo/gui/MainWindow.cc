@@ -1034,17 +1034,28 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     delete child;
   }
 
+  if (!this->menuBar)
+  {
+    this->menuBar = new QMenuBar;
+    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMenuBar(this->menuBar);
+  }
+
+  this->menuBar->clear();
+
   if (!_bar)
   {
     this->CreateMenuBar();
     this->menuLayout->addWidget(this->menuBar);
-    this->setMenuBar(this->menuBar);
   }
   else
   {
-    if (this->menuBar)
-      this->menuBar->hide();
     this->menuLayout->addWidget(_bar);
+    QList<QMenu *> menus  = _bar->findChildren<QMenu *>();
+    for (int i = 0; i < menus.size(); ++i)
+    {
+      this->menuBar->addMenu(menus[i]);
+    }
   }
 
   this->menuLayout->addStretch(5);
@@ -1054,12 +1065,6 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  if (this->menuBar)
-    delete this->menuBar;
-
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
