@@ -118,6 +118,8 @@ GLWidget::GLWidget(QWidget *_parent)
   this->node->Init();
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
 
+  this->qtKeyEventPub = this->node->Advertise<msgs::Request>("~/qtKeyEvent");
+
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
   this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
@@ -156,6 +158,7 @@ GLWidget::~GLWidget()
   this->connections.clear();
   this->node.reset();
   this->modelPub.reset();
+  this->qtKeyEventPub.reset();
   this->selectionSub.reset();
 
   this->userCamera.reset();
@@ -306,6 +309,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   this->userCamera->HandleKeyPressEvent(this->keyText);
 
+  // publish key press event
+  msgs::Request keyData;
+  keyData.set_dbl_data(1.0);
+  keyData.set_data(this->keyText);
+  this->qtKeyEventPub->Publish(keyData);
+
   // Process Key Events
   KeyEventHandler::Instance()->HandlePress(this->keyEvent);
 }
@@ -352,6 +361,12 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->keyText = "";
 
   this->userCamera->HandleKeyReleaseEvent(_event->text().toStdString());
+
+  // publish key press event
+  msgs::Request keyData;
+  keyData.set_dbl_data(0.0);
+  keyData.set_data(_event->text().toStdString());
+  this->qtKeyEventPub->Publish(keyData);
 
   // Process Key Events
   KeyEventHandler::Instance()->HandleRelease(this->keyEvent);
