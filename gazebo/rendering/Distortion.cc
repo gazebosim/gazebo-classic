@@ -75,6 +75,13 @@ void Distortion::SetCamera(CameraPtr _camera)
     return;
   }
 
+  if (this->dataPtr->k1 > 0)
+  {
+    gzerr << "Currently only Barrel Distortion is supported. "
+        << "Distortion will not be applied." << std::endl;
+    return;
+  }
+
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->GetImageHeight() > _camera->GetImageWidth() ?
       _camera->GetImageHeight() : _camera->GetImageWidth();
