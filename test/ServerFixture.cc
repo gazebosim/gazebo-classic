@@ -55,7 +55,7 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
+  gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
@@ -109,6 +109,75 @@ void ServerFixture::Unload()
 
   delete this->serverThread;
   this->serverThread = NULL;
+
+  if (getenv("OGRE_ASSERT_ON_ERRORS"))
+    this->AnalyzeOgreLog();
+
+  if (getenv("OGRE_EXPORT_LOGS"))
+    this->StoreOgreLog();
+}
+
+void ServerFixture::StoreOgreLog()
+{
+  boost::filesystem::path logDirectory =
+    common::SystemPaths::Instance()->GetLogPath();
+  boost::filesystem::path logPath = logDirectory / "ogre.log";
+
+  // exists always?
+  if (! boost::filesystem::is_regular_file(logPath))
+  {
+     FAIL() << "No ogre log file detected";
+     return;
+  }
+
+  if (this->lastWorldFileNameLoaded.empty())
+  {
+    FAIL() << "There is no name for the world loaded!";
+    return;
+  }
+
+  // lastWorldFileNameLoaded could be formed by world/world.name
+  // use .filename() method to get only the last name
+  boost::filesystem::path worldFileLoadedPath(this->lastWorldFileNameLoaded);
+  worldFileLoadedPath = worldFileLoadedPath.filename();
+
+  std::string newLogFileName = std::string("ogre_") + worldFileLoadedPath.string() +
+                               std::string(".log");
+  boost::filesystem::path newLogName = logDirectory / newLogFileName;
+
+  try
+  {
+     boost::filesystem::rename(logPath, newLogName);
+  }
+  catch(const boost::filesystem::filesystem_error& e)
+  {
+     FAIL() << "Can not rename ogre log from " << logPath << " to " << newLogName
+            << ". Error message: " << e.what();
+  }
+}
+
+void ServerFixture::AnalyzeOgreLog()
+{
+  boost::filesystem::path logPath =
+    common::SystemPaths::Instance()->GetLogPath();
+  logPath /= "ogre.log";
+
+  std::ifstream ogreLog(logPath.string().c_str(), std::ios::in);
+  ASSERT_TRUE(ogreLog.is_open());
+
+  while (!ogreLog.eof())
+  {
+    std::string line;
+    std::getline(ogreLog, line);
+
+    if (line.find("Error") != std::string::npos ||
+        line.find("error") != std::string::npos ||
+        line.find("ERROR") != std::string::npos)
+    {
+      std::cerr << line << std::endl;
+      FAIL() << "Ogre log has errors!";
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -220,6 +289,8 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
                                            _physics));
   else
     ASSERT_NO_THROW(this->server->LoadFile(_worldFilename));
+
+  this->lastWorldFileNameLoaded = _worldFilename;
 
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))

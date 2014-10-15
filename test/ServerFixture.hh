@@ -513,6 +513,11 @@ class ServerFixture : public testing::Test
   /// \param[out] _share Shared memory.
   protected: void GetMemInfo(double &_resident, double &_share);
 
+  /// \brief
+  protected: void AnalyzeOgreLog();
+
+  protected: void StoreOgreLog();
+
   /// \brief Pointer the Gazebo server.
   protected: Server *server;
 
@@ -557,5 +562,8 @@ class ServerFixture : public testing::Test
 
   /// \brief True if server is running.
   private: bool serverRunning;
+
+  /// \brief the name of the last world Loaded in the server
+  private: std::string lastWorldFileNameLoaded;
 };
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
