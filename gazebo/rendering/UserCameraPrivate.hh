@@ -18,6 +18,9 @@
 #ifndef _USERCAMERA_PRIVATE_HH_
 #define _USERCAMERA_PRIVATE_HH_
 
+#include <GL/gl.h>
+#include "gazebo/rendering/ogre_gazebo.h"
+
 namespace gazebo
 {
   namespace rendering
@@ -46,6 +49,31 @@ namespace gazebo
       /// \brief Flag to detect if the user changed the camera pose in the
       /// world file.
       public: bool isCameraSetInWorldFile;
+
+      public: class RenderTargetListener : public Ogre::RenderTargetListener
+      {
+        public: RenderTargetListener(Ogre::Viewport *_left,
+                    Ogre::Viewport *_right) : Ogre::RenderTargetListener(),
+        left(_left), right(_right) {}
+
+        public: virtual void preViewportUpdate(
+                    const Ogre::RenderTargetViewportEvent &_evt)
+                {
+                  if (_evt.source == this->left)
+                  {
+                    glDrawBuffer(GL_BACK_LEFT);
+                  }
+                  else
+                  {
+                    glDrawBuffer(GL_BACK_RIGHT);
+                  }
+                }
+
+        public: Ogre::Viewport *left;
+        public: Ogre::Viewport *right;
+      };
+
+      public: RenderTargetListener *renderTargetListener;
     };
   }
 }

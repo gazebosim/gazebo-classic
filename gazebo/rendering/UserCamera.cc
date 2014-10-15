@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -547,8 +546,8 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->rightViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
 
-  this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
-  this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+  // this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+  // this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
@@ -560,6 +559,11 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
   this->dataPtr->selectionBuffer = new SelectionBuffer(this->scopedUniqueName,
       this->scene->GetManager(), this->renderTarget);
+
+  this->dataPtr->renderTargetListener =
+    new UserCameraPrivate::RenderTargetListener(this->viewport,
+      this->rightViewport);
+  this->renderTarget->addListener(this->dataPtr->renderTargetListener);
 }
 
 //////////////////////////////////////////////////
@@ -684,18 +688,17 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 
     this->SetWorldPose(pose);
   }
+}
 
-  //////////////////////////////////////////////////
-  void UserCamera::SetClipDist(float _near, float _far)
+//////////////////////////////////////////////////
+void UserCamera::SetClipDist(float _near, float _far)
+{
+  Camera::SetClipDist(_near, _far);
+  if (this->camera && this->rightCamera)
   {
-    Camera::SetClipDist(_near, _far);
-
-    if (this->camera && this->rightCamera)
-    {
-      this->rightCamera->setNearClipDistance(this->camera->getNearClipDistance());
-      this->rightCamera->setFarClipDistance(this->camera->getFarClipDistance());
-      this->rightCamera->setRenderingDistance(
-          this->camera->getRenderingDistance());
-    }
+    this->rightCamera->setNearClipDistance(this->camera->getNearClipDistance());
+    this->rightCamera->setFarClipDistance(this->camera->getFarClipDistance());
+    this->rightCamera->setRenderingDistance(
+        this->camera->getRenderingDistance());
   }
 }

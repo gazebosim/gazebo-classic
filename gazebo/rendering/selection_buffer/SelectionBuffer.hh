@@ -18,10 +18,12 @@
 #define _SELECTIONBUFFER_HH_
 
 #include <string>
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
 {
+  class Entity;
   class SceneManager;
   class Camera;
   class RenderTarget;

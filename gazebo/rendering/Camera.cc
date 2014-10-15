@@ -389,7 +389,10 @@ void Camera::RenderImpl()
 {
   if (this->renderTarget)
   {
+    //this->renderTarget->_beginUpdate();
+    //this->renderTarget->_updateAutoUpdatedViewports();
     this->renderTarget->update();
+    //this->renderTarget->_endUpdate();
   }
 }
 
