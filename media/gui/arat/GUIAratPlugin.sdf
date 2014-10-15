@@ -11,31 +11,66 @@
       <colorMax>255 102 102</colorMax>
       <handSide>r</handSide>
 
-      <ThPos>155 119</ThPos>
-      <IndPos>130 45</IndPos>
-      <MidPos>91 31</MidPos>
-      <RingPos>50 46</RingPos>
-      <LittlePos>20 82</LittlePos>
+      <contacts>
+        <contact name="ThDistal">155 116</contact>
+        <contact name="IndDistal">130 46</contact>
+        <contact name="MidDistal">90 35</contact>
+        <contact name="RingDistal">50 47</contact>
+        <contact name="LittleDistal">20 83</contact>
+
+        <contact name="ThMedial">145 141</contact>
+        <contact name="IndMedial">124 81</contact>
+        <contact name="MidMedial">90 71</contact>
+        <contact name="RingMedial">55 81</contact>
+        <contact name="LittleMedial">30 109</contact>
+      </contacts>
+
 
       <taskGroup name="Grasp">
-        <task id="grasp_1" icon="file://media/gui/arat/arat_icons/grasp_1.jpg" name="Block 10cm" instructions="Pick up the 10 cm block and place it on top of the box."></task>
-        <task id="grasp_2" icon="file://media/gui/arat/arat_icons/grasp_2.jpg" name="Block 2.5cm" instructions="Pick up the 2.5 cm block and place it on top of the box."></task>
-        <task id="grasp_3" icon="file://media/gui/arat/arat_icons/grasp_3.jpg" name="Block 5cm" instructions="Pick up the 5 cm block and place it on top of the box."></task>
-        <task id="grasp_4" icon="file://media/gui/arat/arat_icons/grasp_4.jpg" name="Block 7.5cm" instructions="Pick up the 7.5 cm block and place it on top of the box."></task>
-        <task id="grasp_5" icon="file://media/gui/arat/arat_icons/grasp_5.jpg" name="Cricket ball" instructions="Pick up the cricket ball and place it on top of the box, inside of the tin lid."></task>
-        <task id="grasp_6" icon="file://media/gui/arat/arat_icons/grasp_6.jpg" name="Stone" instructions="Pick up the stone and place it on top of the box."></task>
+        <task id="grasp_1" icon="file://media/gui/arat/arat_icons/grasp_1.jpg"
+              name="Block 10cm"
+              instructions="Pick up the 10 cm block and place it on top of the box."></task>
+        <task id="grasp_2" icon="file://media/gui/arat/arat_icons/grasp_2.jpg"
+              name="Block 2.5cm"
+              instructions="Pick up the 2.5 cm block and place it on top of the box."></task>
+        <task id="grasp_3" icon="file://media/gui/arat/arat_icons/grasp_3.jpg"
+              name="Block 5cm"
+              instructions="Pick up the 5 cm block and place it on top of the box."></task>
+        <task id="grasp_4" icon="file://media/gui/arat/arat_icons/grasp_4.jpg"
+              name="Block 7.5cm"
+              instructions="Pick up the 7.5 cm block and place it on top of the box."></task>
+        <task id="grasp_5" icon="file://media/gui/arat/arat_icons/grasp_5.jpg"
+              name="Cricket ball"
+              instructions="Pick up the cricket ball and place it on top of the box, inside of the tin lid."></task>
+        <task id="grasp_6" icon="file://media/gui/arat/arat_icons/grasp_6.jpg"
+              name="Stone"
+              instructions="Pick up the stone and place it on top of the box."></task>
       </taskGroup>
 
-      <taskGroup name="Grip">
-        <task id="grip_1" icon="file://media/gui/arat/arat_icons/grip_1.jpg" name="Cups" instructions="Pour the contents of the filled cup into the empty cup."></task>
-        <task id="grip_2" icon="file://media/gui/arat/arat_icons/grip_2.jpg" name="Tube 2.25cm" instructions="Pick up the 2.25cm diameter tube and place it on the wooden peg."></task>
-        <task id="grip_3" icon="file://media/gui/arat/arat_icons/grip_3.jpg" name="Tube 1cm" instructions="Pick up the 1cm diameter tube and place it on the metal peg."></task>
-        <task id="grip_4" icon="file://media/gui/arat/arat_icons/grip_4.jpg" name="Washer" instructions="Pick up the washer and place it on the metal peg."></task>
+      <taskGroup
+              name="Grip">
+        <task id="grip_1" icon="file://media/gui/arat/arat_icons/grip_1.jpg"
+              name="Cups"
+              instructions="Pour the contents of the filled cup into the empty cup."></task>
+        <task id="grip_2" icon="file://media/gui/arat/arat_icons/grip_2.jpg"
+              name="Tube 2.25cm"
+              instructions="Pick up the 2.25cm diameter tube and place it on the wooden peg."></task>
+        <task id="grip_3" icon="file://media/gui/arat/arat_icons/grip_3.jpg"
+              name="Tube 1cm"
+              instructions="Pick up the 1cm diameter tube and place it on the metal peg."></task>
+        <task id="grip_4" icon="file://media/gui/arat/arat_icons/grip_4.jpg"
+              name="Washer"
+              instructions="Pick up the washer and place it on the metal peg."></task>
       </taskGroup>
       
-      <taskGroup name="Pinch">
-        <task id="pinch_1" icon="file://media/gui/arat/arat_icons/pinch_1.jpg" name="Ball bearing" instructions="Pick up the ball bearing and place it on top of the box, inside of the tin lid."></task>
-        <task id="pinch_2" icon="file://media/gui/arat/arat_icons/pinch_2.jpg" name="Marble" instructions="Pick up the marble and place it on top of the box, inside of the tin lid."></task>
+      <taskGroup
+              name="Pinch">
+        <task id="pinch_1" icon="file://media/gui/arat/arat_icons/pinch_1.jpg"
+              name="Ball bearing"
+              instructions="Pick up the ball bearing and place it on top of the box, inside of the tin lid."></task>
+        <task id="pinch_2" icon="file://media/gui/arat/arat_icons/pinch_2.jpg"
+              name="Marble"
+              instructions="Pick up the marble and place it on top of the box, inside of the tin lid."></task>
       </taskGroup>
 
     </plugin>

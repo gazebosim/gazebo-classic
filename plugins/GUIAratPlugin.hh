@@ -89,16 +89,12 @@ namespace gazebo
       /// \sa taskNum
       private: int maxTaskCount;
 
-
-      private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
-
       private: int handImgX;
       private: int handImgY;
 
       private: std::string handImgFilename;
       private: std::string configFilename;
 
-      //TODO: tune these values
       private: int circleSize;
       private: math::Vector2d iconSize;
       private: math::Vector3 colorMin;
@@ -135,17 +131,7 @@ namespace gazebo
                                        sdf::ElementPtr elem,
                                        common::SystemPaths* paths);
 
-      private: void OnFingerContact(ConstContactsPtr &msg, std::string);
-
-      private: void OnThumbContact(ConstContactsPtr &msg);
-
-      private: void OnIndexContact(ConstContactsPtr &msg);
-
-      private: void OnMiddleContact(ConstContactsPtr &msg);
-
-      private: void OnRingContact(ConstContactsPtr &msg);
-
-      private: void OnLittleContact(ConstContactsPtr &msg);
+      private: void OnFingerContact(ConstContactsPtr &msg);
 
       private: std::string getTopicName(std::string fingerName);
 

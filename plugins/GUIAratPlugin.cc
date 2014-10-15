@@ -56,17 +56,19 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout){
   this->handScene->addItem(handItem);
 
   // Preallocate QGraphicsItems for each contact point
-  for(int i = 0; i < 5; i++){
-    int xpos = finger_points[this->fingerNames[i]][0];
-    int ypos = finger_points[this->fingerNames[i]][1];
-    this->contactGraphicsItems[this->fingerNames[i]] =
+  for(std::map<std::string, math::Vector2d>::iterator it =
+        finger_points.begin(); it != finger_points.end(); it++){
+    std::string fingerName = it->first;
+    int xpos = finger_points[fingerName][0];
+    int ypos = finger_points[fingerName][1];
+    this->contactGraphicsItems[fingerName] =
                   new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
-    this->handScene->addItem(this->contactGraphicsItems[this->fingerNames[i]]);
+    this->handScene->addItem(this->contactGraphicsItems[fingerName]);
 
-    this->contactGraphicsItems[this->fingerNames[i]]
-                                   ->setBrush(QBrush(QColor(255, 255, 255, 0)));
-    this->contactGraphicsItems[this->fingerNames[i]]
-                                   ->setPen(QPen(QColor(153, 153, 153, 255)));
+    this->contactGraphicsItems[fingerName]
+                                 ->setBrush(QBrush(QColor(255, 255, 255, 0)));
+    this->contactGraphicsItems[fingerName]
+                                 ->setPen(QPen(QColor(153, 153, 153, 255)));
   }
 
   this->handScene->update();
@@ -194,8 +196,8 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
-  this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
-  this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
+  this->handImgFilename = paths->FindFileURI("file://media/gui/arat/handsim.png");
+  this->configFilename = paths->FindFileURI("file://media/gui/arat/GUIAratPlugin.sdf");
 
   sdf::SDF parameters;
   
@@ -205,11 +207,16 @@ GUIAratPlugin::GUIAratPlugin()
   std::string sdfString = inputStream.str();
   fileinput.close();
   
-  //Parameters for sensor contact visualization
+  // Parameters for sensor contact visualization
   parameters.SetFromString(sdfString);
-  sdf::ElementPtr elem = parameters.root->GetElement("world");
+  sdf::ElementPtr elem;
+  //assert(parameters.root->HasElement("world");
+  elem = parameters.root->GetElement("world");
+  //assert(elem->HasElement("plugin");
   elem = elem->GetElement("plugin");
+  //assert(elem->HasElement("circleSize");
   elem->GetElement("circleSize")->GetValue()->Get(circleSize);
+  //assert(elem->HasElement("forceMin");
   elem->GetElement("forceMin")->GetValue()->Get(forceMin);
   elem->GetElement("forceMax")->GetValue()->Get(forceMax);
   elem->GetElement("colorMin")->GetValue()->Get(colorMin);
@@ -223,11 +230,21 @@ GUIAratPlugin::GUIAratPlugin()
 
   elem->GetElement("iconDimensions")->GetValue()->Get(iconSize);
 
-  for(int i = 0; i < 5; i++){
-    std::string keyName = fingerNames[i]+"Pos";
-    elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
+  // Get contact names
+  if(elem->HasElement("contacts")){
+    sdf::ElementPtr contact = elem->GetElement("contacts");
+    contact = contact->GetElement("contact");
+    while(contact){
+      if(contact->HasAttribute("name")){
+        std::string contactName;
+        contact->GetAttribute("name")->Get(contactName);
+        // Get the position of the contact
+        contact->GetValue()->Get(finger_points[contactName]);
+        contact = contact->GetNextElement();
+      }
+    }
   }
-
+ 
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
@@ -251,24 +268,20 @@ GUIAratPlugin::GUIAratPlugin()
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->taskPub = this->node->Advertise<msgs::GzString>("/gazebo/arat/control");
+  this->taskPub = this->node->Advertise<msgs::GzString>("~/control");
   this->taskNum = 0;
   this->maxTaskCount = 10;
 
 
   // Set up an array of subscribers for each contact sensor
   
-  //TODO: need to change for multiple finger contacts
-  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Th"),
-                              &GUIAratPlugin::OnThumbContact, this));
-  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Ind"),
-                              &GUIAratPlugin::OnIndexContact, this));
-  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Mid"),
-                              &GUIAratPlugin::OnMiddleContact, this));
-  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Ring"),
-                              &GUIAratPlugin::OnRingContact, this));
-  contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Little"),
-                              &GUIAratPlugin::OnLittleContact, this));
+  for(std::map<std::string, math::Vector2d>::iterator it =
+        finger_points.begin(); it != finger_points.end(); it++){
+    std::string topic = this->getTopicName(it->first);
+    transport::SubscriberPtr sub = this->node->Subscribe(topic,
+                                   &GUIAratPlugin::OnFingerContact, this);
+    contactSubscribers.push_back(sub);
+  }
 
   this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
 
@@ -280,41 +293,32 @@ GUIAratPlugin::~GUIAratPlugin()
 }
 
 std::string GUIAratPlugin::getTopicName(std::string fingerName){
-  std::string topicName = this->handSide+fingerName+"Distal";
-  return "/gazebo/default/mpl/"+topicName+"/"+topicName+"_contact_sensor";
+  std::string topicName = this->handSide+fingerName;
+  return "~/mpl/"+topicName+"/"+topicName+"_contact_sensor";
 }
 
-void GUIAratPlugin::OnThumbContact(ConstContactsPtr &msg){
-  this->OnFingerContact(msg, "Th");
-}
-
-void GUIAratPlugin::OnIndexContact(ConstContactsPtr &msg){
-  this->OnFingerContact(msg, "Ind");
-}
-
-void GUIAratPlugin::OnMiddleContact(ConstContactsPtr &msg){
-  this->OnFingerContact(msg, "Mid");
-}
-
-
-void GUIAratPlugin::OnRingContact(ConstContactsPtr &msg){
-  this->OnFingerContact(msg, "Ring");
-}
-
-
-void GUIAratPlugin::OnLittleContact(ConstContactsPtr &msg){
-  this->OnFingerContact(msg, "Little");
-}
-
-
-void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg, std::string fingerName){
-  this->msgQueue.push(ContactsWrapper(msg, fingerName));
+void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
+  // Parse out the finger name
+  // Format is: mpl::r<finger name>::r<finger name>_collision
+  // start at index 6
+  if (msg->contact_size() > 0){
+    std::string rawString = msg->contact(0).collision2();
+    size_t end_idx = rawString.find("::", 6);
+    
+    std::string fingerName = rawString.substr(6, end_idx-6);
+    std::cout << "parsed finger name: " << fingerName << std::endl;
+    if(this->finger_points.find(fingerName) != this->finger_points.end()){
+      this->msgQueue.push(ContactsWrapper(msg, fingerName));
+    }
+  }
 }
 
 void GUIAratPlugin::PreRender(){
-  //Remove items from the scene
-  for(int i = 0; i < 5; i ++){
-    std::string fingerName = this->fingerNames[i];
+  // Remove items from the scene
+  for(std::map<std::string, math::Vector2d>::iterator it =
+        finger_points.begin(); it != finger_points.end(); it++){
+
+    std::string fingerName = it->first;
 
     this->contactGraphicsItems[fingerName]->setBrush(QBrush(QColor(255, 255, 255, 1)));
     this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(153, 153, 153, 255)));
