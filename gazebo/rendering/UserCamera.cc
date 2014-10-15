@@ -121,7 +121,7 @@ void UserCamera::Init()
     this->sceneNode->attachObject(this->rightCamera);
   }
 
-  this->SetHFOV(GZ_DTOR(90));
+  this->SetHFOV(GZ_DTOR(120));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -544,6 +544,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
+  // is 0.03m the stereo baseline?
   Ogre::Vector2 offset(0.03f, 0.0f);
   float focalLength = 1.0;
 
@@ -669,21 +670,30 @@ std::string UserCamera::GetViewControllerTypeString()
 //////////////////////////////////////////////////
 void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 {
+  // Scaling factor applied to rotations.
+  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+
   // This function was establish when integrating the space navigator
   // joystick.
-  if (_msg->has_translation() && _msg->has_rotation() &&
+  if ((_msg->has_translation() || _msg->has_rotation()) &&
       _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
-    // Get the joystick XYZ
-    math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
-
-    // Get the jostick RPY. We are disabling rotation around x and y.
-    math::Vector3 rot = msgs::Convert(_msg->rotation()) *
-      math::Vector3(0, 0.01, 0.05);
-
     math::Pose pose = this->GetWorldPose();
-    pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
-    pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+
+    // Get the joystick XYZ
+    if (_msg->has_translation())
+    {
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    }
+
+    // Get the jostick RPY. We are disabling rotation around x.
+    if (_msg->has_rotation())
+    {
+      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    }
+
     this->SetWorldPose(pose);
   }
 }

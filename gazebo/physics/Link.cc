@@ -1332,6 +1332,3 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 
   return result;
 }
-
-
-
