@@ -37,6 +37,23 @@ namespace gazebo
       public: ContactsWrapper(ConstContactsPtr m, std::string n) : msg(m), name(n){}
     };
 
+    class QTaskButton : public QToolButton
+    {
+      Q_OBJECT
+      public: QTaskButton();
+
+      public: void SetTaskId(std::string task_id);
+      public: void SetTaskInstructionsDocument(QTextDocument* instr);
+      public: void SetIndex(int i);
+
+      public slots: void OnButton();
+
+      private: std::string id;
+      private: QTextDocument* instructions;
+      private: int index; //The canonical index at which this task is stored
+
+      signals: void SendTask(std::string id, QTextDocument* instructions, int index);
+    };
 
     class GUIAratPlugin : public gazebo::GUIPlugin
     {
@@ -72,7 +89,6 @@ namespace gazebo
       /// \sa taskNum
       private: int maxTaskCount;
 
-      private: QGraphicsScene *handScene;
 
       private: const std::string fingerNames[5] = {"Th", "Ind", "Mid", "Ring", "Little"};
 
@@ -96,9 +112,28 @@ namespace gazebo
 
       private: std::map<std::string, math::Vector2d > finger_points;
 
-      private: std::map<std::string, QGraphicsEllipseItem*> contactGraphicsItems;
+      private: std::map<std::string, QGraphicsEllipseItem*>
+                                                      contactGraphicsItems;
+
+      private: std::vector<QTextDocument*> instructionsList;
 
       private: QTextEdit* instructionsView;
+
+      private: QGraphicsScene *handScene;
+
+      private: std::vector<event::ConnectionPtr> connections;
+
+      private: std::queue<ContactsWrapper> msgQueue;
+  
+      private: std::vector<std::string> taskList;
+
+      private: int currentTaskIndex;
+
+      private: void InitializeHandView(QLayout* mainLayout);
+
+      private: void InitializeTaskView(QLayout* mainLayout,
+                                       sdf::ElementPtr elem,
+                                       common::SystemPaths* paths);
 
       private: void OnFingerContact(ConstContactsPtr &msg, std::string);
 
@@ -114,36 +149,9 @@ namespace gazebo
 
       private: std::string getTopicName(std::string fingerName);
 
-      private: boost::mutex contactLock;
-
-      private: std::vector<event::ConnectionPtr> connections;
-
-      private: std::queue<ContactsWrapper> msgQueue;
-  
-      private: std::vector<std::string> taskList;
-      private: std::vector<QTextDocument*> instructionsList;
-      private: int currentTaskIndex;
-
       private: void PreRender();
 
     };
 
-    class QTaskButton : public QToolButton
-    {
-      Q_OBJECT
-      public: QTaskButton();
-
-      public: void SetTaskId(std::string task_id);
-      public: void SetTaskInstructionsDocument(QTextDocument* instr);
-      public: void SetIndex(int i);
-
-      public slots: void OnButton();
-
-      private: std::string id;
-      private: QTextDocument* instructions;
-      private: int index; //The canonical index at which this task is stored
-
-      signals: void SendTask(std::string id, QTextDocument* instructions, int index);
-    };
 }
 #endif

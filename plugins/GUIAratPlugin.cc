@@ -42,55 +42,7 @@ void QTaskButton::OnButton(){
   emit SendTask(this->id, this->instructions, this->index);
 }
 
-
-/////////////////////////////////////////////////
-GUIAratPlugin::GUIAratPlugin()
-  : GUIPlugin()
-{
-
-  // Read parameters
-  common::SystemPaths* paths = common::SystemPaths::Instance();
-  this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
-  this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
-
-  sdf::SDF parameters;
-  
-  std::ifstream fileinput(this->configFilename.c_str());
-  std::stringstream inputStream;
-  inputStream << fileinput.rdbuf();
-  std::string sdfString = inputStream.str();
-  fileinput.close();
-  
-  //Parameters for sensor contact visualization
-  parameters.SetFromString(sdfString);
-  sdf::ElementPtr elem = parameters.root->GetElement("world");
-  elem = elem->GetElement("plugin");
-  elem->GetElement("circleSize")->GetValue()->Get(circleSize);
-  elem->GetElement("forceMin")->GetValue()->Get(forceMin);
-  elem->GetElement("forceMax")->GetValue()->Get(forceMax);
-  elem->GetElement("colorMin")->GetValue()->Get(colorMin);
-  elem->GetElement("colorMax")->GetValue()->Get(colorMax);
-  elem->GetElement("handSide")->GetValue()->Get(handSide);
-
-  math::Vector2d handImgDims;
-  elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
-  handImgX = handImgDims[0];
-  handImgY = handImgDims[1];
-
-  elem->GetElement("iconDimensions")->GetValue()->Get(iconSize);
-
-  for(int i = 0; i < 5; i++){
-    std::string keyName = fingerNames[i]+"Pos";
-    elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
-  }
-
-
-  // Set the frame background and foreground colors
-  this->setStyleSheet(
-      "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
-
-  // Create the main layout
-  QVBoxLayout *mainLayout = new QVBoxLayout;
+void GUIAratPlugin::InitializeHandView(QLayout* mainLayout){
 
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
@@ -101,26 +53,34 @@ GUIAratPlugin::GUIAratPlugin()
   QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(*handImg);
 
   // Draw the hand on the canvas
-  handScene->addItem(handItem);
+  this->handScene->addItem(handItem);
 
   // Preallocate QGraphicsItems for each contact point
   for(int i = 0; i < 5; i++){
-    int xpos = finger_points[fingerNames[i]][0];
-    int ypos = finger_points[fingerNames[i]][1];
-    this->contactGraphicsItems[fingerNames[i]] = new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
-    this->handScene->addItem(this->contactGraphicsItems[fingerNames[i]]);
+    int xpos = finger_points[this->fingerNames[i]][0];
+    int ypos = finger_points[this->fingerNames[i]][1];
+    this->contactGraphicsItems[this->fingerNames[i]] =
+                  new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
+    this->handScene->addItem(this->contactGraphicsItems[this->fingerNames[i]]);
 
-    this->contactGraphicsItems[fingerNames[i]]->setBrush(QBrush(QColor(255, 255, 255, 0)));
-    this->contactGraphicsItems[fingerNames[i]]->setPen(QPen(QColor(153, 153, 153, 255)));
+    this->contactGraphicsItems[this->fingerNames[i]]
+                                   ->setBrush(QBrush(QColor(255, 255, 255, 0)));
+    this->contactGraphicsItems[this->fingerNames[i]]
+                                   ->setPen(QPen(QColor(153, 153, 153, 255)));
   }
 
-  handScene->update();
+  this->handScene->update();
   handView->show();
 
   // Add the frame to the main layout
-  handView->setMaximumSize(handImgX+10, handImgY+10);
+  handView->setMaximumSize(this->handImgX+10, this->handImgY+10);
   mainLayout->addWidget(handView);
 
+}
+
+void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
+                                       sdf::ElementPtr elem,
+                                       common::SystemPaths* paths){
   QVBoxLayout *taskLayout = new QVBoxLayout();
   taskLayout->setContentsMargins(0, 0, 0, 0);
   
@@ -207,11 +167,13 @@ GUIAratPlugin::GUIAratPlugin()
   QHBoxLayout* cycleButtonLayout = new QHBoxLayout();
   QToolButton *resetButton = new QToolButton();
   resetButton->setText(QString("Reset Test"));
+  resetButton->setStyleSheet("border:1px solid #ffffff");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(OnResetClicked()));
   cycleButtonLayout->addWidget(resetButton);
   resetButton->setMaximumWidth(handImgX/2);
   QToolButton *nextButton = new QToolButton();
   nextButton->setText(QString("Next Test"));
+  nextButton->setStyleSheet("border:1px solid #ffffff");
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
   cycleButtonLayout->addWidget(nextButton);
   nextButton->setMaximumWidth(handImgX/2);
@@ -223,6 +185,60 @@ GUIAratPlugin::GUIAratPlugin()
 
   mainLayout->addWidget(taskFrame);
 	
+}
+
+/////////////////////////////////////////////////
+GUIAratPlugin::GUIAratPlugin()
+  : GUIPlugin()
+{
+
+  // Read parameters
+  common::SystemPaths* paths = common::SystemPaths::Instance();
+  this->handImgFilename = paths->FindFileURI("file://media/gui/etc/handsim.png");
+  this->configFilename = paths->FindFileURI("file://media/gui/etc/GUIAratPlugin.sdf");
+
+  sdf::SDF parameters;
+  
+  std::ifstream fileinput(this->configFilename.c_str());
+  std::stringstream inputStream;
+  inputStream << fileinput.rdbuf();
+  std::string sdfString = inputStream.str();
+  fileinput.close();
+  
+  //Parameters for sensor contact visualization
+  parameters.SetFromString(sdfString);
+  sdf::ElementPtr elem = parameters.root->GetElement("world");
+  elem = elem->GetElement("plugin");
+  elem->GetElement("circleSize")->GetValue()->Get(circleSize);
+  elem->GetElement("forceMin")->GetValue()->Get(forceMin);
+  elem->GetElement("forceMax")->GetValue()->Get(forceMax);
+  elem->GetElement("colorMin")->GetValue()->Get(colorMin);
+  elem->GetElement("colorMax")->GetValue()->Get(colorMax);
+  elem->GetElement("handSide")->GetValue()->Get(handSide);
+
+  math::Vector2d handImgDims;
+  elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
+  handImgX = handImgDims[0];
+  handImgY = handImgDims[1];
+
+  elem->GetElement("iconDimensions")->GetValue()->Get(iconSize);
+
+  for(int i = 0; i < 5; i++){
+    std::string keyName = fingerNames[i]+"Pos";
+    elem->GetElement(keyName)->GetValue()->Get(finger_points[fingerNames[i]]);
+  }
+
+
+  // Set the frame background and foreground colors
+  this->setStyleSheet(
+      "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+
+  // Create the main layout
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+
+  this->InitializeHandView(mainLayout);
+
+  this->InitializeTaskView(mainLayout, elem, paths);
 
   // Remove margins to reduce space
   mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -230,7 +246,7 @@ GUIAratPlugin::GUIAratPlugin()
   this->setLayout(mainLayout);
 
   // Position and resize this widget
-  this->setMaximumWidth(handImgX+10);
+  this->setMaximumWidth(this->handImgX+10);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
@@ -242,6 +258,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Set up an array of subscribers for each contact sensor
   
+  //TODO: need to change for multiple finger contacts
   contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Th"),
                               &GUIAratPlugin::OnThumbContact, this));
   contactSubscribers.push_back(this->node->Subscribe(this->getTopicName("Ind"),
@@ -301,12 +318,8 @@ void GUIAratPlugin::PreRender(){
 
     this->contactGraphicsItems[fingerName]->setBrush(QBrush(QColor(255, 255, 255, 1)));
     this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(153, 153, 153, 255)));
-    /*if(this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
-      this->handScene->removeItem(this->contactGraphicsItems[fingerName]);
-    }*/
-  }
 
-  //TODO: position offset, multiple contacts
+  }
 
   //Clear queued messages and draw them
   while( !this->msgQueue.empty()){
@@ -335,10 +348,7 @@ void GUIAratPlugin::PreRender(){
       
       this->contactGraphicsItems[fingerName]->setBrush(color);
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
-      // Draw on the corresponding spot
-      /*if(!this->handScene->items().contains(this->contactGraphicsItems[fingerName])){
-        this->handScene->addItem(this->contactGraphicsItems[fingerName]);
-      }*/
+
     }
 
   }
