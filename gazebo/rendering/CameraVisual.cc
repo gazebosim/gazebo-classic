@@ -47,7 +47,6 @@ CameraVisual::~CameraVisual()
 }
 
 /////////////////////////////////////////////////
-//void CameraVisual::Load(unsigned int _width, unsigned int _height)
 void CameraVisual::Load(const msgs::CameraSensor &_msg)
 {
   CameraVisualPrivate *dPtr =
@@ -61,7 +60,6 @@ void CameraVisual::Load(const msgs::CameraSensor &_msg)
 
   dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
 
-  //msgs::DistortionToSDF
   sdf::ElementPtr cameraElem = msgs::CameraSensorToSDF(_msg);
   dPtr->camera->Load(cameraElem);
   dPtr->camera->Init();

@@ -1954,14 +1954,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         parentVis->AttachVisual(cameraVis);
 
         cameraVis->SetPose(msgs::Convert(_msg->pose()));
-
         cameraVis->SetId(_msg->id());
-
-        //cameraVis->Load(_msg->camera().image_size().x(),
-        //    _msg->camera().image_size().y());
-
         cameraVis->Load(_msg->camera());
-
         this->visuals[cameraVis->GetId()] = cameraVis;
       }
     }
