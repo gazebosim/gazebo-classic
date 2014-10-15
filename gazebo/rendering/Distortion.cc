@@ -58,7 +58,7 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->p2 = this->sdf->Get<double>("p2");
   this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
 
-  if (this->dataPtr->k1 > 0)
+  if (this->dataPtr->k1 >= 0)
   {
     gzerr << "Pincushion model is currently not supported."
       << " Please use a negative k1 coefficient for barrel distortion"
@@ -75,7 +75,7 @@ void Distortion::SetCamera(CameraPtr _camera)
     return;
   }
 
-  if (this->dataPtr->k1 > 0)
+  if (this->dataPtr->k1 >= 0)
   {
     gzerr << "Currently only Barrel Distortion is supported. "
         << "Distortion will not be applied." << std::endl;
