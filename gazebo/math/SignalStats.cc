@@ -15,6 +15,7 @@
  *
 */
 #include <cmath>
+#include <iostream>
 #include <boost/algorithm/string.hpp>
 #include "gazebo/math/SignalStatsPrivate.hh"
 #include "gazebo/math/SignalStats.hh"
