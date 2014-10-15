@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 #define _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 
-#include <vector>
 #include "gazebo/math/SignalStats.hh"
 
 namespace gazebo
