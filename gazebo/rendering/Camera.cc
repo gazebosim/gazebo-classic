@@ -1685,3 +1685,9 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
   boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
 }
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::GetDistortion()
+{
+  return this->dataPtr->distortion;
+}

@@ -497,6 +497,10 @@ namespace gazebo
       /// \return Path to saved screenshots.
       public: std::string GetScreenshotPath() const;
 
+      /// \brief Get the distortion model of this camera.
+      /// \return Distortion model.
+      public: DistortionPtr GetDistortion();
+
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();
 

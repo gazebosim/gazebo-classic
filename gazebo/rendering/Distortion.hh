@@ -57,6 +57,30 @@ namespace gazebo
       /// \param[in] _crop True to crop the black border
       public: void SetCrop(bool _crop);
 
+      /// \brief Get the radial distortion coefficient k1.
+      /// \return Distortion coefficient k1.
+      public: double GetK1();
+
+      /// \brief Get the radial distortion coefficient k2.
+      /// \return Distortion coefficient k2.
+      public: double GetK2();
+
+      /// \brief Get the radial distortion coefficient k3.
+      /// \return Distortion coefficient k3.
+      public: double GetK3();
+
+      /// \brief Get the tangential distortion coefficient p1.
+      /// \return Distortion coefficient p1.
+      public: double GetP1();
+
+      /// \brief Get the tangential distortion coefficient p2.
+      /// \return Distortion coefficient p2.
+      public: double GetP2();
+
+      /// \brief Get the distortion center.
+      /// \return Distortion center.
+      public: math::Vector2d GetCenter();
+
       /// \brief Apply distortion model
       /// \param[in] _in Input uv coordinate.
       /// \param[in] _center Normalized distortion center.

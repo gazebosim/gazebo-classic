@@ -255,7 +255,7 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
     const math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
-  // apply distortion, see
+  // apply Brown's distortion model, see
   // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
 
   math::Vector2d normalized2d = _in - _center;
@@ -283,4 +283,40 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
 void Distortion::SetCrop(bool _crop)
 {
   this->dataPtr->distortionCrop = _crop;
+}
+
+//////////////////////////////////////////////////
+double Distortion::GetK1()
+{
+  return this->dataPtr->k1;
+}
+
+//////////////////////////////////////////////////
+double Distortion::GetK2()
+{
+  return this->dataPtr->k2;
+}
+
+//////////////////////////////////////////////////
+double Distortion::GetK3()
+{
+  return this->dataPtr->k3;
+}
+
+//////////////////////////////////////////////////
+double Distortion::GetP1()
+{
+  return this->dataPtr->p1;
+}
+
+//////////////////////////////////////////////////
+double Distortion::GetP2()
+{
+  return this->dataPtr->p2;
+}
+
+//////////////////////////////////////////////////
+math::Vector2d Distortion::GetCenter()
+{
+  return this->dataPtr->lensCenter;
 }
