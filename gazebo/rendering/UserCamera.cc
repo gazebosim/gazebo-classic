@@ -558,8 +558,10 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->rightViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
 
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
   this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
   this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+#endif
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
   this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
