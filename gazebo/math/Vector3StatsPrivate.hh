@@ -18,7 +18,6 @@
 #define _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 
 #include <vector>
-#include <boost/shared_ptr.hpp>
 #include "gazebo/math/SignalStats.hh"
 
 namespace gazebo
