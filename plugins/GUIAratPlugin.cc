@@ -16,6 +16,9 @@
 */
 
 #include <sstream>
+#include <gazebo/gui/GuiIface.hh>
+#include <gazebo/rendering/UserCamera.hh>
+#include <gazebo/rendering/FPSViewController.hh>
 #include "GUIAratPlugin.hh"
 
 using namespace gazebo;
@@ -291,12 +294,25 @@ GUIAratPlugin::GUIAratPlugin()
 
   this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
 
+  gui::get_active_camera()->SetViewController(
+                                rendering::FPSViewController::GetTypeString());
 }
 
 /////////////////////////////////////////////////
 GUIAratPlugin::~GUIAratPlugin()
 {
 }
+
+/*void GUIAratPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
+{
+  _visual->GetScene()->GetUserCamera(0)->SetViewController(
+                                rendering::FPSViewController::GetTypeString());
+}
+
+void GUIAratPlugin::Init()
+{
+
+}*/
 
 std::string GUIAratPlugin::getTopicName(const std::string& fingerName)
 {

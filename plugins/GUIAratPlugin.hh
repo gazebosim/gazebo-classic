@@ -68,6 +68,12 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GUIAratPlugin();
 
+      //public: void Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf);
+
+      //public: void Init();
+
+      //public: void Reset();
+
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
       protected slots: void OnTaskSent(const std::string &id,
