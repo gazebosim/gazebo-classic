@@ -277,10 +277,10 @@ math::Vector2d Distortion::Distort(const math::Vector2d &_in,
       _k3 * rSq * rSq * rSq);
 
   // tangential
-  dist.x += _p1 * (rSq + 2 * (normalized.x*normalized.x)) +
-      2 * _p2 * normalized.x * normalized.y;
-  dist.y += _p2 * (rSq + 2 * (normalized.y*normalized.y)) +
+  dist.x += _p2 * (rSq + 2 * (normalized.x*normalized.x)) +
       2 * _p1 * normalized.x * normalized.y;
+  dist.y += _p1 * (rSq + 2 * (normalized.y*normalized.y)) +
+      2 * _p2 * normalized.x * normalized.y;
   math::Vector2d out = _center + math::Vector2d(dist.x, dist.y);
 
   return out;
