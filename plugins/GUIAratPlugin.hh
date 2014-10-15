@@ -17,15 +17,14 @@
 #ifndef _GUI_ARAT_PLUGIN_HH_
 #define _GUI_ARAT_PLUGIN_HH_
 
-#include <gazebo/common/Plugin.hh>
-#include <gazebo/gui/GuiPlugin.hh>
-#include <gazebo/transport/transport.hh>
-#include <gazebo/gui/gui.hh>
-#include <gazebo/msgs/msgs.hh>
-#include "gazebo/common/Events.hh"
-#include "gazebo/math/gzmath.hh"
-
 #include <queue>
+#include "gazebo/common/Events.hh"
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/GuiPlugin.hh>
+#include "gazebo/math/gzmath.hh"
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/transport/transport.hh>
 
 namespace gazebo
 {
@@ -34,7 +33,7 @@ namespace gazebo
     {
       public: ConstContactsPtr msg;
       public: std::string name;
-      public: ContactsWrapper(ConstContactsPtr m, std::string n) : msg(m), name(n){}
+      public: ContactsWrapper(ConstContactsPtr m, const std::string &n) : msg(m), name(n){}
     };
 
     class QTaskButton : public QToolButton
@@ -42,17 +41,20 @@ namespace gazebo
       Q_OBJECT
       public: QTaskButton();
 
-      public: void SetTaskId(std::string task_id);
+      public: void SetTaskId(const std::string &task_id);
       public: void SetTaskInstructionsDocument(QTextDocument* instr);
-      public: void SetIndex(int i);
+      public: void SetIndex(const int i);
 
       public slots: void OnButton();
 
       private: std::string id;
       private: QTextDocument* instructions;
-      private: int index; //The canonical index at which this task is stored
 
-      signals: void SendTask(std::string id, QTextDocument* instructions, int index);
+      // The canonical index at which this task is stored
+      private: int index;
+
+      signals: void SendTask(const std::string &id,
+                             QTextDocument* instructions, const int index);
     };
 
     class GUIAratPlugin : public gazebo::GUIPlugin
@@ -68,10 +70,12 @@ namespace gazebo
 
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
-      protected slots: void OnTaskSent(std::string id, QTextDocument* instructions, int index);
+      protected slots: void OnTaskSent(const std::string &id,
+                                       QTextDocument* instructions,
+                                       const int index);
       protected slots: void OnResetClicked(); 
       protected slots: void OnNextClicked(); 
-      private: void PublishTaskMessage(std::string task_name); 
+      private: void PublishTaskMessage(const std::string &task_name); 
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
@@ -80,14 +84,11 @@ namespace gazebo
       private: gazebo::transport::PublisherPtr taskPub;
 
       /// \brief Subscriber to finger contact sensors.
-      private: gazebo::transport::SubscriberPtr contactSub;
+      private: std::vector<transport::SubscriberPtr> contactSubscribers;
 
-      /// \brief Number of the current task.
-      private: int taskNum;
 
       /// \brief Maximum number tasks.
       /// \sa taskNum
-      private: int maxTaskCount;
 
       private: int handImgX;
       private: int handImgY;
@@ -104,12 +105,10 @@ namespace gazebo
 
       private: std::string handSide;
       
-      private: std::vector<transport::SubscriberPtr> contactSubscribers;
-
-      private: std::map<std::string, math::Vector2d > finger_points;
+      private: std::map<std::string, math::Vector2d > contactPoints;
 
       private: std::map<std::string, QGraphicsEllipseItem*>
-                                                      contactGraphicsItems;
+                                                contactGraphicsItems;
 
       private: std::vector<QTextDocument*> instructionsList;
 
@@ -123,6 +122,7 @@ namespace gazebo
   
       private: std::vector<std::string> taskList;
 
+      /// \brief Number of the current task.
       private: int currentTaskIndex;
 
       private: void InitializeHandView(QLayout* mainLayout);
@@ -133,7 +133,7 @@ namespace gazebo
 
       private: void OnFingerContact(ConstContactsPtr &msg);
 
-      private: std::string getTopicName(std::string fingerName);
+      private: std::string getTopicName(const std::string& fingerName);
 
       private: void PreRender();
 

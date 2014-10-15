@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #include <sstream>
 #include "GUIAratPlugin.hh"
 
@@ -22,34 +23,40 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 
-QTaskButton::QTaskButton(){
+QTaskButton::QTaskButton()
+{
   connect(this, SIGNAL(clicked()), this, SLOT(OnButton()));
 }
 
-void QTaskButton::SetTaskId(std::string task_id){
+void QTaskButton::SetTaskId(const std::string& task_id)
+{
   this->id = task_id;
 }
 
-void QTaskButton::SetTaskInstructionsDocument(QTextDocument* instr){
+void QTaskButton::SetTaskInstructionsDocument(QTextDocument* instr)
+{
   this->instructions = instr;
 }
 
-void QTaskButton::SetIndex(int i){
+void QTaskButton::SetIndex(const int i)
+{
   this->index = i;
 }
 
-void QTaskButton::OnButton(){
+void QTaskButton::OnButton()
+{
   emit SendTask(this->id, this->instructions, this->index);
 }
 
-void GUIAratPlugin::InitializeHandView(QLayout* mainLayout){
-
+void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
+{
   // Create a QGraphicsView to draw the finger force contacts
-  this->handScene = new QGraphicsScene(QRectF(0, 0, handImgX, handImgY));
-  QGraphicsView *handView = new QGraphicsView(handScene);
+  this->handScene = new QGraphicsScene(QRectF(0, 0, this->handImgX,
+                                                    this->handImgY));
+  QGraphicsView *handView = new QGraphicsView(this->handScene);
 
   // Load the hand image
-  QPixmap* handImg = new QPixmap(QString(handImgFilename.c_str()));
+  QPixmap* handImg = new QPixmap(QString(this->handImgFilename.c_str()));
   QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(*handImg);
 
   // Draw the hand on the canvas
@@ -57,12 +64,14 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout){
 
   // Preallocate QGraphicsItems for each contact point
   for(std::map<std::string, math::Vector2d>::iterator it =
-        finger_points.begin(); it != finger_points.end(); it++){
+        this->contactPoints.begin(); it != this->contactPoints.end(); it++)
+  {
     std::string fingerName = it->first;
-    int xpos = finger_points[fingerName][0];
-    int ypos = finger_points[fingerName][1];
+    int xpos = this->contactPoints[fingerName][0];
+    int ypos = this->contactPoints[fingerName][1];
     this->contactGraphicsItems[fingerName] =
-                  new QGraphicsEllipseItem(xpos, ypos, circleSize, circleSize);
+                  new QGraphicsEllipseItem(xpos, ypos,
+                                           this->circleSize, this->circleSize);
     this->handScene->addItem(this->contactGraphicsItems[fingerName]);
 
     this->contactGraphicsItems[fingerName]
@@ -77,34 +86,32 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout){
   // Add the frame to the main layout
   handView->setMaximumSize(this->handImgX+10, this->handImgY+10);
   mainLayout->addWidget(handView);
-
 }
 
 void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
                                        sdf::ElementPtr elem,
-                                       common::SystemPaths* paths){
+                                       common::SystemPaths* paths)
+{
   QVBoxLayout *taskLayout = new QVBoxLayout();
   taskLayout->setContentsMargins(0, 0, 0, 0);
   
   QTabWidget *tabWidget = new QTabWidget();
   
   // Populate the tabWidget by parsing out SDF
-  instructionsView = new QTextEdit();
-  instructionsView->setReadOnly(true);
-  instructionsView->setMaximumHeight(handImgY/3);
+  this->instructionsView = new QTextEdit();
+  this->instructionsView->setReadOnly(true);
+  this->instructionsView->setMaximumHeight(handImgY/3);
    
   sdf::ElementPtr taskGroup = elem->GetElement("taskGroup");
   while(taskGroup){
     std::string taskGroupName;
     taskGroup->GetAttribute("name")->Get(taskGroupName);
-    // Create a QWidget for the task group
-    // Insert this widget into the tabWidget
+
     QGroupBox *buttonGroup = new QGroupBox();
     QGridLayout *buttonLayout = new QGridLayout();
     
-    sdf::ElementPtr task = taskGroup->GetElement("task");
     int i = 0;
-
+    sdf::ElementPtr task = taskGroup->GetElement("task");
     while(task){
       std::string id;
       std::string name;
@@ -117,16 +124,16 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
 
       QTaskButton *taskButton = new QTaskButton();
       taskButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-      taskButton->setMaximumWidth(handImgX/3);
-      taskButton->setMaximumHeight(handImgX/3);
-      taskButton->resize(handImgX/3, handImgY/3);
+      taskButton->setMaximumWidth(this->handImgX/3);
+      taskButton->setMaximumHeight(this->handImgX/3);
+      taskButton->resize(this->handImgX/3, this->handImgY/3);
       taskButton->setText(QString(name.c_str()));
       taskButton->SetTaskId(id);
       QTextDocument* instructionsDocument = new QTextDocument(QString(instructions.c_str()));
       taskButton->SetTaskInstructionsDocument(instructionsDocument);
       taskButton->SetIndex(taskList.size());
 
-      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*, int)), this, SLOT(OnTaskSent(std::string, QTextDocument*, int)));
+      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*, int)), this, SLOT(OnTaskSent(const std::string&, QTextDocument*, const int)));
 
       int col = i%3;
       int row = i/3;
@@ -159,7 +166,7 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
     taskGroup = taskGroup->GetNextElement();
   }
 
-  currentTaskIndex = 0;
+  this->currentTaskIndex = 0;
 
   QFrame *taskFrame = new QFrame();
   tabWidget->setContentsMargins(0, 0, 0, 0);
@@ -172,13 +179,15 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   resetButton->setStyleSheet("border:1px solid #ffffff");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(OnResetClicked()));
   cycleButtonLayout->addWidget(resetButton);
-  resetButton->setMaximumWidth(handImgX/2);
+  resetButton->setMaximumWidth(this->handImgX/2);
+
   QToolButton *nextButton = new QToolButton();
   nextButton->setText(QString("Next Test"));
   nextButton->setStyleSheet("border:1px solid #ffffff");
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
   cycleButtonLayout->addWidget(nextButton);
-  nextButton->setMaximumWidth(handImgX/2);
+  nextButton->setMaximumWidth(this->handImgX/2);
+
   QFrame* cycleButtonFrame = new QFrame;
   cycleButtonFrame->setLayout(cycleButtonLayout);
   taskLayout->addWidget(cycleButtonFrame);
@@ -186,7 +195,6 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
-	
 }
 
 /////////////////////////////////////////////////
@@ -196,10 +204,11 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
-  this->handImgFilename = paths->FindFileURI("file://media/gui/arat/handsim.png");
-  this->configFilename = paths->FindFileURI("file://media/gui/arat/GUIAratPlugin.sdf");
+  this->handImgFilename = paths->FindFileURI
+                                  ("file://media/gui/arat/handsim.png");
+  this->configFilename = paths->FindFileURI
+                                  ("file://media/gui/arat/GUIAratPlugin.sdf");
 
-  sdf::SDF parameters;
   
   std::ifstream fileinput(this->configFilename.c_str());
   std::stringstream inputStream;
@@ -208,6 +217,7 @@ GUIAratPlugin::GUIAratPlugin()
   fileinput.close();
   
   // Parameters for sensor contact visualization
+  sdf::SDF parameters;
   parameters.SetFromString(sdfString);
   sdf::ElementPtr elem;
   //assert(parameters.root->HasElement("world");
@@ -215,20 +225,20 @@ GUIAratPlugin::GUIAratPlugin()
   //assert(elem->HasElement("plugin");
   elem = elem->GetElement("plugin");
   //assert(elem->HasElement("circleSize");
-  elem->GetElement("circleSize")->GetValue()->Get(circleSize);
+  elem->GetElement("circleSize")->GetValue()->Get(this->circleSize);
   //assert(elem->HasElement("forceMin");
-  elem->GetElement("forceMin")->GetValue()->Get(forceMin);
-  elem->GetElement("forceMax")->GetValue()->Get(forceMax);
-  elem->GetElement("colorMin")->GetValue()->Get(colorMin);
-  elem->GetElement("colorMax")->GetValue()->Get(colorMax);
-  elem->GetElement("handSide")->GetValue()->Get(handSide);
+  elem->GetElement("forceMin")->GetValue()->Get(this->forceMin);
+  elem->GetElement("forceMax")->GetValue()->Get(this->forceMax);
+  elem->GetElement("colorMin")->GetValue()->Get(this->colorMin);
+  elem->GetElement("colorMax")->GetValue()->Get(this->colorMax);
+  elem->GetElement("handSide")->GetValue()->Get(this->handSide);
 
   math::Vector2d handImgDims;
   elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
-  handImgX = handImgDims[0];
-  handImgY = handImgDims[1];
+  this->handImgX = handImgDims[0];
+  this->handImgY = handImgDims[1];
 
-  elem->GetElement("iconDimensions")->GetValue()->Get(iconSize);
+  elem->GetElement("iconDimensions")->GetValue()->Get(this->iconSize);
 
   // Get contact names
   if(elem->HasElement("contacts")){
@@ -239,12 +249,11 @@ GUIAratPlugin::GUIAratPlugin()
         std::string contactName;
         contact->GetAttribute("name")->Get(contactName);
         // Get the position of the contact
-        contact->GetValue()->Get(finger_points[contactName]);
+        contact->GetValue()->Get(this->contactPoints[contactName]);
         contact = contact->GetNextElement();
       }
     }
   }
- 
 
   // Set the frame background and foreground colors
   this->setStyleSheet(
@@ -269,18 +278,15 @@ GUIAratPlugin::GUIAratPlugin()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->taskPub = this->node->Advertise<msgs::GzString>("~/control");
-  this->taskNum = 0;
-  this->maxTaskCount = 10;
-
 
   // Set up an array of subscribers for each contact sensor
-  
   for(std::map<std::string, math::Vector2d>::iterator it =
-        finger_points.begin(); it != finger_points.end(); it++){
+        this->contactPoints.begin(); it != this->contactPoints.end(); it++)
+  {
     std::string topic = this->getTopicName(it->first);
     transport::SubscriberPtr sub = this->node->Subscribe(topic,
                                    &GUIAratPlugin::OnFingerContact, this);
-    contactSubscribers.push_back(sub);
+    this->contactSubscribers.push_back(sub);
   }
 
   this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
@@ -292,7 +298,8 @@ GUIAratPlugin::~GUIAratPlugin()
 {
 }
 
-std::string GUIAratPlugin::getTopicName(std::string fingerName){
+std::string GUIAratPlugin::getTopicName(const std::string& fingerName)
+{
   std::string topicName = this->handSide+fingerName;
   return "~/mpl/"+topicName+"/"+topicName+"_contact_sensor";
 }
@@ -301,67 +308,74 @@ void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
   // Parse out the finger name
   // Format is: mpl::r<finger name>::r<finger name>_collision
   // start at index 6
-  if (msg->contact_size() > 0){
+  if (msg->contact_size() > 0)
+  {
     std::string rawString = msg->contact(0).collision2();
     size_t end_idx = rawString.find("::", 6);
     
     std::string fingerName = rawString.substr(6, end_idx-6);
-    std::cout << "parsed finger name: " << fingerName << std::endl;
-    if(this->finger_points.find(fingerName) != this->finger_points.end()){
+    if(this->contactPoints.find(fingerName) != this->contactPoints.end())
+    {
       this->msgQueue.push(ContactsWrapper(msg, fingerName));
     }
   }
 }
 
-void GUIAratPlugin::PreRender(){
-  // Remove items from the scene
+void GUIAratPlugin::PreRender()
+{
+  // Draw the contacts as empty gray circles
   for(std::map<std::string, math::Vector2d>::iterator it =
-        finger_points.begin(); it != finger_points.end(); it++){
-
+        this->contactPoints.begin(); it != this->contactPoints.end(); it++)
+  {
     std::string fingerName = it->first;
 
-    this->contactGraphicsItems[fingerName]->setBrush(QBrush(QColor(255, 255, 255, 1)));
-    this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(153, 153, 153, 255)));
-
+    this->contactGraphicsItems[fingerName]->
+                                    setBrush(QBrush(QColor(255, 255, 255, 1)));
+    this->contactGraphicsItems[fingerName]->
+                                    setPen(QPen(QColor(153, 153, 153, 255)));
   }
 
   //Clear queued messages and draw them
-  while( !this->msgQueue.empty()){
-    ContactsWrapper wrapper = msgQueue.front();
+  while(!this->msgQueue.empty())
+  {
+    ContactsWrapper wrapper = this->msgQueue.front();
     ConstContactsPtr msg = wrapper.msg;
     std::string fingerName = wrapper.name;
-    msgQueue.pop();
+    this->msgQueue.pop();
     int numContacts = msg->contact_size();
     if(numContacts > 0){
       // Calculate contact force
-      msgs::Vector3d forceVector = msg->contact(0).wrench(0).body_1_wrench().force();
-      float f = math::Vector3(forceVector.x(), forceVector.y(), forceVector.z()).GetLength();
-      float colorArray[3];
+      msgs::Vector3d forceVector = msg->contact(0).wrench(0).
+                                                  body_1_wrench().force();
+      float f = math::Vector3(forceVector.x(), forceVector.y(),
+                                              forceVector.z()).GetLength();
       float forceRange = this->forceMax - this->forceMin;
-      for(int i = 0; i < 3; i++){
-        float colorRange = this->colorMax[i] - this->colorMin[i];
-        colorArray[i] = colorRange/forceRange*f + colorMin[i];
-        if(colorArray[i] > colorMin[i]){
-          colorArray[i] = colorMin[i];
-        } else if (colorArray[i] < colorMax[i]){
 
-          colorArray[i] = colorMax[i];
+      float colorArray[3];
+      for(int i = 0; i < 3; i++)
+      {
+        float colorRange = this->colorMax[i] - this->colorMin[i];
+        colorArray[i] = colorRange/forceRange*f + this->colorMin[i];
+        if(colorArray[i] > this->colorMin[i])
+        {
+          colorArray[i] = this->colorMin[i];
         }
-      }
+        else if (colorArray[i] < this->colorMax[i])
+
+          colorArray[i] = this->colorMax[i];
+        }
+      
       QBrush color(QColor(colorArray[0], colorArray[1], colorArray[2]));
       
       this->contactGraphicsItems[fingerName]->setBrush(color);
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
-
     }
-
   }
-
 }
 
 ////////////////////////////////////////////////
 
-void GUIAratPlugin::PublishTaskMessage(std::string task_name)
+void GUIAratPlugin::PublishTaskMessage(const std::string& task_name)
 {
   msgs::GzString msg;
   msg.set_data(task_name);
@@ -369,18 +383,22 @@ void GUIAratPlugin::PublishTaskMessage(std::string task_name)
 
 }
 
-void GUIAratPlugin::OnResetClicked(){
+void GUIAratPlugin::OnResetClicked()
+{
   // Signal to the ArrangePlugin to set up the current task
   PublishTaskMessage(this->taskList[currentTaskIndex]);
 }
 
-void GUIAratPlugin::OnNextClicked(){
+void GUIAratPlugin::OnNextClicked()
+{
   this->currentTaskIndex = (this->currentTaskIndex+1) % this->taskList.size();
-  PublishTaskMessage(this->taskList[currentTaskIndex]);
-  this->instructionsView->setDocument(this->instructionsList[currentTaskIndex]);
+  PublishTaskMessage(this->taskList[this->currentTaskIndex]);
+  this->instructionsView->setDocument(
+                               this->instructionsList[this->currentTaskIndex]);
 }
 
-void GUIAratPlugin::OnTaskSent(std::string id, QTextDocument* instructions, int index)
+void GUIAratPlugin::OnTaskSent(const std::string& id,
+                               QTextDocument* instructions, const int index)
 {
   // Show the instructions to the user
   this->instructionsView->setDocument(instructions);
