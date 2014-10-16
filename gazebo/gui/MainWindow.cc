@@ -1035,25 +1035,35 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   if (!this->menuBar)
   {
+    // create the native menu bar
     this->menuBar = new QMenuBar;
     this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     this->setMenuBar(this->menuBar);
+
+    this->CreateMenuBar();
   }
 
   this->menuBar->clear();
 
+  QMenuBar *newMenuBar = NULL;
   if (!_bar)
   {
-    this->CreateMenuBar();
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    newMenuBar = menuBars[0];
   }
   else
   {
-    QList<QMenu *> menus  = _bar->findChildren<QMenu *>();
-    for (int i = 0; i < menus.size(); ++i)
-    {
-      this->menuBar->addMenu(menus[i]);
-    }
+    newMenuBar = _bar;
   }
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->menuBar->addMenu(menus[i]);
+  }
+
   this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
@@ -1063,7 +1073,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  // main window's menu bar
+  QMenuBar *bar = QMainWindow::menuBar();
+
+  QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1072,7 +1085,7 @@ void MainWindow::CreateMenuBar()
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
@@ -1080,7 +1093,7 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Terrain Editor spec.
   // editMenu->addAction(g_editTerrainAct);
 
-  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
 
@@ -1099,7 +1112,7 @@ void MainWindow::CreateMenuBar()
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
-  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
@@ -1108,9 +1121,9 @@ void MainWindow::CreateMenuBar()
   // windowMenu->addAction(g_diagnosticsAct);
 #endif
 
-  this->menuBar->addSeparator();
+  bar->addSeparator();
 
-  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 }
 
