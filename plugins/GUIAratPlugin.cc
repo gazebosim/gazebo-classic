@@ -20,6 +20,7 @@
 #include <gazebo/rendering/UserCamera.hh>
 #include <gazebo/rendering/FPSViewController.hh>
 #include "GUIAratPlugin.hh"
+#include "teleop.h"
 
 using namespace gazebo;
 
@@ -282,6 +283,49 @@ GUIAratPlugin::GUIAratPlugin()
   this->node->Init();
   this->taskPub = this->node->Advertise<msgs::GzString>("~/control");
 
+  this->ignNode = ignition::transport::NodePtr(
+                                new ignition::transport::Node("haptix"));
+  ignNode->Advertise("arm_pose_inc");
+
+  // Parse some SDF to get the arm teleop commands
+  ElementPtr command = elem->GetElement("commands");
+  command = commands->GetElement("command");
+  while(command){
+    std::string button;
+    std::string name;
+    float increment;
+    command->GetAttribute("button")->Get(button);
+    command->GetAttribute("name")->Get(name);
+    command->GetAttribute("increment")->Get(increment);
+
+    if(name.substr(0, "motor".size()).compare("motor") == 0){
+      handMappings[button] = KeyCommand(button, name, increment);
+    } else if(name.substr(0, "arm".size()).compare("arm") == 0){
+      armMappings[button] = KeyCommand(button, name, increment);
+    }
+
+    command = command->GetNextElement();
+  }
+
+  ElementPtr index = elem->GetElement("indices");
+  index = index->GetElement("index");
+  while(index){
+    std::string name;
+    int num;
+    index->GetAttribute("name")->Get(name);
+    index->GetAttribute("num")->Get(num);
+    if(handMappings.find(name) != handMappings.end()){
+      handMappings[name].index = num;
+    } else if (armMappings.find(name) != handMappings.end()){
+      armMappings[name].index = num;
+    }
+    index = index->GetNextElement();
+  }
+
+  // Set up dat subscriber
+  KeyEventHandler::Instance()->AddReleaseFilter("Commands",
+                        boost::bind(&GUIAratPlugin::OnKeyRelease,  this, _1));
+
   // Set up an array of subscribers for each contact sensor
   for(std::map<std::string, math::Vector2d>::iterator it =
         this->contactPoints.begin(); it != this->contactPoints.end(); it++)
@@ -387,6 +431,52 @@ void GUIAratPlugin::PreRender()
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
     }
   }
+}
+
+void GUIAratPlugin::OnKeyRelease(const common::KeyEvent &_event)
+{
+  // convert key to a string
+  
+  
+  // if key is in armCommands
+  if(this->armCommands.find(key) != armCommands.end()){
+    int index = armMappings[key].index;
+
+    float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
+    pose_inc_args[index] = inc;
+    math::Pose pose_inc(pose_inc_args[0], pose_inc_args[1],
+                                          pose_inc_args[2], pose_inc_args[3],
+                                          pose_inc_args[4], pose_inc_args[5]);
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Vector3d* vec_msg;
+    vec_msg = msg.mutable_position();
+    vec_msg->set_x(pose_inc.Pos().X());
+    vec_msg->set_y(pose_inc.Pos().Y());
+    vec_msg->set_z(pose_inc.Pos().Z());
+    gazebo::msgs::Quaternion* quat_msg;
+    quat_msg = msg.mutable_orientation();
+    quat_msg->set_x(pose_inc.Rot().X());
+    quat_msg->set_y(pose_inc.Rot().Y());
+    quat_msg->set_z(pose_inc.Rot().Z());
+    quat_msg->set_w(pose_inc.Rot().W());
+
+    ignNode.Publish("/haptix/arm_pose_inc", msg);
+
+  } else if (this->handCommands.find(key) != handCommands.end()){
+    // if key is in handCommands
+      unsigned int motor_index = handMappings[key].index;
+      hxCommand cmd;
+      cmd.ref_pos[motor_index] += inc;
+
+      coupling_v1(&cmd);
+
+      if (hx_update(hxGAZEBO, &cmd, &sensor) != hxOK)
+        printf("hx_update(): Request error.\n");
+      else
+        cmd.timestamp = sensor.timestamp;
+  }
+
+
 }
 
 ////////////////////////////////////////////////

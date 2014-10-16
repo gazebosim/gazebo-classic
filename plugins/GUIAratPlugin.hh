@@ -18,6 +18,11 @@
 #define _GUI_ARAT_PLUGIN_HH_
 
 #include <queue>
+
+#include <haptix/comm/haptix.h>
+#include "teleop.h"
+#include <ignition/transport.hh>
+
 #include "gazebo/common/Events.hh"
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/gui.hh>
@@ -35,6 +40,17 @@ namespace gazebo
       public: std::string name;
       public: ContactsWrapper(ConstContactsPtr m, const std::string &n) : msg(m), name(n){}
     };
+
+    class KeyCommand
+    {
+      public:
+        std::string button;
+        std::string name;
+        int index;
+        float increment;
+        KeyCommand(std::string b, std::string n, float i) :
+                        button(b), name(n), increment(i){}
+    }
 
     class QTaskButton : public QToolButton
     {
@@ -68,12 +84,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GUIAratPlugin();
 
-      //public: void Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf);
-
-      //public: void Init();
-
-      //public: void Reset();
-
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
       protected slots: void OnTaskSent(const std::string &id,
@@ -85,6 +95,11 @@ namespace gazebo
 
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
+
+      private: ignition::transport::NodePtr ignNode;
+
+      private: std::map<std::string, KeyCommand> armCommands;
+      private: std::map<std::string, KeyCommand> handCommands;
 
       /// \brief Publisher of factory messages.
       private: gazebo::transport::PublisherPtr taskPub;
@@ -138,6 +153,8 @@ namespace gazebo
                                        common::SystemPaths* paths);
 
       private: void OnFingerContact(ConstContactsPtr &msg);
+      
+      private: void OnKeyRelease(const common::KeyEvent &_event);
 
       private: std::string getTopicName(const std::string& fingerName);
 

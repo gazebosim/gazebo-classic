@@ -73,6 +73,245 @@
               instructions="Pick up the marble and place it on top of the box, inside of the tin lid."></task>
       </taskGroup>
 
+      <commands>
+        <hand>
+          <command button="-"
+          name="motor_little_ab_ad"
+          increment=0.05
+          ></command>
+
+          <command button="_"
+          name="motor_little_ab_ad"
+          increment=-0.05
+          ></command>
+
+          <command button="p"
+          name="motor_little_mcp"
+          increment=0.05
+          ></command>
+
+          <command button="P"
+          name="motor_little_mcp"
+          increment=-0.05
+          ></command>
+
+          <command button="0"
+          name="motor_ring_ab_ad"
+          increment=0.05
+          ></command>
+
+          <command button=")"
+          name="motor_ring_ab_ad"
+          increment=-0.05
+          ></command>
+
+          <command button="o"
+          name="motor_ring_mcp"
+          increment=0.05
+          ></command>
+
+          <command button="O"
+          name="motor_ring_mcp"
+          increment=-0.05
+          ></command>
+
+          <command button="9"
+          name="motor_middle_ab_ad"
+          increment=0.05
+          ></command>
+
+          <command button="("
+          name="motor_middle_ab_ad"
+          increment=-0.05
+          ></command>
+
+          <command button="i"
+          name="motor_middle_mcp"
+          increment=0.05
+          ></command>
+
+          <command button="I"
+          name="motor_middle_mcp"
+          increment=-0.05
+          ></command>
+
+          <command button="8"
+          name="motor_index_ab_ad"
+          increment=0.05
+          ></command>
+
+          <command button=""*""
+          name="motor_index_ab_ad"
+          increment=-0.05
+          ></command>
+
+          <command button="u"
+          name="motor_index_mcp"
+          increment=0.05
+          ></command>
+
+          <command button="U"
+          name="motor_index_mcp"
+          increment=-0.05
+          ></command>
+
+          <command button="7"
+          name="motor_thumb_cmc_ab_ad"
+          increment=0.05
+          ></command>
+
+          <command button="&"
+          name="motor_thumb_cmc_ab_ad"
+          increment=-0.05
+          ></command>
+
+          <command button="6"
+          name="motor_thumb_cmc_fe"
+          increment=0.05
+          ></command>
+
+          <command button="^"
+          name="motor_thumb_cmc_fe"
+          increment=-0.05
+          ></command>
+
+          <command button="y"
+          name="motor_thumb_mcp"
+          increment=0.05
+          ></command>
+
+          <command button="Y"
+          name="motor_thumb_mcp"
+          increment=-0.05
+          ></command>
+
+          <command button="k"
+          name="motor_wrist_rot"
+          increment=0.05
+          ></command>
+
+          <command button="K"
+          name="motor_wrist_rot"
+          increment=-0.05
+          ></command>
+
+          <command button="l"
+          name="motor_wrist_dev"
+          increment=0.05
+          ></command>
+
+          <command button="L"
+          name="motor_wrist_dev"
+          increment=-0.05
+          ></command>
+
+          <command button=";"
+          name="motor_wrist_fe"
+          increment=0.05
+          ></command>
+
+          <command button='"'
+          name="motor_wrist_fe"
+          increment=-0.05
+          ></command>
+        </hand>
+        
+        <arm>
+          <command button="g"
+          name="arm_pos_x"
+          increment=0.025
+          ></command>
+
+          <command button="G"
+          name="arm_pos_x"
+          increment=-0.025
+          ></command>
+
+          <command button="h"
+          name="arm_pos_y"
+          increment=0.025
+          ></command>
+
+          <command button="H"
+          name="arm_pos_y"
+          increment=-0.025
+          ></command>
+
+          <command button="j"
+          name="arm_pos_z"
+          increment=0.025
+          ></command>
+
+          <command button="J"
+          name="arm_pos_z"
+          increment=-0.025
+          ></command>
+
+          <command button="b"
+          name="arm_rot_x"
+          increment=0.025
+          ></command>
+
+          <command button="B"
+          name="arm_rot_x"
+          increment=-0.025
+          ></command>
+
+          <command button="n"
+          name="arm_rot_y"
+          increment=0.025
+          ></command>
+
+          <command button="N"
+          name="arm_rot_y"
+          increment=-0.025
+          ></command>
+
+          <command button="m"
+          name="arm_rot_z"
+          increment=0.025
+          ></command>
+
+          <command button="M"
+          name="arm_rot_z"
+          increment=-0.025
+          ></command>
+        </arm>
+      </commands>
+
+      <indices>
+        <index name="motor_wrist_rot" num="0"></index>
+        <index name="motor_wrist_dev" num="1"></index>
+        <index name="motor_wrist_fe" num="2"></index>
+        <index name="motor_index_dip" num="3"></index>
+        <index name="motor_index_mcp" num="4"></index>
+        <index name="motor_index_pip" num="5"></index>
+        <index name="motor_little_dip" num="6"></index>
+        <index name="motor_little_mcp" num="7"></index>
+        <index name="motor_little_pip" num="8"></index>
+        <index name="motor_middle_dip" num="9"></index>
+        <index name="motor_middle_mcp" num="10"></index>
+        <index name="motor_middle_pip" num="11"></index>
+        <index name="motor_thumb_cmc_ab_ad" num="12"></index>
+        <index name="motor_little_ab_ad" num="13"></index>
+        <index name="motor_ring_ab_ad" num="14"></index>
+        <index name="motor_middle_ab_ad" num="15"></index>
+        <index name="motor_index_ab_ad" num="16"></index>
+        <index name="motor_thumb_cmc_fe" num="17"></index>
+        <index name="motor_ring_dip" num="18"></index>
+        <index name="motor_ring_mcp" num="19"></index>
+        <index name="motor_ring_pip" num="20"></index>
+        <index name="motor_thumb_mcp" num="21"></index>
+        <index name="motor_thumb_dip" num="22"></index>
+
+        <index name="arm_pos_x" num="0"></index>
+        <index name="arm_pos_y" num="1"></index>
+        <index name="arm_pos_z" num="2"></index>
+        <index name="arm_rot_x" num="3"></index>
+        <index name="arm_rot_y" num="4"></index>
+        <index name="arm_rot_z" num="5"></index>
+      </indices>
+
     </plugin>
   </world>
 </sdf>
