@@ -217,3 +217,10 @@ void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
     }
   }
 }
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::mousePressEvent(QMouseEvent * /*_event*/)
+{
+  // Cancel draw mode
+  gui::editor::Events::createBuildingEditorItem(std::string());
+}

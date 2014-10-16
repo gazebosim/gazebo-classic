@@ -83,6 +83,10 @@ namespace gazebo
       /// \brief Event received when a building model has been discarded.
       private: void OnDiscardModel();
 
+      /// \brief Qt callback when the palette is pressed.
+      /// \param[in] _event Event.
+      private: void mousePressEvent(QMouseEvent *_event);
+
       /// \brief A label that displays the name of the building model.
       private: QLabel *modelNameLabel;
 
