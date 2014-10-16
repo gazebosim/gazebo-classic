@@ -49,8 +49,6 @@ namespace gazebo
       /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
 
-      // private slots: void OnImportImage();
-
       /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
 

@@ -219,12 +219,11 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
 {
-  std::string buttonText;
-  for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
-      iter != this->brushes.end(); ++iter)
+  if (_type.empty())
   {
-    buttonText = (*iter)->text().toStdString();
-    if (_type.empty() || buttonText.find(_type.substr(1)) == std::string::npos)
+    // Uncheck all the buttons
+    for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
+        iter != this->brushes.end(); ++iter)
     {
       (*iter)->setChecked(false);
     }
