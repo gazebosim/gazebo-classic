@@ -39,7 +39,7 @@ WallItem::WallItem(const QPointF &_start, const QPointF &_end,
 
   this->level = 0;
 
-  this->wallThickness = 20;
+  this->wallThickness = 15;
   this->wallHeight = _height;
 
   this->SetThickness(this->wallThickness);
