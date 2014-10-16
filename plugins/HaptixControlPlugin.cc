@@ -66,6 +66,9 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
   this->gazebonode->Init(this->world->GetName());
   this->polhemusJoyPub =
     this->gazebonode->Advertise<gazebo::msgs::Pose>("~/polhemus/joy");
+  this->keySub =
+    this->gazebonode->Subscribe("~/qtKeyEvent",
+      &HaptixControlPlugin::OnKey, this);
 
   this->baseJoint =
     this->model->GetJoint(this->sdf->Get<std::string>("base_joint"));
@@ -801,6 +804,15 @@ void HaptixControlPlugin::HaptixUpdateCallback(
   _rep = this->robotState;
 
   _result = true;
+}
+
+//////////////////////////////////////////////////
+void HaptixControlPlugin::OnKey(ConstRequestPtr &_msg)
+{
+  boost::mutex::scoped_lock lock(this->baseLinkMutex);
+  std::cerr << "got key [" << _msg->data()
+            << "] press [" << _msg->dbl_data() << "]\n";
+
 }
 
 GZ_REGISTER_MODEL_PLUGIN(HaptixControlPlugin)

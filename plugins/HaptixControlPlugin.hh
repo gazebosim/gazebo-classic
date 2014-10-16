@@ -143,6 +143,9 @@ namespace gazebo
     private: math::Pose targetCameraPose;
     private: math::Pose initialCameraPose;
 
+    // subscribe to key events from gazebo qt window
+    private: gazebo::transport::SubscriberPtr keySub;
+    private: void OnKey(ConstRequestPtr &_msg);
 
     // for tracking polhemus setup, where is the source in the world frame?
     private: physics::LinkPtr polhemusSourceLink;
