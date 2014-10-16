@@ -205,6 +205,11 @@ void HaptixControlPlugin::LoadHandControl()
   {
     joint->GetAttribute("id")->Get(id);
     this->jointNames[id] = joint->Get<std::string>();
+    /// \TODO: assume id in order
+    this->joints.push_back(this->model->GetJoint(this->jointNames[id]));
+    this->pids.push_back(common::PID());
+
+    // get next sdf
     joint = joint->GetNextElement("joint");
   }
 
@@ -214,6 +219,11 @@ void HaptixControlPlugin::LoadHandControl()
   {
     motor->GetAttribute("id")->Get(id);
     this->motorNames[id] = motor->Get<std::string>();
+
+    /// \TODO: assume id in order
+    this->motors.push_back(this->model->GetJoint(this->motorNames[id]));
+
+    // get next sdf
     motor = motor->GetNextElement("motor");
   }
 
@@ -223,6 +233,25 @@ void HaptixControlPlugin::LoadHandControl()
   {
     contactSensor->GetAttribute("id")->Get(id);
     this->contactSensorNames[id] = contactSensor->Get<std::string>();
+
+    // get sensor from gazebo
+    sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+    // Get a pointer to the contact sensor
+    sensors::ContactSensorPtr sensor =
+        boost::dynamic_pointer_cast<sensors::ContactSensor>
+        (mgr->GetSensor(this->contactSensorNames[id]));
+    if (sensor)
+    {
+      /// \TODO: assume id in order
+      this->contactSensors.push_back(sensor);
+    }
+    else
+    {
+      gzerr << "Contact Sensor [" << this->contactSensorNames[id]
+            << "] not found.\n";
+    }
+
+    // get next sdf
     contactSensor = contactSensor->GetNextElement("contactSensor");
   }
 
@@ -232,6 +261,25 @@ void HaptixControlPlugin::LoadHandControl()
   {
     imuSensor->GetAttribute("id")->Get(id);
     this->imuSensorNames[id] = imuSensor->Get<std::string>();
+
+    // get sensor from gazebo
+    sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+    // Get a pointer to the imu sensor
+    sensors::ImuSensorPtr sensor =
+        boost::dynamic_pointer_cast<sensors::ImuSensor>
+        (mgr->GetSensor(this->imuSensorNames[id]));
+    if (sensor)
+    {
+      /// \TODO: assume id in order
+      this->imuSensors.push_back(sensor);
+    }
+    else
+    {
+      gzerr << "Imu Sensor [" << this->imuSensorNames[id]
+            << "] not found.\n";
+    }
+
+    // get next sdf
     imuSensor = imuSensor->GetNextElement("imuSensor");
   }
 

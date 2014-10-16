@@ -164,12 +164,14 @@ namespace gazebo
     // joint names matching those of gazebo model
     private: std::map<unsigned int, std::string> jointNames;
     private: std::vector<physics::JointPtr> joints;
+
+    /// \TODO: fixme, implement motors, 
     private: std::map<unsigned int, std::string> motorNames;
     private: std::vector<physics::JointPtr> motors;
     private: std::map<unsigned int, std::string> contactSensorNames;
-    private: std::vector<sensors::ContactSensor> contactSensors;
+    private: std::vector<sensors::ContactSensorPtr> contactSensors;
     private: std::map<unsigned int, std::string> imuSensorNames;
-    private: std::vector<sensors::ImuSensor> imuSensors;
+    private: std::vector<sensors::ImuSensorPtr> imuSensors;
 
     // internal controllers for holding hand pose
     private: std::vector<common::PID> pids;
