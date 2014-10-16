@@ -70,6 +70,13 @@ namespace gazebo
       /// \return Height of the rect item in pixels.
       public: double GetHeight() const;
 
+      /// \brief Set the position of this item inside its parent wall.
+      /// \param[in] _positionOnWall New normalized position on wall.
+      public: void SetPositionOnWall(double _positionOnWall);
+
+      /// \brief Get the position of this item inside its parent wall.
+      public: double GetPositionOnWall();
+
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
       public: void ShowHandles(bool _show);
@@ -263,6 +270,10 @@ namespace gazebo
 
       /// \brieft Resize flag that controls how the rect item can be resized.
       private: unsigned int resizeFlag;
+
+      /// \brieft Normalized position with respect to the wall segment's start
+      /// point.
+      private: double positionOnWall;
     };
     /// \}
   }

@@ -36,6 +36,8 @@ RectItem::RectItem()
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
 
+  this->positionOnWall = 0;
+
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
@@ -684,6 +686,19 @@ double RectItem::GetHeight() const
 }
 
 /////////////////////////////////////////////////
+void RectItem::SetPositionOnWall(double _positionOnWall)
+{
+  this->positionOnWall = _positionOnWall;
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetPositionOnWall()
+{
+  return this->positionOnWall;
+}
+
+/////////////////////////////////////////////////
+
 QRectF RectItem::boundingRect() const
 {
   return QRectF(-this->width/2, -this->height/2, this->width, this->height);
