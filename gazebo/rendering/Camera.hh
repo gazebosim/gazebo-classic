@@ -499,7 +499,7 @@ namespace gazebo
 
       /// \brief Get the distortion model of this camera.
       /// \return Distortion model.
-      public: DistortionPtr GetDistortion();
+      public: DistortionPtr GetDistortion() const;
 
       /// \brief Implementation of the render call
       protected: virtual void RenderImpl();

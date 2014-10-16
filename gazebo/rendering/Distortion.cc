@@ -293,37 +293,37 @@ void Distortion::SetCrop(bool _crop)
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetK1()
+double Distortion::GetK1() const
 {
   return this->dataPtr->k1;
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetK2()
+double Distortion::GetK2() const
 {
   return this->dataPtr->k2;
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetK3()
+double Distortion::GetK3() const
 {
   return this->dataPtr->k3;
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetP1()
+double Distortion::GetP1() const
 {
   return this->dataPtr->p1;
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetP2()
+double Distortion::GetP2() const
 {
   return this->dataPtr->p2;
 }
 
 //////////////////////////////////////////////////
-math::Vector2d Distortion::GetCenter()
+math::Vector2d Distortion::GetCenter() const
 {
   return this->dataPtr->lensCenter;
 }

@@ -1687,7 +1687,7 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-DistortionPtr Camera::GetDistortion()
+DistortionPtr Camera::GetDistortion() const
 {
   return this->dataPtr->distortion;
 }

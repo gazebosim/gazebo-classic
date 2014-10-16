@@ -59,27 +59,27 @@ namespace gazebo
 
       /// \brief Get the radial distortion coefficient k1.
       /// \return Distortion coefficient k1.
-      public: double GetK1();
+      public: double GetK1() const;
 
       /// \brief Get the radial distortion coefficient k2.
       /// \return Distortion coefficient k2.
-      public: double GetK2();
+      public: double GetK2() const;
 
       /// \brief Get the radial distortion coefficient k3.
       /// \return Distortion coefficient k3.
-      public: double GetK3();
+      public: double GetK3() const;
 
       /// \brief Get the tangential distortion coefficient p1.
       /// \return Distortion coefficient p1.
-      public: double GetP1();
+      public: double GetP1() const;
 
       /// \brief Get the tangential distortion coefficient p2.
       /// \return Distortion coefficient p2.
-      public: double GetP2();
+      public: double GetP2() const;
 
       /// \brief Get the distortion center.
       /// \return Distortion center.
-      public: math::Vector2d GetCenter();
+      public: math::Vector2d GetCenter() const;
 
       /// \brief Apply distortion model
       /// \param[in] _in Input uv coordinate.

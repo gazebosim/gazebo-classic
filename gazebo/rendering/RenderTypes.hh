@@ -157,10 +157,6 @@ namespace gazebo
     /// \brief Shared pointer to RayQuery
     typedef boost::shared_ptr<RayQuery> RayQueryPtr;
 
-    /// \def RayQueryPtr
-    /// \brief Shared pointer to RayQuery
-    typedef boost::shared_ptr<RayQuery> RayQueryPtr;
-
     /// \def DistortionPtr
     /// \brief Shared pointer to Distortion
     typedef boost::shared_ptr<Distortion> DistortionPtr;
