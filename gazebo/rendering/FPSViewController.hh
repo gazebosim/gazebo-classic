@@ -46,6 +46,14 @@ namespace gazebo
       /// \brief Update the camera position
       public: virtual void Update();
 
+      /// \brief Set the camera's velocity
+      /// \param[i] _quat The new velocity of the camera
+      public: void SetVelocity(const math::Pose &_velocity);
+
+      /// \brief Get the camera's current velocity
+      // \return The camera's linear and angular velocity as a math::Pose
+      public: math::Pose GetVelocity() const;
+
       /// \brief Get the type name of this view controller
       /// \return The name of the controller type: "fps"
       public: static std::string GetTypeString();
@@ -58,6 +66,8 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
+
+      private: math::Pose velocity;
     };
     /// \}
   }

@@ -27,7 +27,7 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 FPSViewController::FPSViewController(UserCameraPtr _camera)
-  : ViewController(_camera)
+  : ViewController(_camera), velocity(math::Pose(0, 0, 0, 0, 0, 0))
 {
   this->typeString = TYPE_STRING;
 }
@@ -44,6 +44,34 @@ void FPSViewController::Init()
 //////////////////////////////////////////////////
 void FPSViewController::Update()
 {
+  //std::cout << "Updating" << std::endl;
+  if ( this->velocity != math::Pose(0, 0, 0, 0, 0, 0) )
+  {
+    // Move based on the camera's current velocity
+    // Calculate delta based on frame rate
+    common::Time interval = common::Time::GetWallTime() -
+                            this->camera->GetLastRenderWallTime();
+    float dt = interval.Float();
+
+    math::Vector3 translate(velocity.pos[0]*dt, velocity.pos[1]*dt,
+                             velocity.pos[2]*dt);
+    this->camera->Translate(translate);
+    this->camera->RotatePitch(velocity.rot.GetPitch()*dt);
+    this->camera->RotateYaw(velocity.rot.GetYaw()*dt);
+  }
+}
+
+
+//////////////////////////////////////////////////
+math::Pose FPSViewController::GetVelocity() const
+{
+  return this->velocity;
+}
+
+//////////////////////////////////////////////////
+void FPSViewController::SetVelocity(const math::Pose &_velocity)
+{
+  this->velocity = _velocity;
 }
 
 //////////////////////////////////////////////////
@@ -81,7 +109,11 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
     directionVec.z =  0;
   }
 
-  this->camera->Translate(directionVec);
+  //if(_event.type == common::MouseEvent::MOVE){
+
+    this->camera->Translate(directionVec);
+  //}
+
 }
 
 //////////////////////////////////////////////////
@@ -91,11 +123,33 @@ std::string FPSViewController::GetTypeString()
 }
 
 //////////////////////////////////////////////////
-void FPSViewController::HandleKeyReleaseEvent(const std::string &/*_key*/)
+void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 {
+  if(_key.compare("w") == 0 || _key.compare("a") == 0 ||
+     _key.compare("s") == 0 || _key.compare("d") == 0)
+  {
+    this->SetVelocity(math::Pose(0, 0, 0, 0, 0, 0));
+  }
 }
 
 //////////////////////////////////////////////////
-void FPSViewController::HandleKeyPressEvent(const std::string &/*_key*/)
+void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
+  float linearVelocity = 0.75;
+  if(_key.compare("w") == 0)
+  {
+    this->SetVelocity(math::Pose(linearVelocity, 0, 0, 0, 0, 0));
+  }
+  else if (_key.compare("a") == 0)
+  {
+    this->SetVelocity(math::Pose(0, -linearVelocity, 0, 0, 0, 0));
+  }
+  else if (_key.compare("s") == 0)
+  {
+    this->SetVelocity(math::Pose(linearVelocity, 0, 0, 0, 0, 0));
+  }
+  else if (_key.compare("d") == 0)
+  {
+    this->SetVelocity(math::Pose(0, -linearVelocity, 0, 0, 0, 0));
+  }
 }
