@@ -44,7 +44,7 @@ namespace gazebo
 
     /// \brief Callback for receipt of model control request
     /// \param[in] _msg Model message from gazebo
-    private: void PubControlRequest();
+    private: void RequestControl();
 
     private: void OnControlResponse(gazebo::msgs::ControlResponse &_msg);
 

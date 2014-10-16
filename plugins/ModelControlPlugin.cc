@@ -123,7 +123,7 @@ void ModelControlPlugin::OnControlResponse(gazebo::msgs::ControlResponse &_msg)
 }
 
 /////////////////////////////////////////////////
-void ModelControlPlugin::PubControlRequest()
+void ModelControlPlugin::RequestControl()
 {
   // boost::mutex::scoped_lock lock(this->mutex); // for threading this...
 
@@ -149,12 +149,18 @@ void ModelControlPlugin::PubControlRequest()
 
   gazebo::msgs::ControlResponse res;
   bool result;
-  const int timeout = 1000;  // in ms
+  // timeout in ms
+  // if a response is not received within this time limit,
+  // warn user via console messages and try again until
+  // success.
+  const int timeout = 1000;
 
+  // copied from ign-transport example
   bool executed = false;
   while(!executed)
   {
-    executed = this->node.Request("/" + this->model->GetName() + "/control_request",
+    executed = this->node.Request("/" + this->model->GetName() +
+                                  "/control_request",
                                   req, timeout, res, result);
     if (executed)
     {
@@ -174,25 +180,6 @@ void ModelControlPlugin::PubControlRequest()
 void ModelControlPlugin::OnUpdate()
 {
   // call every simulation step
-  this->PubControlRequest();
-
-  /*
-  {
-    boost::mutex::scoped_lock lock(this->mutex);
-    // block simulation,
-    // wait for a response from responser (task space controller)
-    // calculate amount of time to wait based on rules
-    boost::system_time timeout = boost::get_system_time();
-    timeout += boost::posix_time::microseconds(1000);
-
-    while (!this->delayCondition.timed_wait(lock, timeout))
-    {
-      this->PubControlRequest();
-      // change delay to 1 sec
-      timeout = boost::get_system_time() + boost::posix_time::microseconds(1000000);
-      gzerr << "controller synchronization timedout: "
-               "delay budget exhausted.\n";
-    }
-  }
-  */
+  // this call blocks simulation
+  this->RequestControl();
 }
