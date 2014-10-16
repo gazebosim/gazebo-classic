@@ -61,3 +61,30 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
+
+# customize for haptix control plugin
+find_package(haptix_comm REQUIRED)
+find_package(ignition-transport REQUIRED)
+message(status "debug:\n\n\n${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}\n\n\n")
+# make below target specific?
+include_directories(
+  ${CMAKE_SOURCE_DIR}/deps/polhemus_driver/include
+  ${HAPTIX_COMM_INCLUDE_DIRS}
+  ${IGNITION-TRANSPORT_INCLUDE_DIRS})
+# make below target specific?
+link_directories(
+  ${HAPTIX_COMM_LIBRARY_DIRS}
+  ${IGNITION-TRANSPORT_LIBRARY_DIRS})
+# build library
+add_library(HaptixControlPlugin SHARED HaptixControlPlugin.cc)
+# additional library dependencies
+target_link_libraries(HaptixControlPlugin ${GAZEBO_LIBRARIES}
+  spnav polhemus_driver haptix_comm
+  ${IGNITION-TRANSPORT_LIBRARIES})
+# below adds -std=c++11, needed to compile against ign-transport
+set_target_properties(HaptixControlPlugin PROPERTIES
+  COMPILE_FLAGS ${IGNITION-TRANSPORT_CXX_FLAGS})
+# install library and header
+install (TARGETS HaptixControlPlugin DESTINATION
+  ${GAZEBO_PLUGIN_INSTALL_DIR})
+gz_install_includes("plugins" HaptixControlPlugin.hh)
