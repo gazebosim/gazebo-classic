@@ -183,11 +183,21 @@ namespace gazebo
 
       /// \brief Rotate the camera around the yaw axis
       /// \param[in] _angle Rotation amount
+      void RotateRoll(math::Angle _angle);
+
+      /// \brief Rotate the camera around the yaw axis
+      /// \param[in] _angle Rotation amount
       public: void RotateYaw(math::Angle _angle);
 
       /// \brief Rotate the camera around the pitch axis
       /// \param[in] _angle Pitch amount
       public: void RotatePitch(math::Angle _angle);
+
+      void Rotate(const math::Quaternion &_quat);
+
+      void Rotate(const math::Vector3 &_euler);
+
+      void Rotate(const float _x, const float _y, const float _z);
 
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters

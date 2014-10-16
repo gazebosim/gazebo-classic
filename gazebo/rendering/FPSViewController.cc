@@ -54,37 +54,23 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector2i drag = _event.pos - _event.prevPos;
 
-  math::Vector3 directionVec(0, 0, 0);
+  math::Vector2d directionVec(0, 0);
 
-  if (_event.buttons & common::MouseEvent::LEFT)
-  {
-    this->camera->RotateYaw(GZ_DTOR(drag.x * 0.1));
-    this->camera->RotatePitch(GZ_DTOR(-drag.y * 0.1));
+  //TODO: take care of race conditions
+  math::Pose velocity = this->camera->GetVelocity();
+  if((_event.buttons & common::MouseEvent::LEFT)){
+    float angularVel = 0.075;
+    directionVec.x = -angularVel * drag.x;
+    directionVec.y = angularVel * drag.y;
+    math::Pose velocityIncrement = math::Pose(0, 0, 0, 0, directionVec.x, directionVec.y );
+    this->camera->SetVelocity(velocityIncrement);
   }
-  else if (_event.buttons & common::MouseEvent::RIGHT)
+  else 
   {
-    // interactively pan view
-    directionVec.x = 0;
-    directionVec.y =  drag.x * _event.moveScale;
-    directionVec.z =  drag.y * _event.moveScale;
+    math::Pose newVelocity = velocity;
+    newVelocity.rot = math::Quaternion(0, 0, 0);
+    this->camera->SetVelocity(newVelocity);
   }
-  else if (_event.buttons & common::MouseEvent::MIDDLE)
-  {
-    directionVec.x =  drag.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
-  }
-  else if (_event.type == common::MouseEvent::SCROLL)
-  {
-    directionVec.x -=  50.0 * _event.scroll.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
-  }
-
-  //if(_event.type == common::MouseEvent::MOVE){
-
-    this->camera->Translate(directionVec);
-  //}
 
 }
 
@@ -107,7 +93,7 @@ void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 //////////////////////////////////////////////////
 void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
-  float linearVelocity = 0.75;
+  float linearVelocity = 0.9;
   if(_key.compare("w") == 0)
   {
     this->camera->SetVelocity(math::Pose(linearVelocity, 0, 0, 0, 0, 0));

@@ -382,8 +382,9 @@ void Camera::Update()
     math::Vector3 translate(velocity.pos[0]*dt, velocity.pos[1]*dt,
                              velocity.pos[2]*dt);
     this->Translate(translate);
-    this->RotatePitch(velocity.rot.GetPitch()*dt);
+    this->RotateRoll(velocity.rot.GetPitch()*dt);
     this->RotateYaw(velocity.rot.GetYaw()*dt);
+    //this->Rotate(0, velocity.rot.GetPitch()*dt, velocity.rot.GetYaw()*dt);
   }
 }
 
@@ -604,16 +605,38 @@ void Camera::Translate(const math::Vector3 &direction)
   this->sceneNode->translate(this->sceneNode->getOrientation() * vec);
 }
 
+void Camera::Rotate(const math::Quaternion &_quat)
+{
+  this->sceneNode->setOrientation(
+                          Ogre::Quaternion(_quat.w, _quat.x, _quat.y, _quat.z));
+}
+
+void Camera::Rotate(const math::Vector3 &_euler)
+{
+  this->Rotate(math::Quaternion(_euler));
+}
+
+void Camera::Rotate(const float _x, const float _y, const float _z)
+{
+  this->Rotate(math::Vector3(_x, _y, _z));
+}
+
+//////////////////////////////////////////////////
+void Camera::RotateRoll(math::Angle _angle)
+{
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()));
+}
+
 //////////////////////////////////////////////////
 void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
 
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()));
 }
 
 
