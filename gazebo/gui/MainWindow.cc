@@ -1027,11 +1027,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!this->menuLayout)
     this->menuLayout = new QHBoxLayout;
 
-  // Remove all widgets from the menubar
+  // Remove all widgets from the menuLayout
   QLayoutItem *child = NULL;
   while ((child = this->menuLayout->takeAt(0)) != 0)
   {
-    delete child;
   }
 
   if (!this->menuBar)
@@ -1046,17 +1045,16 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!_bar)
   {
     this->CreateMenuBar();
-    this->menuLayout->addWidget(this->menuBar);
   }
   else
   {
-    this->menuLayout->addWidget(_bar);
     QList<QMenu *> menus  = _bar->findChildren<QMenu *>();
     for (int i = 0; i < menus.size(); ++i)
     {
       this->menuBar->addMenu(menus[i]);
     }
   }
+  this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
