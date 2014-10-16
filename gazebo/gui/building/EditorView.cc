@@ -154,6 +154,7 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
+    gui::editor::Events::createBuildingEditorItem(std::string());
     _event->accept();
     return;
   }
@@ -462,6 +463,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   else if (_event->key() == Qt::Key_Escape)
   {
     this->CancelDrawMode();
+    gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
   }
 }
@@ -718,6 +720,8 @@ void EditorView::Create3DVisual(EditorItem *_item)
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
+  this->CancelDrawMode();
+
   if (_type == "wall")
     this->drawMode = WALL;
   else if (_type == "window")
@@ -726,8 +730,6 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     this->drawMode = DOOR;
   else if (_type == "stairs")
     this->drawMode = STAIRS;
-  else
-    this->drawMode = NONE;
 
   if (this->drawInProgress && this->currentMouseItem)
   {
@@ -1051,6 +1053,5 @@ void EditorView::CancelDrawMode()
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-    gui::editor::Events::createBuildingEditorItem(std::string());
   }
 }
