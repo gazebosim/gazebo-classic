@@ -268,13 +268,16 @@ polhemus_get_poses(polhemus_conn_t* conn,
   // Read multiple poses, separated by 0x0a
   char* sep_idx = (char*)buf;
   int poses_read = 0;
+  // fprintf(stderr, "0 sep_idx [%s] buf [%s] pr [%d] np [%d]\n",
+  //         sep_idx, buf, poses_read, *num_poses);
   while((sep_idx != NULL) && 
         (sep_idx < (char*)buf+len-1) && 
         (poses_read < *num_poses))
   {
     int id;
     double x, y, z, roll, pitch, yaw;
-    if(sscanf((const char*)sep_idx, "%d %lf %lf %lf %lf %lf %lf", &id, &x, &y, &z, &roll, &pitch, &yaw) != 7)
+    if(sscanf((const char*)sep_idx, "%d %lf %lf %lf %lf %lf %lf",
+      &id, &x, &y, &z, &roll, &pitch, &yaw) != 7)
     {
       fprintf(stderr, "Failed to parse string:%s:\n", buf);
       return -1;

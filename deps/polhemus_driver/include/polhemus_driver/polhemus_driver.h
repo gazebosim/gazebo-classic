@@ -50,6 +50,11 @@ int polhemus_get_pose(polhemus_conn_t* conn,
                       double* x, double* y, double* z,
                       double* roll, double* pitch, double* yaw,
                       int max_retries);
+/*
+ * polhemus_get_poses
+ * num_poses[in] max poses to read
+ * num_poses[out] actual number of poses read from sensor
+*/
 int polhemus_get_poses(polhemus_conn_t* conn,
                        polhemus_pose_t* poses,
                        int* num_poses, int max_retries);

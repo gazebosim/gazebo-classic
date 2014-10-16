@@ -124,7 +124,7 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
   this->rotPid.Init(pGain, 0, 0.0, 0, 0, cmdMax, cmdMin);
 
   this->havePolhemus = false;
-  if(!(this->polhemus = polhemus_connect_usb(LIBERTY_HS_VENDOR_ID,
+  if(!(this->polhemusConn = polhemus_connect_usb(LIBERTY_HS_VENDOR_ID,
                                              LIBERTY_HS_PRODUCT_ID,
                                              LIBERTY_HS_WRITE_ENDPOINT,
                                              LIBERTY_HS_READ_ENDPOINT)))
@@ -133,7 +133,7 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
   }
   else
   {
-    if(polhemus_init_comm(this->polhemus, 10))
+    if(polhemus_init_comm(this->polhemusConn, 10))
     {
       fprintf(stderr, "Failed to initialize comms with Polhemus\n");
     }
@@ -141,28 +141,13 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
       this->havePolhemus = true;
   }
 
+  // spin up a separate thread to get polhemus sensor data
+  // update target pose if using polhemus
   if (this->havePolhemus)
-  {
-    int numPoses;
-    polhemus_pose_t poses[8];
-    for(;;)
-    {
-      if(!polhemus_get_poses(this->polhemus, poses, &numPoses, 10))
-      {
-        for (int i = 0; i < numPoses; ++i)
-        {
-          this->initialPolhemusPose[i] =
-            this->convertPolhemusToPose(poses[i]);
-          // (-x,y,z,yaw,-pitch,-roll) seems to do the right thing;
-          // std::cout << "Initial Polhemus pose: "
-          //           << this->initialPolhemusPose << std::endl;
-        }
-        break;
-      }
-      else
-        fprintf(stderr, "polhemus_get_pose() failed; retrying\n");
-    }
-  }
+    this->polhemusThread = boost::thread(
+      boost::bind(&HaptixControlPlugin::UpdatePolhemus, this));
+  else
+    std::cerr << "No usable polhemus setup detected.\n";
 
   // check for spacenav
   this->haveSpacenav = this->LoadSpacenav();
@@ -172,12 +157,6 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
   this->haveKeyboard = this->LoadKeyboard();
 
   this->LoadHandControl();
-
-  // spin up a separate thread to get polhemus sensor data
-  // update target pose if using polhemus
-  if (this->havePolhemus)
-    this->polhemusThread = boost::thread(
-      boost::bind(&HaptixControlPlugin::UpdatePolhemus, this));
 
   // New Mechanism for Updating every World Cycle
   // Listen to the update event. This event is broadcast every
@@ -545,18 +524,17 @@ void HaptixControlPlugin::UpdateSpacenav(double _dt)
 void HaptixControlPlugin::UpdatePolhemus()
 {
   // Get current pose from Polhemus
-  int numPoses;
   polhemus_pose_t poses[8];
   while (true)
   {
-    if(!polhemus_get_poses(this->polhemus, poses, &numPoses, 10))
+    int numPoses = 8;  // fill with max poses to read, returns actual poses
+    if(!polhemus_get_poses(this->polhemusConn, poses, &numPoses, 100))
     {
-      std::cerr << "got pose(" << numPoses << ")\n";
       int armId = 0;  // some number between 0 and numPoses
       if (armId < numPoses)
       {
         math::Pose armSensorPose = this->convertPolhemusToPose(poses[armId]);
-        std::cout << "arm [" << armSensorPose << "]\n";
+        // std::cout << "arm [" << armSensorPose << "]\n";
         if (false) /// \TODO: need a way to say: "calibrate"
         {
           // calibration mode, update this->baseLinkToArmSensor
@@ -579,26 +557,34 @@ void HaptixControlPlugin::UpdatePolhemus()
         math::Pose headSensorPose = this->convertPolhemusToPose(poses[headId]);
         this->targetCameraPose = this->cameraToHeadSensor.GetInverse()
           + headSensorPose + this->sourceWorldPose;
-        // std::cout << "head [" << headSensorPose // << "]\n";
-        //   - this->initialPolhemusPose[headId].pos
-        //   + this->initialCameraPose.pos;
-        // this->targetCameraPose.rot = headSensorPose.rot
-        //   * this->initialPolhemusPose[headId].rot.GetInverse()
-        //   * this->initialCameraPose.rot;
 
         gazebo::msgs::Set(&this->joyMsg, this->targetCameraPose);
         this->polhemusJoyPub->Publish(this->joyMsg);
       }
-      // std::cout << "current polhemus: "
-      //           << pose
-      //           << std::endl;
-      // std::cout << "initial polhemus: "
-      //           << this->initialPolhemusPose << std::endl;
-      // std::cout << "initial link: "
-      //           << this->initialBaseLinkPose[armId] << std::endl;
     }
     else
+    {
       std::cerr << "polhemus_get_pose() failed\n";
+      /*
+      // test reconnect?
+      if(!(this->polhemusConn = polhemus_connect_usb(LIBERTY_HS_VENDOR_ID,
+                                                 LIBERTY_HS_PRODUCT_ID,
+                                                 LIBERTY_HS_WRITE_ENDPOINT,
+                                                 LIBERTY_HS_READ_ENDPOINT)))
+      {
+        fprintf(stderr, "Failed to connect to Polhemus\n");
+      }
+      else
+      {
+        if(polhemus_init_comm(this->polhemusConn, 10))
+        {
+          fprintf(stderr, "Failed to initialize comms with Polhemus\n");
+        }
+        else
+          this->havePolhemus = true;
+      }
+      */
+    }
     usleep(1000);
   }
 }

@@ -116,8 +116,7 @@ namespace gazebo
 
     // basic polhemus interfaces
     private: bool havePolhemus;
-    private: polhemus_conn_t* polhemus;
-    private: math::Pose initialPolhemusPose[8];
+    private: polhemus_conn_t *polhemusConn;
     private: math::Pose convertPolhemusToPose(double x, double y, double z,
       double roll, double pitch, double yaw);
     private: math::Pose convertPolhemusToPose(const polhemus_pose_t &_pose);
