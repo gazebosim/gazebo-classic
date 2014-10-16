@@ -161,6 +161,14 @@ namespace gazebo
       /// \return The pose of the camera in the world coordinate frame.
       public: math::Pose GetWorldPose() const;
 
+      /// \brief Set the camera's velocity
+      /// \param[i] _quat The new velocity of the camera
+      public: void SetVelocity(const math::Pose &_velocity);
+
+      /// \brief Get the camera's current velocity
+      // \return The camera's linear and angular velocity as a math::Pose
+      public: math::Pose GetVelocity() const;
+
       /// \brief Set the world position
       /// \param[in] _pos The new position of the camera
       public: void SetWorldPosition(const math::Vector3 &_pos);
@@ -683,6 +691,8 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: CameraPrivate *dataPtr;
+
+      private: math::Pose velocity;
     };
     /// \}
   }
