@@ -16,13 +16,20 @@
 
 ## Gazebo 4.0
 
-### Gazebo 4.?.? (2014-??-??)
+### Gazebo 4.x.x (yyyy-mm-dd)
+
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
    recursively on all links in model.
     * [Pull request #1208](https://bitbucket.org/osrf/gazebo/pull-request/1208)
+1. The `gz model` command line tool will output model info using either `-i` for complete info, or `-p` for just the model pose.
+    * [Pull request #1212](https://bitbucket.org/osrf/gazebo/pull-request/1212)
+    * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
+1. Added SignalStats class for computing incremental signal statistics.
+    * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
 
 ### Gazebo 4.0.2 (2014-09-23)
+
 1. Fix and improve mechanism to generate pkgconfig libs
     * [Pull request #1027](https://bitbucket.org/osrf/gazebo/pull-request/1027)
     * [Issue #1284](https://bitbucket.org/osrf/gazebo/issue/1284)
