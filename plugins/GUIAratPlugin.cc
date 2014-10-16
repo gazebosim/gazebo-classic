@@ -20,7 +20,6 @@
 #include <gazebo/rendering/UserCamera.hh>
 #include <gazebo/rendering/FPSViewController.hh>
 #include "GUIAratPlugin.hh"
-#include "teleop.h"
 
 using namespace gazebo;
 
@@ -106,9 +105,16 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   this->instructionsView->setReadOnly(true);
   this->instructionsView->setMaximumHeight(handImgY/3);
    
+  if(! elem->HasElement("taskGroup") ){
+    return;
+  }
   sdf::ElementPtr taskGroup = elem->GetElement("taskGroup");
+  //std::cout << "Getting tasks" << std::endl;
   while(taskGroup){
     std::string taskGroupName;
+    if(!taskGroup->HasAttribute("name")){
+      break;
+    }
     taskGroup->GetAttribute("name")->Get(taskGroupName);
 
     QGroupBox *buttonGroup = new QGroupBox();
@@ -206,6 +212,8 @@ GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
 
+  this->setFocusPolicy(Qt::StrongFocus);
+
   // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
   this->handImgFilename = paths->FindFileURI
@@ -220,6 +228,7 @@ GUIAratPlugin::GUIAratPlugin()
   std::string sdfString = inputStream.str();
   fileinput.close();
   
+  //std::cout << "getting sdf" << std::endl;
   // Parameters for sensor contact visualization
   sdf::SDF parameters;
   parameters.SetFromString(sdfString);
@@ -244,6 +253,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   elem->GetElement("iconDimensions")->GetValue()->Get(this->iconSize);
 
+  //std::cout << "getting contact names" << std::endl;
   // Get contact names
   if(elem->HasElement("contacts")){
     sdf::ElementPtr contact = elem->GetElement("contacts");
@@ -283,48 +293,69 @@ GUIAratPlugin::GUIAratPlugin()
   this->node->Init();
   this->taskPub = this->node->Advertise<msgs::GzString>("~/control");
 
-  this->ignNode = ignition::transport::NodePtr(
-                                new ignition::transport::Node("haptix"));
+  this->ignNode = new ignition::transport::Node("haptix");
   ignNode->Advertise("arm_pose_inc");
 
   // Parse some SDF to get the arm teleop commands
-  ElementPtr command = elem->GetElement("commands");
-  command = commands->GetElement("command");
+  //std::cout << "getting commands" << std::endl;
+  sdf::ElementPtr command = elem->GetElement("commands");
+  command = command->GetElement("command");
   while(command){
-    std::string button;
+    char button;
     std::string name;
     float increment;
     command->GetAttribute("button")->Get(button);
     command->GetAttribute("name")->Get(name);
     command->GetAttribute("increment")->Get(increment);
-
-    if(name.substr(0, "motor".size()).compare("motor") == 0){
-      handMappings[button] = KeyCommand(button, name, increment);
-    } else if(name.substr(0, "arm".size()).compare("arm") == 0){
-      armMappings[button] = KeyCommand(button, name, increment);
+    if(name.substr(0, 5).compare("motor") == 0){
+      this->handCommands[button] = KeyCommand(button, name, increment);
+      std::cout << "got hand button: " << button << std::endl;
+    } else if(name.substr(0, 3).compare("arm") == 0){
+      std::cout << "got arm button: " << button << std::endl;
+      this->armCommands[button] = KeyCommand(button, name, increment);
     }
+    buttonNames[name].push_back(button);
 
     command = command->GetNextElement();
   }
 
-  ElementPtr index = elem->GetElement("indices");
+  //std::cout << "Getting indices" << std::endl;
+  sdf::ElementPtr index = elem->GetElement("indices");
   index = index->GetElement("index");
   while(index){
     std::string name;
     int num;
     index->GetAttribute("name")->Get(name);
     index->GetAttribute("num")->Get(num);
-    if(handMappings.find(name) != handMappings.end()){
-      handMappings[name].index = num;
-    } else if (armMappings.find(name) != handMappings.end()){
-      armMappings[name].index = num;
+    std::vector<char> buttons = buttonNames[name];
+    for(int i = 0; i < buttons.size(); i++){
+      char button = buttons[i];
+      std::cout << "Got index: " << num << " for button " << button << std::endl;
+      if(this->handCommands.find(button) != this->handCommands.end()){
+        this->handCommands[button].index = num;
+      } else if (this->armCommands.find(button) != this->armCommands.end()){
+        this->armCommands[button].index = num;
+      }
     }
     index = index->GetNextElement();
   }
 
-  // Set up dat subscriber
-  KeyEventHandler::Instance()->AddReleaseFilter("Commands",
-                        boost::bind(&GUIAratPlugin::OnKeyRelease,  this, _1));
+  /*gui::KeyEventHandler::Instance()->AddReleaseFilter("Commands",
+                        boost::bind(&GUIAratPlugin::OnKeyRelease,  this, _1));*/
+
+  // Set up hx objects
+  if (hx_getdeviceinfo(hxGAZEBO, &handDeviceInfo) != hxOK)
+  {
+    std::cout << "hx_getdeviceinfo(): Request error. Cannot control hand."
+              << std::endl;
+  }
+  for(int i = 0; i < handDeviceInfo.nmotor; i++)
+  {
+    handCommand.ref_pos[i] = 0;
+  }
+  if(hx_update(hxGAZEBO, &handCommand, &handSensor) != hxOK ){
+    std::cout << "hx_update(): Request error.\n" << std::endl;
+  }
 
   // Set up an array of subscribers for each contact sensor
   for(std::map<std::string, math::Vector2d>::iterator it =
@@ -340,7 +371,11 @@ GUIAratPlugin::GUIAratPlugin()
 
   gui::get_active_camera()->SetViewController(
                                 rendering::FPSViewController::GetTypeString());
+
+  this->setFocus();
+
 }
+
 
 /////////////////////////////////////////////////
 GUIAratPlugin::~GUIAratPlugin()
@@ -433,50 +468,105 @@ void GUIAratPlugin::PreRender()
   }
 }
 
-void GUIAratPlugin::OnKeyRelease(const common::KeyEvent &_event)
+
+const hxAPLMotors mcp_indices[5] = {motor_little_mcp, motor_ring_mcp, motor_middle_mcp, motor_index_mcp, motor_thumb_mcp};
+
+void coupling_v1(_hxCommand* cmd){
+    //Version 1 Joint Coupling modeling
+    
+    //this relies on the ordering of enums, bit messy
+    for(int k = 0; k < 5; k++){
+      //Check if slider was changeded
+      
+      hxAPLMotors mcp = mcp_indices[k];
+      
+      float mcp_commanded = cmd->ref_pos[mcp];
+      if(mcp_commanded <= 0){
+        if(mcp == motor_thumb_mcp){
+          cmd->ref_pos[mcp+1] = 0; //thumb dip
+        } else {
+          cmd->ref_pos[mcp+1] = 0; //pip
+          cmd->ref_pos[mcp-1] = 0; //dip
+        }
+      } else {
+        if(mcp == motor_thumb_mcp){
+          cmd->ref_pos[mcp+1] = 8/9.0*mcp_commanded; //thumb dip
+        } else {
+          cmd->ref_pos[mcp+1] = 10/9.0*mcp_commanded; //pip
+          cmd->ref_pos[mcp-1] = 8/9.0*mcp_commanded; //dip
+        }
+      }
+    }
+
+}
+
+void GUIAratPlugin::keyPressEvent(QKeyEvent *_event)
 {
-  // convert key to a string
-  
-  
+  std::cout << "got key " << _event->key() << std::endl;
+  std::string text = _event->text().toStdString();
+  this->OnKeyEvent(text[0], false);
+}
+
+void GUIAratPlugin::keyReleaseEvent(QKeyEvent *_event)
+{
+  std::string text = _event->text().toStdString();
+  this->OnKeyEvent(text[0], true);
+}
+
+bool GUIAratPlugin::OnKeyEvent(const char key, const bool release)
+{
   // if key is in armCommands
-  if(this->armCommands.find(key) != armCommands.end()){
-    int index = armMappings[key].index;
-
+  if(this->armCommands.find(key) != this->armCommands.end()){
+    int index = this->armCommands[key].index;
+    if(index >= 6){
+      return false;
+    }
+    float inc = this->armCommands[key].increment;
     float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
-    pose_inc_args[index] = inc;
-    math::Pose pose_inc(pose_inc_args[0], pose_inc_args[1],
-                                          pose_inc_args[2], pose_inc_args[3],
-                                          pose_inc_args[4], pose_inc_args[5]);
+    if (!release){
+      pose_inc_args[index] = inc;
+    }
+    gazebo::math::Quaternion quat(pose_inc_args[3],
+                                 pose_inc_args[4], pose_inc_args[5]);
     gazebo::msgs::Pose msg;
-    gazebo::msgs::Vector3d* vec_msg;
-    vec_msg = msg.mutable_position();
-    vec_msg->set_x(pose_inc.Pos().X());
-    vec_msg->set_y(pose_inc.Pos().Y());
-    vec_msg->set_z(pose_inc.Pos().Z());
-    gazebo::msgs::Quaternion* quat_msg;
-    quat_msg = msg.mutable_orientation();
-    quat_msg->set_x(pose_inc.Rot().X());
-    quat_msg->set_y(pose_inc.Rot().Y());
-    quat_msg->set_z(pose_inc.Rot().Z());
-    quat_msg->set_w(pose_inc.Rot().W());
+    gazebo::msgs::Vector3d* vec_msg = msg.mutable_position();
+    vec_msg->set_x(pose_inc_args[0]);
+    vec_msg->set_y(pose_inc_args[1]);
+    vec_msg->set_z(pose_inc_args[2]);
+    gazebo::msgs::Quaternion* quat_msg = msg.mutable_orientation();
+    quat_msg->set_x(quat.x);
+    quat_msg->set_y(quat.y);
+    quat_msg->set_z(quat.z);
+    quat_msg->set_w(quat.w);
 
-    ignNode.Publish("/haptix/arm_pose_inc", msg);
-
-  } else if (this->handCommands.find(key) != handCommands.end()){
-    // if key is in handCommands
-      unsigned int motor_index = handMappings[key].index;
-      hxCommand cmd;
-      cmd.ref_pos[motor_index] += inc;
-
-      coupling_v1(&cmd);
-
-      if (hx_update(hxGAZEBO, &cmd, &sensor) != hxOK)
-        printf("hx_update(): Request error.\n");
-      else
-        cmd.timestamp = sensor.timestamp;
+    ignNode->Publish("/haptix/arm_pose_inc", msg);
   }
+  // if key is in handCommands
+  else if (this->handCommands.find(key) != this->handCommands.end())
+  {
+      int motor_index = this->handCommands[key].index;
+      std::cout << "got key " << key << ", index " << motor_index << std::endl;
+      if(motor_index >= handDeviceInfo.nmotor){
+        return false;
+      }
+      /*if(release){
+        for(int i = 0; i < handDeviceInfo.nmotor; i++){
+          handCommand.ref_vel[i] = 0;
+        }
+      } else {
 
+        handCommand.ref_vel[motor_index] += inc*100;
+      }*/
+      float inc = this->handCommands[key].increment;
+      handCommand.ref_pos[motor_index] += inc;
 
+      coupling_v1(&handCommand);
+
+      if (hx_update(hxGAZEBO, &handCommand, &handSensor) != hxOK){
+        printf("hx_update(): Request error.\n");
+      }
+  }
+  return false;
 }
 
 ////////////////////////////////////////////////

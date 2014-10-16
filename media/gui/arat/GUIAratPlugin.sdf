@@ -47,8 +47,7 @@
               instructions="Pick up the stone and place it on top of the box."></task>
       </taskGroup>
 
-      <taskGroup
-              name="Grip">
+      <taskGroup name="Grip">
         <task id="grip_1" icon="file://media/gui/arat/arat_icons/grip_1.jpg"
               name="Cups"
               instructions="Pour the contents of the filled cup into the empty cup."></task>
@@ -63,8 +62,7 @@
               instructions="Pick up the washer and place it on the metal peg."></task>
       </taskGroup>
       
-      <taskGroup
-              name="Pinch">
+      <taskGroup name="Pinch">
         <task id="pinch_1" icon="file://media/gui/arat/arat_icons/pinch_1.jpg"
               name="Ball bearing"
               instructions="Pick up the ball bearing and place it on top of the box, inside of the tin lid."></task>
@@ -74,209 +72,205 @@
       </taskGroup>
 
       <commands>
-        <hand>
-          <command button="-"
-          name="motor_little_ab_ad"
-          increment=0.05
-          ></command>
+        <command button="-"
+        name="motor_little_ab_ad"
+        increment=0.05
+        ></command>
 
-          <command button="_"
-          name="motor_little_ab_ad"
-          increment=-0.05
-          ></command>
+        <command button="_"
+        name="motor_little_ab_ad"
+        increment=-0.05
+        ></command>
 
-          <command button="p"
-          name="motor_little_mcp"
-          increment=0.05
-          ></command>
+        <command button="p"
+        name="motor_little_mcp"
+        increment=0.05
+        ></command>
 
-          <command button="P"
-          name="motor_little_mcp"
-          increment=-0.05
-          ></command>
+        <command button="P"
+        name="motor_little_mcp"
+        increment=-0.05
+        ></command>
 
-          <command button="0"
-          name="motor_ring_ab_ad"
-          increment=0.05
-          ></command>
+        <command button="0"
+        name="motor_ring_ab_ad"
+        increment=0.05
+        ></command>
 
-          <command button=")"
-          name="motor_ring_ab_ad"
-          increment=-0.05
-          ></command>
+        <command button=")"
+        name="motor_ring_ab_ad"
+        increment=-0.05
+        ></command>
 
-          <command button="o"
-          name="motor_ring_mcp"
-          increment=0.05
-          ></command>
+        <command button="o"
+        name="motor_ring_mcp"
+        increment=0.05
+        ></command>
 
-          <command button="O"
-          name="motor_ring_mcp"
-          increment=-0.05
-          ></command>
+        <command button="O"
+        name="motor_ring_mcp"
+        increment=-0.05
+        ></command>
 
-          <command button="9"
-          name="motor_middle_ab_ad"
-          increment=0.05
-          ></command>
+        <command button="9"
+        name="motor_middle_ab_ad"
+        increment=0.05
+        ></command>
 
-          <command button="("
-          name="motor_middle_ab_ad"
-          increment=-0.05
-          ></command>
+        <command button="("
+        name="motor_middle_ab_ad"
+        increment=-0.05
+        ></command>
 
-          <command button="i"
-          name="motor_middle_mcp"
-          increment=0.05
-          ></command>
+        <command button="i"
+        name="motor_middle_mcp"
+        increment=0.05
+        ></command>
 
-          <command button="I"
-          name="motor_middle_mcp"
-          increment=-0.05
-          ></command>
+        <command button="I"
+        name="motor_middle_mcp"
+        increment=-0.05
+        ></command>
 
-          <command button="8"
-          name="motor_index_ab_ad"
-          increment=0.05
-          ></command>
+        <command button="8"
+        name="motor_index_ab_ad"
+        increment=0.05
+        ></command>
 
-          <command button=""*""
-          name="motor_index_ab_ad"
-          increment=-0.05
-          ></command>
+        <command button="*"
+        name="motor_index_ab_ad"
+        increment=-0.05
+        ></command>
 
-          <command button="u"
-          name="motor_index_mcp"
-          increment=0.05
-          ></command>
+        <command button="u"
+        name="motor_index_mcp"
+        increment=0.05
+        ></command>
 
-          <command button="U"
-          name="motor_index_mcp"
-          increment=-0.05
-          ></command>
+        <command button="U"
+        name="motor_index_mcp"
+        increment=-0.05
+        ></command>
 
-          <command button="7"
-          name="motor_thumb_cmc_ab_ad"
-          increment=0.05
-          ></command>
+        <command button="7"
+        name="motor_thumb_cmc_ab_ad"
+        increment=0.05
+        ></command>
 
-          <command button="&"
-          name="motor_thumb_cmc_ab_ad"
-          increment=-0.05
-          ></command>
+        <command button="&amp;"
+        name="motor_thumb_cmc_ab_ad"
+        increment=-0.05
+        ></command>
 
-          <command button="6"
-          name="motor_thumb_cmc_fe"
-          increment=0.05
-          ></command>
+        <command button="6"
+        name="motor_thumb_cmc_fe"
+        increment=0.05
+        ></command>
 
-          <command button="^"
-          name="motor_thumb_cmc_fe"
-          increment=-0.05
-          ></command>
+        <command button="^"
+        name="motor_thumb_cmc_fe"
+        increment=-0.05
+        ></command>
 
-          <command button="y"
-          name="motor_thumb_mcp"
-          increment=0.05
-          ></command>
+        <command button="y"
+        name="motor_thumb_mcp"
+        increment=0.05
+        ></command>
 
-          <command button="Y"
-          name="motor_thumb_mcp"
-          increment=-0.05
-          ></command>
+        <command button="Y"
+        name="motor_thumb_mcp"
+        increment=-0.05
+        ></command>
 
-          <command button="k"
-          name="motor_wrist_rot"
-          increment=0.05
-          ></command>
+        <command button="k"
+        name="motor_wrist_rot"
+        increment=0.05
+        ></command>
 
-          <command button="K"
-          name="motor_wrist_rot"
-          increment=-0.05
-          ></command>
+        <command button="K"
+        name="motor_wrist_rot"
+        increment=-0.05
+        ></command>
 
-          <command button="l"
-          name="motor_wrist_dev"
-          increment=0.05
-          ></command>
+        <command button="l"
+        name="motor_wrist_dev"
+        increment=0.05
+        ></command>
 
-          <command button="L"
-          name="motor_wrist_dev"
-          increment=-0.05
-          ></command>
+        <command button="L"
+        name="motor_wrist_dev"
+        increment=-0.05
+        ></command>
 
-          <command button=";"
-          name="motor_wrist_fe"
-          increment=0.05
-          ></command>
+        <command button=";"
+        name="motor_wrist_fe"
+        increment=0.05
+        ></command>
 
-          <command button='"'
-          name="motor_wrist_fe"
-          increment=-0.05
-          ></command>
-        </hand>
+        <command button=":"
+        name="motor_wrist_fe"
+        increment=-0.05
+        ></command>
         
-        <arm>
-          <command button="g"
-          name="arm_pos_x"
-          increment=0.025
-          ></command>
+        <command button="g"
+        name="arm_pos_x"
+        increment=0.025
+        ></command>
 
-          <command button="G"
-          name="arm_pos_x"
-          increment=-0.025
-          ></command>
+        <command button="G"
+        name="arm_pos_x"
+        increment=-0.025
+        ></command>
 
-          <command button="h"
-          name="arm_pos_y"
-          increment=0.025
-          ></command>
+        <command button="h"
+        name="arm_pos_y"
+        increment=0.025
+        ></command>
 
-          <command button="H"
-          name="arm_pos_y"
-          increment=-0.025
-          ></command>
+        <command button="H"
+        name="arm_pos_y"
+        increment=-0.025
+        ></command>
 
-          <command button="j"
-          name="arm_pos_z"
-          increment=0.025
-          ></command>
+        <command button="j"
+        name="arm_pos_z"
+        increment=0.025
+        ></command>
 
-          <command button="J"
-          name="arm_pos_z"
-          increment=-0.025
-          ></command>
+        <command button="J"
+        name="arm_pos_z"
+        increment=-0.025
+        ></command>
 
-          <command button="b"
-          name="arm_rot_x"
-          increment=0.025
-          ></command>
+        <command button="b"
+        name="arm_rot_x"
+        increment=0.025
+        ></command>
 
-          <command button="B"
-          name="arm_rot_x"
-          increment=-0.025
-          ></command>
+        <command button="B"
+        name="arm_rot_x"
+        increment=-0.025
+        ></command>
 
-          <command button="n"
-          name="arm_rot_y"
-          increment=0.025
-          ></command>
+        <command button="n"
+        name="arm_rot_y"
+        increment=0.025
+        ></command>
 
-          <command button="N"
-          name="arm_rot_y"
-          increment=-0.025
-          ></command>
+        <command button="N"
+        name="arm_rot_y"
+        increment=-0.025
+        ></command>
 
-          <command button="m"
-          name="arm_rot_z"
-          increment=0.025
-          ></command>
+        <command button="m"
+        name="arm_rot_z"
+        increment=0.025
+        ></command>
 
-          <command button="M"
-          name="arm_rot_z"
-          increment=-0.025
-          ></command>
-        </arm>
+        <command button="M"
+        name="arm_rot_z"
+        increment=-0.025
+        ></command>
       </commands>
 
       <indices>

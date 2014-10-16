@@ -20,7 +20,6 @@
 #include <queue>
 
 #include <haptix/comm/haptix.h>
-#include "teleop.h"
 #include <ignition/transport.hh>
 
 #include "gazebo/common/Events.hh"
@@ -44,13 +43,14 @@ namespace gazebo
     class KeyCommand
     {
       public:
-        std::string button;
+        char button;
         std::string name;
         int index;
         float increment;
-        KeyCommand(std::string b, std::string n, float i) :
+        KeyCommand(const char b, const std::string& n, const float i) :
                         button(b), name(n), increment(i){}
-    }
+        KeyCommand(){index = 0; }
+    };
 
     class QTaskButton : public QToolButton
     {
@@ -84,6 +84,8 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GUIAratPlugin();
 
+      protected: void keyPressEvent(QKeyEvent *_event);
+      protected: void keyReleaseEvent(QKeyEvent *_event);
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
       protected slots: void OnTaskSent(const std::string &id,
@@ -96,10 +98,14 @@ namespace gazebo
       /// \brief Node used to establish communication with gzserver.
       private: gazebo::transport::NodePtr node;
 
-      private: ignition::transport::NodePtr ignNode;
+      private: ignition::transport::Node* ignNode;
+      private: hxSensor handSensor;
+      private: hxDeviceInfo handDeviceInfo;
+      hxCommand handCommand;
 
-      private: std::map<std::string, KeyCommand> armCommands;
-      private: std::map<std::string, KeyCommand> handCommands;
+      private: std::map<char, KeyCommand> armCommands;
+      private: std::map<char, KeyCommand> handCommands;
+      private: std::map<std::string, std::vector<char> > buttonNames;
 
       /// \brief Publisher of factory messages.
       private: gazebo::transport::PublisherPtr taskPub;
@@ -154,7 +160,7 @@ namespace gazebo
 
       private: void OnFingerContact(ConstContactsPtr &msg);
       
-      private: void OnKeyRelease(const common::KeyEvent &_event);
+      private: bool OnKeyEvent(const char key, const bool release);
 
       private: std::string getTopicName(const std::string& fingerName);
 
