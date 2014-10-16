@@ -36,6 +36,7 @@ WindowDoorInspectorDialog::WindowDoorInspectorDialog(int _mode,
 
   std::string titleStr = dialogModeStr + " Inspector";
   this->setWindowTitle(tr(titleStr.c_str()));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   std::string itemLabelStr = dialogModeStr + " Name:";
   QLabel *itemlLabel = new QLabel(tr(itemLabelStr.c_str()));

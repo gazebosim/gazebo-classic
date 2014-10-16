@@ -29,6 +29,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->jointType = _jointType;
 

@@ -27,6 +27,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->setObjectName("stairsInspectorDialog");
 
   this->setWindowTitle(tr("Stairs Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *stairsLabel = new QLabel(tr("Stairs Name: "));
   this->stairsNameLabel = new QLabel(tr(""));
