@@ -15,14 +15,8 @@
  *
 */
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-
 #include "gazebo/common/Assert.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/sensors/ContactSensor.hh"
-#include "gazebo/transport/transport.hh"
+#include "gazebo/physics/Model.hh"
 #include "plugins/InitialVelocityPlugin.hh"
 
 using namespace gazebo;
