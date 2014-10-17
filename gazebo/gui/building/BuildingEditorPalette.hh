@@ -94,7 +94,7 @@ namespace gazebo
       private: QPushButton *saveButton;
 
       /// \brief All the brushes (wall, door, window, stair, etc).
-      private: QButtonGroup * brushes;
+      private: QButtonGroup *brushes;
 
       /// \brief Name of model.
       private: std::string modelName;
