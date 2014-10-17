@@ -59,11 +59,6 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
   //TODO: take care of race conditions
   math::Pose velocity = this->camera->GetVelocity();
   if((_event.buttons & common::MouseEvent::LEFT)){
-    float angularVel = 0.075;
-    directionVec.x = -angularVel * drag.x;
-    directionVec.y = angularVel * drag.y;
-    /*math::Pose velocityIncrement = math::Pose(0, 0, 0, 0, directionVec.x, directionVec.y );
-    this->camera->SetVelocity(velocityIncrement);*/
     this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));
     this->camera->RotatePitch(GZ_DTOR(drag.y*0.1));
   }
@@ -95,21 +90,22 @@ void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 //////////////////////////////////////////////////
 void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
-  float linearVelocity = 0.9;
+  float xVelocity = 1.0;
+  float yVelocity = 0.8;
   if(_key.compare("w") == 0)
   {
-    this->camera->SetVelocity(math::Pose(linearVelocity, 0, 0, 0, 0, 0));
+    this->camera->SetVelocity(math::Pose(xVelocity, 0, 0, 0, 0, 0));
   }
   else if (_key.compare("a") == 0)
   {
-    this->camera->SetVelocity(math::Pose(0, linearVelocity, 0, 0, 0, 0));
+    this->camera->SetVelocity(math::Pose(0, yVelocity, 0, 0, 0, 0));
   }
   else if (_key.compare("s") == 0)
   {
-    this->camera->SetVelocity(math::Pose(-linearVelocity, 0, 0, 0, 0, 0));
+    this->camera->SetVelocity(math::Pose(-xVelocity, 0, 0, 0, 0, 0));
   }
   else if (_key.compare("d") == 0)
   {
-    this->camera->SetVelocity(math::Pose(0, -linearVelocity, 0, 0, 0, 0));
+    this->camera->SetVelocity(math::Pose(0, -yVelocity, 0, 0, 0, 0));
   }
 }
