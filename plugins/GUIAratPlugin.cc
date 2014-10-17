@@ -212,7 +212,6 @@ GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
 
-  this->setFocusPolicy(Qt::StrongFocus);
 
   // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
@@ -372,7 +371,8 @@ GUIAratPlugin::GUIAratPlugin()
   gui::get_active_camera()->SetViewController(
                                 rendering::FPSViewController::GetTypeString());
 
-  this->setFocus();
+  gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
+                          boost::bind(&GUIAratPlugin::OnKeyEvent, this, _1));
 
 }
 
@@ -500,7 +500,7 @@ void coupling_v1(_hxCommand* cmd){
 
 }
 
-void GUIAratPlugin::keyPressEvent(QKeyEvent *_event)
+/*void GUIAratPlugin::keyPressEvent(QKeyEvent *_event)
 {
   std::cout << "got key " << _event->key() << std::endl;
   std::string text = _event->text().toStdString();
@@ -511,10 +511,12 @@ void GUIAratPlugin::keyReleaseEvent(QKeyEvent *_event)
 {
   std::string text = _event->text().toStdString();
   this->OnKeyEvent(text[0], true);
-}
+}*/
 
-bool GUIAratPlugin::OnKeyEvent(const char key, const bool release)
+bool GUIAratPlugin::OnKeyEvent(common::KeyEvent _event)
 {
+  std::string text = _event.text;
+  char key = text[0];
   // if key is in armCommands
   if(this->armCommands.find(key) != this->armCommands.end()){
     int index = this->armCommands[key].index;
@@ -523,9 +525,9 @@ bool GUIAratPlugin::OnKeyEvent(const char key, const bool release)
     }
     float inc = this->armCommands[key].increment;
     float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
-    if (!release){
-      pose_inc_args[index] = inc;
-    }
+    //if (!release){
+    pose_inc_args[index] = inc;
+    //}
     gazebo::math::Quaternion quat(pose_inc_args[3],
                                  pose_inc_args[4], pose_inc_args[5]);
     gazebo::msgs::Pose msg;

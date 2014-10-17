@@ -84,8 +84,6 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~GUIAratPlugin();
 
-      protected: void keyPressEvent(QKeyEvent *_event);
-      protected: void keyReleaseEvent(QKeyEvent *_event);
       /// \brief Callback trigged when the button is pressed.
       //protected slots: void OnButton();
       protected slots: void OnTaskSent(const std::string &id,
@@ -160,7 +158,7 @@ namespace gazebo
 
       private: void OnFingerContact(ConstContactsPtr &msg);
       
-      private: bool OnKeyEvent(const char key, const bool release);
+      private: bool OnKeyEvent(common::KeyEvent _event);
 
       private: std::string getTopicName(const std::string& fingerName);
 
