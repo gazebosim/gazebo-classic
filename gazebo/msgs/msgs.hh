@@ -116,6 +116,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     math::Vector3    Convert(const msgs::Vector3d &_v);
 
+    /// \brief Convert a msgs::Vector2d to a math::Vector2d
+    /// \param[in] _v The vector2 to convert
+    /// \return A math::Vector2d object
+    GAZEBO_VISIBLE
+    math::Vector2d    Convert(const msgs::Vector2d &_v);
+
     /// \brief Convert a msgs::Quaternion to a math::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A math::Quaternion object
@@ -255,6 +261,15 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
+    /// \brief Create an SDF element from a msgs::Scene
+    /// \param[in] _msg Light messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element
+    GAZEBO_VISIBLE
+    sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
     /// \cond
     GAZEBO_VISIBLE
     const google::protobuf::FieldDescriptor *GetFD(
@@ -272,4 +287,3 @@ namespace gazebo
 }
 
 #endif
-
