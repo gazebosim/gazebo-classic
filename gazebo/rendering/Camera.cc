@@ -384,7 +384,6 @@ void Camera::Update()
     this->Translate(translate);
     this->RotateRoll(velocity.rot.GetPitch()*dt);
     this->RotateYaw(velocity.rot.GetYaw()*dt);
-    //this->Rotate(0, velocity.rot.GetPitch()*dt, velocity.rot.GetYaw()*dt);
   }
 }
 
@@ -603,22 +602,6 @@ void Camera::Translate(const math::Vector3 &direction)
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
   this->sceneNode->translate(this->sceneNode->getOrientation() * vec);
-}
-
-void Camera::Rotate(const math::Quaternion &_quat)
-{
-  this->sceneNode->setOrientation(
-                          Ogre::Quaternion(_quat.w, _quat.x, _quat.y, _quat.z));
-}
-
-void Camera::Rotate(const math::Vector3 &_euler)
-{
-  this->Rotate(math::Quaternion(_euler));
-}
-
-void Camera::Rotate(const float _x, const float _y, const float _z)
-{
-  this->Rotate(math::Vector3(_x, _y, _z));
 }
 
 //////////////////////////////////////////////////

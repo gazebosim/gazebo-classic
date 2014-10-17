@@ -16,9 +16,6 @@
 */
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/rendering/FPSViewController.hh>
-#include <gazebo/rendering/UserCamera.hh>
-#include <gazebo/gui/GuiIface.hh>
 #include "GUIExampleTimeWidget.hh"
 
 using namespace gazebo;
@@ -75,10 +72,6 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
   this->node->Init("default");
   this->statsSub = this->node->Subscribe("~/world_stats",
       &GUIExampleTimeWidget::OnStats, this);
-
-  gui::get_active_camera()->SetViewController(
-                          rendering::FPSViewController::GetTypeString());
-
 }
 
 /////////////////////////////////////////////////

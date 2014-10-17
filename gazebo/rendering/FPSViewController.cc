@@ -56,7 +56,6 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector2d directionVec(0, 0);
 
-  //TODO: take care of race conditions
   math::Pose velocity = this->camera->GetVelocity();
   if((_event.buttons & common::MouseEvent::LEFT)){
     this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));

@@ -193,12 +193,6 @@ namespace gazebo
       /// \param[in] _angle Pitch amount
       public: void RotatePitch(math::Angle _angle);
 
-      void Rotate(const math::Quaternion &_quat);
-
-      void Rotate(const math::Vector3 &_euler);
-
-      void Rotate(const float _x, const float _y, const float _z);
-
       /// \brief Set the clip distances
       /// \param[in] _near Near clip distance in meters
       /// \param[in] _far Far clip distance in meters
