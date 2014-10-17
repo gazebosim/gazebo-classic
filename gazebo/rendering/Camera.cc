@@ -624,19 +624,19 @@ void Camera::Rotate(const float _x, const float _y, const float _z)
 //////////////////////////////////////////////////
 void Camera::RotateRoll(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()));
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()));
 }
 
 //////////////////////////////////////////////////
 void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()));
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
 
 

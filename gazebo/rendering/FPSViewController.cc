@@ -62,8 +62,10 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
     float angularVel = 0.075;
     directionVec.x = -angularVel * drag.x;
     directionVec.y = angularVel * drag.y;
-    math::Pose velocityIncrement = math::Pose(0, 0, 0, 0, directionVec.x, directionVec.y );
-    this->camera->SetVelocity(velocityIncrement);
+    /*math::Pose velocityIncrement = math::Pose(0, 0, 0, 0, directionVec.x, directionVec.y );
+    this->camera->SetVelocity(velocityIncrement);*/
+    this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));
+    this->camera->RotatePitch(GZ_DTOR(drag.y*0.1));
   }
   else 
   {
