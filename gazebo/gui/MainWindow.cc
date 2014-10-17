@@ -1040,7 +1040,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   {
     newMenuBar = _bar;
   }
-  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  QList<QMenu *> menus = newMenuBar->findChildren<QMenu *>();
   for (int i = 0; i < menus.size(); ++i)
   {
     this->menuBar->addMenu(menus[i]);
