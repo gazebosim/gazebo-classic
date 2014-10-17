@@ -692,7 +692,7 @@ void RectItem::SetPositionOnWall(double _positionOnWall)
 }
 
 /////////////////////////////////////////////////
-double RectItem::GetPositionOnWall()
+double RectItem::GetPositionOnWall() const
 {
   return this->positionOnWall;
 }
