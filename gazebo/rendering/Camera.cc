@@ -382,7 +382,9 @@ void Camera::Update()
     math::Vector3 translate(velocity.pos[0]*dt, velocity.pos[1]*dt,
                              velocity.pos[2]*dt);
     this->Translate(translate);
-    this->RotateRoll(velocity.rot.GetPitch()*dt);
+    // You probably don't want to roll the camera, but it's an option
+    this->RotateRoll(velocity.rot.GetRoll()*dt);
+    this->RotatePitch(velocity.rot.GetPitch()*dt);
     this->RotateYaw(velocity.rot.GetYaw()*dt);
   }
 }
@@ -605,6 +607,9 @@ void Camera::Translate(const math::Vector3 &direction)
 }
 
 //////////////////////////////////////////////////
+// The following 3 methods incorporate a rotation between the Ogre and Gazebo
+// cameras
+
 void Camera::RotateRoll(math::Angle _angle)
 {
   this->sceneNode->pitch(Ogre::Radian(_angle.Radian()));
@@ -621,7 +626,6 @@ void Camera::RotatePitch(math::Angle _angle)
 {
   this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
-
 
 //////////////////////////////////////////////////
 void Camera::SetClipDist()
