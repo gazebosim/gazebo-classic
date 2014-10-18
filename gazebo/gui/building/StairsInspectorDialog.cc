@@ -135,6 +135,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
