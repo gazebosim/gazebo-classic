@@ -55,7 +55,8 @@ double BuildingMaker::conversionScale;
 /////////////////////////////////////////////////
   BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->modelName = "";
+  this->buildingDefaultName = "BuildingDefaultName";
+  this->modelName = this->buildingDefaultName;
 
   this->conversionScale = 0.01;
 
@@ -73,18 +74,16 @@ double BuildingMaker::conversionScale;
 
   this->connections.push_back(
   gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&BuildingMaker::OnSave, this)));
+    boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectDiscardBuildingEditor(
     boost::bind(&BuildingMaker::OnDiscard, this)));
   this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this)));
+    boost::bind(&BuildingMaker::OnDone, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
-
-  this->buildingDefaultName = "BuildingDefaultName";
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -1326,8 +1325,11 @@ void BuildingMaker::OnDiscard()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnSave()
+void BuildingMaker::OnSave(std::string _saveName = "")
 {
+  if (_saveName != "")
+    this->modelName = _saveName;
+
   if (this->saved)
   {
     this->SetModelName(this->modelName);
@@ -1352,8 +1354,11 @@ void BuildingMaker::OnSave()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDone()
+void BuildingMaker::OnDone(std::string _saveName = "")
 {
+  if (_saveName != "")
+    this->modelName = _saveName;
+
   this->finishDialog->SetModelName(this->modelName);
   this->finishDialog->SetSaveLocation(this->saveLocation);
   if (this->finishDialog->exec() == QDialog::Accepted)
