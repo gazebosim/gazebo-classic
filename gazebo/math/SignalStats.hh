@@ -14,14 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _SIGNAL_STATS_HH_
-#define _SIGNAL_STATS_HH_
+#ifndef _GAZEBO_SIGNAL_STATS_HH_
+#define _GAZEBO_SIGNAL_STATS_HH_
 
 #include <map>
 #include <string>
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -30,6 +27,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_math
     /// \{
+
+    /// \brief Forward declare private data class.
+    class SignalStatisticPrivate;
 
     /// \class SignalStatistic SignalStats.hh math/gzmath.hh
     /// \brief Statistical properties of a discrete time scalar signal.
@@ -43,52 +43,41 @@ namespace gazebo
 
       /// \brief Get the current value of the statistical measure.
       /// \return Current value of the statistical measure.
-      public: virtual double Get() const = 0;
+      public: virtual double Value() const = 0;
 
       /// \brief Get a short version of the name of this statistical measure.
       /// \return Short name of the statistical measure.
-      public: virtual std::string GetShortName() const = 0;
+      public: virtual std::string ShortName() const = 0;
 
       /// \brief Get number of data points in measurement.
       /// \return Number of data points in measurement.
-      public: virtual unsigned int GetCount() const;
+      public: virtual size_t Count() const;
 
       /// \brief Add a new sample to the statistical measure.
       /// \param[in] _data New signal data point.
-      public: virtual void InsertData(double _data) = 0;
+      public: virtual void InsertData(const double _data) = 0;
 
       /// \brief Forget all previous data.
       public: virtual void Reset();
 
-      /// \brief Scalar representation of signal data.
-      protected: double data;
-
-      /// \brief Count of data values in mean.
-      protected: unsigned int count;
+      /// \brief Pointer to private data.
+      protected: SignalStatisticPrivate *dataPtr;
     };
     /// \}
-
-    /// \def SignalStatisticPtr
-    /// \brief Boost shared pointer to SignalStatistic object
-    typedef boost::shared_ptr<SignalStatistic> SignalStatisticPtr;
-
-    /// \def SignalStatistic_V
-    /// \brief Vector of SignalStatisticPtr
-    typedef std::vector<SignalStatisticPtr> SignalStatistic_V;
 
     /// \class SignalMean SignalStats.hh math/gzmath.hh
     /// \brief Computing the mean value of a discretely sampled signal.
     class GAZEBO_VISIBLE SignalMean : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "Mean"
-      public: virtual std::string GetShortName() const;
+      /// \return "mean"
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
 
@@ -98,14 +87,14 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalRootMeanSquare : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "Rms"
-      public: virtual std::string GetShortName() const;
+      /// \return "rms"
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
 
@@ -116,16 +105,19 @@ namespace gazebo
     class GAZEBO_VISIBLE SignalMaxAbsoluteValue : public SignalStatistic
     {
       // Documentation inherited.
-      public: virtual double Get() const;
+      public: virtual double Value() const;
 
       /// \brief Get a short version of the name of this statistical measure.
-      /// \return "MaxAbs"
-      public: virtual std::string GetShortName() const;
+      /// \return "maxAbs"
+      public: virtual std::string ShortName() const;
 
       // Documentation inherited.
-      public: virtual void InsertData(double _data);
+      public: virtual void InsertData(const double _data);
     };
     /// \}
+
+    /// \brief Forward declare private data class.
+    class SignalStatsPrivate;
 
     /// \class SignalStats SignalStats.hh math/gzmath.hh
     /// \brief Collection of statistics for a scalar signal.
@@ -138,34 +130,37 @@ namespace gazebo
       public: ~SignalStats();
 
       /// \brief Get number of data points in first statistic.
+      /// Technically you can have different numbers of data points
+      /// in each statistic if you call InsertStatistic after InsertData,
+      /// but this is not a recommended use case.
       /// \return Number of data points in first statistic.
-      public: unsigned int GetCount() const;
+      public: size_t Count() const;
 
       /// \brief Get the current values of each statistical measure,
       /// stored in a map using the short name as the key.
       /// \return Map with short name of each statistic as key
       /// and value of statistic as the value.
-      public: std::map<std::string, double> GetMap() const;
+      public: std::map<std::string, double> Map() const;
 
       /// \brief Add a new sample to the statistical measures.
       /// \param[in] _data New signal data point.
-      public: void InsertData(double _data);
+      public: void InsertData(const double _data);
 
       /// \brief Add a new type of statistic.
       /// \param[in] _name Short name of new statistic.
       /// Valid values include:
-      ///  "MaxAbs"
-      ///  "Mean"
-      ///  "Rms"
+      ///  "maxAbs"
+      ///  "mean"
+      ///  "rms"
       /// \return True if statistic was successfully added,
       /// false if name was not recognized or had already
       /// been inserted.
       public: bool InsertStatistic(const std::string &_name);
 
-      /// \brief Add a new type of statistic.
+      /// \brief Add multiple statistics.
       /// \param[in] _names Comma-separated list of new statistics.
       /// For example, all statistics could be added with:
-      ///  "MaxAbs,Mean,Rms"
+      ///  "maxAbs,mean,rms"
       /// \return True if all statistics were successfully added,
       /// false if any names were not recognized or had already
       /// been inserted.
@@ -174,59 +169,8 @@ namespace gazebo
       /// \brief Forget all previous data.
       public: void Reset();
 
-      /// \brief Vector of `SignalStatistic`s.
-      private: SignalStatistic_V stats;
-    };
-    /// \}
-
-    /// \class Vector3Stats SignalStats.hh math/gzmath.hh
-    /// \brief Collection of statistics for a Vector3 signal.
-    class GAZEBO_VISIBLE Vector3Stats
-    {
-      /// \brief Constructor
-      public: Vector3Stats();
-
-      /// \brief Destructor
-      public: ~Vector3Stats();
-
-      /// \brief Add a new sample to the statistical measures.
-      /// \param[in] _data New signal data point.
-      public: void InsertData(const Vector3 &_data);
-
-      /// \brief Add a new type of statistic.
-      /// \param[in] _name Short name of new statistic.
-      /// Valid values include:
-      ///  "MaxAbs"
-      ///  "Mean"
-      ///  "Rms"
-      /// \return True if statistic was successfully added,
-      /// false if name was not recognized or had already
-      /// been inserted.
-      public: bool InsertStatistic(const std::string &_name);
-
-      /// \brief Add a new type of statistic.
-      /// \param[in] _names Comma-separated list of new statistics.
-      /// For example, all statistics could be added with:
-      ///  "MaxAbs,Mean,Rms"
-      /// \return True if all statistics were successfully added,
-      /// false if any names were not recognized or had already
-      /// been inserted.
-      public: bool InsertStatistics(const std::string &_names);
-
-      /// \brief Forget all previous data.
-      public: void Reset();
-
-      /// \brief Statistics for x component of signal.
-      public: SignalStats x;
-
-      /// \brief Statistics for y component of signal.
-      public: SignalStats y;
-
-      /// \brief Statistics for z component of signal.
-      public: SignalStats z;
-
-      /// \brief Statistics for magnitude of signal.
-      public: SignalStats mag;
+      /// \brief Pointer to private data.
+      protected: SignalStatsPrivate *dataPtr;
     };
     /// \}
   }

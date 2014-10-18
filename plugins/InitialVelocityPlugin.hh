@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INITIAL_VELOCITY_PLUGIN_HH_
-#define _INITIAL_VELOCITY_PLUGIN_HH_
+#ifndef _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
+#define _GAZEBO_INITIAL_VELOCITY_PLUGIN_HH_
 
 #include <string>
 #include <vector>
@@ -47,4 +47,5 @@ namespace gazebo
     private: sdf::ElementPtr sdf;
   };
 }
-#endif  // ifndef _INITIAL_VELOCITY_PLUGIN_HH_
+// ifndef _INITIAL_VELOCITY_PLUGIN_HH_
+#endif

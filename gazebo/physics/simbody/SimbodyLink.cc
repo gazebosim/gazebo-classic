@@ -528,7 +528,6 @@ void SimbodyLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
 /////////////////////////////////////////////////
 void SimbodyLink::AddTorque(const math::Vector3 &/*_torque*/)
 {
-  gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////

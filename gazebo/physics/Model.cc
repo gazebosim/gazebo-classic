@@ -371,12 +371,7 @@ void Model::Reset()
 {
   Entity::Reset();
 
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
@@ -390,6 +385,17 @@ void Model::Reset()
        iter != this->plugins.end(); ++iter)
   {
     (*iter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 

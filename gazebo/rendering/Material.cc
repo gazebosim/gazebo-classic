@@ -150,7 +150,6 @@ void Material::Update(const gazebo::common::Material *_mat)
     matPtr = Ogre::MaterialManager::getSingleton().create(
         _mat->GetName(), "General");
 
-  matPtr->setReceiveShadows(false);
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
   common::Color ambient =  _mat->GetAmbient();

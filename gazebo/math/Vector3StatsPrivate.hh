@@ -14,29 +14,31 @@
  * limitations under the License.
  *
 */
-#ifndef _WIREBOX_PRIVATE_HH_
-#define _WIREBOX_PRIVATE_HH_
+#ifndef _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
+#define _GAZEBO_VECTOR3_STATS_PRIVATE_HH_
 
-#include "gazebo/math/Box.hh"
-#include "gazebo/rendering/Visual.hh"
-#include "gazebo/rendering/DynamicLines.hh"
+#include "gazebo/math/SignalStats.hh"
 
 namespace gazebo
 {
-  namespace rendering
+  namespace math
   {
-    /// \brief Private data for the WireBox class
-    class WireBoxPrivate
+    /// \brief Private data class for the Vector3Stats class.
+    class Vector3StatsPrivate
     {
-      /// \brief Copy of bounding box.
-      public: math::Box box;
+      /// \brief Statistics for x component of signal.
+      public: SignalStats x;
 
-      /// \brief The lines which outline the box.
-      public: DynamicLines *lines;
+      /// \brief Statistics for y component of signal.
+      public: SignalStats y;
 
-      /// \brief The visual which this box is attached to.
-      public: VisualPtr parent;
+      /// \brief Statistics for z component of signal.
+      public: SignalStats z;
+
+      /// \brief Statistics for magnitude of signal.
+      public: SignalStats mag;
     };
   }
 }
 #endif
+
