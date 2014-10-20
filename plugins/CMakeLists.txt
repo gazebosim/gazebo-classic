@@ -65,6 +65,9 @@ set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
 
+QT4_WRAP_CPP(GUIAratPlugin_MOC GUIAratPlugin.hh)
+add_library(GUIAratPlugin SHARED ${GUIAratPlugin_MOC} GUIAratPlugin.cc)
+
 # customize for haptix control plugin
 find_package(haptix_comm REQUIRED)
 find_package(ignition-transport REQUIRED)
@@ -84,6 +87,9 @@ add_library(HaptixControlPlugin SHARED HaptixControlPlugin.cc)
 target_link_libraries(HaptixControlPlugin ${GAZEBO_LIBRARIES}
   spnav polhemus_driver haptix_comm
   ${IGNITION-TRANSPORT_LIBRARIES})
+target_link_libraries( GUIAratPlugin ${GAZEBO_LIBRARIES} ${OGRE_LIBRARIES} 
+            ${OGRE-Terrain_LIBRARIES} ${QT_LIBRARIES} ${PROTOBUF_LIBRARIES}
+            haptix_comm ${IGNITION-TRANSPORT_LIBRARIES})
 # below adds -std=c++11, needed to compile against ign-transport
 set_target_properties(GUIAratPlugin PROPERTIES
   COMPILE_FLAGS ${IGNITION-TRANSPORT_CXX_FLAGS})

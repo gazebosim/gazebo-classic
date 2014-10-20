@@ -176,7 +176,8 @@ namespace gazebo
     private: std::vector<sensors::ImuSensorPtr> imuSensors;
 
     // internal controllers for holding hand pose
-    private: std::vector<common::PID> pids;
+    private: std::vector<common::PID> position_pids;
+    private: std::vector<common::PID> velocity_pids;
 
     // using ignition transport and haptix comm
     private: ignition::transport::Node ignNode;

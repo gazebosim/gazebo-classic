@@ -308,9 +308,9 @@ GUIAratPlugin::GUIAratPlugin()
     command->GetAttribute("increment")->Get(increment);
     if(name.substr(0, 5).compare("motor") == 0){
       this->handCommands[button] = KeyCommand(button, name, increment);
-      std::cout << "got hand button: " << button << std::endl;
+      //std::cout << "got hand button: " << button << std::endl;
     } else if(name.substr(0, 3).compare("arm") == 0){
-      std::cout << "got arm button: " << button << std::endl;
+      //std::cout << "got arm button: " << button << std::endl;
       this->armCommands[button] = KeyCommand(button, name, increment);
     }
     buttonNames[name].push_back(button);
@@ -327,9 +327,9 @@ GUIAratPlugin::GUIAratPlugin()
     index->GetAttribute("name")->Get(name);
     index->GetAttribute("num")->Get(num);
     std::vector<char> buttons = buttonNames[name];
-    for(int i = 0; i < buttons.size(); i++){
+    for(unsigned int i = 0; i < buttons.size(); i++){
       char button = buttons[i];
-      std::cout << "Got index: " << num << " for button " << button << std::endl;
+      //std::cout << "Got index: " << num << " for button " << button << std::endl;
       if(this->handCommands.find(button) != this->handCommands.end()){
         this->handCommands[button].index = num;
       } else if (this->armCommands.find(button) != this->armCommands.end()){
@@ -338,9 +338,6 @@ GUIAratPlugin::GUIAratPlugin()
     }
     index = index->GetNextElement();
   }
-
-  /*gui::KeyEventHandler::Instance()->AddReleaseFilter("Commands",
-                        boost::bind(&GUIAratPlugin::OnKeyRelease,  this, _1));*/
 
   // Set up hx objects
   if (hx_getdeviceinfo(hxGAZEBO, &handDeviceInfo) != hxOK)
@@ -372,7 +369,7 @@ GUIAratPlugin::GUIAratPlugin()
                                 rendering::FPSViewController::GetTypeString());
 
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
-                          boost::bind(&GUIAratPlugin::OnKeyEvent, this, _1));
+                          boost::bind(&GUIAratPlugin::OnKeyPress, this, _1));
 
 }
 
@@ -382,16 +379,6 @@ GUIAratPlugin::~GUIAratPlugin()
 {
 }
 
-/*void GUIAratPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
-{
-  _visual->GetScene()->GetUserCamera(0)->SetViewController(
-                                rendering::FPSViewController::GetTypeString());
-}
-
-void GUIAratPlugin::Init()
-{
-
-}*/
 
 std::string GUIAratPlugin::getTopicName(const std::string& fingerName)
 {
@@ -513,9 +500,10 @@ void GUIAratPlugin::keyReleaseEvent(QKeyEvent *_event)
   this->OnKeyEvent(text[0], true);
 }*/
 
-bool GUIAratPlugin::OnKeyEvent(common::KeyEvent _event)
+bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
 {
   std::string text = _event.text;
+  //std::cout << "got key " << text <<  std::endl;
   char key = text[0];
   // if key is in armCommands
   if(this->armCommands.find(key) != this->armCommands.end()){
@@ -547,7 +535,6 @@ bool GUIAratPlugin::OnKeyEvent(common::KeyEvent _event)
   else if (this->handCommands.find(key) != this->handCommands.end())
   {
       int motor_index = this->handCommands[key].index;
-      std::cout << "got key " << key << ", index " << motor_index << std::endl;
       if(motor_index >= handDeviceInfo.nmotor){
         return false;
       }
@@ -559,8 +546,14 @@ bool GUIAratPlugin::OnKeyEvent(common::KeyEvent _event)
 
         handCommand.ref_vel[motor_index] += inc*100;
       }*/
+
       float inc = this->handCommands[key].increment;
       handCommand.ref_pos[motor_index] += inc;
+      //handCommand.ref_vel[motor_index] += inc;
+      /*for(int i = 0; i < handDeviceInfo.nmotor; i++){
+        handCommand.ref_pos[i] = handSensor.joint_pos[i];
+        std::cout << "hand sensor " << i << ": " << handSensor.joint_pos[i] << std::endl;
+      }*/
 
       coupling_v1(&handCommand);
 
@@ -568,7 +561,7 @@ bool GUIAratPlugin::OnKeyEvent(common::KeyEvent _event)
         printf("hx_update(): Request error.\n");
       }
   }
-  return false;
+  return true;
 }
 
 ////////////////////////////////////////////////

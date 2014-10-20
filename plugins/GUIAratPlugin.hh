@@ -158,7 +158,7 @@ namespace gazebo
 
       private: void OnFingerContact(ConstContactsPtr &msg);
       
-      private: bool OnKeyEvent(common::KeyEvent _event);
+      private: bool OnKeyPress(common::KeyEvent _event);
 
       private: std::string getTopicName(const std::string& fingerName);
 
