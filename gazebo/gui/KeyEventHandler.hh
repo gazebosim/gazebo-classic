@@ -127,7 +127,6 @@ namespace gazebo
       /// \param[in] _list List which contains the filters to process.
       private: void Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
-      
 
       /// \brief List of key press filters.
       private: std::list<Filter> pressFilters;
