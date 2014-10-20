@@ -264,6 +264,7 @@ unsigned int RenderEngine::GetSceneCount() const
 void RenderEngine::PreRender()
 {
   this->root->_fireFrameStarted();
+  this->root->_fireFrameRenderingQueued();
 }
 
 //////////////////////////////////////////////////
@@ -275,7 +276,7 @@ void RenderEngine::Render()
 void RenderEngine::PostRender()
 {
   // _fireFrameRenderingQueued needs to be here for CEGUI to work
-  this->root->_fireFrameRenderingQueued();
+  // this->root->_fireFrameRenderingQueued();
   this->root->_fireFrameEnded();
 }
 

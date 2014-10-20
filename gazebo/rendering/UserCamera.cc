@@ -29,6 +29,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/UserCameraPrivate.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/UserCamera.hh"
 
 using namespace gazebo;
@@ -47,10 +48,13 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
-  // Set default UserCamera render rate to 30Hz
-  this->SetRenderRate(30.0);
+  // Set default UserCamera render rate to 120Hz. This was choosen
+  // for stereo rendering and smooth user interactions.
+  this->SetRenderRate(120.0);
 
   this->SetUseSDFPose(false);
+
+  this->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -82,6 +86,8 @@ void UserCamera::Load()
   this->node->Init();
   this->joySub = this->node->Subscribe("~/spacenav/joy",
       &UserCamera::OnJoy, this);
+  this->joySubAbs = this->node->Subscribe("~/polhemus/joy",
+      &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -98,8 +104,24 @@ void UserCamera::Init()
   // Don't yaw along variable axis, causes leaning
   this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
   this->camera->setDirection(1, 0, 0);
+  this->camera->setAutoAspectRatio(false);
 
-  this->SetHFOV(GZ_DTOR(60));
+  // Right camera
+  {
+    this->rightCamera = this->scene->GetManager()->createCamera(
+        "StereoUserRight");
+    this->rightCamera->pitch(Ogre::Degree(90));
+
+    // Don't yaw along variable axis, causes leaning
+    this->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->rightCamera->setDirection(1, 0, 0);
+
+    this->rightCamera->setAutoAspectRatio(false);
+
+    this->sceneNode->attachObject(this->rightCamera);
+  }
+
+  this->SetHFOV(GZ_DTOR(120));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -174,6 +196,12 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
+
+  if (!this->poseSet)
+  {
+    this->initialPose = _pose;
+    this->poseSet = true;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -355,6 +383,9 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
+    this->rightCamera->setAspectRatio(ratio);
+    this->rightCamera->setFOVy(Ogre::Radian(vfov));
+
     if (this->dataPtr->gui)
     {
       this->dataPtr->gui->Resize(this->viewport->getActualWidth(),
@@ -513,7 +544,27 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   Camera::SetRenderTarget(_target);
 
+  // is 0.03m the stereo baseline?
+  Ogre::Vector2 offset(0.03f, 0.0f);
+  float focalLength = 1.0;
+
+  this->camera->setFocalLength(focalLength);
+  this->camera->setFrustumOffset(offset);
+
+  this->rightCamera->setFocalLength(focalLength);
+  this->rightCamera->setFrustumOffset(-offset);
+
+  this->rightViewport = this->renderTarget->addViewport(this->rightCamera, 1);
+  this->rightViewport->setBackgroundColour(
+        Conversions::Convert(this->scene->GetBackgroundColor()));
+
+#if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
+  this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+  this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+#endif
+
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   if (this->dataPtr->gui)
     this->dataPtr->gui->Init(this->renderTarget);
@@ -626,7 +677,8 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 
   // This function was establish when integrating the space navigator
   // joystick.
-  if (_msg->has_translation() || _msg->has_rotation())
+  if ((_msg->has_translation() || _msg->has_rotation()) &&
+      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
     math::Pose pose = this->GetWorldPose();
 
@@ -645,5 +697,32 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
     }
 
     this->SetWorldPose(pose);
+  }
+}
+
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->poseSet)
+    return;
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
+    this->SetWorldPose(pose);
+  }
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetClipDist(float _near, float _far)
+{
+  Camera::SetClipDist(_near, _far);
+
+  if (this->camera && this->rightCamera)
+  {
+    this->rightCamera->setNearClipDistance(this->camera->getNearClipDistance());
+    this->rightCamera->setFarClipDistance(this->camera->getFarClipDistance());
+    this->rightCamera->setRenderingDistance(
+        this->camera->getRenderingDistance());
   }
 }
