@@ -84,7 +84,7 @@ namespace gazebo
       private: void Update();
 
       /// \brief Emit floor changed Qt signals.
-      private: void FloorChanged();
+      public: void FloorChanged();
 
       /// \brief Emit size changed Qt signals.
       private: void SizeChanged();

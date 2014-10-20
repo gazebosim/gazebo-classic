@@ -17,6 +17,7 @@
 
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
+#include "gazebo/gui/building/ImportImageDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -64,11 +65,16 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
   // Add a stair button
-  QPushButton *addStairButton = new QPushButton(tr("Add Stair"), this);
+  QPushButton *addStairButton = new QPushButton(tr("Add Stairs"), this);
   addStairButton->setCheckable(true);
   addStairButton->setChecked(false);
   this->brushes.push_back(addStairButton);
   connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
+
+  // Import floorplan
+  QPushButton *importImageButton = new QPushButton(tr("Import Floorplan"),
+      this);
+  connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
   // Layout to hold the drawing buttons
   QGridLayout *gridLayout = new QGridLayout;
@@ -76,6 +82,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   gridLayout->addWidget(addWindowButton, 0, 1);
   gridLayout->addWidget(addDoorButton, 1, 0);
   gridLayout->addWidget(addStairButton, 1, 1);
+  gridLayout->addWidget(importImageButton, 2, 0);
 
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
@@ -145,6 +152,11 @@ void BuildingEditorPalette::OnAddDoor()
   gui::editor::Events::createBuildingEditorItem("door");
 }
 
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnImportImage()
+{
+  gui::editor::Events::createBuildingEditorItem("image");
+}
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStair()
