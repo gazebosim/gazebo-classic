@@ -106,6 +106,8 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
+      public: bool autoRepeat;
+
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
       /// \param[in] _filter Filter function callback.
@@ -123,6 +125,7 @@ namespace gazebo
       /// \param[in] _list List which contains the filters to process.
       private: void Handle(const common::KeyEvent &_event,
                    std::list<Filter> &_list);
+      
 
       /// \brief List of key press filters.
       private: std::list<Filter> pressFilters;
