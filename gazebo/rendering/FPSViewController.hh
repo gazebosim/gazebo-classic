@@ -58,6 +58,7 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
+
     };
     /// \}
   }

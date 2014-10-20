@@ -370,6 +370,23 @@ void Camera::Update()
 
     this->SetWorldPosition(pos);
   }
+
+  if ( this->velocity != math::Pose(0, 0, 0, 0, 0, 0) )
+  {
+    // Move based on the camera's current velocity
+    // Calculate delta based on frame rate
+    common::Time interval = common::Time::GetWallTime() -
+                            this->GetLastRenderWallTime();
+    float dt = interval.Float();
+
+    math::Vector3 translate(velocity.pos[0]*dt, velocity.pos[1]*dt,
+                             velocity.pos[2]*dt);
+    this->Translate(translate);
+    // You probably don't want to roll the camera, but it's an option
+    this->RotateRoll(velocity.rot.GetRoll()*dt);
+    this->RotatePitch(velocity.rot.GetPitch()*dt);
+    this->RotateYaw(velocity.rot.GetYaw()*dt);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -540,6 +557,19 @@ void Camera::SetWorldPose(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+math::Pose Camera::GetVelocity() const
+{
+  return this->velocity;
+}
+
+//////////////////////////////////////////////////
+void Camera::SetVelocity(const math::Pose &_velocity)
+{
+  //std::cout << "setting velocity" << std::endl;
+  this->velocity = _velocity;
+}
+
+//////////////////////////////////////////////////
 math::Pose Camera::GetWorldPose() const
 {
   return math::Pose(this->GetWorldPosition(), this->GetWorldRotation());
@@ -576,8 +606,16 @@ void Camera::Translate(const math::Vector3 &direction)
 {
   Ogre::Vector3 vec(direction.x, direction.y, direction.z);
 
-  this->sceneNode->translate(this->sceneNode->getOrientation() *
-      this->sceneNode->getOrientation() * vec);
+  this->sceneNode->translate(this->sceneNode->getOrientation() * vec);
+}
+
+//////////////////////////////////////////////////
+// The following 3 methods incorporate a rotation between the Ogre and Gazebo
+// cameras
+
+void Camera::RotateRoll(math::Angle _angle)
+{
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()));
 }
 
 //////////////////////////////////////////////////
@@ -591,7 +629,6 @@ void Camera::RotatePitch(math::Angle _angle)
 {
   this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
 }
-
 
 //////////////////////////////////////////////////
 void Camera::SetClipDist()

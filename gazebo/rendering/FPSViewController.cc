@@ -54,34 +54,18 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector2i drag = _event.pos - _event.prevPos;
 
-  math::Vector3 directionVec(0, 0, 0);
-
-  if (_event.buttons & common::MouseEvent::LEFT)
-  {
-    this->camera->RotateYaw(GZ_DTOR(drag.x * 0.1));
-    this->camera->RotatePitch(GZ_DTOR(-drag.y * 0.1));
+  math::Pose velocity = this->camera->GetVelocity();
+  if((_event.buttons & common::MouseEvent::LEFT)){
+    this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));
+    this->camera->RotatePitch(GZ_DTOR(drag.y*0.1));
   }
-  else if (_event.buttons & common::MouseEvent::RIGHT)
+  else 
   {
-    // interactively pan view
-    directionVec.x = 0;
-    directionVec.y =  drag.x * _event.moveScale;
-    directionVec.z =  drag.y * _event.moveScale;
-  }
-  else if (_event.buttons & common::MouseEvent::MIDDLE)
-  {
-    directionVec.x =  drag.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
-  }
-  else if (_event.type == common::MouseEvent::SCROLL)
-  {
-    directionVec.x -=  50.0 * _event.scroll.y * _event.moveScale;
-    directionVec.y =  0;
-    directionVec.z =  0;
+    math::Pose newVelocity = velocity;
+    newVelocity.rot = math::Quaternion(0, 0, 0);
+    this->camera->SetVelocity(newVelocity);
   }
 
-  this->camera->Translate(directionVec);
 }
 
 //////////////////////////////////////////////////
@@ -91,11 +75,34 @@ std::string FPSViewController::GetTypeString()
 }
 
 //////////////////////////////////////////////////
-void FPSViewController::HandleKeyReleaseEvent(const std::string &/*_key*/)
+void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 {
+  if(_key.compare("w") == 0 || _key.compare("a") == 0 ||
+     _key.compare("s") == 0 || _key.compare("d") == 0)
+  {
+    this->camera->SetVelocity(math::Pose(0, 0, 0, 0, 0, 0));
+  }
 }
 
 //////////////////////////////////////////////////
-void FPSViewController::HandleKeyPressEvent(const std::string &/*_key*/)
+void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
+  float xVelocity = 1.0;
+  float yVelocity = 0.8;
+  if(_key.compare("w") == 0)
+  {
+    this->camera->SetVelocity(math::Pose(xVelocity, 0, 0, 0, 0, 0));
+  }
+  else if (_key.compare("a") == 0)
+  {
+    this->camera->SetVelocity(math::Pose(0, yVelocity, 0, 0, 0, 0));
+  }
+  else if (_key.compare("s") == 0)
+  {
+    this->camera->SetVelocity(math::Pose(-xVelocity, 0, 0, 0, 0, 0));
+  }
+  else if (_key.compare("d") == 0)
+  {
+    this->camera->SetVelocity(math::Pose(0, -yVelocity, 0, 0, 0, 0));
+  }
 }
