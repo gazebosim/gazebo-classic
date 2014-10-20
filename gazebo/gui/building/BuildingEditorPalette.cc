@@ -27,18 +27,16 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->modelName = "BuildingDefaultName";
+  this->buildingDefaultName = "BuildingDefaultName";
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
   QLabel *modelLabel = new QLabel(tr("Model: "));
-  this->modelNameLabel = new QLabel(tr(this->modelName.c_str()));
+  this->modelNameEdit = new QLineEdit();
+  this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
-  modelNameLayout->addWidget(modelNameLabel);
-
-  modelNameLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                      QSizePolicy::Minimum));
+  modelNameLayout->addWidget(this->modelNameEdit);
 
   QFont underLineFont;
   underLineFont.setUnderline(true);
@@ -147,6 +145,12 @@ BuildingEditorPalette::~BuildingEditorPalette()
 }
 
 /////////////////////////////////////////////////
+std::string BuildingEditorPalette::GetModelName() const
+{
+  return this->modelNameEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 void BuildingEditorPalette::OnDrawWall()
 {
   gui::editor::Events::createBuildingEditorItem("wall");
@@ -180,20 +184,22 @@ void BuildingEditorPalette::OnDiscard()
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnSave()
 {
-  gui::editor::Events::saveBuildingEditor();
+  gui::editor::Events::saveBuildingEditor(
+      this->modelNameEdit->text().toStdString());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDone()
 {
-  gui::editor::Events::doneBuildingEditor();
+  gui::editor::Events::doneBuildingEditor(
+      this->modelNameEdit->text().toStdString());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDiscardModel()
 {
   this->saveButton->setText("&Save As");
-  this->modelNameLabel->setText("MyNamedModel");
+  this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
 }
 
 /////////////////////////////////////////////////
@@ -201,7 +207,7 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
     const std::string &/*_saveLocation*/)
 {
   this->saveButton->setText("Save");
-  this->modelNameLabel->setText(tr(_saveName.c_str()));
+  this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 
 /////////////////////////////////////////////////

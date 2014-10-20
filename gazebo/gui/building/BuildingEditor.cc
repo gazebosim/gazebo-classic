@@ -75,7 +75,8 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor();
+  gui::editor::Events::saveBuildingEditor(
+      this->buildingPalette->GetModelName());
 }
 
 /////////////////////////////////////////////////
@@ -87,7 +88,8 @@ void BuildingEditor::Discard()
 /////////////////////////////////////////////////
 void BuildingEditor::Done()
 {
-  gui::editor::Events::doneBuildingEditor();
+  gui::editor::Events::doneBuildingEditor(
+      this->buildingPalette->GetModelName());
 }
 
 /////////////////////////////////////////////////
