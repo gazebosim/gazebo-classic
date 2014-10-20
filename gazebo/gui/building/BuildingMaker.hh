@@ -243,7 +243,7 @@ namespace gazebo
 
       /// \brief Callback for saving the model.
       /// \param[in] _saveName Name to save the model.
-      private: void OnSave(std::string _saveName);
+      private: void OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for discarding the model.
       private: void OnDiscard();
@@ -251,7 +251,7 @@ namespace gazebo
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
       /// \param[in] _saveName Name to save the model.
-      private: void OnDone(std::string _saveName);
+      private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();

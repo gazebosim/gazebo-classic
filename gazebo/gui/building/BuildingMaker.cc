@@ -1325,7 +1325,7 @@ void BuildingMaker::OnDiscard()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnSave(std::string _saveName = "")
+void BuildingMaker::OnSave(const std::string &_saveName)
 {
   if (_saveName != "")
     this->modelName = _saveName;
@@ -1354,7 +1354,7 @@ void BuildingMaker::OnSave(std::string _saveName = "")
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDone(std::string _saveName = "")
+void BuildingMaker::OnDone(const std::string &_saveName)
 {
   if (_saveName != "")
     this->modelName = _saveName;
