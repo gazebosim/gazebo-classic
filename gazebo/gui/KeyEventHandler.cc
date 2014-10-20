@@ -23,8 +23,7 @@ using namespace gui;
 /////////////////////////////////////////////////
 KeyEventHandler::KeyEventHandler()
 {
-  pressAutoRepeat = false;
-  releaseAutoRepeat = false;
+  autoRepeat = false;
 }
 
 /////////////////////////////////////////////////
@@ -72,32 +71,14 @@ void KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
 
 /////////////////////////////////////////////////
 
-bool KeyEventHandler::GetPressAutoRepeat()
+bool KeyEventHandler::GetAutoRepeat()
 {
-  return this->pressAutoRepeat;
+  return this->autoRepeat;
 }
-
-bool KeyEventHandler::GetReleaseAutoRepeat()
-{
-  return this->releaseAutoRepeat;
-}
-
-void KeyEventHandler::SetPressAutoRepeat(bool _autorepeat)
-{
-  this->pressAutoRepeat = _autorepeat;
-}
-
-void KeyEventHandler::SetReleaseAutoRepeat(bool _autorepeat)
-{
-
-  this->releaseAutoRepeat = _autorepeat;
-}
-
 
 void KeyEventHandler::SetAutoRepeat(bool _autorepeat)
 {
-  this->pressAutoRepeat = _autorepeat;
-  this->releaseAutoRepeat = _autorepeat;
+  this->autoRepeat = _autorepeat;
 }
 
 /////////////////////////////////////////////////
