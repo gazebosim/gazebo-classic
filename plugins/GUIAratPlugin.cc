@@ -368,9 +368,9 @@ GUIAratPlugin::GUIAratPlugin()
   gui::get_active_camera()->SetViewController(
                                 rendering::FPSViewController::GetTypeString());
 
+  gui::KeyEventHandler::Instance()->pressAutoRepeat = true;
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
                           boost::bind(&GUIAratPlugin::OnKeyPress, this, _1));
-
 }
 
 
