@@ -257,7 +257,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->autoRepeat)
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->pressAutoRepeat)
     return;
 
   this->keyText = _event->text().toStdString();
@@ -324,7 +324,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->autoRepeat)
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->releaseAutoRepeat)
     return;
 
   this->keyModifiers = _event->modifiers();

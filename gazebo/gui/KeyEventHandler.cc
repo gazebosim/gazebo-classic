@@ -23,7 +23,8 @@ using namespace gui;
 /////////////////////////////////////////////////
 KeyEventHandler::KeyEventHandler()
 {
-  autoRepeat = false;
+  pressAutoRepeat = false;
+  releaseAutoRepeat = false;
 }
 
 /////////////////////////////////////////////////
