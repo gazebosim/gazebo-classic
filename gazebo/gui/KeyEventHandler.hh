@@ -106,13 +106,21 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
+      /// \brief Return whether or not autorepeats are toggled for key presses.
       public: bool GetPressAutoRepeat();
+      /// \brief Return whether or not autorepeats are toggled for key
+      /// releases.
       public: bool GetReleaseAutoRepeat();
 
+      /// \brief Toggle autorepeats for key presses.
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
       public: void SetPressAutoRepeat(bool _autorepeat);
+
+      /// \brief Toggle autorepeats for key releases.
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
       public: void SetReleaseAutoRepeat(bool _autorepeat);
 
-      /// \brief Set all auto_autorepeats (press and release) to either true or false. 
+      /// \brief Toggle both autorepeats (press and release) to the same value. 
       /// \param[in] _autorepeat Whether or not to allow autorepeats.
       public: void SetAutoRepeat(bool _autorepeat);
 
