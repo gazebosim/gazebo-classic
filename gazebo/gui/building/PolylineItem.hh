@@ -88,6 +88,10 @@ namespace gazebo
       /// \param[in] _thickness Thickness in pixels.
       public: void SetThickness(double _thickness);
 
+      /// \brief Set the color of the polyline item.
+      /// \param[in] _color Color.
+      public: void SetColor(QColor _color);
+
       /// \brief Set the position of the polyline item.
       /// \param[in] _pos Position in pixel coordinates.
       public: void SetPosition(const QPointF &_pos);
@@ -179,7 +183,7 @@ namespace gazebo
       /// \param[in] _painter Qt painter object.
       /// \param[in] _option Qt style options for the item.
       /// \param[in] _widget Qt widget being painted on.
-      private: void paint(QPainter *_painter,
+      private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       /// \brief Draw bounding box
@@ -211,6 +215,9 @@ namespace gazebo
 
       /// \brief Thickness of the polyline in pixels
       private: double lineThickness;
+
+      /// \brief Color of the polyline
+      private: QColor lineColor;
     };
     /// \}
   }
