@@ -71,6 +71,36 @@ void KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
+
+bool KeyEventHandler::GetPressAutoRepeat()
+{
+  return this->pressAutoRepeat;
+}
+
+bool KeyEventHandler::GetReleaseAutoRepeat()
+{
+  return this->releaseAutoRepeat;
+}
+
+void KeyEventHandler::SetPressAutoRepeat(bool _autorepeat)
+{
+  this->pressAutoRepeat = _autorepeat;
+}
+
+void KeyEventHandler::SetReleaseAutoRepeat(bool _autorepeat)
+{
+
+  this->releaseAutoRepeat = _autorepeat;
+}
+
+
+void KeyEventHandler::SetAutoRepeat(bool _autorepeat)
+{
+  this->pressAutoRepeat = _autorepeat;
+  this->releaseAutoRepeat = _autorepeat;
+}
+
+/////////////////////////////////////////////////
 void KeyEventHandler::Add(const std::string &_name,
     KeyEventFilter _filter, std::list<Filter> &_list)
 {

@@ -106,9 +106,31 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
-      public: bool pressAutoRepeat;
+      /// \brief Return whether or not autorepeats are toggled for key presses.
+      public: bool GetPressAutoRepeat();
+      /// \brief Return whether or not autorepeats are toggled for key
+      /// releases.
+      public: bool GetReleaseAutoRepeat();
 
-      public: bool releaseAutoRepeat;
+      /// \brief Toggle autorepeats for key presses.
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
+      public: void SetPressAutoRepeat(bool _autorepeat);
+
+      /// \brief Toggle autorepeats for key releases.
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
+      public: void SetReleaseAutoRepeat(bool _autorepeat);
+
+      /// \brief Toggle both autorepeats (press and release) to the same value. 
+      /// \param[in] _autorepeat Whether or not to allow autorepeats.
+      public: void SetAutoRepeat(bool _autorepeat);
+
+      /// \brief Boolean to toggle autorepeats (events that occur continuously
+      /// while a key held down by the user) for key presses.
+      private: bool pressAutoRepeat;
+
+      /// \brief Boolean to toggle autorepeats (events that occur continuously
+      /// while a key held down by the user) for key releases.
+      private: bool releaseAutoRepeat;
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
