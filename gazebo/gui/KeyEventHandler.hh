@@ -106,6 +106,10 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
+      public: bool pressAutoRepeat;
+
+      public: bool releaseAutoRepeat;
+
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
       /// \param[in] _filter Filter function callback.
