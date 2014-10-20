@@ -324,7 +324,7 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat())
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->autoRepeat)
     return;
 
   this->keyModifiers = _event->modifiers();
