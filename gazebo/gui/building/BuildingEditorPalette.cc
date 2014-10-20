@@ -17,6 +17,7 @@
 
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
 #include "gazebo/gui/building/BuildingEditorEvents.hh"
+#include "gazebo/gui/building/ImportImageDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -62,10 +63,17 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
   // Add a stair button
-  QPushButton *addStairButton = new QPushButton(tr("Add Stair"), this);
+  QPushButton *addStairButton = new QPushButton(tr("Add Stairs"), this);
   addStairButton->setCheckable(true);
   addStairButton->setChecked(false);
   connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
+
+  // Import floorplan
+  QPushButton *importImageButton = new QPushButton(tr("Import Floorplan"),
+      this);
+  importImageButton->setCheckable(true);
+  importImageButton->setChecked(false);
+  connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
   // Layout to hold the drawing buttons
   QGridLayout *gridLayout = new QGridLayout;
@@ -73,6 +81,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   gridLayout->addWidget(addWindowButton, 0, 1);
   gridLayout->addWidget(addDoorButton, 1, 0);
   gridLayout->addWidget(addStairButton, 1, 1);
+  gridLayout->addWidget(importImageButton, 2, 0);
 
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
@@ -100,7 +109,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   std::stringstream tipsText;
   tipsText << "<font size=3><p><b> Tips: </b></b>"
-      << "<p>Draw Walls: Click/release to start a wall."
+      << "<p>Add Walls: Click/release to start a wall."
       << "<br>Click again to start a new, attached wall.</br>"
       << "<br>Double-click to stop drawing.</br></p>"
       << "<p>Add Window/Doorway: Click/release in Palette, "
@@ -140,6 +149,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   brushes->addButton(addWindowButton);
   brushes->addButton(addDoorButton);
   brushes->addButton(addStairButton);
+  brushes->addButton(importImageButton);
 }
 
 /////////////////////////////////////////////////
@@ -180,6 +190,14 @@ void BuildingEditorPalette::OnAddDoor()
     gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnImportImage()
+{
+  if (this->currentMode != "image")
+    gui::editor::Events::createBuildingEditorItem("image");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
+}
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStair()
