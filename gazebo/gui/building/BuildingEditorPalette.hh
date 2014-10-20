@@ -46,6 +46,10 @@ namespace gazebo
       /// \brief Destructor
       public: ~BuildingEditorPalette();
 
+      /// \brief Get model name
+      /// \return Model name
+      public: std::string GetModelName() const;
+
       /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
 
@@ -87,8 +91,11 @@ namespace gazebo
       /// \param[in] _event Event.
       private: void mousePressEvent(QMouseEvent *_event);
 
-      /// \brief A label that displays the name of the building model.
-      private: QLabel *modelNameLabel;
+      /// \brief Default name of the building model.
+      private: std::string buildingDefaultName;
+
+      /// \brief Edit the name of the building model.
+      private: QLineEdit *modelNameEdit;
 
       /// \brief Save button.
       private: QPushButton *saveButton;

@@ -237,13 +237,13 @@ namespace gazebo
         public: static event::EventT<void (double)> changeBuildingEditorZoom;
 
         /// \brief Save the model
-        public: static event::EventT<void ()> saveBuildingEditor;
+        public: static event::EventT<void (std::string)> saveBuildingEditor;
 
         /// \brief Discard the model
         public: static event::EventT<void ()> discardBuildingEditor;
 
         /// \brief Finish creating the model, save, and exit
-        public: static event::EventT<void ()> doneBuildingEditor;
+        public: static event::EventT<void (std::string)> doneBuildingEditor;
 
         /// \brief Exit the editor mode with the option to save
         public: static event::EventT<void ()> exitBuildingEditor;

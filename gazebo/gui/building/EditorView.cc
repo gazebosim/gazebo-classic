@@ -401,6 +401,15 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           QPointF closest(segmentLine.p1() + t*deltaLine);
           grabber->setPos(wallSegment->mapFromScene(closest));
           grabber->setRotation(wallSegment->rotation());
+
+          QPointF absPositionOnWall = grabber->pos() -
+              wallSegment->line().p1();
+          double positionLength = sqrt(absPositionOnWall.x()*
+                                       absPositionOnWall.x() +
+                                       absPositionOnWall.y()*
+                                       absPositionOnWall.y());
+          editorItem->SetPositionOnWall(positionLength /
+              wallSegment->line().length());
         }
         return;
       }
@@ -425,6 +434,15 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             editorItem->SetPosition(wallSegment->mapFromScene(scenePos));
             this->mousePressRotation = -wallSegment->line().angle();
             editorItem->SetRotation(this->mousePressRotation);
+
+            QPointF absPositionOnWall = editorItem->pos() -
+                wallSegment->line().p1();
+            double positionLength = sqrt(absPositionOnWall.x()*
+                                         absPositionOnWall.x() +
+                                         absPositionOnWall.y()*
+                                         absPositionOnWall.y());
+            editorItem->SetPositionOnWall(positionLength /
+                wallSegment->line().length());
             return;
           }
         }
