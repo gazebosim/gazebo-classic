@@ -119,7 +119,8 @@ void BuildingEditor::OnFinish()
 /////////////////////////////////////////////////
 void BuildingEditor::CreateMenus()
 {
-  delete this->menuBar;
+  if (this->menuBar)
+    return;
 
   this->menuBar = new QMenuBar;
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

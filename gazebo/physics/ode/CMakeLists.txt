@@ -55,6 +55,7 @@ SET (headers
 )
 
 set (gtest_sources
+  ODEJoint_TEST.cc
   ODEPhysics_TEST.cc
 )
 gz_build_tests(${gtest_sources})
