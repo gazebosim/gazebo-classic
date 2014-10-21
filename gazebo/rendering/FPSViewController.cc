@@ -56,17 +56,16 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Pose velocity = this->camera->GetVelocity();
   if (_event.buttons & common::MouseEvent::LEFT)
-	{
+  {
     this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));
     this->camera->RotatePitch(GZ_DTOR(drag.y*0.1));
   }
-  else 
+  else
   {
     math::Pose newVelocity = velocity;
     newVelocity.rot = math::Quaternion(0, 0, 0);
     this->camera->SetVelocity(newVelocity);
   }
-
 }
 
 //////////////////////////////////////////////////
