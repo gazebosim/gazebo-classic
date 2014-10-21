@@ -51,6 +51,9 @@ namespace gazebo
       /// \brief Qt callback when the dialog is accepted.
       private slots: void OnAccept();
 
+      /// \brief Qt callback when the dialog is rejected.
+      private slots: void OnReject();
+
       /// \brief Qt callback when the Next button is clicked.
       private slots: void OnNext();
 

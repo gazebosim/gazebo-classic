@@ -171,6 +171,7 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
   if (this->drawInProgress)
   {
     this->CancelDrawMode();
+    gui::editor::Events::createBuildingEditorItem(std::string());
     _event->accept();
     return;
   }
@@ -497,6 +498,7 @@ void EditorView::keyPressEvent(QKeyEvent *_event)
   else if (_event->key() == Qt::Key_Escape)
   {
     this->CancelDrawMode();
+    gui::editor::Events::createBuildingEditorItem(std::string());
     this->releaseKeyboard();
   }
 }
@@ -784,11 +786,14 @@ void EditorView::SetBackgroundImage(const std::string &_filename,
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
     gui::editor::Events::triggerShowFloorplan();
   }
+  gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
 void EditorView::OnCreateEditorItem(const std::string &_type)
 {
+  this->CancelDrawMode();
+
   if (_type == "wall")
     this->drawMode = WALL;
   else if (_type == "window")
@@ -803,8 +808,6 @@ void EditorView::OnCreateEditorItem(const std::string &_type)
     ImportImageDialog *importImage = new ImportImageDialog(this);
     importImage->show();
   }
-  else
-    this->drawMode = NONE;
 
   if (this->drawInProgress && this->currentMouseItem)
   {
@@ -1141,7 +1144,6 @@ void EditorView::CancelDrawMode()
     this->drawInProgress = false;
     this->currentMouseItem = NULL;
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-    gui::editor::Events::createBuildingEditorItem(std::string());
   }
 }
 

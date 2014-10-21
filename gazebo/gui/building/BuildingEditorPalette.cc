@@ -29,6 +29,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->setObjectName("buildingEditorPalette");
 
   this->buildingDefaultName = "BuildingDefaultName";
+  this->currentMode = std::string();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
@@ -47,33 +48,31 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QPushButton *addWallButton = new QPushButton(tr("Add Wall"), this);
   addWallButton->setCheckable(true);
   addWallButton->setChecked(false);
-  this->brushes.push_back(addWallButton);
   connect(addWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
   // Add a window button
   QPushButton *addWindowButton = new QPushButton(tr("Add Window"), this);
   addWindowButton->setCheckable(true);
   addWindowButton->setChecked(false);
-  this->brushes.push_back(addWindowButton);
   connect(addWindowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
 
   // Add a door button
   QPushButton *addDoorButton = new QPushButton(tr("Add Door"), this);
   addDoorButton->setCheckable(true);
   addDoorButton->setChecked(false);
-  this->brushes.push_back(addDoorButton);
   connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
 
   // Add a stair button
   QPushButton *addStairButton = new QPushButton(tr("Add Stairs"), this);
   addStairButton->setCheckable(true);
   addStairButton->setChecked(false);
-  this->brushes.push_back(addStairButton);
   connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
 
   // Import floorplan
   QPushButton *importImageButton = new QPushButton(tr("Import Floorplan"),
       this);
+  importImageButton->setCheckable(true);
+  importImageButton->setChecked(false);
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
   // Layout to hold the drawing buttons
@@ -144,6 +143,13 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
+
+  brushes = new QButtonGroup();
+  brushes->addButton(addWallButton);
+  brushes->addButton(addWindowButton);
+  brushes->addButton(addDoorButton);
+  brushes->addButton(addStairButton);
+  brushes->addButton(importImageButton);
 }
 
 /////////////////////////////////////////////////
@@ -160,31 +166,46 @@ std::string BuildingEditorPalette::GetModelName() const
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnDrawWall()
 {
-  gui::editor::Events::createBuildingEditorItem("wall");
+  if (this->currentMode != "wall")
+    gui::editor::Events::createBuildingEditorItem("wall");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddWindow()
 {
-  gui::editor::Events::createBuildingEditorItem("window");
+  if (this->currentMode != "window")
+    gui::editor::Events::createBuildingEditorItem("window");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddDoor()
 {
-  gui::editor::Events::createBuildingEditorItem("door");
+  if (this->currentMode != "door")
+    gui::editor::Events::createBuildingEditorItem("door");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnImportImage()
 {
-  gui::editor::Events::createBuildingEditorItem("image");
+  if (this->currentMode != "image")
+    gui::editor::Events::createBuildingEditorItem("image");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnAddStair()
 {
-  gui::editor::Events::createBuildingEditorItem("stairs");
+  if (this->currentMode != "stairs")
+    gui::editor::Events::createBuildingEditorItem("stairs");
+  else
+    gui::editor::Events::createBuildingEditorItem(std::string());
 }
 
 /////////////////////////////////////////////////
@@ -223,15 +244,26 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnCreateEditorItem(const std::string &_type)
+void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 {
-  if (_type.empty())
+  if (_mode.empty() || this->currentMode == _mode)
   {
-    // Uncheck all the buttons
-    for (std::list<QPushButton *>::iterator iter = this->brushes.begin();
-        iter != this->brushes.end(); ++iter)
-    {
-      (*iter)->setChecked(false);
-    }
+    this->brushes->setExclusive(false);
+    if (this->brushes->checkedButton())
+      this->brushes->checkedButton()->setChecked(false);
+    this->brushes->setExclusive(true);
+
+    this->currentMode = std::string();
   }
+  else
+  {
+    this->currentMode = _mode;
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::mousePressEvent(QMouseEvent * /*_event*/)
+{
+  // Cancel draw mode
+  gui::editor::Events::createBuildingEditorItem(std::string());
 }

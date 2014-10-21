@@ -58,7 +58,7 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
   QPushButton *cancelButton1 = new QPushButton(tr("Cancel"));
   this->nextButton = new QPushButton(tr("Next"));
   this->nextButton->setEnabled(false);
-  connect(cancelButton1, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(cancelButton1, SIGNAL(clicked()), this, SLOT(OnReject()));
   connect(this->nextButton, SIGNAL(clicked()), this, SLOT(OnNext()));
 
   QHBoxLayout *step1Buttons = new QHBoxLayout;
@@ -119,7 +119,7 @@ ImportImageDialog::ImportImageDialog(QWidget *_parent)
 
   connect(this->okButton, SIGNAL(clicked()), this, SLOT(OnAccept()));
   connect(backButton, SIGNAL(clicked()), this, SLOT(OnBack()));
-  connect(cancelButton2, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(cancelButton2, SIGNAL(clicked()), this, SLOT(OnReject()));
 
   QHBoxLayout *step2Buttons = new QHBoxLayout;
   step2Buttons->addWidget(backButton);
@@ -189,6 +189,13 @@ void ImportImageDialog::OnAccept()
     this->view->SetBackgroundImage(filename, this->resolutionSpin->value());
   }
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void ImportImageDialog::OnReject()
+{
+  gui::editor::Events::createBuildingEditorItem(std::string());
+  this->reject();
 }
 
 /////////////////////////////////////////////////
