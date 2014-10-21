@@ -106,7 +106,8 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
-      /// \brief Return whether or not autorepeats are toggled for key presses.
+			/// \brief Method to check if autorepeats are toggled.
+      /// \return Whether or not autorepeats are toggled for key presses.
       public: bool GetAutoRepeat() const;
 
       /// \brief Toggle the allowance of autorepeats on key presses.
