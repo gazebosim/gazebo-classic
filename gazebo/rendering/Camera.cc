@@ -562,7 +562,6 @@ math::Pose Camera::GetVelocity() const
 //////////////////////////////////////////////////
 void Camera::SetVelocity(const math::Pose &_velocity)
 {
-  //std::cout << "setting velocity" << std::endl;
   this->velocity = _velocity;
 }
 

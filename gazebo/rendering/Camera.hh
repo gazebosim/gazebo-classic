@@ -696,6 +696,7 @@ namespace gazebo
       /// \brief Pointer to private data.
       private: CameraPrivate *dataPtr;
 
+			/// \brief The current velocity of the camera.
       private: math::Pose velocity;
     };
     /// \}
