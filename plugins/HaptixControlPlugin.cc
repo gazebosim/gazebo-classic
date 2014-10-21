@@ -94,7 +94,7 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
   // we should get this from the polhemus sensor, but first approximate
   // it as some constant offset from arm base link.
   // assuming arm is over the table, and the 
-  this->initialCameraPose = math::Pose(); // + this->baseLink->GetWorldPose();
+  this->initialCameraPose = math::Pose(0, 0, 0, 0, 0, 0); // + this->baseLink->GetWorldPose();
   this->targetCameraPose = this->initialCameraPose;
 
   this->polhemusSourceLink =
@@ -154,8 +154,6 @@ void HaptixControlPlugin::Load(physics::ModelPtr _parent,
 
   // check for spacenav
   this->haveSpacenav = this->LoadSpacenav();
-
-  this->haveKeyboard = false;
 
   this->haveKeyboard = this->LoadKeyboard();
 
@@ -810,8 +808,8 @@ void HaptixControlPlugin::HaptixUpdateCallback(
 void HaptixControlPlugin::OnKey(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->baseLinkMutex);
-  std::cerr << "got key [" << _msg->data()
-            << "] press [" << _msg->dbl_data() << "]\n";
+  /*std::cerr << "got key [" << _msg->data()
+            << "] press [" << _msg->dbl_data() << "]\n";*/
 
 }
 
