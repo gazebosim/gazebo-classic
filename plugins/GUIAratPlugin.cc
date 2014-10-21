@@ -204,8 +204,7 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
 
   taskFrame->setLayout(taskLayout);
 
-  //TODO: bring back after user testing
-  //mainLayout->addWidget(taskFrame);
+  mainLayout->addWidget(taskFrame);
 }
 
 /////////////////////////////////////////////////
@@ -288,8 +287,6 @@ GUIAratPlugin::GUIAratPlugin()
   // Position and resize this widget
   this->setMaximumWidth(this->handImgX+10);
 
-  this->setMaximumHeight(this->handImgY+10);
-
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
@@ -368,8 +365,8 @@ GUIAratPlugin::GUIAratPlugin()
 
   this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
 
-  gui::get_active_camera()->SetViewController(
-                                rendering::FPSViewController::GetTypeString());
+  /*gui::get_active_camera()->SetViewController(
+                                rendering::FPSViewController::GetTypeString());*/
 
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
@@ -382,6 +379,10 @@ GUIAratPlugin::~GUIAratPlugin()
 {
 }
 
+std::string parseString(const std::string& rawString){
+  size_t end_idx = rawString.find("::", 6);
+  return rawString.substr(6, end_idx-6);
+}
 
 std::string GUIAratPlugin::getTopicName(const std::string& fingerName)
 {
@@ -395,14 +396,16 @@ void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
   // start at index 6
   if (msg->contact_size() > 0)
   {
-    std::string rawString = msg->contact(0).collision2();
-    size_t end_idx = rawString.find("::", 6);
-    
-    std::string fingerName = rawString.substr(6, end_idx-6);
-    if(this->contactPoints.find(fingerName) != this->contactPoints.end())
+    std::string collisionName1 = parseString(msg->contact(0).collision1());
+    std::string collisionName2 = parseString(msg->contact(0).collision2());
+    if (this->contactPoints.find(collisionName1) != this->contactPoints.end())
     {
-      //std::cout << "Pushing to msg queue" << std::endl;
-      this->msgQueue.push(ContactsWrapper(msg, fingerName));
+      this->msgQueue.push(ContactsWrapper(msg, collisionName1));
+    }
+    else if (this->contactPoints.find(collisionName1) !=
+             this->contactPoints.end())
+    {
+      this->msgQueue.push(ContactsWrapper(msg, collisionName2));
     }
   }
 }
@@ -452,7 +455,6 @@ void GUIAratPlugin::PreRender()
       
       QBrush color(QColor(colorArray[0], colorArray[1], colorArray[2]));
       
-      std::cout << "drawing circle color: " << colorArray[0] << ", " << colorArray[1] << ", " << colorArray[2] << std::endl;
       this->contactGraphicsItems[fingerName]->setBrush(color);
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
     }
