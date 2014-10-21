@@ -204,7 +204,8 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
 
   taskFrame->setLayout(taskLayout);
 
-  mainLayout->addWidget(taskFrame);
+  //TODO: bring back after user testing
+  //mainLayout->addWidget(taskFrame);
 }
 
 /////////////////////////////////////////////////
