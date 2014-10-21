@@ -129,7 +129,7 @@ namespace gazebo
 
       /// \brief Set flag indicating whether implicit spring damper is enabled.
       /// \param[in] _implicit True if implicit spring damper is used.
-      public: void UseImplicitSpringDamper(bool _implicit);
+      public: void UseImplicitSpringDamper(const bool _implicit);
 
       /// \brief simulate implicit spring and damper with CFM/ERP
       /// and meddling with Joint limits.
