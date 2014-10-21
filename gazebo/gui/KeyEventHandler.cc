@@ -70,12 +70,12 @@ void KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-
 bool KeyEventHandler::GetAutoRepeat()
 {
   return this->autoRepeat;
 }
 
+/////////////////////////////////////////////////
 void KeyEventHandler::SetAutoRepeat(bool _autorepeat)
 {
   this->autoRepeat = _autorepeat;

@@ -109,7 +109,7 @@ namespace gazebo
       /// \brief Return whether or not autorepeats are toggled for key presses.
       public: bool GetAutoRepeat();
 
-      /// \brief Toggle the allowance of autorepeats on key presses. 
+      /// \brief Toggle the allowance of autorepeats on key presses.
       /// \param[in] _autorepeat Whether or not to allow autorepeats.
       public: void SetAutoRepeat(bool _autorepeat);
 
