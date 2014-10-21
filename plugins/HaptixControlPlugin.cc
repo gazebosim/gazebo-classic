@@ -31,6 +31,8 @@ namespace gazebo
 // Constructor
 HaptixControlPlugin::HaptixControlPlugin()
 {
+  this->keyPressed = char(0);
+
   // Advertise haptix services.
   this->ignNode.Advertise("/haptix/gazebo/GetDeviceInfo",
     &HaptixControlPlugin::HaptixGetDeviceInfoCallback, this);
@@ -538,13 +540,14 @@ void HaptixControlPlugin::UpdatePolhemus()
       {
         math::Pose armSensorPose = this->convertPolhemusToPose(poses[armId]);
         // std::cout << "arm [" << armSensorPose << "]\n";
-        if (false) /// \TODO: need a way to say: "calibrate"
+        const char *cKey = "c";
+        if (strcmp(&this->keyPressed, cKey) == 0)
         {
           // calibration mode, update this->baseLinkToArmSensor
           // withouthis->world->IsPaused())t changing targetBaseLinkPose
           math::Pose baseLinkPose = this->baseLink->GetWorldPose();
-          this->baseLinkToArmSensor = baseLinkPose -
-            (armSensorPose + this->sourceWorldPose);
+          this->baseLinkToArmSensor =
+            (armSensorPose + this->sourceWorldPose) - baseLinkPose;
         }
         else
         {
@@ -810,8 +813,20 @@ void HaptixControlPlugin::HaptixUpdateCallback(
 void HaptixControlPlugin::OnKey(ConstRequestPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->baseLinkMutex);
-  std::cerr << "got key [" << _msg->data()
-            << "] press [" << _msg->dbl_data() << "]\n";
+  // std::cerr << "got key [" << _msg->data()
+  //           << "] press [" << _msg->dbl_data() << "]\n";
+  if (_msg->dbl_data() > 0.0)
+  {
+    // pressed
+    this->keyPressed = _msg->data().c_str()[0];
+    // std::cerr << " pressed key [" << this->keyPressed << "]\n";
+  }
+  else
+  {
+    // clear
+    this->keyPressed = char(0);
+    // std::cerr << " released key [" << this->keyPressed << "]\n";
+  }
 
 }
 
