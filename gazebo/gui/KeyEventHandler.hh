@@ -106,17 +106,13 @@ namespace gazebo
       /// \param[in] _event The key event.
       public: void HandleRelease(const common::KeyEvent &_event);
 
-			/// \brief Method to check if autorepeats are toggled.
+      /// \brief Method to check if autorepeats are toggled.
       /// \return Whether or not autorepeats are toggled for key presses.
       public: bool GetAutoRepeat() const;
 
       /// \brief Toggle the allowance of autorepeats on key presses.
       /// \param[in] _autorepeat Whether or not to allow autorepeats.
       public: void SetAutoRepeat(const bool _autorepeat);
-
-      /// \brief Boolean to toggle autorepeats (events that occur continuously
-      /// while a key held down by the user) for key presses.
-      private: bool autoRepeat;
 
       /// \brief Helper function to add a named filter to an event list.
       /// \param[in] _name Name associated with the _filter.
@@ -144,6 +140,10 @@ namespace gazebo
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<KeyEventHandler>;
+
+      /// \brief Boolean to toggle autorepeats (events that occur continuously
+      /// while a key held down by the user) for key presses.
+      private: bool autoRepeat;
     };
   }
 }
