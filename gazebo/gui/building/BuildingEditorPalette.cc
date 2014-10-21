@@ -107,29 +107,6 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
   mainLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
 
-  std::stringstream tipsText;
-  tipsText << "<font size=3><p><b> Tips: </b></b>"
-      << "<p>Add Walls: Click/release to start a wall."
-      << "<br>Click again to start a new, attached wall.</br>"
-      << "<br>Double-click to stop drawing.</br></p>"
-      << "<p>Add Window/Doorway: Click/release in Palette, "
-      << "click/release again in 2D View to place the object.<p>"
-      << "<p>Double-click an object to open an Inspector with configuration "
-      << "options.</p>"
-      << "<p>Note: Currently, windows & doors are simple holes in the wall.</p>"
-      << "<p>Note: Because Gazebo only supports simple primitive shapes, "
-      << "all floors will be rectangular.</p>";
-
-  QTextEdit *tipsTextEdit = new QTextEdit(this);
-  tipsTextEdit->setObjectName("tipsTextEdit");
-  tipsTextEdit->setText(tr(tipsText.str().c_str()));
-  tipsTextEdit->setContentsMargins(0, 0, 0, 0);
-  tipsTextEdit->setReadOnly(true);
-
-  mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
-                      QSizePolicy::Minimum));
-  mainLayout->addWidget(tipsTextEdit);
-
   this->setLayout(mainLayout);
 
   this->connections.push_back(
