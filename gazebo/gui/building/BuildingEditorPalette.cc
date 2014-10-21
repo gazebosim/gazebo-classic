@@ -234,13 +234,6 @@ void BuildingEditorPalette::OnSave()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditorPalette::OnDone()
-{
-  gui::editor::Events::doneBuildingEditor(
-      this->modelNameEdit->text().toStdString());
-}
-
-/////////////////////////////////////////////////
 void BuildingEditorPalette::OnDiscardModel()
 {
   this->saveButton->setText("&Save As");
