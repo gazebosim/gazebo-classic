@@ -288,6 +288,8 @@ GUIAratPlugin::GUIAratPlugin()
   // Position and resize this widget
   this->setMaximumWidth(this->handImgX+10);
 
+  this->setMaximumHeight(this->handImgY+10);
+
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
