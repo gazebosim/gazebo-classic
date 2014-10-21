@@ -107,11 +107,11 @@ namespace gazebo
       public: void HandleRelease(const common::KeyEvent &_event);
 
       /// \brief Return whether or not autorepeats are toggled for key presses.
-      public: bool GetAutoRepeat();
+      public: bool GetAutoRepeat() const;
 
       /// \brief Toggle the allowance of autorepeats on key presses.
       /// \param[in] _autorepeat Whether or not to allow autorepeats.
-      public: void SetAutoRepeat(bool _autorepeat);
+      public: void SetAutoRepeat(const bool _autorepeat);
 
       /// \brief Boolean to toggle autorepeats (events that occur continuously
       /// while a key held down by the user) for key presses.
