@@ -398,6 +398,7 @@ void GUIAratPlugin::OnFingerContact(ConstContactsPtr &msg){
     std::string fingerName = rawString.substr(6, end_idx-6);
     if(this->contactPoints.find(fingerName) != this->contactPoints.end())
     {
+      //std::cout << "Pushing to msg queue" << std::endl;
       this->msgQueue.push(ContactsWrapper(msg, fingerName));
     }
   }
@@ -424,8 +425,7 @@ void GUIAratPlugin::PreRender()
     ConstContactsPtr msg = wrapper.msg;
     std::string fingerName = wrapper.name;
     this->msgQueue.pop();
-    int numContacts = msg->contact_size();
-    if(numContacts > 0){
+    if(msg->contact_size() > 0){
       // Calculate contact force
       msgs::Vector3d forceVector = msg->contact(0).wrench(0).
                                                   body_1_wrench().force();
@@ -449,6 +449,7 @@ void GUIAratPlugin::PreRender()
       
       QBrush color(QColor(colorArray[0], colorArray[1], colorArray[2]));
       
+      std::cout << "drawing circle color: " << colorArray[0] << ", " << colorArray[1] << ", " << colorArray[2] << std::endl;
       this->contactGraphicsItems[fingerName]->setBrush(color);
       this->contactGraphicsItems[fingerName]->setPen(QPen(QColor(0, 0, 0, 0)));
     }
