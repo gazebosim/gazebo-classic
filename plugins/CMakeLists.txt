@@ -78,6 +78,9 @@ link_directories(
 # build library
 add_library(HaptixControlPlugin SHARED HaptixControlPlugin.cc)
 # additional library dependencies
+add_dependencies(HaptixControlPlugin
+  gazebo_msgs
+)
 target_link_libraries(HaptixControlPlugin ${GAZEBO_LIBRARIES}
   spnav polhemus_driver haptix_comm
   ${IGNITION-TRANSPORT_LIBRARIES})

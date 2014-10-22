@@ -657,7 +657,6 @@ void HaptixControlPlugin::UpdateHandControl(double _dt)
 // Play the trajectory, update states
 void HaptixControlPlugin::GetRobotStateFromSim()
 {
-  this->robotState.set_timestamp(this->world->GetSimTime().Double());
   for (unsigned int i = 0; i < this->motors.size(); ++i)
   {
     this->robotState.set_motor_pos(i, i);
@@ -766,8 +765,8 @@ void HaptixControlPlugin::HaptixGetDeviceInfoCallback(
   for (unsigned int i = 0; i < this->joints.size(); ++i)
   {
     haptix::comm::msgs::hxJointAngle *joint = _rep.add_limit();
-    joint->set_min(this->joints[i]->GetLowerLimit(0).Radian());
-    joint->set_max(this->joints[i]->GetUpperLimit(0).Radian());
+    joint->set_minimum(this->joints[i]->GetLowerLimit(0).Radian());
+    joint->set_maximum(this->joints[i]->GetUpperLimit(0).Radian());
   }
 
   _result = true;
@@ -789,8 +788,6 @@ void HaptixControlPlugin::HaptixUpdateCallback(
   // Read the request parameters.
   // Debug output.
   std::cout << "Received a new command:" << std::endl;
-  double elapsed = this->world->GetSimTime().Double() - _req.timestamp();
-  std::cout << "Elapsed: " << elapsed << std::endl;
   /*for (unsigned int i = 0; i < this->joints.size(); ++i)
   {
     std::cout << "\tMotor " << i << ":" << std::endl;
