@@ -290,7 +290,7 @@ GUIAratPlugin::GUIAratPlugin()
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->taskPub = this->node->Advertise<msgs::GzString>("~/control");
+  this->taskPub = this->node->Advertise<msgs::GzString>("~/arrange");
 
   this->ignNode = new ignition::transport::Node("haptix");
   ignNode->Advertise("arm_pose_inc");
