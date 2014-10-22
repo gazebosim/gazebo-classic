@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * Brick-wall, Window and Door designed by Juan Pablo Bravo from the
+ * thenounproject.com
+ * Stairs designed by Brian Oppenlander from the thenounproject.com
 */
 
 #include "gazebo/gui/building/BuildingEditorPalette.hh"
@@ -33,6 +36,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
+  // Model name layout
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
   QLabel *modelLabel = new QLabel(tr("Model: "));
   this->modelNameEdit = new QLineEdit();
@@ -40,68 +44,97 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   modelNameLayout->addWidget(modelLabel);
   modelNameLayout->addWidget(this->modelNameEdit);
 
-  QFont underLineFont;
-  underLineFont.setUnderline(true);
-  underLineFont.setPointSize(14);
+  QSize toolButtonSize(100, 100);
+  QSize iconSize(65, 65);
 
-  // Add a wall button
-  QPushButton *addWallButton = new QPushButton(tr("Add Wall"), this);
-  addWallButton->setCheckable(true);
-  addWallButton->setChecked(false);
-  connect(addWallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
+  // Walls label
+  QLabel *wallsLabel = new QLabel(tr(
+       "<font size=4 color='white'>Create Walls</font>"));
 
-  // Add a window button
-  QPushButton *addWindowButton = new QPushButton(tr("Add Window"), this);
-  addWindowButton->setCheckable(true);
-  addWindowButton->setChecked(false);
-  connect(addWindowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
+  // Wall button
+  QToolButton *wallButton = new QToolButton(this);
+  wallButton->setFixedSize(toolButtonSize);
+  wallButton->setCheckable(true);
+  wallButton->setChecked(false);
+  wallButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  wallButton->setIcon(QPixmap(":/images/wall.svg"));
+  wallButton->setText("Wall");
+  wallButton->setIconSize(QSize(iconSize));
+  connect(wallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
-  // Add a door button
-  QPushButton *addDoorButton = new QPushButton(tr("Add Door"), this);
-  addDoorButton->setCheckable(true);
-  addDoorButton->setChecked(false);
-  connect(addDoorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
+  // Features label
+  QLabel *featuresLabel = new QLabel(tr(
+       "<font size=4 color='white'>Add Features</font>"));
 
-  // Add a stair button
-  QPushButton *addStairButton = new QPushButton(tr("Add Stairs"), this);
-  addStairButton->setCheckable(true);
-  addStairButton->setChecked(false);
-  connect(addStairButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
+  // Window button
+  QToolButton *windowButton = new QToolButton(this);
+  windowButton->setFixedSize(toolButtonSize);
+  windowButton->setCheckable(true);
+  windowButton->setChecked(false);
+  windowButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  windowButton->setIcon(QPixmap(":/images/window.svg"));
+  windowButton->setText("Window");
+  windowButton->setIconSize(QSize(iconSize));
+  connect(windowButton, SIGNAL(clicked()), this, SLOT(OnAddWindow()));
 
-  // Import floorplan
-  QPushButton *importImageButton = new QPushButton(tr("Import Floorplan"),
+  // Door button
+  QToolButton *doorButton = new QToolButton(this);
+  doorButton->setFixedSize(toolButtonSize);
+  doorButton->setCheckable(true);
+  doorButton->setChecked(false);
+  doorButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  doorButton->setIcon(QPixmap(":/images/door.svg"));
+  doorButton->setText("Door");
+  doorButton->setIconSize(QSize(iconSize));
+  connect(doorButton, SIGNAL(clicked()), this, SLOT(OnAddDoor()));
+
+  // Stairs button
+  QToolButton *stairsButton = new QToolButton(this);
+  stairsButton->setFixedSize(toolButtonSize);
+  stairsButton->setCheckable(true);
+  stairsButton->setChecked(false);
+  stairsButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  stairsButton->setIcon(QPixmap(":/images/stairs.svg"));
+  stairsButton->setText("Stairs");
+  stairsButton->setIconSize(QSize(iconSize));
+  connect(stairsButton, SIGNAL(clicked()), this, SLOT(OnAddStair()));
+
+  // Features layout
+  QGridLayout *featuresLayout = new QGridLayout;
+  featuresLayout->addWidget(windowButton, 0, 0);
+  featuresLayout->addWidget(doorButton, 0, 1);
+  featuresLayout->addWidget(stairsButton, 1, 0);
+
+  // Import button
+  QPushButton *importImageButton = new QPushButton(tr("Import"),
       this);
   importImageButton->setCheckable(true);
   importImageButton->setChecked(false);
+  importImageButton->setToolTip(tr(
+      "Import an existing floor plan to use as a guide"));
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
-  // Layout to hold the drawing buttons
-  QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addWidget(addWallButton, 0, 0);
-  gridLayout->addWidget(addWindowButton, 0, 1);
-  gridLayout->addWidget(addDoorButton, 1, 0);
-  gridLayout->addWidget(addStairButton, 1, 1);
-  gridLayout->addWidget(importImageButton, 2, 0);
-
+  // Discard button
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
 
+  // Save (As) button
   this->saveButton = new QPushButton(tr("Save As"));
   connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
 
-  QPushButton *doneButton = new QPushButton(tr("Done"));
-  connect(doneButton, SIGNAL(clicked()), this, SLOT(OnDone()));
-
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(discardButton);
+  buttonsLayout->addWidget(importImageButton);
   buttonsLayout->addWidget(this->saveButton);
-  buttonsLayout->addWidget(doneButton);
-  buttonsLayout->setAlignment(Qt::AlignCenter);
 
+  // Main layout
   mainLayout->addLayout(modelNameLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
-  mainLayout->addLayout(gridLayout);
+  mainLayout->addWidget(wallsLabel);
+  mainLayout->addWidget(wallButton);
+  mainLayout->addWidget(featuresLabel);
+  mainLayout->addLayout(featuresLayout);
   mainLayout->addItem(new QSpacerItem(10, 20, QSizePolicy::Expanding,
                       QSizePolicy::Minimum));
   mainLayout->addLayout(buttonsLayout);
@@ -109,6 +142,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   this->setLayout(mainLayout);
 
+  // Connections
   this->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
@@ -121,11 +155,12 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       gui::editor::Events::ConnectCreateBuildingEditorItem(
     boost::bind(&BuildingEditorPalette::OnCreateEditorItem, this, _1)));
 
+  // Brushes (button group)
   brushes = new QButtonGroup();
-  brushes->addButton(addWallButton);
-  brushes->addButton(addWindowButton);
-  brushes->addButton(addDoorButton);
-  brushes->addButton(addStairButton);
+  brushes->addButton(wallButton);
+  brushes->addButton(windowButton);
+  brushes->addButton(doorButton);
+  brushes->addButton(stairsButton);
   brushes->addButton(importImageButton);
 }
 
@@ -195,13 +230,6 @@ void BuildingEditorPalette::OnDiscard()
 void BuildingEditorPalette::OnSave()
 {
   gui::editor::Events::saveBuildingEditor(
-      this->modelNameEdit->text().toStdString());
-}
-
-/////////////////////////////////////////////////
-void BuildingEditorPalette::OnDone()
-{
-  gui::editor::Events::doneBuildingEditor(
       this->modelNameEdit->text().toStdString());
 }
 
