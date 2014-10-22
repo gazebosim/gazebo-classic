@@ -31,16 +31,16 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WallItem::WallItem(const QPointF &_start, const QPointF &_end)
-    : PolylineItem(_start, _end), BuildingItem()
+WallItem::WallItem(const QPointF &_start, const QPointF &_end,
+    const double _height) : PolylineItem(_start, _end), BuildingItem()
 {
   this->editorType = "Wall";
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
 
-  this->wallThickness = 20;
-  this->wallHeight = 250;
+  this->wallThickness = 15;
+  this->wallHeight = _height;
 
   this->SetThickness(this->wallThickness);
 
@@ -85,7 +85,7 @@ void WallItem::SetHeight(double _height)
 WallItem *WallItem::Clone() const
 {
   WallItem *wallItem = new WallItem(this->scenePos(),
-      this->scenePos() + QPointF(1, 0));
+      this->scenePos() + QPointF(1, 0), this->wallHeight);
 
   LineSegmentItem *segment = this->segments[0];
   wallItem->SetVertexPosition(0, this->mapToScene(segment->line().p1()));
@@ -408,17 +408,14 @@ void WallItem::UpdateSegmentChildren(LineSegmentItem *_segment)
   QList<QGraphicsItem *> children = _segment->childItems();
   for (int j = 0; j < children.size(); ++j)
   {
-    // TODO find a more generic way than casting child as rect item,
-    // and need to keep wall-children pos ratio fixed
+    // TODO find a more generic way than casting child as rect item
     RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
     if (rectItem)
     {
       rectItem->SetRotation(-_segment->line().angle());
-      QPointF delta = rectItem->pos() - _segment->line().p1();
-      QPointF deltaLine = _segment->line().p2() - _segment->line().p1();
-      double deltaRatio = sqrt(delta.x()*delta.x() + delta.y()*delta.y())
-          / _segment->line().length();
-      rectItem->setPos(_segment->line().p1() + deltaRatio*deltaLine);
+      QPointF segLine = _segment->line().p2() - _segment->line().p1();
+      rectItem->setPos(_segment->line().p1() + rectItem->GetPositionOnWall()*
+          segLine);
     }
   }
 }
@@ -428,6 +425,7 @@ void WallItem::WallChanged()
 {
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
+  emit PosZChanged(this->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////

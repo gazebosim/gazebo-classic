@@ -181,17 +181,18 @@ void BulletSliderJoint::Init()
 double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  // I'm not sure this will work
-  if (this->bulletSlider)
-    result = this->bulletSlider->getTargetLinMotorVelocity();
+  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  if (this->childLink)
+    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+  if (this->parentLink)
+    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
   return result;
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetVelocity(unsigned int /*_index*/, double _angle)
+void BulletSliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  if (this->bulletSlider)
-    this->bulletSlider->setTargetLinMotorVelocity(_angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -338,12 +339,25 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  math::Angle result;
-  if (this->bulletSlider)
-    result = this->bulletSlider->getLinearPos();
-  else
-    gzwarn << "bulletSlider does not exist, returning default position\n";
-  return result;
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Invalid axis index [" << _index << "]" << std::endl;
+    return math::Angle();
+  }
+
+  // The getLinearPos function seems to be off by one time-step
+  // https://github.com/bulletphysics/bullet3/issues/239
+  // if (this->bulletSlider)
+  //   result = this->bulletSlider->getLinearPos();
+  // else
+  //   gzwarn << "bulletSlider does not exist, returning default position\n";
+
+  // Compute slider angle from gazebo's cached poses instead
+  math::Vector3 offset = this->GetWorldPose().pos
+                 - this->GetParentWorldPose().pos;
+  math::Vector3 axis = this->GetGlobalAxis(_index);
+  math::Pose poseParent = this->GetWorldPose();
+  return math::Angle(axis.Dot(offset));
 }

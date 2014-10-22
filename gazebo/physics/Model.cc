@@ -67,10 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -373,17 +377,23 @@ void Model::Reset()
     (*iter)->Reset();
   }
 
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 
@@ -558,19 +568,8 @@ JointPtr Model::GetJoint(const std::string &_name)
 
   for (iter = this->joints.begin(); iter != this->joints.end(); ++iter)
   {
-    if ((*iter)->GetScopedName() == _name ||
-        (*iter)->GetName() == _name)
+    if ((*iter)->GetScopedName() == _name || (*iter)->GetName() == _name)
     {
-      // \todo: Deprecated. Remove this if block and the above
-      // "(*iter)->GetName() == _name" in Gazebo 5.0
-      if ((*iter)->GetName() == _name)
-      {
-        result = (*iter);
-        gzwarn << "Calling Model::GetJoint(" << _name
-          << ") with un-scoped joint name is deprecated, please scope\n";
-        break;
-      }
-
       result = (*iter);
       break;
     }
@@ -586,7 +585,7 @@ LinkPtr Model::GetLinkById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-Link_V Model::GetLinks() const
+const Link_V &Model::GetLinks() const
 {
   return this->links;
 }

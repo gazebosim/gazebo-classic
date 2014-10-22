@@ -22,8 +22,8 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DART_INCLUDE_DIRS} )
-  link_directories ( ${DART_LIBRARY_DIRS} )
+  include_directories ( ${DARTCore_INCLUDE_DIRS} )
+  link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
 set(tests
@@ -46,19 +46,26 @@ set(tests
   joint_gearbox.cc
   joint_revolute.cc
   joint_screw.cc
+  joint_set_position_test.cc
   joint_spawn.cc
   joint_test.cc
   joint_universal.cc
   laser.cc
+  model.cc
   model_database.cc
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_basic_controller_response.cc
   physics_friction.cc
+  physics_inertia_ratio.cc
   physics_link.cc
   physics_msgs.cc
   physics_thread_safe.cc
   pioneer2dx.cc
+  polyline.cc
+  road.cc
+  sensor.cc
   server_fixture.cc
   speed.cc
   stress_spawn_models.cc
@@ -67,7 +74,9 @@ set(tests
   transceiver.cc
   transport.cc
   world.cc
+  world_clone.cc
   world_entity_below_point.cc
+  world_population.cc
   worlds_installed.cc
   )
 
@@ -82,6 +91,9 @@ if (ENABLE_TESTS_COMPILATION)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+
+  # Add plugin dependency
+  add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 endif()
 
 set(display_tests
@@ -115,3 +127,4 @@ if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_pioneer2dx PROPERTIES TIMEOUT 500)
 endif()
+

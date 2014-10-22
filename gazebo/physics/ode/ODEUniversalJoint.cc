@@ -95,13 +95,8 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  /// \TODO: currently we assume joint axis is specified in model frame,
-  /// this is incorrect, and should be corrected to be
-  /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
-  if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  math::Quaternion axisFrame = this->GetAxisFrame(_index);
+  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
   {
@@ -164,13 +159,7 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamVel, _angle);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamVel2, _angle);
-  else
-    gzerr << "Joint index out of bounds.\n";
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

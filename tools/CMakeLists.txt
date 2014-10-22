@@ -4,11 +4,11 @@ add_definitions(${QT_DEFINITIONS})
 include_directories( 
   ${tinyxml_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
-  ${SDF_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
 )
 
 link_directories( 
-  ${SDF_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
 )
 
@@ -30,8 +30,6 @@ target_link_libraries(gz
 gz_install_executable(gz)
 
 roffman(gz 1)
-
-install (PROGRAMS gzmodel_create gzmodel_create DESTINATION ${BIN_INSTALL_DIR})
 
 install (PROGRAMS gzprop DESTINATION ${BIN_INSTALL_DIR})
 manpage(gzprop 1)

@@ -8,4 +8,4 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 
 add_library(animate_pose SHARED animate_pose.cc)
-target_link_libraries(animate_pose ${GAZEBO_libraries})
+target_link_libraries(animate_pose ${GAZEBO_LIBRARIES})

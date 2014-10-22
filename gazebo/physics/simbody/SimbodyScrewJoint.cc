@@ -212,8 +212,18 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
     {
       if (!this->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
-          this->simbodyPhysics->integ->getState(), _index));
+        // simbody screw joint only has one dof
+        // _index=0: angular dof
+        // _index=1: linear dof
+        math::Angle angle(this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), 0));
+        if (_index == 1)
+        {
+          // return linear position
+          // thread pitch units rad/m
+          angle /= math::Angle(this->threadPitch);
+        }
+        return angle;
       }
       else
       {

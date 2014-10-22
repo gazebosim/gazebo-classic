@@ -140,9 +140,9 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODEHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

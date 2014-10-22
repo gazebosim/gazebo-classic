@@ -13,6 +13,7 @@ set (msgs
   cylindergeom.proto
   diagnostics.proto
   factory.proto
+  fluid.proto
   fog.proto
   friction.proto
   geometry.proto
@@ -24,6 +25,7 @@ set (msgs
   gz_string_v.proto
   header.proto
   heightmapgeom.proto
+  hydra.proto
   imagegeom.proto
   image.proto
   image_stamped.proto
@@ -36,6 +38,7 @@ set (msgs
   joint_cmd.proto
   joint_wrench.proto
   joint_wrench_stamped.proto
+  joystick.proto
   laserscan.proto
   laserscan_stamped.proto
   light.proto
@@ -54,6 +57,7 @@ set (msgs
   pid.proto
   plugin.proto
   pointcloud.proto
+  polylinegeom.proto
   pose.proto
   pose_animation.proto
   pose_stamped.proto

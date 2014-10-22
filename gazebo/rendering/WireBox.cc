@@ -47,9 +47,6 @@ WireBox::~WireBox()
 /////////////////////////////////////////////////
 void WireBox::Init(const math::Box &_box)
 {
-  if (this->dataPtr->box == _box)
-    return;
-
   this->dataPtr->box = _box;
 
   math::Vector3 max = _box.max;
@@ -109,12 +106,6 @@ void WireBox::Init(const math::Box &_box)
 }
 
 /////////////////////////////////////////////////
-math::Box WireBox::GetBox() const
-{
-  return this->dataPtr->box;
-}
-
-/////////////////////////////////////////////////
 void WireBox::SetVisible(bool _visible)
 {
   this->dataPtr->lines->setVisible(_visible);
@@ -124,4 +115,10 @@ void WireBox::SetVisible(bool _visible)
 bool WireBox::GetVisible() const
 {
   return this->dataPtr->lines->isVisible();
+}
+
+/////////////////////////////////////////////////
+math::Box WireBox::GetBox() const
+{
+  return this->dataPtr->box;
 }

@@ -422,7 +422,9 @@ void SensorManager::SensorContainer::Stop()
   this->runCondition.notify_all();
   if (this->runThread)
   {
-    this->runThread->interrupt();
+    // Note: calling interrupt seems to cause the thread to either block
+    // or throw an exception, so commenting it out for now.
+    // this->runThread->interrupt();
     this->runThread->join();
     delete this->runThread;
     this->runThread = NULL;
