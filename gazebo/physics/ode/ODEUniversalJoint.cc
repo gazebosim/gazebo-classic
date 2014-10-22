@@ -159,13 +159,7 @@ double ODEUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  // flipping axis 1 and 2 around
-  if (_index == UniversalJoint::AXIS_CHILD)
-    this->SetParam(dParamVel, _angle);
-  else if (_index == UniversalJoint::AXIS_PARENT)
-    this->SetParam(dParamVel2, _angle);
-  else
-    gzerr << "Joint index out of bounds.\n";
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

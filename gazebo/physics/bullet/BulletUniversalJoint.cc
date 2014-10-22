@@ -186,12 +186,7 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void BulletUniversalJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  math::Vector3 desiredVel;
-  if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldAngularVel();
-  desiredVel += _angle * this->GetGlobalAxis(_index);
-  if (this->childLink)
-    this->childLink->SetAngularVel(desiredVel);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

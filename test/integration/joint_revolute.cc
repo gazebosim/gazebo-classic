@@ -113,7 +113,6 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  bool isOde = physics->GetType().compare("ode") == 0;
 
   // disable gravity
   physics->SetGravity(math::Vector3::Zero);
@@ -134,8 +133,6 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
     EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
 
     joint->SetVelocity(0, vel);
-    if (isOde)
-      joint->SetMaxForce(0, 1e4);
 
     // expect that joint velocity is constant
     // and that joint angle is unwrapped

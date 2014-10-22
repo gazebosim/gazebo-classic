@@ -47,7 +47,6 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name"));
   this->modelNameLineEdit = new QLineEdit;
-  this->modelNameLineEdit->setText(tr("BuildingDefaultName"));
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location"));
   this->modelLocationLineEdit = new QLineEdit;
