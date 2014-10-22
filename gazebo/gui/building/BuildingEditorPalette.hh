@@ -71,9 +71,6 @@ namespace gazebo
       /// \brief Qt callback when the save button is pressed.
       private slots: void OnSave();
 
-      /// \brief Qt callback when the done button is pressed.
-      private slots: void OnDone();
-
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
