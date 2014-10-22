@@ -61,7 +61,7 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->setDragMode(QGraphicsView::ScrollHandDrag);
 
   // TODO remove this wall and make sure scene updates without any items in it
-  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0));
+  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0), 0);
   wallItem->SetThickness(0);
   this->scene->addItem(wallItem);
 

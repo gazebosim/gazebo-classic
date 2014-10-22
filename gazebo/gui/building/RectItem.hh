@@ -70,6 +70,14 @@ namespace gazebo
       /// \return Height of the rect item in pixels.
       public: double GetHeight() const;
 
+      /// \brief Set the position of this item inside its parent wall.
+      /// \param[in] _positionOnWall New normalized position on wall.
+      public: void SetPositionOnWall(double _positionOnWall);
+
+      /// \brief Get the position of this item inside its parent wall.
+      /// \return Normalized position on parent wall.
+      public: double GetPositionOnWall() const;
+
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
       public: void ShowHandles(bool _show);
@@ -258,11 +266,15 @@ namespace gazebo
       /// grabber handles.
       private: std::vector<Qt::CursorShape> cursors;
 
-      /// \brieft Z ordering of the rect item when selected.
+      /// \brief Z ordering of the rect item when selected.
       private: int zValueSelected;
 
-      /// \brieft Resize flag that controls how the rect item can be resized.
+      /// \brief Resize flag that controls how the rect item can be resized.
       private: unsigned int resizeFlag;
+
+      /// \brief Normalized position with respect to the wall segment's start
+      /// point.
+      private: double positionOnWall;
     };
     /// \}
   }

@@ -73,6 +73,22 @@ void PolylineItem::SetThickness(double _thickness)
 }
 
 /////////////////////////////////////////////////
+void PolylineItem::SetColor(QColor _color)
+{
+  this->lineColor = _color;
+
+  QPen polylinePen = this->pen();
+  polylinePen.setColor(_color);
+  this->setPen(polylinePen);
+  for (unsigned int i = 0; i < this->segments.size(); ++i)
+  {
+    QPen segmentPen = this->segments[i]->pen();
+    segmentPen.setColor(_color);
+    this->segments[i]->setPen(segmentPen);
+  }
+}
+
+/////////////////////////////////////////////////
 void PolylineItem::SetPosition(const QPointF &_pos)
 {
   this->setPos(_pos);
