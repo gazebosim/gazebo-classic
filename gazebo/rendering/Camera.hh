@@ -162,11 +162,11 @@ namespace gazebo
       public: math::Pose GetWorldPose() const;
 
       /// \brief Set the camera's velocity
-      /// \param[i] _quat The new velocity of the camera
+      /// \param[i] _velocity The new velocity of the camera
       public: void SetVelocity(const math::Pose &_velocity);
 
       /// \brief Get the camera's current velocity
-      // \return The camera's linear and angular velocity as a math::Pose
+      /// \return The camera's linear and angular velocity as a math::Pose
       public: math::Pose GetVelocity() const;
 
       /// \brief Set the world position
@@ -627,7 +627,7 @@ namespace gazebo
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
-      // \brief Buffer for a single image frame.
+      /// \brief Buffer for a single image frame.
       protected: unsigned char *saveFrameBuffer;
 
       /// \brief Buffer for a bayer image frame.
