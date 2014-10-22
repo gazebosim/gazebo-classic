@@ -341,9 +341,9 @@ void RigidBodyTest::SphereImpact(const std::string &_physicsEngine
 
   // Record statistics on pitch and yaw angles
   this->Record("linMomentum0", (P0mag_1 + P0mag_2));
-  this->Record("linMomentumError", linearMomentumError.mag);
+  this->Record("linMomentumError", linearMomentumError.Mag());
   this->Record("angMomentum0", (H0mag_1 + H0mag_2));
-  this->Record("angMomentumError", angularMomentumError.mag);
+  this->Record("angMomentumError", angularMomentumError.Mag());
   this->Record("energy0", (E0_1 + E0_2));
   this->Record("energyError", energyError);
   this->Record("rmsErrorTotal", constraintErrorTotal);
