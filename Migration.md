@@ -11,6 +11,10 @@
 
 ### Additions
 
+1. **gazebo/physics/Joint.hh**
+    + void SetVelocityLimit(unsigned int, double)
+    + bool SetVelocityMaximal(unsigned int, double)
+
 1. **gazebo/physics/Population.hh**
     + ***New class:*** Population
 
@@ -40,6 +44,8 @@
     + ***Replacement*** unsigned int GetShapeType() const
 
 1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual double GetMaxForce(unsigned int)
+    + ***Deprecation*** virtual void SetMaxForce(unsigned int, double)
     + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
     + ***Replacement*** virtual void SetPosition(unsigned int, double)
 

@@ -15,7 +15,9 @@
  *
 */
 #include <cmath>
+#include <iostream>
 #include <boost/algorithm/string.hpp>
+#include "gazebo/math/SignalStatsPrivate.hh"
 #include "gazebo/math/SignalStats.hh"
 
 using namespace gazebo;
@@ -23,119 +25,122 @@ using namespace math;
 
 //////////////////////////////////////////////////
 SignalStatistic::SignalStatistic()
-  : data(0.0)
-  , count(0)
+  : dataPtr(new SignalStatisticPrivate)
 {
+  this->dataPtr->data = 0.0;
+  this->dataPtr->count = 0;
 }
 
 //////////////////////////////////////////////////
 SignalStatistic::~SignalStatistic()
 {
+  delete this->dataPtr;
+  this->dataPtr = 0;
 }
 
 //////////////////////////////////////////////////
-unsigned int SignalStatistic::GetCount() const
+size_t SignalStatistic::Count() const
 {
-  return this->count;
+  return this->dataPtr->count;
 }
 
 //////////////////////////////////////////////////
 void SignalStatistic::Reset()
 {
-  this->data = 0;
-  this->count = 0;
+  this->dataPtr->data = 0;
+  this->dataPtr->count = 0;
 }
 
 //////////////////////////////////////////////////
-double SignalMean::Get() const
+double SignalMean::Value() const
 {
-  if (this->count == 0)
+  if (this->dataPtr->count == 0)
   {
     return 0;
   }
-  return this->data / this->count;
+  return this->dataPtr->data / this->dataPtr->count;
 }
 
 //////////////////////////////////////////////////
-std::string SignalMean::GetShortName() const
+std::string SignalMean::ShortName() const
 {
-  return "Mean";
+  return "mean";
 }
 
 //////////////////////////////////////////////////
-void SignalMean::InsertData(double _data)
+void SignalMean::InsertData(const double _data)
 {
-  this->data += _data;
-  this->count++;
+  this->dataPtr->data += _data;
+  this->dataPtr->count++;
 }
 
 //////////////////////////////////////////////////
-double SignalRootMeanSquare::Get() const
+double SignalRootMeanSquare::Value() const
 {
-  if (this->count == 0)
+  if (this->dataPtr->count == 0)
   {
     return 0;
   }
-  return sqrt(this->data / this->count);
+  return sqrt(this->dataPtr->data / this->dataPtr->count);
 }
 
 //////////////////////////////////////////////////
-std::string SignalRootMeanSquare::GetShortName() const
+std::string SignalRootMeanSquare::ShortName() const
 {
-  return "Rms";
+  return "rms";
 }
 
 //////////////////////////////////////////////////
-void SignalRootMeanSquare::InsertData(double _data)
+void SignalRootMeanSquare::InsertData(const double _data)
 {
-  this->data += _data * _data;
-  this->count++;
+  this->dataPtr->data += _data * _data;
+  this->dataPtr->count++;
 }
 
 //////////////////////////////////////////////////
-double SignalMaxAbsoluteValue::Get() const
+double SignalMaxAbsoluteValue::Value() const
 {
-  return this->data;
+  return this->dataPtr->data;
 }
 
 //////////////////////////////////////////////////
-std::string SignalMaxAbsoluteValue::GetShortName() const
+std::string SignalMaxAbsoluteValue::ShortName() const
 {
-  return "MaxAbs";
+  return "maxAbs";
 }
 
 //////////////////////////////////////////////////
-void SignalMaxAbsoluteValue::InsertData(double _data)
+void SignalMaxAbsoluteValue::InsertData(const double _data)
 {
-  double fabsData = fabs(_data);
-  if (fabsData > this->data)
+  double absData = std::abs(_data);
+  if (absData > this->dataPtr->data)
   {
-    this->data = fabsData;
+    this->dataPtr->data = absData;
   }
-  this->count++;
+  this->dataPtr->count++;
 }
 
 //////////////////////////////////////////////////
-double SignalVarianceValue::Get() const
+double SignalVarianceValue::Value() const
 {
-  return this->data;
+  return this->dataPtr->data;
 }
 
 //////////////////////////////////////////////////
-std::string SignalVarianceValue::GetShortName() const
+std::string SignalVarianceValue::ShortName() const
 {
-  return "Variance";
+  return "variance";
 }
 
 //////////////////////////////////////////////////
 void SignalVarianceValue::InsertData(double _data)
 {
   // from nfs-uxsup.csx.cam.ac.uk/~fanf2/hermes/doc/antiforgery/stats.pdf
-  double oldMean = this->sum / (this->count + 1.0);
-  this->count++;
+  double oldMean = this->sum / (this->dataPtr->count + 1.0);
+  this->dataPtr->count++;
   this->sum += _data;
-  double newMean = this->sum / (this->count + 1.0);
-  this->data += this->count * (this->count - 1.0)
+  double newMean = this->sum / (this->dataPtr->count + 1.0);
+  this->dataPtr->data += this->dataPtr->count * (this->dataPtr->count - 1.0)
     * (newMean - oldMean) * (newMean - oldMean);
 }
 
@@ -148,6 +153,7 @@ void SignalVarianceValue::Reset()
 
 //////////////////////////////////////////////////
 SignalStats::SignalStats()
+  : dataPtr(new SignalStatsPrivate)
 {
 }
 
@@ -157,34 +163,31 @@ SignalStats::~SignalStats()
 }
 
 //////////////////////////////////////////////////
-unsigned int SignalStats::GetCount() const
+size_t SignalStats::Count() const
 {
-  unsigned int count = 0;
-  SignalStatistic_V::const_iterator iter = this->stats.begin();
-  if (iter != this->stats.end())
-  {
-    count = (*iter)->GetCount();
-  }
-  return count;
+  if (this->dataPtr->stats.empty())
+    return 0;
+
+  return this->dataPtr->stats.front()->Count();
 }
 
 //////////////////////////////////////////////////
-std::map<std::string, double> SignalStats::GetMap() const
+std::map<std::string, double> SignalStats::Map() const
 {
   std::map<std::string, double> map;
-  for (SignalStatistic_V::const_iterator iter = this->stats.begin();
-       iter != this->stats.end(); ++iter)
+  for (SignalStatistic_V::const_iterator iter = this->dataPtr->stats.begin();
+       iter != this->dataPtr->stats.end(); ++iter)
   {
-    map[(*iter)->GetShortName()] = (*iter)->Get();
+    map[(*iter)->ShortName()] = (*iter)->Value();
   }
   return map;
 }
 
 //////////////////////////////////////////////////
-void SignalStats::InsertData(double _data)
+void SignalStats::InsertData(const double _data)
 {
-  for (SignalStatistic_V::iterator iter = this->stats.begin();
-       iter != this->stats.end(); ++iter)
+  for (SignalStatistic_V::iterator iter = this->dataPtr->stats.begin();
+       iter != this->dataPtr->stats.end(); ++iter)
   {
     (*iter)->InsertData(_data);
   }
@@ -195,37 +198,45 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 {
   // Check if the statistic is already inserted
   {
-    std::map<std::string, double> map = this->GetMap();
+    std::map<std::string, double> map = this->Map();
     if (map.find(_name) != map.end())
     {
+      std::cerr << "Unable to InsertStatistic ["
+                << _name
+                << "] since it has already been inserted."
+                << std::endl;
       return false;
     }
   }
 
   SignalStatisticPtr stat;
-  if (_name == "MaxAbs")
+  if (_name == "maxAbs")
   {
     stat.reset(new SignalMaxAbsoluteValue());
-    this->stats.push_back(stat);
+    this->dataPtr->stats.push_back(stat);
   }
-  else if (_name == "Variance")
+  else if (_name == "variance")
   {
     stat.reset(new SignalVarianceValue());
-    this->stats.push_back(stat);
+    this->dataPtr->stats.push_back(stat);
   }
-  else if (_name == "Mean")
+  else if (_name == "mean")
   {
     stat.reset(new SignalMean());
-    this->stats.push_back(stat);
+    this->dataPtr->stats.push_back(stat);
   }
-  else if (_name == "Rms")
+  else if (_name == "rms")
   {
     stat.reset(new SignalRootMeanSquare());
-    this->stats.push_back(stat);
+    this->dataPtr->stats.push_back(stat);
   }
   else
   {
     // Unrecognized name string
+    std::cerr << "Unable to InsertStatistic ["
+              << _name
+              << "] since it is an unrecognized name."
+              << std::endl;
     return false;
   }
   return true;
@@ -235,7 +246,12 @@ bool SignalStats::InsertStatistic(const std::string &_name)
 bool SignalStats::InsertStatistics(const std::string &_names)
 {
   if (_names.empty())
+  {
+    std::cerr << "Unable to InsertStatistics "
+              << "since no names were supplied."
+              << std::endl;
     return false;
+  }
 
   bool result = true;
   std::vector<std::string> names;
@@ -251,60 +267,10 @@ bool SignalStats::InsertStatistics(const std::string &_names)
 //////////////////////////////////////////////////
 void SignalStats::Reset()
 {
-  for (SignalStatistic_V::iterator iter = this->stats.begin();
-       iter != this->stats.end(); ++iter)
+  for (SignalStatistic_V::iterator iter = this->dataPtr->stats.begin();
+       iter != this->dataPtr->stats.end(); ++iter)
   {
     (*iter)->Reset();
   }
-}
-
-//////////////////////////////////////////////////
-Vector3Stats::Vector3Stats()
-{
-}
-
-//////////////////////////////////////////////////
-Vector3Stats::~Vector3Stats()
-{
-}
-
-//////////////////////////////////////////////////
-void Vector3Stats::InsertData(const Vector3 &_data)
-{
-  this->x.InsertData(_data.x);
-  this->y.InsertData(_data.y);
-  this->z.InsertData(_data.z);
-  this->mag.InsertData(_data.GetLength());
-}
-
-//////////////////////////////////////////////////
-bool Vector3Stats::InsertStatistic(const std::string &_name)
-{
-  bool result = true;
-  result = result && this->x.InsertStatistic(_name);
-  result = result && this->y.InsertStatistic(_name);
-  result = result && this->z.InsertStatistic(_name);
-  result = result && this->mag.InsertStatistic(_name);
-  return result;
-}
-
-//////////////////////////////////////////////////
-bool Vector3Stats::InsertStatistics(const std::string &_names)
-{
-  bool result = true;
-  result = result && this->x.InsertStatistics(_names);
-  result = result && this->y.InsertStatistics(_names);
-  result = result && this->z.InsertStatistics(_names);
-  result = result && this->mag.InsertStatistics(_names);
-  return result;
-}
-
-//////////////////////////////////////////////////
-void Vector3Stats::Reset()
-{
-  this->x.Reset();
-  this->y.Reset();
-  this->z.Reset();
-  this->mag.Reset();
 }
 

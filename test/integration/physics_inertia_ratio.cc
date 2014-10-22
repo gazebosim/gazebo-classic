@@ -21,6 +21,7 @@
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
+#include "gazebo/math/Vector3Stats.hh"
 #include "gazebo/physics/physics.hh"
 #include "test/integration/helper_physics_generator.hh"
 #include "test/ServerFixture.hh"
@@ -62,7 +63,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   math::Vector3Stats upperAngles;
   math::Vector3Stats lowerAngles;
   {
-    const std::string statNames = "MaxAbs,Rms";
+    const std::string statNames = "maxAbs";
     EXPECT_TRUE(upperAngles.InsertStatistics(statNames));
     EXPECT_TRUE(lowerAngles.InsertStatistics(statNames));
   }
@@ -82,10 +83,10 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   this->Record("simTime", world->GetSimTime().Double());
 
   // Expect out of plane angles to fall within limits
-  EXPECT_NEAR((upperAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((upperAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
-  EXPECT_NEAR((lowerAngles.y.GetMap())["MaxAbs"], 0.0, g_angle_y_tol);
-  EXPECT_NEAR((lowerAngles.z.GetMap())["MaxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((upperAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((upperAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
+  EXPECT_NEAR((lowerAngles.Y().Map())["maxAbs"], 0.0, g_angle_y_tol);
+  EXPECT_NEAR((lowerAngles.Z().Map())["maxAbs"], 0.0, g_angle_z_tol);
 
   // Record statistics on pitch and yaw angles
   this->Record("upper_pitch_", upperAngles.y);

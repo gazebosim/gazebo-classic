@@ -17,6 +17,7 @@ set (sources
   Vector2d.cc
   Vector2i.cc
   Vector3.cc
+  Vector3Stats.cc
   Vector4.cc
 )
 
@@ -39,6 +40,7 @@ set (headers
   Vector2d.hh
   Vector2i.hh
   Vector3.hh
+  Vector3Stats.hh
   Vector4.hh
 )
 
@@ -58,6 +60,7 @@ set (gtest_sources
   Vector2d_TEST.cc
   Vector2i_TEST.cc
   Vector3_TEST.cc
+  Vector3Stats_TEST.cc
   Vector4_TEST.cc
 )
 gz_build_tests(${gtest_sources})
