@@ -72,7 +72,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit door changed signals
-      private: void DoorChanged();
+      public: void DoorChanged();
 
       /// \brief Emit size changed signals
       private: void SizeChanged();
