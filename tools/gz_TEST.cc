@@ -369,7 +369,7 @@ TEST_F(gzTest, Model)
     boost::split(parts, modelInfo, boost::is_any_of(" "));
 
     // Make sure we have the right number of parts.
-    ASSERT_EQ(parts.size(), 6);
+    ASSERT_EQ(parts.size(), 6u);
 
     // Make sure the pose is correct.
     EXPECT_DOUBLE_EQ(boost::lexical_cast<double>(parts[0]), 0.0);
