@@ -186,7 +186,7 @@ void SegmentItem::SegmentUpdated()
 }
 
 /////////////////////////////////////////////////
-bool SegmentItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
+bool SegmentItem::sceneEventFilter(QGraphicsItem *_watched, QEvent *_event)
 {
   GrabberHandle *grabber = dynamic_cast<GrabberHandle *>(_watched);
   if (grabber)
@@ -196,7 +196,7 @@ bool SegmentItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-bool SegmentItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
+bool SegmentItem::GrabberEventFilter(GrabberHandle*_grabber, QEvent *_event)
 {
   QGraphicsSceneMouseEvent *mouseEvent =
     dynamic_cast<QGraphicsSceneMouseEvent*>(_event);
@@ -286,13 +286,13 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle* _grabber, QEvent *_event)
 }
 
 /////////////////////////////////////////////////
-void SegmentItem::UpdateLinkedGrabbers(GrabberHandle * _grabber, QPointF _pos)
+void SegmentItem::UpdateLinkedGrabbers(GrabberHandle *_grabber, QPointF _pos)
 {
   for (unsigned int i = 0; i < _grabber->linkedGrabbers.size(); ++i)
   {
-    GrabberHandle * linkedGrabber = _grabber->linkedGrabbers[i];
+    GrabberHandle *linkedGrabber = _grabber->linkedGrabbers[i];
     int index = linkedGrabber->GetIndex();
-    SegmentItem * parentSegment = dynamic_cast<SegmentItem*>(
+    SegmentItem *parentSegment = dynamic_cast<SegmentItem*>(
         linkedGrabber->parentItem());
     if (index == 0)
       parentSegment->SetStartPoint(_pos);

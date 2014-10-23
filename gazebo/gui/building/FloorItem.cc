@@ -52,7 +52,6 @@ FloorItem::~FloorItem()
 {
 }
 
-
 /////////////////////////////////////////////////
 QVector3D FloorItem::GetSize() const
 {
@@ -88,7 +87,7 @@ void FloorItem::AttachWallSegment(WallSegmentItem *_wallSegmentItem)
   connect(_wallSegmentItem, SIGNAL(PosYChanged(double)), this,
       SLOT(NotifyChange()));
   connect(_wallSegmentItem, SIGNAL(ItemDeleted()), this,
-      SLOT(WallDeleted()));
+      SLOT(WallSegmentDeleted()));
   this->Update();
 }
 
@@ -117,7 +116,7 @@ void FloorItem::RecalculateBoundingBox()
     return;
 
   this->floorBoundingRect.clear();
-  for (unsigned int i = 1; i < this->wallSegments.size(); ++i)
+  for (unsigned int i = 0; i < this->wallSegments.size(); ++i)
   {
     this->floorBoundingRect <<
         this->wallSegments[i]->boundingRect().topLeft();

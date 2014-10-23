@@ -100,21 +100,21 @@ namespace gazebo
       /// \brief Update the position of all grabbers linked to the given one.
       /// \param[in] _grabber Original grabber.
       /// \param[in] _pos New position.
-      protected: void UpdateLinkedGrabbers(GrabberHandle * _grabber, QPointF
+      protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber, QPointF
           _pos);
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.
       /// \param[in] _event Qt event.
       /// \return True to prevent further processing of a given event.
-      private: bool sceneEventFilter(QGraphicsItem * watched,
+      private: bool sceneEventFilter(QGraphicsItem *watched,
           QEvent *_event);
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _grabber Grabber that will handle the event.
       /// \param[in] _event Qt event.
       /// \return True to prevent further processing of a given event.
-      private: bool GrabberEventFilter(GrabberHandle * _grabber,
+      private: bool GrabberEventFilter(GrabberHandle *_grabber,
           QEvent *_event);
 
       /// \brief Qt mouse hover enter event.

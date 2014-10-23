@@ -214,16 +214,16 @@ namespace gazebo
       /// \brief Link grabbers so they move together.
       /// \param[in] _grabber1 First grabber to be liked.
       /// \param[in] _grabber2 Second grabber to be unliked.
-      private: void LinkGrabbers(GrabberHandle * _grabber1,
-          GrabberHandle * _grabber2);
+      private: void LinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2);
 
       /// \brief Unlink grabbers so they don't move together anymore. If only
       /// one grabber is input, that grabber is unliked from all its current
       /// links.
       /// \param[in] _grabber1 First grabber to be unliked.
       /// \param[in] _grabber2 Second grabber to be unliked.
-      private: void UnlinkGrabbers(GrabberHandle * _grabber1,
-          GrabberHandle * _grabber2 = NULL);
+      private: void UnlinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2 = NULL);
 
       /// \brief Current draw mode
       private: int drawMode;
@@ -308,10 +308,10 @@ namespace gazebo
       private: bool snapToGrabber;
 
       /// \brief Existing grabber to snap towards.
-      private: GrabberHandle * snapGrabberOther;
+      private: GrabberHandle *snapGrabberOther;
 
       /// \brief Currently held grabber which will be snapped.
-      private: GrabberHandle * snapGrabberCurrent;
+      private: GrabberHandle *snapGrabberCurrent;
     };
     /// \}
   }

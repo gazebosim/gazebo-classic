@@ -337,7 +337,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
               it  != itemsList.end(); ++it)
           {
-            WallSegmentItem * anotherWall = dynamic_cast<WallSegmentItem *>
+            WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>
                 (*it);
             if (anotherWall && anotherWall != wallSegmentItem)
             {
@@ -568,7 +568,7 @@ void EditorView::DeleteItem(EditorItem *_item)
 
   if (_item->GetType() == "WallSegment")
   {
-    WallSegmentItem* wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
+    WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
     this->UnlinkGrabbers(wallSegmentItem->grabbers[0]);
     this->UnlinkGrabbers(wallSegmentItem->grabbers[1]);
 
@@ -653,7 +653,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     // Start from previous segment's end
     QPointF newPointStart = wallSegmentItem->GetEndPoint();
     QPointF newPointEnd = newPointStart + QPointF(1, 0);
-    GrabberHandle * grabberStart = wallSegmentItem->grabbers[1];
+    GrabberHandle *grabberStart = wallSegmentItem->grabbers[1];
 
     wallSegmentItem = new WallSegmentItem(newPointStart,
         newPointEnd, this->levelDefaultHeight);
@@ -989,8 +989,8 @@ void EditorView::OnAddLevel()
   for (clonedIt iterator = clonedWallMap.begin(); iterator !=
       clonedWallMap.end(); ++iterator)
   {
-    WallSegmentItem * oldWall = iterator->first;
-    WallSegmentItem * newWall = iterator->second;
+    WallSegmentItem *oldWall = iterator->first;
+    WallSegmentItem *newWall = iterator->second;
 
     // start / end
     for (int g = 0; g < 2; ++g)
@@ -998,7 +998,7 @@ void EditorView::OnAddLevel()
       for (unsigned int i = 0; i < oldWall->grabbers[g]->linkedGrabbers.size();
           ++i)
       {
-        WallSegmentItem * parentItem = dynamic_cast<WallSegmentItem*>(
+        WallSegmentItem *parentItem = dynamic_cast<WallSegmentItem*>(
             oldWall->grabbers[g]->linkedGrabbers[i]->parentItem());
         int index = oldWall->grabbers[g]->linkedGrabbers[i]->GetIndex();
 
@@ -1271,8 +1271,8 @@ void EditorView::ShowCurrentLevelItems()
 }
 
 /////////////////////////////////////////////////
-void EditorView::LinkGrabbers(GrabberHandle * _grabber1,
-    GrabberHandle * _grabber2)
+void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
+    GrabberHandle *_grabber2)
 {
   if (_grabber1 && _grabber2 && _grabber1 != _grabber2)
   {
@@ -1300,8 +1300,8 @@ void EditorView::LinkGrabbers(GrabberHandle * _grabber1,
 }
 
 /////////////////////////////////////////////////
-void EditorView::UnlinkGrabbers(GrabberHandle * _grabber1,
-    GrabberHandle * _grabber2)
+void EditorView::UnlinkGrabbers(GrabberHandle *_grabber1,
+    GrabberHandle *_grabber2)
 {
   // If only one grabber, erase it from all grabbers it is linked
   if (!_grabber2)
