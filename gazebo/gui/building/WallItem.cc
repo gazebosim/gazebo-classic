@@ -31,16 +31,16 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-WallItem::WallItem(const QPointF &_start, const QPointF &_end)
-    : PolylineItem(_start, _end), BuildingItem()
+WallItem::WallItem(const QPointF &_start, const QPointF &_end,
+    const double _height) : PolylineItem(_start, _end), BuildingItem()
 {
   this->editorType = "Wall";
   this->scale = BuildingMaker::conversionScale;
 
   this->level = 0;
 
-  this->wallThickness = 20;
-  this->wallHeight = 250;
+  this->wallThickness = 15;
+  this->wallHeight = _height;
 
   this->SetThickness(this->wallThickness);
 
@@ -85,7 +85,7 @@ void WallItem::SetHeight(double _height)
 WallItem *WallItem::Clone() const
 {
   WallItem *wallItem = new WallItem(this->scenePos(),
-      this->scenePos() + QPointF(1, 0));
+      this->scenePos() + QPointF(1, 0), this->wallHeight);
 
   LineSegmentItem *segment = this->segments[0];
   wallItem->SetVertexPosition(0, this->mapToScene(segment->line().p1()));
@@ -425,6 +425,7 @@ void WallItem::WallChanged()
 {
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
+  emit PosZChanged(this->levelBaseHeight);
 }
 
 /////////////////////////////////////////////////

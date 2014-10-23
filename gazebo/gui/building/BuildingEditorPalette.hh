@@ -53,13 +53,14 @@ namespace gazebo
       /// \brief Qt callback when the draw wall button is pressed.
       private slots: void OnDrawWall();
 
-      // private slots: void OnImportImage();
-
       /// \brief Qt callback when the draw window button is pressed.
       private slots: void OnAddWindow();
 
       /// \brief Qt callback when the draw door button is pressed.
       private slots: void OnAddDoor();
+
+      /// \brief Qt callback when the import image button is pressed.
+      private slots: void OnImportImage();
 
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
@@ -70,9 +71,6 @@ namespace gazebo
       /// \brief Qt callback when the save button is pressed.
       private slots: void OnSave();
 
-      /// \brief Qt callback when the done button is pressed.
-      private slots: void OnDone();
-
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -81,17 +79,18 @@ namespace gazebo
           const std::string &_saveLocation);
 
       /// \brief Event received when an editor item is selected.
-      /// \param[in] _type Type of item to add.
-      private: void OnCreateEditorItem(const std::string &_type);
+      /// \param[in] _mode Type of item to add or empty for none.
+      private: void OnCreateEditorItem(const std::string &_mode);
 
       /// \brief Event received when a building model has been discarded.
       private: void OnDiscardModel();
 
+      /// \brief Qt callback when the palette is pressed.
+      /// \param[in] _event Event.
+      private: void mousePressEvent(QMouseEvent *_event);
+
       /// \brief Default name of the building model.
       private: std::string buildingDefaultName;
-
-      /// \brief A label that displays the name of the building model.
-      private: QLabel *modelNameLabel;
 
       /// \brief Edit the name of the building model.
       private: QLineEdit *modelNameEdit;
@@ -100,14 +99,19 @@ namespace gazebo
       private: QPushButton *saveButton;
 
       /// \brief All the brushes (wall, door, window, stair, etc).
-      private: std::list<QPushButton *> brushes;
+      private: QButtonGroup *brushes;
 
+      /// \brief Name of model.
+      private: std::string modelName;
 
       /// \brief Save location.
       private: std::string saveLocation;
 
       /// \brief A list of gui editor events connected to this palette.
       private: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief The current draw mode, empty for none.
+      private: std::string currentMode;
     };
     /// \}
   }
