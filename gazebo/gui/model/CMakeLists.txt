@@ -11,6 +11,7 @@ set (sources
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
+  PartCollisionTab.cc
   PartGeneralTab.cc
   PartInspector.cc
   PartVisualTab.cc
@@ -24,6 +25,7 @@ set (qt_headers
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
+  PartCollisionTab.hh
   PartGeneralTab.hh
   PartInspector.hh
   PartVisualTab.hh
