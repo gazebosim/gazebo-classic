@@ -222,6 +222,8 @@ void WallSegmentItem::OnApply()
     this->SetStartPoint(newStartPoint);
     this->SetEndPoint(newEndPoint);
   }
+  this->UpdateLinkedGrabbers(this->grabbers[0], this->GetStartPoint());
+  this->UpdateLinkedGrabbers(this->grabbers[1], this->GetEndPoint());
   this->update();
   this->UpdateInspector();
 }

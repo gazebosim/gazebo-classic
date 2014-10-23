@@ -641,7 +641,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
-    wallSegmentItem->setSelected(true); // Select/deselect, trigger item change
+    wallSegmentItem->setSelected(true);  // Select -> deselect to trigger change
     wallSegmentItem->setSelected(false);
     wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
@@ -933,7 +933,8 @@ void EditorView::OnAddLevel()
   this->levels.push_back(newLevel);
   gui::editor::Events::updateLevelWidget(this->currentLevel, levelName);
 
-  std::vector<WallSegmentItem *>::iterator wallIt = this->wallSegmentList.begin();
+  std::vector<WallSegmentItem *>::iterator wallIt =
+      this->wallSegmentList.begin();
   double wallHeight = (*wallIt)->GetHeight() + (*wallIt)->GetLevelBaseHeight();
   double maxHeight = wallHeight;
   int wallLevel = 0;
@@ -979,7 +980,7 @@ void EditorView::OnAddLevel()
 
     floorItem->AttachWallSegment(wallSegmentItem);
 
-    wallSegmentItem->setSelected(true); // Select/deselect, trigger item change
+    wallSegmentItem->setSelected(true);  // Select -> deselect to trigger change
     wallSegmentItem->setSelected(false);
   }
 
@@ -1102,7 +1103,8 @@ void EditorView::DeleteLevel(int _level)
       (*it)->FloorChanged();
     }
   }
-  for (std::vector<WallSegmentItem *>::iterator it = this->wallSegmentList.begin();
+  for (std::vector<WallSegmentItem *>::iterator it =
+      this->wallSegmentList.begin();
       it != this->wallSegmentList.end(); ++it)
   {
     if ((*it)->GetLevel() == _level)

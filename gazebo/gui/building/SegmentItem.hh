@@ -97,6 +97,12 @@ namespace gazebo
       /// \brief Update item.
       protected: virtual void SegmentUpdated();
 
+      /// \brief Update the position of all grabbers linked to the given one.
+      /// \param[in] _grabber Original grabber.
+      /// \param[in] _pos New position.
+      protected: void UpdateLinkedGrabbers(GrabberHandle * _grabber, QPointF
+          _pos);
+
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.
       /// \param[in] _event Qt event.
@@ -110,12 +116,6 @@ namespace gazebo
       /// \return True to prevent further processing of a given event.
       private: bool GrabberEventFilter(GrabberHandle * _grabber,
           QEvent *_event);
-
-      /// \brief Update the position of all grabbers linked to the given one.
-      /// \param[in] _grabber Original grabber.
-      /// \param[in] _pos New position.
-      private: void UpdateLinkedGrabbers(GrabberHandle * _grabber, QPointF
-          _pos);
 
       /// \brief Qt mouse hover enter event.
       /// \param[in] _event Qt mouse hover event.
