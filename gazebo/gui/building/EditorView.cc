@@ -326,7 +326,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         QPointF pf;
         pf = p2;
 
-        if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
+        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
         {
           double distanceToClose = 30;
 
