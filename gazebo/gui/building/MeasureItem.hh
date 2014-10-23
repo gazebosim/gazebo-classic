@@ -19,22 +19,21 @@
 #define _MEASURE_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/building/PolylineItem.hh"
+#include "gazebo/gui/building/SegmentItem.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace gui
   {
-    class PolylineItem;
-    class LineSegmentItem;
+    class SegmentItem;
 
     /// \addtogroup gazebo_gui
     /// \{
 
     /// \class MeasureItem MeasureItem.hh
     /// \brief Measurement lines and values.
-    class GAZEBO_VISIBLE MeasureItem : public PolylineItem
+    class GAZEBO_VISIBLE MeasureItem : public SegmentItem
     {
       Q_OBJECT
 

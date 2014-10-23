@@ -18,9 +18,6 @@
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
-#include "gazebo/gui/building/LineSegmentItem.hh"
-#include "gazebo/gui/building/PolylineItem.hh"
-#include "gazebo/gui/building/WallItem.hh"
 #include "gazebo/gui/building/LevelWidget.hh"
 #include "gazebo/gui/building/ScaleWidget.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
@@ -61,9 +58,10 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->setDragMode(QGraphicsView::ScrollHandDrag);
 
   // TODO remove this wall and make sure scene updates without any items in it
-  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0), 0);
-  wallItem->SetThickness(0);
-  this->scene->addItem(wallItem);
+  // Done?
+//  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0), 0);
+//  wallItem->SetThickness(0);
+//  this->scene->addItem(wallItem);
 
   this->levelWidget = new LevelWidget(this);
   this->levelWidget->resize(250, 50);
