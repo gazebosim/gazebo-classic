@@ -291,7 +291,7 @@ void RenderWidget::ShowEditor(bool _show)
   if (_show)
   {
     this->buildingEditorWidget->show();
-    this->baseOverlayMsg = "Building is View Only";
+    this->baseOverlayMsg = "Building is view-only";
     this->OnClearOverlayMsg();
     this->bottomFrame->hide();
   }
