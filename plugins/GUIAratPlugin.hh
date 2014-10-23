@@ -81,21 +81,20 @@ namespace gazebo
        
        public:
          DigitalClock(QWidget *parent = 0);
-       private: QTime *time;
+       private: QTime lastStartTime;
        private: bool running;
 
-       private slots:
+       protected slots:
          void showTime()
          {
 
            QString text("00:00:00");
            if(running)
            {
-             text = time->toString("hh:mm:ss");
+             QTime elapsedTime = QTime(0, 0, 0).addMSecs(lastStartTime.elapsed());
+             text = elapsedTime.toString("hh:mm:ss");
            }
 
-           /*if ((time.second() % 2) == 0)
-               text[2] = ' ';*/
            display(text);
          }
       private slots:
@@ -106,8 +105,8 @@ namespace gazebo
 
           if (running)
           {
-            // If we are now running, restart the time to 0
-            time->restart();
+            // If we are now running, restart the time
+            lastStartTime.restart();
           }
         }
     };

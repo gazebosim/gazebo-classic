@@ -54,8 +54,10 @@ void QTaskButton::OnButton()
 DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent)
 {
   setSegmentStyle(Filled);
+  setDigitCount(8);
 
-  time = new QTime(0, 0);
+  lastStartTime = QTime(0, 0);
+  lastStartTime.start();
 
   running = false;
   QTimer *clock = new QTimer(this);
@@ -64,7 +66,7 @@ DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent)
 
   showTime();
 
-  resize(150, 60);
+  resize(300, 60);
 }
 
 
@@ -240,6 +242,8 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
 
   // Clock
   DigitalClock *digitalClock = new DigitalClock();
+  connect(startStopButton, SIGNAL(clicked()), digitalClock,
+          SLOT(OnStartStop()));
   mainLayout->addWidget(digitalClock);
 }
 
