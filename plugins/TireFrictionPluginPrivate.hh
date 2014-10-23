@@ -35,6 +35,9 @@ namespace gazebo
     /// \brief Pointer to world.
     public: physics::WorldPtr world;
 
+    /// \brief Pointer to physics engine.
+    public: physics::PhysicsEnginePtr physics;
+
     /// \brief Pointer to model containing plugin.
     public: physics::ModelPtr model;
 

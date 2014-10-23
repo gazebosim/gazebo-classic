@@ -53,6 +53,10 @@ void TireFrictionPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->dataPtr->world = this->dataPtr->model->GetWorld();
   GZ_ASSERT(this->dataPtr->world, "TireFrictionPlugin world pointer is NULL");
 
+  this->dataPtr->physics = this->dataPtr->world->GetPhysicsEngine();
+  GZ_ASSERT(this->dataPtr->physics,
+            "TireFrictionPlugin physics pointer is NULL");
+
   this->dataPtr->sdf = _sdf;
   GZ_ASSERT(_sdf, "TireFrictionPlugin _sdf pointer is NULL");
 
@@ -71,7 +75,7 @@ void TireFrictionPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("collision_name"))
   {
     std::string collisionName = _sdf->Get<std::string>("collision_name");
-    this->dataPtr->link = this->dataPtr->link->GetCollision(0);
+    this->dataPtr->collision = this->dataPtr->link->GetCollision(collisionName);
   }
   GZ_ASSERT(this->dataPtr->collision,
     "TireFrictionPlugin collision pointer is NULL");
@@ -83,14 +87,10 @@ void TireFrictionPlugin::Init()
   this->dataPtr->node.reset(new transport::Node());
   this->dataPtr->node->Init(this->dataPtr->world->GetName());
 
-  std::string topic;
-  {
-    physics::PhysicsEnginePtr physics =
-      this->dataPtr->world->GetPhysicsEngine();
-    topic = physics->GetContactManager()->CreateFilter(
+  std::string topic =
+    this->dataPtr->physics->GetContactManager()->CreateFilter(
       this->dataPtr->collision->GetScopedName(),
       this->dataPtr->collision->GetScopedName());
-  }
 
   // Subscribe to the contact topic
   this->dataPtr->contactSub = this->dataPtr->node->Subscribe(topic,
@@ -115,7 +115,7 @@ void TireFrictionPlugin::OnUpdate()
   if (!this->dataPtr->newMsg)
   {
     // Use time step to track wait time between messages.
-    double dt = this->physics->GetMaxStepSize();
+    double dt = this->dataPtr->physics->GetMaxStepSize();
     this->dataPtr->newMsgWait += common::Time(dt);
 
     const common::Time messageTime(1, 0);
@@ -133,13 +133,75 @@ void TireFrictionPlugin::OnUpdate()
   // Copy contacts message so that mutex lock is short.
   msgs::Contacts contacts;
   {
-    boost::mutex::scoped_lock lock(this->mutex);
+    boost::mutex::scoped_lock lock(this->dataPtr->mutex);
     contacts = this->dataPtr->newestContactsMsg;
     this->dataPtr->newMsg = false;
     this->dataPtr->newMsgWait.Set(0, 0);
   }
 
   // Compute slip at contact points.
+  //  First compute average position and normal of contact points.
+  math::Vector3 positionAverage;
+  math::Vector3 normalAverage;
+  {
+    math::Vector3 positionSum;
+    int positionCount = 0;
+    math::Vector3 normalSum;
+    int normalCount = 0;
+    for (int i = 0; i < contacts.contact_size(); ++i)
+    {
+      const msgs::Contact *contact = &contacts.contact(i);
+      for (int j = 0; j < contact->position_size(); ++j)
+      {
+        positionAverage += msgs::Convert(contact->position(j));
+        positionCount++;
+      }
+      for (int j = 0; j < contact->normal_size(); ++j)
+      {
+        normalAverage += msgs::Convert(contact->normal(j));
+        normalCount++;
+      }
+    }
+    if (positionCount > 0)
+    {
+      positionAverage = positionSum / positionCount;
+    }
+    if (normalCount > 0)
+    {
+      normalAverage = normalSum / normalCount;
+    }
+  }
+
+  //  Then compute velocity on body at that average contact point.
+  math::Vector3 contactPointVelocity;
+  {
+    math::Pose linkPose = this->dataPtr->link->GetWorldPose();
+    math::Vector3 offset = positionAverage - linkPose.pos;
+    contactPointVelocity =
+      this->dataPtr->link->GetWorldLinearVel(offset, math::Quaternion());
+  }
+
+  //  Compute contact point speed in tangential directions.
+  double speedTangential;
+  {
+    math::Vector3 velocityTangential = contactPointVelocity -
+      contactPointVelocity.Dot(normalAverage) * normalAverage;
+    speedTangential = velocityTangential.GetLength();
+  }
+
+  //  Then normalize that tangential speed somehow.
+  //   Use speed at origin of link frame.
+  double slip;
+  {
+    double speed = this->dataPtr->link->GetWorldLinearVel().GetLength();
+    const double speedMin = 0.1;
+    if (speed < speedMin)
+    {
+      speed = speedMin;
+    }
+    slip = speedTangential / speed;
+  }
+
   // Compute friction from slip.
   // Set friction coefficient.
 }

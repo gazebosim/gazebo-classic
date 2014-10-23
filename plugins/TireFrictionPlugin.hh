@@ -45,6 +45,10 @@ namespace gazebo
     /// \brief Callback for World Update events.
     protected: virtual void OnUpdate();
 
+    /// \brief Callback for contact filter.
+    /// \param[in] _msg Contacts message.
+    private: void OnContacts(ConstContactsPtr &_msg);
+
     /// \internal
     /// \brief Pointer to private data.
     protected: TireFrictionPluginPrivate *dataPtr;
