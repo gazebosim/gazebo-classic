@@ -54,24 +54,47 @@ void QTaskButton::OnButton()
 DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent)
 {
   setSegmentStyle(Filled);
+  setStyleSheet("font: 30px;");
   setDigitCount(8);
 
   lastStartTime = QTime(0, 0);
-  lastStartTime.start();
+  //lastStartTime.start();
 
   running = false;
   QTimer *clock = new QTimer(this);
-  connect(clock, SIGNAL(timeout()), this, SLOT(showTime()));
+  connect(clock, SIGNAL(timeout()), this, SLOT(ShowTime()));
   clock->start(1000);
 
-  showTime();
+  ShowTime();
 
-  resize(300, 60);
+  //resize(300, 60);
 }
 
+void DigitalClock::ShowTime()
+{
+  QString text("00:00:00");
+  if(running)
+  {
+    QTime elapsedTime = QTime(0, 0, 1).addMSecs(lastStartTime.elapsed());
+    text = elapsedTime.toString("hh:mm:ss");
+  }
 
+  display(text);
+}
 
-void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
+void DigitalClock::OnStartStop()
+{
+  running = !running;
+
+  if (running)
+  {
+    // If we are now running, restart the time
+    lastStartTime.restart();
+    ShowTime();
+  }
+}
+
+void GUIAratPlugin::InitializeHandView(/*QMainWindow* mainWindow*/)
 {
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, this->handImgX,
@@ -105,15 +128,14 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
   }
 
   this->handScene->update();
-  handView->setMaximumSize(this->handImgX+10, this->handImgY+10);
   handView->setMinimumSize(this->handImgX, this->handImgY);
-  handView->show();
+  handView->setMaximumSize(this->handImgX+5, this->handImgY+5);
 
-  // Add the frame to the main layout
   mainLayout->addWidget(handView);
+  handView->show();
 }
 
-void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
+void GUIAratPlugin::InitializeTaskView(/*QMainWindow* mainWindow,*/
                                        sdf::ElementPtr elem,
                                        common::SystemPaths* paths)
 {
@@ -228,7 +250,6 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   taskLayout->addWidget(cycleButtonFrame);
 
   taskFrame->setLayout(taskLayout);
-
   mainLayout->addWidget(taskFrame);
 
   // Start/Stop button
@@ -236,15 +257,32 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   startStopButton = new QPushButton();
   startStopButton->setText(QString("Start Test"));
   startStopButton->setStyleSheet(startButtonStyle);
-  startStopButton->setMaximumSize(QSize(this->handImgX-10, this->handImgY-10));
+  startStopButton->setMaximumWidth(this->handImgX*0.85);
   connect(startStopButton, SIGNAL(clicked()), this, SLOT(OnStartStopClicked()));
-  mainLayout->addWidget(startStopButton);
 
   // Clock
   DigitalClock *digitalClock = new DigitalClock();
   connect(startStopButton, SIGNAL(clicked()), digitalClock,
           SLOT(OnStartStop()));
-  mainLayout->addWidget(digitalClock);
+  digitalClock->setMaximumWidth(this->handImgX*0.5);
+
+  QHBoxLayout *clockBox = new QHBoxLayout();
+  clockBox->addStretch();
+  clockBox->addWidget(digitalClock);
+  clockBox->addStretch();
+  QFrame *clockFrame = new QFrame();
+  clockFrame->setLayout(clockBox);
+  clockFrame->setContentsMargins(0, 0, 0, 0);
+  mainLayout->addWidget(clockFrame);
+
+  QHBoxLayout *startStopBox = new QHBoxLayout();
+  startStopBox->addStretch();
+  startStopBox->addWidget(startStopButton);
+  startStopBox->addStretch();
+  QFrame *startStopFrame = new QFrame();
+  startStopFrame->setLayout(startStopBox);
+  startStopFrame->setContentsMargins(0, 0, 0, 0);
+  mainLayout->addWidget(startStopFrame);
 }
 
 /////////////////////////////////////////////////
@@ -315,22 +353,21 @@ GUIAratPlugin::GUIAratPlugin()
   // Set the frame background and foreground colors
   this->setStyleSheet(
       "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+  mainLayout = new QVBoxLayout();
+  this->setPalette(QPalette(QColor(255, 255, 255, 0)));
+  
+  this->InitializeHandView();
 
-  // Create the main layout
-  QVBoxLayout *mainLayout = new QVBoxLayout;
+  this->InitializeTaskView(elem, paths);
 
-  this->InitializeHandView(mainLayout);
-
-  this->InitializeTaskView(mainLayout, elem, paths);
 
   // Remove margins to reduce space
   mainLayout->setContentsMargins(0, 0, 0, 0);
-
+  mainLayout->setSpacing(0);
   this->setLayout(mainLayout);
 
-  // Position and resize this widget
   this->setMaximumWidth(this->handImgX+10);
-  this->setMinimumHeight(this->handImgY*2);
+  this->setMinimumHeight(this->handImgY*2.6);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
@@ -617,7 +654,7 @@ void GUIAratPlugin::OnStartStopClicked(){
     // Stop timer
   } else {
     startStopButton->setStyleSheet(stopButtonStyle);
-    startStopButton->setText(QString("Stop Test"));
+    startStopButton->setText(QString("End Test"));
     // Start timer
   }
   isTestRunning = !isTestRunning;

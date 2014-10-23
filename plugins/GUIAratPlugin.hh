@@ -84,34 +84,12 @@ namespace gazebo
        private: QTime lastStartTime;
        private: bool running;
 
-       protected slots:
-         void showTime()
-         {
+       protected slots: void ShowTime();
 
-           QString text("00:00:00");
-           if(running)
-           {
-             QTime elapsedTime = QTime(0, 0, 0).addMSecs(lastStartTime.elapsed());
-             text = elapsedTime.toString("hh:mm:ss");
-           }
-
-           display(text);
-         }
-      private slots:
-        void OnStartStop()
-        {
-          
-          running = !running;
-
-          if (running)
-          {
-            // If we are now running, restart the time
-            lastStartTime.restart();
-          }
-        }
+      private slots: void OnStartStop();
     };
 
-    class GUIAratPlugin : public gazebo::GUIPlugin
+    class GUIAratPlugin : public gazebo::GUIPlugin 
     {
       Q_OBJECT
 
@@ -182,6 +160,10 @@ namespace gazebo
 
       private: std::vector<QTextDocument*> instructionsList;
 
+      private: QVBoxLayout* mainLayout;
+
+      private: QDockWidget* handDockWidget; //used for relative positioning
+
       private: QTextEdit* instructionsView;
 
       private: QGraphicsScene *handScene;
@@ -197,10 +179,9 @@ namespace gazebo
       /// \brief Number of the current task.
       private: int currentTaskIndex;
 
-      private: void InitializeHandView(QLayout* mainLayout);
+      private: void InitializeHandView();
 
-      private: void InitializeTaskView(QLayout* mainLayout,
-                                       sdf::ElementPtr elem,
+      private: void InitializeTaskView(sdf::ElementPtr elem,
                                        common::SystemPaths* paths);
 
       private: void OnFingerContact(ConstContactsPtr &msg);

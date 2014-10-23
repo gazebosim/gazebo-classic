@@ -7,13 +7,13 @@
       <iconDimensions>100 100</iconDimensions>
       <scaleFactor>0.75</scaleFactor>
       <forceMin>0</forceMin>
-      <forceMax>200</forceMax>
+      <forceMax>75</forceMax>
       <colorMin>255 227 32</colorMin>
       <colorMax>255 102 102</colorMax>
       <handSide>r</handSide>
 
-      <startButtonStyle>background-color: green; font: bold 30px;</startButtonStyle>
-      <stopButtonStyle>background-color: red; font: bold 30px;</stopButtonStyle>
+      <startButtonStyle>background-color: #7A95D6; font: bold 30px; color: #FFFFFF;</startButtonStyle>
+      <stopButtonStyle>background-color: #D85C48; font: bold 30px;; color: #FFFFFF;</stopButtonStyle>
 
       <contacts>
         <contact name="ThDistal">334 220</contact>
