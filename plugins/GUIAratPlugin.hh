@@ -73,6 +73,45 @@ namespace gazebo
                              QTextDocument* instructions, const int index);
     };
 
+    // Digital clock adapted from
+    // http://qt-project.org/doc/qt-4.8/widgets-digitalclock.html
+    class DigitalClock : public QLCDNumber
+    {
+       Q_OBJECT
+       
+       public:
+         DigitalClock(QWidget *parent = 0);
+       private: QTime *time;
+       private: bool running;
+
+       private slots:
+         void showTime()
+         {
+
+           QString text("00:00:00");
+           if(running)
+           {
+             text = time->toString("hh:mm:ss");
+           }
+
+           /*if ((time.second() % 2) == 0)
+               text[2] = ' ';*/
+           display(text);
+         }
+      private slots:
+        void OnStartStop()
+        {
+          
+          running = !running;
+
+          if (running)
+          {
+            // If we are now running, restart the time to 0
+            time->restart();
+          }
+        }
+    };
+
     class GUIAratPlugin : public gazebo::GUIPlugin
     {
       Q_OBJECT
@@ -91,6 +130,8 @@ namespace gazebo
                                        const int index);
       protected slots: void OnResetClicked(); 
       protected slots: void OnNextClicked(); 
+      protected slots: void OnStartStopClicked();
+
       private: void PublishTaskMessage(const std::string &task_name); 
 
       /// \brief Node used to establish communication with gzserver.
@@ -121,12 +162,17 @@ namespace gazebo
       private: std::string handImgFilename;
       private: std::string configFilename;
 
+      private: float GUIScaleFactor;
       private: int circleSize;
       private: math::Vector2d iconSize;
       private: math::Vector3 colorMin;
       private: math::Vector3 colorMax;
       private: float forceMin;
       private: float forceMax;
+
+      private: bool isTestRunning;
+      private: QString startButtonStyle;
+      private: QString stopButtonStyle;
 
       private: std::string handSide;
       
@@ -140,6 +186,8 @@ namespace gazebo
       private: QTextEdit* instructionsView;
 
       private: QGraphicsScene *handScene;
+
+      private: QPushButton *startStopButton;
 
       private: std::vector<event::ConnectionPtr> connections;
 

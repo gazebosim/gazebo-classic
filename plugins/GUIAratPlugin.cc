@@ -51,6 +51,24 @@ void QTaskButton::OnButton()
   emit SendTask(this->id, this->instructions, this->index);
 }
 
+DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent)
+{
+  setSegmentStyle(Filled);
+
+  time = new QTime(0, 0);
+
+  running = false;
+  QTimer *clock = new QTimer(this);
+  connect(clock, SIGNAL(timeout()), this, SLOT(showTime()));
+  clock->start(1000);
+
+  showTime();
+
+  resize(150, 60);
+}
+
+
+
 void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
 {
   // Create a QGraphicsView to draw the finger force contacts
@@ -59,8 +77,9 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
   QGraphicsView *handView = new QGraphicsView(this->handScene);
 
   // Load the hand image
-  QPixmap* handImg = new QPixmap(QString(this->handImgFilename.c_str()));
-  QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(*handImg);
+  QPixmap handImg = QPixmap(QString(this->handImgFilename.c_str()));
+  handImg = handImg.scaled(this->handImgX, this->handImgY);
+  QGraphicsPixmapItem* handItem = new QGraphicsPixmapItem(handImg);
 
   // Draw the hand on the canvas
   this->handScene->addItem(handItem);
@@ -84,10 +103,11 @@ void GUIAratPlugin::InitializeHandView(QLayout* mainLayout)
   }
 
   this->handScene->update();
+  handView->setMaximumSize(this->handImgX+10, this->handImgY+10);
+  handView->setMinimumSize(this->handImgX, this->handImgY);
   handView->show();
 
   // Add the frame to the main layout
-  handView->setMaximumSize(this->handImgX+10, this->handImgY+10);
   mainLayout->addWidget(handView);
 }
 
@@ -139,11 +159,13 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
       taskButton->resize(this->handImgX/3, this->handImgY/3);
       taskButton->setText(QString(name.c_str()));
       taskButton->SetTaskId(id);
-      QTextDocument* instructionsDocument = new QTextDocument(QString(instructions.c_str()));
+      QTextDocument* instructionsDocument =
+                            new QTextDocument(QString(instructions.c_str()));
       taskButton->SetTaskInstructionsDocument(instructionsDocument);
       taskButton->SetIndex(taskList.size());
 
-      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*, int)), this, SLOT(OnTaskSent(const std::string&, QTextDocument*, const int)));
+      connect(taskButton, SIGNAL(SendTask(std::string, QTextDocument*, int)),
+         this, SLOT(OnTaskSent(const std::string&, QTextDocument*, const int)));
 
       int col = i%3;
       int row = i/3;
@@ -151,6 +173,7 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
 
       if(icon_path.compare("none") != 0){
         QPixmap icon_picture(QString(paths->FindFileURI(icon_path).c_str()));
+        icon_picture = icon_picture.scaled(iconSize[0], iconSize[1]);
         
         taskButton->setIcon(QIcon(icon_picture));
         taskButton->setIconSize(QSize(iconSize[0], iconSize[1]));
@@ -184,14 +207,14 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   taskLayout->addWidget(instructionsView);
 
   QHBoxLayout* cycleButtonLayout = new QHBoxLayout();
-  QToolButton *resetButton = new QToolButton();
+  QPushButton *resetButton = new QPushButton();
   resetButton->setText(QString("Reset Test"));
   resetButton->setStyleSheet("border:1px solid #ffffff");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(OnResetClicked()));
   cycleButtonLayout->addWidget(resetButton);
   resetButton->setMaximumWidth(this->handImgX/2);
 
-  QToolButton *nextButton = new QToolButton();
+  QPushButton *nextButton = new QPushButton();
   nextButton->setText(QString("Next Test"));
   nextButton->setStyleSheet("border:1px solid #ffffff");
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
@@ -205,13 +228,25 @@ void GUIAratPlugin::InitializeTaskView(QLayout* mainLayout,
   taskFrame->setLayout(taskLayout);
 
   mainLayout->addWidget(taskFrame);
+
+  // Start/Stop button
+  this->isTestRunning = false;
+  startStopButton = new QPushButton();
+  startStopButton->setText(QString("Start Test"));
+  startStopButton->setStyleSheet(startButtonStyle);
+  startStopButton->setMaximumSize(QSize(this->handImgX-10, this->handImgY-10));
+  connect(startStopButton, SIGNAL(clicked()), this, SLOT(OnStartStopClicked()));
+  mainLayout->addWidget(startStopButton);
+
+  // Clock
+  DigitalClock *digitalClock = new DigitalClock();
+  mainLayout->addWidget(digitalClock);
 }
 
 /////////////////////////////////////////////////
 GUIAratPlugin::GUIAratPlugin()
   : GUIPlugin()
 {
-
 
   // Read parameters
   common::SystemPaths* paths = common::SystemPaths::Instance();
@@ -227,32 +262,36 @@ GUIAratPlugin::GUIAratPlugin()
   std::string sdfString = inputStream.str();
   fileinput.close();
   
-  //std::cout << "getting sdf" << std::endl;
   // Parameters for sensor contact visualization
   sdf::SDF parameters;
   parameters.SetFromString(sdfString);
   sdf::ElementPtr elem;
-  //assert(parameters.root->HasElement("world");
   elem = parameters.root->GetElement("world");
-  //assert(elem->HasElement("plugin");
   elem = elem->GetElement("plugin");
-  //assert(elem->HasElement("circleSize");
   elem->GetElement("circleSize")->GetValue()->Get(this->circleSize);
-  //assert(elem->HasElement("forceMin");
+
   elem->GetElement("forceMin")->GetValue()->Get(this->forceMin);
   elem->GetElement("forceMax")->GetValue()->Get(this->forceMax);
   elem->GetElement("colorMin")->GetValue()->Get(this->colorMin);
   elem->GetElement("colorMax")->GetValue()->Get(this->colorMax);
   elem->GetElement("handSide")->GetValue()->Get(this->handSide);
+  elem->GetElement("scaleFactor")->GetValue()->Get(this->GUIScaleFactor);
+
+  std::string buttonStyle;
+  elem->GetElement("startButtonStyle")->GetValue()->Get(buttonStyle);
+  this->startButtonStyle = QString(buttonStyle.c_str());
+  elem->GetElement("stopButtonStyle")->GetValue()->Get(buttonStyle);
+  this->stopButtonStyle = QString(buttonStyle.c_str());
 
   math::Vector2d handImgDims;
   elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
-  this->handImgX = handImgDims[0];
-  this->handImgY = handImgDims[1];
+  this->handImgX = GUIScaleFactor*handImgDims[0];
+  this->handImgY = GUIScaleFactor*handImgDims[1];
 
   elem->GetElement("iconDimensions")->GetValue()->Get(this->iconSize);
+  this->iconSize *= GUIScaleFactor;
+  this->circleSize *= GUIScaleFactor;
 
-  //std::cout << "getting contact names" << std::endl;
   // Get contact names
   if(elem->HasElement("contacts")){
     sdf::ElementPtr contact = elem->GetElement("contacts");
@@ -263,6 +302,7 @@ GUIAratPlugin::GUIAratPlugin()
         contact->GetAttribute("name")->Get(contactName);
         // Get the position of the contact
         contact->GetValue()->Get(this->contactPoints[contactName]);
+        this->contactPoints[contactName]*=this->GUIScaleFactor;
         contact = contact->GetNextElement();
       }
     }
@@ -286,6 +326,7 @@ GUIAratPlugin::GUIAratPlugin()
 
   // Position and resize this widget
   this->setMaximumWidth(this->handImgX+10);
+  this->setMinimumHeight(this->handImgY*2);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
@@ -318,7 +359,6 @@ GUIAratPlugin::GUIAratPlugin()
     command = command->GetNextElement();
   }
 
-  //std::cout << "Getting indices" << std::endl;
   sdf::ElementPtr index = elem->GetElement("indices");
   index = index->GetElement("index");
   while(index){
@@ -329,7 +369,6 @@ GUIAratPlugin::GUIAratPlugin()
     std::vector<char> buttons = buttonNames[name];
     for(unsigned int i = 0; i < buttons.size(); i++){
       char button = buttons[i];
-      //std::cout << "Got index: " << num << " for button " << button << std::endl;
       if(this->handCommands.find(button) != this->handCommands.end()){
         this->handCommands[button].index = num;
       } else if (this->armCommands.find(button) != this->armCommands.end()){
@@ -363,10 +402,11 @@ GUIAratPlugin::GUIAratPlugin()
     this->contactSubscribers.push_back(sub);
   }
 
-  this->connections.push_back(event::Events::ConnectPreRender(boost::bind(&GUIAratPlugin::PreRender, this)));
+  this->connections.push_back(event::Events::ConnectPreRender(
+                              boost::bind(&GUIAratPlugin::PreRender, this)));
 
   /*gui::get_active_camera()->SetViewController(
-                                rendering::FPSViewController::GetTypeString());*/
+                              rendering::FPSViewController::GetTypeString());*/
 
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
@@ -493,23 +533,9 @@ void coupling_v1(_hxCommand* cmd){
 
 }
 
-/*void GUIAratPlugin::keyPressEvent(QKeyEvent *_event)
-{
-  std::cout << "got key " << _event->key() << std::endl;
-  std::string text = _event->text().toStdString();
-  this->OnKeyEvent(text[0], false);
-}
-
-void GUIAratPlugin::keyReleaseEvent(QKeyEvent *_event)
-{
-  std::string text = _event->text().toStdString();
-  this->OnKeyEvent(text[0], true);
-}*/
-
 bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
 {
   std::string text = _event.text;
-  //std::cout << "got key " << text <<  std::endl;
   char key = text[0];
   // if key is in armCommands
   if(this->armCommands.find(key) != this->armCommands.end()){
@@ -519,9 +545,7 @@ bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
     }
     float inc = this->armCommands[key].increment;
     float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
-    //if (!release){
     pose_inc_args[index] = inc;
-    //}
     gazebo::math::Quaternion quat(pose_inc_args[3],
                                  pose_inc_args[4], pose_inc_args[5]);
     gazebo::msgs::Pose msg;
@@ -544,22 +568,9 @@ bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
       if(motor_index >= handDeviceInfo.nmotor){
         return false;
       }
-      /*if(release){
-        for(int i = 0; i < handDeviceInfo.nmotor; i++){
-          handCommand.ref_vel[i] = 0;
-        }
-      } else {
-
-        handCommand.ref_vel[motor_index] += inc*100;
-      }*/
 
       float inc = this->handCommands[key].increment;
       handCommand.ref_pos[motor_index] += inc;
-      //handCommand.ref_vel[motor_index] += inc;
-      /*for(int i = 0; i < handDeviceInfo.nmotor; i++){
-        handCommand.ref_pos[i] = handSensor.joint_pos[i];
-        std::cout << "hand sensor " << i << ": " << handSensor.joint_pos[i] << std::endl;
-      }*/
 
       coupling_v1(&handCommand);
 
@@ -592,6 +603,20 @@ void GUIAratPlugin::OnNextClicked()
   PublishTaskMessage(this->taskList[this->currentTaskIndex]);
   this->instructionsView->setDocument(
                                this->instructionsList[this->currentTaskIndex]);
+}
+
+
+void GUIAratPlugin::OnStartStopClicked(){
+  if(isTestRunning){
+    startStopButton->setStyleSheet(startButtonStyle);
+    startStopButton->setText(QString("Start Test"));
+    // Stop timer
+  } else {
+    startStopButton->setStyleSheet(stopButtonStyle);
+    startStopButton->setText(QString("Stop Test"));
+    // Start timer
+  }
+  isTestRunning = !isTestRunning;
 }
 
 void GUIAratPlugin::OnTaskSent(const std::string& id,

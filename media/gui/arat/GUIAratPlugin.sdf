@@ -2,27 +2,31 @@
 <sdf version="1.5">
   <world name="default">
     <plugin name="GUIAratPlugin" filename="libGUIAratPlugin.so">
-      <circleSize>10</circleSize>
-      <handImgDimensions>250 250</handImgDimensions>
-      <iconDimensions>60 60</iconDimensions>
+      <circleSize>30</circleSize>
+      <handImgDimensions>500 500</handImgDimensions>
+      <iconDimensions>100 100</iconDimensions>
+      <scaleFactor>0.75</scaleFactor>
       <forceMin>0</forceMin>
       <forceMax>200</forceMax>
       <colorMin>255 227 32</colorMin>
       <colorMax>255 102 102</colorMax>
       <handSide>r</handSide>
 
-      <contacts>
-        <contact name="ThDistal">155 116</contact>
-        <contact name="IndDistal">130 46</contact>
-        <contact name="MidDistal">90 35</contact>
-        <contact name="RingDistal">50 47</contact>
-        <contact name="LittleDistal">20 83</contact>
+      <startButtonStyle>background-color: green; font: bold 30px;</startButtonStyle>
+      <stopButtonStyle>background-color: red; font: bold 30px;</stopButtonStyle>
 
-        <contact name="ThMedial">145 141</contact>
-        <contact name="IndMedial">124 81</contact>
-        <contact name="MidMedial">90 71</contact>
-        <contact name="RingMedial">55 81</contact>
-        <contact name="LittleMedial">30 109</contact>
+      <contacts>
+        <contact name="ThDistal">334 220</contact>
+        <contact name="IndDistal">278 67</contact>
+        <contact name="MidDistal">187 40</contact>
+        <contact name="RingDistal">97 67</contact>
+        <contact name="LittleDistal">31 146</contact>
+
+        <contact name="ThMedial">310 276</contact>
+        <contact name="IndMedial">265 141</contact>
+        <contact name="MidMedial">187 119</contact>
+        <contact name="RingMedial">110 141</contact>
+        <contact name="LittleMedial">53 205</contact>
       </contacts>
 
 
