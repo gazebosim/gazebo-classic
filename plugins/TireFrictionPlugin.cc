@@ -140,6 +140,12 @@ void TireFrictionPlugin::OnUpdate()
   }
 
   // Compute slip at contact points.
+  // The following needs to be done differently,
+  // instead of computing average position of contact points:
+  // * compute relative slip velocity between bodies at each contact point
+  // * somehow lump these into a scalar value of slip
+  //   (perhaps normalizing by normal force magnitude)
+
   //  First compute average position and normal of contact points.
   math::Vector3 positionAverage;
   math::Vector3 normalAverage;
