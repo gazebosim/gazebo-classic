@@ -345,7 +345,7 @@ std::string RenderWidget::GetOverlayMsg() const
 
 void RenderWidget::ShowToolbar(const bool _show)
 {
-  if(_show)
+  if (_show)
   {
     this->toolbar->show();
   }
