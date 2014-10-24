@@ -214,6 +214,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+  this->glWidget = NULL;
+
+  delete this->toolbar;
+  this->toolbar = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -343,15 +347,19 @@ std::string RenderWidget::GetOverlayMsg() const
   return this->msgOverlayLabel->text().toStdString();
 }
 
+/////////////////////////////////////////////////
 void RenderWidget::ShowToolbar(const bool _show)
 {
-  if (_show)
+  if (this->toolbar)
   {
-    this->toolbar->show();
-  }
-  else
-  {
-    this->toolbar->hide();
+    if (_show)
+    {
+      this->toolbar->show();
+    }
+    else
+    {
+      this->toolbar->hide();
+    }
   }
 }
 
