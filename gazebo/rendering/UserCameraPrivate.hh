@@ -25,6 +25,15 @@ namespace gazebo
     /// \brief Private data for the UserCamera class
     class UserCameraPrivate
     {
+      /// \brief Gazebo communication node pointer.
+      public: transport::NodePtr node;
+
+      /// \brief Subscribes to relative joystick messages.
+      public: transport::SubscriberPtr joySubTwist;
+
+      /// \brief Subscribes to absolute joystick messages.
+      public: transport::SubscriberPtr joySubPose;
+
       /// \brief The currently active view controller.
       public: ViewController *viewController;
 
@@ -43,12 +52,24 @@ namespace gazebo
       /// \brief Used to select objects from mouse clicks.
       public: SelectionBuffer *selectionBuffer;
 
+      /// \brief Initial pose of camera, used in OnJoyAbs()
+      public: math::Pose initialPose;
+
+      /// \brief Has the pose been set by somebody yet?
+      public: bool poseSet;
+
       /// \brief Flag to detect if the user changed the camera pose in the
       /// world file.
       public: bool isCameraSetInWorldFile;
 
       /// \brief Toggle joystick camera move state
-      public: bool isJoystickMoveCamera;
+      public: bool canJoystickMoveCamera;
+
+      /// \brief Ogre camera for the right Oculus screen.
+      public: Ogre::Camera *rightCamera;
+
+      /// \brief View port for the right camera.
+      public: Ogre::Viewport *rightViewport;
     };
   }
 }
