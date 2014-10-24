@@ -16,15 +16,23 @@
 */
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
-#include "GUIExampleTimeWidget.hh"
+#include "MainWindowExampleWidget.hh"
+#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/MainWindow.hh>
 
 using namespace gazebo;
 
 // Register this plugin with the simulator
-GZ_REGISTER_GUI_PLUGIN(GUIExampleTimeWidget)
+GZ_REGISTER_GUI_PLUGIN(MainWindowExampleWidget)
+
+void MainWindowExampleWidget::PauseWorld()
+{
+  gui::get_main_window()->Pause();
+  std::cout << "Got main window" << std::endl;
+}
 
 /////////////////////////////////////////////////
-GUIExampleTimeWidget::GUIExampleTimeWidget()
+MainWindowExampleWidget::MainWindowExampleWidget()
   : GUIPlugin()
 {
   // Set the frame background and foreground colors
@@ -71,23 +79,33 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init("default");
   this->statsSub = this->node->Subscribe("~/world_stats",
-      &GUIExampleTimeWidget::OnStats, this);
+      &MainWindowExampleWidget::OnStats, this);
+
+  if (gui::get_main_window() == NULL)
+  {
+    std::cout << "main window is null at constructor" << std::endl;
+    this->connections.push_back(gui::Events::ConnectMainWindowReady(
+              boost::bind(&MainWindowExampleWidget::PauseWorld, this)));
+  } else {
+    std::cout << "got main window" << std::endl;
+    PauseWorld();
+  }
 }
 
 /////////////////////////////////////////////////
-GUIExampleTimeWidget::~GUIExampleTimeWidget()
+MainWindowExampleWidget::~MainWindowExampleWidget()
 {
 }
 
 /////////////////////////////////////////////////
-void GUIExampleTimeWidget::OnStats(ConstWorldStatisticsPtr &_msg)
+void MainWindowExampleWidget::OnStats(ConstWorldStatisticsPtr &_msg)
 {
   this->SetSimTime(QString::fromStdString(
         this->FormatTime(_msg->sim_time())));
 }
 
 /////////////////////////////////////////////////
-std::string GUIExampleTimeWidget::FormatTime(const msgs::Time &_msg) const
+std::string MainWindowExampleWidget::FormatTime(const msgs::Time &_msg) const
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;
