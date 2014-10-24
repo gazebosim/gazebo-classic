@@ -52,6 +52,18 @@ namespace gazebo
         KeyCommand(){index = 0; }
     };
 
+    class Grasp
+    {
+      public:
+        float sliderValue;
+        std::vector<float> desiredGrasp;
+        char incKey;
+        char decKey;
+        void SliderChanged(char key, float inc);
+        Grasp(char i, char d) : incKey(i), decKey(d) { sliderValue = 0; }
+        Grasp() {}
+    };
+
     class QTaskButton : public QToolButton
     {
       Q_OBJECT
@@ -122,13 +134,15 @@ namespace gazebo
       private: std::map<char, KeyCommand> armCommands;
       private: std::map<char, KeyCommand> handCommands;
       private: std::map<std::string, std::vector<char> > buttonNames;
+      // The mapping between a button and the grasp it is commanding
+      private: std::map<char, std::string> graspCommands;
+      private: std::map<std::string, Grasp> grasps;
 
       /// \brief Publisher of factory messages.
       private: gazebo::transport::PublisherPtr taskPub;
 
       /// \brief Subscriber to finger contact sensors.
       private: std::vector<transport::SubscriberPtr> contactSubscribers;
-
 
       /// \brief Maximum number tasks.
       /// \sa taskNum
@@ -146,6 +160,7 @@ namespace gazebo
       private: math::Vector3 colorMax;
       private: float forceMin;
       private: float forceMax;
+      private: float graspIncrement;
 
       private: bool isTestRunning;
       private: QString startButtonStyle;

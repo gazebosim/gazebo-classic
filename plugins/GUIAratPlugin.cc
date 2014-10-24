@@ -26,6 +26,17 @@ using namespace gazebo;
 // Register this plugin with the simulator
 GZ_REGISTER_GUI_PLUGIN(GUIAratPlugin)
 
+void Grasp::SliderChanged(char key, float inc){
+  if (key != this->incKey && key != this->decKey)
+  {
+    return;
+  }
+  int sign = key == this->incKey ? 1 : -1;
+  this->sliderValue += sign*inc;
+  this->sliderValue = this->sliderValue < 0 ? 0 : this->sliderValue;
+  this->sliderValue = this->sliderValue > 1 ? 1 : this->sliderValue;
+}
+
 QTaskButton::QTaskButton()
 {
   connect(this, SIGNAL(clicked()), this, SLOT(OnButton()));
@@ -94,7 +105,7 @@ void DigitalClock::OnStartStop()
   }
 }
 
-void GUIAratPlugin::InitializeHandView(/*QMainWindow* mainWindow*/)
+void GUIAratPlugin::InitializeHandView()
 {
   // Create a QGraphicsView to draw the finger force contacts
   this->handScene = new QGraphicsScene(QRectF(0, 0, this->handImgX,
@@ -135,8 +146,7 @@ void GUIAratPlugin::InitializeHandView(/*QMainWindow* mainWindow*/)
   handView->show();
 }
 
-void GUIAratPlugin::InitializeTaskView(/*QMainWindow* mainWindow,*/
-                                       sdf::ElementPtr elem,
+void GUIAratPlugin::InitializeTaskView(sdf::ElementPtr elem,
                                        common::SystemPaths* paths)
 {
   QVBoxLayout *taskLayout = new QVBoxLayout();
@@ -377,8 +387,7 @@ GUIAratPlugin::GUIAratPlugin()
   this->ignNode = new ignition::transport::Node("haptix");
   ignNode->Advertise("arm_pose_inc");
 
-  // Parse some SDF to get the arm teleop commands
-  //std::cout << "getting commands" << std::endl;
+  // Parse SDF to get the arm teleop commands
   sdf::ElementPtr command = elem->GetElement("commands");
   command = command->GetElement("command");
   while(command){
@@ -390,14 +399,38 @@ GUIAratPlugin::GUIAratPlugin()
     command->GetAttribute("increment")->Get(increment);
     if(name.substr(0, 5).compare("motor") == 0){
       this->handCommands[button] = KeyCommand(button, name, increment);
-      //std::cout << "got hand button: " << button << std::endl;
     } else if(name.substr(0, 3).compare("arm") == 0){
-      //std::cout << "got arm button: " << button << std::endl;
       this->armCommands[button] = KeyCommand(button, name, increment);
     }
     buttonNames[name].push_back(button);
 
     command = command->GetNextElement();
+  }
+
+  // Get predefined grasps
+  sdf::ElementPtr grasp = elem->GetElement("grasps");
+  grasp->GetElement("increment")->GetValue()->Get(this->graspIncrement);
+  grasp = grasp->GetElement("grasp");
+  while(grasp){
+    std::string name;
+    char inc_key;
+    char dec_key;
+    grasp->GetAttribute("name")->Get(name);
+    grasp->GetAttribute("inc_key")->Get(inc_key);
+    grasp->GetAttribute("dec_key")->Get(dec_key);
+    this->grasps[name] = Grasp(inc_key, dec_key);
+    std::string graspBuffer;
+    grasp->GetValue()->Get(graspBuffer);
+    std::istringstream iss(graspBuffer);
+    std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
+                                    std::istream_iterator<std::string>{}};
+    for(unsigned int i = 0; i < tokens.size(); i++)
+    {
+      grasps[name].desiredGrasp.push_back(stof(tokens[i]));
+    }
+    this->graspCommands[inc_key] = name;
+    this->graspCommands[dec_key] = name;
+    grasp = grasp->GetNextElement();
   }
 
   sdf::ElementPtr index = elem->GetElement("indices");
@@ -445,9 +478,6 @@ GUIAratPlugin::GUIAratPlugin()
 
   this->connections.push_back(event::Events::ConnectPreRender(
                               boost::bind(&GUIAratPlugin::PreRender, this)));
-
-  /*gui::get_active_camera()->SetViewController(
-                              rendering::FPSViewController::GetTypeString());*/
 
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
@@ -546,34 +576,35 @@ void GUIAratPlugin::PreRender()
 const hxAPLMotors mcp_indices[5] = {motor_little_mcp, motor_ring_mcp, motor_middle_mcp, motor_index_mcp, motor_thumb_mcp};
 
 void coupling_v1(_hxCommand* cmd){
-    //Version 1 Joint Coupling modeling
+  //Version 1 Joint Coupling modeling
+  
+  //this relies on the ordering of enums, bit messy
+  for(int k = 0; k < 5; k++){
+    //Check if slider was changeded
     
-    //this relies on the ordering of enums, bit messy
-    for(int k = 0; k < 5; k++){
-      //Check if slider was changeded
-      
-      hxAPLMotors mcp = mcp_indices[k];
-      
-      float mcp_commanded = cmd->ref_pos[mcp];
-      if(mcp_commanded <= 0){
-        if(mcp == motor_thumb_mcp){
-          cmd->ref_pos[mcp+1] = 0; //thumb dip
-        } else {
-          cmd->ref_pos[mcp+1] = 0; //pip
-          cmd->ref_pos[mcp-1] = 0; //dip
-        }
+    hxAPLMotors mcp = mcp_indices[k];
+    
+    float mcp_commanded = cmd->ref_pos[mcp];
+    if(mcp_commanded <= 0){
+      if(mcp == motor_thumb_mcp){
+        cmd->ref_pos[mcp+1] = 0; //thumb dip
       } else {
-        if(mcp == motor_thumb_mcp){
-          cmd->ref_pos[mcp+1] = 8/9.0*mcp_commanded; //thumb dip
-        } else {
-          cmd->ref_pos[mcp+1] = 10/9.0*mcp_commanded; //pip
-          cmd->ref_pos[mcp-1] = 8/9.0*mcp_commanded; //dip
-        }
+        cmd->ref_pos[mcp+1] = 0; //pip
+        cmd->ref_pos[mcp-1] = 0; //dip
+      }
+    } else {
+      if(mcp == motor_thumb_mcp){
+        cmd->ref_pos[mcp+1] = 8/9.0*mcp_commanded; //thumb dip
+      } else {
+        cmd->ref_pos[mcp+1] = 10/9.0*mcp_commanded; //pip
+        cmd->ref_pos[mcp-1] = 8/9.0*mcp_commanded; //dip
       }
     }
-
+  }
 }
 
+// TODO: This function is inefficient. Think of ways to refactor--maybe a more
+// efficient structure for storage/search.
 bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
 {
   std::string text = _event.text;
@@ -601,23 +632,71 @@ bool GUIAratPlugin::OnKeyPress(common::KeyEvent _event)
     quat_msg->set_w(quat.w);
 
     ignNode->Publish("/haptix/arm_pose_inc", msg);
+    return true;
   }
   // if key is in handCommands
-  else if (this->handCommands.find(key) != this->handCommands.end())
+  if (this->handCommands.find(key) != this->handCommands.end())
   {
       int motor_index = this->handCommands[key].index;
-      if(motor_index >= handDeviceInfo.nmotor){
+      if(motor_index >= handDeviceInfo.nmotor)
+      {
         return false;
       }
 
       float inc = this->handCommands[key].increment;
       handCommand.ref_pos[motor_index] += inc;
 
-      coupling_v1(&handCommand);
+      //coupling_v1(&handCommand);
+  }
+  else if (this->graspCommands.find(key) != this->graspCommands.end())
+  {
+    std::string name = this->graspCommands[key];
 
-      if (hx_update(hxGAZEBO, &handCommand, &handSensor) != hxOK){
-        printf("hx_update(): Request error.\n");
+    // Increment/decrement slider value corresponding to key
+    grasps[name].SliderChanged(key, this->graspIncrement);  
+  }
+
+
+  float sliderTotal = 0;
+  // get total of slider values
+  for (std::map<std::string, Grasp>::iterator it = grasps.begin();
+       it != grasps.end(); it++)
+  {
+    if (it->second.sliderValue > 0)
+    {
+      sliderTotal += 1;
+    }
+  }
+  
+  hxCommand avgCommand;
+  for (int j = 0; j < handDeviceInfo.nmotor; j++)
+  {
+    avgCommand.ref_pos[j] = 0;
+  }
+  
+  for (std::map<std::string, Grasp>::iterator it = grasps.begin();
+       it != grasps.end(); it++)
+  {
+    // Get the slider value and interpolate the grasp 
+    float sliderValue = it->second.sliderValue;
+
+    std::vector<float> desiredGrasp = it->second.desiredGrasp;
+    for (unsigned int j = 0; j < handDeviceInfo.nmotor; j++)
+    {
+      if(sliderTotal > 0 && j < desiredGrasp.size()){
+        avgCommand.ref_pos[j] += sliderValue*desiredGrasp[j]/
+                                                        (sliderTotal);
       }
+    }
+  }
+  for (int j = 0; j < handDeviceInfo.nmotor; j++)
+  {
+    avgCommand.ref_pos[j] += this->handCommand.ref_pos[j];
+  }
+ 
+  if (hx_update(hxGAZEBO, &avgCommand, &handSensor) != hxOK)
+  {
+    printf("hx_update(): Request error.\n");
   }
   return true;
 }
