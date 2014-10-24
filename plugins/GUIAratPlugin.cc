@@ -36,7 +36,7 @@ void Grasp::SliderChanged(char key, float inc){
   this->sliderValue = this->sliderValue < 0 ? 0 : this->sliderValue;
   this->sliderValue = this->sliderValue > 1 ? 1 : this->sliderValue;
 }
-
+ 
 QTaskButton::QTaskButton()
 {
   connect(this, SIGNAL(clicked()), this, SLOT(OnButton()));
@@ -74,7 +74,7 @@ DigitalClock::DigitalClock(QWidget *parent) : QLCDNumber(parent)
   running = false;
   QTimer *clock = new QTimer(this);
   connect(clock, SIGNAL(timeout()), this, SLOT(ShowTime()));
-  clock->start(1000);
+  clock->start(100);
 
   ShowTime();
 
@@ -86,11 +86,18 @@ void DigitalClock::ShowTime()
   QString text("00:00:00");
   if(running)
   {
-    QTime elapsedTime = QTime(0, 0, 1).addMSecs(lastStartTime.elapsed());
+    QTime elapsedTime = QTime(0, 0, 0).addMSecs(lastStartTime.elapsed());
     text = elapsedTime.toString("hh:mm:ss");
   }
 
   display(text);
+  update();
+}
+
+
+void DigitalClock::StopClock()
+{
+  this->running = false;
 }
 
 void DigitalClock::OnStartStop()
@@ -264,17 +271,18 @@ void GUIAratPlugin::InitializeTaskView(sdf::ElementPtr elem,
 
   // Start/Stop button
   this->isTestRunning = false;
-  startStopButton = new QPushButton();
-  startStopButton->setText(QString("Start Test"));
-  startStopButton->setStyleSheet(startButtonStyle);
-  startStopButton->setMaximumWidth(this->handImgX*0.85);
-  connect(startStopButton, SIGNAL(clicked()), this, SLOT(OnStartStopClicked()));
+  this->startStopButton = new QPushButton();
+  this->startStopButton->setText(QString("Start Test"));
+  this->startStopButton->setStyleSheet(startButtonStyle);
+  this->startStopButton->setMaximumWidth(this->handImgX*0.85);
+  connect(this->startStopButton, SIGNAL(clicked()), this,
+          SLOT(OnStartStopClicked()));
 
   // Clock
-  DigitalClock *digitalClock = new DigitalClock();
-  connect(startStopButton, SIGNAL(clicked()), digitalClock,
+  this->digitalClock = new DigitalClock();
+  connect(this->startStopButton, SIGNAL(clicked()), this->digitalClock,
           SLOT(OnStartStop()));
-  digitalClock->setMaximumWidth(this->handImgX*0.5);
+  this->digitalClock->setMaximumWidth(this->handImgX*0.5);
 
   QHBoxLayout *clockBox = new QHBoxLayout();
   clockBox->addStretch();
@@ -714,6 +722,7 @@ void GUIAratPlugin::PublishTaskMessage(const std::string& task_name)
 void GUIAratPlugin::OnResetClicked()
 {
   // Signal to the ArrangePlugin to set up the current task
+  this->digitalClock->StopClock();
   PublishTaskMessage(this->taskList[currentTaskIndex]);
 }
 

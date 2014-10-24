@@ -91,8 +91,8 @@ namespace gazebo
     {
        Q_OBJECT
        
-       public:
-         DigitalClock(QWidget *parent = 0);
+       public: DigitalClock(QWidget *parent = 0);
+       public: void StopClock();
        private: QTime lastStartTime;
        private: bool running;
 
@@ -184,6 +184,8 @@ namespace gazebo
       private: QGraphicsScene *handScene;
 
       private: QPushButton *startStopButton;
+  
+      private: DigitalClock *digitalClock;
 
       private: std::vector<event::ConnectionPtr> connections;
 
