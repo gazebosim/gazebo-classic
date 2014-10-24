@@ -46,6 +46,9 @@ namespace gazebo
       /// \brief Flag to detect if the user changed the camera pose in the
       /// world file.
       public: bool isCameraSetInWorldFile;
+
+      /// \brief Toggle joystick camera move state
+      public: bool isJoystickMoveCamera;
     };
   }
 }

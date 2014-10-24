@@ -48,6 +48,8 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
+  this->dataPtr->isJoystickMoveCamera = false;
+
   // Set default UserCamera render rate to 120Hz. This was choosen
   // for stereo rendering and smooth user interactions.
   this->SetRenderRate(120.0);
@@ -675,10 +677,20 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // Scaling factor applied to rotations.
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
 
+  // toggle using joystick to move camera
+  if (_msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+  {
+    this->dataPtr->isJoystickMoveCamera = !this->dataPtr->isJoystickMoveCamera;
+    if (this->dataPtr->isJoystickMoveCamera)
+      gzmsg << "Joystick camera viewpoint control active.\n";
+    else
+      gzmsg << "Joystick camera viewpoint control deactivated.\n";
+  }
+
   // This function was establish when integrating the space navigator
   // joystick.
   if ((_msg->has_translation() || _msg->has_rotation()) &&
-      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+      this->dataPtr->isJoystickMoveCamera)
   {
     math::Pose pose = this->GetWorldPose();
 
@@ -698,6 +710,8 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 
     this->SetWorldPose(pose);
   }
+  else
+    gzdbg << "Press joystick button 1 to toggle camera move.\n";
 }
 
 void UserCamera::OnJoyPose(ConstPosePtr &_msg)
