@@ -53,7 +53,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setObjectName("toolFrame");
   toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  toolbar = new QToolBar;
+  this->toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
