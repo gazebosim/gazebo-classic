@@ -146,6 +146,9 @@ namespace gazebo
 
       /// \brief Vertical splitter between widgets.
       private: QSplitter *splitter;
+      
+      /// \brief All the gui plugins
+      private: std::vector<gazebo::GUIPluginPtr> plugins;
 
       /// \brief Time panel widget.
       private: TimePanel *timePanel;

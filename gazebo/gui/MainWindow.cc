@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -28,6 +29,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -46,10 +49,10 @@
 #include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
-
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -184,6 +187,9 @@ MainWindow::MainWindow()
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
+
+  // Create a pointer to the space navigator interface
+  this->spacenav = new SpaceNav();
 }
 
 /////////////////////////////////////////////////
@@ -216,6 +222,10 @@ void MainWindow::Load()
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
 #endif
+
+  // Load the space navigator
+  if (!this->spacenav->Load())
+    gzerr << "Unable to load space navigator\n";
 }
 
 /////////////////////////////////////////////////
@@ -279,6 +289,10 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
@@ -466,6 +480,21 @@ void MainWindow::Save()
     msgBox.setText("Unable to save world.\n"
                    "Unable to retrieve SDF world description from server.");
     msgBox.exec();
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Create a gzserver clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
   }
 }
 
@@ -920,6 +949,10 @@ void MainWindow::CreateActions()
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
 
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1254,25 +1287,44 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!this->menuLayout)
     this->menuLayout = new QHBoxLayout;
 
-  // Remove all widgets from the menubar
+  // Remove all widgets from the menuLayout
   QLayoutItem *child = NULL;
   while ((child = this->menuLayout->takeAt(0)) != 0)
   {
-    delete child;
   }
 
+  if (!this->menuBar)
+  {
+    // create the native menu bar
+    this->menuBar = new QMenuBar;
+    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMenuBar(this->menuBar);
+
+    this->CreateMenuBar();
+  }
+
+  this->menuBar->clear();
+
+  QMenuBar *newMenuBar = NULL;
   if (!_bar)
   {
-    this->CreateMenuBar();
-    this->menuLayout->addWidget(this->menuBar);
-    this->setMenuBar(this->menuBar);
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    newMenuBar = menuBars[0];
   }
   else
   {
-    if (this->menuBar)
-      this->menuBar->hide();
-    this->menuLayout->addWidget(_bar);
+    newMenuBar = _bar;
   }
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->menuBar->addMenu(menus[i]);
+  }
+
+  this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -1281,13 +1333,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  if (this->menuBar)
-    delete this->menuBar;
+  // main window's menu bar
+  QMenuBar *bar = QMainWindow::menuBar();
 
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1295,10 +1344,11 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
@@ -1309,7 +1359,7 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
-  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
 
@@ -1328,7 +1378,7 @@ void MainWindow::CreateMenuBar()
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
-  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
@@ -1339,9 +1389,9 @@ void MainWindow::CreateMenuBar()
   // windowMenu->addAction(g_diagnosticsAct);
 #endif
 
-  this->menuBar->addSeparator();
+  bar->addSeparator();
 
-  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 }
 
@@ -1544,6 +1594,16 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned())
+  {
+    if (_msg->cloned())
+    {
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+      gzerr << "Error cloning a world" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

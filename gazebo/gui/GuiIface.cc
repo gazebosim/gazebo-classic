@@ -244,7 +244,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit("gzclient.log");
+  gzLogInit("client-", "gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
