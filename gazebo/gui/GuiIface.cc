@@ -192,20 +192,35 @@ bool gui::load()
 {
   bool result = true;
 
-  // Get the HOME path
-  char *home = getenv("HOME");
-  if (home)
+  // Get the gui.ini path environment variable
+  char *guiINIPath = getenv("GAZEBO_GUI_INI_PATH");
+
+  // If the environment variable was not specified
+  if (!guiINIPath)
   {
-    // Construct the path to gui.ini
-    boost::filesystem::path path = home;
-    path = path / ".gazebo" / "gui.ini";
-    result = gui::loadINI(path);
+    gzmsg << "Reading gui.ini from home .gazebo directory\n";
+    // Check the home directory
+    char *home = getenv("HOME");
+
+    if (home)
+    {
+      // Construct the path to gui.ini
+      boost::filesystem::path path = home;
+      path = path / ".gazebo" / "gui.ini";
+      result = gui::loadINI(path);
+    }
+    else
+    {
+      gzerr << "HOME environment variable not found. "
+        "Unable to read ~/.gazebo/gui.ini file.\n";
+      result = false;
+    }
   }
   else
   {
-    gzerr << "HOME environment variable not found. "
-      "Unable to read ~/.gazebo/gui.ini file.\n";
-    result = false;
+    gzmsg << "Loading specified .ini file: " << guiINIPath << "\n";
+    boost::filesystem::path path = guiINIPath;
+    result = gui::loadINI(path);
   }
 
   g_modelRightMenu = new gui::ModelRightMenu();
