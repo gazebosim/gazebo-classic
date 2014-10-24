@@ -49,7 +49,8 @@ Exception::~Exception()
 //////////////////////////////////////////////////
 void Exception::Print() const
 {
-  gzerr << "EXCEPTION: " << *this << std::endl;
+  (gazebo::common::Console::err(this->file, this->line)) << "EXCEPTION: "
+      << *this << std::endl;
 }
 
 //////////////////////////////////////////////////
