@@ -47,10 +47,14 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
+  this->dataPtr->isJoystickMoveCamera = false;
+
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
   this->SetUseSDFPose(false);
+
+  this->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -80,8 +84,10 @@ void UserCamera::Load()
   Camera::Load();
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->joySub = this->node->Subscribe("~/spacenav/joy",
+  this->joySub = this->node->Subscribe("~/user_camera/joy_twist",
       &UserCamera::OnJoy, this);
+  this->joySubAbs = this->node->Subscribe("~/user_camera/joy_pose",
+      &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -174,6 +180,12 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
+
+  if (!this->poseSet)
+  {
+    this->initialPose = _pose;
+    this->poseSet = true;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -624,9 +636,20 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // Scaling factor applied to rotations.
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
 
+  // toggle using joystick to move camera
+  if (_msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+  {
+    this->dataPtr->isJoystickMoveCamera = !this->dataPtr->isJoystickMoveCamera;
+    if (this->dataPtr->isJoystickMoveCamera)
+      gzmsg << "Joystick camera viewpoint control active.\n";
+    else
+      gzmsg << "Joystick camera viewpoint control deactivated.\n";
+  }
+
   // This function was establish when integrating the space navigator
   // joystick.
-  if (_msg->has_translation() || _msg->has_rotation())
+  if ((_msg->has_translation() || _msg->has_rotation()) &&
+      this->dataPtr->isJoystickMoveCamera)
   {
     math::Pose pose = this->GetWorldPose();
 
@@ -644,6 +667,22 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
       pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
     }
 
+    this->SetWorldPose(pose);
+  }
+  else
+    gzdbg << "Press joystick button 1 to toggle camera move.\n";
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->poseSet)
+    return;
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
     this->SetWorldPose(pose);
   }
 }

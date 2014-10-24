@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
-#ifndef _USERCAMERA_HH_
-#define _USERCAMERA_HH_
+#ifndef _GAZEBO_USERCAMERA_HH_
+#define _GAZEBO_USERCAMERA_HH_
 
 #include <string>
 #include <vector>
@@ -222,9 +217,13 @@ namespace gazebo
       /// a visual.
       private: void OnMoveToVisualComplete();
 
-      /// \brief Handles incoming joystick messages.
+      /// \brief Handles incoming relative joystick messages.
       /// \param[in] _msg New joystick message.
       private: void OnJoy(ConstJoystickPtr &_msg);
+
+      /// \brief Handles incoming absolute joystick messages.
+      /// \param[in] _msg New pose message.
+      private: void OnJoyPose(ConstPosePtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.
@@ -233,8 +232,17 @@ namespace gazebo
       /// \brief Gazebo communication node pointer.
       private: transport::NodePtr node;
 
-      /// \brief Subscribes to joystick messages.
+      /// \brief Subscribes to relative joystick messages.
       private: transport::SubscriberPtr joySub;
+
+      /// \brief Subscribes to absolute joystick messages.
+      private: transport::SubscriberPtr joySubAbs;
+
+      /// \brief Initial pose of camera, used in OnJoyAbs()
+      private: math::Pose initialPose;
+
+      /// \brief Has the pose been set by somebody yet?
+      private: bool poseSet;
     };
     /// \}
   }
