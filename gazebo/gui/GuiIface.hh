@@ -55,6 +55,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     void clear_active_camera();
 
+    /// \brief Return a pointer to the main graphical window.
     GAZEBO_VISIBLE
     MainWindow *get_main_window();
 
