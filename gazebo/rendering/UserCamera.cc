@@ -47,14 +47,14 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
-  this->dataPtr->isJoystickMoveCamera = false;
+  this->dataPtr->canJoystickMoveCamera = false;
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
   this->SetUseSDFPose(false);
 
-  this->poseSet = false;
+  this->dataPtr->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -82,12 +82,14 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->joySub = this->node->Subscribe("~/user_camera/joy_twist",
-      &UserCamera::OnJoy, this);
-  this->joySubAbs = this->node->Subscribe("~/user_camera/joy_pose",
-      &UserCamera::OnJoyPose, this);
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->joySubTwist =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
+    &UserCamera::OnJoyTwist, this);
+  this->dataPtr->joySubPose =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
+    &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -181,10 +183,10 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
 
-  if (!this->poseSet)
+  if (!this->dataPtr->poseSet)
   {
-    this->initialPose = _pose;
-    this->poseSet = true;
+    this->dataPtr->initialPose = _pose;
+    this->dataPtr->poseSet = true;
   }
 }
 
@@ -631,7 +633,7 @@ std::string UserCamera::GetViewControllerTypeString()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::OnJoy(ConstJoystickPtr &_msg)
+void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 {
   // Scaling factor applied to rotations.
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
@@ -639,8 +641,10 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // toggle using joystick to move camera
   if (_msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
-    this->dataPtr->isJoystickMoveCamera = !this->dataPtr->isJoystickMoveCamera;
-    if (this->dataPtr->isJoystickMoveCamera)
+    this->dataPtr->canJoystickMoveCamera =
+      !this->dataPtr->canJoystickMoveCamera;
+
+    if (this->dataPtr->canJoystickMoveCamera)
       gzmsg << "Joystick camera viewpoint control active.\n";
     else
       gzmsg << "Joystick camera viewpoint control deactivated.\n";
@@ -649,7 +653,7 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // This function was establish when integrating the space navigator
   // joystick.
   if ((_msg->has_translation() || _msg->has_rotation()) &&
-      this->dataPtr->isJoystickMoveCamera)
+      this->dataPtr->canJoystickMoveCamera)
   {
     math::Pose pose = this->GetWorldPose();
 
@@ -676,7 +680,7 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
 //////////////////////////////////////////////////
 void UserCamera::OnJoyPose(ConstPosePtr &_msg)
 {
-  if (!this->poseSet)
+  if (!this->dataPtr->poseSet)
     return;
   if (_msg->has_position() && _msg->has_orientation())
   {
