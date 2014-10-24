@@ -17,6 +17,8 @@
 #include <sstream>
 #include <gazebo/msgs/msgs.hh>
 #include "GUIExampleTimeWidget.hh"
+#include <gazebo/gui/gui.hh>
+#include <gazebo/gui/MainWindow.hh>
 
 using namespace gazebo;
 
@@ -72,6 +74,11 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
   this->node->Init("default");
   this->statsSub = this->node->Subscribe("~/world_stats",
       &GUIExampleTimeWidget::OnStats, this);
+
+  if (gui::get_main_window() == NULL)
+  {
+    std::cout << "main window is null at constructor" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

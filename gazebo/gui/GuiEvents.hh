@@ -124,6 +124,15 @@ namespace gazebo
       public: static void DisconnectFollow(
               event::ConnectionPtr _subscriber)
               { follow.Disconnect(_subscriber); }
+              
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a boost::slot to the main window ready signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
+              { return mainWindowReady.Connect(_subscriber); }
+      public: static void DisconnectMainWindowReady(
+              event::ConnectionPtr _subscriber)
+              { mainWindowReady.Disconnect(_subscriber); }              
 
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
@@ -155,6 +164,9 @@ namespace gazebo
 
       /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;
+
+      /// \brief Main window ready event.
+      public: static event::EventT<void ()> mainWindowReady;
     };
   }
 }
