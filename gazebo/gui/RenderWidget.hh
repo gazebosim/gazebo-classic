@@ -105,6 +105,7 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
