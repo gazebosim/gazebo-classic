@@ -257,13 +257,14 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat())
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->GetAutoRepeat())
     return;
 
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
   this->keyEvent.key = _event->key();
+  this->keyEvent.text = this->keyText;
 
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
@@ -323,7 +324,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat())
+  // this shouldn't happen, but in case it does...
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->GetAutoRepeat())
     return;
 
   this->keyModifiers = _event->modifiers();

@@ -36,8 +36,8 @@ Editor::~Editor()
 }
 
 /////////////////////////////////////////////////
-void Editor::Init(const std::string &_objName,
-                  const std::string &_tabLabel, QWidget *_widget)
+void Editor::Init(const std::string &_objName, const std::string &_tabLabel,
+    QWidget *_widget, QWidget *_cornerWidget)
 {
   if (this->tabWidget)
     delete this->tabWidget;
@@ -49,6 +49,9 @@ void Editor::Init(const std::string &_objName,
       QSizePolicy::Expanding);
   this->tabWidget->setMinimumWidth(250);
   this->tabWidget->hide();
+
+  if (_cornerWidget)
+    this->tabWidget->setCornerWidget(_cornerWidget);
 
   this->mainWindow->AddToLeftColumn(_objName, this->tabWidget);
 }
