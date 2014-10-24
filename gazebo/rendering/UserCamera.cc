@@ -84,9 +84,9 @@ void UserCamera::Load()
   Camera::Load();
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
-  this->joySub = this->node->Subscribe("~/spacenav/joy",
+  this->joySub = this->node->Subscribe("~/user_camera/joy_twist",
       &UserCamera::OnJoy, this);
-  this->joySubAbs = this->node->Subscribe("~/polhemus/joy",
+  this->joySubAbs = this->node->Subscribe("~/user_camera/joy_pose",
       &UserCamera::OnJoyPose, this);
 }
 
