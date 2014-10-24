@@ -57,12 +57,6 @@ BuildingEditorWidget::BuildingEditorWidget(QWidget *_parent)
   view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   view->setDragMode(QGraphicsView::ScrollHandDrag);
 
-  // TODO remove this wall and make sure scene updates without any items in it
-  // Done?
-//  WallItem *wallItem = new WallItem(QPointF(0, 0), QPointF(0, 0), 0);
-//  wallItem->SetThickness(0);
-//  this->scene->addItem(wallItem);
-
   this->levelWidget = new LevelWidget(this);
   this->levelWidget->resize(250, 50);
 //  QGraphicsProxyWidget* proxyWidget = scene->addWidget(levelWidget);
