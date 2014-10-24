@@ -53,7 +53,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   toolFrame->setObjectName("toolFrame");
   toolFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-  QToolBar *toolbar = new QToolBar;
+  toolbar = new QToolBar;
   QHBoxLayout *toolLayout = new QHBoxLayout;
   toolLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -341,6 +341,18 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 std::string RenderWidget::GetOverlayMsg() const
 {
   return this->msgOverlayLabel->text().toStdString();
+}
+
+void RenderWidget::ShowToolbar(const bool _show)
+{
+  if(_show)
+  {
+    this->toolbar->show();
+  }
+  else
+  {
+    this->toolbar->hide();
+  }
 }
 
 /////////////////////////////////////////////////

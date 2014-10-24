@@ -60,6 +60,10 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
+      /// \brief Set the visibility of the toolbar.
+      /// \param[in] _visible Whether or not to show the toolbar.
+      public: void ShowToolbar(const bool _show);
+
       private slots: virtual void update();
 
       /// \brief Qt callback to clear overlay message if a duration is
@@ -101,6 +105,7 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
