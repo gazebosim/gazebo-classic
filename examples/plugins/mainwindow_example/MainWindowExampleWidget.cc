@@ -81,15 +81,8 @@ MainWindowExampleWidget::MainWindowExampleWidget()
   this->statsSub = this->node->Subscribe("~/world_stats",
       &MainWindowExampleWidget::OnStats, this);
 
-  if (gui::get_main_window() == NULL)
-  {
-    std::cout << "main window is null at constructor" << std::endl;
-    this->connections.push_back(gui::Events::ConnectMainWindowReady(
+  this->connections.push_back(gui::Events::ConnectMainWindowReady(
               boost::bind(&MainWindowExampleWidget::PauseWorld, this)));
-  } else {
-    std::cout << "got main window" << std::endl;
-    PauseWorld();
-  }
 }
 
 /////////////////////////////////////////////////
