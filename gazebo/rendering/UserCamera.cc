@@ -48,7 +48,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->dataPtr->selectionBuffer = NULL;
 
-  this->dataPtr->isJoystickMoveCamera = false;
+  this->dataPtr->canJoystickMoveCamera = false;
 
   // Set default UserCamera render rate to 120Hz. This was choosen
   // for stereo rendering and smooth user interactions.
@@ -56,7 +56,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
 
   this->SetUseSDFPose(false);
 
-  this->poseSet = false;
+  this->dataPtr->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -84,12 +84,14 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
-  this->joySub = this->node->Subscribe("~/user_camera/joy_twist",
-      &UserCamera::OnJoy, this);
-  this->joySubAbs = this->node->Subscribe("~/user_camera/joy_pose",
-      &UserCamera::OnJoyPose, this);
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->joySubTwist =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
+    &UserCamera::OnJoyTwist, this);
+  this->dataPtr->joySubPose =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
+    &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -110,20 +112,20 @@ void UserCamera::Init()
 
   // Right camera
   {
-    this->rightCamera = this->scene->GetManager()->createCamera(
+    this->dataPtr->rightCamera = this->scene->GetManager()->createCamera(
         "StereoUserRight");
-    this->rightCamera->pitch(Ogre::Degree(90));
+    this->dataPtr->rightCamera->pitch(Ogre::Degree(90));
 
     // Don't yaw along variable axis, causes leaning
-    this->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-    this->rightCamera->setDirection(1, 0, 0);
+    this->dataPtr->rightCamera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->dataPtr->rightCamera->setDirection(1, 0, 0);
 
-    this->rightCamera->setAutoAspectRatio(false);
+    this->dataPtr->rightCamera->setAutoAspectRatio(false);
 
-    this->sceneNode->attachObject(this->rightCamera);
+    this->sceneNode->attachObject(this->dataPtr->rightCamera);
   }
 
-  this->SetHFOV(GZ_DTOR(120));
+  this->SetHFOV(GZ_DTOR(60));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
@@ -199,10 +201,10 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
 
-  if (!this->poseSet)
+  if (!this->dataPtr->poseSet)
   {
-    this->initialPose = _pose;
-    this->poseSet = true;
+    this->dataPtr->initialPose = _pose;
+    this->dataPtr->poseSet = true;
   }
 }
 
@@ -385,8 +387,8 @@ void UserCamera::Resize(unsigned int /*_w*/, unsigned int /*_h*/)
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
 
-    this->rightCamera->setAspectRatio(ratio);
-    this->rightCamera->setFOVy(Ogre::Radian(vfov));
+    this->dataPtr->rightCamera->setAspectRatio(ratio);
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
 
     if (this->dataPtr->gui)
     {
@@ -553,20 +555,21 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   this->camera->setFocalLength(focalLength);
   this->camera->setFrustumOffset(offset);
 
-  this->rightCamera->setFocalLength(focalLength);
-  this->rightCamera->setFrustumOffset(-offset);
+  this->dataPtr->rightCamera->setFocalLength(focalLength);
+  this->dataPtr->rightCamera->setFrustumOffset(-offset);
 
-  this->rightViewport = this->renderTarget->addViewport(this->rightCamera, 1);
-  this->rightViewport->setBackgroundColour(
+  this->dataPtr->rightViewport =
+    this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+  this->dataPtr->rightViewport->setBackgroundColour(
         Conversions::Convert(this->scene->GetBackgroundColor()));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
   this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
-  this->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
+  this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
   this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
-  this->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
 
   if (this->dataPtr->gui)
     this->dataPtr->gui->Init(this->renderTarget);
@@ -672,7 +675,7 @@ std::string UserCamera::GetViewControllerTypeString()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::OnJoy(ConstJoystickPtr &_msg)
+void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 {
   // Scaling factor applied to rotations.
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
@@ -680,8 +683,10 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // toggle using joystick to move camera
   if (_msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
-    this->dataPtr->isJoystickMoveCamera = !this->dataPtr->isJoystickMoveCamera;
-    if (this->dataPtr->isJoystickMoveCamera)
+    this->dataPtr->canJoystickMoveCamera =
+      !this->dataPtr->canJoystickMoveCamera;
+
+    if (this->dataPtr->canJoystickMoveCamera)
       gzmsg << "Joystick camera viewpoint control active.\n";
     else
       gzmsg << "Joystick camera viewpoint control deactivated.\n";
@@ -690,7 +695,7 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
   // This function was establish when integrating the space navigator
   // joystick.
   if ((_msg->has_translation() || _msg->has_rotation()) &&
-      this->dataPtr->isJoystickMoveCamera)
+      this->dataPtr->canJoystickMoveCamera)
   {
     math::Pose pose = this->GetWorldPose();
 
@@ -714,9 +719,10 @@ void UserCamera::OnJoy(ConstJoystickPtr &_msg)
     gzdbg << "Press joystick button 1 to toggle camera move.\n";
 }
 
+//////////////////////////////////////////////////
 void UserCamera::OnJoyPose(ConstPosePtr &_msg)
 {
-  if (!this->poseSet)
+  if (!this->dataPtr->poseSet)
     return;
   if (_msg->has_position() && _msg->has_orientation())
   {
@@ -732,11 +738,13 @@ void UserCamera::SetClipDist(float _near, float _far)
 {
   Camera::SetClipDist(_near, _far);
 
-  if (this->camera && this->rightCamera)
+  if (this->camera && this->dataPtr->rightCamera)
   {
-    this->rightCamera->setNearClipDistance(this->camera->getNearClipDistance());
-    this->rightCamera->setFarClipDistance(this->camera->getFarClipDistance());
-    this->rightCamera->setRenderingDistance(
-        this->camera->getRenderingDistance());
+    this->dataPtr->rightCamera->setNearClipDistance(
+      this->camera->getNearClipDistance());
+    this->dataPtr->rightCamera->setFarClipDistance(
+      this->camera->getFarClipDistance());
+    this->dataPtr->rightCamera->setRenderingDistance(
+      this->camera->getRenderingDistance());
   }
 }
