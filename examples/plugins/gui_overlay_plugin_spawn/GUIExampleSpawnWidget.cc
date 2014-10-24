@@ -69,8 +69,6 @@ GUIExampleSpawnWidget::GUIExampleSpawnWidget()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
-  
-  mainWindow->GetRenderWidget()->ShowToolbar(false);
 }
 
 /////////////////////////////////////////////////
