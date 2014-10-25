@@ -125,6 +125,64 @@ void PartVisualTab::OnAddVisual()
   dataWidget->geometryComboBox->addItem(tr("unit_sphere"));
   // geometryComboBox->addItem(tr("custom"));
 
+  connect(dataWidget->geometryComboBox,
+      SIGNAL(currentIndexChanged(const QString)),
+      this, SLOT(OnGeometryChanged(const QString)));
+
+  dataWidget->geomSizeXSpinBox = new QDoubleSpinBox;
+  dataWidget->geomSizeXSpinBox->setRange(-1000, 1000);
+  dataWidget->geomSizeXSpinBox->setSingleStep(0.01);
+  dataWidget->geomSizeXSpinBox->setDecimals(3);
+  dataWidget->geomSizeXSpinBox->setValue(0.000);
+
+  dataWidget->geomSizeYSpinBox = new QDoubleSpinBox;
+  dataWidget->geomSizeYSpinBox->setRange(-1000, 1000);
+  dataWidget->geomSizeYSpinBox->setSingleStep(0.01);
+  dataWidget->geomSizeYSpinBox->setDecimals(3);
+  dataWidget->geomSizeYSpinBox->setValue(0.000);
+
+  dataWidget->geomSizeZSpinBox = new QDoubleSpinBox;
+  dataWidget->geomSizeZSpinBox->setRange(-1000, 1000);
+  dataWidget->geomSizeZSpinBox->setSingleStep(0.01);
+  dataWidget->geomSizeZSpinBox->setDecimals(3);
+  dataWidget->geomSizeZSpinBox->setValue(0.000);
+
+  QLabel *geomSizeXLabel = new QLabel(tr("x: "));
+  QLabel *geomSizeYLabel = new QLabel(tr("y: "));
+  QLabel *geomSizeZLabel = new QLabel(tr("z: "));
+
+  dataWidget->geomSizeLayout = new QHBoxLayout;
+  dataWidget->geomSizeLayout->addWidget(geomSizeXLabel);
+  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeXSpinBox);
+  dataWidget->geomSizeLayout->addWidget(geomSizeYLabel);
+  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeYSpinBox);
+  dataWidget->geomSizeLayout->addWidget(geomSizeZLabel);
+  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeZSpinBox);
+
+  QLabel *geomRadiusLabel = new QLabel(tr("radius: "));
+  QLabel *geomLengthLabel = new QLabel(tr("length: "));
+
+  dataWidget->geomRadiusSpinBox = new QDoubleSpinBox;
+  dataWidget->geomRadiusSpinBox->setRange(-1000, 1000);
+  dataWidget->geomRadiusSpinBox->setSingleStep(0.01);
+  dataWidget->geomRadiusSpinBox->setDecimals(3);
+  dataWidget->geomRadiusSpinBox->setValue(0.000);
+
+  dataWidget->geomLengthSpinBox = new QDoubleSpinBox;
+  dataWidget->geomLengthSpinBox->setRange(-1000, 1000);
+  dataWidget->geomLengthSpinBox->setSingleStep(0.01);
+  dataWidget->geomLengthSpinBox->setDecimals(3);
+  dataWidget->geomLengthSpinBox->setValue(0.000);
+
+  dataWidget->geomRLLayout = new QHBoxLayout;
+  dataWidget->geomRLLayout->addWidget(geomRadiusLabel);
+  dataWidget->geomRLLayout->addWidget(dataWidget->geomRadiusSpinBox);
+  dataWidget->geomRLLayout->addWidget(geomLengthLabel);
+  dataWidget->geomRLLayout->addWidget(dataWidget->geomLengthSpinBox);
+
+  QWidget *geomSizeWidget = new QWidget;
+  geomSizeWidget->setLayout(dataWidget->geomSizeLayout);
+
   QLabel *transparencyLabel = new QLabel(tr("Transparency:"));
   dataWidget->transparencySpinBox = new QDoubleSpinBox;
   dataWidget->transparencySpinBox->setRange(-1000, 1000);
@@ -140,10 +198,14 @@ void PartVisualTab::OnAddVisual()
   visualGeneralLayout->addWidget(dataWidget->visualNameLabel, 0, 1);
   visualGeneralLayout->addWidget(geometryLabel, 1, 0);
   visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
-  visualGeneralLayout->addWidget(transparencyLabel, 2, 0);
-  visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 2, 1);
-  visualGeneralLayout->addWidget(materialLabel, 3, 0);
-  visualGeneralLayout->addWidget(dataWidget->materialLineEdit, 3, 1);
+
+  visualGeneralLayout->addWidget(geomSizeWidget, 2, 1);
+//  visualGeneralLayout->addLayout(geomRLLayout, 3, 1);
+
+  visualGeneralLayout->addWidget(transparencyLabel, 3, 0);
+  visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 3, 1);
+  visualGeneralLayout->addWidget(materialLabel, 4, 0);
+  visualGeneralLayout->addWidget(dataWidget->materialLineEdit, 4, 1);
 
   QLabel *posXLabel = new QLabel(tr("x: "));
   QLabel *posYLabel = new QLabel(tr("y: "));
@@ -265,6 +327,7 @@ void PartVisualTab::SetPose(unsigned int _index, const math::Pose &_pose)
   if (_index >= this->dataWidgets.size())
   {
     gzerr << "Index is out of range" << std::endl;
+    return;
   }
 
   this->dataWidgets[_index]->posXSpinBox->setValue(_pose.pos.x);
@@ -299,6 +362,7 @@ void PartVisualTab::SetTransparency(unsigned int _index, double _transparency)
   if (_index >= this->dataWidgets.size())
   {
     gzerr << "Index is out of range" << std::endl;
+    return;
   }
 
   this->dataWidgets[_index]->transparencySpinBox->setValue(_transparency);
@@ -335,6 +399,7 @@ void PartVisualTab::SetMaterial(unsigned int _index,
   if (_index >= this->dataWidgets.size())
   {
     gzerr << "Index is out of range" << std::endl;
+    return;
   }
 
   this->dataWidgets[_index]->materialLineEdit->setText(tr(_material.c_str()));
@@ -348,6 +413,7 @@ void PartVisualTab::SetGeometry(unsigned int _index,
   if (_index >= this->dataWidgets.size())
   {
     gzerr << "Index is out of range" << std::endl;
+    return;
   }
   int dataIndex = this->dataWidgets[_index]->geometryComboBox->findText(
       QString(tr(_geometry.c_str())));
@@ -372,11 +438,91 @@ std::string PartVisualTab::GetGeometry(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
+void PartVisualTab::SetGeometrySize(unsigned int _index,
+    const math::Vector3 &_size)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  this->dataWidgets[_index]->geomSizeXSpinBox->setValue(_size.x);
+  this->dataWidgets[_index]->geomSizeYSpinBox->setValue(_size.y);
+  this->dataWidgets[_index]->geomSizeZSpinBox->setValue(_size.z);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 PartVisualTab::GetGeometrySize(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return math::Vector3::Zero;
+  }
+
+  return math::Vector3(this->dataWidgets[_index]->geomSizeXSpinBox->value(),
+      this->dataWidgets[_index]->geomSizeYSpinBox->value(),
+      this->dataWidgets[_index]->geomSizeZSpinBox->value());
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetGeometryRadius(unsigned int _index,
+    double _radius)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  this->dataWidgets[_index]->geomRadiusSpinBox->setValue(_radius);
+}
+
+/////////////////////////////////////////////////
+double PartVisualTab::GetGeometryRadius(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->dataWidgets[_index]->geomRadiusSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetGeometryLength(unsigned int _index,
+    double _length)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  this->dataWidgets[_index]->geomLengthSpinBox->setValue(_length);
+}
+
+/////////////////////////////////////////////////
+double PartVisualTab::GetGeometryLength(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->dataWidgets[_index]->geomLengthSpinBox->value();
+}
+
+/////////////////////////////////////////////////
 void PartVisualTab::SetName(unsigned int _index, const std::string &_name)
 {
   if (_index >= this->dataWidgets.size())
   {
     gzerr << "Index is out of range" << std::endl;
+    return;
   }
 
   this->dataWidgets[_index]->visualNameLabel->setText(tr(_name.c_str()));
@@ -392,4 +538,14 @@ std::string PartVisualTab::GetName(unsigned int _index) const
   }
 
   return this->dataWidgets[_index]->visualNameLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void PartVisualTab::GeometryChanged(const QString _text)
+{
+  QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
+
+  if (widget)
+  {
+  }
 }

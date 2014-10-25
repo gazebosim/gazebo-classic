@@ -290,19 +290,19 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 /////////////////////////////////////////////////
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
-  PartData *part = new PartData;
+  PartData *part = new PartData();
 
   part->partVisual = _visual->GetParent();
   part->visuals.push_back(_visual);
 
-  part->name = part->partVisual->GetName();
-  part->pose = part->partVisual->GetWorldPose();
-  part->gravity = true;
-  part->selfCollide = false;
-  part->kinematic = false;
+  part->SetName(part->partVisual->GetName());
+  part->SetPose(part->partVisual->GetWorldPose());
+  part->SetGravity(true);
+  part->SetSelfCollide(false);
+  part->SetKinematic(false);
 
   part->inspector = new PartInspector;
-  part->inspector->SetName(part->name);
+  part->inspector->SetName(part->GetName());
   part->inspector->setModal(false);
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
@@ -313,12 +313,12 @@ void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
       SIGNAL(VisualRemoved(const std::string &)), part,
       SLOT(OnRemoveVisual(const std::string &)));
 
-  part->inertial.reset(new physics::Inertial);
-  CollisionData *collisionData = new CollisionData;
-  part->collisions.push_back(collisionData);
-  part->sensorData = new SensorData;
+  //part->inertial.reset(new physics::Inertial);
+  //CollisionData *collisionData = new CollisionData;
+  //part->collisions.push_back(collisionData);
+  //part->sensorData = new SensorData;
 
-  this->allParts[part->name] = part;
+  this->allParts[part->GetName()] = part;
 }
 
 /////////////////////////////////////////////////
@@ -360,8 +360,8 @@ void ModelCreator::RemovePart(const std::string &_partName)
   part->collisions.clear();
 
   delete part->inspector;
-  part->inertial.reset();
-  delete part->sensorData;
+  //part->inertial.reset();
+  //delete part->sensorData;
 
   this->allParts.erase(_partName);
 }
@@ -620,7 +620,7 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
         this->allParts.end())
     {
       PartData *part = this->allParts[this->mouseVisual->GetName()];
-      part->pose = this->mouseVisual->GetWorldPose();
+      part->SetPose(this->mouseVisual->GetWorldPose());
     }
 
     // reset and return
@@ -734,15 +734,15 @@ void ModelCreator::OpenInspector(const std::string &_name)
 {
   PartData *part = this->allParts[_name];
   PartGeneralTab *generalTab = part->inspector->GetGeneral();
-  generalTab->SetGravity(part->gravity);
-  generalTab->SetSelfCollide(part->selfCollide);
-  generalTab->SetKinematic(part->kinematic);
-  generalTab->SetPose(part->pose);
-  generalTab->SetMass(part->inertial->GetMass());
-  generalTab->SetInertialPose(part->inertial->GetPose());
-  generalTab->SetInertia(part->inertial->GetIXX(), part->inertial->GetIYY(),
-      part->inertial->GetIZZ(), part->inertial->GetIXY(),
-      part->inertial->GetIXZ(), part->inertial->GetIYZ());
+  generalTab->SetGravity(part->GetGravity());
+  generalTab->SetSelfCollide(part->GetSelfCollide());
+  generalTab->SetKinematic(part->GetKinematic());
+  generalTab->SetPose(part->GetPose());
+  generalTab->SetMass(part->GetMass());
+  generalTab->SetInertialPose(part->GetInertialPose());
+  generalTab->SetInertia(part->GetInertiaIXX(), part->GetInertiaIYY(),
+      part->GetInertiaIZZ(), part->GetInertiaIXY(),
+      part->GetInertiaIXZ(), part->GetInertiaIYZ());
 
   PartVisualTab *visualTab = part->inspector->GetVisual();
 
@@ -797,7 +797,7 @@ void ModelCreator::GenerateSDF()
       ++partsIt)
   {
     PartData *part = partsIt->second;
-    mid += part->pose.pos;
+    mid += part->GetPose().pos;
   }
   mid /= this->allParts.size();
   this->origin.pos = mid;
@@ -813,21 +813,21 @@ void ModelCreator::GenerateSDF()
     PartData *part = partsIt->second;
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     newLinkElem->ClearElements();
-    newLinkElem->GetAttribute("name")->Set(part->name);
-    newLinkElem->GetElement("pose")->Set(part->pose - this->origin);
-    newLinkElem->GetElement("gravity")->Set(part->gravity);
-    newLinkElem->GetElement("self_collide")->Set(part->selfCollide);
-    newLinkElem->GetElement("kinematic")->Set(part->kinematic);
+    newLinkElem->GetAttribute("name")->Set(part->GetName());
+    newLinkElem->GetElement("pose")->Set(part->GetPose() - this->origin);
+    newLinkElem->GetElement("gravity")->Set(part->GetGravity());
+    newLinkElem->GetElement("self_collide")->Set(part->GetSelfCollide());
+    newLinkElem->GetElement("kinematic")->Set(part->GetKinematic());
     sdf::ElementPtr inertialElem = newLinkElem->GetElement("inertial");
-    inertialElem->GetElement("mass")->Set(part->inertial->GetMass());
-    inertialElem->GetElement("pose")->Set(part->inertial->GetPose());
+    inertialElem->GetElement("mass")->Set(part->GetMass());
+    inertialElem->GetElement("pose")->Set(part->GetInertialPose());
     sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-    inertiaElem->GetElement("ixx")->Set(part->inertial->GetIXX());
-    inertiaElem->GetElement("iyy")->Set(part->inertial->GetIYY());
-    inertiaElem->GetElement("izz")->Set(part->inertial->GetIZZ());
-    inertiaElem->GetElement("ixy")->Set(part->inertial->GetIXY());
-    inertiaElem->GetElement("ixz")->Set(part->inertial->GetIXZ());
-    inertiaElem->GetElement("iyz")->Set(part->inertial->GetIYZ());
+    inertiaElem->GetElement("ixx")->Set(part->GetInertiaIXX());
+    inertiaElem->GetElement("iyy")->Set(part->GetInertiaIYY());
+    inertiaElem->GetElement("izz")->Set(part->GetInertiaIZZ());
+    inertiaElem->GetElement("ixy")->Set(part->GetInertiaIXY());
+    inertiaElem->GetElement("ixz")->Set(part->GetInertiaIXZ());
+    inertiaElem->GetElement("iyz")->Set(part->GetInertiaIYZ());
 
     modelElem->InsertElement(newLinkElem);
 

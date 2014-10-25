@@ -46,6 +46,27 @@ namespace gazebo
       /// \brief Combo box for for specifying the geometry of the visual.
       public: QComboBox *geometryComboBox;
 
+      /// \brief Spin box for configuring size X of a box geom.
+      public: QDoubleSpinBox *geomSizeXSpinBox;
+
+      /// \brief Spin box for configuring size Y of a box geom.
+      public: QDoubleSpinBox *geomSizeYSpinBox;
+
+      /// \brief Spin box for configuring size Z of a box geom.
+      public: QDoubleSpinBox *geomSizeZSpinBox;
+
+      /// \brief Spin box for configuring radius of a cylinder or sphere geom.
+      public: QDoubleSpinBox *geomRadiusSpinBox;
+
+      /// \brief Spin box for configuring length of a cylinder geom.
+      public: QDoubleSpinBox *geomLengthSpinBox;
+
+      /// \brief Layout for configuring geometry size.
+      public: QHBoxLayout *geomSizeLayout;
+
+      /// \brief Layout for configuring geometry radius and length.
+      public: QHBoxLayout *geomRLLayout;
+
       /// \brief Spin box for configuring the transparency of the visual.
       public: QDoubleSpinBox *transparencySpinBox;
 
@@ -135,6 +156,7 @@ namespace gazebo
 
       /// \brief Set the geometry of the visual.
       /// \param[in] _index Index of visual
+      /// \param[in] _geometry Geometry type to set to.
       public: void SetGeometry(unsigned int _index,
           const std::string &_geometry);
 
@@ -142,6 +164,39 @@ namespace gazebo
       /// \param[in] _index Index of visual
       /// \return Geometry type.
       public: std::string GetGeometry(unsigned int _index) const;
+
+      /// \brief Set the geometry size of the visual.
+      /// \param[in] _index Index of visual
+      /// \param[in] _length Size to set the geometry to.
+      public: void SetGeometrySize(unsigned int _index,
+          const math::Vector3 &_size);
+
+      /// \brief Get the geometry length of the visual.
+      /// \param[in] _index Index of visual
+      /// \return Geometry size.
+      public: math::Vector3 GetGeometrySize(unsigned int _index) const;
+
+      /// \brief Set the geometry radius of the visual.
+      /// \param[in] _index Index of visual
+      /// \param[in] _length Radius to set the geometry to.
+      public: void SetGeometryRadius(unsigned int _index,
+          double _radius);
+
+      /// \brief Get the geometry radius of the visual.
+      /// \param[in] _index Index of visual
+      /// \return Geometry radius.
+      public: double GetGeometryRadius(unsigned int _index) const;
+
+      /// \brief Set the geometry length of the visual.
+      /// \param[in] _index Index of visual
+      /// \param[in] _length Length to set the geometry to.
+      public: void SetGeometryLength(unsigned int _index,
+          double _length);
+
+      /// \brief Get the geometry length of the visual.
+      /// \param[in] _index Index of visual
+      /// \return Geometry length.
+      public: double GetGeometryLength(unsigned int _index) const;
 
       /// \brief List of visual widgets for configuring visual properties.
       private: std::vector<VisualDataWidget *> dataWidgets;
@@ -164,6 +219,9 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a visual is added.
       Q_SIGNALS: void VisualAdded();
+
+      /// \brief Qt signal emitted when a visual is added.
+      private slots: void GeometryChanged(const QString _text);
 
       /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();
