@@ -49,6 +49,7 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->selectionBuffer = NULL;
 
   this->dataPtr->canJoystickMoveCamera = false;
+  this->dataPtr->joystickButtonToggleLast = false;
 
   // Set default UserCamera render rate to 120Hz. This was choosen
   // for stereo rendering and smooth user interactions.
@@ -681,15 +682,24 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
 
   // toggle using joystick to move camera
-  if (_msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+  if (_msg->buttons().size() == 2 &&
+      this->dataPtr->joystickButtonToggleLast == false &&
+       _msg->buttons(0) == 1)
   {
     this->dataPtr->canJoystickMoveCamera =
       !this->dataPtr->canJoystickMoveCamera;
+
+    this->dataPtr->joystickButtonToggleLast = true;
 
     if (this->dataPtr->canJoystickMoveCamera)
       gzmsg << "Joystick camera viewpoint control active.\n";
     else
       gzmsg << "Joystick camera viewpoint control deactivated.\n";
+  }
+  else
+  {
+    // detect button release
+    this->dataPtr->joystickButtonToggleLast = false;
   }
 
   // This function was establish when integrating the space navigator
@@ -715,8 +725,6 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 
     this->SetWorldPose(pose);
   }
-  else
-    gzdbg << "Press joystick button 1 to toggle camera move.\n";
 }
 
 //////////////////////////////////////////////////

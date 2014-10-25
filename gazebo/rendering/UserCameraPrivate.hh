@@ -55,7 +55,8 @@ namespace gazebo
       /// \brief Initial pose of camera, used in OnJoyAbs()
       public: math::Pose initialPose;
 
-      /// \brief Has the pose been set by somebody yet?
+      /// \brief Initialized to false in constructor,
+      /// set to true after first call to SetWorldPose
       public: bool poseSet;
 
       /// \brief Flag to detect if the user changed the camera pose in the
@@ -64,6 +65,9 @@ namespace gazebo
 
       /// \brief Toggle joystick camera move state
       public: bool canJoystickMoveCamera;
+
+      /// \brief Used to detect joystick button release
+      public: bool joystickButtonToggleLast;
 
       /// \brief Ogre camera for the right Oculus screen.
       protected: Ogre::Camera *rightCamera;
