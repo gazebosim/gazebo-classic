@@ -55,7 +55,8 @@ namespace gazebo
       /// \brief Initial pose of camera, used in OnJoyAbs()
       public: math::Pose initialPose;
 
-      /// \brief Has the pose been set by somebody yet?
+      /// \brief Initialized to false in constructor,
+      /// set to true after first call to SetWorldPose
       public: bool poseSet;
 
       /// \brief Flag to detect if the user changed the camera pose in the
