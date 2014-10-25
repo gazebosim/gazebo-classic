@@ -673,8 +673,6 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 
     this->SetWorldPose(pose);
   }
-  else
-    gzdbg << "Press joystick button 1 to toggle camera move.\n";
 }
 
 //////////////////////////////////////////////////
