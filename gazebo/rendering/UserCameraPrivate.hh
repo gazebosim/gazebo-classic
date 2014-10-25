@@ -64,6 +64,9 @@ namespace gazebo
 
       /// \brief Toggle joystick camera move state
       public: bool canJoystickMoveCamera;
+
+      /// \brief Used to detect joystick button release
+      public: bool joystickButtonToggleLast;
     };
   }
 }
