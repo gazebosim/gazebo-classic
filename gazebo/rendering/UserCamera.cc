@@ -696,7 +696,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     else
       gzmsg << "Joystick camera viewpoint control deactivated.\n";
   }
-  else
+  else if (_msg->buttons(0) == 0)
   {
     // detect button release
     this->dataPtr->joystickButtonToggleLast = false;
