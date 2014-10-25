@@ -70,10 +70,10 @@ namespace gazebo
       public: bool joystickButtonToggleLast;
 
       /// \brief Ogre camera for the right Oculus screen.
-      protected: Ogre::Camera *rightCamera;
+      public: Ogre::Camera *rightCamera;
 
       /// \brief View port for the right camera.
-      protected: Ogre::Viewport *rightViewport;
+      public: Ogre::Viewport *rightViewport;
     };
   }
 }
