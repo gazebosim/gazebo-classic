@@ -45,6 +45,7 @@
 #include "gazebo/physics/dart/DARTCylinderShape.hh"
 #include "gazebo/physics/dart/DARTPlaneShape.hh"
 #include "gazebo/physics/dart/DARTMeshShape.hh"
+#include "gazebo/physics/dart/DARTPolylineShape.hh"
 #include "gazebo/physics/dart/DARTMultiRayShape.hh"
 #include "gazebo/physics/dart/DARTHeightmapShape.hh"
 
@@ -323,6 +324,8 @@ ShapePtr DARTPhysics::CreateShape(const std::string &_type,
     shape.reset(new DARTMultiRayShape(collision));
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new DARTMeshShape(collision));
+  else if (_type == "polyline")
+    shape.reset(new DARTPolylineShape(collision));
   else if (_type == "heightmap")
     shape.reset(new DARTHeightmapShape(collision));
   else if (_type == "map" || _type == "image")
@@ -378,8 +381,22 @@ void DARTPhysics::DebugPrint() const
 //////////////////////////////////////////////////
 boost::any DARTPhysics::GetParam(const std::string &_key) const
 {
+  if (_key == "max_step_size")
+  {
+    return this->GetMaxStepSize();
+  }
+
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  // physics dart element not yet added to sdformat
+  // GZ_ASSERT(dartElem != NULL, "DART SDF element does not exist");
+  if (dartElem == NULL)
+  {
+    gzerr << "DART SDF element not found"
+          << ", unable to get param ["
+          << _key << "]"
+          << std::endl;
+    return 0;
+  }
 
   if (_key == "max_contacts")
   {

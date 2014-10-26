@@ -67,10 +67,14 @@ void Model::Load(sdf::ElementPtr _sdf)
   this->jointPub = this->node->Advertise<msgs::Joint>("~/joint");
 
   this->SetStatic(this->sdf->Get<bool>("static"));
-  this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
-      boost::bind(&Entity::IsStatic, this));
+  if (this->sdf->HasElement("static"))
+  {
+    this->sdf->GetElement("static")->GetValue()->SetUpdateFunc(
+        boost::bind(&Entity::IsStatic, this));
+  }
 
-  this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
+  if (this->sdf->HasElement("allow_auto_disable"))
+    this->SetAutoDisable(this->sdf->Get<bool>("allow_auto_disable"));
   this->LoadLinks();
 
   // Load the joints if the world is already loaded. Otherwise, the World
@@ -373,17 +377,23 @@ void Model::Reset()
     (*iter)->Reset();
   }
 
-  // reset link velocities when resetting model
-  for (Link_V::iterator liter = this->links.begin();
-       liter != this->links.end(); ++liter)
-  {
-    (*liter)->ResetPhysicsStates();
-  }
+  this->ResetPhysicsStates();
 
   for (Joint_V::iterator jiter = this->joints.begin();
        jiter != this->joints.end(); ++jiter)
   {
     (*jiter)->Reset();
+  }
+}
+
+//////////////////////////////////////////////////
+void Model::ResetPhysicsStates()
+{
+  // reset link velocities when resetting model
+  for (Link_V::iterator liter = this->links.begin();
+       liter != this->links.end(); ++liter)
+  {
+    (*liter)->ResetPhysicsStates();
   }
 }
 

@@ -1223,6 +1223,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
   else if (typeElem->FirstChildElement("texture"))
   {
+    _mat->SetLighting(true);
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
@@ -1518,10 +1519,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                   subMesh->GetVertex(newVertIndex));
               Skeleton *skel = _mesh->GetSkeleton();
               for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+                  i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
               {
                 std::pair<std::string, double> node_weight =
-                  skel->GetVertNodeWeight(values[daeVertIndex], i);
+                  skel->GetVertNodeWeight(daeVertIndex, i);
                 SkeletonNode *node =
                     _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
                 subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,

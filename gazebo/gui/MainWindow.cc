@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
 #include "gazebo/gui/viewers/ViewFactory.hh"
@@ -28,6 +29,8 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -43,12 +46,13 @@
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/ToolsWidget.hh"
 #include "gazebo/gui/GLWidget.hh"
+#include "gazebo/gui/AlignWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiEvents.hh"
+#include "gazebo/gui/SpaceNav.hh"
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
-
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -184,6 +188,9 @@ MainWindow::MainWindow()
     (void) new QShortcut(Qt::CTRL + Qt::Key_Q, this, SLOT(close()));
     this->CreateMenus();
   }
+
+  // Create a pointer to the space navigator interface
+  this->spacenav = new SpaceNav();
 }
 
 /////////////////////////////////////////////////
@@ -216,6 +223,10 @@ void MainWindow::Load()
             << "Did you forget to set ~/.gazebo/gui.ini?\n";
   }
 #endif
+
+  // Load the space navigator
+  if (!this->spacenav->Load())
+    gzerr << "Unable to load space navigator\n";
 }
 
 /////////////////////////////////////////////////
@@ -277,6 +288,10 @@ void MainWindow::closeEvent(QCloseEvent * /*_event*/)
   this->connections.clear();
 
   delete this->renderWidget;
+
+  // Cleanup the space navigator
+  delete this->spacenav;
+  this->spacenav = NULL;
 
 #ifdef HAVE_OCULUS
   if (this->oculusWindow)
@@ -468,6 +483,21 @@ void MainWindow::Save()
 }
 
 /////////////////////////////////////////////////
+void MainWindow::Clone()
+{
+  boost::scoped_ptr<CloneWindow> cloneWindow(new CloneWindow(this));
+  if (cloneWindow->exec() == QDialog::Accepted && cloneWindow->IsValidPort())
+  {
+    // Create a gzserver clone in the server side.
+    msgs::ServerControl msg;
+    msg.set_save_world_name("");
+    msg.set_clone(true);
+    msg.set_new_port(cloneWindow->GetPort());
+    this->serverControlPub->Publish(msg);
+  }
+}
+
+/////////////////////////////////////////////////
 void MainWindow::About()
 {
   std::string helpTxt;
@@ -484,15 +514,9 @@ void MainWindow::About()
     "<table>"
       "<tr>"
         "<td style='padding-right: 10px;'>Tutorials:</td>"
-        "<td><a href='http://gazebosim.org/wiki/tutorials' "
+        "<td><a href='http://gazebosim.org/tutorials' "
         "style='text-decoration: none; color: #f58113'>"
-        "http://gazebosim.org/wiki/tutorials</a></td>"
-      "</tr>"
-      "<tr>"
-        "<td style='padding-right: 10px;'>User Guide:</td>"
-        "<td><a href='http://gazebosim.org/user_guide' "
-        "style='text-decoration: none; color: #f58113'>"
-        "http://gazebosim.org/user_guide</a></td>"
+        "http://gazebosim.org/tutorials</a></td>"
       "</tr>"
       "<tr>"
         "<td style='padding-right: 10px;'>API:</td>"
@@ -626,6 +650,24 @@ void MainWindow::Rotate()
 void MainWindow::Scale()
 {
   gui::Events::manipMode("scale");
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Align()
+{
+  for (unsigned int i = 0 ; i < this->alignActionGroups.size(); ++i)
+  {
+    this->alignActionGroups[i]->setExclusive(false);
+    if (this->alignActionGroups[i]->checkedAction())
+      this->alignActionGroups[i]->checkedAction()->setChecked(false);
+    this->alignActionGroups[i]->setExclusive(true);
+  }
+}
+
+/////////////////////////////////////////////////
+void MainWindow::Snap()
+{
+  gui::Events::manipMode("snap");
 }
 
 /////////////////////////////////////////////////
@@ -906,6 +948,10 @@ void MainWindow::CreateActions()
   g_saveCfgAct->setStatusTip(tr("Save GUI configuration"));
   connect(g_saveCfgAct, SIGNAL(triggered()), this, SLOT(SaveINI()));
 
+  g_cloneAct = new QAction(tr("Clone World"), this);
+  g_cloneAct->setStatusTip(tr("Clone the world"));
+  connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
+
   g_aboutAct = new QAction(tr("&About"), this);
   g_aboutAct->setStatusTip(tr("Show the about info"));
   connect(g_aboutAct, SIGNAL(triggered()), this, SLOT(About()));
@@ -1141,18 +1187,96 @@ void MainWindow::CreateActions()
   connect(g_screenshotAct, SIGNAL(triggered()), this,
       SLOT(CaptureScreenshot()));
 
-  g_copyAct = new QAction(QIcon(":/images/copy_object.png"), tr("Copy"), this);
+  g_copyAct = new QAction(QIcon(":/images/copy_object.png"),
+      tr("Copy (Ctrl + C)"), this);
   g_copyAct->setStatusTip(tr("Copy Entity"));
   g_copyAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/copy_object.png", g_copyAct);
   g_copyAct->setEnabled(false);
 
   g_pasteAct = new QAction(QIcon(":/images/paste_object.png"),
-      tr("Paste"), this);
+      tr("Paste (Ctrl + V)"), this);
   g_pasteAct->setStatusTip(tr("Paste Entity"));
   g_pasteAct->setCheckable(false);
   this->CreateDisabledIcon(":/images/paste_object.png", g_pasteAct);
   g_pasteAct->setEnabled(false);
+
+  g_snapAct = new QAction(QIcon(":/images/magnet.png"),
+      tr("Snap Mode (N)"), this);
+  g_snapAct->setStatusTip(tr("Snap entity"));
+  g_snapAct->setCheckable(true);
+  g_snapAct->setToolTip(tr("Snap Mode"));
+  connect(g_snapAct, SIGNAL(triggered()), this, SLOT(Snap()));
+
+  // set up align actions and widget
+  QAction *xAlignMin = new QAction(QIcon(":/images/x_min.png"),
+      tr("X Align Min"), this);
+  QAction *xAlignCenter = new QAction(QIcon(":/images/x_center.png"),
+      tr("X Align Center"), this);
+  QAction *xAlignMax = new QAction(QIcon(":/images/x_max.png"),
+      tr("X Align Max"), this);
+  QAction *yAlignMin = new QAction(QIcon(":/images/y_min.png"),
+      tr("Y Align Min"), this);
+  QAction *yAlignCenter = new QAction(QIcon(":/images/y_center.png"),
+      tr("Y Align Center"), this);
+  QAction *yAlignMax = new QAction(QIcon(":/images/y_max.png"),
+      tr("Y Align Max"), this);
+  QAction *zAlignMin = new QAction(QIcon(":/images/z_min.png"),
+      tr("Z Align Min"), this);
+  QAction *zAlignCenter = new QAction(QIcon(":/images/z_center.png"),
+      tr("Z Align Center"), this);
+  QAction *zAlignMax = new QAction(QIcon(":/images/z_max.png"),
+      tr("Z Align Max"), this);
+  this->CreateDisabledIcon(":/images/x_min.png", xAlignMin);
+  this->CreateDisabledIcon(":/images/x_center.png", xAlignCenter);
+  this->CreateDisabledIcon(":/images/x_max.png", xAlignMax);
+  this->CreateDisabledIcon(":/images/y_min.png", yAlignMin);
+  this->CreateDisabledIcon(":/images/y_center.png", yAlignCenter);
+  this->CreateDisabledIcon(":/images/y_max.png", yAlignMax);
+  this->CreateDisabledIcon(":/images/z_min.png", zAlignMin);
+  this->CreateDisabledIcon(":/images/z_center.png", zAlignCenter);
+  this->CreateDisabledIcon(":/images/z_max.png", zAlignMax);
+
+  QActionGroup *xAlignActionGroup = new QActionGroup(this);
+  xAlignActionGroup->addAction(xAlignMin);
+  xAlignActionGroup->addAction(xAlignCenter);
+  xAlignActionGroup->addAction(xAlignMax);
+  xAlignActionGroup->setExclusive(true);
+  QActionGroup *yAlignActionGroup = new QActionGroup(this);
+  yAlignActionGroup->addAction(yAlignMin);
+  yAlignActionGroup->addAction(yAlignCenter);
+  yAlignActionGroup->addAction(yAlignMax);
+  yAlignActionGroup->setExclusive(true);
+  QActionGroup *zAlignActionGroup = new QActionGroup(this);
+  zAlignActionGroup->addAction(zAlignMin);
+  zAlignActionGroup->addAction(zAlignCenter);
+  zAlignActionGroup->addAction(zAlignMax);
+  zAlignActionGroup->setExclusive(true);
+  this->alignActionGroups.push_back(xAlignActionGroup);
+  this->alignActionGroups.push_back(yAlignActionGroup);
+  this->alignActionGroups.push_back(zAlignActionGroup);
+
+  AlignWidget *alignWidget = new AlignWidget(this);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MIN, xAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_CENTER,
+      xAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_X, AlignWidget::ALIGN_MAX, xAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MIN, yAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_CENTER,
+      yAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Y, AlignWidget::ALIGN_MAX, yAlignMax);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MIN, zAlignMin);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_CENTER,
+      zAlignCenter);
+  alignWidget->Add(AlignWidget::ALIGN_Z, AlignWidget::ALIGN_MAX, zAlignMax);
+  alignWidget->adjustSize();
+  alignWidget->setFixedWidth(alignWidget->width()+5);
+
+  g_alignAct = new QWidgetAction(this);
+  g_alignAct->setCheckable(true);
+  g_alignAct->setDefaultWidget(alignWidget);
+  g_alignAct->setEnabled(false);
+  connect(g_alignAct, SIGNAL(triggered()), this, SLOT(Align()));
 }
 
 /////////////////////////////////////////////////
@@ -1161,25 +1285,44 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
   if (!this->menuLayout)
     this->menuLayout = new QHBoxLayout;
 
-  // Remove all widgets from the menubar
+  // Remove all widgets from the menuLayout
   QLayoutItem *child = NULL;
   while ((child = this->menuLayout->takeAt(0)) != 0)
   {
-    delete child;
   }
 
+  if (!this->menuBar)
+  {
+    // create the native menu bar
+    this->menuBar = new QMenuBar;
+    this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    this->setMenuBar(this->menuBar);
+
+    this->CreateMenuBar();
+  }
+
+  this->menuBar->clear();
+
+  QMenuBar *newMenuBar = NULL;
   if (!_bar)
   {
-    this->CreateMenuBar();
-    this->menuLayout->addWidget(this->menuBar);
-    this->setMenuBar(this->menuBar);
+    // Get the main window's menubar
+    // Note: for some reason we can not call menuBar() again,
+    // so manually retrieving the menubar from the mainwindow.
+    QList<QMenuBar *> menuBars  = this->findChildren<QMenuBar *>();
+    newMenuBar = menuBars[0];
   }
   else
   {
-    if (this->menuBar)
-      this->menuBar->hide();
-    this->menuLayout->addWidget(_bar);
+    newMenuBar = _bar;
   }
+  QList<QMenu *> menus  = newMenuBar->findChildren<QMenu *>();
+  for (int i = 0; i < menus.size(); ++i)
+  {
+    this->menuBar->addMenu(menus[i]);
+  }
+
+  this->menuLayout->addWidget(this->menuBar);
 
   this->menuLayout->addStretch(5);
   this->menuLayout->setContentsMargins(0, 0, 0, 0);
@@ -1188,13 +1331,10 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 /////////////////////////////////////////////////
 void MainWindow::CreateMenuBar()
 {
-  if (this->menuBar)
-    delete this->menuBar;
+  // main window's menu bar
+  QMenuBar *bar = QMainWindow::menuBar();
 
-  this->menuBar = new QMenuBar;
-  this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-  QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  QMenu *fileMenu = bar->addMenu(tr("&File"));
   // fileMenu->addAction(g_openAct);
   // fileMenu->addAction(g_importAct);
   // fileMenu->addAction(g_newAct);
@@ -1202,10 +1342,11 @@ void MainWindow::CreateMenuBar()
   fileMenu->addAction(g_saveAsAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_saveCfgAct);
+  fileMenu->addAction(g_cloneAct);
   fileMenu->addSeparator();
   fileMenu->addAction(g_quitAct);
 
-  this->editMenu = this->menuBar->addMenu(tr("&Edit"));
+  this->editMenu = bar->addMenu(tr("&Edit"));
   editMenu->addAction(g_resetModelsAct);
   editMenu->addAction(g_resetWorldAct);
   editMenu->addAction(g_editBuildingAct);
@@ -1216,7 +1357,7 @@ void MainWindow::CreateMenuBar()
   // \TODO: Add this back in when implementing the full Model Editor spec.
   editMenu->addAction(g_editModelAct);
 
-  QMenu *viewMenu = this->menuBar->addMenu(tr("&View"));
+  QMenu *viewMenu = bar->addMenu(tr("&View"));
   viewMenu->addAction(g_showGridAct);
   viewMenu->addSeparator();
 
@@ -1235,7 +1376,7 @@ void MainWindow::CreateMenuBar()
   // viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
-  QMenu *windowMenu = this->menuBar->addMenu(tr("&Window"));
+  QMenu *windowMenu = bar->addMenu(tr("&Window"));
   windowMenu->addAction(g_topicVisAct);
   windowMenu->addSeparator();
   windowMenu->addAction(g_dataLoggerAct);
@@ -1246,9 +1387,9 @@ void MainWindow::CreateMenuBar()
   // windowMenu->addAction(g_diagnosticsAct);
 #endif
 
-  this->menuBar->addSeparator();
+  bar->addSeparator();
 
-  QMenu *helpMenu = this->menuBar->addMenu(tr("&Help"));
+  QMenu *helpMenu = bar->addMenu(tr("&Help"));
   helpMenu->addAction(g_aboutAct);
 }
 
@@ -1451,6 +1592,16 @@ void MainWindow::OnWorldModify(ConstWorldModifyPtr &_msg)
   }
   else if (_msg->has_remove() && _msg->remove())
     this->renderWidget->RemoveScene(_msg->world_name());
+  else if (_msg->has_cloned())
+  {
+    if (_msg->cloned())
+    {
+      gzlog << "Cloned world available at:\n\t" << _msg->cloned_uri()
+            << std::endl;
+    }
+    else
+      gzerr << "Error cloning a world" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

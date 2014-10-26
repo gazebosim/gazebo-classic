@@ -43,6 +43,9 @@ namespace gazebo
     /// \brief A convenient structure for storing level information
     class GAZEBO_VISIBLE Level
     {
+      /// \brief Constructor
+      public: Level() : backgroundPixmap(NULL) {}
+
       /// \brief Level number
       public: int level;
 
@@ -50,7 +53,13 @@ namespace gazebo
       public: std::string name;
 
       /// \brief Level height from ground
+      public: double baseHeight;
+
+      /// \brief Level height
       public: double height;
+
+      /// \brief Background pixmap for a level
+      public: QGraphicsPixmapItem *backgroundPixmap;
     };
 
     /// \addtogroup gazebo_gui
@@ -90,6 +99,12 @@ namespace gazebo
       /// \brief Delete an editor item.
       /// \param[in] _item Item to be deleted.
       public: void DeleteItem(EditorItem *_item);
+
+      /// \brief Set the graphics view background image.
+      /// \param[in] _filename Name of the image file.
+      /// \param[in] _scale Image scale, in meters/pixel.
+      public: void SetBackgroundImage(const std::string &_filename,
+                  double _scale);
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event
@@ -186,11 +201,26 @@ namespace gazebo
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();
 
+      /// \brief Toggle visibility of background floorplan.
+      private: void OnShowFloorplan();
+
+      /// \brief Toggle visibility of editor items.
+      private: void OnShowElements();
+
+      /// \brief Show current level items if not currently hiding.
+      private: void ShowCurrentLevelItems();
+
       /// \brief Current draw mode
       private: int drawMode;
 
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
+
+      /// \brief Indicate whether or not the floorplan is visible.
+      private: bool floorplanVisible;
+
+      /// \brief Indicate whether or not the editor items are visible.
+      private: bool elementsVisible;
 
       /// \brief A list of wall items in the scene.
       private: std::vector<WallItem*> wallList;
@@ -234,6 +264,9 @@ namespace gazebo
       /// \brief A counter that holds the total number of levels in the building
       /// model.
       private: int levelCounter;
+
+      /// \brief Default height for levels
+      private: double levelDefaultHeight;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;

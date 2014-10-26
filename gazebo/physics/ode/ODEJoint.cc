@@ -127,10 +127,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -146,10 +142,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -1063,6 +1055,12 @@ bool ODEJoint::UsesImplicitSpringDamper()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::UseImplicitSpringDamper(const bool _implicit)
+{
+  this->useImplicitSpringDamper = _implicit;
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::ApplyImplicitStiffnessDamping()
 {
   // check if we are violating joint limits
@@ -1396,4 +1394,10 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 
     // gzerr << this->GetVelocity(0) << " : " << dampingForce << "\n";
   }
+}
+
+//////////////////////////////////////////////////
+bool ODEJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

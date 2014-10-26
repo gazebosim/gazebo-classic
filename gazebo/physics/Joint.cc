@@ -136,6 +136,24 @@ void Joint::Load(sdf::ElementPtr _sdf)
       {
         this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
       }
+
+      // Axis dynamics
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (dynamicsElem)
+      {
+        double reference = 0;
+        double stiffness = 0;
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(0, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
+      }
     }
     if (axisElem->HasElement("limit"))
     {
@@ -160,6 +178,25 @@ void Joint::Load(sdf::ElementPtr _sdf)
       if (axisElem->HasElement(param))
       {
         this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+      }
+
+      // Axis dynamics
+      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
+      if (dynamicsElem)
+      {
+        double reference = 0;
+        double stiffness = 0;
+
+        if (dynamicsElem->HasElement("spring_reference"))
+        {
+          reference = dynamicsElem->Get<double>("spring_reference");
+        }
+        if (dynamicsElem->HasElement("spring_stiffness"))
+        {
+          stiffness = dynamicsElem->Get<double>("spring_stiffness");
+        }
+        this->SetStiffnessDamping(1, stiffness,
+            dynamicsElem->Get<double>("damping"), reference);
       }
     }
     if (axisElem->HasElement("limit"))
@@ -353,6 +390,21 @@ void Joint::SetEffortLimit(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
+void Joint::SetVelocityLimit(unsigned int _index, double _velocity)
+{
+  if (_index < this->GetAngleCount())
+  {
+    this->velocityLimit[_index] = _velocity;
+    return;
+  }
+
+  gzerr << "SetVelocityLimit index["
+        << _index
+        << "] out of range"
+        << std::endl;
+}
+
+//////////////////////////////////////////////////
 double Joint::GetEffortLimit(unsigned int _index)
 {
   if (_index < this->GetAngleCount())
@@ -387,7 +439,6 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   this->staticAngle.SetFromRadian(0);
 }
@@ -550,23 +601,57 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-void Joint::SetAngle(unsigned int _index, math::Angle _position)
+void Joint::SetAngle(unsigned int _index, math::Angle _angle)
 {
-  // check if index is inbound
+  this->SetPosition(_index, _angle.Radian());
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+{
+  // parent class doesn't do much, derived classes do all the work.
+  if (this->model)
+  {
+    if (this->model->IsStatic())
+    {
+      this->staticAngle = _position;
+    }
+  }
+  else
+  {
+    gzwarn << "model not setup yet, setting staticAngle.\n";
+    this->staticAngle = _position;
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetPositionMaximal(unsigned int _index, double _position)
+{
+  // check if index is within bounds
   if (_index >= this->GetAngleCount())
   {
-    gzerr << "Joint axis index too large.\n";
-    return;
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
+    return false;
   }
 
-  if (this->model->IsStatic())
+  /// If the Joint is static, Gazebo stores the state of
+  /// this Joint as a scalar inside the Joint class in Joint::SetPosition.
+  if (!Joint::SetPosition(_index, _position))
   {
-    this->staticAngle = _position;
+    gzerr << "Joint::SetPosition failed, "
+          << "but it's not possible as implemented.\n";
+    return false;
   }
 
   // truncate position by joint limits
-  math::Angle lower = this->GetLowStop(_index);
-  math::Angle upper = this->GetHighStop(_index);
+  double lower = this->GetLowStop(_index).Radian();
+  double upper = this->GetHighStop(_index).Radian();
   if (lower < upper)
     _position = math::clamp(_position, lower, upper);
   else
@@ -606,7 +691,7 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
 
         // Compute new child link pose based on position change
         math::Pose newChildLinkPose =
-          this->ComputeChildLinkPose(_index, _position.Radian());
+          this->ComputeChildLinkPose(_index, _position);
 
         // debug
         // gzerr << "child link pose0 [" << childLinkPose
@@ -639,32 +724,119 @@ void Joint::SetAngle(unsigned int _index, math::Angle _position)
         gzwarn << "failed to find a clean set of connected links,"
                << " i.e. this joint is inside a loop, cannot SetPosition"
                << " kinematically.\n";
-        return;
+        return false;
       }
     }
     else
     {
       gzerr << "child link is null.\n";
-      return;
+      return false;
     }
   }
   else
   {
     gzerr << "joint type SetPosition not supported.\n";
-    return;
+    return false;
   }
 
   /// \todo:  Set link and joint "velocities" based on change / time
-  return;
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
+{
+  // check if index is within bounds
+  if (_index >= this->GetAngleCount())
+  {
+    gzerr << "Joint axis index ["
+          << _index
+          << "] larger than angle count ["
+          << this->GetAngleCount()
+          << "]."
+          << std::endl;
+    return false;
+  }
+
+  // Set child link relative to parent for now.
+  // TODO: recursive velocity setting on trees.
+  if (!this->childLink)
+  {
+    gzerr << "SetVelocityMaximal failed for joint ["
+          << this->GetScopedName()
+          << "] since a child link was not found."
+          << std::endl;
+    return false;
+  }
+
+  // only deal with hinge, universal, slider joints for now
+  if (this->HasType(Base::HINGE_JOINT) ||
+      this->HasType(Base::UNIVERSAL_JOINT))
+  {
+    // Desired angular and linear velocity in world frame for child link
+    math::Vector3 angularVel, linearVel;
+    if (this->parentLink)
+    {
+      // Use parent link velocity as reference (if parent exists)
+      angularVel = this->parentLink->GetWorldAngularVel();
+
+      // Get parent linear velocity at joint anchor
+      // Passing unit quaternion q ensures that parentOffset will be
+      //  interpreted in world frame.
+      math::Quaternion q;
+      math::Vector3 parentOffset =
+        this->GetParentWorldPose().pos - this->parentLink->GetWorldPose().pos;
+      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
+    }
+
+    // Add desired velocity along specified axis
+    angularVel += _velocity * this->GetGlobalAxis(_index);
+
+    if (this->HasType(Base::UNIVERSAL_JOINT))
+    {
+      // For multi-axis joints, retain velocity of other axis.
+      unsigned int otherIndex = (_index + 1) % 2;
+      angularVel += this->GetVelocity(otherIndex)
+                  * this->GetGlobalAxis(otherIndex);
+    }
+
+    this->childLink->SetAngularVel(angularVel);
+
+    // Compute desired linear velocity of the child link based on
+    //  offset between the child's CG and the joint anchor
+    //  and the desired angular velocity.
+    math::Vector3 childCoGOffset =
+      this->childLink->GetWorldCoGPose().pos - this->GetWorldPose().pos;
+    linearVel += angularVel.Cross(childCoGOffset);
+    this->childLink->SetLinearVel(linearVel);
+  }
+  else if (this->HasType(Base::SLIDER_JOINT))
+  {
+    math::Vector3 desiredVel;
+    if (this->parentLink)
+    {
+      desiredVel = this->parentLink->GetWorldLinearVel();
+    }
+    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    this->childLink->SetLinearVel(desiredVel);
+  }
+  else
+  {
+    gzerr << "SetVelocityMaximal does not yet support"
+          << " this joint type."
+          << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
 void Joint::SetState(const JointState &_state)
 {
-  this->SetMaxForce(0, 0);
   this->SetVelocity(0, 0);
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
-    this->SetAngle(i, _state.GetAngle(i));
+    this->SetPosition(i, _state.GetAngle(i).Radian());
 }
 
 //////////////////////////////////////////////////
