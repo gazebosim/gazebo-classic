@@ -14,6 +14,11 @@
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
 
+1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
+   and improve robustness of `UNIT_gz_TEST`
+  * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
+  * [Issue #1299](https://bitbucket.org/osrf/gazebo/issue/1299)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
