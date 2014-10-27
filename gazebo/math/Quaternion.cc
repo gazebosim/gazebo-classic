@@ -607,7 +607,7 @@ Quaternion Quaternion::Integrate(const Vector3 _angularVelocity,
 {
   Quaternion deltaQ;
   Vector3 theta = _angularVelocity * _deltaT * 0.5;
-  double thetaMagSq = theta.GetLengthSquared();
+  double thetaMagSq = theta.GetSquaredLength();
   double s;
   if (thetaMagSq * thetaMagSq / 24.0 < GZ_DBL_MIN)
   {
