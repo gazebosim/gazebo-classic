@@ -45,7 +45,9 @@ namespace gazebo
       /// \brief Constructor
       /// param[in] _start Start position of the wall item in pixel coordinates.
       /// param[in] _end End position of the wall item in pixel coordinates.
-      public: WallItem(const QPointF &_start, const QPointF &_end);
+      /// param[in] _height Height of the wall in meters.
+      public: WallItem(const QPointF &_start, const QPointF &_end,
+          const double _height);
 
       /// \brief Destructor
       public: ~WallItem();
@@ -92,7 +94,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit wall changed Qt signals.
-      private: void WallChanged();
+      public: void WallChanged();
 
       /// \brief Set a particular segment of the wall to be selected or not.
       /// \param[in] _index Index of the wall segment.

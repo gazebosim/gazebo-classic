@@ -1091,6 +1091,12 @@ bool ODEJoint::UsesImplicitSpringDamper()
 }
 
 //////////////////////////////////////////////////
+void ODEJoint::UseImplicitSpringDamper(const bool _implicit)
+{
+  this->useImplicitSpringDamper = _implicit;
+}
+
+//////////////////////////////////////////////////
 void ODEJoint::ApplyImplicitStiffnessDamping()
 {
   // check if we are violating joint limits
