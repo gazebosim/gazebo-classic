@@ -29,6 +29,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
 {
   this->setObjectName("JointInspectorDialog");
   this->setWindowTitle(tr("Joint Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   this->jointType = _jointType;
 
@@ -176,6 +177,7 @@ JointInspector::JointInspector(JointMaker::JointType _jointType,
   }
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
   if (this->jointType)
     this->SetType(this->jointType);

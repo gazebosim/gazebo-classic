@@ -17,6 +17,14 @@
 1. Implemented camera lens distortion.
   * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
 
+1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
+   and improve robustness of `UNIT_gz_TEST`
+  * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
+  * [Issue #1299](https://bitbucket.org/osrf/gazebo/issue/1299)
+
+1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
+  * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
