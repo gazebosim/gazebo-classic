@@ -83,12 +83,11 @@ void PartData::OnApply()
   this->partSDF->GetElement("self_collide")->Set(generalTab->GetSelfCollide());
   this->partSDF->GetElement("kinematic")->Set(generalTab->GetKinematic());
 
-  sdf::ElementPtr inertialElem;
-  this->partSDF->GetElement("inertial");
+  sdf::ElementPtr inertialElem = this->partSDF->GetElement("inertial");
   inertialElem->GetElement("mass")->Set(generalTab->GetMass());
   inertialElem->GetElement("pose")->Set(generalTab->GetInertialPose());
 
-  sdf::ElementPtr inertiaElem;
+  sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
   inertiaElem->GetElement("ixx")->Set(generalTab->GetInertiaIXX());
   inertiaElem->GetElement("iyy")->Set(generalTab->GetInertiaIYY());
   inertiaElem->GetElement("izz")->Set(generalTab->GetInertiaIZZ());
@@ -108,14 +107,15 @@ void PartData::OnApply()
       {
         this->visuals[i]->DetachObjects();
         this->visuals[i]->AttachMesh(visual->GetGeometry(i));
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
       }
-      this->visuals[i]->SetPose(visual->GetPose(i));
-      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
       if (this->visuals[i]->GetMaterialName() != visual->GetMaterial(i))
       {
-        this->visuals[i]->SetMaterial(visual->GetMaterial(i));
+        this->visuals[i]->SetMaterial(visual->GetMaterial(i), false);
       }
+
+      this->visuals[i]->SetPose(visual->GetPose(i));
+      this->visuals[i]->SetTransparency(visual->GetTransparency(i));
+      this->visuals[i]->SetScale(visual->GetGeometryScale(i));
     }
   }
 }

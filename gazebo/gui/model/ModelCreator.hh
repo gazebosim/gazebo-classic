@@ -178,7 +178,7 @@ namespace gazebo
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.
-      private: void CreatePart(const rendering::VisualPtr &_visual);
+      private: PartData *CreatePart(const rendering::VisualPtr &_visual);
 
       /// \brief Open the part inspector.
       /// \param[in] _name Name of part.
@@ -235,14 +235,8 @@ namespace gazebo
       /// \brief A list of gui editor events connected to the model creator.
       private: std::vector<event::ConnectionPtr> connections;
 
-      /// \brief Counter for the number of boxes in the model.
-      private: int boxCounter;
-
-      /// \brief Counter for the number of cylinders in the model.
-      private: int cylinderCounter;
-
-      /// \brief Counter for the number of spheres in the model.
-      private: int sphereCounter;
+      /// \brief Counter for the number of parts in the model.
+      private: int partCounter;
 
       /// \brief Counter for the number of custom parts in the model.
       private: int customCounter;

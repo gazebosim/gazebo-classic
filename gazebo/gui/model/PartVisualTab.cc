@@ -420,8 +420,12 @@ void PartVisualTab::SetGeometry(unsigned int _index,
     gzerr << "Index is out of range" << std::endl;
     return;
   }
+  std::string geometryStr = _geometry;
+  if (geometryStr.substr(0, 5) == "unit_")
+      geometryStr = geometryStr.substr(5);
+
   int dataIndex = this->dataWidgets[_index]->geometryComboBox->findText(
-      QString(tr(_geometry.c_str())));
+      QString(tr(geometryStr.c_str())));
   if (dataIndex >= 0)
   {
     this->dataWidgets[_index]->geometryComboBox->setCurrentIndex(dataIndex);
@@ -438,7 +442,7 @@ std::string PartVisualTab::GetGeometry(unsigned int _index) const
   }
 
   int dataIndex = this->dataWidgets[_index]->geometryComboBox->currentIndex();
-  return this->dataWidgets[_index]->geometryComboBox->itemText(
+  return "unit_" + this->dataWidgets[_index]->geometryComboBox->itemText(
       dataIndex).toStdString();
 }
 
@@ -519,6 +523,65 @@ double PartVisualTab::GetGeometryLength(unsigned int _index) const
   }
 
   return this->dataWidgets[_index]->geomLengthSpinBox->value();
+}
+
+
+/////////////////////////////////////////////////
+void PartVisualTab::SetGeometryScale(unsigned int _index,
+    const math::Vector3 &_scale)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  std::string geom =
+      this->dataWidgets[_index]->geometryComboBox->currentText().toStdString();
+
+  if (geom == "box")
+  {
+    this->SetGeometrySize(_index, _scale);
+  }
+  else if (geom == "cylinder")
+  {
+    this->SetGeometryRadius(_index, _scale[0]/2);
+    this->SetGeometryLength(_index, _scale[2]);
+  }
+  else if (geom == "sphere")
+  {
+    this->SetGeometryRadius(_index, _scale[0]/2);
+  }
+}
+
+/////////////////////////////////////////////////
+math::Vector3 PartVisualTab::GetGeometryScale(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return math::Vector3::Zero;
+  }
+
+  math::Vector3 scale;
+  std::string geom =
+      this->dataWidgets[_index]->geometryComboBox->currentText().toStdString();
+
+  if (geom == "box")
+  {
+    scale = this->GetGeometrySize(_index);
+  }
+  else if (geom == "cylinder")
+  {
+    double r = this->GetGeometryRadius(_index);
+    scale = math::Vector3(r*2, r*2, this->GetGeometryLength(_index));
+  }
+  else if (geom == "sphere")
+  {
+    double r = this->GetGeometryRadius(_index);
+    scale = math::Vector3(r*2, r*2, r*2);
+  }
+  return scale;
 }
 
 /////////////////////////////////////////////////

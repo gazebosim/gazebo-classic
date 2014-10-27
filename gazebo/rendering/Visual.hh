@@ -106,6 +106,10 @@ namespace gazebo
       /// \brief Update the visual.
       public: void Update();
 
+      /// \brief Get the visual SDF.
+      /// \return SDF of the visual.
+      public: sdf::ElementPtr GetSDF() const;
+
       /// \brief Set the name of the visual
       /// \param[in] _name Name of the visual
       public: void SetName(const std::string &_name);

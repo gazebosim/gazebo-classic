@@ -727,6 +727,7 @@ void Visual::DetachObjects()
   this->dataPtr->sceneNode->detachAllObjects();
   this->dataPtr->meshName = "";
   this->dataPtr->subMeshName = "";
+  this->dataPtr->myMaterialName = "";
 }
 
 //////////////////////////////////////////////////
@@ -777,16 +778,25 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 
   Ogre::MovableObject *obj;
   std::string objName = _objName;
-  std::string entityMeshName = _meshName;
-  entityMeshName += _subMesh.empty() ? "" : "::" + _subMesh;
+  std::string meshName = _meshName;
+  meshName += _subMesh.empty() ? "" : "::" + _subMesh;
 
   if (objName.empty())
-    objName = this->dataPtr->sceneNode->getName() + "_ENTITY_" + entityMeshName;
+    objName = this->dataPtr->sceneNode->getName() + "_ENTITY_" + meshName;
 
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
-  obj = (Ogre::MovableObject*)
-    (this->dataPtr->sceneNode->getCreator()->createEntity(objName, entityMeshName));
+  if (this->dataPtr->sceneNode->getCreator()->hasEntity(objName))
+  {
+    obj = (Ogre::MovableObject*)
+      (this->dataPtr->sceneNode->getCreator()->getEntity(objName));
+  }
+  else
+  {
+    obj = (Ogre::MovableObject*)
+        (this->dataPtr->sceneNode->getCreator()->createEntity(objName,
+        meshName));
+  }
 
   this->AttachObject(obj);
   return obj;
@@ -2717,4 +2727,10 @@ uint32_t Visual::GetId() const
 void Visual::SetId(uint32_t _id)
 {
   this->dataPtr->id = _id;
+}
+
+//////////////////////////////////////////////////
+sdf::ElementPtr Visual::GetSDF() const
+{
+  return this->dataPtr->sdf;
 }

@@ -203,6 +203,17 @@ namespace gazebo
       /// \return Geometry length.
       public: double GetGeometryLength(unsigned int _index) const;
 
+      /// \brief Set the scale of the geometry.
+      /// \param[in] _index Index of visual
+      /// \param[in] _dimensions Geometry scale.
+      public: void SetGeometryScale(unsigned int _index,
+          const math::Vector3 &_scale);
+
+      /// \brief Get the scale of the geometry.
+      /// \param[in] _index Index of visual
+      /// \return Geometry scale.
+      public: math::Vector3 GetGeometryScale(unsigned int _index) const;
+
       /// \brief List of visual widgets for configuring visual properties.
       private: std::vector<VisualDataWidget *> dataWidgets;
 
