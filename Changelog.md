@@ -11,6 +11,8 @@
     * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
 1. Added SignalStats class for computing incremental signal statistics.
     * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
+1. Added Quaternion::Integrate function.
+    * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
