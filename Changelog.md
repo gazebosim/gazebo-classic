@@ -13,6 +13,11 @@
 
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
+  * [Issue #964](https://bitbucket.org/osrf/gazebo/issue/964)
+
+1. Implement Coulomb joint friction for ODE
+  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1221)
+  * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 ## Gazebo 4.0
 
