@@ -14,6 +14,9 @@
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
 
+1. Implemented camera lens distortion.
+  * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
+
 1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
    and improve robustness of `UNIT_gz_TEST`
   * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
@@ -788,4 +791,3 @@
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-
