@@ -120,68 +120,76 @@ void PartVisualTab::OnAddVisual()
 
   QLabel *geometryLabel = new QLabel(tr("Geometry:"));
   dataWidget->geometryComboBox = new QComboBox;
-  dataWidget->geometryComboBox->addItem(tr("unit_box"));
-  dataWidget->geometryComboBox->addItem(tr("unit_cylinder"));
-  dataWidget->geometryComboBox->addItem(tr("unit_sphere"));
+  dataWidget->geometryComboBox->addItem(tr("box"));
+  dataWidget->geometryComboBox->addItem(tr("cylinder"));
+  dataWidget->geometryComboBox->addItem(tr("sphere"));
   // geometryComboBox->addItem(tr("custom"));
 
   connect(dataWidget->geometryComboBox,
       SIGNAL(currentIndexChanged(const QString)),
-      this, SLOT(OnGeometryChanged(const QString)));
+      dataWidget, SLOT(GeometryChanged(const QString)));
 
   dataWidget->geomSizeXSpinBox = new QDoubleSpinBox;
   dataWidget->geomSizeXSpinBox->setRange(-1000, 1000);
   dataWidget->geomSizeXSpinBox->setSingleStep(0.01);
   dataWidget->geomSizeXSpinBox->setDecimals(3);
-  dataWidget->geomSizeXSpinBox->setValue(0.000);
+  dataWidget->geomSizeXSpinBox->setValue(1.000);
 
   dataWidget->geomSizeYSpinBox = new QDoubleSpinBox;
   dataWidget->geomSizeYSpinBox->setRange(-1000, 1000);
   dataWidget->geomSizeYSpinBox->setSingleStep(0.01);
   dataWidget->geomSizeYSpinBox->setDecimals(3);
-  dataWidget->geomSizeYSpinBox->setValue(0.000);
+  dataWidget->geomSizeYSpinBox->setValue(1.000);
 
   dataWidget->geomSizeZSpinBox = new QDoubleSpinBox;
   dataWidget->geomSizeZSpinBox->setRange(-1000, 1000);
   dataWidget->geomSizeZSpinBox->setSingleStep(0.01);
   dataWidget->geomSizeZSpinBox->setDecimals(3);
-  dataWidget->geomSizeZSpinBox->setValue(0.000);
+  dataWidget->geomSizeZSpinBox->setValue(1.000);
 
   QLabel *geomSizeXLabel = new QLabel(tr("x: "));
   QLabel *geomSizeYLabel = new QLabel(tr("y: "));
   QLabel *geomSizeZLabel = new QLabel(tr("z: "));
 
-  dataWidget->geomSizeLayout = new QHBoxLayout;
-  dataWidget->geomSizeLayout->addWidget(geomSizeXLabel);
-  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeXSpinBox);
-  dataWidget->geomSizeLayout->addWidget(geomSizeYLabel);
-  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeYSpinBox);
-  dataWidget->geomSizeLayout->addWidget(geomSizeZLabel);
-  dataWidget->geomSizeLayout->addWidget(dataWidget->geomSizeZSpinBox);
+  QHBoxLayout *geomSizeLayout = new QHBoxLayout;
+  geomSizeLayout->addWidget(geomSizeXLabel);
+  geomSizeLayout->addWidget(dataWidget->geomSizeXSpinBox);
+  geomSizeLayout->addWidget(geomSizeYLabel);
+  geomSizeLayout->addWidget(dataWidget->geomSizeYSpinBox);
+  geomSizeLayout->addWidget(geomSizeZLabel);
+  geomSizeLayout->addWidget(dataWidget->geomSizeZSpinBox);
 
   QLabel *geomRadiusLabel = new QLabel(tr("radius: "));
-  QLabel *geomLengthLabel = new QLabel(tr("length: "));
+  dataWidget->geomLengthLabel = new QLabel(tr("length: "));
 
   dataWidget->geomRadiusSpinBox = new QDoubleSpinBox;
   dataWidget->geomRadiusSpinBox->setRange(-1000, 1000);
   dataWidget->geomRadiusSpinBox->setSingleStep(0.01);
   dataWidget->geomRadiusSpinBox->setDecimals(3);
-  dataWidget->geomRadiusSpinBox->setValue(0.000);
+  dataWidget->geomRadiusSpinBox->setValue(0.500);
 
   dataWidget->geomLengthSpinBox = new QDoubleSpinBox;
   dataWidget->geomLengthSpinBox->setRange(-1000, 1000);
   dataWidget->geomLengthSpinBox->setSingleStep(0.01);
   dataWidget->geomLengthSpinBox->setDecimals(3);
-  dataWidget->geomLengthSpinBox->setValue(0.000);
+  dataWidget->geomLengthSpinBox->setValue(1.000);
 
-  dataWidget->geomRLLayout = new QHBoxLayout;
-  dataWidget->geomRLLayout->addWidget(geomRadiusLabel);
-  dataWidget->geomRLLayout->addWidget(dataWidget->geomRadiusSpinBox);
-  dataWidget->geomRLLayout->addWidget(geomLengthLabel);
-  dataWidget->geomRLLayout->addWidget(dataWidget->geomLengthSpinBox);
+  QHBoxLayout *geomRLLayout = new QHBoxLayout;
+  geomRLLayout->addWidget(geomRadiusLabel);
+  geomRLLayout->addWidget(dataWidget->geomRadiusSpinBox);
+  geomRLLayout->addWidget(dataWidget->geomLengthLabel);
+  geomRLLayout->addWidget(dataWidget->geomLengthSpinBox);
+
+  dataWidget->geomDimensionWidget = new QStackedWidget;
 
   QWidget *geomSizeWidget = new QWidget;
-  geomSizeWidget->setLayout(dataWidget->geomSizeLayout);
+  geomSizeWidget->setLayout(geomSizeLayout);
+  dataWidget->geomDimensionWidget->insertWidget(0, geomSizeWidget);
+
+  QWidget *geomRLWidget = new QWidget;
+  geomRLWidget->setLayout(geomRLLayout);
+  dataWidget->geomDimensionWidget->insertWidget(1, geomRLWidget);
+  dataWidget->geomDimensionWidget->setCurrentIndex(0);
 
   QLabel *transparencyLabel = new QLabel(tr("Transparency:"));
   dataWidget->transparencySpinBox = new QDoubleSpinBox;
@@ -198,10 +206,7 @@ void PartVisualTab::OnAddVisual()
   visualGeneralLayout->addWidget(dataWidget->visualNameLabel, 0, 1);
   visualGeneralLayout->addWidget(geometryLabel, 1, 0);
   visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
-
-  visualGeneralLayout->addWidget(geomSizeWidget, 2, 1);
-//  visualGeneralLayout->addLayout(geomRLLayout, 3, 1);
-
+  visualGeneralLayout->addWidget(dataWidget->geomDimensionWidget, 2, 1);
   visualGeneralLayout->addWidget(transparencyLabel, 3, 0);
   visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 3, 1);
   visualGeneralLayout->addWidget(materialLabel, 4, 0);
@@ -541,11 +546,28 @@ std::string PartVisualTab::GetName(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::GeometryChanged(const QString _text)
+void VisualDataWidget::GeometryChanged(const QString _text)
 {
   QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
 
   if (widget)
   {
+    std::string textStr = _text.toStdString();
+    if (textStr == "box")
+    {
+      this->geomDimensionWidget->setCurrentIndex(0);
+    }
+    else if (textStr == "cylinder")
+    {
+      this->geomDimensionWidget->setCurrentIndex(1);
+      this->geomLengthSpinBox->show();
+      this->geomLengthLabel->show();
+    }
+    else if (textStr == "sphere")
+    {
+      this->geomDimensionWidget->setCurrentIndex(1);
+      this->geomLengthSpinBox->hide();
+      this->geomLengthLabel->hide();
+    }
   }
 }

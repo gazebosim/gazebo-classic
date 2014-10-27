@@ -35,8 +35,10 @@ namespace gazebo
 
     /// \class VisualDataWidget PartVisualTab.hh
     /// \brief A class of widgets used for configuring visual properties.
-    class VisualDataWidget
+    class VisualDataWidget : public QObject
     {
+      Q_OBJECT
+
       /// \brief Unique id for this widget.
       public: int id;
 
@@ -61,11 +63,11 @@ namespace gazebo
       /// \brief Spin box for configuring length of a cylinder geom.
       public: QDoubleSpinBox *geomLengthSpinBox;
 
-      /// \brief Layout for configuring geometry size.
-      public: QHBoxLayout *geomSizeLayout;
+      /// \brief Widget for configuring geometry dimensions.
+      public: QStackedWidget *geomDimensionWidget;
 
-      /// \brief Layout for configuring geometry radius and length.
-      public: QHBoxLayout *geomRLLayout;
+      /// \brief Label for the geometry length.
+      public: QLabel *geomLengthLabel;
 
       /// \brief Spin box for configuring the transparency of the visual.
       public: QDoubleSpinBox *transparencySpinBox;
@@ -90,6 +92,9 @@ namespace gazebo
 
       /// \brief Spin box for configuring the yaw of the part.
       public: QDoubleSpinBox *rotYSpinBox;
+
+      /// \brief Qt signal emitted when a visual is added.
+      private slots: void GeometryChanged(const QString _text);
     };
 
     /// \class PartVisualTab PartVisualTab.hh
@@ -219,9 +224,6 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a visual is added.
       Q_SIGNALS: void VisualAdded();
-
-      /// \brief Qt signal emitted when a visual is added.
-      private slots: void GeometryChanged(const QString _text);
 
       /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();
