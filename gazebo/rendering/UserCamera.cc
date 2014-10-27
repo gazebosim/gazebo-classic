@@ -550,7 +550,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   Camera::SetRenderTarget(_target);
 
   // is 0.03m the stereo baseline?
-  Ogre::Vector2 offset(0.03f, 0.0f);
+  Ogre::Vector2 offset(0.0f, 0.0f);
   float focalLength = 1.0;
 
   this->camera->setFocalLength(focalLength);
