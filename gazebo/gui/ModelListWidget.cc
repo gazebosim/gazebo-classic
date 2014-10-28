@@ -1375,9 +1375,30 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
 
+  // joint name
   item = this->variantManager->addProperty(QVariant::String,
                                            tr("name"));
   item->setValue(_msg.name().c_str());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
+
+  // parent link
+  item = this->variantManager->addProperty(QVariant::String,
+                                           tr("parent link"));
+  item->setValue(_msg.parent().c_str());
+  if (_parent)
+    _parent->addSubProperty(item);
+  else
+    this->propTreeBrowser->addProperty(item);
+  item->setEnabled(false);
+
+  // child link
+  item = this->variantManager->addProperty(QVariant::String,
+                                           tr("child link"));
+  item->setValue(_msg.child().c_str());
   if (_parent)
     _parent->addSubProperty(item);
   else
