@@ -662,8 +662,8 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 
   // This function was establish when integrating the space navigator
   // joystick.
-  if ((_msg->has_translation() || _msg->has_rotation()) &&
-      this->dataPtr->canJoystickMoveCamera)
+  if (this->dataPtr->canJoystickMoveCamera &&
+      (_msg->has_translation() || _msg->has_rotation()))
   {
     math::Pose pose = this->GetWorldPose();
 
