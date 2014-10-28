@@ -80,11 +80,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolbar->addSeparator();
   this->toolbar->addAction(g_screenshotAct);
 
-  toolbar->addSeparator();
-  toolbar->addAction(g_copyAct);
-  toolbar->addAction(g_pasteAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_copyAct);
+  this->toolbar->addAction(g_pasteAct);
 
-  toolbar->addSeparator();
+  this->toolbar->addSeparator();
 
   QToolButton *alignButton = new QToolButton;
   alignButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -96,11 +96,11 @@ RenderWidget::RenderWidget(QWidget *_parent)
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-  toolbar->addWidget(alignButton);
+  this->toolbar->addWidget(alignButton);
   connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
 
-  toolbar->addSeparator();
-  toolbar->addAction(g_snapAct);
+  this->toolbar->addSeparator();
+  this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
   toolLayout->addWidget(this->toolbar);
@@ -214,6 +214,10 @@ RenderWidget::RenderWidget(QWidget *_parent)
 RenderWidget::~RenderWidget()
 {
   delete this->glWidget;
+  this->glWidget = NULL;
+
+  delete this->toolbar;
+  this->toolbar = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -341,6 +345,22 @@ void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 std::string RenderWidget::GetOverlayMsg() const
 {
   return this->msgOverlayLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::ShowToolbar(const bool _show)
+{
+  if (this->toolbar)
+  {
+    if (_show)
+    {
+      this->toolbar->show();
+    }
+    else
+    {
+      this->toolbar->hide();
+    }
+  }
 }
 
 /////////////////////////////////////////////////
