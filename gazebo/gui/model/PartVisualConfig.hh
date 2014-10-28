@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _PART_VISUAL_TAB_HH_
-#define _PART_VISUAL_TAB_HH_
+#ifndef _PART_VISUAL_CONFIG_HH_
+#define _PART_VISUAL_CONFIG_HH_
 
 #include <string>
 
@@ -33,7 +33,7 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class VisualDataWidget PartVisualTab.hh
+    /// \class VisualDataWidget PartVisualConfig.hh
     /// \brief A class of widgets used for configuring visual properties.
     class VisualDataWidget : public QObject
     {
@@ -97,17 +97,17 @@ namespace gazebo
       private slots: void GeometryChanged(const QString _text);
     };
 
-    /// \class PartVisualTab PartVisualTab.hh
+    /// \class PartVisualConfig PartVisualConfig.hh
     /// \brief A tab for configuring visual properties of a part.
-    class PartVisualTab : public QWidget
+    class PartVisualConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartVisualTab();
+      public: PartVisualConfig();
 
       /// \brief Destructor
-      public: ~PartVisualTab();
+      public: ~PartVisualConfig();
 
       /// \brief Add a visual widget to the tab.
       public: void AddVisual();

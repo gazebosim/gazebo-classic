@@ -21,8 +21,9 @@
 
 #include "gazebo/rendering/Scene.hh"
 
-#include "gazebo/gui/model/PartVisualTab.hh"
-#include "gazebo/gui/model/PartGeneralTab.hh"
+#include "gazebo/gui/model/PartVisualConfig.hh"
+#include "gazebo/gui/model/PartGeneralConfig.hh"
+#include "gazebo/gui/model/PartCollisionConfig.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
 
@@ -76,31 +77,32 @@ PartData::PartData()
 /////////////////////////////////////////////////
 void PartData::OnApply()
 {
-  PartGeneralTab *generalTab = this->inspector->GetGeneral();
+  PartGeneralConfig *generalConfig = this->inspector->GetGeneralConfig();
 
-  this->partSDF->GetElement("pose")->Set(generalTab->GetPose());
-  this->partSDF->GetElement("gravity")->Set(generalTab->GetGravity());
-  this->partSDF->GetElement("self_collide")->Set(generalTab->GetSelfCollide());
-  this->partSDF->GetElement("kinematic")->Set(generalTab->GetKinematic());
+  this->partSDF->GetElement("pose")->Set(generalConfig->GetPose());
+  this->partSDF->GetElement("gravity")->Set(generalConfig->GetGravity());
+  this->partSDF->GetElement("self_collide")->Set(
+      generalConfig->GetSelfCollide());
+  this->partSDF->GetElement("kinematic")->Set(generalConfig->GetKinematic());
 
   sdf::ElementPtr inertialElem = this->partSDF->GetElement("inertial");
-  inertialElem->GetElement("mass")->Set(generalTab->GetMass());
-  inertialElem->GetElement("pose")->Set(generalTab->GetInertialPose());
+  inertialElem->GetElement("mass")->Set(generalConfig->GetMass());
+  inertialElem->GetElement("pose")->Set(generalConfig->GetInertialPose());
 
   sdf::ElementPtr inertiaElem = inertialElem->GetElement("inertia");
-  inertiaElem->GetElement("ixx")->Set(generalTab->GetInertiaIXX());
-  inertiaElem->GetElement("iyy")->Set(generalTab->GetInertiaIYY());
-  inertiaElem->GetElement("izz")->Set(generalTab->GetInertiaIZZ());
-  inertiaElem->GetElement("ixy")->Set(generalTab->GetInertiaIXY());
-  inertiaElem->GetElement("ixz")->Set(generalTab->GetInertiaIXZ());
-  inertiaElem->GetElement("iyz")->Set(generalTab->GetInertiaIYZ());
+  inertiaElem->GetElement("ixx")->Set(generalConfig->GetInertiaIXX());
+  inertiaElem->GetElement("iyy")->Set(generalConfig->GetInertiaIYY());
+  inertiaElem->GetElement("izz")->Set(generalConfig->GetInertiaIZZ());
+  inertiaElem->GetElement("ixy")->Set(generalConfig->GetInertiaIXY());
+  inertiaElem->GetElement("ixz")->Set(generalConfig->GetInertiaIXZ());
+  inertiaElem->GetElement("iyz")->Set(generalConfig->GetInertiaIYZ());
 
   // set visual properties
   if (!this->visuals.empty())
   {
     this->partVisual->SetWorldPose(this->GetPose());
 
-    PartVisualTab *visual = this->inspector->GetVisual();
+    PartVisualConfig *visual = this->inspector->GetVisualConfig();
     for (unsigned int i = 0; i < this->visuals.size(); ++i)
     {
       if (this->visuals[i]->GetMeshName() != visual->GetGeometry(i))
@@ -124,14 +126,14 @@ void PartData::OnApply()
 void PartData::OnAddVisual()
 {
   // add a visual when the user adds a visual via the inspector's visual tab
-  PartVisualTab *visualTab = this->inspector->GetVisual();
-  if (this->visuals.size() != visualTab->GetVisualCount())
+  PartVisualConfig *visualConfig = this->inspector->GetVisualConfig();
+  if (this->visuals.size() != visualConfig->GetVisualCount())
   {
     std::ostringstream visualName;
     visualName << this->partVisual->GetName() << "_visual_"
         << this->partVisual->GetChildCount();
 
-    visualTab->SetName(visualTab->GetVisualCount()-1, visualName.str());
+    visualConfig->SetName(visualConfig->GetVisualCount()-1, visualName.str());
 
     // add a box for now
     rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),

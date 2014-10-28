@@ -18,105 +18,105 @@
 #include <iostream>
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/gui/model/PartVisualTab.hh"
+#include "gazebo/gui/model/PartCollisionConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartVisualTab::PartVisualTab()
+PartCollisionConfig::PartCollisionConfig()
 {
-  this->setObjectName("partVisualTab");
+  this->setObjectName("PartCollisionConfig");
   QVBoxLayout *mainLayout = new QVBoxLayout;
 
-  this->visualsTreeWidget = new QTreeWidget();
-  this->visualsTreeWidget->setColumnCount(1);
-  this->visualsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->visualsTreeWidget->header()->hide();
+  this->collisionsTreeWidget = new QTreeWidget();
+  this->collisionsTreeWidget->setColumnCount(1);
+  this->collisionsTreeWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->collisionsTreeWidget->header()->hide();
 
-  this->visualsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  connect(this->visualsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
+  this->collisionsTreeWidget->setSelectionMode(QAbstractItemView::NoSelection);
+  connect(this->collisionsTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem *, int)),
       this, SLOT(OnItemSelection(QTreeWidgetItem *, int)));
 
-  QPushButton *addVisualButton = new QPushButton(tr("+ &Another Visual"));
-  connect(addVisualButton, SIGNAL(clicked()), this, SLOT(OnAddVisual()));
+  QPushButton *addCollisionButton = new QPushButton(tr("+ &Another Collision"));
+  connect(addCollisionButton, SIGNAL(clicked()), this, SLOT(OnAddCollision()));
 
-  mainLayout->addWidget(this->visualsTreeWidget);
-  mainLayout->addWidget(addVisualButton);
+  mainLayout->addWidget(this->collisionsTreeWidget);
+  mainLayout->addWidget(addCollisionButton);
   this->setLayout(mainLayout);
 
   this->counter = 0;
   this->signalMapper = new QSignalMapper(this);
 
   connect(this->signalMapper, SIGNAL(mapped(int)),
-     this, SLOT(OnRemoveVisual(int)));
+     this, SLOT(OnRemoveCollision(int)));
 }
 
 /////////////////////////////////////////////////
-PartVisualTab::~PartVisualTab()
+PartCollisionConfig::~PartCollisionConfig()
 {
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::AddVisual()
+void PartCollisionConfig::AddCollision()
 {
-  this->OnAddVisual();
+  this->OnAddCollision();
 }
 
 /////////////////////////////////////////////////
-unsigned int PartVisualTab::GetVisualCount() const
+unsigned int PartCollisionConfig::GetCollisionCount() const
 {
   return this->dataWidgets.size();
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::Reset()
+void PartCollisionConfig::Reset()
 {
-  this->visualItems.clear();
+  this->collisionItems.clear();
   this->dataWidgets.clear();
-  this->visualsTreeWidget->clear();
+  this->collisionsTreeWidget->clear();
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::OnAddVisual()
+void PartCollisionConfig::OnAddCollision()
 {
   // Create a top-level tree item for the path
-  std::stringstream visualIndex;
-  visualIndex << "Visual " << counter;
+  std::stringstream collisionIndex;
+  collisionIndex << "Collision " << counter;
 
-  QTreeWidgetItem *visualItem =
+  QTreeWidgetItem *collisionItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0));
-  this->visualsTreeWidget->addTopLevelItem(visualItem);
+  this->collisionsTreeWidget->addTopLevelItem(collisionItem);
 
-  this->visualItems[counter] = visualItem;
+  this->collisionItems[counter] = collisionItem;
 
-  QWidget *visualItemWidget = new QWidget;
-  QHBoxLayout *visualItemLayout = new QHBoxLayout;
-  QLabel *visualLabel = new QLabel(QString(visualIndex.str().c_str()));
+  QWidget *collisionItemWidget = new QWidget;
+  QHBoxLayout *collisionItemLayout = new QHBoxLayout;
+  QLabel *collisionLabel = new QLabel(QString(collisionIndex.str().c_str()));
 
-  QPushButton *removeVisualButton = new QPushButton(tr("Remove"));
-  connect(removeVisualButton, SIGNAL(clicked()), this->signalMapper,
+  QPushButton *removeCollisionButton = new QPushButton(tr("Remove"));
+  connect(removeCollisionButton, SIGNAL(clicked()), this->signalMapper,
       SLOT(map()));
-  this->signalMapper->setMapping(removeVisualButton, counter);
+  this->signalMapper->setMapping(removeCollisionButton, counter);
 
-  VisualDataWidget *dataWidget = new VisualDataWidget;
+  CollisionDataWidget *dataWidget = new CollisionDataWidget;
   dataWidget->id = counter;
   this->dataWidgets.push_back(dataWidget);
   counter++;
 
-  visualItemLayout->addWidget(visualLabel);
-  visualItemLayout->addWidget(removeVisualButton);
-  visualItemWidget->setLayout(visualItemLayout);
-  this->visualsTreeWidget->setItemWidget(visualItem, 0, visualItemWidget);
+  collisionItemLayout->addWidget(collisionLabel);
+  collisionItemLayout->addWidget(removeCollisionButton);
+  collisionItemWidget->setLayout(collisionItemLayout);
+  this->collisionsTreeWidget->setItemWidget(collisionItem, 0, collisionItemWidget);
 
-  QTreeWidgetItem *visualChildItem =
-    new QTreeWidgetItem(visualItem);
+  QTreeWidgetItem *collisionChildItem =
+    new QTreeWidgetItem(collisionItem);
 
-  QWidget *visualWidget = new QWidget;
-  QVBoxLayout *visualLayout = new QVBoxLayout;
+  QWidget *collisionWidget = new QWidget;
+  QVBoxLayout *collisionLayout = new QVBoxLayout;
 
   QLabel *nameLabel = new QLabel(tr("Name:"));
-  dataWidget->visualNameLabel = new QLabel(tr(""));
+  dataWidget->collisionNameLabel = new QLabel(tr(""));
 
   QLabel *geometryLabel = new QLabel(tr("Geometry:"));
   dataWidget->geometryComboBox = new QComboBox;
@@ -191,26 +191,13 @@ void PartVisualTab::OnAddVisual()
   dataWidget->geomDimensionWidget->insertWidget(1, geomRLWidget);
   dataWidget->geomDimensionWidget->setCurrentIndex(0);
 
-  QLabel *transparencyLabel = new QLabel(tr("Transparency:"));
-  dataWidget->transparencySpinBox = new QDoubleSpinBox;
-  dataWidget->transparencySpinBox->setRange(-1000, 1000);
-  dataWidget->transparencySpinBox->setSingleStep(0.01);
-  dataWidget->transparencySpinBox->setDecimals(3);
-  dataWidget->transparencySpinBox->setValue(0.000);
 
-  QLabel *materialLabel = new QLabel(tr("Material:"));
-  dataWidget->materialLineEdit = new QLineEdit;
-
-  QGridLayout *visualGeneralLayout = new QGridLayout;
-  visualGeneralLayout->addWidget(nameLabel, 0, 0);
-  visualGeneralLayout->addWidget(dataWidget->visualNameLabel, 0, 1);
-  visualGeneralLayout->addWidget(geometryLabel, 1, 0);
-  visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
-  visualGeneralLayout->addWidget(dataWidget->geomDimensionWidget, 2, 1);
-  visualGeneralLayout->addWidget(transparencyLabel, 3, 0);
-  visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 3, 1);
-  visualGeneralLayout->addWidget(materialLabel, 4, 0);
-  visualGeneralLayout->addWidget(dataWidget->materialLineEdit, 4, 1);
+  QGridLayout *collisionGeneralLayout = new QGridLayout;
+  collisionGeneralLayout->addWidget(nameLabel, 0, 0);
+  collisionGeneralLayout->addWidget(dataWidget->collisionNameLabel, 0, 1);
+  collisionGeneralLayout->addWidget(geometryLabel, 1, 0);
+  collisionGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
+  collisionGeneralLayout->addWidget(dataWidget->geomDimensionWidget, 2, 1);
 
   QLabel *posXLabel = new QLabel(tr("x: "));
   QLabel *posYLabel = new QLabel(tr("y: "));
@@ -280,19 +267,19 @@ void PartVisualTab::OnAddVisual()
   QGroupBox *poseGroupBox = new QGroupBox(tr("Pose"));
   poseGroupBox->setLayout(poseGroupLayout);
 
-  visualLayout->addLayout(visualGeneralLayout);
-  visualLayout->addWidget(poseGroupBox);
-  visualWidget->setLayout(visualLayout);
+  collisionLayout->addLayout(collisionGeneralLayout);
+  collisionLayout->addWidget(poseGroupBox);
+  collisionWidget->setLayout(collisionLayout);
 
-  this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
-  visualItem->setExpanded(true);
-  visualChildItem->setExpanded(true);
+  this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0, collisionWidget);
+  collisionItem->setExpanded(true);
+  collisionChildItem->setExpanded(true);
 
-  emit VisualAdded();
+  emit CollisionAdded();
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::OnItemSelection(QTreeWidgetItem *_item,
+void PartCollisionConfig::OnItemSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item && _item->childCount() > 0)
@@ -300,26 +287,26 @@ void PartVisualTab::OnItemSelection(QTreeWidgetItem *_item,
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::OnRemoveVisual(int _id)
+void PartCollisionConfig::OnRemoveCollision(int _id)
 {
-  std::map<int, QTreeWidgetItem*>::iterator it = this->visualItems.find(_id);
-  if (it == this->visualItems.end())
+  std::map<int, QTreeWidgetItem*>::iterator it = this->collisionItems.find(_id);
+  if (it == this->collisionItems.end())
   {
-    gzerr << "No visual item found" << std::endl;
+    gzerr << "No collision item found" << std::endl;
     return;
   }
   QTreeWidgetItem *item = it->second;
-  int index = this->visualsTreeWidget->indexOfTopLevelItem(item);
-  this->visualsTreeWidget->takeTopLevelItem(index);
+  int index = this->collisionsTreeWidget->indexOfTopLevelItem(item);
+  this->collisionsTreeWidget->takeTopLevelItem(index);
 
-  this->visualItems.erase(it);
+  this->collisionItems.erase(it);
 
   for (unsigned int i = 0; i < this->dataWidgets.size(); ++i)
   {
     if (this->dataWidgets[i]->id == _id)
     {
-      emit VisualRemoved(
-          this->dataWidgets[i]->visualNameLabel->text().toStdString());
+      emit CollisionRemoved(
+          this->dataWidgets[i]->collisionNameLabel->text().toStdString());
       this->dataWidgets.erase(this->dataWidgets.begin() + i);
       break;
     }
@@ -327,7 +314,7 @@ void PartVisualTab::OnRemoveVisual(int _id)
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetPose(unsigned int _index, const math::Pose &_pose)
+void PartCollisionConfig::SetPose(unsigned int _index, const math::Pose &_pose)
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -345,7 +332,7 @@ void PartVisualTab::SetPose(unsigned int _index, const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
-math::Pose PartVisualTab::GetPose(unsigned int _index) const
+math::Pose PartCollisionConfig::GetPose(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -362,57 +349,7 @@ math::Pose PartVisualTab::GetPose(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetTransparency(unsigned int _index, double _transparency)
-{
-  if (_index >= this->dataWidgets.size())
-  {
-    gzerr << "Index is out of range" << std::endl;
-    return;
-  }
-
-  this->dataWidgets[_index]->transparencySpinBox->setValue(_transparency);
-}
-
-/////////////////////////////////////////////////
-double PartVisualTab::GetTransparency(unsigned int _index) const
-{
-  if (_index >= this->dataWidgets.size())
-  {
-    gzerr << "Index is out of range" << std::endl;
-    return -1;
-  }
-
-  return this->dataWidgets[_index]->transparencySpinBox->value();
-}
-
-/////////////////////////////////////////////////
-std::string PartVisualTab::GetMaterial(unsigned int _index) const
-{
-  if (_index >= this->dataWidgets.size())
-  {
-    gzerr << "Index is out of range" << std::endl;
-    return "";
-  }
-
-  return this->dataWidgets[_index]->materialLineEdit->text().toStdString();
-}
-
-/////////////////////////////////////////////////
-void PartVisualTab::SetMaterial(unsigned int _index,
-    const std::string &_material)
-{
-  if (_index >= this->dataWidgets.size())
-  {
-    gzerr << "Index is out of range" << std::endl;
-    return;
-  }
-
-  this->dataWidgets[_index]->materialLineEdit->setText(tr(_material.c_str()));
-}
-
-
-/////////////////////////////////////////////////
-void PartVisualTab::SetGeometry(unsigned int _index,
+void PartCollisionConfig::SetGeometry(unsigned int _index,
     const std::string &_geometry)
 {
   if (_index >= this->dataWidgets.size())
@@ -433,7 +370,7 @@ void PartVisualTab::SetGeometry(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-std::string PartVisualTab::GetGeometry(unsigned int _index) const
+std::string PartCollisionConfig::GetGeometry(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -447,7 +384,7 @@ std::string PartVisualTab::GetGeometry(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetGeometrySize(unsigned int _index,
+void PartCollisionConfig::SetGeometrySize(unsigned int _index,
     const math::Vector3 &_size)
 {
   if (_index >= this->dataWidgets.size())
@@ -462,7 +399,7 @@ void PartVisualTab::SetGeometrySize(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 PartVisualTab::GetGeometrySize(unsigned int _index) const
+math::Vector3 PartCollisionConfig::GetGeometrySize(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -476,7 +413,7 @@ math::Vector3 PartVisualTab::GetGeometrySize(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetGeometryRadius(unsigned int _index,
+void PartCollisionConfig::SetGeometryRadius(unsigned int _index,
     double _radius)
 {
   if (_index >= this->dataWidgets.size())
@@ -489,7 +426,7 @@ void PartVisualTab::SetGeometryRadius(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-double PartVisualTab::GetGeometryRadius(unsigned int _index) const
+double PartCollisionConfig::GetGeometryRadius(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -501,7 +438,7 @@ double PartVisualTab::GetGeometryRadius(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetGeometryLength(unsigned int _index,
+void PartCollisionConfig::SetGeometryLength(unsigned int _index,
     double _length)
 {
   if (_index >= this->dataWidgets.size())
@@ -514,7 +451,7 @@ void PartVisualTab::SetGeometryLength(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-double PartVisualTab::GetGeometryLength(unsigned int _index) const
+double PartCollisionConfig::GetGeometryLength(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -527,7 +464,7 @@ double PartVisualTab::GetGeometryLength(unsigned int _index) const
 
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetGeometryScale(unsigned int _index,
+void PartCollisionConfig::SetGeometryScale(unsigned int _index,
     const math::Vector3 &_scale)
 {
   if (_index >= this->dataWidgets.size())
@@ -555,7 +492,7 @@ void PartVisualTab::SetGeometryScale(unsigned int _index,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 PartVisualTab::GetGeometryScale(unsigned int _index) const
+math::Vector3 PartCollisionConfig::GetGeometryScale(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -585,7 +522,7 @@ math::Vector3 PartVisualTab::GetGeometryScale(unsigned int _index) const
 }
 
 /////////////////////////////////////////////////
-void PartVisualTab::SetName(unsigned int _index, const std::string &_name)
+void PartCollisionConfig::SetName(unsigned int _index, const std::string &_name)
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -593,11 +530,11 @@ void PartVisualTab::SetName(unsigned int _index, const std::string &_name)
     return;
   }
 
-  this->dataWidgets[_index]->visualNameLabel->setText(tr(_name.c_str()));
+  this->dataWidgets[_index]->collisionNameLabel->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
-std::string PartVisualTab::GetName(unsigned int _index) const
+std::string PartCollisionConfig::GetName(unsigned int _index) const
 {
   if (_index >= this->dataWidgets.size())
   {
@@ -605,11 +542,11 @@ std::string PartVisualTab::GetName(unsigned int _index) const
     return "";
   }
 
-  return this->dataWidgets[_index]->visualNameLabel->text().toStdString();
+  return this->dataWidgets[_index]->collisionNameLabel->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-void VisualDataWidget::GeometryChanged(const QString _text)
+void CollisionDataWidget::GeometryChanged(const QString _text)
 {
   QWidget *widget= qobject_cast<QWidget *>(QObject::sender());
 

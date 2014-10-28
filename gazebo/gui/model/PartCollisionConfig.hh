@@ -33,18 +33,41 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class CollisionDataWidget PartCollisionTab.hh
+    /// \class CollisionDataWidget PartCollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
-    class CollisionDataWidget
+    class CollisionDataWidget : public QObject
     {
+      Q_OBJECT
+
       /// \brief Unique id for this widget.
       public: int id;
 
-      /// \brief Label for displaying the visual's name.
+      /// \brief Label for displaying the collision's name.
       public: QLabel *collisionNameLabel;
 
       /// \brief Combo box for for specifying the geometry of the collision.
       public: QComboBox *geometryComboBox;
+
+      /// \brief Spin box for configuring size X of a box geom.
+      public: QDoubleSpinBox *geomSizeXSpinBox;
+
+      /// \brief Spin box for configuring size Y of a box geom.
+      public: QDoubleSpinBox *geomSizeYSpinBox;
+
+      /// \brief Spin box for configuring size Z of a box geom.
+      public: QDoubleSpinBox *geomSizeZSpinBox;
+
+      /// \brief Spin box for configuring radius of a cylinder or sphere geom.
+      public: QDoubleSpinBox *geomRadiusSpinBox;
+
+      /// \brief Spin box for configuring length of a cylinder geom.
+      public: QDoubleSpinBox *geomLengthSpinBox;
+
+      /// \brief Widget for configuring geometry dimensions.
+      public: QStackedWidget *geomDimensionWidget;
+
+      /// \brief Label for the geometry length.
+      public: QLabel *geomLengthLabel;
 
       /// \brief Spin box for configuring the X position of the collision.
       public: QDoubleSpinBox *posXSpinBox;
@@ -63,19 +86,22 @@ namespace gazebo
 
       /// \brief Spin box for configuring the yaw of the part.
       public: QDoubleSpinBox *rotYSpinBox;
+
+      /// \brief Qt signal emitted when a collision is added.
+      private slots: void GeometryChanged(const QString _text);
     };
 
-    /// \class PartCollisionTab PartCollisionTab.hh
-    /// \brief A tab for configuring visual properties of a part.
-    class PartCollisionTab : public QWidget
+    /// \class PartCollisionConfig PartCollisionConfig.hh
+    /// \brief A tab for configuring collision properties of a part.
+    class PartCollisionConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartCollisionTab();
+      public: PartCollisionConfig();
 
       /// \brief Destructor
-      public: ~PartCollisionTab();
+      public: ~PartCollisionConfig();
 
       /// \brief Add a collision widget to the tab.
       public: void AddCollision();
@@ -84,7 +110,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Get the number of collisions.
-      /// \return Number of visuals.
+      /// \return Number of collisions.
       public: unsigned int GetCollisionCount() const;
 
       /// \brief Set the name of the collision.
@@ -94,7 +120,7 @@ namespace gazebo
 
       /// \brief Get the name of the collision.
       /// \param[in] _index Index of collision.
-      /// \return Name of visual.
+      /// \return Name of collision.
       public: std::string GetName(unsigned int _index) const;
 
       /// \brief Set the pose of the collision.
@@ -109,6 +135,7 @@ namespace gazebo
 
       /// \brief Set the geometry of the collision.
       /// \param[in] _index Index of collision
+      /// \param[in] _geometry Geometry type to set to.
       public: void SetGeometry(unsigned int _index,
           const std::string &_geometry);
 
@@ -117,7 +144,51 @@ namespace gazebo
       /// \return Geometry type.
       public: std::string GetGeometry(unsigned int _index) const;
 
-      /// \brief List of visual widgets for configuring collision properties.
+      /// \brief Set the geometry size of the collision.
+      /// \param[in] _index Index of collision
+      /// \param[in] _length Size to set the geometry to.
+      public: void SetGeometrySize(unsigned int _index,
+          const math::Vector3 &_size);
+
+      /// \brief Get the geometry length of the collision.
+      /// \param[in] _index Index of collision
+      /// \return Geometry size.
+      public: math::Vector3 GetGeometrySize(unsigned int _index) const;
+
+      /// \brief Set the geometry radius of the collision.
+      /// \param[in] _index Index of collision
+      /// \param[in] _length Radius to set the geometry to.
+      public: void SetGeometryRadius(unsigned int _index,
+          double _radius);
+
+      /// \brief Get the geometry radius of the collision.
+      /// \param[in] _index Index of collision
+      /// \return Geometry radius.
+      public: double GetGeometryRadius(unsigned int _index) const;
+
+      /// \brief Set the geometry length of the collision.
+      /// \param[in] _index Index of collision
+      /// \param[in] _length Length to set the geometry to.
+      public: void SetGeometryLength(unsigned int _index,
+          double _length);
+
+      /// \brief Get the geometry length of the collision.
+      /// \param[in] _index Index of collision
+      /// \return Geometry length.
+      public: double GetGeometryLength(unsigned int _index) const;
+
+      /// \brief Set the scale of the geometry.
+      /// \param[in] _index Index of collision
+      /// \param[in] _dimensions Geometry scale.
+      public: void SetGeometryScale(unsigned int _index,
+          const math::Vector3 &_scale);
+
+      /// \brief Get the scale of the geometry.
+      /// \param[in] _index Index of collision
+      /// \return Geometry scale.
+      public: math::Vector3 GetGeometryScale(unsigned int _index) const;
+
+      /// \brief List of collision widgets for configuring collision properties.
       private: std::vector<CollisionDataWidget *> dataWidgets;
 
       /// \brief Widget that display collision' properties.
@@ -129,11 +200,11 @@ namespace gazebo
       /// \brief Qt signal mapper for mapping remove button signals.
       private:  QSignalMapper *signalMapper;
 
-      /// \brief A map of visual items to their id.
+      /// \brief A map of collision items to their id.
       private: std::map<int, QTreeWidgetItem *> collisionItems;
 
-      /// \brief Qt signal emitted when a visual is removed.
-      /// \param[in] _name Name of visual removed.
+      /// \brief Qt signal emitted when a collision is removed.
+      /// \param[in] _name Name of collision removed.
       Q_SIGNALS: void CollisionRemoved(const std::string &_name);
 
       /// \brief Qt signal emitted when a collision is added.

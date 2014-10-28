@@ -40,8 +40,9 @@
 #include "gazebo/gui/ModelManipulator.hh"
 
 #include "gazebo/gui/model/ModelData.hh"
-#include "gazebo/gui/model/PartGeneralTab.hh"
-#include "gazebo/gui/model/PartVisualTab.hh"
+#include "gazebo/gui/model/PartGeneralConfig.hh"
+#include "gazebo/gui/model/PartVisualConfig.hh"
+#include "gazebo/gui/model/PartCollisionConfig.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 #include "gazebo/gui/model/JointMaker.hh"
 #include "gazebo/gui/model/ModelCreator.hh"
@@ -313,9 +314,9 @@ PartData *ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
   connect(part->inspector, SIGNAL(Applied()),
       part, SLOT(OnApply()));
 
-  connect(part->inspector->GetVisual(), SIGNAL(VisualAdded()), part,
+  connect(part->inspector->GetVisualConfig(), SIGNAL(VisualAdded()), part,
       SLOT(OnAddVisual()));
-  connect(part->inspector->GetVisual(),
+  connect(part->inspector->GetVisualConfig(),
       SIGNAL(VisualRemoved(const std::string &)), part,
       SLOT(OnRemoveVisual(const std::string &)));
 
@@ -740,30 +741,43 @@ void ModelCreator::OnOpenInspector()
 void ModelCreator::OpenInspector(const std::string &_name)
 {
   PartData *part = this->allParts[_name];
-  PartGeneralTab *generalTab = part->inspector->GetGeneral();
-  generalTab->SetGravity(part->GetGravity());
-  generalTab->SetSelfCollide(part->GetSelfCollide());
-  generalTab->SetKinematic(part->GetKinematic());
-  generalTab->SetPose(part->GetPose());
-  generalTab->SetMass(part->GetMass());
-  generalTab->SetInertialPose(part->GetInertialPose());
-  generalTab->SetInertia(part->GetInertiaIXX(), part->GetInertiaIYY(),
+  PartGeneralConfig *generalConfig = part->inspector->GetGeneralConfig();
+  generalConfig->SetGravity(part->GetGravity());
+  generalConfig->SetSelfCollide(part->GetSelfCollide());
+  generalConfig->SetKinematic(part->GetKinematic());
+  generalConfig->SetPose(part->GetPose());
+  generalConfig->SetMass(part->GetMass());
+  generalConfig->SetInertialPose(part->GetInertialPose());
+  generalConfig->SetInertia(part->GetInertiaIXX(), part->GetInertiaIYY(),
       part->GetInertiaIZZ(), part->GetInertiaIXY(),
       part->GetInertiaIXZ(), part->GetInertiaIYZ());
 
-  PartVisualTab *visualTab = part->inspector->GetVisual();
-
+  PartVisualConfig *visualConfig = part->inspector->GetVisualConfig();
   for (unsigned int i = 0; i < part->visuals.size(); ++i)
   {
-    if (i >= visualTab->GetVisualCount())
-      visualTab->AddVisual();
-    visualTab->SetName(i, part->visuals[i]->GetName());
-    visualTab->SetPose(i, part->visuals[i]->GetPose());
-    visualTab->SetTransparency(i, part->visuals[i]->GetTransparency());
-    visualTab->SetMaterial(i, part->visuals[i]->GetMaterialName());
-    visualTab->SetGeometry(i, part->visuals[i]->GetMeshName());
-    visualTab->SetGeometryScale(i, part->visuals[i]->GetScale());
+    if (i >= visualConfig->GetVisualCount())
+      visualConfig->AddVisual();
+    visualConfig->SetName(i, part->visuals[i]->GetName());
+    visualConfig->SetPose(i, part->visuals[i]->GetPose());
+    visualConfig->SetTransparency(i, part->visuals[i]->GetTransparency());
+    visualConfig->SetMaterial(i, part->visuals[i]->GetMaterialName());
+    visualConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
+    visualConfig->SetGeometryScale(i, part->visuals[i]->GetScale());
   }
+
+  PartCollisionConfig *collisionConfig = part->inspector->GetCollisionConfig();
+  for (unsigned int i = 0; i < part->collisions.size(); ++i)
+  {
+    if (i >= collisionConfig->GetCollisionCount())
+      collisionConfig->AddCollision();
+/*    visualConfig->SetName(i, part->visuals[i]->GetName());
+    visualConfig->SetPose(i, part->visuals[i]->GetPose());
+    visualConfig->SetTransparency(i, part->visuals[i]->GetTransparency());
+    visualConfig->SetMaterial(i, part->visuals[i]->GetMaterialName());
+    visualConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
+    visualConfig->SetGeometryScale(i, part->visuals[i]->GetScale());*/
+  }
+
   part->inspector->show();
 }
 

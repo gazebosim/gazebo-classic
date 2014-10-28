@@ -32,17 +32,17 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    /// \class PartGeneralTab PartGeneralTab.hh
+    /// \class PartGeneralConfig PartGeneralConfig.hh
     /// \brief A tab for configuring general properties of a part.
-    class PartGeneralTab : public QWidget
+    class PartGeneralConfig : public QWidget
     {
       Q_OBJECT
 
       /// \brief Constructor
-      public: PartGeneralTab();
+      public: PartGeneralConfig();
 
       /// \brief Destructor
-      public: ~PartGeneralTab();
+      public: ~PartGeneralConfig();
 
       /// \brief Set the part to be affected by gravity.
       /// \param[in] _enabled True to enable gravity on part.

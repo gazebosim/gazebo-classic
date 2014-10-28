@@ -15,15 +15,15 @@
  *
 */
 
-#include "gazebo/gui/model/PartGeneralTab.hh"
+#include "gazebo/gui/model/PartGeneralConfig.hh"
 
 using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
-PartGeneralTab::PartGeneralTab()
+PartGeneralConfig::PartGeneralConfig()
 {
-  this->setObjectName("partGeneralTab");
+  this->setObjectName("PartGeneralConfig");
   QVBoxLayout *generalLayout = new QVBoxLayout;
 
   QLabel *gravityLabel = new QLabel(tr("Gravity:"));
@@ -269,48 +269,48 @@ PartGeneralTab::PartGeneralTab()
 }
 
 /////////////////////////////////////////////////
-PartGeneralTab::~PartGeneralTab()
+PartGeneralConfig::~PartGeneralConfig()
 {
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetGravity(bool _enabled)
+void PartGeneralConfig::SetGravity(bool _enabled)
 {
   this->gravityCheck->setChecked(_enabled);
 }
 
 /////////////////////////////////////////////////
-bool PartGeneralTab::GetGravity() const
+bool PartGeneralConfig::GetGravity() const
 {
   return this->gravityCheck->isChecked();
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetSelfCollide(bool _enabled)
+void PartGeneralConfig::SetSelfCollide(bool _enabled)
 {
   this->selfCollideCheck->setChecked(_enabled);
 }
 
 /////////////////////////////////////////////////
-bool PartGeneralTab::GetSelfCollide() const
+bool PartGeneralConfig::GetSelfCollide() const
 {
   return this->selfCollideCheck->isChecked();
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetKinematic(bool _enabled)
+void PartGeneralConfig::SetKinematic(bool _enabled)
 {
   this->kinematicCheck->setChecked(_enabled);
 }
 
 /////////////////////////////////////////////////
-bool PartGeneralTab::GetKinematic() const
+bool PartGeneralConfig::GetKinematic() const
 {
   return this->kinematicCheck->isChecked();
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetPose(const math::Pose &_pose)
+void PartGeneralConfig::SetPose(const math::Pose &_pose)
 {
   this->posXSpinBox->setValue(_pose.pos.x);
   this->posYSpinBox->setValue(_pose.pos.y);
@@ -322,7 +322,7 @@ void PartGeneralTab::SetPose(const math::Pose &_pose)
 }
 
 /////////////////////////////////////////////////
-math::Pose PartGeneralTab::GetPose() const
+math::Pose PartGeneralConfig::GetPose() const
 {
   return math::Pose(this->posXSpinBox->value(), this->posYSpinBox->value(),
       this->posZSpinBox->value(), this->rotRSpinBox->value(),
@@ -330,19 +330,19 @@ math::Pose PartGeneralTab::GetPose() const
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetMass(double _mass)
+void PartGeneralConfig::SetMass(double _mass)
 {
   this->massSpinBox->setValue(_mass);
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetMass() const
+double PartGeneralConfig::GetMass() const
 {
   return this->massSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetInertialPose(const math::Pose &_inertialPose)
+void PartGeneralConfig::SetInertialPose(const math::Pose &_inertialPose)
 {
   this->inertialPosXSpinBox->setValue(_inertialPose.pos.x);
   this->inertialPosYSpinBox->setValue(_inertialPose.pos.y);
@@ -354,7 +354,7 @@ void PartGeneralTab::SetInertialPose(const math::Pose &_inertialPose)
 }
 
 /////////////////////////////////////////////////
-math::Pose PartGeneralTab::GetInertialPose() const
+math::Pose PartGeneralConfig::GetInertialPose() const
 {
   return math::Pose(this->inertialPosXSpinBox->value(),
       this->inertialPosYSpinBox->value(), this->inertialPosZSpinBox->value(),
@@ -363,7 +363,7 @@ math::Pose PartGeneralTab::GetInertialPose() const
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::SetInertia(double _ixx, double _iyy, double _izz,
+void PartGeneralConfig::SetInertia(double _ixx, double _iyy, double _izz,
     double _ixy, double _ixz, double _iyz)
 {
   this->inertiaIXXSpinBox->setValue(_ixx);
@@ -375,57 +375,57 @@ void PartGeneralTab::SetInertia(double _ixx, double _iyy, double _izz,
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIXX() const
+double PartGeneralConfig::GetInertiaIXX() const
 {
   return this->inertiaIXXSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIYY() const
+double PartGeneralConfig::GetInertiaIYY() const
 {
   return this->inertiaIYYSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIZZ() const
+double PartGeneralConfig::GetInertiaIZZ() const
 {
   return this->inertiaIZZSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIXY() const
+double PartGeneralConfig::GetInertiaIXY() const
 {
   return this->inertiaIXYSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIXZ() const
+double PartGeneralConfig::GetInertiaIXZ() const
 {
   return this->inertiaIXZSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-double PartGeneralTab::GetInertiaIYZ() const
+double PartGeneralConfig::GetInertiaIYZ() const
 {
   return this->inertiaIYZSpinBox->value();
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::OnGravity()
+void PartGeneralConfig::OnGravity()
 {
   std::string text = this->gravityCheck->isChecked() ? "True" : "False";
   this->gravityCheck->setText(tr(text.c_str()));
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::OnSelfCollide()
+void PartGeneralConfig::OnSelfCollide()
 {
   std::string text = this->selfCollideCheck->isChecked() ? "True" : "False";
   this->selfCollideCheck->setText(tr(text.c_str()));
 }
 
 /////////////////////////////////////////////////
-void PartGeneralTab::OnKinematic()
+void PartGeneralConfig::OnKinematic()
 {
   std::string text = this->kinematicCheck->isChecked() ? "True" : "False";
   this->kinematicCheck->setText(tr(text.c_str()));

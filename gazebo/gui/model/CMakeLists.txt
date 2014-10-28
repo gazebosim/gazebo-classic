@@ -11,10 +11,10 @@ set (sources
   ModelEditor.cc
   ModelEditorEvents.cc
   ModelEditorPalette.cc
-  PartCollisionTab.cc
-  PartGeneralTab.cc
+  PartCollisionConfig.cc
+  PartGeneralConfig.cc
   PartInspector.cc
-  PartVisualTab.cc
+  PartVisualConfig.cc
 )
 
 set (qt_headers
@@ -25,10 +25,11 @@ set (qt_headers
   ModelData.hh
   ModelEditor.hh
   ModelEditorPalette.hh
-  PartCollisionTab.hh
-  PartGeneralTab.hh
+  PartVisualConfig.hh
+  PartCollisionConfig.hh
+  PartGeneralConfig.hh
   PartInspector.hh
-  PartVisualTab.hh
+  PartVisualConfig.hh
 )
 
 set (headers

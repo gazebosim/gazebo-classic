@@ -26,8 +26,9 @@ namespace gazebo
 {
   namespace gui
   {
-    class PartGeneralTab;
-    class PartVisualTab;
+    class PartGeneralConfig;
+    class PartVisualConfig;
+    class PartCollisionConfig;
 
     class PartInspector : public QDialog
     {
@@ -48,13 +49,17 @@ namespace gazebo
       /// \return Name of the part.
       public: std::string GetName() const;
 
-      /// \brief Get general properties of the part.
-      /// \return Tab widget with general properties.
-      public: PartGeneralTab *GetGeneral() const;
+      /// \brief Get general configurations of the part.
+      /// \return Tab widget with general configurations.
+      public: PartGeneralConfig *GetGeneralConfig() const;
 
-      /// \brief Get visual properties of the part.
-      /// \return Tab widget with visual properties.
-      public: PartVisualTab *GetVisual() const;
+      /// \brief Get visual configurations of the part.
+      /// \return Tab widget with visual configurations.
+      public: PartVisualConfig *GetVisualConfig() const;
+
+      /// \brief Get collision configurations of the part.
+      /// \return Tab widget with visual configurations.
+      public: PartCollisionConfig *GetCollisionConfig() const;
 
       /// \brief Set the item name.
       /// \param[in] _name Name to set to.
@@ -78,11 +83,14 @@ namespace gazebo
       /// \brief Label that displays the name of the part.
       private: QLabel* partNameLabel;
 
-      /// \brief Tab widget with configurable general properties.
-      private: PartGeneralTab *generalTab;
+      /// \brief Widget with configurable general properties.
+      private: PartGeneralConfig *generalConfig;
 
-      /// \brief Tab widget with configurable visual properties.
-      private: PartVisualTab *visualTab;
+      /// \brief Widget with configurable visual properties.
+      private: PartVisualConfig *visualConfig;
+
+      /// \brief Widget with configurable collision properties.
+      private: PartCollisionConfig *collisionConfig;
     };
     /// \}
   }

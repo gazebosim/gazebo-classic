@@ -17,8 +17,9 @@
 
 #include "gazebo/common/Console.hh"
 
-#include "gazebo/gui/model/PartGeneralTab.hh"
-#include "gazebo/gui/model/PartVisualTab.hh"
+#include "gazebo/gui/model/PartGeneralConfig.hh"
+#include "gazebo/gui/model/PartVisualConfig.hh"
+#include "gazebo/gui/model/PartCollisionConfig.hh"
 #include "gazebo/gui/model/PartInspector.hh"
 
 using namespace gazebo;
@@ -37,14 +38,16 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   nameLayout->addWidget(partLabel);
   nameLayout->addWidget(partNameLabel);
 
-  this->generalTab = new PartGeneralTab;
-  this->visualTab = new PartVisualTab;
+  this->generalConfig = new PartGeneralConfig;
+  this->visualConfig = new PartVisualConfig;
+  this->collisionConfig = new PartCollisionConfig;
 
   // Create the main tab widget for all components in a part
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("partInspectorTab");
-  this->tabWidget->addTab(this->generalTab, "General");
-  this->tabWidget->addTab(this->visualTab, "Visual");
+  this->tabWidget->addTab(this->generalConfig, "General");
+  this->tabWidget->addTab(this->visualConfig, "Visual");
+  this->tabWidget->addTab(this->collisionConfig, "Collision");
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -84,16 +87,23 @@ std::string PartInspector::GetName() const
 }
 
 /////////////////////////////////////////////////
-PartGeneralTab *PartInspector::GetGeneral() const
+PartGeneralConfig *PartInspector::GetGeneralConfig() const
 {
-  return this->generalTab;
+  return this->generalConfig;
 }
 
 /////////////////////////////////////////////////
-PartVisualTab *PartInspector::GetVisual() const
+PartVisualConfig *PartInspector::GetVisualConfig() const
 {
-  return this->visualTab;
+  return this->visualConfig;
 }
+
+/////////////////////////////////////////////////
+PartCollisionConfig *PartInspector::GetCollisionConfig() const
+{
+  return this->collisionConfig;
+}
+
 
 /////////////////////////////////////////////////
 void PartInspector::OnCancel()
