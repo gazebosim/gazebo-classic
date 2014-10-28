@@ -44,18 +44,15 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->orbitViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
-
   this->dataPtr->selectionBuffer = NULL;
-
-  this->dataPtr->canJoystickMoveCamera = false;
+  this->dataPtr->joyTwistControl = true;
   this->dataPtr->joystickButtonToggleLast = false;
+  this->dataPtr->joyPoseControl = true;
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
 
   this->SetUseSDFPose(false);
-
-  this->dataPtr->poseSet = false;
 }
 
 //////////////////////////////////////////////////
@@ -183,12 +180,6 @@ void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
   Camera::SetWorldPose(_pose);
   this->dataPtr->viewController->Init();
-
-  if (!this->dataPtr->poseSet)
-  {
-    this->dataPtr->initialPose = _pose;
-    this->dataPtr->poseSet = true;
-  }
 }
 
 //////////////////////////////////////////////////
@@ -253,13 +244,30 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 /////////////////////////////////////////////////
 bool UserCamera::IsCameraSetInWorldFile()
 {
+  // note: this function is used in rendering::Heightmap
+  // to check if user specified custom pose for the camera.
+  // Otherwise, camera is raised based on heightmap height
+  // automatically.
   return this->dataPtr->isCameraSetInWorldFile;
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetUseSDFPose(bool _value)
 {
+  // true if user specified custom pose for the camera.
   this->dataPtr->isCameraSetInWorldFile = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyTwistControl(bool _value)
+{
+  this->dataPtr->joyTwistControl = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyPoseControl(bool _value)
+{
+  this->dataPtr->joyPoseControl = _value;
 }
 
 /////////////////////////////////////////////////
@@ -640,21 +648,20 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
   static math::Vector3 rpyFactor(0, 0.01, 0.05);
 
   // toggle using joystick to move camera
-  if (_msg->buttons().size() == 2 &&
-      this->dataPtr->joystickButtonToggleLast == false &&
-       _msg->buttons(0) == 1)
+  if (this->dataPtr->joystickButtonToggleLast == false &&
+      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
   {
-    this->dataPtr->canJoystickMoveCamera =
-      !this->dataPtr->canJoystickMoveCamera;
+    this->dataPtr->joyTwistControl =
+      !this->dataPtr->joyTwistControl;
 
     this->dataPtr->joystickButtonToggleLast = true;
 
-    if (this->dataPtr->canJoystickMoveCamera)
+    if (this->dataPtr->joyTwistControl)
       gzmsg << "Joystick camera viewpoint control active.\n";
     else
       gzmsg << "Joystick camera viewpoint control deactivated.\n";
   }
-  else if (_msg->buttons(0) == 0)
+  else if (_msg->buttons().size() == 2 && _msg->buttons(0) == 0)
   {
     // detect button release
     this->dataPtr->joystickButtonToggleLast = false;
@@ -662,7 +669,7 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 
   // This function was establish when integrating the space navigator
   // joystick.
-  if (this->dataPtr->canJoystickMoveCamera &&
+  if (this->dataPtr->joyTwistControl &&
       (_msg->has_translation() || _msg->has_rotation()))
   {
     math::Pose pose = this->GetWorldPose();
@@ -689,8 +696,9 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
 //////////////////////////////////////////////////
 void UserCamera::OnJoyPose(ConstPosePtr &_msg)
 {
-  if (!this->dataPtr->poseSet)
+  if (!this->dataPtr->joyPoseControl)
     return;
+
   if (_msg->has_position() && _msg->has_orientation())
   {
     // Get the XYZ
