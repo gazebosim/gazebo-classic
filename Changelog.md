@@ -14,6 +14,17 @@
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
 
+1. Implemented camera lens distortion.
+  * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
+
+1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
+   and improve robustness of `UNIT_gz_TEST`
+  * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
+  * [Issue #1299](https://bitbucket.org/osrf/gazebo/issue/1299)
+
+1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
+  * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
+
 1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
@@ -32,6 +43,8 @@
     * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
 1. Added SignalStats class for computing incremental signal statistics.
     * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
+1. Add InitialVelocityPlugin to setting the initial state of links
+    * [Pull request #1237](https://bitbucket.org/osrf/gazebo/pull-request/1237)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
@@ -131,6 +144,11 @@
     * [Pull request #1084](https://bitbucket.org/osrf/gazebo/pull-request/1084)
 
 ## Gazebo 3.0
+
+### Gazebo 3.x.x (yyyy-mm-dd)
+
+1. Fixed sonar and wireless sensor visualization
+    * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
 
 ### Gazebo 3.1.0 (2014-08-08)
 
@@ -785,4 +803,3 @@
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-

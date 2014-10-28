@@ -22,6 +22,7 @@ set (sources
   ContactVisual.cc
   Conversions.cc
   DepthCamera.cc
+  Distortion.cc
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
@@ -66,6 +67,7 @@ set (headers
   ContactVisual.hh
   Conversions.hh
   DepthCamera.hh
+  Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
@@ -121,6 +123,8 @@ gz_build_tests(${gtest_sources})
 set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  SonarVisual_TEST.cc
+  TransmitterVisual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})

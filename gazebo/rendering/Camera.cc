@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
@@ -186,6 +187,12 @@ void Camera::Load()
   {
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
         "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
+  }
+
+  if (this->sdf->HasElement("distortion"))
+  {
+    this->dataPtr->distortion.reset(new Distortion());
+    this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
   }
 }
 
@@ -1326,6 +1333,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
+    if (this->dataPtr->distortion)
+      this->dataPtr->distortion->SetCamera(shared_from_this());
 
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
@@ -1675,4 +1684,10 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::GetDistortion() const
+{
+  return this->dataPtr->distortion;
 }
