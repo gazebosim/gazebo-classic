@@ -2,6 +2,9 @@
 
 ### Gazebo 5.0.0
 
+1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
+    * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
+
 1. Added ability to read the directory where the log files are stored.
     * [Pull request #1277](https://bitbucket.org/osrf/gazebo/pull-request/1277)
 
