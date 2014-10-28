@@ -234,6 +234,12 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
+{
+  msgs::Joint::Type type = msgs::Joint::REVOLUTE;
+  EXPECT_EQ(type, msgs::Convert(msgs::Convert(type)));
+}
+
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
