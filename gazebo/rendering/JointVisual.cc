@@ -22,6 +22,7 @@
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/AxisVisual.hh"
+#include "gazebo/rendering/ArrowVisual.hh"
 #include "gazebo/rendering/JointVisualPrivate.hh"
 #include "gazebo/rendering/JointVisual.hh"
 
@@ -51,29 +52,56 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
   Visual::Load();
 
-  // joint axis is in the model frame so set up the scene node to be
-  // the same orientation as the model then apply rotations later.
-  VisualPtr model = this->GetRootVisual();
-  if (model)
-  {
-    math::Quaternion quat = model->GetRotation();
-    this->GetSceneNode()->_setDerivedOrientation(Conversions::Convert(quat));
-  }
-
   dPtr->axisVisual.reset(
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   dPtr->axisVisual->Load();
 
   this->SetPosition(msgs::Convert(_msg->pose().position()));
-  this->SetRotation(this->GetRotation() *
-      msgs::Convert(_msg->pose().orientation()));
+  this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
-  if (math::equal(_msg->axis1().xyz().x(), 1.0))
-    dPtr->axisVisual->ShowRotation(0);
+  if (_msg->has_axis1())
+  {
+    msgs::Axis axis1Msg = _msg->axis1();
+    this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
+        axis1Msg.use_parent_model_frame(), _msg->type());
+  }
+  if (_msg->has_axis2())
+  {
+    msgs::Axis axis2Msg = _msg->axis2();
+    this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
+        axis2Msg.use_parent_model_frame(), _msg->type());
+  }
+}
 
-  if (math::equal(_msg->axis1().xyz().y(), 1.0))
-    dPtr->axisVisual->ShowRotation(1);
+/////////////////////////////////////////////////
+void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
+    int _type)
+{
+  ArrowVisualPtr axis;
+  axis.reset(new ArrowVisual(this->GetName() +
+      "_axis1_AXIS", shared_from_this()));
+  axis->Load();
+  axis->SetMaterial("Gazebo/Yellow");
+  math::Vector3 axis1Dir = _axis;
+  math::Vector3 u = axis1Dir.Normalize();
+  math::Vector3 v = math::Vector3::UnitZ;
+  double cosTheta = v.Dot(u);
+  double angle = acos(cosTheta);
+  math::Quaternion quat;
+  // check the parallel case
+  if (math::equal(angle, M_PI))
+    quat.SetFromAxis(u.GetPerpendicular(), angle);
+  else
+    quat.SetFromAxis((v.Cross(u)).Normalize(), angle);
+  axis->SetRotation(quat);
 
-  if (math::equal(_msg->axis1().xyz().z(), 1.0))
-    dPtr->axisVisual->ShowRotation(2);
+  if (_useParentFrame)
+  {
+    VisualPtr model = this->GetRootVisual();
+    math::Quaternion quatFromModel =
+        model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
+    axis->SetRotation(quatFromModel.GetInverse()*axis->GetRotation());
+  }
+  if (_type == msgs::Joint::REVOLUTE)
+      axis->ShowRotation();
 }

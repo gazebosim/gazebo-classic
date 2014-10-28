@@ -47,6 +47,14 @@ namespace gazebo
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
       using Visual::Load;
+
+      /// \brief Create an axis and attach it to the joint visual.
+      /// \param[in] _axis Axis vector
+      /// \param[in] _useParentFrame True to use parent frame instead of the
+      /// joint frame.
+      /// \param[in] _type Type of axis.
+      public: void CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
+          int _type);
     };
     /// \}
   }

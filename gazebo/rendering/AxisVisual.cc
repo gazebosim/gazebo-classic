@@ -57,17 +57,17 @@ void AxisVisual::Load()
   dPtr->xAxis.reset(new ArrowVisual(this->GetName() +
       "_X_AXIS", shared_from_this()));
   dPtr->xAxis->Load();
-  dPtr->xAxis->SetMaterial("__GAZEBO_TRANS_RED_MATERIAL__");
+  dPtr->xAxis->SetMaterial("Gazebo/RedTransparent");
 
   dPtr->yAxis.reset(new ArrowVisual(this->GetName() +
       "_Y_AXIS", shared_from_this()));
   dPtr->yAxis->Load();
-  dPtr->yAxis->SetMaterial("__GAZEBO_TRANS_GREEN_MATERIAL__");
+  dPtr->yAxis->SetMaterial("Gazebo/GreenTransparent");
 
   dPtr->zAxis.reset(new ArrowVisual(this->GetName() +
       "_Z_AXIS", shared_from_this()));
   dPtr->zAxis->Load();
-  dPtr->zAxis->SetMaterial("__GAZEBO_TRANS_BLUE_MATERIAL__");
+  dPtr->zAxis->SetMaterial("Gazebo/BlueTransparent");
 
   dPtr->xAxis->SetRotation(
       math::Quaternion(math::Vector3(0, 1, 0), GZ_DTOR(90)));
