@@ -218,10 +218,14 @@ namespace gazebo
       private: void OnMoveToVisualComplete();
 
       /// \brief Handles incoming relative joystick messages.
+      /// Incoming joystick messages are used to control
+      /// translation and rotation rates of the camera position.
       /// \param[in] _msg New joystick message.
       private: void OnJoyTwist(ConstJoystickPtr &_msg);
 
       /// \brief Handles incoming absolute joystick messages.
+      /// Incoming joystick messages are used to control
+      /// camera's world pose.
       /// \param[in] _msg New pose message.
       private: void OnJoyPose(ConstPosePtr &_msg);
 

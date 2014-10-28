@@ -670,7 +670,8 @@ void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
     // Get the joystick XYZ
     if (_msg->has_translation())
     {
-      math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+      const double transRotRatio = 0.05;
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
       pose.pos = pose.rot.RotateVector(trans) + pose.pos;
     }
 
