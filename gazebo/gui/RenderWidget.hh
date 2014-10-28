@@ -63,7 +63,7 @@ namespace gazebo
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
       public: QToolBar *GetToolbar();
-      
+
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _visible Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
@@ -111,6 +111,7 @@ namespace gazebo
 
       /// \brief Widget for the top toolbar
       private: QToolBar *toolbar;
+
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
@@ -127,9 +128,6 @@ namespace gazebo
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
 
-      /// \brief Toolbar consisting of various Qt actions
-      private: QToolBar *toolbar;
-      
       /// \brief All the gui plugins
       private: std::vector<gazebo::GUIPluginPtr> plugins;
     };
