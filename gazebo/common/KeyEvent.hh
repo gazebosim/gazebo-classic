@@ -42,6 +42,8 @@ namespace gazebo
       public: EventType type;
 
       public: int key;
+
+      public: std::string text;
     };
     /// \}
   }
