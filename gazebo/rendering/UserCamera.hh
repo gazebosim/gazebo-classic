@@ -179,13 +179,13 @@ namespace gazebo
       /// \param[in] _value True if the camera pose changed in the world file.
       public: void SetUseSDFPose(bool _value);
 
-      /// brief Enable of disable camera control through ~/user_camera/joy_twist
+      /// brief Enable or disable camera control through ~/user_camera/joy_twist
       /// gz topic. Defaults to true.
       /// \param[in] _value True to enable camera pose control by
       /// gz topic ~/user_camera/joy_twist.
       public: void SetJoyTwistControl(bool _value);
 
-      /// brief Enable of disable camera control through ~/user_camera/joy_pose
+      /// brief Enable or disable camera control through ~/user_camera/joy_pose
       /// gz topic. Defaults to true.
       /// \param[in] _value True to enable camera pose control by
       /// gz topic ~/user_camera/joy_pose.
