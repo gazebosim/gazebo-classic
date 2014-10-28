@@ -58,6 +58,18 @@ namespace gazebo
 
       // Documentation inherited from parent
       public: void HandleKeyPressEvent(const std::string &_key);
+
+      /// \brief The current velocity of the camera.
+      private: math::Pose velocity;
+
+      /// \brief Translation velocity along the x-axis
+      private: float xVelocityFactor;
+
+      /// \brief Translation velocity along the y-axis
+      private: float yVelocityFactor;
+
+      private: math::Vector3 xVelocity;
+      private: math::Vector3 yVelocity;
     };
     /// \}
   }

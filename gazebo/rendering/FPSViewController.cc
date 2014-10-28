@@ -29,6 +29,9 @@ using namespace rendering;
 FPSViewController::FPSViewController(UserCameraPtr _camera)
   : ViewController(_camera)
 {
+  this->xVelocityFactor = 1.0;
+  this->yVelocityFactor = 0.8;
+
   this->typeString = TYPE_STRING;
 }
 
@@ -37,13 +40,31 @@ FPSViewController::~FPSViewController()
 {
 }
 
+//////////////////////////////////////////////////
 void FPSViewController::Init()
 {
+  this->xVelocityFactor = 1.0;
+  this->yVelocityFactor = 0.8;
+
+  this->xVelocity = math::Vector3::Zero;
+  this->yVelocity = math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////
 void FPSViewController::Update()
 {
+  if (this->xVelocity != math::Vector3::Zero ||
+      this->yVelocity != math::Vector3::Zero)
+  {
+    // Move based on the camera's current velocity
+    // Calculate delta based on frame rate
+    common::Time interval = common::Time::GetWallTime() -
+      this->camera->GetLastRenderWallTime();
+    float dt = interval.Float();
+
+    math::Vector3 trans = this->xVelocity + this->yVelocity;
+    this->camera->Translate(trans * dt);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -54,17 +75,29 @@ void FPSViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
   math::Vector2i drag = _event.pos - _event.prevPos;
 
-  math::Pose velocity = this->camera->GetVelocity();
   if (_event.buttons & common::MouseEvent::LEFT)
   {
-    this->camera->RotateYaw(GZ_DTOR(-drag.x*0.1));
-    this->camera->RotatePitch(GZ_DTOR(drag.y*0.1));
+    this->camera->Yaw(GZ_DTOR(-drag.x*0.1));
+    this->camera->Pitch(GZ_DTOR(drag.y*0.1));
   }
-  else
+  else if (_event.type == common::MouseEvent::SCROLL)
   {
-    math::Pose newVelocity = velocity;
-    newVelocity.rot = math::Quaternion(0, 0, 0);
-    this->camera->SetVelocity(newVelocity);
+    if (_event.scroll.y < 0)
+    {
+      this->xVelocityFactor *= 1.05;
+      this->yVelocityFactor *= 1.05;
+
+      this->xVelocity *= 1.05;
+      this->yVelocity *= 1.05;
+    }
+    else
+    {
+      this->xVelocityFactor *= 0.95;
+      this->yVelocityFactor *= 0.95;
+
+      this->xVelocity *= 0.95;
+      this->yVelocity *= 0.95;
+    }
   }
 }
 
@@ -77,32 +110,23 @@ std::string FPSViewController::GetTypeString()
 //////////////////////////////////////////////////
 void FPSViewController::HandleKeyReleaseEvent(const std::string & _key)
 {
-  if (_key.compare("w") == 0 || _key.compare("a") == 0 ||
-      _key.compare("s") == 0 || _key.compare("d") == 0)
-  {
-    this->camera->SetVelocity(math::Pose(0, 0, 0, 0, 0, 0));
-  }
+  if (_key.compare("w") == 0 || _key.compare("s") == 0)
+    this->xVelocity = math::Vector3::Zero;
+
+  if (_key.compare("a") == 0 || _key.compare("d") == 0)
+    this->yVelocity = math::Vector3::Zero;
 }
 
 //////////////////////////////////////////////////
 void FPSViewController::HandleKeyPressEvent(const std::string & _key)
 {
-  float xVelocity = 1.0;
-  float yVelocity = 0.8;
   if (_key.compare("w") == 0)
-  {
-    this->camera->SetVelocity(math::Pose(xVelocity, 0, 0, 0, 0, 0));
-  }
-  else if (_key.compare("a") == 0)
-  {
-    this->camera->SetVelocity(math::Pose(0, yVelocity, 0, 0, 0, 0));
-  }
+    this->xVelocity = math::Vector3(this->xVelocityFactor, 0, 0);
   else if (_key.compare("s") == 0)
-  {
-    this->camera->SetVelocity(math::Pose(-xVelocity, 0, 0, 0, 0, 0));
-  }
+    this->xVelocity = math::Vector3(-this->xVelocityFactor, 0, 0);
+
+  if (_key.compare("a") == 0)
+    this->yVelocity = math::Vector3(0, this->yVelocityFactor, 0);
   else if (_key.compare("d") == 0)
-  {
-    this->camera->SetVelocity(math::Pose(0, -yVelocity, 0, 0, 0, 0));
-  }
+    this->yVelocity = math::Vector3(0, -this->yVelocityFactor, 0);
 }
