@@ -72,7 +72,7 @@ int main(int _argc, char **_argv)
 
   /// \TODO: change ur10 to your model name
   const std::string modelName = "sr_description";
-  node->Advertise("/" + modelName + "/control_request", cb);
+  node->Advertise("/control_request", cb);
 
   int c = 0;
   // Busy wait loop...replace with your own code as needed.

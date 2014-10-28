@@ -154,7 +154,7 @@ void ModelControlPlugin::PubControlRequest()
   bool executed = false;
   while(!executed)
   {
-    executed = this->node.Request("/" + this->model->GetName() + "/control_request",
+    executed = this->node.Request("/control_request",
                                   req, timeout, res, result);
     if (executed)
     {
