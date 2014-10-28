@@ -14,6 +14,11 @@
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
 
+1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
+   see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
+   with joystick button 1.
+  * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
