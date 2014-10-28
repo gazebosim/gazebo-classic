@@ -138,6 +138,11 @@
 
 ## Gazebo 3.0
 
+### Gazebo 3.x.x (yyyy-mm-dd)
+
+1. Fixed sonar and wireless sensor visualization
+    * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
+
 ### Gazebo 3.1.0 (2014-08-08)
 
 1. Implemented Simbody::Link::Set*Vel
