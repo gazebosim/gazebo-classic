@@ -313,11 +313,33 @@ namespace gazebo
           _p.d());
     }
 
+    /////////////////////////////////////////////
     msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::GUI result;
 
       result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
+
+      // Set plugins of the gui
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          msgs::Plugin *plgnMsg = result.mutable_plugin();
+          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
+          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
+
+          std::stringstream ss;
+          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
+              innerElem; innerElem = innerElem->GetNextElement(""))
+          {
+            ss << innerElem->ToString("");
+          }
+          plgnMsg->set_innerxml("<sdf>" + ss.str() + "</sdf>");
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
 
 
       if (_sdf->HasElement("camera"))
