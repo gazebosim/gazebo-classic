@@ -378,7 +378,7 @@ void Camera::Update()
     this->SetWorldPosition(pos);
   }
 
-  if ( this->velocity != math::Pose(0, 0, 0, 0, 0, 0) )
+  if (this->velocity != math::Pose::Zero)
   {
     // Move based on the camera's current velocity
     // Calculate delta based on frame rate
@@ -386,9 +386,8 @@ void Camera::Update()
                             this->GetLastRenderWallTime();
     float dt = interval.Float();
 
-    math::Vector3 translate(velocity.pos[0]*dt, velocity.pos[1]*dt,
-                             velocity.pos[2]*dt);
-    this->Translate(translate);
+    this->Translate(velocity.pos * dt);
+
     // You probably don't want to roll the camera, but it's an option
     this->RotateRoll(velocity.rot.GetRoll()*dt);
     this->RotatePitch(velocity.rot.GetPitch()*dt);
