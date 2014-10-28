@@ -66,6 +66,11 @@ namespace gazebo
       /// \param[in] _material The name of the material to apply to the axis
       public: void SetAxisMaterial(unsigned int _axis,
                                    const std::string &_material);
+
+      /// \brief Set whether the axis will be visiable
+      /// \param[in] _axis The number of the axis (0, 1, 2 = x,y,z)
+      /// \param[in] _visible True to set the axis to be visible.
+      public: void SetAxisVisible(unsigned int _axis, bool _visible);
     };
     /// \}
   }

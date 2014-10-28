@@ -151,3 +151,32 @@ void AxisVisual::ShowRotation(unsigned int _axis)
       break;
   };
 }
+
+/////////////////////////////////////////////////
+void AxisVisual::SetAxisVisible(unsigned int _axis, bool _visible)
+{
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  VisualPtr axis;
+  switch (_axis)
+  {
+    case 0:
+      axis = dPtr->xAxis;
+      break;
+    case 1:
+      axis = dPtr->yAxis;
+      break;
+    case 2:
+      axis = dPtr->zAxis;
+      break;
+    default:
+      gzerr << "Invlid axis index[" << _axis << "]" << std::endl;
+      return;
+  };
+
+  if (_visible)
+    this->AttachVisual(axis);
+  else
+    this->DetachVisual(axis);
+}

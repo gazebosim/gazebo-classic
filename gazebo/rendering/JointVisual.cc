@@ -72,17 +72,23 @@ void JointVisual::Load(ConstJointPtr &_msg)
     this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
         axis2Msg.use_parent_model_frame(), _msg->type());
   }
+
+  this->GetSceneNode()->setInheritScale(false);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
 void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
     int _type)
 {
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
   ArrowVisualPtr axis;
   axis.reset(new ArrowVisual(this->GetName() +
       "_axis1_AXIS", shared_from_this()));
   axis->Load();
-  axis->SetMaterial("Gazebo/Yellow");
+  axis->SetMaterial("Gazebo/YellowTransparent");
 
   // Get rotation to axis vector
   math::Vector3 axis1Dir = _axis;
@@ -109,4 +115,16 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
   }
   if (_type == msgs::Joint::REVOLUTE)
       axis->ShowRotation();
+
+  math::Quaternion axisWorldRotation = axis->GetWorldPose().rot;
+  math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
+
+  // hide the existing axis visual if it overlaps with the one we are creating
+  math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
+  if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
+    dPtr->axisVisual->SetAxisVisible(0, false);
+  else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
+    dPtr->axisVisual->SetAxisVisible(1, false);
+  else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
+    dPtr->axisVisual->SetAxisVisible(2, false);
 }
