@@ -24,12 +24,21 @@
 1. **gazebo/gui/SpaceNav.hh**
     + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
 
+1. **gazebo/rendering/UserCamera.hh**
+    + private: void OnJoyPose(ConstJoystickPtr &_msg)
+    + public: void SetJoyTwistControl(bool _value)
+    + public: void SetJoyPoseControl(bool _value)
+
 ### Modifications
 
 1. **gazebo/common/Plugin.hh**
     + ***Removed:*** protected: std::string Plugin::handle
     + ***Replacement:*** protected: std::string Plugin::handleName
 
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
+    + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
+    
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**
