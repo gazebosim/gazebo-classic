@@ -1156,19 +1156,27 @@ void MainWindow::CreateActions()
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
 
-
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
 
-  // g_fpsAct = new QAction(tr("FPS View Control"), this);
-  // g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
-  // connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+  g_fpsAct = new QAction(tr("FPS View Control"), this);
+  g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
+  g_fpsAct->setCheckable(true);
+  g_fpsAct->setChecked(false);
+  connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
 
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
+  g_orbitAct->setCheckable(true);
+  g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  QActionGroup *viewControlActionGroup = new QActionGroup(this);
+  viewControlActionGroup->addAction(g_fpsAct);
+  viewControlActionGroup->addAction(g_orbitAct);
+  viewControlActionGroup->setExclusive(true);
 
   g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
   g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
@@ -1373,7 +1381,8 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_resetAct);
   viewMenu->addAction(g_fullScreenAct);
   viewMenu->addSeparator();
-  // viewMenu->addAction(g_fpsAct);
+
+  viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
