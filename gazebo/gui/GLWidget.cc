@@ -311,13 +311,9 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   // Process Key Events
-
-  bool handled = KeyEventHandler::Instance()->HandlePress(this->keyEvent);
-
-  if (!handled)
+  if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
   {
     ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
-
     this->userCamera->HandleKeyPressEvent(this->keyText);
   }
 }
