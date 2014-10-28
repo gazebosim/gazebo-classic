@@ -25,8 +25,6 @@ using namespace gazebo;
 
 class QuaternionTest : public gazebo::testing::AutoLogFixture { };
 
-const double g_tol = 1e-10;
-
 //////////////////////////////////////////////////
 TEST_F(QuaternionTest, Quaternion)
 {
@@ -282,9 +280,9 @@ TEST_F(QuaternionTest, Integrate)
     math::Quaternion qRoll  = q.Integrate(math::Vector3::UnitX, 1.0);
     math::Quaternion qPitch = q.Integrate(math::Vector3::UnitY, 1.0);
     math::Quaternion qYaw   = q.Integrate(math::Vector3::UnitZ, 1.0);
-    EXPECT_NEAR(qRoll.GetAsEuler().x, 1.0, g_tol);
-    EXPECT_NEAR(qPitch.GetAsEuler().y, 1.0, g_tol);
-    EXPECT_NEAR(qYaw.GetAsEuler().z, 1.0, g_tol);
+    EXPECT_EQ(qRoll.GetAsEuler(),  math::Vector3::UnitX);
+    EXPECT_EQ(qPitch.GetAsEuler(), math::Vector3::UnitY);
+    EXPECT_EQ(qYaw.GetAsEuler(),   math::Vector3::UnitZ);
   }
 
   // Integrate a full rotation about different axes,

@@ -27,6 +27,10 @@
     * [DRCSim Issue #389](https://bitbucket.org/osrf/drcsim/issue/389)
 1. Added SignalStats class for computing incremental signal statistics.
     * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
+1. Add InitialVelocityPlugin to setting the initial state of links
+    * [Pull request #1237](https://bitbucket.org/osrf/gazebo/pull-request/1237)
+1. Added Quaternion::Integrate function.
+    * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
@@ -126,6 +130,11 @@
     * [Pull request #1084](https://bitbucket.org/osrf/gazebo/pull-request/1084)
 
 ## Gazebo 3.0
+
+### Gazebo 3.x.x (yyyy-mm-dd)
+
+1. Fixed sonar and wireless sensor visualization
+    * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
 
 ### Gazebo 3.1.0 (2014-08-08)
 
@@ -780,4 +789,3 @@
 *  Numerous bug fixes
 *  APT repository hosted at [http://osrfoundation.org OSRF]
 *  Improved process control prevents zombie processes
-

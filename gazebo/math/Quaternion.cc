@@ -602,7 +602,7 @@ Quaternion Quaternion::Slerp(double _fT, const Quaternion &_rkP,
 //////////////////////////////////////////////////
 // Implementation based on:
 // http://physicsforgames.blogspot.com/2010/02/quaternions.html
-Quaternion Quaternion::Integrate(const Vector3 _angularVelocity,
+Quaternion Quaternion::Integrate(const Vector3 &_angularVelocity,
                                  const double _deltaT) const
 {
   Quaternion deltaQ;

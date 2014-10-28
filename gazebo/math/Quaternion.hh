@@ -348,7 +348,7 @@ namespace gazebo
     /// same reference frame as base of this quaternion.
     /// \param[in] _deltaT Time interval in seconds to integrate over.
     /// \return Quaternion at integrated configuration.
-    public: Quaternion Integrate(const Vector3 _angularVelocity,
+    public: Quaternion Integrate(const Vector3 &_angularVelocity,
                                  const double _deltaT) const;
 
     /// \brief Attributes of the quaternion
