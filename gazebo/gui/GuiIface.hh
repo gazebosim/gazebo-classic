@@ -58,9 +58,10 @@ namespace gazebo
     GAZEBO_VISIBLE
     bool has_entity_name(const std::string &_name);
 
-    /// \brief Load an INI configuration file.
+    /// \brief Load an INI configuration file. If the file does not exists
+    /// one will be automatically created.
     /// \param[in] _file Full path to the INI file.
-    /// \return True on success.
+    /// \return False if the file provided exists but is not an INI valid file.
     GAZEBO_VISIBLE
     bool loadINI(const boost::filesystem::path &_file);
 
