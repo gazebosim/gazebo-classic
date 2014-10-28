@@ -396,7 +396,6 @@ void Camera::RenderImpl()
 //////////////////////////////////////////////////
 void Camera::ReadPixelBuffer()
 {
-  return;
   if (this->newData && (this->captureData || this->captureDataOnce))
   {
     size_t size;
@@ -440,9 +439,7 @@ void Camera::ReadPixelBuffer()
       Ogre::Viewport *vp = rtt->addViewport(this->camera);
       vp->setClearEveryFrame(true);
       vp->setShadowsEnabled(true);
-      vp->setOverlaysEnabled(true);
-
-      vp->setDrawBuffer(Ogre::CBT_BACK_LEFT);
+      vp->setOverlaysEnabled(false);
     }
 
     // This update is only needed for client side data captures
