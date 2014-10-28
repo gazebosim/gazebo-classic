@@ -22,11 +22,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "Event.pb.h"
 #include "MOOCRestApi.hh"
-
-typedef const boost::shared_ptr<const Event_msgs::msgs::RestLogin> ConstRestLoginPtr;
-typedef const boost::shared_ptr<const Event_msgs::msgs::RestPost> ConstRestPostPtr;
 
 
 namespace gazebo
@@ -83,10 +79,10 @@ namespace gazebo
     private: bool stopMsgProcessing;
  
     /// \brief a list to accumulate pending request    
-    private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestLogin> > msgLoginQ;
+    private: std::list< boost::shared_ptr<const gazebo::msgs::RestLogin> > msgLoginQ;
 
     /// \brief a list to accumulate pending request    
-    private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestPost> > msgEventQ;
+    private: std::list< boost::shared_ptr<const gazebo::msgs::RestPost> > msgEventQ;
  
     /// \brief a thread to process requests without stopping the simulation
     private: boost::thread *requestQThread;

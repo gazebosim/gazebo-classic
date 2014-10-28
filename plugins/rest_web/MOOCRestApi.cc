@@ -226,7 +226,6 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   curl_easy_setopt(curl, CURLOPT_URL, path.c_str() );
  
   // in case things go wrong 
-  bool trace_requestsdebug = true;
   if(trace_requests)
   {
     cout << "MOOCRestApi::Request" << endl;

@@ -33,7 +33,7 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
   node->Init( );
   cout << "advertizing on /gazebo/event/rest_login" << endl;
-  pub = node->Advertise<Event_msgs::msgs::RestLogin>("/gazebo/event/rest_login");
+  pub = node->Advertise<gazebo::msgs::RestLogin>("/gazebo/event/rest_login");
   // this for a problem where the server cannot subscribe to the topic
   cout << "wait for connection..." << endl;
   pub->WaitForConnection();
@@ -55,7 +55,7 @@ void MOOCUIWidget::LoginMOOC()
   if(dialog.exec() == QDialog::Rejected) {
     cout << "MOOCUIWidget::Login CANCELLED" << endl;
   } else {
-    Event_msgs::msgs::RestLogin msg;
+    gazebo::msgs::RestLogin msg;
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());

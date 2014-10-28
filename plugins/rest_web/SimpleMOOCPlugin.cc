@@ -173,7 +173,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
   }
   catch(MOOCException &x)
   {
-    Event_msgs::msgs::RestError msg;
+    gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to send data to the MOOC: ");
     errorMsg += x.what();
     msg.set_type("Error");
@@ -212,7 +212,7 @@ void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
   }
   catch(MOOCException &x)
   {
-    Event_msgs::msgs::RestError msg;
+    gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to login the web server: ");
     errorMsg += x.what();
     msg.set_type("Error");
@@ -232,7 +232,7 @@ void SimpleMOOCPlugin::ProcessMOOCEvent(ConstRestPostPtr _msg)
   }
   catch(MOOCException &x)
   {
-    Event_msgs::msgs::RestError msg;
+    gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to post data to the web server: ");
     errorMsg += x.what();
     msg.set_type("Error");
@@ -248,14 +248,14 @@ void SimpleMOOCPlugin::RunRequestQ()
   
   // be ready to send errors back to the UI
   cout << "SimpleMOOCPlugin::RunRequestQ THREAD started" << endl;
-  pub = node->Advertise<Event_msgs::msgs::RestError>("/gazebo/event/rest_error");
+  pub = node->Advertise<gazebo::msgs::RestError>("/gazebo/event/rest_error");
 
   // process any login or post data that ha been received
   while (!stopMsgProcessing) {
     gazebo::common::Time::MSleep(50);
     try{
-      boost::shared_ptr<const Event_msgs::msgs::RestLogin> login;
-      boost::shared_ptr<const Event_msgs::msgs::RestPost> post;
+      boost::shared_ptr<const gazebo::msgs::RestLogin> login;
+      boost::shared_ptr<const gazebo::msgs::RestPost> post;
       // Grab the mutex and remove first message in each queue
       {
         boost::mutex::scoped_lock lock(this->requestQMutex);

@@ -13,6 +13,7 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
+
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
@@ -61,3 +62,5 @@ target_link_libraries(BreakableJointPlugin ForceTorquePlugin)
 set_target_properties(BreakableJointPlugin PROPERTIES
   INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR}
 )
+
+add_subdirectory(rest_web)

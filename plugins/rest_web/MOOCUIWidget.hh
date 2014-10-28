@@ -19,11 +19,9 @@
 #define _MOOCUI_WIDGET_HH_
 
 #include <gazebo/gazebo.hh>
-#include "Event.pb.h" 
 #include "MOOCLoginDialog.hh"
 
-
-typedef const boost::shared_ptr<const Event_msgs::msgs::RestError> ConstRestErrorPtr;
+//typedef const boost::shared_ptr<const ::msgs::RestError> ConstRestErrorPtr;
 
 namespace gazebo
 {
@@ -58,7 +56,7 @@ namespace gazebo
     /// \brief login dialog
     private: gui::MOOCLoginDialog dialog;
     
-   private: std::list< boost::shared_ptr<const Event_msgs::msgs::RestError> > msgRespQ;
+   private: std::list< boost::shared_ptr<const gazebo::msgs::RestError> > msgRespQ;
 
  };
 }
