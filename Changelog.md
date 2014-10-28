@@ -25,6 +25,9 @@
 1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
   * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
 
+1. Fix joint axis visualization.
+  * [Pull request #1258](https://bitbucket.org/osrf/gazebo/pull-request/1258)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
