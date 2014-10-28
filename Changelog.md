@@ -43,6 +43,8 @@
     * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
 1. Add InitialVelocityPlugin to setting the initial state of links
     * [Pull request #1237](https://bitbucket.org/osrf/gazebo/pull-request/1237)
+1. Added Quaternion::Integrate function.
+    * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
