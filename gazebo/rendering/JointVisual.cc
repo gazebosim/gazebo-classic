@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
   this->SetPosition(msgs::Convert(_msg->pose().position()));
   this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
+  // create an arrow visual for each axis in the joint message
   if (_msg->has_axis1())
   {
     msgs::Axis axis1Msg = _msg->axis1();
@@ -82,6 +83,8 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
       "_axis1_AXIS", shared_from_this()));
   axis->Load();
   axis->SetMaterial("Gazebo/Yellow");
+
+  // Get rotation to axis vector
   math::Vector3 axis1Dir = _axis;
   math::Vector3 u = axis1Dir.Normalize();
   math::Vector3 v = math::Vector3::UnitZ;
@@ -97,6 +100,8 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
 
   if (_useParentFrame)
   {
+    // if set to use parent model frame
+    // rotate the arrow visual relative to the model
     VisualPtr model = this->GetRootVisual();
     math::Quaternion quatFromModel =
         model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;

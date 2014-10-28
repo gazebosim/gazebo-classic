@@ -683,9 +683,13 @@ VisualPtr Scene::GetVisual(uint32_t _id) const
 //////////////////////////////////////////////////
 VisualPtr Scene::GetVisual(const std::string &_name) const
 {
+ Visual_M::const_iterator iter;
+  for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
+    std::cerr << "visuals " << iter->second->GetName()  << std::endl;
+
   VisualPtr result;
 
-  Visual_M::const_iterator iter;
+  //Visual_M::const_iterator iter;
   for (iter = this->visuals.begin(); iter != this->visuals.end(); ++iter)
     if (iter->second->GetName() == _name)
       break;

@@ -121,6 +121,7 @@ gz_build_tests(${gtest_sources})
 set (gtest_sources_dri
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
+  JointVisual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})
