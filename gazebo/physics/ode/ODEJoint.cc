@@ -507,7 +507,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
-      gzwarn << "The '" << _key "' parameter is deprecated "
+      gzwarn << "The '" << _key << "' parameter is deprecated "
              << "to enable Coulomb joint friction with the "
              << "'friction' parameter"
              << std::endl;
@@ -539,7 +539,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
-      gzwarn << "The '" << _key "' parameter is deprecated "
+      gzwarn << "The '" << _key << "' parameter is deprecated "
              << "to enable Coulomb joint friction with the "
              << "'friction' parameter"
              << std::endl;
