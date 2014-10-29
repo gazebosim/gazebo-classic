@@ -66,6 +66,49 @@ namespace gazebo
     /// \brief Helper class to store collision data
     class CollisionData
     {
+      /// \brief Constructor
+      public: CollisionData();
+
+      /// \brief Get the name of the collision.
+      /// \return Name of collision.
+      public: std::string GetName() const;
+
+      /// \brief Set the name of the collision.
+      /// \param[in] _name Name of collision.
+      public: void SetName(const std::string &_name);
+
+      /// \brief Get the pose of the collision.
+      /// \return Pose of collision.
+      public: math::Pose GetPose() const;
+
+      /// \brief Set the pose of the collision.
+      /// \param[in] _pose Pose of collision.
+      public: void SetPose(const math::Pose &_pose);
+
+      /// \brief Get the laser retro of the collision.
+      /// \return Laser retro.
+      public: double GetLaserRetro() const;
+
+      /// \brief Set the laser retro of collision.
+      /// \param[in] _retro Laser retro.
+      public: void SetLaserRetro(double _retro);
+
+      /// \brief Get the maximum number of contacts of the collision.
+      /// \return Maximum number of contacts.
+      public: int GetMaxContacts() const;
+
+      /// \brief Set the maximum number of contacts of collision.
+      /// \param[in] _maxContacts Maximum number of contacts.
+      public: void SetMaxContacts(int _maxContacts);
+
+      /// \brief Get the surface restitution coefficient of the collision.
+      /// \return Surface restitution coefficient.
+      public: double GetSurfaceRestitutionCoeff() const;
+
+      /// \brief Set the surface restitution coefficient of collision.
+      /// \param[in] _coeff Surface restitution coefficient.
+      public: void SetSurfaceRestitutionCoeff(double _coeff);
+
       /// \brief Name of collision.
       public: std::string name;
 

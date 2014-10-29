@@ -104,7 +104,6 @@ PartCollisionConfig *PartInspector::GetCollisionConfig() const
   return this->collisionConfig;
 }
 
-
 /////////////////////////////////////////////////
 void PartInspector::OnCancel()
 {

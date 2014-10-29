@@ -87,6 +87,12 @@ namespace gazebo
       /// \brief Spin box for configuring the yaw of the part.
       public: QDoubleSpinBox *rotYSpinBox;
 
+      /// \brief Spin box for configuring the laser retro value.
+      public: QDoubleSpinBox *laserRetroSpinBox;
+
+      /// \brief Spin box for configuring the maximum number of contacts.
+      public: QSpinBox *maxContactsSpinBox;
+
       /// \brief Qt signal emitted when a collision is added.
       private slots: void GeometryChanged(const QString _text);
     };
@@ -179,7 +185,7 @@ namespace gazebo
 
       /// \brief Set the scale of the geometry.
       /// \param[in] _index Index of collision
-      /// \param[in] _dimensions Geometry scale.
+      /// \param[in] _scale Geometry scale.
       public: void SetGeometryScale(unsigned int _index,
           const math::Vector3 &_scale);
 
@@ -187,6 +193,28 @@ namespace gazebo
       /// \param[in] _index Index of collision
       /// \return Geometry scale.
       public: math::Vector3 GetGeometryScale(unsigned int _index) const;
+
+      /// \brief Set the laser retro value
+      /// \param[in] _index Index of collision
+      /// \param[in] _retro Laser retro.
+      public: void SetLaserRetro(unsigned int _index,
+          double _retro);
+
+      /// \brief Get the laser retro of the collision.
+      /// \param[in] _index Index of collision
+      /// \return Laser retro.
+      public: double GetLaserRetro(unsigned int _index) const;
+
+      /// \brief Get the maximum number of contacts of the collision.
+      /// \param[in] _index Index of collision
+      /// \return Maximum number of contacts.
+      public: double GetMaxContacts(unsigned int _index) const;
+
+      /// \brief Set the maximum number of contacts of the collision.
+      /// \param[in] _index Index of collision
+      /// \param[in] _maxContacts Maximum number of contacts.
+      public: void SetMaxContacts(unsigned int _index,
+          double _maxContacts);
 
       /// \brief List of collision widgets for configuring collision properties.
       private: std::vector<CollisionDataWidget *> dataWidgets;

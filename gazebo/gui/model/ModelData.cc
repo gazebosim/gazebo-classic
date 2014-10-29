@@ -66,6 +66,74 @@ void VisualData::SetMaterial(const std::string &_material)
 }
 */
 
+/////////////////////////////////////////////////
+CollisionData::CollisionData()
+{
+  this->collisionSDF.reset(new sdf::Element);
+  sdf::initFile("collision.sdf", this->collisionSDF);
+}
+
+/////////////////////////////////////////////////
+void CollisionData::SetName(const std::string &_name)
+{
+  this->collisionSDF->GetElement("name")->Set(_name);
+}
+
+/////////////////////////////////////////////////
+std::string CollisionData::GetName() const
+{
+ return  this->collisionSDF->Get<std::string>("name");
+}
+
+/////////////////////////////////////////////////
+math::Pose CollisionData::GetPose() const
+{
+  return this->collisionSDF->Get<math::Pose>("pose");
+}
+
+/////////////////////////////////////////////////
+void CollisionData::SetPose(const math::Pose &_pose)
+{
+  this->collisionSDF->GetElement("pose")->Set(_pose);
+}
+
+/////////////////////////////////////////////////
+double CollisionData::GetLaserRetro() const
+{
+  return this->collisionSDF->Get<double>("laser_retro");
+}
+
+/////////////////////////////////////////////////
+void CollisionData::SetLaserRetro(double _retro)
+{
+  this->collisionSDF->GetElement("laser_retro")->Set(_retro);
+}
+
+/////////////////////////////////////////////////
+int CollisionData::GetMaxContacts() const
+{
+  return this->collisionSDF->Get<int>("max_contacts");
+}
+
+/////////////////////////////////////////////////
+void CollisionData::SetMaxContacts(int _maxContacts)
+{
+  this->collisionSDF->GetElement("max_contacts")->Set(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+double CollisionData::GetSurfaceRestitutionCoeff() const
+{
+  return this->collisionSDF->GetElement("surface")
+      ->Get<double>("restitution_coefficient");
+}
+
+/////////////////////////////////////////////////
+void CollisionData::SetSurfaceRestitutionCoeff(double _coeff)
+{
+  this->collisionSDF->GetElement("surface")->
+      GetElement("restitution_coefficient")->Set(_coeff);
+}
 
 /////////////////////////////////////////////////
 PartData::PartData()
@@ -241,7 +309,6 @@ void PartData::SetMass(double _mass)
 {
   this->partSDF->GetElement("inertial")->GetElement("mass")->Set(_mass);
 }
-
 
 /////////////////////////////////////////////////
 math::Pose PartData::GetInertialPose() const

@@ -770,12 +770,35 @@ void ModelCreator::OpenInspector(const std::string &_name)
   {
     if (i >= collisionConfig->GetCollisionCount())
       collisionConfig->AddCollision();
-/*    visualConfig->SetName(i, part->visuals[i]->GetName());
-    visualConfig->SetPose(i, part->visuals[i]->GetPose());
-    visualConfig->SetTransparency(i, part->visuals[i]->GetTransparency());
-    visualConfig->SetMaterial(i, part->visuals[i]->GetMaterialName());
-    visualConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
-    visualConfig->SetGeometryScale(i, part->visuals[i]->GetScale());*/
+    collisionConfig->SetName(i, part->collisions[i]->GetName());
+    collisionConfig->SetPose(i, part->collisions[i]->GetPose());
+    collisionConfig->SetLaserRetro(i, part->collisions[i]->GetLaserRetro());
+    collisionConfig->SetMaxContacts(i, part->collisions[i]->GetMaxContacts());
+/*    collisionConfig->SetSurfaceRestitutionCoeff(i,
+        part->collisions[i]->GetSurfaceRestitutionCoeff());
+    collisionConfig->SetSurfaceBounceThreshold(i,
+        part->collisions[i]->GetSurfaceBounceThreshold());
+    collisionConfig->SetSurfaceBounceThreshold(i,
+        part->collisions[i]->GetSurfaceBounceThreshold());
+    collisionConfig->SetSurfaceSoftCFM(i,
+        part->collisions[i]->GetSurfaceSoftCFM());
+    collisionConfig->SetSurfaceSoftERP(i,
+        part->collisions[i]->GetSurfaceSoftERP());
+    collisionConfig->SetSurfaceKp(i,
+        part->collisions[i]->GetSurfaceKP());
+    collisionConfig->SetSurfaceKd(i,
+        part->collisions[i]->GetSurfaceKd());
+    collisionConfig->SetSurfaceMaxVel(i,
+        part->collisions[i]->GetSurfaceMaxVel());
+    collisionConfig->SetSurfaceMinDepth(i,
+        part->collisions[i]->GetSurfaceMinDepth());
+    collisionConfig->SetSurfaceCollideWithoutContact(i,
+        part->collisions[i]->GetSurfaceCollideWithoutContact());
+    collisionConfig->SetSurfaceCollideWithoutContactBitmask(i,
+        part->collisions[i]->GetSurfaceCollideWithoutContactBitmask());*/
+
+//    collisionConfig->SetGeometry(i, part->visuals[i]->GetMeshName());
+//    collisionConfig->SetGeometryScale(i, part->visuals[i]->GetScale());
   }
 
   part->inspector->show();

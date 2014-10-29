@@ -191,6 +191,18 @@ void PartCollisionConfig::OnAddCollision()
   dataWidget->geomDimensionWidget->insertWidget(1, geomRLWidget);
   dataWidget->geomDimensionWidget->setCurrentIndex(0);
 
+  QLabel *laserRetroLabel = new QLabel(tr("laser retro: "));
+  dataWidget->laserRetroSpinBox = new QDoubleSpinBox;
+  dataWidget->laserRetroSpinBox->setRange(-1000, 1000);
+  dataWidget->laserRetroSpinBox->setSingleStep(0.01);
+  dataWidget->laserRetroSpinBox->setDecimals(3);
+  dataWidget->laserRetroSpinBox->setValue(0.0);
+
+  QLabel *maxContactsLabel = new QLabel(tr("max contacts: "));
+  dataWidget->maxContactsSpinBox = new QSpinBox;
+  dataWidget->maxContactsSpinBox->setRange(0, 1000);
+  dataWidget->maxContactsSpinBox->setSingleStep(1);
+  dataWidget->maxContactsSpinBox->setValue(10);
 
   QGridLayout *collisionGeneralLayout = new QGridLayout;
   collisionGeneralLayout->addWidget(nameLabel, 0, 0);
@@ -198,6 +210,12 @@ void PartCollisionConfig::OnAddCollision()
   collisionGeneralLayout->addWidget(geometryLabel, 1, 0);
   collisionGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
   collisionGeneralLayout->addWidget(dataWidget->geomDimensionWidget, 2, 1);
+
+  QGridLayout *collisionPropertyLayout = new QGridLayout;
+  collisionPropertyLayout->addWidget(laserRetroLabel, 0, 0);
+  collisionPropertyLayout->addWidget(dataWidget->laserRetroSpinBox, 0, 1);
+  collisionPropertyLayout->addWidget(maxContactsLabel, 1, 0);
+  collisionPropertyLayout->addWidget(dataWidget->maxContactsSpinBox, 1, 1);
 
   QLabel *posXLabel = new QLabel(tr("x: "));
   QLabel *posYLabel = new QLabel(tr("y: "));
@@ -269,9 +287,11 @@ void PartCollisionConfig::OnAddCollision()
 
   collisionLayout->addLayout(collisionGeneralLayout);
   collisionLayout->addWidget(poseGroupBox);
+  collisionLayout->addLayout(collisionPropertyLayout);
   collisionWidget->setLayout(collisionLayout);
 
-  this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0, collisionWidget);
+  this->collisionsTreeWidget->setItemWidget(collisionChildItem, 0,
+      collisionWidget);
   collisionItem->setExpanded(true);
   collisionChildItem->setExpanded(true);
 
@@ -543,6 +563,56 @@ std::string PartCollisionConfig::GetName(unsigned int _index) const
   }
 
   return this->dataWidgets[_index]->collisionNameLabel->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+void PartCollisionConfig::SetLaserRetro(unsigned int _index,
+    double _retro)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  this->dataWidgets[_index]->laserRetroSpinBox->setValue(_retro);
+}
+
+/////////////////////////////////////////////////
+double PartCollisionConfig::GetLaserRetro(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->dataWidgets[_index]->laserRetroSpinBox->value();
+}
+
+/////////////////////////////////////////////////
+void PartCollisionConfig::SetMaxContacts(unsigned int _index,
+    double _maxContacts)
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return;
+  }
+
+  this->dataWidgets[_index]->maxContactsSpinBox->setValue(_maxContacts);
+}
+
+/////////////////////////////////////////////////
+double PartCollisionConfig::GetMaxContacts(unsigned int _index) const
+{
+  if (_index >= this->dataWidgets.size())
+  {
+    gzerr << "Index is out of range" << std::endl;
+    return 0;
+  }
+
+  return this->dataWidgets[_index]->maxContactsSpinBox->value();
 }
 
 /////////////////////////////////////////////////

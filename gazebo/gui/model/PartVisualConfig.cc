@@ -207,10 +207,12 @@ void PartVisualConfig::OnAddVisual()
   visualGeneralLayout->addWidget(geometryLabel, 1, 0);
   visualGeneralLayout->addWidget(dataWidget->geometryComboBox, 1, 1);
   visualGeneralLayout->addWidget(dataWidget->geomDimensionWidget, 2, 1);
-  visualGeneralLayout->addWidget(transparencyLabel, 3, 0);
-  visualGeneralLayout->addWidget(dataWidget->transparencySpinBox, 3, 1);
-  visualGeneralLayout->addWidget(materialLabel, 4, 0);
-  visualGeneralLayout->addWidget(dataWidget->materialLineEdit, 4, 1);
+
+  QGridLayout *visualPropertyLayout = new QGridLayout;
+  visualPropertyLayout->addWidget(transparencyLabel, 0, 0);
+  visualPropertyLayout->addWidget(dataWidget->transparencySpinBox, 0, 1);
+  visualPropertyLayout->addWidget(materialLabel, 1, 0);
+  visualPropertyLayout->addWidget(dataWidget->materialLineEdit, 1, 1);
 
   QLabel *posXLabel = new QLabel(tr("x: "));
   QLabel *posYLabel = new QLabel(tr("y: "));
@@ -282,6 +284,7 @@ void PartVisualConfig::OnAddVisual()
 
   visualLayout->addLayout(visualGeneralLayout);
   visualLayout->addWidget(poseGroupBox);
+  visualLayout->addLayout(visualPropertyLayout);
   visualWidget->setLayout(visualLayout);
 
   this->visualsTreeWidget->setItemWidget(visualChildItem, 0, visualWidget);
