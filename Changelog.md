@@ -28,6 +28,11 @@
 1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
   * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
 
+1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
+   see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
+   with joystick button 1.
+  * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
