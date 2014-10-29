@@ -1,6 +1,59 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>0 -2 1.75  0 0.35 1.57</pose>
+      </camera>
+    </gui>
+    <scene>
+      <shadows>0</shadows>
+    </scene>
+    <physics type="ode">
+      <gravity>0.000000 0.000000 -9.810000</gravity>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>100</iters>
+          <precon_iters>0</precon_iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <contact_max_correcting_vel>0.000000</contact_max_correcting_vel>
+          <contact_surface_layer>0.00000</contact_surface_layer>
+        </constraints>
+      </ode>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>100</iters>
+          <sor>1.000000</sor>
+        </solver>
+        <constraints>
+          <cfm>0.000000</cfm>
+          <erp>0.200000</erp>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+          <contact_surface_layer>0.01000</contact_surface_layer>
+        </constraints>
+      </bullet>
+      <simbody>
+        <accuracy>0.001</accuracy>
+        <max_transient_velocity>0.01</max_transient_velocity>
+        <contact>
+          <stiffness>1e8</stiffness>
+          <dissipation>10</dissipation>
+          <static_friction>0.15</static_friction>
+          <dynamic_friction>0.1</dynamic_friction>
+          <viscous_friction>0.0</viscous_friction>
+        </contact>
+      </simbody>
+      <real_time_update_rate>0.000000</real_time_update_rate>
+      <max_step_size>0.001000</max_step_size>
+    </physics>
+
     <!-- A global light source -->
     <include>
       <uri>model://sun</uri>
@@ -19,6 +72,38 @@
       <uri>model://wooden_case</uri>
       <pose>0 0.037 1.015 0 0 -1.570796</pose>
     </include>
+
+    <model name="polhemus_source">
+      <pose>-.5 0 1.3 0 3.1416 1.57</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.25</mass>
+          <inertia>
+            <ixx>0.000104167</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.000104167</iyy>
+            <iyz>0</iyz>
+            <izz>0.000104167</izz>
+          </inertia>
+        </inertial>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <static>true</static>
+    </model>
 
     <include>
       <uri>model://cricket_ball</uri>
