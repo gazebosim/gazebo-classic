@@ -28,6 +28,7 @@
 #include "gazebo/rendering/RayQuery.hh"
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -192,10 +193,14 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    // select first triangle on any mesh, if it's on the same mesh, update the
-    // triangle vertices.
+    // Select first triangle on any mesh
+    // Update triangle if:
+    // Main window: same model
+    // Model Editor: same visual (allow snapping within a model)
     if (!this->dataPtr->selectedVis ||
-       (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
+        (!g_editModelAct->isChecked() &&
+        (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
+        || (g_editModelAct->isChecked() && (vis == this->dataPtr->selectedVis)))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -222,9 +227,16 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
       if (!vertices.empty())
       {
-        this->Snap(this->dataPtr->selectedTriangle, vertices,
-            this->dataPtr->selectedVis->GetRootVisual());
-
+        if (!g_editModelAct->isChecked())
+        {
+          this->Snap(this->dataPtr->selectedTriangle, vertices,
+              this->dataPtr->selectedVis->GetRootVisual());
+        }
+        else
+        {
+          this->Snap(this->dataPtr->selectedTriangle, vertices,
+              this->dataPtr->selectedVis);
+        }
         this->Reset();
         gui::Events::manipMode("select");
       }
