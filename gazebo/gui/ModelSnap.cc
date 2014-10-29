@@ -196,11 +196,12 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // Select first triangle on any mesh
     // Update triangle if:
     // Main window: same model
-    // Model Editor: same visual (allow snapping within a model)
+    // Model Editor: same link (allow snapping within a model)
     if (!this->dataPtr->selectedVis ||
         (!g_editModelAct->isChecked() &&
         (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
-        || (g_editModelAct->isChecked() && (vis == this->dataPtr->selectedVis)))
+        || (g_editModelAct->isChecked() &&
+        (vis->GetParent() == this->dataPtr->selectedVis->GetParent())))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -235,7 +236,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
         else
         {
           this->Snap(this->dataPtr->selectedTriangle, vertices,
-              this->dataPtr->selectedVis);
+              this->dataPtr->selectedVis->GetParent());
         }
         this->Reset();
         gui::Events::manipMode("select");
