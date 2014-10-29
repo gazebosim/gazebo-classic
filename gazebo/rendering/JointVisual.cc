@@ -85,14 +85,17 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   ArrowVisualPtr axis;
-  axis.reset(new ArrowVisual(this->GetName() +
-      "_axis1_AXIS", shared_from_this()));
+
+  std::stringstream nameStr;
+  nameStr << this->GetName() << "_axis_" << this->GetChildCount() << "_AXIS";
+
+  axis.reset(new ArrowVisual(nameStr.str(), shared_from_this()));
   axis->Load();
   axis->SetMaterial("Gazebo/YellowTransparent");
 
   // Get rotation to axis vector
-  math::Vector3 axis1Dir = _axis;
-  math::Vector3 u = axis1Dir.Normalize();
+  math::Vector3 axisDir = _axis;
+  math::Vector3 u = axisDir.Normalize();
   math::Vector3 v = math::Vector3::UnitZ;
   double cosTheta = v.Dot(u);
   double angle = acos(cosTheta);
@@ -113,7 +116,8 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
         model->GetWorldPose().rot.GetInverse()*this->GetWorldPose().rot;
     axis->SetRotation(quatFromModel.GetInverse()*axis->GetRotation());
   }
-  if (_type == msgs::Joint::REVOLUTE)
+  if (_type == msgs::Joint::REVOLUTE || _type == msgs::Joint::REVOLUTE2
+      || _type == msgs::Joint::UNIVERSAL || _type == msgs::Joint::GEARBOX)
       axis->ShowRotation();
 
   math::Quaternion axisWorldRotation = axis->GetWorldPose().rot;

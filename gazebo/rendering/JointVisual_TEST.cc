@@ -70,8 +70,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   {
     msgs::Axis *axis2 = jointMsg->mutable_axis2();
     msgs::Set(axis2->mutable_xyz(), gazebo::math::Vector3(0, 0, 1));
-    axis2->set_limit_lower(+1.2);
-    axis2->set_limit_upper(-2.3);
+    axis2->set_limit_lower(-1.2);
+    axis2->set_limit_upper(-0.3);
     axis2->set_limit_effort(3);
     axis2->set_limit_velocity(2);
     axis2->set_damping(false);
