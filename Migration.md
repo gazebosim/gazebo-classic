@@ -9,27 +9,22 @@
   environment variable GAZEBO_MASTER_URI is not present or invalid,
   <GAZEBO_MASTER_PORT> will be replaced by "default".
 
-### Additions
-
-1. **gazebo/physics/Joint.hh**
-    + void SetVelocityLimit(unsigned int, double)
-    + bool SetVelocityMaximal(unsigned int, double)
-
-1. **gazebo/physics/Population.hh**
-    + ***New class:*** Population
-
-1. **gazebo/math/Kmeans.hh**
-    + ***New class:*** Kmeans
-
-1. **gazebo/gui/SpaceNav.hh**
-    + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
-
-### Modifications
-
 1. **gazebo/common/Plugin.hh**
     + ***Removed:*** protected: std::string Plugin::handle
     + ***Replacement:*** protected: std::string Plugin::handleName
 
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Removed:*** public: void HandlePress(const common::KeyEvent &_event);
+    + ***Replacement:*** public: bool HandlePress(const common::KeyEvent &_event);
+
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Removed:*** public: void HandleRelease(const common::KeyEvent &_event);
+    + ***Replacement:*** public: bool HandleRelease(const common::KeyEvent &_event);
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
+    + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
+    
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**

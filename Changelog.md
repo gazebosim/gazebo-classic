@@ -2,6 +2,9 @@
 
 ### Gazebo 5.0.0
 
+1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
+    * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
+
 1. Added ability to read the directory where the log files are stored.
     * [Pull request #1277](https://bitbucket.org/osrf/gazebo/pull-request/1277)
 
@@ -28,6 +31,11 @@
 1. Fix joint axis visualization.
   * [Pull request #1258](https://bitbucket.org/osrf/gazebo/pull-request/1258)
 
+1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
+   see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
+   with joystick button 1.
+  * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
@@ -43,6 +51,8 @@
     * [Pull request #1198](https://bitbucket.org/osrf/gazebo/pull-request/1198)
 1. Add InitialVelocityPlugin to setting the initial state of links
     * [Pull request #1237](https://bitbucket.org/osrf/gazebo/pull-request/1237)
+1. Added Quaternion::Integrate function.
+    * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 
 ### Gazebo 4.0.2 (2014-09-23)
 

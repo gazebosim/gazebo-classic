@@ -63,7 +63,7 @@ bool SpaceNav::Load()
 
   // Read topic from [spacenav] in gui.ini
   std::string topic = getINIProperty<std::string>("spacenav.topic",
-                                                  "~/spacenav/joy");
+                                                  "~/user_camera/joy_twist");
 
   if (spnav_open() >= 0)
   {
