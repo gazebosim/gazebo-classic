@@ -54,7 +54,7 @@ namespace gazebo
       /// joint frame.
       /// \param[in] _type Type of axis.
       public: void CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
-          int _type);
+          msgs::Joint::Type _type);
     };
     /// \}
   }

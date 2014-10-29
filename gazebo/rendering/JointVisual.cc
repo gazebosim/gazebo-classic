@@ -14,9 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Joint Visualization Class
- * Author: Nate Koenig
- */
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/DynamicLines.hh"
@@ -79,7 +76,7 @@ void JointVisual::Load(ConstJointPtr &_msg)
 
 /////////////////////////////////////////////////
 void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
-    int _type)
+    msgs::Joint::Type _type)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
