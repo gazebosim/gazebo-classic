@@ -15,6 +15,8 @@
  *
 */
 
+#include <iostream>
+
 #include "gazebo/gui/GuiIface_TEST.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/common/ModelDatabase.hh"
@@ -53,6 +55,37 @@ void GuiIface_TEST::noINIFile()
   QVERIFY(height == 200);
 
   gazebo::gui::stop();
+}
+
+/////////////////////////////////////////////////
+void GuiIface_TEST::GUIINIPATHEnvVariable()
+{
+  // Get a temp directory
+  boost::filesystem::path path =
+    boost::filesystem::temp_directory_path() / "gazebo";
+  boost::filesystem::create_directories(path);
+
+  // Set the gui.ini filename
+  path /= "foo.ini";
+  const char * filepath = path.string().c_str();
+
+  setenv("GAZEBO_GUI_INI_PATH", filepath, 1);
+
+  // Return true, we are creating it for you
+  QVERIFY(gazebo::gui::load());
+
+  // Write invalid content for an INI file
+  std::ofstream iniFile;
+  iniFile.open(filepath);
+  iniFile << "Invalid content\n";
+  iniFile.close();
+
+  // Only false when trying to read invalid content
+  QVERIFY(gazebo::gui::load() == false);
+
+  // Need to clean up the variable for the next tests
+  unsetenv("GAZEBO_GUI_INI_PATH");
+  boost::filesystem::remove(path);
 }
 
 /////////////////////////////////////////////////
