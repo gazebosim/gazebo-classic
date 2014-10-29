@@ -44,7 +44,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
       new gazebo::rendering::Visual("child", scene->GetWorldVisual()));
 
   // create a joint message for testing
-  boost::shared_ptr<gazebo::msgs::Joint> jointMsg;
+  gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
   jointMsg->set_parent(scene->GetWorldVisual()->GetName());
   jointMsg->set_parent_id(scene->GetWorldVisual()->GetId());
@@ -55,25 +55,29 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   msgs::Set(jointMsg->mutable_pose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
   jointMsg->set_type(msgs::Joint::REVOLUTE2);
   jointMsg->add_angle(1.2);
-  msgs::Axis *axis1 = jointMsg->mutable_axis1();
-  msgs::Set(axis1->mutable_xyz(), gazebo::math::Vector3(0, 1, 0));
-  axis1->set_limit_lower(-1.2);
-  axis1->set_limit_upper(2.3);
-  axis1->set_limit_effort(6);
-  axis1->set_limit_velocity(1);
-  axis1->set_damping(true);
-  axis1->set_friction(true);
-  axis1->set_use_parent_model_frame(true);
+  {
+    msgs::Axis *axis1 = jointMsg->mutable_axis1();
+    msgs::Set(axis1->mutable_xyz(), gazebo::math::Vector3(0, 1, 0));
+    axis1->set_limit_lower(-1.2);
+    axis1->set_limit_upper(2.3);
+    axis1->set_limit_effort(6);
+    axis1->set_limit_velocity(1);
+    axis1->set_damping(true);
+    axis1->set_friction(true);
+    axis1->set_use_parent_model_frame(true);
+  }
   jointMsg->add_angle(-1.2);
-  msgs::Axis *axis2 = jointMsg->mutable_axis2();
-  msgs::Set(axis2->mutable_xyz(), gazebo::math::Vector3(0, 0, 1));
-  axis2->set_limit_lower(+1.2);
-  axis2->set_limit_upper(-2.3);
-  axis2->set_limit_effort(3);
-  axis2->set_limit_velocity(2);
-  axis2->set_damping(false);
-  axis2->set_friction(false);
-  axis2->set_use_parent_model_frame(false);
+  {
+    msgs::Axis *axis2 = jointMsg->mutable_axis2();
+    msgs::Set(axis2->mutable_xyz(), gazebo::math::Vector3(0, 0, 1));
+    axis2->set_limit_lower(+1.2);
+    axis2->set_limit_upper(-2.3);
+    axis2->set_limit_effort(3);
+    axis2->set_limit_velocity(2);
+    axis2->set_damping(false);
+    axis2->set_friction(false);
+    axis2->set_use_parent_model_frame(false);
+  }
 
   // test calling constructor and Load functions and make sure
   // there are no segfaults
