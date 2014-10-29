@@ -507,6 +507,10 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
+      gzwarn << "The '" << _key "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
@@ -535,6 +539,10 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
+      gzwarn << "The '" << _key "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
       this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)

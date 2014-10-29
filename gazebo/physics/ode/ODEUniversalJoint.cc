@@ -342,7 +342,10 @@ bool ODEUniversalJoint::SetParam(
     }
     catch(const boost::bad_any_cast &e)
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
+      gzerr << "boost any_cast error during "
+            << "SetParam('" << _key << "'): "
+            << e.what()
+            << std::endl;
       return false;
     }
   }
