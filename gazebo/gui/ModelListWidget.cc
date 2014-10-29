@@ -1390,7 +1390,7 @@ void ModelListWidget::FillPropertyTree(const msgs::Joint &_msg,
   {
     item = this->variantManager->addProperty(QVariant::String,
                                              tr("type"));
-    std::string jointType = msgs::Convert(_msg.type());
+    std::string jointType = msgs::ConvertJointType(_msg.type());
     item->setValue(jointType.c_str());
     if (_parent)
       _parent->addSubProperty(item);

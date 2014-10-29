@@ -114,13 +114,13 @@ namespace gazebo
     /// \param[in] _str Joint type string.
     /// \return A msgs::Joint::Type enum.
     GAZEBO_VISIBLE
-    msgs::Joint::Type Convert(const std::string &_str);
+    msgs::Joint::Type ConvertJointType(const std::string &_str);
 
     /// \brief Convert a msgs::Joint::Type to a string.
     /// \param[in] _type A msgs::Joint::Type enum.
     /// \return Joint type string.
     GAZEBO_VISIBLE
-    std::string Convert(const msgs::Joint::Type _type);
+    std::string ConvertJointType(const msgs::Joint::Type _type);
 
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert

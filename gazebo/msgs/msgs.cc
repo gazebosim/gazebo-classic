@@ -275,7 +275,7 @@ namespace gazebo
       return result;
     }
 
-    msgs::Joint::Type Convert(const std::string &_str)
+    msgs::Joint::Type ConvertJointType(const std::string &_str)
     {
       msgs::Joint::Type result = msgs::Joint::REVOLUTE;
       if (_str == "revolute")
@@ -309,7 +309,7 @@ namespace gazebo
       return result;
     }
 
-    std::string Convert(const msgs::Joint::Type _type)
+    std::string ConvertJointType(const msgs::Joint::Type _type)
     {
       std::string result;
       switch (_type)

@@ -236,7 +236,7 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
 
 void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
 {
-  EXPECT_EQ(_type, msgs::Convert(msgs::Convert(_type)));
+  EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
 }
 
 TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
