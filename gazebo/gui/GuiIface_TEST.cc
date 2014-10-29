@@ -54,6 +54,7 @@ void GuiIface_TEST::noINIFile()
   QVERIFY(width == 100);
   QVERIFY(height == 200);
 
+  boost::filesystem::remove(path);
   gazebo::gui::stop();
 }
 
@@ -67,6 +68,11 @@ void GuiIface_TEST::GUIINIPATHEnvVariable()
 
   // Set the gui.ini filename
   path /= "foo.ini";
+
+  // Make sure the INI file doesn't exist.
+  if (boost::filesystem::exists(path))
+    boost::filesystem::remove(path);
+
   const char * filepath = path.string().c_str();
 
   setenv("GAZEBO_GUI_INI_PATH", filepath, 1);
@@ -86,6 +92,8 @@ void GuiIface_TEST::GUIINIPATHEnvVariable()
   // Need to clean up the variable for the next tests
   unsetenv("GAZEBO_GUI_INI_PATH");
   boost::filesystem::remove(path);
+
+  gazebo::gui::stop();
 }
 
 /////////////////////////////////////////////////
@@ -138,6 +146,7 @@ void GuiIface_TEST::setINIProperties()
   QVERIFY(width == widthOrig);
   QVERIFY(height == heightOrig);
 
+  boost::filesystem::remove(path);
   gazebo::gui::stop();
 }
 
@@ -188,6 +197,7 @@ void GuiIface_TEST::saveINIProperties()
   QVERIFY(width == widthNew);
   QVERIFY(height == heightNew);
 
+  boost::filesystem::remove(path);
   gazebo::gui::stop();
 }
 

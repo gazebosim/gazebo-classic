@@ -224,7 +224,7 @@ bool gui::load()
   {
     if (!(result=gui::loadINI(path)))
     {
-      gzerr << "Unable to read ~/.gazebo/gui.ini file from " << path << ".\n";
+      gzerr << "Unable to read .ini file from " << path << ".\n";
       result = false;
     }
     else 
