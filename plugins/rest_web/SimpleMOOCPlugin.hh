@@ -28,7 +28,7 @@
 namespace gazebo
 {
 
-  class SimpleMOOCPlugin : public SystemPlugin
+  class GAZEBO_VISIBLE SimpleMOOCPlugin : public SystemPlugin
   {
     /// \brief ctor
     public: SimpleMOOCPlugin();

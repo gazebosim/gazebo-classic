@@ -28,6 +28,10 @@ using namespace std;
 MOOCUIPlugin::MOOCUIPlugin()
   :widget(NULL)
 {
+  menuTitle = "Web service";
+  loginTitle = "Web service login";
+  urlLabel = "url";
+  defaultUrl = "https://";
   cout << "MOOCUIPlugin()" << endl;
 }
 
@@ -36,9 +40,33 @@ MOOCUIPlugin::~MOOCUIPlugin()
   cout << "~MOOCUIPlugin()" << endl;
 }
 
-void MOOCUIPlugin::Load(int /*_argc*/, char ** /*_argv*/)
+void MOOCUIPlugin::Load(int _argc, char ** _argv)
 {
   cout << "MOOCUIPlugin::Load()" << endl;
+  cout << "looking for [menu=, title=, label=, url=" << endl;
+  cout << _argc << " args" << endl;
+  for (int i=0; i < _argc; i++)
+  {
+    std::string arg = _argv[i]; 
+    cout << " " << i << ": " << arg << endl;
+
+    if (arg.find("menu=") == 0)
+    {
+        this->menuTitle = arg.substr(5);
+    }
+    else if (arg.find("title=") == 0 )
+    {
+        this->loginTitle = arg.substr(6);
+    }
+    else if (arg.find("label=") == 0 )
+    {
+        this->urlLabel = arg.substr(6);
+    }
+    else if (arg.find("url=") == 0 )
+    {
+        this->defaultUrl = arg.substr(4);
+    }
+  }
 }
 
 void MOOCUIPlugin::Init()
@@ -67,13 +95,19 @@ void MOOCUIPlugin::OnMainWindowReady()
 {
   cout << "MOOCUIPlugin::OnMainWindowReady()" << endl;
   // add menu for this plugin
-  QMenu *menu = new QMenu(QString("&MOOC"));
+  std::string menuStr("&");
+  menuStr += this->menuTitle;
+  QMenu *menu = new QMenu(QString(menuStr.c_str()));
   QAction* loginAct = new QAction(QString("&Login"), menu );
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
   // the MOOCUIPlugin class is not a QT object
-  widget = new MOOCUIWidget(mainWindow);
+  widget = new MOOCUIWidget(mainWindow,
+                            this->menuTitle.c_str(),
+                            this->loginTitle.c_str(),
+                            this->urlLabel.c_str(),
+                            this->defaultUrl.c_str());
   QObject::connect(loginAct, SIGNAL(triggered()), widget, SLOT(LoginMOOC()));
   menu->addAction(loginAct);
   mainWindow->AddMenu(menu);

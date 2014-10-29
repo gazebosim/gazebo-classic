@@ -20,17 +20,24 @@
 
 #include <gazebo/gazebo.hh>
 #include "MOOCLoginDialog.hh"
+#include "gazebo/util/system.hh"
 
 //typedef const boost::shared_ptr<const ::msgs::RestError> ConstRestErrorPtr;
 
 namespace gazebo
 {
-  class MOOCUIWidget : public QWidget
+  class GAZEBO_VISIBLE  MOOCUIWidget : public QWidget
   {
     Q_OBJECT
 
     /// \brief ctor
-    public: MOOCUIWidget(QWidget *_parent = 0);
+    public: MOOCUIWidget(QWidget *_parent,
+                         const char* _menuTitle,
+                         const char* _title,
+                         const char* _urlLabel,
+                         const char* _defautlUrl
+                        );
+
     /// \brief dtor
     public: virtual ~MOOCUIWidget();
 
@@ -55,8 +62,12 @@ namespace gazebo
  
     /// \brief login dialog
     private: gui::MOOCLoginDialog dialog;
-    
-   private: std::list< boost::shared_ptr<const gazebo::msgs::RestError> > msgRespQ;
+
+    /// \brief the title to use when displaying dialog/message windows
+    private: std::string title;
+
+    /// \brief List of unprocessed error messages to be displayed from the gui thread    
+    private: std::list< boost::shared_ptr<const gazebo::msgs::RestError> > msgRespQ;
 
  };
 }

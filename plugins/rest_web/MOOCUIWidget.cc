@@ -24,10 +24,15 @@ using namespace std;
 
 
 
-MOOCUIWidget::MOOCUIWidget(QWidget *_parent)
+MOOCUIWidget::MOOCUIWidget(QWidget *_parent,
+                            const char* _menuTitle,
+                            const char* _loginTitle,
+                            const char* _urlLabel,
+                            const char* _defautlUrl)
   : QWidget(_parent),
+    title(_menuTitle),
     node(new gazebo::transport::Node()),
-    dialog(this, "https://mentor2.companion.org")
+    dialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   
   cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
@@ -91,8 +96,8 @@ void  MOOCUIWidget::Update()
     ConstRestErrorPtr msg = msgRespQ.front();
     msgRespQ.pop_front();
     if(msg->type().c_str() == string("Error")) 
-      QMessageBox::critical(this, tr("MOOC"),tr(msg->msg().c_str()) );
+      QMessageBox::critical(this, tr(this->title.c_str()),tr(msg->msg().c_str()) );
     else
-      QMessageBox::information(this, tr("MOOC"),tr(msg->msg().c_str()) );
+      QMessageBox::information(this, tr(this->title.c_str()),tr(msg->msg().c_str()) );
   }
 }

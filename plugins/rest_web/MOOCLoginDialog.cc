@@ -31,15 +31,18 @@ using namespace std;
 
 
 /////////////////////////////////////////////////
-MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent, const char* defaultUrl)
-    : QDialog(_parent), url(defaultUrl)
+MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent,
+                                                  const char* _title,
+                                                  const char* _urlLabel,
+                                                  const char* _defaultUrl)
+    : QDialog(_parent), url(_defaultUrl)
 {
 
-  setWindowTitle(tr("Mentor 2 Login"));
+  setWindowTitle(tr(_title));
   setModal(true);
 
   labelUrl = new QLabel(this);
-  labelUrl->setText(tr("Learning companion URL"));
+  labelUrl->setText(tr(_urlLabel));
   editUrl = new QLineEdit(this);
   editUrl->setText(tr(url.c_str()));
   editUrl->setFixedWidth(400);

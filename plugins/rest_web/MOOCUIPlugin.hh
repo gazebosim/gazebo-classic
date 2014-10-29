@@ -19,15 +19,16 @@
 #define _MOOCUI_PLUGIN_HH_
 
 
-#include "gazebo/gazebo.hh"
+#include <gazebo/gazebo.hh>
 #include <gazebo/gui/qt.h>
+#include <gazebo/util/system.hh>
 
 #include "MOOCUIWidget.hh"
 
 namespace gazebo
 {
 
-  class MOOCUIPlugin : public SystemPlugin
+  class GAZEBO_VISIBLE MOOCUIPlugin : public SystemPlugin
   {
     /// \brief ctor
     public: MOOCUIPlugin();
@@ -36,7 +37,7 @@ namespace gazebo
     public: virtual ~MOOCUIPlugin();
 
     /// \brief called when plugin is loaded
-    public: virtual void Load(int /*_argc*/, char ** /*_argv*/);
+    public: virtual void Load(int _argc, char **_argv);
 
     /// \brief plugin initialization
     private: virtual void Init();
@@ -50,6 +51,19 @@ namespace gazebo
     /// \brief callbacks (to connect to the main window ready event)
     private: std::vector<event::ConnectionPtr> connections;
 
+    /// \brief The Title, used for the menu item
+    private: std::string menuTitle;
+
+    /// \brief The login title
+    private: std::string loginTitle;
+
+    /// \brief The url description
+    private: std::string urlLabel;
+
+    /// \brief The default url (if fixed)
+    private: std::string defaultUrl;
+
+    /// \brief the widget    
     private: MOOCUIWidget *widget;
   };
 }

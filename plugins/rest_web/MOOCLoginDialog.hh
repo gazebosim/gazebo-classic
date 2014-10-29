@@ -20,6 +20,7 @@
 #define _MOOCLOGIN_DIALOG_HH_
 
 #include <gazebo/gui/qt.h>
+#include "gazebo/util/system.hh"
 
 namespace gazebo
 {
@@ -29,22 +30,25 @@ namespace gazebo
 
     class MOOCUIWidget;
 
-    class MOOCLoginDialog : public QDialog
+    class GAZEBO_VISIBLE MOOCLoginDialog : public QDialog
     {
       Q_OBJECT
         
-      public:
-        /// \brief Consotructor
-        /// \param[in] _parent Parent QWidget
-        MOOCLoginDialog(QWidget *_parent = 0, const char* defautlUrl= "");
+      /// \brief Consotructor
+      /// \param[in] _parent Parent QWidget
+      /// \param[in] _title the dialog window title bar text
+      /// \param[in] _urlLabel the title of the url (ex: super webservice url)
+      /// \param[in] _default url text for the url (ex: https://superweb.com)
+      public: MOOCLoginDialog(QWidget *_parent,
+                              const char* _title,
+                              const char* _urlLabel,
+                              const char* _defautlUrl);
 
-      signals:
-        /// \brief emitted when the user presses the login button
-        void acceptLogin(QString &url, QString& username, QString& password);
+      /// \brief emitted when the user presses the login button
+      signals: void acceptLogin(QString &url, QString& _username, QString& _password);
 
-      public slots:
-        
-        void slotAcceptLogin();
+      /// slot for the AcceptLogin 
+      public slots: void slotAcceptLogin();
 
       /// \brief A label for the url component
       private: QLabel *labelUrl;
@@ -70,9 +74,13 @@ namespace gazebo
       /// \brief The standard dialog buttons
       private: QDialogButtonBox *buttons;
       
-      /// \brief getters
+      /// \brief Getter for User name (of the basic auth REST service)
       public: std::string getUsername() {return username;}
+
+      /// \brief Getter for the password
       public: std::string getPassword() {return password;}
+
+      /// \brief Getter for the Url (https)
       public: std::string getUrl() {return url;}
 
       private:
