@@ -1287,8 +1287,7 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
     this->menuLayout = new QHBoxLayout;
 
   // Remove all widgets from the menuLayout
-  QLayoutItem *child = NULL;
-  while ((child = this->menuLayout->takeAt(0)) != 0)
+  while (this->menuLayout->takeAt(0) != 0)
   {
   }
 

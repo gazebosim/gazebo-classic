@@ -17,6 +17,7 @@ set (files
   heightmap_dem.world
   heightmap.world
   hydra_demo.world
+  initial_velocity.world
   joint_damping_demo.world
   joint_friction_demo.world
   joints.world
