@@ -22,6 +22,7 @@ set (sources
   ContactVisual.cc
   Conversions.cc
   DepthCamera.cc
+  Distortion.cc
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
@@ -66,6 +67,7 @@ set (headers
   ContactVisual.hh
   Conversions.hh
   DepthCamera.hh
+  Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh

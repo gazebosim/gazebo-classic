@@ -2,6 +2,9 @@
 
 ### Gazebo 5.0.0
 
+1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
+    * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
+
 1. Added ability to read the directory where the log files are stored.
     * [Pull request #1277](https://bitbucket.org/osrf/gazebo/pull-request/1277)
 
@@ -13,6 +16,22 @@
 
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
+
+1. Implemented camera lens distortion.
+  * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
+
+1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
+   and improve robustness of `UNIT_gz_TEST`
+  * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
+  * [Issue #1299](https://bitbucket.org/osrf/gazebo/issue/1299)
+
+1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
+  * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
+
+1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
+   see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
+   with joystick button 1.
+  * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
 
 ## Gazebo 4.0
 

@@ -182,6 +182,18 @@ namespace gazebo
       /// \param[in] _value True if the camera pose changed in the world file.
       public: void SetUseSDFPose(bool _value);
 
+      /// brief Enable or disable camera control through ~/user_camera/joy_twist
+      /// gz topic. Defaults to true.
+      /// \param[in] _value True to enable camera pose control by
+      /// gz topic ~/user_camera/joy_twist.
+      public: void SetJoyTwistControl(bool _value);
+
+      /// brief Enable or disable camera control through ~/user_camera/joy_pose
+      /// gz topic. Defaults to true.
+      /// \param[in] _value True to enable camera pose control by
+      /// gz topic ~/user_camera/joy_pose.
+      public: void SetJoyPoseControl(bool _value);
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.
@@ -221,10 +233,14 @@ namespace gazebo
       private: void OnMoveToVisualComplete();
 
       /// \brief Handles incoming relative joystick messages.
+      /// Incoming joystick messages are used to control
+      /// translation and rotation rates of the camera position.
       /// \param[in] _msg New joystick message.
       private: void OnJoyTwist(ConstJoystickPtr &_msg);
 
       /// \brief Handles incoming absolute joystick messages.
+      /// Incoming joystick messages are used to control
+      /// camera's world pose.
       /// \param[in] _msg New pose message.
       private: void OnJoyPose(ConstPosePtr &_msg);
 
