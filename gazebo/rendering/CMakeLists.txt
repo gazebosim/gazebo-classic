@@ -22,6 +22,7 @@ set (sources
   ContactVisual.cc
   Conversions.cc
   DepthCamera.cc
+  Distortion.cc
   DynamicLines.cc
   DynamicRenderable.cc
   FPSViewController.cc
@@ -37,6 +38,7 @@ set (sources
   MovableText.cc
   OrbitViewController.cc
   Projector.cc
+  RayQuery.cc
   RenderEngine.cc
   RenderEvents.cc
   RenderingIface.cc
@@ -65,6 +67,7 @@ set (headers
   ContactVisual.hh
   Conversions.hh
   DepthCamera.hh
+  Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
@@ -80,6 +83,7 @@ set (headers
   MovableText.hh
   OrbitViewController.hh
   Projector.hh
+  RayQuery.hh
   RenderEngine.hh
   RenderEvents.hh
   RenderingIface.hh

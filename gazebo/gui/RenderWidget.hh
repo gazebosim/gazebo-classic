@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -60,6 +61,14 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      public: void AddPlugin(GUIPluginPtr _plugin);
+
+      /// \brief Set the visibility of the toolbar.
+      /// \param[in] _visible Whether or not to show the toolbar.
+      public: void ShowToolbar(const bool _show);
+
       private slots: virtual void update();
 
       /// \brief Qt callback to clear overlay message if a duration is
@@ -71,6 +80,9 @@ namespace gazebo
       /// \brief Handle follow model user event.
       /// \param[in] _modelName Name of the model that is being followed.
       private: void OnFollow(const std::string &_modelName);
+
+      /// \brief Handle align model user event.
+      private: void OnAlign();
 
       /// \brief Widget used to draw the scene.
       private: GLWidget *glWidget;
@@ -98,6 +110,8 @@ namespace gazebo
       private: QLineEdit *fpsEdit;
       private: QLineEdit *trianglesEdit;
 
+      /// \brief Widget for the top toolbar
+      private: QToolBar *toolbar;
       private: QToolBar *mouseToolbar;
       private: QToolBar *editToolbar;
 
@@ -113,6 +127,9 @@ namespace gazebo
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
+
+      /// \brief All the gui plugins
+      private: std::vector<gazebo::GUIPluginPtr> plugins;
     };
   }
 }

@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -83,6 +78,10 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init();
+  this->joySub = this->node->Subscribe("~/spacenav/joy",
+      &UserCamera::OnJoy, this);
 }
 
 //////////////////////////////////////////////////
@@ -617,4 +616,34 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
   return this->dataPtr->viewController->GetTypeString();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoy(ConstJoystickPtr &_msg)
+{
+  // Scaling factor applied to rotations.
+  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+
+  // This function was establish when integrating the space navigator
+  // joystick.
+  if (_msg->has_translation() || _msg->has_rotation())
+  {
+    math::Pose pose = this->GetWorldPose();
+
+    // Get the joystick XYZ
+    if (_msg->has_translation())
+    {
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * 0.05;
+      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    }
+
+    // Get the jostick RPY. We are disabling rotation around x.
+    if (_msg->has_rotation())
+    {
+      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    }
+
+    this->SetWorldPose(pose);
+  }
 }

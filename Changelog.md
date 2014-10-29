@@ -1,3 +1,33 @@
+## Gazebo 5.0
+
+### Gazebo 5.0.0
+
+1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
+    * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
+
+1. Added ability to read the directory where the log files are stored.
+    * [Pull request #1277](https://bitbucket.org/osrf/gazebo/pull-request/1277)
+
+1. Implemented a simulation cloner
+    * [Pull request #1180](https://bitbucket.org/osrf/gazebo/pull-request/1180/clone-a-simulation)
+
+1. Added GUI overlay plugins. Users can now write a Gazebo + QT plugin that displays widgets over the render window.
+  * [Pull request #1181](https://bitbucket.org/osrf/gazebo/pull-request/1181)
+
+1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
+  * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
+
+1. Implemented camera lens distortion.
+  * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
+
+1. Kill rogue gzservers left over from failed INTEGRATION_world_clone tests
+   and improve robustness of `UNIT_gz_TEST`
+  * [Pull request #1232](https://bitbucket.org/osrf/gazebo/pull-request/1232)
+  * [Issue #1299](https://bitbucket.org/osrf/gazebo/issue/1299)
+
+1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
+  * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
@@ -66,7 +96,7 @@
     * [Pull request #1074](https://bitbucket.org/osrf/gazebo/pull-request/1074)
     * [Pull request #1136](https://bitbucket.org/osrf/gazebo/pull-request/1136)
     * [Pull request #1139](https://bitbucket.org/osrf/gazebo/pull-request/1139)
-1. Updated Base::GetScopedName 
+1. Updated Base::GetScopedName
     * [Pull request #1104](https://bitbucket.org/osrf/gazebo/pull-request/1104)
 1. Fix collada loader from adding duplicate materials into a Mesh
     * [Pull request #1105](https://bitbucket.org/osrf/gazebo/pull-request/1105)

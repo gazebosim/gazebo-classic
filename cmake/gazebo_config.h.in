@@ -31,6 +31,7 @@
 #cmakedefine HAVE_GDAL 1
 #cmakedefine HAVE_USB 1
 #cmakedefine HAVE_OCULUS 1
+#cmakedefine HAVE_SPNAV 1
 
 #ifdef BUILD_TYPE_PROFILE
 #include <google/heap-checker.h>

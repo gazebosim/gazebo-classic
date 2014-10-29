@@ -41,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -77,6 +78,9 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
+      /// \brief A signal to trigger loading of GUI plugins.
+      signals: void AddPlugins();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -91,6 +95,9 @@ namespace gazebo
       /// \brief Save GUI configuration to INI file.
       private slots: void SaveINI();
 
+      /// \brief Clone a simulation.
+      private slots: void Clone();
+
       private slots: void About();
       private slots: void Step();
       private slots: void NewModel();
@@ -104,6 +111,13 @@ namespace gazebo
 
       /// \brief Qt callback when the scale mode is triggered.
       private slots: void Scale();
+
+      /// \brief Qt callback when the main align action is triggered. Currently
+      /// just resets the child align actions.
+      private slots: void Align();
+
+      /// \brief Qt callback when the snap mode is triggered.
+      private slots: void Snap();
 
       private slots: void CreateBox();
       private slots: void CreateSphere();
@@ -143,6 +157,9 @@ namespace gazebo
 
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
+
+      /// \brief Callback for adding plugins.
+      private slots: void OnAddPlugins();
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -256,9 +273,17 @@ namespace gazebo
       /// \brief List of all the editors.
       private: std::list<Editor*> editors;
 
+      /// \brief List of all the align action groups.
+      private: std::vector<QActionGroup *> alignActionGroups;
+
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
+
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
 #endif
+
+      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
     };
   }
 }
