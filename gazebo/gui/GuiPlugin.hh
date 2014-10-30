@@ -35,7 +35,7 @@ namespace gazebo
     /// when a GUI plugin is loaded from an SDF file. This function is not
     /// called when a GUI plugin is loaded via a gui.ini file.
     /// \param[in] _sdf Pointer the the SDF element of the plugin.
-    public: virtual void Load(sdf::ElementPtr /*_sdf*/) {};
+    public: virtual void Load(sdf::ElementPtr /*_sdf*/) {}
   };
 
 /// \brief Plugin registration function for gui plugin. Part of the
