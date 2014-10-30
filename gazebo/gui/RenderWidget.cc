@@ -96,14 +96,14 @@ RenderWidget::RenderWidget(QWidget *_parent)
   alignMenu->addAction(g_alignAct);
   alignButton->setMenu(alignMenu);
   alignButton->setPopupMode(QToolButton::InstantPopup);
-  this->toolbar->addWidget(alignButton);
+  g_alignButtonAct = this->toolbar->addWidget(alignButton);
   connect(alignButton, SIGNAL(pressed()), g_alignAct, SLOT(trigger()));
 
   this->toolbar->addSeparator();
   this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -361,6 +361,12 @@ void RenderWidget::ShowToolbar(const bool _show)
       this->toolbar->hide();
     }
   }
+}
+
+/////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar()
+{
+  return this->toolbar;
 }
 
 /////////////////////////////////////////////////
