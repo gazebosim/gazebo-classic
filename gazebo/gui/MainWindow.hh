@@ -283,7 +283,11 @@ namespace gazebo
       private: gui::OculusWindow *oculusWindow;
 #endif
 
+      /// \brief Buffer of plugin messages to process.
       private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+
+      /// \brief Mutext to protect plugin loading.
+      private: boost::mutex pluginLoadMutex;
     };
   }
 }

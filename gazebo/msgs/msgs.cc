@@ -329,7 +329,7 @@ namespace gazebo
 
       result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
-      // Set plugins of the gui
+      // Set gui plugins
       if (_sdf->HasElement("plugin"))
       {
         sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
