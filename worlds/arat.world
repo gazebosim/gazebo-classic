@@ -178,8 +178,15 @@
     </include>
 
     <include>
+      <name>marble</name>
       <uri>model://marble_1_5cm</uri>
       <pose>-2.0 250 1.015 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>marble2</name>
+      <uri>model://marble_1_5cm</uri>
+      <pose>-2.0 250 1.115 0 0 0</pose>
     </include>
 
     <include>
@@ -210,12 +217,21 @@
       <model_name>washer</model_name>
 
       <model_name>ball_bearing</model_name>
-      <model_name>marble_1_5cm</model_name>
+      <model_name>marble</model_name>
+      <model_name>marble2</model_name>
 
       <model_name>round_tin_top</model_name>
       <model_name>round_tin_base</model_name>
 
-      <initial_arrangement>grasp_1</initial_arrangement>
+      <initial_arrangement>demo_practice</initial_arrangement>
+      <arrangement name="demo_practice">
+        <pose model="wood_cube_10cm">-0.500 -0.265 1.020 0 0 0</pose>
+        <pose model="round_tin_base"> 0.500 -0.274 1.036 0 0 0</pose>
+        <pose model="round_tin_top">  0.217  0.040 1.393 0 0 0 </pose>
+        <pose model="marble">         0.500 -0.274 1.036 0 0 0</pose>
+        <pose model="marble2">        0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="cup_1">         -0.100 -0.274 1.034 0 0 0</pose>
+      </arrangement>
       <arrangement name="grasp_1">
         <pose model="wood_cube_10cm"> 0.217 -0.265 1.04 0 0 0</pose>
       </arrangement>
@@ -261,7 +277,7 @@
       <arrangement name="pinch_2">
         <pose model="round_tin_base">0.217 -0.274 1.036 0 0 0</pose>
         <pose model="round_tin_top">0.217  0.04 1.393 0 0 0 </pose>
-        <pose model="marble_1_5cm">0.217 -0.274 1.036 0 0 0</pose>
+        <pose model="marble">0.217 -0.274 1.036 0 0 0</pose>
       </arrangement>
 
     </plugin>
