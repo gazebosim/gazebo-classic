@@ -32,6 +32,9 @@
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
   * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
+  
+1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
+    * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
 ## Gazebo 4.0
 
