@@ -201,6 +201,7 @@
 
 
     <plugin name="arrange_plugin" filename="libArrangePlugin.so">
+      <topic_name>~/arrange</topic_name>
       <model_name>cricket_ball</model_name>
       <model_name>wood_cube_10cm</model_name>
       <model_name>wood_cube_7_5cm</model_name>
