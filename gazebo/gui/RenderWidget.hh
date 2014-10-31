@@ -62,7 +62,7 @@ namespace gazebo
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
-      public: QToolBar *GetToolbar();
+      public: QToolBar *GetToolbar() const;
 
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _show Whether or not to show the toolbar.
