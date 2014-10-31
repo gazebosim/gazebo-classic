@@ -250,9 +250,9 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   }
 
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
+  */
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
                           boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
-  */
 }
 
 
@@ -365,6 +365,34 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
     QGraphicsTextItem *psiText = new QGraphicsTextItem(tr("N"));
     psiText->setPos(scaleXPos-4, 362);
     this->handScene->addItem(psiText);
+  }
+
+  // Get key commands names
+  if (_elem->HasElement("motor_keys"))
+  {
+    sdf::ElementPtr motor = _elem->GetElement("motor_keys");
+    motor = motor->GetElement("motor");
+
+    while (motor)
+    {
+      if (motor->HasAttribute("inc_key") &&
+          motor->HasAttribute("dec_key") &&
+          motor->HasAttribute("index") &&
+          motor->HasAttribute("increment"))
+      {
+        std::pair<unsigned int, float> mapping;
+	mapping.first = motor->Get<int>("index");
+	mapping.second = motor->Get<float>("increment");
+	this->motor_keys[motor->Get<std::string>("inc_key")] = mapping;
+	mapping.second = -mapping.second;
+	this->motor_keys[motor->Get<std::string>("dec_key")] = mapping;
+      }
+      else
+      {
+        gzwarn << "Skipping malformed motor_key/motor element" << std::endl;
+      }
+      motor = motor->GetNextElement();
+    }
   }
 
   this->InitializeTaskView(_elem);
@@ -600,13 +628,20 @@ void HaptixGUIPlugin::OnStartStop()
 
 
 /////////////////////////////////////////////////
-// \todo: This function is inefficient. Think of ways to refactor--maybe a more
-// efficient structure for storage/search.
-bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent /*_event*/)
+// Handle key presses, which can perform various kinds of teleoperation.
+bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
 {
+  std::string key = _event.text;
+  std::cout << "key: " << key << std::endl;
+
+  // Is this a direct motor command?
+  if (this->motor_keys.find(key) != this->motor_keys.end())
+  {
+    
+  }
+
+  
   /*
-  std::string text = _event.text;
-  char key = text[0];
   // if key is in armCommands
   if(this->armCommands.find(key) != this->armCommands.end()){
     int index = this->armCommands[key].index;

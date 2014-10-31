@@ -202,6 +202,9 @@ namespace gazebo
     /// \brief Publisher that controls the clock
     private: gazebo::transport::PublisherPtr timerPub;
 
+    /// \brief A place to store key-to-motor mappings
+    private: std::map<std::string, std::pair<unsigned int, float> > motor_keys;
+
 /*    private: ignition::transport::Node *ignNode;
 
     private: std::map<char, KeyCommand> armCommands;

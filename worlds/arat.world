@@ -166,53 +166,54 @@
           </task>
         </task_group>
 
-        <commands>
-          <command button="a" name="arm_pos_x" increment=-0.025></command>
-          <command button="d" name="arm_pos_x" increment=0.025></command>
+	<!-- TODO
+        <arm_keys>
+          <key key="s" motor_index="arm_pos_x" increment=-0.025></key>
+          <key key="w" motor_index="arm_pos_x" increment=0.025></key>
+  
+          <key key="a" motor_index="arm_pos_y" increment=0.025></key>
+          <key key="d" motor_index="arm_pos_y" increment=-0.025></key>
+  
+          <key key="q" motor_index="arm_pos_z" increment=0.025></key>
+          <key key="e" motor_index="arm_pos_z" increment=-0.025></key>
+  
+          <key key="S" motor_index="arm_rot_x" increment=-0.025></key>
+          <key key="W" motor_index="arm_rot_x" increment=0.025></key>
+  
+          <key key="A" motor_index="arm_rot_y" increment=0.025></key>
+          <key key="D" motor_index="arm_rot_y" increment=-0.025></key>
+  
+          <key key="Q" motor_index="arm_rot_z" increment=0.025></key>
+          <key key="E" motor_index="arm_rot_z" increment=-0.025></key>
+        </arm_keys> -->
 
-          <command button="w" name="arm_pos_y" increment=0.025></command>
-          <command button="s" name="arm_pos_y" increment=-0.025></command>
+        <motor_keys>
+          <motor inc_key="z" dec_key="Z" index=0 increment=0.05></motor>
+          <motor inc_key="x" dec_key="X" index=1 increment=0.05></motor>
+          <motor inc_key="c" dec_key="C" index=2 increment=0.05></motor>
+          <motor inc_key="1" dec_key="!" index=3 increment=0.05></motor>
+          <motor inc_key="2" dec_key="@" index=4 increment=0.05></motor>
+          <motor inc_key="3" dec_key="#" index=5 increment=0.05></motor>
+          <motor inc_key="4" dec_key="$" index=6 increment=0.05></motor>
+          <motor inc_key="5" dec_key="%" index=7 increment=0.05></motor>
+          <motor inc_key="6" dec_key="^" index=8 increment=0.05></motor>
+          <motor inc_key="7" dec_key="&amp;" index=9 increment=0.05></motor>
+          <motor inc_key="8" dec_key="*" index=10 increment=0.05></motor>
+          <motor inc_key="9" dec_key="(" index=11 increment=0.05></motor>
+          <motor inc_key="0" dec_key=")" index=12 increment=0.05></motor>
+          <motor inc_key="-" dec_key="_" index=13 increment=0.05></motor>
+          <motor inc_key="=" dec_key="+" index=14 increment=0.05></motor>
+        </motor_keys>
 
-          <command button="q" name="arm_pos_z" increment=0.025></command>
-          <command button="e" name="arm_pos_z" increment=-0.025></command>
-
-          <command button="A" name="arm_rot_x" increment=-0.025></command>
-          <command button="D" name="arm_rot_x" increment=0.025></command>
-
-          <command button="W" name="arm_rot_y" increment=0.025></command>
-          <command button="S" name="arm_rot_y" increment=-0.025></command>
-
-          <command button="Q" name="arm_rot_z" increment=0.025></command>
-          <command button="E" name="arm_rot_z" increment=-0.025></command>
-
-          <command button="z" name="motor_wrist_rot" increment=0.05></command>
-          <command button="Z" name="motor_wrist_rot" increment=-0.05></command>
-
-          <command button="x" name="motor_wrist_dev" increment=0.05></command>
-          <command button="X" name="motor_wrist_dev" increment=-0.05></command>
-
-          <command button="c" name="motor_wrist_fe" increment=0.05></command>
-          <command button="C" name="motor_wrist_fe" increment=-0.05></command>
-        </commands>
-
-        <grasps>
-          <increment>0.015</increment>
-          <grasp inc_key="1" dec_key="!" name="cylinder">0.000000 0.000000 0.000000 1.242345 1.397638 1.552931 1.318693 1.483530 1.648367 1.318693 1.483530 1.648367 1.521320 0.005497 0.126433 -0.258364 -0.343569 0.549709 1.318693 1.483530 1.648367 1.011464 0.899079</grasp>
-          <grasp inc_key="2" dec_key="@" name="spherical">0.000000 0.000000 0.000000 1.303424 1.466352 1.629279 1.303424 1.466352 1.629279 1.257615 1.414816 1.572018 0.797765 0.057720 0.002749 -0.343569 0.000000 0.879534 1.303424 1.466352 1.629279 0.857546 0.762263</grasp>
-          <grasp inc_key="3" dec_key="#" name="pinch">0.000000 0.000000 0.000000 0.662095 0.744857 0.827619 1.089648 1.225853 1.362059 0.860602 0.968177 1.075752 1.150266 0.000000 0.000000 -0.294095 -0.156667 0.516726 0.936950 1.054069 1.171188 0.637662 0.566811</grasp>
-        </grasps>
-
-        <indices>
-          <index name="motor_wrist_rot" num="0"></index>
-          <index name="motor_wrist_dev" num="1"></index>
-          <index name="motor_wrist_fe" num="2"></index>
-          <index name="arm_pos_x" num="0"></index>
-          <index name="arm_pos_y" num="1"></index>
-          <index name="arm_pos_z" num="2"></index>
-          <index name="arm_rot_x" num="3"></index>
-          <index name="arm_rot_y" num="4"></index>
-          <index name="arm_rot_z" num="5"></index>
-        </indices>
+        <!-- TODO <grasp_keys>
+          <grasp inc_key="1" dec_key="!" increment="0.015" name="Cylindrical"></grasp>
+          <grasp inc_key="2" dec_key="@" name="Spherical"></grasp>
+          <grasp inc_key="3" dec_key="#" name="ThreeFingerPinch"></grasp>
+          <grasp inc_key="4" dec_key="$" name="FinePinch(American)"></grasp>
+          <grasp inc_key="5" dec_key="%" name="FinePinch(British)"></grasp>
+          <grasp inc_key="6" dec_key="^" name="Palmar(Tray)"></grasp>
+          <grasp inc_key="7" dec_key="&amp;" name="Hook"></grasp>
+        </grasp_keys> -->
 
       </plugin>
     </gui>
