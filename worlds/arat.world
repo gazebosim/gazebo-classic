@@ -10,6 +10,12 @@
         <pose>0 -2 1.75  0 0.35 1.57</pose>
       </camera>
 
+      <plugin name="TimerGUIPlugin" filename="libTimerGUIPlugin.so">
+        <pos>200 10</pos>
+        <size>200 30</size>
+        <topic>~/timer_control</topic> 
+      </plugin>
+
       <plugin name="HaptixGUIPlugin" filename="libHaptixGUIPlugin.so">
         <circle_size>25</circle_size>
         <force_min>0</force_min>
@@ -17,6 +23,7 @@
         <color_min>255 227 32 255</color_min>
         <color_max>255 102 102 255</color_max>
         <hand_side>right</hand_side>
+        <timer_topic>~/timer_control</timer_topic> 
 
         <contacts>
           <contact name="mpl::rThDistal::rThDistal_collision">
@@ -65,7 +72,6 @@
           </contact>
         </contacts>
 
-        <startButtonStyle>background-color: #7A95D6; font: bold 30px; color: #FFFFFF;</startButtonStyle>
         <stopButtonStyle>background-color: #D85C48; font: bold 30px;; color: #FFFFFF;</stopButtonStyle>
 
 

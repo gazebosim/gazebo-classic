@@ -54,7 +54,7 @@ HaptixGUIPlugin::HaptixGUIPlugin()
 
   // Create the hand
     // Create a QGraphicsView to draw the finger force contacts
-    this->handScene = new QGraphicsScene(QRectF(0, 0, 400, 300));
+    this->handScene = new QGraphicsScene(QRectF(0, 0, 400, 220));
     QGraphicsView *handView = new QGraphicsView(this->handScene);
     handView->setStyleSheet("border: 0px");
     handView->setSizePolicy(QSizePolicy::Expanding,
@@ -136,10 +136,11 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   QPushButton *nextButton = new QPushButton();
   nextButton->setText(QString("Next Test"));
   nextButton->setStyleSheet(
-      "background-color: rgba(23, 85, 138, 255);"
+      "background-color: rgba(120, 120, 120, 255);"
       "border: 0px;"
       "border-radius: 4px;"
       "color: #ffffff");
+      // "background-color: rgba(23, 85, 138, 255);"
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
   nextButton->setMaximumWidth(120);
 
@@ -149,11 +150,33 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   QFrame *cycleButtonFrame = new QFrame;
   cycleButtonFrame->setLayout(cycleButtonLayout);
 
+  // Start/Stop button
+  //this->isTestRunning = false;
+  QPushButton *startStopButton = new QPushButton();
+  startStopButton->setText(QString("Start Test"));
+  startStopButton->setStyleSheet(
+      "margin: 10px;"
+      "padding: 10px;"
+      "background-color: #7A95D6;"
+      "font: bold 30px;"
+      "border: 0px;"
+      "border-radius: 4px;"
+      "color: #FFFFFF;"
+      );
+
+  //this->startStopButton->setStyleSheet(startButtonStyle);
+  //this->startStopButton->setMaximumWidth(this->handImgX*0.85);
+  //connect(this->startStopButton, SIGNAL(clicked()), this,
+  //        SLOT(OnStartStopClicked()));
+  connect(startStopButton, SIGNAL(clicked()), this,
+      SLOT(OnStartStop()));
+
   // Add all widgets to the main frame layout
   frameLayout->addWidget(handView, 1.0);
   frameLayout->addWidget(tabFrame);
   frameLayout->addWidget(instructionsView);
   frameLayout->addWidget(cycleButtonFrame);
+  frameLayout->addWidget(startStopButton);
 
   QVBoxLayout *mainLayout = new QVBoxLayout();
   mainLayout->addWidget(mainFrame);
@@ -184,7 +207,6 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   this->currentTaskId = 0;
 
   /*
-
   this->ignNode = new ignition::transport::Node("haptix");
   ignNode->Advertise("arm_pose_inc");
 
@@ -227,27 +249,6 @@ HaptixGUIPlugin::HaptixGUIPlugin()
     index = index->GetNextElement();
   }
 
-  // Set up hx objects
-  //if (hx_getdeviceinfo(hxGAZEBO, &handDeviceInfo) != hxOK)
-  //{
-  //  std::cout << "hx_getdeviceinfo(): Request error. Cannot control hand."
-  //            << std::endl;
-  //}
-  //for(int i = 0; i < handDeviceInfo.nmotor; i++)
-  //{
-  //  handCommand.ref_pos[i] = 0;
-  //}
-
-  //if(hx_update(hxGAZEBO, &handCommand, &handSensor) != hxOK ){
-  //  std::cout << "hx_update(): Request error.\n" << std::endl;
-  //}
-
-  // Set up an array of subscribers for each contact sensor
-  for(std::map<std::string, math::Vector2d>::iterator it =
-        this->contactPoints.begin(); it != this->contactPoints.end(); it++)
-  {
-  }
-
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
   gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
                           boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
@@ -258,23 +259,22 @@ HaptixGUIPlugin::HaptixGUIPlugin()
 /////////////////////////////////////////////////
 HaptixGUIPlugin::~HaptixGUIPlugin()
 {
-  /*
-
-  for (std::map<std::string, QGraphicsEllipseItem*>::iterator it =
-       contactGraphicsItems.begin(); it != contactGraphicsItems.end(); it++)
-  {
-    delete it->second;
-    it->second = NULL;
-  }
-
-  delete ignNode;
-  ignNode = NULL;
-  */
 }
 
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
 {
+  // Create the publisher that controls the timer
+  if (_elem->HasElement("timer_topic"))
+  {
+    this->timerPub = this->node->Advertise<msgs::GzString>(
+        _elem->Get<std::string>("timer_topic"));
+  }
+  else
+  {
+    this->timerPub = this->node->Advertise<msgs::GzString>("~/timer_control");
+  }
+
   this->circleSize = _elem->Get<int>("circle_size");
 
   this->forceMin = _elem->Get<double>("force_min");
@@ -362,32 +362,12 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
     }
 
     // Draw the PSI label
-    QGraphicsTextItem *psiText = new QGraphicsTextItem(tr("PSI"));
+    QGraphicsTextItem *psiText = new QGraphicsTextItem(tr("N"));
     psiText->setPos(scaleXPos-4, 362);
     this->handScene->addItem(psiText);
   }
 
   this->InitializeTaskView(_elem);
-
-
-  /*
-  elem->GetElement("scaleFactor")->GetValue()->Get(this->GUIScaleFactor);
-
-  std::string buttonStyle;
-  elem->GetElement("startButtonStyle")->GetValue()->Get(buttonStyle);
-  this->startButtonStyle = QString(buttonStyle.c_str());
-  elem->GetElement("stopButtonStyle")->GetValue()->Get(buttonStyle);
-  this->stopButtonStyle = QString(buttonStyle.c_str());
-
-  math::Vector2d handImgDims;
-  elem->GetElement("handImgDimensions")->GetValue()->Get(handImgDims);
-  this->handImgX = GUIScaleFactor*handImgDims[0];
-  this->handImgY = GUIScaleFactor*handImgDims[1];
-
-  elem->GetElement("iconDimensions")->GetValue()->Get(this->iconSize);
-  this->iconSize *= GUIScaleFactor;
-  this->circleSize *= GUIScaleFactor;
-  */
 }
 
 /////////////////////////////////////////////////
@@ -459,13 +439,6 @@ void HaptixGUIPlugin::PreRender()
 
     iter->second->setBrush(brush);
   }
-}
-
-/////////////////////////////////////////////////
-void HaptixGUIPlugin::mousePressEvent(QMouseEvent *_mouseEvent)
-{
-  printf("On Mouse Press\n");
-  std::cout << "Pos[" << _mouseEvent->x() << " " << _mouseEvent->y() << "]\n";
 }
 
 /////////////////////////////////////////////////
@@ -554,21 +527,10 @@ void HaptixGUIPlugin::InitializeTaskView(sdf::ElementPtr _elem)
     groupIndex++;
   }
 
-
-/*
-  // Start/Stop button
-  this->isTestRunning = false;
-  this->startStopButton = new QPushButton();
-  this->startStopButton->setText(QString("Start Test"));
-  this->startStopButton->setStyleSheet(startButtonStyle);
-  this->startStopButton->setMaximumWidth(this->handImgX*0.85);
-  connect(this->startStopButton, SIGNAL(clicked()), this,
-          SLOT(OnStartStopClicked()));
+  /*
 
   // Clock
   this->digitalClock = new DigitalClock();
-  connect(this->startStopButton, SIGNAL(clicked()), this->digitalClock,
-          SLOT(OnStartStop()));
   this->digitalClock->setMaximumWidth(this->handImgX*0.5);
 
   QHBoxLayout *clockBox = new QHBoxLayout();
@@ -613,11 +575,25 @@ void HaptixGUIPlugin::OnNextClicked()
 }
 
 ////////////////////////////////////////////////
+void HaptixGUIPlugin::PublishTimerMessage(const std::string &_msg) const
+{
+  msgs::GzString msg;
+  msg.set_data(_msg);
+  this->timerPub->Publish(msg);
+}
+
+////////////////////////////////////////////////
 void HaptixGUIPlugin::PublishTaskMessage(const std::string &_taskId) const
 {
   msgs::GzString msg;
   msg.set_data(_taskId);
   this->taskPub->Publish(msg);
+}
+
+////////////////////////////////////////////////
+void HaptixGUIPlugin::OnStartStop()
+{
+  this->PublishTimerMessage("start");
 }
 
 
@@ -747,6 +723,7 @@ void HaptixGUIPlugin::OnResetClicked()
 {
   // Signal to the ArrangePlugin to set up the current task
   // this->digitalClock->StopClock();
+  this->PublishTimerMessage("reset");
   this->PublishTaskMessage(this->taskList[this->currentTaskId]->Id());
 }
 
@@ -823,17 +800,6 @@ void DigitalClock::StopClock()
   this->running = false;
 }
 
-void DigitalClock::OnStartStop()
-{
-  running = !running;
-
-  if (running)
-  {
-    // If we are now running, restart the time
-    lastStartTime.restart();
-    ShowTime();
-  }
-}
 */
 
 

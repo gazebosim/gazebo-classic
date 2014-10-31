@@ -68,28 +68,7 @@ namespace gazebo
     public: char decKey;
     public: void SliderChanged(char key, float inc);
   };
-
-
-
-  // Digital clock adapted from
-  // http://qt-project.org/doc/qt-4.8/widgets-digitalclock.html
-  class DigitalClock : public QLCDNumber
-  {
-    Q_OBJECT
-
-    public: DigitalClock(QWidget *_parent = 0);
-    public: void StopClock();
-
-    protected slots: void ShowTime();
-
-    private slots: void OnStartStop();
-
-    private: QTime lastStartTime;
-    private: bool running;
-  };
 */
-
-
 
   /// \brief Make HAPTIX GUI plugin
   class HaptixGUIPlugin : public gazebo::GUIPlugin
@@ -130,24 +109,32 @@ namespace gazebo
     /// \param[in] _taskName Name of the task to publish
     private: void PublishTaskMessage(const std::string &_taskName) const;
 
+    /// \brief Helper function to publish a timer message
+    /// \param[in] _msg Message to publish
+    private: void PublishTimerMessage(const std::string &_msg) const;
 
+    /// \brief Callback when the start/stop button is pressed.
+    private slots: void OnStartStop();
 
-
-
-
-
-
-
-
-
-
-
+    /// \brief Callback triggered when the next button is clicked
+    protected slots: void OnNextClicked();
 
     /// \brief Callback triggered when the reset button is clicked
     protected slots: void OnResetClicked();
 
-    /// \brief Callback triggered when the next button is clicked
-    protected slots: void OnNextClicked();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// \brief Callback triggered when the start/stop button is clicked
     protected slots: void OnStartStopClicked();
@@ -179,8 +166,6 @@ namespace gazebo
 
     /// \brief All the finger contact points.
     private: std::map<std::string, math::Vector2d > contactPoints;
-
-    private: virtual void mousePressEvent(QMouseEvent *_mouseEvent);
 
     /// \brief The scene onto which is drawn the hand and contact
     /// force data
@@ -214,6 +199,9 @@ namespace gazebo
     /// scene.
     private: gazebo::transport::PublisherPtr taskPub;
 
+    /// \brief Publisher that controls the clock
+    private: gazebo::transport::PublisherPtr timerPub;
+
 /*    private: ignition::transport::Node *ignNode;
 
     private: std::map<char, KeyCommand> armCommands;
@@ -225,31 +213,11 @@ namespace gazebo
 
     private: std::map<std::string, Grasp> grasps;
 
-
-    /// \brief Maximum number tasks.
-    /// \sa taskNum
-    private: int handImgX;
-    private: int handImgY;
-
-    private: std::string handImgFilename;
-    private: std::string configFilename;
-
-    private: float GUIScaleFactor;
-    private: math::Vector2d iconSize;
     private: float graspIncrement;
 
     private: bool isTestRunning;
-    private: QString startButtonStyle;
-    private: QString stopButtonStyle;
-
-
-
-
-    private: QPushButton *startStopButton;
 
     private: DigitalClock *digitalClock;
-
-
     */
   };
 }
