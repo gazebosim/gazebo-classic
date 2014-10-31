@@ -17,6 +17,8 @@
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -55,11 +57,19 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   {
     this->mainWindow->Pause();
     this->mainWindow->ShowLeftColumnWidget("modelEditorTab");
+
+    // Make models currently on the scene not selectable and greyed out
+    rendering::UserCameraPtr camera = gui::get_active_camera();
+    camera->SetVisibilityMask(GZ_VISIBILITY_EDITOR);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
+
+    // Make all models selectable and on normal colors
+    rendering::UserCameraPtr camera = gui::get_active_camera();
+    camera->SetVisibilityMask(GZ_VISIBILITY_ALL);
   }
   event::Events::setSelectedEntity("", "normal");
   this->active = !this->active;

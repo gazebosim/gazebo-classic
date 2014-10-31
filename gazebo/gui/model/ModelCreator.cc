@@ -282,6 +282,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 /////////////////////////////////////////////////
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
+  _visual->SetVisibilityFlags(GZ_VISIBILITY_EDITOR);
+
   PartData *part = new PartData;
   part->name = _visual->GetName();
   part->visuals.push_back(_visual);

@@ -214,7 +214,7 @@ namespace gazebo
       /// \brief The root visual of the model.
       private: rendering::VisualPtr modelVisual;
 
-      /// \brief The root visual of the model.
+      /// \brief The visual held by the mouse.
       private: rendering::VisualPtr mouseVisual;
 
       /// \brief The pose of the model.

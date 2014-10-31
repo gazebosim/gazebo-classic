@@ -235,7 +235,7 @@ void Light::CreateVisual()
 
     // Make sure the selection object is rendered only in the selection
     // buffer.
-    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
+    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTABLE);
     obj->setUserAny(Ogre::Any(this->GetName()));
     obj->setCastShadows(false);
 

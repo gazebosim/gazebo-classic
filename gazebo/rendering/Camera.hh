@@ -211,6 +211,9 @@ namespace gazebo
       /// \param[in] _h Image height
       public: void SetImageHeight(unsigned int _h);
 
+      /// \brief TODO
+      public: void SetVisibilityMask(uint32_t _mask);
+
       /// \brief Get the width of the image
       /// \return Image width
       public: virtual unsigned int GetImageWidth() const;

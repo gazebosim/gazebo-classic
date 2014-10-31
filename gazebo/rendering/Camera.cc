@@ -1691,3 +1691,9 @@ DistortionPtr Camera::GetDistortion() const
 {
   return this->dataPtr->distortion;
 }
+
+//////////////////////////////////////////////////
+void Camera::SetVisibilityMask(uint32_t _mask)
+{
+  this->viewport->setVisibilityMask(_mask);
+}
