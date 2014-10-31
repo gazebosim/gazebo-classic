@@ -1,15 +1,217 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+    <scene>
+      <shadows>0</shadows>
+    </scene>
+
     <gui>
       <camera name="user_camera">
         <pose>0 -2 1.75  0 0.35 1.57</pose>
       </camera>
+
+      <plugin name="HaptixGUIPlugin" filename="libHaptixGUIPlugin.so">
+        <circle_size>25</circle_size>
+        <force_min>0</force_min>
+        <force_max>75</force_max>
+        <color_min>255 227 32 255</color_min>
+        <color_max>255 102 102 255</color_max>
+        <hand_side>right</hand_side>
+
+        <contacts>
+          <contact name="mpl::rThDistal::rThDistal_collision">
+            <pos>302 130</pos>
+            <topic>~/mpl/rThDistal/rThDistal_contact_sensor</topic>
+          </contact>
+          <contact name="mpl::rThMedial::rThMedial_collision">
+            <pos>275 195</pos>
+            <topic>~/mpl/rThMedial/rThMedial_contact_sensor</topic>
+          </contact>
+
+          <contact name="mpl::rIndDistal::rIndDistal_collision">
+            <pos>248 -30</pos>
+            <topic>~/mpl/rIndDistal/rIndDistal_contact_sensor</topic>
+          </contact>
+          <contact name="mpl::rIndMedial::rIndMedial_collision">
+            <pos>233 43</pos>
+            <topic>~/mpl/rIndMedial/rIndMedial_contact_sensor</topic>
+          </contact>
+
+          <contact name="mpl::rMidDistal::rMidDistal_collision">
+            <pos>153 -60</pos>
+            <topic>~/mpl/rMidDistal/rMidDistal_contact_sensor</topic>
+          </contact>
+          <contact name="mpl::rMidMedial::rMidMedial_collision">
+            <pos>155 19</pos>
+            <topic>~/mpl/rMidMedial/rMidMedial_contact_sensor</topic>
+          </contact>
+
+          <contact name="mpl::rRingDistal::rRingDistal_collision">
+            <pos>64 -19</pos>
+            <topic>~/mpl/rRingDistal/rRingDistal_contact_sensor</topic>
+          </contact>
+          <contact name="mpl::rRingMedial::rRingMedial_collision">
+            <pos>74 41</pos>
+            <topic>~/mpl/rRingMedial/rRingMedial_contact_sensor</topic>
+          </contact>
+
+          <contact name="mpl::rLittleDistal::rLittleDistal_collision">
+            <pos>-7 54</pos>
+            <topic>~/mpl/rLittleDistal/rLittleDistal_contact_sensor</topic>
+          </contact>
+          <contact name="mpl::rLittleMedial::rLittleMedial_collision">
+            <pos>14 105</pos>
+            <topic>~/mpl/rLittleMedial/rLittleMedial_contact_sensor</topic>
+          </contact>
+        </contacts>
+
+        <startButtonStyle>background-color: #7A95D6; font: bold 30px; color: #FFFFFF;</startButtonStyle>
+        <stopButtonStyle>background-color: #D85C48; font: bold 30px;; color: #FFFFFF;</stopButtonStyle>
+
+
+
+        <task_group name="Grasp">
+          <task id="grasp_1" name="Block 10cm">
+            <icon>file://media/materials/textures/grasp_1.jpg</icon>
+            <instructions>
+              Pick up the 10 cm block and place it on top of the box.
+            </instructions>
+          </task>
+
+          <task id="grasp_2" name="Block 2.5cm">
+            <icon>file://media/materials/textures/grasp_2.jpg</icon>
+            <instructions>
+              Pick up the 2.5 cm block and place it on top of the box.
+            </instructions>
+          </task>
+
+          <task id="grasp_3" name="Block 5cm">
+            <icon>file://media/materials/textures/grasp_3.jpg</icon>
+            <instructions>
+              Pick up the 5 cm block and place it on top of the box.
+            </instructions>
+          </task>
+
+          <task id="grasp_4" name="Block 7.5cm">
+            <icon>file://media/materials/textures/grasp_4.jpg</icon>
+            <instructions>
+              Pick up the 7.5 cm block and place it on top of the box.
+            </instructions>
+          </task>
+
+          <task id="grasp_5" name="Cricket ball">
+            <icon>file://media/materials/textures/grasp_5.jpg</icon>
+            <instructions>
+              Pick up the cricket ball and place it on top of the box, inside of the tin lid.
+            </instructions>
+          </task>
+
+          <task id="grasp_6"name="Stone">
+            <icon>file://media/materials/textures/grasp_6.jpg</icon> 
+            <instructions>
+              Pick up the stone and place it on top of the box.
+            </instructions>
+          </task>
+        </task_group>
+
+        <task_group name="Grip">
+          <task id="grip_1" name="Cups">
+            <icon>file://media/materials/textures/grip_1.jpg</icon>
+            <instructions>
+              Pour the contents of the filled cup into the empty cup.
+            </instructions>
+          </task>
+
+          <task id="grip_2" name="Tube 2.25cm">
+            <icon>file://media/materials/textures/grip_2.jpg</icon>
+            <instructions>
+              Pick up the 2.25cm diameter tube and place it on the wooden peg.
+            </instructions>
+          </task>
+
+          <task id="grip_3" name="Tube 1cm">
+            <icon>file://media/materials/textures/grip_3.jpg</icon>
+            <instructions>
+              Pick up the 1cm diameter tube and place it on the metal peg.
+            </instructions>
+          </task>
+
+          <task id="grip_4" name="Washer">
+            <icon>file://media/materials/textures/grip_4.jpg</icon>
+            <instructions>
+              Pick up the washer and place it on the metal peg.
+            </instructions>
+          </task>
+        </task_group>
+
+        <task_group name="Pinch">
+          <task id="pinch_1" name="Ball bearing">
+            <icon>file://media/materials/textures/pinch_1.jpg</icon>
+            <instructions>
+              Pick up the ball bearing and place it on top of the box, inside of the tin lid.
+            </instructions>
+          </task>
+
+          <task id="pinch_2" name="Marble">
+            <icon>file://media/materials/textures/pinch_2.jpg</icon>
+            <instructions>
+              Pick up the marble and place it on top of the box, inside of the tin lid.
+            </instructions>
+          </task>
+        </task_group>
+
+        <commands>
+          <command button="a" name="arm_pos_x" increment=-0.025></command>
+          <command button="d" name="arm_pos_x" increment=0.025></command>
+
+          <command button="w" name="arm_pos_y" increment=0.025></command>
+          <command button="s" name="arm_pos_y" increment=-0.025></command>
+
+          <command button="q" name="arm_pos_z" increment=0.025></command>
+          <command button="e" name="arm_pos_z" increment=-0.025></command>
+
+          <command button="A" name="arm_rot_x" increment=-0.025></command>
+          <command button="D" name="arm_rot_x" increment=0.025></command>
+
+          <command button="W" name="arm_rot_y" increment=0.025></command>
+          <command button="S" name="arm_rot_y" increment=-0.025></command>
+
+          <command button="Q" name="arm_rot_z" increment=0.025></command>
+          <command button="E" name="arm_rot_z" increment=-0.025></command>
+
+          <command button="z" name="motor_wrist_rot" increment=0.05></command>
+          <command button="Z" name="motor_wrist_rot" increment=-0.05></command>
+
+          <command button="x" name="motor_wrist_dev" increment=0.05></command>
+          <command button="X" name="motor_wrist_dev" increment=-0.05></command>
+
+          <command button="c" name="motor_wrist_fe" increment=0.05></command>
+          <command button="C" name="motor_wrist_fe" increment=-0.05></command>
+        </commands>
+
+        <grasps>
+          <increment>0.015</increment>
+          <grasp inc_key="1" dec_key="!" name="cylinder">0.000000 0.000000 0.000000 1.242345 1.397638 1.552931 1.318693 1.483530 1.648367 1.318693 1.483530 1.648367 1.521320 0.005497 0.126433 -0.258364 -0.343569 0.549709 1.318693 1.483530 1.648367 1.011464 0.899079</grasp>
+          <grasp inc_key="2" dec_key="@" name="spherical">0.000000 0.000000 0.000000 1.303424 1.466352 1.629279 1.303424 1.466352 1.629279 1.257615 1.414816 1.572018 0.797765 0.057720 0.002749 -0.343569 0.000000 0.879534 1.303424 1.466352 1.629279 0.857546 0.762263</grasp>
+          <grasp inc_key="3" dec_key="#" name="pinch">0.000000 0.000000 0.000000 0.662095 0.744857 0.827619 1.089648 1.225853 1.362059 0.860602 0.968177 1.075752 1.150266 0.000000 0.000000 -0.294095 -0.156667 0.516726 0.936950 1.054069 1.171188 0.637662 0.566811</grasp>
+        </grasps>
+
+        <indices>
+          <index name="motor_wrist_rot" num="0"></index>
+          <index name="motor_wrist_dev" num="1"></index>
+          <index name="motor_wrist_fe" num="2"></index>
+          <index name="arm_pos_x" num="0"></index>
+          <index name="arm_pos_y" num="1"></index>
+          <index name="arm_pos_z" num="2"></index>
+          <index name="arm_rot_x" num="3"></index>
+          <index name="arm_rot_y" num="4"></index>
+          <index name="arm_rot_z" num="5"></index>
+        </indices>
+
+      </plugin>
     </gui>
-    <scene>
-      <shadows>0</shadows>
-    </scene>
-    <physics type="ode">
+
+   <physics type="ode">
       <gravity>0.000000 0.000000 -9.810000</gravity>
       <ode>
         <solver>

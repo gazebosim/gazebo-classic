@@ -17,6 +17,8 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
+add_subdirectory(haptix_gui)
+
 set (plugins
   ArrangePlugin
   BreakableJointPlugin

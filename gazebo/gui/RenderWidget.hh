@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
@@ -59,6 +60,10 @@ namespace gazebo
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
+
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      public: void AddPlugin(GUIPluginPtr _plugin);
 
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _visible Whether or not to show the toolbar.

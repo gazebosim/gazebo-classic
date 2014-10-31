@@ -30,6 +30,10 @@ if (PROTOBUF_VERSION LESS 2.3.0)
 endif()
 
 ########################################
+# The Ignition Robotics transport library
+find_package(ignition-transport QUIET REQUIRED)
+
+########################################
 # The Google Protobuf library for message generation + serialization
 find_package(Protobuf REQUIRED)
 if (NOT PROTOBUF_FOUND)
@@ -518,3 +522,5 @@ endif()
 #    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
 #  endif (QWT_FIND_REQUIRED)
 #endif ()
+
+

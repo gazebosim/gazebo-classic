@@ -18,6 +18,7 @@
 
 #include "gazebo/gazebo_config.h"
 
+#include "gazebo/gui/GuiPlugin.hh"
 #include "gazebo/gui/CloneWindow.hh"
 #include "gazebo/gui/TopicSelector.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -191,6 +192,10 @@ MainWindow::MainWindow()
 
   // Create a pointer to the space navigator interface
   this->spacenav = new SpaceNav();
+
+  // Use a signal/slot to load plugins. This makes the process thread safe.
+  connect(this, SIGNAL(AddPlugins()),
+          this, SLOT(OnAddPlugins()), Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////
@@ -1482,6 +1487,55 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
       cam->AttachToVisual(name, false, minDist, maxDist);
     }
   }
+
+  // Store all the plugins for processing
+  {
+    boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+    for (int i = 0; i < _msg->plugin_size(); ++i)
+    {
+      boost::shared_ptr<msgs::Plugin> pm(new msgs::Plugin(_msg->plugin(i)));
+      this->pluginMsgs.push_back(pm);
+    }
+  }
+
+  // Call the signal to trigger plugin loading in the main thread.
+  this->AddPlugins();
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnAddPlugins()
+{
+  boost::mutex::scoped_lock lock(this->pluginLoadMutex);
+
+  // Load all plugins.
+  for (std::vector<boost::shared_ptr<msgs::Plugin const> >::iterator iter =
+      this->pluginMsgs.begin(); iter != this->pluginMsgs.end(); ++iter)
+  {
+    // Make sure the filename string is not empty
+    if (!(*iter)->filename().empty())
+    {
+      // Try to create the plugin
+      gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
+          (*iter)->filename(), (*iter)->name());
+
+      // Load the plugin.
+      plugin->Load(msgs::PluginToSDF(**iter));
+
+      if (!plugin)
+      {
+        gzerr << "Unable to create gui overlay plugin with filename["
+          << (*iter)->filename() << "]\n";
+      }
+      else
+      {
+        gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
+
+        // Attach the plugin to the render widget.
+        this->renderWidget->AddPlugin(plugin);
+      }
+    }
+  }
+  this->pluginMsgs.clear();
 }
 
 /////////////////////////////////////////////////
