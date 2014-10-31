@@ -18,6 +18,7 @@
 #include <sstream>
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/rendering/UserCamera.hh>
+#include <gazebo/gui/GuiEvents.hh>
 
 #include "TaskButton.hh"
 #include "HaptixGUIPlugin.hh"
@@ -368,6 +369,7 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
 
   this->InitializeTaskView(_elem);
 
+
   /*
   elem->GetElement("scaleFactor")->GetValue()->Get(this->GUIScaleFactor);
 
@@ -442,6 +444,9 @@ void HaptixGUIPlugin::OnSetContactForce(QString _contactName, double _value)
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::PreRender()
 {
+  // Hide the scene tree.
+  gui::Events::sceneTreeVisibility(false);
+
   // Fade out old force values
   for (std::map<std::string, QGraphicsEllipseItem*>::iterator iter =
       this->contactGraphicsItems.begin();

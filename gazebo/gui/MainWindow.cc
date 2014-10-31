@@ -159,6 +159,10 @@ MainWindow::MainWindow()
 #endif
 
   this->connections.push_back(
+      gui::Events::ConnectSceneTreeVisibility(
+        boost::bind(&MainWindow::SetSceneTreeVisibility, this, _1)));
+
+  this->connections.push_back(
       gui::Events::ConnectFullScreen(
         boost::bind(&MainWindow::OnFullScreen, this, _1)));
 
@@ -281,6 +285,7 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
 }
 
 /////////////////////////////////////////////////
@@ -1761,4 +1766,13 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
   p.drawPixmap(0, 0, pixmap);
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SetSceneTreeVisibility(bool _on)
+{
+  if (_on)
+    this->leftColumn->show();
+  else
+    this->leftColumn->hide();
 }
