@@ -1523,9 +1523,6 @@ void MainWindow::OnAddPlugins()
       gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
           (*iter)->filename(), (*iter)->name());
 
-      // Load the plugin.
-      plugin->Load(msgs::PluginToSDF(**iter));
-
       if (!plugin)
       {
         gzerr << "Unable to create gui overlay plugin with filename["
@@ -1536,7 +1533,7 @@ void MainWindow::OnAddPlugins()
         gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
 
         // Attach the plugin to the render widget.
-        this->renderWidget->AddPlugin(plugin);
+        this->renderWidget->AddPlugin(plugin, msgs::PluginToSDF(**iter));
       }
     }
   }

@@ -140,7 +140,6 @@ HaptixGUIPlugin::HaptixGUIPlugin()
       "border: 0px;"
       "border-radius: 4px;"
       "color: #ffffff");
-      // "background-color: rgba(23, 85, 138, 255);"
   connect(nextButton, SIGNAL(clicked()), this, SLOT(OnNextClicked()));
   nextButton->setMaximumWidth(120);
 
@@ -151,25 +150,54 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   cycleButtonFrame->setLayout(cycleButtonLayout);
 
   // Start/Stop button
-  //this->isTestRunning = false;
-  QPushButton *startStopButton = new QPushButton();
-  startStopButton->setText(QString("Start Test"));
-  startStopButton->setStyleSheet(
-      "margin: 10px;"
-      "padding: 10px;"
-      "background-color: #7A95D6;"
-      "font: bold 30px;"
-      "border: 0px;"
-      "border-radius: 4px;"
-      "color: #FFFFFF;"
-      );
+  this->startStopButton = new QPushButton();
+  this->startStopButton->setCheckable(true);
+  this->startStopButton->setText(QString("Start"));
+  this->startStopButton->setDisabled(true);
+  this->startStyle =
+      "QPushButton {"
+        "margin: 10px;"
+        "padding: 10px;"
+        "background-color: #7A95D6;"
+        "font: bold 30px;"
+        "border: 0px;"
+        "border-radius: 4px;"
+        "color: #FFFFFF;"
+      "}"
 
-  //this->startStopButton->setStyleSheet(startButtonStyle);
-  //this->startStopButton->setMaximumWidth(this->handImgX*0.85);
-  //connect(this->startStopButton, SIGNAL(clicked()), this,
-  //        SLOT(OnStartStopClicked()));
-  connect(startStopButton, SIGNAL(clicked()), this,
-      SLOT(OnStartStop()));
+      "QPushButton:hover {"
+        "background-color: rgba(83, 101, 146, 255);"
+      "}"
+
+      "QPushButton::disabled {"
+        "background-color: rgba(180, 180, 180, 255);"
+        "color: rgba(200, 200, 200, 255);"
+      "}";
+
+  this->stopStyle =
+      "QPushButton {"
+        "margin: 10px;"
+        "padding: 10px;"
+        "background-color: #D85C48;"
+        "font: bold 30px;"
+        "border: 0px;"
+        "border-radius: 4px;"
+        "color: #FFFFFF;"
+      "}"
+
+      "QPushButton:hover {"
+        "background-color: rgba(191, 81, 64, 255);"
+      "}"
+
+      "QPushButton::disabled {"
+        "background-color: rgba(180, 180, 180, 255);"
+        "color: rgba(200, 200, 200, 255);"
+      "}";
+
+  this->startStopButton->setStyleSheet(this->startStyle.c_str());
+
+  connect(this->startStopButton, SIGNAL(toggled(bool)), this,
+      SLOT(OnStartStop(bool)));
 
   // Add all widgets to the main frame layout
   frameLayout->addWidget(handView, 1.0);
@@ -205,54 +233,6 @@ HaptixGUIPlugin::HaptixGUIPlugin()
                               boost::bind(&HaptixGUIPlugin::PreRender, this)));
 
   this->currentTaskId = 0;
-
-  /*
-  this->ignNode = new ignition::transport::Node("haptix");
-  ignNode->Advertise("arm_pose_inc");
-
-  // Parse SDF to get the arm teleop commands
-  sdf::ElementPtr command = elem->GetElement("commands");
-  command = command->GetElement("command");
-  while(command){
-    char button;
-    std::string name;
-    float increment;
-    command->GetAttribute("button")->Get(button);
-    command->GetAttribute("name")->Get(name);
-    command->GetAttribute("increment")->Get(increment);
-    if(name.substr(0, 5).compare("motor") == 0){
-      this->handCommands[button] = KeyCommand(button, name, increment);
-    } else if(name.substr(0, 3).compare("arm") == 0){
-      this->armCommands[button] = KeyCommand(button, name, increment);
-    }
-    buttonNames[name].push_back(button);
-
-    command = command->GetNextElement();
-  }
-
-  sdf::ElementPtr index = elem->GetElement("indices");
-  index = index->GetElement("index");
-  while(index){
-    std::string name;
-    int num;
-    index->GetAttribute("name")->Get(name);
-    index->GetAttribute("num")->Get(num);
-    std::vector<char> buttons = buttonNames[name];
-    for(unsigned int i = 0; i < buttons.size(); i++){
-      char button = buttons[i];
-      if(this->handCommands.find(button) != this->handCommands.end()){
-        this->handCommands[button].index = num;
-      } else if (this->armCommands.find(button) != this->armCommands.end()){
-        this->armCommands[button].index = num;
-      }
-    }
-    index = index->GetNextElement();
-  }
-
-  gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
-  gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
-                          boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
-  */
 }
 
 
@@ -368,6 +348,10 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
   }
 
   this->InitializeTaskView(_elem);
+
+  gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
+  gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
+                          boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
 }
 
 /////////////////////////////////////////////////
@@ -425,7 +409,7 @@ void HaptixGUIPlugin::OnSetContactForce(QString _contactName, double _value)
 void HaptixGUIPlugin::PreRender()
 {
   // Hide the scene tree.
-  gui::Events::sceneTreeVisibility(false);
+  // gui::Events::sceneTreeVisibility(false);
 
   // Fade out old force values
   for (std::map<std::string, QGraphicsEllipseItem*>::iterator iter =
@@ -510,8 +494,8 @@ void HaptixGUIPlugin::InitializeTaskView(sdf::ElementPtr _elem)
       // Set the first button checked, and set the instructions.
       if (this->taskList.empty())
       {
-        instructionsView->setDocument(taskButton->Instructions());
-        taskButton->setChecked(true);
+        // instructionsView->setDocument(taskButton->Instructions());
+        // taskButton->setChecked(true);
       }
 
       this->taskList[taskIndex] = taskButton;
@@ -526,36 +510,17 @@ void HaptixGUIPlugin::InitializeTaskView(sdf::ElementPtr _elem)
     taskGroup = taskGroup->GetNextElement("task_group");
     groupIndex++;
   }
-
-  /*
-
-  // Clock
-  this->digitalClock = new DigitalClock();
-  this->digitalClock->setMaximumWidth(this->handImgX*0.5);
-
-  QHBoxLayout *clockBox = new QHBoxLayout();
-  clockBox->addStretch();
-  clockBox->addWidget(digitalClock);
-  clockBox->addStretch();
-  QFrame *clockFrame = new QFrame();
-  clockFrame->setLayout(clockBox);
-  clockFrame->setContentsMargins(0, 0, 0, 0);
-  mainLayout->addWidget(clockFrame);
-
-  QHBoxLayout *startStopBox = new QHBoxLayout();
-  startStopBox->addStretch();
-  startStopBox->addWidget(startStopButton);
-  startStopBox->addStretch();
-  QFrame *startStopFrame = new QFrame();
-  startStopFrame->setLayout(startStopBox);
-  startStopFrame->setContentsMargins(0, 0, 0, 0);
-  mainLayout->addWidget(startStopFrame);
-  */
 }
 
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::OnTaskSent(const int _id)
 {
+  this->startStopButton->setDisabled(false);
+  this->startStopButton->setChecked(false);
+
+  // reset the clock when a new task is selected
+  this->PublishTimerMessage("reset");
+
   // Show the instructions to the user
   this->instructionsView->setDocument(this->taskList[_id]->Instructions());
   this->currentTaskId = _id;
@@ -565,6 +530,12 @@ void HaptixGUIPlugin::OnTaskSent(const int _id)
 ////////////////////////////////////////////////
 void HaptixGUIPlugin::OnNextClicked()
 {
+  this->startStopButton->setDisabled(false);
+  this->startStopButton->setChecked(false);
+
+  // reset the clock when a new task is selected
+  this->PublishTimerMessage("reset");
+
   this->currentTaskId = (this->currentTaskId+1) % this->taskList.size();
   this->instructionsView->setDocument(
       this->taskList[this->currentTaskId]->Instructions());
@@ -591,245 +562,34 @@ void HaptixGUIPlugin::PublishTaskMessage(const std::string &_taskId) const
 }
 
 ////////////////////////////////////////////////
-void HaptixGUIPlugin::OnStartStop()
+void HaptixGUIPlugin::OnStartStop(bool _checked)
 {
-  this->PublishTimerMessage("start");
-}
-
-
-
-
-/////////////////////////////////////////////////
-// \todo: This function is inefficient. Think of ways to refactor--maybe a more
-// efficient structure for storage/search.
-bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent /*_event*/)
-{
-  /*
-  std::string text = _event.text;
-  char key = text[0];
-  // if key is in armCommands
-  if(this->armCommands.find(key) != this->armCommands.end()){
-    int index = this->armCommands[key].index;
-    if(index >= 6){
-      return false;
-    }
-    float inc = this->armCommands[key].increment;
-
-    float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
-    pose_inc_args[index] = inc;
-    gazebo::math::Pose increment(gazebo::math::Vector3(pose_inc_args[0],
-                                   pose_inc_args[1], pose_inc_args[2]),
-                                 gazebo::math::Quaternion(pose_inc_args[3],
-                                   pose_inc_args[4], pose_inc_args[5]));
-
-    gazebo::math::Quaternion cameraRot =
-                                gui::get_active_camera()->GetWorldRotation();
-    if (index < 3)
-    {
-      increment.pos = cameraRot.RotateVector(increment.pos);
-    }
-    else
-    {
-      std::cout << "Increment.rot: " << increment.rot.GetAsEuler() << std::endl;
-      std::cout << "camera rot: " << cameraRot.GetAsEuler() << std::endl;
-      increment.rot = increment.rot*cameraRot;
-      std::cout << "rotation after multiplication " << increment.rot.GetAsEuler() << std::endl;
-    }
-
-    gazebo::msgs::Pose msg;
-    gazebo::msgs::Vector3d* vec_msg = msg.mutable_position();
-    vec_msg->set_x(increment.pos.x);
-    vec_msg->set_y(increment.pos.y);
-    vec_msg->set_z(increment.pos.z);
-    gazebo::msgs::Quaternion* quat_msg = msg.mutable_orientation();
-    quat_msg->set_x(increment.rot.x);
-    quat_msg->set_y(increment.rot.y);
-    quat_msg->set_z(increment.rot.z);
-    quat_msg->set_w(increment.rot.w);
-
-    ignNode->Publish("/haptix/arm_pose_inc", msg);
-    return true;
-  }
-  // if key is in handCommands
-  if (this->handCommands.find(key) != this->handCommands.end())
+  if (_checked)
   {
-      int motor_index = this->handCommands[key].index;
-      if (motor_index >= handDeviceInfo.nmotor)
-      {
-        return false;
-      }
-
-      float inc = this->handCommands[key].increment;
-      handCommand.ref_pos[motor_index] += inc;
-
-      //coupling_v1(&handCommand);
+    this->startStopButton->setText(tr("Stop"));
+    this->startStopButton->setStyleSheet(this->stopStyle.c_str());
+    this->PublishTimerMessage("start");
   }
-  else if (this->graspCommands.find(key) != this->graspCommands.end())
+  else
   {
-    std::string name = this->graspCommands[key];
-
-    // Increment/decrement slider value corresponding to key
-    grasps[name].SliderChanged(key, this->graspIncrement);
+    this->startStopButton->setText(tr("Start"));
+    this->startStopButton->setStyleSheet(this->startStyle.c_str());
+    this->PublishTimerMessage("stop");
   }
-
-
-  float sliderTotal = 0;
-  // get total of slider values
-  for (std::map<std::string, Grasp>::iterator it = grasps.begin();
-       it != grasps.end(); it++)
-  {
-    if (it->second.sliderValue > 0)
-    {
-      sliderTotal += 1;
-    }
-  }
-
-  hxCommand avgCommand;
-  for (int j = 0; j < handDeviceInfo.nmotor; j++)
-  {
-    avgCommand.ref_pos[j] = 0;
-  }
-
-  for (std::map<std::string, Grasp>::iterator it = grasps.begin();
-       it != grasps.end(); it++)
-  {
-    // Get the slider value and interpolate the grasp
-    float sliderValue = it->second.sliderValue;
-
-    std::vector<float> desiredGrasp = it->second.desiredGrasp;
-    for (unsigned int j = 0; j < handDeviceInfo.nmotor; j++)
-    {
-      if(sliderTotal > 0 && j < desiredGrasp.size()){
-        avgCommand.ref_pos[j] += sliderValue*desiredGrasp[j]/
-                                                        (sliderTotal);
-      }
-    }
-  }
-  for (int j = 0; j < handDeviceInfo.nmotor; j++)
-  {
-    avgCommand.ref_pos[j] += this->handCommand.ref_pos[j];
-  }
-
-  // if (hx_update(hxGAZEBO, &avgCommand, &handSensor) != hxOK)
-  // {
-  //   printf("hx_update(): Request error.\n");
-  // }
-  */
-  return true;
 }
 
 ////////////////////////////////////////////////
 void HaptixGUIPlugin::OnResetClicked()
 {
+  this->startStopButton->setChecked(false);
+
   // Signal to the ArrangePlugin to set up the current task
-  // this->digitalClock->StopClock();
   this->PublishTimerMessage("reset");
   this->PublishTaskMessage(this->taskList[this->currentTaskId]->Id());
 }
 
-////////////////////////////////////////////////
-void HaptixGUIPlugin::OnStartStopClicked()
+/////////////////////////////////////////////////
+bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent /*_event*/)
 {
-  /*
-  if(isTestRunning)
-  {
-    startStopButton->setStyleSheet(startButtonStyle);
-    startStopButton->setText(QString("Start Test"));
-    // Stop timer
-  }
-  else
-  {
-    startStopButton->setStyleSheet(stopButtonStyle);
-    startStopButton->setText(QString("End Test"));
-    // Start timer
-  }
-  isTestRunning = !isTestRunning;
-  */
+  return true;
 }
-
-
-/*
-void Grasp::SliderChanged(char key, float inc){
-  if (key != this->incKey && key != this->decKey)
-  {
-    return;
-  }
-  int sign = key == this->incKey ? 1 : -1;
-  this->sliderValue += sign*inc;
-  this->sliderValue = this->sliderValue < 0 ? 0 : this->sliderValue;
-  this->sliderValue = this->sliderValue > 1 ? 1 : this->sliderValue;
-}
-*/
-
-/*
-DigitalClock::DigitalClock(QWidget *_parent) : QLCDNumber(_parent)
-{
-  setSegmentStyle(Filled);
-  setStyleSheet("font: 30px;");
-  setDigitCount(8);
-
-  lastStartTime = QTime(0, 0);
-  //lastStartTime.start();
-
-  running = false;
-  QTimer *clock = new QTimer(this);
-  connect(clock, SIGNAL(timeout()), this, SLOT(ShowTime()));
-  clock->start(100);
-
-  ShowTime();
-
-  //resize(300, 60);
-}
-
-void DigitalClock::ShowTime()
-{
-  QString text("00:00:00");
-  if(running)
-  {
-    QTime elapsedTime = QTime(0, 0, 0).addMSecs(lastStartTime.elapsed());
-    text = elapsedTime.toString("hh:mm:ss");
-  }
-
-  display(text);
-  update();
-}
-
-
-void DigitalClock::StopClock()
-{
-  this->running = false;
-}
-
-*/
-
-
-//const hxAPLMotors mcp_indices[5] = {motor_little_mcp, motor_ring_mcp, motor_middle_mcp, motor_index_mcp, motor_thumb_mcp};
-
-/*void coupling_v1(_hxCommand* cmd){
-  //Version 1 Joint Coupling modeling
-
-  //this relies on the ordering of enums, bit messy
-  for(int k = 0; k < 5; k++){
-    //Check if slider was changeded
-
-    hxAPLMotors mcp = mcp_indices[k];
-
-    float mcp_commanded = cmd->ref_pos[mcp];
-    if(mcp_commanded <= 0){
-      if(mcp == motor_thumb_mcp){
-        cmd->ref_pos[mcp+1] = 0; //thumb dip
-      } else {
-        cmd->ref_pos[mcp+1] = 0; //pip
-        cmd->ref_pos[mcp-1] = 0; //dip
-      }
-    } else {
-      if(mcp == motor_thumb_mcp){
-        cmd->ref_pos[mcp+1] = 8/9.0*mcp_commanded; //thumb dip
-      } else {
-        cmd->ref_pos[mcp+1] = 10/9.0*mcp_commanded; //pip
-        cmd->ref_pos[mcp-1] = 8/9.0*mcp_commanded; //dip
-      }
-    }
-  }
-}*/
-

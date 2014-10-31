@@ -11,8 +11,7 @@
       </camera>
 
       <plugin name="TimerGUIPlugin" filename="libTimerGUIPlugin.so">
-        <pos>200 10</pos>
-        <size>200 30</size>
+        <size>100 30</size>
         <topic>~/timer_control</topic> 
       </plugin>
 
@@ -71,9 +70,6 @@
             <topic>~/mpl/rLittleMedial/rLittleMedial_contact_sensor</topic>
           </contact>
         </contacts>
-
-        <stopButtonStyle>background-color: #D85C48; font: bold 30px;; color: #FFFFFF;</stopButtonStyle>
-
 
 
         <task_group name="Grasp">
@@ -166,6 +162,7 @@
           </task>
         </task_group>
 
+        <!--
         <commands>
           <command button="a" name="arm_pos_x" increment=-0.025></command>
           <command button="d" name="arm_pos_x" increment=0.025></command>
@@ -213,6 +210,7 @@
           <index name="arm_rot_y" num="4"></index>
           <index name="arm_rot_z" num="5"></index>
         </indices>
+-->
 
       </plugin>
     </gui>

@@ -17,10 +17,6 @@
 #ifndef _GUI_ARAT_PLUGIN_HH_
 #define _GUI_ARAT_PLUGIN_HH_
 
-#include <queue>
-
-#include <ignition/transport.hh>
-
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/gui.hh>
@@ -29,48 +25,12 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
-
 namespace gazebo
 {
+  // Forward declare task button
   class TaskButton;
 
-  /*
-  class KeyCommand
-  {
-    public: KeyCommand(const char _button, const std::string &_name,
-                       const float _increment) :
-        button(_button), name(_name), increment(_increment) {}
-
-    public: KeyCommand()
-    {
-      this->index = 0;
-    }
-
-    public: char button;
-    public: std::string name;
-    public: int index;
-    public: float increment;
-  };
-
-  class Grasp
-  {
-    public: Grasp(char _incKey, char _decKey)
-            : incKey(_incKey), decKey(_decKey)
-    {
-      this->sliderValue = 0;
-    }
-
-    public: Grasp() {}
-
-    public: float sliderValue;
-    public: std::vector<float> desiredGrasp;
-    public: char incKey;
-    public: char decKey;
-    public: void SliderChanged(char key, float inc);
-  };
-*/
-
-  /// \brief Make HAPTIX GUI plugin
+  /// \brief A graphical interface for the HAPTIX project
   class HaptixGUIPlugin : public gazebo::GUIPlugin
   {
     Q_OBJECT
@@ -114,36 +74,21 @@ namespace gazebo
     private: void PublishTimerMessage(const std::string &_msg) const;
 
     /// \brief Callback when the start/stop button is pressed.
-    private slots: void OnStartStop();
+    /// \param[in] _checked True if the button was checked.
+    private slots: void OnStartStop(bool _checked);
 
     /// \brief Callback triggered when the next button is clicked
-    protected slots: void OnNextClicked();
+    private slots: void OnNextClicked();
 
     /// \brief Callback triggered when the reset button is clicked
-    protected slots: void OnResetClicked();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /// \brief Callback triggered when the start/stop button is clicked
-    protected slots: void OnStartStopClicked();
+    private slots: void OnResetClicked();
 
     /// \brief Helper function to initialize the task view
     /// \param[in] _elem SDF element pointer that contains HAPTIX task
     /// parameters.
     private: void InitializeTaskView(sdf::ElementPtr _elem);
 
+    /// \brief Handle GUI keypresses
     private: bool OnKeyPress(common::KeyEvent _event);
 
     /// \brief Size of the contact sensor display circle, in pixels.
@@ -202,23 +147,15 @@ namespace gazebo
     /// \brief Publisher that controls the clock
     private: gazebo::transport::PublisherPtr timerPub;
 
-/*    private: ignition::transport::Node *ignNode;
+    /// \brief Task start/stop button
+    private: QPushButton *startStopButton;
 
-    private: std::map<char, KeyCommand> armCommands;
-    private: std::map<char, KeyCommand> handCommands;
-    private: std::map<std::string, std::vector<char> > buttonNames;
+    /// \brief QT style for the start setting of the start/stop button
+    private: std::string startStyle;
 
-    // The mapping between a button and the grasp it is commanding
-    private: std::map<char, std::string> graspCommands;
+    /// \brief QT style for the start setting of the start/stop button
+    private: std::string stopStyle;
 
-    private: std::map<std::string, Grasp> grasps;
-
-    private: float graspIncrement;
-
-    private: bool isTestRunning;
-
-    private: DigitalClock *digitalClock;
-    */
   };
 }
 #endif
