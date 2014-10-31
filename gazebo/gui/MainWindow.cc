@@ -1517,7 +1517,12 @@ void MainWindow::OnAddPlugins()
       // Try to create the plugin
       gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
           (*iter)->filename(), (*iter)->name());
-
+      if (!plugin)
+      {
+        gzerr << "Plugin not found: [" << (*iter)->filename() << "]"
+              << std::endl;
+        return;
+      }
       // Load the plugin.
       plugin->Load(msgs::PluginToSDF(**iter));
 
