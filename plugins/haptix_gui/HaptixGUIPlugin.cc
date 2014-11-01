@@ -69,57 +69,58 @@ HaptixGUIPlugin::HaptixGUIPlugin()
     this->handScene->addItem(handItem);
 
   // Create the task layout
-    this->taskTab = new QTabWidget();
-    this->taskTab->setStyleSheet(
-        "QTabWidget {"
-          "border: 1px solid rgba(128, 128, 128, 255)"
-        "}"
+  this->taskTab = new QTabWidget();
+  this->taskTab->setStyleSheet(
+      "QTabWidget {"
+        "border: 1px solid rgba(128, 128, 128, 255)"
+      "}"
 
-        "QTabWidget::pane {"
-          "top: -1px;"
-          "background-color: #ff00ff;"
-          "border: 1px solid rgba(128, 128, 128, 255);"
-        "}"
+      "QTabWidget::pane {"
+        "top: -1px;"
+        "background-color: #ff00ff;"
+        "border: 1px solid rgba(128, 128, 128, 255);"
+      "}"
 
-        "QTabBar::tab-bar {"
-          "left: 5px"
-        "}"
+      "QTabBar::tab-bar {"
+        "left: 5px"
+      "}"
 
-        "QTabBar::tab {"
-          "color: rgba(100, 100, 100, 255);"
-          "border: 1px solid rgba(128, 128, 128, 255);"
-          "padding: 0px;"
-          "border-top-left-radius: 4px;"
-          "border-top-right-radius: 4px;"
-          "background-color: rgba(200, 200, 200, 255);"
-        "}"
+      "QTabBar::tab {"
+        "color: rgba(100, 100, 100, 255);"
+        "border: 1px solid rgba(128, 128, 128, 255);"
+        "padding: 0px;"
+        "border-top-left-radius: 4px;"
+        "border-top-right-radius: 4px;"
+        "background-color: rgba(200, 200, 200, 255);"
+      "}"
 
-        "QTabBar::tab:selected {"
-          "color: rgba(100, 100, 100, 255);"
-          "background-color: rgba(255, 255, 255, 255);"
-          "border: 1px solid rgba(128, 128, 128, 255);"
-          "border-bottom: 1px solid rgba(255, 255, 255, 255);"
-        "}"
-        );
+      "QTabBar::tab:selected {"
+        "color: rgba(100, 100, 100, 255);"
+        "background-color: rgba(255, 255, 255, 255);"
+        "border: 1px solid rgba(128, 128, 128, 255);"
+        "border-bottom: 1px solid rgba(255, 255, 255, 255);"
+      "}"
+      );
 
-    QFrame *tabFrame = new QFrame();
-    tabFrame->setContentsMargins(4, 0, 4, 0);
-    QVBoxLayout *tabFrameLayout = new QVBoxLayout();
-    tabFrame->setLayout(tabFrameLayout);
+  QFrame *tabFrame = new QFrame();
+  tabFrame->setContentsMargins(4, 0, 4, 0);
+  QVBoxLayout *tabFrameLayout = new QVBoxLayout();
+  tabFrame->setLayout(tabFrameLayout);
 
-    this->instructionsView = new QTextEdit();
-    this->instructionsView->setReadOnly(true);
-    this->instructionsView->setMaximumHeight(60);
-    this->instructionsView->setStyleSheet(
-        "margin-top: 0px;"
-        "margin-bottom: 0px;"
-        "margin-left: 20px;"
-        "margin-right: 20px;"
-        "background-color: #ffffff"
-        );
+  this->instructionsView = new QTextEdit("Instructions:");
+  this->instructionsView->setReadOnly(true);
+  this->instructionsView->setMaximumHeight(60);
+  this->instructionsView->setMinimumHeight(60);
+  this->instructionsView->setStyleSheet(
+      "margin-top: 0px;"
+      "margin-bottom: 0px;"
+      "margin-left: 20px;"
+      "margin-right: 20px;"
+      "background-color: #ffffff"
+      );
 
-    tabFrameLayout->addWidget(taskTab);
-    tabFrameLayout->addWidget(this->instructionsView);
+  tabFrameLayout->addWidget(taskTab);
+  tabFrameLayout->addWidget(this->instructionsView);
 
 
   QHBoxLayout *cycleButtonLayout = new QHBoxLayout();
@@ -244,6 +245,9 @@ HaptixGUIPlugin::~HaptixGUIPlugin()
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
 {
+  // Hide the scene tree.
+  gui::Events::sceneTreeVisibility(false);
+
   // Create the publisher that controls the timer
   if (_elem->HasElement("timer_topic"))
   {
@@ -339,12 +343,13 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
           forceStream.str().c_str());
       text->setPos(scaleXPos + scaleWidth + 4, i-11.5);
       this->handScene->addItem(text);
+      std::cout << "I[" << i-11.5 << "]\n";
     }
 
     // Draw the PSI label
-    QGraphicsTextItem *psiText = new QGraphicsTextItem(tr("N"));
-    psiText->setPos(scaleXPos-4, 362);
-    this->handScene->addItem(psiText);
+    QGraphicsTextItem *newtonText = new QGraphicsTextItem(tr("N"));
+    newtonText->setPos(scaleXPos + scaleWidth - 20, -62);
+    this->handScene->addItem(newtonText);
   }
 
   this->InitializeTaskView(_elem);
@@ -408,9 +413,6 @@ void HaptixGUIPlugin::OnSetContactForce(QString _contactName, double _value)
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::PreRender()
 {
-  // Hide the scene tree.
-  // gui::Events::sceneTreeVisibility(false);
-
   // Fade out old force values
   for (std::map<std::string, QGraphicsEllipseItem*>::iterator iter =
       this->contactGraphicsItems.begin();

@@ -292,6 +292,9 @@ namespace gazebo
 
       /// \brief Mutext to protect plugin loading.
       private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }

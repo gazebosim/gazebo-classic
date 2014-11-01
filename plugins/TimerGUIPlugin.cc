@@ -29,7 +29,11 @@ TimerGUIPlugin::TimerGUIPlugin()
 {
   // Set the frame background and foreground colors
   this->setStyleSheet(
-      "QFrame { background-color : rgba(255, 255, 255, 255); color : black; }");
+      "QFrame {"
+        "background-color : rgba(255, 255, 255, 255);"
+        "color : black;"
+        "font-size: 24px;"
+      "}");
 
   // Create the main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;

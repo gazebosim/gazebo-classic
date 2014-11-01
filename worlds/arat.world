@@ -10,11 +10,6 @@
         <pose>0 -2 1.75  0 0.35 1.57</pose>
       </camera>
 
-      <plugin name="TimerGUIPlugin" filename="libTimerGUIPlugin.so">
-        <size>100 30</size>
-        <topic>~/timer_control</topic> 
-      </plugin>
-
       <plugin name="HaptixGUIPlugin" filename="libHaptixGUIPlugin.so">
         <circle_size>25</circle_size>
         <force_min>0</force_min>
@@ -74,90 +69,102 @@
 
         <task_group name="Grasp">
           <task id="grasp_1" name="Block 10cm">
+            <enabled>true</enabled>
             <icon>file://media/materials/textures/grasp_1.jpg</icon>
             <instructions>
-              Pick up the 10 cm block and place it on top of the box.
+              Instructions: Pick up the 10 cm block and place it on top of the box.
             </instructions>
           </task>
 
           <task id="grasp_2" name="Block 2.5cm">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grasp_2.jpg</icon>
             <instructions>
-              Pick up the 2.5 cm block and place it on top of the box.
+              Instructions: Pick up the 2.5 cm block and place it on top of the box.
             </instructions>
           </task>
 
           <task id="grasp_3" name="Block 5cm">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grasp_3.jpg</icon>
             <instructions>
-              Pick up the 5 cm block and place it on top of the box.
+              Instructions: Pick up the 5 cm block and place it on top of the box.
             </instructions>
           </task>
 
           <task id="grasp_4" name="Block 7.5cm">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grasp_4.jpg</icon>
             <instructions>
-              Pick up the 7.5 cm block and place it on top of the box.
+              Instructions: Pick up the 7.5 cm block and place it on top of the box.
             </instructions>
           </task>
 
           <task id="grasp_5" name="Cricket ball">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grasp_5.jpg</icon>
             <instructions>
-              Pick up the cricket ball and place it on top of the box, inside of the tin lid.
+              Instructions: Pick up the cricket ball and place it on top of the box, inside of the tin lid.
             </instructions>
           </task>
 
           <task id="grasp_6"name="Stone">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grasp_6.jpg</icon> 
             <instructions>
-              Pick up the stone and place it on top of the box.
+              Instructions: Pick up the stone and place it on top of the box.
             </instructions>
           </task>
         </task_group>
 
         <task_group name="Grip">
           <task id="grip_1" name="Cups">
+            <enabled>true</enabled>
             <icon>file://media/materials/textures/grip_1.jpg</icon>
             <instructions>
-              Pour the contents of the filled cup into the empty cup.
+              Instructions: Pour the contents of the filled cup into the empty cup.
             </instructions>
           </task>
 
           <task id="grip_2" name="Tube 2.25cm">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grip_2.jpg</icon>
             <instructions>
-              Pick up the 2.25cm diameter tube and place it on the wooden peg.
+              Instructions: Pick up the 2.25cm diameter tube and place it on the wooden peg.
             </instructions>
           </task>
 
           <task id="grip_3" name="Tube 1cm">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grip_3.jpg</icon>
             <instructions>
-              Pick up the 1cm diameter tube and place it on the metal peg.
+              Instructions: Pick up the 1cm diameter tube and place it on the metal peg.
             </instructions>
           </task>
 
           <task id="grip_4" name="Washer">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/grip_4.jpg</icon>
             <instructions>
-              Pick up the washer and place it on the metal peg.
+              Instructions: Pick up the washer and place it on the metal peg.
             </instructions>
           </task>
         </task_group>
 
         <task_group name="Pinch">
           <task id="pinch_1" name="Ball bearing">
+            <enabled>true</enabled>
             <icon>file://media/materials/textures/pinch_1.jpg</icon>
             <instructions>
-              Pick up the ball bearing and place it on top of the box, inside of the tin lid.
+              Instructions: Pick up the ball bearing and place it on top of the box, inside of the tin lid.
             </instructions>
           </task>
 
           <task id="pinch_2" name="Marble">
+            <enabled>false</enabled>
             <icon>file://media/materials/textures/pinch_2.jpg</icon>
             <instructions>
-              Pick up the marble and place it on top of the box, inside of the tin lid.
+              Instructions:   Pick up the marble and place it on top of the box, inside of the tin lid.
             </instructions>
           </task>
         </task_group>
@@ -211,8 +218,13 @@
           <index name="arm_rot_z" num="5"></index>
         </indices>
 -->
-
       </plugin>
+
+      <plugin name="TimerGUIPlugin" filename="libTimerGUIPlugin.so">
+        <size>155 30</size>
+        <topic>~/timer_control</topic> 
+      </plugin>
+
     </gui>
 
    <physics type="ode">
