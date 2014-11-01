@@ -1715,7 +1715,6 @@ void MainWindow::ItemSelected(QTreeWidgetItem *_item, int)
 /////////////////////////////////////////////////
 void MainWindow::AddToLeftColumn(const std::string &_name, QWidget *_widget)
 {
-  std::cout << "AddTOLeft[" << _name << "]\n";
   this->leftColumn->addWidget(_widget);
   this->leftColumnStack[_name] = this->leftColumn->count()-1;
 }
