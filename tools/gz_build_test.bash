@@ -10,43 +10,32 @@ fi
 
 # Create a logfile based on the current time
 timestamp=`eval date +%Y_%m_%d_%R:%S`
-logfile="/tmp/gazebo_test-$timestamp.txt"
-logfileSummary="/tmp/gazebo_test-$timestamp-summary.txt"
-logfileVerbose="/tmp/gazebo_test-$timestamp-verbose.txt"
+logfilePrefix="/tmp/gazebo_test-$timestamp"
+logfile="${logfilePrefix}.txt"
+logfileSummary="${logfilePrefix}-summary.txt"
+logfileVerbose="${logfilePrefix}-verbose.txt"
 BUILD_ROOT=/tmp/gazebo_build
 logfileRaw=$BUILD_ROOT/raw.log
-testCount=33
+testCount=30
 
 # Create working directory
 cd 
 rm -rf $BUILD_ROOT
-mkdir $BUILD_ROOT
+mkdir -p $BUILD_ROOT
 
 # Clone
-ORIGIN=https://bitbucket.org/osrf/gazebo
+GAZEBO_ORIGIN=https://bitbucket.org/osrf/gazebo
 if [ `hostname` == t2 ]
 then
-  hg clone $HOME/osrf/gazebo_readonly $BUILD_ROOT/source
-  cd $BUILD_ROOT/source
-  hg pull $ORIGIN
-elif [ `hostname` == t1000 ]
-then
-  hg clone $HOME/code/gazebo $BUILD_ROOT/source
-  cd $BUILD_ROOT/source
-  hg pull $ORIGIN
-
-  # build against homebrew
-  export PATH=/usr/local/bin:/usr/local/sbin:$PATH
-  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
-  export PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/usr/lib/pkgconfig:/usr/local/Library/ENV/pkgconfig/10.8
-  export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+  hg clone $HOME/osrf/gazebo $BUILD_ROOT/source
 else
   hg clone $ORIGIN $BUILD_ROOT/source
 fi
+cd $BUILD_ROOT/source
+hg pull ${GAZEBO_ORIGIN}
 
 start_time=`eval date +%s`
 
-export GAZEBO_MASTER_URI=http://localhost:11342
 export DISPLAY=:0
 export PATH=$BUILD_ROOT/install/bin:$PATH
 export LD_LIBRARY_PATH=$BUILD_ROOT/install/lib:$BUILD_ROOT/install/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
@@ -71,13 +60,13 @@ do
   cd build
   cmake .. \
     -DCMAKE_INSTALL_PREFIX=$BUILD_ROOT/install \
-    -DENABLE_SCREEN_TESTS:BOOL=False \
+    -DENABLE_SCREEN_TESTS:BOOL=True \
     -DFORCE_GRAPHIC_TESTS_COMPILATION:BOOL=True
   make -j4 install
   . $BUILD_ROOT/install/share/gazebo/setup.sh
 
   echo "Branch: $branch" >> $logfile
-  echo "hg id: `hg id`" >> $logFile
+  echo "hg id: `hg id`" >> $logfile
   echo "==================================================" >> $logfile
 
   echo "Code Check Results" >> $logfile
@@ -107,8 +96,8 @@ do
       echo Branch "$branch" try $i of $testCount, failed test $f >> $logfileVerbose
       # then send the raw output of both the test and its companion test_ran
       # to the logfile for perusal
-      grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw >> $logfileVerbose
-      grep '^ *'`echo "(($f-1)/2)*2+2" | bc`':' $logfileRaw >> $logfileVerbose
+      grep '^ *'`echo "(($f-1)/2)*2+1" | bc`':' $logfileRaw | grep -v YANKING >> $logfileVerbose
+      grep '^ *'`echo "(($f-1)/2)*2+2" | bc`':' $logfileRaw | grep -v YANKING >> $logfileVerbose
     done
 
     # update summary file
@@ -124,6 +113,7 @@ hour=`expr $duration / 3600`
 min=`expr $(( $duration - $hour * 3600 )) / 60`
 sec=`expr $duration - $hour \* 3600 - $min \* 60`
 echo "Duration: $hour hr $min min $sec sec" >> $logfile
+cp $logfileRaw /tmp
 
 # Cleanup
 cd
