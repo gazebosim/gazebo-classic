@@ -62,7 +62,7 @@ namespace gazebo
                                    const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual void SetGearRatio(double _gearRatio);
+      public: virtual void SetGearboxRatio(double _gearRatio);
 
       // Documentation inherited
       public: virtual math::Angle GetAngleImpl(unsigned int _index) const;

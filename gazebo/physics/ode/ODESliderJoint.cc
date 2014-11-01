@@ -88,9 +88,9 @@ double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODESliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////
@@ -153,4 +153,19 @@ void ODESliderJoint::SetMaxForce(unsigned int /*_index*/, double _t)
 double ODESliderJoint::GetMaxForce(unsigned int /*_index*/)
 {
   return this->GetParam(dParamFMax);
+}
+
+//////////////////////////////////////////////////
+math::Vector3 ODESliderJoint::GetAnchor(unsigned int /*_index*/) const
+{
+  dVector3 result;
+  gzlog << "ODESliderJoint::GetAnchor not implemented.\n";
+  return math::Vector3(result[0], result[1], result[2]);
+}
+
+//////////////////////////////////////////////////
+void ODESliderJoint::SetAnchor(unsigned int /*_index*/,
+  const math::Vector3 &/*_anchor*/)
+{
+  gzlog << "ODESliderJoint::SetAnchor not implemented.\n";
 }

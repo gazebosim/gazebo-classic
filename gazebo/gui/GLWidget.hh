@@ -54,6 +54,11 @@ namespace gazebo
       public: GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
+      /// \brief View a scene in this widget.
+      /// This will use the scene's UserCamera to visualize the scene.
+      /// If a UserCamera does not exist, one is created with the
+      /// name "gzclient_camera".
+      /// \param[in] _scene Pointer to the scene to visualize.
       public: void ViewScene(rendering::ScenePtr _scene);
       public: rendering::UserCameraPtr GetCamera() const;
       public: rendering::ScenePtr GetScene() const;
@@ -138,9 +143,6 @@ namespace gazebo
 
       private: void ClearSelection();
 
-      /// \brief Copy an object by name
-      private: void Paste(const std::string &_object);
-
       private: void PushHistory(const std::string &_visName,
                                 const math::Pose &_pose);
       private: void PopHistory();
@@ -148,6 +150,30 @@ namespace gazebo
       /// \brief Set the selected visual, which will highlight the
       /// visual
       private: void SetSelectedVisual(rendering::VisualPtr _vis);
+
+      /// \brief Callback when a specific alignment configuration is set.
+      /// \param[in] _axis Axis of alignment: x, y, or z.
+      /// \param[in] _config Configuration: min, center, or max.
+      /// \param[in] _target Target of alignment: first or last.
+      /// \param[in] _bool True to preview alignment without publishing
+      /// to server.
+      private: void OnAlignMode(const std::string &_axis,
+          const std::string &_config, const std::string &_target,
+          bool _preview);
+
+      /// \brief Copy an entity by name
+      /// \param[in] _name Name of entity to be copied.
+      private: void Copy(const std::string &_name);
+
+      /// \brief Paste an entity by name
+      /// \param[in] _name Name of entity to be pasted.
+      private: void Paste(const std::string &_name);
+
+      /// \brief Qt callback when the copy action is triggered.
+      private slots: void OnCopy();
+
+      /// \brief Qt callback when the paste action is triggered.
+      private slots: void OnPaste();
 
       private: int windowId;
 
@@ -171,7 +197,13 @@ namespace gazebo
       private: SpotLightMaker spotLightMaker;
       private: DirectionalLightMaker directionalLightMaker;
 
-      private: rendering::VisualPtr hoverVis, selectedVis;
+      /// \brief Light maker
+      private: LightMaker lightMaker;
+
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief A list of selected visuals.
+      private: std::vector<rendering::VisualPtr> selectedVisuals;
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
@@ -186,6 +218,9 @@ namespace gazebo
       private: std::string state;
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
+
+      /// \brief Name of entity that is being copied.
+      private: std::string copyEntityName;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene

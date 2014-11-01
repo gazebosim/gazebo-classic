@@ -213,6 +213,10 @@ namespace gazebo
       unsigned int size;
       _i.GetData(&data, size);
       _msg->set_data(data, size);
+      if (data)
+      {
+        delete[] data;
+      }
     }
 
     /////////////////////////////////////////////////
@@ -222,6 +226,15 @@ namespace gazebo
       result.set_x(_v.x);
       result.set_y(_v.y);
       result.set_z(_v.z);
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Vector2d Convert(const math::Vector2d &_v)
+    {
+      msgs::Vector2d result;
+      result.set_x(_v.x);
+      result.set_y(_v.y);
       return result;
     }
 
@@ -274,6 +287,11 @@ namespace gazebo
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
+    }
+
+    math::Vector2d Convert(const msgs::Vector2d &_v)
+    {
+      return math::Vector2d(_v.x(), _v.y());
     }
 
     math::Quaternion Convert(const msgs::Quaternion &_q)
@@ -496,6 +514,19 @@ namespace gazebo
         msgs::Set(result.mutable_plane()->mutable_size(),
             geomElem->Get<math::Vector2d>("size"));
       }
+      else if (geomElem->GetName() == "polyline")
+      {
+        result.set_type(msgs::Geometry::POLYLINE);
+        result.mutable_polyline()->set_height(geomElem->Get<double>("height"));
+        sdf::ElementPtr pointElem = geomElem->GetElement("point");
+        while (pointElem)
+        {
+           math::Vector2d point = pointElem->Get<math::Vector2d>();
+           pointElem = pointElem->GetNextElement("point");
+           msgs::Vector2d *ptMsg = result.mutable_polyline()->add_point();
+           msgs::Set(ptMsg, point);
+        }
+      }
       else if (geomElem->GetName() == "image")
       {
         result.set_type(msgs::Geometry::IMAGE);
@@ -670,6 +701,7 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
     msgs::Fog FogFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::Fog result;
@@ -743,6 +775,173 @@ namespace gazebo
         result.set_shadows(_sdf->Get<bool>("shadows"));
 
       return result;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr LightToSDF(const msgs::Light &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr lightSDF;
+
+      if (_sdf)
+      {
+        lightSDF = _sdf;
+      }
+      else
+      {
+        lightSDF.reset(new sdf::Element);
+        sdf::initFile("light.sdf", lightSDF);
+      }
+
+      lightSDF->GetAttribute("name")->Set(_msg.name());
+
+      if (_msg.has_type() && _msg.type() == msgs::Light::POINT)
+        lightSDF->GetAttribute("type")->Set("point");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::SPOT)
+        lightSDF->GetAttribute("type")->Set("spot");
+      else if (_msg.has_type() && _msg.type() == msgs::Light::DIRECTIONAL)
+        lightSDF->GetAttribute("type")->Set("directional");
+
+      if (_msg.has_pose())
+      {
+        lightSDF->GetElement("pose")->Set(msgs::Convert(_msg.pose()));
+      }
+
+      if (_msg.has_diffuse())
+      {
+        lightSDF->GetElement("diffuse")->Set(msgs::Convert(_msg.diffuse()));
+      }
+
+      if (_msg.has_specular())
+      {
+        lightSDF->GetElement("specular")->Set(msgs::Convert(_msg.specular()));
+      }
+
+      if (_msg.has_direction())
+      {
+        lightSDF->GetElement("direction")->Set(msgs::Convert(_msg.direction()));
+      }
+
+      if (_msg.has_attenuation_constant())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("constant")->Set(_msg.attenuation_constant());
+      }
+
+      if (_msg.has_attenuation_linear())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("linear")->Set(_msg.attenuation_linear());
+      }
+
+      if (_msg.has_attenuation_quadratic())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("quadratic")->Set(_msg.attenuation_quadratic());
+      }
+
+      if (_msg.has_range())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("attenuation");
+        elem->GetElement("range")->Set(_msg.range());
+      }
+
+      if (_msg.has_cast_shadows())
+        lightSDF->GetElement("cast_shadows")->Set(_msg.cast_shadows());
+
+      if (_msg.has_spot_inner_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("inner_angle")->Set(_msg.spot_inner_angle());
+      }
+
+      if (_msg.has_spot_outer_angle())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("outer_angle")->Set(_msg.spot_outer_angle());
+      }
+
+      if (_msg.has_spot_falloff())
+      {
+        sdf::ElementPtr elem = lightSDF->GetElement("spot");
+        elem->GetElement("falloff")->Set(_msg.spot_falloff());
+      }
+      return lightSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr cameraSDF;
+
+      if (_sdf)
+      {
+        cameraSDF = _sdf;
+      }
+      else
+      {
+        cameraSDF.reset(new sdf::Element);
+        sdf::initFile("camera.sdf", cameraSDF);
+      }
+
+      if (_msg.has_horizontal_fov())
+      {
+        cameraSDF->GetElement("horizontal_fov")->Set(
+            _msg.horizontal_fov());
+      }
+      if (_msg.has_image_size())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("width")->Set(_msg.image_size().x());
+        imageElem->GetElement("height")->Set(_msg.image_size().y());
+      }
+      if (_msg.has_image_format())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("format")->Set(_msg.image_format());
+      }
+      if (_msg.has_near_clip() || _msg.has_far_clip())
+      {
+        sdf::ElementPtr clipElem = cameraSDF->GetElement("clip");
+        if (_msg.has_near_clip())
+          clipElem->GetElement("near")->Set(_msg.near_clip());
+        if (_msg.has_far_clip())
+          clipElem->GetElement("far")->Set(_msg.far_clip());
+      }
+
+      if (_msg.has_distortion())
+      {
+        msgs::Distortion distortionMsg = _msg.distortion();
+        sdf::ElementPtr distortionElem =
+            cameraSDF->GetElement("distortion");
+
+        if (distortionMsg.has_center())
+        {
+          distortionElem->GetElement("center")->Set(
+              msgs::Convert(distortionMsg.center()));
+        }
+        if (distortionMsg.has_k1())
+        {
+          distortionElem->GetElement("k1")->Set(distortionMsg.k1());
+        }
+        if (distortionMsg.has_k2())
+        {
+          distortionElem->GetElement("k2")->Set(distortionMsg.k2());
+        }
+        if (distortionMsg.has_k3())
+        {
+          distortionElem->GetElement("k3")->Set(distortionMsg.k3());
+        }
+        if (distortionMsg.has_p1())
+        {
+          distortionElem->GetElement("p1")->Set(distortionMsg.p1());
+        }
+        if (distortionMsg.has_p2())
+        {
+          distortionElem->GetElement("p2")->Set(distortionMsg.p2());
+        }
+      }
+      return cameraSDF;
     }
   }
 }

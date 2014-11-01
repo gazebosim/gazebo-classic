@@ -1,7 +1,8 @@
-<?xml version="1.0"?>
-<sdf version="1.4">
+<?xml version="1.0" ?>
+<sdf version="1.5">
   <world name="default">
-    <model name="plane1_model" static="1">
+    <model name="plane1_model">
+      <static>true</static>
       <link name="body" gravity="1" self_collide="0" kinematic="0">
         <collision name="geom" laser_retro="0.000000">
           <geometry>
@@ -35,7 +36,8 @@
       <attenuation range="100.000000" linear="0.010000" constant="0.800000" quadratic="0.000000" />
       <direction xyz="0.000000 0.200000 -8.000000" />
     </light>
-    <actor name="actor1" static="1">
+    <actor name="actor1">
+      <static>true</static>
       <pose>0.000000 0.000000 0.000000 0.000000 -0.000000 0.000000</pose>
       <skin filename="sub_16.dae" scale="1.000000" />
       <animation name="walking" filename="walk.dae" scale="1.000000" interpolate_x="1" />

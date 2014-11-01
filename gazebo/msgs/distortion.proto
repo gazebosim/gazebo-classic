@@ -1,0 +1,17 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Distortion
+/// \brief Information about a distortion element
+
+import "vector2d.proto";
+
+message Distortion
+{
+  optional Vector2d center  = 1;
+  optional double k1        = 2;
+  optional double k2        = 3;
+  optional double k3        = 4;
+  optional double p1        = 5;
+  optional double p2        = 6;
+}

@@ -116,7 +116,8 @@ void GUIOverlay::Init(Ogre::RenderTarget * /*_renderTarget*/)
 void GUIOverlay::Hide()
 {
 #ifdef HAVE_CEGUI
-  CEGUI::System::getSingletonPtr()->getGUISheet()->hide();
+  if (this->dataPtr->initialized)
+    CEGUI::System::getSingletonPtr()->getGUISheet()->hide();
 #endif
 }
 
@@ -124,7 +125,8 @@ void GUIOverlay::Hide()
 void GUIOverlay::Show()
 {
 #ifdef HAVE_CEGUI
-  CEGUI::System::getSingletonPtr()->getGUISheet()->show();
+  if (this->dataPtr->initialized)
+    CEGUI::System::getSingletonPtr()->getGUISheet()->show();
 #endif
 }
 
@@ -132,7 +134,8 @@ void GUIOverlay::Show()
 void GUIOverlay::Update()
 {
 #ifdef HAVE_CEGUI
-  CEGUI::System::getSingleton().injectTimePulse(0.01);
+  if (this->dataPtr->initialized)
+    CEGUI::System::getSingleton().injectTimePulse(0.01);
 #endif
 }
 

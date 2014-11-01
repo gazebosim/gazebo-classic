@@ -24,7 +24,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-
+#include "gazebo/gazebo_config.h"
 #include "gazebo/rendering/Road2d.hh"
 #include "gazebo/rendering/Projector.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -64,6 +64,10 @@
 #include "gazebo/transport/Node.hh"
 
 #include "gazebo/rendering/Scene.hh"
+
+#ifdef HAVE_OCULUS
+#include "gazebo/rendering/OculusCamera.hh"
+#endif
 
 using namespace gazebo;
 using namespace rendering;
@@ -167,6 +171,7 @@ Scene::Scene(const std::string &_name, bool _enableVisualizations,
 void Scene::Clear()
 {
   this->node->Fini();
+  this->modelMsgs.clear();
   this->visualMsgs.clear();
   this->lightMsgs.clear();
   this->poseMsgs.clear();
@@ -562,6 +567,29 @@ CameraPtr Scene::GetCamera(const std::string &_name) const
 
   return result;
 }
+
+//////////////////////////////////////////////////
+#ifdef HAVE_OCULUS
+OculusCameraPtr Scene::CreateOculusCamera(const std::string &_name)
+{
+  OculusCameraPtr camera(new OculusCamera(_name, shared_from_this()));
+
+  if (camera->Ready())
+  {
+    camera->Load();
+    camera->Init();
+    this->oculusCameras.push_back(camera);
+  }
+
+  return camera;
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::GetOculusCameraCount() const
+{
+  return this->oculusCameras.size();
+}
+#endif
 
 //////////////////////////////////////////////////
 UserCameraPtr Scene::CreateUserCamera(const std::string &_name)
@@ -1498,15 +1526,18 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
 
     {
       boost::recursive_mutex::scoped_lock lock(this->poseMsgMutex);
-      PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
-      if (iter != this->poseMsgs.end())
-        iter->second.CopyFrom(_msg.link(j).pose());
-      else
-        this->poseMsgs.insert(
-            std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
+      if (_msg.link(j).has_pose())
+      {
+        PoseMsgs_M::iterator iter = this->poseMsgs.find(_msg.link(j).id());
+        if (iter != this->poseMsgs.end())
+          iter->second.CopyFrom(_msg.link(j).pose());
+        else
+          this->poseMsgs.insert(
+              std::make_pair(_msg.link(j).id(), _msg.link(j).pose()));
 
-      this->poseMsgs[_msg.link(j).id()].set_name(linkName);
-      this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+        this->poseMsgs[_msg.link(j).id()].set_name(linkName);
+        this->poseMsgs[_msg.link(j).id()].set_id(_msg.link(j).id());
+      }
     }
 
     if (_msg.link(j).has_inertial())
@@ -1794,15 +1825,18 @@ void Scene::PreRender()
       for (int i = 0; i < (*spIter)->pose_size(); i++)
       {
         const msgs::Pose& pose_msg = (*spIter)->pose(i);
-        Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
-        if (iter2 != this->visuals.end())
+        if (pose_msg.has_id())
         {
-          // If an object is selected, don't let the physics engine move it.
-          if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first != this->selectedVis->GetId())
+          Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
+          if (iter2 != this->visuals.end())
           {
-            math::Pose pose = msgs::Convert(pose_msg);
-            iter2->second->SetPose(pose);
+            // If an object is selected, don't let the physics engine move it.
+            if (!this->selectedVis || this->selectionMode != "move" ||
+              iter->first != this->selectedVis->GetId())
+            {
+              math::Pose pose = msgs::Convert(pose_msg);
+              iter2->second->SetPose(pose);
+            }
           }
         }
       }
@@ -1920,11 +1954,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         parentVis->AttachVisual(cameraVis);
 
         cameraVis->SetPose(msgs::Convert(_msg->pose()));
-
         cameraVis->SetId(_msg->id());
-        cameraVis->Load(_msg->camera().image_size().x(),
-            _msg->camera().image_size().y());
-
+        cameraVis->Load(_msg->camera());
         this->visuals[cameraVis->GetId()] = cameraVis;
       }
     }
@@ -2434,7 +2465,6 @@ bool Scene::ProcessLightMsg(ConstLightPtr &_msg)
   {
     LightPtr light(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->lightPub->Publish(*_msg);
     this->lights[_msg->name()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -2704,6 +2734,28 @@ void Scene::RemoveVisual(VisualPtr _vis)
 }
 
 /////////////////////////////////////////////////
+void Scene::AddLight(LightPtr _light)
+{
+  std::string n = this->StripSceneName(_light->GetName());
+  Light_M::iterator iter = this->lights.find(n);
+  if (iter != this->lights.end())
+    gzerr << "Duplicate lights detected[" << _light->GetName() << "]\n";
+
+  this->lights[n] = _light;
+}
+
+/////////////////////////////////////////////////
+void Scene::RemoveLight(LightPtr _light)
+{
+  if (_light)
+  {
+    // Delete the light
+    std::string n = this->StripSceneName(_light->GetName());
+    this->lights.erase(n);
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::SetGrid(bool _enabled)
 {
   if (_enabled && this->grids.empty())
@@ -2759,13 +2811,6 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
   comVis->Load(_elem);
   comVis->SetVisible(false);
   this->visuals[comVis->GetId()] = comVis;
-}
-
-/////////////////////////////////////////////////
-VisualPtr Scene::CloneVisual(const std::string & /*_visualName*/,
-                             const std::string & /*_newName*/)
-{
-  return VisualPtr();
 }
 
 /////////////////////////////////////////////////

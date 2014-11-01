@@ -204,8 +204,8 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   // perturbe joints so top link topples over, then remeasure
   physics->SetGravity(math::Vector3(-30, 10, -50));
   // tune joint stop properties
-  joint_01->SetAttribute("stop_erp", 0, 0.02);
-  joint_12->SetAttribute("stop_erp", 0, 0.02);
+  joint_01->SetParam("stop_erp", 0, 0.02);
+  joint_12->SetParam("stop_erp", 0, 0.02);
   // wait for dynamics to stabilize
   world->Step(2000);
   // check force torques in new system

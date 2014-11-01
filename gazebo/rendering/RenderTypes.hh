@@ -18,6 +18,7 @@
 #define _RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include "gazebo/gazebo_config.h"
 #include "gazebo/util/system.hh"
 
 /// \def GZ_VISIBILITY_ALL
@@ -61,6 +62,12 @@ namespace gazebo
     class RFIDTagVisual;
     class WindowManager;
     class SelectionObj;
+    class RayQuery;
+    class Distortion;
+
+#ifdef HAVE_OCULUS
+    class OculusCamera;
+#endif
 
     /// \def ScenePtr
     /// \brief Shared pointer to Scene
@@ -142,9 +149,23 @@ namespace gazebo
     /// \brief Shared pointer to WindowManager
     typedef boost::shared_ptr<WindowManager> WindowManagerPtr;
 
-    /// \def ContactVisualPtr
+    /// \def SelectionObj
     /// \brief Shared pointer to SelectionObj
     typedef boost::shared_ptr<SelectionObj> SelectionObjPtr;
+
+    /// \def RayQueryPtr
+    /// \brief Shared pointer to RayQuery
+    typedef boost::shared_ptr<RayQuery> RayQueryPtr;
+
+    /// \def DistortionPtr
+    /// \brief Shared pointer to Distortion
+    typedef boost::shared_ptr<Distortion> DistortionPtr;
+
+#ifdef HAVE_OCULUS
+    /// \def OculusCameraPtr
+    /// \brief Shared pointer to OculusCamera
+    typedef boost::shared_ptr<OculusCamera> OculusCameraPtr;
+#endif
 
     /// \enum RenderOpType
     /// \brief Type of render operation for a drawable

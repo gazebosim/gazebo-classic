@@ -287,7 +287,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Wireless Receiver - rx2
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
-  math::Pose rx2Pose(math::Vector3(-3, 0, 0.5), math::Quaternion(0, 0, 0));
+  math::Pose rx2Pose(math::Vector3(-2, 0, 0.5), math::Quaternion(0, 0, 0));
 
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.pos,
@@ -301,7 +301,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   ASSERT_TRUE(rx2);
 
   // Spawn an obstacle between the transmitter and the receiver
-  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1.5, 0, 0.5),
+  SpawnBox("Box", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
       math::Vector3(0, 0, 0), true);
 
   // Initialize gazebo transport layer
@@ -402,7 +402,7 @@ TEST_P(TransceiverTest, Obstacle)
   if (std::string(GetParam()) == "dart")
   {
     gzerr << "Abort test since this test frequently fails with dart, "
-          << " see (issues #916, #911)" << std::endl;
+          << " see (issues #911)" << std::endl;
     return;
   }
 

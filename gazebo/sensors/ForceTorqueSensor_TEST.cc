@@ -17,10 +17,14 @@
 
 #include <gtest/gtest.h>
 #include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
+
 
 using namespace gazebo;
-class ForceTorqueSensor_TEST : public ServerFixture
+class ForceTorqueSensor_TEST : public ServerFixture,
+                               public testing::WithParamInterface<const char*>
 {
+    public: void ForceTorqueTest(const std::string &_physicsEngine);
 };
 
 static std::string forceTorqueSensorString =
@@ -33,9 +37,10 @@ static std::string forceTorqueSensorString =
 
 /////////////////////////////////////////////////
 /// \brief Test Creation of a ForceTorque sensor
-TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
+void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
 {
-  Load("worlds/pioneer2dx.world");
+  Load("worlds/pioneer2dx.world", true, _physicsEngine);
+
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   sdf::ElementPtr sdf(new sdf::Element);
@@ -46,7 +51,7 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   physics::ModelPtr model = world->GetModel("pioneer2dx");
   physics::JointPtr joint = model->GetJoint("left_wheel_hinge");
 
-  // Create the Ray sensor
+  // Create the force torque sensor
   std::string sensorName = mgr->CreateSensor(sdf, "default",
       "pioneer2dx::left_wheel_hinge", joint->GetId());
 
@@ -57,7 +62,7 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
   // Update the sensor manager so that it can process new sensors.
   mgr->Update();
 
-  // Get a pointer to the Ray sensor
+  // Get a pointer to the force torque sensor
   sensors::ForceTorqueSensorPtr sensor =
     boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         mgr->GetSensor(sensorName));
@@ -70,6 +75,16 @@ TEST_F(ForceTorqueSensor_TEST, CreateForceTorque)
 
   EXPECT_TRUE(sensor->IsActive());
 }
+
+/////////////////////////////////////////////////
+TEST_P(ForceTorqueSensor_TEST, ForceTorqueTest)
+{
+  ForceTorqueTest(GetParam());
+}
+
+INSTANTIATE_TEST_CASE_P(PhysicsEngines,
+                        ForceTorqueSensor_TEST,
+                        PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

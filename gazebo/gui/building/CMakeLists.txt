@@ -16,9 +16,12 @@ set (sources
   FloorItem.cc
   GrabberHandle.cc
   GridLines.cc
+  ImportImageDialog.cc
+  ImportImageView.cc
   LevelInspectorDialog.cc
   LevelWidget.cc
   LineSegmentItem.cc
+  MeasureItem.cc
   PolylineItem.cc
   RectItem.cc
   RotateHandle.cc
@@ -40,8 +43,11 @@ set (qt_headers
   EditorView.hh
   FinishBuildingDialog.hh
   FloorItem.hh
+  ImportImageDialog.hh
+  ImportImageView.hh
   LevelInspectorDialog.hh
   LevelWidget.hh
+  MeasureItem.hh
   RectItem.hh
   ScaleWidget.hh
   StairsInspectorDialog.hh
@@ -76,6 +82,7 @@ target_link_libraries(gazebo_gui_building
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_msgs)
+  gazebo_msgs
+  ${QT_LIBRARIES})
 
 gz_install_library(gazebo_gui_building)

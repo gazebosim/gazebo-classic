@@ -87,12 +87,12 @@ namespace gazebo
                                         double _value);
 
       // Documentation inherited.
-      public: virtual void SetAttribute(const std::string &_key,
+      public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
                                         const boost::any &_value);
 
       // Documentation inherited.
-      public: virtual double GetAttribute(const std::string &_key,
+      public: virtual double GetParam(const std::string &_key,
                   unsigned int _index);
 
       // Save current Simbody State
@@ -192,11 +192,11 @@ namespace gazebo
       public: bool physicsInitialized;
 
       // Documentation inherited.
-      public: virtual void SetHighStop(unsigned int _index,
+      public: virtual bool SetHighStop(unsigned int _index,
                                        const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual void SetLowStop(unsigned int _index,
+      public: virtual bool SetLowStop(unsigned int _index,
                                       const math::Angle &_angle);
 
       // Documentation inherited.

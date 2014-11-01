@@ -31,6 +31,8 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
 
+#include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
@@ -132,12 +134,6 @@ void Sensor::Init()
   msgs::Sensor msg;
   this->FillMsg(msg);
   this->sensorPub->Publish(msg);
-}
-
-//////////////////////////////////////////////////
-void Sensor::SetParent(const std::string &_name)
-{
-  this->parentName = _name;
 }
 
 //////////////////////////////////////////////////
@@ -251,7 +247,7 @@ std::string Sensor::GetName() const
 std::string Sensor::GetScopedName() const
 {
   return this->world->GetName() + "::" + this->parentName + "::" +
-         this->GetName();
+    this->GetName();
 }
 
 //////////////////////////////////////////////////
@@ -367,6 +363,19 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     msgs::CameraSensor *camMsg = _msg.mutable_camera();
     camMsg->mutable_image_size()->set_x(camSensor->GetImageWidth());
     camMsg->mutable_image_size()->set_y(camSensor->GetImageHeight());
+    rendering::DistortionPtr distortion =
+        camSensor->GetCamera()->GetDistortion();
+    if (distortion)
+    {
+      msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
+      distortionMsg->set_k1(distortion->GetK1());
+      distortionMsg->set_k2(distortion->GetK2());
+      distortionMsg->set_k3(distortion->GetK3());
+      distortionMsg->set_p1(distortion->GetP1());
+      distortionMsg->set_p2(distortion->GetP2());
+      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
+      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+    }
   }
 }
 

@@ -19,10 +19,9 @@
 
 #include <string>
 
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/gazebo.hh"
 #include "gazebo/util/system.hh"
 
 #define NUMBER_OF_WHEELS 4

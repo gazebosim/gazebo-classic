@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A universal joint
- * Author: Nate Koenig, Andrew Howard
- * Date: 21 May 2003
- */
-
-#ifndef _UNIVERSALJOINT_HH_
-#define _UNIVERSALJOINT_HH_
+#ifndef _GAZEBO_UNIVERSALJOINT_HH_
+#define _GAZEBO_UNIVERSALJOINT_HH_
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
