@@ -56,7 +56,8 @@ double BuildingMaker::conversionScale;
   BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "BuildingDefaultName";
-  this->modelName = this->buildingDefaultName;
+  this->modelTempName = "tempBuilding";
+  this->modelSaveName = this->buildingDefaultName;
 
   this->conversionScale = 0.01;
 
@@ -156,13 +157,6 @@ void BuildingMaker::DetachManip(const std::string &_child,
 }
 
 /////////////////////////////////////////////////
-std::string BuildingMaker::CreateModel()
-{
-  this->Reset();
-  return this->modelName;
-}
-
-/////////////////////////////////////////////////
 std::string BuildingMaker::AddPart(const std::string &_type,
     const QVector3D &_size, const QVector3D &_pos, double _angle)
 {
@@ -190,13 +184,12 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   linkNameStream << "Wall_" << wallCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelTempName +
+      "::" + linkName, this->modelVisual));
   linkVisual->Load();
 
-
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->modelTempName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
@@ -231,12 +224,12 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   linkNameStream << "Window_" << this->windowCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelTempName +
+      "::" + linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->modelTempName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -274,12 +267,12 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   linkNameStream << "Door_" << this->doorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelTempName +
+      "::" + linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->modelTempName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -316,12 +309,12 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   linkNameStream << "Stairs_" << this->stairsCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelTempName +
+      "::" + linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->modelTempName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -387,12 +380,12 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   linkNameStream << "Floor_" << this->floorCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
+  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelTempName +
+      "::" + linkName, this->modelVisual));
   linkVisual->Load();
 
   std::ostringstream visualName;
-  visualName << this->modelName << "::" << linkName << "::Visual";
+  visualName << this->modelTempName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
 
@@ -451,12 +444,14 @@ void BuildingMaker::Start(const rendering::UserCameraPtr _camera)
 /////////////////////////////////////////////////
 void BuildingMaker::Stop()
 {
-//  rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
-//  scene->RemoveVisual(this->modelVisual);
-//  this->modelVisual.reset();
-//  this->visuals.clear();
-//  this->modelSDF.reset();
-//  this->modelVisual->SetVisible(false);
+  if (this->modelVisual)
+  {
+    rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
+    scene->RemoveVisual(this->modelVisual);
+    this->modelVisual.reset();
+  }
+  if (this->modelSDF)
+    this->modelSDF.reset();
 }
 
 /////////////////////////////////////////////////
@@ -473,9 +468,9 @@ void BuildingMaker::Reset()
 
   this->saved = false;
   this->saveLocation = QDir::homePath().toStdString();
-  this->modelName = this->buildingDefaultName;
+  this->modelSaveName = this->buildingDefaultName;
 
-  this->modelVisual.reset(new rendering::Visual(this->modelName,
+  this->modelVisual.reset(new rendering::Visual(this->modelTempName,
       scene->GetWorldVisual()));
 
   this->modelVisual->Load();
@@ -499,7 +494,7 @@ bool BuildingMaker::IsActive() const
 /////////////////////////////////////////////////
 void BuildingMaker::SetModelName(const std::string &_modelName)
 {
-  this->modelName = _modelName;
+  this->modelSaveName = _modelName;
 }
 
 /////////////////////////////////////////////////
@@ -509,7 +504,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   std::ofstream savefile;
   boost::filesystem::path path;
   path = boost::filesystem::operator/(this->saveLocation,
-      this->modelName + ".sdf");
+      this->modelSaveName + ".sdf");
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -554,7 +549,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->modelSaveName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -845,7 +840,7 @@ void BuildingMaker::GenerateSDFWithCSG()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->modelSaveName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
   for (itemsIt = this->allItems.begin(); itemsIt != this->allItems.end();
@@ -956,7 +951,7 @@ void BuildingMaker::GenerateSDFWithCSG()
       visGeomElem->ClearElements();
       sdf::ElementPtr meshElem = visGeomElem->AddElement("mesh");
       // TODO create the folder
-      std::string uri = "model://" + this->modelName + "/meshes/"
+      std::string uri = "model://" + this->modelSaveName + "/meshes/"
           + booleanMeshName;
       meshElem->GetElement("uri")->Set(uri);
       visualElem->GetElement("pose")->Set(visual->GetPose());
@@ -1002,7 +997,6 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  this->GenerateSDF();
   msgs::Factory msg;
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
@@ -1312,7 +1306,7 @@ void BuildingMaker::OnDiscard()
   {
     case QMessageBox::Discard:
       gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
+      this->modelSaveName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
       break;
@@ -1328,44 +1322,42 @@ void BuildingMaker::OnDiscard()
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
   if (this->saved)
   {
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
   }
   else
   {
-    this->saveDialog->SetModelName(this->modelName);
+    this->saveDialog->SetModelName(this->modelSaveName);
     this->saveDialog->SetSaveLocation(this->saveLocation);
     if (this->saveDialog->exec() == QDialog::Accepted)
     {
-      this->modelName = this->saveDialog->GetModelName();
+      this->SetModelName(this->saveDialog->GetModelName());
       this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
       this->GenerateSDF();
       this->SaveToSDF(this->saveLocation);
       this->saved = true;
     }
   }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+  gui::editor::Events::saveBuildingModel(this->modelSaveName,
+      this->saveLocation);
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnDone(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
-  this->finishDialog->SetModelName(this->modelName);
+  this->finishDialog->SetModelName(this->modelSaveName);
   this->finishDialog->SetSaveLocation(this->saveLocation);
   if (this->finishDialog->exec() == QDialog::Accepted)
   {
-    this->modelName = this->finishDialog->GetModelName();
+    this->SetModelName(this->finishDialog->GetModelName());
     this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
@@ -1391,7 +1383,7 @@ void BuildingMaker::OnExit()
   {
     case QMessageBox::Discard:
       gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
+      this->modelSaveName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
       gui::editor::Events::finishBuildingModel();
