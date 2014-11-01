@@ -177,10 +177,6 @@ class BitbucketPullRequests
   # check changed files in pull request by id
   def checkPullRequest(id, fork=true)
     summary = getPullRequestSummary(id)
-    if id == 878
-      puts "skipping pr 878"
-      return
-    end
     puts "checking pull request #{id}, branch #{summary.branch}"
     files = getPullRequestFiles(id)
     files_list = ""
