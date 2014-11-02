@@ -1,5 +1,8 @@
+find_package(haptix-comm REQUIRED)
+
 include_directories(
   ${IGNITION-TRANSPORT_INCLUDE_DIRS}
+	${HAPTIX-COMM_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -7,6 +10,7 @@ include_directories(
 # failures in clang.
 link_directories(
   ${IGNITION-TRANSPORT_LIBRARY_DIRS}
+  ${HAPTIX-COMM_LIBRARY_DIRS}
 )
 
 include (${QT_USE_FILE})
@@ -19,9 +23,13 @@ set(GAZEBO_TEXTURE_INSTALL_DIR
 )
 
 QT4_WRAP_CPP(HaptixGUIPlugin_MOC HaptixGUIPlugin.hh TaskButton.hh)
-add_library(HaptixGUIPlugin SHARED HaptixGUIPlugin.cc TaskButton.cc ${HaptixGUIPlugin_MOC})
+add_library(HaptixGUIPlugin SHARED HaptixGUIPlugin.cc TaskButton.cc
+						${HaptixGUIPlugin_MOC}
+						${HAPTIX-COMM_INCLUDE_DIRS}/haptix/comm/msg/hxGrasp.pb.cc
+						${HAPTIX-COMM_INCLUDE_DIRS}/haptix/comm/msg/hxCommand.pb.cc)
+
 set_target_properties(HaptixGUIPlugin PROPERTIES COMPILE_FLAGS "-std=c++11")
-target_link_libraries(HaptixGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${IGNITION-TRANSPORT_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(HaptixGUIPlugin libgazebo gazebo_sensors ${ogre_libraries}  ${IGNITION-TRANSPORT_LIBRARIES} ${QT_LIBRARIES})
 install (TARGETS HaptixGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 set (images

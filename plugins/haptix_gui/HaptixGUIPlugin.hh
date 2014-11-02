@@ -21,6 +21,9 @@
 
 #include <ignition/transport.hh>
 
+#include <haptix/comm/haptix.h>
+#include <haptix/comm/msg/hxCommand.pb.h>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/gui.hh>
@@ -122,20 +125,6 @@ namespace gazebo
     /// \brief Callback triggered when the reset button is clicked
     protected slots: void OnResetClicked();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /// \brief Callback triggered when the start/stop button is clicked
     protected slots: void OnStartStopClicked();
 
@@ -204,9 +193,22 @@ namespace gazebo
 
     /// \brief A place to store key-to-motor mappings
     private: std::map<std::string, std::pair<unsigned int, float> > motor_keys;
+		/// \brief A place to store key-to-arm motor mappings
+    private: std::map<std::string, std::pair<unsigned int, float> > arm_keys;
+		/// \brief A place to store key-to-grasp mappings
+    private: std::map<std::string, std::pair<std::string, float> > grasp_keys;
 
-/*    private: ignition::transport::Node *ignNode;
+    private: ignition::transport::Node *ignNode;
+		private: hxDeviceInfo handDeviceInfo;
+		private: hxCommand directCommand;
+		private: haptix::comm::msgs::hxCommand lastGraspCommand;
+		private: bool lastGraspCommandValid;
 
+		private: bool graspMode;
+		private: float graspValue;
+		private: std::string currentGraspName;
+
+/*
     private: std::map<char, KeyCommand> armCommands;
     private: std::map<char, KeyCommand> handCommands;
     private: std::map<std::string, std::vector<char> > buttonNames;

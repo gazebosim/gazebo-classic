@@ -16,6 +16,9 @@
 */
 
 #include <sstream>
+
+#include <haptix/comm/msg/hxGrasp.pb.h>
+
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/rendering/UserCamera.hh>
 #include <gazebo/gui/GuiEvents.hh>
@@ -206,10 +209,11 @@ HaptixGUIPlugin::HaptixGUIPlugin()
 
   this->currentTaskId = 0;
 
-  /*
+	this->graspMode = false;
   this->ignNode = new ignition::transport::Node("haptix");
-  ignNode->Advertise("arm_pose_inc");
+  this->ignNode->Advertise("arm_pose_inc");
 
+  /*
   // Parse SDF to get the arm teleop commands
   sdf::ElementPtr command = elem->GetElement("commands");
   command = command->GetElement("command");
@@ -251,8 +255,7 @@ HaptixGUIPlugin::HaptixGUIPlugin()
 
   gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
   */
-  gui::KeyEventHandler::Instance()->AddPressFilter("arat_gui",
-                          boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
+
 }
 
 
@@ -381,11 +384,11 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
           motor->HasAttribute("increment"))
       {
         std::pair<unsigned int, float> mapping;
-	mapping.first = motor->Get<int>("index");
-	mapping.second = motor->Get<float>("increment");
-	this->motor_keys[motor->Get<std::string>("inc_key")] = mapping;
-	mapping.second = -mapping.second;
-	this->motor_keys[motor->Get<std::string>("dec_key")] = mapping;
+				mapping.first = motor->Get<int>("index");
+				mapping.second = motor->Get<float>("increment");
+				this->motor_keys[motor->Get<std::string>("inc_key")] = mapping;
+				mapping.second = -mapping.second;
+				this->motor_keys[motor->Get<std::string>("dec_key")] = mapping;
       }
       else
       {
@@ -395,6 +398,55 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
     }
   }
 
+	// Get arm pose teleop keys
+	if (_elem->HasElement("arm_keys"))
+	{
+		sdf::ElementPtr arm = _elem->GetElement("arm_keys");
+		arm = arm->GetElement("key");
+		while (arm)
+		{
+			if (arm->HasAttribute("key") &&
+				  arm->HasAttribute("index") &&
+				  arm->HasAttribute("increment"))
+			{
+				std::pair<unsigned int, float> mapping;
+				mapping.first = arm->Get<int>("index");
+				mapping.second = arm->Get<float>("increment");
+				this->arm_keys[arm->Get<std::string>("key")] = mapping;
+			}
+			else
+			{
+        gzwarn << "Skipping malformed arm_key/arm element" << std::endl;
+			}
+      arm = arm->GetNextElement();
+		}
+	}
+
+	// Get grasp keys
+	if (_elem->HasElement("grasp_keys"))
+	{
+		sdf::ElementPtr grasp = _elem->GetElement("grasp_keys");
+		grasp = grasp->GetElement("grasp");
+		while (grasp)
+		{
+			if (grasp->HasAttribute("inc_key") &&
+					grasp->HasAttribute("dec_key") &&
+					grasp->HasAttribute("increment") &&
+					grasp->HasAttribute("name"))
+			{
+        std::pair<std::string, float> mapping;
+				mapping.first = grasp->Get<std::string>("name");
+				mapping.second = grasp->Get<float>("increment");
+				this->grasp_keys[grasp->Get<std::string>("inc_key")] = mapping;
+				mapping.second = -mapping.second;
+				this->grasp_keys[grasp->Get<std::string>("dec_key")] = mapping;
+			}
+		}
+	}
+
+  gui::KeyEventHandler::Instance()->SetAutoRepeat(true);
+  gui::KeyEventHandler::Instance()->AddPressFilter("haptix_gui",
+                          boost::bind(&HaptixGUIPlugin::OnKeyPress, this, _1));
   this->InitializeTaskView(_elem);
 }
 
@@ -631,14 +683,109 @@ void HaptixGUIPlugin::OnStartStop()
 // Handle key presses, which can perform various kinds of teleoperation.
 bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
 {
+	static bool hxInitialized = false;
+
   std::string key = _event.text;
   std::cout << "key: " << key << std::endl;
 
+	// Is this an arm base pose command?
+	if (this->arm_keys.find(key) != this->arm_keys.end())
+	{
+		unsigned int index = this->arm_keys[key].first;
+		if (index >=6)
+		{
+			return false; // Tried to command index out of range
+		}
+
+    float pose_arguments[6] = {0, 0, 0, 0, 0, 0};
+    pose_arguments[index] = this->arm_keys[key].second;
+		math::Pose increment_vector(pose_arguments[0], pose_arguments[1],
+																pose_arguments[2], pose_arguments[3],
+																pose_arguments[4], pose_arguments[5]);
+		msgs::Pose arm_message = msgs::Convert(increment_vector);
+    ignNode->Publish("/haptix/arm_pose_inc", arm_message);
+		return true; // Handled command
+	}
+
+	// Before attempting to control the hand, check if haptix-comm is initialized
+	if (!hxInitialized)
+	{
+		if (hx_getdeviceinfo(hxGAZEBO, &handDeviceInfo) != hxOK)
+		{
+			gzerr << "hx_getdeviceinfo(): Request error. Cannot control hand."
+						<< std::endl;
+			return false;
+		}
+    memset(&this->directCommand, 0, sizeof(this->directCommand));
+		hxSensor handSensor;
+    if(hx_update(hxGAZEBO, &this->directCommand, &handSensor) != hxOK )
+    {
+      std::cout << "hx_update(): Request error.\n" << std::endl;
+      return false;
+    }
+    hxInitialized = true;
+	}
+
   // Is this a direct motor command?
-  if (this->motor_keys.find(key) != this->motor_keys.end())
+  if (this->motor_keys.find(key) != this->motor_keys.end() && !this->graspMode)
   {
-    
+		unsigned int motor_index = this->motor_keys[key].first;
+		if (motor_index >= this->handDeviceInfo.nmotor)
+		{
+			return false; // Tried to command index out of range
+		}
+		this->directCommand.ref_pos[motor_index] += this->motor_keys[key].second;
+
+		// add directCommand and lastGraspCommand
+		hxCommand cmd;
+		for (int i = 0; i < this->handDeviceInfo.nmotor; i++)
+		{
+			cmd.ref_pos[i] = this->directCommand.ref_pos[i];
+			if (this->lastGraspCommandValid)
+			  cmd.ref_pos[i] = this->lastGraspCommand.ref_pos(i);
+		}
+
+		hxSensor handSensor;
+		if (hx_update(hxGAZEBO, &cmd, &handSensor) != hxOK)
+		{
+			gzerr << "hx_update(): Request error." << std::endl;
+			return false;
+		}
+    return true; // Handled command
   }
+
+	if (this->grasp_keys.find(key) != this->grasp_keys.end() && this->graspMode)
+	{
+		std::string graspName = this->grasp_keys[key].first;
+		// If a new grasp is commanded, reset the grasp value to 0
+		if (graspName.compare(this->currentGraspName) != 0)
+		{
+			this->graspValue = 0;
+			this->currentGraspName = graspName;
+		}
+		else
+		{
+			this->graspValue += this->grasp_keys[key].second;
+			this->graspValue = this->graspValue > 1 ? 1 : this->graspValue;
+		}
+		
+		// Send the grasp
+		haptix::comm::msgs::hxGrasp req;
+		haptix::comm::msgs::hxGrasp::hxGraspValue* gv = req.add_grasps();
+		gv->set_grasp_name(graspName);
+		gv->set_grasp_value(this->graspValue);
+		haptix::comm::msgs::hxCommand rep;
+		bool result;
+		this->ignNode->Request("gazebo/Grasp", req, 1000, rep, result);
+		if (!result)
+		{
+			gzerr << "Failed to call gazebo/Grasp service" << std::endl;
+			return false;
+		}
+
+		this->lastGraspCommand = rep;
+		this->lastGraspCommandValid = true;
+	}
 
   
   /*
