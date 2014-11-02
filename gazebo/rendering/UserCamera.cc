@@ -123,7 +123,7 @@ void UserCamera::Init()
     this->sceneNode->attachObject(this->dataPtr->rightCamera);
   }
 
-  this->SetHFOV(GZ_DTOR(60));
+  this->SetHFOV(GZ_DTOR(120));
 
   // Careful when setting this value.
   // A far clip that is too close will have bad side effects on the
