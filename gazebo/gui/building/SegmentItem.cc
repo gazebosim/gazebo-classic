@@ -257,13 +257,13 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     // TODO: snap to other grabbers on the scene
 
-    // Snap to 45 degree increments
+    // Snap to 15 degrees increments
     if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       QLineF newLine(p1, p2);
       double PI = acos(-1);
       double angle = QLineF(p1, p2).angle()*PI/180.0;
-      double range = (45)*PI/180.0;
+      double range = (15)*PI/180.0;
       int increment = angle / range;
 
       if ((angle - range*increment) > range/2)
