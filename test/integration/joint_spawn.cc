@@ -290,12 +290,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
+  bool isOde = physics->GetType().compare("ode") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
       _joint->HasType(physics::Base::GEARBOX_JOINT) ||
-      _joint->HasType(physics::Base::SCREW_JOINT) ||
-      _joint->HasType(physics::Base::UNIVERSAL_JOINT))
+      _joint->HasType(physics::Base::SCREW_JOINT))
   {
     gzerr << "This portion of the test fails for this joint type" << std::endl;
     return;
@@ -356,6 +356,48 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     EXPECT_LT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
     EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+  }
+
+  // Test Coloumb friction
+  if (!isOde)
+  {
+    gzerr << "Skipping friction test for "
+          << physics->GetType()
+          << std::endl;
+  }
+  else
+  {
+    // reset world and expect joint to be stopped at home position
+    world->Reset();
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+
+    // set friction to 1.0
+    const double friction = 1.0;
+    _joint->SetParam("friction", _index, friction);
+    EXPECT_NEAR(_joint->GetParam("friction", _index), friction, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with smaller magnitude than friction
+      _joint->SetForce(_index, friction * 0.5);
+      world->Step(1);
+    }
+
+    // Expect no motion
+    EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+
+    for (unsigned int i = 0; i < 500; ++i)
+    {
+      // Apply force with larger magnitude than friction
+      _joint->SetForce(_index, friction * 1.5);
+      world->Step(1);
+    }
+
+    // Expect motion
+    EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
+    EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
   }
 
   // SetHighStop
