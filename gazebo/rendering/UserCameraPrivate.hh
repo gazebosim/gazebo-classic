@@ -35,7 +35,7 @@ namespace gazebo
       public: transport::SubscriberPtr joySubPose;
 
       /// \brief Publishes user camera world pose
-      public: transport::PublisherPtr joyPosePub;
+      public: transport::PublisherPtr posePub;
 
       /// \brief The currently active view controller.
       public: ViewController *viewController;
