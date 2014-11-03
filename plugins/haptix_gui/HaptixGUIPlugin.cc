@@ -714,6 +714,7 @@ bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
       std::cout << "hx_update(): Request error.\n" << std::endl;
       return false;
     }
+		gzdbg << "Initialized haptix-comm" << std::endl;
     hxInitialized = true;
 	}
 
@@ -737,6 +738,7 @@ bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
 		}
 
 		hxSensor handSensor;
+		gzdbg << "Calling hx_update" << std::endl;
 		if (hx_update(hxGAZEBO, &cmd, &handSensor) != hxOK)
 		{
 			gzerr << "hx_update(): Request error." << std::endl;
@@ -777,6 +779,25 @@ bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
 		this->lastGraspCommand = rep;
 		this->lastGraspCommandValid = true;
 		return true;
+	}
+
+	if (key.compare("~") == 0)
+	{
+    if (this->graspMode)
+    {
+      // Send an empty grasp request, to switch modes in the control plugin
+      haptix::comm::msgs::hxGrasp req;
+      haptix::comm::msgs::hxCommand rep;
+      bool result;
+      // this->ignNode was created in the "haptix" namespace
+      if(!this->ignNode->Request("gazebo/Grasp", req, 1000, rep, result) ||
+        !result)
+      {
+        gzerr << "Failed to call gazebo/Grasp service" << std::endl;
+      }
+    }
+		graspMode = !graspMode;
+		return false;
 	}
 
 }
