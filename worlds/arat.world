@@ -500,5 +500,9 @@
       </arrangement>
 
     </plugin>
+    <plugin name="hydra" filename="libHydraPlugin.so">
+      <pivot>0.04 0 0</pivot>
+      <grab>0.12 0 0</grab>
+    </plugin>
   </world>
 </sdf>
