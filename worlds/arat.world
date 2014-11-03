@@ -166,26 +166,15 @@
           </task>
         </task_group>
 
-	<!-- TODO
         <arm_keys>
-          <key key="s" motor_index="arm_pos_x" increment=-0.025></key>
-          <key key="w" motor_index="arm_pos_x" increment=0.025></key>
-  
-          <key key="a" motor_index="arm_pos_y" increment=0.025></key>
-          <key key="d" motor_index="arm_pos_y" increment=-0.025></key>
-  
-          <key key="q" motor_index="arm_pos_z" increment=0.025></key>
-          <key key="e" motor_index="arm_pos_z" increment=-0.025></key>
-  
-          <key key="S" motor_index="arm_rot_x" increment=-0.025></key>
-          <key key="W" motor_index="arm_rot_x" increment=0.025></key>
-  
-          <key key="A" motor_index="arm_rot_y" increment=0.025></key>
-          <key key="D" motor_index="arm_rot_y" increment=-0.025></key>
-  
-          <key key="Q" motor_index="arm_rot_z" increment=0.025></key>
-          <key key="E" motor_index="arm_rot_z" increment=-0.025></key>
-        </arm_keys> -->
+	  <!-- Indices 0-5 are: tx, ty, tz, rx, ry, rz -->
+          <arm inc_key="w" dec_key="s" index="0" increment=0.025></arm>
+          <arm inc_key="a" dec_key="d" index="1" increment=0.025></arm>
+          <arm inc_key="q" dec_key="e" index="2" increment=0.025></arm>
+          <arm inc_key="W" dec_key="S" index="3" increment=0.025></arm>
+          <arm inc_key="A" dec_key="D" index="4" increment=0.025></arm>
+          <arm inc_key="Q" dec_key="E" index="5" increment=0.025></arm>
+        </arm_keys>
 
         <motor_keys>
           <motor inc_key="z" dec_key="Z" index=0 increment=0.05></motor>
@@ -197,7 +186,9 @@
           <motor inc_key="4" dec_key="$" index=6 increment=0.05></motor>
           <motor inc_key="5" dec_key="%" index=7 increment=0.05></motor>
           <motor inc_key="6" dec_key="^" index=8 increment=0.05></motor>
-          <motor inc_key="7" dec_key="&amp;" index=9 increment=0.05></motor>
+	  <!-- I'm having trouble parsing "&" and "&amp;", so I'll just use
+	       "amp" and handle it in the code. -->
+          <motor inc_key="7" dec_key="amp" index=9 increment=0.05></motor>
           <motor inc_key="8" dec_key="*" index=10 increment=0.05></motor>
           <motor inc_key="9" dec_key="(" index=11 increment=0.05></motor>
           <motor inc_key="0" dec_key=")" index=12 increment=0.05></motor>
@@ -205,15 +196,15 @@
           <motor inc_key="=" dec_key="+" index=14 increment=0.05></motor>
         </motor_keys>
 
-        <!-- TODO <grasp_keys>
-          <grasp inc_key="1" dec_key="!" increment="0.015" name="Cylindrical"></grasp>
-          <grasp inc_key="2" dec_key="@" name="Spherical"></grasp>
-          <grasp inc_key="3" dec_key="#" name="ThreeFingerPinch"></grasp>
-          <grasp inc_key="4" dec_key="$" name="FinePinch(American)"></grasp>
-          <grasp inc_key="5" dec_key="%" name="FinePinch(British)"></grasp>
-          <grasp inc_key="6" dec_key="^" name="Palmar(Tray)"></grasp>
-          <grasp inc_key="7" dec_key="&amp;" name="Hook"></grasp>
-        </grasp_keys> -->
+        <grasp_keys>
+          <grasp inc_key="1" dec_key="!" name="Cylindrical" increment="0.015"></grasp>
+          <grasp inc_key="2" dec_key="@" name="Spherical" increment="0.015"></grasp>
+          <grasp inc_key="3" dec_key="#" name="ThreeFingerPinch" increment="0.015"></grasp>
+          <grasp inc_key="4" dec_key="$" name="FinePinch(American)" increment="0.015"></grasp>
+          <grasp inc_key="5" dec_key="%" name="FinePinch(British)" increment="0.015"></grasp>
+          <grasp inc_key="6" dec_key="^" name="Palmar(Tray)" increment="0.015"></grasp>
+          <grasp inc_key="7" dec_key="amp" name="Hook" increment="0.015"></grasp>
+        </grasp_keys>
 
       </plugin>
     </gui>

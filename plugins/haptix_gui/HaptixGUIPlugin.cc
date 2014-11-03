@@ -206,6 +206,10 @@ HaptixGUIPlugin::HaptixGUIPlugin()
 
   this->currentTaskId = 0;
 
+  this->ignNode.Advertise("haptix/arm_pose_inc");
+
+  this->graspMode = true;
+
   /*
   this->ignNode = new ignition::transport::Node("haptix");
   ignNode->Advertise("arm_pose_inc");
@@ -367,7 +371,7 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
     this->handScene->addItem(psiText);
   }
 
-  // Get key commands names
+  // Get motor key commands
   if (_elem->HasElement("motor_keys"))
   {
     sdf::ElementPtr motor = _elem->GetElement("motor_keys");
@@ -383,15 +387,86 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
         std::pair<unsigned int, float> mapping;
 	mapping.first = motor->Get<int>("index");
 	mapping.second = motor->Get<float>("increment");
-	this->motor_keys[motor->Get<std::string>("inc_key")] = mapping;
+	this->motorKeys[motor->Get<std::string>("inc_key")[0]] = mapping;
 	mapping.second = -mapping.second;
-	this->motor_keys[motor->Get<std::string>("dec_key")] = mapping;
+	std::string dec_key = motor->Get<std::string>("dec_key");
+	// Special case to work around trouble with parsing "&" ("&amp;" doesn't
+	// work either).
+        if (dec_key == "amp")
+	  dec_key = "&";
+	this->motorKeys[dec_key[0]] = mapping;
       }
       else
       {
         gzwarn << "Skipping malformed motor_key/motor element" << std::endl;
       }
       motor = motor->GetNextElement();
+    }
+  }
+
+  // Get arm key commands
+  if (_elem->HasElement("arm_keys"))
+  {
+    sdf::ElementPtr arm = _elem->GetElement("arm_keys");
+    arm = arm->GetElement("arm");
+
+    while (arm)
+    {
+      if (arm->HasAttribute("inc_key") &&
+          arm->HasAttribute("dec_key") &&
+          arm->HasAttribute("index") &&
+          arm->HasAttribute("increment"))
+      {
+        std::pair<unsigned int, float> mapping;
+	mapping.first = arm->Get<int>("index");
+	mapping.second = arm->Get<float>("increment");
+	this->armKeys[arm->Get<std::string>("inc_key")[0]] = mapping;
+	mapping.second = -mapping.second;
+	std::string dec_key = arm->Get<std::string>("dec_key");
+	// Special case to work around trouble with parsing "&" ("&amp;" doesn't
+	// work either).
+        if (dec_key == "amp")
+	  dec_key = "&";
+	this->armKeys[dec_key[0]] = mapping;
+      }
+      else
+      {
+        gzwarn << "Skipping malformed arm_key/arm element" << std::endl;
+      }
+      arm = arm->GetNextElement();
+    }
+  }
+
+  // Get grasp key commands
+  if (_elem->HasElement("grasp_keys"))
+  {
+    sdf::ElementPtr grasp = _elem->GetElement("grasp_keys");
+    grasp = grasp->GetElement("grasp");
+
+    while (grasp)
+    {
+      if (grasp->HasAttribute("inc_key") &&
+          grasp->HasAttribute("dec_key") &&
+          grasp->HasAttribute("name") &&
+          grasp->HasAttribute("increment"))
+      {
+        std::pair<std::string, float> mapping;
+	mapping.first = grasp->Get<std::string>("name");
+	mapping.second = grasp->Get<float>("increment");
+	this->graspKeys[grasp->Get<std::string>("inc_key")[0]] = mapping;
+	mapping.second = -mapping.second;
+	std::string dec_key = grasp->Get<std::string>("dec_key");
+	// Special case to work around trouble with parsing "&" ("&amp;" doesn't
+	// work either).
+        if (dec_key == "amp")
+	  dec_key = "&";
+	this->graspKeys[dec_key[0]] = mapping;
+      }
+      else
+      {
+        gzwarn << "Skipping malformed grasp_key/grasp element" << std::endl;
+      }
+      grasp = grasp->GetNextElement();
     }
   }
 
@@ -631,16 +706,100 @@ void HaptixGUIPlugin::OnStartStop()
 // Handle key presses, which can perform various kinds of teleoperation.
 bool HaptixGUIPlugin::OnKeyPress(common::KeyEvent _event)
 {
-  std::string key = _event.text;
+  char key = _event.text[0];
   std::cout << "key: " << key << std::endl;
 
-  // Is this a direct motor command?
-  if (this->motor_keys.find(key) != this->motor_keys.end())
+  std::map<char, std::pair<unsigned int, float> >::const_iterator motor;
+  std::map<char, std::pair<unsigned int, float> >::const_iterator arm;
+  std::map<char, std::pair<std::string, float> >::const_iterator grasp;
+
+  motor = this->motorKeys.find(key);
+  arm = this->armKeys.find(key);
+  grasp = this->graspKeys.find(key);
+
+  // Is this an arm motion command?  These keys don't overlap with any others.
+  if (arm != this->armKeys.end())
   {
-    
+    unsigned int index = arm->second.first;
+    if (index > 5)
+    {
+      return false;
+    }
+    float inc = arm->second.second;
+
+    float pose_inc_args[6] = {0, 0, 0, 0, 0, 0};
+    pose_inc_args[index] = inc;
+    gazebo::math::Pose increment(gazebo::math::Vector3(pose_inc_args[0],
+                                   pose_inc_args[1], pose_inc_args[2]),
+                                 gazebo::math::Quaternion(pose_inc_args[3],
+                                   pose_inc_args[4], pose_inc_args[5]));
+    gazebo::msgs::Pose msg;
+    gazebo::msgs::Vector3d* vec_msg = msg.mutable_position();
+    vec_msg->set_x(increment.pos.x);
+    vec_msg->set_y(increment.pos.y);
+    vec_msg->set_z(increment.pos.z);
+    gazebo::msgs::Quaternion* quat_msg = msg.mutable_orientation();
+    quat_msg->set_x(increment.rot.x);
+    quat_msg->set_y(increment.rot.y);
+    quat_msg->set_z(increment.rot.z);
+    quat_msg->set_w(increment.rot.w);
+
+    std::cout << "haptix/arm_pose_inc: " << msg.DebugString() << std::endl;
+    this->ignNode.Publish("haptix/arm_pose_inc", msg);
+    return true;
   }
 
-  
+  // If we're in grasp mode, is this a grasp command?
+  if (this->graspMode && (grasp != this->graspKeys.end()))
+  {
+    std::string name = grasp->second.first;
+    float inc = grasp->second.second;
+    // If we're commanding the same grasp as last time, increment it; otherwise,
+    // start over.
+    haptix::comm::msgs::hxGrasp grasp;
+    haptix::comm::msgs::hxGrasp::hxGraspValue* gv = grasp.add_grasps();
+    gv->set_grasp_name(name);
+    if ((this->lastGraspRequest.grasps_size() > 0) &&
+        (this->lastGraspRequest.grasps(0).grasp_name() == name))
+    {
+      float curr = this->lastGraspRequest.grasps(0).grasp_value();
+      gv->set_grasp_value(curr + inc);
+    }
+    else
+      gv->set_grasp_value(inc);
+
+    bool result;
+    std::cout << "haptix/gazebo/Grasp: " << grasp.DebugString() << std::endl;
+    haptix::comm::msgs::hxCommand resp;
+    if(!this->ignNode.Request("haptix/gazebo/Grasp",
+                              grasp,
+			      1000,
+			      resp,
+			      result) || !result)
+    {
+      gzerr << "Failed to call gazebo/Grasp service" << std::endl;
+      return false;
+    }
+
+    this->lastGraspRequest = grasp;
+    this->lastGraspResponse = resp;
+    return true;
+  }
+
+  // If it's a motor command and either: we're not in grasp mode, or it's
+  // for the wrist motors (which are the first 3 indices).
+  if (motor != this->motorKeys.end())
+  {
+    unsigned int index = motor->second.first;
+    float inc = motor->second.second.
+    unsigned int num_wrist_motors = 3;
+    if (!this->graspMode || (motor->second.first < num_wrist_motors))
+    {
+    }
+  }
+
+  // Is this an arm motion command?  These keys don't overlap with any others.
+
   /*
   // if key is in armCommands
   if(this->armCommands.find(key) != this->armCommands.end()){

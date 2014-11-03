@@ -29,6 +29,9 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
+#include <haptix/comm/msg/hxCommand.pb.h>
+#include <haptix/comm/msg/hxGrasp.pb.h>
+
 
 namespace gazebo
 {
@@ -203,10 +206,27 @@ namespace gazebo
     private: gazebo::transport::PublisherPtr timerPub;
 
     /// \brief A place to store key-to-motor mappings
-    private: std::map<std::string, std::pair<unsigned int, float> > motor_keys;
+    private: std::map<char, std::pair<unsigned int, float> > motorKeys;
 
-/*    private: ignition::transport::Node *ignNode;
+    /// \brief A place to store key-to-arm mappings
+    private: std::map<char, std::pair<unsigned int, float> > armKeys;
 
+    /// \brief A place to store key-to-grasp mappings
+    private: std::map<char, std::pair<std::string, float> > graspKeys;
+
+    /// \brief An ignition node that we'll use for sending messages
+    private: ignition::transport::Node ignNode;
+
+    /// \brief Are we in grasp mode, or direct motor control mode?
+    private: bool graspMode;
+
+    /// \brief The last grasp request that we sent
+    private: gazebo::msgs::HaptixGrasp lastGraspRequest;
+
+    /// \brief The last grasp response that we received
+    private: gazebo::msgs::HaptixCommand lastGraspResponse;
+
+    /*
     private: std::map<char, KeyCommand> armCommands;
     private: std::map<char, KeyCommand> handCommands;
     private: std::map<std::string, std::vector<char> > buttonNames;
