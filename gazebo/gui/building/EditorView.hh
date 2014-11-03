@@ -45,7 +45,10 @@ namespace gazebo
     class GAZEBO_VISIBLE Level
     {
       /// \brief Constructor
-      public: Level() : backgroundPixmap(NULL) {}
+      public: Level() : level(0), name("level"), baseHeight(0),
+              // 2.4384m == 8ft, standard room height in US
+              height(2.4384),
+              backgroundPixmap(NULL) {}
 
       /// \brief Level number
       public: int level;

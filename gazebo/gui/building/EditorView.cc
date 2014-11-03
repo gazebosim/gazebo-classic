@@ -1145,6 +1145,9 @@ void EditorView::DeleteLevel(int _level)
 /////////////////////////////////////////////////
 void EditorView::OnChangeLevel(int _level)
 {
+  if (_level < 0)
+    return;
+
   if (this->levels[this->currentLevel]->backgroundPixmap)
     this->levels[this->currentLevel]->backgroundPixmap->setVisible(false);
 
