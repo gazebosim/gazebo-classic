@@ -100,8 +100,8 @@ namespace gazebo
       /// \brief Update the position of all grabbers linked to the given one.
       /// \param[in] _grabber Original grabber.
       /// \param[in] _pos New position.
-      protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber, QPointF
-          _pos);
+      protected: void UpdateLinkedGrabbers(GrabberHandle *_grabber,
+          const QPointF &_pos);
 
       /// \brief Filter Qt events and redirect them to the another item.
       /// \param[in] _watched Item that watches and will handle the event.

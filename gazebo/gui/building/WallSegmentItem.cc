@@ -151,7 +151,7 @@ void WallSegmentItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
   QMenu menu;
   menu.addAction(this->openInspectorAct);
   menu.addAction(this->deleteItemAct);
-  menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent*>(
+  menu.exec(dynamic_cast<QGraphicsSceneContextMenuEvent *>(
       _event)->screenPos());
 }
 
@@ -235,6 +235,7 @@ void WallSegmentItem::OnApply()
 void WallSegmentItem::OnOpenInspector()
 {
   this->UpdateInspector();
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 
