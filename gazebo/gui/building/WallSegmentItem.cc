@@ -159,10 +159,13 @@ void WallSegmentItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *_event)
 void WallSegmentItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *
     _event)
 {
-  this->scene()->clearSelection();
-  this->setSelected(true);
-  this->OnOpenInspector();
-  _event->setAccepted(true);
+  if (this->isSelected())
+  {
+    this->scene()->clearSelection();
+    this->setSelected(true);
+    this->OnOpenInspector();
+    _event->setAccepted(true);
+  }
 }
 
 /////////////////////////////////////////////////
