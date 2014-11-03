@@ -153,6 +153,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
         }
         this->SetStiffnessDamping(0, stiffness,
             dynamicsElem->Get<double>("damping"), reference);
+
+        if (dynamicsElem->HasElement("friction"))
+        {
+          this->SetParam("friction", 0,
+            dynamicsElem->Get<double>("friction"));
+        }
       }
     }
     if (axisElem->HasElement("limit"))
@@ -197,6 +203,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
         }
         this->SetStiffnessDamping(1, stiffness,
             dynamicsElem->Get<double>("damping"), reference);
+
+        if (dynamicsElem->HasElement("friction"))
+        {
+          this->SetParam("friction", 1,
+            dynamicsElem->Get<double>("friction"));
+        }
       }
     }
     if (axisElem->HasElement("limit"))
