@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
@@ -63,7 +64,8 @@ namespace gazebo
 
       /// \brief Add a plugin to the render widget.
       /// \param[in] _plugin Plugin pointer to add.
-      public: void AddPlugin(GUIPluginPtr _plugin);
+      /// \param[in] _elem Plugin sdf parameters.
+      public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
 
       /// \brief Set the visibility of the toolbar.
       /// \param[in] _visible Whether or not to show the toolbar.
