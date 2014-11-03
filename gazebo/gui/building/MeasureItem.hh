@@ -51,9 +51,11 @@ namespace gazebo
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
 
       /// \brief Get distance between end points
-      public: double GetDistance();
+      /// \return Distance between end points.
+      public: double GetDistance() const;
 
       /// \brief Set value in meters
+      /// \param[in] _value Value measured in meters.
       public: void SetValue(double _value);
 
       /// \brief Value measured in meters.

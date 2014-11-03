@@ -117,7 +117,7 @@ void MeasureItem::paint(QPainter *_painter,
 }
 
 /////////////////////////////////////////////////
-double MeasureItem::GetDistance()
+double MeasureItem::GetDistance() const
 {
   return this->line().length();
 }

@@ -212,6 +212,7 @@ void WindowItem::OnOpenInspector()
   QPointF itemPos = this->windowPos * this->scale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 
