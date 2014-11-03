@@ -190,7 +190,7 @@
           <key key="E" index=5 increment=-0.025></key>
         </arm_keys>
 
-        <!--<motor_keys>
+        <motor_keys>
           <motor inc_key="z" dec_key="Z" index=0 increment=0.05></motor>
           <motor inc_key="x" dec_key="X" index=1 increment=0.05></motor>
           <motor inc_key="c" dec_key="C" index=2 increment=0.05></motor>
@@ -200,13 +200,13 @@
           <motor inc_key="4" dec_key="$" index=6 increment=0.05></motor>
           <motor inc_key="5" dec_key="%" index=7 increment=0.05></motor>
           <motor inc_key="6" dec_key="^" index=8 increment=0.05></motor>
-          <motor inc_key="7" dec_key="&amp;" index=9 increment=0.05></motor>
+          <!--<motor inc_key="7" dec_key="&amp;" index=9 increment=0.05></motor>-->
           <motor inc_key="8" dec_key="*" index=10 increment=0.05></motor>
           <motor inc_key="9" dec_key="(" index=11 increment=0.05></motor>
           <motor inc_key="0" dec_key=")" index=12 increment=0.05></motor>
           <motor inc_key="-" dec_key="_" index=13 increment=0.05></motor>
           <motor inc_key="=" dec_key="+" index=14 increment=0.05></motor>
-        </motor_keys>-->
+        </motor_keys>
 
         <grasp_keys>
           <grasp inc_key="1" dec_key="!" increment="0.015" name="Cylindrical"></grasp>

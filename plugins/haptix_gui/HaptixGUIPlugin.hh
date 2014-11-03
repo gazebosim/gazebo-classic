@@ -170,6 +170,9 @@ namespace gazebo
 		private: bool graspMode;
 		private: float graspValue;
 		private: std::string currentGraspName;
+
+    private: QPushButton *startStopButton;
+
     /// \brief QT style for the start setting of the start/stop button
     private: std::string startStyle;
 

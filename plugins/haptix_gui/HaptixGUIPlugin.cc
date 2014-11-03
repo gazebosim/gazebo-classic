@@ -229,6 +229,9 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init();
 
+	this->ignNode = new ignition::transport::Node("haptix");
+	ignNode->Advertise("arm_pose_inc");
+
   // Create the publisher that communicates with the arrange plugin
   this->taskPub = this->node->Advertise<msgs::GzString>("~/arrange");
 
@@ -426,6 +429,7 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
 				mapping.second = -mapping.second;
 				this->grasp_keys[grasp->Get<std::string>("dec_key")] = mapping;
 			}
+			grasp = grasp->GetNextElement();
 		}
 	}
 
