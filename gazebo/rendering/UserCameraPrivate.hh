@@ -70,6 +70,9 @@ namespace gazebo
 
       /// \brief View port for the right camera.
       public: Ogre::Viewport *rightViewport;
+
+      /// \brief Publishes user camera world pose
+      public: transport::PublisherPtr posePub;
     };
   }
 }

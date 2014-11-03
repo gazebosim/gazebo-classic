@@ -84,12 +84,17 @@ void UserCamera::Load()
   Camera::Load();
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
+
   this->dataPtr->joySubTwist =
     this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
     &UserCamera::OnJoyTwist, this);
+
   this->dataPtr->joySubPose =
     this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
     &UserCamera::OnJoyPose, this);
+
+  this->dataPtr->posePub =
+    this->dataPtr->node->Advertise<msgs::Pose>("~/user_camera/pose", 1, 30.0);
 }
 
 //////////////////////////////////////////////////
@@ -207,6 +212,9 @@ void UserCamera::Update()
 
   if (this->dataPtr->gui)
     this->dataPtr->gui->Update();
+
+  // publish camera pose
+  this->dataPtr->posePub->Publish(msgs::Convert(this->GetWorldPose()));
 }
 
 //////////////////////////////////////////////////
