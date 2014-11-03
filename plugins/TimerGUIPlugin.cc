@@ -29,7 +29,11 @@ TimerGUIPlugin::TimerGUIPlugin()
 {
   // Set the frame background and foreground colors
   this->setStyleSheet(
-      "QFrame { background-color : rgba(100, 100, 100, 255); color : white; }");
+      "QFrame {"
+        "background-color : rgba(255, 255, 255, 255);"
+        "color : black;"
+        "font-size: 24px;"
+      "}");
 
   // Create the main layout
   QHBoxLayout *mainLayout = new QHBoxLayout;
@@ -40,15 +44,12 @@ TimerGUIPlugin::TimerGUIPlugin()
   // Create the layout that sits inside the frame
   QHBoxLayout *frameLayout = new QHBoxLayout();
 
-  QLabel *label = new QLabel(tr("Time:"));
-
   // Create a time label
   QLabel *timeLabel = new QLabel(tr("00:00:00.00"));
 
   // Add the label to the frame's layout
-  frameLayout->addWidget(label);
   frameLayout->addWidget(timeLabel);
-  connect(this, SIGNAL(SetSimTime(QString)),
+  connect(this, SIGNAL(SetTime(QString)),
       timeLabel, SLOT(setText(QString)), Qt::QueuedConnection);
 
   // Add frameLayout to the frame
@@ -62,6 +63,10 @@ TimerGUIPlugin::TimerGUIPlugin()
   mainLayout->setContentsMargins(0, 0, 0, 0);
 
   this->setLayout(mainLayout);
+
+  // Connect to the PreRender Gazebo signal
+  this->connections.push_back(event::Events::ConnectPreRender(
+                              boost::bind(&TimerGUIPlugin::PreRender, this)));
 }
 
 /////////////////////////////////////////////////
@@ -72,17 +77,6 @@ TimerGUIPlugin::~TimerGUIPlugin()
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
 {
-  // Position this widget
-  if (_elem->HasElement("pos"))
-  {
-    math::Vector2d p = _elem->Get<math::Vector2d>("pos");
-    this->move(p.x, p.y);
-  }
-  else
-  {
-    this->move(200, 10);
-  }
-
   // Size this widget
   if (_elem->HasElement("size"))
   {
@@ -94,32 +88,68 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     this->resize(200, 30);
   }
 
+  // Position this widget
+  if (_elem->HasElement("pos"))
+  {
+    math::Vector2d p = _elem->Get<math::Vector2d>("pos");
+    this->move(p.x, p.y);
+  }
+  else
+  {
+    int xPos, yPos;
+    if (parent())
+       xPos = static_cast<QWidget*>(parent())->width() - this->width() - 10;
+    else
+      xPos = 600;
+
+    yPos = 10;
+    this->move(xPos, yPos);
+  }
+
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init("default");
-  this->ctrlSub = this->node->Subscribe("~/timer_ctrl",
-      &TimerGUIPlugin::OnTimerCtrl, this);
+  this->node->Init();
+
+  // Subscribe to the control topic
+  if (_elem->HasElement("topic"))
+  {
+    this->ctrlSub = this->node->Subscribe(_elem->Get<std::string>("topic"),
+        &TimerGUIPlugin::OnTimerCtrl, this);
+  }
+  else
+  {
+    this->ctrlSub = this->node->Subscribe("~/timer_control",
+        &TimerGUIPlugin::OnTimerCtrl, this);
+  }
 }
 
+/////////////////////////////////////////////////
+void TimerGUIPlugin::PreRender()
+{
+  this->SetTime(QString::fromStdString(
+        this->FormatTime(this->timer.GetElapsed())));
+}
 
 /////////////////////////////////////////////////
 void TimerGUIPlugin::OnTimerCtrl(ConstGzStringPtr &_msg)
 {
-  std::cout << "OnTimerCtrl\n";
-  /*this->SetSimTime(QString::fromStdString(
-        this->FormatTime(_msg->sim_time())));
-        */
+  if (_msg->data() == "start")
+    this->timer.Start();
+  else if (_msg->data() == "stop")
+    this->timer.Stop();
+  else if (_msg->data() == "reset")
+    this->timer.Reset();
 }
 
 /////////////////////////////////////////////////
-std::string TimerGUIPlugin::FormatTime(const msgs::Time &_msg) const
+std::string TimerGUIPlugin::FormatTime(const common::Time &_time) const
 {
   std::ostringstream stream;
   unsigned int day, hour, min, sec, msec;
 
   stream.str("");
 
-  sec = _msg.sec();
+  sec = _time.sec;
 
   day = sec / 86400;
   sec -= day * 86400;
@@ -130,9 +160,9 @@ std::string TimerGUIPlugin::FormatTime(const msgs::Time &_msg) const
   min = sec / 60;
   sec -= min * 60;
 
-  msec = rint(_msg.nsec() * 1e-6);
+  msec = rint(_time.nsec * 1e-6);
 
-  stream << std::setw(2) << std::setfill('0') << day << " ";
+  // stream << std::setw(2) << std::setfill('0') << day << " ";
   stream << std::setw(2) << std::setfill('0') << hour << ":";
   stream << std::setw(2) << std::setfill('0') << min << ":";
   stream << std::setw(2) << std::setfill('0') << sec << ".";

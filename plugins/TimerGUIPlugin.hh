@@ -19,7 +19,9 @@
 
 #include <string>
 
+#include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
+#include <gazebo/common/Timer.hh>
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/gui/gui.hh>
@@ -46,18 +48,27 @@ namespace gazebo
     /// \brief Callback that receives timer control message.
     /// \param[in] _msg "start" = start timer, "stop" = stop timer, "reset"
     /// = reset timer.
-    protected: void OnTimerCtrl(ConstGzStringPtr &_msg);
+    private: void OnTimerCtrl(ConstGzStringPtr &_msg);
+
+    /// \brief Handles the prerender callback
+    private: void PreRender();
 
     /// \brief Helper function to format time string.
     /// \param[in] _msg Time message.
     /// \return Time formatted as a string.
-    private: std::string FormatTime(const msgs::Time &_msg) const;
+    private: std::string FormatTime(const common::Time &_time) const;
 
     /// \brief Node used to establish communication with gzserver.
     private: transport::NodePtr node;
 
     /// \brief Subscriber to control signals.
     private: transport::SubscriberPtr ctrlSub;
+
+    /// \brief Timer;
+    private: common::Timer timer;
+
+    // \brief Set of Gazebo signal connections.
+    private: std::vector<event::ConnectionPtr> connections;
   };
 }
 

@@ -120,11 +120,11 @@ MainWindow::MainWindow()
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->leftColumn);
-  splitter->addWidget(this->renderWidget);
-  splitter->addWidget(this->toolsWidget);
-  splitter->setContentsMargins(0, 0, 0, 0);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(this->leftColumn);
+  this->splitter->addWidget(this->renderWidget);
+  this->splitter->addWidget(this->toolsWidget);
+  this->splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -132,11 +132,10 @@ MainWindow::MainWindow()
   sizes.push_back(0);
   splitter->setSizes(sizes);
 
-  splitter->setStretchFactor(0, 0);
-  splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 0);
-  splitter->setCollapsible(2, false);
-  splitter->setHandleWidth(10);
+  this->splitter->setStretchFactor(0, 0);
+  this->splitter->setStretchFactor(1, 2);
+  this->splitter->setStretchFactor(2, 0);
+  this->splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -1523,9 +1522,6 @@ void MainWindow::OnAddPlugins()
       gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(
           (*iter)->filename(), (*iter)->name());
 
-      // Load the plugin.
-      plugin->Load(msgs::PluginToSDF(**iter));
-
       if (!plugin)
       {
         gzerr << "Unable to create gui overlay plugin with filename["
@@ -1536,7 +1532,7 @@ void MainWindow::OnAddPlugins()
         gzlog << "Loaded GUI plugin[" << (*iter)->filename() << "]\n";
 
         // Attach the plugin to the render widget.
-        this->renderWidget->AddPlugin(plugin);
+        this->renderWidget->AddPlugin(plugin, msgs::PluginToSDF(**iter));
       }
     }
   }
@@ -1772,7 +1768,21 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 void MainWindow::SetSceneTreeVisibility(bool _on)
 {
   if (_on)
-    this->leftColumn->show();
+  {
+    QList<int> sizes;
+    sizes.push_back(MINIMUM_TAB_WIDTH);
+    sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
+    sizes.push_back(0);
+
+    this->splitter->setSizes(sizes);
+  }
   else
-    this->leftColumn->hide();
+  {
+    QList<int> sizes;
+    sizes.push_back(0);
+    sizes.push_back(this->width()+MINIMUM_TAB_WIDTH);
+    sizes.push_back(0);
+
+    this->splitter->setSizes(sizes);
+  }
 }
