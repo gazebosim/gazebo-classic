@@ -1402,10 +1402,10 @@ void BuildingMaker::OnExit(const std::string &_saveName)
   QPushButton *discardButton = NULL;
   if (this->saved)
   {
-    msgBox.setText("Building Editor state is not maintained\n"
-        "between sessions. Once you quit the Building Editor,\n"
-        "your building will no longer be editable.\n\n");
-    doneButton = msgBox.addButton("Done", QMessageBox::ActionRole);
+    msgBox.setText("Once you exit the Building Editor, your\n"
+        "building will no longer be editable.\n\n"
+        "Are you ready to exit?");
+    doneButton = msgBox.addButton("Exit", QMessageBox::ActionRole);
     msgBox.addButton(QMessageBox::Cancel);
     msgBox.setDefaultButton(doneButton);
   }
@@ -1413,14 +1413,12 @@ void BuildingMaker::OnExit(const std::string &_saveName)
   {
     msgBox.setText("Save changes before exiting? If you do not\n"
         "save, all of your work will be lost!\n\n"
-        "Note: Building Editor state is not maintained\n"
-        "between sessions. Once you quit the Building Editor,\n"
-        "your building will no longer be editable.\n\n");
+        "Note: Once you exit the Building Editor, your\n"
+        "building will no longer be editable.");
     discardButton = msgBox.addButton("Don't Save, Exit",
         QMessageBox::ActionRole);
-    msgBox.addButton(QMessageBox::Cancel);
-    doneButton = msgBox.addButton("Save",
-        QMessageBox::ActionRole);
+    msgBox.addButton("Cancel", QMessageBox::ActionRole);
+    doneButton = msgBox.addButton("Save", QMessageBox::ActionRole);
     msgBox.setDefaultButton(doneButton);
   }
 
