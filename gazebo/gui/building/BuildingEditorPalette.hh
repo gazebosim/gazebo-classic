@@ -71,6 +71,10 @@ namespace gazebo
       /// \brief Qt callback when the save button is pressed.
       private slots: void OnSave();
 
+      /// \brief Qt callback when the model name has been edited.
+      /// \param[in] _name Edited name.
+      private slots: void OnNameEdited(QString _name);
+
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.

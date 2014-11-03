@@ -242,7 +242,8 @@ namespace gazebo
       private: void OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for discarding the model.
-      private: void OnDiscard();
+      /// \param[in] _exit Exit editor after discarding or not.
+      private: void OnDiscard(bool _exit = false);
 
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
@@ -250,7 +251,8 @@ namespace gazebo
       private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
-      private: void OnExit();
+      /// \param[in] _saveName Name to save the model.
+      private: void OnExit(const std::string &_saveName = "");
 
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;

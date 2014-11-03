@@ -43,6 +43,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
   modelNameLayout->addWidget(this->modelNameEdit);
+  connect(this->modelNameEdit, SIGNAL(textEdited(QString)), this,
+      SLOT(OnNameEdited(QString)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -271,4 +273,10 @@ void BuildingEditorPalette::mousePressEvent(QMouseEvent * /*_event*/)
 {
   // Cancel draw mode
   gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnNameEdited(QString /*_name*/)
+{
+  this->saveButton->setText("Save As");
 }

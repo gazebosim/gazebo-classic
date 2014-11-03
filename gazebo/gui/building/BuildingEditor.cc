@@ -106,7 +106,8 @@ void BuildingEditor::Done()
 /////////////////////////////////////////////////
 void BuildingEditor::Exit()
 {
-  gui::editor::Events::exitBuildingEditor();
+  gui::editor::Events::exitBuildingEditor(
+      this->buildingPalette->GetModelName());
 }
 
 /////////////////////////////////////////////////

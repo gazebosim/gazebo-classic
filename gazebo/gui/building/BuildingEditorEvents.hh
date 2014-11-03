@@ -316,7 +316,7 @@ namespace gazebo
         public: static event::EventT<void (std::string)> doneBuildingEditor;
 
         /// \brief Exit the editor mode with the option to save
-        public: static event::EventT<void ()> exitBuildingEditor;
+        public: static event::EventT<void (std::string)> exitBuildingEditor;
       };
     }
   }

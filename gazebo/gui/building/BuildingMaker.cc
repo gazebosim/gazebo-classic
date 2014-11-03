@@ -75,16 +75,16 @@ double BuildingMaker::conversionScale;
 
   this->connections.push_back(
   gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&BuildingMaker::OnSave, this, _1)));
+      boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectDiscardBuildingEditor(
-    boost::bind(&BuildingMaker::OnDiscard, this)));
+      boost::bind(&BuildingMaker::OnDiscard, this, false)));
   this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this, _1)));
+      boost::bind(&BuildingMaker::OnDone, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
-    boost::bind(&BuildingMaker::OnExit, this)));
+      boost::bind(&BuildingMaker::OnExit, this, _1)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -206,6 +206,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
+  this->saved = false;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
@@ -248,6 +249,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = windowManip;
+  this->saved = false;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
@@ -291,6 +293,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = doorManip;
+  this->saved = false;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
@@ -333,6 +336,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   stairsManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = stairsManip;
+  this->saved = false;
 
   std::stringstream visualStepName;
   visualStepName << visualName.str() << "step" << 0;
@@ -404,6 +408,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
+  this->saved = false;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   return linkName;
@@ -425,6 +430,7 @@ void BuildingMaker::RemovePart(const std::string &_partName)
   if (visParent)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
+  this->saved = false;
   delete manip;
 }
 
@@ -1293,22 +1299,24 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDiscard()
+void BuildingMaker::OnDiscard(bool _exit)
 {
   int ret = QMessageBox::warning(0, QString("Discard"),
       QString("Are you sure you want to discard\n"
       "your model? All of your work will\n"
       "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Yes | QMessageBox::Cancel,
       QMessageBox::Cancel);
 
   switch (ret)
   {
-    case QMessageBox::Discard:
+    case QMessageBox::Yes:
       gui::editor::Events::discardBuildingModel();
       this->modelSaveName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
+      if (_exit)
+        gui::editor::Events::finishBuildingModel();
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -1321,6 +1329,9 @@ void BuildingMaker::OnDiscard()
 /////////////////////////////////////////////////
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
+  if (_saveName != "" && _saveName != this->modelSaveName)
+    this->saved = false;
+
   if (_saveName != "")
     this->SetModelName(_saveName);
 
@@ -1340,15 +1351,19 @@ void BuildingMaker::OnSave(const std::string &_saveName)
       this->GenerateSDF();
       this->SaveToSDF(this->saveLocation);
       this->saved = true;
+      // Send confirmation that model has been saved
+      gui::editor::Events::saveBuildingModel(this->modelSaveName,
+          this->saveLocation);
     }
   }
-  gui::editor::Events::saveBuildingModel(this->modelSaveName,
-      this->saveLocation);
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnDone(const std::string &_saveName)
 {
+  if (_saveName != "" && _saveName != this->modelSaveName)
+    this->saved = false;
+
   if (_saveName != "")
     this->SetModelName(_saveName);
 
@@ -1367,34 +1382,55 @@ void BuildingMaker::OnDone(const std::string &_saveName)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnExit()
+void BuildingMaker::OnExit(const std::string &_saveName)
 {
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
+  if (this->allItems.size() == 0)
   {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelSaveName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
-      this->OnSave();
-      gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
+    gui::editor::Events::finishBuildingModel();
+    return;
+  }
+
+  if (_saveName != "" && _saveName != this->modelSaveName)
+    this->saved = false;
+
+  if (_saveName != "")
+    this->SetModelName(_saveName);
+
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Exit");
+  QPushButton *doneButton = NULL;
+  QPushButton *discardButton = NULL;
+  if (this->saved)
+  {
+    msgBox.setText("Building Editor state is not maintained\n"
+        "between sessions. Once you quit the Building Editor,\n"
+        "your building will no longer be editable.\n\n");
+    doneButton = msgBox.addButton("Done", QMessageBox::ActionRole);
+    msgBox.addButton(QMessageBox::Cancel);
+    msgBox.setDefaultButton(doneButton);
+  }
+  else
+  {
+    msgBox.setText("Save changes before exiting? If you do not\n"
+        "save, all of your work will be lost!\n\n"
+        "Note: Building Editor state is not maintained\n"
+        "between sessions. Once you quit the Building Editor,\n"
+        "your building will no longer be editable.\n\n");
+    discardButton = msgBox.addButton("Don't Save, Exit",
+        QMessageBox::ActionRole);
+    msgBox.addButton(QMessageBox::Cancel);
+    doneButton = msgBox.addButton("Save",
+        QMessageBox::ActionRole);
+    msgBox.setDefaultButton(doneButton);
+  }
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == doneButton)
+  {
+    this->OnDone(_saveName);
+  }
+  else if(msgBox.clickedButton() == discardButton)
+  {
+    this->OnDiscard(true);
   }
 }
