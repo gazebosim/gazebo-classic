@@ -34,6 +34,9 @@ namespace gazebo
       /// \brief Subscribes to absolute joystick messages.
       public: transport::SubscriberPtr joySubPose;
 
+      /// \brief Publishes user camera world pose
+      public: transport::PublisherPtr joyPosePub;
+
       /// \brief The currently active view controller.
       public: ViewController *viewController;
 
