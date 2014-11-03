@@ -522,5 +522,3 @@ endif()
 #    BUILD_WARNING ("Could not find libqwt-dev. Plotting features will be disabled.")
 #  endif (QWT_FIND_REQUIRED)
 #endif ()
-
-

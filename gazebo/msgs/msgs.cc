@@ -350,7 +350,6 @@ namespace gazebo
         }
       }
 
-
       if (_sdf->HasElement("camera"))
       {
         sdf::ElementPtr camSDF = _sdf->GetElement("camera");
