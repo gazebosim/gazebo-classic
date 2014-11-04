@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <sdf/sdf.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
@@ -59,6 +60,11 @@ namespace gazebo
       /// \brief Get the overlay message being displayed
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
+
+      /// \brief Add a plugin to the render widget.
+      /// \param[in] _plugin Plugin pointer to add.
+      /// \param[in] _elem Plugin sdf parameters.
+      public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar

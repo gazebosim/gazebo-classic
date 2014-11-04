@@ -389,3 +389,16 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_rotateAct->setEnabled(false);
   }
 }
+
+/////////////////////////////////////////////////
+void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
+{
+  // Set the plugin's parent and store the plugin
+  _plugin->setParent(this->glWidget);
+  this->plugins.push_back(_plugin);
+
+  // Load the plugin.
+  _plugin->Load(_elem);
+
+  _plugin->show();
+}
