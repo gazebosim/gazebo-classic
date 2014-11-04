@@ -4,12 +4,9 @@ package gazebo.msgs;
 /// \interface Plugin
 /// \brief A message containing visual information for gazebo::Plugin
 
-
 message Plugin
 {
   required string name         = 1;
   required string filename     = 2;
   optional string innerxml     = 3 [default = ""];
 }
-
-

@@ -27,6 +27,16 @@ namespace gazebo
   {
     public: GUIPlugin() : QWidget(NULL)
             {this->type = GUI_PLUGIN;}
+
+    /// \brief Load function
+    ///
+    /// Called when a plugin is first created.
+    /// This function should not be blocking. This function is only called
+    /// when a GUI plugin is loaded from an SDF file. This function is not
+    /// called when a GUI plugin is loaded via a gui.ini file.
+    /// \param[in] _sdf Pointer the the SDF element of the plugin. This is
+    /// the plugin SDF, <plugin ...>, and its children.
+    public: virtual void Load(sdf::ElementPtr /*_sdf*/) {}
   };
 
 /// \brief Plugin registration function for gui plugin. Part of the
