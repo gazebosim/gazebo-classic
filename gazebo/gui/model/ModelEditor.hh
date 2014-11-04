@@ -47,6 +47,9 @@ namespace gazebo
       /// \brief Callback when the model has been completed.
       private: void OnFinish();
 
+      /// \brief Toggle main window's toolbar to display model editor icons.
+      private: void ToggleToolbar();
+
       /// \brief Contains all the model editor tools.
       private: ModelEditorPalette *modelPalette;
 
