@@ -68,6 +68,5 @@ set_target_properties(BreakableJointPlugin PROPERTIES
 
 QT4_WRAP_CPP(TimerGUIPlugin_MOC TimerGUIPlugin.hh)
 add_library(TimerGUIPlugin SHARED TimerGUIPlugin.cc ${TimerGUIPlugin_MOC})
-set_target_properties(TimerGUIPlugin PROPERTIES COMPILE_FLAGS "-std=c++11")
 target_link_libraries(TimerGUIPlugin libgazebo gazebo_sensors ${ogre_libraries} ${QT_LIBRARIES})
 install (TARGETS TimerGUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
