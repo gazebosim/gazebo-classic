@@ -188,7 +188,7 @@ namespace gazebo
       /// \brief An event to trigger full screen mode.
       public: static event::EventT<void (bool)> fullScreen;
 
-      /// \brief An event to enable first-person-shooter view controll.
+      /// \brief An event to enable first-person-shooter view control.
       public: static event::EventT<void ()> fps;
 
       /// \brief An event to enable orbit view control.
