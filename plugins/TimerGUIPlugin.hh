@@ -31,7 +31,7 @@ namespace gazebo
 {
   /// \brief A GUI plugin that displays a timer. Control of this timer
   /// is managed via a topic that is ~/timer_control by default. The
-  /// topic may be specified in the plugin's SDF. The topic recieves
+  /// topic may be specified in the plugin's SDF. The topic receives
   /// string messages where:
   ///
   ///     "start" == start the timer
