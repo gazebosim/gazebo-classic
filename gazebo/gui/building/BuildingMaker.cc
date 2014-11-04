@@ -58,6 +58,7 @@ double BuildingMaker::conversionScale;
   this->buildingDefaultName = "BuildingDefaultName";
   this->modelTempName = "tempBuilding";
   this->modelSaveName = this->buildingDefaultName;
+  this->saveLocation = QDir::homePath().toStdString();
 
   this->conversionScale = 0.01;
 
@@ -78,7 +79,7 @@ double BuildingMaker::conversionScale;
       boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectDiscardBuildingEditor(
-      boost::bind(&BuildingMaker::OnDiscard, this, false)));
+      boost::bind(&BuildingMaker::OnDiscard, this)));
   this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
       boost::bind(&BuildingMaker::OnDone, this, _1)));
@@ -1299,7 +1300,7 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDiscard(bool _exit)
+void BuildingMaker::OnDiscard()
 {
   int ret = QMessageBox::warning(0, QString("Discard"),
       QString("Are you sure you want to discard\n"
@@ -1311,12 +1312,8 @@ void BuildingMaker::OnDiscard(bool _exit)
   switch (ret)
   {
     case QMessageBox::Yes:
+      this->Reset();
       gui::editor::Events::discardBuildingModel();
-      this->modelSaveName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      if (_exit)
-        gui::editor::Events::finishBuildingModel();
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -1384,7 +1381,7 @@ void BuildingMaker::OnDone(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit(const std::string &_saveName)
 {
-  if (this->allItems.size() == 0)
+  if (this->allItems.empty())
   {
     gui::editor::Events::finishBuildingModel();
     return;
@@ -1427,8 +1424,10 @@ void BuildingMaker::OnExit(const std::string &_saveName)
   {
     this->OnDone(_saveName);
   }
-  else if(msgBox.clickedButton() == discardButton)
+  else if (msgBox.clickedButton() == discardButton)
   {
-    this->OnDiscard(true);
+    this->Reset();
+    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::finishBuildingModel();
   }
 }

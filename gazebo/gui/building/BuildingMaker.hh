@@ -242,8 +242,7 @@ namespace gazebo
       private: void OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for discarding the model.
-      /// \param[in] _exit Exit editor after discarding or not.
-      private: void OnDiscard(bool _exit = false);
+      private: void OnDiscard();
 
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
