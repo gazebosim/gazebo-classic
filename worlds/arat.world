@@ -2,7 +2,7 @@
 <sdf version="1.5">
   <world name="default">
     <scene>
-      <shadows>0</shadows>
+      <shadows>1</shadows>
     </scene>
 
     <gui>
@@ -169,7 +169,6 @@
           </task>
         </task_group>
 
-        <!--
         <commands>
           <command button="a" name="arm_pos_x" increment=-0.025></command>
           <command button="d" name="arm_pos_x" increment=0.025></command>
@@ -217,7 +216,6 @@
           <index name="arm_rot_y" num="4"></index>
           <index name="arm_rot_z" num="5"></index>
         </indices>
--->
       </plugin>
 
       <plugin name="TimerGUIPlugin" filename="libTimerGUIPlugin.so">

@@ -236,7 +236,6 @@ HaptixGUIPlugin::HaptixGUIPlugin()
   this->currentTaskId = 0;
 }
 
-
 /////////////////////////////////////////////////
 HaptixGUIPlugin::~HaptixGUIPlugin()
 {
@@ -245,8 +244,11 @@ HaptixGUIPlugin::~HaptixGUIPlugin()
 /////////////////////////////////////////////////
 void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
 {
+  if (gui::get_active_camera())
+    gui::get_active_camera()->SetHFOV(GZ_DTOR(120));
+
   // Hide the scene tree.
-  gui::Events::sceneTreeVisibility(false);
+  gui::Events::leftPaneVisibility(false);
 
   // Create the publisher that controls the timer
   if (_elem->HasElement("timer_topic"))
@@ -343,7 +345,6 @@ void HaptixGUIPlugin::Load(sdf::ElementPtr _elem)
           forceStream.str().c_str());
       text->setPos(scaleXPos + scaleWidth + 4, i-11.5);
       this->handScene->addItem(text);
-      std::cout << "I[" << i-11.5 << "]\n";
     }
 
     // Draw the PSI label
@@ -464,10 +465,12 @@ void HaptixGUIPlugin::InitializeTaskView(sdf::ElementPtr _elem)
       std::string instructions = task->Get<std::string>("instructions");
       std::string iconPath = common::SystemPaths::Instance()->FindFileURI(
           task->Get<std::string>("icon"));
+      bool enabled = task->Get<bool>("enabled");
 
       // Create a new button for the task
       TaskButton *taskButton = new TaskButton(name, id, taskIndex, groupIndex);
       taskButton->SetInstructions(instructions);
+      taskButton->setEnabled(enabled);
 
       // Listen to the task button press signal
       connect(taskButton, SIGNAL(SendTask(const int)),
@@ -491,13 +494,6 @@ void HaptixGUIPlugin::InitializeTaskView(sdf::ElementPtr _elem)
         taskButton->setIconSize(QSize(60, 60));
         taskButton->setMinimumSize(80, 80);
         taskButton->setMaximumSize(100, 80);
-      }
-
-      // Set the first button checked, and set the instructions.
-      if (this->taskList.empty())
-      {
-        // instructionsView->setDocument(taskButton->Instructions());
-        // taskButton->setChecked(true);
       }
 
       this->taskList[taskIndex] = taskButton;
@@ -538,7 +534,11 @@ void HaptixGUIPlugin::OnNextClicked()
   // reset the clock when a new task is selected
   this->PublishTimerMessage("reset");
 
-  this->currentTaskId = (this->currentTaskId+1) % this->taskList.size();
+  do
+  {
+    this->currentTaskId = (this->currentTaskId+1) % this->taskList.size();
+  } while (!this->taskList[this->currentTaskId]->isEnabled());
+
   this->instructionsView->setDocument(
       this->taskList[this->currentTaskId]->Instructions());
   this->taskList[this->currentTaskId]->setChecked(true);

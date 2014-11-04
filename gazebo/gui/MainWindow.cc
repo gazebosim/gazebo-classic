@@ -158,8 +158,8 @@ MainWindow::MainWindow()
 #endif
 
   this->connections.push_back(
-      gui::Events::ConnectSceneTreeVisibility(
-        boost::bind(&MainWindow::SetSceneTreeVisibility, this, _1)));
+      gui::Events::ConnectLeftPaneVisibility(
+        boost::bind(&MainWindow::SetLeftPaneVisibility, this, _1)));
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -284,7 +284,6 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
-
 }
 
 /////////////////////////////////////////////////
@@ -1765,7 +1764,7 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::SetSceneTreeVisibility(bool _on)
+void MainWindow::SetLeftPaneVisibility(bool _on)
 {
   if (_on)
   {

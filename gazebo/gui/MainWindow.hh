@@ -78,9 +78,9 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
-      /// \brief Set whether the scene tree is visible
-      /// \param[in] _on True to show the scene tree, false to hide.
-      public: void SetSceneTreeVisibility(bool _on);
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();

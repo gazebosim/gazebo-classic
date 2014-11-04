@@ -126,14 +126,14 @@ namespace gazebo
               { follow.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a signal to the follow signal
+      /// \brief Connect a signal to toggle the GUI's left hand pane signal
       public: template<typename T>
-              static event::ConnectionPtr ConnectSceneTreeVisibility
+              static event::ConnectionPtr ConnectLeftPaneVisibility
                 (T _subscriber)
-                { return sceneTreeVisibility.Connect(_subscriber); }
-      public: static void DisconnectSceneTreeVisibility(
+                { return leftPaneVisibility.Connect(_subscriber); }
+      public: static void DisconnectLeftPaneVisibility(
               event::ConnectionPtr _subscriber)
-              { sceneTreeVisibility.Disconnect(_subscriber); }
+              { leftPaneVisibility.Disconnect(_subscriber); }
 
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
@@ -166,8 +166,8 @@ namespace gazebo
       /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;
 
-      /// \brief Used to set whether the scene tree is visible
-      public: static event::EventT<void (bool)> sceneTreeVisibility;
+      /// \brief Used to set whether the GUI's left pane is visible
+      public: static event::EventT<void (bool)> leftPaneVisibility;
     };
   }
 }
