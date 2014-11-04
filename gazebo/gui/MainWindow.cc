@@ -1766,22 +1766,13 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
 /////////////////////////////////////////////////
 void MainWindow::SetLeftPaneVisibility(bool _on)
 {
-  if (_on)
-  {
-    QList<int> sizes;
-    sizes.push_back(MINIMUM_TAB_WIDTH);
-    sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
-    sizes.push_back(0);
+  int leftPane = _on ? MINIMUM_TAB_WIDTH : 0;
+  int rightPane = this->splitter->sizes().at(2);
 
-    this->splitter->setSizes(sizes);
-  }
-  else
-  {
-    QList<int> sizes;
-    sizes.push_back(0);
-    sizes.push_back(this->width()+MINIMUM_TAB_WIDTH);
-    sizes.push_back(0);
+  QList<int> sizes;
+  sizes.push_back(leftPane);
+  sizes.push_back(this->width() - leftPane - rightPane);
+  sizes.push_back(rightPane);
 
-    this->splitter->setSizes(sizes);
-  }
+  this->splitter->setSizes(sizes);
 }
