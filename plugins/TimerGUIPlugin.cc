@@ -92,6 +92,37 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   if (_elem->HasElement("pos"))
   {
     math::Vector2d p = _elem->Get<math::Vector2d>("pos");
+
+    // Check for negative x position
+    if (p.x < 0)
+    {
+      gzwarn << "GUI widget x pos < 0, clamping to 0.\n";
+      p.x = 0;
+    }
+
+    // Check for negative y position
+    if (p.y < 0)
+    {
+      gzwarn << "GUI widget y pos < 0, clamping to 0.\n";
+      p.y = 0;
+    }
+
+    // Check for x position greater than parent width
+    if (parent() && p.x > static_cast<QWidget*>(parent())->width())
+    {
+      gzwarn << "GUI widget x pos > parent width, "
+        << "clamping to parent width - this widget's width.\n";
+      p.x = static_cast<QWidget*>(parent())->width() - this->width();
+    }
+
+    // Check for y position greater than parent height
+    if (parent() && p.y > static_cast<QWidget*>(parent())->height())
+    {
+      gzwarn << "GUI widget y pos > parent height, "
+        << "clamping to parent height - this widget's height.\n";
+      p.y = static_cast<QWidget*>(parent())->height() - this->height();
+    }
+
     this->move(p.x, p.y);
   }
   else
@@ -105,6 +136,7 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     yPos = 10;
     this->move(xPos, yPos);
   }
+
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());
