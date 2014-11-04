@@ -2,6 +2,9 @@
 
 ### Gazebo 5.0.0
 
+1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI. 
+    * [Pull request #1270](https://bitbucket.org/osrf/gazebo/pull-request/1270)
+
 1. Added ability to load plugins via SDF. 
     * [Pull request #1261](https://bitbucket.org/osrf/gazebo/pull-request/1261)
 
