@@ -130,14 +130,14 @@ MainWindow::MainWindow()
   sizes.push_back(MINIMUM_TAB_WIDTH);
   sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
   sizes.push_back(0);
-  splitter->setSizes(sizes);
+  this->splitter->setSizes(sizes);
 
   this->splitter->setStretchFactor(0, 0);
   this->splitter->setStretchFactor(1, 2);
   this->splitter->setStretchFactor(2, 0);
   this->splitter->setHandleWidth(10);
 
-  centerLayout->addWidget(splitter);
+  centerLayout->addWidget(this->splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
   centerLayout->setSpacing(0);
 
