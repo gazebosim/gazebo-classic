@@ -21,7 +21,6 @@
 #include <vector>
 #include <sdf/sdf.hh>
 
-#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Event.hh"
 #include "gazebo/util/system.hh"
