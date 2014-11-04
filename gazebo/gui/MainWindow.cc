@@ -119,11 +119,11 @@ MainWindow::MainWindow()
 
   QHBoxLayout *centerLayout = new QHBoxLayout;
 
-  QSplitter *splitter = new QSplitter(this);
-  splitter->addWidget(this->leftColumn);
-  splitter->addWidget(this->renderWidget);
-  splitter->addWidget(this->toolsWidget);
-  splitter->setContentsMargins(0, 0, 0, 0);
+  this->splitter = new QSplitter(this);
+  this->splitter->addWidget(this->leftColumn);
+  this->splitter->addWidget(this->renderWidget);
+  this->splitter->addWidget(this->toolsWidget);
+  this->splitter->setContentsMargins(0, 0, 0, 0);
 
   QList<int> sizes;
   sizes.push_back(MINIMUM_TAB_WIDTH);
@@ -131,11 +131,10 @@ MainWindow::MainWindow()
   sizes.push_back(0);
   splitter->setSizes(sizes);
 
-  splitter->setStretchFactor(0, 0);
-  splitter->setStretchFactor(1, 2);
-  splitter->setStretchFactor(2, 0);
-  splitter->setCollapsible(2, false);
-  splitter->setHandleWidth(10);
+  this->splitter->setStretchFactor(0, 0);
+  this->splitter->setStretchFactor(1, 2);
+  this->splitter->setStretchFactor(2, 0);
+  this->splitter->setHandleWidth(10);
 
   centerLayout->addWidget(splitter);
   centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -156,6 +155,10 @@ MainWindow::MainWindow()
 #ifdef HAVE_OCULUS
   this->oculusWindow = NULL;
 #endif
+
+  this->connections.push_back(
+      gui::Events::ConnectLeftPaneVisibility(
+        boost::bind(&MainWindow::SetLeftPaneVisibility, this, _1)));
 
   this->connections.push_back(
       gui::Events::ConnectFullScreen(
@@ -1707,4 +1710,27 @@ void MainWindow::CreateDisabledIcon(const std::string &_pixmap, QAction *_act)
   p.drawPixmap(0, 0, pixmap);
   icon.addPixmap(disabledPixmap, QIcon::Disabled);
   _act->setIcon(icon);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::SetLeftPaneVisibility(bool _on)
+{
+  if (_on)
+  {
+    QList<int> sizes;
+    sizes.push_back(MINIMUM_TAB_WIDTH);
+    sizes.push_back(this->width() - MINIMUM_TAB_WIDTH);
+    sizes.push_back(0);
+
+    this->splitter->setSizes(sizes);
+  }
+  else
+  {
+    QList<int> sizes;
+    sizes.push_back(0);
+    sizes.push_back(this->width()+MINIMUM_TAB_WIDTH);
+    sizes.push_back(0);
+
+    this->splitter->setSizes(sizes);
+  }
 }

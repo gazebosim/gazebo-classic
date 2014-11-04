@@ -29,7 +29,7 @@ namespace gazebo
     class GAZEBO_VISIBLE Events
     {
       /////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the add entity signal
+      /// \brief Connect a signal the add entity signal
       public: template<typename T>
               static event::ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return createEntity.Connect(_subscriber); }
@@ -38,7 +38,7 @@ namespace gazebo
               { createEntity.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the move mode signal
+      /// \brief Connect a signal to the move mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectMoveMode(T _subscriber)
               { return moveMode.Connect(_subscriber); }
@@ -46,7 +46,7 @@ namespace gazebo
               { moveMode.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the manip mode signal
+      /// \brief Connect a signal to the manip mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectManipMode(T _subscriber)
               {return manipMode.Connect(_subscriber);}
@@ -54,7 +54,7 @@ namespace gazebo
               {manipMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the align mode signal
+      /// \brief Connect a signal to the align mode signal
       public: template<typename T>
               static event::ConnectionPtr ConnectAlignMode(T _subscriber)
               {return alignMode.Connect(_subscriber);}
@@ -62,28 +62,28 @@ namespace gazebo
               {alignMode.Disconnect(_subscriber);}
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the fullscreen signal
+      /// \brief Connect a signal to the fullscreen signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFullScreen(T _subscriber)
               { return fullScreen.Connect(_subscriber); }
       public: static void DisconnectFullScreen(event::ConnectionPtr _subscriber)
               { fullScreen.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the view FPS signal
+      /// \brief Connect a signal to the view FPS signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFPS(T _subscriber)
               { return fps.Connect(_subscriber); }
       public: static void DisconnectFPS(event::ConnectionPtr _subscriber)
               { fps.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the view Orbit signal
+      /// \brief Connect a signal to the view Orbit signal
       public: template<typename T>
               static event::ConnectionPtr ConnectOrbit(T _subscriber)
               { return orbit.Connect(_subscriber); }
       public: static void DisconnectOrbit(event::ConnectionPtr _subscriber)
               { orbit.Disconnect(_subscriber); }
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the view KeyPress signal
+      /// \brief Connect a signal to the view KeyPress signal
       public: template<typename T>
               static event::ConnectionPtr ConnectKeyPress(T _subscriber)
               { return keyPress.Connect(_subscriber); }
@@ -91,7 +91,7 @@ namespace gazebo
               { keyPress.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the light update signal
+      /// \brief Connect a signal to the light update signal
       public: template<typename T>
               static event::ConnectionPtr ConnectLightUpdate(T _subscriber)
               { return lightUpdate.Connect(_subscriber); }
@@ -108,7 +108,7 @@ namespace gazebo
               { modelUpdate.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the input step size signal
+      /// \brief Connect a signal to the input step size signal
       public: template<typename T>
               static event::ConnectionPtr ConnectInputStepSize(T _subscriber)
               { return inputStepSize.Connect(_subscriber); }
@@ -117,13 +117,23 @@ namespace gazebo
               { inputStepSize.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the follow signal
+      /// \brief Connect a signal to the follow signal
       public: template<typename T>
               static event::ConnectionPtr ConnectFollow(T _subscriber)
               { return follow.Connect(_subscriber); }
       public: static void DisconnectFollow(
               event::ConnectionPtr _subscriber)
               { follow.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to toggle the GUI's left hand pane signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectLeftPaneVisibility
+                (T _subscriber)
+                { return leftPaneVisibility.Connect(_subscriber); }
+      public: static void DisconnectLeftPaneVisibility(
+              event::ConnectionPtr _subscriber)
+              { leftPaneVisibility.Disconnect(_subscriber); }
 
       ///  that indicates the user is moving the camera
       public: static event::EventT<void (bool)>  moveMode;
@@ -155,6 +165,9 @@ namespace gazebo
 
       /// \brief Step size changed event
       public: static event::EventT<void (int)> inputStepSize;
+
+      /// \brief Used to set whether the GUI's left pane is visible
+      public: static event::EventT<void (bool)> leftPaneVisibility;
     };
   }
 }

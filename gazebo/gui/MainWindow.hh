@@ -78,6 +78,10 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -276,6 +280,9 @@ namespace gazebo
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
 #endif
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }
