@@ -2,6 +2,12 @@
 
 ### Gazebo 5.0.0
 
+1. Added ability to load plugins via SDF. 
+    * [Pull request #1261](https://bitbucket.org/osrf/gazebo/pull-request/1261)
+
+1. Added GUIEvent to hide/show the left GUI pane. 
+    * [Pull request #1269](https://bitbucket.org/osrf/gazebo/pull-request/1269)
+
 1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
     * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
 
