@@ -1,8 +1,12 @@
 <?xml version="1.0" ?>
 <sdf version="1.5">
   <world name="default">
+
     <gui>
-      <plugin name="timer_gui" filename="libTimerGUIPlugi.so">
+      <plugin name="timer_gui" filename="libTimerGUIPlugin.so">
+        <topic>~/timer_control</topic>
+        <pos>10 10</pos>
+        <size>150 30</size>
       </plugin>
     </gui>
 
