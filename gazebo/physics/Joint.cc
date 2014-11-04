@@ -126,6 +126,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("axis"))
   {
+    const unsigned int index = 0;
     sdf::ElementPtr axisElem = _sdf->GetElement("axis");
     {
       std::string param = "use_parent_model_frame";
@@ -134,7 +135,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
       // and we should assume support for backwards compatibility
       if (axisElem->HasElement(param))
       {
-        this->axisParentModelFrame[0] = axisElem->Get<bool>(param);
+        this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
       }
 
       // Axis dynamics
@@ -151,12 +152,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
         {
           stiffness = dynamicsElem->Get<double>("spring_stiffness");
         }
-        this->SetStiffnessDamping(0, stiffness,
+        this->SetStiffnessDamping(index, stiffness,
             dynamicsElem->Get<double>("damping"), reference);
 
         if (dynamicsElem->HasElement("friction"))
         {
-          this->SetParam("friction", 0,
+          this->SetParam("friction", index,
             dynamicsElem->Get<double>("friction"));
         }
       }
@@ -166,24 +167,25 @@ void Joint::Load(sdf::ElementPtr _sdf)
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[0] = limitElem->Get<double>("upper");
-      this->lowerLimit[0] = limitElem->Get<double>("lower");
+      this->upperLimit[index] = limitElem->Get<double>("upper");
+      this->lowerLimit[index] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
-      this->stopStiffness[0] = limitElem->Get<double>("stiffness");
-      this->stopDissipation[0] = limitElem->Get<double>("dissipation");
+      this->stopStiffness[index] = limitElem->Get<double>("stiffness");
+      this->stopDissipation[index] = limitElem->Get<double>("dissipation");
       // store joint effort and velocity limits
-      this->effortLimit[0] = limitElem->Get<double>("effort");
-      this->velocityLimit[0] = limitElem->Get<double>("velocity");
+      this->effortLimit[index] = limitElem->Get<double>("effort");
+      this->velocityLimit[index] = limitElem->Get<double>("velocity");
     }
   }
   if (_sdf->HasElement("axis2"))
   {
+    const unsigned int index = 1;
     sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
     {
       std::string param = "use_parent_model_frame";
       if (axisElem->HasElement(param))
       {
-        this->axisParentModelFrame[1] = axisElem->Get<bool>(param);
+        this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
       }
 
       // Axis dynamics
@@ -201,12 +203,12 @@ void Joint::Load(sdf::ElementPtr _sdf)
         {
           stiffness = dynamicsElem->Get<double>("spring_stiffness");
         }
-        this->SetStiffnessDamping(1, stiffness,
+        this->SetStiffnessDamping(index, stiffness,
             dynamicsElem->Get<double>("damping"), reference);
 
         if (dynamicsElem->HasElement("friction"))
         {
-          this->SetParam("friction", 1,
+          this->SetParam("friction", index,
             dynamicsElem->Get<double>("friction"));
         }
       }
@@ -216,14 +218,14 @@ void Joint::Load(sdf::ElementPtr _sdf)
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
       // store upper and lower joint limits
-      this->upperLimit[1] = limitElem->Get<double>("upper");
-      this->lowerLimit[1] = limitElem->Get<double>("lower");
+      this->upperLimit[index] = limitElem->Get<double>("upper");
+      this->lowerLimit[index] = limitElem->Get<double>("lower");
       // store joint stop stiffness and dissipation coefficients
-      this->stopStiffness[1] = limitElem->Get<double>("stiffness");
-      this->stopDissipation[1] = limitElem->Get<double>("dissipation");
+      this->stopStiffness[index] = limitElem->Get<double>("stiffness");
+      this->stopDissipation[index] = limitElem->Get<double>("dissipation");
       // store joint effort and velocity limits
-      this->effortLimit[1] = limitElem->Get<double>("effort");
-      this->velocityLimit[1] = limitElem->Get<double>("velocity");
+      this->effortLimit[index] = limitElem->Get<double>("effort");
+      this->velocityLimit[index] = limitElem->Get<double>("velocity");
     }
   }
 
