@@ -373,7 +373,7 @@ double ODEUniversalJoint::GetParam(
   {
     gzerr << "Error during "
           << "GetParam('" << _key << "'): "
-          << e.what()
+          << e.GetErrorStr()
           << std::endl;
     return 0;
   }
