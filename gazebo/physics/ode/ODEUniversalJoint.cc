@@ -355,7 +355,6 @@ double ODEUniversalJoint::GetParam(
     if (_key == "friction")
     {
         return this->GetParam(dParamFMax | group);
-      }
     }
     else if (_key == "hi_stop")
     {

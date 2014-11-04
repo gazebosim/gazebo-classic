@@ -557,6 +557,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
       gzwarn << "The '" << _key << "' parameter is deprecated "
              << "to enable Coulomb joint friction with the "
              << "'friction' parameter"
+             << std::endl;
       return this->GetParam(dParamFMax | group);
     }
     else if (_key == "friction")
@@ -568,16 +569,17 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
       gzwarn << "The '" << _key << "' parameter is deprecated "
              << "to enable Coulomb joint friction with the "
              << "'friction' parameter"
+             << std::endl;
       return this->GetParam(dParamVel | group);
     }
     else if (_key == "hi_stop")
     {
           return this->GetParam(dParamHiStop | group);
-    } 
+    }
     else if (_key == "lo_stop")
     {
           return this->GetParam(dParamLoStop | group);
-    } 
+    }
     else if (_key == "thread_pitch")
     {
       ScrewJoint<ODEJoint>* screwJoint =
