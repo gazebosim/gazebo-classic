@@ -322,12 +322,33 @@ namespace gazebo
           _p.d());
     }
 
+    /////////////////////////////////////////////
     msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::GUI result;
 
       result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
+      // Set gui plugins
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          msgs::Plugin *plgnMsg = result.add_plugin();
+          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
+          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
+
+          std::stringstream ss;
+          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
+              innerElem; innerElem = innerElem->GetNextElement(""))
+          {
+            ss << innerElem->ToString("");
+          }
+          plgnMsg->set_innerxml(ss.str());
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
 
       if (_sdf->HasElement("camera"))
       {
@@ -942,6 +963,33 @@ namespace gazebo
         }
       }
       return cameraSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr pluginSDF;
+
+      if (_sdf)
+      {
+        pluginSDF = _sdf;
+      }
+      else
+      {
+        pluginSDF.reset(new sdf::Element);
+        sdf::initFile("plugin.sdf", pluginSDF);
+      }
+
+      // Use the SDF parser to read all the inner xml.
+      std::string tmp = "<sdf version='1.5'>";
+      tmp += "<plugin name='" + _msg.name() + "' filename='" +
+        _msg.filename() + "'>";
+      tmp += _msg.innerxml();
+      tmp += "</plugin></sdf>";
+
+      sdf::readString(tmp, pluginSDF);
+
+      return pluginSDF;
     }
   }
 }

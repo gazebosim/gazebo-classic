@@ -16,6 +16,11 @@
 
 1. Change behavior of Joint::SetVelocity, add Joint::SetVelocityLimit(unsigned int, double)
   * [Pull request #1218](https://bitbucket.org/osrf/gazebo/pull-request/1218)
+  * [Issue #964](https://bitbucket.org/osrf/gazebo/issue/964)
+
+1. Implement Coulomb joint friction for ODE
+  * [Pull request #1221](https://bitbucket.org/osrf/gazebo/pull-request/1221)
+  * [Issue #381](https://bitbucket.org/osrf/gazebo/issue/381)
 
 1. Implemented camera lens distortion.
   * [Pull request #1213](https://bitbucket.org/osrf/gazebo/pull-request/1213)
@@ -32,6 +37,9 @@
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
   * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
+  
+1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
+    * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
 ## Gazebo 4.0
 

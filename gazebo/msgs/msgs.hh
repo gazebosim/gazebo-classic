@@ -285,6 +285,14 @@ namespace gazebo
     sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
+    /// \brief Create an SDF element from a msgs::Plugin
+    /// \param[in] _msg Plugin messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
     /// \cond
     GAZEBO_VISIBLE
     const google::protobuf::FieldDescriptor *GetFD(
