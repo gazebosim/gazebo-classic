@@ -103,7 +103,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -361,6 +361,12 @@ void RenderWidget::ShowToolbar(const bool _show)
       this->toolbar->hide();
     }
   }
+}
+
+/////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar() const
+{
+  return this->toolbar;
 }
 
 /////////////////////////////////////////////////

@@ -66,8 +66,12 @@ namespace gazebo
       /// \param[in] _elem Plugin sdf parameters.
       public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
 
+      /// \brief Get the toolbar on top of the render widget
+      /// \return Toolbar
+      public: QToolBar *GetToolbar() const;
+
       /// \brief Set the visibility of the toolbar.
-      /// \param[in] _visible Whether or not to show the toolbar.
+      /// \param[in] _show Whether or not to show the toolbar.
       public: void ShowToolbar(const bool _show);
 
       private slots: virtual void update();
