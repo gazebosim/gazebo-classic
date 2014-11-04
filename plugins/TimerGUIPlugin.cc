@@ -126,6 +126,7 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 void TimerGUIPlugin::PreRender()
 {
+  boost::mutex::scoped_lock lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
         this->FormatTime(this->timer.GetElapsed())));
 }
@@ -133,6 +134,7 @@ void TimerGUIPlugin::PreRender()
 /////////////////////////////////////////////////
 void TimerGUIPlugin::OnTimerCtrl(ConstGzStringPtr &_msg)
 {
+  boost::mutex::scoped_lock lock(this->timerMutex);
   if (_msg->data() == "start")
     this->timer.Start();
   else if (_msg->data() == "stop")

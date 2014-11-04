@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/thread/mutex.hpp>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
