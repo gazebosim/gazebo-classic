@@ -97,6 +97,11 @@ namespace gazebo
       /// \brief Update the visual representation of the snap spot.
       private: void Update();
 
+      /// \brief Set the snap mode.
+      /// \param[in] _snapMode Choose "model" to snap models to each other or
+      /// "link" to snap links within a model.
+      private: void SetSnapMode(const std::string &_snapMode);
+
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelSnap>;
 

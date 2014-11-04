@@ -56,7 +56,7 @@ namespace gazebo
       /// \brief Current key event.
       public: common::KeyEvent keyEvent;
 
-      /// \brief True if the model align tool is initialized.
+      /// \brief True if the model snap tool is initialized.
       public: bool initialized;
 
       /// \brief Vertices of a mesh triangle used as the basis for alignment.
@@ -94,6 +94,10 @@ namespace gazebo
 
       /// \brief A variable to indicate the hovered triangle has changed.
       public: bool hoverTriangleDirty;
+
+      /// \brief Snap mode: "model" to snap a model to another, "link" to snap
+      /// links within a model.
+      public: std::string snapMode;
     };
   }
 }

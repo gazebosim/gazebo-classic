@@ -47,6 +47,7 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
+  this->dataPtr->snapMode = "model";
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
@@ -134,6 +135,15 @@ void ModelSnap::Reset()
 
   event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
+
+  if (g_editModelAct->isChecked())
+  {
+    this->SetSnapMode("link");
+  }
+  else
+  {
+    this->SetSnapMode("model");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -196,14 +206,12 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
     // Select first triangle on any mesh
-    // Update triangle if:
-    // Main window: same model
-    // Model Editor: same link (allow snapping within a model)
+    // Update triangle if the new triangle is on the same model/link
     if (!this->dataPtr->selectedVis ||
-        (!g_editModelAct->isChecked() &&
-        (vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual()))
-        || (g_editModelAct->isChecked() &&
-        (vis->GetParent() == this->dataPtr->selectedVis->GetParent())))
+        (this->dataPtr->snapMode == "model" &&
+        vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual())
+        || (this->dataPtr->snapMode == "link" &&
+        vis->GetParent() == this->dataPtr->selectedVis->GetParent()))
     {
       math::Vector3 intersect;
       this->dataPtr->rayQuery->SelectMeshTriangle(_event.pos.x, _event.pos.y,
@@ -230,7 +238,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
       if (!vertices.empty())
       {
-        if (!g_editModelAct->isChecked())
+        if (this->dataPtr->snapMode == "model")
         {
           this->Snap(this->dataPtr->selectedTriangle, vertices,
               this->dataPtr->selectedVis->GetRootVisual());
@@ -441,4 +449,10 @@ void ModelSnap::Update()
     }
     this->dataPtr->selectedTriangleDirty = false;
   }
+}
+
+/////////////////////////////////////////////////
+void ModelSnap::SetSnapMode(const std::string &_snapMode)
+{
+  this->dataPtr->snapMode = _snapMode;
 }

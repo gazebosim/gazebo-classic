@@ -86,11 +86,11 @@ void ModelEditor::ToggleToolbar()
         actions[i] == g_rotateAct ||
         actions[i] == g_translateAct ||
         actions[i] == g_scaleAct ||
-        actions[i] == g_screenshotAct)
+        actions[i] == g_screenshotAct ||
 //        actions[i] == g_copyAct -- issue #1314
 //        actions[i] == g_pasteAct
 //        align tool              -- issue #1323
-//        actions[i] == g_snapAct -- issue #1318
+        actions[i] == g_snapAct)
     {
       actions[i]->setVisible(true);
       if (i > 0 && actions[i-1]->isSeparator())
