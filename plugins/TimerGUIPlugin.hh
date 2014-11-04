@@ -83,8 +83,11 @@ namespace gazebo
     /// \brief The actual timer
     private: common::Timer timer;
 
-    // \brief Set of Gazebo signal connections.
+    /// \brief Set of Gazebo signal connections.
     private: std::vector<event::ConnectionPtr> connections;
+
+    /// \brief Mutex to protect timer updates.
+    private: boost::mutex timerMutex;
   };
 }
 
