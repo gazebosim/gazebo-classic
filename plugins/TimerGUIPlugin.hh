@@ -18,6 +18,7 @@
 #define _GUI_TIMER_PLUGIN_HH_
 
 #include <string>
+#include <vector>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>

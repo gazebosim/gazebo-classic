@@ -79,7 +79,6 @@ namespace gazebo
 
       /// \brief The time when Stop was called.
       private: Time stop;
-
     };
     /// \}
   }
