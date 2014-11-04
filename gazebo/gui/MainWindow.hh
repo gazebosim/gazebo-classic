@@ -78,6 +78,10 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
 
@@ -288,6 +292,9 @@ namespace gazebo
 
       /// \brief Mutext to protect plugin loading.
       private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }
