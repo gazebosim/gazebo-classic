@@ -129,7 +129,7 @@ namespace gazebo
                                             QTreeWidgetItem *_parent);
 
       private: void FillPropertyTree(const msgs::Model &_msg,
-                                     QtProperty *_parentItem);
+                                     QtProperty * /*_parent*/);
 
       private: void FillPropertyTree(const msgs::Link &_msg,
                                      QtProperty *_parent);
@@ -138,25 +138,25 @@ namespace gazebo
                                      QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Joint &_msg,
-                                     QtProperty *_parent);
+                                     QtProperty * /*_parent*/);
 
       private: void FillPropertyTree(const msgs::Surface &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Visual &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Geometry &_msg,
-                                       QtProperty *_parent);
+                                     QtProperty *_parent);
 
       private: void FillPropertyTree(const msgs::Scene &_msg,
-                                     QtProperty *_parent);
+                                     QtProperty * /*_parent*/);
 
       private: void FillPropertyTree(const msgs::Physics &_msg,
-                                     QtProperty *_parent);
+                                     QtProperty * /*_parent*/);
 
       private: void FillPropertyTree(const msgs::Light &_msg,
-                                       QtProperty * /*_parent*/);
+                                     QtProperty * /*_parent*/);
 
       private: void FillVector3dProperty(const msgs::Vector3d &_msg,
                                          QtProperty *_parent);
@@ -169,7 +169,12 @@ namespace gazebo
       /// \param[in] _parent Pointer to the qtproperty which will receive
       /// the message data.
       private: void FillPropertyTree(const msgs::SphericalCoordinates &_msg,
-                                     QtProperty *_parent);
+                                     QtProperty * /*_parent*/);
+
+      /// \brief Add a property to a parent property or to the property tree.
+      /// \param[in] _item Pointer to the property to be added.
+      /// \param[in] _parent Pointer to the parent property, if applicable.
+      private: void AddProperty(QtProperty *_item, QtProperty *_parent);
 
       private: void ProcessModelMsgs();
       private: void ProcessLightMsgs();
