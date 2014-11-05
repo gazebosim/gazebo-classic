@@ -2629,6 +2629,9 @@ void ModelListWidget::ProcessLightMsgs()
 /////////////////////////////////////////////////
 void ModelListWidget::AddProperty(QtProperty *_item, QtProperty *_parent)
 {
+  if (!_item)
+    return;
+
   if (_parent)
     _parent->addSubProperty(_item);
   else
