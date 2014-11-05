@@ -17,6 +17,8 @@
     * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 1. Added ConvertJointType functions, display more joint info on model list.
     * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
+1. Added ModelListWidget::AddProperty, removed unnecessary checks on ModelListWidget.
+    * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
