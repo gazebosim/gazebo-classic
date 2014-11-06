@@ -1690,7 +1690,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Collision &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding collision elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
@@ -1745,7 +1749,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Surface &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding surface elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
@@ -1841,7 +1849,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Geometry &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding geometry elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtVariantProperty *item = NULL;
 
@@ -1963,7 +1975,11 @@ void ModelListWidget::FillPropertyTree(const msgs::Visual &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding visual elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtProperty *topItem = NULL;
   QtVariantProperty *item = NULL;
@@ -2066,7 +2082,11 @@ void ModelListWidget::FillVector3dProperty(const msgs::Vector3d &_msg,
                                            QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding Vector3d elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtVariantProperty *item;
   math::Vector3 value;
@@ -2113,7 +2133,11 @@ void ModelListWidget::FillPoseProperty(const msgs::Pose &_msg,
                                        QtProperty *_parent)
 {
   if (!_parent)
+  {
+    gzwarn << "Null QtProperty parent, not adding pose elements."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   QtVariantProperty *item;
   math::Pose value;
@@ -2630,7 +2654,11 @@ void ModelListWidget::ProcessLightMsgs()
 void ModelListWidget::AddProperty(QtProperty *_item, QtProperty *_parent)
 {
   if (!_item)
+  {
+    gzwarn << "Null QtProperty item, not adding."
+           << " This should never happen." << std::endl;
     return;
+  }
 
   if (_parent)
     _parent->addSubProperty(_item);
