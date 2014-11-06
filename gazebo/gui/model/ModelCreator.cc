@@ -114,6 +114,7 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     MouseEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+    this->jointMaker->Stop();
   }
 }
 
