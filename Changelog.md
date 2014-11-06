@@ -2,6 +2,15 @@
 
 ### Gazebo 5.0.0
 
+1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI. 
+    * [Pull request #1270](https://bitbucket.org/osrf/gazebo/pull-request/1270)
+
+1. Added ability to load plugins via SDF. 
+    * [Pull request #1261](https://bitbucket.org/osrf/gazebo/pull-request/1261)
+
+1. Added GUIEvent to hide/show the left GUI pane. 
+    * [Pull request #1269](https://bitbucket.org/osrf/gazebo/pull-request/1269)
+
 1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
     * [Pull request #1251](https://bitbucket.org/osrf/gazebo/pull-request/1251)
 
@@ -58,6 +67,8 @@
     * [Pull request #1237](https://bitbucket.org/osrf/gazebo/pull-request/1237)
 1. Added Quaternion::Integrate function.
     * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
+1. Added ConvertJointType functions, display more joint info on model list.
+    * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
 
 ### Gazebo 4.0.2 (2014-09-23)
 

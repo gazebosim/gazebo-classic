@@ -57,6 +57,9 @@ namespace gazebo
       /// \return The time
       public: Time GetElapsed() const;
 
+      /// \brief Reset the timer
+      public: void Reset();
+
       /// \brief Stream operator friendly
       public: friend std::ostream &operator<<(std::ostream &out,
                                               const gazebo::common::Timer &t)
@@ -65,14 +68,17 @@ namespace gazebo
                 return out;
               }
 
+      /// \brief True if a reset is needed.
+      private: bool reset;
+
+      /// \brief True if the timer is running.
+      private: bool running;
+
       /// \brief The time of the last call to Start
       private: Time start;
 
       /// \brief The time when Stop was called.
       private: Time stop;
-
-      /// \brief True if the timer is running.
-      private: bool running;
     };
     /// \}
   }
