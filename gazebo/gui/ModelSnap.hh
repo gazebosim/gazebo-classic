@@ -90,17 +90,17 @@ namespace gazebo
       /// \param[in] _event Mouse event.
       public: void OnMouseReleaseEvent(const common::MouseEvent &_event);
 
+      /// \brief Set the snap level.
+      /// \param[in] _snapLevel Choose "model" to snap models to each other or
+      /// "link" to snap links within a model.
+      public: void SetSnapLevel(const std::string &_snapLevel);
+
       /// \brief Publish visual's pose to the server
       /// \param[in] _vis Pointer to the visual whose pose is to be published.
       private: void PublishVisualPose(rendering::VisualPtr _vis);
 
       /// \brief Update the visual representation of the snap spot.
       private: void Update();
-
-      /// \brief Set the snap mode.
-      /// \param[in] _snapMode Choose "model" to snap models to each other or
-      /// "link" to snap links within a model.
-      private: void SetSnapMode(const std::string &_snapMode);
 
       /// \brief This is a singleton class.
       private: friend class SingletonT<ModelSnap>;

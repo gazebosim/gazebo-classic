@@ -97,7 +97,7 @@ namespace gazebo
 
       /// \brief Snap mode: "model" to snap a model to another, "link" to snap
       /// links within a model.
-      public: std::string snapMode;
+      public: std::string snapLevel;
     };
   }
 }

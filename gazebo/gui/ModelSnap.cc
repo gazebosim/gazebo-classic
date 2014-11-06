@@ -47,7 +47,7 @@ ModelSnap::ModelSnap()
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
   this->dataPtr->snapLines = NULL;
-  this->dataPtr->snapMode = "model";
+  this->dataPtr->snapLevel = "model";
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
@@ -135,15 +135,6 @@ void ModelSnap::Reset()
 
   event::Events::DisconnectRender(this->dataPtr->renderConnection);
   this->dataPtr->renderConnection.reset();
-
-  if (g_editModelAct->isChecked())
-  {
-    this->SetSnapMode("link");
-  }
-  else
-  {
-    this->SetSnapMode("model");
-  }
 }
 
 /////////////////////////////////////////////////
@@ -208,9 +199,9 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
     // Select first triangle on any mesh
     // Update triangle if the new triangle is on the same model/link
     if (!this->dataPtr->selectedVis ||
-        (this->dataPtr->snapMode == "model" &&
+        (this->dataPtr->snapLevel == "model" &&
         vis->GetRootVisual()  == this->dataPtr->selectedVis->GetRootVisual())
-        || (this->dataPtr->snapMode == "link" &&
+        || (this->dataPtr->snapLevel == "link" &&
         vis->GetParent() == this->dataPtr->selectedVis->GetParent()))
     {
       math::Vector3 intersect;
@@ -238,7 +229,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 
       if (!vertices.empty())
       {
-        if (this->dataPtr->snapMode == "model")
+        if (this->dataPtr->snapLevel == "model")
         {
           this->Snap(this->dataPtr->selectedTriangle, vertices,
               this->dataPtr->selectedVis->GetRootVisual());
@@ -452,7 +443,7 @@ void ModelSnap::Update()
 }
 
 /////////////////////////////////////////////////
-void ModelSnap::SetSnapMode(const std::string &_snapMode)
+void ModelSnap::SetSnapLevel(const std::string &_snapLevel)
 {
-  this->dataPtr->snapMode = _snapMode;
+  this->dataPtr->snapLevel = _snapLevel;
 }

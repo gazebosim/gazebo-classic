@@ -612,16 +612,18 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   }
   else if (vis && this->allParts.find(vis->GetName()) != this->allParts.end())
   {
-    // In mouse normal mode, let users select a part if the parent model
-    // is currently selected.
-    if (this->selectedVis)
-      this->selectedVis->SetHighlighted(false);
-    else
-      event::Events::setSelectedEntity("", "normal");
+//    // In mouse normal mode, let users select a part if the parent model
+//    // is currently selected.
+//    if (this->selectedVis)
+//      this->selectedVis->SetHighlighted(false);
+//    else
+//      event::Events::setSelectedEntity("", "normal");
 
-    this->selectedVis = vis;
-    this->selectedVis->SetHighlighted(true);
-    return true;
+//    this->selectedVis = vis;
+//    this->selectedVis->SetHighlighted(true);
+
+
+//    return true;
   }
   else if (vis && this->allParts.find(vis->GetName()) == this->allParts.end())
   {
