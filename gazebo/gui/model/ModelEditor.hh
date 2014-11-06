@@ -40,7 +40,7 @@ namespace gazebo
       /// \brief Destuctor.
       public: virtual ~ModelEditor();
 
-      /// \brief QT callback when entering building edit mode
+      /// \brief QT callback when entering model edit mode
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
