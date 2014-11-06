@@ -124,10 +124,28 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (_sdf->HasElement("axis"))
+  for (unsigned int index = 0; index < this->GetAngleCount(); ++index)
   {
-    const unsigned int index = 0;
-    sdf::ElementPtr axisElem = _sdf->GetElement("axis");
+    std::string axisName;
+    if (index == 0)
+    {
+      axisName = "axis";
+    }
+    else if (index == 1)
+    {
+      axisName = "axis2";
+    }
+    else
+    {
+      gzerr << "Invalid axis count" << std::endl;
+      continue;
+    }
+
+    if (!_sdf->HasElement(axisName))
+    {
+      continue;
+    }
+    sdf::ElementPtr axisElem = _sdf->GetElement(axisName);
     {
       std::string param = "use_parent_model_frame";
       // Check if "use_parent_model_frame" element exists.
@@ -144,57 +162,6 @@ void Joint::Load(sdf::ElementPtr _sdf)
       {
         double reference = 0;
         double stiffness = 0;
-        if (dynamicsElem->HasElement("spring_reference"))
-        {
-          reference = dynamicsElem->Get<double>("spring_reference");
-        }
-        if (dynamicsElem->HasElement("spring_stiffness"))
-        {
-          stiffness = dynamicsElem->Get<double>("spring_stiffness");
-        }
-        this->SetStiffnessDamping(index, stiffness,
-            dynamicsElem->Get<double>("damping"), reference);
-
-        if (dynamicsElem->HasElement("friction"))
-        {
-          this->SetParam("friction", index,
-            dynamicsElem->Get<double>("friction"));
-        }
-      }
-    }
-    if (axisElem->HasElement("limit"))
-    {
-      sdf::ElementPtr limitElem = axisElem->GetElement("limit");
-
-      // store upper and lower joint limits
-      this->upperLimit[index] = limitElem->Get<double>("upper");
-      this->lowerLimit[index] = limitElem->Get<double>("lower");
-      // store joint stop stiffness and dissipation coefficients
-      this->stopStiffness[index] = limitElem->Get<double>("stiffness");
-      this->stopDissipation[index] = limitElem->Get<double>("dissipation");
-      // store joint effort and velocity limits
-      this->effortLimit[index] = limitElem->Get<double>("effort");
-      this->velocityLimit[index] = limitElem->Get<double>("velocity");
-    }
-  }
-  if (_sdf->HasElement("axis2"))
-  {
-    const unsigned int index = 1;
-    sdf::ElementPtr axisElem = _sdf->GetElement("axis2");
-    {
-      std::string param = "use_parent_model_frame";
-      if (axisElem->HasElement(param))
-      {
-        this->axisParentModelFrame[index] = axisElem->Get<bool>(param);
-      }
-
-      // Axis dynamics
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-      if (dynamicsElem)
-      {
-        double reference = 0;
-        double stiffness = 0;
-
         if (dynamicsElem->HasElement("spring_reference"))
         {
           reference = dynamicsElem->Get<double>("spring_reference");
