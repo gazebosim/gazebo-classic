@@ -358,11 +358,11 @@ double ODEUniversalJoint::GetParam(
     }
     else if (_key == "hi_stop")
     {
-      return ODEJoint::GetParam(dParamHiStop | group);
+      return this->GetHighStop(_index).Radian();
     }
     else if (_key == "lo_stop")
     {
-      return ODEJoint::GetParam(dParamLoStop | group);
+      return this->GetLowStop(_index).Radian();
     }
     else
     {
