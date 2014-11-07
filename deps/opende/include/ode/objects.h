@@ -498,6 +498,22 @@ ODE_API dReal dWorldGetQuickStepW (dWorldID);
  */
 ODE_API dReal dWorldGetQuickStepRMSError (dWorldID);
 
+/* PGS experimental parameters */
+
+/**
+ * @brief Get option to turn on inertia ratio reduction.
+ * @ingroup world
+ */
+ODE_API bool dWorldGetQuickStepInertiaRatioReduction (dWorldID);
+
+
+/**
+ * @brief Option to turn on inertia ratio reduction.
+ * @ingroup world
+ * @param irr set to true to turn on inertia ratio reduction.
+ */
+ODE_API void dWorldSetQuickStepInertiaRatioReduction (dWorldID, bool irr);
+
 /* World contact parameter functions */
 
 /**
