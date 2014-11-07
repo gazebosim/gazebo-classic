@@ -113,10 +113,12 @@ void ModelControlPlugin::OnControlResponse(gazebo::msgs::ControlResponse &_msg)
   // pass response efforts to joints
   for (int i = 0; i < _msg.torques().size(); ++i)
   {
+    /*
     gzerr << i << " : "
           << this->joints[this->jointId[i]]->GetName()
           << " : " << _msg.torques(i)
           << "\n";
+    */
     this->joints[this->jointId[i]]->SetForce(0, _msg.torques(i));
   }
  
