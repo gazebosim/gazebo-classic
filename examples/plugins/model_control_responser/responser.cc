@@ -44,9 +44,9 @@ void callback(const std::string &_topic,
   const gazebo::msgs::ControlRequest &_req,
   gazebo::msgs::ControlResponse &_res, bool &_result)
 {
-  std::cout << "responding\n";
   // Dump the message contents to stdout.
-  std::cout << _req.DebugString();
+  // std::cout << "responding\n";
+  // std::cout << _req.DebugString();
 
   std::vector<unsigned int> jIndex;
   std::vector<unsigned int> uIndex, qIndex;
@@ -86,6 +86,15 @@ void callback(const std::string &_topic,
                   _req.target_pos().z());
   m_modelTasks.setTarget(target_pos);
 
+  // get endeffector position from message
+  gazebo::msgs::Vector3d endEffectorPos = _req.end_effector_pos();
+
+  SimTK::Vec3 e(endEffectorPos.x(),
+                endEffectorPos.y(),
+                endEffectorPos.z());
+
+  m_modelRobot.setSampledEndEffectorPos(m_modelState, e);
+
   // get pelvis pose from message
   gazebo::msgs::Pose pelvisPose = _req.pelvis_pose();
 
@@ -117,7 +126,7 @@ void callback(const std::string &_topic,
   // publish joint torques
   _res.set_name("response");
   _res.clear_torques();
-  _res.add_torques(0); // for the world_joint
+  // _res.add_torques(0); // for the world_joint
   for (unsigned int i = 0; i < uIndex.size(); ++i)
   {
     // std::cout << i << " : " << tau[i] << "\n";
@@ -145,10 +154,37 @@ int main(int _argc, char **_argv)
   // Busy wait loop...replace with your own code as needed.
   while(c != 'q')
   {
-    std::cout << "press g to toggle gravity";
+    std::cout << "press: g to toggle gravity\n"
+              << "       t to toggle task (end effector tracking)\n"
+              << "       p to toggle pose control\n>";
     c = getchar();
     if (c == 'g')
+    {
       m_modelTasks.toggleGravityComp();
+    }
+    else if (c == 't')
+    {
+      m_modelTasks.toggleTask();
+    }
+    else if (c == 'p')
+    {
+      m_modelTasks.togglePoseControl();
+    }
+    // print out status
+    std::cout << "-------------------------------\n";
+    if (m_modelTasks.isGravityCompensationOn())
+      std::cout << "Gravity compensation is now on.\n";
+    else
+      std::cout << "Gravity compensation is now off.\n";
+    if (m_modelTasks.isTaskPointFollowingOn())
+      std::cout << "Task point following is now on.\n";
+    else
+      std::cout << "Task point following is now off.\n";
+    if (m_modelTasks.isPoseControlOn())
+      std::cout << "Pose control is now on.\n";
+    else
+      std::cout << "Pose control is now off.\n";
+    std::cout << "-------------------------------\n";
   }
   std::cout << "exit!";
 }

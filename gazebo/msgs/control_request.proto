@@ -19,6 +19,8 @@ message ControlRequest
 
   required Pose pelvis_pose    = 20;
 
+  required Vector3d end_effector_pos    = 21;
+
   required Vector3d target_pos = 32;
 }
 

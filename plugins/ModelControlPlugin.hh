@@ -88,6 +88,9 @@ namespace gazebo
     /// \brief capturing atlas pelvis pose
     private: physics::LinkPtr pelvisLink;
 
+    /// \brief capturing atlas right hand link
+    private: physics::LinkPtr endEffectorLink;
+
     /// \brief synchronization mechanism
     private: boost::condition_variable delayCondition;
 

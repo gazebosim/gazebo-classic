@@ -54,6 +54,8 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
 
   this->pelvisLink = this->model->GetLink("pelvis");
 
+  this->endEffectorLink = this->model->GetLink("r_hand");
+
   this->joints = this->model->GetJoints();
   this->links = this->model->GetLinks();
   /*
@@ -160,6 +162,19 @@ void ModelControlPlugin::RequestControl()
   // set pelvis pose
   gazebo::msgs::Set(req.mutable_pelvis_pose(),
     this->pelvisLink->GetWorldPose());
+
+  // set end effector
+  // offset from endEffectorLink from endEffectorLink origin
+  //in endEffectorLink frame, this should match the
+  // controller m_endEffectorStation in Atlas.cpp
+  gazebo::math::Vector3 endEffectorStation(0, -.15, 0);
+  // rotate local offset into world frame
+  gazebo::math::Pose endEffectorPose = this->endEffectorLink->GetWorldPose();
+  gazebo::math::Vector3 endEffectorPosWorld =
+    endEffectorPose.rot.RotateVectorReverse(endEffectorStation) +
+    endEffectorPose.pos;
+  gazebo::msgs::Set(req.mutable_end_effector_pos(),
+    endEffectorPosWorld);
 
   // set target position
   gazebo::msgs::Set(req.mutable_target_pos(),
