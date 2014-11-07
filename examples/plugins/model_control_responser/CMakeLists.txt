@@ -25,7 +25,7 @@ link_directories(
   ${Simbody_LIB_DIR}
   ${GAZEBO_LIBRARY_DIRS})
 
-add_executable(responser responser.cc UR10.h UR10.cpp)
+add_executable(responser responser.cc URDFReader.h URDFReader.cpp Atlas.h Atlas.cpp TaskSpace.h TaskSpace.cpp task_measure.h)
 target_link_libraries(responser
   ${IGNITION-TRANSPORT_LIBRARIES}
   gazebo_msgs #${GAZEBO_LIBRARIES}

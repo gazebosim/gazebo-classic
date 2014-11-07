@@ -18,10 +18,10 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
-#include "gazebo/common/Assert.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/sensors/ContactSensor.hh"
+#include <gazebo/common/Assert.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/sensors/SensorManager.hh>
+#include <gazebo/sensors/ContactSensor.hh>
 #include "plugins/ModelControlPlugin.hh"
 
 using namespace gazebo;
@@ -51,6 +51,8 @@ void ModelControlPlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_sdf, "ModelControlPlugin _sdf pointer is NULL");
 
   this->targetModel = this->world->GetModel("box");
+
+  this->pelvisLink = this->model->GetLink("pelvis");
 
   this->joints = this->model->GetJoints();
   this->links = this->model->GetLinks();
@@ -109,7 +111,11 @@ void ModelControlPlugin::OnControlResponse(gazebo::msgs::ControlResponse &_msg)
   // pass response efforts to joints
   for (int i = 0; i < _msg.torques().size(); ++i)
   {
-    this->joints[i]->SetForce(0, _msg.torques(i));
+    gzerr << i << " : "
+          << this->joints[this->jointId[i]]->GetName()
+          << " : " << _msg.torques(i)
+          << "\n";
+    this->joints[this->jointId[i]]->SetForce(0, _msg.torques(i));
   }
  
   /* 
@@ -138,12 +144,24 @@ void ModelControlPlugin::RequestControl()
   req.clear_joint_names();
   req.clear_joint_pos();
   req.clear_joint_vel();
+  this->jointId.clear();
   for (unsigned int i = 0; i < this->joints.size(); ++i)
   {
-    req.add_joint_names(this->joints[i]->GetName());
-    req.add_joint_pos(this->joints[i]->GetAngle(0).Radian());
-    req.add_joint_vel(this->joints[i]->GetVelocity(0));
+    // pluck pelvis and up, no legs
+    if (this->joints[i]->GetName().find("_leg_") == std::string::npos)
+    {
+      this->jointId.push_back(i);
+      req.add_joint_names(this->joints[i]->GetName());
+      req.add_joint_pos(this->joints[i]->GetAngle(0).Radian());
+      req.add_joint_vel(this->joints[i]->GetVelocity(0));
+    }
   }
+
+  // set pelvis pose
+  gazebo::msgs::Set(req.mutable_pelvis_pose(),
+    this->pelvisLink->GetWorldPose());
+
+  // set target position
   gazebo::msgs::Set(req.mutable_target_pos(),
     this->targetModel->GetWorldPose().pos);
 
@@ -159,7 +177,7 @@ void ModelControlPlugin::RequestControl()
   bool executed = false;
   while(!executed)
   {
-    executed = this->node.Request("/" + this->model->GetName() +
+    executed = this->node.Request(/*"/" + this->model->GetName() +*/
                                   "/control_request",
                                   req, timeout, res, result);
     if (executed)

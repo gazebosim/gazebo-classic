@@ -24,10 +24,10 @@
 
 #include <boost/thread/condition.hpp>
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/common/Plugin.hh>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/msgs/MessageTypes.hh>
+#include <gazebo/util/system.hh>
 
 namespace gazebo
 {
@@ -85,8 +85,14 @@ namespace gazebo
     private: gazebo::msgs::ControlResponse controlResponse;
     private: physics::ModelPtr targetModel;
 
+    /// \brief capturing atlas pelvis pose
+    private: physics::LinkPtr pelvisLink;
+
     /// \brief synchronization mechanism
     private: boost::condition_variable delayCondition;
+
+    /// \brief joint ids without legs
+    private: std::vector<unsigned int> jointId;
   };
 }
 #endif

@@ -5,6 +5,7 @@ package gazebo.msgs;
 /// \brief A control request
 
 import "vector3d.proto";
+import "pose.proto";
 import "quaternion.proto";
 
 message ControlRequest
@@ -15,6 +16,8 @@ message ControlRequest
   repeated string joint_names  = 10;
   repeated double joint_pos    = 12;
   repeated double joint_vel    = 14;
+
+  required Pose pelvis_pose    = 20;
 
   required Vector3d target_pos = 32;
 }
