@@ -1613,6 +1613,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
   const unsigned int TEXCOORD = 2;
+  unsigned int otherSemantics = TEXCOORD + 1;
   bool hasVertices = false;
   bool hasNormals = false;
   bool hasTexcoords = false;
@@ -1655,8 +1656,9 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
     else
     {
+      inputs[otherSemantics++] = math::parseInt(offset);
       gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
-          << "not supported" << std::endl;
+          << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
     offsetSize++;
