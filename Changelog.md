@@ -17,6 +17,8 @@
     * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 1. Added ConvertJointType functions, display more joint info on model list.
     * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
+1. Added ModelListWidget::AddProperty, removed unnecessary checks on ModelListWidget.
+    * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
 1. Fix loading collada meshes with unsupported input semantics.
     * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
 
