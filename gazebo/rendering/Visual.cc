@@ -1839,7 +1839,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
   }
 }
 
-
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const std::string &_meshName,
                         const std::string &_subMesh,
