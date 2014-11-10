@@ -58,9 +58,11 @@ TEST_F(Visual_TEST, BoundingBox)
   ASSERT_TRUE(visual);
 
   // verify initial bounding box
+  math::Vector3 bboxMin(-0.5, -0.5, -0.5);
+  math::Vector3 bboxMax(0.5, 0.5, 0.5);
   math::Box boundingBox = visual->GetBoundingBox();
-  EXPECT_EQ(boundingBox.min, math::Vector3(-0.5, -0.5, -0.5));
-  EXPECT_EQ(boundingBox.max, math::Vector3(0.5, 0.5, 0.5));
+  EXPECT_EQ(boundingBox.min, bboxMin);
+  EXPECT_EQ(boundingBox.max, bboxMax);
 
   // verify scale
   math::Vector3 scale = visual->GetScale();
@@ -75,14 +77,12 @@ TEST_F(Visual_TEST, BoundingBox)
   EXPECT_EQ(newScale, scaleToSet);
   EXPECT_EQ(newScale, math::Vector3(2, 3, 4));
 
-  // verify local bounding box dimensions remain the same
-  math::Box newBoundingBox = visual->GetBoundingBox();
-  EXPECT_EQ(newBoundingBox.min, math::Vector3(-0.5, -0.5, -0.5));
-  EXPECT_EQ(newBoundingBox.max, math::Vector3(0.5, 0.5, 0.5));
-
   // verify scaled bounding box dimensions
-  EXPECT_EQ(scaleToSet*newBoundingBox.min, math::Vector3(-1, -1.5, -2));
-  EXPECT_EQ(scaleToSet*newBoundingBox.max, math::Vector3(1, 1.5, 2));
+  math::Box newBoundingBox = visual->GetBoundingBox();
+  EXPECT_EQ(newBoundingBox.min, newScale*bboxMin);
+  EXPECT_EQ(newBoundingBox.max, newScale*bboxMax);
+  EXPECT_EQ(newBoundingBox.min, math::Vector3(-1, -1.5, -2));
+  EXPECT_EQ(newBoundingBox.max, math::Vector3(1, 1.5, 2));
 }
 
 /////////////////////////////////////////////////
