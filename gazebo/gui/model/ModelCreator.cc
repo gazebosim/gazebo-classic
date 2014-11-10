@@ -66,7 +66,6 @@ ModelCreator::ModelCreator()
   this->jointMaker = new JointMaker();
 
   connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
-
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
 
@@ -89,31 +88,26 @@ ModelCreator::~ModelCreator()
 /////////////////////////////////////////////////
 void ModelCreator::OnEdit(bool _checked)
 {
-  // Toggle event filters
   if (_checked)
   {
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
+
+    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseRelease, this, _1));
 
     MouseEventHandler::Instance()->AddMoveFilter("model_creator",
         boost::bind(&ModelCreator::OnMouseMove, this, _1));
 
     MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
         boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
-
-    MouseEventHandler::Instance()->AddPressFilter("model_creator",
-        boost::bind(&ModelCreator::OnMousePress, this, _1));
-
-    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
-        boost::bind(&ModelCreator::OnMouseRelease, this, _1));
   }
   else
   {
     KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
-    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
     this->jointMaker->Stop();
   }
 }
@@ -568,28 +562,6 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
-{
-  if (this->mouseVisual)
-    return false;
-
-  rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis && this->allParts.find(vis->GetName()) != this->allParts.end())
-  {
-    // Propagate event if it's an editor part
-    return false;
-  }
-  else if (vis && this->allParts.find(vis->GetName()) == this->allParts.end())
-  {
-    // If it's another model, send event to OrbitViewController only
-    userCamera->HandleMouseEvent(_event);
-    return true;
-  }
-  return false;
-}
-
-/////////////////////////////////////////////////
 bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
@@ -603,31 +575,32 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::UserCameraPtr userCamera = gui::get_active_camera();
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis && vis->IsPlane())
+  // In mouse normal mode, let users select a part if the parent model
+  // is currently selected.
+  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  if (vis)
   {
-    // Propagate event if it's the ground plane
-    return false;
-  }
-  else if (vis && this->allParts.find(vis->GetName()) != this->allParts.end())
-  {
-    // In mouse normal mode, let users select a part if the parent model
-    // is currently selected.
-    if (this->selectedVis)
-      this->selectedVis->SetHighlighted(false);
-    else
-      event::Events::setSelectedEntity("", "normal");
+    if (this->allParts.find(vis->GetName()) !=
+        this->allParts.end())
+    {
+      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
+          == this->modelVisual || this->selectedVis)
+      {
+        if (this->selectedVis)
+          this->selectedVis->SetHighlighted(false);
+        else
+          event::Events::setSelectedEntity("", "normal");
 
-    this->selectedVis = vis;
-    this->selectedVis->SetHighlighted(true);
-    return true;
-  }
-  else if (vis && this->allParts.find(vis->GetName()) == this->allParts.end())
-  {
-    // Suppress event if it's another model
-    userCamera->HandleMouseEvent(_event);
-    return true;
+        this->selectedVis = vis;
+        this->selectedVis->SetHighlighted(true);
+        return true;
+      }
+    }
+    else if (this->selectedVis)
+    {
+      this->selectedVis->SetHighlighted(false);
+      this->selectedVis.reset();
+    }
   }
   return false;
 }
