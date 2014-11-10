@@ -575,33 +575,33 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-  // In mouse normal mode, let users select a part if the parent model
-  // is currently selected.
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
-  if (vis)
-  {
-    if (this->allParts.find(vis->GetName()) !=
-        this->allParts.end())
-    {
-      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
-          == this->modelVisual || this->selectedVis)
-      {
-        if (this->selectedVis)
-          this->selectedVis->SetHighlighted(false);
-        else
-          event::Events::setSelectedEntity("", "normal");
+//  // In mouse normal mode, let users select a part if the parent model
+//  // is currently selected.
+//  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+//  if (vis)
+//  {
+//    if (this->allParts.find(vis->GetName()) !=
+//        this->allParts.end())
+//    {
+//      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
+//          == this->modelVisual || this->selectedVis)
+//      {
+//        if (this->selectedVis)
+//          this->selectedVis->SetHighlighted(false);
+//        else
+//          event::Events::setSelectedEntity("", "normal");
 
-        this->selectedVis = vis;
-        this->selectedVis->SetHighlighted(true);
-        return true;
-      }
-    }
-    else if (this->selectedVis)
-    {
-      this->selectedVis->SetHighlighted(false);
-      this->selectedVis.reset();
-    }
-  }
+//        this->selectedVis = vis;
+//        this->selectedVis->SetHighlighted(true);
+//        return true;
+//      }
+//    }
+//    else if (this->selectedVis)
+//    {
+//      this->selectedVis->SetHighlighted(false);
+//      this->selectedVis.reset();
+//    }
+//  }
   return false;
 }
 

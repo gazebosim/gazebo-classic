@@ -60,6 +60,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
+  this->levelOfManipulation = "model";
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -147,6 +148,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnModelEditor(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -662,9 +666,17 @@ void GLWidget::OnMouseReleaseNormal()
       this->userCamera->GetVisual(this->mouseEvent.pos);
     if (vis)
     {
-      vis = vis->GetRootVisual();
-      this->SetSelectedVisual(vis);
-      event::Events::setSelectedEntity(vis->GetName(), "normal");
+      if (this->levelOfManipulation == "model")
+      {
+        vis = vis->GetRootVisual();
+//        this->SetSelectedVisual(vis);
+        event::Events::setSelectedEntity(vis->GetName(), "normal");
+      }
+      else
+      {
+        vis = vis->GetParent();
+        this->SetSelectedVisual(vis);
+      }
 
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
@@ -1138,4 +1150,19 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 {
   ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
       _target, !_preview);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnModelEditor(bool _checked)
+{
+  if (_checked)
+    this->SetLevelOfManipulation("link");
+  else
+    this->SetLevelOfManipulation("model");
+}
+
+/////////////////////////////////////////////////
+void GLWidget::SetLevelOfManipulation(std::string _level)
+{
+  this->levelOfManipulation = _level;
 }

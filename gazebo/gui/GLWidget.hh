@@ -169,11 +169,19 @@ namespace gazebo
       /// \param[in] _name Name of entity to be pasted.
       private: void Paste(const std::string &_name);
 
+      /// \brief Set the level of manipulation
+      /// \param[in] _level Level of manipulation.
+      private: void SetLevelOfManipulation(std::string _level);
+
       /// \brief Qt callback when the copy action is triggered.
       private slots: void OnCopy();
 
       /// \brief Qt callback when the paste action is triggered.
       private slots: void OnPaste();
+
+      /// \brief Qt callback when the model editor action is toggled.
+      /// \param[in] _checked True if the model editor was checked.
+      private slots: void OnModelEditor(bool _checked);
 
       private: int windowId;
 
@@ -225,6 +233,10 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief Indicates whether to manipulate entire models ("model")
+      /// or individual links ("link").
+      private: std::string levelOfManipulation;
     };
   }
 }
