@@ -115,8 +115,7 @@ set (gtest_sources_dri
   Visual_TEST.cc
 )
 
-#gz_build_dri_tests(${gtest_sources_dri})
-gz_build_display_tests(${gtest_sources_dri})
+gz_build_dri_tests(${gtest_sources_dri})
 
 set (rendering_headers "" CACHE INTERNAL "rendering headers" FORCE)
 foreach (hdr ${headers})
