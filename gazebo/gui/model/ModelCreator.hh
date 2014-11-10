@@ -161,6 +161,11 @@ namespace gazebo
       /// \param[in] _checked True if the menu item is checked
       private slots: void OnEdit(bool _checked);
 
+      /// \brief Mouse event filter callback when mouse is pressed.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
       /// \brief Mouse event filter callback when mouse is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled

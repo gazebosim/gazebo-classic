@@ -93,6 +93,9 @@ void ModelCreator::OnEdit(bool _checked)
     KeyEventHandler::Instance()->AddPressFilter("model_creator",
         boost::bind(&ModelCreator::OnKeyPress, this, _1));
 
+    MouseEventHandler::Instance()->AddPressFilter("model_creator",
+        boost::bind(&ModelCreator::OnMousePress, this, _1));
+
     MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
         boost::bind(&ModelCreator::OnMouseRelease, this, _1));
 
@@ -105,6 +108,7 @@ void ModelCreator::OnEdit(bool _checked)
   else
   {
     KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
     MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
@@ -562,6 +566,27 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
+bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    {
+      // Prevent interaction with other models, send event only to
+      // OrbitViewController
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
@@ -575,33 +600,21 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
-//  // In mouse normal mode, let users select a part if the parent model
-//  // is currently selected.
-//  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
-//  if (vis)
-//  {
-//    if (this->allParts.find(vis->GetName()) !=
-//        this->allParts.end())
-//    {
-//      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
-//          == this->modelVisual || this->selectedVis)
-//      {
-//        if (this->selectedVis)
-//          this->selectedVis->SetHighlighted(false);
-//        else
-//          event::Events::setSelectedEntity("", "normal");
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
 
-//        this->selectedVis = vis;
-//        this->selectedVis->SetHighlighted(true);
-//        return true;
-//      }
-//    }
-//    else if (this->selectedVis)
-//    {
-//      this->selectedVis->SetHighlighted(false);
-//      this->selectedVis.reset();
-//    }
-//  }
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis)
+  {
+    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    {
+      // Prevent interaction with other models, send event only to
+      // OrbitViewController
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+  }
   return false;
 }
 
