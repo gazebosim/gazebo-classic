@@ -89,7 +89,7 @@
       </link>
       <joint name="joint_0" type="revolute">
         <parent>world</parent>
-        <child>link_1</child>
+        <child>link_pendulum_rod</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <xyz>1.0 0.0 0.0</xyz>
@@ -144,8 +144,8 @@
         </sensor>
       </link>
       <joint name="joint_1" type="revolute">
-        <parent>link_1</parent>
-        <child>link_2</child>
+        <parent>link_pendulum_rod</parent>
+        <child>link_pendulum_ball</child>
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>

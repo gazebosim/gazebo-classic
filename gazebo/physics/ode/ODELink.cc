@@ -42,6 +42,8 @@ ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
   this->linkId = NULL;
+  this->force.Set(0, 0, 0);
+  this->torque.Set(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
@@ -190,6 +192,26 @@ void ODELink::MoveCallback(dBodyID _id)
   self->world->dirtyPoses.push_back(self);
 
   // self->poseMutex->unlock();
+
+  // get force and applied to this body
+  if (_id)
+  {
+    const dReal *dforce;
+
+    dforce = dBodyGetForce(_id);
+
+    self->force.x = dforce[0];
+    self->force.y = dforce[1];
+    self->force.z = dforce[2];
+
+    const dReal *dtorque;
+
+    dtorque = dBodyGetTorque(_id);
+
+    self->torque.x = dtorque[0];
+    self->torque.y = dtorque[1];
+    self->torque.z = dtorque[2];
+  }
 }
 
 //////////////////////////////////////////////////
@@ -612,51 +634,13 @@ void ODELink::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldForce() const
 {
-  math::Vector3 force;
-
-  if (this->linkId)
-  {
-    const dReal *dforce;
-
-    dforce = dBodyGetForce(this->linkId);
-
-    force.x = dforce[0];
-    force.y = dforce[1];
-    force.z = dforce[2];
-  }
-  else if (!this->IsStatic())
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldForce returns default of "
-          << force << std::endl;
-  }
-
-  return force;
+  return this->force;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 ODELink::GetWorldTorque() const
 {
-  math::Vector3 torque;
-
-  if (this->linkId)
-  {
-    const dReal *dtorque;
-
-    dtorque = dBodyGetTorque(this->linkId);
-
-    torque.x = dtorque[0];
-    torque.y = dtorque[1];
-    torque.z = dtorque[2];
-  }
-  else if (!this->IsStatic())
-  {
-    gzlog << "ODE body for link [" << this->GetScopedName() << "]"
-          << " does not exist, GetWorldTorque returns default of "
-          << torque << std::endl;
-  }
-
-  return torque;
+  return this->torque;
 }
 
 //////////////////////////////////////////////////
