@@ -76,10 +76,10 @@ void JointMaker::Reset()
     return;
 
   this->newJointCreated = false;
-  if (mouseJoint)
+  if (this->mouseJoint)
   {
-    delete mouseJoint;
-    mouseJoint = NULL;
+    delete this->mouseJoint;
+    this->mouseJoint = NULL;
   }
 
   this->jointType = JointMaker::JOINT_NONE;
