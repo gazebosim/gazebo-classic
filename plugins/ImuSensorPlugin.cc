@@ -41,6 +41,13 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
   this->parentSensor =
     boost::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
+  this->world = physics::get_world(_parent->GetWorldName());
+  this->entity = this->world->GetEntity(_parent->GetParentName());
+  this->link = boost::dynamic_pointer_cast<physics::Link>(this->entity);
+
+  if (!this->link)
+    gzthrow("Imu sensor parent is not a Link.");
+
   if (!this->parentSensor)
     gzthrow("ImuSensorPlugin requires a imu sensor as its parent.");
 
@@ -52,7 +59,11 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
 void ImuSensorPlugin::OnUpdate(sensors::ImuSensorPtr _sensor)
 {
   // overload with useful callback here
-  gzdbg << _sensor->GetName()
-        << " [" << _sensor->GetLinearAcceleration()
+  gzdbg << _sensor->GetName() << " :\n"
+        << "  sensor linear accel [" << _sensor->GetLinearAcceleration()
+        << "]\n  Link::GetRelativeLinearAccel() ["
+        << this->link->GetRelativeLinearAccel()
+        << "]\n  Link::GetWorldLinearAccel() ["
+        << this->link->GetWorldLinearAccel()
         << "]\n";
 }

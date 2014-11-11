@@ -41,9 +41,9 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <model name="model_1">
+    <model name="model_pendulum">
       <pose>0.0 0.0 10.2 1.57079633 0.0 0.0</pose>
-      <link name="link_1">
+      <link name="link_pendulum_rod">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
@@ -95,7 +95,7 @@
           <xyz>1.0 0.0 0.0</xyz>
         </axis>
       </joint>
-      <link name="link_2">
+      <link name="link_pendulum_ball">
         <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
         <inertial>
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
@@ -136,9 +136,9 @@
         <gravity>true</gravity>
         <self_collide>true</self_collide>
         <kinematic>false</kinematic>
-        <sensor name="imu_sensor" type="imu">
+        <sensor name="pendulum_imu_sensor" type="imu">
           <always_on>1</always_on>
-          <plugin name="imu_sensor_plugin" filename="libImuSensorPlugin.so">
+          <plugin name="pendulum_imu_sensor_plugin" filename="libImuSensorPlugin.so">
             <custom>1</custom>
           </plugin>
         </sensor>
