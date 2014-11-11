@@ -31,15 +31,18 @@
           <contact_surface_layer>0.00000</contact_surface_layer>
         </constraints>
       </bullet>
-      <real_time_update_rate>0.000000</real_time_update_rate>
+      <real_time_update_rate>100.000000</real_time_update_rate>
       <max_step_size>0.001</max_step_size>
     </physics>
     <include>
       <uri>model://sun</uri>
     </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
 
     <model name="model_1">
-      <pose>0.0 0.0 10.1 1.57079633 0.0 0.0</pose>
+      <pose>0.0 0.0 10.2 1.57079633 0.0 0.0</pose>
       <link name="link_1">
         <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <inertial>
@@ -156,5 +159,168 @@
       </joint>
       <static>false</static>
     </model>
+
+
+    <model name="model_ramp">
+      <pose>3.0 0.0 1.0 0.0 0.5 0.0</pose>
+      <link name="link_ramp">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 -10.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>5.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <box>
+              <size>5 5 0.01</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <box>
+              <size>5 5 0.01</size>
+            </box>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+      </link>
+      <static>true</static>
+    </model>
+
+    <model name="model_ball">
+      <pose>2.0 -0.5 10.0 0.0 0.0 0.0</pose>
+      <link name="link_ball">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>5.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.3</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <sphere>
+              <radius>0.3</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+        <sensor name="ball_imu_sensor" type="imu">
+          <always_on>1</always_on>
+          <plugin name="ball_imu_sensor_plugin" filename="libImuSensorPlugin.so">
+            <custom>1</custom>
+          </plugin>
+        </sensor>
+      </link>
+      <static>false</static>
+    </model>
+
+    <model name="model_ball_no_friction">
+      <pose>2.0 0.5 10.0 0.0 0 0.0</pose>
+      <link name="link_ball_no_friction">
+        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+        <inertial>
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <inertia>
+            <ixx>1e-1</ixx>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyy>1e-1</iyy>
+            <iyz>0.0</iyz>
+            <izz>1e-1</izz>
+          </inertia>
+          <mass>5.0</mass>
+        </inertial>
+        <velocity_decay>
+          <linear>0.0</linear>
+          <angular>0.0</angular>
+        </velocity_decay>
+        <visual name="visual_sphere">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <geometry>
+            <sphere>
+              <radius>0.3</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>Gazebo/Green</script>
+          </material>
+        </visual>
+        <collision name="collision_cylinder">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <max_contacts>250</max_contacts>
+          <geometry>
+            <sphere>
+              <radius>0.3</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0</mu>
+                <mu2>0</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <gravity>true</gravity>
+        <self_collide>true</self_collide>
+        <kinematic>false</kinematic>
+        <sensor name="ball_no_friction_imu_sensor" type="imu">
+          <always_on>1</always_on>
+          <plugin name="ball_no_friction_imu_sensor_plugin" filename="libImuSensorPlugin.so">
+            <custom>1</custom>
+          </plugin>
+        </sensor>
+      </link>
+      <static>false</static>
+    </model>
+
   </world>
 </sdf>
