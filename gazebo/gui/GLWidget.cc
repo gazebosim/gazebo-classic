@@ -669,13 +669,14 @@ void GLWidget::OnMouseReleaseNormal()
       if (this->levelOfManipulation == "model")
       {
         vis = vis->GetRootVisual();
+//        this->SetSelectedVisual(vis);
+        event::Events::setSelectedEntity(vis->GetName(), "normal");
       }
       else
       {
         vis = vis->GetParent();
+        this->SetSelectedVisual(vis);
       }
-      this->SetSelectedVisual(vis);
-      event::Events::setSelectedEntity(vis->GetName(), "normal");
 
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
@@ -1164,5 +1165,6 @@ void GLWidget::OnModelEditor(bool _checked)
 void GLWidget::SetLevelOfManipulation(std::string _level)
 {
   this->levelOfManipulation = _level;
+  ModelManipulator::Instance()->SetLevelOfManipulation(_level);
   ModelSnap::Instance()->SetSnapLevel(_level);
 }

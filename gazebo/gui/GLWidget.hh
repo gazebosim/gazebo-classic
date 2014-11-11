@@ -227,16 +227,16 @@ namespace gazebo
 
       private: std::list<std::pair<std::string, math::Pose> > moveHistory;
 
-      /// \brief Indicates whether to manipulate entire models ("model")
-      /// or individual links ("link").
-      private: std::string levelOfManipulation;
-
       /// \brief Name of entity that is being copied.
       private: std::string copyEntityName;
 
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief Indicates whether to manipulate entire models ("model")
+      /// or individual links ("link").
+      private: std::string levelOfManipulation;
     };
   }
 }
