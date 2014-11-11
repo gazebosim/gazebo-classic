@@ -19,6 +19,8 @@
     * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
 1. Added ModelListWidget::AddProperty, removed unnecessary checks on ModelListWidget.
     * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
+1. Fix loading collada meshes with unsupported input semantics.
+    * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
@@ -70,7 +72,7 @@
     * [Pull request #1074](https://bitbucket.org/osrf/gazebo/pull-request/1074)
     * [Pull request #1136](https://bitbucket.org/osrf/gazebo/pull-request/1136)
     * [Pull request #1139](https://bitbucket.org/osrf/gazebo/pull-request/1139)
-1. Updated Base::GetScopedName 
+1. Updated Base::GetScopedName
     * [Pull request #1104](https://bitbucket.org/osrf/gazebo/pull-request/1104)
 1. Fix collada loader from adding duplicate materials into a Mesh
     * [Pull request #1105](https://bitbucket.org/osrf/gazebo/pull-request/1105)
