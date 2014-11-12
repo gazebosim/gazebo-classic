@@ -205,8 +205,11 @@ void SimbodyLink::OnPoseChange()
   //   this->simbodyPhysics->integ->updAdvancedState()))
   //       << "]\n";
 
+  gzerr << "1\n";
   if (!this->masterMobod.isGround())
   {
+    boost::recursive_mutex::scoped_lock lock(
+      *this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex());
     if (this->masterMobod.getParentMobilizedBody().isGround())
     {
       /// If parent is ground:
