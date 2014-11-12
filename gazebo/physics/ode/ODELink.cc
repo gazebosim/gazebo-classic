@@ -370,16 +370,14 @@ void ODELink::UpdateMass()
       principals.x, principals.y, principals.z,
       products.x, products.y, products.z);
 
-  if (this->inertial->GetMass() > 0)
-    dBodySetMass(this->linkId, &odeMass);
-  else
+  dBodySetMass(this->linkId, &odeMass);
+  if (this->inertial->GetMass() <= 0)
   {
-    gzwarn << "Setting mass of custom link " << this->GetScopedName() 
-           << " to zero for ODE."
+    gzwarn << "The mass of custom link " << this->GetScopedName() 
+           << " is either zero or negative in ODE."
            << " This may result in unrealistic physics behavior."
            << std::endl;
     // Set the mass of the object outside of ODE
-    this->inertial->SetMass(0);
   }
 }
 
