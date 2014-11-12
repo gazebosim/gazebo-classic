@@ -170,8 +170,6 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   // simbody stepTo() failure
   if(SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
 
-  std::cout << "SimEventsTest::ModelInAndOutOfRegion [" << _physicsEngine << "]" << std::endl;
-
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   // setup the callback that increments the counter everytime a 
