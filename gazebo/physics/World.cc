@@ -1305,9 +1305,6 @@ void World::RemovePlugin(const std::string &_name)
   {
     if ((*iter)->GetHandle() == _name)
     {
-      std::cerr << "shared point count " << (*iter).use_count() << std::endl;
-      (*iter).reset();
-
       this->plugins.erase(iter);
       break;
     }
