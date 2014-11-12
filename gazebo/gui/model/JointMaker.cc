@@ -56,7 +56,6 @@ JointMaker::JointMaker()
       event::Events::ConnectPreRender(
         boost::bind(&JointMaker::Update, this)));
 
-
   this->inspectAct = new QAction(tr("Open Joint Inspector"), this);
   connect(this->inspectAct, SIGNAL(triggered()), this,
       SLOT(OnOpenInspector()));
@@ -133,7 +132,6 @@ void JointMaker::RemoveJointsByPart(const std::string &_partName)
   toDelete.clear();
 }
 
-
 /////////////////////////////////////////////////
 bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 {
@@ -145,7 +143,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
 
   // intercept mouse press events when user clicks on the joint hotspot visual
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+//  rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
   if (vis)
   {
@@ -166,7 +164,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
 {
   // Get the active camera and scene.
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::ScenePtr scene = camera->GetScene();
+//  rendering::ScenePtr scene = camera->GetScene();
   rendering::VisualPtr vis = camera->GetVisual(_event.pos);
 
   if (_event.button == common::MouseEvent::RIGHT)
@@ -203,7 +201,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       this->hoverVis.reset();
 
       std::stringstream ss;
-      ss << this->selectedVis->GetName() << "_JOINT_" << this->jointCounter++;
+      ss << this->selectedVis->GetRootVisual()->GetName() + "::joint_" << this->jointCounter++;
       rendering::VisualPtr jointVis(
           new rendering::Visual(ss.str(), this->selectedVis));
       jointVis->Load();
@@ -495,19 +493,29 @@ void JointMaker::GenerateSDF()
   this->modelSDF->ClearElements();
 
   boost::unordered_map<std::string, JointData *>::iterator jointsIt;
-  // loop through all parts
+  // loop through all joints
   for (jointsIt = this->joints.begin(); jointsIt != this->joints.end();
       ++jointsIt)
   {
     JointData *joint = jointsIt->second;
     sdf::ElementPtr jointElem = this->modelSDF->AddElement("joint");
 
-    jointElem->GetAttribute("name")->Set(joint->visual->GetName());
+    std::string name = joint->visual->GetName();
+    name = name.substr(name.find("::")+2);
+    jointElem->GetAttribute("name")->Set(name);
+
     jointElem->GetAttribute("type")->Set(GetTypeAsString(joint->type));
+
     sdf::ElementPtr parentElem = jointElem->GetElement("parent");
-    parentElem->Set(joint->parent->GetParent()->GetName());
+    name = joint->parent->GetParent()->GetName();
+    name = name.substr(name.find("::")+2);
+    parentElem->Set(name);
+
     sdf::ElementPtr childElem = jointElem->GetElement("child");
-    childElem->Set(joint->child->GetParent()->GetName());
+    name = joint->child->GetParent()->GetName();
+    name = name.substr(name.find("::")+2);
+    childElem->Set(name);
+
     sdf::ElementPtr poseElem = jointElem->GetElement("pose");
     poseElem->Set(math::Pose(joint->anchor, math::Vector3::Zero));
     int axisCount = GetJointAxisCount(joint->type);

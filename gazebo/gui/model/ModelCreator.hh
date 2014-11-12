@@ -300,7 +300,8 @@ namespace gazebo
     };
 
     /// \class PartData PartData.hh
-    /// \brief Helper class to store part data
+    /// \brief Helper class to store part data.
+    /// At the moment, each part is a link with a single visual.
     class GAZEBO_VISIBLE PartData : public QObject
     {
       Q_OBJECT

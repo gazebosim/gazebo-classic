@@ -132,32 +132,18 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     const math::Pose &_pose)
 {
   if (!this->modelVisual)
-  {
     this->Reset();
-  }
 
+  // Link
   std::ostringstream linkNameStream;
-  linkNameStream << "unit_box_" << this->boxCounter++;
+  linkNameStream << this->modelName + "::unit_box_" << this->boxCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(linkName,
       this->modelVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "_visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-      linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  ((geomElem->AddElement("box"))->AddElement("size"))->Set(_size);
-
-  visVisual->Load(visualElem);
+  sdf::ElementPtr linkElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link");
+  linkVisual->Load(linkElem);
 
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
@@ -166,8 +152,23 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
     _pose.pos.z + _size.z/2));
   }
 
-  this->CreatePart(visVisual);
+  // Visual
+  std::ostringstream visualName;
+  visualName << linkName << "::visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+      linkVisual));
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
+  sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  ((geomElem->AddElement("box"))->AddElement("size"))->Set(_size);
+
+  visVisual->Load(visualElem);
+
+  this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
 
   return linkName;
@@ -180,28 +181,16 @@ std::string ModelCreator::AddSphere(double _radius,
   if (!this->modelVisual)
     this->Reset();
 
+  // Link
   std::ostringstream linkNameStream;
-  linkNameStream << "unit_sphere_" << this->sphereCounter++;
+  linkNameStream << this->modelName + "::unit_sphere_" << this->sphereCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
       linkName, this->modelVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "_visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_radius);
-
-  visVisual->Load(visualElem);
+  sdf::ElementPtr linkElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link");
+  linkVisual->Load(linkElem);
 
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
@@ -209,6 +198,22 @@ std::string ModelCreator::AddSphere(double _radius,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _radius));
   }
+
+  // Visual
+  std::ostringstream visualName;
+  visualName << linkName << "::visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+
+  sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  ((geomElem->AddElement("sphere"))->GetElement("radius"))->Set(_radius);
+
+  visVisual->Load(visualElem);
 
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
@@ -223,30 +228,17 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
   if (!this->modelVisual)
     this->Reset();
 
+  // Link
   std::ostringstream linkNameStream;
-  linkNameStream << "unit_cylinder_" << this->cylinderCounter++;
+  linkNameStream << this->modelName + "::unit_cylinder_"
+      << this->cylinderCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(
       linkName, this->modelVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "_visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
-  (cylinderElem->GetElement("radius"))->Set(_radius);
-  (cylinderElem->GetElement("length"))->Set(_length);
-
-  visVisual->Load(visualElem);
+  sdf::ElementPtr linkElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link");
+  linkVisual->Load(linkElem);
 
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
@@ -254,6 +246,24 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _length/2));
   }
+
+  // Visual
+  std::ostringstream visualName;
+  visualName << linkName << "::visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+
+  sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  sdf::ElementPtr cylinderElem = geomElem->AddElement("cylinder");
+  (cylinderElem->GetElement("radius"))->Set(_radius);
+  (cylinderElem->GetElement("length"))->Set(_length);
+
+  visVisual->Load(visualElem);
 
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
@@ -270,29 +280,16 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 
   std::string path = _path;
 
+  // Link
   std::ostringstream linkNameStream;
-  linkNameStream << "custom_" << this->customCounter++;
+  linkNameStream << this->modelName + "::custom_" << this->customCounter++;
   std::string linkName = linkNameStream.str();
 
-  rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
-        linkName, this->modelVisual));
-  linkVisual->Load();
-
-  std::ostringstream visualName;
-  visualName << linkName << "_visual";
-  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
-        linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
-      ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
-
-  sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
-  geomElem->ClearElements();
-  sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
-  meshElem->GetElement("scale")->Set(_scale);
-  meshElem->GetElement("uri")->Set(path);
-  visVisual->Load(visualElem);
+  rendering::VisualPtr linkVisual(new rendering::Visual(
+      linkName, this->modelVisual));
+  sdf::ElementPtr linkElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link");
+  linkVisual->Load(linkElem);
 
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
@@ -300,6 +297,24 @@ std::string ModelCreator::AddCustom(const std::string &_path,
     linkVisual->SetPosition(math::Vector3(_pose.pos.x, _pose.pos.y,
     _pose.pos.z + _scale.z/2));
   }
+
+  // Visual
+  std::ostringstream visualName;
+  visualName << linkName << "::visual";
+  rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
+        linkVisual));
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
+      ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->GetElement("script")
+      ->GetElement("name")->Set("Gazebo/GreyTransparent");
+
+  sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+  geomElem->ClearElements();
+  sdf::ElementPtr meshElem = geomElem->AddElement("mesh");
+  meshElem->GetElement("scale")->Set(_scale);
+  meshElem->GetElement("uri")->Set(path);
+
+  visVisual->Load(visualElem);
 
   this->CreatePart(visVisual);
   this->mouseVisual = linkVisual;
@@ -311,7 +326,8 @@ std::string ModelCreator::AddCustom(const std::string &_path,
 void ModelCreator::CreatePart(const rendering::VisualPtr &_visual)
 {
   PartData *part = new PartData;
-  part->name = _visual->GetName();
+  // Link name
+  part->name = _visual->GetParent()->GetName();
   part->visuals.push_back(_visual);
 
   part->gravity = true;
@@ -340,15 +356,22 @@ void ModelCreator::RemovePart(const std::string &_partName)
   if (!part)
     return;
 
-  for (unsigned int i = 0; i < part->visuals.size(); ++i)
-  {
-    rendering::VisualPtr vis = part->visuals[i];
-    rendering::VisualPtr visParent = vis->GetParent();
-    rendering::ScenePtr scene = vis->GetScene();
-    scene->RemoveVisual(vis);
-    if (visParent)
-      scene->RemoveVisual(visParent);
-  }
+//  for (unsigned int i = 0; i < part->visuals.size(); ++i)
+//  {
+//    rendering::VisualPtr vis = part->visuals[i];
+//    rendering::VisualPtr visParent = vis->GetParent();
+//    rendering::ScenePtr scene = vis->GetScene();
+//    scene->RemoveVisual(vis);
+//    if (visParent)
+//      scene->RemoveVisual(visParent);
+//  }
+
+  // Each part has only one visual for now
+  rendering::VisualPtr visual = part->visuals[0];
+  rendering::VisualPtr link = visual->GetParent();
+  rendering::ScenePtr scene = visual->GetScene();
+  scene->RemoveVisual(visual);
+  scene->RemoveVisual(link);
 
   delete part->inertial;
   delete part->sensorData;
@@ -520,8 +543,7 @@ void ModelCreator::Stop()
 {
   if (this->addPartType != PART_NONE && this->mouseVisual)
   {
-    for (unsigned int i = 0; i < this->mouseVisual->GetChildCount(); ++i)
-        this->RemovePart(this->mouseVisual->GetChild(0)->GetName());
+    this->RemovePart(this->mouseVisual->GetName());
     this->mouseVisual.reset();
   }
   if (this->jointMaker)
@@ -580,7 +602,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) !=
+    if (this->allParts.find(vis->GetParent()->GetName()) !=
         this->allParts.end())
     {
       if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
@@ -591,7 +613,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         else
           event::Events::setSelectedEntity("", "normal");
 
-        this->selectedVis = vis;
+        this->selectedVis = vis->GetParent();
         this->selectedVis->SetHighlighted(true);
         return true;
       }
@@ -635,7 +657,7 @@ bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) != this->allParts.end())
+    if (this->allParts.find(vis->GetParent()->GetName()) != this->allParts.end())
     {
       // TODO part inspector code goes here
       return true;
@@ -665,10 +687,10 @@ void ModelCreator::GenerateSDF()
 
   linkElem = modelElem->GetElement("link");
   sdf::ElementPtr templateLinkElem = linkElem->Clone();
-  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
-      "visual")->Clone();
-  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
-      "collision")->Clone();
+//  sdf::ElementPtr templateVisualElem = templateLinkElem->GetElement(
+//      "visual")->Clone();
+//  sdf::ElementPtr templateCollisionElem = templateLinkElem->GetElement(
+//      "collision")->Clone();
   modelElem->ClearElements();
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
@@ -702,7 +724,10 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr newLinkElem = templateLinkElem->Clone();
     visualElem = newLinkElem->GetElement("visual");
     collisionElem = newLinkElem->GetElement("collision");
-    newLinkElem->GetAttribute("name")->Set(visual->GetParent()->GetName());
+
+    std::string linkName = part->name.substr(part->name.find("::")+2);
+
+    newLinkElem->GetAttribute("name")->Set(linkName);
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose()
         - this->origin);
     newLinkElem->GetElement("gravity")->Set(part->gravity);
@@ -721,10 +746,8 @@ void ModelCreator::GenerateSDF()
 
     modelElem->InsertElement(newLinkElem);
 
-    visualElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_visual");
-    collisionElem->GetAttribute("name")->Set(visual->GetParent()->GetName()
-        + "_collision");
+    visualElem->GetAttribute("name")->Set("visual");
+    collisionElem->GetAttribute("name")->Set("collision");
     visualElem->GetElement("pose")->Set(visual->GetPose());
     collisionElem->GetElement("pose")->Set(visual->GetPose());
 
