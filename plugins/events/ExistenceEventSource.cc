@@ -18,7 +18,6 @@
 #include "ExistenceEventSource.hh"
 
 using namespace gazebo;
-using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +50,7 @@ void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
   if(_model.find(this->model) == 0)
   {
     // set the data for the existence event
-    string json = "{";
+    std::string json = "{";
     json += "\"event\":\"existence\",";
     if(_alive)
     {

@@ -20,7 +20,6 @@
 
 
 using namespace gazebo;
-using namespace std;
 using namespace sdf;
 using namespace physics;
 
@@ -28,7 +27,7 @@ using namespace physics;
 ////////////////////////////////////////////////////////////////////////////////
 void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
 {
-  string modelName = _msg->name();
+  std::string modelName = _msg->name();
   // only if the model is not already in the set...
   if(models.insert(modelName).second)
   {
@@ -48,7 +47,7 @@ void SimEventsPlugin::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    string modelName = _msg->data();
+    std::string modelName = _msg->data();
     if(models.erase(modelName) == 1)
     {
       // notify everyone!
@@ -96,8 +95,8 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   while (child)
   { 
     // get name and type of each event
-    string eventName = child->GetElement("name")->Get<string>();
-    string eventType = child->GetElement("type")->Get<string>();
+    std::string eventName = child->GetElement("name")->Get<std::string>();
+    std::string eventType = child->GetElement("type")->Get<std::string>();
 
     // this is more or less a factory for event loading, dispatching
     // the correct ctor based on the type of the event
@@ -116,7 +115,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     }
     else
     {
-      string m;
+      std::string m;
       m = "Unknown event type: \"" + eventType + "\" in scoring plugin"; 
       throw SimEventsException(m.c_str());
     }
@@ -140,7 +139,7 @@ void SimEventsPlugin::Init()
   // seed the map with the initial models
   for (unsigned int i=0; i < world->GetModelCount(); ++i)
   {
-    string name = world->GetModel(i)->GetName();
+    std::string name = world->GetModel(i)->GetName();
     models.insert(name);
   } 
 }
