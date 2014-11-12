@@ -18,7 +18,6 @@
 #include "EventSource.hh"
 
 using namespace gazebo;
-using namespace std;
 
 // static data initialization
 event::EventT<void (std::string, bool)> SimEventsEvents::spawnModel;
@@ -43,7 +42,7 @@ void EventSource::Init()
 ////////////////////////////////////////////////////////////////////////////////
 void EventSource::Load(const sdf::ElementPtr &_sdf)
 {
-  this->name = _sdf->GetElement("name")->Get<string>();
+  this->name = _sdf->GetElement("name")->Get<std::string>();
 }
 
 
