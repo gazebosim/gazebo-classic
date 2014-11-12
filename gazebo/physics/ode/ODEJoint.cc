@@ -119,36 +119,6 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->Get<double>());
   }
-
-  if (this->sdf->HasElement("axis"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
-      }
-    }
-  }
-
-  if (this->sdf->HasElement("axis2"))
-  {
-    sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    if (axisElem->HasElement("dynamics"))
-    {
-      sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
-
-      if (dynamicsElem->HasElement("friction"))
-      {
-        sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
-        gzlog << "joint friction not implemented\n";
-      }
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -400,8 +370,27 @@ void ODEJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 
 //////////////////////////////////////////////////
 bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
-                            const boost::any &_value)
+                        const boost::any &_value)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case 0:
+      group = dParamGroup1;
+      break;
+    case 1:
+      group = dParamGroup2;
+      break;
+    case 2:
+      group = dParamGroup3;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  };
+
   if (_key == "fudge_factor")
   {
     try
@@ -518,7 +507,27 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
-      this->SetParam(dParamFMax, boost::any_cast<double>(_value));
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
+    }
+    catch(const boost::bad_any_cast &e)
+    {
+      gzerr << "boost any_cast error:" << e.what() << "\n";
+      return false;
+    }
+  }
+  else if (_key == "friction")
+  {
+    try
+    {
+      // To represent Coulomb friction,
+      //  set FMax to friction value
+      //  set Vel to 0
+      this->SetParam(group | dParamFMax, boost::any_cast<double>(_value));
+      this->SetParam(group | dParamVel, 0.0);
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -530,7 +539,11 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     try
     {
-      this->SetParam(dParamVel, boost::any_cast<double>(_value));
+      gzwarn << "The '" << _key << "' parameter is deprecated "
+             << "to enable Coulomb joint friction with the "
+             << "'friction' parameter"
+             << std::endl;
+      this->SetParam(dParamVel | group, boost::any_cast<double>(_value));
     }
     catch(const boost::bad_any_cast &e)
     {
@@ -635,6 +648,25 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
 {
+  // Axis parameters for multi-axis joints use a group bitmask
+  // to identify the variable.
+  unsigned int group;
+  switch (_index)
+  {
+    case 0:
+      group = dParamGroup1;
+      break;
+    case 1:
+      group = dParamGroup2;
+      break;
+    case 2:
+      group = dParamGroup3;
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
+      return false;
+  }
+
   if (_key == "fudge_factor")
   {
     try
@@ -725,7 +757,19 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     try
     {
-      return this->GetParam(dParamFMax);
+      return this->GetParam(dParamFMax | group);
+    }
+    catch(common::Exception &e)
+    {
+      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
+      return 0;
+    }
+  }
+  else if (_key == "friction")
+  {
+    try
+    {
+      return this->GetParam(dParamFMax | group);
     }
     catch(common::Exception &e)
     {
@@ -737,7 +781,7 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     try
     {
-      return this->GetParam(dParamVel);
+      return this->GetParam(dParamVel | group);
     }
     catch(common::Exception &e)
     {

@@ -76,10 +76,10 @@ void JointMaker::Reset()
     return;
 
   this->newJointCreated = false;
-  if (mouseJoint)
+  if (this->mouseJoint)
   {
-    delete mouseJoint;
-    mouseJoint = NULL;
+    delete this->mouseJoint;
+    this->mouseJoint = NULL;
   }
 
   this->jointType = JointMaker::JOINT_NONE;
@@ -310,6 +310,10 @@ void JointMaker::Stop()
     this->selectedVis.reset();
     this->hoverVis.reset();
   }
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 }
 
 /////////////////////////////////////////////////
