@@ -27,9 +27,25 @@ using namespace gazebo;
 class ImuTest : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
+  /// \brief start imu_sensor_test.world, which contains a pendulum,
+  /// a sphere with frictional contact, a sphere with frictionless
+  /// contact and a ramp.  Each model has an IMU attached.
+  /// This test check results to make sure the readings adhere to
+  /// each simple model under gravity.
+  public: void ImuSensorTestWorld(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs.
   public: void Stationary_EmptyWorld(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs with noise enabled.
   public: void Stationary_EmptyWorld_Noise(const std::string &_physicsEngine);
+
+  /// \brief Spawn a static model with an ImuSensor attached
+  /// in the empty world.  Test basic IMU outputs with bias enabled.
   public: void Stationary_EmptyWorld_Bias(const std::string &_physicsEngine);
+
   private: void GetGravity(const math::Quaternion& _rot, math::Vector3 &_g);
   private: void GetImuData(sensors::ImuSensorPtr _imu, unsigned int _cnt,
                            math::Vector3 &_rateMean,
@@ -78,6 +94,53 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
   _rateMean = rateSum / _cnt;
   _accelMean = accelSum / _cnt;
   _orientation = _imu->GetOrientation();
+}
+
+void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
+{
+  Load("worlds/imu_sensor_test.world", true, _physicsEngine);
+
+  /*
+  std::string modelName = "imu_model";
+  std::string imuSensorName = "imu_sensor";
+  math::Pose testPose(math::Vector3(0, 0, 0.05),
+      math::Quaternion(0.5, -1.0, 0.2));
+
+  SpawnImuSensor(modelName, imuSensorName, testPose.pos,
+      testPose.rot.GetAsEuler());
+
+  sensors::ImuSensorPtr imu =
+    boost::static_pointer_cast<sensors::ImuSensor>(
+        sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+
+  ASSERT_TRUE(imu);
+  imu->Init();
+  math::Vector3 rateMean, accelMean;
+  math::Quaternion orientation;
+  this->GetImuData(imu, 1, rateMean, accelMean, orientation);
+
+  EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
+  EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
+  EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+
+  math::Vector3 g;
+  this->GetGravity(testPose.rot, g);
+  EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
+  EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
+  EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+
+  // Orientation should be identity, since it is reported relative
+  // to reference pose.
+  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  */
+}
+
+TEST_P(ImuTest, ImuSensorTestWorld)
+{
+  ImuSensorTestWorld(GetParam());
 }
 
 void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
