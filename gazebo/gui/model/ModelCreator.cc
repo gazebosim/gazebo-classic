@@ -568,15 +568,12 @@ bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
 {
-  if (this->mouseVisual)
-    return false;
-
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
 
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
-  if (vis)
+  if (vis && !vis->IsPlane())
   {
     if (this->allParts.find(vis->GetName()) == this->allParts.end())
     {
