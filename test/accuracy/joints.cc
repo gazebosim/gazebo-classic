@@ -125,7 +125,7 @@ void JointsTest::OneDof(const std::string &_physicsEngine
   {
     msgs::Joint *joint = msgModel.mutable_joint(0);
     joint->set_name("joint");
-    joint->set_type(msgs::Convert(_jointType));
+    joint->set_type(msgs::ConvertJointType(_jointType));
     joint->set_parent("world");
     joint->set_child(msgModel.link(0).name());
     msgs::Set(joint->mutable_axis1()->mutable_xyz(), axis);
