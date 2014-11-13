@@ -100,42 +100,120 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 {
   Load("worlds/imu_sensor_test.world", true, _physicsEngine);
 
-  /*
-  std::string modelName = "imu_model";
-  std::string imuSensorName = "imu_sensor";
-  math::Pose testPose(math::Vector3(0, 0, 0.05),
-      math::Quaternion(0.5, -1.0, 0.2));
+  // get world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
 
-  SpawnImuSensor(modelName, imuSensorName, testPose.pos,
-      testPose.rot.GetAsEuler());
+  /* pendulum */
+  {
+    std::string pendulumName = "model_pendulum";
+    physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
+    ASSERT_TRUE(pendulumModel);
 
-  sensors::ImuSensorPtr imu =
-    boost::static_pointer_cast<sensors::ImuSensor>(
-        sensors::SensorManager::Instance()->GetSensor(imuSensorName));
+    std::string pendulumSensorName = "pendulum_imu_sensor";
+    sensors::ImuSensorPtr pendulumImu =
+      boost::static_pointer_cast<sensors::ImuSensor>(
+          sensors::SensorManager::Instance()->GetSensor(pendulumSensorName));
+    ASSERT_TRUE(pendulumImu);
 
-  ASSERT_TRUE(imu);
-  imu->Init();
-  math::Vector3 rateMean, accelMean;
-  math::Quaternion orientation;
-  this->GetImuData(imu, 1, rateMean, accelMean, orientation);
+    pendulumImu->Init();
+    math::Vector3 rateMean, accelMean;
+    math::Quaternion orientation;
+    this->GetImuData(pendulumImu, 1, rateMean, accelMean, orientation);
 
-  EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
-  EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
 
-  math::Vector3 g;
-  this->GetGravity(testPose.rot, g);
-  EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
-  EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
-  EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+    math::Pose testPose = pendulumModel->GetWorldPose();
 
-  // Orientation should be identity, since it is reported relative
-  // to reference pose.
-  EXPECT_NEAR(orientation.x, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.y, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.z, 0, IMU_TOL);
-  EXPECT_NEAR(orientation.w, 1, IMU_TOL);
-  */
+    math::Vector3 g;
+    this->GetGravity(testPose.rot, g);
+    EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
+    EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
+    EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+
+    // Orientation should be identity, since it is reported relative
+    // to reference pose.
+    EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  }
+
+  /* friction ball */
+  {
+    std::string ballFrictionName = "model_ball";
+    physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
+    ASSERT_TRUE(ballFrictionModel);
+
+    std::string ballFrictionSensorName = "ball_imu_sensor";
+    sensors::ImuSensorPtr ballFrictionImu =
+      boost::static_pointer_cast<sensors::ImuSensor>(
+        sensors::SensorManager::Instance()->GetSensor(ballFrictionSensorName));
+    ASSERT_TRUE(ballFrictionImu);
+
+    ballFrictionImu->Init();
+    math::Vector3 rateMean, accelMean;
+    math::Quaternion orientation;
+    this->GetImuData(ballFrictionImu, 1, rateMean, accelMean, orientation);
+
+    EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+
+    math::Pose testPose = ballFrictionModel->GetWorldPose();
+
+    math::Vector3 g;
+    this->GetGravity(testPose.rot, g);
+    EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
+    EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
+    EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+
+    // Orientation should be identity, since it is reported relative
+    // to reference pose.
+    EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  }
+
+  /* frictionless ball */
+  {
+    std::string ballNoFrictionName = "model_ball_no_friction";
+    physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
+    ASSERT_TRUE(ballNoFrictionModel);
+
+    std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
+    sensors::ImuSensorPtr ballNoFrictionImu =
+      boost::static_pointer_cast<sensors::ImuSensor>(
+        sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
+    ASSERT_TRUE(ballNoFrictionImu);
+
+    ballNoFrictionImu->Init();
+    math::Vector3 rateMean, accelMean;
+    math::Quaternion orientation;
+    this->GetImuData(ballNoFrictionImu, 1, rateMean, accelMean, orientation);
+
+    EXPECT_NEAR(rateMean.x, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.y, 0.0, IMU_TOL);
+    EXPECT_NEAR(rateMean.z, 0.0, IMU_TOL);
+
+    math::Pose testPose = ballNoFrictionModel->GetWorldPose();
+
+    math::Vector3 g;
+    this->GetGravity(testPose.rot, g);
+    EXPECT_NEAR(accelMean.x, -g.x, IMU_TOL);
+    EXPECT_NEAR(accelMean.y, -g.y, IMU_TOL);
+    EXPECT_NEAR(accelMean.z, -g.z, IMU_TOL);
+
+    // Orientation should be identity, since it is reported relative
+    // to reference pose.
+    EXPECT_NEAR(orientation.x, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.y, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.z, 0, IMU_TOL);
+    EXPECT_NEAR(orientation.w, 1, IMU_TOL);
+  }
 }
 
 TEST_P(ImuTest, ImuSensorTestWorld)
