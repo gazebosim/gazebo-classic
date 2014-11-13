@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,8 @@
  *
 */
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-
 #include "gazebo/common/Assert.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/SensorManager.hh"
-#include "gazebo/sensors/ContactSensor.hh"
-#include "gazebo/transport/transport.hh"
+#include "gazebo/physics/Model.hh"
 #include "plugins/InitialVelocityPlugin.hh"
 
 using namespace gazebo;
