@@ -105,6 +105,14 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   /* pendulum */
+  // on startup
+  //   sensor linear accel [0 0 0]
+  //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+  //   Link::GetWorldLinearAccel() [0 0 -9.81]
+  // at max lowest position
+  //   sensor linear accel [-0 -0.041216 29.4258]
+  //   Link::GetRelativeLinearAccel() [-0 -0.008923 19.6159]
+  //   Link::GetWorldLinearAccel() [-0 0.055649 19.6158]
   {
     std::string pendulumName = "model_pendulum";
     physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
@@ -142,6 +150,20 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   }
 
   /* friction ball */
+  // before contact
+  //   sensor linear accel [0 0 0]
+  //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+  //   Link::GetWorldLinearAccel() [0 0 -9.81]
+  //
+  // on ramp - varies, e.g.
+  //   sensor linear accel [-7.81558 0 3.71003]
+  //   Link::GetRelativeLinearAccel() [1.98569 0 3.29613]
+  //   Link::GetWorldLinearAccel() [3.37698 0 -1.84485]
+  //
+  // on ground - sensor vector rotates
+  //   sensor linear accel [-2.93844 0 9.35958]
+  //   Link::GetRelativeLinearAccel() [0 0 0]
+  //   Link::GetWorldLinearAccel() [0 0 0]
   {
     std::string ballFrictionName = "model_ball";
     physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
@@ -179,6 +201,18 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   }
 
   /* frictionless ball */
+  // before contact
+  //   sensor linear accel [0 0 0]
+  //   Link::GetRelativeLinearAccel() [0 0 -9.81]
+  //   Link::GetWorldLinearAccel() [0 0 -9.81]
+  // on ramp - constant
+  //   sensor linear accel [4.12742 0 7.55518]
+  //   Link::GetRelativeLinearAccel() [4.12742 0 -2.25482]
+  //   Link::GetWorldLinearAccel() [4.12742 0 -2.25482]
+  // on ground - constant
+  //   sensor linear accel [0 0 9.81]
+  //   Link::GetRelativeLinearAccel() [0 0 0]
+  //   Link::GetWorldLinearAccel() [0 0 0]   
   {
     std::string ballNoFrictionName = "model_ball_no_friction";
     physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
@@ -187,7 +221,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
     sensors::ImuSensorPtr ballNoFrictionImu =
       boost::static_pointer_cast<sensors::ImuSensor>(
-        sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
+      sensors::SensorManager::Instance()->GetSensor(ballNoFrictionSensorName));
     ASSERT_TRUE(ballNoFrictionImu);
 
     ballNoFrictionImu->Init();
