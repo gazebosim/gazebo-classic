@@ -60,7 +60,6 @@ GLWidget::GLWidget(QWidget *_parent)
   this->state = "select";
   this->sceneCreated = false;
   this->copyEntityName = "";
-  this->levelOfManipulation = "model";
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -666,17 +665,9 @@ void GLWidget::OnMouseReleaseNormal()
       this->userCamera->GetVisual(this->mouseEvent.pos);
     if (vis)
     {
-      if (this->levelOfManipulation == "model")
-      {
-        vis = vis->GetRootVisual();
-//        this->SetSelectedVisual(vis);
-        event::Events::setSelectedEntity(vis->GetName(), "normal");
-      }
-      else
-      {
-        vis = vis->GetParent();
-        this->SetSelectedVisual(vis);
-      }
+      vis = vis->GetRootVisual();
+      this->SetSelectedVisual(vis);
+      event::Events::setSelectedEntity(vis->GetName(), "normal");
 
       if (this->mouseEvent.button == common::MouseEvent::RIGHT)
       {
@@ -1156,14 +1147,7 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 void GLWidget::OnModelEditor(bool _checked)
 {
   if (_checked)
-    this->SetLevelOfManipulation("link");
+    ModelSnap::Instance()->SetSnapLevel("link");
   else
-    this->SetLevelOfManipulation("model");
-}
-
-/////////////////////////////////////////////////
-void GLWidget::SetLevelOfManipulation(std::string _level)
-{
-  this->levelOfManipulation = _level;
-  ModelSnap::Instance()->SetSnapLevel(_level);
+    ModelSnap::Instance()->SetSnapLevel("model");
 }
