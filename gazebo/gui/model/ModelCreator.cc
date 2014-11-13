@@ -603,6 +603,8 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return true;
   }
 
+  // In mouse normal mode, let users select a part if the parent model
+  // is currently selected.
   rendering::UserCameraPtr userCamera = gui::get_active_camera();
   if (!userCamera)
     return false;
@@ -610,8 +612,38 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
   rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    // Is part
+    if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
+      // Whole model or another part is selected
+      if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
+          this->selectedVis)
+      {
+        // Deselect part
+        if (this->selectedVis)
+          this->selectedVis->SetHighlighted(false);
+        // Deselect model
+        else
+          event::Events::setSelectedEntity("", "normal");
+
+        this->selectedVis = vis;
+        this->selectedVis->SetHighlighted(true);
+        return true;
+      }
+      // Handle at GLWidget - select whole model
+    }
+    // Not part
+    else
+    {
+      // Deselect part and model
+      if (this->selectedVis)
+      {
+        this->selectedVis->SetHighlighted(false);
+        this->selectedVis.reset();
+      }
+      else
+        event::Events::setSelectedEntity("", "normal");
+
       // Prevent interaction with other models, send event only to
       // OrbitViewController
       userCamera->HandleMouseEvent(_event);
@@ -624,15 +656,30 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (!this->mouseVisual)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
 
-  if (!gui::get_active_camera())
+  if (!this->mouseVisual)
+  {
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    if (vis && !vis->IsPlane())
+    {
+      if (this->allParts.find(vis->GetName()) == this->allParts.end())
+      {
+        // Prevent interaction with other models, send event only to
+        // OrbitViewController
+        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+        userCamera->HandleMouseEvent(_event);
+        return true;
+      }
+    }
     return false;
+  }
 
   math::Pose pose = this->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
-      gui::get_active_camera(), _event);
+      userCamera, _event);
 
   if (!_event.shift)
   {
@@ -747,7 +794,7 @@ void ModelCreator::GenerateSDF()
     sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
     geomElem->ClearElements();
 
-    math::Vector3 scale = visual->GetParent()->GetScale();
+    math::Vector3 scale = visual->GetScale();
     if (visual->GetParent()->GetName().find("unit_box") != std::string::npos)
     {
       sdf::ElementPtr boxElem = geomElem->AddElement("box");

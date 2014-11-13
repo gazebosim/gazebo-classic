@@ -28,7 +28,6 @@
 #include "gazebo/rendering/RayQuery.hh"
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -295,7 +294,7 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
   else
     _rot.SetFromAxis((v.Cross(u)).Normalize(), angle);
 
-  // Get translation needed for alignment
+  // Get translation needed for snapping
   // taking into account the rotated position of the mesh
   _trans = centroidDest - (_rot * (centroidSrc - _poseSrc.pos) + _poseSrc.pos);
 }
