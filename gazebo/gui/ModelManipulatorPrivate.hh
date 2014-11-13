@@ -84,10 +84,6 @@ namespace gazebo
 
       /// \brief True to manipulate model in global frame.
       public: bool globalManip;
-
-      /// \brief Indicates whether to manipulate entire models ("model")
-      /// or individual links ("link").
-      public: std::string levelOfManipulation;
     };
   }
 }

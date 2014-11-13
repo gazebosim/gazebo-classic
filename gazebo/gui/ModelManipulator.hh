@@ -98,10 +98,6 @@ namespace gazebo
           const math::Vector3 &_axis,
           bool _local = false);
 
-      /// \brief Set the level of manipulation
-      /// \param[in] _level Level of manipulation.
-      public: void SetLevelOfManipulation(std::string _level);
-
       /// \brief Snap a point at intervals of a fixed distance. Currently used
       /// to give a snapping behavior when moving models with a mouse.
       /// \param[in] _point Input point.

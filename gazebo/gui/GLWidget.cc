@@ -1165,6 +1165,5 @@ void GLWidget::OnModelEditor(bool _checked)
 void GLWidget::SetLevelOfManipulation(std::string _level)
 {
   this->levelOfManipulation = _level;
-  ModelManipulator::Instance()->SetLevelOfManipulation(_level);
   ModelSnap::Instance()->SetSnapLevel(_level);
 }

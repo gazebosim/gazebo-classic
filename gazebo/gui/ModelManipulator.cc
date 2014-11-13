@@ -45,7 +45,6 @@ ModelManipulator::ModelManipulator()
 
   this->dataPtr->manipMode = "";
   this->dataPtr->globalManip = false;
-  this->dataPtr->levelOfManipulation = "model";
 }
 
 /////////////////////////////////////////////////
@@ -461,7 +460,30 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   if (vis && !vis->IsPlane() &&
       this->dataPtr->mouseEvent.button == common::MouseEvent::LEFT)
   {
-    this->SetAttachedVisual(vis);
+    if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
+    {
+      vis = vis->GetRootVisual();
+    }
+
+    this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
+
+    this->SetMouseMoveVisual(vis);
+
+    event::Events::setSelectedEntity(
+        this->dataPtr->mouseMoveVis->GetName(), "move");
+    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+
+    if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
+    {
+      this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
+      this->dataPtr->selectionObj->SetMode(this->dataPtr->manipMode);
+    }
+    else
+    {
+      this->dataPtr->selectionObj->SetMode(
+          rendering::SelectionObj::SELECTION_NONE);
+      this->dataPtr->selectionObj->Detach();
+    }
   }
   else
     this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
@@ -659,38 +681,15 @@ void ModelManipulator::SetAttachedVisual(rendering::VisualPtr _vis)
 {
   rendering::VisualPtr vis = _vis;
 
-  if (gui::get_entity_id(vis->GetRootVisual()->GetName()) &&
-      this->dataPtr->levelOfManipulation == "model")
-  {
+  if (gui::get_entity_id(vis->GetRootVisual()->GetName()))
     vis = vis->GetRootVisual();
-  }
-  // Links inside model editor are not found by get_entity_id.
-  // For now, always manipulate at link level, not visual level.
-  else if (this->dataPtr->levelOfManipulation == "link" &&
-      vis->GetName().find("_visual") != std::string::npos)
-  {
-    vis = vis->GetParent();
-  }
 
   this->dataPtr->mouseMoveVisStartPose = vis->GetWorldPose();
 
   this->SetMouseMoveVisual(vis);
 
-  event::Events::setSelectedEntity(
-        this->dataPtr->mouseMoveVis->GetName(), "move");
-    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
-
   if (this->dataPtr->mouseMoveVis && !this->dataPtr->mouseMoveVis->IsPlane())
-  {
     this->dataPtr->selectionObj->Attach(this->dataPtr->mouseMoveVis);
-    this->dataPtr->selectionObj->SetMode(this->dataPtr->manipMode);
-  }
-  else
-  {
-    this->dataPtr->selectionObj->SetMode(
-        rendering::SelectionObj::SELECTION_NONE);
-    this->dataPtr->selectionObj->Detach();
-  }
 }
 
 /////////////////////////////////////////////////
@@ -759,12 +758,6 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     }
   }
   this->dataPtr->keyEvent.key = 0;
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::SetLevelOfManipulation(std::string _level)
-{
-  this->dataPtr->levelOfManipulation = _level;
 }
 
 // Function migrated here from GLWidget.cc and commented out since it doesn't
