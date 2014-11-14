@@ -23,6 +23,7 @@ set (sources
   AlignWidget.cc
   BoxMaker.cc
   CloneWindow.cc
+  ConfigWidget.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -57,6 +58,7 @@ set (qt_headers
   Actions.hh
   AlignWidget.hh
   CloneWindow.hh
+  ConfigWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh
@@ -115,6 +117,7 @@ endif ()
 #endif()
 
 set (qt_tests
+  ConfigWidget_TEST.cc
   DataLogger_TEST.cc
   GuiIface_TEST.cc
   ModelAlign_TEST.cc
