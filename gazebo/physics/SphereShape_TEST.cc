@@ -45,7 +45,7 @@ TEST_F(SphereShapeTest, Scale)
   physics::SphereShapePtr sphere(
       new physics::SphereShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = sphereSDF->root;
-  ASSERT_TRUE(elem. != NULL);
+  ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("model");
   ASSERT_TRUE(elem != NULL);
   elem = elem->GetElement("link");
