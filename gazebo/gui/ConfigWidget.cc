@@ -66,10 +66,10 @@ google::protobuf::Message *ConfigWidget::GetMsg()
 /////////////////////////////////////////////////
 void ConfigWidget::SetIntWidgetProperty(const std::string &_name, int _value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateIntWidget(childWidget, _value);
 }
 
@@ -77,10 +77,10 @@ void ConfigWidget::SetIntWidgetProperty(const std::string &_name, int _value)
 void ConfigWidget::SetUIntWidgetProperty(const std::string &_name,
     unsigned int _value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateUIntWidget(childWidget, _value);
 }
 
@@ -88,10 +88,10 @@ void ConfigWidget::SetUIntWidgetProperty(const std::string &_name,
 void ConfigWidget::SetDoubleWidgetProperty(const std::string &_name,
     double _value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateDoubleWidget(childWidget, _value);
 }
 
@@ -99,10 +99,10 @@ void ConfigWidget::SetDoubleWidgetProperty(const std::string &_name,
 void ConfigWidget::SetBoolWidgetProperty(const std::string &_name,
     bool _value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateBoolWidget(childWidget, _value);
 }
 
@@ -110,10 +110,10 @@ void ConfigWidget::SetBoolWidgetProperty(const std::string &_name,
 void ConfigWidget::SetStringWidgetProperty(const std::string &_name,
     const std::string &_value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateStringWidget(childWidget, _value);
 }
 
@@ -121,10 +121,10 @@ void ConfigWidget::SetStringWidgetProperty(const std::string &_name,
 void ConfigWidget::SetVector3WidgetProperty(const std::string &_name,
     const math::Vector3 &_value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateVector3Widget(childWidget, _value);
 }
 
@@ -132,10 +132,10 @@ void ConfigWidget::SetVector3WidgetProperty(const std::string &_name,
 void ConfigWidget::SetColorWidgetProperty(const std::string &_name,
     const common::Color &_value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateColorWidget(childWidget, _value);
 }
 
@@ -143,10 +143,10 @@ void ConfigWidget::SetColorWidgetProperty(const std::string &_name,
 void ConfigWidget::SetPoseWidgetProperty(const std::string &_name,
     const math::Pose &_value)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdatePoseWidget(childWidget, _value);
 }
 
@@ -154,10 +154,10 @@ void ConfigWidget::SetPoseWidgetProperty(const std::string &_name,
 void ConfigWidget::SetGeometryWidgetProperty(const std::string &_name,
     const std::string &_value, const math::Vector3 &_dimensions)
 {
-  if (configWidgets.find(_name) == configWidgets.end())
+  if (this->configWidgets.find(_name) == this->configWidgets.end())
     return;
 
-  ConfigChildWidget *childWidget = configWidgets[_name];
+  ConfigChildWidget *childWidget = this->configWidgets[_name];
   this->UpdateGeometryWidget(childWidget, _value, _dimensions);
 }
 
@@ -196,10 +196,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
       bool newWidget = true;
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
-      if (configWidgets.find(scopedName) != configWidgets.end())
+      if (this->configWidgets.find(scopedName) != this->configWidgets.end())
         newWidget = false;
       else
-        configChildWidget = configWidgets[scopedName];
+        configChildWidget = this->configWidgets[scopedName];
 
       switch (field->cpp_type())
       {
@@ -449,7 +449,6 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
 
             math::Vector3 vec3 = this->ParseVector3(valueMsg);
             this->UpdateVector3Widget(configChildWidget, vec3);
-
           }
           // parse and create custom color widgets
           else if (field->message_type()->name() == "Color")
@@ -982,10 +981,10 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
     if (!field->is_repeated() && ref->HasField(*_msg, field))
     {
       std::string scopedName = _name.empty() ? name : _name + "::" + name;
-      if (configWidgets.find(scopedName) == configWidgets.end())
+      if (this->configWidgets.find(scopedName) == this->configWidgets.end())
         continue;
 
-      ConfigChildWidget *childWidget = configWidgets[scopedName];
+      ConfigChildWidget *childWidget = this->configWidgets[scopedName];
 
       switch (field->cpp_type())
       {
