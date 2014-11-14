@@ -40,9 +40,9 @@ class ImuTest : public ServerFixture,
 void ImuTest::GetGravity(const math::Quaternion &_rot, math::Vector3 &_g)
 {
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics);
+  ASSERT_TRUE(physics != NULL);
   // Rotate into IMU's frame
   _g = _rot.GetInverse().RotateVector(physics->GetGravity());
 }
@@ -54,7 +54,7 @@ void ImuTest::GetImuData(sensors::ImuSensorPtr _imu,
                          math::Quaternion& _orientation)
 {
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
   // Collect a number of samples and return the average rate and accel values
   math::Vector3 rateSum, accelSum;
   for (unsigned int i = 0; i < _cnt; ++i)
@@ -103,7 +103,7 @@ void ImuTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
-  ASSERT_TRUE(imu);
+  ASSERT_TRUE(imu != NULL);
   imu->Init();
   math::Vector3 rateMean, accelMean;
   math::Quaternion orientation;
@@ -167,7 +167,7 @@ void ImuTest::Stationary_EmptyWorld_Noise(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
-  ASSERT_TRUE(imu);
+  ASSERT_TRUE(imu != NULL);
   imu->Init();
   math::Vector3 rateMean, accelMean;
   math::Quaternion orientation;
@@ -254,7 +254,7 @@ void ImuTest::Stationary_EmptyWorld_Bias(const std::string &_physicsEngine)
     boost::static_pointer_cast<sensors::ImuSensor>(
         sensors::SensorManager::Instance()->GetSensor(imuSensorName));
 
-  ASSERT_TRUE(imu);
+  ASSERT_TRUE(imu != NULL);
   imu->Init();
   math::Vector3 rateMean, accelMean;
   math::Quaternion orientation;

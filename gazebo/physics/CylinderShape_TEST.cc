@@ -46,17 +46,17 @@ TEST_F(CylinderShapeTest, Scale)
   physics::CylinderShapePtr cylinder(
       new physics::CylinderShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = cylinderSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("cylinder");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   cylinder->Load(elem);
 
   // Test scaling with unit size

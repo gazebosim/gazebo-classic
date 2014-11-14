@@ -37,7 +37,7 @@ void WorldEnvPopulationTest::EmptyPopulation(const std::string &/*_physicsEng*/)
 {
   Load("test/worlds/empty_population.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // The models should not load because we are trying to load a population with
   // a non positive 'model_count' value. In any case. let's wait some time to
@@ -60,7 +60,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
 {
   Load("worlds/population.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != NULL);
 
   // Wait some time while the models are being loaded.
   int i = 0;

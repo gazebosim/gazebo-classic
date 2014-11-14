@@ -44,17 +44,17 @@ TEST_F(BoxShapeTest, Scale)
 
   physics::BoxShapePtr box(new physics::BoxShape(physics::CollisionPtr()));
   sdf::ElementPtr elem = boxSDF->root;
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("collision");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("geometry");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   elem = elem->GetElement("box");
-  ASSERT_TRUE(elem);
+  ASSERT_TRUE(elem.get());
   box->Load(elem);
 
   // Test scaling with unit size
