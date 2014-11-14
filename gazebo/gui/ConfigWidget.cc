@@ -499,7 +499,8 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             configGroupLayout->addWidget(groupButton);
             configGroupLayout->addWidget(newFieldWidget);
             groupWidget->setLayout(configGroupLayout);
-            connect(groupButton, SIGNAL(clicked()), groupWidget,SLOT(Toggle()));
+            connect(groupButton, SIGNAL(clicked()), groupWidget,
+                SLOT(Toggle()));
             // reset new field widget pointer in order for it to be added
             // to the parent widget
             newFieldWidget = groupWidget;
@@ -1144,7 +1145,6 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
           // update pose msg field
           else if (field->message_type()->name() == "Pose")
           {
-
             const google::protobuf::Descriptor *valueDescriptor =
                 valueMsg->GetDescriptor();
             int valueMsgFieldCount = valueDescriptor->field_count();
