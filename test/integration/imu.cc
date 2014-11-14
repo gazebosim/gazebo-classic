@@ -170,7 +170,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   for (unsigned n = 0; n < 1900; ++n)
   {
     world->StepWorld(1);
-    gzdbg << "time: " << world->GetSimTime().Double() << "\n";
+    // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
+
     /* pendulum */
     // on startup
     //   sensor linear accel [0 0 0]
