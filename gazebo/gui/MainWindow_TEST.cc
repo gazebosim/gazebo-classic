@@ -122,7 +122,7 @@ void MainWindow_TEST::CopyPasteModel()
     QTest::qWait(30);
     sleep++;
   }
-  QVERIFY(modelVisClone.get());
+  QVERIFY(modelVisClone != NULL);
 
   cam->Fini();
   mainWindow->close();
@@ -217,7 +217,7 @@ void MainWindow_TEST::CopyPasteLight()
     QTest::qWait(30);
     sleep++;
   }
-  QVERIFY(lightClone.get());
+  QVERIFY(lightClone != NULL);
 
   lightClone.reset();
   cam->Fini();

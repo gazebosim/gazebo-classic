@@ -29,7 +29,6 @@
 #include <sdf/sdf.hh>
 
 #include <gtest/gtest.h>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem.hpp>
 
