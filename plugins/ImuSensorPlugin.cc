@@ -56,14 +56,14 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
 }
 
 /////////////////////////////////////////////////
-void ImuSensorPlugin::OnUpdate(sensors::ImuSensorPtr _sensor)
+void ImuSensorPlugin::OnUpdate(sensors::ImuSensorPtr /*_sensor*/)
 {
   // overload with useful callback here
-  gzdbg << _sensor->GetName() << " :\n"
-        << "  sensor linear accel [" << _sensor->GetLinearAcceleration()
-        << "]\n  Link::GetRelativeLinearAccel() ["
-        << this->link->GetRelativeLinearAccel()
-        << "]\n  Link::GetWorldLinearAccel() ["
-        << this->link->GetWorldLinearAccel()
-        << "]\n";
+  // gzdbg << _sensor->GetName() << " :\n"
+  //       << "  sensor linear accel [" << _sensor->GetLinearAcceleration()
+  //       << "]\n  Link::GetRelativeLinearAccel() ["
+  //       << this->link->GetRelativeLinearAccel()
+  //       << "]\n  Link::GetWorldLinearAccel() ["
+  //       << this->link->GetWorldLinearAccel()
+  //       << "]\n";
 }
