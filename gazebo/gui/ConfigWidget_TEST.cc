@@ -32,8 +32,6 @@
 /////////////////////////////////////////////////
 void ConfigWidget_TEST::EmptyMsgWidget()
 {
-  //this->Load("worlds/empty.world");
-
   gazebo::gui::ConfigWidget *visualConfigWidget =
       new gazebo::gui::ConfigWidget;
   gazebo::msgs::Visual visualMsg;
@@ -309,7 +307,6 @@ void ConfigWidget_TEST::VisualMsgWidget()
 
   delete visualConfigWidget;
 }
-
 
 // Generate a main function for the test
 QTEST_MAIN(ConfigWidget_TEST)

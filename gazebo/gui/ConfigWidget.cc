@@ -1272,7 +1272,6 @@ void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
   }
 }
 
-
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateIntWidget(ConfigChildWidget *_widget,  int _value)
 {
