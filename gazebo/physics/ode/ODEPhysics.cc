@@ -1439,7 +1439,7 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case INERTIA_RATIO_REDUCTION:
     {
-      return this->GetParam("use_dynamic_moi_rescaling");
+      return this->GetParam("inertia_ratio_reduction");
     }
     default:
     {
