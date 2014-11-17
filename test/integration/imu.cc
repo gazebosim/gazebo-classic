@@ -172,7 +172,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     world->StepWorld(1);
     // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
 
-    /* pendulum */
+    // pendulum
     // on startup
     //   sensor linear accel [0 0 0]
     //   Link::GetRelativeLinearAccel() [0 0 -9.81]
@@ -212,7 +212,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       }
     }
 
-    /* friction ball */
+    // friction ball
     // before contact
     //   sensor linear accel [0 0 0]
     //   Link::GetRelativeLinearAccel() [0 0 -9.81]
@@ -271,7 +271,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       }
     }
 
-    /* frictionless ball */
+    // frictionless ball
     // before contact
     //   sensor linear accel [0 0 0]
     //   Link::GetRelativeLinearAccel() [0 0 -9.81]
@@ -283,7 +283,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
     // @T=1.8 sec, on ground - constant
     //   sensor linear accel [0 0 9.81]
     //   Link::GetRelativeLinearAccel() [0 0 0]
-    //   Link::GetWorldLinearAccel() [0 0 0]   
+    //   Link::GetWorldLinearAccel() [0 0 0]
     {
       // get states from imu sensor
       math::Vector3 imuLinearAccel =

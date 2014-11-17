@@ -2359,10 +2359,12 @@ void dxQuickStepper (dxWorldProcessContext *context,
     IFTIMING (dTimerNow ("update position"));
     const dReal *caccelcurr = caccel;
     dxBody *const *const bodyend = body + nb;
-    for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
+    for (dxBody *const *bodycurr = body; bodycurr != bodyend;
+         caccelcurr += 6, ++bodycurr)
+    {
       dxBody *b_ptr = *bodycurr;
       {
-        // summ all forces (external and constraint) into facc and tacc
+        // sum all forces (external and constraint) into facc and tacc
         // so dBodyGetForce and dBodyGetTorque returns total force and torque
         // on the body
         dReal cf[6];

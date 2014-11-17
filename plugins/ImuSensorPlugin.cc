@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ void ImuSensorPlugin::Load(sensors::SensorPtr _parent,
     boost::dynamic_pointer_cast<sensors::ImuSensor>(_parent);
 
   this->world = physics::get_world(_parent->GetWorldName());
-  this->entity = this->world->GetEntity(_parent->GetParentName());
-  this->link = boost::dynamic_pointer_cast<physics::Link>(this->entity);
+  physics::EntityPtr entity = this->world->GetEntity(_parent->GetParentName());
+  this->link = boost::dynamic_pointer_cast<physics::Link>(entity);
 
   if (!this->link)
     gzthrow("Imu sensor parent is not a Link.");

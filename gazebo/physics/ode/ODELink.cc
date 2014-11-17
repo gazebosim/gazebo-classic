@@ -196,21 +196,11 @@ void ODELink::MoveCallback(dBodyID _id)
   // get force and applied to this body
   if (_id)
   {
-    const dReal *dforce;
+    const dReal *dforce = dBodyGetForce(_id);
+    self->force.Set(dforce[0], dforce[1], dforce[2]);
 
-    dforce = dBodyGetForce(_id);
-
-    self->force.x = dforce[0];
-    self->force.y = dforce[1];
-    self->force.z = dforce[2];
-
-    const dReal *dtorque;
-
-    dtorque = dBodyGetTorque(_id);
-
-    self->torque.x = dtorque[0];
-    self->torque.y = dtorque[1];
-    self->torque.z = dtorque[2];
+    const dReal *dtorque = dBodyGetTorque(_id);
+    self->torque.Set(dtorque[0], dtorque[1], dtorque[2]);
   }
 }
 

@@ -48,8 +48,10 @@ namespace gazebo
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr connection;
 
+    /// \brief Pointer to the world
     private: physics::WorldPtr world;
-    private: physics::EntityPtr entity;
+
+    /// \brief Pointer to the parent link
     private: physics::LinkPtr link;
   };
 }
