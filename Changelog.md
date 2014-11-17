@@ -125,6 +125,8 @@
 
 1. Fixed sonar and wireless sensor visualization
     * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
+1. Update visual bounding box when model is selected
+    * [Pull request #1280](https://bitbucket.org/osrf/gazebo/pull-request/1280)
 
 ### Gazebo 3.1.0 (2014-08-08)
 
