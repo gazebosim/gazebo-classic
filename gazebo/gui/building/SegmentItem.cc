@@ -15,7 +15,7 @@
  *
 */
 
-#include <iostream>
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
 
@@ -261,9 +261,8 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
     {
       QLineF newLine(p1, p2);
-      double PI = acos(-1);
-      double angle = QLineF(p1, p2).angle()*PI/180.0;
-      double range = (15)*PI/180.0;
+      double angle = GZ_DTOR(QLineF(p1, p2).angle());
+      double range = GZ_DTOR(15);
       int increment = angle / range;
 
       if ((angle - range*increment) > range/2)

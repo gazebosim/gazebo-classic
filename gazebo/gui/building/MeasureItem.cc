@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/MeasureItem.hh"
@@ -50,8 +51,7 @@ void MeasureItem::paint(QPainter *_painter,
 {
   QPointF p1 = this->line().p1();
   QPointF p2 = this->line().p2();
-  double PI = acos(-1);
-  double angle = this->line().angle()*PI/180.0;
+  double angle = GZ_DTOR(this->line().angle());
 
   QPen measurePen;
   measurePen.setStyle(Qt::SolidLine);
@@ -64,15 +64,15 @@ void MeasureItem::paint(QPainter *_painter,
   _painter->drawLine(this->line());
 
   // End tips
-  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+PI/2),
-                             p1.y()-tipLength*qSin(angle+PI/2)),
-                     QPointF(p1.x()-tipLength*qCos(angle+PI/2),
-                             p1.y()+tipLength*qSin(angle+PI/2)));
+  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+GZ_DTOR(90)),
+                             p1.y()-tipLength*qSin(angle+GZ_DTOR(90))),
+                     QPointF(p1.x()-tipLength*qCos(angle+GZ_DTOR(90)),
+                             p1.y()+tipLength*qSin(angle+GZ_DTOR(90))));
 
-  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+PI/2),
-                             p2.y()-tipLength*qSin(angle+PI/2)),
-                     QPointF(p2.x()-tipLength*qCos(angle+PI/2),
-                             p2.y()+tipLength*qSin(angle+PI/2)));
+  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+GZ_DTOR(90)),
+                             p2.y()-tipLength*qSin(angle+GZ_DTOR(90))),
+                     QPointF(p2.x()-tipLength*qCos(angle+GZ_DTOR(90)),
+                             p2.y()+tipLength*qSin(angle+GZ_DTOR(90))));
 
   // Value
   std::ostringstream stream;
@@ -86,20 +86,20 @@ void MeasureItem::paint(QPainter *_painter,
   float posX = (p1.x()+p2.x())/2;
   float posY = (p1.y()+p2.y())/2;
   double textAngle = angle;
-  if (textAngle > PI)
-    textAngle = textAngle - PI;
+  if (textAngle > GZ_DTOR(180))
+    textAngle = textAngle - GZ_DTOR(180);
 
-  if (textAngle > 0 && textAngle <= PI/2)
+  if (textAngle > 0 && textAngle <= GZ_DTOR(90))
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+PI/2)-textWidth;
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+PI/2);
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+GZ_DTOR(90))-textWidth;
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+GZ_DTOR(90));
   }
-  else if (textAngle > PI/2 && textAngle < PI)
+  else if (textAngle > GZ_DTOR(90) && textAngle < GZ_DTOR(180))
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-PI/2);
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-PI/2);
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-GZ_DTOR(90));
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-GZ_DTOR(90));
   }
-  else if (fabs(textAngle) < 0.01 || fabs(textAngle - PI) < 0.01)
+  else if (fabs(textAngle) < 0.01 || fabs(textAngle - GZ_DTOR(180)) < 0.01)
   {
     posX = (p1.x()+p2.x())/2 - textWidth/2;
     posY = (p1.y()+p2.y())/2 - margin;

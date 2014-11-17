@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/ImportImageDialog.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/gui/building/GridLines.hh"
@@ -366,12 +367,11 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
           if (!this->snapToGrabber)
           {
             QLineF newLine(p1, p2);
-            double PI = acos(-1);
-            double angle = QLineF(p1, p2).angle()*PI/180.0;
-            double range = (15)*PI/180.0;
+            double angle = GZ_DTOR(QLineF(p1, p2).angle());
+            double range = GZ_DTOR(15);
             int increment = angle / range;
 
-            if ((angle - range*increment) > range/2)
+            if ((angle - range*increment) > range*0.5)
               increment++;
             angle = -range*increment;
 
@@ -641,7 +641,8 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
-    wallSegmentItem->setSelected(true);  // Select -> deselect to trigger change
+    // Select -> deselect to trigger change
+    wallSegmentItem->setSelected(true);
     wallSegmentItem->setSelected(false);
     wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
@@ -980,7 +981,8 @@ void EditorView::OnAddLevel()
 
     floorItem->AttachWallSegment(wallSegmentItem);
 
-    wallSegmentItem->setSelected(true);  // Select -> deselect to trigger change
+    // Select -> deselect to trigger change
+    wallSegmentItem->setSelected(true);
     wallSegmentItem->setSelected(false);
   }
 
@@ -1279,21 +1281,27 @@ void EditorView::LinkGrabbers(GrabberHandle *_grabber1,
 {
   if (_grabber1 && _grabber2 && _grabber1 != _grabber2)
   {
+    // if _grabber2 is not yet linked to _grabber1
     if (std::find(_grabber1->linkedGrabbers.begin(),
                   _grabber1->linkedGrabbers.end(), _grabber2) ==
                   _grabber1->linkedGrabbers.end())
     {
+      // Add _grabber2 so it moves when _grabber1 is moved
       _grabber1->linkedGrabbers.push_back(_grabber2);
+      // also link _grabber1 to all grabbers already linked to _grabber2
       for (unsigned int i2 = 0; i2 < _grabber2->linkedGrabbers.size(); ++i2)
       {
         this->LinkGrabbers(_grabber1, _grabber2->linkedGrabbers[i2]);
       }
     }
+    // if _grabber1 is not yet linked to _grabber2
     if (std::find(_grabber2->linkedGrabbers.begin(),
                   _grabber2->linkedGrabbers.end(), _grabber1) ==
                   _grabber2->linkedGrabbers.end())
     {
+      // Add _grabber1 so it moves when _grabber2 is moved
       _grabber2->linkedGrabbers.push_back(_grabber1);
+      // also link _grabber2 to all grabbers already linked to _grabber1
       for (unsigned int i1 = 0; i1 < _grabber1->linkedGrabbers.size(); ++i1)
       {
         this->LinkGrabbers(_grabber2, _grabber1->linkedGrabbers[i1]);
