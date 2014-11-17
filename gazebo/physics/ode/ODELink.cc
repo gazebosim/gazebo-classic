@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <math.h>
 #include <sstream>
 
@@ -42,8 +37,6 @@ ODELink::ODELink(EntityPtr _parent)
     : Link(_parent)
 {
   this->linkId = NULL;
-  this->force.Set(0, 0, 0);
-  this->torque.Set(0, 0, 0);
 }
 
 //////////////////////////////////////////////////
