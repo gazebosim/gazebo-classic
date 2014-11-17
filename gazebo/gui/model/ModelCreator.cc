@@ -159,8 +159,6 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
       linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -168,6 +166,7 @@ std::string ModelCreator::AddBox(const math::Vector3 &_size,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -203,8 +202,6 @@ std::string ModelCreator::AddSphere(double _radius,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -212,6 +209,7 @@ std::string ModelCreator::AddSphere(double _radius,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -246,8 +244,6 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -257,6 +253,7 @@ std::string ModelCreator::AddCylinder(double _radius, double _length,
 
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -293,8 +290,6 @@ std::string ModelCreator::AddCustom(const std::string &_path,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreyTransparent");
 
   sdf::ElementPtr geomElem =  visualElem->GetElement("geometry");
   geomElem->ClearElements();
@@ -303,6 +298,7 @@ std::string ModelCreator::AddCustom(const std::string &_path,
   meshElem->GetElement("uri")->Set(path);
   visVisual->Load(visualElem);
 
+  linkVisual->SetTransparency(0.5);
   linkVisual->SetPose(_pose);
   if (_pose == math::Pose::Zero)
   {
@@ -620,13 +616,13 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     // Is part
     if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
-      // Either the model or parts are selected
+      // In mouse normal mode, let users select a part if the parent model
+      // is currently selected.
       if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
           !this->selectedVisuals.empty())
-      {
-        // In mouse normal mode, let users select a part if the parent model
-        // is currently selected.
+      {        
         // Deselect model
+        this->modelVisual->SetHighlighted(false);
         event::Events::setSelectedEntity("", "normal");
 
         // deselect all parts if not in multi-selection mode.
