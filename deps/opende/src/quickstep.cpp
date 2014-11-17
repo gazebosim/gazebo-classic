@@ -2082,7 +2082,8 @@ void dxQuickStepper (dxWorldProcessContext *context,
           }
 
           // Modify inertia to keep simulation stable
-          DYNAMIC_INERTIA(infom, Jinfo, b1, b2, jicurr, invMOI, MOI);
+          if (world->qs.dynamic_inertia_reduction)
+            DYNAMIC_INERTIA(infom, Jinfo, b1, b2, jicurr, invMOI, MOI);
 
           // update index for next joint
           ofsi += infom;

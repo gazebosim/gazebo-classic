@@ -109,6 +109,12 @@ public:
   dReal getQuickStepRMSError() const
     { return dWorldGetQuickStepRMSError (get_id()); }
 
+  /* experimental PGS */
+  bool getQuickStepInertiaRatioReduction() const
+    { return dWorldGetQuickStepInertiaRatioReduction (get_id()); }
+  void setQuickStepInertiaRatioReduction(bool irr)
+    { dWorldSetQuickStepInertiaRatioReduction (get_id(), irr); }
+
   void  setAutoDisableLinearThreshold (dReal threshold) 
     { dWorldSetAutoDisableLinearThreshold (get_id(), threshold); }
   dReal getAutoDisableLinearThreshold() const

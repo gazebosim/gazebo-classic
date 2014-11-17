@@ -1658,6 +1658,11 @@ dxWorld * dWorldCreate()
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
   w->qs.sor_lcp_tolerance = 0;
+  // NOTE: This feature creates a dynamics incompatibility with simulations
+  // that worked with Gazebo 2.2.2 and earlier. It was broken in Gazebo 2.2.3
+  // but with this patch can be disabled with the <use_dynamic_moi_rescaling>
+  // tag.
+  w->qs.dynamic_inertia_reduction = true;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -2241,6 +2246,21 @@ dReal dWorldGetQuickStepRMSError (dWorldID w)
 	dAASSERT(w);
 	return w->qs.rms_error;
 }
+
+
+/* experimental PGS */
+bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
+{
+	dAASSERT(w);
+  return w->qs.dynamic_inertia_reduction;
+}
+
+void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
+{
+	dAASSERT(w);
+  w->qs.dynamic_inertia_reduction = irr;
+}
+
 
 
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)

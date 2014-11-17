@@ -218,6 +218,8 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters());
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
+  dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+       odeElem->GetElement("solver")->Get<bool>("use_dynamic_moi_rescaling"));
 
   // Set the physics update function
   if (this->stepType == "quick")
@@ -1245,6 +1247,14 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
       odeElem->GetElement("solver")->GetElement("min_step_size")->Set(value);
       break;
     }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      bool value = boost::any_cast<bool>(_value);
+      odeElem->GetElement("solver")->GetElement(
+          "use_dynamic_moi_rescaling")->Set(value);
+      dWorldSetQuickStepInertiaRatioReduction(this->worldId, value);
+      break;
+    }
     default:
     {
       gzwarn << "Param not supported in ode" << std::endl;
@@ -1278,6 +1288,8 @@ void ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
     param = MAX_CONTACTS;
   else if (_key == "min_step_size")
     param = MIN_STEP_SIZE;
+  else if (_key == "inertia_ratio_reduction")
+    param = INERTIA_RATIO_REDUCTION;
   else
   {
     gzwarn << _key << " is not supported in ode" << std::endl;
@@ -1345,6 +1357,12 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     case MIN_STEP_SIZE:
     {
       value = odeElem->GetElement("solver")->Get<double>("min_step_size");
+      break;
+    }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      value = odeElem->GetElement("solver")->Get<bool>(
+          "use_dynamic_moi_rescaling");
       break;
     }
     default:
