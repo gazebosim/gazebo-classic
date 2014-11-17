@@ -112,6 +112,7 @@ set (gtest_sources_dri
   Heightmap_TEST.cc
   SonarVisual_TEST.cc
   TransmitterVisual_TEST.cc
+  Visual_TEST.cc
 )
 
 gz_build_dri_tests(${gtest_sources_dri})

@@ -789,13 +789,30 @@ void Visual::SetScale(const math::Vector3 &_scale)
   if (this->dataPtr->scale == _scale)
     return;
 
-  math::Vector3 tmpScale = this->dataPtr->scale;
   this->dataPtr->scale = _scale;
+
+  // update geom size based on scale.
+  this->UpdateGeomSize(_scale);
+
+  this->dataPtr->sceneNode->setScale(
+      Conversions::Convert(this->dataPtr->scale));
+}
+
+//////////////////////////////////////////////////
+void Visual::UpdateGeomSize(const math::Vector3 &_scale)
+{
+  for (std::vector<VisualPtr>::iterator iter = this->dataPtr->children.begin();
+       iter != this->dataPtr->children.end(); ++iter)
+  {
+    (*iter)->UpdateGeomSize(_scale);
+  }
 
   sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
 
   if (geomElem->HasElement("box"))
+  {
     geomElem->GetElement("box")->GetElement("size")->Set(_scale);
+  }
   else if (geomElem->HasElement("sphere"))
   {
     geomElem->GetElement("sphere")->GetElement("radius")->Set(_scale.x/2.0);
@@ -808,48 +825,12 @@ void Visual::SetScale(const math::Vector3 &_scale)
   }
   else if (geomElem->HasElement("mesh"))
     geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
-
-  this->dataPtr->sceneNode->setScale(
-      Conversions::Convert(this->dataPtr->scale));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
   return this->dataPtr->scale;
-  /*math::Vector3 result(1, 1, 1);
-  if (this->dataPtr->sdf->HasElement("geometry"))
-  {
-    sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
-
-    if (geomElem->HasElement("box"))
-    {
-      result = geomElem->GetElement("box")->Get<math::Vector3>("size");
-    }
-    else if (geomElem->HasElement("sphere"))
-    {
-      double r = geomElem->GetElement("sphere")->Get<double>("radius");
-      result.Set(r * 2.0, r * 2.0, r * 2.0);
-    }
-    else if (geomElem->HasElement("cylinder"))
-    {
-      double r = geomElem->GetElement("cylinder")->Get<double>("radius");
-      double l = geomElem->GetElement("cylinder")->Get<double>("length");
-      result.Set(r * 2.0, r * 2.0, l);
-    }
-    else if (geomElem->HasElement("plane"))
-    {
-      math::Vector2d size =
-        geomElem->GetElement("plane")->Get<math::Vector2d>("size");
-      result.Set(size.x, size.y, 1);
-    }
-    else if (geomElem->HasElement("mesh"))
-    {
-      result = geomElem->GetElement("mesh")->Get<math::Vector3>("scale");
-    }
-  }
-
-  return result;*/
 }
 
 //////////////////////////////////////////////////
@@ -1406,13 +1387,24 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
+    math::Box bbox = this->GetBoundingBox();
+    // GetBoundingBox returns the box in world coordinates
+    // Invert thes scale of the box before attaching to the visual
+    // so that the new inherited scale after attachment is correct.
+    math::Vector3 scale = Conversions::Convert(
+          this->dataPtr->sceneNode->_getDerivedScale());
+    bbox.min = bbox.min / scale;
+    bbox.max = bbox.max / scale;
+
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
     {
-      this->dataPtr->boundingBox = new WireBox(shared_from_this(),
-                                      this->GetBoundingBox());
+      this->dataPtr->boundingBox = new WireBox(shared_from_this(), bbox);
     }
-
+    else
+    {
+      this->dataPtr->boundingBox->Init(bbox);
+    }
     this->dataPtr->boundingBox->SetVisible(true);
   }
   else if (this->dataPtr->boundingBox)
@@ -1779,6 +1771,10 @@ math::Box Visual::GetBoundingBox() const
 void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 {
   node->_updateBounds();
+  node->_update(false, true);
+
+  Ogre::Matrix4 invTransform =
+      this->dataPtr->sceneNode->_getFullTransform().inverse();
 
   Ogre::SceneNode::ChildNodeIterator it = node->getChildIterator();
 
@@ -1793,7 +1789,8 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       if (any.getType() == typeid(std::string))
       {
         std::string str = Ogre::any_cast<std::string>(any);
-        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans")
+        if (str.substr(0, 3) == "rot" || str.substr(0, 5) == "trans"
+            || str.substr(0, 5) == "scale")
           continue;
       }
 
@@ -1801,14 +1798,6 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
 
       math::Vector3 min;
       math::Vector3 max;
-      math::Quaternion rotDiff;
-      math::Vector3 posDiff;
-
-      rotDiff = Conversions::Convert(node->_getDerivedOrientation()) -
-                this->GetWorldPose().rot;
-
-      posDiff = Conversions::Convert(node->_getDerivedPosition()) -
-                this->GetWorldPose().pos;
 
       // Ogre does not return a valid bounding box for lights.
       if (obj->getMovableType() == "Light")
@@ -1818,12 +1807,18 @@ void Visual::GetBoundsHelper(Ogre::SceneNode *node, math::Box &box) const
       }
       else
       {
-        min = rotDiff *
-          Conversions::Convert(bb.getMinimum() * node->getScale()) + posDiff;
-        max = rotDiff *
-          Conversions::Convert(bb.getMaximum() * node->getScale()) + posDiff;
+        // Get transform to be applied to the current node.
+        Ogre::Matrix4 transform = invTransform * node->_getFullTransform();
+        // Correct precision error which makes ogre's isAffine check fail.
+        transform[3][0] = transform[3][1] = transform[3][2] = 0;
+        transform[3][3] = 1;
+        // get oriented bounding box in object's local space
+        bb.transformAffine(transform);
+        if (node->getParentSceneNode())
+          bb.scale(node->getParentSceneNode()->_getDerivedScale());
+        min = Conversions::Convert(bb.getMinimum());
+        max = Conversions::Convert(bb.getMaximum());
       }
-
 
       box.Merge(math::Box(min, max));
     }
