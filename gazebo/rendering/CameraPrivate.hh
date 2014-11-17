@@ -57,6 +57,9 @@ namespace gazebo
       /// \brief Screen space ambient occlusion compositor.
       public: Ogre::CompositorInstance *ssaoInstance;
 
+      /// \brief Lens distortion model
+      public: DistortionPtr distortion;
+
       /// \brief Queue of move positions.
       public: std::deque<std::pair<math::Pose, double> > moveToPositionQueue;
 

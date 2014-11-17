@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <gui>
+      <plugin name="timer_gui" filename="libTimerGUIPlugin.so">
+        <topic>~/timer_control</topic>
+        <pos>10 10</pos>
+        <size>150 30</size>
+      </plugin>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+  </world>
+</sdf>

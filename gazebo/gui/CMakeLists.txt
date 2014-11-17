@@ -129,7 +129,12 @@ set (qt_tests
 
 # MainWindow is using screen rendering
 if (ENABLE_SCREEN_TESTS)
-  set (qt_tests   ${qt_tests} MainWindow_TEST.cc ModelListWidget_TEST.cc ModelSnap_TEST.cc)
+  set (qt_tests
+      ${qt_tests}
+      BuildingEditor_TEST.cc
+      MainWindow_TEST.cc
+      ModelListWidget_TEST.cc
+      ModelSnap_TEST.cc)
 endif()
 
 # Generate executables for each of the QT unit tests
