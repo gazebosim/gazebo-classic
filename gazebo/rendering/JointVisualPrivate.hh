@@ -31,6 +31,9 @@ namespace gazebo
     {
       /// \brief The visual used to draw the joint.
       public: AxisVisualPtr axisVisual;
+
+      /// \brief The arrow visuals representing main axes of the joint.
+      public: std::vector<ArrowVisualPtr> arrowVisuals;
     };
   }
 }

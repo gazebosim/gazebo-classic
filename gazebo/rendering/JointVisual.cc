@@ -128,4 +128,21 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
     dPtr->axisVisual->SetAxisVisible(1, false);
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
     dPtr->axisVisual->SetAxisVisible(2, false);
+
+  dPtr->arrowVisuals.push_back(axis);
+}
+
+/////////////////////////////////////////////////
+void JointVisual::ShowAxis(unsigned int _index, bool _show)
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  if (_index >= dPtr->arrowVisuals.size())
+    return;
+
+  if (_show)
+    this->AttachVisual(dPtr->arrowVisuals[_index]);
+  else
+    this->DetachVisual(dPtr->arrowVisuals[_index]);
 }

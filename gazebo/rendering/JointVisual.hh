@@ -55,6 +55,11 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       public: void CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
           msgs::Joint::Type _type);
+
+      /// \brief Set whether to show an axis in the joint
+      /// \param[in] _index Axis index.
+      /// \param[in] _show True to show the axis.
+      public: void ShowAxis(unsigned int _index, bool _show);
     };
     /// \}
   }
