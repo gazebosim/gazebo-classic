@@ -51,6 +51,7 @@
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
 1. Added accessor for MainWindow graphical widget to GuiIface.
+    * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
 
 ## Gazebo 4.0
 
