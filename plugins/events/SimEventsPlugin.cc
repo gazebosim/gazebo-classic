@@ -89,7 +89,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // Reading events
   child = this->sdf->GetElement("event");
   while (child)
-  { 
+  {
     // get name and type of each event
     std::string eventName = child->GetElement("name")->Get<std::string>();
     std::string eventType = child->GetElement("type")->Get<std::string>();

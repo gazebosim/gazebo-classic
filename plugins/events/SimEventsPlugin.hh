@@ -18,6 +18,10 @@
 #define _SIMEVENTS_PLUGIN_HH_
 
 #include <iostream>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "SimEventsException.hh"
 #include "InRegionEventSource.hh"

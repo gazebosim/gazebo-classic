@@ -18,10 +18,11 @@
 #ifndef _INREGIONEVENTSOURCE_HH_
 #define _INREGIONEVENTSOURCE_HH_
 
-#include "EventSource.hh"
 #include <map>
 #include <string>
 #include <vector>
+
+#include "EventSource.hh"
 
 namespace gazebo
 {

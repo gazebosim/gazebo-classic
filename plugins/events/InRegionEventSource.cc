@@ -153,7 +153,7 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     }
     else if (ename == "name")
     {
-      this->name = child->Get<std::string>(); 
+      this->name = child->Get<std::string>();
     }
     else
     {

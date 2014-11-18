@@ -26,9 +26,10 @@
 
 #include "SimEventsException.hh"
 
+#include <string>
+
 namespace gazebo
 {
-
   /// \brief The base class for emitting SimEvents
   class EventSource
   {
@@ -50,10 +51,10 @@ namespace gazebo
 
     /// \brief Initialize the event
     public: virtual void Init();
- 
+
     /// \brief An event source can be used to enable other events
     public: virtual bool IsActive();
- 
+
     /// \brief Name of the event.
     protected: std::string name;
 
@@ -62,7 +63,7 @@ namespace gazebo
 
     /// \brief Pointer to the world.
     protected: physics::WorldPtr world;
- 
+
     /// \brief True if the event source is active.
     /// Inactive event sources do not emit events
     protected: bool active;
@@ -70,7 +71,7 @@ namespace gazebo
     /// \brief a way to send messages to the other topics (to the REST)
     protected: transport::PublisherPtr pub;
   };
-  
+
   typedef boost::shared_ptr<EventSource> EventSourcePtr;
 
   /// \brief Gazebo events to detect model creation/deletion
@@ -93,7 +94,6 @@ namespace gazebo
     /// \brief A model has been completed and uploaded onto the server.
     public: static event::EventT<void (std::string, bool)> spawnModel;
   };
-
 }
 
 #endif

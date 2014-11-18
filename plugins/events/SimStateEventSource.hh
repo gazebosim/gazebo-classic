@@ -50,5 +50,5 @@ namespace gazebo
     private: event::ConnectionPtr pauseConnection;
   };
 }
- 
+
 #endif

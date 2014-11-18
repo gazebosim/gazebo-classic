@@ -20,8 +20,8 @@
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
-SimStateEventSource::SimStateEventSource( transport::PublisherPtr _pub,
-                                          physics::WorldPtr _world)
+SimStateEventSource::SimStateEventSource(transport::PublisherPtr _pub,
+                                         physics::WorldPtr _world)
   :EventSource(_pub, "sim_state", _world), hasPaused(false)
 {
 }

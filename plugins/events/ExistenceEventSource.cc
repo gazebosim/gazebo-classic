@@ -21,11 +21,10 @@ using namespace gazebo;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-ExistenceEventSource::ExistenceEventSource( transport::PublisherPtr _pub,
-                                            physics::WorldPtr _world)
+ExistenceEventSource::ExistenceEventSource(transport::PublisherPtr _pub,
+                                           physics::WorldPtr _world)
   :EventSource(_pub, "existence", _world)
 {
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +49,7 @@ void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
     // set the data for the existence event
     std::string json = "{";
     json += "\"event\":\"existence\",";
-    if(_alive)
+    if (_alive)
     {
       json += "\"state\":\"creation\",";
     }

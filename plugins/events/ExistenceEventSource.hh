@@ -18,8 +18,9 @@
 #ifndef _EXISTENCEVENTSOURCE_HH_
 #define _EXISTENCEVENTSOURCE_HH_
 
-#include "EventSource.hh"
 #include <string>
+
+#include "EventSource.hh"
 
 namespace gazebo
 {
@@ -37,7 +38,7 @@ namespace gazebo
 
     /// \brief callback for gazebo event
     /// \param[in] _model the name of the model
-    /// \param[in] _alive true for spawn, false for delete 
+    /// \param[in] _alive true for spawn, false for delete
     public: void OnExistence(std::string _model, bool _alive);
 
     /// \brief A filter to raise the event only for models
