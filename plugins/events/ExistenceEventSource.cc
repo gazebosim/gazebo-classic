@@ -32,7 +32,6 @@ ExistenceEventSource::ExistenceEventSource( transport::PublisherPtr _pub,
 void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
 {
   EventSource::Load(_sdf);
-  // TODO: make configurable filter?
   if (_sdf->HasElement("model"))
   {
     this->model = _sdf->GetElement("model")->Get<std::string>();
