@@ -233,7 +233,6 @@ bool gui::load()
     }
   }
 
-
   g_modelRightMenu = new gui::ModelRightMenu();
 
   rendering::load();
