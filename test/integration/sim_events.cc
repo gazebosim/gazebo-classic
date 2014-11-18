@@ -93,7 +93,7 @@ void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
-  // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -126,7 +126,7 @@ TEST_P(SimEventsTest, SimPauseRun)
 void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
   Load("test/worlds/sim_events.world", false, _physicsEngine);
-  // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -166,7 +166,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
 
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();

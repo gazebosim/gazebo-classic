@@ -18,15 +18,14 @@
 #ifndef _SCORING_EVENTSOURCE_HH_
 #define _SCORING_EVENTSOURCE_HH_
 
-#include "gazebo/gazebo.hh"
+#include <string>
 
+#include "gazebo/gazebo.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "SimEventsException.hh"
-
-#include <string>
 
 namespace gazebo
 {
