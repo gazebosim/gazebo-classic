@@ -87,7 +87,7 @@ TEST_F(JointControllerTest, VelocityControl)
   world->Step(5000);
   double vel = model->GetJoint("arm_shoulder_pan_joint")->GetVelocity(0);
 
-  EXPECT_NEAR(vel, 0.2, 0.05);
+  EXPECT_DOUBLE_EQ(vel, 0.2, 0.05);
 }
 
 /////////////////////////////////////////////////
