@@ -57,7 +57,8 @@ void EventSource::Emit(const char* data )
     msg.set_name(this->name);
     msg.set_data(data);
     // add world stats to give context to the event (mostly time & sim state)
-    gazebo::msgs::WorldStatistics *worldStatsMsg = msg.mutable_world_statistics();
+    gazebo::msgs::WorldStatistics *worldStatsMsg =
+                                    msg.mutable_world_statistics();
     worldStatsMsg->set_iterations(this->world->GetIterations());
     worldStatsMsg->set_paused(this->world->IsPaused());
     msgs::Set(worldStatsMsg->mutable_sim_time(), this->world->GetSimTime());
@@ -66,7 +67,6 @@ void EventSource::Emit(const char* data )
     // send it on the publisher we got in the ctor
     pub->Publish(msg);
   }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

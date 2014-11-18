@@ -23,9 +23,10 @@ using namespace gazebo;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-InRegionEventSource::InRegionEventSource( transport::PublisherPtr _pub,
-                                          physics::WorldPtr _world, 
-                                          const std::map<std::string, RegionPtr> &_regions) 
+InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
+                                         physics::WorldPtr _world, 
+                                         const std::map<std::string, RegionPtr>
+                                                                      &_regions)
   :EventSource(_pub, "region", _world), regions(_regions), isInside(false)
 {
 }
@@ -86,10 +87,10 @@ void InRegionEventSource::Update()
   math::Vector3 point = this->model->GetWorldPose().pos;
   bool oldState = this->isInside;
   this->isInside = this->region->PointInRegion(point);
-  if( oldState != this->isInside)
+  if (oldState != this->isInside)
   {
     std::string json = "{";
-    if(this->isInside)
+    if (this->isInside)
     {
       json += "\"state\":\"inside\",";
     }
@@ -107,27 +108,28 @@ void InRegionEventSource::Update()
 ////////////////////////////////////////////////////////////////////////////////
 bool Volume::PointInVolume(const math::Vector3 &_p) const
 {
-
-  if(_p.x >= min.x && _p.x <= max.x)
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+  /*if (_p.x >= min.x && _p.x <= max.x)
   {
-    if(_p.y >= min.y && _p.y <= max.y)
+    if (_p.y >= min.y && _p.y <= max.y)
     {
-      if(_p.z >= min.z && _p.z <= max.z)
+      if (_p.z >= min.z && _p.z <= max.z)
       {
         return true;
       }
     }
   }
-  return false;
+  return false;*/
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Region::PointInRegion(const math::Vector3 &_p) const
 {
-  for (unsigned int i=0; i< volumes.size(); ++i)
+  for (unsigned int i = 0; i < this->volumes.size(); ++i)
   {
-    if (volumes[i]->PointInVolume(_p))
+    if (this->volumes[i]->PointInVolume(_p))
     {
       return true;
     }
@@ -135,12 +137,11 @@ bool Region::PointInRegion(const math::Vector3 &_p) const
   return false;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void Region::Load(const sdf::ElementPtr &_sdf)
 {
   sdf::ElementPtr child = _sdf->GetFirstElement();
-  while(child)
+  while (child)
   {
     std::string ename = child->GetName();
     if (ename == "volume")
@@ -162,8 +163,4 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     }
     child = child->GetNextElement();
   }
- 
 }
-
- 
-

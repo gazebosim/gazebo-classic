@@ -21,14 +21,12 @@ class SimEventsTest : public ServerFixture,
   public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
 };
 
-
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_event_count = 0;
 std::string g_event_data;
 std::string g_event_type;
 std::string g_event_name;
-
 
 // callback for SimEvent messages
 // increment a counter and keep the data around
@@ -62,15 +60,13 @@ std::string GetEventData()
   return g_event_data;
 }
 
-
-
-// waits for one or multiple  events. if the expected number is 
+// waits for one or multiple events. if the expected number is 
 // specified, then the function can return early
-unsigned int WaitForNewEvent(  unsigned int current,
-                               unsigned int max_tries=10,
-                               unsigned int ms=10)
+unsigned int WaitForNewEvent(unsigned int current,
+                             unsigned int max_tries=10,
+                             unsigned int ms=10)
 {
-  for (unsigned int i=0; i < max_tries; i++)
+  for (unsigned int i = 0; i < max_tries; i++)
   {
     unsigned int count = GetEventCount();
     if (count > current)
@@ -82,7 +78,6 @@ unsigned int WaitForNewEvent(  unsigned int current,
   return GetEventCount();
 }
 
-
 // test macro
 TEST_P(SimEventsTest, ModelInAnOutOfRegion)
 {
@@ -91,7 +86,7 @@ TEST_P(SimEventsTest, ModelInAnOutOfRegion)
 
 ////////////////////////////////////////////////////////////////////////
 // SimPauseRun:
-// Load test world, pause, run  and verify that events are generated.
+// Load test world, pause, run and verify that events are generated.
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
 {
@@ -131,7 +126,7 @@ TEST_P(SimEventsTest, SimPauseRun)
 void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
   Load("test/worlds/sim_events.world", false, _physicsEngine);
-   // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a 
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -142,7 +137,6 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
   std::string name = "beer";
 
   countBefore = GetEventCount();
-  //  SpawnSphere(name, math::Vector3::Zero, math::Vector3::Zero, false);  
   std::string modelUri = "model://beer";
   SpawnModel(modelUri);
   countAfter = WaitForNewEvent(countBefore, 10, 100);
@@ -158,7 +152,7 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 // test macro
 TEST_P(SimEventsTest, SpawnAndDeleteModel)
 {
-    SpawnAndDeleteModel(GetParam());
+  SpawnAndDeleteModel(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -200,16 +194,15 @@ INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES);
 // main, where we can specify to skip certain tests
 int main(int argc, char **argv)
 {
-  if(argc >1)
+  if (argc > 1)
   {
-     std::string skipStr = argv[1];
-     if (skipStr == "no_skip")
-     {
-       std::cout << "Not skipping failing tests" << std::endl; 
-       SKIP_FAILING_TESTS = false;
-     }
+    std::string skipStr = argv[1];
+    if (skipStr == "no_skip")
+    {
+      std::cout << "Not skipping failing tests" << std::endl; 
+      SKIP_FAILING_TESTS = false;
+    }
   }      
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-

@@ -16,10 +16,10 @@
     <region>
       <name>start</name>
       <volume>
-          <!-- min and max are sdf::Vector3-->
-          <!-- around the origin -->
-          <min>-3 -3 -3</min>
-          <max>3 3 3</max>
+        <!-- min and max are sdf::Vector3 -->
+        <!-- around the origin -->
+        <min>-3 -3 -3</min>
+        <max>3 3 3</max>
      </volume>
     </region>
 
@@ -76,8 +76,8 @@
     </plugin>
     
     <!-- 
-    spawn a few beers in the world (not coke cans, they have
-    meshes that can't be loaded with all engines yet
+      spawn a few beers in the world (not coke cans, they have
+      meshes that can't be loaded with all engines yet
     -->
     <include>
       <pose>0 0 0 0 0 0</pose>

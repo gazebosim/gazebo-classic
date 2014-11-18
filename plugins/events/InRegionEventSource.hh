@@ -31,7 +31,6 @@ namespace gazebo
 
     /// \brief The volume extent
     public: math::Vector3 min, max;
-  
   };
 
   typedef boost::shared_ptr<Volume> VolumePtr;
@@ -56,12 +55,12 @@ namespace gazebo
 
   typedef boost::shared_ptr<Region> RegionPtr;
 
-  /// \brief convenient function to print a region to the console
+  /// \brief convenience function to print a region to the console
   /// \param[in] _out the output stream
   /// \param[in] _region the instance to write out
   std::ostream& operator << (std::ostream &_out, const Region &_region);
 
-  /// \brief This is the event generator class
+  /// \brief The event generator class
   class  InRegionEventSource: public EventSource
   {
     /// \brief Constructor
@@ -70,7 +69,8 @@ namespace gazebo
     /// \param[in] _regions dictionary of regions in the world
     public: InRegionEventSource(transport::PublisherPtr _pub, 
                                 physics::WorldPtr _world, 
-                                const std::map<std::string, RegionPtr> &_regions);
+                                const std::map<std::string, RegionPtr>
+                                                              &_regions);
 
     /// \brief Initialize the event
     public: virtual void Init();
@@ -78,7 +78,8 @@ namespace gazebo
     /// \brief Called every simulation step
     public: void Update();
 
-    /// \brief Loads the full name of the model and the region from the world file.
+    /// \brief Loads the full name of the model and the region from the world
+    /// file.
     /// \param[in] _sdf
     public: virtual void Load(const sdf::ElementPtr &_sdf);
 
@@ -88,7 +89,7 @@ namespace gazebo
     /// \brief The model used for the in region check.
     private: std::string modelName;
 
-    /// \brief a Pointer to the model
+    /// \brief A pointer to the model
     /// looked up at initialization, to avoid doing lookups during updates
     private: physics::ModelPtr model;
 

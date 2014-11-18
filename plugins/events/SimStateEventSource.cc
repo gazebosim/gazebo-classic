@@ -42,12 +42,11 @@ void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
       boost::bind(&SimStateEventSource::OnPause, this, _1));
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void SimStateEventSource::OnPause(bool _pause)
 {
   std::string json;
-  if(_pause)
+  if (_pause)
   {
     json = "{\"state\": \"paused\" }";
   }
@@ -57,4 +56,3 @@ void SimStateEventSource::OnPause(bool _pause)
   }
   this->Emit(json.c_str());  
 }
-
