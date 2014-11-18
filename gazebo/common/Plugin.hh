@@ -83,13 +83,6 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~PluginT()
             {
-#ifdef HAVE_DL
-// The following ifdef is a workaround for #1026.
-// \todo Figure out the right thing to do.
-#ifndef __APPLE__
-              dlclose(this->dlHandle);
-#endif  // ifndef __APPLE
-#endif
             }
 
     /// \brief Get the name of the handler
