@@ -698,7 +698,6 @@ double RectItem::GetPositionOnWall() const
 }
 
 /////////////////////////////////////////////////
-
 QRectF RectItem::boundingRect() const
 {
   return QRectF(-this->width/2, -this->height/2, this->width, this->height);

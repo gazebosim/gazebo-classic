@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -31,6 +32,11 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
 {
   this->editorType = "WallSegment";
   this->scale = BuildingMaker::conversionScale;
+
+  this->measure = new MeasureItem(this->GetStartPoint(),
+                                  this->GetEndPoint());
+  this->measure->setParentItem(this);
+  this->SegmentUpdated();
 
   this->level = 0;
 
@@ -126,6 +132,22 @@ void WallSegmentItem::UpdateInspector()
 /////////////////////////////////////////////////
 void WallSegmentItem::SegmentUpdated()
 {
+  // distance in px between wall and measure line
+  double d = 20;
+  double t = this->GetThickness()/2;
+
+  QPointF p1 = this->GetStartPoint();
+  QPointF p2 = this->GetEndPoint();
+  double angle = GZ_DTOR(this->line().angle());
+
+  this->measure->SetStartPoint(
+      QPointF(p1.x()+(d+t)*qCos(angle+GZ_DTOR(90))+t*qCos(angle+GZ_DTOR(180)),
+              p1.y()-(d+t)*qSin(angle+GZ_DTOR(90))-t*qSin(angle+GZ_DTOR(180))));
+  this->measure->SetEndPoint(
+      QPointF(p2.x()+(d+t)*qCos(angle+GZ_DTOR(90))-t*qCos(angle+GZ_DTOR(180)),
+              p2.y()-(d+t)*qSin(angle+GZ_DTOR(90))+t*qSin(angle+GZ_DTOR(180))));
+  this->measure->SetValue((this->line().length()+2*t)/100);
+
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
   for (int j = 0; j < children.size(); ++j)
@@ -177,12 +199,14 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
     if (_value.toBool())
     {
       this->ShowHandles(true);
+      this->measure->setVisible(true);
       this->setZValue(5);
       this->SetColor(QColor(247, 142, 30));
     }
     else
     {
       this->ShowHandles(false);
+      this->measure->setVisible(false);
       this->setZValue(0);
       this->SetColor(Qt::black);
     }
