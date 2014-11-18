@@ -192,7 +192,7 @@
             <script>Gazebo/Green</script>
           </material>
         </visual>
-        <collision name="collision_cylinder">
+        <collision name="collision_box">
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
@@ -239,7 +239,7 @@
             <script>Gazebo/Green</script>
           </material>
         </visual>
-        <collision name="collision_cylinder">
+        <collision name="collision_sphere">
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
@@ -292,7 +292,7 @@
             <script>Gazebo/Green</script>
           </material>
         </visual>
-        <collision name="collision_cylinder">
+        <collision name="collision_sphere">
           <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
           <max_contacts>250</max_contacts>
           <geometry>
