@@ -18,6 +18,7 @@
 #define _MAIN_WINDOW_EXAMPLE_WIDGET_HH_
 
 #include <string>
+#include <vector>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/gui/GuiPlugin.hh>
@@ -35,7 +36,8 @@ namespace gazebo
 
     /// \brief Destructor
     public: virtual ~MainWindowExampleWidget();
-  
+
+    /// \brief Callback function to pause the world.
     public: void PauseWorld();
 
     /// \brief A signal used to set the sim time line edit.
@@ -57,6 +59,7 @@ namespace gazebo
     /// \brief Subscriber to world statistics messages.
     private: transport::SubscriberPtr statsSub;
 
+    /// \brief The event connections for this plugin.
     private: std::vector<event::ConnectionPtr> connections;
   };
 }

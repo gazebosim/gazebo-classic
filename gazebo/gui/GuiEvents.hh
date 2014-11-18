@@ -152,7 +152,7 @@ namespace gazebo
       public: static void DisconnectFollow(
               event::ConnectionPtr _subscriber)
               { follow.Disconnect(_subscriber); }
-              
+
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to the main window ready signal
       public: template<typename T>
@@ -162,7 +162,7 @@ namespace gazebo
       /// \brief Disconnect a signal from the main window ready signal
       public: static void DisconnectMainWindowReady(
               event::ConnectionPtr _subscriber)
-              { mainWindowReady.Disconnect(_subscriber); }   
+              { mainWindowReady.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to toggle the GUI's left hand pane signal

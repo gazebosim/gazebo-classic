@@ -15,10 +15,13 @@
  *
 */
 #include <sstream>
+#include <vector>
+
 #include <gazebo/msgs/msgs.hh>
-#include "MainWindowExampleWidget.hh"
 #include <gazebo/gui/gui.hh>
 #include <gazebo/gui/MainWindow.hh>
+
+#include "MainWindowExampleWidget.hh"
 
 using namespace gazebo;
 
