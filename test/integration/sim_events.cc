@@ -10,7 +10,7 @@ using namespace gazebo;
 
 // certain tests fail (with the symbody engine
 // setting this to true skips those tests
-bool SKIP_FAILING_TESTS = true ;
+bool SKIP_FAILING_TESTS = true;
 
 // this is the test fixture
 class SimEventsTest : public ServerFixture,
@@ -50,7 +50,7 @@ unsigned int GetEventCount()
 std::string GetEventType()
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  return g_event_type;  
+  return g_event_type;
 }
 
 // get the data in a thread safe way
@@ -60,11 +60,11 @@ std::string GetEventData()
   return g_event_data;
 }
 
-// waits for one or multiple events. if the expected number is 
+// waits for one or multiple events. if the expected number is
 // specified, then the function can return early
 unsigned int WaitForNewEvent(unsigned int current,
-                             unsigned int max_tries=10,
-                             unsigned int ms=10)
+                             unsigned int max_tries = 10,
+                             unsigned int ms = 10)
 {
   for (unsigned int i = 0; i < max_tries; i++)
   {
@@ -140,12 +140,12 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
   std::string modelUri = "model://beer";
   SpawnModel(modelUri);
   countAfter = WaitForNewEvent(countBefore, 10, 100);
-  EXPECT_GT(countAfter, countBefore); 
+  EXPECT_GT(countAfter, countBefore);
 
   countBefore = GetEventCount();
   RemoveModel(name);
   countAfter = WaitForNewEvent(countBefore);
-  EXPECT_GT(countAfter, countBefore); 
+  EXPECT_GT(countAfter, countBefore);
   EXPECT_EQ(GetEventType(), "existence");
 }
 
@@ -162,7 +162,7 @@ TEST_P(SimEventsTest, SpawnAndDeleteModel)
 void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
 {
   // simbody stepTo() failure
-  if(SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
+  if (SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
 
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -185,7 +185,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   unsigned int countBefore2 = GetEventCount();
   can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
-  EXPECT_GT(countAfter2, countBefore2);  
+  EXPECT_GT(countAfter2, countBefore2);
 }
 
 // magic macro
@@ -199,10 +199,10 @@ int main(int argc, char **argv)
     std::string skipStr = argv[1];
     if (skipStr == "no_skip")
     {
-      std::cout << "Not skipping failing tests" << std::endl; 
+      std::cout << "Not skipping failing tests" << std::endl;
       SKIP_FAILING_TESTS = false;
     }
-  }      
+  }
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

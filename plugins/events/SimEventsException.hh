@@ -20,14 +20,12 @@
 
 namespace gazebo
 { 
-
   class SimEventsException : public std::runtime_error
   {
     /// \brief Constructor
     /// param[in] m the exception message 
     public: SimEventsException(const char* m) : std::runtime_error(m){}
   };
-    
 }
 
 #endif

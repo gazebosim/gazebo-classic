@@ -20,13 +20,12 @@
 using namespace gazebo;
 
 // static data initialization
-event::EventT<void (std::string, bool)> SimEventsEvents::spawnModel;
-
+event::EventT<void(std::string, bool)> SimEventsEvents::spawnModel;
 
 ////////////////////////////////////////////////////////////////////////////////
-EventSource::EventSource( transport::PublisherPtr _pub,
-                          const char* _type,
-                          physics::WorldPtr _world)
+EventSource::EventSource(transport::PublisherPtr _pub,
+                         const char* _type,
+                         physics::WorldPtr _world)
   :type(_type), pub(_pub)
 {
   this->name = "";
@@ -49,7 +48,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void EventSource::Emit(const char* data )
 {
-  if(this->IsActive())
+  if (this->IsActive())
   {
     // add event name, type and data as strings (data is JSON)
     gazebo::msgs::SimEvent msg;

@@ -35,11 +35,12 @@ namespace gazebo
     /// \brief Constructor
     /// \param[in] _pub the publisher where the events are emitted
     /// \param[in] _type the type of event
-    /// \param[in] _world Pointer to the world (in order to get model refs, etc).
+    /// \param[in] _world Pointer to the world (in order to get model refs, etc)
     public: EventSource(transport::PublisherPtr _pub, const char* _type,
                         physics::WorldPtr _world);
 
-    /// \brief emit an event with data to the internal publisher (and using the internal type)
+    /// \brief emit an event with data to the internal publisher
+    /// (and using the internal type)
     /// \param[in] _data the JSON data related to this event.
     public: void Emit(const char* _data);
 
@@ -49,7 +50,7 @@ namespace gazebo
 
     /// \brief Initialize the event
     public: virtual void Init();
-  
+ 
     /// \brief An event source can be used to enable other events
     public: virtual bool IsActive();
  

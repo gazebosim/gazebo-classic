@@ -108,12 +108,12 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     }
     else if (eventType == "existence" )
     {
-      event.reset(new ExistenceEventSource(this->pub, this->world)); 
+      event.reset(new ExistenceEventSource(this->pub, this->world));
     }
     else
     {
       std::string m;
-      m = "Unknown event type: \"" + eventType + "\" in scoring plugin"; 
+      m = "Unknown event type: \"" + eventType + "\" in scoring plugin";
       throw SimEventsException(m.c_str());
     }
     if (event)
@@ -134,11 +134,11 @@ void SimEventsPlugin::Init()
     events[i]->Init();
   }
   // seed the map with the initial models
-  for (unsigned int i=0; i < world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < world->GetModelCount(); ++i)
   {
     std::string name = world->GetModel(i)->GetName();
     models.insert(name);
-  } 
+  }
 }
 
 // Register this plugin with the simulator

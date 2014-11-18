@@ -19,6 +19,9 @@
 #define _INREGIONEVENTSOURCE_HH_
 
 #include "EventSource.hh"
+#include <map>
+#include <string>
+#include <vector>
 
 namespace gazebo
 {
@@ -36,7 +39,7 @@ namespace gazebo
   typedef boost::shared_ptr<Volume> VolumePtr;
 
   /// \brief A region, made of a list of volumes
-  class Region 
+  class Region
   {
     /// \brief Load from a world file (inside a SimEvent plugin element)
     /// \param[in] _sdf the region element
@@ -67,14 +70,14 @@ namespace gazebo
     /// \param[in] _pub the publisher for the SimEvents
     /// \param[in] _world Pointer to the world.
     /// \param[in] _regions dictionary of regions in the world
-    public: InRegionEventSource(transport::PublisherPtr _pub, 
-                                physics::WorldPtr _world, 
+    public: InRegionEventSource(transport::PublisherPtr _pub,
+                                physics::WorldPtr _world,
                                 const std::map<std::string, RegionPtr>
                                                               &_regions);
 
     /// \brief Initialize the event
     public: virtual void Init();
-   
+
     /// \brief Called every simulation step
     public: void Update();
 
@@ -101,12 +104,10 @@ namespace gazebo
 
     /// \brief A map of region names to region pointers.
     private: const std::map<std::string, RegionPtr> &regions;
- 
+
     /// \brief true if the model is currently inside the region
     private: bool isInside;
-    
   };
-
 }
 
 

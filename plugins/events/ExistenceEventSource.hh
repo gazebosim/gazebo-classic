@@ -19,10 +19,10 @@
 #define _EXISTENCEVENTSOURCE_HH_
 
 #include "EventSource.hh"
+#include <string>
 
 namespace gazebo
 {
-
   class  ExistenceEventSource: public EventSource
   {
     /// \brief Constructor
@@ -50,7 +50,6 @@ namespace gazebo
     /// or deleted
     private: event::ConnectionPtr existenceConnection;
   };
-
 }
 
 #endif

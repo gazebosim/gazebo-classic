@@ -24,7 +24,7 @@ using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
 InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
-                                         physics::WorldPtr _world, 
+                                         physics::WorldPtr _world,
                                          const std::map<std::string, RegionPtr>
                                                                       &_regions)
   :EventSource(_pub, "region", _world), regions(_regions), isInside(false)
@@ -36,7 +36,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
 {
   EventSource::Load(_sdf);
   if (_sdf->HasElement("model"))
-    this->modelName = _sdf->GetElement("model")->Get<std::string>();  
+    this->modelName = _sdf->GetElement("model")->Get<std::string>();
   else
     gzerr << this->name << " is missing a model element" << std::endl;
 
@@ -57,19 +57,19 @@ void InRegionEventSource::Init()
   this->model = this->world->GetModel(this->modelName);
   if (!model)
   {
-    gzerr << this->name << ": Model '" << this->modelName 
+    gzerr << this->name << ": Model '" << this->modelName
         << "' does not exist" << std::endl;
   }
 
-  std::map<std::string, RegionPtr>::const_iterator it = 
-    this->regions.find(this->regionName); 
+  std::map<std::string, RegionPtr>::const_iterator it =
+    this->regions.find(this->regionName);
   if (it != this->regions.end())
   {
     this->region = it->second;
   }
-  else 
+  else
   {
-    gzerr << this->name << ": Region '" << this->regionName 
+    gzerr << this->name << ": Region '" << this->regionName
         << "' does not exist" << std::endl;
   }
 }
@@ -150,7 +150,7 @@ void Region::Load(const sdf::ElementPtr &_sdf)
       volume->min = child->GetElement("min")->Get<math::Vector3>();
       volume->max = child->GetElement("max")->Get<math::Vector3>();
       this->volumes.push_back(volume);
-    }   
+    }
     else if (ename == "name")
     {
       this->name = child->Get<std::string>(); 
@@ -159,7 +159,7 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     {
       std::string m;
       m += "Unexpected element \"" + ename + "\" in Region element";
-      throw SimEventsException(m.c_str()); 
+      throw SimEventsException(m.c_str());
     }
     child = child->GetNextElement();
   }
