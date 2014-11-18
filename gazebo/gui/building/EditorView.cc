@@ -263,6 +263,10 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     case WINDOW:
       if (this->drawInProgress)
       {
+        // Select -> deselect to trigger change
+        this->currentMouseItem->setSelected(true);
+        this->currentMouseItem->setSelected(false);
+
         this->windowList.push_back(dynamic_cast<WindowItem *>(
             this->currentMouseItem));
         this->drawMode = NONE;
@@ -273,6 +277,10 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     case DOOR:
       if (this->drawInProgress)
       {
+        // Select -> deselect to trigger change
+        this->currentMouseItem->setSelected(true);
+        this->currentMouseItem->setSelected(false);
+
         this->doorList.push_back(dynamic_cast<DoorItem *>(
             this->currentMouseItem));
         this->drawMode = NONE;
@@ -283,6 +291,10 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
     case STAIRS:
       if (this->drawInProgress)
       {
+        // Select -> deselect to trigger change
+        this->currentMouseItem->setSelected(true);
+        this->currentMouseItem->setSelected(false);
+
         this->stairsList.push_back(dynamic_cast<StairsItem *>(
             this->currentMouseItem));
         if ((this->currentLevel) < static_cast<int>(floorList.size()))

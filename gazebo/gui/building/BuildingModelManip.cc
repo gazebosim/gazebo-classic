@@ -263,6 +263,12 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnTransparencyChanged(float _transparency)
+{
+  this->SetTransparency(_transparency);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnDeleted()
 {
   this->maker->RemovePart(this->name);
@@ -313,4 +319,11 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
       - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetTransparency(float _transparency)
+{
+  this->transparency = _transparency;
+  this->visual->GetParent()->SetTransparency(this->transparency);
 }

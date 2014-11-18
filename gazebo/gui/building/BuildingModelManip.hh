@@ -128,6 +128,10 @@ namespace gazebo
       /// \param[in] _height Height pixels.
       public: void SetSize(double _width, double _depth, double _height);
 
+      /// \brief Set the transparency of the manip.
+      /// \param[in] _transparency Transparency.
+      public: void SetTransparency(float _transparency);
+
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
       /// \param[in] _x New X position in pixel coordinates.
@@ -208,6 +212,11 @@ namespace gazebo
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
 
+      /// \brief Qt callback when the 3D visual's transparency has been changed
+      /// from the associated editor item.
+      /// \param[in] _transparency Transparency.
+      private slots: void OnTransparencyChanged(float _transparency);
+
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();
 
@@ -230,7 +239,10 @@ namespace gazebo
       private: std::vector<BuildingModelManip *> attachedManips;
 
       /// \brief Parent manip.
-      private: BuildingModelManip * parent;
+      private: BuildingModelManip *parent;
+
+      /// \brief Visual's transparency.
+      private: float transparency;
     };
     /// \}
   }

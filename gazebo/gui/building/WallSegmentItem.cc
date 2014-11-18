@@ -40,6 +40,7 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetThickness(this->wallThickness);
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
+  this->visual3dTransparency = 0.0;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
@@ -101,6 +102,7 @@ void WallSegmentItem::WallSegmentChanged()
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
+  emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
 
@@ -179,12 +181,14 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
       this->ShowHandles(true);
       this->setZValue(5);
       this->SetColor(QColor(247, 142, 30));
+      this->Set3dTransparency(0.0);
     }
     else
     {
       this->ShowHandles(false);
       this->setZValue(0);
       this->SetColor(Qt::black);
+      this->Set3dTransparency(0.5);
     }
     this->WallSegmentChanged();
   }
