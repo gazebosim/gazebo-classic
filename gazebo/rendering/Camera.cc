@@ -377,7 +377,6 @@ void Camera::Update()
 
     this->SetWorldPosition(pos);
   }
-
 }
 
 //////////////////////////////////////////////////
