@@ -25,6 +25,15 @@ namespace gazebo
     /// \brief Private data for the UserCamera class
     class UserCameraPrivate
     {
+      /// \brief Gazebo communication node pointer.
+      public: transport::NodePtr node;
+
+      /// \brief Subscribes to relative joystick messages.
+      public: transport::SubscriberPtr joySubTwist;
+
+      /// \brief Subscribes to absolute joystick messages.
+      public: transport::SubscriberPtr joySubPose;
+
       /// \brief The currently active view controller.
       public: ViewController *viewController;
 
@@ -46,6 +55,15 @@ namespace gazebo
       /// \brief Flag to detect if the user changed the camera pose in the
       /// world file.
       public: bool isCameraSetInWorldFile;
+
+      /// \brief Toggle joystick camera move through ~/user_camera/joy_twist
+      public: bool joyTwistControl;
+
+      /// \brief Toggle joystick camera move through ~/user_camera/joy_pose
+      public: bool joyPoseControl;
+
+      /// \brief Used to detect joystick button release
+      public: bool joystickButtonToggleLast;
     };
   }
 }

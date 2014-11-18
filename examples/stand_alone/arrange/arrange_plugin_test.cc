@@ -16,9 +16,11 @@
 */
 
 #include <gazebo/gazebo.hh>
+#include <vector>
+#include <iostream>
+
 #include "gazebo/transport/transport.hh"
 #include "gazebo/msgs/msgs.hh"
-#include <stdlib.h>
 
 int main(int _argc, char** _argv)
 {
