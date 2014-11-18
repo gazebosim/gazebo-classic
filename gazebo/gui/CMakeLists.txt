@@ -94,12 +94,6 @@ set (headers
   SphereMaker.hh
 )
 
-set (install_headers
-  ${headers}
-  MainWindow.hh
-  RenderWidget.hh
-)
-
 if (HAVE_OCULUS)
   set (sources ${sources}
     OculusWindow.cc
@@ -196,13 +190,13 @@ endif()
 add_definitions(${QT_DEFINITIONS})
 
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
-foreach (hdr ${install_headers})
+foreach (hdr ${headers} ${qt_headers})
   APPEND_TO_CACHED_STRING(gui_headers
     "GUI Headers" "#include \"gazebo/gui/${hdr}\"\n")
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gui.hh.in ${CMAKE_CURRENT_BINARY_DIR}/gui.hh )
 
 gz_install_library(gazebo_gui)
-gz_install_includes("gui" ${install_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
+gz_install_includes("gui" ${headers} ${qt_headers} ${CMAKE_CURRENT_BINARY_DIR}/gui.hh)
 gz_install_executable(gzclient)
 manpage(gzclient 1)
