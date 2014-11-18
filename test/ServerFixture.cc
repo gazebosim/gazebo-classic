@@ -79,10 +79,6 @@ ServerFixture::ServerFixture()
   path /= "plugins";
   gazebo::common::SystemPaths::Instance()->AddPluginPaths(path.string());
 
-  path = PROJECT_BINARY_PATH;
-  path += "/test/plugins";
-  gazebo::common::SystemPaths::Instance()->AddPluginPaths(path);
-
   path = TEST_PATH;
   gazebo::common::SystemPaths::Instance()->AddGazeboPaths(path.string());
 }
