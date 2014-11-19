@@ -65,6 +65,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     bool loadINI(const boost::filesystem::path &_file);
 
+    /// \brief Locate the GUI INI configuration file.
+    /// \return True if an INI file was loaded, false otherwise.
+    GAZEBO_VISIBLE
+    bool getGUIINIPath();
+
     /// \brief Get a property from the GUI INI file.
     /// \param[in] _key String based key[ SECTION.VALUE ]
     /// \param[in] _default Default value to use if property is not found.

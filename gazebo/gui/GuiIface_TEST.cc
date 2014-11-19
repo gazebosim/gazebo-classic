@@ -77,8 +77,8 @@ void GuiIface_TEST::GUIINIPATHEnvVariable()
 
   setenv("GAZEBO_GUI_INI_PATH", filepath, 1);
 
-  // Return true, we are creating it for you
-  QVERIFY(gazebo::gui::load());
+  // False if the path didn't exist
+  QVERIFY(gazebo::gui::getGUIINIPath() == false);
 
   // Write invalid content for an INI file
   std::ofstream iniFile;
@@ -87,7 +87,7 @@ void GuiIface_TEST::GUIINIPATHEnvVariable()
   iniFile.close();
 
   // Only false when trying to read invalid content
-  QVERIFY(gazebo::gui::load() == false);
+  QVERIFY(gazebo::gui::getGUIINIPath() == false);
 
   // Need to clean up the variable for the next tests
   unsetenv("GAZEBO_GUI_INI_PATH");

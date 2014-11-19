@@ -190,23 +190,27 @@ bool gui::loadINI(const boost::filesystem::path &_file)
 }
 
 /////////////////////////////////////////////////
-bool gui::load()
+/// If the GAZEBO_GUI_INI_PATH environment variable is set and contains
+/// valid content, load and return true.
+/// If GAZEBO_GUI_INI_PATH is not set, load from ~/.gazebo/gui.ini and return
+/// true.
+/// If GAZEBO_GUI_INI_PATH is set but the path does not exist, or if it exists
+/// and contains invalid content, do not load, and return false.
+bool gui::getGUIINIPath()
 {
-  bool result = true;
-
   // Get the gui.ini path environment variable
   char *guiINIPath = getenv("GAZEBO_GUI_INI_PATH");
   char *home = getenv("HOME");
 
   boost::filesystem::path path;
-  // If the environment variable was not specified
+  // If the environment variable was specified
   if (guiINIPath)
   {
     path = guiINIPath;
     if (!boost::filesystem::exists(path))
     {
       gzerr << "GAZEBO_GUI_INI_PATH does not exist: " << path << ".\n";
-      path.clear();
+      return false;
     }
   }
   else if (home)
@@ -216,22 +220,21 @@ bool gui::load()
     path = home;
     path = path / ".gazebo" / "gui.ini";
   }
-  if (path.empty())
+
+  if (!gui::loadINI(path))
   {
-    gzerr << "Unable to locate gui.ini." << std::endl;
+    gzerr << "Unable to read .ini file from " << path << ".\n";
+    return false;
   }
-  else
-  {
-    if (!(result=gui::loadINI(path)))
-    {
-      gzerr << "Unable to read .ini file from " << path << ".\n";
-      result = false;
-    }
-    else 
-    {
-      gzmsg << "Loaded .ini file from: " << path << std::endl;
-    }
-  }
+
+  gzmsg << "Loaded .ini file from: " << path << std::endl;
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool gui::load()
+{
+  getGUIINIPath();
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
@@ -253,7 +256,7 @@ bool gui::load()
   g_main_win->Load();
   g_main_win->resize(1024, 768);
 
-  return result;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -280,8 +283,9 @@ bool gui::run(int _argc, char **_argv)
   if (!gazebo::setupClient(_argc, _argv))
     return false;
 
-  if (!gazebo::gui::load())
-    return false;
+  gazebo::gui::load();
+  /*if (!gazebo::gui::load())
+    return false;*/
 
   gazebo::gui::init();
 
