@@ -284,6 +284,8 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
+  gui::Events::mainWindowReady();
 }
 
 /////////////////////////////////////////////////
