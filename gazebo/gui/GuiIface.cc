@@ -283,9 +283,8 @@ bool gui::run(int _argc, char **_argv)
   if (!gazebo::setupClient(_argc, _argv))
     return false;
 
-  gazebo::gui::load();
-  /*if (!gazebo::gui::load())
-    return false;*/
+  if (!gazebo::gui::load())
+    return false;
 
   gazebo::gui::init();
 
