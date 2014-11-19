@@ -226,7 +226,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   }
   else
   {
-    dWorldSetQuickStepInertiaRatioReduction(true);
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId, true);
   }
 
   // Set the physics update function
