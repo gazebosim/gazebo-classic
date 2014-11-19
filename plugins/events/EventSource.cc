@@ -20,7 +20,7 @@
 using namespace gazebo;
 
 // static data initialization
-event::EventT<void (std::string, bool)> SimEventsEvents::spawnModel;
+event::EventT<void (std::string, bool)> SimEventConnector::spawnModel;
 
 
 ////////////////////////////////////////////////////////////////////////////////

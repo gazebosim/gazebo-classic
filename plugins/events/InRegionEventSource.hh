@@ -22,7 +22,8 @@
 
 namespace gazebo
 {
-  /// \brief A simple axis aligned box volume
+  /// \brief A Volume base class with an inclusion query PointInVoume.
+  ///  The default implementation is a simple axis aligned bounding box.
   class Volume
   {
     /// \brief Checks if a point lies inside the box

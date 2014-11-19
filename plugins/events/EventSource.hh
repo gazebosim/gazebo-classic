@@ -73,7 +73,7 @@ namespace gazebo
 
 
   /// \brief Gazebo events to detect model creation/deletion
-  class  SimEventsEvents
+  class  SimEventConnector
   {
         /// \brief Connect a boost::slot to the spawn model event
         /// \param[in] _subscriber the subscriber to this event

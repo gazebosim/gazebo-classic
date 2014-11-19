@@ -38,7 +38,7 @@ void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
     this->model = _sdf->GetElement("model")->Get<std::string>();
   }
 
-  this->existenceConnection = SimEventsEvents::ConnectSpawnModel(
+  this->existenceConnection = SimEventConnector::ConnectSpawnModel(
       boost::bind(&ExistenceEventSource::OnExistence, this, _1, _2));
 }
 

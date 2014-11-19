@@ -32,7 +32,7 @@ void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
   if(models.insert(modelName).second)
   {
     // notify everyone!
-    SimEventsEvents::spawnModel(modelName, true);
+    SimEventConnector::spawnModel(modelName, true);
   }
 }
 
@@ -51,7 +51,7 @@ void SimEventsPlugin::OnRequest(ConstRequestPtr &_msg)
     if(models.erase(modelName) == 1)
     {
       // notify everyone!
-      SimEventsEvents::spawnModel(modelName, false);
+      SimEventConnector::spawnModel(modelName, false);
     } 
   }
 }
