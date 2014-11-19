@@ -124,13 +124,13 @@ void AxisVisual::SetAxisMaterial(unsigned int _axis,
       dPtr->zAxis->SetMaterial(_material);
       break;
     default:
-      gzerr << "Invlid axis index[" << _axis << "]\n";
+      gzerr << "Invalid axis index[" << _axis << "]\n";
       break;
   };
 }
 
 /////////////////////////////////////////////////
-void AxisVisual::ShowRotation(unsigned int _axis)
+void AxisVisual::ShowAxisRotation(unsigned int _axis, bool _show)
 {
   AxisVisualPrivate *dPtr =
       reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
@@ -138,16 +138,63 @@ void AxisVisual::ShowRotation(unsigned int _axis)
   switch (_axis)
   {
     case 0:
-      dPtr->xAxis->ShowRotation();
+      dPtr->xAxis->ShowRotation(_show);
       break;
     case 1:
-      dPtr->yAxis->ShowRotation();
+      dPtr->yAxis->ShowRotation(_show);
       break;
     case 2:
-      dPtr->zAxis->ShowRotation();
+      dPtr->zAxis->ShowRotation(_show);
       break;
     default:
-      gzerr << "Invlid axis index[" << _axis << "]\n";
+      gzerr << "Invalid axis index[" << _axis << "]\n";
+      break;
+  };
+}
+
+
+/////////////////////////////////////////////////
+void AxisVisual::ShowAxisShaft(unsigned int _axis, bool _show)
+{
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  switch (_axis)
+  {
+    case 0:
+      dPtr->xAxis->ShowShaft(_show);
+      break;
+    case 1:
+      dPtr->yAxis->ShowShaft(_show);
+      break;
+    case 2:
+      dPtr->zAxis->ShowShaft(_show);
+      break;
+    default:
+      gzerr << "Invalid axis index[" << _axis << "]\n";
+      break;
+  };
+}
+
+/////////////////////////////////////////////////
+void AxisVisual::ShowAxisHead(unsigned int _axis, bool _show)
+{
+  AxisVisualPrivate *dPtr =
+      reinterpret_cast<AxisVisualPrivate *>(this->dataPtr);
+
+  switch (_axis)
+  {
+    case 0:
+      dPtr->xAxis->ShowHead(_show);
+      break;
+    case 1:
+      dPtr->yAxis->ShowHead(_show);
+      break;
+    case 2:
+      dPtr->zAxis->ShowHead(_show);
+      break;
+    default:
+      gzerr << "Invalid axis index[" << _axis << "]\n";
       break;
   };
 }
@@ -171,7 +218,7 @@ void AxisVisual::SetAxisVisible(unsigned int _axis, bool _visible)
       axis = dPtr->zAxis;
       break;
     default:
-      gzerr << "Invlid axis index[" << _axis << "]" << std::endl;
+      gzerr << "Invalid axis index[" << _axis << "]" << std::endl;
       return;
   };
 

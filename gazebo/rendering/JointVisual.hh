@@ -43,10 +43,18 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~JointVisual();
 
-      /// \brief Load the visual based on a message
+      /// \brief Load the joint visual based on a message
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
       using Visual::Load;
+
+      /// \internal
+      /// \brief Load the joint visual based on a message and an offset pose
+      /// This is currently used internally for creating a second visual for
+      /// joint types that have more than 1 axis.
+      /// \param[in] _msg Joint message
+      /// \param[in] _pose Pose of the joint visual in world coordinates.
+      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -56,10 +64,8 @@ namespace gazebo
       public: void CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
           msgs::Joint::Type _type);
 
-      /// \brief Set whether to show an axis in the joint
-      /// \param[in] _index Axis index.
-      /// \param[in] _show True to show the axis.
-      public: void ShowAxis(unsigned int _index, bool _show);
+      // Documentation Inherited.
+      public: void SetVisible(bool _visible, bool _cascade = true);
     };
     /// \}
   }

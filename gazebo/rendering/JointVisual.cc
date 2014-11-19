@@ -56,19 +56,57 @@ void JointVisual::Load(ConstJointPtr &_msg)
   this->SetPosition(msgs::Convert(_msg->pose().position()));
   this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
-  // create an arrow visual for each axis in the joint message
-  if (_msg->has_axis1())
+  if (_msg->has_axis2())
   {
+    // for hinge2 and universal joints:
+    // axis1 is attached to parent link and axis2 is attached to child link
+
+    // create extra joint visual for axis1
+    VisualPtr parentVis;
+    if (_msg->has_parent() && _msg->parent() == "world")
+      parentVis = this->GetScene()->GetWorldVisual();
+    else if (_msg->has_parent_id())
+      parentVis = this->GetScene()->GetVisual(_msg->parent_id());
+
+    JointVisualPtr jointVis;
+    jointVis.reset(new JointVisual(this->GetName() + "_parent_", parentVis));
+    jointVis->Load(_msg,
+        msgs::Convert(_msg->pose()) + this->GetParent()->GetWorldPose());
+
+    // attach axis2 to this visual
+    msgs::Axis axis2Msg = _msg->axis2();
+    this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
+        axis2Msg.use_parent_model_frame(), _msg->type());
+
+    dPtr->parentAxisVis = jointVis;
+  }
+  else if (_msg->has_axis1())
+  {
+    // for all other joint types:
+    // axis1 is attached to child link
     msgs::Axis axis1Msg = _msg->axis1();
     this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
         axis1Msg.use_parent_model_frame(), _msg->type());
   }
-  if (_msg->has_axis2())
-  {
-    msgs::Axis axis2Msg = _msg->axis2();
-    this->CreateAxis(msgs::Convert(axis2Msg.xyz()),
-        axis2Msg.use_parent_model_frame(), _msg->type());
-  }
+
+  this->GetSceneNode()->setInheritScale(false);
+  this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+}
+
+/////////////////////////////////////////////////
+void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+{
+  JointVisualPrivate *dPtr =
+      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
+
+  Visual::Load();
+
+  msgs::Axis axis1Msg = _msg->axis1();
+  this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
+      axis1Msg.use_parent_model_frame(), _msg->type());
+
+  // joint pose is always relative to the child link so update axis pose
+  this->SetWorldPose(_worldPose);
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -115,34 +153,48 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
   }
   if (_type == msgs::Joint::REVOLUTE || _type == msgs::Joint::REVOLUTE2
       || _type == msgs::Joint::UNIVERSAL || _type == msgs::Joint::GEARBOX)
-      axis->ShowRotation();
+    axis->ShowRotation(true);
 
   math::Quaternion axisWorldRotation = axis->GetWorldPose().rot;
   math::Quaternion jointWorldRotation = this->GetWorldPose().rot;
 
-  // hide the existing axis visual if it overlaps with the one we are creating
+  // hide the existing axis's arrow head if it overlaps with the one we are
+  // creating
   math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
   if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
-    dPtr->axisVisual->SetAxisVisible(0, false);
+  {
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(0, false);
+      axis->ShowShaft(false);
+    }
+  }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
-    dPtr->axisVisual->SetAxisVisible(1, false);
+  {
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(1, false);
+      axis->ShowShaft(false);
+    }
+  }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
-    dPtr->axisVisual->SetAxisVisible(2, false);
-
-  dPtr->arrowVisuals.push_back(axis);
+  {
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(2, false);
+      axis->ShowShaft(false);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
-void JointVisual::ShowAxis(unsigned int _index, bool _show)
+void JointVisual::SetVisible(bool _visible, bool _cascade)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
-  if (_index >= dPtr->arrowVisuals.size())
-    return;
+  Visual::SetVisible(_visible, _cascade);
 
-  if (_show)
-    this->AttachVisual(dPtr->arrowVisuals[_index]);
-  else
-    this->DetachVisual(dPtr->arrowVisuals[_index]);
+  if (dPtr->parentAxisVis)
+    dPtr->parentAxisVis->SetVisible(_visible, _cascade);
 }
