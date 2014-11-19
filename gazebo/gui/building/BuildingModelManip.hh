@@ -240,9 +240,6 @@ namespace gazebo
 
       /// \brief Parent manip.
       private: BuildingModelManip *parent;
-
-      /// \brief Visual's transparency.
-      private: float transparency;
     };
     /// \}
   }

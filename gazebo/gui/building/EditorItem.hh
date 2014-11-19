@@ -65,7 +65,7 @@ namespace gazebo
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
 
-      /// \brief Set the transparency of the 3D counterpart.
+      /// \brief Set the transparency of the associated 3D visual.
       /// \param[in] _transparency Transparency.
       public: void Set3dTransparency(float _transparency);
 
@@ -154,7 +154,7 @@ namespace gazebo
       /// \brief Name of editor item.
       protected: std::string name;
 
-      /// \brief Transparency for the 3D visual.
+      /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
     };
     /// \}

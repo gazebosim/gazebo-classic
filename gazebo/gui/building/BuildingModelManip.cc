@@ -324,6 +324,5 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetTransparency(float _transparency)
 {
-  this->transparency = _transparency;
-  this->visual->GetParent()->SetTransparency(this->transparency);
+  this->visual->GetParent()->SetTransparency(_transparency);
 }

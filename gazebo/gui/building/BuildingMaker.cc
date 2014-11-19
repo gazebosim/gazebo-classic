@@ -203,8 +203,8 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")->
-      Set(gazebo::common::Color(1, 1, 1));
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
@@ -246,8 +246,8 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")->
-      Set(gazebo::common::Color(0, 0, 1));
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(0, 0, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
@@ -291,8 +291,8 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")->
-      Set(gazebo::common::Color(1, 1, 0));
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 0));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
@@ -353,8 +353,8 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
   visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")->
-      Set(gazebo::common::Color(1, 1, 1));
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
 
@@ -407,8 +407,8 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
-  visualElem->GetElement("material")->AddElement("ambient")->
-      Set(gazebo::common::Color(1, 1, 1));
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
