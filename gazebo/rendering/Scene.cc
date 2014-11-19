@@ -2053,7 +2053,7 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
 {
-  VisualPtr childVis, parentVis;
+  VisualPtr childVis;
 
   if (_msg->has_child() && _msg->child() == "world")
     childVis = this->worldVisual;

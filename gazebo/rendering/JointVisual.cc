@@ -96,9 +96,6 @@ void JointVisual::Load(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 {
-  JointVisualPrivate *dPtr =
-      reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
-
   Visual::Load();
 
   msgs::Axis axis1Msg = _msg->axis1();
