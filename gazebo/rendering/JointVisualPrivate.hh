@@ -32,8 +32,8 @@ namespace gazebo
       /// \brief The visual used to draw the joint.
       public: AxisVisualPtr axisVisual;
 
-      /// \brief The arrow visuals representing main axes of the joint.
-      public: std::vector<ArrowVisualPtr> arrowVisuals;
+      /// \brief Second joint visual for hinge2 and universal joints.
+      public: JointVisualPtr parentAxisVis;
     };
   }
 }

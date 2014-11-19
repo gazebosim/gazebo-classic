@@ -46,8 +46,20 @@ namespace gazebo
       /// \brief Load the axis visual
       public: virtual void Load();
 
-      /// \brief Load the rotation tube
-      public: void ShowRotation(unsigned int _axis);
+      /// \brief Show the rotation tube
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis rotation tube.
+      public: void ShowAxisRotation(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow shaft
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow shaft.
+      public: void ShowAxisShaft(unsigned int _axis, bool _show);
+
+      /// \brief Show the axis arrow shaft
+      /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
+      /// \param[in] _show True to show the axis arrow shaft.
+      public: void ShowAxisHead(unsigned int _axis, bool _show);
 
       /// \brief Scale the X axis
       /// \param[in] _scale Scaling factor

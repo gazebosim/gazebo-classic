@@ -2063,37 +2063,12 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   if (!childVis)
     return false;
 
-  std::vector<VisualPtr> parentVisuals;
-  if (_msg->type() == msgs::Joint::REVOLUTE2 ||
-      _msg->type() == msgs::Joint::UNIVERSAL)
-  {
-    if (_msg->has_parent() && _msg->parent() == "world")
-      parentVis = this->worldVisual;
-    else if (_msg->has_parent_id())
-      parentVis = this->GetVisual(_msg->parent_id());
+  JointVisualPtr jointVis(
+      new JointVisual(_msg->name() + "_JOINT_VISUAL__", childVis));
+  jointVis->Load(_msg);
+  jointVis->SetVisible(this->showJoints);
 
-    if (!parentVis)
-        return false;
-
-    parentVisuals.push_back(parentVis);
-  }
-
-  parentVisuals.push_back(childVis);
-
-  for (unsigned int i = 0; i < parentVisuals.size(); ++i)
-  {
-    JointVisualPtr jointVis(new JointVisual(
-          _msg->name() + "_JOINT_VISUAL__", parentVisuals[i]));
-    jointVis->Load(_msg);
-    jointVis->SetVisible(this->showJoints);
-    jointVis->ShowAxis(parentVisuals.size() - i, false);
-
-    if (_msg->has_id())
-      jointVis->SetId(_msg->id());
-
-    this->visuals[jointVis->GetId()] = jointVis;
-  }
-
+  this->visuals[jointVis->GetId()] = jointVis;
   return true;
 }
 
