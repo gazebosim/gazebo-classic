@@ -287,119 +287,45 @@ bool ODEUniversalJoint::SetParam(
       gzerr << "Invalid index[" << _index << "]\n";
       return false;
   };
-  if (_key == "stop_erp")
+
+  try
   {
-    try
+    if (_key == "stop_erp")
     {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamStopERP, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamStopERP2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
+      this->SetParam(dParamStopERP | group, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "stop_cfm")
     {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
+      this->SetParam(dParamStopCFM | group, boost::any_cast<double>(_value));
     }
-  }
-  else if (_key == "stop_cfm")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamStopCFM, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamStopCFM2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else if (_key == "friction")
-  {
-    try
+    else if (_key == "friction")
     {
       this->SetParam(dParamVel | group, 0.0);
       this->SetParam(dParamFMax | group, boost::any_cast<double>(_value));
     }
-    catch(const boost::bad_any_cast &e)
+    else if (_key == "hi_stop")
     {
-      gzerr << "boost any_cast error during "
-            << "SetParam('" << _key << "'): "
-            << e.what()
-            << std::endl;
-      return false;
+      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+    }
+    else if (_key == "lo_stop")
+    {
+      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+    }
+    else
+    {
+      // Overload because we switched axis orders
+      return ODEJoint::SetParam(_key, _index, _value);
     }
   }
-  else if (_key == "hi_stop")
+  catch(const boost::bad_any_cast &e)
   {
-    try
-    {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamHiStop, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamHiStop2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
+    gzerr << "boost any_cast error during "
+          << "SetParam('" << _key << "'): "
+          << e.what()
+          << std::endl;
+    return false;
   }
-  else if (_key == "lo_stop")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          this->SetParam(dParamLoStop, boost::any_cast<double>(_value));
-          break;
-        case UniversalJoint::AXIS_PARENT:
-          this->SetParam(dParamLoStop2, boost::any_cast<double>(_value));
-          break;
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return false;
-      };
-    }
-    catch(const boost::bad_any_cast &e)
-    {
-      gzerr << "boost any_cast error:" << e.what() << "\n";
-      return false;
-    }
-  }
-  else
-  {
-    // Overload because we switched axis orders
-    return ODEJoint::SetParam(_key, _index, _value);
-  }
+
   return true;
 }
 
@@ -422,65 +348,33 @@ double ODEUniversalJoint::GetParam(
       gzerr << "Invalid index[" << _index << "]\n";
       return false;
   };
+
   // Overload because we switched axis orders
-  if (_key == "friction")
+  try
   {
-    try
+    if (_key == "friction")
     {
-      return this->GetParam(dParamFMax | group);
+        return this->GetParam(dParamFMax | group);
     }
-    catch(const common::Exception &e)
+    else if (_key == "hi_stop")
     {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
+      return this->GetHighStop(_index).Radian();
+    }
+    else if (_key == "lo_stop")
+    {
+      return this->GetLowStop(_index).Radian();
+    }
+    else
+    {
+      return ODEJoint::GetParam(_key, _index);
     }
   }
-  else if (_key == "hi_stop")
+  catch(const common::Exception &e)
   {
-    try
-    {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          return ODEJoint::GetParam(dParamHiStop);
-        case UniversalJoint::AXIS_PARENT:
-          return ODEJoint::GetParam(dParamHiStop2);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return 0;
-          break;
-      };
-    }
-    catch(const common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else if (_key == "lo_stop")
-  {
-    try
-    {
-      switch (_index)
-      {
-        case UniversalJoint::AXIS_CHILD:
-          return ODEJoint::GetParam(dParamLoStop);
-        case UniversalJoint::AXIS_PARENT:
-          return ODEJoint::GetParam(dParamLoStop2);
-        default:
-          gzerr << "Invalid index[" << _index << "]\n";
-          return 0;
-          break;
-      };
-    }
-    catch(const common::Exception &e)
-    {
-      gzerr << "GetParam error:" << e.GetErrorStr() << "\n";
-      return 0;
-    }
-  }
-  else
-  {
-    return ODEJoint::GetParam(_key, _index);
+    gzerr << "Error during "
+          << "GetParam('" << _key << "'): "
+          << e.GetErrorStr()
+          << std::endl;
+    return 0;
   }
 }

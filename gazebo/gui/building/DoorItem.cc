@@ -185,6 +185,7 @@ void DoorItem::OnOpenInspector()
   QPointF itemPos = this->doorPos * this->scale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 
