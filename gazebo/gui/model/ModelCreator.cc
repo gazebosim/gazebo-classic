@@ -113,6 +113,12 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     this->jointMaker->Stop();
+
+    if (this->selectedVis)
+    {
+      this->selectedVis->SetHighlighted(false);
+      this->selectedVis.reset();
+    }
   }
 }
 

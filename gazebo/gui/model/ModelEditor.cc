@@ -62,7 +62,6 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
   }
-  event::Events::setSelectedEntity("", "normal");
   this->active = !this->active;
   this->ToggleToolbar();
   g_editModelAct->setChecked(this->active);
