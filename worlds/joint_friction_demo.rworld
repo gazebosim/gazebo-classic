@@ -1,0 +1,227 @@
+<?xml version="1.0" ?>
+<%
+  # Joint friction demo world
+  # Spawn joints of different types with different friction parameters
+
+  # Inertial parameters
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+  dy = 0.5
+  dx = dy/10
+  dz = dy/10
+  dd = dy
+  mass = density * dx * dy * dz 
+  ixx = 1.0 / 12 * mass * (dy*dy + dz*dz)
+  iyy = 1.0 / 12 * mass * (dz*dz + dx*dx)
+  izz = 1.0 / 12 * mass * (dx*dx + dy*dy)
+
+  # Initial angle of revolute joints
+  theta = 0* Math::PI
+
+  revolute_friction = [0.0, 0.1, 1.0, 10.0]
+  prismatic_friction = [0.0, 5.0, 9.0, 9.81]
+  universal_friction = [0.0, 0.1, 1.0, 10.0]
+%>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <%  # Revolute joints
+        i = 0
+        revolute_friction.each do |f|
+          i = i + 1
+          name = 'pendulum_' + i.to_s
+    %>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2.1*i %> 0 <%= dd*1.8 %>  <%= theta %> 0 0</pose>
+      <link name="link">
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="revolute">
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <dynamics>
+            <friction><%= f %></friction>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+    <% end %>
+    <%  # Universal joints, axis 1
+        i = 0
+        universal_friction.each do |f|
+          i = i + 1
+          name = 'universal_axis1_' + i.to_s
+    %>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2.1*i %> <%= -dd*3 %> <%= dd*1.8 %>  <%= theta %> 0 0</pose>
+      <link name="link">
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="universal">
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <dynamics>
+            <friction><%= f %></friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>0 0 1</xyz>
+          <dynamics>
+            <friction><%= 0 %></friction>
+          </dynamics>
+        </axis2>
+      </joint>
+    </model>
+    <% end %>
+    <%  # Universal joints, axis 2
+        i = 0
+        universal_friction.each do |f|
+          i = i + 1
+          name = 'universal_axis2_' + i.to_s
+    %>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2.1*i %> <%= -dd*6 %> <%= dd*1.8 %>  <%= theta %> 0 0</pose>
+      <link name="link">
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
+        <inertial>
+          <mass><%= mass %></mass>
+          <inertia>
+            <ixx><%= ixx %></ixx>
+            <iyy><%= iyy %></iyy>
+            <izz><%= izz %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="universal">
+        <pose>0 <%= dd/2 %> 0  0 0 0</pose>
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <dynamics>
+            <friction><%= 0 %></friction>
+          </dynamics>
+        </axis>
+        <axis2>
+          <xyz>1 0 0</xyz>
+          <dynamics>
+            <friction><%= f %></friction>
+          </dynamics>
+        </axis2>
+      </joint>
+    </model>
+    <% end %>
+    <%  # Prismatic joints
+        i = 0
+        prismatic_friction.each do |f|
+          i = i + 1
+          name = 'slider_' + i.to_s
+    %>
+    <%= "<model name='#{name}'>" %>
+      <pose><%= dd*2.1*i %> <%= dd*3 %> <%= dd*1.8 %>  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 <%= -dd/2 %>  0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="joint" type="prismatic">
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <dynamics>
+            <friction><%= f %></friction>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+    <% end %>
+  </world>
+</sdf>

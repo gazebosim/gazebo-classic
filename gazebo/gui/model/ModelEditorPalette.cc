@@ -234,9 +234,9 @@ ModelEditorPalette::ModelEditorPalette(QWidget *_parent)
 
   this->modelCreator = new ModelCreator();
 
-  connect(modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
+  connect(this->modelCreator->GetJointMaker(), SIGNAL(JointAdded()), this,
       SLOT(OnJointAdded()));
-  connect(modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
+  connect(this->modelCreator, SIGNAL(PartAdded()), this, SLOT(OnPartAdded()));
 
   QFrame *frame = new QFrame;
   QVBoxLayout *frameLayout = new QVBoxLayout;

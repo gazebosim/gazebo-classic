@@ -234,6 +234,22 @@ TEST_F(MsgsTest, ConvertMsgsPlaneToMath)
   EXPECT_TRUE(math::equal(1.0, v.d));
 }
 
+void CompareMsgsJointTypeToString(const msgs::Joint::Type _type)
+{
+  EXPECT_EQ(_type, msgs::ConvertJointType(msgs::ConvertJointType(_type)));
+}
+
+TEST_F(MsgsTest, ConvertMsgsJointTypeToString)
+{
+  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE);
+  CompareMsgsJointTypeToString(msgs::Joint::REVOLUTE2);
+  CompareMsgsJointTypeToString(msgs::Joint::PRISMATIC);
+  CompareMsgsJointTypeToString(msgs::Joint::UNIVERSAL);
+  CompareMsgsJointTypeToString(msgs::Joint::BALL);
+  CompareMsgsJointTypeToString(msgs::Joint::SCREW);
+  CompareMsgsJointTypeToString(msgs::Joint::GEARBOX);
+}
+
 TEST_F(MsgsTest, SetVector3)
 {
   msgs::Vector3d msg;
