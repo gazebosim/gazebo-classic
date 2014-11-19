@@ -141,12 +141,12 @@ void WallSegmentItem::SegmentUpdated()
   double angle = GZ_DTOR(this->line().angle());
 
   this->measure->SetStartPoint(
-      QPointF(p1.x()+(d+t)*qCos(angle+GZ_DTOR(90))+t*qCos(angle+GZ_DTOR(180)),
-              p1.y()-(d+t)*qSin(angle+GZ_DTOR(90))-t*qSin(angle+GZ_DTOR(180))));
+      QPointF(p1.x()+(d+t)*qCos(angle+M_PI/2.0)+t*qCos(angle+M_PI),
+              p1.y()-(d+t)*qSin(angle+M_PI/2.0)-t*qSin(angle+M_PI)));
   this->measure->SetEndPoint(
-      QPointF(p2.x()+(d+t)*qCos(angle+GZ_DTOR(90))-t*qCos(angle+GZ_DTOR(180)),
-              p2.y()-(d+t)*qSin(angle+GZ_DTOR(90))+t*qSin(angle+GZ_DTOR(180))));
-  this->measure->SetValue((this->line().length()+2*t)/100);
+      QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
+              p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
+  this->measure->SetValue((this->line().length()+2*t)*this->scale);
 
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
