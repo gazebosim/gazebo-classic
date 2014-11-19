@@ -578,7 +578,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetName()) == this->allParts.end())
     {
       // Prevent interaction with other models, send event only to
-      // OrbitViewController
+      // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
     }
@@ -642,7 +642,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
         event::Events::setSelectedEntity("", "normal");
 
       // Prevent interaction with other models, send event only to
-      // OrbitViewController
+      // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
     }
@@ -665,7 +665,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
       if (this->allParts.find(vis->GetName()) == this->allParts.end())
       {
         // Prevent interaction with other models, send event only to
-        // OrbitViewController
+        // user camera
         QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
         userCamera->HandleMouseEvent(_event);
         return true;
