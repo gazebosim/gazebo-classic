@@ -116,6 +116,18 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::PlaneGeom Convert(const math::Plane &_p);
 
+    /// \brief Convert a string to a msgs::Joint::Type enum.
+    /// \param[in] _str Joint type string.
+    /// \return A msgs::Joint::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Joint::Type ConvertJointType(const std::string &_str);
+
+    /// \brief Convert a msgs::Joint::Type to a string.
+    /// \param[in] _type A msgs::Joint::Type enum.
+    /// \return Joint type string.
+    GAZEBO_VISIBLE
+    std::string ConvertJointType(const msgs::Joint::Type _type);
+
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
     /// \return A math::Vector3 object
@@ -283,6 +295,14 @@ namespace gazebo
     /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Plugin
+    /// \param[in] _msg Plugin messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond

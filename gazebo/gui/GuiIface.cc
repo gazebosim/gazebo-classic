@@ -336,3 +336,9 @@ bool gui::saveINI(const boost::filesystem::path &_file)
   }
   return result;
 }
+
+/////////////////////////////////////////////////
+gui::MainWindow *gui::get_main_window()
+{
+  return g_main_win;
+}
