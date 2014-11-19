@@ -101,10 +101,6 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 
   Visual::Load();
 
-  dPtr->axisVisual.reset(
-      new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
-
-  dPtr->axisVisual->Load();
   msgs::Axis axis1Msg = _msg->axis1();
   this->CreateAxis(msgs::Convert(axis1Msg.xyz()),
       axis1Msg.use_parent_model_frame(), _msg->type());
@@ -167,18 +163,27 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
   math::Vector3 axisWorld = axisWorldRotation*math::Vector3::UnitZ;
   if (axisWorld == jointWorldRotation*math::Vector3::UnitX)
   {
-    dPtr->axisVisual->ShowAxisHead(0, false);
-    axis->ShowShaft(false);
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(0, false);
+      axis->ShowShaft(false);
+    }
   }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitY)
   {
-    dPtr->axisVisual->ShowAxisHead(1, false);
-    axis->ShowShaft(false);
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(1, false);
+      axis->ShowShaft(false);
+    }
   }
   else if (axisWorld == jointWorldRotation*math::Vector3::UnitZ)
   {
-    dPtr->axisVisual->ShowAxisHead(2, false);
-    axis->ShowShaft(false);
+    if (dPtr->axisVisual)
+    {
+      dPtr->axisVisual->ShowAxisHead(2, false);
+      axis->ShowShaft(false);
+    }
   }
 }
 
