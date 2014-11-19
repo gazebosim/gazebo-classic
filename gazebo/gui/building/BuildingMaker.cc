@@ -1305,16 +1305,14 @@ void BuildingMaker::OnDiscard()
       QString("Are you sure you want to discard\n"
       "your model? All of your work will\n"
       "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Yes | QMessageBox::Cancel,
       QMessageBox::Cancel);
 
   switch (ret)
   {
-    case QMessageBox::Discard:
+    case QMessageBox::Yes:
+      this->Reset();
       gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -1328,11 +1326,10 @@ void BuildingMaker::OnDiscard()
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
   if (this->saved)
   {
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
   }
@@ -1342,30 +1339,30 @@ void BuildingMaker::OnSave(const std::string &_saveName)
     this->saveDialog->SetSaveLocation(this->saveLocation);
     if (this->saveDialog->exec() == QDialog::Accepted)
     {
-      this->modelName = this->saveDialog->GetModelName();
+      this->SetModelName(this->saveDialog->GetModelName());
       this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
       this->GenerateSDF();
       this->SaveToSDF(this->saveLocation);
       this->saved = true;
+      // Send confirmation that model has been saved
+      gui::editor::Events::saveBuildingModel(this->modelName,
+          this->saveLocation);
     }
   }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnDone(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
   this->finishDialog->SetModelName(this->modelName);
   this->finishDialog->SetSaveLocation(this->saveLocation);
   if (this->finishDialog->exec() == QDialog::Accepted)
   {
-    this->modelName = this->finishDialog->GetModelName();
+    this->SetModelName(this->finishDialog->GetModelName());
     this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
@@ -1377,32 +1374,34 @@ void BuildingMaker::OnDone(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()
 {
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
+  if (this->allItems.empty())
   {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
-      this->OnSave();
-      gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
+    gui::editor::Events::finishBuildingModel();
+    return;
+  }
+
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Exit");
+  msgBox.setText("Save changes before exiting? If you do not\n"
+        "save, all of your work will be lost!\n\n"
+        "Note: Once you exit the Building Editor, your\n"
+        "building will no longer be editable.");
+  QPushButton *discardButton = msgBox.addButton("Don't Save, Exit",
+      QMessageBox::ActionRole);
+  msgBox.addButton("Cancel", QMessageBox::ActionRole);
+  QPushButton *doneButton = msgBox.addButton("Save", QMessageBox::ActionRole);
+  msgBox.setDefaultButton(doneButton);
+
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == doneButton)
+  {
+    this->OnDone();
+  }
+  else if (msgBox.clickedButton() == discardButton)
+  {
+    this->Reset();
+    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::finishBuildingModel();
   }
 }
