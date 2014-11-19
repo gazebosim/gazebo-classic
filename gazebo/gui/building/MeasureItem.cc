@@ -64,15 +64,15 @@ void MeasureItem::paint(QPainter *_painter,
   _painter->drawLine(this->line());
 
   // End tips
-  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+GZ_DTOR(90)),
-                             p1.y()-tipLength*qSin(angle+GZ_DTOR(90))),
-                     QPointF(p1.x()-tipLength*qCos(angle+GZ_DTOR(90)),
-                             p1.y()+tipLength*qSin(angle+GZ_DTOR(90))));
+  _painter->drawLine(QPointF(p1.x()+tipLength*qCos(angle+M_PI/2.0),
+                             p1.y()-tipLength*qSin(angle+M_PI/2.0)),
+                     QPointF(p1.x()-tipLength*qCos(angle+M_PI/2.0),
+                             p1.y()+tipLength*qSin(angle+M_PI/2.0)));
 
-  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+GZ_DTOR(90)),
-                             p2.y()-tipLength*qSin(angle+GZ_DTOR(90))),
-                     QPointF(p2.x()-tipLength*qCos(angle+GZ_DTOR(90)),
-                             p2.y()+tipLength*qSin(angle+GZ_DTOR(90))));
+  _painter->drawLine(QPointF(p2.x()+tipLength*qCos(angle+M_PI/2.0),
+                             p2.y()-tipLength*qSin(angle+M_PI/2.0)),
+                     QPointF(p2.x()-tipLength*qCos(angle+M_PI/2.0),
+                             p2.y()+tipLength*qSin(angle+M_PI/2.0)));
 
   // Value
   std::ostringstream stream;
@@ -86,20 +86,20 @@ void MeasureItem::paint(QPainter *_painter,
   float posX = (p1.x()+p2.x())/2;
   float posY = (p1.y()+p2.y())/2;
   double textAngle = angle;
-  if (textAngle > GZ_DTOR(180))
-    textAngle = textAngle - GZ_DTOR(180);
+  if (textAngle > M_PI)
+    textAngle = textAngle - M_PI;
 
-  if (textAngle > 0 && textAngle <= GZ_DTOR(90))
+  if (textAngle > 0 && textAngle <= M_PI/2.0)
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+GZ_DTOR(90))-textWidth;
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+GZ_DTOR(90));
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle+M_PI/2.0)-textWidth;
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle+M_PI/2.0);
   }
-  else if (textAngle > GZ_DTOR(90) && textAngle < GZ_DTOR(180))
+  else if (textAngle > M_PI/2.0 && textAngle < M_PI)
   {
-    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-GZ_DTOR(90));
-    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-GZ_DTOR(90));
+    posX = (p1.x()+p2.x())/2 + margin*qCos(textAngle-M_PI/2.0);
+    posY = (p1.y()+p2.y())/2 - margin*qSin(textAngle-M_PI/2.0);
   }
-  else if (fabs(textAngle) < 0.01 || fabs(textAngle - GZ_DTOR(180)) < 0.01)
+  else if (fabs(textAngle) < 0.01 || fabs(textAngle - M_PI) < 0.01)
   {
     posX = (p1.x()+p2.x())/2 - textWidth/2;
     posY = (p1.y()+p2.y())/2 - margin;
