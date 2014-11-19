@@ -73,7 +73,7 @@ void GuiIface_TEST::GUIINIPATHEnvVariable()
   if (boost::filesystem::exists(path))
     boost::filesystem::remove(path);
 
-  const char * filepath = path.string().c_str();
+  const char *filepath = path.string().c_str();
 
   setenv("GAZEBO_GUI_INI_PATH", filepath, 1);
 
