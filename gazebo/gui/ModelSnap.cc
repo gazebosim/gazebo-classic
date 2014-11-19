@@ -45,6 +45,7 @@ ModelSnap::ModelSnap()
   this->dataPtr->initialized = false;
   this->dataPtr->selectedTriangleDirty = false;
   this->dataPtr->hoverTriangleDirty = false;
+  this->dataPtr->snapLines = NULL;
 
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 }
@@ -56,7 +57,8 @@ ModelSnap::~ModelSnap()
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->dataPtr->updateMutex);
-    delete this->dataPtr->snapLines;
+    if (this->dataPtr->snapLines)
+      delete this->dataPtr->snapLines;
     this->dataPtr->snapVisual.reset();
   }
 

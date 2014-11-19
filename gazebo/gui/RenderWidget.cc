@@ -103,7 +103,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->toolbar->addAction(g_snapAct);
 
   toolLayout->addSpacing(10);
-  toolLayout->addWidget(toolbar);
+  toolLayout->addWidget(this->toolbar);
   toolFrame->setLayout(toolLayout);
 
   this->glWidget = new GLWidget(this->mainFrame);
@@ -364,6 +364,12 @@ void RenderWidget::ShowToolbar(const bool _show)
 }
 
 /////////////////////////////////////////////////
+QToolBar *RenderWidget::GetToolbar() const
+{
+  return this->toolbar;
+}
+
+/////////////////////////////////////////////////
 void RenderWidget::OnClearOverlayMsg()
 {
   this->DisplayOverlayMsg("");
@@ -382,4 +388,17 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_translateAct->setEnabled(false);
     g_rotateAct->setEnabled(false);
   }
+}
+
+/////////////////////////////////////////////////
+void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
+{
+  // Set the plugin's parent and store the plugin
+  _plugin->setParent(this->glWidget);
+  this->plugins.push_back(_plugin);
+
+  // Load the plugin.
+  _plugin->Load(_elem);
+
+  _plugin->show();
 }
