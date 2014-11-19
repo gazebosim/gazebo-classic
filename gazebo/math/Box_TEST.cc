@@ -29,8 +29,7 @@ class ExampleBox : public ::testing::Test
   protected:
     virtual void SetUp()
     {
-//       box = math::Box(math::Vector3(0, 1, 2), math::Vector3(1, 2, 3));
-    	box = math::Box(math::Vector3(0, -1, 2), math::Vector3(1, -2, 3));
+      box = math::Box(math::Vector3(0, -1, 2), math::Vector3(1, -2, 3));
     }
 
     math::Box box;
