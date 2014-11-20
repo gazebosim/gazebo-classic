@@ -1147,6 +1147,9 @@ void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
 void GLWidget::OnModelEditor(bool /*_checked*/)
 {
   g_arrowAct->trigger();
+  event::Events::setSelectedEntity("", "normal");
+
+  // Manually deselect, in case the editor was opened with Ctrl
   for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
   {
     this->selectedVisuals[i]->SetHighlighted(false);
