@@ -50,6 +50,9 @@
 1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
+1. Added accessor for MainWindow graphical widget to GuiIface.
+    * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
+
 1. Added a ConfigWidget class that takes in a google protobuf message and generates widgets for configuring the fields in the message
     * [Pull request #1285](https://bitbucket.org/osrf/gazebo/pull-request/1285)
 
