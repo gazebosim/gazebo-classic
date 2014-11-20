@@ -273,6 +273,7 @@ void StairsItem::OnOpenInspector()
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 

@@ -154,6 +154,17 @@ namespace gazebo
               { follow.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
+      /// \brief Connect a signal to the main window ready signal
+      public: template<typename T>
+              static event::ConnectionPtr ConnectMainWindowReady(T _subscriber)
+              { return mainWindowReady.Connect(_subscriber); }
+
+      /// \brief Disconnect a signal from the main window ready signal
+      public: static void DisconnectMainWindowReady(
+              event::ConnectionPtr _subscriber)
+              { mainWindowReady.Disconnect(_subscriber); }
+
+      //////////////////////////////////////////////////////////////////////////
       /// \brief Connect a signal to toggle the GUI's left hand pane signal
       public: template<typename T>
               static event::ConnectionPtr ConnectLeftPaneVisibility
@@ -206,6 +217,9 @@ namespace gazebo
 
       /// \brief Used to set whether the GUI's left pane is visible
       public: static event::EventT<void (bool)> leftPaneVisibility;
+
+      /// \brief Main window ready event.
+      public: static event::EventT<void ()> mainWindowReady;
     };
   }
 }

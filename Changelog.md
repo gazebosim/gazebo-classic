@@ -50,6 +50,9 @@
 1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
+1. Added accessor for MainWindow graphical widget to GuiIface.
+    * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
