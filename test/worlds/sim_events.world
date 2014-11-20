@@ -16,7 +16,7 @@
     <region>
       <name>start</name>
       <volume>
-          <!-- min and max are sdf::Vector3-->
+          <!-- min and max are sdf::Vector3 -->
           <!-- around the origin -->
           <min>-3 -3 -3</min>
           <max>3 3 3</max>
@@ -44,6 +44,17 @@
       <name>NewBeer</name>
       <type>existence</type>
       <model>beer</model>
+    </event>
+
+    <event>
+      <name>Inactive</name>
+      <type>sim_state</type>
+      <!-- elements can be active or not,
+      and this property can be set at runtime or in the world file
+      with the active element
+      by default, they are.
+      -->
+      <active>false</active>
     </event>
 
     <event>

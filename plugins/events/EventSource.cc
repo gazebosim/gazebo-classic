@@ -43,6 +43,12 @@ void EventSource::Init()
 void EventSource::Load(const sdf::ElementPtr &_sdf)
 {
   this->name = _sdf->GetElement("name")->Get<std::string>();
+  // active by default, but this can be set in the world file
+  if(_sdf->HasElement("active"))
+  {
+    sdf::ElementPtr activeE = _sdf->GetElement("active");
+    this->active = activeE->Get<std::string>() == "true";
+  }
 }
 
 
