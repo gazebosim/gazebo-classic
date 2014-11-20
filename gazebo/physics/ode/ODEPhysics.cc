@@ -1155,6 +1155,10 @@ bool ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     {
       return this->SetParam("min_step_size", _value);
     }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      return this->SetParam("inertia_ratio_reduction", _value);
+    }
     default:
     {
       gzwarn << "Param not supported in ode" << std::endl;
@@ -1432,6 +1436,10 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     case MIN_STEP_SIZE:
     {
       return this->GetParam("min_step_size");
+    }
+    case INERTIA_RATIO_REDUCTION:
+    {
+      return this->GetParam("inertia_ratio_reduction");
     }
     default:
     {

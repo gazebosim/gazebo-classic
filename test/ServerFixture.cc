@@ -224,17 +224,17 @@ void ServerFixture::RunServer(const std::string &_worldFilename, bool _paused,
   if (!rendering::get_scene(
         gazebo::physics::get_world()->GetName()))
   {
-    rendering::create_scene(
-        gazebo::physics::get_world()->GetName(), false, true);
+    ASSERT_NO_THROW(rendering::create_scene(
+        gazebo::physics::get_world()->GetName(), false, true));
   }
 
-  this->SetPause(_paused);
+  ASSERT_NO_THROW(this->SetPause(_paused));
 
-  this->server->Run();
+  ASSERT_NO_THROW(this->server->Run());
 
   ASSERT_NO_THROW(this->server->Fini());
 
-  delete this->server;
+  ASSERT_NO_THROW(delete this->server);
   this->server = NULL;
 }
 
