@@ -29,16 +29,16 @@ TEST_F(Issue1124Test, SetModelPose)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link != NULL);
+  ASSERT_TRUE(link.get());
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll != NULL);
+  ASSERT_TRUE(coll.get());
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
@@ -66,16 +66,16 @@ TEST_F(Issue1124Test, SetLinkPose)
 {
   Load("worlds/box_plane_low_friction_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link != NULL);
+  ASSERT_TRUE(link.get());
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll != NULL);
+  ASSERT_TRUE(coll.get());
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));
@@ -92,16 +92,16 @@ TEST_F(Issue1124Test, MovingPose)
 {
   Load("worlds/box_plane_low_friction_test.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr model = world->GetModel("box");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   physics::LinkPtr link = model->GetLink("link");
-  ASSERT_TRUE(link != NULL);
+  ASSERT_TRUE(link.get());
 
   physics::CollisionPtr coll = link->GetCollision("collision");
-  ASSERT_TRUE(coll != NULL);
+  ASSERT_TRUE(coll.get());
 
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->GetWorldPose(), math::Pose(0, 0, 0.5, 0, 0, 0));

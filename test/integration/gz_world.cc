@@ -30,7 +30,7 @@ TEST_F(GzWorld, Pause)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   EXPECT_FALSE(world->IsPaused());
 
@@ -53,7 +53,7 @@ TEST_F(GzWorld, Step)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   EXPECT_TRUE(world->IsPaused());
 

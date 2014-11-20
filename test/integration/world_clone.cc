@@ -72,7 +72,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -118,7 +118,7 @@ TEST_F(WorldClone, CloneEmptyPort)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -149,7 +149,7 @@ TEST_F(WorldClone, Clone)
 {
   Load("worlds/camera.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -173,7 +173,7 @@ TEST_F(WorldClone, Clone)
   while (!worldCloned && retries++ < 100)
     common::Time::MSleep(20);
 
-  ASSERT_TRUE(worldCloned != NULL);
+  ASSERT_TRUE(worldCloned);
 
   // Remove all the models from the original world.
   world->Clear();

@@ -32,24 +32,24 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // Load the sample world
   Load("worlds/polyline.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr triangleModel = world->GetModel("triangle");
-  EXPECT_TRUE(triangleModel != NULL);
+  EXPECT_TRUE(triangleModel.get());
 
   physics::LinkPtr triangleLink = triangleModel->GetLink("link");
-  EXPECT_TRUE(triangleLink != NULL);
+  EXPECT_TRUE(triangleLink.get());
 
   physics::CollisionPtr triangleColl = triangleLink->GetCollision("collision");
-  EXPECT_TRUE(triangleColl != NULL);
+  EXPECT_TRUE(triangleColl.get());
 
   physics::ShapePtr shape = triangleColl->GetShape();
-  EXPECT_TRUE(shape != NULL);
+  EXPECT_TRUE(shape.get());
   EXPECT_TRUE(shape->HasType(physics::Base::POLYLINE_SHAPE));
 
   physics::PolylineShapePtr polyShape =
     boost::dynamic_pointer_cast<physics::PolylineShape>(shape);
-  EXPECT_TRUE(polyShape != NULL);
+  EXPECT_TRUE(polyShape.get());
 
   EXPECT_DOUBLE_EQ(polyShape->GetHeight(), 1.0);
 

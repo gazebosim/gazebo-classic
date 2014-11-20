@@ -63,13 +63,13 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
 
   // get model and joints
   physics::ModelPtr model = world->GetModel("model_1");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
   physics::JointPtr jointUpper = model->GetJoint("joint_00");
   physics::JointPtr jointLower = model->GetJoint("joint_01");
-  ASSERT_TRUE(jointUpper != NULL);
-  ASSERT_TRUE(jointLower != NULL);
+  ASSERT_TRUE(jointUpper.get());
+  ASSERT_TRUE(jointLower.get());
   physics::LinkPtr linkLower = jointLower->GetChild();
-  ASSERT_TRUE(linkLower != NULL);
+  ASSERT_TRUE(linkLower.get());
 
   // check joint limits from sdf
   EXPECT_NEAR(1.4, jointLower->GetHighStop(0).Radian(), g_tolerance);
@@ -156,9 +156,9 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
 
   // get model and joints
   physics::ModelPtr model = world->GetModel("model_1");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
   physics::JointPtr jointLower = model->GetJoint("joint_01");
-  ASSERT_TRUE(jointLower != NULL);
+  ASSERT_TRUE(jointLower.get());
 
   // Call SetVelocity on both axes of lower joint
   const double vel = 1.0;

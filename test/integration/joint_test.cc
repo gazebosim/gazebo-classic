@@ -236,7 +236,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
   ASSERT_TRUE(linkRevolute2 != NULL);
 
   physics::JointPtr jointPluginImplicit = modelPlugin->GetJoint("joint_1");
-  ASSERT_TRUE(jointPluginImplicit != NULL);
+  ASSERT_TRUE(jointPluginImplicit.get());
 
   int cyclesPrismatic = 0;
   int cyclesRevolute = 0;
@@ -414,22 +414,22 @@ TEST_F(JointTest, joint_SDF14)
     gzthrow("Unable to get joint14_model");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine != NULL);
+  EXPECT_TRUE(physicsEngine.get());
   physics::ModelPtr model = world->GetModel("joint14_model");
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model.get());
   physics::LinkPtr link1 = model->GetLink("body1");
-  EXPECT_TRUE(link1 != NULL);
+  EXPECT_TRUE(link1.get());
   physics::LinkPtr link2 = model->GetLink("body2");
-  EXPECT_TRUE(link2 != NULL);
+  EXPECT_TRUE(link2.get());
 
   EXPECT_EQ(model->GetJointCount(), 1u);
   physics::JointPtr joint = model->GetJoint("joint14_revolute_joint");
-  EXPECT_TRUE(joint != NULL);
+  EXPECT_TRUE(joint.get());
 
   physics::LinkPtr parent = joint->GetParent();
-  EXPECT_TRUE(parent != NULL);
+  EXPECT_TRUE(parent.get());
   physics::LinkPtr child = joint->GetChild();
-  EXPECT_TRUE(child != NULL);
+  EXPECT_TRUE(child.get());
   EXPECT_EQ(parent->GetName(), "body2");
   EXPECT_EQ(child->GetName(), "body1");
 }

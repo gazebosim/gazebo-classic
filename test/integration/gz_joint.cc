@@ -31,15 +31,15 @@ TEST_F(GzJoint, Force)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Get a pointer to the model
   physics::ModelPtr model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   // Get a pointer to the joint
   physics::JointPtr joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint.get());
 
   // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
@@ -63,20 +63,20 @@ TEST_F(GzJoint, PositionPID)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Disable gravity to simplify PID control
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics.get());
   physics->SetGravity(math::Vector3::Zero);
 
   // Get a pointer to the model
   physics::ModelPtr model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   // Get a pointer to the joint
   physics::JointPtr joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint.get());
 
   // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
@@ -105,15 +105,15 @@ TEST_F(GzJoint, VelocityPID)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Get a pointer to the model
   physics::ModelPtr model = world->GetModel("model");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 
   // Get a pointer to the joint
   physics::JointPtr joint = model->GetJoint("joint");
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint.get());
 
   // Make sure the joint is at the correct initial pose
   EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);

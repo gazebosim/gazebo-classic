@@ -57,7 +57,7 @@ TEST_P(SpawnModels, WirelessTransmitters)
           sensors::SensorManager::Instance()->GetSensor(sensorName));
 
       EXPECT_TRUE(this->HasEntity(modelName));
-      EXPECT_TRUE(tx != NULL);
+      EXPECT_TRUE(tx.get());
     }
   }
 }

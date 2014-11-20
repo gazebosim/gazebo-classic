@@ -31,10 +31,10 @@ void NonDefaultWorld::Load(const std::string &_physicsEngine)
   ServerFixture::Load("worlds/empty_different_name.world", false,
     _physicsEngine);
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr model = world->GetModel("ground_plane");
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model.get());
 }
 
 TEST_P(NonDefaultWorld, Load)

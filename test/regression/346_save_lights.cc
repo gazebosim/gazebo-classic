@@ -31,7 +31,7 @@ TEST_F(Issue346Test, SaveLights)
 {
   Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   std::string spotLightName = "spot_light";
   math::Vector3 spotLightPos(1, 2, 5);
@@ -58,13 +58,13 @@ TEST_F(Issue346Test, SaveLights)
   sdf::SDFPtr sdf(new sdf::SDF);
   ASSERT_TRUE(sdf::init(sdf));
   ASSERT_TRUE(sdf::readFile(common::find_file(filenameOut), sdf));
-  ASSERT_TRUE(sdf->root != NULL);
+  ASSERT_TRUE(sdf->root.get());
 
   // Verify there is one spot light and one point light
   int hasSpotLight = 0;
   int hasPointLight = 0;
   sdf::ElementPtr worldElem = sdf->root->GetElement("world");
-  ASSERT_TRUE(worldElem != NULL);
+  ASSERT_TRUE(worldElem.get());
   sdf::ElementPtr lightElem = worldElem->GetElement("light");
   while (lightElem)
   {

@@ -76,9 +76,9 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
 
     // Get initial energy
     physics::LinkPtr link = joint->GetChild();
-    ASSERT_TRUE(link != NULL);
+    ASSERT_TRUE(link.get());
     physics::ModelPtr model = link->GetModel();
-    ASSERT_TRUE(model != NULL);
+    ASSERT_TRUE(model.get());
 
     double energy0 = model->GetWorldEnergy();
     EXPECT_NEAR(model->GetWorldEnergyKinetic(), 0.0, g_tolerance);
@@ -598,11 +598,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
     gzthrow("Unable to get model_1");
 
   physics::PhysicsEnginePtr physicsEngine = world->GetPhysicsEngine();
-  EXPECT_TRUE(physicsEngine != NULL);
+  EXPECT_TRUE(physicsEngine.get());
   physics::ModelPtr model = world->GetModel("model_1");
-  EXPECT_TRUE(model != NULL);
+  EXPECT_TRUE(model.get());
   physics::LinkPtr link = model->GetLink("link_2");  // sphere link at end
-  EXPECT_TRUE(link != NULL);
+  EXPECT_TRUE(link.get());
 
   double g = 9.81;
   double l = 10.0;

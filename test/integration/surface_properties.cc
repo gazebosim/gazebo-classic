@@ -68,7 +68,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   sensors::SensorPtr sensor = sensors::get_sensor("box_contact");
   sensors::ContactSensorPtr contactSensor =
       boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
-  ASSERT_TRUE(contactSensor != NULL);
+  ASSERT_TRUE(contactSensor.get());
 
   // Step forward 0.2 s
   double stepTime = 0.2;

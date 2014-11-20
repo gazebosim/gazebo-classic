@@ -31,7 +31,7 @@ TEST_F(CameraTest, Follow)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Spawn a box to follow.
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),

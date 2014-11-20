@@ -32,7 +32,7 @@ TEST_F(GzCamera, Follow)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Spawn a box to follow.
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
@@ -45,10 +45,10 @@ TEST_F(GzCamera, Follow)
       cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   rendering::ScenePtr scene = rendering::get_scene();
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene.get());
 
   rendering::CameraPtr camera = scene->GetCamera("test_camera");
-  ASSERT_TRUE(camera != NULL);
+  ASSERT_TRUE(camera.get());
 
   // Make sure the sensor is at the correct initial pose
   EXPECT_EQ(camera->GetWorldPose(), cameraStartPose);

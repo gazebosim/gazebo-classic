@@ -26,7 +26,7 @@ TEST_F(WorldTest, ClearEmptyWorld)
 {
   Load("worlds/blank.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   EXPECT_EQ(world->GetModelCount(), 0u);
 
@@ -48,7 +48,7 @@ TEST_F(WorldTest, Clear)
 {
   Load("worlds/pioneer2dx.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   EXPECT_EQ(world->GetModelCount(), 2u);
 
@@ -68,7 +68,7 @@ TEST_F(WorldTest, ModifyLight)
 {
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   // Make sure there is only one light, and it is named "sun"
   {
@@ -198,13 +198,13 @@ TEST_F(WorldTest, RemoveModelPaused)
 {
   Load("worlds/shapes.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel != NULL);
-  EXPECT_TRUE(boxModel != NULL);
+  EXPECT_TRUE(sphereModel.get());
+  EXPECT_TRUE(boxModel.get());
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
@@ -212,8 +212,8 @@ TEST_F(WorldTest, RemoveModelPaused)
   sphereModel = world->GetModel("sphere");
   boxModel = world->GetModel("box");
 
-  EXPECT_FALSE(sphereModel != NULL);
-  EXPECT_FALSE(boxModel != NULL);
+  EXPECT_FALSE(sphereModel.get());
+  EXPECT_FALSE(boxModel.get());
 }
 
 /////////////////////////////////////////////////
@@ -221,13 +221,13 @@ TEST_F(WorldTest, RemoveModelUnPaused)
 {
   Load("worlds/shapes.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::ModelPtr sphereModel = world->GetModel("sphere");
   physics::ModelPtr boxModel = world->GetModel("box");
 
-  EXPECT_TRUE(sphereModel != NULL);
-  EXPECT_TRUE(boxModel != NULL);
+  EXPECT_TRUE(sphereModel.get());
+  EXPECT_TRUE(boxModel.get());
 
   world->RemoveModel(sphereModel);
   world->RemoveModel("box");
@@ -235,8 +235,8 @@ TEST_F(WorldTest, RemoveModelUnPaused)
   sphereModel = world->GetModel("sphere");
   boxModel = world->GetModel("box");
 
-  EXPECT_FALSE(sphereModel != NULL);
-  EXPECT_FALSE(boxModel != NULL);
+  EXPECT_FALSE(sphereModel.get());
+  EXPECT_FALSE(boxModel.get());
 }
 
 /////////////////////////////////////////////////

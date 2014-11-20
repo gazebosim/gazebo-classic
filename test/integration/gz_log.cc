@@ -33,11 +33,11 @@ TEST_F(GzLog, Record)
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   world->SetPaused(true);
 
-  ASSERT_TRUE(recorder != NULL);
+  ASSERT_TRUE(recorder);
 
   EXPECT_FALSE(recorder->GetPaused());
   EXPECT_FALSE(recorder->GetRunning());

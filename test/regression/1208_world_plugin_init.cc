@@ -31,10 +31,10 @@ TEST_F(Issue1208Test, Reset)
 {
   Load("worlds/issue_1208.world", true);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world.get());
 
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics.get());
 
   // There is a WorldPlugin attached to this world.
   // It has a counter that increments with each call of Init.
