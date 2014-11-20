@@ -37,7 +37,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
 
-  connect(g_editModelAct, SIGNAL(triggered(bool)), this, SLOT(OnEdit(bool)));
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
       gui::model::Events::ConnectFinishModel(

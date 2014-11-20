@@ -985,6 +985,10 @@ void MainWindow::CreateActions()
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
+  // Exclusive doesn't allow all actions to be unchecked at the same time
+  editorGroup->setExclusive(false);
+  connect(editorGroup, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnEditorGroup(QAction *)));
 
   g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
@@ -1775,4 +1779,18 @@ void MainWindow::SetLeftPaneVisibility(bool _on)
   sizes.push_back(rightPane);
 
   this->splitter->setSizes(sizes);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnEditorGroup(QAction *_action)
+{
+  QActionGroup * editorGroup = _action->actionGroup();
+  // Manually uncheck all other actions in the group
+  for (int i = 0; i < editorGroup->actions().size(); ++i)
+  {
+    if (editorGroup->actions()[i] != _action)
+    {
+      editorGroup->actions()[i]->setChecked(false);
+    }
+  }
 }

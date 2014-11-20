@@ -165,6 +165,10 @@ namespace gazebo
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
 
+      /// \brief Qt call back when one of the editor actions is triggered.
+      /// \param[in] _action Action in the group which was triggered.
+      private slots: void OnEditorGroup(QAction *_action);
+
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
       private: void OnFullScreen(bool _value);

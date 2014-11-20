@@ -50,6 +50,9 @@
 1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
 
+1. Added MainWindow::OnEditorGroup to manually uncheck editor actions.
+    * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
