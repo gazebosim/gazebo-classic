@@ -218,8 +218,16 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   dWorldSetQuickStepNumIterations(this->worldId, this->GetSORPGSIters());
   dWorldSetQuickStepW(this->worldId, this->GetSORPGSW());
-  dWorldSetQuickStepInertiaRatioReduction(this->worldId,
-       odeElem->GetElement("solver")->Get<bool>("use_dynamic_moi_rescaling"));
+
+  if (odeElem->GetElement("solver")->HasElement("use_dynamic_moi_rescaling"))
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+        odeElem->GetElement("solver")->Get<bool>("use_dynamic_moi_rescaling"));
+  }
+  else
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId, true);
+  }
 
   // Set the physics update function
   if (this->stepType == "quick")
@@ -1249,10 +1257,14 @@ void ODEPhysics::SetParam(ODEParam _param, const boost::any &_value)
     }
     case INERTIA_RATIO_REDUCTION:
     {
-      bool value = boost::any_cast<bool>(_value);
-      odeElem->GetElement("solver")->GetElement(
-          "use_dynamic_moi_rescaling")->Set(value);
-      dWorldSetQuickStepInertiaRatioReduction(this->worldId, value);
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
+      {
+        bool value = boost::any_cast<bool>(_value);
+        odeElem->GetElement("solver")->GetElement(
+            "use_dynamic_moi_rescaling")->Set(value);
+        dWorldSetQuickStepInertiaRatioReduction(this->worldId, value);
+      }
       break;
     }
     default:
@@ -1361,8 +1373,17 @@ boost::any ODEPhysics::GetParam(ODEParam _param) const
     }
     case INERTIA_RATIO_REDUCTION:
     {
-      value = odeElem->GetElement("solver")->Get<bool>(
-          "use_dynamic_moi_rescaling");
+      if (odeElem->GetElement("solver")->HasElement(
+            "use_dynamic_moi_rescaling"))
+      {
+        value = odeElem->GetElement("solver")->Get<bool>(
+            "use_dynamic_moi_rescaling");
+      }
+      else
+      {
+        value = true;
+      }
+
       break;
     }
     default:
