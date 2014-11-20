@@ -23,19 +23,18 @@
 
 namespace gazebo
 {
-
- 
   /// \brief SimEvent that fires when the simulation is paused/resumed
   class SimStateEventSource: public EventSource
   {
     /// \brief Constructor
     /// \param[in] _pub publisher for the SimEvents
     /// \param[in] _world pointer to the world.
-    public: SimStateEventSource(transport::PublisherPtr _pub, physics::WorldPtr _world);
+    public: SimStateEventSource(transport::PublisherPtr _pub,
+                                physics::WorldPtr _world);
 
     /// \brief Dtor
     public: virtual ~SimStateEventSource();
-   
+
     /// \brief Load the name of the event from the world file
     /// \param[in] _sdf the event element in the world file
     public: virtual void Load(const sdf::ElementPtr &_sdf);
@@ -49,10 +48,7 @@ namespace gazebo
 
     /// \brief Pointer to the Gazebo pause event connection
     private: event::ConnectionPtr pauseConnection;
-    
   };
-
 }
- 
 
 #endif

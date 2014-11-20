@@ -1,7 +1,7 @@
 link_directories(
   ${GAZEBO_LIBRARY_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
-  )
+)
 
 set (src
   SimEventsPlugin.cc
@@ -9,7 +9,7 @@ set (src
   InRegionEventSource.cc
   ExistenceEventSource.cc
   SimStateEventSource.cc
-  )
+)
 
 set (inc
   SimEventsPlugin.hh
@@ -18,11 +18,11 @@ set (inc
   ExistenceEventSource.hh
   SimEventsException.hh
   SimStateEventSource.hh
-  )
+)
 
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
-  )
+)
 
 add_library(SimEventsPlugin SHARED ${src} )
 target_link_libraries(SimEventsPlugin ${GAZEBO_libraries} gazebo_msgs)

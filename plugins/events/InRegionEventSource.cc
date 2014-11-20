@@ -23,9 +23,10 @@ using namespace gazebo;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-InRegionEventSource::InRegionEventSource( transport::PublisherPtr _pub,
-                                          physics::WorldPtr _world, 
-                                          const std::map<std::string, RegionPtr> &_regions) 
+InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
+                                         physics::WorldPtr _world,
+                                         const std::map<std::string, RegionPtr>
+                                                                      &_regions)
   :EventSource(_pub, "region", _world), regions(_regions), isInside(false)
 {
 }
@@ -35,7 +36,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
 {
   EventSource::Load(_sdf);
   if (_sdf->HasElement("model"))
-    this->modelName = _sdf->GetElement("model")->Get<std::string>();  
+    this->modelName = _sdf->GetElement("model")->Get<std::string>();
   else
     gzerr << this->name << " is missing a model element" << std::endl;
 
@@ -56,19 +57,19 @@ void InRegionEventSource::Init()
   this->model = this->world->GetModel(this->modelName);
   if (!model)
   {
-    gzerr << this->name << ": Model '" << this->modelName 
+    gzerr << this->name << ": Model '" << this->modelName
         << "' does not exist" << std::endl;
   }
 
-  std::map<std::string, RegionPtr>::const_iterator it = 
-    this->regions.find(this->regionName); 
+  std::map<std::string, RegionPtr>::const_iterator it =
+    this->regions.find(this->regionName);
   if (it != this->regions.end())
   {
     this->region = it->second;
   }
-  else 
+  else
   {
-    gzerr << this->name << ": Region '" << this->regionName 
+    gzerr << this->name << ": Region '" << this->regionName
         << "' does not exist" << std::endl;
   }
 }
@@ -86,10 +87,10 @@ void InRegionEventSource::Update()
   math::Vector3 point = this->model->GetWorldPose().pos;
   bool oldState = this->isInside;
   this->isInside = this->region->PointInRegion(point);
-  if( oldState != this->isInside)
+  if (oldState != this->isInside)
   {
     std::string json = "{";
-    if(this->isInside)
+    if (this->isInside)
     {
       json += "\"state\":\"inside\",";
     }
@@ -105,29 +106,35 @@ void InRegionEventSource::Update()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+Volume::~Volume()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
 bool Volume::PointInVolume(const math::Vector3 &_p) const
 {
-
-  if(_p.x >= min.x && _p.x <= max.x)
+  return _p.x >= this->min.x && _p.x <= this->max.x &&
+         _p.y >= this->min.y && _p.y <= this->max.y &&
+         _p.z >= this->min.z && _p.z <= this->max.z;
+  /*if (_p.x >= min.x && _p.x <= max.x)
   {
-    if(_p.y >= min.y && _p.y <= max.y)
+    if (_p.y >= min.y && _p.y <= max.y)
     {
-      if(_p.z >= min.z && _p.z <= max.z)
+      if (_p.z >= min.z && _p.z <= max.z)
       {
         return true;
       }
     }
   }
-  return false;
+  return false;*/
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 bool Region::PointInRegion(const math::Vector3 &_p) const
 {
-  for (unsigned int i=0; i< volumes.size(); ++i)
+  for (unsigned int i = 0; i < this->volumes.size(); ++i)
   {
-    if (volumes[i]->PointInVolume(_p))
+    if (this->volumes[i]->PointInVolume(_p))
     {
       return true;
     }
@@ -135,12 +142,11 @@ bool Region::PointInRegion(const math::Vector3 &_p) const
   return false;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void Region::Load(const sdf::ElementPtr &_sdf)
 {
   sdf::ElementPtr child = _sdf->GetFirstElement();
-  while(child)
+  while (child)
   {
     std::string ename = child->GetName();
     if (ename == "volume")
@@ -149,21 +155,17 @@ void Region::Load(const sdf::ElementPtr &_sdf)
       volume->min = child->GetElement("min")->Get<math::Vector3>();
       volume->max = child->GetElement("max")->Get<math::Vector3>();
       this->volumes.push_back(volume);
-    }   
+    }
     else if (ename == "name")
     {
-      this->name = child->Get<std::string>(); 
+      this->name = child->Get<std::string>();
     }
     else
     {
       std::string m;
       m += "Unexpected element \"" + ename + "\" in Region element";
-      throw SimEventsException(m.c_str()); 
+      throw SimEventsException(m.c_str());
     }
     child = child->GetNextElement();
   }
- 
 }
-
- 
-

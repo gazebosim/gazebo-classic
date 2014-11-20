@@ -22,9 +22,13 @@ using namespace gazebo;
 // static data initialization
 event::EventT<void (std::string, bool)> SimEventConnector::spawnModel;
 
+////////////////////////////////////////////////////////////////////////////////
+EventSource::~EventSource()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-EventSource::EventSource( transport::PublisherPtr _pub,
+EventSource::EventSource(transport::PublisherPtr _pub,
                           const char* _type,
                           physics::WorldPtr _world)
   :type(_type), pub(_pub)
@@ -44,7 +48,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 {
   this->name = _sdf->GetElement("name")->Get<std::string>();
   // active by default, but this can be set in the world file
-  if(_sdf->HasElement("active"))
+  if (_sdf->HasElement("active"))
   {
     sdf::ElementPtr activeE = _sdf->GetElement("active");
     this->active = activeE->Get<std::string>() == "true";
@@ -55,7 +59,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void EventSource::Emit(const char* data )
 {
-  if(this->IsActive())
+  if (this->IsActive())
   {
     // add event name, type and data as strings (data is JSON)
     gazebo::msgs::SimEvent msg;
@@ -63,7 +67,8 @@ void EventSource::Emit(const char* data )
     msg.set_name(this->name);
     msg.set_data(data);
     // add world stats to give context to the event (mostly time & sim state)
-    gazebo::msgs::WorldStatistics *worldStatsMsg = msg.mutable_world_statistics();
+    gazebo::msgs::WorldStatistics *worldStatsMsg;
+    worldStatsMsg = msg.mutable_world_statistics();
     worldStatsMsg->set_iterations(this->world->GetIterations());
     worldStatsMsg->set_paused(this->world->IsPaused());
     msgs::Set(worldStatsMsg->mutable_sim_time(), this->world->GetSimTime());
@@ -72,7 +77,6 @@ void EventSource::Emit(const char* data )
     // send it on the publisher we got in the ctor
     pub->Publish(msg);
   }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

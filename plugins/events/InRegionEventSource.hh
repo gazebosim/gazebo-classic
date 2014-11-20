@@ -18,6 +18,10 @@
 #ifndef _INREGIONEVENTSOURCE_HH_
 #define _INREGIONEVENTSOURCE_HH_
 
+#include <map>
+#include <string>
+#include <vector>
+
 #include "EventSource.hh"
 
 namespace gazebo
@@ -26,19 +30,21 @@ namespace gazebo
   ///  The default implementation is a simple axis aligned bounding box.
   class Volume
   {
+    /// \brief dtor
+    public: virtual ~Volume();
+
     /// \brief Checks if a point lies inside the box
     /// \param[in] _p point
     public: virtual bool PointInVolume(const math::Vector3 &_p) const;
 
     /// \brief The volume extent
     public: math::Vector3 min, max;
-  
   };
 
   typedef boost::shared_ptr<Volume> VolumePtr;
 
   /// \brief A region, made of a list of volumes
-  class Region 
+  class Region
   {
     /// \brief Load from a world file (inside a SimEvent plugin element)
     /// \param[in] _sdf the region element
@@ -57,29 +63,31 @@ namespace gazebo
 
   typedef boost::shared_ptr<Region> RegionPtr;
 
-  /// \brief convenient function to print a region to the console
+  /// \brief convenience function to print a region to the console
   /// \param[in] _out the output stream
   /// \param[in] _region the instance to write out
   std::ostream& operator << (std::ostream &_out, const Region &_region);
 
-  /// \brief This is the event generator class
+  /// \brief The event generator class
   class  InRegionEventSource: public EventSource
   {
     /// \brief Constructor
     /// \param[in] _pub the publisher for the SimEvents
     /// \param[in] _world Pointer to the world.
     /// \param[in] _regions dictionary of regions in the world
-    public: InRegionEventSource(transport::PublisherPtr _pub, 
-                                physics::WorldPtr _world, 
-                                const std::map<std::string, RegionPtr> &_regions);
+    public: InRegionEventSource(transport::PublisherPtr _pub,
+                                physics::WorldPtr _world,
+                                const std::map<std::string, RegionPtr>
+                                                              &_regions);
 
     /// \brief Initialize the event
     public: virtual void Init();
-   
+
     /// \brief Called every simulation step
     public: void Update();
 
-    /// \brief Loads the full name of the model and the region from the world file.
+    /// \brief Loads the full name of the model and the region from the world
+    /// file.
     /// \param[in] _sdf
     public: virtual void Load(const sdf::ElementPtr &_sdf);
 
@@ -89,7 +97,7 @@ namespace gazebo
     /// \brief The model used for the in region check.
     private: std::string modelName;
 
-    /// \brief a Pointer to the model
+    /// \brief A pointer to the model
     /// looked up at initialization, to avoid doing lookups during updates
     private: physics::ModelPtr model;
 
@@ -101,12 +109,10 @@ namespace gazebo
 
     /// \brief A map of region names to region pointers.
     private: const std::map<std::string, RegionPtr> &regions;
- 
+
     /// \brief true if the model is currently inside the region
     private: bool isInside;
-    
   };
-
 }
 
 

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2014 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+
 #include <limits>
 
 #include "ServerFixture.hh"
@@ -10,7 +28,7 @@ using namespace gazebo;
 
 // certain tests fail (with the symbody engine
 // setting this to true skips those tests
-bool SKIP_FAILING_TESTS = true ;
+bool SKIP_FAILING_TESTS = true;
 
 // this is the test fixture
 class SimEventsTest : public ServerFixture,
@@ -21,14 +39,12 @@ class SimEventsTest : public ServerFixture,
   public: void ModelInAndOutOfRegion(const std::string &_physicsEngine);
 };
 
-
 // globals to exchange data between threads
 boost::mutex g_mutex;
 unsigned int g_event_count = 0;
 std::string g_event_data;
 std::string g_event_type;
 std::string g_event_name;
-
 
 // callback for SimEvent messages
 // increment a counter and keep the data around
@@ -52,7 +68,7 @@ unsigned int GetEventCount()
 std::string GetEventType()
 {
   boost::mutex::scoped_lock lock(g_mutex);
-  return g_event_type;  
+  return g_event_type;
 }
 
 // get the data in a thread safe way
@@ -62,15 +78,13 @@ std::string GetEventData()
   return g_event_data;
 }
 
-
-
-// waits for one or multiple  events. if the expected number is 
+// waits for one or multiple events. if the expected number is
 // specified, then the function can return early
-unsigned int WaitForNewEvent(  unsigned int current,
-                               unsigned int max_tries=10,
-                               unsigned int ms=10)
+unsigned int WaitForNewEvent(unsigned int current,
+                             unsigned int max_tries = 10,
+                             unsigned int ms = 10)
 {
-  for (unsigned int i=0; i < max_tries; i++)
+  for (unsigned int i = 0; i < max_tries; i++)
   {
     unsigned int count = GetEventCount();
     if (count > current)
@@ -82,7 +96,6 @@ unsigned int WaitForNewEvent(  unsigned int current,
   return GetEventCount();
 }
 
-
 // test macro
 TEST_P(SimEventsTest, ModelInAnOutOfRegion)
 {
@@ -91,14 +104,14 @@ TEST_P(SimEventsTest, ModelInAnOutOfRegion)
 
 ////////////////////////////////////////////////////////////////////////
 // SimPauseRun:
-// Load test world, pause, run  and verify that events are generated.
+// Load test world, pause, run and verify that events are generated.
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::SimPauseRun(const std::string &_physicsEngine)
 {
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
 
-  // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -131,7 +144,7 @@ TEST_P(SimEventsTest, SimPauseRun)
 void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
   Load("test/worlds/sim_events.world", false, _physicsEngine);
-   // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -142,23 +155,22 @@ void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
   std::string name = "beer";
 
   countBefore = GetEventCount();
-  //  SpawnSphere(name, math::Vector3::Zero, math::Vector3::Zero, false);  
   std::string modelUri = "model://beer";
   SpawnModel(modelUri);
   countAfter = WaitForNewEvent(countBefore, 10, 100);
-  EXPECT_GT(countAfter, countBefore); 
+  EXPECT_GT(countAfter, countBefore);
 
   countBefore = GetEventCount();
   RemoveModel(name);
   countAfter = WaitForNewEvent(countBefore);
-  EXPECT_GT(countAfter, countBefore); 
+  EXPECT_GT(countAfter, countBefore);
   EXPECT_EQ(GetEventType(), "existence");
 }
 
 // test macro
 TEST_P(SimEventsTest, SpawnAndDeleteModel)
 {
-    SpawnAndDeleteModel(GetParam());
+  SpawnAndDeleteModel(GetParam());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,11 +180,11 @@ TEST_P(SimEventsTest, SpawnAndDeleteModel)
 void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
 {
   // simbody stepTo() failure
-  if(SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
+  if (SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
 
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  // setup the callback that increments the counter everytime a 
+  // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -191,7 +203,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   unsigned int countBefore2 = GetEventCount();
   can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
-  EXPECT_GT(countAfter2, countBefore2);  
+  EXPECT_GT(countAfter2, countBefore2);
 }
 
 // magic macro
@@ -200,16 +212,15 @@ INSTANTIATE_TEST_CASE_P(PhysicsEngines, SimEventsTest, PHYSICS_ENGINE_VALUES);
 // main, where we can specify to skip certain tests
 int main(int argc, char **argv)
 {
-  if(argc >1)
+  if (argc > 1)
   {
-     std::string skipStr = argv[1];
-     if (skipStr == "no_skip")
-     {
-       std::cout << "Not skipping failing tests" << std::endl; 
-       SKIP_FAILING_TESTS = false;
-     }
-  }      
+    std::string skipStr = argv[1];
+    if (skipStr == "no_skip")
+    {
+      std::cout << "Not skipping failing tests" << std::endl;
+      SKIP_FAILING_TESTS = false;
+    }
+  }
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-

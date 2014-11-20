@@ -29,7 +29,7 @@ void SimEventsPlugin::OnModelInfo(ConstModelPtr &_msg)
 {
   std::string modelName = _msg->name();
   // only if the model is not already in the set...
-  if(models.insert(modelName).second)
+  if (models.insert(modelName).second)
   {
     // notify everyone!
     SimEventConnector::spawnModel(modelName, true);
@@ -48,11 +48,11 @@ void SimEventsPlugin::OnRequest(ConstRequestPtr &_msg)
   if (_msg->request() == "entity_delete")
   {
     std::string modelName = _msg->data();
-    if(models.erase(modelName) == 1)
+    if (models.erase(modelName) == 1)
     {
       // notify everyone!
       SimEventConnector::spawnModel(modelName, false);
-    } 
+    }
   }
 }
 
@@ -69,7 +69,9 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // Create a publisher on the Rest plugin topic
   pub = node->Advertise<gazebo::msgs::SimEvent>("/gazebo/sim_events");
   // Subscribe to model spawning
-  spawnSub = node->Subscribe("~/model/info", &SimEventsPlugin::OnModelInfo, this );
+  spawnSub = node->Subscribe("~/model/info",
+                             &SimEventsPlugin::OnModelInfo,
+                             this);
   // detect model deletion
   requestSub = node->Subscribe("~/request", &SimEventsPlugin::OnRequest, this);
 
@@ -77,23 +79,20 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // between events....
   // and we read them first
   sdf::ElementPtr child = this->sdf->GetElement("region");
-  while(child)
+  while (child)
   {
-   
     Region* r = new Region;
     r->Load(child);
     RegionPtr region;
     region.reset(r);
-
     this->regions[region->name] = region;
     child = child->GetNextElement("region");
-
   }
 
   // Reading events
   child = this->sdf->GetElement("event");
   while (child)
-  { 
+  {
     // get name and type of each event
     std::string eventName = child->GetElement("name")->Get<std::string>();
     std::string eventType = child->GetElement("type")->Get<std::string>();
@@ -107,16 +106,18 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     }
     else if (eventType == "inclusion")
     {
-      event.reset(new InRegionEventSource(this->pub, this->world, this->regions));
+      event.reset(new InRegionEventSource(this->pub,
+                                          this->world,
+                                          this->regions));
     }
     else if (eventType == "existence" )
     {
-      event.reset(new ExistenceEventSource(this->pub, this->world) ); 
+      event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
     else
     {
       std::string m;
-      m = "Unknown event type: \"" + eventType + "\" in scoring plugin"; 
+      m = "Unknown event type: \"" + eventType + "\" in scoring plugin";
       throw SimEventsException(m.c_str());
     }
     if (event)
@@ -133,15 +134,16 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void SimEventsPlugin::Init()
 {
-  for (unsigned int i = 0; i < events.size(); ++i){
+  for (unsigned int i = 0; i < events.size(); ++i)
+  {
     events[i]->Init();
   }
   // seed the map with the initial models
-  for (unsigned int i=0; i < world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < world->GetModelCount(); ++i)
   {
     std::string name = world->GetModel(i)->GetName();
     models.insert(name);
-  } 
+  }
 }
 
 

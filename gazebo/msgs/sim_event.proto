@@ -2,9 +2,8 @@ package gazebo.msgs;
 
 import "world_stats.proto";
 
-
 /// \ingroup gazebo_msgs
-/// \interface Event
+/// \interface SimEvent
 
 message SimEvent 
 {
@@ -14,6 +13,3 @@ message SimEvent
  
   optional string data = 4;
 }
-
-
-

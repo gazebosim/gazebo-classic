@@ -20,8 +20,8 @@
 using namespace gazebo;
 
 ////////////////////////////////////////////////////////////////////////////////
-SimStateEventSource::SimStateEventSource( transport::PublisherPtr _pub,
-                                          physics::WorldPtr _world) 
+SimStateEventSource::SimStateEventSource(transport::PublisherPtr _pub,
+                                         physics::WorldPtr _world)
   :EventSource(_pub, "sim_state", _world), hasPaused(false)
 {
 }
@@ -35,19 +35,18 @@ SimStateEventSource::~SimStateEventSource()
 ////////////////////////////////////////////////////////////////////////////////
 void SimStateEventSource::Load(const sdf::ElementPtr &_sdf)
 {
-  EventSource::Load(_sdf); 
+  EventSource::Load(_sdf);
   // Listen to the pause event. This event is broadcast every
   // simulation iteration.
   this->pauseConnection = event::Events::ConnectPause(
       boost::bind(&SimStateEventSource::OnPause, this, _1));
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void SimStateEventSource::OnPause(bool _pause)
 {
   std::string json;
-  if(_pause)
+  if (_pause)
   {
     json = "{\"state\": \"paused\" }";
   }
@@ -55,6 +54,5 @@ void SimStateEventSource::OnPause(bool _pause)
   {
     json = "{\"state\": \"running\" }";
   }
-  this->Emit(json.c_str());  
+  this->Emit(json.c_str());
 }
-

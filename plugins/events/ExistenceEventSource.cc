@@ -21,19 +21,17 @@ using namespace gazebo;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-ExistenceEventSource::ExistenceEventSource( transport::PublisherPtr _pub,
-                                            physics::WorldPtr _world)
+ExistenceEventSource::ExistenceEventSource(transport::PublisherPtr _pub,
+                                           physics::WorldPtr _world)
   :EventSource(_pub, "existence", _world)
 {
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
 {
   EventSource::Load(_sdf);
-  if(_sdf->HasElement("model"))
+  if (_sdf->HasElement("model"))
   {
     this->model = _sdf->GetElement("model")->Get<std::string>();
   }
@@ -42,17 +40,16 @@ void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
       boost::bind(&ExistenceEventSource::OnExistence, this, _1, _2));
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
 {
   // is this a model we're interested in?
-  if(_model.find(this->model) == 0)
+  if (_model.find(this->model) == 0)
   {
     // set the data for the existence event
     std::string json = "{";
     json += "\"event\":\"existence\",";
-    if(_alive)
+    if (_alive)
     {
       json += "\"state\":\"creation\",";
     }
