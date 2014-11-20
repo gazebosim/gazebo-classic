@@ -57,6 +57,9 @@
 1. Added accessor for MainWindow graphical widget to GuiIface.
     * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
 
+1. Added GLWidget::OnModelEditor when model editor is triggered.
+    * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
+
 1. Added MainWindow::OnEditorGroup to manually uncheck editor actions.
     * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
 
