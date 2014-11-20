@@ -75,9 +75,7 @@ math::Vector3 Box::GetSize() const
 //////////////////////////////////////////////////
 math::Vector3 Box::GetCenter() const
 {
-  Vector3 size = this->GetSize();
-  size /= 2.0;
-  return this->min + size;
+  return this->min + (this->max - this->min) / 2;
 }
 
 
