@@ -104,7 +104,6 @@ namespace gazebo
 
       private slots: void About();
       private slots: void Step();
-      private slots: void NewModel();
       private slots: void Arrow();
 
       /// \brief Qt callback when the translate mode is triggered.

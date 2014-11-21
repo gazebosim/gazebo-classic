@@ -611,16 +611,6 @@ void MainWindow::OnFollow(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::NewModel()
-{
-  /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
-  modelBuilder->Init();
-  modelBuilder->show();
-  modelBuilder->resize(800, 600);
-  */
-}
-
-/////////////////////////////////////////////////
 void MainWindow::OnResetModelOnly()
 {
   msgs::WorldControl msg;
@@ -969,11 +959,6 @@ void MainWindow::CreateActions()
   g_quitAct = new QAction(tr("&Quit"), this);
   g_quitAct->setStatusTip(tr("Quit"));
   connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
-
-//  g_newModelAct = new QAction(tr("New &Model"), this);
-//  g_newModelAct->setShortcut(tr("Ctrl+M"));
-//  g_newModelAct->setStatusTip(tr("Create a new model"));
-//  connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
 
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
