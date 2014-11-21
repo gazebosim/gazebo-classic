@@ -50,8 +50,6 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 
-#include "test_config.h"
-
 using namespace gazebo;
 
 std::string custom_exec(std::string _cmd);

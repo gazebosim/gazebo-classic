@@ -58,4 +58,4 @@ add_subdirectory(cmake)
 add_subdirectory(pkgconfig)
 
 set(headers ServerFixture.hh)
-gz_install_includes("test" ${headers} ${PROJECT_BINARY_DIR}/test_config.h)
+gz_install_includes("test" ${headers})
