@@ -117,7 +117,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     else
     {
       std::string m;
-      m = "Unknown event type: \"" + eventType + "\" in scoring plugin";
+      m = "Unknown event type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
     if (event)

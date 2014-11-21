@@ -4,19 +4,19 @@ link_directories(
 )
 
 set (src
-  SimEventsPlugin.cc
   EventSource.cc
-  InRegionEventSource.cc
   ExistenceEventSource.cc
+  InRegionEventSource.cc
+  SimEventsPlugin.cc
   SimStateEventSource.cc
 )
 
 set (inc
-  SimEventsPlugin.hh
   EventSource.hh
-  InRegionEventSource.hh
   ExistenceEventSource.hh
+  InRegionEventSource.hh
   SimEventsException.hh
+  SimEventsPlugin.hh
   SimStateEventSource.hh
 )
 

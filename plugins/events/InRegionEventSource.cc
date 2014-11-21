@@ -101,7 +101,7 @@ void InRegionEventSource::Update()
     json += "\"region\":\"" + this->regionName + "\", ";
     json += "\"model\":\"" + this->modelName + "\"";
     json += "}";
-    this->Emit(json.c_str());
+    this->Emit(json);
   }
 }
 
@@ -116,17 +116,6 @@ bool Volume::PointInVolume(const math::Vector3 &_p) const
   return _p.x >= this->min.x && _p.x <= this->max.x &&
          _p.y >= this->min.y && _p.y <= this->max.y &&
          _p.z >= this->min.z && _p.z <= this->max.z;
-  /*if (_p.x >= min.x && _p.x <= max.x)
-  {
-    if (_p.y >= min.y && _p.y <= max.y)
-    {
-      if (_p.z >= min.z && _p.z <= max.z)
-      {
-        return true;
-      }
-    }
-  }
-  return false;*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////

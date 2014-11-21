@@ -29,13 +29,10 @@ EventSource::~EventSource()
 
 ////////////////////////////////////////////////////////////////////////////////
 EventSource::EventSource(transport::PublisherPtr _pub,
-                          const char* _type,
-                          physics::WorldPtr _world)
-  :type(_type), pub(_pub)
+                         const std::string& _type,
+                         physics::WorldPtr _world)
+  :type(_type), world(_world), pub(_pub), active(true)
 {
-  this->name = "";
-  this->world = _world;
-  this->active = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +54,7 @@ void EventSource::Load(const sdf::ElementPtr &_sdf)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void EventSource::Emit(const char* data )
+void EventSource::Emit(const std::string& _data)
 {
   if (this->IsActive())
   {
@@ -65,7 +62,7 @@ void EventSource::Emit(const char* data )
     gazebo::msgs::SimEvent msg;
     msg.set_type(this->type);
     msg.set_name(this->name);
-    msg.set_data(data);
+    msg.set_data(_data);
     // add world stats to give context to the event (mostly time & sim state)
     gazebo::msgs::WorldStatistics *worldStatsMsg;
     worldStatsMsg = msg.mutable_world_statistics();

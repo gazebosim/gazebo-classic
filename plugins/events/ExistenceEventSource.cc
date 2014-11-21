@@ -60,6 +60,6 @@ void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
     json += "\"model\":\"" + _model + "\"";
     json += "}";
 
-    this->Emit(json.c_str());
+    this->Emit(json);
   }
 }
