@@ -41,7 +41,7 @@ void ExistenceEventSource::Load(const sdf::ElementPtr &_sdf)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExistenceEventSource::OnExistence(std::string _model, bool _alive)
+void ExistenceEventSource::OnExistence(const std::string &_model, bool _alive)
 {
   // is this a model we're interested in?
   if (_model.find(this->model) == 0)

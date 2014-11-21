@@ -39,7 +39,7 @@ namespace gazebo
     /// \brief callback for gazebo event
     /// \param[in] _model the name of the model
     /// \param[in] _alive true for spawn, false for delete
-    public: void OnExistence(std::string _model, bool _alive);
+    public: void OnExistence(const std::string &_model, bool _alive);
 
     /// \brief A filter to raise the event only for models
     /// with a name that starts with this model specific prefix.
