@@ -513,7 +513,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     axis->set_limit_effort(this->GetEffortLimit(i));
     axis->set_limit_velocity(this->GetVelocityLimit(i));
     axis->set_damping(this->GetDamping(i));
-    axis->set_friction(0);
+    axis->set_friction(this->GetParam("friction", i));
     axis->set_use_parent_model_frame(this->axisParentModelFrame[i]);
   }
 
