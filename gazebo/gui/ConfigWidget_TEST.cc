@@ -23,8 +23,6 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/ConfigWidget.hh"
-
-#include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/ConfigWidget_TEST.hh"
 
 #include "test_config.h"
