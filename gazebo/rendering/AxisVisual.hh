@@ -51,14 +51,14 @@ namespace gazebo
       /// \param[in] _show True to show the axis rotation tube.
       public: void ShowAxisRotation(unsigned int _axis, bool _show);
 
-      /// \brief Show the axis arrow shaft
+      /// \brief Show the axis arrow shaft.
       /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
       /// \param[in] _show True to show the axis arrow shaft.
       public: void ShowAxisShaft(unsigned int _axis, bool _show);
 
-      /// \brief Show the axis arrow shaft
+      /// \brief Show the axis arrow head.
       /// \param[in] _axis Axis index. 0: x, 1: y, 2: z
-      /// \param[in] _show True to show the axis arrow shaft.
+      /// \param[in] _show True to show the axis arrow head.
       public: void ShowAxisHead(unsigned int _axis, bool _show);
 
       /// \brief Scale the X axis
