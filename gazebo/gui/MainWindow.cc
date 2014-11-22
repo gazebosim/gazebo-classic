@@ -54,6 +54,7 @@
 #include "gazebo/gui/building/BuildingEditor.hh"
 #include "gazebo/gui/terrain/TerrainEditor.hh"
 #include "gazebo/gui/model/ModelEditor.hh"
+#include "gazebo/gui/ConfigWidget.hh"
 
 #ifdef HAVE_QWT
 #include "gazebo/gui/Diagnostics.hh"
@@ -284,6 +285,34 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
+  // added for testing ConfigWidget
+  gazebo::gui::ConfigWidget *linkConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Link linkMsg;
+  linkConfigWidget->Load(&linkMsg);
+
+  gazebo::gui::ConfigWidget *visualConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Visual visualMsg;
+  visualConfigWidget->Load(&visualMsg);
+
+  gazebo::gui::ConfigWidget *collisionConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Collision collisionMsg;
+  collisionConfigWidget->Load(&collisionMsg);
+
+  gazebo::gui::ConfigWidget *sensorConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Sensor sensorMsg;
+  sensorConfigWidget->Load(&sensorMsg);
+
+  QTabWidget *configTabWidget = new QTabWidget();
+  configTabWidget->setObjectName("partInspectorTab");
+  configTabWidget->addTab(linkConfigWidget, "Link");
+  configTabWidget->addTab(visualConfigWidget, "Visual");
+  configTabWidget->addTab(collisionConfigWidget, "Collision");
+  configTabWidget->show();
 
   gui::Events::mainWindowReady();
 }
