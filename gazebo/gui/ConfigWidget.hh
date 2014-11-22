@@ -50,6 +50,7 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief List of child widgets.
       public: std::vector<QWidget *> widgets;
     };
 
@@ -180,7 +181,7 @@ namespace gazebo
 
       /// \brief Update the message field using values from the widgets.
       /// \param[in] _msg Message to be updated.
-      /// \param[in] _name Name of each widget.
+      /// \param[in] _name Name of parent widget.
       private: void UpdateMsg(google::protobuf::Message *_msg,
           const std::string &_name = "");
 

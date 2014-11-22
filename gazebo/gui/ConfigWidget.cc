@@ -66,101 +66,100 @@ google::protobuf::Message *ConfigWidget::GetMsg()
 /////////////////////////////////////////////////
 void ConfigWidget::SetIntWidgetProperty(const std::string &_name, int _value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateIntWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateIntWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetUIntWidgetProperty(const std::string &_name,
     unsigned int _value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateUIntWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateUIntWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetDoubleWidgetProperty(const std::string &_name,
     double _value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateDoubleWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateDoubleWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetBoolWidgetProperty(const std::string &_name,
     bool _value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateBoolWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateBoolWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetStringWidgetProperty(const std::string &_name,
     const std::string &_value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateStringWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateStringWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetVector3WidgetProperty(const std::string &_name,
     const math::Vector3 &_value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateVector3Widget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateVector3Widget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetColorWidgetProperty(const std::string &_name,
     const common::Color &_value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateColorWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdateColorWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetPoseWidgetProperty(const std::string &_name,
     const math::Pose &_value)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdatePoseWidget(childWidget, _value);
+  if (iter != this->configWidgets.end())
+    this->UpdatePoseWidget(iter->second, _value);
 }
 
 /////////////////////////////////////////////////
 void ConfigWidget::SetGeometryWidgetProperty(const std::string &_name,
     const std::string &_value, const math::Vector3 &_dimensions)
 {
-  if (this->configWidgets.find(_name) == this->configWidgets.end())
-    return;
+  std::map <std::string, ConfigChildWidget *>::iterator iter =
+      this->configWidgets.find(_name);
 
-  ConfigChildWidget *childWidget = this->configWidgets[_name];
-  this->UpdateGeometryWidget(childWidget, _value, _dimensions);
+  if (iter != this->configWidgets.end())
+    this->UpdateGeometryWidget(iter->second, _value, _dimensions);
 }
-
 
 /////////////////////////////////////////////////
 QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
@@ -488,13 +487,15 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
             // (contained in a group box).
             GroupWidget *groupWidget = new GroupWidget;
             newFieldWidget->setStyleSheet(
-                "QGroupBox {border : 0px; padding-left : 10px}");
+                "QGroupBox {border : 0px; padding-left : 20px}");
 
             QVBoxLayout *configGroupLayout = new QVBoxLayout;
             configGroupLayout->setContentsMargins(0, 0, 0, 0);
             QPushButton *groupButton = new QPushButton(tr(name.c_str()));
+
             // set the child widget so it can be toggled
             groupWidget->childWidget = newFieldWidget;
+            newFieldWidget->setContentsMargins(20, 0, 0, 0);
             configGroupLayout->addWidget(groupButton);
             configGroupLayout->addWidget(newFieldWidget);
             groupWidget->setLayout(configGroupLayout);
@@ -546,7 +547,9 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
     QVBoxLayout *widgetLayout = new QVBoxLayout;
 
     for (unsigned int i = 0; i < newWidgets.size(); ++i)
+    {
       widgetLayout->addWidget(newWidgets[i]);
+    }
 
     widgetLayout->setContentsMargins(0, 0, 0, 0);
     widgetLayout->setAlignment(Qt::AlignTop);
@@ -675,27 +678,30 @@ ConfigChildWidget *ConfigWidget::CreateBoolWidget(const std::string &_key)
 ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
     const std::string &/*_key*/)
 {
-  QLabel *vecXLabel = new QLabel(tr("x: "));
-  QLabel *vecYLabel = new QLabel(tr("y: "));
-  QLabel *vecZLabel = new QLabel(tr("z: "));
+  QLabel *vecXLabel = new QLabel(tr("x"));
+  QLabel *vecYLabel = new QLabel(tr("y"));
+  QLabel *vecZLabel = new QLabel(tr("z"));
 
   QDoubleSpinBox *vecXSpinBox = new QDoubleSpinBox;
   vecXSpinBox->setRange(-1e6, 1e6);
   vecXSpinBox->setSingleStep(0.01);
   vecXSpinBox->setDecimals(6);
   vecXSpinBox->setAlignment(Qt::AlignRight);
+  vecXSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecYSpinBox = new QDoubleSpinBox;
   vecYSpinBox->setRange(-1e6, 1e6);
   vecYSpinBox->setSingleStep(0.01);
   vecYSpinBox->setDecimals(6);
   vecYSpinBox->setAlignment(Qt::AlignRight);
+  vecYSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *vecZSpinBox = new QDoubleSpinBox;
   vecZSpinBox->setRange(-1e6, 1e6);
   vecZSpinBox->setSingleStep(0.01);
   vecZSpinBox->setDecimals(6);
   vecZSpinBox->setAlignment(Qt::AlignRight);
+  vecZSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   widgetLayout->addWidget(vecXLabel);
@@ -718,34 +724,38 @@ ConfigChildWidget *ConfigWidget::CreateVector3dWidget(
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
 {
-  QLabel *colorRLabel = new QLabel(tr("r: "));
-  QLabel *colorGLabel = new QLabel(tr("g: "));
-  QLabel *colorBLabel = new QLabel(tr("b: "));
-  QLabel *colorALabel = new QLabel(tr("a: "));
+  QLabel *colorRLabel = new QLabel(tr("r"));
+  QLabel *colorGLabel = new QLabel(tr("g"));
+  QLabel *colorBLabel = new QLabel(tr("b"));
+  QLabel *colorALabel = new QLabel(tr("a"));
 
   QDoubleSpinBox *colorRSpinBox = new QDoubleSpinBox;
   colorRSpinBox->setRange(0, 1.0);
   colorRSpinBox->setSingleStep(0.01);
   colorRSpinBox->setDecimals(3);
   colorRSpinBox->setAlignment(Qt::AlignRight);
+  colorRSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *colorGSpinBox = new QDoubleSpinBox;
   colorGSpinBox->setRange(0, 1.0);
   colorGSpinBox->setSingleStep(0.01);
   colorGSpinBox->setDecimals(3);
   colorGSpinBox->setAlignment(Qt::AlignRight);
+  colorGSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *colorBSpinBox = new QDoubleSpinBox;
   colorBSpinBox->setRange(0, 1.0);
   colorBSpinBox->setSingleStep(0.01);
   colorBSpinBox->setDecimals(3);
   colorBSpinBox->setAlignment(Qt::AlignRight);
+  colorBSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QDoubleSpinBox *colorASpinBox = new QDoubleSpinBox;
   colorASpinBox->setRange(0, 1.0);
   colorASpinBox->setSingleStep(0.01);
   colorASpinBox->setDecimals(3);
   colorASpinBox->setAlignment(Qt::AlignRight);
+  colorASpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
   QHBoxLayout *widgetLayout = new QHBoxLayout;
   widgetLayout->addWidget(colorRLabel);
@@ -772,12 +782,12 @@ ConfigChildWidget *ConfigWidget::CreateColorWidget(const std::string &/*_key*/)
 /////////////////////////////////////////////////
 ConfigChildWidget *ConfigWidget::CreatePoseWidget(const std::string &/*_key*/)
 {
-  QLabel *posXLabel = new QLabel(tr("x: "));
-  QLabel *posYLabel = new QLabel(tr("y: "));
-  QLabel *posZLabel = new QLabel(tr("z: "));
-  QLabel *rotRLabel = new QLabel(tr("roll: "));
-  QLabel *rotPLabel = new QLabel(tr("pitch: "));
-  QLabel *rotYLabel = new QLabel(tr("yaw: "));
+  QLabel *posXLabel = new QLabel(tr("x"));
+  QLabel *posYLabel = new QLabel(tr("y"));
+  QLabel *posZLabel = new QLabel(tr("z"));
+  QLabel *rotRLabel = new QLabel(tr("roll"));
+  QLabel *rotPLabel = new QLabel(tr("pitch"));
+  QLabel *rotYLabel = new QLabel(tr("yaw"));
 
   QDoubleSpinBox *posXSpinBox = new QDoubleSpinBox;
   posXSpinBox->setRange(-1e6, 1e6);
@@ -880,9 +890,9 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeZSpinBox->setDecimals(6);
   geomSizeZSpinBox->setValue(1.000);
 
-  QLabel *geomSizeXLabel = new QLabel(tr("x: "));
-  QLabel *geomSizeYLabel = new QLabel(tr("y: "));
-  QLabel *geomSizeZLabel = new QLabel(tr("z: "));
+  QLabel *geomSizeXLabel = new QLabel(tr("x"));
+  QLabel *geomSizeYLabel = new QLabel(tr("y"));
+  QLabel *geomSizeZLabel = new QLabel(tr("z"));
 
   QHBoxLayout *geomSizeLayout = new QHBoxLayout;
   geomSizeLayout->addWidget(geomSizeXLabel);
@@ -892,8 +902,8 @@ ConfigChildWidget *ConfigWidget::CreateGeometryWidget(
   geomSizeLayout->addWidget(geomSizeZLabel);
   geomSizeLayout->addWidget(geomSizeZSpinBox);
 
-  QLabel *geomRadiusLabel = new QLabel(tr("radius: "));
-  QLabel *geomLengthLabel = new QLabel(tr("length: "));
+  QLabel *geomRadiusLabel = new QLabel(tr("radius"));
+  QLabel *geomLengthLabel = new QLabel(tr("length"));
 
   QDoubleSpinBox *geomRadiusSpinBox = new QDoubleSpinBox;
   geomRadiusSpinBox->setRange(-1000, 1000);
@@ -1129,7 +1139,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
                   typeEnumDescriptor->FindValueByName("SPHERE");
               geomReflection->SetEnum(valueMsg, typeField, geometryType);
 
-              // set radius and length
+              // set radius
               const google::protobuf::FieldDescriptor *geomFieldDescriptor =
                 valueDescriptor->FindFieldByName(geomType);
               google::protobuf::Message *geomValueMsg =
@@ -1438,7 +1448,6 @@ void ConfigWidget::UpdateGeometryWidget(ConfigChildWidget *_widget,
         _dimensions.x/2.0);
   }
 }
-
 
 /////////////////////////////////////////////////
 void ConfigWidget::OnItemSelection(QTreeWidgetItem *_item,
