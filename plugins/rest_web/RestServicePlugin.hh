@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMPLE_MOOC_PLUGIN_HH_
-#define _SIMPLE_MOOC_PLUGIN_HH_
+#ifndef _REST_SERVICE_PLUGIN_HH_
+#define _REST_SERVICE_PLUGIN_HH_
 
 
 #include <gazebo/gazebo.hh>

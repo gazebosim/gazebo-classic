@@ -16,21 +16,21 @@ set (server_src
   )
 
 set (client_inc
-  MOOCLoginDialog.hh
-  MOOCUIPlugin.hh
-  MOOCUIWidget.hh
+  RestUiLoginDialog.hh
+  RestUiPlugin.hh
+  RestUiWidget.hh
   )
 
 
 set (client_src
-  MOOCLoginDialog.cc
-  MOOCUIPlugin.cc
-  MOOCUIWidget.cc
+  RestUiLoginDialog.cc
+  RestUiPlugin.cc
+  RestUiWidget.cc
   )
 
 set (qt_headers
-    MOOCUIWidget.hh
-    MOOCLoginDialog.hh)
+    RestUiWidget.hh
+    RestUiLoginDialog.hh)
 
 include ( ${QT_USE_FILE} )
 

@@ -19,7 +19,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
 
-#include "MOOCUIPlugin.hh"
+#include "RestUiPlugin.hh"
 
 using namespace gazebo;
 using namespace std;

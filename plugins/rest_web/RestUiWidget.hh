@@ -19,8 +19,8 @@
 #define _MOOCUI_WIDGET_HH_
 
 #include <gazebo/gazebo.hh>
-#include "MOOCLoginDialog.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/util/system.hh>
+#include "RestUiLoginDialog.hh"
 
 //typedef const boost::shared_ptr<const ::msgs::RestError> ConstRestErrorPtr;
 

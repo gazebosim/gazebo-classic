@@ -15,15 +15,14 @@
  *
 */
 
-#ifndef _MOOCUI_LOGIN_DIALOG_HH_
-#define _MOOCUI_LOGIN_DIALOG_HH_
+#ifndef _REST_UI_LOGIN_DIALOG_HH_
+#define _REST_UI_LOGIN_DIALOG_HH_
 
-
-#include "MOOCLoginDialog.hh"
-#include "MOOCUIWidget.hh"
 #include <iostream>
-
 #include <curl/curl.h>
+
+#include "RestUiLoginDialog.hh"
+#include "RestUiWidget.hh"
 
 using namespace gazebo;
 using namespace gui;

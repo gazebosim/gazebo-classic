@@ -23,7 +23,7 @@
 #include <gazebo/gui/qt.h>
 #include <gazebo/util/system.hh>
 
-#include "MOOCUIWidget.hh"
+#include "RestUiWidget.hh"
 
 namespace gazebo
 {

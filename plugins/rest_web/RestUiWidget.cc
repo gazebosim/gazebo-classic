@@ -17,7 +17,7 @@
 
 #include <curl/curl.h>
 #include <QMessageBox>
-#include "MOOCUIWidget.hh"
+#include "RestUiWidget.hh"
 
 using namespace gazebo;
 using namespace std;
