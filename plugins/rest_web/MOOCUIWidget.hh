@@ -44,8 +44,18 @@ namespace gazebo
     /// \brief QT callback (MOOC/Login menu) 
     public slots: void LoginMOOC();
 
+    /// \brief called before rendering, from the GUI thread
+    /// this is called from the plugin's update
+    public: void Update();
+
+    /// \brief the title to use when displaying dialog/message windows
+    private: std::string title;
+
     /// \brief pub/sub node to communicate with gzserver
     private: gazebo::transport::NodePtr node;
+
+    /// \brief login dialog
+    private: gui::MOOCLoginDialog dialog;
 
     /// \brief Gazebo topics publisher
     private: gazebo::transport::PublisherPtr pub;
@@ -55,16 +65,6 @@ namespace gazebo
 
     /// \brief called everytime a response  message is received.
     private: void OnResponse(ConstRestErrorPtr &_msg);   
-
-    /// \brief called before rendering, from the GUI thread
-    /// this is called from the plugin's update
-    public: void Update();
- 
-    /// \brief login dialog
-    private: gui::MOOCLoginDialog dialog;
-
-    /// \brief the title to use when displaying dialog/message windows
-    private: std::string title;
 
     /// \brief List of unprocessed error messages to be displayed from the gui thread    
     private: std::list< boost::shared_ptr<const gazebo::msgs::RestError> > msgRespQ;

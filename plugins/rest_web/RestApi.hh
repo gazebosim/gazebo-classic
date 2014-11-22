@@ -21,7 +21,7 @@
 #define _MOOC_REST_API_HH_
 
 #include <list>
-#include "MOOCException.hh"
+#include "RestException.hh"
 
 namespace gazebo
 {

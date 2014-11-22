@@ -16,8 +16,8 @@
 */
 
 
-#ifndef _MOOC_EXCEPTION_HH_
-#define _MOOC_EXCEPTION_HH_
+#ifndef _REST_EXCEPTION_HH_
+#define _REST_EXCEPTION_HH_
 
 #include <stdexcept>
 
@@ -27,9 +27,9 @@ namespace gazebo
 
   // basic exception class that inherints from the
   // standard runtime error
-  class MOOCException : public std::runtime_error
+  class RestException : public std::runtime_error
   {
-    public: MOOCException(const char*m) :std::runtime_error(m){}
+    public: RestException(const char*m) :std::runtime_error(m){}
         
   };
 }

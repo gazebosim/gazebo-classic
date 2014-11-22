@@ -1,0 +1,12 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestError
+
+message RestError
+{
+  required string type  = 1;
+  optional string msg   = 2;
+}
+
+

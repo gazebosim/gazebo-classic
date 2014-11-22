@@ -15,7 +15,7 @@
  *
 */
 
-#include "SimpleMOOCPlugin.hh"
+#include "RestServicePlugin.hh"
 #include <uuid/uuid.h>
 
 using namespace gazebo;
@@ -171,7 +171,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
     event += "}";
     restApi.PostLearningEvent(_msg->route().c_str(), event.c_str());
   }
-  catch(MOOCException &x)
+  catch(RestException &x)
   {
     gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to send data to the MOOC: ");
@@ -210,7 +210,7 @@ void SimpleMOOCPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
     cout << "LOGIN " <<  _msg->username().c_str() << endl;
     resp = restApi.Login(_msg->url().c_str(), "/login", _msg->username().c_str(), _msg->password().c_str());
   }
-  catch(MOOCException &x)
+  catch(RestException &x)
   {
     gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to login the web server: ");
@@ -230,7 +230,7 @@ void SimpleMOOCPlugin::ProcessMOOCEvent(ConstRestPostPtr _msg)
   {
     restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
   }
-  catch(MOOCException &x)
+  catch(RestException &x)
   {
     gazebo::msgs::RestError msg;
     std::string errorMsg ("There was a problem trying to post data to the web server: ");

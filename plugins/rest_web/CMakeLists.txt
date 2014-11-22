@@ -4,14 +4,15 @@ link_directories(
   )
 
 set (server_inc 
-  SimpleMOOCPlugin.hh
-  MOOCRestApi.hh
+  RestApi.hh
+  RestException.hh
+  RestServicePlugin.hh
   )
 
 
 set (server_src 
-  SimpleMOOCPlugin.cc
-  MOOCRestApi.cc
+  RestApi.cc
+  RestServicePlugin.cc
   )
 
 set (client_inc
@@ -46,12 +47,12 @@ include_directories(
 
 
 
-add_library(SimpleMOOCPlugin SHARED ${server_src} )
-target_link_libraries(SimpleMOOCPlugin ${GAZEBO_libraries} gazebo_msgs)
-install (TARGETS SimpleMOOCPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+add_library(RestServicePlugin SHARED ${server_src} )
+target_link_libraries(RestServicePlugin ${GAZEBO_libraries} gazebo_msgs)
+install (TARGETS RestServicePlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" ${server_inc})
 
-add_library(MOOCUIPlugin SHARED ${client_src} ${headers_MOC})
-target_link_libraries(MOOCUIPlugin ${GAZEBO_libraries} gazebo_msgs)
-install (TARGETS MOOCUIPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+add_library(RestUiPlugin SHARED ${client_src} ${headers_MOC})
+target_link_libraries(RestUiPlugin ${GAZEBO_libraries} gazebo_msgs)
+install (TARGETS RestUiPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
 gz_install_includes("plugins" ${client_inc})

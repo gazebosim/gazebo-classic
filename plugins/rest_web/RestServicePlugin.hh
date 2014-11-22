@@ -22,7 +22,7 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 
-#include "MOOCRestApi.hh"
+#include "RestApi.hh"
 
 
 namespace gazebo

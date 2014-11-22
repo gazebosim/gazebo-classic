@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include <iostream>
-#include "MOOCRestApi.hh"
+#include "RestApi.hh"
 
 using namespace gazebo;
 using namespace std;
@@ -217,9 +217,9 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 {
 
   if(this->url.empty())
-    throw MOOCException("A URL must be specified for the Learning Companion");
+    throw RestException("A URL must be specified for web service");
   if(this->user.empty())
-    throw MOOCException("No user specified for the Learning Companion. Please login.");
+    throw RestException("No user specified for the web service. Please login.");
 
   string path = url + _reqUrl;
   CURL *curl = curl_easy_init();
@@ -294,14 +294,14 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   curl_easy_cleanup(curl);
   if(res != CURLE_OK) {
     cerr << "Request to " << url << " failed: " << curl_easy_strerror(res) << endl;
-    throw MOOCException(curl_easy_strerror(res));
+    throw RestException(curl_easy_strerror(res));
   }
   // copy the data into a string
   std::string response(chunk.memory, chunk.size);
 
   if(http_code != 200) {
     cerr << "Request to " << url << " error: " << response << endl;
-    throw MOOCException(response.c_str()); 
+    throw RestException(response.c_str()); 
   }
 
   // clean up
