@@ -110,7 +110,7 @@ namespace gazebo
       private: double scale;
 
       /// \brief This wall segment's measure item.
-      private: MeasureItem * measure;
+      private: MeasureItem *measure;
 
       /// \brief Qt action for opening the inspector.
       private: QAction *openInspectorAct;
