@@ -41,6 +41,7 @@ namespace gazebo
     class ToolsWidget;
     class ModelListWidget;
     class Editor;
+    class SpaceNav;
 
     class GAZEBO_VISIBLE MainWindow : public QMainWindow
     {
@@ -77,6 +78,13 @@ namespace gazebo
       /// \brief Pause simulation.
       public slots: void Pause();
 
+      /// \brief Set whether the left pane is visible
+      /// \param[in] _on True to show the left pane, false to hide.
+      public: void SetLeftPaneVisibility(bool _on);
+
+      /// \brief A signal to trigger loading of GUI plugins.
+      signals: void AddPlugins();
+
       protected: void closeEvent(QCloseEvent *_event);
 
       private: void OnGUI(ConstGUIPtr &_msg);
@@ -90,6 +98,9 @@ namespace gazebo
 
       /// \brief Save GUI configuration to INI file.
       private slots: void SaveINI();
+
+      /// \brief Clone a simulation.
+      private slots: void Clone();
 
       private slots: void About();
       private slots: void Step();
@@ -150,6 +161,9 @@ namespace gazebo
 
       /// \brief Callback for diagnostics action.
       private slots: void Diagnostics();
+
+      /// \brief Callback for adding plugins.
+      private slots: void OnAddPlugins();
 
       /// \brief Toggle full screen display.
       /// \param[in] _value True to display in full screen mode.
@@ -266,9 +280,21 @@ namespace gazebo
       /// \brief List of all the align action groups.
       private: std::vector<QActionGroup *> alignActionGroups;
 
+      /// \brief Space navigator interface.
+      private: SpaceNav *spacenav;
+
 #ifdef HAVE_OCULUS
       private: gui::OculusWindow *oculusWindow;
 #endif
+
+      /// \brief Buffer of plugin messages to process.
+      private: std::vector<boost::shared_ptr<msgs::Plugin const> > pluginMsgs;
+
+      /// \brief Mutext to protect plugin loading.
+      private: boost::mutex pluginLoadMutex;
+
+      /// \brief Splitter for the main window.
+      private: QSplitter *splitter;
     };
   }
 }

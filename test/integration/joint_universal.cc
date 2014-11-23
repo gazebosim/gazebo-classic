@@ -17,19 +17,23 @@
 #include <string>
 
 #include "gazebo/physics/physics.hh"
-#include "ServerFixture.hh"
-#include "helper_physics_generator.hh"
+#include "test/ServerFixture.hh"
+#include "test/integration/helper_physics_generator.hh"
 
 using namespace gazebo;
 
 const double g_tolerance = 1e-4;
 
 class JointTestUniversal : public ServerFixture,
-                        public testing::WithParamInterface<const char*>
+                           public testing::WithParamInterface<const char*>
 {
   /// \brief Test setting and enforcing joint limits.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void Limits(const std::string &_physicsEngine);
+
+  /// \brief Test calling SetVelocity for multiple axes per timestep.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void SetVelocity(const std::string &_physicsEngine);
 
   /// \brief Test universal joint implementation with SetWorldPose.
   /// Set links world poses then check joint angles.
@@ -132,6 +136,54 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     math::Vector3 eulerAngles = linkLower->GetWorldPose().rot.GetAsEuler();
     EXPECT_NEAR(des0, eulerAngles.x, 0.05);
     EXPECT_NEAR(des1, eulerAngles.y, 0.05);
+  }
+}
+
+/////////////////////////////////////////////////
+void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
+{
+  // Load our universal joint test world
+  Load("worlds/universal_joint_test.world", true, _physicsEngine);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // get model and joints
+  physics::ModelPtr model = world->GetModel("model_1");
+  ASSERT_TRUE(model);
+  physics::JointPtr jointLower = model->GetJoint("joint_01");
+  ASSERT_TRUE(jointLower);
+
+  // Call SetVelocity on both axes of lower joint
+  const double vel = 1.0;
+  jointLower->SetVelocity(0, vel);
+  jointLower->SetVelocity(1, vel);
+
+  // Expect GetVelocity to match
+  EXPECT_NEAR(jointLower->GetVelocity(0), vel, g_tolerance);
+  EXPECT_NEAR(jointLower->GetVelocity(1), vel, g_tolerance);
+
+  // Expect child link velocity to match parent at joint anchor
+  {
+    math::Vector3 childOffset = jointLower->GetWorldPose().pos -
+      jointLower->GetChild()->GetWorldPose().pos;
+    math::Vector3 parentOffset = jointLower->GetWorldPose().pos -
+      jointLower->GetParent()->GetWorldPose().pos;
+    math::Quaternion q;
+
+    math::Vector3 childVel =
+      jointLower->GetChild()->GetWorldLinearVel(childOffset, q);
+    math::Vector3 parentVel =
+      jointLower->GetParent()->GetWorldLinearVel(parentOffset, q);
+    EXPECT_NEAR(childVel.x, parentVel.x, g_tolerance);
+    EXPECT_NEAR(childVel.y, parentVel.y, g_tolerance);
+    EXPECT_NEAR(childVel.z, parentVel.z, g_tolerance);
   }
 }
 
@@ -379,6 +431,12 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
 TEST_P(JointTestUniversal, Limits)
 {
   Limits(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(JointTestUniversal, SetVelocity)
+{
+  SetVelocity(GetParam());
 }
 
 /////////////////////////////////////////////////

@@ -55,7 +55,7 @@ ServerFixture::ServerFixture()
   this->imgData = NULL;
   this->serverThread = NULL;
 
-  gzLogInit("test.log");
+  gzLogInit("test-", "test.log");
   gazebo::common::Console::SetQuiet(false);
   common::SystemPaths::Instance()->AddGazeboPaths(
       TEST_INTEGRATION_PATH);
@@ -457,11 +457,11 @@ void ServerFixture::GetFrame(const std::string &_cameraName,
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
     const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    unsigned int _width, unsigned int _height,
-    double _rate,
-    const std::string &_noiseType,
-    double _noiseMean,
-    double _noiseStdDev)
+    unsigned int _width, unsigned int _height, double _rate,
+    const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
+    bool _distortion, double _distortionK1, double _distortionK2,
+    double _distortionK3, double _distortionP1, double _distortionP2,
+    double _cx, double _cy)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -494,6 +494,16 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+
+  if (_distortion)
+    newModelStr << "      <distortion>"
+    << "        <k1>" << _distortionK1 << "</k1>"
+    << "        <k2>" << _distortionK2 << "</k2>"
+    << "        <k3>" << _distortionK3 << "</k3>"
+    << "        <p1>" << _distortionP1 << "</p1>"
+    << "        <p2>" << _distortionP2 << "</p2>"
+    << "        <center>" << _cx << " " << _cy << "</center>"
+    << "      </distortion>";
 
   newModelStr << "    </camera>"
     << "  </sensor>"

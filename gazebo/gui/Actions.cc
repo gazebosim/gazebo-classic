@@ -39,6 +39,8 @@ QAction *gazebo::gui::g_saveAsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_saveCfgAct = 0;
 GAZEBO_VISIBLE
+QAction *gazebo::gui::g_cloneAct = 0;
+GAZEBO_VISIBLE
 QAction *gazebo::gui::g_aboutAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_quitAct = 0;

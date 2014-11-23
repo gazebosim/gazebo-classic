@@ -43,6 +43,8 @@ from __future__ import print_function
 NAME="check_test_ran.py"
 
 import os
+import re
+import string
 import sys
 import subprocess
 
@@ -106,6 +108,19 @@ def check_main():
         print("Detect QTest xml file. Converting to JUNIT ...")
         stylesheet = os.path.dirname(os.path.abspath(__file__)) + "/qtest_to_junit.xslt"
         run_xsltproc(stylesheet, test_file)
+
+    # kill rogue gzservers from INTEGRATION_world_clone test
+    # https://bitbucket.org/osrf/gazebo/issue/1299
+    if 'INTEGRATION_world_clone' in test_file:
+        process = subprocess.Popen(['ps', 'ax'], stdout=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        for line in string.split(stdout, '\n'):
+            if line.find('gzserver /tmp/clone.11347.world') >= 0:
+                m = re.search('^([0-9]+) .*', line)
+                print(line)
+                pid = m.group(1)
+                print("killing gzserver with pid %s" % (pid))
+                subprocess.call(["kill", "%s" % (pid)])
 
 if __name__ == '__main__':
     check_main()

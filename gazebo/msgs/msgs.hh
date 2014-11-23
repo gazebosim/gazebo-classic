@@ -80,6 +80,12 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Vector3d      Convert(const math::Vector3 &_v);
 
+    /// \brief Convert a math::Vector2d to a msgs::Vector2d
+    /// \param[in] _v The vector to convert
+    /// \return A msgs::Vector2d object
+    GAZEBO_VISIBLE
+    msgs::Vector2d Convert(const math::Vector2d &_v);
+
     /// \brief Convert a math::Quaternion to a msgs::Quaternion
     /// \param[in] _q The quaternion to convert
     /// \return A msgs::Quaternion object
@@ -109,6 +115,18 @@ namespace gazebo
     /// \return A msgs::PlaneGeom object
     GAZEBO_VISIBLE
     msgs::PlaneGeom Convert(const math::Plane &_p);
+
+    /// \brief Convert a string to a msgs::Joint::Type enum.
+    /// \param[in] _str Joint type string.
+    /// \return A msgs::Joint::Type enum.
+    GAZEBO_VISIBLE
+    msgs::Joint::Type ConvertJointType(const std::string &_str);
+
+    /// \brief Convert a msgs::Joint::Type to a string.
+    /// \param[in] _type A msgs::Joint::Type enum.
+    /// \return Joint type string.
+    GAZEBO_VISIBLE
+    std::string ConvertJointType(const msgs::Joint::Type _type);
 
     /// \brief Convert a msgs::Vector3d to a math::Vector
     /// \param[in] _v The plane to convert
@@ -261,13 +279,30 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Scene SceneFromSDF(sdf::ElementPtr _sdf);
 
-    /// \brief Create an SDF element from a msgs::Scene
+    /// \brief Create an SDF element from a msgs::Light
     /// \param[in] _msg Light messsage
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
-    /// \return The new SDF element
+    /// \return The new SDF element.
     GAZEBO_VISIBLE
     sdf::ElementPtr LightToSDF(const msgs::Light &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::CameraSensor
+    /// \param[in] _msg CameraSensor messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    GAZEBO_VISIBLE
+    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf = sdf::ElementPtr());
+
+    /// \brief Create an SDF element from a msgs::Plugin
+    /// \param[in] _msg Plugin messsage
+    /// \param[in] _sdf if supplied, performs an update from _msg intead of
+    /// creating a new sdf element.
+    /// \return The new SDF element.
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     /// \cond

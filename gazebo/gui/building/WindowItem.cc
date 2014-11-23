@@ -35,7 +35,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->level = 0;
   this->levelBaseHeight = 0;
 
-  this->windowDepth = 20;
+  this->windowDepth = 15;
   this->windowHeight = 80;
   this->windowWidth = 80;
   this->windowSideBar = 10;
@@ -212,6 +212,7 @@ void WindowItem::OnOpenInspector()
   QPointF itemPos = this->windowPos * this->scale;
   itemPos.setY(-itemPos.y());
   this->inspector->SetPosition(itemPos);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 

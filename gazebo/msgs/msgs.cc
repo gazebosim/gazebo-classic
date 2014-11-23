@@ -229,6 +229,15 @@ namespace gazebo
       return result;
     }
 
+    /////////////////////////////////////////////////
+    msgs::Vector2d Convert(const math::Vector2d &_v)
+    {
+      msgs::Vector2d result;
+      result.set_x(_v.x);
+      result.set_y(_v.y);
+      return result;
+    }
+
     msgs::Quaternion Convert(const math::Quaternion &_q)
     {
       msgs::Quaternion result;
@@ -275,6 +284,89 @@ namespace gazebo
       return result;
     }
 
+    msgs::Joint::Type ConvertJointType(const std::string &_str)
+    {
+      msgs::Joint::Type result = msgs::Joint::REVOLUTE;
+      if (_str == "revolute")
+      {
+        result = msgs::Joint::REVOLUTE;
+      }
+      else if (_str == "revolute2")
+      {
+        result = msgs::Joint::REVOLUTE2;
+      }
+      else if (_str == "prismatic")
+      {
+        result = msgs::Joint::PRISMATIC;
+      }
+      else if (_str == "universal")
+      {
+        result = msgs::Joint::UNIVERSAL;
+      }
+      else if (_str == "ball")
+      {
+        result = msgs::Joint::BALL;
+      }
+      else if (_str == "screw")
+      {
+        result = msgs::Joint::SCREW;
+      }
+      else if (_str == "gearbox")
+      {
+        result = msgs::Joint::GEARBOX;
+      }
+      return result;
+    }
+
+    std::string ConvertJointType(const msgs::Joint::Type _type)
+    {
+      std::string result;
+      switch (_type)
+      {
+        case msgs::Joint::REVOLUTE:
+        {
+          result = "revolute";
+          break;
+        }
+        case msgs::Joint::REVOLUTE2:
+        {
+          result = "revolute2";
+          break;
+        }
+        case msgs::Joint::PRISMATIC:
+        {
+          result = "prismatic";
+          break;
+        }
+        case msgs::Joint::UNIVERSAL:
+        {
+          result = "universal";
+          break;
+        }
+        case msgs::Joint::BALL:
+        {
+          result = "ball";
+          break;
+        }
+        case msgs::Joint::SCREW:
+        {
+          result = "screw";
+          break;
+        }
+        case msgs::Joint::GEARBOX:
+        {
+          result = "gearbox";
+          break;
+        }
+        default:
+        {
+          result = "unknown";
+          break;
+        }
+      }
+      return result;
+    }
+
     math::Vector3 Convert(const msgs::Vector3d &_v)
     {
       return math::Vector3(_v.x(), _v.y(), _v.z());
@@ -313,12 +405,33 @@ namespace gazebo
           _p.d());
     }
 
+    /////////////////////////////////////////////
     msgs::GUI GUIFromSDF(sdf::ElementPtr _sdf)
     {
       msgs::GUI result;
 
       result.set_fullscreen(_sdf->Get<bool>("fullscreen"));
 
+      // Set gui plugins
+      if (_sdf->HasElement("plugin"))
+      {
+        sdf::ElementPtr pluginElem = _sdf->GetElement("plugin");
+        while (pluginElem)
+        {
+          msgs::Plugin *plgnMsg = result.add_plugin();
+          plgnMsg->set_name(pluginElem->Get<std::string>("name"));
+          plgnMsg->set_filename(pluginElem->Get<std::string>("filename"));
+
+          std::stringstream ss;
+          for (sdf::ElementPtr innerElem = pluginElem->GetFirstElement();
+              innerElem; innerElem = innerElem->GetNextElement(""))
+          {
+            ss << innerElem->ToString("");
+          }
+          plgnMsg->set_innerxml(ss.str());
+          pluginElem = pluginElem->GetNextElement("plugin");
+        }
+      }
 
       if (_sdf->HasElement("camera"))
       {
@@ -857,6 +970,109 @@ namespace gazebo
         elem->GetElement("falloff")->Set(_msg.spot_falloff());
       }
       return lightSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr CameraSensorToSDF(const msgs::CameraSensor &_msg,
+        sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr cameraSDF;
+
+      if (_sdf)
+      {
+        cameraSDF = _sdf;
+      }
+      else
+      {
+        cameraSDF.reset(new sdf::Element);
+        sdf::initFile("camera.sdf", cameraSDF);
+      }
+
+      if (_msg.has_horizontal_fov())
+      {
+        cameraSDF->GetElement("horizontal_fov")->Set(
+            _msg.horizontal_fov());
+      }
+      if (_msg.has_image_size())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("width")->Set(_msg.image_size().x());
+        imageElem->GetElement("height")->Set(_msg.image_size().y());
+      }
+      if (_msg.has_image_format())
+      {
+        sdf::ElementPtr imageElem = cameraSDF->GetElement("image");
+        imageElem->GetElement("format")->Set(_msg.image_format());
+      }
+      if (_msg.has_near_clip() || _msg.has_far_clip())
+      {
+        sdf::ElementPtr clipElem = cameraSDF->GetElement("clip");
+        if (_msg.has_near_clip())
+          clipElem->GetElement("near")->Set(_msg.near_clip());
+        if (_msg.has_far_clip())
+          clipElem->GetElement("far")->Set(_msg.far_clip());
+      }
+
+      if (_msg.has_distortion())
+      {
+        msgs::Distortion distortionMsg = _msg.distortion();
+        sdf::ElementPtr distortionElem =
+            cameraSDF->GetElement("distortion");
+
+        if (distortionMsg.has_center())
+        {
+          distortionElem->GetElement("center")->Set(
+              msgs::Convert(distortionMsg.center()));
+        }
+        if (distortionMsg.has_k1())
+        {
+          distortionElem->GetElement("k1")->Set(distortionMsg.k1());
+        }
+        if (distortionMsg.has_k2())
+        {
+          distortionElem->GetElement("k2")->Set(distortionMsg.k2());
+        }
+        if (distortionMsg.has_k3())
+        {
+          distortionElem->GetElement("k3")->Set(distortionMsg.k3());
+        }
+        if (distortionMsg.has_p1())
+        {
+          distortionElem->GetElement("p1")->Set(distortionMsg.p1());
+        }
+        if (distortionMsg.has_p2())
+        {
+          distortionElem->GetElement("p2")->Set(distortionMsg.p2());
+        }
+      }
+      return cameraSDF;
+    }
+
+    /////////////////////////////////////////////////
+    sdf::ElementPtr PluginToSDF(const msgs::Plugin &_msg, sdf::ElementPtr _sdf)
+    {
+      sdf::ElementPtr pluginSDF;
+
+      if (_sdf)
+      {
+        pluginSDF = _sdf;
+      }
+      else
+      {
+        pluginSDF.reset(new sdf::Element);
+        sdf::initFile("plugin.sdf", pluginSDF);
+      }
+
+      // Use the SDF parser to read all the inner xml.
+      std::string tmp = "<sdf version='1.5'>";
+      tmp += "<plugin name='" + _msg.name() + "' filename='" +
+        _msg.filename() + "'>";
+      tmp += _msg.innerxml();
+      tmp += "</plugin></sdf>";
+
+      sdf::readString(tmp, pluginSDF);
+
+      return pluginSDF;
     }
   }
 }
