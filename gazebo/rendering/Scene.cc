@@ -2063,12 +2063,15 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   if (!childVis)
     return false;
 
-  JointVisualPtr jointVis(
-      new JointVisual(_msg->name() + "_JOINT_VISUAL__", childVis));
+  JointVisualPtr jointVis(new JointVisual(
+      _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
   jointVis->SetVisible(this->showJoints);
+  if (_msg->has_id())
+    jointVis->SetId(_msg->id());
 
   this->visuals[jointVis->GetId()] = jointVis;
+
   return true;
 }
 
