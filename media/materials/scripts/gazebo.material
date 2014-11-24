@@ -606,22 +606,7 @@ material Gazebo/YellowTransparent
       texture_unit
       {
         colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
-      }
-    }
-
-    pass
-    {
-      depth_write on
-
-      ambient 1.0 1.0 0.0 1
-      diffuse 1.0 1.0 0.0 1
-      polygon_mode points
-
-      texture_unit
-      {
-        colour_op_ex source1 src_current src_current 0 1 0
-        alpha_op_ex source1 src_manual src_current 0.4
+        alpha_op_ex source1 src_manual src_current 0.5
       }
     }
   }
