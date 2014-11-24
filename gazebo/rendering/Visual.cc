@@ -1423,6 +1423,7 @@ void Visual::SetHighlighted(bool _highlighted)
     {
       this->dataPtr->boundingBox->Init(this->GetBoundingBox());
     }
+
     this->dataPtr->boundingBox->SetVisible(true);
   }
   else if (this->dataPtr->boundingBox)

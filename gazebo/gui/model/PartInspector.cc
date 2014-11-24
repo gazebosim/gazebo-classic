@@ -17,6 +17,10 @@
 
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/msgs/msgs.hh"
+#include "gazebo/gui/ConfigWidget.hh"
+
+
 #include "gazebo/gui/model/PartGeneralConfig.hh"
 #include "gazebo/gui/model/PartVisualConfig.hh"
 #include "gazebo/gui/model/PartCollisionConfig.hh"
@@ -48,6 +52,12 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   this->tabWidget->addTab(this->generalConfig, "General");
   this->tabWidget->addTab(this->visualConfig, "Visual");
   this->tabWidget->addTab(this->collisionConfig, "Collision");
+
+  ConfigWidget *configWidget = new ConfigWidget;
+  msgs::Link msg;
+  configWidget->Load(&msg);
+  this->tabWidget->addTab(configWidget, "test");
+  msgs::Visual *retMsg = dynamic_cast<msgs::Visual *>(configWidget->GetMsg());
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
