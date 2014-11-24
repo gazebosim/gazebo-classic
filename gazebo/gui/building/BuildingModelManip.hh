@@ -134,8 +134,7 @@ namespace gazebo
       public: void SetSize(double _width, double _depth, double _height);
 
       /// \brief Set the color of the manip.
-      /// \param[in] _materialName Material name.
-      /// TODO
+      /// \param[in] _color Color.
       public: void SetColor(QColor _color);
 
       /// \brief Set the transparency of the manip.
