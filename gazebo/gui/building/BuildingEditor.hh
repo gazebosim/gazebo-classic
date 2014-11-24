@@ -44,6 +44,10 @@ namespace gazebo
       /// triggered.
       private slots: void Save();
 
+      /// \brief Qt callback when the building editor's save as action is
+      /// triggered.
+      private slots: void SaveAs();
+
       /// \brief Qt callback when the building editor's discard action is
       /// triggered.
       private slots: void Discard();
@@ -74,6 +78,7 @@ namespace gazebo
       private: QMenuBar *menuBar;
 
       private: QAction *saveAct;
+      private: QAction *saveAsAct;
       private: QAction *discardAct;
       private: QAction *doneAct;
       private: QAction *exitAct;

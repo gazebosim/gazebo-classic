@@ -68,6 +68,14 @@ namespace gazebo
       /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);
 
+      /// \brief Get the model's author's name.
+      /// \param[out] The author's name.
+      public: std::string GetAuthor() const;
+
+      /// \brief Get the model's description.
+      /// \param[out] The model's description.
+      public: std::string GetDescription() const;
+
       /// \brief Qt callback when the file directory browse button is pressed.
       private slots: void OnBrowse();
 
@@ -82,6 +90,12 @@ namespace gazebo
 
       /// \brief Editable line that holds the model's save location.
       private: QLineEdit* modelLocationLineEdit;
+
+      /// \brief Editable line that holds the model's author's name.
+      private: QLineEdit* modelAuthorLineEdit;
+
+      /// \brief Editable line that holds the model's author's name.
+      private: QLineEdit* modelDescriptionLineEdit;
     };
     /// \}
   }

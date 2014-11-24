@@ -76,6 +76,9 @@ double BuildingMaker::conversionScale;
   gui::editor::Events::ConnectSaveBuildingEditor(
     boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
+  gui::editor::Events::ConnectSaveAsBuildingEditor(
+    boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
+  this->connections.push_back(
   gui::editor::Events::ConnectDiscardBuildingEditor(
     boost::bind(&BuildingMaker::OnDiscard, this)));
   this->connections.push_back(
@@ -508,8 +511,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   this->saveLocation = _savePath;
   std::ofstream savefile;
   boost::filesystem::path path;
-  path = boost::filesystem::operator/(this->saveLocation,
-      this->modelName + ".sdf");
+  path = boost::filesystem::operator/(this->saveLocation, "model.sdf");
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -1052,6 +1054,22 @@ double BuildingMaker::ConvertAngle(double _angle)
   return GZ_DTOR(_angle);
 }
 
+std::string BuildingMaker::GetTemplateConfigString()
+{
+  std::ostringstream newModelStr;
+  newModelStr << "<?xml version=\"1.0\"?>"
+  << "<model>"
+  <<   "<name>building_template_model</name>"
+  <<   "<version>1.0</version>"
+  <<   "<sdf version=\"1.5\">model.sdf</sdf>"
+  <<   "<author>"
+  <<     "<name>author_name</name>"
+  <<   "</author>"
+  <<   "<description></description>"
+  << "</model>";
+  return newModelStr.str();
+}
+
 /////////////////////////////////////////////////
 std::string BuildingMaker::GetTemplateSDFString()
 {
@@ -1324,6 +1342,13 @@ void BuildingMaker::OnDiscard()
   }
 }
 
+void BuildingMaker::SaveModelFiles()
+{
+  this->SetModelName(this->modelName);
+  this->GenerateSDF();
+  this->SaveToSDF(this->saveLocation);
+}
+
 /////////////////////////////////////////////////
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
@@ -1332,25 +1357,60 @@ void BuildingMaker::OnSave(const std::string &_saveName)
 
   if (this->saved)
   {
-    this->SetModelName(this->modelName);
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
+    this->SaveModelFiles();
+    gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
   }
   else
   {
-    this->saveDialog->SetModelName(this->modelName);
-    this->saveDialog->SetSaveLocation(this->saveLocation);
-    if (this->saveDialog->exec() == QDialog::Accepted)
-    {
-      this->modelName = this->saveDialog->GetModelName();
-      this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
-      this->GenerateSDF();
-      this->SaveToSDF(this->saveLocation);
-      this->saved = true;
-    }
+    this->OnSaveAs(_saveName);
   }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnSaveAs(const std::string &_saveName)
+{
+  this->saveDialog->SetModelName(this->modelName);
+  this->saveDialog->SetSaveLocation(this->saveLocation);
+  if (this->saveDialog->exec() == QDialog::Accepted)
+  {
+    this->modelName = this->saveDialog->GetModelName();
+    this->saveLocation = this->saveDialog->GetSaveLocation();
+    this->authorName = this->saveDialog->GetAuthor();
+    this->description = this->saveDialog->GetDescription();
+
+    // create folder if it doesn't exist?
+
+    // TODO: sdf checks
+    // Create a config file
+    sdf::SDFPtr configSDF;
+    configSDF.reset(new sdf::SDF);
+    configSDF->SetFromString(this->GetTemplateConfigString());
+
+    sdf::ElementPtr configElem = configSDF->root->GetElement("model");
+    configElem->GetAttribute("name")->Set(this->modelName);
+    // get element author
+    sdf::ElementPtr authorElem = configSDF->root->GetElement("author");
+    authorElem->GetAttribute("name")->Set(this->authorName);
+    configElem->GetAttribute("description")->Set(this->description);
+
+    boost::filesystem::path path;
+    path = boost::filesystem::operator/(this->saveLocation, "model.config");
+    std::ofstream savefile;
+    savefile.open(path.string().c_str());
+    savefile << configSDF->ToString();
+    savefile.close();
+
+    // Create folders for assets
+
+    // TODO: save textures
+
+    // Save all the things
+    this->SaveModelFiles();
+    this->saved = true;
+  }
+  // hmm???
+  gui::editor::Events::saveAsBuildingModel(this->modelName, this->saveLocation);
+
 }
 
 /////////////////////////////////////////////////

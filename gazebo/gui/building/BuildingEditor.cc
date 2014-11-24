@@ -45,11 +45,17 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
       tipsLabel);
 
-  this->saveAct = new QAction(tr("&Save (As)"), this->mainWindow);
-  this->saveAct->setStatusTip(tr("Save (As)"));
+  this->saveAct = new QAction(tr("&Save"), this->mainWindow);
+  this->saveAct->setStatusTip(tr("Save"));
   this->saveAct->setShortcut(tr("Ctrl+S"));
   this->saveAct->setCheckable(false);
   connect(this->saveAct, SIGNAL(triggered()), this, SLOT(Save()));
+
+  this->saveAsAct = new QAction(tr("&Save As"), this->mainWindow);
+  this->saveAsAct->setStatusTip(tr("Save As"));
+  this->saveAsAct->setShortcut(tr("Ctrl+SHIFT+S"));
+  this->saveAsAct->setCheckable(false);
+  connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
   this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
   this->discardAct->setStatusTip(tr("Discard"));
@@ -87,6 +93,13 @@ BuildingEditor::~BuildingEditor()
 void BuildingEditor::Save()
 {
   gui::editor::Events::saveBuildingEditor(
+    this->buildingPalette->GetModelName());
+}
+
+////////////////////////////////////////////////
+void BuildingEditor::SaveAs()
+{
+  gui::editor::Events::saveAsBuildingEditor(
       this->buildingPalette->GetModelName());
 }
 
@@ -127,6 +140,7 @@ void BuildingEditor::CreateMenus()
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
   fileMenu->addAction(this->saveAct);
+  fileMenu->addAction(this->saveAsAct);
   fileMenu->addAction(this->discardAct);
   fileMenu->addAction(this->doneAct);
   fileMenu->addAction(this->exitAct);

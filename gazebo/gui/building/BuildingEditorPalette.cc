@@ -119,14 +119,19 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QPushButton *discardButton = new QPushButton(tr("Discard"));
   connect(discardButton, SIGNAL(clicked()), this, SLOT(OnDiscard()));
 
-  // Save (As) button
-  this->saveButton = new QPushButton(tr("Save As"));
+  // Save button
+  this->saveButton = new QPushButton(tr("Save"));
   connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave()));
+
+  // Save As button
+  this->saveAsButton = new QPushButton(tr("Save As"));
+  connect(this->saveAsButton, SIGNAL(clicked()), this, SLOT(OnSaveAs()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(discardButton);
   buttonsLayout->addWidget(importImageButton);
   buttonsLayout->addWidget(this->saveButton);
+  buttonsLayout->addWidget(this->saveAsButton);
 
   // Main layout
   mainLayout->addLayout(modelNameLayout);
@@ -147,6 +152,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->connections.push_back(
       gui::editor::Events::ConnectSaveBuildingModel(
       boost::bind(&BuildingEditorPalette::OnSaveModel, this, _1, _2)));
+
+  this->connections.push_back(
+      gui::editor::Events::ConnectSaveAsBuildingModel(
+      boost::bind(&BuildingEditorPalette::OnSaveAsModel, this, _1, _2)));
 
   this->connections.push_back(
       gui::editor::Events::ConnectDiscardBuildingModel(
@@ -235,9 +244,16 @@ void BuildingEditorPalette::OnSave()
 }
 
 /////////////////////////////////////////////////
+void BuildingEditorPalette::OnSaveAs()
+{
+  gui::editor::Events::saveAsBuildingEditor(
+      this->modelNameEdit->text().toStdString());
+}
+
+/////////////////////////////////////////////////
 void BuildingEditorPalette::OnDiscardModel()
 {
-  this->saveButton->setText("&Save As");
+  //this->saveButton->setText("&Save As");
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
 }
 
@@ -245,7 +261,15 @@ void BuildingEditorPalette::OnDiscardModel()
 void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
     const std::string &/*_saveLocation*/)
 {
-  this->saveButton->setText("Save");
+  //this->saveButton->setText("Save");
+  this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnSaveAsModel(const std::string &_saveName,
+    const std::string &/*_saveLocation*/)
+{
+  //this->saveButton->setText("Save");
   this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 

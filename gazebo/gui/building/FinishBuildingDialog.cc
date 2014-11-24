@@ -54,6 +54,12 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
+  QLabel *modelAuthor = new QLabel;
+  modelAuthor->setText(tr("Author (optional)"));
+
+  QLabel *modelDescription = new QLabel;
+  modelDescription->setText(tr("Description (optional)"));
+
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
          "the entire Gazebo community can benefit!\n"
@@ -107,6 +113,18 @@ std::string FinishBuildingDialog::GetModelName() const
 std::string FinishBuildingDialog::GetSaveLocation() const
 {
   return this->modelLocationLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetAuthor() const
+{
+  return this->modelAuthorLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetDescription() const
+{
+  return this->modelDescriptionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
