@@ -586,10 +586,10 @@ void BuildingMaker::GenerateSDF()
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
+    // Only stairs have children
     if (visual->GetChildCount() == 0)
     {
-      // subdivide wall surface to create holes for representing
-      // window/doors
+      // Window / Door not attached to walls
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
@@ -702,9 +702,10 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
         }
       }
-      // check if floors have attached children, i.e. stairs
+      // Floor
       else if (name.find("Floor") != std::string::npos)
       {
+        // check if floors have attached children, i.e. stairs
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
@@ -773,13 +774,14 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 subdivisions[i].height(), floorVis->GetScale().z);
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Floor without stairs
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -795,9 +797,10 @@ void BuildingMaker::GenerateSDF()
         }
       }
     }
+    // Stairs
     else
     {
-      // TODO: This handles the special case for stairs where
+      // TODO: This handles the special case for stairs, where
       // there are nested visuals which SDF doesn't support.
       // Should somehow generalize/combine the code above and below
       newLinkElem->ClearElements();
@@ -821,6 +824,8 @@ void BuildingMaker::GenerateSDF()
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+        visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
 
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);
