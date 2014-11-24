@@ -50,6 +50,7 @@ namespace gazebo
             static event::ConnectionPtr ConnectSaveBuildingModel(T _subscriber)
           { return saveBuildingModel.Connect(_subscriber); }
 
+        /// XXX
         /// \brief Connect a Gazebo event to the save model signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection

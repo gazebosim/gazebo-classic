@@ -71,9 +71,6 @@ namespace gazebo
       /// \brief Qt callback when the save button is pressed.
       private slots: void OnSave();
 
-      /// \brief Qt callback when the save as button is pressed.
-      private slots: void OnSaveAs();
-
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -109,11 +106,11 @@ namespace gazebo
       /// \brief Save button.
       private: QPushButton *saveButton;
 
-      /// \brief Save As button.
-      private: QPushButton *saveAsButton;
-
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;
+  
+      /// \brief True if the model has been saved, false otherwise.
+      private: bool saved;
 
       /// \brief Name of model.
       private: std::string modelName;

@@ -1319,7 +1319,24 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 /////////////////////////////////////////////////
 void BuildingMaker::OnDiscard()
 {
-  int ret = QMessageBox::warning(0, QString("Discard"),
+  QString msg("Are you sure you want to discard\n"
+              "your model? All of your work will\n"
+              "be lost.");
+  QMessageBox msgBox(QMessageBox::Warning, QString("Discard"), msg);
+
+  QPushButton *discardButton = msgBox.addButton("Discard",
+                                             QMessageBox::ApplyRole);
+  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+  msgBox.exec();
+  if (msgBox.clickedButton() == discardButton)
+  {
+    gui::editor::Events::discardBuildingModel();
+    this->modelName = this->buildingDefaultName;
+    this->saveLocation = QDir::homePath().toStdString();
+    this->saved = false;
+  }
+
+  /*int ret = QMessageBox::warning(0, QString("Discard"),
       QString("Are you sure you want to discard\n"
       "your model? All of your work will\n"
       "be lost."),
@@ -1339,7 +1356,7 @@ void BuildingMaker::OnDiscard()
     break;
     default:
     break;
-  }
+  }*/
 }
 
 void BuildingMaker::SaveModelFiles()
@@ -1384,8 +1401,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     this->authorEmail = this->saveDialog->GetAuthorEmail();
     this->description = this->saveDialog->GetDescription();
     this->version = this->saveDialog->GetVersion();
-
-    // create folder if it doesn't exist?
 
     // Create an xml config file
     TiXmlDocument xmlDoc;
@@ -1461,6 +1476,38 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
 
     path = path / "model.config";
+
+    if (boost::filesystem::exists(path))
+    {
+      // TODO: same size buttons
+      std::string msg = "A file named " + path.string() + " already exists.\n"
+                        "Do you wish to overwrite the existing file?\n";
+      QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
+                         QString(msg.c_str()));
+
+      QPushButton *saveButton = msgBox.addButton("Save",
+                                                 QMessageBox::ApplyRole);
+      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+      msgBox.exec();
+      if (msgBox.clickedButton() == cancelButton)
+      {
+        this->OnSaveAs(_saveName);
+        return;
+      }
+
+      /*switch (ret)
+      {
+        case QMessageBox::Save:
+          // Do nothing
+          break;
+        case QMessageBox::Cancel:
+          this->OnSaveAs(_saveName);
+          return;
+        default:
+          break;
+      }*/
+    }
+
     std::ofstream savefile;
     savefile.open(path.string().c_str());
     // TODO: human-readable formatting of XML output
@@ -1473,10 +1520,9 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     // Save all the things
     this->SaveModelFiles();
     this->saved = true;
+    gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
   }
   // hmm...?
-  gui::editor::Events::saveAsBuildingModel(this->modelName, this->saveLocation);
-  //gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
 
 }
 
@@ -1507,32 +1553,70 @@ void BuildingMaker::OnDone(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()
 {
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
+  if (saved)
   {
-    case QMessageBox::Discard:
+    QString msg("Once you exit the Building Editor, \n"
+      "your building will no longer be editable.\n\n"
+      "Are you ready to exit?\n\n");
+    QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+
+    QPushButton *exitButton = msgBox.addButton("Exit",
+                                               QMessageBox::ApplyRole);
+    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+    msgBox.exec();
+    if (msgBox.clickedButton() == exitButton)
+    {
+      gui::editor::Events::finishBuildingModel();
+      return;
+    }
+  }
+  else
+  {
+    QString msg("Save Changes before exiting? If you do not\n"
+        "save, all of your work will be lost!\n\n"
+        "Note: Once you exit the Building Editor, \n"
+        "your building will no longer be editable.\n\n");
+    QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
+    // Order is don't save, exit, save, cancel
+    QPushButton *discardButton = msgBox.addButton("Don't Save, Exit",
+                                                  QMessageBox::ApplyRole);
+    QPushButton *saveButton = msgBox.addButton("Save and Exit",
+                                                  QMessageBox::NoRole);
+    QPushButton *cancelButton = msgBox.addButton("Cancel",
+                                                  QMessageBox::YesRole);
+    msgBox.exec();
+    if (msgBox.clickedButton() == discardButton)
+    {
       gui::editor::Events::discardBuildingModel();
       this->modelName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
       gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
+    }
+    else if (msgBox.clickedButton() == saveButton)
+    {
       this->OnSave();
       gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
+    }
+    /*int ret = QMessageBox::warning(0, QString("Exit"),
+        QString("Save Changes before exiting? If you do not\n"
+        "save, all of your work will be lost!\n\n"
+        "Note: Once you exit the Building Editor, \n"
+        "your building will no longer be editable.\n\n"),
+  //      "If you are done editing your model, select Done\n"),
+        QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
+        QMessageBox::Save);
+
+    switch (ret)
+    {
+      case QMessageBox::Discard:
+        break;
+      case QMessageBox::Cancel:
+        break;
+      case QMessageBox::Save:
+        break;
+      default:
+        break;
+    }*/
   }
 }
