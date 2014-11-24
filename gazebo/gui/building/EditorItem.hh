@@ -61,9 +61,17 @@ namespace gazebo
       /// \return Name of the item.
       public: virtual std::string GetName() const;
 
+      /// \brief Get the associated 3D visual's color.
+      /// \return Color of the 3D visual.
+      public: virtual QColor Get3dColor() const;
+
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
+
+      /// \brief Set the associated 3D visual's color.
+      /// \param[in] _color Color.
+      public: void Set3dColor(QColor _color);
 
       /// \brief Set the transparency of the associated 3D visual.
       /// \param[in] _transparency Transparency.

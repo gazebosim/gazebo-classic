@@ -50,6 +50,10 @@ namespace gazebo
       /// \return The level height in pixels.
       public: double GetHeight() const;
 
+      /// \brief Get the color of this level's floor.
+      /// \return Floor color.
+      public: QColor GetFloorColor() const;
+
       /// \brief Set the name of the level.
       /// \param[in] _levelName New level name.
       public: void SetLevelName(const std::string &_levelName);
@@ -57,6 +61,10 @@ namespace gazebo
       /// \brief Set the height of the level.
       /// \param[in] _height Level height in pixels.
       public: void SetHeight(double _height);
+
+      /// \brief Set the color of this level's floor.
+      /// \param[in] _color Color.
+      public: void SetFloorColor(const QColor _color);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -70,6 +78,9 @@ namespace gazebo
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
 
+      /// \brief Widget containing the floor specs.
+      public: QWidget *floorWidget;
+
       /// \brief Editable line that holds the the level name.
       private: QLineEdit *levelNameLineEdit;
 
@@ -81,6 +92,12 @@ namespace gazebo
 
       /// \brief Combo box for configuring the floor material.
       private: QComboBox *materialComboBox;
+
+      /// \brief Combo box for selecting the color of the floor.
+      private: QComboBox *floorColorComboBox;
+
+      /// \brief Vector of color options for the floor.
+      private: std::vector<QColor> floorColorList;
     };
     /// \}
   }

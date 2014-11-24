@@ -777,6 +777,8 @@ void BuildingMaker::GenerateSDF()
                 GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
@@ -794,6 +796,8 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
         }
       }
     }
