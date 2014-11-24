@@ -2,6 +2,9 @@
 
 ### Modifications
 
+1. **gazebo/math/Box.hh**
+    + The constructor that takes two math::Vector3 values now treats these as two corners, and computes the minimum and maximum values automatically. This change is API and ABI compatible.
+
 1. **Informational logs:** The log files will be created inside
   ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
   ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
@@ -24,7 +27,15 @@
 1. **gazebo/rendering/UserCamera.hh**
     + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
     + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
-    
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Removed:*** public: void ShowRotation(unsigned int _axis)
+    + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
+
+1. **gazebo/rendering/ArrowVisual.hh**
+    + ***Removed:*** public: void ShowRotation()
+    + ***Replacement:*** public: void ShowRotation(bool _show)
+
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**

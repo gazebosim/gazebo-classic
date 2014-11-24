@@ -2,6 +2,10 @@
 
 ### Gazebo 5.0.0
 
+1. Fixed `math::Box::GetCenter` functionality.
+    * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
+    * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
+
 1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI. 
     * [Pull request #1270](https://bitbucket.org/osrf/gazebo/pull-request/1270)
 
@@ -42,13 +46,22 @@
 1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
   * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
 
+1. Fix joint axis visualization.
+  * [Pull request #1258](https://bitbucket.org/osrf/gazebo/pull-request/1258)
+
 1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
   * [Pull request #1249](https://bitbucket.org/osrf/gazebo/pull-request/1249)
-  
+
 1. Added RenderWidget::GetToolbar to get the top toolbar and change its actions on ModelEditor.
     * [Pull request #1263](https://bitbucket.org/osrf/gazebo/pull-request/1263)
+
+1. Added accessor for MainWindow graphical widget to GuiIface.
+    * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
+
+1. Added a ConfigWidget class that takes in a google protobuf message and generates widgets for configuring the fields in the message
+    * [Pull request #1285](https://bitbucket.org/osrf/gazebo/pull-request/1285)
 
 ## Gazebo 4.0
 
