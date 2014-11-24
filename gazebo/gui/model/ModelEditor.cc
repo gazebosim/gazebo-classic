@@ -192,18 +192,25 @@ void ModelEditor::ToggleToolbar()
 
   for (int i = 0; i < actions.size(); ++i)
   {
-    actions[i]->setVisible(!this->active);
+    if (actions[i] == g_arrowAct ||
+        actions[i] == g_rotateAct ||
+        actions[i] == g_translateAct ||
+        actions[i] == g_scaleAct ||
+        actions[i] == g_screenshotAct)
+//        actions[i] == g_copyAct -- issue #1314
+//        actions[i] == g_pasteAct
+//        align tool              -- issue #1323
+//        actions[i] == g_snapAct -- issue #1318
+    {
+      actions[i]->setVisible(true);
+      if (i > 0 && actions[i-1]->isSeparator())
+      {
+        actions[i-1]->setVisible(true);
+      }
+    }
+    else
+    {
+      actions[i]->setVisible(!this->active);
+    }
   }
-
-  if (this->active)
-  {
-    g_arrowAct->setVisible(true);
-    g_rotateAct->setVisible(true);
-    g_translateAct->setVisible(true);
-    g_scaleAct->setVisible(true);
-  }
-
-  this->jointAct->setVisible(this->active);
-  this->jointTypeAct->setVisible(this->active);
-  this->jointSeparatorAct->setVisible(this->active);
 }

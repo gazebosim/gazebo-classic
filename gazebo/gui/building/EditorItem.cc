@@ -68,3 +68,9 @@ void EditorItem::SetName(const std::string &_name)
 {
   this->name = _name;
 }
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dTransparency(float _transparency)
+{
+  this->visual3dTransparency = _transparency;
+}

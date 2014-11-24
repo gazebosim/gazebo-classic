@@ -2,6 +2,9 @@
 
 ### Modifications
 
+1. **gazebo/math/Box.hh**
+    + The constructor that takes two math::Vector3 values now treats these as two corners, and computes the minimum and maximum values automatically. This change is API and ABI compatible.
+
 1. **Informational logs:** The log files will be created inside
   ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
   ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
@@ -21,21 +24,10 @@
     + ***Removed:*** public: void HandleRelease(const common::KeyEvent &_event);
     + ***Replacement:*** public: bool HandleRelease(const common::KeyEvent &_event);
 
-### Additions
-
-1. **gazebo/physics/Joint.hh**
-    + void SetVelocityLimit(unsigned int, double)
-    + bool SetVelocityMaximal(unsigned int, double)
-
-1. **gazebo/physics/Population.hh**
-    + ***New class:*** Population
-
-1. **gazebo/math/Kmeans.hh**
-    + ***New class:*** Kmeans
-
-1. **gazebo/gui/SpaceNav.hh**
-    + ***New class:*** SpaceNav, an interface to the space navigator 3D mouse
-
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
+    + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
+    
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**

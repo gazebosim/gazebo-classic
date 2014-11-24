@@ -375,6 +375,10 @@ void JointMaker::Stop()
     this->selectedVis.reset();
     this->hoverVis.reset();
   }
+  MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveMoveFilter("model_joint");
+  MouseEventHandler::Instance()->RemovePressFilter("model_joint");
+  MouseEventHandler::Instance()->RemoveReleaseFilter("model_joint");
 }
 
 /////////////////////////////////////////////////
