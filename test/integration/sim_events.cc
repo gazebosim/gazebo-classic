@@ -143,6 +143,8 @@ TEST_P(SimEventsTest, SimPauseRun)
 ////////////////////////////////////////////////////////////////////////
 void SimEventsTest::SpawnAndDeleteModel(const std::string &_physicsEngine)
 {
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
+
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   // setup the callback that increments the counter everytime a
   // SimEvent is emitted.
@@ -180,7 +182,7 @@ TEST_P(SimEventsTest, SpawnAndDeleteModel)
 void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
 {
   // simbody stepTo() failure
-  if (SKIP_FAILING_TESTS && _physicsEngine == "simbody") return;
+  if (SKIP_FAILING_TESTS && _physicsEngine != "ode") return;
 
   Load("test/worlds/sim_events.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
