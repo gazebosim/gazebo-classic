@@ -27,6 +27,14 @@
 1. **gazebo/rendering/UserCamera.hh**
     + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
     + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void RotatePitch(math::Angle _angle);
+    + ***Replacement:*** public: void Pitch(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
+    + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
     
 ### Deletions
 
