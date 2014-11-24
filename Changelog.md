@@ -46,6 +46,9 @@
 1. Added RenderWidget::ShowToolbar to toggle visibility of top toolbar.
   * [Pull request #1248](https://bitbucket.org/osrf/gazebo/pull-request/1248)
 
+1. Fix joint axis visualization.
+  * [Pull request #1258](https://bitbucket.org/osrf/gazebo/pull-request/1258)
+
 1. Change UserCamera view control via joysticks. Clean up rate control vs. pose control.
    see UserCamera::OnJoyPose and UserCamera::OnJoyTwist. Added view twist control toggle
    with joystick button 1.
