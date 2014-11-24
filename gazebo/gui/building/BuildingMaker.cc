@@ -511,7 +511,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   this->saveLocation = _savePath;
   std::ofstream savefile;
   boost::filesystem::path path;
-  path = boost::filesystem::operator/(this->saveLocation, "model.sdf");
+  path = path / this->saveLocation / this->modelFolderName / "model.sdf";
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -1065,7 +1065,7 @@ std::string BuildingMaker::GetTemplateConfigString()
   <<   "<author>"
   <<     "<name>author_name</name>"
   <<   "</author>"
-  <<   "<description></description>"
+  <<   "<description>Made with the Gazebo Building Editor</description>"
   << "</model>";
   return newModelStr.str();
 }
@@ -1369,47 +1369,114 @@ void BuildingMaker::OnSave(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
+  // auto-fill these fields with existing values 
   this->saveDialog->SetModelName(this->modelName);
-  this->saveDialog->SetSaveLocation(this->saveLocation);
+  if (this->saveLocation.length() > 0)
+  {
+    this->saveDialog->SetSaveLocation(this->saveLocation);
+  }
   if (this->saveDialog->exec() == QDialog::Accepted)
   {
     this->modelName = this->saveDialog->GetModelName();
     this->saveLocation = this->saveDialog->GetSaveLocation();
-    this->authorName = this->saveDialog->GetAuthor();
+    this->modelFolderName = this->saveDialog->GetModelFolderName();
+    this->authorName = this->saveDialog->GetAuthorName();
+    this->authorEmail = this->saveDialog->GetAuthorEmail();
     this->description = this->saveDialog->GetDescription();
+    this->version = this->saveDialog->GetVersion();
 
     // create folder if it doesn't exist?
 
-    // TODO: sdf checks
-    // Create a config file
-    sdf::SDFPtr configSDF;
-    configSDF.reset(new sdf::SDF);
-    configSDF->SetFromString(this->GetTemplateConfigString());
+    // Create an xml config file
+    TiXmlDocument xmlDoc;
+    xmlDoc.Parse(this->GetTemplateConfigString().c_str());
 
-    sdf::ElementPtr configElem = configSDF->root->GetElement("model");
-    configElem->GetAttribute("name")->Set(this->modelName);
-    // get element author
-    sdf::ElementPtr authorElem = configSDF->root->GetElement("author");
-    authorElem->GetAttribute("name")->Set(this->authorName);
-    configElem->GetAttribute("description")->Set(this->description);
+    TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+    if (!modelXML)
+    {
+      gzerr << "No model name in default config file\n";
+      return;
+    }
+    TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");
+    modelNameXML->FirstChild()->SetValue(this->modelName);
 
+    TiXmlElement *versionXML = modelXML->FirstChildElement("version");
+    if (!versionXML)
+    {
+      gzerr << "Couldn't find model version" << std::endl;
+    }
+    else
+    {
+      versionXML->FirstChild()->SetValue(this->version);
+    }
+
+    TiXmlElement *descriptionXML = modelXML->FirstChildElement("description");
+    if (!descriptionXML)
+    {
+      gzerr << "Couldn't find model description" << std::endl;
+    }
+    else
+    {
+      descriptionXML->FirstChild()->SetValue(this->description);
+    }
+
+    // TODO: Multiple authors
+    TiXmlElement *authorXML = modelXML->FirstChildElement("author");
+    if (!authorXML)
+    {
+      gzerr << "Couldn't find model author" << std::endl;
+    }
+    else
+    {
+      TiXmlElement *authorChild = authorXML->FirstChildElement("name");
+      if (!authorChild)
+      {
+        gzerr << "Couldn't find author name" << std::endl;
+      }
+      else
+      {
+        authorChild->FirstChild()->SetValue(this->authorName);
+      }
+      authorChild = authorXML->FirstChildElement("email");
+      if (!authorChild)
+      {
+        gzerr << "Couldn't find author email" << std::endl;
+      }
+      else
+      {
+        authorChild->FirstChild()->SetValue(this->authorEmail);
+      }
+    }
+ 
     boost::filesystem::path path;
-    path = boost::filesystem::operator/(this->saveLocation, "model.config");
+    path = path / this->saveLocation/ this->modelFolderName;
+    if (!boost::filesystem::exists(path))
+    {
+      if (!boost::filesystem::create_directories(path))
+      {
+        gzerr << "Couldn't create folder for model files." << std::endl;
+        return;
+      }
+      gzmsg << "Created folder " << path << " for model files." << std::endl;
+    }
+
+    path = path / "model.config";
     std::ofstream savefile;
     savefile.open(path.string().c_str());
-    savefile << configSDF->ToString();
+    // TODO: human-readable formatting of XML output
+    savefile << xmlDoc;
     savefile.close();
 
-    // Create folders for assets
-
+    // Create subfolders for assets
     // TODO: save textures
 
     // Save all the things
     this->SaveModelFiles();
     this->saved = true;
   }
-  // hmm???
+  // hmm...?
   gui::editor::Events::saveAsBuildingModel(this->modelName, this->saveLocation);
+  //gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
 
 }
 
@@ -1420,7 +1487,10 @@ void BuildingMaker::OnDone(const std::string &_saveName)
     this->modelName = _saveName;
 
   this->finishDialog->SetModelName(this->modelName);
-  this->finishDialog->SetSaveLocation(this->saveLocation);
+  if (this->saveLocation.length() > 0)
+  {
+    this->finishDialog->SetSaveLocation(this->saveLocation);
+  }
   if (this->finishDialog->exec() == QDialog::Accepted)
   {
     this->modelName = this->finishDialog->GetModelName();

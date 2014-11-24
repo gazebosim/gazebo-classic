@@ -47,18 +47,50 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name"));
   this->modelNameLineEdit = new QLineEdit;
+  this->modelNameLineEdit->setText(tr("Human readable name"));
+
+  // Advanced options
+  // TODO: setting proper default values
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("Location"));
   this->modelLocationLineEdit = new QLineEdit;
-  this->modelLocationLineEdit->setText(QDir::homePath());
+  // Try to get path to ~
+  const char* home_cstr = getenv("HOME");
+  if (!home_cstr)
+  {
+    // Dubious...
+    this->modelLocationLineEdit->setText(tr("ERROR: home folder not found."));
+  }
+  else
+  {
+    this->modelLocationLineEdit->setText(tr(home_cstr));
+  }
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
-  QLabel *modelAuthor = new QLabel;
-  modelAuthor->setText(tr("Author (optional)"));
+  QLabel *authorText = new QLabel;
+  authorText->setText(tr("Author"));
+  QLabel *modelAuthorName = new QLabel;
+  modelAuthorName->setText(tr("Name"));
+  this->modelAuthorNameLineEdit = new QLineEdit;
+  QLabel *modelAuthorEmail = new QLabel;
+  modelAuthorEmail->setText(tr("Email"));
+  this->modelAuthorEmailLineEdit = new QLineEdit;
+
+  QLabel *modelVersion = new QLabel;
+  modelVersion->setText(tr("Version"));
+  this->modelVersionLineEdit = new QLineEdit;
+  this->modelVersionLineEdit->setText(tr("1.0"));
 
   QLabel *modelDescription = new QLabel;
-  modelDescription->setText(tr("Description (optional)"));
+  modelDescription->setText(tr("Description"));
+  this->modelDescriptionLineEdit = new QLineEdit;
+
+  // TODO: auto-generate filename, note about no spaces?
+  QLabel *modelFolderName = new QLabel;
+  modelFolderName->setText(tr("FolderName"));
+  this->modelFolderNameLineEdit = new QLineEdit;
+  this->modelFolderNameLineEdit->setText(tr("folder_name_for_model"));
 
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
@@ -84,9 +116,26 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QGridLayout *gridLayout = new QGridLayout;
   gridLayout->addWidget(modelLabel, 0, 0);
   gridLayout->addWidget(modelNameLineEdit, 0, 1);
-  gridLayout->addWidget(modelLocation, 1, 0);
-  gridLayout->addWidget(this->modelLocationLineEdit, 1, 1);
-  gridLayout->addWidget(browseButton, 1, 2);
+
+  // Advanced options
+
+  gridLayout->addWidget(authorText, 1, 0);
+  gridLayout->addWidget(modelAuthorName, 2, 0);
+  gridLayout->addWidget(this->modelAuthorNameLineEdit, 2, 1);
+  gridLayout->addWidget(modelAuthorEmail, 3, 0);
+  gridLayout->addWidget(this->modelAuthorEmailLineEdit, 3, 1);
+
+  gridLayout->addWidget(modelVersion, 4, 0);
+  gridLayout->addWidget(this->modelVersionLineEdit, 4, 1);
+  gridLayout->addWidget(modelDescription, 5, 0);
+  gridLayout->addWidget(this->modelDescriptionLineEdit, 5, 1);
+
+  gridLayout->addWidget(modelFolderName, 6, 0);
+  gridLayout->addWidget(this->modelFolderNameLineEdit, 6, 1);
+  gridLayout->addWidget(modelLocation, 7, 0);
+  gridLayout->addWidget(this->modelLocationLineEdit, 7, 1);
+  gridLayout->addWidget(browseButton, 7, 2);
+  
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
@@ -110,21 +159,39 @@ std::string FinishBuildingDialog::GetModelName() const
 }
 
 /////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetModelFolderName() const
+{
+  return this->modelFolderNameLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
 std::string FinishBuildingDialog::GetSaveLocation() const
 {
   return this->modelLocationLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
-std::string FinishBuildingDialog::GetAuthor() const
+std::string FinishBuildingDialog::GetAuthorName() const
 {
-  return this->modelAuthorLineEdit->text().toStdString();
+  return this->modelAuthorNameLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetAuthorEmail() const
+{
+  return this->modelAuthorEmailLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
 std::string FinishBuildingDialog::GetDescription() const
 {
   return this->modelDescriptionLineEdit->text().toStdString();
+}
+
+/////////////////////////////////////////////////
+std::string FinishBuildingDialog::GetVersion() const
+{
+  return this->modelVersionLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////

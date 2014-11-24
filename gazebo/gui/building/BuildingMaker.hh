@@ -309,11 +309,20 @@ namespace gazebo
       /// \brief Path to where the model is saved.
       private: std::string saveLocation;
 
+      /// \brief Folder name containing model data.
+      private: std::string modelFolderName;
+
       /// \brief Name of the building model's author.
       private: std::string authorName;
 
+      /// \brief Name of the building model's author's email.
+      private: std::string authorEmail;
+
       /// \brief Model description.
       private: std::string description;
+
+      /// \brief Model version.
+      private: std::string version;
 
       /// \brief A list of gui editor events connected to the building maker.
       private: std::vector<event::ConnectionPtr> connections;
