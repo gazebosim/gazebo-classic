@@ -254,6 +254,11 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
+      /// \brief Callback received when a level on a building model is to
+      /// be changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
+
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;
 
@@ -309,6 +314,9 @@ namespace gazebo
       /// \brief A dialog that prompts to confirm model completion and uploading
       /// to the server
       private: FinishBuildingDialog *finishDialog;
+
+      /// \brief The current level that is being edited.
+      private: int currentLevel;
     };
     /// \}
   }

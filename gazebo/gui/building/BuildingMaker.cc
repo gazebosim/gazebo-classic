@@ -67,6 +67,7 @@ double BuildingMaker::conversionScale;
   this->doorCounter = 0;
   this->stairsCounter = 0;
   this->floorCounter = 0;
+  this->currentLevel = 0;
 
   this->modelTemplateSDF.reset(new sdf::SDF);
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
@@ -83,6 +84,9 @@ double BuildingMaker::conversionScale;
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
 
   this->buildingDefaultName = "BuildingDefaultName";
 
@@ -188,7 +192,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   }
 
   std::ostringstream linkNameStream;
-  linkNameStream << "Wall_" << wallCounter++;
+  linkNameStream << "Wall_" << this->wallCounter++;
   std::string linkName = linkNameStream.str();
 
   rendering::VisualPtr linkVisual(new rendering::Visual(this->modelName + "::" +
@@ -200,10 +204,10 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
-  sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
+  sdf::ElementPtr visualElem = this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/Orange");
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   BuildingModelManip *wallManip = new BuildingModelManip();
@@ -211,7 +215,9 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   wallManip->SetName(linkName);
   wallManip->SetVisual(visVisual);
   visVisual->SetScale(scaledSize);
+  visVisual->SetTransparency(0.4);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
+  wallManip->SetLevel(this->currentLevel);
   wallManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = wallManip;
 
@@ -244,7 +250,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/BlueTransparent");
+      ->GetElement("name")->Set("Gazebo/Blue");
   visVisual->Load(visualElem);
 
   BuildingModelManip *windowManip = new BuildingModelManip();
@@ -253,8 +259,10 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   windowManip->SetVisual(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
+  visVisual->SetTransparency(0.4);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   windowManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  windowManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -287,7 +295,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/YellowTransparent");
+      ->GetElement("name")->Set("Gazebo/Yellow");
   visVisual->Load(visualElem);
 
   BuildingModelManip *doorManip = new BuildingModelManip();
@@ -296,8 +304,10 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   doorManip->SetVisual(visVisual);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
+  visVisual->SetTransparency(0.4);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   doorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
+  doorManip->SetLevel(this->currentLevel);
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -335,6 +345,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   stairsManip->SetMaker(this);
   stairsManip->SetName(linkName);
   stairsManip->SetVisual(visVisual);
+  stairsManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
   double dSteps = static_cast<double>(_steps);
@@ -347,8 +358,9 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreenTransparent");
+      ->GetElement("name")->Set("Gazebo/Green");
   baseStepVisual->Load(visualElem);
+  baseStepVisual->SetTransparency(0.4);
 
   double rise = 1.0 / dSteps;
   double run = 1.0 / dSteps;
@@ -400,15 +412,17 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+      ->GetElement("name")->Set("Gazebo/Orange");
   visVisual->Load(visualElem);
 
   BuildingModelManip *floorManip = new BuildingModelManip();
   floorManip->SetMaker(this);
   floorManip->SetName(linkName);
   floorManip->SetVisual(visVisual);
+  floorManip->SetLevel(this->currentLevel);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   visVisual->SetScale(scaledSize);
+  visVisual->SetTransparency(0.4);
   visVisual->SetPosition(math::Vector3(0, 0, scaledSize.z/2.0));
   floorManip->SetPose(_pos.x(), _pos.y(), _pos.z(), 0, 0, _angle);
   this->allItems[linkName] = floorManip;
@@ -1400,4 +1414,10 @@ void BuildingMaker::OnExit()
     default:
       break;
   }
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnChangeLevel(int _level)
+{
+  this->currentLevel = _level;
 }

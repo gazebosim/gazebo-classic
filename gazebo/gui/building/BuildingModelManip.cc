@@ -18,6 +18,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Quaternion.hh"
+#include "gazebo/gui/building/BuildingEditorEvents.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/BuildingModelManip.hh"
 
@@ -28,6 +29,11 @@ using namespace gui;
 BuildingModelManip::BuildingModelManip()
 {
   this->parent = NULL;
+  this->level = 0;
+
+  this->connections.push_back(
+  gui::editor::Events::ConnectChangeBuildingLevel(
+    boost::bind(&BuildingModelManip::OnChangeLevel, this, _1)));
 }
 
 /////////////////////////////////////////////////
@@ -313,4 +319,25 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
       - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetLevel(const int _level)
+{
+  this->level = _level;
+}
+
+/////////////////////////////////////////////////
+int BuildingModelManip::GetLevel() const
+{
+  return this->level;
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::OnChangeLevel(int _level)
+{
+  if (_level != this->level)
+    this->visual->SetTransparency(0.0);
+  else
+    this->visual->SetTransparency(0.4);
 }
