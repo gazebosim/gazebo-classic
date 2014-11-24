@@ -46,6 +46,7 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetThickness(this->wallThickness);
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
+  this->visual3dColor = QColor(1.0, 1.0, 1.0);
   this->visual3dTransparency = 0.0;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
@@ -108,6 +109,7 @@ void WallSegmentItem::WallSegmentChanged()
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
+  emit ColorChanged(this->visual3dColor);
   emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
@@ -129,6 +131,7 @@ void WallSegmentItem::UpdateInspector()
   QPointF endPos = segmentEndPoint * this->scale;
   endPos.setY(-endPos.y());
   this->inspector->SetEndPosition(endPos);
+  this->inspector->SetColor(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////
@@ -229,6 +232,7 @@ void WallSegmentItem::OnApply()
   this->wallThickness = dialog->GetThickness() / this->scale;
   this->SetThickness(this->wallThickness);
   this->wallHeight = dialog->GetHeight() / this->scale;
+  this->visual3dColor = dialog->GetColor();
   this->WallSegmentChanged();
 
   double newLength = dialog->GetLength() / this->scale;

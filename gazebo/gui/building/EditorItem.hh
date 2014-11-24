@@ -140,6 +140,11 @@ namespace gazebo
       /// \param[in] _yaw Yaw rotation of item in degrees.
       Q_SIGNALS: void YawChanged(double _yaw);
 
+      /// \brief Qt signal emitted when the editor item's 3D color has
+      /// changed.
+      /// \param[in] _color Color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
+
       /// \brief Qt signal emitted when the editor item's 3D transparency has
       /// changed.
       /// \param[in] _transparency Transparency.
@@ -153,6 +158,9 @@ namespace gazebo
 
       /// \brief Name of editor item.
       protected: std::string name;
+
+      /// \brief Color of the associated 3D visual.
+      protected: QColor visual3dColor;
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;

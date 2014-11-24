@@ -119,6 +119,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
+      manip, SLOT(OnColorChanged(QColor)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
       manip, SLOT(OnTransparencyChanged(float)));
 
@@ -604,9 +606,10 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale());
       }
-      // check if walls have attached children, i.e. windows or doors
+      // Wall
       else if (name.find("Wall") != std::string::npos)
       {
+        // check if walls have attached children, i.e. windows or doors
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
@@ -673,13 +676,16 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 wallVis->GetScale().y, subdivisions[i].height());
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Wall without windows or doors
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -688,6 +694,8 @@ void BuildingMaker::GenerateSDF()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
           visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
