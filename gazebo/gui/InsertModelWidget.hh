@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 
+#include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -50,6 +51,10 @@ namespace gazebo
       private: void OnModels(
                    const std::map<std::string, std::string> &_models);
 
+      /// \brief Callback triggered when a request to update the model database
+      /// is received.
+      private: void OnModelUpdateRequest(const std::string &_localPath);
+
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
@@ -67,6 +72,8 @@ namespace gazebo
       /// \brief Update a specific path.
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
+
+      private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Private data pointer.
       private: InsertModelWidgetPrivate *dataPtr;

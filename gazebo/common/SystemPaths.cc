@@ -34,6 +34,7 @@
 using namespace gazebo;
 using namespace common;
 
+//event::EventT<void (std::string)> updateModelRequest;
 
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
@@ -487,6 +488,13 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPathsUpdate(const std::string &_path)
+{
+  this->AddModelPaths(_path);
+  updateModelRequest(_path);
 }
 
 /////////////////////////////////////////////////
