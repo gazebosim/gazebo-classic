@@ -1,0 +1,223 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="tire_rig">
+      <pose>0 0 0.5 0 0 0</pose>
+
+      <link name="wheel">
+        <inertial>
+          <mass>2.5</mass>
+          <inertia>
+            <ixx>0.208333</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.208333</iyy>
+            <iyz>0</iyz>
+            <izz>0.3125</izz>
+          </inertia>
+        </inertial>
+        <pose>0 0 0 1.57 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual_indicator">
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.4 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Red</name></script>
+          </material>
+        </visual>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><name>Gazebo/DarkGrey</name></script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="axel">
+        <pose>0 0.35 0 1.57 0 0</pose>
+
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.0029166</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0029166</iyy>
+            <iyz>0</iyz>
+            <izz>0.0025</izz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>0.2</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>0.2</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="upright">
+        <pose>0 0.55 0.4 0 0 0</pose>
+
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.08667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.08667</iyy>
+            <iyz>0</iyz>
+            <izz>0.0066667</izz>
+          </inertia>
+        </inertial>
+
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <joint type="revolute" name="axel_wheel">
+        <parent>axel</parent>
+        <child>wheel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <joint type="revolute" name="upright_axel">
+        <parent>upright</parent>
+        <child>axel</child>
+        <axis>
+          <xyz>1 0 0</xyz>
+          <limit>
+            <upper>0.75</upper>
+            <lower>-0.75</lower>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint type="revolute" name="world_upright">
+        <parent>world</parent>
+        <child>upright</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>1.5707</upper>
+            <lower>-1.5707</lower>
+          </limit>
+        </axis>
+      </joint>
+
+      <plugin name="tire_friction" filename="libTireFrictionPlugin.so">
+        <link_name>wheel</link_name>
+        <collision_name>collision</collision_name>
+      </plugin>
+    </model>
+
+
+    <model name="treadmill_drums">
+      <pose>0 0 -4.0 1.57079632679 0 0</pose>
+
+      <link name="drum">
+        <inertial>
+          <mass>10</mass>
+          <inertia>
+            <ixx>43.3333</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>43.3333</iyy>
+            <iyz>0</iyz>
+            <izz>80.0</izz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>4</radius>
+              <length>2</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>4</radius>
+              <length>2</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Yellow</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <joint type="revolute" name="drum_joint0">
+        <parent>world</parent>
+        <child>drum</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+
+  </world>
+</sdf>
