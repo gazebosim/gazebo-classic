@@ -41,23 +41,23 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
 1. Configure and build sdformat:
 
         cd sdformat
-	hg up win_gerkey
-	mkdir build
-	cd build
+        hg up win_gerkey
+        mkdir build
+        cd build
         ..\configure
-	nmake
-	nmake install
+        nmake
+        nmake install
 
     You should now have an installation of sdformat in gz-ws/sdformat/build/install/Release.
 
 1. Configure and build gazebo:
 
         cd gazebo
-	hg up win_gerkey
-	mkdir build
-	cd build
+        hg up win_gerkey
+        mkdir build
+        cd build
         ..\configure
-	nmake
-	nmake install
+        nmake
+        nmake install
 
     Once this all works (which it currently does not, by a long shot): you should now have an installation of gazebo in gz-ws/sdformat/build/install/Release.
