@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/math/Angle.hh"
 #include "gazebo/gui/building/EditorView.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
@@ -32,6 +33,11 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->editorType = "WallSegment";
   this->scale = BuildingMaker::conversionScale;
 
+  this->measure = new MeasureItem(this->GetStartPoint(),
+                                  this->GetEndPoint());
+  this->measure->setParentItem(this);
+  this->SegmentUpdated();
+
   this->level = 0;
 
   this->wallThickness = 15;
@@ -40,6 +46,7 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetThickness(this->wallThickness);
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
+  this->visual3dTransparency = 0.0;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
@@ -101,6 +108,7 @@ void WallSegmentItem::WallSegmentChanged()
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
+  emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
 
@@ -126,6 +134,22 @@ void WallSegmentItem::UpdateInspector()
 /////////////////////////////////////////////////
 void WallSegmentItem::SegmentUpdated()
 {
+  // distance in px between wall and measure line
+  double d = 20;
+  double t = this->GetThickness()/2;
+
+  QPointF p1 = this->GetStartPoint();
+  QPointF p2 = this->GetEndPoint();
+  double angle = GZ_DTOR(this->line().angle());
+
+  this->measure->SetStartPoint(
+      QPointF(p1.x()+(d+t)*qCos(angle+M_PI/2.0)+t*qCos(angle+M_PI),
+              p1.y()-(d+t)*qSin(angle+M_PI/2.0)-t*qSin(angle+M_PI)));
+  this->measure->SetEndPoint(
+      QPointF(p2.x()+(d+t)*qCos(angle+M_PI/2.0)-t*qCos(angle+M_PI),
+              p2.y()-(d+t)*qSin(angle+M_PI/2.0)+t*qSin(angle+M_PI)));
+  this->measure->SetValue((this->line().length()+2*t)*this->scale);
+
   // Doors, windows...
   QList<QGraphicsItem *> children = this->childItems();
   for (int j = 0; j < children.size(); ++j)
@@ -177,14 +201,18 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
     if (_value.toBool())
     {
       this->ShowHandles(true);
+      this->measure->setVisible(true);
       this->setZValue(5);
       this->SetColor(QColor(247, 142, 30));
+      this->Set3dTransparency(0.0);
     }
     else
     {
       this->ShowHandles(false);
+      this->measure->setVisible(false);
       this->setZValue(0);
       this->SetColor(Qt::black);
+      this->Set3dTransparency(0.5);
     }
     this->WallSegmentChanged();
   }
