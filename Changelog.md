@@ -82,6 +82,10 @@
     * [Pull request #1255](https://bitbucket.org/osrf/gazebo/pull-request/1255)
 1. Added ConvertJointType functions, display more joint info on model list.
     * [Pull request #1259](https://bitbucket.org/osrf/gazebo/pull-request/1259)
+1. Added ModelListWidget::AddProperty, removed unnecessary checks on ModelListWidget.
+    * [Pull request #1271](https://bitbucket.org/osrf/gazebo/pull-request/1271)
+1. Fix loading collada meshes with unsupported input semantics.
+    * [Pull request #1319](https://bitbucket.org/osrf/gazebo/pull-request/1319)
 
 ### Gazebo 4.0.2 (2014-09-23)
 
@@ -186,6 +190,8 @@
 
 1. Fixed sonar and wireless sensor visualization
     * [Pull request #1254](https://bitbucket.org/osrf/gazebo/pull-request/1254)
+1. Update visual bounding box when model is selected
+    * [Pull request #1280](https://bitbucket.org/osrf/gazebo/pull-request/1280)
 
 ### Gazebo 3.1.0 (2014-08-08)
 
