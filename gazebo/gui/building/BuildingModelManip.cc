@@ -348,8 +348,10 @@ int BuildingModelManip::GetLevel() const
 /////////////////////////////////////////////////
 void BuildingModelManip::OnChangeLevel(int _level)
 {
-  if (_level != this->level)
-    this->visual->SetTransparency(0.0);
+  if (this->level > _level)
+    this->SetTransparency(1.0);
+  else if (this->level < _level)
+    this->SetTransparency(0.0);
   else
-    this->visual->SetTransparency(0.4);
+    this->SetTransparency(0.4);
 }
