@@ -1,6 +1,13 @@
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
+
+1. Building Editor.
+  1. Current level is transparent, other levels opaque.
+    * [Pull request #1299](https://bitbucket.org/osrf/gazebo/pull-request/1299)
+
+### Gazebo 4.1.0 (2014-11-20)
 
 1. Add ArrangePlugin for arranging groups of models.
    Also add Model::ResetPhysicsStates to call Link::ResetPhysicsStates
