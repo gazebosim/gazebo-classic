@@ -27,7 +27,15 @@
 1. **gazebo/rendering/UserCamera.hh**
     + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
     + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
-    
+
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Removed:*** public: void ShowRotation(unsigned int _axis)
+    + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
+
+1. **gazebo/rendering/ArrowVisual.hh**
+    + ***Removed:*** public: void ShowRotation()
+    + ***Replacement:*** public: void ShowRotation(bool _show)
+
 ### Deletions
 
 1. **gazebo/physics/Collision.hh**
