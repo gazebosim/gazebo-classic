@@ -127,6 +127,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   //buttonsLayout->addWidget(discardButton);
   buttonsLayout->addWidget(importImageButton);
+  buttonsLayout->setAlignment(Qt::AlignHCenter);
+  buttonsLayout->setContentsMargins(30, 11, 30, 11);
   //buttonsLayout->addWidget(this->saveButton);
 
   // Main layout

@@ -1332,32 +1332,43 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 void BuildingMaker::OnNew()
 {
   QString msg;
+  QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
+  QPushButton *button1;
+  QPushButton *button2;
+  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+
   if (this->saved)
   {
     msg.append("Are you sure you want to close this model and open a new \n"
-               "canvas?");
+               "canvas?\n\n");
+    button1 = msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
   }
   else
   {
     msg.append("You have unsaved changes. Do you want to save this model \n"
-               "and open a new canvas?");
+               "and open a new canvas?\n\n");
+    button1 = msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
+    button2 = msgBox.addButton("Save", QMessageBox::YesRole);
+
   }
-  
   msg.append("Once you open a new canvas, your current model will no longer \n"
              "be editable.");
+  msgBox.setText(msg);
 
-  QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
 
-  QPushButton *newButton = msgBox.addButton("Close and Start New Model",
-                                             QMessageBox::ApplyRole);
-  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
   msgBox.exec();
-  if (msgBox.clickedButton() == newButton)
-  {
+  if (msgBox.clickedButton() != cancelButton){
+    if (!this->saved && msgBox.clickedButton() == button2)
+    {
+      this->OnSave(this->modelName);
+    }
+
     gui::editor::Events::newBuildingModel();
     this->modelName = this->buildingDefaultName;
+    // TODO: Reset values in saveDialog
     this->saveLocation = QDir::homePath().toStdString();
     this->saved = false;
+
   }
 }
 
@@ -1495,7 +1506,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
 
     if (boost::filesystem::exists(modelConfigPath))
     {
-      bool save = this->FileOverwriteDialog(path.string());
+      bool save = this->FileOverwriteDialog(modelConfigPath.string());
       // TODO: same size buttons
       /*
       std::string msg = "A file named " + path.string() + " already exists.\n"
@@ -1558,10 +1569,11 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
     if (iter == modelPaths.end())
     {
-      std::cout << "Adding save location to gazebo model paths" << std::endl;
       // Add it to GAZEBO_MODEL_PATHS
-      gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
+      gazebo::common::SystemPaths::Instance()->
+        AddModelPaths(this->saveLocation);
       //gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
+      // Notify InsertModelWidget
     }
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
