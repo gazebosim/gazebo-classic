@@ -204,7 +204,7 @@
           </geometry>
           <material>
             <script>
-              <name>Gazebo/Yellow</name>
+              <name>Gazebo/Orange</name>
             </script>
           </material>
         </visual>
