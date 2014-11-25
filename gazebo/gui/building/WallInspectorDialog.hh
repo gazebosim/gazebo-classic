@@ -66,10 +66,6 @@ namespace gazebo
       /// \return Wall color.
       public: QColor GetColor() const;
 
-//      /// \brief Get the material of the wall.
-//      /// \return Wall material.
-//      public: std::string GetMaterial() const;
-
       /// \brief Set the name of the wall.
       /// \param[in] _name Name to set the wall to.
       public: void SetName(const std::string &_name);
@@ -98,10 +94,6 @@ namespace gazebo
       /// \brief Set the color of the wall.
       /// \param[in] _color Color.
       public: void SetColor(const QColor _color);
-
-//      /// \brief Set the material of the wall.
-//      /// \param[in] _material New wall material to use.
-//      public: void SetMaterial(const std::string &_material);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -145,9 +137,6 @@ namespace gazebo
 
       /// \brief Vector of color options.
       private: std::vector<QColor> colorList;
-
-//      /// \brief Combo box for selecting the material of the wall to use.
-//      private: QComboBox *materialComboBox;
 
       /// \brief Label that holds the name of the wall.
       private: QLabel* wallNameLabel;

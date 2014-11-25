@@ -128,7 +128,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   this->colorList.push_back(QColor(254, 121,   5, 255));
   this->colorList.push_back(QColor(255, 195,  78, 255));
   this->colorList.push_back(QColor(111, 203, 172, 255));
-  for(unsigned int i = 0; i < this->colorList.size(); i++)
+  for(unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     colorIcon.fill(this->colorList.at(i));
     this->colorComboBox->addItem(colorIcon, QString(""));
@@ -251,6 +251,7 @@ void StairsInspectorDialog::SetColor(const QColor _color)
     if (this->colorList[i] == _color)
     {
       this->colorComboBox->setCurrentIndex(i);
+      break;
     }
   }
 }

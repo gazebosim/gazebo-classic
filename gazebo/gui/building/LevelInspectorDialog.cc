@@ -71,11 +71,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->heightSpinBox->setRange(-1000, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-
-  QLabel *materialLabel = new QLabel(tr("Floor Material: "));
-  this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));*/
+  this->heightSpinBox->setValue(0.000);*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
@@ -83,9 +79,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 /*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
   levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
-  levelLayout->addWidget(this->heightSpinBox, 2, 1);
-  levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
+  levelLayout->addWidget(this->heightSpinBox, 2, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -153,6 +147,7 @@ void LevelInspectorDialog::SetFloorColor(const QColor _color)
     if (this->floorColorList[i] == _color)
     {
       this->floorColorComboBox->setCurrentIndex(i);
+      break;
     }
   }
 }
