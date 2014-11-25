@@ -629,7 +629,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       // is currently selected.
       if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
           !this->selectedVisuals.empty())
-      {        
+      {
         // Deselect model
         this->modelVisual->SetHighlighted(false);
         event::Events::setSelectedEntity("", "normal");
@@ -889,8 +889,8 @@ void ModelCreator::GenerateSDF()
 }
 
 /////////////////////////////////////////////////
-void ModelCreator::OnAlignMode(const std::string &_axis, const std::string &_config,
-    const std::string &_target, bool _preview)
+void ModelCreator::OnAlignMode(const std::string &_axis,
+    const std::string &_config, const std::string &_target, bool _preview)
 {
   // Align links, not visuals
   std::vector<rendering::VisualPtr> selectedLinks;
