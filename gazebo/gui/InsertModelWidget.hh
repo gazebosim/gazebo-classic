@@ -54,6 +54,7 @@ namespace gazebo
 
       /// \brief Callback triggered when a request to update the model database
       /// is received.
+      /// \param[i] _localPath The model path that was updated.
       private: void OnModelUpdateRequest(const std::string &_localPath);
 
       /// \brief Received model selection user input

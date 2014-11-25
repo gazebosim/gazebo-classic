@@ -39,11 +39,6 @@
 using namespace gazebo;
 using namespace gui;
 
-void foo(std::string bar)
-{
-  std::cout << "foo" << std::endl;
-}
-
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
@@ -78,18 +73,9 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
           this, SLOT(OnDirectoryChanged(const QString &)));
 
   // Connect a callback to trigger when the model paths are updated.
-  /*connect(gazebo::common::SystemPaths::Instance(),
-          SIGNAL(ModelUpdateRequest(const std::string &)),
-          this, SLOT(OnModelUpdateRequest(const std::string &)));*/
-
-  /*this->connections.push_back(common::SystemPaths::Instance()->
-        ConnectModelUpdateRequest(
-          boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));*/
-  common::SystemPaths::Instance()->updateModelRequest.Connect(
-    boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1));
-
-  /*common::SystemPaths::Instance()->ConnectModelUpdateRequest(
-          boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1));*/
+  this->connections.push_back(
+          common::SystemPaths::Instance()->updateModelRequest.Connect(
+            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
