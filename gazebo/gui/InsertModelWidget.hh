@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
@@ -73,6 +74,7 @@ namespace gazebo
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
 
+      /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Private data pointer.

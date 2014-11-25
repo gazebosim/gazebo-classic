@@ -34,8 +34,6 @@
 using namespace gazebo;
 using namespace common;
 
-//event::EventT<void (std::string)> updateModelRequest;
-
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
 {
