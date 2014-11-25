@@ -263,8 +263,8 @@ namespace gazebo
       /// \param[in] _saveName Name to save the model.
       private: void OnSaveAs(const std::string &_saveName);
 
-      /// \brief Callback for discarding the model.
-      private: void OnDiscard();
+      /// \brief Callback for newing the model.
+      private: void OnNew();
 
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.

@@ -45,6 +45,12 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
       tipsLabel);
 
+  this->newAct = new QAction(tr("&New"), this->mainWindow);
+  this->newAct->setStatusTip(tr("New"));
+  this->newAct->setShortcut(tr("Ctrl+N"));
+  this->newAct->setCheckable(false);
+  connect(this->newAct, SIGNAL(triggered()), this, SLOT(New()));
+
   this->saveAct = new QAction(tr("&Save"), this->mainWindow);
   this->saveAct->setStatusTip(tr("Save"));
   this->saveAct->setShortcut(tr("Ctrl+S"));
@@ -57,11 +63,11 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->saveAsAct->setCheckable(false);
   connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
-  this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
+  /*this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
   this->discardAct->setStatusTip(tr("Discard"));
   this->discardAct->setShortcut(tr("Ctrl+D"));
   this->discardAct->setCheckable(false);
-  connect(this->discardAct, SIGNAL(triggered()), this, SLOT(Discard()));
+  connect(this->discardAct, SIGNAL(triggered()), this, SLOT(Discard()));*/
 
   this->doneAct = new QAction(tr("Don&e"), this->mainWindow);
   this->doneAct->setShortcut(tr("Ctrl+E"));
@@ -104,9 +110,9 @@ void BuildingEditor::SaveAs()
 }
 
 /////////////////////////////////////////////////
-void BuildingEditor::Discard()
+void BuildingEditor::New()
 {
-  gui::editor::Events::discardBuildingEditor();
+  gui::editor::Events::newBuildingEditor();
 }
 
 /////////////////////////////////////////////////
@@ -139,9 +145,9 @@ void BuildingEditor::CreateMenus()
   this->menuBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
   QMenu *fileMenu = this->menuBar->addMenu(tr("&File"));
+  fileMenu->addAction(this->newAct);
   fileMenu->addAction(this->saveAct);
   fileMenu->addAction(this->saveAsAct);
-  fileMenu->addAction(this->discardAct);
   fileMenu->addAction(this->doneAct);
   fileMenu->addAction(this->exitAct);
 }

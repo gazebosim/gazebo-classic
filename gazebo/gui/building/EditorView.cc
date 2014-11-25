@@ -59,7 +59,7 @@ EditorView::EditorView(QWidget *_parent)
     boost::bind(&EditorView::OnDone, this)));*/
 
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(

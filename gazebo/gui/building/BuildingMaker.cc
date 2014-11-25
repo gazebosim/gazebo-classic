@@ -80,8 +80,8 @@ double BuildingMaker::conversionScale;
   gui::editor::Events::ConnectSaveAsBuildingEditor(
     boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
   this->connections.push_back(
-  gui::editor::Events::ConnectDiscardBuildingEditor(
-    boost::bind(&BuildingMaker::OnDiscard, this)));
+  gui::editor::Events::ConnectNewBuildingEditor(
+    boost::bind(&BuildingMaker::OnNew, this)));
   this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
     boost::bind(&BuildingMaker::OnDone, this, _1)));
@@ -1329,20 +1329,32 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDiscard()
+void BuildingMaker::OnNew()
 {
-  QString msg("Are you sure you want to discard\n"
-              "your model? All of your work will\n"
-              "be lost.");
-  QMessageBox msgBox(QMessageBox::Warning, QString("Discard"), msg);
+  QString msg;
+  if (this->saved)
+  {
+    msg.append("Are you sure you want to close this model and open a new \n"
+               "canvas?");
+  }
+  else
+  {
+    msg.append("You have unsaved changes. Do you want to save this model \n"
+               "and open a new canvas?");
+  }
+  
+  msg.append("Once you open a new canvas, your current model will no longer \n"
+             "be editable.");
 
-  QPushButton *discardButton = msgBox.addButton("Discard",
+  QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
+
+  QPushButton *newButton = msgBox.addButton("Close and Start New Model",
                                              QMessageBox::ApplyRole);
   QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
   msgBox.exec();
-  if (msgBox.clickedButton() == discardButton)
+  if (msgBox.clickedButton() == newButton)
   {
-    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::newBuildingModel();
     this->modelName = this->buildingDefaultName;
     this->saveLocation = QDir::homePath().toStdString();
     this->saved = false;
@@ -1575,7 +1587,7 @@ void BuildingMaker::OnDone(const std::string &_saveName)
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
-    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::newBuildingModel();
     gui::editor::Events::finishBuildingModel();
   }
 }
@@ -1608,16 +1620,16 @@ void BuildingMaker::OnExit()
         "your building will no longer be editable.\n\n");
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
     // Order is don't save, exit, save, cancel
-    QPushButton *discardButton = msgBox.addButton("Don't Save, Exit",
+    QPushButton *newButton = msgBox.addButton("Don't Save, Exit",
                                                   QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
                                                   QMessageBox::NoRole);
     QPushButton *cancelButton = msgBox.addButton("Cancel",
                                                   QMessageBox::YesRole);
     msgBox.exec();
-    if (msgBox.clickedButton() == discardButton)
+    if (msgBox.clickedButton() == newButton)
     {
-      gui::editor::Events::discardBuildingModel();
+      gui::editor::Events::newBuildingModel();
       this->modelName = this->buildingDefaultName;
       this->saveLocation = QDir::homePath().toStdString();
       this->saved = false;
