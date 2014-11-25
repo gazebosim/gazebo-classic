@@ -23,9 +23,9 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
     - [Boost 1.56.0](http://packages.osrfoundation.org/win32/deps/boost_1_56_0.zip)
     - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-8-1.zip)
 
-1. Unzip each of them.
+1. Unzip each of them in gz-ws.
 
-1. Also download and execute the Qt 4.8 installer.  As far as I can tell, this installation is not relocatable, so cannot be put into a .zip and dropped into a local workspace:
+1. Also download and execute the Qt 4.8 installer.  It should end up somewhere like C:\Qt.  As far as I can tell, this installation is not relocatable, so cannot be put into a .zip and dropped into a local workspace:
 
     - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-opensource-windows-x86-vs2010-4.8.6.exe)
 
