@@ -242,14 +242,16 @@ namespace gazebo
         const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
       /// \brief Callback for saving the model.
-      private: void OnSave();
+      /// \param[in] _saveName Name to save the model.
+      private: void OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for discarding the model.
       private: void OnDiscard();
 
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
-      private: void OnDone();
+      /// \param[in] _saveName Name to save the model.
+      private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();

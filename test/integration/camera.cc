@@ -178,7 +178,7 @@ TEST_F(CameraTest, Visible)
   EXPECT_TRUE(!camera->IsVisible(visual->GetName()));
 
   // rotate the camera counter-clockwise to see the box
-  camera->RotateYaw(math::Angle(1.57));
+  camera->Yaw(math::Angle(1.57));
   EXPECT_TRUE(camera->IsVisible(visual));
   EXPECT_TRUE(camera->IsVisible(visual->GetName()));
 

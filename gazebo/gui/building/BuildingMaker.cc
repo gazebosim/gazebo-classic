@@ -55,7 +55,8 @@ double BuildingMaker::conversionScale;
 /////////////////////////////////////////////////
   BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->modelName = "";
+  this->buildingDefaultName = "BuildingDefaultName";
+  this->modelName = this->buildingDefaultName;
 
   this->conversionScale = 0.01;
 
@@ -74,21 +75,19 @@ double BuildingMaker::conversionScale;
 
   this->connections.push_back(
   gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&BuildingMaker::OnSave, this)));
+    boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectDiscardBuildingEditor(
     boost::bind(&BuildingMaker::OnDiscard, this)));
   this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this)));
+    boost::bind(&BuildingMaker::OnDone, this, _1)));
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
   this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
-
-  this->buildingDefaultName = "BuildingDefaultName";
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -124,6 +123,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
+      manip, SLOT(OnTransparencyChanged(float)));
 
   QObject::connect(_item, SIGNAL(WidthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -199,15 +200,16 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
         linkName, this->modelVisual));
   linkVisual->Load();
 
-
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem = this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Orange");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   BuildingModelManip *wallManip = new BuildingModelManip();
@@ -249,8 +251,10 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Blue");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(0, 0, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *windowManip = new BuildingModelManip();
@@ -294,8 +298,10 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Yellow");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 0));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *doorManip = new BuildingModelManip();
@@ -357,8 +363,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visualStepName << visualName.str() << "step" << 0;
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Green");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
   baseStepVisual->SetTransparency(0.4);
 
@@ -369,7 +377,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   math::Vector3 baseOffset(0, 0.5 - run/2.0,
       -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
-
 
   for (int i = 1; i < _steps; ++i)
   {
@@ -411,8 +418,10 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/Orange");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *floorManip = new BuildingModelManip();
@@ -1320,16 +1329,14 @@ void BuildingMaker::OnDiscard()
       QString("Are you sure you want to discard\n"
       "your model? All of your work will\n"
       "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
+      QMessageBox::Yes | QMessageBox::Cancel,
       QMessageBox::Cancel);
 
   switch (ret)
   {
-    case QMessageBox::Discard:
+    case QMessageBox::Yes:
+      this->Reset();
       gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
       break;
     case QMessageBox::Cancel:
     // Do nothing
@@ -1340,11 +1347,13 @@ void BuildingMaker::OnDiscard()
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnSave()
+void BuildingMaker::OnSave(const std::string &_saveName)
 {
+  if (_saveName != "")
+    this->SetModelName(_saveName);
+
   if (this->saved)
   {
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
   }
@@ -1354,27 +1363,30 @@ void BuildingMaker::OnSave()
     this->saveDialog->SetSaveLocation(this->saveLocation);
     if (this->saveDialog->exec() == QDialog::Accepted)
     {
-      this->modelName = this->saveDialog->GetModelName();
+      this->SetModelName(this->saveDialog->GetModelName());
       this->saveLocation = this->saveDialog->GetSaveLocation();
-      this->SetModelName(this->modelName);
       this->GenerateSDF();
       this->SaveToSDF(this->saveLocation);
       this->saved = true;
+      // Send confirmation that model has been saved
+      gui::editor::Events::saveBuildingModel(this->modelName,
+          this->saveLocation);
     }
   }
-  gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDone()
+void BuildingMaker::OnDone(const std::string &_saveName)
 {
+  if (_saveName != "")
+    this->SetModelName(_saveName);
+
   this->finishDialog->SetModelName(this->modelName);
   this->finishDialog->SetSaveLocation(this->saveLocation);
   if (this->finishDialog->exec() == QDialog::Accepted)
   {
-    this->modelName = this->finishDialog->GetModelName();
+    this->SetModelName(this->finishDialog->GetModelName());
     this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
@@ -1386,33 +1398,35 @@ void BuildingMaker::OnDone()
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()
 {
-  int ret = QMessageBox::warning(0, QString("Exit"),
-      QString("Save Changes before exiting? If you do not\n"
-      "save, all of your work will be lost!\n\n"
-      "Note: Building Editor state is not maintained\n"
-      "between Gazebo sessions. Once you quit\n"
-      "Gazebo, your building will no longer be editable.\n\n"),
-//      "If you are done editing your model, select Done\n"),
-      QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-      QMessageBox::Save);
-
-  switch (ret)
+  if (this->allItems.empty())
   {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      gui::editor::Events::finishBuildingModel();
-      break;
-    case QMessageBox::Cancel:
-      break;
-    case QMessageBox::Save:
-      this->OnSave();
-      gui::editor::Events::finishBuildingModel();
-      break;
-    default:
-      break;
+    gui::editor::Events::finishBuildingModel();
+    return;
+  }
+
+  QMessageBox msgBox;
+  msgBox.setWindowTitle("Exit");
+  msgBox.setText("Save changes before exiting? If you do not\n"
+        "save, all of your work will be lost!\n\n"
+        "Note: Once you exit the Building Editor, your\n"
+        "building will no longer be editable.");
+  QPushButton *discardButton = msgBox.addButton("Don't Save, Exit",
+      QMessageBox::ActionRole);
+  msgBox.addButton("Cancel", QMessageBox::ActionRole);
+  QPushButton *doneButton = msgBox.addButton("Save", QMessageBox::ActionRole);
+  msgBox.setDefaultButton(doneButton);
+
+
+  msgBox.exec();
+  if (msgBox.clickedButton() == doneButton)
+  {
+    this->OnDone();
+  }
+  else if (msgBox.clickedButton() == discardButton)
+  {
+    this->Reset();
+    gui::editor::Events::discardBuildingModel();
+    gui::editor::Events::finishBuildingModel();
   }
 }
 

@@ -934,7 +934,7 @@ bool SDFCommand::RunImpl()
   try
   {
     // Initialize the informational logger. This will log warnings and errors.
-    gzLogInit("gzsdf.log");
+    gzLogInit("gz-", "gzsdf.log");
   }
   catch(gazebo::common::Exception &_e)
   {

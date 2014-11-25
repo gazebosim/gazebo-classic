@@ -37,6 +37,7 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Distortion.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
@@ -186,6 +187,12 @@ void Camera::Load()
   {
     this->dataPtr->cmdSub = this->dataPtr->node->Subscribe(
         "~/" + this->GetName() + "/cmd", &Camera::OnCmdMsg, this, true);
+  }
+
+  if (this->sdf->HasElement("distortion"))
+  {
+    this->dataPtr->distortion.reset(new Distortion());
+    this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
   }
 }
 
@@ -569,26 +576,44 @@ void Camera::SetWorldRotation(const math::Quaternion &_quant)
 }
 
 //////////////////////////////////////////////////
-void Camera::Translate(const math::Vector3 &direction)
+void Camera::Translate(const math::Vector3 &_direction)
 {
-  Ogre::Vector3 vec(direction.x, direction.y, direction.z);
-
   this->sceneNode->translate(this->sceneNode->getOrientation() *
-      this->sceneNode->getOrientation() * vec);
+      Conversions::Convert(_direction));
+}
+
+//////////////////////////////////////////////////
+void Camera::Roll(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->pitch(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Yaw(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), _relativeTo);
+}
+
+//////////////////////////////////////////////////
+void Camera::Pitch(const math::Angle &_angle,
+    Ogre::Node::TransformSpace _relativeTo)
+{
+  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()), _relativeTo);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotateYaw(math::Angle _angle)
 {
-  this->sceneNode->roll(Ogre::Radian(_angle.Radian()), Ogre::Node::TS_WORLD);
+  this->Yaw(_angle);
 }
 
 //////////////////////////////////////////////////
 void Camera::RotatePitch(math::Angle _angle)
 {
-  this->sceneNode->yaw(Ogre::Radian(_angle.Radian()));
+  this->Pitch(_angle);
 }
-
 
 //////////////////////////////////////////////////
 void Camera::SetClipDist()
@@ -1326,6 +1351,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
       // this->dataPtr->this->ssaoInstance->setEnabled(false);
     }
 
+    if (this->dataPtr->distortion)
+      this->dataPtr->distortion->SetCamera(shared_from_this());
 
     if (this->GetScene()->skyx != NULL)
       this->renderTarget->addListener(this->GetScene()->skyx);
@@ -1675,4 +1702,10 @@ void Camera::OnCmdMsg(ConstCameraCmdPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->dataPtr->receiveMutex);
   this->dataPtr->commandMsgs.push_back(_msg);
+}
+
+//////////////////////////////////////////////////
+DistortionPtr Camera::GetDistortion() const
+{
+  return this->dataPtr->distortion;
 }
