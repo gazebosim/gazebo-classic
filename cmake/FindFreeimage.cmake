@@ -4,7 +4,7 @@ include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(freeimage freeimage>=${FREEIMAGE_VERSION})
+  pkg_check_modules(freeimage freeimage>=${MIN_FREEIMAGE_VERSION})
   if (NOT freeimage_FOUND)
     message (STATUS "  freeimage.pc not found, trying freeimage_include_dir and freeimage_library_dir flags.")
   endif (NOT freeimage_FOUND)
@@ -23,7 +23,7 @@ if (NOT freeimage_FOUND)
     try_run(FREEIMAGE_RUNS FREEIMAGE_COMPILES ${CMAKE_CURRENT_BINARY_DIR} 
                 ${testFreeImageSource})
     if (NOT FREEIMAGE_RUNS)
-      BUILD_ERROR("Invalid FreeImage Version. Requires ${FREEIMAGE_VERSION}")
+      BUILD_ERROR("Invalid FreeImage Version. Requires ${MIN_FREEIMAGE_VERSION}")
     else (NOT FREEIMAGE_RUNS)
        message (STATUS "  Looking for FreeImage.h - found")
     endif (NOT FREEIMAGE_RUNS)

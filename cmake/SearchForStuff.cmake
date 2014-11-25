@@ -47,12 +47,16 @@ include (FindOpenGL)
 if (NOT OPENGL_FOUND)
   BUILD_ERROR ("Missing: OpenGL")
 else ()
- APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
-                       ${gazeboserver_include_dirs_desc}
-                       ${OPENGL_INCLUDE_DIR})
- APPEND_TO_CACHED_LIST(gazeboserver_link_libs
-                       ${gazeboserver_link_libs_desc}
-                       ${OPENGL_LIBRARIES})
+ if (OPENGL_INCLUDE_DIR)
+   APPEND_TO_CACHED_LIST(gazeboserver_include_dirs
+                         ${gazeboserver_include_dirs_desc}
+                         ${OPENGL_INCLUDE_DIR})
+ endif()
+ if (OPENGL_LIBRARIES)
+   APPEND_TO_CACHED_LIST(gazeboserver_link_libs
+                         ${gazeboserver_link_libs_desc}
+                         ${OPENGL_LIBRARIES})
+ endif()
 endif ()
 
 ########################################
@@ -382,7 +386,7 @@ if (PKG_CONFIG_FOUND)
 
 else (PKG_CONFIG_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Error: pkg-config not found")
+  #BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
 ########################################
@@ -417,7 +421,7 @@ endif()
 find_path(libdl_include_dir dlfcn.h /usr/include /usr/local/include)
 if (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - not found")
-  BUILD_ERROR ("Missing libdl: Required for plugins.")
+  #BUILD_ERROR ("Missing libdl: Required for plugins.")
   set (libdl_include_dir /usr/include)
 else (NOT libdl_include_dir)
   message (STATUS "Looking for dlfcn.h - found")
@@ -426,7 +430,7 @@ endif ()
 find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
-  BUILD_ERROR ("Missing libdl: Required for plugins.")
+  #BUILD_ERROR ("Missing libdl: Required for plugins.")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()
