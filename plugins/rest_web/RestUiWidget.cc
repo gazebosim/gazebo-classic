@@ -24,7 +24,7 @@ using namespace std;
 
 
 
-MOOCUIWidget::MOOCUIWidget(QWidget *_parent,
+RestUiWidget::RestUiWidget(QWidget *_parent,
                             const char* _menuTitle,
                             const char* _loginTitle,
                             const char* _urlLabel,
@@ -35,7 +35,7 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent,
     dialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   
-  cout << "MOOCUIWidget::MOOCUIWidget node setup" << endl;
+  cout << "RestUiWidget::RestUiWidget node setup" << endl;
   node->Init( );
   cout << "advertizing on /gazebo/event/rest_login" << endl;
   pub = node->Advertise<gazebo::msgs::RestLogin>("/gazebo/event/rest_login");
@@ -43,28 +43,28 @@ MOOCUIWidget::MOOCUIWidget(QWidget *_parent,
   cout << "wait for connection..." << endl;
   pub->WaitForConnection();
   cout << "subscribing on /gazebo/event/rest_error" << endl;
-  sub = node->Subscribe("/gazebo/event/rest_error", &MOOCUIWidget::OnResponse, this);
+  sub = node->Subscribe("/gazebo/event/rest_error", &RestUiWidget::OnResponse, this);
   cout << "done" << endl;
 }
  
 
-MOOCUIWidget::~MOOCUIWidget()
+RestUiWidget::~RestUiWidget()
 {
-  cout << "MOOCUIWidget::~MOOCUIWidget()" << endl;
+  cout << "RestUiWidget::~RestUiWidget()" << endl;
 }
 
-void MOOCUIWidget::LoginMOOC()
+void RestUiWidget::LoginMOOC()
 {
   std::cout << "MOOCUI login" << std::endl;
 
   if(dialog.exec() == QDialog::Rejected) {
-    cout << "MOOCUIWidget::Login CANCELLED" << endl;
+    cout << "RestUiWidget::Login CANCELLED" << endl;
   } else {
     gazebo::msgs::RestLogin msg;
     msg.set_url(dialog.getUrl());
     msg.set_username(dialog.getUsername());
     msg.set_password(dialog.getPassword());
-    cout << "MOOCUIWidget::LoginMOOC() Login  [";
+    cout << "RestUiWidget::LoginMOOC() Login  [";
     cout << dialog.getUrl() << ", ";
     cout << dialog.getUsername() << ", ";
     // cout << dialog.getPassword()
@@ -77,7 +77,7 @@ void MOOCUIWidget::LoginMOOC()
 }
 
 
-void MOOCUIWidget::OnResponse(ConstRestErrorPtr &_msg )
+void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg )
 {
   cout << "Error received:" << endl;
   cout << " type: " << _msg->type() << endl;
@@ -89,7 +89,7 @@ void MOOCUIWidget::OnResponse(ConstRestErrorPtr &_msg )
   msgRespQ.push_back(_msg);
 }
 
-void  MOOCUIWidget::Update()
+void  RestUiWidget::Update()
 {
   // Login problem?
   while(!msgRespQ.empty()) {

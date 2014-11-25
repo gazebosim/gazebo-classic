@@ -25,24 +25,24 @@ using namespace gazebo;
 using namespace std;
 
 
-MOOCUIPlugin::MOOCUIPlugin()
+RestUiPlugin::RestUiPlugin()
   :widget(NULL)
 {
   menuTitle = "Web service";
   loginTitle = "Web service login";
   urlLabel = "url";
   defaultUrl = "https://";
-  cout << "MOOCUIPlugin()" << endl;
+  cout << "RestUiPlugin()" << endl;
 }
 
-MOOCUIPlugin::~MOOCUIPlugin()
+RestUiPlugin::~RestUiPlugin()
 {
-  cout << "~MOOCUIPlugin()" << endl;
+  cout << "~RestUiPlugin()" << endl;
 }
 
-void MOOCUIPlugin::Load(int _argc, char ** _argv)
+void RestUiPlugin::Load(int _argc, char ** _argv)
 {
-  cout << "MOOCUIPlugin::Load()" << endl;
+  cout << "RestUiPlugin::Load()" << endl;
   cout << "looking for [menu=, title=, label=, url=" << endl;
   cout << _argc << " args" << endl;
   for (int i=0; i < _argc; i++)
@@ -69,31 +69,31 @@ void MOOCUIPlugin::Load(int _argc, char ** _argv)
   }
 }
 
-void MOOCUIPlugin::Init()
+void RestUiPlugin::Init()
 {
   // Connect to the sensor update event.
   this->connections.push_back(
       gui::Events::ConnectMainWindowReady(
-      boost::bind(&MOOCUIPlugin::OnMainWindowReady, this)));
+      boost::bind(&RestUiPlugin::OnMainWindowReady, this)));
 
   this->connections.push_back(
         event::Events::ConnectPreRender(
-        boost::bind(&MOOCUIPlugin::Update, this)));
+        boost::bind(&RestUiPlugin::Update, this)));
 
-  std::cerr << "MOOCUIPlugin::Init() done" <<  std::endl;
+  std::cerr << "RestUiPlugin::Init() done" <<  std::endl;
 
 }
 
-void MOOCUIPlugin::Update()
+void RestUiPlugin::Update()
 {
   if(widget) {
     widget->Update();
   }
 }
 
-void MOOCUIPlugin::OnMainWindowReady()
+void RestUiPlugin::OnMainWindowReady()
 {
-  cout << "MOOCUIPlugin::OnMainWindowReady()" << endl;
+  cout << "RestUiPlugin::OnMainWindowReady()" << endl;
   // add menu for this plugin
   std::string menuStr("&");
   menuStr += this->menuTitle;
@@ -102,8 +102,8 @@ void MOOCUIPlugin::OnMainWindowReady()
   loginAct->setStatusTip(QString("Login to Mentor 2 Learning Companion"));
   gui::MainWindow *mainWindow = gui::get_main_window();
   // create a global widget instance, to act as a global QT object
-  // the MOOCUIPlugin class is not a QT object
-  widget = new MOOCUIWidget(mainWindow,
+  // the RestUiPlugin class is not a QT object
+  widget = new RestUiWidget(mainWindow,
                             this->menuTitle.c_str(),
                             this->loginTitle.c_str(),
                             this->urlLabel.c_str(),
@@ -114,7 +114,7 @@ void MOOCUIPlugin::OnMainWindowReady()
 }
 
 // Register this plugin with the simulator
-GZ_REGISTER_SYSTEM_PLUGIN(MOOCUIPlugin)
+GZ_REGISTER_SYSTEM_PLUGIN(RestUiPlugin)
 
 
 

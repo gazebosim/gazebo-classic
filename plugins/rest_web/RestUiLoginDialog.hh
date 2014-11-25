@@ -16,8 +16,8 @@
 */
 
 
-#ifndef  _MOOCLOGIN_DIALOG_HH_
-#define _MOOCLOGIN_DIALOG_HH_
+#ifndef  _REST_LOGIN_DIALOG_HH_
+#define  _REST_LOGIN_DIALOG_HH_
 
 #include <gazebo/gui/qt.h>
 #include "gazebo/util/system.hh"
@@ -28,9 +28,9 @@ namespace gazebo
   namespace gui
   {
 
-    class MOOCUIWidget;
+    class RestUiWidget;
 
-    class GAZEBO_VISIBLE MOOCLoginDialog : public QDialog
+    class GAZEBO_VISIBLE RestUiLoginDialog : public QDialog
     {
       Q_OBJECT
         
@@ -39,7 +39,7 @@ namespace gazebo
       /// \param[in] _title the dialog window title bar text
       /// \param[in] _urlLabel the title of the url (ex: super webservice url)
       /// \param[in] _default url text for the url (ex: https://superweb.com)
-      public: MOOCLoginDialog(QWidget *_parent,
+      public: RestUiLoginDialog(QWidget *_parent,
                               const char* _title,
                               const char* _urlLabel,
                               const char* _defautlUrl);

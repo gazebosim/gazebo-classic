@@ -73,7 +73,7 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
 
     /// \brief REST calls
-    private: MOOCRestApi restApi;
+    private: RestApi restApi;
 
     /// \brief a flag to interrupt message processing
     private: bool stopMsgProcessing;

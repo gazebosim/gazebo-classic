@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MOOCUI_WIDGET_HH_
-#define _MOOCUI_WIDGET_HH_
+#ifndef _RestUi_WIDGET_HH_
+#define _RestUi_WIDGET_HH_
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/util/system.hh>
@@ -26,12 +26,12 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE  MOOCUIWidget : public QWidget
+  class GAZEBO_VISIBLE  RestUiWidget : public QWidget
   {
     Q_OBJECT
 
     /// \brief ctor
-    public: MOOCUIWidget(QWidget *_parent,
+    public: RestUiWidget(QWidget *_parent,
                          const char* _menuTitle,
                          const char* _title,
                          const char* _urlLabel,
@@ -39,7 +39,7 @@ namespace gazebo
                         );
 
     /// \brief dtor
-    public: virtual ~MOOCUIWidget();
+    public: virtual ~RestUiWidget();
 
     /// \brief QT callback (MOOC/Login menu) 
     public slots: void LoginMOOC();
@@ -55,7 +55,7 @@ namespace gazebo
     private: gazebo::transport::NodePtr node;
 
     /// \brief login dialog
-    private: gui::MOOCLoginDialog dialog;
+    private: gui::RestUiLoginDialog dialog;
 
     /// \brief Gazebo topics publisher
     private: gazebo::transport::PublisherPtr pub;

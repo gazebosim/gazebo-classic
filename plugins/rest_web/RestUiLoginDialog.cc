@@ -30,10 +30,10 @@ using namespace std;
 
 
 /////////////////////////////////////////////////
-MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent,
-                                                  const char* _title,
-                                                  const char* _urlLabel,
-                                                  const char* _defaultUrl)
+RestUiLoginDialog::RestUiLoginDialog(QWidget *_parent,
+                                     const char* _title,
+                                     const char* _urlLabel,
+                                     const char* _defaultUrl)
     : QDialog(_parent), url(_defaultUrl)
 {
 
@@ -96,7 +96,7 @@ MOOCLoginDialog::MOOCLoginDialog::MOOCLoginDialog(QWidget *_parent,
 }
 
 
-void MOOCLoginDialog::slotAcceptLogin()
+void RestUiLoginDialog::slotAcceptLogin()
 {
   QString user = editUsername->text();
   QString pass = editPassword->text();
@@ -111,7 +111,7 @@ void MOOCLoginDialog::slotAcceptLogin()
 
   std::string msg;  
 
-//  cout << "MOOCLoginDialog::slotAcceptLogin" << endl;
+//  cout << "RestUiLoginDialog::slotAcceptLogin" << endl;
 //  cout << "  URL: " << url << endl;
 //  cout << "  USER: " << username << endl;
 //  cout << "  password: " << password <<  endl; 

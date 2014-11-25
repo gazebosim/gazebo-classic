@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MOOCUI_PLUGIN_HH_
-#define _MOOCUI_PLUGIN_HH_
+#ifndef _REST_UI_PLUGIN_HH_
+#define _REST_UI_PLUGIN_HH_
 
 
 #include <gazebo/gazebo.hh>
@@ -28,13 +28,13 @@
 namespace gazebo
 {
 
-  class GAZEBO_VISIBLE MOOCUIPlugin : public SystemPlugin
+  class GAZEBO_VISIBLE RestUiPlugin : public SystemPlugin
   {
     /// \brief ctor
-    public: MOOCUIPlugin();
+    public: RestUiPlugin();
 
     /// \brief dtor
-    public: virtual ~MOOCUIPlugin();
+    public: virtual ~RestUiPlugin();
 
     /// \brief called when plugin is loaded
     public: virtual void Load(int _argc, char **_argv);
@@ -64,7 +64,7 @@ namespace gazebo
     private: std::string defaultUrl;
 
     /// \brief the widget    
-    private: MOOCUIWidget *widget;
+    private: RestUiWidget *widget;
   };
 }
 

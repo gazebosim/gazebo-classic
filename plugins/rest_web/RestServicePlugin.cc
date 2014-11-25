@@ -169,7 +169,7 @@ void SimpleMOOCPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += "}";
     }
     event += "}";
-    restApi.PostLearningEvent(_msg->route().c_str(), event.c_str());
+    restApi.PostJsonData(_msg->route().c_str(), event.c_str());
   }
   catch(RestException &x)
   {
@@ -228,7 +228,7 @@ void SimpleMOOCPlugin::ProcessMOOCEvent(ConstRestPostPtr _msg)
   // this is executed asynchronously
   try
   {
-    restApi.PostLearningEvent(_msg->route().c_str(), _msg->json().c_str());
+    restApi.PostJsonData(_msg->route().c_str(), _msg->json().c_str());
   }
   catch(RestException &x)
   {

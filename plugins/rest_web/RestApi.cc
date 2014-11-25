@@ -154,19 +154,19 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 }
 
 
-MOOCRestApi::MOOCRestApi()
+RestApi::RestApi()
   :isLoggedIn(false)
 {
   cout << "REST ready!!!!!!!" <<endl;
 }
 
-MOOCRestApi::~MOOCRestApi()
+RestApi::~RestApi()
 {
   curl_global_cleanup();
 }
 
 
-void MOOCRestApi::PostLearningEvent(const char* _route, const char *_json)
+void RestApi::PostJsonData(const char* _route, const char *_json)
 {
   string resp;
   Post post;
@@ -176,7 +176,7 @@ void MOOCRestApi::PostLearningEvent(const char* _route, const char *_json)
   SendUnpostedPosts();
 }
 
-std::string MOOCRestApi::Login(const char* urlStr, const char *route, const char* userStr, const char* passStr)
+std::string RestApi::Login(const char* urlStr, const char *route, const char* userStr, const char* passStr)
 {
   this->isLoggedIn = false;
   this->url = urlStr;
@@ -192,9 +192,9 @@ std::string MOOCRestApi::Login(const char* urlStr, const char *route, const char
   return resp;
 }
 
-void MOOCRestApi::SendUnpostedPosts()
+void RestApi::SendUnpostedPosts()
 {
-  cout << "MOOCRestApi::SendUnpostedPosts() isLoggedIn " << this->isLoggedIn << endl;
+  cout << "RestApi::SendUnpostedPosts() isLoggedIn " << this->isLoggedIn << endl;
   if(this->isLoggedIn)
   {
     cout << posts.size() << " post(s) to send" <<endl;
@@ -213,7 +213,7 @@ void MOOCRestApi::SendUnpostedPosts()
   }
 }
 
-std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
+std::string RestApi::Request(const char* _reqUrl, const char* _postJsonStr)
 {
 
   if(this->url.empty())
@@ -228,7 +228,7 @@ std::string MOOCRestApi::Request(const char* _reqUrl, const char* _postJsonStr)
   // in case things go wrong 
   if(trace_requests)
   {
-    cout << "MOOCRestApi::Request" << endl;
+    cout << "RestApi::Request" << endl;
     cout << "  path: " << path << endl;
     cout << "  data: " << _postJsonStr << endl;
     cout << endl;
