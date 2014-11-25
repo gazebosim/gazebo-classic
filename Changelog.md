@@ -63,6 +63,9 @@
 1. Added a ConfigWidget class that takes in a google protobuf message and generates widgets for configuring the fields in the message
     * [Pull request #1285](https://bitbucket.org/osrf/gazebo/pull-request/1285)
 
+1. Added GLWidget::OnModelEditor when model editor is triggered, and MainWindow::OnEditorGroup to manually uncheck editor actions.
+    * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
