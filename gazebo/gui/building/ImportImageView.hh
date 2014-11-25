@@ -70,6 +70,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseMoveEvent(QMouseEvent *_event);
 
+      /// \brief Qt mouse press event.
+      /// \param[in] _event Qt mouse event.
+      private: void mousePressEvent(QMouseEvent *_event);
+
       /// \brief Qt mouse release event.
       /// \param[in] _event Qt mouse event.
       private: void mouseReleaseEvent(QMouseEvent *_event);

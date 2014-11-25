@@ -118,6 +118,15 @@ void ModelCreator::OnEdit(bool _checked)
     MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
     MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
     this->jointMaker->Stop();
+
+    if (!this->selectedVisuals.empty())
+    {
+      for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+      {
+        this->selectedVisuals[i]->SetHighlighted(false);
+      }
+      this->selectedVisuals.clear();
+    }
   }
 }
 
@@ -584,7 +593,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     if (this->allParts.find(vis->GetName()) == this->allParts.end())
     {
       // Prevent interaction with other models, send event only to
-      // OrbitViewController
+      // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
     }
@@ -680,7 +689,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
       g_alignAct->setEnabled(false);
 
       // Prevent interaction with other models, send event only to
-      // OrbitViewController
+      // user camera
       userCamera->HandleMouseEvent(_event);
       return true;
     }
@@ -703,7 +712,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
       if (this->allParts.find(vis->GetName()) == this->allParts.end())
       {
         // Prevent interaction with other models, send event only to
-        // OrbitViewController
+        // user camera
         QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
         userCamera->HandleMouseEvent(_event);
         return true;

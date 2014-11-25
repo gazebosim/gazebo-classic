@@ -608,9 +608,6 @@ namespace gazebo
       /// \brief Cached list of collisions. This is here for performance.
       private: Collision_V collisions;
 
-      /// \brief scale of the link.
-      private: math::Vector3 scale;
-
 #ifdef HAVE_OPENAL
       /// \brief All the audio sources
       private: std::vector<util::OpenALSourcePtr> audioSources;

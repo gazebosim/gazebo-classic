@@ -48,8 +48,6 @@ GAZEBO_VISIBLE
 QAction *gazebo::gui::g_dataLoggerAct = 0;
 
 GAZEBO_VISIBLE
-QAction *gazebo::gui::g_newModelAct = 0;
-GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetModelsAct = 0;
 GAZEBO_VISIBLE
 QAction *gazebo::gui::g_resetWorldAct = 0;

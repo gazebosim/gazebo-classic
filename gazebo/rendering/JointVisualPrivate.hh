@@ -31,6 +31,9 @@ namespace gazebo
     {
       /// \brief The visual used to draw the joint.
       public: AxisVisualPtr axisVisual;
+
+      /// \brief Second joint visual for hinge2 and universal joints.
+      public: JointVisualPtr parentAxisVis;
     };
   }
 }
