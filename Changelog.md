@@ -57,6 +57,9 @@
 1. Added accessor for MainWindow graphical widget to GuiIface.
     * [Pull request #1250](https://bitbucket.org/osrf/gazebo/pull-request/1250)
 
+1. Added color picker and related functions to inspector dialogs on Building Editor.
+    * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
+
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
