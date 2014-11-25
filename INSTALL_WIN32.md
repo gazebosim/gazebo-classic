@@ -1,6 +1,6 @@
 # Installation on Windows
 
-This documentation describes how to set up a workspace for trying to compile Gazebo on Windows.  It doesn't actually work yet.
+This documentation describes how to set up a workspace for trying to compile Gazebo on Windows.  It does not actually work yet.
 
 ## Supported compilers
 
@@ -21,11 +21,11 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
 
     - [Protobuf 2.6.0](http://packages.osrfoundation.org/win32/deps/protobuf-2.6.0-win64-vc12.zip)
     - [Boost 1.56.0](http://packages.osrfoundation.org/win32/deps/boost_1_56_0.zip)
-    - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-9-1.zip)
+    - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-8-1.zip)
 
 1. Unzip each of them.
 
-1. Also download and execute the Qt 4.8 installer.  As far as I can tell, this installation is not relocatable, so can't be put into a .zip and dropped into a local workspace:
+1. Also download and execute the Qt 4.8 installer.  As far as I can tell, this installation is not relocatable, so cannot be put into a .zip and dropped into a local workspace:
 
     - [Qt 4.8.6](http://packages.osrfoundation.org/win32/deps/qt-opensource-windows-x86-vs2010-4.8.6.exe)
 
@@ -34,7 +34,7 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
         hg clone https://bitbucket.org/osrf/sdformat
         hg clone https://bitbucket.org/osrf/gazebo
 
-1. Load your compiler setup, e.g. (note that we're asking for the 64-bit toolchain here):
+1. Load your compiler setup, e.g. (note that we are asking for the 64-bit toolchain here):
 
         "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x86_amd64
 

@@ -168,6 +168,7 @@ if (PKG_CONFIG_FOUND)
     BUILD_ERROR("Missing: tinyxml")
   endif()
 
+  if (NOT WIN32)
   #################################################
   # Find libtar.
   find_path (libtar_INCLUDE_DIRS libtar.h)
@@ -190,6 +191,7 @@ if (PKG_CONFIG_FOUND)
 
   if (NOT LIBTAR_FOUND)
      BUILD_ERROR("Missing: libtar")
+  endif()
   endif()
 
   #################################################
