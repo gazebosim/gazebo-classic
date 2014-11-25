@@ -1581,7 +1581,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     {
       // Add it to GAZEBO_MODEL_PATHS
       gazebo::common::SystemPaths::Instance()->
-        AddModelPaths(this->saveLocation);
+        AddModelPathsUpdate(this->saveLocation);
       //gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
       // Notify InsertModelWidget
     }
