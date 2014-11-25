@@ -138,6 +138,12 @@
         <axis>
           <xyz>0 0 1</xyz>
         </axis>
+
+        <sensor name="force_torque" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>30</update_rate>
+        </sensor>
       </joint>
 
       <joint type="revolute" name="upright_axel">
