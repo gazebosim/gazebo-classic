@@ -63,8 +63,58 @@
 1. Added a ConfigWidget class that takes in a google protobuf message and generates widgets for configuring the fields in the message
     * [Pull request #1285](https://bitbucket.org/osrf/gazebo/pull-request/1285)
 
-1. Added color picker and related functions to inspector dialogs on Building Editor.
-    * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
+1. Building editor updates
+    1. Fixed inspector resizing.
+        * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)
+        * [Issue #395](https://bitbucket.org/osrf/gazebo/issue/395)
+
+    1. Doors and windows move proportionally with wall.
+        * [Pull request #1231](https://bitbucket.org/osrf/gazebo/pull-request/1231)
+        * [Issue #368](https://bitbucket.org/osrf/gazebo/issue/368)
+
+    1. Inspector dialogs stay on top.
+        * [Pull request #1229](https://bitbucket.org/osrf/gazebo/pull-request/1229)
+        * [Issue #417](https://bitbucket.org/osrf/gazebo/issue/417)
+
+    1. Make model name editable on palette.
+        * [Pull request #1239](https://bitbucket.org/osrf/gazebo/pull-request/1239)
+
+    1. Import background image and improve add/delete levels.
+        * [Pull request #1214](https://bitbucket.org/osrf/gazebo/pull-request/1214)
+        * [Issue #422](https://bitbucket.org/osrf/gazebo/issue/422)
+        * [Issue #361](https://bitbucket.org/osrf/gazebo/issue/361)
+
+    1. Fix changing draw mode.
+        * [Pull request #1233](https://bitbucket.org/osrf/gazebo/pull-request/1233)
+        * [Issue #405](https://bitbucket.org/osrf/gazebo/issue/405)
+
+    1. Tips on palette's top-right corner.
+        * [Pull request #1241](https://bitbucket.org/osrf/gazebo/pull-request/1241)
+
+    1. New buttons and layout for the palette.
+        * [Pull request #1242](https://bitbucket.org/osrf/gazebo/pull-request/1242)
+
+    1. Individual wall segments instead of polylines.
+        * [Pull request #1246](https://bitbucket.org/osrf/gazebo/pull-request/1246)
+        * [Issue #389](https://bitbucket.org/osrf/gazebo/issue/389)
+        * [Issue #415](https://bitbucket.org/osrf/gazebo/issue/415)
+
+    1. Fix exiting and saving, exiting when there's nothing drawn, fix text on popups.
+        * [Pull request #1296](https://bitbucket.org/osrf/gazebo/pull-request/1296)
+
+    1. Display measure for selected wall segment.
+        * [Pull request #1291](https://bitbucket.org/osrf/gazebo/pull-request/1291)
+        * [Issue #366](https://bitbucket.org/osrf/gazebo/issue/366)
+
+    1. Highlight selected item's 3D visual.
+        * [Pull request #1292](https://bitbucket.org/osrf/gazebo/pull-request/1292)
+
+    1. Added color picker to inspector dialogs.
+        * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
+
+1. Model editor updates
+    1. Fix adding/removing event filters .
+        * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
 
 ## Gazebo 4.0
 
