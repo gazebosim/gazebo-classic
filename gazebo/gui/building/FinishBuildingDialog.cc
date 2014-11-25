@@ -60,19 +60,13 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
-  // Try to get path to ~
+  // Try to get path to home folder
   const char* home_cstr = getenv("HOME");
-  if (!home_cstr)
-  {
-    // Dubious...?
-    //this->modelLocationLineEdit->setText(tr("ERROR: home folder not found."));
-    /*gazebo::common::gzwarn << "Home folder not found. Please choose a path for model data." <<
-              std::endl;*/
-  }
-  else
+  if (home_cstr)
   {
     this->modelLocationLineEdit->setText(tr(home_cstr));
   }
+  
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
@@ -125,31 +119,47 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   gridLayout->addWidget(modelLabel, 0, 0);
   gridLayout->addWidget(modelNameLineEdit, 0, 1);
 
+  QRadioButton *advancedOptionsCollapser = new QRadioButton();
+  advancedOptionsCollapser->setChecked(true);
+  advancedOptionsCollapser->setText("Advanced Options");
+  // initialize as "closed" (unchecked)
+  // Button behavior: when "open", show advancedOptionsGrid
+  connect(advancedOptionsCollapser, SIGNAL(toggled(bool)), this,
+           SLOT(ToggleAdvancedOptions(bool)));
+
+  QHBoxLayout *advancedOptions = new QHBoxLayout();
+  advancedOptions->addWidget(advancedOptionsCollapser);
+
   // Advanced options
-  QGridLayout *advancedOptionsGrid;
-  advancedOptionsGrid->addWidget(modelHeader, 2, 0);
-  advancedOptionsGrid->addWidget(modelVersion, 3, 0);
-  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 3, 1);
-  advancedOptionsGrid->addWidget(modelDescription, 4, 0);
-  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 4, 1);
+  QGridLayout *advancedOptionsGrid = new QGridLayout();
+  advancedOptionsGrid->addWidget(modelHeader, 0, 0);
+  advancedOptionsGrid->addWidget(modelVersion, 1, 0);
+  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 1, 1);
+  advancedOptionsGrid->addWidget(modelDescription, 2, 0);
+  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 2, 1);
 
-  advancedOptionsGrid->addWidget(authorHeader, 5, 0);
-  advancedOptionsGrid->addWidget(modelAuthorName, 6, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 6, 1);
-  advancedOptionsGrid->addWidget(modelAuthorEmail, 7, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 7, 1);
+  advancedOptionsGrid->addWidget(authorHeader, 3, 0);
+  advancedOptionsGrid->addWidget(modelAuthorName, 4, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 4, 1);
+  advancedOptionsGrid->addWidget(modelAuthorEmail, 5, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 5, 1);
 
-  advancedOptionsGrid->addWidget(fileHeader, 8, 0);
-  advancedOptionsGrid->addWidget(modelFolderName, 9, 0);
-  advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 9, 1);
-  advancedOptionsGrid->addWidget(modelLocation, 10, 0);
-  advancedOptionsGrid->addWidget(this->modelLocationLineEdit, 10, 1);
-  advancedOptionsGrid->addWidget(browseButton, 10, 2);
+  advancedOptionsGrid->addWidget(fileHeader, 6, 0);
+  advancedOptionsGrid->addWidget(modelFolderName, 7, 0);
+  advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 7, 1);
+  advancedOptionsGrid->addWidget(modelLocation, 8, 0);
+  advancedOptionsGrid->addWidget(this->modelLocationLineEdit, 8, 1);
+  advancedOptionsGrid->addWidget(browseButton, 8, 2);
   
+  this->advancedOptionsWidget = new QWidget();
+  this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
   mainLayout->addLayout(gridLayout);
+
+  mainLayout->addLayout(advancedOptions);
+  mainLayout->addWidget(this->advancedOptionsWidget);
 //  if (_mode == MODEL_FINISH)
 //    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
@@ -236,4 +246,17 @@ void FinishBuildingDialog::OnCancel()
 void FinishBuildingDialog::OnFinish()
 {
   this->accept();
+}
+
+/////////////////////////////////////////////////
+void FinishBuildingDialog::ToggleAdvancedOptions(bool _checked)
+{
+  if (_checked)
+  {
+    this->advancedOptionsWidget->show();
+  }
+  else
+  {
+    this->advancedOptionsWidget->hide();
+  }
 }

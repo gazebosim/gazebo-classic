@@ -97,6 +97,12 @@ namespace gazebo
       /// \brief Qt callback when the Done button is pressed.
       private slots: void OnFinish();
 
+      /// \brief Qt callback to show/hide advanced model saving options.
+      private slots: void ToggleAdvancedOptions(bool _checked);
+
+      /// \brief Widget container to hold advanced model saving options.
+      private: QWidget *advancedOptionsWidget;
+
       /// \brief Editable line that holds the model name.
       private: QLineEdit* modelNameLineEdit;
 
