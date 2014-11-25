@@ -45,21 +45,29 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   }
 
   QLabel *modelLabel = new QLabel;
-  modelLabel->setText(tr("Name"));
+  modelLabel->setText(tr("Name: "));
   this->modelNameLineEdit = new QLineEdit;
-  this->modelNameLineEdit->setText(tr("Human readable name"));
+  //this->modelNameLineEdit->setText(tr("Human readable name"));
 
-  // Advanced options
-  // TODO: setting proper default values
+  // TODO: Advanced options
+  // TODO: setting proper default values?
+
+  QLabel *modelHeader = new QLabel;
+  modelHeader->setText(tr("<b>Model</b>"));
+  QLabel *fileHeader = new QLabel;
+  fileHeader->setText(tr("<b>File</b>"));
+
   QLabel *modelLocation = new QLabel;
-  modelLocation->setText(tr("Location"));
+  modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
   // Try to get path to ~
   const char* home_cstr = getenv("HOME");
   if (!home_cstr)
   {
-    // Dubious...
-    this->modelLocationLineEdit->setText(tr("ERROR: home folder not found."));
+    // Dubious...?
+    //this->modelLocationLineEdit->setText(tr("ERROR: home folder not found."));
+    /*gazebo::common::gzwarn << "Home folder not found. Please choose a path for model data." <<
+              std::endl;*/
   }
   else
   {
@@ -68,27 +76,27 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
-  QLabel *authorText = new QLabel;
-  authorText->setText(tr("Author"));
+  QLabel *authorHeader = new QLabel;
+  authorHeader->setText(tr("<b>Author</b>"));
   QLabel *modelAuthorName = new QLabel;
-  modelAuthorName->setText(tr("Name"));
+  modelAuthorName->setText(tr("  Name:"));
   this->modelAuthorNameLineEdit = new QLineEdit;
   QLabel *modelAuthorEmail = new QLabel;
-  modelAuthorEmail->setText(tr("Email"));
+  modelAuthorEmail->setText(tr("  Email:"));
   this->modelAuthorEmailLineEdit = new QLineEdit;
 
   QLabel *modelVersion = new QLabel;
-  modelVersion->setText(tr("Version"));
+  modelVersion->setText(tr("  Version:"));
   this->modelVersionLineEdit = new QLineEdit;
   this->modelVersionLineEdit->setText(tr("1.0"));
 
   QLabel *modelDescription = new QLabel;
-  modelDescription->setText(tr("Description"));
+  modelDescription->setText(tr("  Description:"));
   this->modelDescriptionLineEdit = new QLineEdit;
 
   // TODO: auto-generate filename, note about no spaces?
   QLabel *modelFolderName = new QLabel;
-  modelFolderName->setText(tr("FolderName"));
+  modelFolderName->setText(tr("  Name:"));
   this->modelFolderNameLineEdit = new QLineEdit;
   this->modelFolderNameLineEdit->setText(tr("folder_name_for_model"));
 
@@ -118,23 +126,25 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   gridLayout->addWidget(modelNameLineEdit, 0, 1);
 
   // Advanced options
+  QGridLayout *advancedOptionsGrid;
+  advancedOptionsGrid->addWidget(modelHeader, 2, 0);
+  advancedOptionsGrid->addWidget(modelVersion, 3, 0);
+  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 3, 1);
+  advancedOptionsGrid->addWidget(modelDescription, 4, 0);
+  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 4, 1);
 
-  gridLayout->addWidget(authorText, 1, 0);
-  gridLayout->addWidget(modelAuthorName, 2, 0);
-  gridLayout->addWidget(this->modelAuthorNameLineEdit, 2, 1);
-  gridLayout->addWidget(modelAuthorEmail, 3, 0);
-  gridLayout->addWidget(this->modelAuthorEmailLineEdit, 3, 1);
+  advancedOptionsGrid->addWidget(authorHeader, 5, 0);
+  advancedOptionsGrid->addWidget(modelAuthorName, 6, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 6, 1);
+  advancedOptionsGrid->addWidget(modelAuthorEmail, 7, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 7, 1);
 
-  gridLayout->addWidget(modelVersion, 4, 0);
-  gridLayout->addWidget(this->modelVersionLineEdit, 4, 1);
-  gridLayout->addWidget(modelDescription, 5, 0);
-  gridLayout->addWidget(this->modelDescriptionLineEdit, 5, 1);
-
-  gridLayout->addWidget(modelFolderName, 6, 0);
-  gridLayout->addWidget(this->modelFolderNameLineEdit, 6, 1);
-  gridLayout->addWidget(modelLocation, 7, 0);
-  gridLayout->addWidget(this->modelLocationLineEdit, 7, 1);
-  gridLayout->addWidget(browseButton, 7, 2);
+  advancedOptionsGrid->addWidget(fileHeader, 8, 0);
+  advancedOptionsGrid->addWidget(modelFolderName, 9, 0);
+  advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 9, 1);
+  advancedOptionsGrid->addWidget(modelLocation, 10, 0);
+  advancedOptionsGrid->addWidget(this->modelLocationLineEdit, 10, 1);
+  advancedOptionsGrid->addWidget(browseButton, 10, 2);
   
 
   QVBoxLayout *mainLayout = new QVBoxLayout;

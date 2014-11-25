@@ -1335,28 +1335,6 @@ void BuildingMaker::OnDiscard()
     this->saveLocation = QDir::homePath().toStdString();
     this->saved = false;
   }
-
-  /*int ret = QMessageBox::warning(0, QString("Discard"),
-      QString("Are you sure you want to discard\n"
-      "your model? All of your work will\n"
-      "be lost."),
-      QMessageBox::Discard | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-
-  switch (ret)
-  {
-    case QMessageBox::Discard:
-      gui::editor::Events::discardBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
-      this->saved = false;
-      break;
-    case QMessageBox::Cancel:
-    // Do nothing
-    break;
-    default:
-    break;
-  }*/
 }
 
 void BuildingMaker::SaveModelFiles()
@@ -1494,18 +1472,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
         this->OnSaveAs(_saveName);
         return;
       }
-
-      /*switch (ret)
-      {
-        case QMessageBox::Save:
-          // Do nothing
-          break;
-        case QMessageBox::Cancel:
-          this->OnSaveAs(_saveName);
-          return;
-        default:
-          break;
-      }*/
     }
 
     std::ofstream savefile;
@@ -1522,8 +1488,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     this->saved = true;
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
   }
-  // hmm...?
-
 }
 
 /////////////////////////////////////////////////
@@ -1598,25 +1562,5 @@ void BuildingMaker::OnExit()
       this->OnSave();
       gui::editor::Events::finishBuildingModel();
     }
-    /*int ret = QMessageBox::warning(0, QString("Exit"),
-        QString("Save Changes before exiting? If you do not\n"
-        "save, all of your work will be lost!\n\n"
-        "Note: Once you exit the Building Editor, \n"
-        "your building will no longer be editable.\n\n"),
-  //      "If you are done editing your model, select Done\n"),
-        QMessageBox::Discard | QMessageBox::Cancel | QMessageBox::Save,
-        QMessageBox::Save);
-
-    switch (ret)
-    {
-      case QMessageBox::Discard:
-        break;
-      case QMessageBox::Cancel:
-        break;
-      case QMessageBox::Save:
-        break;
-      default:
-        break;
-    }*/
   }
 }
