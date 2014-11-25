@@ -1381,7 +1381,7 @@ void BuildingMaker::SaveModelFiles()
 
 bool BuildingMaker::FileOverwriteDialog(const std::string pathName)
 {
-  std::string msg = "A file named " + pathName + " already exists.\n"
+  std::string msg = "A file named " + pathName + " already exists.\n\n"
                     "Do you wish to overwrite the existing file?\n";
   QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
                      QString(msg.c_str()));
@@ -1626,8 +1626,7 @@ void BuildingMaker::OnExit()
   }
   else
   {
-    QString msg("Save Changes before exiting? If you do not\n"
-        "save, all of your work will be lost!\n\n"
+    QString msg("Save Changes before exiting?\n\n"
         "Note: Once you exit the Building Editor, \n"
         "your building will no longer be editable.\n\n");
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
