@@ -253,35 +253,25 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
 /////////////////////////////////////////////////
 void EditorView::mouseReleaseEvent(QMouseEvent *_event)
 {
-  switch (this->drawMode)
+  if (this->drawMode == WALL)
   {
-    case NONE:
-      break;
-    case WALL:
-      this->DrawWall(_event->pos());
-      break;
-    case WINDOW:
-      if (this->drawInProgress)
+    this->DrawWall(_event->pos());
+  }
+  else if (this->drawMode != NONE)
+  {
+    if (this->drawInProgress)
+    {
+      if (this->drawMode == WINDOW)
       {
         this->windowList.push_back(dynamic_cast<WindowItem *>(
             this->currentMouseItem));
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-      break;
-    case DOOR:
-      if (this->drawInProgress)
+      else if (this->drawMode == DOOR)
       {
         this->doorList.push_back(dynamic_cast<DoorItem *>(
             this->currentMouseItem));
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-      break;
-    case STAIRS:
-      if (this->drawInProgress)
+      else if (this->drawMode == STAIRS)
       {
         this->stairsList.push_back(dynamic_cast<StairsItem *>(
             this->currentMouseItem));
@@ -291,12 +281,16 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
           this->buildingMaker->AttachManip(this->itemToVisualMap[item],
               this->itemToVisualMap[floorList[this->currentLevel]]);
         }
-        this->drawMode = NONE;
-        this->drawInProgress = false;
-        gui::editor::Events::createBuildingEditorItem(std::string());
       }
-    default:
-      break;
+
+      // Select -> deselect to trigger change
+      this->currentMouseItem->setSelected(true);
+      this->currentMouseItem->setSelected(false);
+
+      this->drawMode = NONE;
+      this->drawInProgress = false;
+      gui::editor::Events::createBuildingEditorItem(std::string());
+    }
   }
 
   if (!this->drawInProgress)

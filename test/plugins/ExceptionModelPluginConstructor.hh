@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2014 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,26 @@
  * limitations under the License.
  *
 */
-
-#ifndef _JOINTVISUAL_PRIVATE_HH_
-#define _JOINTVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_EXCEPTION_MODEL_PLUGIN_CONSTRUCTOR_HH_
+#define _GAZEBO_EXCEPTION_MODEL_PLUGIN_CONSTRUCTOR_HH_
 
 #include <string>
-#include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/rendering/VisualPrivate.hh"
+
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/gazebo.hh"
 
 namespace gazebo
 {
-  namespace rendering
+  class ExceptionModelPluginConstructor : public ModelPlugin
   {
-    /// \brief Private data for the Joint Visual class.
-    class JointVisualPrivate : public VisualPrivate
-    {
-      /// \brief The visual used to draw the joint.
-      public: AxisVisualPtr axisVisual;
+    /// \brief Constructor
+    public: ExceptionModelPluginConstructor();
 
-      /// \brief Second joint visual for hinge2 and universal joints.
-      public: JointVisualPtr parentAxisVis;
-    };
-  }
+    /// \brief Destructor
+    public: virtual ~ExceptionModelPluginConstructor();
+
+    // Documentation inherited
+    public: virtual void Load(physics::ModelPtr _mode, sdf::ElementPtr _sdf);
+  };
 }
 #endif

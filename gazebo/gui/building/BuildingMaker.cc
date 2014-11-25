@@ -123,6 +123,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
+      manip, SLOT(OnTransparencyChanged(float)));
 
   QObject::connect(_item, SIGNAL(WidthChanged(double)),
       manip, SLOT(OnWidthChanged(double)));
@@ -198,15 +200,16 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
         linkName, this->modelVisual));
   linkVisual->Load();
 
-
   std::ostringstream visualName;
   visualName << this->modelName << "::" << linkName << "::Visual";
   rendering::VisualPtr visVisual(new rendering::Visual(visualName.str(),
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   math::Vector3 scaledSize = BuildingMaker::ConvertSize(_size);
   BuildingModelManip *wallManip = new BuildingModelManip();
@@ -246,8 +249,10 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/BlueTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(0, 0, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *windowManip = new BuildingModelManip();
@@ -289,8 +294,10 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/YellowTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 0));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *doorManip = new BuildingModelManip();
@@ -349,8 +356,10 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visualStepName << visualName.str() << "step" << 0;
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/GreenTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   baseStepVisual->Load(visualElem);
 
   double rise = 1.0 / dSteps;
@@ -360,7 +369,6 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   math::Vector3 baseOffset(0, 0.5 - run/2.0,
       -0.5 + rise/2.0);
   baseStepVisual->SetPosition(baseOffset);
-
 
   for (int i = 1; i < _steps; ++i)
   {
@@ -402,8 +410,10 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
-  visualElem->GetElement("material")->GetElement("script")
-      ->GetElement("name")->Set("Gazebo/OrangeTransparent");
+  visualElem->GetElement("material")->ClearElements();
+  visualElem->GetElement("material")->AddElement("ambient")
+      ->Set(gazebo::common::Color(1, 1, 1));
+  visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
   BuildingModelManip *floorManip = new BuildingModelManip();
@@ -1397,7 +1407,7 @@ bool BuildingMaker::FileOverwriteDialog(const std::string pathName)
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
   if (this->saved)
   {
@@ -1584,7 +1594,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
 void BuildingMaker::OnDone(const std::string &_saveName)
 {
   if (_saveName != "")
-    this->modelName = _saveName;
+    this->SetModelName(_saveName);
 
   this->finishDialog->SetModelName(this->modelName);
   if (this->saveLocation.length() > 0)
@@ -1593,9 +1603,8 @@ void BuildingMaker::OnDone(const std::string &_saveName)
   }
   if (this->finishDialog->exec() == QDialog::Accepted)
   {
-    this->modelName = this->finishDialog->GetModelName();
+    this->SetModelName(this->finishDialog->GetModelName());
     this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->SetModelName(this->modelName);
     this->GenerateSDF();
     this->SaveToSDF(this->saveLocation);
     this->FinishModel();
