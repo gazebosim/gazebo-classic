@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"
@@ -53,6 +54,7 @@ namespace gazebo
 
       /// \brief Callback triggered when a request to update the model database
       /// is received.
+      /// \param[i] _localPath The model path that was updated.
       private: void OnModelUpdateRequest(const std::string &_localPath);
 
       /// \brief Received model selection user input
@@ -73,6 +75,7 @@ namespace gazebo
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
 
+      /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
 
       /// \brief Private data pointer.

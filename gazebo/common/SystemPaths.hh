@@ -120,7 +120,7 @@ namespace gazebo
 
       /// \brief Add colon delimited paths to modelPaths and signal the update
       /// to InsertModelWidget
-      /// \param[in] _path the directory to add
+      /// \param[in] _path Path to be added to the current model path
       public: void AddModelPathsUpdate(const std::string &_path);
 
       /// \brief Add colon delimited paths to ogre install
