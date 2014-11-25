@@ -33,6 +33,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
 
+#include "gazebo/common/SystemPaths.hh"
 #ifdef HAVE_GTS
   #include "gazebo/common/Mesh.hh"
   #include "gazebo/common/MeshManager.hh"
@@ -512,6 +513,17 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   std::ofstream savefile;
   boost::filesystem::path path;
   path = path / this->saveLocation / this->modelFolderName / "model.sdf";
+
+  /*if (boost::filesystem::exists(path))
+  {
+    bool save = FileOverwriteDialog(path.string());
+    if (!save)
+    {
+      this->OnSaveAs(this->modelName);
+      return;
+    }
+  }*/
+
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -1344,6 +1356,20 @@ void BuildingMaker::SaveModelFiles()
   this->SaveToSDF(this->saveLocation);
 }
 
+bool BuildingMaker::FileOverwriteDialog(const std::string pathName)
+{
+  std::string msg = "A file named " + pathName + " already exists.\n"
+                    "Do you wish to overwrite the existing file?\n";
+  QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
+                     QString(msg.c_str()));
+
+  QPushButton *saveButton = msgBox.addButton("Save",
+                                             QMessageBox::ApplyRole);
+  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+  msgBox.exec();
+  return msgBox.clickedButton() == saveButton;
+}
+
 /////////////////////////////////////////////////
 void BuildingMaker::OnSave(const std::string &_saveName)
 {
@@ -1365,7 +1391,7 @@ void BuildingMaker::OnSave(const std::string &_saveName)
 void BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
   // auto-fill these fields with existing values 
-  this->saveDialog->SetModelName(this->modelName);
+  this->saveDialog->SetModelName(_saveName);
   if (this->saveLocation.length() > 0)
   {
     this->saveDialog->SetSaveLocation(this->saveLocation);
@@ -1453,11 +1479,13 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       gzmsg << "Created folder " << path << " for model files." << std::endl;
     }
 
-    path = path / "model.config";
+    boost::filesystem::path modelConfigPath = path / "model.config";
 
-    if (boost::filesystem::exists(path))
+    if (boost::filesystem::exists(modelConfigPath))
     {
+      bool save = this->FileOverwriteDialog(path.string());
       // TODO: same size buttons
+      /*
       std::string msg = "A file named " + path.string() + " already exists.\n"
                         "Do you wish to overwrite the existing file?\n";
       QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
@@ -1468,6 +1496,11 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
       msgBox.exec();
       if (msgBox.clickedButton() == cancelButton)
+      {
+        this->OnSaveAs(_saveName);
+        return;
+      }*/
+      if (!save)
       {
         this->OnSaveAs(_saveName);
         return;
@@ -1484,8 +1517,41 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     // TODO: save textures
 
     // Save all the things
+    path = path / this->saveLocation / this->modelFolderName / "model.sdf";
+
+    if (boost::filesystem::exists(path))
+    {
+      bool save = FileOverwriteDialog(path.string());
+      if (!save)
+      {
+        this->OnSaveAs(this->modelName);
+        return;
+      }
+    }
+
     this->SaveModelFiles();
     this->saved = true;
+
+    // Check if this this->saveLocation is in GAZEBO_MODEL_PATHS
+    std::list<std::string> modelPaths =
+                gazebo::common::SystemPaths::Instance()->GetModelPaths();
+    std::list<std::string>::iterator iter;
+    for (iter = modelPaths.begin();
+         iter != modelPaths.end(); ++iter)
+    {
+      if (iter->compare(this->saveLocation) == 0)
+      {
+        break;
+      }
+    }
+    if (iter == modelPaths.end())
+    {
+      std::cout << "Adding save location to gazebo model paths" << std::endl;
+      // Add it to GAZEBO_MODEL_PATHS
+      gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
+      //gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
+    }
+
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
   }
 }

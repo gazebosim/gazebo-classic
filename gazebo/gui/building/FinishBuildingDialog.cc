@@ -47,9 +47,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelLabel = new QLabel;
   modelLabel->setText(tr("Name: "));
   this->modelNameLineEdit = new QLineEdit;
-  //this->modelNameLineEdit->setText(tr("Human readable name"));
 
-  // TODO: Advanced options
   // TODO: setting proper default values?
 
   QLabel *modelHeader = new QLabel;
@@ -111,8 +109,8 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QPushButton *finishButton = new QPushButton(tr(finishButtonText.c_str()));
   finishButton->setDefault(true);
   connect(finishButton, SIGNAL(clicked()), this, SLOT(OnFinish()));
-  buttonsLayout->addWidget(cancelButton);
   buttonsLayout->addWidget(finishButton);
+  buttonsLayout->addWidget(cancelButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
   QGridLayout *gridLayout = new QGridLayout;
@@ -120,7 +118,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   gridLayout->addWidget(modelNameLineEdit, 0, 1);
 
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
-  advancedOptionsCollapser->setChecked(true);
+  advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
   // initialize as "closed" (unchecked)
   // Button behavior: when "open", show advancedOptionsGrid
@@ -153,6 +151,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   
   this->advancedOptionsWidget = new QWidget();
   this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
+  this->advancedOptionsWidget->hide();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
@@ -218,6 +217,12 @@ std::string FinishBuildingDialog::GetVersion() const
 void FinishBuildingDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
+
+  // Auto-set folder name based on model name
+
+  // TODO: regexing
+  //std::string foldername = ...
+  //this->modelFolderNameLineEdit->setText(foldername);
 }
 
 /////////////////////////////////////////////////

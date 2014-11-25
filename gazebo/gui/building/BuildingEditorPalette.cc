@@ -31,7 +31,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 {
   this->setObjectName("buildingEditorPalette");
 
-  this->buildingDefaultName = "BuildingDefaultName";
+  this->buildingDefaultName = "Building Default Name";
   this->currentMode = std::string();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
