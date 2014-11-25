@@ -34,7 +34,8 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorColorComboBox = new QComboBox;
   this->floorColorComboBox->setIconSize(QSize(15, 15));
   this->floorColorComboBox->setMinimumWidth(50);
-  this->floorColorComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->floorColorComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
   QPixmap floorColorIcon(15, 15);
   this->floorColorList.push_back(QColor(255, 255, 255, 255));
   this->floorColorList.push_back(QColor(194, 169, 160, 255));
@@ -42,7 +43,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorColorList.push_back(QColor(254, 121,   5, 255));
   this->floorColorList.push_back(QColor(255, 195,  78, 255));
   this->floorColorList.push_back(QColor(111, 203, 172, 255));
-  for(unsigned int i = 0; i < this->floorColorList.size(); i++)
+  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
   {
     floorColorIcon.fill(this->floorColorList.at(i));
     this->floorColorComboBox->addItem(floorColorIcon, QString(""));
