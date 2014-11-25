@@ -31,7 +31,7 @@ EventSource::~EventSource()
 EventSource::EventSource(transport::PublisherPtr _pub,
                          const std::string& _type,
                          physics::WorldPtr _world)
-  :type(_type), world(_world), pub(_pub), active(true)
+  :type(_type), world(_world), active(true), pub(_pub)
 {
 }
 
