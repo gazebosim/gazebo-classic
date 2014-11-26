@@ -100,6 +100,7 @@ int EditorItem::GetLevel() const
 void EditorItem::SetLevel(int _level)
 {
   this->level = _level;
+  this->LevelChanged(this->level);
 }
 
 /////////////////////////////////////////////////

@@ -123,6 +123,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(LevelChanged(int)),
+      manip, SLOT(OnLevelChanged(int)));
   QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
       manip, SLOT(OnColorChanged(QColor)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),

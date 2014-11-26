@@ -275,6 +275,12 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnLevelChanged(int _level)
+{
+  this->SetLevel(_level);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnColorChanged(QColor _color)
 {
   this->SetColor(_color);

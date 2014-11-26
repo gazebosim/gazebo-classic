@@ -230,6 +230,11 @@ namespace gazebo
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
 
+      /// \brief Qt callback when the level of the associated editor item
+      /// has changed.
+      /// \param[in] _level New level.
+      private slots: void OnLevelChanged(int _level);
+
       /// \brief Qt callback when the 3D visual's color has been changed from
       /// the associated editor item.
       /// \param[in] _color New color.
