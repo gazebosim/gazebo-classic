@@ -205,6 +205,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
         linkVisual));
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
@@ -247,6 +248,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(0, 0, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
@@ -291,6 +293,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 0));
   visualElem->AddElement("cast_shadows")->Set(false);
@@ -352,6 +355,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   visualStepName << visualName.str() << "step" << 0;
   rendering::VisualPtr baseStepVisual(new rendering::Visual(
       visualStepName.str(), visVisual));
+  visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
@@ -405,6 +409,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 
   sdf::ElementPtr visualElem =  this->modelTemplateSDF->root
       ->GetElement("model")->GetElement("link")->GetElement("visual");
+  visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
       ->Set(gazebo::common::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
