@@ -155,6 +155,7 @@ void InsertModelWidget::OnModels(
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   if (_item)
   {
     std::string path, filename;
@@ -179,7 +180,6 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   if (_path.empty())
     return;
 
@@ -298,11 +298,13 @@ void InsertModelWidget::UpdateAllLocalPaths()
 /////////////////////////////////////////////////
 void InsertModelWidget::OnDirectoryChanged(const QString &_path)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->UpdateLocalPath(_path.toStdString());
 }
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->UpdateLocalPath(_path);
 }
