@@ -524,16 +524,6 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   boost::filesystem::path path;
   path = path / this->saveLocation / this->modelFolderName / "model.sdf";
 
-  /*if (boost::filesystem::exists(path))
-  {
-    bool save = FileOverwriteDialog(path.string());
-    if (!save)
-    {
-      this->OnSaveAs(this->modelName);
-      return;
-    }
-  }*/
-
   savefile.open(path.string().c_str());
   savefile << this->modelSDF->ToString();
   savefile.close();
@@ -578,7 +568,7 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelName);
+  modelElem->GetAttribute("name")->Set(this->modelFolderName);
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
