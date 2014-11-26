@@ -277,8 +277,6 @@ namespace gazebo
 
       /// \brief A list of gui editor events connected to this view.
       private: std::vector<event::ConnectionPtr> connections;
-
-      private: std::string trueMaterial;
     };
     /// \}
   }
