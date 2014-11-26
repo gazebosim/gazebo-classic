@@ -1327,7 +1327,6 @@ void BuildingMaker::OnNew()
 {
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
-  //QPushButton *button1;
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
   QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
 
@@ -1336,7 +1335,7 @@ void BuildingMaker::OnNew()
     msg.append("Are you sure you want to close this model and open a new \n"
                "canvas?\n\n");
     msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
-    saveButton.hide();
+    saveButton->hide();
   }
   else
   {
@@ -1344,13 +1343,15 @@ void BuildingMaker::OnNew()
                "and open a new canvas?\n\n");
     msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
   }
+
   msg.append("Once you open a new canvas, your current model will no longer \n"
              "be editable.");
   msgBox.setText(msg);
 
-
   msgBox.exec();
-  if (msgBox.clickedButton() != cancelButton){
+
+  if (msgBox.clickedButton() != cancelButton)
+  {
     if (!this->saved && msgBox.clickedButton() == saveButton)
     {
       this->OnSave(this->modelName);
@@ -1380,7 +1381,7 @@ bool BuildingMaker::FileOverwriteDialog(const std::string &pathName)
 
   QPushButton *saveButton = msgBox.addButton("Save",
                                              QMessageBox::ApplyRole);
-  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+  msgBox.addButton(QMessageBox::Cancel);
   msgBox.exec();
   return msgBox.clickedButton() == saveButton;
 }
@@ -1405,7 +1406,7 @@ void BuildingMaker::OnSave(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
-  // TODO: auto-fill these fields with existing values 
+  // TODO: auto-fill these fields with existing values
   this->saveDialog->SetModelName(_saveName);
 
   // Auto-generate folder name based on model name
@@ -1505,7 +1506,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
         authorChild->FirstChild()->SetValue(this->authorEmail);
       }
     }
- 
+
     boost::filesystem::path path;
     path = path / this->saveLocation/ this->modelFolderName;
     if (!boost::filesystem::exists(path))
@@ -1590,7 +1591,7 @@ void BuildingMaker::OnExit()
 
     QPushButton *exitButton = msgBox.addButton("Exit",
                                                QMessageBox::ApplyRole);
-    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
+    msgBox.addButton(QMessageBox::Cancel);
     msgBox.exec();
     if (msgBox.clickedButton() == exitButton)
     {
@@ -1604,13 +1605,12 @@ void BuildingMaker::OnExit()
         "Note: Once you exit the Building Editor, \n"
         "your building will no longer be editable.\n\n");
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-    // Order is don't save, exit, save, cancel
+    // Order is don't save+exit, save, cancel
     QPushButton *newButton = msgBox.addButton("Don't Save, Exit",
                                                   QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
                                                   QMessageBox::NoRole);
-    QPushButton *cancelButton = msgBox.addButton("Cancel",
-                                                  QMessageBox::YesRole);
+    msgBox.addButton("Cancel", QMessageBox::YesRole);
     msgBox.exec();
     if (msgBox.clickedButton() == newButton)
     {
@@ -1622,7 +1622,7 @@ void BuildingMaker::OnExit()
     }
     else if (msgBox.clickedButton() == saveButton)
     {
-      this->OnSave();
+      this->OnSave(this->modelName);
       gui::editor::Events::finishBuildingModel();
     }
   }

@@ -65,25 +65,14 @@ namespace gazebo
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
-      /// \brief Qt callback when the discard button is pressed.
-      //private slots: void OnDiscard();
-
-      /// \brief Qt callback when the save button is pressed.
-      //private slots: void OnSave();
+      /// Qt callback when the save button is pressed.
+      // private slots: void OnSave();
 
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
       /// \param[in] _saveLocation Location to save the model to.
       private: void OnSaveModel(const std::string &_saveName,
-          const std::string &_saveLocation);
-
-      /// TODO : combine with above
-      /// \brief Callback when user has provided information on where to save
-      /// the model to.
-      /// \param[in] _saveName Name of model being saved.
-      /// \param[in] _saveLocation Location to save the model to.
-      private: void OnSaveAsModel(const std::string &_saveName,
           const std::string &_saveLocation);
 
       /// \brief Event received when an editor item is selected.
@@ -103,12 +92,12 @@ namespace gazebo
       /// \brief Edit the name of the building model.
       private: QLineEdit *modelNameEdit;
 
-      /// \brief Save button.
-      //private: QPushButton *saveButton;
+      /// Save button.
+      // private: QPushButton *saveButton;
 
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;
-  
+
       /// \brief True if the model has been saved, false otherwise.
       private: bool saved;
 

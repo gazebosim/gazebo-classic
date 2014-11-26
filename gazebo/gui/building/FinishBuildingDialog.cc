@@ -64,7 +64,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   {
     this->modelLocationLineEdit->setText(tr(home_cstr));
   }
-  
+
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
 
@@ -89,7 +89,6 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelFolderName = new QLabel;
   modelFolderName->setText(tr("  Name:"));
   this->modelFolderNameLineEdit = new QLineEdit;
-  //this->modelFolderNameLineEdit->setText(tr(foldername.c_str()));
 
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
@@ -157,7 +156,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   advancedOptionsGrid->addWidget(modelLocation, 8, 0);
   advancedOptionsGrid->addWidget(this->modelLocationLineEdit, 8, 1);
   advancedOptionsGrid->addWidget(browseButton, 8, 2);
-  
+
   this->advancedOptionsWidget = new QWidget();
   this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
   this->advancedOptionsWidget->hide();

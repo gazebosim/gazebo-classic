@@ -29,7 +29,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
-//#include "gazebo/gui/building/Dialogs.hh"
 #include "gazebo/gui/SaveDialog.hh"
 
 namespace gazebo
