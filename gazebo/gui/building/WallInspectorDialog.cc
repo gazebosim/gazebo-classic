@@ -142,6 +142,8 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   heightThicknessLayout->addWidget(thicknessLabel, 1, 0);
   heightThicknessLayout->addWidget(thicknessSpinBox, 1, 1);
 
+  // TODO Color and texture code is repeated on all dialogs.
+  // Make a generalized widget
   QLabel *colorLabel = new QLabel(tr("Color: "));
   this->colorComboBox = new QComboBox;
   this->colorComboBox->setIconSize(QSize(15, 15));
@@ -310,7 +312,6 @@ void WallInspectorDialog::SetColor(const QColor _color)
 {
   // Find index corresponding to color (only a few colors allowed so far)
   int index = 0;
-
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     if (this->colorList[i] == _color)
@@ -319,7 +320,6 @@ void WallInspectorDialog::SetColor(const QColor _color)
       break;
     }
   }
-
   this->colorComboBox->setCurrentIndex(index);
 }
 
@@ -328,7 +328,6 @@ void WallInspectorDialog::SetTexture(QString _texture)
 {
   // Find index corresponding to texture (only a few textures allowed so far)
   int index = this->textureComboBox->count()-1;
-
   for (unsigned int i = 0; i < this->textureList.size(); ++i)
   {
     if (this->textureList[i] == _texture)
@@ -337,7 +336,6 @@ void WallInspectorDialog::SetTexture(QString _texture)
       break;
     }
   }
-
   this->textureComboBox->setCurrentIndex(index);
 }
 

@@ -138,6 +138,27 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   colorLayout->addWidget(colorLabel);
   colorLayout->addWidget(colorComboBox);
 
+  QLabel *textureLabel = new QLabel(tr("Texture: "));
+  this->textureComboBox = new QComboBox;
+  this->textureComboBox->setIconSize(QSize(30, 30));
+  this->textureComboBox->setMinimumWidth(50);
+  this->textureComboBox->setMinimumHeight(50);
+  this->textureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->textureList.push_back(":/images/wood.jpg");
+  this->textureList.push_back(":/images/ceiling_tiled.jpg");
+//  this->textureList.push_back(":/images/sidewalk");
+  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  {
+    this->textureComboBox->addItem(QPixmap(this->textureList[i]),
+        QString(""));
+  }
+  this->textureComboBox->addItem("X");
+  this->textureComboBox->setCurrentIndex(this->textureComboBox->count()-1);
+
+  QHBoxLayout *textureLayout = new QHBoxLayout;
+  textureLayout->addWidget(textureLabel);
+  textureLayout->addWidget(textureComboBox);
+
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -156,6 +177,7 @@ StairsInspectorDialog::StairsInspectorDialog(QWidget *_parent)
   mainLayout->addWidget(positionGroupBox);
   mainLayout->addWidget(sizeGroupBox);
   mainLayout->addLayout(colorLayout);
+  mainLayout->addLayout(textureLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -202,6 +224,19 @@ int StairsInspectorDialog::GetSteps() const
 QColor StairsInspectorDialog::GetColor() const
 {
   return this->colorList[this->colorComboBox->currentIndex()];
+}
+
+/////////////////////////////////////////////////
+QString StairsInspectorDialog::GetTexture() const
+{
+  QString texture = QString("");
+  if (this->textureComboBox->currentIndex() != -1 &&
+      this->textureComboBox->currentIndex() <
+      this->textureComboBox->count() - 1)
+  {
+    texture = this->textureList[this->textureComboBox->currentIndex()];
+  }
+  return texture;
 }
 
 /////////////////////////////////////////////////
@@ -254,6 +289,22 @@ void StairsInspectorDialog::SetColor(const QColor _color)
       break;
     }
   }
+}
+
+/////////////////////////////////////////////////
+void StairsInspectorDialog::SetTexture(QString _texture)
+{
+  // Find index corresponding to texture (only a few textures allowed so far)
+  int index = this->textureComboBox->count()-1;
+  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  {
+    if (this->textureList[i] == _texture)
+    {
+      index = i;
+      break;
+    }
+  }
+  this->textureComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////

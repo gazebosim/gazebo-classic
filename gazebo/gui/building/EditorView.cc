@@ -1168,6 +1168,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->show();
     this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+    this->levelInspector->SetFloorTexture(floorItem->Get3dTexture());
   }
   else
   {
@@ -1186,6 +1187,8 @@ void EditorView::OnLevelApply()
   this->levels[this->currentLevel]->name = newLevelName;
   this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
       GetFloorColor());
+  this->levels[this->currentLevel]->floorItem->Set3dTexture(dialog->
+      GetFloorTexture());
   this->levels[this->currentLevel]->floorItem->FloorChanged();
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
