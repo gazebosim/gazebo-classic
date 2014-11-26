@@ -178,6 +178,7 @@ else()
   set (tinyxml_LIBRARY_DIRS "")
 endif()
 
+  if (NOT WIN32)
   #################################################
   # Find libtar.
   find_path (libtar_INCLUDE_DIRS libtar.h)
@@ -201,6 +202,7 @@ endif()
   if (NOT LIBTAR_FOUND)
      #BUILD_ERROR("Missing: libtar")
      set(libtar_LIBRARIES "")
+  endif()
   endif()
 
   #################################################
