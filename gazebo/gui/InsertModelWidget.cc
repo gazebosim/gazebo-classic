@@ -179,6 +179,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
 /////////////////////////////////////////////////
 void InsertModelWidget::UpdateLocalPath(const std::string &_path)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   if (_path.empty())
     return;
 
