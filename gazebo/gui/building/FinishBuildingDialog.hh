@@ -68,6 +68,10 @@ namespace gazebo
       /// \param[in] _name Name to set the model to.
       public: void SetModelName(const std::string &_name);
 
+      /// \brief Set the building folder name.
+      /// \param[in] _name Folder name for saving model data.
+      public: void SetFolderName(const std::string &_name);
+
       /// \brief Set the save location.
       /// \param[in] _location Location to save to.
       public: void SetSaveLocation(const std::string &_location);

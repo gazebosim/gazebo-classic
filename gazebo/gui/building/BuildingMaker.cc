@@ -1086,6 +1086,7 @@ std::string BuildingMaker::GetTemplateConfigString()
   <<   "<sdf version=\"1.5\">model.sdf</sdf>"
   <<   "<author>"
   <<     "<name>author_name</name>"
+  <<     "<email>author_email</email>"
   <<   "</author>"
   <<   "<description>Made with the Gazebo Building Editor</description>"
   << "</model>";
@@ -1425,6 +1426,27 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
   // auto-fill these fields with existing values 
   this->saveDialog->SetModelName(_saveName);
+
+  // Auto-generate folder name based on model name
+  std::string foldername = _saveName;
+
+  std::vector<std::pair<std::string, std::string> > replacePairs;
+  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
+
+  for (unsigned int i = 0; i < replacePairs.size(); i++)
+  {
+    std::string forbiddenChar = replacePairs[i].first;
+    std::string replaceChar = replacePairs[i].second;
+    size_t index = foldername.find(forbiddenChar);
+    // Strip 
+    while (index != std::string::npos)
+    {
+      foldername.replace(index, forbiddenChar.size(), replaceChar);
+      index = foldername.find(forbiddenChar);
+    }
+  }
+  this->saveDialog->SetFolderName(foldername);
+
   if (this->saveLocation.length() > 0)
   {
     this->saveDialog->SetSaveLocation(this->saveLocation);
@@ -1456,6 +1478,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     if (!versionXML)
     {
       gzerr << "Couldn't find model version" << std::endl;
+      versionXML->FirstChild()->SetValue("1.0");
     }
     else
     {
@@ -1466,6 +1489,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     if (!descriptionXML)
     {
       gzerr << "Couldn't find model description" << std::endl;
+      descriptionXML->FirstChild()->SetValue("");
     }
     else
     {
@@ -1484,6 +1508,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       if (!authorChild)
       {
         gzerr << "Couldn't find author name" << std::endl;
+        authorChild->FirstChild()->SetValue("");
       }
       else
       {
@@ -1493,6 +1518,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       if (!authorChild)
       {
         gzerr << "Couldn't find author email" << std::endl;
+        authorChild->FirstChild()->SetValue("");
       }
       else
       {
@@ -1541,7 +1567,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
 
     std::ofstream savefile;
-    savefile.open(path.string().c_str());
+    savefile.open(modelConfigPath.string().c_str());
     // TODO: human-readable formatting of XML output
     savefile << xmlDoc;
     savefile.close();

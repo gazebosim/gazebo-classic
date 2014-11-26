@@ -86,11 +86,10 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   modelDescription->setText(tr("  Description:"));
   this->modelDescriptionLineEdit = new QLineEdit;
 
-  // TODO: auto-generate filename, note about no spaces?
   QLabel *modelFolderName = new QLabel;
   modelFolderName->setText(tr("  Name:"));
   this->modelFolderNameLineEdit = new QLineEdit;
-  this->modelFolderNameLineEdit->setText(tr("folder_name_for_model"));
+  //this->modelFolderNameLineEdit->setText(tr(foldername.c_str()));
 
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
@@ -217,12 +216,12 @@ std::string FinishBuildingDialog::GetVersion() const
 void FinishBuildingDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
+}
 
-  // Auto-set folder name based on model name
-
-  // TODO: regexing
-  //std::string foldername = ...
-  //this->modelFolderNameLineEdit->setText(foldername);
+/////////////////////////////////////////////////
+void FinishBuildingDialog::SetFolderName(const std::string &_name)
+{
+  this->modelFolderNameLineEdit->setText(tr(_name.c_str()));
 }
 
 /////////////////////////////////////////////////
