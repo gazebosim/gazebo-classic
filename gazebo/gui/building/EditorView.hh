@@ -48,7 +48,8 @@ namespace gazebo
       public: Level() : level(0), name("level"), baseHeight(0),
               // 2.4384m == 8ft, standard room height in US
               height(2.4384),
-              backgroundPixmap(NULL) {}
+              backgroundPixmap(NULL),
+              floorItem(NULL) {}
 
       /// \brief Level number
       public: int level;
@@ -64,6 +65,9 @@ namespace gazebo
 
       /// \brief Background pixmap for a level
       public: QGraphicsPixmapItem *backgroundPixmap;
+
+      /// \brief Level's floor item
+      public: FloorItem *floorItem;
     };
 
     /// \addtogroup gazebo_gui

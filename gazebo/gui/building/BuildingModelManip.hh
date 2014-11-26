@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include "gazebo/gui/qt.h"
+#include "gazebo/common/Color.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
@@ -54,6 +55,10 @@ namespace gazebo
       /// \brief Get the visual this manip manages.
       /// \return A pointer to the visual object.
       public: rendering::VisualPtr GetVisual() const;
+
+      /// \brief Get the color of the manip.
+      /// \return Color.
+      public: common::Color GetColor() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -128,6 +133,10 @@ namespace gazebo
       /// \param[in] _depth Depth in pixels.
       /// \param[in] _height Height pixels.
       public: void SetSize(double _width, double _depth, double _height);
+
+      /// \brief Set the color of the manip.
+      /// \param[in] _color Color.
+      public: void SetColor(QColor _color);
 
       /// \brief Set the transparency of the manip.
       /// \param[in] _transparency Transparency.
@@ -221,6 +230,11 @@ namespace gazebo
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
 
+      /// \brief Qt callback when the 3D visual's color has been changed from
+      /// the associated editor item.
+      /// \param[in] _color New color.
+      private slots: void OnColorChanged(QColor _color);
+
       /// \brief Qt callback when the 3D visual's transparency has been changed
       /// from the associated editor item.
       /// \param[in] _transparency Transparency.
@@ -254,6 +268,9 @@ namespace gazebo
 
       /// \brief Parent manip.
       private: BuildingModelManip *parent;
+
+      /// \brief Visual's color.
+      private: common::Color color;
 
       /// \brief Level this manipulator is on.
       private: int level;
