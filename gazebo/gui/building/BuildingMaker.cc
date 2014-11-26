@@ -1325,6 +1325,11 @@ void BuildingMaker::SubdivideRectSurface(const QRectF &_surface,
 /////////////////////////////////////////////////
 void BuildingMaker::OnNew()
 {
+  if (this->allItems.empty())
+  {
+    gui::editor::Events::newBuildingModel();
+    return;
+  }
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
@@ -1582,6 +1587,12 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()
 {
+  if (this->allItems.empty())
+  {
+    gui::editor::Events::finishBuildingModel();
+    return;
+  } 
+
   if (saved)
   {
     QString msg("Once you exit the Building Editor, \n"

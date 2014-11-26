@@ -23,8 +23,6 @@ using namespace gui;
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
 event::EventT<void (std::string, std::string)>
     editor::Events::saveBuildingModel;
-event::EventT<void (std::string, std::string)>
-    editor::Events::saveAsBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;
 event::EventT<void ()> editor::Events::newBuildingModel;
 event::EventT<void (int)> editor::Events::changeBuildingLevel;

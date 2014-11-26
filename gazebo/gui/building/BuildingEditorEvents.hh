@@ -50,26 +50,11 @@ namespace gazebo
             static event::ConnectionPtr ConnectSaveBuildingModel(T _subscriber)
           { return saveBuildingModel.Connect(_subscriber); }
 
-        /// XXX
-        /// \brief Connect a Gazebo event to the save model signal
-        /// \param[in] _subscriber the subscriber to this event
-        /// \return a connection
-        public: template<typename T>
-            static event::ConnectionPtr ConnectSaveAsBuildingModel
-                    (T _subscriber)
-          { return saveAsBuildingModel.Connect(_subscriber); }
-
         /// \brief Disconnect a Gazebo event from the save model signal
         /// \param[in] _subscriber the subscriber to this event
         public: static void DisconnectSaveBuildingModel(
             event::ConnectionPtr _subscriber)
           { saveBuildingModel.Disconnect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the save model signal
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSaveAsBuildingModel(
-            event::ConnectionPtr _subscriber)
-          { saveAsBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the finish model signal
         /// \param[in] _subscriber the subscriber to this event
@@ -287,10 +272,6 @@ namespace gazebo
         /// \brief A model has been saved with a name and a location
         public: static event::EventT<void (std::string, std::string)>
             saveBuildingModel;
-
-        /// \brief A model has been saved with a name and a location
-        public: static event::EventT<void (std::string, std::string)>
-            saveAsBuildingModel;
 
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishBuildingModel;

@@ -59,11 +59,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
   // Try to get path to home folder
-  const char* home_cstr = getenv("HOME");
-  if (home_cstr)
-  {
-    this->modelLocationLineEdit->setText(tr(home_cstr));
-  }
+  this->modelLocationLineEdit->setText(QDir::homePath());
 
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
