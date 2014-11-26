@@ -61,7 +61,6 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
   this->floorTextureList.push_back(":/images/wood.jpg");
   this->floorTextureList.push_back(":/images/ceiling_tiled.jpg");
-//  this->floorTextureList.push_back(":/images/sidewalk");
   for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
   {
     this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i]),

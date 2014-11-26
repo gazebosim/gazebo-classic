@@ -51,7 +51,6 @@
   <file>images/z_center.png</file>  
   <file>images/z_max.png</file>
   <file>images/wood.jpg</file>
-  <file>images/ceiling_tiled.jpg</file>  
-  <file>images/sidewalk.jpg</file>       
+  <file>images/ceiling_tiled.jpg</file>
 </qresource>
 </RCC>

@@ -295,8 +295,8 @@ void StairsItem::StairsChanged()
   emit HeightChanged(this->stairsHeight);
   emit PositionChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->levelBaseHeight + this->stairsElevation);
-  emit ColorChanged(this->visual3dColor);
   emit TextureChanged(this->visual3dTexture);
+  emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////

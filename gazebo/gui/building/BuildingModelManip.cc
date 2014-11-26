@@ -363,8 +363,6 @@ void BuildingModelManip::SetTexture(QString _texture)
     this->texture = "Gazebo/Wood";
   else if (_texture == ":/images/ceiling_tiled.jpg")
     this->texture = "Gazebo/CeilingTiled";
-//  else if (_texture == ":/images/sidewalk.jpg")
-//    material = "Gazebo/Pedestrian";
 
   this->visual->GetParent()->SetMaterial(this->texture);
 }

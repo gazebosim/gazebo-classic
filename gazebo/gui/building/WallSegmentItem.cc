@@ -110,8 +110,8 @@ void WallSegmentItem::WallSegmentChanged()
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
-  emit ColorChanged(this->visual3dColor);
   emit TextureChanged(this->visual3dTexture);
+  emit ColorChanged(this->visual3dColor);
   emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
