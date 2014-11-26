@@ -82,17 +82,17 @@ double BuildingMaker::conversionScale;
   this->connections.push_back(
   gui::editor::Events::ConnectNewBuildingEditor(
     boost::bind(&BuildingMaker::OnNew, this)));
-  this->connections.push_back(
+/*  this->connections.push_back(
   gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this, _1)));
+    boost::bind(&BuildingMaker::OnDone, this, _1)));*/
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
-  this->finishDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);
+/*  this->finishDialog =
+      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);*/
 }
 
 /////////////////////////////////////////////////
@@ -101,8 +101,8 @@ BuildingMaker::~BuildingMaker()
 //  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
-  if (this->finishDialog)
-    delete this->finishDialog;
+/*  if (this->finishDialog)
+    delete this->finishDialog;*/
 }
 
 /////////////////////////////////////////////////
@@ -1588,7 +1588,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnDone(const std::string &_saveName)
+/*void BuildingMaker::OnDone(const std::string &_saveName)
 {
   if (_saveName != "")
     this->SetModelName(_saveName);
@@ -1608,7 +1608,7 @@ void BuildingMaker::OnDone(const std::string &_saveName)
     gui::editor::Events::newBuildingModel();
     gui::editor::Events::finishBuildingModel();
   }
-}
+}*/
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()

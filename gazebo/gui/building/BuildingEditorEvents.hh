@@ -256,15 +256,15 @@ namespace gazebo
         /// \brief Connect a Gazebo event to the done signal
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
-        public: template<typename T>
+        /*public: template<typename T>
             static event::ConnectionPtr ConnectDoneBuildingEditor(T _subscriber)
-          { return doneBuildingEditor.Connect(_subscriber); }
+          { return doneBuildingEditor.Connect(_subscriber); }*/
 
         /// \brief Disconnect a Gazebo event from the done signal
         /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDoneBuildingEditor(
+        /*public: static void DisconnectDoneBuildingEditor(
                     event::ConnectionPtr _subscriber)
-                { doneBuildingEditor.Disconnect(_subscriber); }
+                { doneBuildingEditor.Disconnect(_subscriber); }*/
 
         /// \brief Connect a Gazebo event to the new signal
         /// \param[in] _subscriber the subscriber to this event

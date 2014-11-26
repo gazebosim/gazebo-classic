@@ -40,5 +40,5 @@ event::EventT<void (double)> editor::Events::changeBuildingEditorZoom;
 event::EventT<void (std::string)> editor::Events::saveAsBuildingEditor;
 event::EventT<void (std::string)> editor::Events::saveBuildingEditor;
 event::EventT<void ()> editor::Events::newBuildingEditor;
-event::EventT<void (std::string)> editor::Events::doneBuildingEditor;
+//event::EventT<void (std::string)> editor::Events::doneBuildingEditor;
 event::EventT<void ()> editor::Events::exitBuildingEditor;

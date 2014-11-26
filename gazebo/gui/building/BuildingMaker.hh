@@ -269,7 +269,7 @@ namespace gazebo
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
       /// \param[in] _saveName Name to save the model.
-      private: void OnDone(const std::string &_saveName = "");
+      //private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
@@ -343,7 +343,7 @@ namespace gazebo
 
       /// \brief A dialog that prompts to confirm model completion and uploading
       /// to the server
-      private: FinishBuildingDialog *finishDialog;
+      //private: FinishBuildingDialog *finishDialog;
     };
     /// \}
   }

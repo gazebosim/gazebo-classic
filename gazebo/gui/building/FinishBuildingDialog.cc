@@ -173,7 +173,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
-  this->setMinimumSize(400, 140);
+  this->setMinimumSize(400, 150);
   this->setMaximumSize(400, 380);
   this->resize(this->minimumSize());
 }
