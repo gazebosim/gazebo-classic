@@ -22,6 +22,7 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
     - [Protobuf 2.6.0](http://packages.osrfoundation.org/win32/deps/protobuf-2.6.0-win64-vc12.zip)
     - [Boost 1.56.0](http://packages.osrfoundation.org/win32/deps/boost_1_56_0.zip)
     - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-8-1.zip)
+    - [FreeImage 3.1.6](http://packages.osrfoundation.org/win32/deps/FreeImage3160Win32.zip)
 
 1. Unzip each of them in gz-ws.
 
