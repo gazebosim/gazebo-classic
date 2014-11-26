@@ -115,6 +115,9 @@
     1. Added color picker to inspector dialogs.
         * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
 
+    1. Current level is transparent, lower levels opaque, higher levels invisible.
+        * [Pull request #1303](https://bitbucket.org/osrf/gazebo/pull-request/1303)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
@@ -123,9 +126,7 @@
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
 
-1. Building Editor.
-    1. Current level is transparent, other levels opaque.
-        * [Pull request #1299](https://bitbucket.org/osrf/gazebo/pull-request/1299)
+
 
 ### Gazebo 4.1.0 (2014-11-20)
 

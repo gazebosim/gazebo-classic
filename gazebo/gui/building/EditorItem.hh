@@ -77,12 +77,12 @@ namespace gazebo
       public: virtual void SetName(const std::string &_name);
 
       /// \brief Set the level of this building item.
-      /// \param[in] _level level number
+      /// \param[in] _level Level number.
       public: void SetLevel(int _level);
 
       /// \brief Set the base height of this level relative to the ground
       /// plane.
-      /// \param[in] _height base height
+      /// \param[in] _height Base height.
       public: void SetLevelBaseHeight(double _height);
 
       /// \brief Set the associated 3D visual's color.
@@ -187,10 +187,11 @@ namespace gazebo
       /// \brief Name of editor item.
       protected: std::string name;
 
-      /// \brief Level that this building item is in.
+      /// \brief Level that this item is on.
       protected: int level;
 
-      /// \brief Base height of the level
+      /// \brief Vertical distance from the building's base to the base of
+      /// the level this editor is in.
       protected: double levelBaseHeight;
 
       /// \brief Color of the associated 3D visual.

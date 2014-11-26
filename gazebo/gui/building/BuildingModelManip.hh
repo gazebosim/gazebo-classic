@@ -248,8 +248,9 @@ namespace gazebo
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();
 
-      /// \brief Callback received when a level on a building model is to
-      /// be changed.
+      /// \brief Callback received when the building level being edited has
+      /// changed. Do not confuse with OnLevelChange, where the manip's level
+      /// is changed.
       /// \param[in] _level The level that is currently being edited.
       private: void OnChangeLevel(int _level);
 
