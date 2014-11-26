@@ -939,6 +939,7 @@ void EditorView::OnAddLevel()
   newLevel->baseHeight = maxHeight;
 
   FloorItem *floorItem = new FloorItem();
+  this->levels[this->currentLevel]->floorItem = floorItem;
   std::vector<WallSegmentItem *> newWalls;
   std::map<WallSegmentItem *, WallSegmentItem *> clonedWallMap;
   for (std::vector<WallSegmentItem *>::iterator it = wallSegmentList.begin();
@@ -1154,6 +1155,16 @@ void EditorView::OnChangeLevel(int _level)
 void EditorView::OnOpenLevelInspector()
 {
   this->levelInspector->SetLevelName(this->levels[this->currentLevel]->name);
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    this->levelInspector->floorWidget->show();
+    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+  }
+  else
+  {
+    this->levelInspector->floorWidget->hide();
+  }
   this->levelInspector->show();
 }
 
@@ -1165,6 +1176,9 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
+  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
+      GetFloorColor());
+  this->levels[this->currentLevel]->floorItem->FloorChanged();
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
