@@ -36,7 +36,7 @@ namespace gazebo
     /// transport/transport.hh
     /// \brief Reads data from a remote advertiser, and passes the data
     /// along to local subscribers
-    class GAZEBO_VISIBLE PublicationTransport
+    class GZ_TRANSPORT_VISIBLE PublicationTransport
     {
       /// \brief Constructor
       /// \param[in] _topic Topic that we're publishing

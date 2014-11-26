@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class MeshExporter MeshExporter.hh common/common.hh
     /// \brief Base class for exporting meshes
-    class GAZEBO_VISIBLE MeshExporter
+    class GZ_COMMON_VISIBLE MeshExporter
     {
       /// \brief Constructor
       public: MeshExporter();

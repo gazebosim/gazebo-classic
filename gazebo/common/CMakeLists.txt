@@ -14,6 +14,12 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+include_directories(${CURL_INCLUDE_DIRS})
+link_directories(${CURL_LIBRARY_DIRS})
+
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
+
 set (sources
   Animation.cc
   Assert.cc
@@ -48,6 +54,15 @@ set (sources
   Timer.cc
   Video.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (headers
   Animation.hh
@@ -138,6 +153,8 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/common.hh.in ${CMAKE_CURRENT_BINARY_DIR}/common.hh )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_COMMON")
+
 gz_add_library(gazebo_common ${sources})
 
 set_property(
@@ -149,10 +166,6 @@ set_property(
   GAZEBO_MODEL_DATABASE_URI="${GAZEBO_MODEL_DATABASE_URI}"
   GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
   OGRE_RESOURCE_PATH="${OGRE_RESOURCE_PATH}"
-)
-
-link_directories( 
-  ${tinyxml_LIBRARY_DIRS}
 )
 
 target_link_libraries(gazebo_common
@@ -170,11 +183,13 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
-  pthread
 )
-
-if (NOT APPLE)
-  # rt is used for clock_gettime, which is not available on apple
+if (UNIX)
+  target_link_libraries(gazebo_common pthread)
+endif()
+  
+if (UNIX)
+  # rt is used for clock_gettime, which is not available on apple or windows
   target_link_libraries(gazebo_common rt)
 endif()
 

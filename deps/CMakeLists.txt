@@ -5,7 +5,3 @@ if (NOT CCD_FOUND)
 endif()
 # add_subdirectory(ann)
 # add_subdirectory(fcl)
-
-if (WIN32)
-  add_subdirectory(win)
-endif()

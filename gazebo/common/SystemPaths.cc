@@ -15,7 +15,11 @@
  *
  */
 
-#include <dirent.h>
+#ifdef _WIN32
+  #include "win_dirent.h"
+#else
+  #include <dirent.h>
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -86,7 +90,11 @@ SystemPaths::SystemPaths()
   DIR *dir = opendir(fullPath.c_str());
   if (!dir)
   {
+#ifdef _WIN32
+    mkdir(fullPath.c_str());
+#else
     mkdir(fullPath.c_str(), S_IRWXU | S_IRGRP | S_IROTH);
+#endif
   }
   else
     closedir(dir);

@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class DEM DEM.hh common/common.hh
     /// \brief Encapsulates a DEM (Digital Elevation Model) file.
-    class GAZEBO_VISIBLE Dem : public HeightmapData
+    class GZ_COMMON_VISIBLE Dem : public HeightmapData
     {
       /// \brief Constructor.
       public: Dem();

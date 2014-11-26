@@ -50,4 +50,79 @@
   #endif
 #endif
 
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_COMMON
+    #ifdef __GNUC__
+      #define GZ_COMMON_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_COMMON_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_COMMON_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_COMMON_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_COMMON_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_COMMON_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_COMMON_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_COMMON_VISIBLE
+    #define GZ_COMMON_HIDDEN
+  #endif
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_MATH
+    #ifdef __GNUC__
+      #define GZ_MATH_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_MATH_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_MATH_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_MATH_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_MATH_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_MATH_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_MATH_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_MATH_VISIBLE
+    #define GZ_MATH_HIDDEN
+  #endif
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_TRANSPORT
+    #ifdef __GNUC__
+      #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_TRANSPORT_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_TRANSPORT_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_TRANSPORT_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_TRANSPORT_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_TRANSPORT_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_TRANSPORT_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_TRANSPORT_VISIBLE
+    #define GZ_TRANSPORT_HIDDEN
+  #endif
+#endif
+
 #endif /* GAZEBO_VISIBLE_HH */

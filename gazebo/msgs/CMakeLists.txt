@@ -114,7 +114,10 @@ gz_build_tests(${msgs_tests_sources})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(gazebomsgs_out generator/GazeboGenerator.cc generator/gazebo_generator.cc)
-target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY} pthread)
+target_link_libraries(gazebomsgs_out ${PROTOBUF_LIBRARY} ${PROTOBUF_PROTOC_LIBRARY})
+if (UNIX)
+  target_link_libraries(gazebomsgs_out pthread)
+endif()
 
 set (sources msgs.cc MsgFactory.cc)
 set (headers msgs.hh MsgFactory.hh)

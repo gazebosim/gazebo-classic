@@ -33,7 +33,7 @@ namespace gazebo
     /// k-means partitions the observations into k sets so as to minimize the
     /// within-cluster sum of squares.
     /// Description based on http://en.wikipedia.org/wiki/K-means_clustering.
-    class GAZEBO_VISIBLE Kmeans
+    class GZ_MATH_VISIBLE Kmeans
     {
       /// \brief constructor
       /// \param[in] _obs Set of observations to cluster.

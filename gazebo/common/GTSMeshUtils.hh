@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class GTSMeshUtils GTSMeshUtils.hh common/common.hh
     /// \brief Creates GTS utilities for meshes
-    class GAZEBO_VISIBLE GTSMeshUtils
+    class GZ_COMMON_VISIBLE GTSMeshUtils
     {
       /// \brief Create an extruded Polyline submesh
       /// \param[in] _vertices the x y dimentions of eah vertex in meter

@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class Matrix3 Matrix3hh math/gzmath.hh
     /// \brief A 3x3 matrix class
-    class GAZEBO_VISIBLE Matrix3
+    class GZ_MATH_VISIBLE Matrix3
     {
       /// \brief Constructor
       public: Matrix3();

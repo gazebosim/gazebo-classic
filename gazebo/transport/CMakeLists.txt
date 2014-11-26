@@ -48,6 +48,8 @@ set_property(
 )
 
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_TRANSPORT")
+
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport
   gazebo_common 

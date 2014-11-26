@@ -172,9 +172,8 @@ if (USE_EXTERNAL_TINXYML)
 else()
   # Needed in WIN32 since in UNIX the flag is added in the code installed
   add_definitions(-DTIXML_USE_STL)
-  include_directories (${PROJECT_SOURCE_DIR}/deps/win/tinyxml)
-  set (tinyxml_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/deps/win/tinyxml)
-  set (tinyxml_LIBRARIES "tinyxml")
+  set (tinyxml_INCLUDE_DIRS "")
+  set (tinyxml_LIBRARIES "")
   set (tinyxml_LIBRARY_DIRS "")
 endif()
 

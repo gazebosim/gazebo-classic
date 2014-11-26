@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class SphericalCoordinates SphericalCoordinates.hh commmon/common.hh
     /// \brief Convert spherical coordinates for planetary surfaces.
-    class GAZEBO_VISIBLE SphericalCoordinates
+    class GZ_COMMON_VISIBLE SphericalCoordinates
     {
       /// \enum SurfaceType
       /// \brief Unique identifiers for planetary surface models.

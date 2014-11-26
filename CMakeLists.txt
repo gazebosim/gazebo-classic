@@ -218,6 +218,8 @@ filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-
 if (WIN32)
     # Need for M_PI constant
     add_definitions(-D_USE_MATH_DEFINES) 
+    # Don't pull in the Windows min/max macros
+    add_definitions(-DNOMINMAX) 
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
     # And force linking to MSVC dynamic runtime

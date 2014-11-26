@@ -47,7 +47,7 @@ namespace gazebo
 
     /// \class Skeleton Skeleton.hh common/common.hh
     /// \brief A skeleton
-    class GAZEBO_VISIBLE Skeleton
+    class GZ_COMMON_VISIBLE Skeleton
     {
       /// \brief Constructor
       public: Skeleton();
@@ -167,7 +167,7 @@ namespace gazebo
 
     /// \class SkeletonNode Skeleton.hh common/common.hh
     /// \brief A skeleton node
-    class GAZEBO_VISIBLE SkeletonNode
+    class GZ_COMMON_VISIBLE SkeletonNode
     {
       /// \brief enumeration of node types
       public: enum SkeletonNodeType {NODE, JOINT};
@@ -352,7 +352,7 @@ namespace gazebo
 
     /// \clas NodeTransform Skeleton.hh common/common.hh
     /// \brief A transformation node
-    class GAZEBO_VISIBLE NodeTransform
+    class GZ_COMMON_VISIBLE NodeTransform
     {
       /// \brief Enumeration of the transform types
       public: enum TransformType {TRANSLATE, ROTATE, SCALE, MATRIX};
