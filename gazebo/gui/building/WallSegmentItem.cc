@@ -110,7 +110,6 @@ void WallSegmentItem::WallSegmentChanged()
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
   emit ColorChanged(this->visual3dColor);
-  emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
 
@@ -215,7 +214,7 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
       this->measure->setVisible(false);
       this->setZValue(0);
       this->SetColor(Qt::black);
-      this->Set3dTransparency(0.5);
+      this->Set3dTransparency(0.4);
     }
     this->WallSegmentChanged();
   }

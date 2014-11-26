@@ -88,6 +88,7 @@ void EditorItem::Set3dColor(QColor _color)
 void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;
+  this->TransparencyChanged(this->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////

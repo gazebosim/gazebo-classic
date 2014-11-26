@@ -1022,6 +1022,7 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dTransparency(0.4);
 }
 
 /////////////////////////////////////////////////

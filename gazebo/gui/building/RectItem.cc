@@ -33,7 +33,7 @@ RectItem::RectItem()
   this->width = 100;
   this->height = 100;
   this->visual3dColor = QColor(255, 255, 255, 255);
-  this->visual3dTransparency = 0.5;
+  this->visual3dTransparency = 0.0;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
@@ -141,9 +141,8 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
           this->grabbers[i]->removeSceneEventFilter(this);
       }
       this->rotateHandle->removeSceneEventFilter(this);
-      this->Set3dTransparency(0.5);
+      this->Set3dTransparency(0.4);
     }
-    emit TransparencyChanged(this->visual3dTransparency);
   }
   else if (_change == QGraphicsItem::ItemScenePositionHasChanged
       && this->scene())
