@@ -70,8 +70,20 @@ struct CTypeStandardLess
  *	and it is acceptable to have it as template parameter.
  */
 
+// The visibility on this class is tricky because a particular templated
+// instance is declared inside the ODE library (in odeou.cpp).
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementEqualType=CTypeStandardEqual<ElementType> >
-class OU_VISIBLE CEnumUnsortedElementArray
+class 
+#if defined ODE_API
+  ODE_API
+#else
+  #if defined(_MSC_VER)
+    __declspec(dllimport)
+  #else
+    OU_VISIBLE
+  #endif
+#endif
+CEnumUnsortedElementArray
 {
 public:
 	_OU_CONVENTION_METHOD CEnumUnsortedElementArray()
