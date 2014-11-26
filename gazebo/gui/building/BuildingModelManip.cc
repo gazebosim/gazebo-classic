@@ -358,12 +358,9 @@ void BuildingModelManip::SetTexture(QString _texture)
 {
   this->texture = _texture;
 
-  if (this->texture == QString(""))
-    return;
-
   // TODO For now setting existing material scripts.
   // Add support for custom textures.
-  std::string material;
+  std::string material = "Gazebo/Grey";
   if (_texture == ":/images/wood.jpg")
     material = "Gazebo/Wood";
   else if (_texture == ":/images/ceiling_tiled.jpg")

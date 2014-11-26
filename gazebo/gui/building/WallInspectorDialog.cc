@@ -178,6 +178,8 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
     this->textureComboBox->addItem(QPixmap(this->textureList[i]),
         QString(""));
   }
+  this->textureComboBox->addItem("X");
+  this->textureComboBox->setCurrentIndex(this->textureComboBox->count()-1);
 
   QHBoxLayout *textureLayout = new QHBoxLayout;
   textureLayout->addWidget(textureLabel);
@@ -255,7 +257,14 @@ QColor WallInspectorDialog::GetColor() const
 /////////////////////////////////////////////////
 QString WallInspectorDialog::GetTexture() const
 {
-  return this->textureList[this->textureComboBox->currentIndex()];
+  QString texture = QString("");
+  if (this->textureComboBox->currentIndex() != -1 &&
+      this->textureComboBox->currentIndex() <
+      this->textureComboBox->count() - 1)
+  {
+    texture = this->textureList[this->textureComboBox->currentIndex()];
+  }
+  return texture;
 }
 
 /////////////////////////////////////////////////
@@ -300,28 +309,36 @@ void WallInspectorDialog::SetThickness(double _thickness)
 void WallInspectorDialog::SetColor(const QColor _color)
 {
   // Find index corresponding to color (only a few colors allowed so far)
+  int index = 0;
+
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     if (this->colorList[i] == _color)
     {
-      this->colorComboBox->setCurrentIndex(i);
+      index = i;
       break;
     }
   }
+
+  this->colorComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////
 void WallInspectorDialog::SetTexture(QString _texture)
 {
   // Find index corresponding to texture (only a few textures allowed so far)
+  int index = this->textureComboBox->count()-1;
+
   for (unsigned int i = 0; i < this->textureList.size(); ++i)
   {
     if (this->textureList[i] == _texture)
     {
-      this->textureComboBox->setCurrentIndex(i);
+      index = i;
       break;
     }
   }
+
+  this->textureComboBox->setCurrentIndex(index);
 }
 
 /////////////////////////////////////////////////
