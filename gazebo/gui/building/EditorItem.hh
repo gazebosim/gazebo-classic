@@ -61,9 +61,17 @@ namespace gazebo
       /// \return Name of the item.
       public: virtual std::string GetName() const;
 
+      /// \brief Get the associated 3D visual's color.
+      /// \return Color of the 3D visual.
+      public: virtual QColor Get3dColor() const;
+
       /// \brief Set the name of this editor item.
       /// \param[in] _name Name to set the editor item to.
       public: virtual void SetName(const std::string &_name);
+
+      /// \brief Set the associated 3D visual's color.
+      /// \param[in] _color Color.
+      public: void Set3dColor(QColor _color);
 
       /// \brief Set the transparency of the associated 3D visual.
       /// \param[in] _transparency Transparency.
@@ -140,6 +148,11 @@ namespace gazebo
       /// \param[in] _yaw Yaw rotation of item in degrees.
       Q_SIGNALS: void YawChanged(double _yaw);
 
+      /// \brief Qt signal emitted when the editor item's 3D color has
+      /// changed.
+      /// \param[in] _color Color.
+      Q_SIGNALS: void ColorChanged(QColor _color);
+
       /// \brief Qt signal emitted when the editor item's 3D transparency has
       /// changed.
       /// \param[in] _transparency Transparency.
@@ -153,6 +166,9 @@ namespace gazebo
 
       /// \brief Name of editor item.
       protected: std::string name;
+
+      /// \brief Color of the associated 3D visual.
+      protected: QColor visual3dColor;
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
