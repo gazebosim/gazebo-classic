@@ -72,6 +72,7 @@ set(tests
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
+  tire_slip.cc
   transceiver.cc
   transport.cc
   world.cc

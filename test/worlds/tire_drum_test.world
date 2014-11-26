@@ -6,7 +6,7 @@
       <uri>model://sun</uri>
     </include>
 
-    <model name="tire_rig">
+    <model name="tire">
       <pose>0 0 0.5 0 0 0</pose>
 
       <link name="wheel">
@@ -177,10 +177,10 @@
     </model>
 
 
-    <model name="treadmill_drums">
+    <model name="drum">
       <pose>0 0 -4.0 1.57079632679 0 0</pose>
 
-      <link name="drum">
+      <link name="link">
         <inertial>
           <mass>10</mass>
           <inertia>
@@ -216,9 +216,9 @@
         </visual>
       </link>
 
-      <joint type="revolute" name="drum_joint0">
+      <joint type="revolute" name="joint">
         <parent>world</parent>
-        <child>drum</child>
+        <child>link</child>
         <axis>
           <xyz>0 0 1</xyz>
         </axis>
