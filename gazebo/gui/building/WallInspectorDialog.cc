@@ -164,6 +164,25 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   colorLayout->addWidget(colorLabel);
   colorLayout->addWidget(colorComboBox);
 
+  QLabel *textureLabel = new QLabel(tr("Texture: "));
+  this->textureComboBox = new QComboBox;
+  this->textureComboBox->setIconSize(QSize(30, 30));
+  this->textureComboBox->setMinimumWidth(50);
+  this->textureComboBox->setMinimumHeight(50);
+  this->textureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->textureList.push_back(":/images/wood.jpg");
+  this->textureList.push_back(":/images/ceiling_tiled.jpg");
+//  this->textureList.push_back(":/images/sidewalk");
+  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  {
+    this->textureComboBox->addItem(QPixmap(this->textureList[i]),
+        QString(""));
+  }
+
+  QHBoxLayout *textureLayout = new QHBoxLayout;
+  textureLayout->addWidget(textureLabel);
+  textureLayout->addWidget(textureComboBox);
+
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
@@ -183,6 +202,7 @@ WallInspectorDialog::WallInspectorDialog(QWidget *_parent)
   mainLayout->addWidget(lengthGroupBox);
   mainLayout->addLayout(heightThicknessLayout);
   mainLayout->addLayout(colorLayout);
+  mainLayout->addLayout(textureLayout);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
@@ -233,6 +253,12 @@ QColor WallInspectorDialog::GetColor() const
 }
 
 /////////////////////////////////////////////////
+QString WallInspectorDialog::GetTexture() const
+{
+  return this->textureList[this->textureComboBox->currentIndex()];
+}
+
+/////////////////////////////////////////////////
 void WallInspectorDialog::SetName(const std::string &_name)
 {
   this->wallNameLabel->setText(tr(_name.c_str()));
@@ -279,6 +305,20 @@ void WallInspectorDialog::SetColor(const QColor _color)
     if (this->colorList[i] == _color)
     {
       this->colorComboBox->setCurrentIndex(i);
+      break;
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+void WallInspectorDialog::SetTexture(QString _texture)
+{
+  // Find index corresponding to texture (only a few textures allowed so far)
+  for (unsigned int i = 0; i < this->textureList.size(); ++i)
+  {
+    if (this->textureList[i] == _texture)
+    {
+      this->textureComboBox->setCurrentIndex(i);
       break;
     }
   }
