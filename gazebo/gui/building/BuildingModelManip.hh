@@ -61,7 +61,7 @@ namespace gazebo
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
-      public: QString GetTexture() const;
+      public: std::string GetTexture() const;
 
       /// \brief Set the name of the manip object.
       /// \param[in] _name Name to set the manip to.
@@ -272,7 +272,7 @@ namespace gazebo
       private: common::Color color;
 
       /// \brief Visual's texture.
-      private: QString texture;
+      private: std::string texture;
     };
     /// \}
   }
