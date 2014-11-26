@@ -976,9 +976,7 @@ void EditorView::OnAddLevel()
 
     floorItem->AttachWallSegment(wallSegmentItem);
 
-    // Select -> deselect to trigger change
-    wallSegmentItem->setSelected(true);
-    wallSegmentItem->setSelected(false);
+    wallSegmentItem->Set3dTransparency(0.4);
   }
 
   // Clone linked grabber relations
