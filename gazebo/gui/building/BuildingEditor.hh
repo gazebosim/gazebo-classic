@@ -50,13 +50,7 @@ namespace gazebo
 
       /// \brief Qt callback when the building editor's new action is
       /// triggered.
-      //private slots: void New();
-
       private slots: void New();
-
-      /// \brief Qt callback when the building editor's done action is
-      /// triggered.
-      //private slots: void Done();
 
       /// \brief Qt callback when the building editor's exit action is
       /// triggered.
@@ -82,7 +76,6 @@ namespace gazebo
       private: QAction *saveAct;
       private: QAction *saveAsAct;
       private: QAction *newAct;
-      //private: QAction *doneAct;
       private: QAction *exitAct;
     };
   }

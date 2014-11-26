@@ -253,7 +253,7 @@ namespace gazebo
       /// \brief Bring up a "File Exists" dialog for the given path.
       /// \param[in] Path to a file that the user is attempting to overwrite.
       /// \param[out] Whether or not the user chose to overwrite the file.
-      private: bool FileOverwriteDialog(const std::string _pathName);
+      private: bool FileOverwriteDialog(const std::string &_pathName);
 
       /// \brief Callback for saving the model.
       /// \param[in] _saveName Name to save the model.
@@ -265,11 +265,6 @@ namespace gazebo
 
       /// \brief Callback for newing the model.
       private: void OnNew();
-
-      /// \brief Callback when the model is to be finished and uploaded on to
-      /// the server.
-      /// \param[in] _saveName Name to save the model.
-      //private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
@@ -340,10 +335,6 @@ namespace gazebo
 
       /// \brief A dialog for setting building model name and save location.
       private: FinishBuildingDialog *saveDialog;
-
-      /// \brief A dialog that prompts to confirm model completion and uploading
-      /// to the server
-      //private: FinishBuildingDialog *finishDialog;
     };
     /// \}
   }

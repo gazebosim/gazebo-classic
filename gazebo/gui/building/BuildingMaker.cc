@@ -82,17 +82,12 @@ double BuildingMaker::conversionScale;
   this->connections.push_back(
   gui::editor::Events::ConnectNewBuildingEditor(
     boost::bind(&BuildingMaker::OnNew, this)));
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDoneBuildingEditor(
-    boost::bind(&BuildingMaker::OnDone, this, _1)));*/
   this->connections.push_back(
   gui::editor::Events::ConnectExitBuildingEditor(
     boost::bind(&BuildingMaker::OnExit, this)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
-/*  this->finishDialog =
-      new FinishBuildingDialog(FinishBuildingDialog::MODEL_FINISH, 0);*/
 }
 
 /////////////////////////////////////////////////
@@ -101,8 +96,6 @@ BuildingMaker::~BuildingMaker()
 //  this->camera.reset();
   if (this->saveDialog)
     delete this->saveDialog;
-/*  if (this->finishDialog)
-    delete this->finishDialog;*/
 }
 
 /////////////////////////////////////////////////
@@ -1334,23 +1327,22 @@ void BuildingMaker::OnNew()
 {
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
-  QPushButton *button1;
-  QPushButton *button2;
+  //QPushButton *button1;
+  QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
   QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
 
   if (this->saved)
   {
     msg.append("Are you sure you want to close this model and open a new \n"
                "canvas?\n\n");
-    button1 = msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+    msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
+    saveButton.hide();
   }
   else
   {
     msg.append("You have unsaved changes. Do you want to save this model \n"
                "and open a new canvas?\n\n");
-    button1 = msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
-    button2 = msgBox.addButton("Save", QMessageBox::YesRole);
-
+    msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
   }
   msg.append("Once you open a new canvas, your current model will no longer \n"
              "be editable.");
@@ -1359,7 +1351,7 @@ void BuildingMaker::OnNew()
 
   msgBox.exec();
   if (msgBox.clickedButton() != cancelButton){
-    if (!this->saved && msgBox.clickedButton() == button2)
+    if (!this->saved && msgBox.clickedButton() == saveButton)
     {
       this->OnSave(this->modelName);
     }
@@ -1369,7 +1361,6 @@ void BuildingMaker::OnNew()
     // TODO: Reset values in saveDialog
     this->saveLocation = QDir::homePath().toStdString();
     this->saved = false;
-
   }
 }
 
@@ -1380,7 +1371,7 @@ void BuildingMaker::SaveModelFiles()
   this->SaveToSDF(this->saveLocation);
 }
 
-bool BuildingMaker::FileOverwriteDialog(const std::string pathName)
+bool BuildingMaker::FileOverwriteDialog(const std::string &pathName)
 {
   std::string msg = "A file named " + pathName + " already exists.\n\n"
                     "Do you wish to overwrite the existing file?\n";
@@ -1586,29 +1577,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
   }
 }
-
-/////////////////////////////////////////////////
-/*void BuildingMaker::OnDone(const std::string &_saveName)
-{
-  if (_saveName != "")
-    this->SetModelName(_saveName);
-
-  this->finishDialog->SetModelName(this->modelName);
-  if (this->saveLocation.length() > 0)
-  {
-    this->finishDialog->SetSaveLocation(this->saveLocation);
-  }
-  if (this->finishDialog->exec() == QDialog::Accepted)
-  {
-    this->SetModelName(this->finishDialog->GetModelName());
-    this->saveLocation = this->finishDialog->GetSaveLocation();
-    this->GenerateSDF();
-    this->SaveToSDF(this->saveLocation);
-    this->FinishModel();
-    gui::editor::Events::newBuildingModel();
-    gui::editor::Events::finishBuildingModel();
-  }
-}*/
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnExit()

@@ -63,18 +63,6 @@ BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   this->saveAsAct->setCheckable(false);
   connect(this->saveAsAct, SIGNAL(triggered()), this, SLOT(SaveAs()));
 
-  /*this->discardAct = new QAction(tr("&Discard"), this->mainWindow);
-  this->discardAct->setStatusTip(tr("Discard"));
-  this->discardAct->setShortcut(tr("Ctrl+D"));
-  this->discardAct->setCheckable(false);
-  connect(this->discardAct, SIGNAL(triggered()), this, SLOT(Discard()));*/
-
-/*  this->doneAct = new QAction(tr("Don&e"), this->mainWindow);
-  this->doneAct->setShortcut(tr("Ctrl+E"));
-  this->doneAct->setStatusTip(tr("Done"));
-  this->doneAct->setCheckable(false);
-  connect(this->doneAct, SIGNAL(triggered()), this, SLOT(Done()));*/
-
   this->exitAct = new QAction(tr("E&xit Building Editor"), this->mainWindow);
   this->exitAct->setStatusTip(tr("Exit Building Editor"));
   this->exitAct->setShortcut(tr("Ctrl+X"));
@@ -116,13 +104,6 @@ void BuildingEditor::New()
 }
 
 /////////////////////////////////////////////////
-/*void BuildingEditor::Done()
-{
-  gui::editor::Events::doneBuildingEditor(
-      this->buildingPalette->GetModelName());
-}*/
-
-/////////////////////////////////////////////////
 void BuildingEditor::Exit()
 {
   gui::editor::Events::exitBuildingEditor();
@@ -148,7 +129,6 @@ void BuildingEditor::CreateMenus()
   fileMenu->addAction(this->newAct);
   fileMenu->addAction(this->saveAct);
   fileMenu->addAction(this->saveAsAct);
-  //fileMenu->addAction(this->doneAct);
   fileMenu->addAction(this->exitAct);
 }
 
