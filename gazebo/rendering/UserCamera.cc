@@ -115,16 +115,16 @@ void UserCamera::Init()
   switch (RenderEngine::Instance()->GetRenderPathType())
   {
     case RenderEngine::VERTEX:
-      this->SetClipDist(0.1, 100);
+      this->SetClipDist(0.001, 100);
       break;
 
     case RenderEngine::DEFERRED:
     case RenderEngine::FORWARD:
-      this->SetClipDist(.1, 5000);
+      this->SetClipDist(.001, 5000);
       break;
 
     default:
-      this->SetClipDist(.1, 5000);
+      this->SetClipDist(.001, 5000);
       break;
   }
 

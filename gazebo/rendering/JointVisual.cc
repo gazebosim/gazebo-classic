@@ -53,6 +53,11 @@ void JointVisual::Load(ConstJointPtr &_msg)
       new AxisVisual(this->GetName() + "_AXIS", shared_from_this()));
   dPtr->axisVisual->Load();
 
+  /// \TODO temporary hack for hand (small link visualization)
+  dPtr->axisVisual->ScaleXAxis(math::Vector3(0.1, 0.1, 0.1));
+  dPtr->axisVisual->ScaleYAxis(math::Vector3(0.1, 0.1, 0.1));
+  dPtr->axisVisual->ScaleZAxis(math::Vector3(0.1, 0.1, 0.1));
+
   this->SetPosition(msgs::Convert(_msg->pose().position()));
   this->SetRotation(msgs::Convert(_msg->pose().orientation()));
 
@@ -124,6 +129,9 @@ void JointVisual::CreateAxis(const math::Vector3 &_axis, bool _useParentFrame,
   axis.reset(new ArrowVisual(nameStr.str(), shared_from_this()));
   axis->Load();
   axis->SetMaterial("Gazebo/YellowTransparent");
+
+  /// \TODO temporary hack for hand (small link visualization)
+  axis->SetScale(math::Vector3(0.1, 0.1, 0.1));
 
   // Get rotation to axis vector
   math::Vector3 axisDir = _axis;
