@@ -122,6 +122,17 @@ if(NOT DEFINED ENABLE_SCREEN_TESTS)
 endif()
 
 message (STATUS "\n\n====== Finding 3rd Party Packages ======")
+# Use of tinyxml. System installation on UNIX. Internal copy on WIN
+if (UNIX)
+  message (STATUS "Using system tinyxml")
+  set (USE_EXTERNAL_TINYXML True)
+elseif(WIN32)
+  message (STATUS "Using internal tinyxml code")
+  set (USE_EXTERNAL_TINYXML False)
+else()
+  message (STATUS "Unknown platform")
+  BUILD_ERROR("Unknown platform")
+endif()
 include (${gazebo_cmake_dir}/SearchForStuff.cmake)
 message (STATUS "----------------------------------------\n")
 
@@ -203,6 +214,27 @@ endif()
 filter_valid_compiler_flags(-Wall -Wextra -Wno-long-long -Wno-unused-value -Wno-unused-value
                                -Wno-unused-value -Wno-unused-value -Wfloat-equal -Wshadow
 			       -Winit-self -Wswitch-default -Wmissing-include-dirs -pedantic)
+
+if (WIN32)
+    # Need for M_PI constant
+    add_definitions(-D_USE_MATH_DEFINES) 
+    # Use dynamic linking for boost
+    add_definitions(-DBOOST_ALL_DYN_LINK)
+    # And force linking to MSVC dynamic runtime
+    if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
+      add_definitions("/MDd")
+    else()
+      add_definitions("/MD")
+    endif()
+    # And we want exceptions
+    add_definitions("/EHsc")
+    if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+      # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
+      # Enable as a second measeure to workaround over bug
+      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240 
+      set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
+    endif()
+ENDIF(WIN32)
 
 # Check and add visibility hidden by default. Only in UNIX
 # Windows and MacosX does not handled properly the hidden compilation
@@ -365,9 +397,9 @@ else (build_errors)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_physics_bullet)
   endif()
 
-  if (${OGRE_VERSION} GREATER 1.7.4)
-    set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
-  endif()
+  #if (${OGRE_VERSION} GREATER 1.7.4)
+  #  set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_rendering_deferred)
+  #endif()
 
   set(PKG_DEPENDS Boost Protobuf SDFormat)
 

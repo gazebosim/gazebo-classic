@@ -33,7 +33,9 @@
 #include "lcp.h"
 #include "util.h"
 
-#include <sys/time.h>
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
 
 #ifdef SSE
 #include <xmmintrin.h>

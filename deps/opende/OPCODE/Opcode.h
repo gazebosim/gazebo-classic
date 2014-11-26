@@ -81,7 +81,32 @@
 // #endif
 
 // Preprocessor__
-#define OPCODE_API GAZEBO_VISIBLE
+//#define OPCODE_API GAZEBO_VISIBLE
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_OPCODE
+    #ifdef __GNUC__
+      #define OPCODE_API __attribute__ ((dllexport))
+    #else
+      #define OPCODE_API __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define OPCODE_API __attribute__ ((dllimport))
+    #else
+      #define OPCODE_API __declspec(dllimport)
+    #endif
+  #endif
+  #define OPCODE_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define OPCODE_API __attribute__ ((visibility ("default")))
+    #define OPCODE_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define OPCODE_API
+    #define OPCODE_HIDDEN
+  #endif
+#endif
 
   #include "OPC_Settings.h"
   #include "OPC_IceHook.h"

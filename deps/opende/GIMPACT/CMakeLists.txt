@@ -37,6 +37,8 @@ set ( headers
   include/GIMPACT/gim_math.h
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GIMPACT")
+
 gz_add_library(gazebo_gimpact ${sources})
 gz_install_library(gazebo_gimpact)
 gz_install_includes("GIMPACT" ${headers})

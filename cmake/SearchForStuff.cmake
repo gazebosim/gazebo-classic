@@ -70,7 +70,8 @@ endif ()
 
 ########################################
 # Find packages
-if (PKG_CONFIG_FOUND)
+#if (PKG_CONFIG_FOUND)
+if (True)
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -145,28 +146,37 @@ if (PKG_CONFIG_FOUND)
     set (HAVE_DART FALSE)
   endif()
 
+if (USE_EXTERNAL_TINXYML)
   #################################################
   # Find tinyxml. Only debian distributions package tinyxml with a pkg-config
   # Use pkg_check_modules and fallback to manual detection (needed, at least, for MacOS)
   pkg_check_modules(tinyxml tinyxml)
   if (NOT tinyxml_FOUND)
-      find_path (tinyxml_INCLUDE_DIRS tinyxml.h ${tinyxml_INCLUDE_DIRS} ENV CPATH)
-      find_library(tinyxml_LIBRARIES NAMES tinyxml)
-      set (tinyxml_FAIL False)
-      if (NOT tinyxml_INCLUDE_DIRS)
-        message (STATUS "Looking for tinyxml headers - not found")
-        set (tinyxml_FAIL True)
-      endif()
-      if (NOT tinyxml_LIBRARIES)
-        message (STATUS "Looking for tinyxml library - not found")
-        set (tinyxml_FAIL True)
-      endif()
+    find_path (tinyxml_include_dirs tinyxml.h ${tinyxml_include_dirs} ENV CPATH)
+    find_library(tinyxml_LIBRARIES NAMES tinyxml)
+    set (tinyxml_FAIL False) 
+    if (NOT tinyxml_include_dirs)
+      message (STATUS "Looking for tinyxml headers - not found")
+      set (tinyxml_FAIL True) 
+    endif()
+    if (NOT tinyxml_LIBRARIES)
+      message (STATUS "Looking for tinyxml library - not found")
+      set (tinyxml_FAIL True) 
+    endif()
   endif()
-
+		  
   if (tinyxml_FAIL)
     message (STATUS "Looking for tinyxml.h - not found")
     BUILD_ERROR("Missing: tinyxml")
   endif()
+else()
+  # Needed in WIN32 since in UNIX the flag is added in the code installed
+  add_definitions(-DTIXML_USE_STL)
+  include_directories (${PROJECT_SOURCE_DIR}/deps/win/tinyxml)
+  set (tinyxml_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/deps/win/tinyxml)
+  set (tinyxml_LIBRARIES "tinyxml")
+  set (tinyxml_LIBRARY_DIRS "")
+endif()
 
   #################################################
   # Find libtar.
@@ -189,7 +199,8 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   if (NOT LIBTAR_FOUND)
-     BUILD_ERROR("Missing: libtar")
+     #BUILD_ERROR("Missing: libtar")
+     set(libtar_LIBRARIES "")
   endif()
 
   #################################################
@@ -203,7 +214,7 @@ if (PKG_CONFIG_FOUND)
       set(TBB_FOUND true)
       set(TBB_LIBRARIES ${tbb_library})
     else (tbb_library)
-      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+      #BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
     endif(tbb_library)
   endif (NOT TBB_FOUND)
 
@@ -211,7 +222,7 @@ if (PKG_CONFIG_FOUND)
   # Find OGRE
   execute_process(COMMAND pkg-config --modversion OGRE
                   OUTPUT_VARIABLE OGRE_VERSION)
-  string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
+  #string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
   pkg_check_modules(OGRE-RTShaderSystem
                     OGRE-RTShaderSystem>=${MIN_OGRE_VERSION})
@@ -232,7 +243,7 @@ if (PKG_CONFIG_FOUND)
   # There are some runtime problems to solve with ogre-1.9.
   # Please read gazebo issues: 994, 995
   if (NOT OGRE_FOUND)
-    BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
+    #BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
   else ()
     set(ogre_ldflags ${ogre_ldflags} ${OGRE_LDFLAGS})
     set(ogre_include_dirs ${ogre_include_dirs} ${OGRE_INCLUDE_DIRS})
@@ -408,6 +419,11 @@ endif()
 
 ########################################
 # Find Boost, if not specified manually
+if (WIN32)
+  set(Boost_USE_STATIC_LIBS       OFF) 
+  set(Boost_USE_MULTITHREADED      ON)
+  set(Boost_USE_STATIC_RUNTIME    OFF)
+endif()
 include(FindBoost)
 find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
 
@@ -431,6 +447,7 @@ find_library(libdl_library dl /usr/lib /usr/local/lib)
 if (NOT libdl_library)
   message (STATUS "Looking for libdl - not found")
   #BUILD_ERROR ("Missing libdl: Required for plugins.")
+  set(libdl_library "")
 else (NOT libdl_library)
   message (STATUS "Looking for libdl - found")
 endif ()

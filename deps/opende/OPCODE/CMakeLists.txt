@@ -83,6 +83,8 @@ OPC_VolumeCollider.h
 Stdafx.h
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_OPCODE")
+
 gz_add_library(gazebo_opcode ${sources})
 gz_install_library(gazebo_opcode)
 gz_install_includes("opcode" ${headers})

@@ -32,7 +32,7 @@
 #include <ou/macros.h>
 #include <ou/platform.h>
 #include <ou/namespace.h>
-#include <gazebo/util/system.hh>
+#include <ou/ou_dll.h>
 
 
 BEGIN_NAMESPACE_OU()
@@ -71,7 +71,7 @@ struct CTypeStandardLess
  */
 
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementEqualType=CTypeStandardEqual<ElementType> >
-class GAZEBO_VISIBLE CEnumUnsortedElementArray
+class OU_VISIBLE CEnumUnsortedElementArray
 {
 public:
 	_OU_CONVENTION_METHOD CEnumUnsortedElementArray()
@@ -155,7 +155,7 @@ private:
  */
 
 template<typename EnumType, const EnumType EnumMax, typename ElementType, const int Instance=0, class CElementLessType=CTypeStandardLess<ElementType> >
-class GAZEBO_VISIBLE CEnumSortedElementArray
+class OU_VISIBLE CEnumSortedElementArray
 {
 public:
 	_OU_INLINE _OU_CONVENTION_METHOD CEnumSortedElementArray()

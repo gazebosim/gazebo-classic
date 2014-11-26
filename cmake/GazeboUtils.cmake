@@ -96,13 +96,13 @@ endmacro (BUILD_WARNING)
 #################################################
 macro (gz_add_library _name)
   add_library(${_name} SHARED ${ARGN})
+  set_source_files_properties(${ARGN} PROPERTIES COMPILE_DEFINITIONS "BUILDING_DLL")
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
 #################################################
 macro (gz_add_executable _name)
   add_executable(${_name} ${ARGN})
-  set_source_files_properties(${ARGN} PROPERTIES COMPILE_DEFINITIONS "BUILDING_DLL")
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 

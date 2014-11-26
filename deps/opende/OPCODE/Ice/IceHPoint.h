@@ -12,7 +12,15 @@
 #ifndef __ICEHPOINT_H__
 #define __ICEHPOINT_H__
 
-	class __attribute__((__may_alias__)) ICEMATHS_API  HPoint : public Point
+#ifndef ATTRIBUTE_MAY_ALIAS
+  #if  defined _WIN32
+    #define ATTRIBUTE_MAY_ALIAS
+  #else
+    #define ATTRIBUTE_MAY_ALIAS __attribute__((__may_alias__)) 
+  #endif
+#endif
+
+	class ATTRIBUTE_MAY_ALIAS ICEMATHS_API  HPoint : public Point
 	{
 		public:
 
