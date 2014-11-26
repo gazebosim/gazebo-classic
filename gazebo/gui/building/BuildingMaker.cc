@@ -1414,7 +1414,7 @@ void BuildingMaker::OnSave(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
-  // auto-fill these fields with existing values 
+  // TODO: auto-fill these fields with existing values 
   this->saveDialog->SetModelName(_saveName);
 
   // Auto-generate folder name based on model name
@@ -1428,7 +1428,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     std::string forbiddenChar = replacePairs[i].first;
     std::string replaceChar = replacePairs[i].second;
     size_t index = foldername.find(forbiddenChar);
-    // Strip 
     while (index != std::string::npos)
     {
       foldername.replace(index, forbiddenChar.size(), replaceChar);
@@ -1533,22 +1532,6 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     if (boost::filesystem::exists(modelConfigPath))
     {
       bool save = this->FileOverwriteDialog(modelConfigPath.string());
-      // TODO: same size buttons
-      /*
-      std::string msg = "A file named " + path.string() + " already exists.\n"
-                        "Do you wish to overwrite the existing file?\n";
-      QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
-                         QString(msg.c_str()));
-
-      QPushButton *saveButton = msgBox.addButton("Save",
-                                                 QMessageBox::ApplyRole);
-      QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
-      msgBox.exec();
-      if (msgBox.clickedButton() == cancelButton)
-      {
-        this->OnSaveAs(_saveName);
-        return;
-      }*/
       if (!save)
       {
         this->OnSaveAs(_saveName);
@@ -1566,7 +1549,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     // TODO: save textures
 
     // Save all the things
-    path = path / this->saveLocation / this->modelFolderName / "model.sdf";
+    path = path / "model.sdf";
 
     if (boost::filesystem::exists(path))
     {
@@ -1595,11 +1578,9 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
     if (iter == modelPaths.end())
     {
-      // Add it to GAZEBO_MODEL_PATHS
+      // Add it to GAZEBO_MODEL_PATHS and notify InsertModelWidget
       gazebo::common::SystemPaths::Instance()->
         AddModelPathsUpdate(this->saveLocation);
-      //gazebo::common::SystemPaths::Instance()->AddModelPaths(this->saveLocation);
-      // Notify InsertModelWidget
     }
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);

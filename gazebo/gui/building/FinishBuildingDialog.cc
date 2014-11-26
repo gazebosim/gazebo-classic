@@ -119,6 +119,16 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
   advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
+  advancedOptionsCollapser->setStyleSheet(
+     "QRadioButton {\
+        color: #d0d0d0;\
+      }\
+      QRadioButton::indicator::checked {\
+        image: url(:/images/right_arrow.png);\
+      }\
+      QRadioButton::indicator::unchecked {\
+        image: url(:/images/down_arrow.png);\
+      }");
   // initialize as "closed" (unchecked)
   // Button behavior: when "open", show advancedOptionsGrid
   connect(advancedOptionsCollapser, SIGNAL(toggled(bool)), this,
@@ -163,6 +173,9 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->setMinimumSize(400, 140);
+  this->setMaximumSize(400, 380);
+  this->resize(this->minimumSize());
 }
 
 /////////////////////////////////////////////////
@@ -258,9 +271,11 @@ void FinishBuildingDialog::ToggleAdvancedOptions(bool _checked)
   if (_checked)
   {
     this->advancedOptionsWidget->show();
+    this->resize(this->maximumSize());
   }
   else
   {
     this->advancedOptionsWidget->hide();
+    this->resize(this->minimumSize());
   }
 }

@@ -127,6 +127,9 @@ namespace gazebo
 
       /// \brief Editable line that holds the model's filename.
       private: QLineEdit* modelFolderNameLineEdit;
+
+      /// \brief The widget's initial height.
+      private: float initialHeight;
     };
     /// \}
   }
