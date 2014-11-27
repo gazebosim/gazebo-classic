@@ -61,6 +61,12 @@ rendering::VisualPtr BuildingModelManip::GetVisual() const
 }
 
 /////////////////////////////////////////////////
+common::Color BuildingModelManip::GetColor() const
+{
+  return this->color;
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::SetMaker(BuildingMaker *_maker)
 {
   this->maker = _maker;
@@ -263,6 +269,12 @@ void BuildingModelManip::OnRotationChanged(double _roll, double _pitch,
 }
 
 /////////////////////////////////////////////////
+void BuildingModelManip::OnColorChanged(QColor _color)
+{
+  this->SetColor(_color);
+}
+
+/////////////////////////////////////////////////
 void BuildingModelManip::OnTransparencyChanged(float _transparency)
 {
   this->SetTransparency(_transparency);
@@ -319,6 +331,14 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
       - math::Vector3(dScale.x/2.0, dScale.y/2.0, dScale.z/2.0);
 
   this->visual->SetPosition(newPos);
+}
+
+/////////////////////////////////////////////////
+void BuildingModelManip::SetColor(QColor _color)
+{
+  common::Color newColor(_color.red(), _color.green(), _color.blue());
+  this->color = newColor;
+  this->visual->GetParent()->SetAmbient(this->color);
 }
 
 /////////////////////////////////////////////////
