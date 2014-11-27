@@ -64,13 +64,14 @@ void ModelEditor::OnEdit(bool /*_checked*/)
   }
   this->active = !this->active;
   this->ToggleToolbar();
-  g_editModelAct->setChecked(this->active);
+//  g_editModelAct->setChecked(this->active);
 }
 
 /////////////////////////////////////////////////
 void ModelEditor::OnFinish()
 {
-  this->OnEdit(g_editModelAct->isChecked());
+//  this->OnEdit(g_editModelAct->isChecked());
+  g_editModelAct->trigger();
 }
 
 /////////////////////////////////////////////////

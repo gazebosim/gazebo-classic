@@ -321,7 +321,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         QPointF pf;
         pf = p2;
 
-        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
         {
           double distanceToClose = 30;
 
@@ -612,6 +612,43 @@ void EditorView::DrawWall(const QPoint &_pos)
 
     wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
         this->levelDefaultHeight);
+
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
+    {
+      double distanceToClose = 30;
+
+      // Snap to other walls' points
+      QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
+          QPointF(pointStart.x() - distanceToClose/2,
+                  pointStart.y() - distanceToClose/2),
+          QPointF(pointStart.x() + distanceToClose/2,
+                  pointStart.y() + distanceToClose/2)));
+      for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
+          it  != itemsList.end(); ++it)
+      {
+        WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>(*it);
+        if (anotherWall)
+        {
+          if (QVector2D(pointStart - anotherWall->GetStartPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
+            this->LinkGrabbers(anotherWall->grabbers[0],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+          else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
+            this->LinkGrabbers(anotherWall->grabbers[1],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+        }
+      }
+    }
+
     wallSegmentItem->SetLevel(this->currentLevel);
     wallSegmentItem->SetLevelBaseHeight(this->levels[this->currentLevel]->
         baseHeight);
@@ -947,6 +984,7 @@ void EditorView::OnAddLevel()
   newLevel->baseHeight = maxHeight;
 
   FloorItem *floorItem = new FloorItem();
+  this->levels[this->currentLevel]->floorItem = floorItem;
   std::vector<WallSegmentItem *> newWalls;
   std::map<WallSegmentItem *, WallSegmentItem *> clonedWallMap;
   for (std::vector<WallSegmentItem *>::iterator it = wallSegmentList.begin();
@@ -1162,6 +1200,16 @@ void EditorView::OnChangeLevel(int _level)
 void EditorView::OnOpenLevelInspector()
 {
   this->levelInspector->SetLevelName(this->levels[this->currentLevel]->name);
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    this->levelInspector->floorWidget->show();
+    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+  }
+  else
+  {
+    this->levelInspector->floorWidget->hide();
+  }
   this->levelInspector->show();
 }
 
@@ -1173,6 +1221,9 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
+  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
+      GetFloorColor());
+  this->levels[this->currentLevel]->floorItem->FloorChanged();
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
