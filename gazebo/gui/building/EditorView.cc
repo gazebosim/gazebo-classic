@@ -640,7 +640,7 @@ void EditorView::DrawWall(const QPoint &_pos)
           else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
               <= distanceToClose)
           {
-            wallSegmentItem->SetEndPoint(anotherWall->GetEndPoint());
+            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
             this->LinkGrabbers(anotherWall->grabbers[1],
                 wallSegmentItem->grabbers[0]);
             break;
