@@ -53,7 +53,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor;
-      public: ConfigChildWidget() : groupWidget(NULL) {};
+      public: ConfigChildWidget() : groupWidget(NULL) {}
 
       /// \brief List of child widgets.
       public: std::vector<QWidget *> widgets;

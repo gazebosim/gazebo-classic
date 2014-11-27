@@ -150,7 +150,6 @@ void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
     }
     iter->second->setEnabled(!_readOnly);
   }
-
 }
 
 /////////////////////////////////////////////////
