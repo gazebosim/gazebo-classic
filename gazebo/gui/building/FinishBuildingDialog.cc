@@ -53,13 +53,14 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   QLabel *modelHeader = new QLabel;
   modelHeader->setText(tr("<b>Model</b>"));
   QLabel *fileHeader = new QLabel;
-  fileHeader->setText(tr("<b>File</b>"));
+  fileHeader->setText(tr("<b>Folder</b>"));
 
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
   // Try to get path to home folder
-  this->modelLocationLineEdit->setText(QDir::homePath());
+  this->modelLocationLineEdit->setText(QDir::homePath()+
+                                       "/building_editor_models");
 
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
@@ -118,10 +119,10 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
      "QRadioButton {\
         color: #d0d0d0;\
       }\
-      QRadioButton::indicator::checked {\
+      QRadioButton::indicator::unchecked {\
         image: url(:/images/right_arrow.png);\
       }\
-      QRadioButton::indicator::unchecked {\
+      QRadioButton::indicator::checked {\
         image: url(:/images/down_arrow.png);\
       }");
   // initialize as "closed" (unchecked)

@@ -256,11 +256,13 @@ namespace gazebo
 
       /// \brief Callback for saving the model.
       /// \param[in] _saveName Name to save the model.
-      private: void OnSave(const std::string &_saveName = "");
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for selecting a folder and saving the model.
       /// \param[in] _saveName Name to save the model.
-      private: void OnSaveAs(const std::string &_saveName);
+      /// \return True if the user chose to save, false if the user cancelled.
+      private: bool OnSaveAs(const std::string &_saveName);
 
       /// \brief Callback for newing the model.
       private: void OnNew();

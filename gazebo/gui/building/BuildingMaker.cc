@@ -481,7 +481,8 @@ void BuildingMaker::Reset()
     scene->RemoveVisual(this->modelVisual);
 
   this->saved = false;
-  this->saveLocation = QDir::homePath().toStdString();
+  this->saveLocation = (QDir::homePath()+"/building_editor_models").
+                       toStdString();
   this->modelName = this->buildingDefaultName;
 
   this->modelVisual.reset(new rendering::Visual(this->modelName,
@@ -518,8 +519,14 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   std::ofstream savefile;
   boost::filesystem::path path;
   path = path / this->saveLocation / this->modelFolderName / "model.sdf";
+  gzdbg << "Saving file to " << path.string() << std::endl;
 
   savefile.open(path.string().c_str());
+  if (!savefile.is_open())
+  {
+    gzerr << "Couldn't open file for writing: " << path.string() << std::endl;
+    return;
+  }
   savefile << this->modelSDF->ToString();
   savefile.close();
 }
@@ -1376,13 +1383,15 @@ void BuildingMaker::OnNew()
   {
     if (!this->saved && msgBox.clickedButton() == saveButton)
     {
+      //FIXME for unsaved models
       this->OnSave(this->modelName);
     }
 
     gui::editor::Events::newBuildingModel();
     this->modelName = this->buildingDefaultName;
     // TODO: Reset values in saveDialog
-    this->saveLocation = QDir::homePath().toStdString();
+    this->saveLocation = (QDir::homePath()+"/building_editor_models").
+                         toStdString();
     this->saved = false;
   }
 }
@@ -1409,7 +1418,7 @@ bool BuildingMaker::FileOverwriteDialog(const std::string &pathName)
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnSave(const std::string &_saveName)
+bool BuildingMaker::OnSave(const std::string &_saveName)
 {
   if (_saveName != "")
     this->SetModelName(_saveName);
@@ -1418,15 +1427,13 @@ void BuildingMaker::OnSave(const std::string &_saveName)
   {
     this->SaveModelFiles();
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+    return true;
   }
-  else
-  {
-    this->OnSaveAs(_saveName);
-  }
+  return this->OnSaveAs(_saveName);
 }
 
 /////////////////////////////////////////////////
-void BuildingMaker::OnSaveAs(const std::string &_saveName)
+bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
   // TODO: auto-fill these fields with existing values
   this->saveDialog->SetModelName(_saveName);
@@ -1472,7 +1479,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     if (!modelXML)
     {
       gzerr << "No model name in default config file\n";
-      return;
+      return false;
     }
     TiXmlElement *modelNameXML = modelXML->FirstChildElement("name");
     modelNameXML->FirstChild()->SetValue(this->modelName);
@@ -1536,7 +1543,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       if (!boost::filesystem::create_directories(path))
       {
         gzerr << "Couldn't create folder for model files." << std::endl;
-        return;
+        return false;
       }
       gzmsg << "Created folder " << path << " for model files." << std::endl;
     }
@@ -1548,13 +1555,20 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       bool save = this->FileOverwriteDialog(modelConfigPath.string());
       if (!save)
       {
-        this->OnSaveAs(_saveName);
-        return;
+        return this->OnSaveAs(_saveName);
       }
     }
+    
+    const char* modelConfigString = modelConfigPath.string().c_str();
+    gzdbg << "Saving file to " << modelConfigString << std::endl;
 
     std::ofstream savefile;
-    savefile.open(modelConfigPath.string().c_str());
+    savefile.open(modelConfigString);
+    if (!savefile.is_open())
+    {
+      gzerr << "Couldn't open file for writing: " << modelConfigPath.string() <<
+               std::endl;
+    }
     // TODO: human-readable formatting of XML output
     savefile << xmlDoc;
     savefile.close();
@@ -1570,8 +1584,7 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
       bool save = FileOverwriteDialog(path.string());
       if (!save)
       {
-        this->OnSaveAs(this->modelName);
-        return;
+        return this->OnSaveAs(this->modelName);
       }
     }
 
@@ -1598,7 +1611,9 @@ void BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
+    return true;
   }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -1644,14 +1659,16 @@ void BuildingMaker::OnExit()
     {
       gui::editor::Events::newBuildingModel();
       this->modelName = this->buildingDefaultName;
-      this->saveLocation = QDir::homePath().toStdString();
+      this->saveLocation = (QDir::homePath()+"/building_editor_models").toStdString();
       this->saved = false;
       gui::editor::Events::finishBuildingModel();
     }
     else if (msgBox.clickedButton() == saveButton)
     {
-      this->OnSave(this->modelName);
-      gui::editor::Events::finishBuildingModel();
+      if (this->OnSave(this->modelName))
+      {
+        gui::editor::Events::finishBuildingModel();
+      }
     }
   }
 }

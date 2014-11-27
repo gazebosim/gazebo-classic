@@ -308,10 +308,10 @@ namespace gazebo
         public: static event::EventT<void (double)> changeBuildingEditorZoom;
 
         /// \brief Save the model
-        public: static event::EventT<void (std::string)> saveBuildingEditor;
+        public: static event::EventT<bool (std::string)> saveBuildingEditor;
 
         /// \brief Save the model as
-        public: static event::EventT<void (std::string)> saveAsBuildingEditor;
+        public: static event::EventT<bool (std::string)> saveAsBuildingEditor;
 
         /// \brief New the model
         public: static event::EventT<void ()> newBuildingEditor;
