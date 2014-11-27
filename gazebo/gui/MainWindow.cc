@@ -284,6 +284,8 @@ void MainWindow::Init()
 
   this->requestMsg = msgs::CreateRequest("scene_info");
   this->requestPub->Publish(*this->requestMsg);
+
+  gui::Events::mainWindowReady();
 }
 
 /////////////////////////////////////////////////
@@ -606,16 +608,6 @@ void MainWindow::OnFollow(const std::string &_modelName)
         "Press Escape to exit Follow mode", 0);
     this->editMenu->setEnabled(false);
   }
-}
-
-/////////////////////////////////////////////////
-void MainWindow::NewModel()
-{
-  /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
-  modelBuilder->Init();
-  modelBuilder->show();
-  modelBuilder->resize(800, 600);
-  */
 }
 
 /////////////////////////////////////////////////
@@ -968,11 +960,6 @@ void MainWindow::CreateActions()
   g_quitAct->setStatusTip(tr("Quit"));
   connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  g_newModelAct = new QAction(tr("New &Model"), this);
-  g_newModelAct->setShortcut(tr("Ctrl+M"));
-  g_newModelAct->setStatusTip(tr("Create a new model"));
-  connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
-
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
@@ -985,6 +972,10 @@ void MainWindow::CreateActions()
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
+  // Exclusive doesn't allow all actions to be unchecked at the same time
+  editorGroup->setExclusive(false);
+  connect(editorGroup, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnEditorGroup(QAction *)));
 
   g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
@@ -1164,19 +1155,27 @@ void MainWindow::CreateActions()
   connect(g_showJointsAct, SIGNAL(triggered()), this,
           SLOT(ShowJoints()));
 
-
   g_fullScreenAct = new QAction(tr("Full Screen"), this);
   g_fullScreenAct->setStatusTip(tr("Full Screen(F-11 to exit)"));
   connect(g_fullScreenAct, SIGNAL(triggered()), this,
       SLOT(FullScreen()));
 
-  // g_fpsAct = new QAction(tr("FPS View Control"), this);
-  // g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
-  // connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
+  g_fpsAct = new QAction(tr("FPS View Control"), this);
+  g_fpsAct->setStatusTip(tr("First Person Shooter View Style"));
+  g_fpsAct->setCheckable(true);
+  g_fpsAct->setChecked(false);
+  connect(g_fpsAct, SIGNAL(triggered()), this, SLOT(FPS()));
 
   g_orbitAct = new QAction(tr("Orbit View Control"), this);
   g_orbitAct->setStatusTip(tr("Orbit View Style"));
+  g_orbitAct->setCheckable(true);
+  g_orbitAct->setChecked(true);
   connect(g_orbitAct, SIGNAL(triggered()), this, SLOT(Orbit()));
+
+  QActionGroup *viewControlActionGroup = new QActionGroup(this);
+  viewControlActionGroup->addAction(g_fpsAct);
+  viewControlActionGroup->addAction(g_orbitAct);
+  viewControlActionGroup->setExclusive(true);
 
   g_viewOculusAct = new QAction(tr("Oculus Rift"), this);
   g_viewOculusAct->setStatusTip(tr("Oculus Rift Render Window"));
@@ -1381,7 +1380,8 @@ void MainWindow::CreateMenuBar()
   viewMenu->addAction(g_resetAct);
   viewMenu->addAction(g_fullScreenAct);
   viewMenu->addSeparator();
-  // viewMenu->addAction(g_fpsAct);
+
+  viewMenu->addAction(g_fpsAct);
   viewMenu->addAction(g_orbitAct);
 
   QMenu *windowMenu = bar->addMenu(tr("&Window"));
@@ -1775,4 +1775,18 @@ void MainWindow::SetLeftPaneVisibility(bool _on)
   sizes.push_back(rightPane);
 
   this->splitter->setSizes(sizes);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnEditorGroup(QAction *_action)
+{
+  QActionGroup * editorGroup = _action->actionGroup();
+  // Manually uncheck all other actions in the group
+  for (int i = 0; i < editorGroup->actions().size(); ++i)
+  {
+    if (editorGroup->actions()[i] != _action)
+    {
+      editorGroup->actions()[i]->setChecked(false);
+    }
+  }
 }

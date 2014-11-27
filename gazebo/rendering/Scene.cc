@@ -2070,7 +2070,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return false;
 
   JointVisualPtr jointVis(new JointVisual(
-        _msg->name() + "_JOINT_VISUAL__", childVis));
+      _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
   jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())

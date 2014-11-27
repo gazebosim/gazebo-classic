@@ -258,6 +258,7 @@ void StairsItem::OnApply()
     this->StepsChanged();
   }
   // this->stairsElevation = dialog->GetElevation();
+  this->visual3dColor = dialog->GetColor();
   this->StairsChanged();
 }
 
@@ -273,6 +274,8 @@ void StairsItem::OnOpenInspector()
   QPointF startPos = this->stairsPos * this->scale;
   startPos.setY(-startPos.y());
   this->inspector->SetStartPosition(startPos);
+  this->inspector->SetColor(this->visual3dColor);
+  this->inspector->move(QCursor::pos());
   this->inspector->show();
 }
 
@@ -290,6 +293,7 @@ void StairsItem::StairsChanged()
   emit HeightChanged(this->stairsHeight);
   emit PositionChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->levelBaseHeight + this->stairsElevation);
+  emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////

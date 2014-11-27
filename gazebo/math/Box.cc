@@ -30,9 +30,14 @@ Box::Box()
 
 
 //////////////////////////////////////////////////
-Box::Box(const Vector3 &_min, const Vector3 &_max)
-  : min(_min), max(_max), extent(EXTENT_FINITE)
+Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
+  : extent(EXTENT_FINITE)
 {
+  this->min = _vec1;
+  this->min.SetToMin(_vec2);
+
+  this->max = _vec2;
+  this->max.SetToMax(_vec1);
 }
 
 //////////////////////////////////////////////////
@@ -75,9 +80,7 @@ math::Vector3 Box::GetSize() const
 //////////////////////////////////////////////////
 math::Vector3 Box::GetCenter() const
 {
-  Vector3 size = this->GetSize();
-  size /= 2.0;
-  return this->min + size;
+  return this->min + (this->max - this->min) * 0.5;
 }
 
 

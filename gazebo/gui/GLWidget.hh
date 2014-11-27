@@ -175,6 +175,10 @@ namespace gazebo
       /// \brief Qt callback when the paste action is triggered.
       private slots: void OnPaste();
 
+      /// \brief Qt callback when the model editor action is toggled.
+      /// \param[in] _checked True if the model editor was checked.
+      private slots: void OnModelEditor(bool _checked);
+
       private: int windowId;
 
       private: rendering::UserCameraPtr userCamera;
