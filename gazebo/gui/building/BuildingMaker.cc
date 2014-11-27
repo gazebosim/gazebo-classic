@@ -1583,9 +1583,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     savefile << xmlDoc;
     savefile.close();
 
-    // Create subfolders for assets
-    // TODO: save textures
-
     // Save all the things
     path = path / "model.sdf";
 
