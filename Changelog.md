@@ -115,6 +115,9 @@
     1. Added color picker to inspector dialogs.
         * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
 
+    1. Snapping on by default, off holding Shift. Improved snapping.
+        * [Pull request #1304](https://bitbucket.org/osrf/gazebo/pull-request/1304)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
