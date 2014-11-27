@@ -64,7 +64,6 @@ google::protobuf::Message *ConfigWidget::GetMsg()
   return this->configMsg;
 }
 
-
 /////////////////////////////////////////////////
 bool ConfigWidget::GetWidgetVisible(const std::string &_name) const
 {
