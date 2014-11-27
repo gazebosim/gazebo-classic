@@ -74,17 +74,20 @@ double BuildingMaker::conversionScale;
   this->modelTemplateSDF->SetFromString(this->GetTemplateSDFString());
 
   this->connections.push_back(
-  gui::editor::Events::ConnectSaveBuildingEditor(
-    boost::bind(&BuildingMaker::OnSave, this, _1)));
+    gui::editor::Events::ConnectSaveBuildingEditor(
+      boost::bind(&BuildingMaker::OnSave, this, _1)));
   this->connections.push_back(
-  gui::editor::Events::ConnectSaveAsBuildingEditor(
-    boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
+    gui::editor::Events::ConnectSaveAsBuildingEditor(
+      boost::bind(&BuildingMaker::OnSaveAs, this, _1)));
   this->connections.push_back(
-  gui::editor::Events::ConnectNewBuildingEditor(
-    boost::bind(&BuildingMaker::OnNew, this)));
+    gui::editor::Events::ConnectNewBuildingEditor(
+      boost::bind(&BuildingMaker::OnNew, this)));
   this->connections.push_back(
-  gui::editor::Events::ConnectExitBuildingEditor(
-    boost::bind(&BuildingMaker::OnExit, this)));
+    gui::editor::Events::ConnectExitBuildingEditor(
+      boost::bind(&BuildingMaker::OnExit, this)));
+  this->connections.push_back(
+    gui::editor::Events::ConnectBuildingNameChanged(
+      boost::bind(&BuildingMaker::OnNameChanged, this, _1)));
 
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
@@ -481,6 +484,7 @@ void BuildingMaker::Reset()
     scene->RemoveVisual(this->modelVisual);
 
   this->saved = false;
+  this->savedChanges = false;
   this->saveLocation = (QDir::homePath()+"/building_editor_models").
                        toStdString();
   this->modelName = this->buildingDefaultName;
@@ -1356,24 +1360,24 @@ void BuildingMaker::OnNew()
   }
   QString msg;
   QMessageBox msgBox(QMessageBox::Warning, QString("New"), msg);
+  QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
-  QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
 
-  if (this->saved)
+  if (this->savedChanges)
   {
-    msg.append("Are you sure you want to close this model and open a new \n"
+    msg.append("Are you sure you want to close this model and open a new " 
                "canvas?\n\n");
     msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
     saveButton->hide();
   }
   else
   {
-    msg.append("You have unsaved changes. Do you want to save this model \n"
+    msg.append("You have unsaved changes. Do you want to save this model "
                "and open a new canvas?\n\n");
     msgBox.addButton("Don't Save", QMessageBox::ApplyRole);
   }
 
-  msg.append("Once you open a new canvas, your current model will no longer \n"
+  msg.append("Once you open a new canvas, your current model will no longer "
              "be editable.");
   msgBox.setText(msg);
 
@@ -1381,10 +1385,13 @@ void BuildingMaker::OnNew()
 
   if (msgBox.clickedButton() != cancelButton)
   {
-    if (!this->saved && msgBox.clickedButton() == saveButton)
+    if (!this->savedChanges && msgBox.clickedButton() == saveButton)
     {
-      //FIXME for unsaved models
-      this->OnSave(this->modelName);
+      //FIXME name for unsaved models
+      if (!this->OnSave(this->modelName))
+      {
+        return;
+      }
     }
 
     gui::editor::Events::newBuildingModel();
@@ -1393,6 +1400,7 @@ void BuildingMaker::OnNew()
     this->saveLocation = (QDir::homePath()+"/building_editor_models").
                          toStdString();
     this->saved = false;
+    this->savedChanges = false;
   }
 }
 
@@ -1423,9 +1431,11 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
+  // todo
   if (this->saved)
   {
     this->SaveModelFiles();
+    this->savedChanges = true;
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
   }
@@ -1589,7 +1599,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
 
     this->SaveModelFiles();
-    this->saved = true;
 
     // Check if this this->saveLocation is in GAZEBO_MODEL_PATHS
     std::list<std::string> modelPaths =
@@ -1609,11 +1618,20 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       gazebo::common::SystemPaths::Instance()->
         AddModelPathsUpdate(this->saveLocation);
     }
+    this->saved = true;
+    this->savedChanges = true;
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnNameChanged(const std::string &_name)
+{
+  this->modelName = _name;
+  this->savedChanges = false;
 }
 
 /////////////////////////////////////////////////
@@ -1625,50 +1643,60 @@ void BuildingMaker::OnExit()
     return;
   } 
 
-  if (saved)
+  if (this->savedChanges)
   {
-    QString msg("Once you exit the Building Editor, \n"
+    QString msg("Once you exit the Building Editor, "
       "your building will no longer be editable.\n\n"
       "Are you ready to exit?\n\n");
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
 
-    QPushButton *exitButton = msgBox.addButton("Exit",
+    msgBox.addButton("Exit",
                                                QMessageBox::ApplyRole);
-    msgBox.addButton(QMessageBox::Cancel);
+    QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
     msgBox.exec();
-    if (msgBox.clickedButton() == exitButton)
+    if (msgBox.clickedButton() == cancelButton)
     {
-      gui::editor::Events::finishBuildingModel();
+      //gui::editor::Events::finishBuildingModel();
+      //return;
       return;
     }
   }
   else
   {
     QString msg("Save Changes before exiting?\n\n"
-        "Note: Once you exit the Building Editor, \n"
+        "Note: Once you exit the Building Editor, "
         "your building will no longer be editable.\n\n");
+
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
-    // Order is don't save+exit, save, cancel
-    QPushButton *newButton = msgBox.addButton("Don't Save, Exit",
-                                                  QMessageBox::ApplyRole);
+    QPushButton *cancelButton = msgBox.addButton("Cancel",
+      QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
-                                                  QMessageBox::NoRole);
-    msgBox.addButton("Cancel", QMessageBox::YesRole);
+      QMessageBox::ApplyRole);
+    QPushButton *newButton = msgBox.addButton("Don't Save, Exit",
+      QMessageBox::ApplyRole);
     msgBox.exec();
+    if (msgBox.clickedButton() == cancelButton)
+      return;
+
     if (msgBox.clickedButton() == newButton)
     {
       gui::editor::Events::newBuildingModel();
       this->modelName = this->buildingDefaultName;
       this->saveLocation = (QDir::homePath()+"/building_editor_models").toStdString();
       this->saved = false;
+      this->savedChanges = false;
       gui::editor::Events::finishBuildingModel();
     }
     else if (msgBox.clickedButton() == saveButton)
     {
-      if (this->OnSave(this->modelName))
+      if (!this->OnSave(this->modelName))
       {
-        gui::editor::Events::finishBuildingModel();
+        //gui::editor::Events::finishBuildingModel();
+        return;
       }
     }
   }
+  
+  this->FinishModel();
+  gui::editor::Events::finishBuildingModel();
 }

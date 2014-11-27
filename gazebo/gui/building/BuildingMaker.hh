@@ -264,6 +264,8 @@ namespace gazebo
       /// \return True if the user chose to save, false if the user cancelled.
       private: bool OnSaveAs(const std::string &_saveName);
 
+      private: void OnNameChanged(const std::string &_modelName);
+
       /// \brief Callback for newing the model.
       private: void OnNew();
 
@@ -309,6 +311,9 @@ namespace gazebo
 
       /// \brief Indicate whether the model has been saved before or not.
       private: bool saved;
+
+      /// \brief Indicate whether all the changes to the model have been saved.
+      private: bool savedChanges;
 
       /// \brief Path to where the model is saved.
       private: std::string saveLocation;

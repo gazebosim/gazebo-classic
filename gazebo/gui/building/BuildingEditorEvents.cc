@@ -38,3 +38,4 @@ event::EventT<bool (std::string)> editor::Events::saveAsBuildingEditor;
 event::EventT<bool (std::string)> editor::Events::saveBuildingEditor;
 event::EventT<void ()> editor::Events::newBuildingEditor;
 event::EventT<void ()> editor::Events::exitBuildingEditor;
+event::EventT<void (std::string)> editor::Events::buildingNameChanged;

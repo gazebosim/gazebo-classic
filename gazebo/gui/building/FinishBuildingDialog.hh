@@ -114,7 +114,7 @@ namespace gazebo
       private: QLineEdit* modelVersionLineEdit;
 
       /// \brief Editable line that holds the model's description.
-      private: QLineEdit* modelDescriptionLineEdit;
+      private: QLineEdit* modelDescriptionTextEdit;
 
       /// \brief Editable line that holds the model's author's name.
       private: QLineEdit* modelAuthorNameLineEdit;

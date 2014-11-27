@@ -265,6 +265,20 @@ namespace gazebo
             event::ConnectionPtr _subscriber)
           { exitBuildingEditor.Disconnect(_subscriber); }
 
+        /// \brief Connect a Gazebo event to the name changed signal
+        /// \param[in] _subscriber the subscriber to this event
+        /// \return a connection
+        public: template<typename T>
+            static event::ConnectionPtr ConnectBuildingNameChanged
+              (T _subscriber)
+          { return buildingNameChanged.Connect(_subscriber); }
+
+        /// \brief Disconnect a Gazebo event from the exit signal
+        /// \param[in] _subscriber the subscriber to this event
+        public: static void ConnectBuildingNameChanged(
+            event::ConnectionPtr _subscriber)
+          { buildingNameChanged.Disconnect(_subscriber); }
+
         /// \brief An editor item is to be created
         public: static event::EventT<void (std::string)>
             createBuildingEditorItem;
@@ -276,7 +290,7 @@ namespace gazebo
         /// \brief A model has been completed and uploaded onto the server.
         public: static event::EventT<void ()> finishBuildingModel;
 
-        /// \brief A model has been newed
+        /// \brief A new model has been started
         public: static event::EventT<void ()> newBuildingModel;
 
         /// \brief The current level has been changed
@@ -313,11 +327,14 @@ namespace gazebo
         /// \brief Save the model as
         public: static event::EventT<bool (std::string)> saveAsBuildingEditor;
 
-        /// \brief New the model
+        /// \brief Make a new model
         public: static event::EventT<void ()> newBuildingEditor;
 
         /// \brief Exit the editor mode with the option to save
         public: static event::EventT<void ()> exitBuildingEditor;
+
+        /// \brief Name was changed in the editor palette
+        public: static event::EventT<void (std::string)> buildingNameChanged;
       };
     }
   }

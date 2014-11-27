@@ -81,7 +81,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 
   QLabel *modelDescription = new QLabel;
   modelDescription->setText(tr("  Description:"));
-  this->modelDescriptionLineEdit = new QLineEdit;
+  this->modelDescriptionTextEdit = new QLineEdit;
 
   QLabel *modelFolderName = new QLabel;
   modelFolderName->setText(tr("  Name:"));
@@ -139,7 +139,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   advancedOptionsGrid->addWidget(modelVersion, 1, 0);
   advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 1, 1);
   advancedOptionsGrid->addWidget(modelDescription, 2, 0);
-  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 2, 1);
+  advancedOptionsGrid->addWidget(this->modelDescriptionTextEdit, 2, 1);
 
   advancedOptionsGrid->addWidget(authorHeader, 3, 0);
   advancedOptionsGrid->addWidget(modelAuthorName, 4, 0);
@@ -212,7 +212,7 @@ std::string FinishBuildingDialog::GetAuthorEmail() const
 /////////////////////////////////////////////////
 std::string FinishBuildingDialog::GetDescription() const
 {
-  return this->modelDescriptionLineEdit->text().toStdString();
+  return this->modelDescriptionTextEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////

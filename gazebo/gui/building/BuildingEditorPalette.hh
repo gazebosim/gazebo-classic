@@ -65,6 +65,9 @@ namespace gazebo
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
+      /// \brief Qt callback when the Model Name field is changed.
+      private slots: void OnNameChanged(const QString &_name);
+
       /// Qt callback when the save button is pressed.
       // private slots: void OnSave();
 

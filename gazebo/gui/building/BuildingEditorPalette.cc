@@ -43,6 +43,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
   modelNameLayout->addWidget(this->modelNameEdit);
+  connect(this->modelNameEdit, SIGNAL(textChanged(QString)), this,
+          SLOT(OnNameChanged(QString)));
 
   QSize toolButtonSize(100, 100);
   QSize iconSize(65, 65);
@@ -255,6 +257,12 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
   /* this->saved = true;
   this->saveButton->setText("Save"); */
   this->modelNameEdit->setText(tr(_saveName.c_str()));
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnNameChanged(const QString &_name)
+{
+  gui::editor::Events::buildingNameChanged(_name.toUtf8().constData());
 }
 
 /////////////////////////////////////////////////
