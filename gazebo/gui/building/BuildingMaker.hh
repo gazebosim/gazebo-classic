@@ -23,6 +23,7 @@
 #include <map>
 #include <sdf/sdf.hh>
 
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/gui/EntityMaker.hh"
@@ -256,6 +257,18 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
+      /// \brief TODO
+      private: void OnColorSelected(QColor _color);
+
+      /// \brief TODO
+      private: void OnTextureSelected(QString _texture);
+
+      /// \brief TODO
+      private: bool On3dMouseMove(const common::MouseEvent &_event);
+
+      /// \brief TODO
+      private: bool On3dMouseRelease(const common::MouseEvent &_event);
+
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;
 
@@ -311,6 +324,15 @@ namespace gazebo
       /// \brief A dialog that prompts to confirm model completion and uploading
       /// to the server
       private: FinishBuildingDialog *finishDialog;
+
+      /// \brief Visual that is currently hovered over by the mouse
+      private: rendering::VisualPtr hoverVis;
+
+      /// \brief TODO
+      private: QColor selectedColor;
+
+      /// \brief TODO
+      private: QString selectedTexture;
     };
     /// \}
   }

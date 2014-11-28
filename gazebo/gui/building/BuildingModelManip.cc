@@ -351,6 +351,7 @@ void BuildingModelManip::SetColor(QColor _color)
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
   this->visual->SetAmbient(this->color);
+  emit ColorChanged(_color);
 }
 
 /////////////////////////////////////////////////

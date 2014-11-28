@@ -21,6 +21,8 @@ using namespace gazebo;
 using namespace gui;
 
 event::EventT<void (std::string)> editor::Events::createBuildingEditorItem;
+event::EventT<void (QColor)> editor::Events::colorSelected;
+event::EventT<void (QString)> editor::Events::textureSelected;
 event::EventT<void (std::string, std::string)>
     editor::Events::saveBuildingModel;
 event::EventT<void ()> editor::Events::finishBuildingModel;

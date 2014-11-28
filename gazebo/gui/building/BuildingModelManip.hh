@@ -149,6 +149,9 @@ namespace gazebo
       /// \param[in] _transparency Transparency.
       public: void SetTransparency(float _transparency);
 
+      /// \brief TODO
+      Q_SIGNALS: void ColorChanged(QColor _color);
+
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
       /// \param[in] _x New X position in pixel coordinates.

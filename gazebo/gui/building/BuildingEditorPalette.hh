@@ -65,6 +65,12 @@ namespace gazebo
       /// \brief Qt callback when the draw stairs button is pressed.
       private slots: void OnAddStair();
 
+      /// \brief TODO
+      private slots: void OnColor(int _colorId);
+
+      /// \brief TODO
+      private slots: void OnTexture(int _textureId);
+
       /// \brief Qt callback when the discard button is pressed.
       private slots: void OnDiscard();
 
@@ -112,6 +118,12 @@ namespace gazebo
 
       /// \brief The current draw mode, empty for none.
       private: std::string currentMode;
+
+      /// \brief TODO
+      private: std::vector<QColor> colorList;
+
+      /// \brief TODO
+      private: std::vector<QString> textureList;
     };
     /// \}
   }

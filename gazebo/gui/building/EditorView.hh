@@ -91,7 +91,11 @@ namespace gazebo
                   /// \brief Door mode
                   DOOR,
                   /// \brief Stairs mode
-                  STAIRS
+                  STAIRS,
+                  /// \brief Color mode
+                  COLOR,
+                  /// \brief Texture mode
+                  TEXTURE
                 };
 
       /// \brief Constructor
@@ -147,6 +151,10 @@ namespace gazebo
       /// \param[in] _event Qt mouse event.
       private: void mouseDoubleClickEvent(QMouseEvent *_event);
 
+      /// \brief TODO
+      /// \param[in] _event Qt mouse event.
+      private: void leaveEvent(QEvent *_event);
+
       /// \brief Qt key press event.
       /// \param[in] _event Qt key event.
       private: void keyPressEvent(QKeyEvent *_event);
@@ -174,6 +182,12 @@ namespace gazebo
       /// in the scene
       /// \param[in] _type Type of editor item to be created.
       private: void OnCreateEditorItem(const std::string &_type);
+
+      /// \brief TODO
+      private: void OnColorSelected(QColor _color);
+
+      /// \brief TODO
+      private: void OnTextureSelected(QString _texture);
 
       // private: void OnSaveModel(const std::string &_modelName,
       //     const std::string &_savePath);
@@ -319,6 +333,9 @@ namespace gazebo
 
       /// \brief Currently held grabber which will be snapped.
       private: GrabberHandle *snapGrabberCurrent;
+
+      /// \brief TODO
+      private: QGraphicsTextItem * mouseTooltip;
     };
     /// \}
   }
