@@ -73,6 +73,9 @@ namespace gazebo
       /// \brief Update inspector with current values.
       public: void UpdateInspector();
 
+      // Documentation inherited
+      public: void SetHighlighted(bool _highlighted);
+
       /// \brief Update wall segment when segment updated.
       protected: void SegmentUpdated();
 

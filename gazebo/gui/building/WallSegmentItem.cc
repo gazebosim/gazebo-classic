@@ -46,9 +46,6 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
   this->SetThickness(this->wallThickness);
   this->SetLine(_start, _end);
   this->SetColor(QColor(247, 142, 30));
-  this->visual3dColor = QColor(255, 255, 255, 255);
-  this->visual3dTexture = QString("");
-  this->visual3dTransparency = 0.0;
 
   this->setFlag(QGraphicsItem::ItemSendsGeometryChanges);
   this->setAcceptHoverEvents(true);
@@ -110,9 +107,6 @@ void WallSegmentItem::WallSegmentChanged()
   emit DepthChanged(this->wallThickness);
   emit HeightChanged(this->wallHeight);
   emit PosZChanged(this->levelBaseHeight);
-  emit TextureChanged(this->visual3dTexture);
-  emit ColorChanged(this->visual3dColor);
-  emit TransparencyChanged(this->visual3dTransparency);
   this->SegmentUpdated();
 }
 
@@ -204,25 +198,30 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
-    {
-      this->ShowHandles(true);
-      this->measure->setVisible(true);
-      this->setZValue(5);
-      this->SetColor(QColor(247, 142, 30));
-      this->Set3dTransparency(0.0);
-    }
-    else
-    {
-      this->ShowHandles(false);
-      this->measure->setVisible(false);
-      this->setZValue(0);
-      this->SetColor(Qt::black);
-      this->Set3dTransparency(0.5);
-    }
-    this->WallSegmentChanged();
+    this->SetHighlighted(_value.toBool());
   }
   return QGraphicsItem::itemChange(_change, _value);
+}
+
+/////////////////////////////////////////////////
+void WallSegmentItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->ShowHandles(true);
+    this->measure->setVisible(true);
+    this->setZValue(5);
+    this->SetColor(QColor(247, 142, 30));
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->ShowHandles(false);
+    this->measure->setVisible(false);
+    this->setZValue(0);
+    this->SetColor(Qt::black);
+    this->Set3dTransparency(0.4);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -235,8 +234,8 @@ void WallSegmentItem::OnApply()
   this->wallThickness = dialog->GetThickness() / this->scale;
   this->SetThickness(this->wallThickness);
   this->wallHeight = dialog->GetHeight() / this->scale;
-  this->visual3dColor = dialog->GetColor();
-  this->visual3dTexture = dialog->GetTexture();
+  this->Set3dTexture(dialog->GetTexture());
+  this->Set3dColor(dialog->GetColor());
   this->WallSegmentChanged();
 
   double newLength = dialog->GetLength() / this->scale;

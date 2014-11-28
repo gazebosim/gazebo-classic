@@ -258,8 +258,8 @@ void StairsItem::OnApply()
     this->StepsChanged();
   }
   // this->stairsElevation = dialog->GetElevation();
-  this->visual3dColor = dialog->GetColor();
-  this->visual3dTexture = dialog->GetTexture();
+  this->Set3dTexture(dialog->GetTexture());
+  this->Set3dColor(dialog->GetColor());
   this->StairsChanged();
 }
 
@@ -295,8 +295,6 @@ void StairsItem::StairsChanged()
   emit HeightChanged(this->stairsHeight);
   emit PositionChanged(this->stairsPos.x(), this->stairsPos.y(),
       this->levelBaseHeight + this->stairsElevation);
-  emit TextureChanged(this->visual3dTexture);
-  emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////

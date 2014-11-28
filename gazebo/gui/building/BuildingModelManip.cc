@@ -350,7 +350,7 @@ void BuildingModelManip::SetColor(QColor _color)
 {
   common::Color newColor(_color.red(), _color.green(), _color.blue());
   this->color = newColor;
-  this->visual->GetParent()->SetAmbient(this->color);
+  this->visual->SetAmbient(this->color);
 }
 
 /////////////////////////////////////////////////
@@ -364,11 +364,11 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":/images/ceiling_tiled.jpg")
     this->texture = "Gazebo/CeilingTiled";
 
-  this->visual->GetParent()->SetMaterial(this->texture);
+  this->visual->SetMaterial(this->texture);
 }
 
 /////////////////////////////////////////////////
 void BuildingModelManip::SetTransparency(float _transparency)
 {
-  this->visual->GetParent()->SetTransparency(_transparency);
+  this->visual->SetTransparency(_transparency);
 }
