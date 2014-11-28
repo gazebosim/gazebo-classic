@@ -15,12 +15,9 @@
  *
 */
 
-
-
 #include "InRegionEventSource.hh"
 
 using namespace gazebo;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 InRegionEventSource::InRegionEventSource(transport::PublisherPtr _pub,
@@ -43,7 +40,7 @@ void InRegionEventSource::Load(const sdf::ElementPtr &_sdf)
   if (_sdf->HasElement("region"))
     this->regionName = _sdf->GetElement("region")->Get<std::string>();
   else
-    gzerr << this->name << " is missing a reigon element" << std::endl;
+    gzerr << this->name << " is missing a region element" << std::endl;
 
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
