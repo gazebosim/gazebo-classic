@@ -14,6 +14,15 @@ if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
 
+if (CURL_FOUND)
+  include_directories(${CURL_INCLUDEDIR})
+  link_directories(${CURL_LIBDIR})
+  if (WIN32)
+    message(STATUS " - Using STATIC curl on Windows")
+    add_definitions(-DCURL_STATICLIB)
+  endif()
+endif()
+
 include_directories(${CURL_INCLUDE_DIRS})
 link_directories(${CURL_LIBRARY_DIRS})
 
