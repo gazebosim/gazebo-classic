@@ -1213,6 +1213,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->hide();
   }
+  this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
 }
 
