@@ -145,12 +145,19 @@ foreach(FIL ${msgs})
   list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
   list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
 
+  # Need to add .exe to executable in windows
+  if (WIN32)
+     set(gazebomsgs_out_binary "gazebomsgs_out.exe")
+  else()
+     set(gazebomsgs_out_binary "gazebomsgs_out")
+  endif()
+
   add_custom_command(
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/gazebomsgs_out --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out ${CMAKE_CURRENT_BINARY_DIR} --proto_path ${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
