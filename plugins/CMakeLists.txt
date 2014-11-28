@@ -22,6 +22,7 @@ set (plugins
   DiffDrivePlugin
   ForceTorquePlugin
   GpuRayPlugin
+  ImuSensorPlugin
   JointTrajectoryPlugin
   ModelPropShop
   ModelTrajectoryTestPlugin
