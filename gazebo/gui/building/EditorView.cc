@@ -357,20 +357,26 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             }
           }
 
-          // Snap to 15 degrees increments
           if (!this->snapToGrabber)
           {
+            // Snap to 15 degrees increments
             QLineF newLine(p1, p2);
             double angle = GZ_DTOR(QLineF(p1, p2).angle());
             double range = GZ_DTOR(15);
-            int increment = angle / range;
+            int angleIncrement = angle / range;
 
-            if ((angle - range*increment) > range*0.5)
-              increment++;
-            angle = -range*increment;
+            if ((angle - range*angleIncrement) > range*0.5)
+              angleIncrement++;
+            angle = -range*angleIncrement;
 
-            pf.setX(p1.x() + qCos(angle)*newLine.length());
-            pf.setY(p1.y() + qSin(angle)*newLine.length());
+            // Snap to 0.25 m increments
+            double newLength = newLine.length();
+            double lengthIncrement = 0.25 / wallSegmentItem->GetScale();
+            newLength  = round(newLength/lengthIncrement)*lengthIncrement-
+                wallSegmentItem->GetThickness();
+
+            pf.setX(p1.x() + qCos(angle)*newLength);
+            pf.setY(p1.y() + qSin(angle)*newLength);
           }
         }
         wallSegmentItem->SetEndPoint(pf);

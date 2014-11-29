@@ -31,7 +31,6 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
     const double _height) : SegmentItem(), BuildingItem()
 {
   this->editorType = "WallSegment";
-  this->scale = BuildingMaker::conversionScale;
 
   this->measure = new MeasureItem(this->GetStartPoint(),
                                   this->GetEndPoint());
