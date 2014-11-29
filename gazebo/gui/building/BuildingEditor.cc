@@ -142,13 +142,11 @@ void BuildingEditor::OnEdit(bool _checked)
     this->mainWindow->ShowLeftColumnWidget("buildingEditorTab");
     this->mainWindow->ShowMenuBar(this->menuBar);
     this->mainWindow->GetRenderWidget()->ShowEditor(true);
-    this->mainWindow->GetRenderWidget()->ShowToolbar(false);
   }
   else
   {
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->GetRenderWidget()->ShowEditor(false);
-    this->mainWindow->GetRenderWidget()->ShowToolbar(true);
     this->mainWindow->ShowMenuBar();
     this->mainWindow->Play();
   }

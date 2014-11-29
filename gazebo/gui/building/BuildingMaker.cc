@@ -1497,11 +1497,11 @@ void BuildingMaker::OnColorSelected(QColor _color)
 /////////////////////////////////////////////////
 void BuildingMaker::OnTextureSelected(QString _texture)
 {
-  if (_texture == QString("")
+  if (_texture == QString(""))
     return;
 
   this->selectedTexture = _texture;
-  this->selectedColor.convertTo(QColor::Invalid);
+  this->selectedColor = QColor::Invalid;
 }
 
 /////////////////////////////////////////////////
@@ -1591,10 +1591,10 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
     // Cancel mode
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
     userCamera->HandleMouseEvent(_event);
-    this->selectedColor.convertTo(QColor::Invalid);
     this->selectedTexture = QString("");
-    gui::editor::Events::colorSelected(this->selectedColor);
-    gui::editor::Events::textureSelected(this->selectedTexture);
+    this->selectedColor = QColor::Invalid;
+    gui::editor::Events::colorSelected(this->selectedColor.convertTo(
+        QColor::Invalid));
     gui::editor::Events::createBuildingEditorItem(std::string());
   }
   return true;
