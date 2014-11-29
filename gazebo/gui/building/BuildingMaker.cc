@@ -54,7 +54,7 @@ using namespace gui;
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "BuildingDefaultName";
   this->modelName = this->buildingDefaultName;
@@ -94,6 +94,10 @@ double BuildingMaker::conversionScale;
       gui::editor::Events::ConnectTextureSelected(
       boost::bind(&BuildingMaker::OnTextureSelected, this, _1)));
 
+  this->connections.push_back(
+      gui::editor::Events::ConnectToggleEditMode(
+      boost::bind(&BuildingMaker::OnEdit, this, _1)));
+
   this->saveDialog =
       new FinishBuildingDialog(FinishBuildingDialog::MODEL_SAVE, 0);
   this->finishDialog =
@@ -108,6 +112,26 @@ BuildingMaker::~BuildingMaker()
     delete this->saveDialog;
   if (this->finishDialog)
     delete this->finishDialog;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnEdit(bool _checked)
+{
+  if (_checked)
+  {
+    MouseEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMousePress, this, _1));
+    MouseEventHandler::Instance()->AddReleaseFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
+    MouseEventHandler::Instance()->AddMoveFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+  }
+  else
+  {
+    MouseEventHandler::Instance()->RemovePressFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("building_maker");
+    MouseEventHandler::Instance()->RemoveMoveFilter("building_maker");
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1464,48 +1488,37 @@ void BuildingMaker::OnExit()
 void BuildingMaker::OnColorSelected(QColor _color)
 {
   if (!_color.isValid())
-  {
-    MouseEventHandler::Instance()->RemoveMoveFilter("building_color");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("building_color");
-    MouseEventHandler::Instance()->RemoveMoveFilter("building_texture");
-    MouseEventHandler::Instance()->RemoveReleaseFilter("building_texture");
     return;
-  }
 
   this->selectedColor = _color;
   this->selectedTexture = "";
-
-  MouseEventHandler::Instance()->AddReleaseFilter("building_color",
-      boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
-  MouseEventHandler::Instance()->AddMoveFilter("building_color",
-      boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnTextureSelected(QString _texture)
 {
+  if (_texture == QString("")
+    return;
+
   this->selectedTexture = _texture;
-  this->selectedColor = QColor::Invalid;
-
-  MouseEventHandler::Instance()->RemoveMoveFilter("building_color");
-  MouseEventHandler::Instance()->RemoveReleaseFilter("building_color");
-
-  MouseEventHandler::Instance()->AddReleaseFilter("building_texture",
-        boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
-  MouseEventHandler::Instance()->AddMoveFilter("building_texture",
-      boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+  this->selectedColor.convertTo(QColor::Invalid);
 }
 
 /////////////////////////////////////////////////
 bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
 {
-  if (_event.dragging)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
 
-  // Get the active camera
-  rendering::UserCameraPtr newcamera = gui::get_active_camera();
-  rendering::VisualPtr vis = newcamera->GetVisual(_event.pos);
+  if (this->selectedTexture == QString("") && !this->selectedColor.isValid())
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+    userCamera->HandleMouseEvent(_event);
+    return true;
+  }
 
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   // Highlight visual on hover
   if (vis)
   {
@@ -1518,7 +1531,6 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
 
     rendering::VisualPtr rootVis = vis->GetRootVisual();
     std::string hoverName = vis->GetParent()->GetName();
-    // Only walls, floors
     if (!rootVis->IsPlane() && (
         hoverName.find("Wall") != std::string::npos ||
         hoverName.find("Floor") != std::string::npos))
@@ -1544,7 +1556,18 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &/*_event*/)
+bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  userCamera->HandleMouseEvent(_event);
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 {
   if (this->hoverVis)
   {
@@ -1566,8 +1589,12 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &/*_event*/)
   else
   {
     // Cancel mode
-    gui::editor::Events::colorSelected(this->selectedColor.convertTo(
-        QColor::Invalid));
+    rendering::UserCameraPtr userCamera = gui::get_active_camera();
+    userCamera->HandleMouseEvent(_event);
+    this->selectedColor.convertTo(QColor::Invalid);
+    this->selectedTexture = QString("");
+    gui::editor::Events::colorSelected(this->selectedColor);
+    gui::editor::Events::textureSelected(this->selectedTexture);
     gui::editor::Events::createBuildingEditorItem(std::string());
   }
   return true;

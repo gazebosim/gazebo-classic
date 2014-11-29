@@ -57,6 +57,9 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~BuildingMaker();
 
+      /// \brief TODO
+      public: void OnEdit(bool _checked);
+
       /// \brief Set the name of this building model.
       /// \param[in] _modelName Name of the model to set to.
       public: void SetModelName(const std::string &_modelName);
@@ -265,6 +268,9 @@ namespace gazebo
 
       /// \brief TODO
       private: bool On3dMouseMove(const common::MouseEvent &_event);
+
+      /// \brief TODO
+      private: bool On3dMousePress(const common::MouseEvent &_event);
 
       /// \brief TODO
       private: bool On3dMouseRelease(const common::MouseEvent &_event);
