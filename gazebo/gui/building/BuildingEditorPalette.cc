@@ -371,15 +371,15 @@ void BuildingEditorPalette::OnColor(int _buttonId)
 
   std::ostringstream colorStr;
   colorStr << "color_" << _buttonId;
-  QColor color = colorList[_buttonId];
+  QColor color = this->colorList[_buttonId];
   if (this->currentMode != colorStr.str())
   {
     gui::editor::Events::colorSelected(color);
     this->currentMode = colorStr.str();
 
-//    QPixmap colorCursor(30, 30);
-//    colorCursor.fill(color);
-//    QApplication::setOverrideCursor(QCursor(colorCursor));
+    QPixmap colorCursor(30, 30);
+    colorCursor.fill(color);
+    QApplication::setOverrideCursor(QCursor(colorCursor));
   }
   else
   {
@@ -392,11 +392,15 @@ void BuildingEditorPalette::OnTexture(int _textureId)
 {
   std::ostringstream textureStr;
   textureStr << "texture_" << _textureId;
-  QString texture = textureList[_textureId];
+  QString texture = this->textureList[_textureId];
   if (this->currentMode != textureStr.str())
   {
     gui::editor::Events::textureSelected(texture);
     this->currentMode = textureStr.str();
+
+    QPixmap textureCursor(this->textureList[_textureId]);
+    textureCursor = textureCursor.scaled(QSize(30, 30));
+    QApplication::setOverrideCursor(textureCursor);
   }
   else
   {
