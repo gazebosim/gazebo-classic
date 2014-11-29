@@ -33,6 +33,7 @@
 
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/EntityMaker.hh"
+#include "gazebo/gui/KeyEventHandler.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 
 #ifdef HAVE_GTS
@@ -125,12 +126,15 @@ void BuildingMaker::OnEdit(bool _checked)
         boost::bind(&BuildingMaker::On3dMouseRelease, this, _1));
     MouseEventHandler::Instance()->AddMoveFilter("building_maker",
         boost::bind(&BuildingMaker::On3dMouseMove, this, _1));
+    KeyEventHandler::Instance()->AddPressFilter("building_maker",
+        boost::bind(&BuildingMaker::On3dKeyPress, this, _1));
   }
   else
   {
     MouseEventHandler::Instance()->RemovePressFilter("building_maker");
     MouseEventHandler::Instance()->RemoveReleaseFilter("building_maker");
     MouseEventHandler::Instance()->RemoveMoveFilter("building_maker");
+    KeyEventHandler::Instance()->RemovePressFilter("building_maker");
   }
 }
 
@@ -1569,6 +1573,12 @@ bool BuildingMaker::On3dMousePress(const common::MouseEvent &_event)
 /////////////////////////////////////////////////
 bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
 {
+  if (_event.button != common::MouseEvent::LEFT)
+  {
+    this->StopMaterialModes();
+    return true;
+  }
+
   if (this->hoverVis)
   {
     std::string hoverName = this->hoverVis->GetParent()->GetName();
@@ -1588,14 +1598,32 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
   }
   else
   {
-    // Cancel mode
     rendering::UserCameraPtr userCamera = gui::get_active_camera();
     userCamera->HandleMouseEvent(_event);
-    this->selectedTexture = QString("");
-    this->selectedColor = QColor::Invalid;
-    gui::editor::Events::colorSelected(this->selectedColor.convertTo(
-        QColor::Invalid));
-    gui::editor::Events::createBuildingEditorItem(std::string());
+    this->StopMaterialModes();
   }
   return true;
+}
+
+/////////////////////////////////////////////////
+bool BuildingMaker::On3dKeyPress(const common::KeyEvent &_event)
+{
+  if (_event.key == Qt::Key_Escape)
+  {
+    this->StopMaterialModes();
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::StopMaterialModes()
+{
+  if (this->hoverVis)
+    this->hoverVis->SetTransparency(0.4);
+
+  this->selectedTexture = QString("");
+  this->selectedColor = QColor::Invalid;
+  gui::editor::Events::colorSelected(this->selectedColor.convertTo(
+      QColor::Invalid));
+  gui::editor::Events::createBuildingEditorItem(std::string());
 }

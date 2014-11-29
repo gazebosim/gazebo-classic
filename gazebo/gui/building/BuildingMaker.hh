@@ -26,6 +26,7 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/EntityMaker.hh"
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
@@ -261,6 +262,9 @@ namespace gazebo
       private: void OnExit();
 
       /// \brief TODO
+      private: void StopMaterialModes();
+
+      /// \brief TODO
       private: void OnColorSelected(QColor _color);
 
       /// \brief TODO
@@ -274,6 +278,9 @@ namespace gazebo
 
       /// \brief TODO
       private: bool On3dMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief TODO
+      private: bool On3dKeyPress(const common::KeyEvent &_event);
 
       /// \brief Conversion scale used by the Convert helper functions.
       public: static double conversionScale;
