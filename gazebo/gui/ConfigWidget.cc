@@ -1827,7 +1827,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   else if (value == "sphere")
   {
     _dimensions.x =
-        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value();
+        qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
     _dimensions.y = _dimensions.x;
     _dimensions.z = _dimensions.x;
   }
