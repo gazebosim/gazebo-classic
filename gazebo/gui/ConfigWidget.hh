@@ -59,7 +59,7 @@ namespace gazebo
       public: std::vector<QWidget *> widgets;
 
       /// \brief Pointer to group widget.
-     /// NULL if this widget is not contained inside a group widget.
+      /// NULL if this widget is not contained inside a group widget.
       public: GroupWidget *groupWidget;
     };
 
@@ -109,31 +109,31 @@ namespace gazebo
       /// \brief Destructor
       public: ~ConfigWidget();
 
-      /// \brief Load from a google protobuf message
-      /// \param[in] _msg Message to load from
+      /// \brief Load from a google protobuf message.
+      /// \param[in] _msg Message to load from.
       public: void Load(const google::protobuf::Message *_msg);
 
       /// \brief Get the updated message.
       /// \return Updated message.
       public: google::protobuf::Message *GetMsg();
 
-      /// \brief Set whether this child widget should be visible.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set whether a child widget should be visible.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _visible True to set the widget to be visible.
       public: void SetWidgetVisible(const std::string &_name, bool _visible);
 
-      /// \brief Get whether this child widget is visible.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get whether a child widget is visible.
+      /// \param[in] _name Name of the child widget.
       /// \return True if the widget is visible.
       public: bool GetWidgetVisible(const std::string &_name) const;
 
-      /// \brief Set whether this child widget should be read-only.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set whether a child widget should be read-only.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _visible True to set the widget to be read-only.
       public: void SetWidgetReadOnly(const std::string &_name, bool _readOnly);
 
-      /// \brief Get whether this child widget is read-only.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get whether a child widget is read-only.
+      /// \param[in] _name Name of the child widget.
       /// \return True if the widget is read-only.
       public: bool GetWidgetReadOnly(const std::string &_name) const;
 
@@ -141,104 +141,102 @@ namespace gazebo
       /// \param[in] _msg Message used for updating the widgets.
       public: void UpdateFromMsg(const google::protobuf::Message *_msg);
 
-      /// \brief Set an integer value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set an integer value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetIntWidgetValue(const std::string &_name, int _value);
 
-      /// \brief Set an unsigned integer value to a child wiget in the
-      /// config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set an unsigned integer value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetUIntWidgetValue(const std::string &_name, unsigned int
           _value);
 
-      /// \brief Set a double value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a double value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetDoubleWidgetValue(const std::string &_name,
           double _value);
 
-      /// \brief Set a bool value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a bool value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetBoolWidgetValue(const std::string &_name, bool _value);
 
-      /// \brief Set a string value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a string value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetStringWidgetValue(const std::string &_name,
           const std::string &_value);
 
-      /// \brief Set a vector3 value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a vector3 value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetVector3WidgetValue(const std::string &_name,
           const math::Vector3 &_value);
 
-      /// \brief Set a color value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a color value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetColorWidgetValue(const std::string &_name,
           const common::Color &_value);
 
-      /// \brief Set a pose value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a pose value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       public: void SetPoseWidgetValue(const std::string &_name,
           const math::Pose &_value);
 
-      /// \brief Set a geometry value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Set a geometry value to a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of geometry.
       public: void SetGeometryWidgetValue(const std::string &_name,
           const std::string &_value, const math::Vector3 &_dimensions);
 
-      /// \brief Get an integer value from a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get an integer value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \return Value of the widget.
       public: int GetIntWidgetValue(const std::string &_name) const;
 
-      /// \brief Get an unsigned integer value to a child wiget in the
-      /// config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get an unsigned integer value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: unsigned int GetUIntWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a double value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a double value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: double GetDoubleWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a bool value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a bool value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: bool GetBoolWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a string value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a string value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: std::string GetStringWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a vector3 value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a vector3 value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
           const;
 
-      /// \brief Set a color value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a color value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: common::Color GetColorWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a pose value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a pose value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value of the widget.
       public: math::Pose GetPoseWidgetValue(const std::string &_name) const;
 
-      /// \brief Set a geometry value to a child wiget in the config widget.
-      /// \param[in] _name Name of the widget.
+      /// \brief Get a geometry value from a child widget.
+      /// \param[in] _name Name of the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
       /// \return Type of geometry.
       public: std::string GetGeometryWidgetValue(const std::string &_name,
@@ -247,13 +245,15 @@ namespace gazebo
       /// \brief Parse the input message and either create widgets for
       /// configuring fields of the message, or update the widgets with values
       /// from the message.
+      /// \param[in] _msg Message.
       /// \param[in] _name Name used when creating new widgets.
+      /// return Updated widget.
       private: QWidget *Parse(google::protobuf::Message *_msg,
           const std::string &_name = "");
 
       /// \brief Parse a vector3 message.
       /// param[in] _msg Input vector3d message.
-      /// return Parsed vector
+      /// return Parsed vector.
       private: math::Vector3 ParseVector3(
           const google::protobuf::Message *_msg);
 
@@ -314,106 +314,105 @@ namespace gazebo
       /// \return The newly created widget.
       private: ConfigChildWidget *CreateGeometryWidget(const std::string &_key);
 
-      /// \brief Update the input widget with an unsigned integer value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with an unsigned integer value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateUIntWidget(ConfigChildWidget *_widget,
           unsigned int _value);
 
-      /// \brief Update the input widget with an integer value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with an integer value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateIntWidget(ConfigChildWidget *_widget, int _value);
 
-      /// \brief Update the input widget with a double value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a double value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateDoubleWidget(ConfigChildWidget *_widget,
           double _value);
 
-      /// \brief Update the input widget with a string value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a string value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateStringWidget(ConfigChildWidget *_widget,
           const std::string &_value);
 
-      /// \brief Update the input widget with a bool value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a bool value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateBoolWidget(ConfigChildWidget *_widget, bool _value);
 
-      /// \brief Update the input widget with a vector3 value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a vector3 value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateVector3Widget(ConfigChildWidget *_widget,
           const math::Vector3 &_value);
 
-      /// \brief Update the input widget with a color value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a color value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdateColorWidget(ConfigChildWidget *_widget,
           const common::Color &_value);
 
-      /// \brief Update the input widget with a pose value.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Update a child widget with a pose value.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[in] _value Value to set to.
       private: void UpdatePoseWidget(ConfigChildWidget *_widget,
           const math::Pose &_value);
 
-      /// \brief Update the input widget with a geometry type and dimensions.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value Type of geometry
+      /// \brief Update a child widget with a geometry type and dimensions.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \param[in] _value Type of geometry.
       /// \param[in] _dimensions Dimensions of the geometry.
       private: void UpdateGeometryWidget(ConfigChildWidget *_widget,
           const std::string &_value, const math::Vector3 &_dimensions);
 
-      /// \brief Get an integer value from a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Get an integer value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
       private: int GetIntWidgetValue(ConfigChildWidget *_widget) const;
 
-      /// \brief Get an unsigned integer value to a child wiget in the
-      /// config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get an unsigned integer value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: unsigned int GetUIntWidgetValue(ConfigChildWidget *_widget)
           const;
 
-      /// \brief Set a double value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a double value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: double GetDoubleWidgetValue(ConfigChildWidget *_widget) const;
 
-      /// \brief Set a bool value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a bool value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: bool GetBoolWidgetValue(ConfigChildWidget *_widget) const;
 
-      /// \brief Set a string value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a string value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: std::string GetStringWidgetValue(ConfigChildWidget *_widget)
           const;
 
-      /// \brief Set a vector3 value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a vector3 value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: math::Vector3 GetVector3WidgetValue(ConfigChildWidget *_widget)
           const;
 
-      /// \brief Set a color value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a color value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: common::Color GetColorWidgetValue(ConfigChildWidget *_widget)
           const;
 
-      /// \brief Set a pose value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
-      /// \param[in] _value Value of the widget.
+      /// \brief Get a pose value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
+      /// \return Value of the widget.
       private: math::Pose GetPoseWidgetValue(ConfigChildWidget *_widget) const;
 
-      /// \brief Set a geometry value to a child wiget in the config widget.
-      /// \param[in] _widget Pointer to the widget.
+      /// \brief Get a geometry value from a child widget.
+      /// \param[in] _widget Pointer to the child widget.
       /// \param[out] _dimensions Dimensions of geometry.
       /// \return Type of geometry.
       private: std::string GetGeometryWidgetValue(ConfigChildWidget *_widget,
