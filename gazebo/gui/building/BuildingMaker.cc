@@ -1603,13 +1603,17 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 
     // Check if this this->saveLocation is in the model path
     // TODO: Add the directory ABOVE saveLocation to SystemPaths
+
+    std::string parentDirectory = boost::filesystem::path(this->saveLocation)
+                                    .parent_path().string();
+
     std::list<std::string> modelPaths =
                 gazebo::common::SystemPaths::Instance()->GetModelPaths();
     std::list<std::string>::iterator iter;
     for (iter = modelPaths.begin();
          iter != modelPaths.end(); ++iter)
     {
-      if (iter->compare(this->saveLocation) == 0)
+      if (iter->compare(parentDirectory) == 0)
       {
         break;
       }
@@ -1618,7 +1622,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     {
       // Add it to GAZEBO_MODEL_PATHS and notify InsertModelWidget
       gazebo::common::SystemPaths::Instance()->
-        AddModelPathsUpdate(this->saveLocation);
+        AddModelPathsUpdate(parentDirectory);
     }
 
     this->saved = true;

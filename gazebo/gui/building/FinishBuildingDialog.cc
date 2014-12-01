@@ -48,17 +48,17 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   modelLabel->setText(tr("Model Name: "));
   this->modelNameLineEdit = new QLineEdit;
 
-  /*QLabel *modelHeader = new QLabel;
-  modelHeader->setText(tr("<b>Model</b>"));*/
-  QLabel *fileHeader = new QLabel;
-  fileHeader->setText(tr("<b>Folder</b>"));
+  QLabel *modelHeader = new QLabel;
+  modelHeader->setText(tr("<b>Model</b>"));
+  /*QLabel *fileHeader = new QLabel;
+  fileHeader->setText(tr("<b>Folder</b>"));*/
 
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));
   this->modelLocationLineEdit = new QLineEdit;
   // Try to get path to home folder
   this->modelLocationLineEdit->setText(QDir::homePath()+
-                                       "/building_editor_models");
+                                       "/building_editor_models/Untitled");
 
   QPushButton *browseButton = new QPushButton(tr("Browse"));
   connect(browseButton, SIGNAL(clicked()), this, SLOT(OnBrowse()));
