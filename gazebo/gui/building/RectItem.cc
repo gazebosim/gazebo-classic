@@ -32,9 +32,13 @@ RectItem::RectItem()
 
   this->width = 100;
   this->height = 100;
+  this->visual3dColor = QColor(255, 255, 255, 255);
+  this->visual3dTransparency = 0.5;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
+
+  this->positionOnWall = 0;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -126,6 +130,7 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
           this->grabbers[i]->installSceneEventFilter(this);
       }
       this->rotateHandle->installSceneEventFilter(this);
+      this->Set3dTransparency(0.0);
     }
     else
     {
@@ -136,7 +141,9 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
           this->grabbers[i]->removeSceneEventFilter(this);
       }
       this->rotateHandle->removeSceneEventFilter(this);
+      this->Set3dTransparency(0.5);
     }
+    emit TransparencyChanged(this->visual3dTransparency);
   }
   else if (_change == QGraphicsItem::ItemScenePositionHasChanged
       && this->scene())
@@ -681,6 +688,18 @@ double RectItem::GetWidth() const
 double RectItem::GetHeight() const
 {
   return this->drawingHeight;
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetPositionOnWall(double _positionOnWall)
+{
+  this->positionOnWall = _positionOnWall;
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetPositionOnWall() const
+{
+  return this->positionOnWall;
 }
 
 /////////////////////////////////////////////////

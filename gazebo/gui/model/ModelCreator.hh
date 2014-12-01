@@ -157,25 +157,34 @@ namespace gazebo
       /// \brief Generate the SDF from model part and joint visuals.
       public: void GenerateSDF();
 
-      /// \brief Mouse event filter callback when mouse is moved.
+      /// \brief QT callback when entering model edit mode
+      /// \param[in] _checked True if the menu item is checked
+      private slots: void OnEdit(bool _checked);
+
+      /// \brief Mouse event filter callback when mouse is pressed.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseMovePart(const common::MouseEvent &_event);
+      private: bool OnMousePress(const common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is released.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseReleasePart(const common::MouseEvent &_event);
+      private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Mouse event filter callback when mouse is moved.
+      /// \param[in] _event The mouse event.
+      /// \return True if the event was handled
+      private: bool OnMouseMove(const common::MouseEvent &_event);
 
       /// \brief Mouse event filter callback when mouse is double clicked.
       /// \param[in] _event The mouse event.
       /// \return True if the event was handled
-      private: bool OnMouseDoubleClickPart(const common::MouseEvent &_event);
+      private: bool OnMouseDoubleClick(const common::MouseEvent &_event);
 
       /// \brief Key event filter callback when key is pressed.
       /// \param[in] _event The key event.
       /// \return True if the event was handled
-      private: bool OnKeyPressPart(const common::KeyEvent &_event);
+      private: bool OnKeyPress(const common::KeyEvent &_event);
 
       /// \brief Create part with default properties from a visual
       /// \param[in] _visual Visual used to create the part.

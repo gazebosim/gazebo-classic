@@ -30,9 +30,20 @@ using namespace gui;
 BuildingEditor::BuildingEditor(MainWindow *_mainWindow)
   : Editor(_mainWindow)
 {
+  // Tips
+  QLabel *tipsLabel = new QLabel(tr(
+      "<font size=4 color='white'><b>?</b></font>"));
+  tipsLabel->setToolTip(tr("<font size=3><p><b> Tips: </b></b>"
+      "<p>Double-click an object to open an Inspector with configuration "
+      "options.</p>"
+      "<p>Currently, windows & doors are simple holes in the wall.</p>"
+      "<p>Because Gazebo only supports simple primitive shapes, all floors "
+      "will be rectangular.</p>"));
+
   // Create the building editor tab
   this->buildingPalette = new BuildingEditorPalette;
-  this->Init("buildingEditorTab", "Building Editor", this->buildingPalette);
+  this->Init("buildingEditorTab", "Building Editor", this->buildingPalette,
+      tipsLabel);
 
   this->saveAct = new QAction(tr("&Save (As)"), this->mainWindow);
   this->saveAct->setStatusTip(tr("Save (As)"));
@@ -75,7 +86,8 @@ BuildingEditor::~BuildingEditor()
 ////////////////////////////////////////////////
 void BuildingEditor::Save()
 {
-  gui::editor::Events::saveBuildingEditor();
+  gui::editor::Events::saveBuildingEditor(
+      this->buildingPalette->GetModelName());
 }
 
 /////////////////////////////////////////////////
@@ -87,7 +99,8 @@ void BuildingEditor::Discard()
 /////////////////////////////////////////////////
 void BuildingEditor::Done()
 {
-  gui::editor::Events::doneBuildingEditor();
+  gui::editor::Events::doneBuildingEditor(
+      this->buildingPalette->GetModelName());
 }
 
 /////////////////////////////////////////////////

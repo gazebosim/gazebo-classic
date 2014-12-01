@@ -17,6 +17,7 @@
 #ifndef _KEYEVENT_HH_
 #define _KEYEVENT_HH_
 
+#include <string>
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -42,6 +43,8 @@ namespace gazebo
       public: EventType type;
 
       public: int key;
+
+      public: std::string text;
     };
     /// \}
   }

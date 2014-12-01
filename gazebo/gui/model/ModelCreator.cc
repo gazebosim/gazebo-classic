@@ -65,6 +65,7 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
 
@@ -82,6 +83,43 @@ ModelCreator::~ModelCreator()
   this->makerPub.reset();
 
   delete jointMaker;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator::OnEdit(bool _checked)
+{
+  if (_checked)
+  {
+    KeyEventHandler::Instance()->AddPressFilter("model_creator",
+        boost::bind(&ModelCreator::OnKeyPress, this, _1));
+
+    MouseEventHandler::Instance()->AddPressFilter("model_creator",
+        boost::bind(&ModelCreator::OnMousePress, this, _1));
+
+    MouseEventHandler::Instance()->AddReleaseFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseRelease, this, _1));
+
+    MouseEventHandler::Instance()->AddMoveFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseMove, this, _1));
+
+    MouseEventHandler::Instance()->AddDoubleClickFilter("model_creator",
+        boost::bind(&ModelCreator::OnMouseDoubleClick, this, _1));
+  }
+  else
+  {
+    KeyEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemovePressFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveReleaseFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveMoveFilter("model_creator");
+    MouseEventHandler::Instance()->RemoveDoubleClickFilter("model_creator");
+    this->jointMaker->Stop();
+
+    if (this->selectedVis)
+    {
+      this->selectedVis->SetHighlighted(false);
+      this->selectedVis.reset();
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -335,18 +373,6 @@ void ModelCreator::Reset()
       !gui::get_active_camera()->GetScene())
     return;
 
-  KeyEventHandler::Instance()->AddPressFilter("model_part",
-      boost::bind(&ModelCreator::OnKeyPressPart, this, _1));
-
-  MouseEventHandler::Instance()->AddReleaseFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseReleasePart, this, _1));
-
-  MouseEventHandler::Instance()->AddMoveFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseMovePart, this, _1));
-
-  MouseEventHandler::Instance()->AddDoubleClickFilter("model_part",
-      boost::bind(&ModelCreator::OnMouseDoubleClickPart, this, _1));
-
   this->jointMaker->Reset();
   this->selectedVis.reset();
 
@@ -528,7 +554,7 @@ void ModelCreator::OnDelete(const std::string &_part)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
+bool ModelCreator::OnKeyPress(const common::KeyEvent &_event)
 {
   if (_event.key == Qt::Key_Escape)
   {
@@ -546,7 +572,28 @@ bool ModelCreator::OnKeyPressPart(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
+{
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+  if (vis && !vis->IsPlane())
+  {
+    if (this->allParts.find(vis->GetName()) == this->allParts.end())
+    {
+      // Prevent interaction with other models, send event only to
+      // user camera
+      userCamera->HandleMouseEvent(_event);
+      return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
 {
   if (_event.button != common::MouseEvent::LEFT)
     return false;
@@ -561,17 +608,24 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
 
   // In mouse normal mode, let users select a part if the parent model
   // is currently selected.
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
+    return false;
+
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
   if (vis)
   {
-    if (this->allParts.find(vis->GetName()) !=
-        this->allParts.end())
+    // Is part
+    if (this->allParts.find(vis->GetName()) != this->allParts.end())
     {
-      if (gui::get_active_camera()->GetScene()->GetSelectedVisual()
-          == this->modelVisual || this->selectedVis)
+      // Whole model or another part is selected
+      if (userCamera->GetScene()->GetSelectedVisual() == this->modelVisual ||
+          this->selectedVis)
       {
+        // Deselect part
         if (this->selectedVis)
           this->selectedVis->SetHighlighted(false);
+        // Deselect model
         else
           event::Events::setSelectedEntity("", "normal");
 
@@ -579,28 +633,56 @@ bool ModelCreator::OnMouseReleasePart(const common::MouseEvent &_event)
         this->selectedVis->SetHighlighted(true);
         return true;
       }
+      // Handle at GLWidget - select whole model
     }
-    else if (this->selectedVis)
+    // Not part
+    else
     {
-      this->selectedVis->SetHighlighted(false);
-      this->selectedVis.reset();
+      // Deselect part and model
+      if (this->selectedVis)
+      {
+        this->selectedVis->SetHighlighted(false);
+        this->selectedVis.reset();
+      }
+      else
+        event::Events::setSelectedEntity("", "normal");
+
+      // Prevent interaction with other models, send event only to
+      // user camera
+      userCamera->HandleMouseEvent(_event);
+      return true;
     }
   }
   return false;
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 {
-  if (!this->mouseVisual)
+  rendering::UserCameraPtr userCamera = gui::get_active_camera();
+  if (!userCamera)
     return false;
 
-  if (!gui::get_active_camera())
+  if (!this->mouseVisual)
+  {
+    rendering::VisualPtr vis = userCamera->GetVisual(_event.pos);
+    if (vis && !vis->IsPlane())
+    {
+      if (this->allParts.find(vis->GetName()) == this->allParts.end())
+      {
+        // Prevent interaction with other models, send event only to
+        // user camera
+        QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+        userCamera->HandleMouseEvent(_event);
+        return true;
+      }
+    }
     return false;
+  }
 
   math::Pose pose = this->mouseVisual->GetWorldPose();
   pose.pos = ModelManipulator::GetMousePositionOnPlane(
-      gui::get_active_camera(), _event);
+      userCamera, _event);
 
   if (!_event.shift)
   {
@@ -614,7 +696,7 @@ bool ModelCreator::OnMouseMovePart(const common::MouseEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool ModelCreator::OnMouseDoubleClickPart(const common::MouseEvent &_event)
+bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.pos);
   if (vis)

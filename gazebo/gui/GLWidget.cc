@@ -35,6 +35,8 @@
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/SelectionObj.hh"
 
+#include "gazebo/gui/ModelAlign.hh"
+#include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 #include "gazebo/gui/MouseEventHandler.hh"
 #include "gazebo/gui/KeyEventHandler.hh"
@@ -109,6 +111,10 @@ GLWidget::GLWidget(QWidget *_parent)
      event::Events::ConnectSetSelectedEntity(
        boost::bind(&GLWidget::OnSetSelectedEntity, this, _1, _2)));
 
+  this->connections.push_back(
+      gui::Events::ConnectAlignMode(
+        boost::bind(&GLWidget::OnAlignMode, this, _1, _2, _3, _4)));
+
   this->renderFrame->setMouseTracking(true);
   this->setMouseTracking(true);
 
@@ -131,11 +137,8 @@ GLWidget::GLWidget(QWidget *_parent)
   this->requestSub = this->node->Subscribe("~/request",
       &GLWidget::OnRequest, this);
 
-
   this->installEventFilter(this);
   this->keyModifiers = 0;
-
-  this->selectedVis.reset();
 
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
       boost::bind(&GLWidget::OnMousePress, this, _1));
@@ -151,6 +154,9 @@ GLWidget::GLWidget(QWidget *_parent)
 
   connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
   connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+      SLOT(OnModelEditor(bool)));
 }
 
 /////////////////////////////////////////////////
@@ -262,13 +268,14 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat())
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->GetAutoRepeat())
     return;
 
   this->keyText = _event->text().toStdString();
   this->keyModifiers = _event->modifiers();
 
   this->keyEvent.key = _event->key();
+  this->keyEvent.text = this->keyText;
 
   // Toggle full screen
   if (_event->key() == Qt::Key_F11)
@@ -279,8 +286,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   // Trigger a model delete if the Delete key was pressed, and a model
   // is currently selected.
-  if (_event->key() == Qt::Key_Delete && this->selectedVis)
-    g_deleteAct->Signal(this->selectedVis->GetName());
+  if (_event->key() == Qt::Key_Delete)
+  {
+    while (!this->selectedVisuals.empty())
+      g_deleteAct->Signal(this->selectedVisuals.back()->GetName());
+  }
 
   if (_event->key() == Qt::Key_Escape)
   {
@@ -301,7 +311,7 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
 
   if (this->mouseEvent.control)
   {
-    if (_event->key() == Qt::Key_C && this->selectedVis)
+    if (_event->key() == Qt::Key_C && !this->selectedVisuals.empty())
     {
       g_copyAct->trigger();
     }
@@ -311,12 +321,12 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
-  ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
-
-  this->userCamera->HandleKeyPressEvent(this->keyText);
-
   // Process Key Events
-  KeyEventHandler::Instance()->HandlePress(this->keyEvent);
+  if (!KeyEventHandler::Instance()->HandlePress(this->keyEvent))
+  {
+    ModelManipulator::Instance()->OnKeyPressEvent(this->keyEvent);
+    this->userCamera->HandleKeyPressEvent(this->keyText);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -325,7 +335,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   if (!this->scene)
     return;
 
-  if (_event->isAutoRepeat())
+  // this shouldn't happen, but in case it does...
+  if (_event->isAutoRepeat() && !KeyEventHandler::Instance()->GetAutoRepeat())
     return;
 
   this->keyModifiers = _event->modifiers();
@@ -345,6 +356,8 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
       g_translateAct->trigger();
     else if (_event->key() == Qt::Key_S)
       g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N)
+      g_snapAct->trigger();
     else if (_event->key() == Qt::Key_Escape)
       g_arrowAct->trigger();
   }
@@ -442,6 +455,8 @@ bool GLWidget::OnMousePress(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMousePressEvent(this->mouseEvent);
+  else if (this->state == "snap")
+    ModelSnap::Instance()->OnMousePressEvent(this->mouseEvent);
 
   return true;
 }
@@ -451,11 +466,16 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 {
   if (this->state == "make_entity")
     this->OnMouseReleaseMakeEntity();
-  else if (this->state == "select")
+  // Auto switch to select mode if control is pressed to allow multi-object
+  // selection. Remove this once multi-object manipulation is implemented in
+  // RTS modes, issue #213
+  else if (this->state == "select"  || this->mouseEvent.control)
     this->OnMouseReleaseNormal();
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseReleaseEvent(this->mouseEvent);
+  else if (this->state == "snap")
+    ModelSnap::Instance()->OnMouseReleaseEvent(this->mouseEvent);
 
   return true;
 }
@@ -471,6 +491,8 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
   else if (this->state == "translate" || this->state == "rotate"
       || this->state == "scale")
     ModelManipulator::Instance()->OnMouseMoveEvent(this->mouseEvent);
+  else if (this->state == "snap")
+    ModelSnap::Instance()->OnMouseMoveEvent(this->mouseEvent);
 
   return true;
 }
@@ -794,6 +816,8 @@ void GLWidget::OnCreateScene(const std::string &_name)
   this->ViewScene(rendering::get_scene(_name));
 
   ModelManipulator::Instance()->Init();
+  ModelSnap::Instance()->Init();
+  ModelAlign::Instance()->Init();
 
   this->sceneCreated = true;
 }
@@ -892,36 +916,47 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
-  boost::mutex::scoped_lock lock(this->selectionMutex);
-
-  msgs::Selection msg;
-
-  if (this->selectedVis && _vis != this->selectedVis)
+  // deselect all if not in multi-selection mode.
+  if (!this->mouseEvent.control)
   {
-    this->selectedVis->SetHighlighted(false);
-
-    msg.set_id(this->selectedVis->GetId());
-    msg.set_name(this->selectedVis->GetName());
-    msg.set_selected(false);
-
-    // The order of the following two lines matters. Make sure to publish
-    // after resetting this->selectedVis
-    this->selectedVis.reset();
-    this->selectionPub->Publish(msg);
+    for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+    {
+      this->selectedVisuals[i]->SetHighlighted(false);
+      msg.set_id(this->selectedVis->GetId());
+      msg.set_name(this->selectedVis->GetName());
+      msg.set_selected(false);
+      this->selectionPub->Publish(msg);
+    }
+    this->selectedVisuals.clear();
   }
 
-  this->selectedVis = _vis;
-
-  if (this->selectedVis)
+  if (_vis)
   {
-    msg.set_id(this->selectedVis->GetId());
-    msg.set_name(this->selectedVis->GetName());
+    msg.set_id(_vis->GetId());
+    msg.set_name(_vis->GetName());
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
 
-    if (!this->selectedVis->IsPlane())
+    if (!_vis->IsPlane())
     {
-      this->selectedVis->SetHighlighted(true);
+      _vis->SetHighlighted(true);
+
+      // enable multi-selection if control is pressed
+      if (this->selectedVisuals.empty() || this->mouseEvent.control)
+      {
+        std::vector<rendering::VisualPtr>::iterator it =
+            std::find(this->selectedVisuals.begin(),
+            this->selectedVisuals.end(), _vis);
+        if (it == this->selectedVisuals.end())
+          this->selectedVisuals.push_back(_vis);
+        else
+        {
+          // if element already exists, move to the back of vector
+          rendering::VisualPtr vis = (*it);
+          this->selectedVisuals.erase(it);
+          this->selectedVisuals.push_back(vis);
+        }
+      }
       g_copyAct->setEnabled(true);
     }
   }
@@ -929,6 +964,8 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
   {
     g_copyAct->setEnabled(false);
   }
+
+  g_alignAct->setEnabled(this->selectedVisuals.size() > 1);
 }
 
 /////////////////////////////////////////////////
@@ -936,17 +973,36 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  if (this->selectedVis)
-    ModelManipulator::Instance()->SetAttachedVisual(this->selectedVis);
+  if (!this->selectedVisuals.empty())
+  {
+    ModelManipulator::Instance()->SetAttachedVisual(
+        this->selectedVisuals.back());
+  }
 
   ModelManipulator::Instance()->SetManipulationMode(_mode);
+  ModelSnap::Instance()->Reset();
+
+  if (this->state != "select")
+  {
+    // only support multi-model selection in select mode for now.
+    // deselect 0 to n-1 models.
+    if (this->selectedVisuals.size() > 1)
+    {
+      for (std::vector<rendering::VisualPtr>::iterator it
+          = this->selectedVisuals.begin(); it != --this->selectedVisuals.end();)
+      {
+         (*it)->SetHighlighted(false);
+         it = this->selectedVisuals.erase(it);
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::OnCopy()
 {
-  if (this->selectedVis)
-    this->Copy(this->selectedVis->GetName());
+  if (!this->selectedVisuals.empty())
+    this->Copy(this->selectedVisuals.back()->GetName());
 }
 
 /////////////////////////////////////////////////
@@ -1075,15 +1131,46 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
 {
   if (_msg->request() == "entity_delete")
   {
-    if (this->selectedVis && this->selectedVis->GetName() == _msg->data())
+    if (!this->selectedVisuals.empty())
     {
-      this->selectedVis.reset();
-      this->SetSelectedVisual(rendering::VisualPtr());
+      for (std::vector<rendering::VisualPtr>::iterator it =
+          this->selectedVisuals.begin(); it != this->selectedVisuals.end();
+          ++it)
+      {
+        if ((*it)->GetName() == _msg->data())
+        {
+          this->selectedVisuals.erase(it);
+          break;
+        }
+      }
     }
+
     if (this->copyEntityName == _msg->data())
     {
       this->copyEntityName = "";
       g_pasteAct->setEnabled(false);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnAlignMode(const std::string &_axis, const std::string &_config,
+    const std::string &_target, bool _preview)
+{
+  ModelAlign::Instance()->AlignVisuals(this->selectedVisuals, _axis, _config,
+      _target, !_preview);
+}
+
+/////////////////////////////////////////////////
+void GLWidget::OnModelEditor(bool /*_checked*/)
+{
+  g_arrowAct->trigger();
+  event::Events::setSelectedEntity("", "normal");
+
+  // Manually deselect, in case the editor was opened with Ctrl
+  for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
+  {
+    this->selectedVisuals[i]->SetHighlighted(false);
+  }
+  this->selectedVisuals.clear();
 }

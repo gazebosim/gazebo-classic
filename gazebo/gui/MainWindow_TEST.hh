@@ -38,6 +38,9 @@ class MainWindow_TEST : public QTestFixture
   /// \brief Test creating a main window with non-default world
   private slots: void NonDefaultWorld();
 
+  /// \brief Test moving the user camera via a joystick message.
+  private slots: void UserCameraJoystick();
+
   /// \brief Test selecting an object.
   private slots: void SelectObject();
 };

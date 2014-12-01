@@ -64,7 +64,25 @@ std::string EditorItem::GetName() const
 }
 
 /////////////////////////////////////////////////
+QColor EditorItem::Get3dColor() const
+{
+  return this->visual3dColor;
+}
+
+/////////////////////////////////////////////////
 void EditorItem::SetName(const std::string &_name)
 {
   this->name = _name;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dColor(QColor _color)
+{
+  this->visual3dColor = _color;
+}
+
+/////////////////////////////////////////////////
+void EditorItem::Set3dTransparency(float _transparency)
+{
+  this->visual3dTransparency = _transparency;
 }
