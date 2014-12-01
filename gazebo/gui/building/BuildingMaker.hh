@@ -29,8 +29,6 @@
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
-#include "gazebo/gui/SaveDialog.hh"
-
 namespace gazebo
 {
   namespace msgs
@@ -248,11 +246,6 @@ namespace gazebo
 
       /// \brief Helper function to manage writing files to disk.
       private: void SaveModelFiles();
-
-      /// \brief Bring up a "File Exists" dialog for the given path.
-      /// \param[in] Path to a file that the user is attempting to overwrite.
-      /// \param[out] Whether or not the user chose to overwrite the file.
-      private: bool FileOverwriteDialog(const std::string &_pathName);
 
       /// \brief Callback for saving the model.
       /// \param[in] _saveName Name to save the model.

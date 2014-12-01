@@ -77,19 +77,19 @@ namespace gazebo
       public: void SetSaveLocation(const std::string &_location);
 
       /// \brief Get the model's author's name.
-      /// \param[out] The author's name.
+      /// \return The author's name.
       public: std::string GetAuthorName() const;
 
       /// \brief Get the model's author's email.
-      /// \param[out] The author's email.
+      /// \return The author's email.
       public: std::string GetAuthorEmail() const;
 
       /// \brief Get the model's description.
-      /// \param[out] The model's description.
+      /// \return The model's description.
       public: std::string GetDescription() const;
 
       /// \brief Get the model's version.
-      /// \param[out] The model's version.
+      /// \return The model's version.
       public: std::string GetVersion() const;
 
       /// \brief Qt callback when the file directory browse button is pressed.
@@ -127,9 +127,6 @@ namespace gazebo
 
       /// \brief Editable line that holds the model's filename.
       private: QLineEdit* modelFolderNameLineEdit;
-
-      /// \brief The widget's initial height.
-      private: float initialHeight;
     };
     /// \}
   }

@@ -68,9 +68,6 @@ namespace gazebo
       /// \brief Qt callback when the Model Name field is changed.
       private slots: void OnNameChanged(const QString &_name);
 
-      /// Qt callback when the save button is pressed.
-      // private slots: void OnSave();
-
       /// \brief Callback when user has provided information on where to save
       /// the model to.
       /// \param[in] _saveName Name of model being saved.
@@ -94,9 +91,6 @@ namespace gazebo
 
       /// \brief Edit the name of the building model.
       private: QLineEdit *modelNameEdit;
-
-      /// Save button.
-      // private: QPushButton *saveButton;
 
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;

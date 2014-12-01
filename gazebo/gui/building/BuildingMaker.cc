@@ -1369,7 +1369,7 @@ void BuildingMaker::OnNew()
 
   if (this->savedChanges)
   {
-    msg.append("Are you sure you want to close this model and open a new " 
+    msg.append("Are you sure you want to close this model and open a new "
                "canvas?\n\n");
     msgBox.addButton("New Canvas", QMessageBox::ApplyRole);
     saveButton->hide();
@@ -1411,21 +1411,6 @@ void BuildingMaker::SaveModelFiles()
   this->SaveToSDF(this->saveLocation);
 }
 
-bool BuildingMaker::FileOverwriteDialog(const std::string &pathName)
-{
-  std::string msg = "A model named " + pathName + " already exists.\n\n"
-                    "Do you wish to overwrite the existing model files?\n";
-
-  QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
-                     QString(msg.c_str()));
-
-  QPushButton *saveButton = msgBox.addButton("Save",
-                                             QMessageBox::ApplyRole);
-  msgBox.addButton(QMessageBox::Cancel);
-  msgBox.exec();
-  return msgBox.clickedButton() == saveButton;
-}
-
 /////////////////////////////////////////////////
 bool BuildingMaker::OnSave(const std::string &_saveName)
 {
@@ -1445,7 +1430,6 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
 /////////////////////////////////////////////////
 bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
-  // TODO: auto-fill these fields with existing values
   this->saveDialog->SetModelName(_saveName);
 
   // Auto-generate folder name based on model name
@@ -1566,12 +1550,23 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     if (boost::filesystem::exists(sdfPath) ||
           boost::filesystem::exists(modelConfigPath))
     {
-      if (!FileOverwriteDialog(this->modelFolderName))
+      std::string msg = "A model named " + this->modelName +
+                        " already exists in folder " + path.string() + ".\n\n"
+                        "Do you wish to overwrite the existing model files?\n";
+
+      QMessageBox msgBox(QMessageBox::Warning, QString("Files Exist"),
+                         QString(msg.c_str()));
+
+      QPushButton *saveButton = msgBox.addButton("Save",
+                                                 QMessageBox::ApplyRole);
+      msgBox.addButton(QMessageBox::Cancel);
+      msgBox.exec();
+      if (msgBox.clickedButton() == saveButton)
       {
         return this->OnSaveAs(this->modelName);
       }
     }
-    
+
     const char* modelConfigString = modelConfigPath.string().c_str();
     gzdbg << "Saving file to " << modelConfigString << std::endl;
 
@@ -1630,7 +1625,7 @@ void BuildingMaker::OnExit()
   {
     gui::editor::Events::finishBuildingModel();
     return;
-  } 
+  }
 
   if (this->savedChanges)
   {
@@ -1639,8 +1634,7 @@ void BuildingMaker::OnExit()
       "Are you ready to exit?\n\n");
     QMessageBox msgBox(QMessageBox::NoIcon, QString("Exit"), msg);
 
-    msgBox.addButton("Exit",
-                                               QMessageBox::ApplyRole);
+    msgBox.addButton("Exit", QMessageBox::ApplyRole);
     QPushButton *cancelButton = msgBox.addButton(QMessageBox::Cancel);
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
@@ -1678,7 +1672,7 @@ void BuildingMaker::OnExit()
       }
     }
   }
-  
+
   this->FinishModel();
   gui::editor::Events::finishBuildingModel();
   gui::editor::Events::newBuildingModel();

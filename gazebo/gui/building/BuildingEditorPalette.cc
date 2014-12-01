@@ -117,16 +117,10 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
       "Import an existing floor plan to use as a guide"));
   connect(importImageButton, SIGNAL(clicked()), this, SLOT(OnImportImage()));
 
-  // Save button
-  /* this->saved = false;
-  this->saveButton = new QPushButton(tr("Save As"));
-  connect(this->saveButton, SIGNAL(clicked()), this, SLOT(OnSave())); */
-
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(importImageButton);
   buttonsLayout->setAlignment(Qt::AlignHCenter);
   buttonsLayout->setContentsMargins(30, 11, 30, 11);
-  // buttonsLayout->addWidget(this->saveButton);
 
   // Main layout
   mainLayout->addLayout(modelNameLayout);
@@ -222,31 +216,8 @@ void BuildingEditorPalette::OnAddStair()
 }
 
 /////////////////////////////////////////////////
-/*void BuildingEditorPalette::OnDiscard()
-{
-  gui::editor::Events::discardBuildingEditor();
-}*/
-
-/////////////////////////////////////////////////
-/*void BuildingEditorPalette::OnSave()
-{
-  if (this->saved)
-  {
-  gui::editor::Events::saveBuildingEditor(
-      this->modelNameEdit->text().toStdString());
-  }
-  else
-  {
-    gui::editor::Events::saveAsBuildingEditor(
-        this->modelNameEdit->text().toStdString());
-  }
-}*/
-
-/////////////////////////////////////////////////
 void BuildingEditorPalette::OnNewModel()
 {
-  /* this->saved = false;
-  this->saveButton->setText("&Save As"); */
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
 }
 
@@ -254,8 +225,6 @@ void BuildingEditorPalette::OnNewModel()
 void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
     const std::string &/*_saveLocation*/)
 {
-  /* this->saved = true;
-  this->saveButton->setText("Save"); */
   this->modelNameEdit->setText(tr(_saveName.c_str()));
 }
 
