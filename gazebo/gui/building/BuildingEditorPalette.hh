@@ -69,6 +69,9 @@ namespace gazebo
       private slots: void OnColor(int _colorId);
 
       /// \brief TODO
+      private slots: void OnCustomColor();
+
+      /// \brief TODO
       private slots: void OnTexture(int _textureId);
 
       /// \brief Qt callback when the discard button is pressed.

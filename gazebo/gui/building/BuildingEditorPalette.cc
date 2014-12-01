@@ -136,6 +136,11 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   }
   connect(brushes, SIGNAL(buttonClicked(int)), this, SLOT(OnColor(int)));
 
+  QPushButton *customColor = new QPushButton("More");
+  colorsLayout->addWidget(customColor, 1, 4, 1, 2);
+  connect(customColor, SIGNAL(clicked()), this,
+      SLOT(OnCustomColor()));
+
   // Textures label
   QLabel *texturesLabel = new QLabel(tr(
        "<font size=4 color='white'>Add Texture</font>"));
@@ -357,7 +362,7 @@ void BuildingEditorPalette::OnColor(int _buttonId)
   if (_buttonId >= (int)colorList.size())
   {
     // Textures
-    if (_buttonId < (int)colorList.size() + 3)
+    if (_buttonId < (int)colorList.size() + (int)textureList.size())
     {
       this->OnTexture(_buttonId - (int)colorList.size());
       return;
@@ -384,6 +389,28 @@ void BuildingEditorPalette::OnColor(int _buttonId)
   else
   {
     gui::editor::Events::createBuildingEditorItem(std::string());
+  }
+}
+
+/////////////////////////////////////////////////
+void BuildingEditorPalette::OnCustomColor()
+{
+  // Cancel draw mode
+  gui::editor::Events::createBuildingEditorItem(std::string());
+
+  QColor color = QColorDialog::getColor(Qt::green, this);
+
+  if (color.isValid())
+  {
+    std::ostringstream colorStr;
+    colorStr << "color_custom";
+
+    gui::editor::Events::colorSelected(color);
+    this->currentMode = colorStr.str();
+
+    QPixmap colorCursor(30, 30);
+    colorCursor.fill(color);
+    QApplication::setOverrideCursor(QCursor(colorCursor));
   }
 }
 
