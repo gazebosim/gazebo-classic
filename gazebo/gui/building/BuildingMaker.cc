@@ -852,6 +852,8 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           visualElem->GetElement("material")->GetElement("ambient")->
               Set(buildingModelManip->GetColor());
+          visualElem->GetElement("material")->GetElement("script")
+              ->GetElement("name")->Set(buildingModelManip->GetTexture());
         }
       }
     }
@@ -1524,25 +1526,49 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   // Highlight visual on hover
   if (vis)
   {
+    std::string visName = vis->GetParent()->GetName();
+    // Stairs have nested visuals
+    if (visName.find("Stair") != std::string::npos)
+    {
+      vis = vis->GetParent();
+    }
+
+    // Reset previous hoverVis
     if (this->hoverVis && this->hoverVis != vis)
     {
-      // FIX after PR #1303
-      // change transparency on manip instead?
+      std::string hoverName = this->hoverVis->GetParent()->GetName();
+      hoverName = hoverName.substr(hoverName.find("::")+2);
+      BuildingModelManip *manip = this->allItems[hoverName];
+      this->hoverVis->SetAmbient(manip->GetColor());
+      this->hoverVis->SetMaterial(manip->GetTexture());
       this->hoverVis->SetTransparency(0.4);
     }
 
-    rendering::VisualPtr rootVis = vis->GetRootVisual();
-    std::string hoverName = vis->GetParent()->GetName();
-    if (!rootVis->IsPlane() && (
-        hoverName.find("Wall") != std::string::npos ||
-        hoverName.find("Floor") != std::string::npos))
+    if (visName.find("Wall") != std::string::npos ||
+        visName.find("Floor") != std::string::npos ||
+        visName.find("Stair") != std::string::npos)
     {
       this->hoverVis = vis;
-      this->hoverVis->SetTransparency(0);
-    }
-    else if (hoverName.find("Stair") != std::string::npos)
-    {
-      this->hoverVis = vis->GetParent();
+      if (this->selectedColor.isValid())
+      {
+        common::Color newColor(this->selectedColor.red(),
+                               this->selectedColor.green(),
+                               this->selectedColor.blue());
+        this->hoverVis->SetAmbient(newColor);
+      }
+      else if (this->selectedTexture != "")
+      {
+        std::string material = "Gazebo/Grey";
+        if (this->selectedTexture == ":/images/wood.png")
+          material = "Gazebo/Wood";
+        else if (this->selectedTexture == ":/images/ceiling_tiled.png")
+          material = "Gazebo/CeilingTiled";
+        else if (this->selectedTexture == ":/images/bricks.png")
+          material = "Gazebo/Bricks";
+
+        this->hoverVis->SetMaterial(material);
+      }
+
       this->hoverVis->SetTransparency(0);
     }
     else
@@ -1591,7 +1617,6 @@ bool BuildingMaker::On3dMouseRelease(const common::MouseEvent &_event)
     {
       manip->SetTexture(this->selectedTexture);
     }
-    this->hoverVis->SetEmissive(common::Color(0.0, 0.0, 0.0));
     this->hoverVis.reset();
   }
   else
