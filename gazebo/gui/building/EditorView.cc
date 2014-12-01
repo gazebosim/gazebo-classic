@@ -1281,8 +1281,8 @@ void EditorView::OnLevelApply()
       GetFloorTexture());
   this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
       GetFloorColor());
-  this->levels[this->currentLevel]->floorItem->Set3dTransparency(0.4);
   this->levels[this->currentLevel]->floorItem->FloorChanged();
+  this->levels[this->currentLevel]->floorItem->Set3dTransparency(0.4);
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
