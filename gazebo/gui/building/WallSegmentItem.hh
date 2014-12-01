@@ -106,9 +106,6 @@ namespace gazebo
       /// \brief Height of the wall segment in meters.
       private: double wallHeight;
 
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
-
       /// \brief This wall segment's measure item.
       private: MeasureItem *measure;
 
