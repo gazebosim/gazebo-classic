@@ -45,13 +45,11 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   }
 
   QLabel *modelLabel = new QLabel;
-  modelLabel->setText(tr("Name: "));
+  modelLabel->setText(tr("Model Name: "));
   this->modelNameLineEdit = new QLineEdit;
 
-  // TODO: setting proper default values?
-
-  QLabel *modelHeader = new QLabel;
-  modelHeader->setText(tr("<b>Model</b>"));
+  /*QLabel *modelHeader = new QLabel;
+  modelHeader->setText(tr("<b>Model</b>"));*/
   QLabel *fileHeader = new QLabel;
   fileHeader->setText(tr("<b>Folder</b>"));
 

@@ -38,7 +38,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
 
   // Model name layout
   QHBoxLayout *modelNameLayout = new QHBoxLayout;
-  QLabel *modelLabel = new QLabel(tr("Model: "));
+  QLabel *modelLabel = new QLabel(tr("Model Name: "));
   this->modelNameEdit = new QLineEdit();
   this->modelNameEdit->setText(tr(this->buildingDefaultName.c_str()));
   modelNameLayout->addWidget(modelLabel);
