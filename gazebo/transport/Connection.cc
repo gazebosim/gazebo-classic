@@ -15,13 +15,35 @@
  *
 */
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
+#ifdef _WIN32
+  // For socket(), connect(), send(), and recv().
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  #include <iphlpapi.h>
+  // Type used for raw data on this platform.
+  typedef char raw_type;
+#else
+  // For data types
+  #include <sys/types.h>
+  // For socket(), connect(), send(), and recv()
+  #include <sys/socket.h>
+  // For gethostbyname()
+  #include <netdb.h>
+  // For inet_addr()
+  #include <arpa/inet.h>
+  // For close()
+  #include <unistd.h>
+  // For sockaddr_in
+  #include <netinet/in.h>
+  // Type used for raw data on this platform
+  typedef void raw_type;
+  #include <ifaddrs.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include <boost/lexical_cast.hpp>
 
