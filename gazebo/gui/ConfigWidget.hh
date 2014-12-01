@@ -267,7 +267,7 @@ namespace gazebo
       /// \param[in] _msg Vector3d message to be updated.
       /// \param[in] _value Vector3 used for updating the message.
       private: void UpdateVector3Msg(google::protobuf::Message *_msg,
-          const math::Vector3 _value);
+          const math::Vector3 &_value);
 
       /// \brief Create a widget for configuring an unsigned integer value.
       /// \param[in] _key A key that is used as a label for the widget.

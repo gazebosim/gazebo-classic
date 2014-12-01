@@ -1472,7 +1472,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
-    const math::Vector3 _value)
+    const math::Vector3 &_value)
 {
   const google::protobuf::Descriptor *valueDescriptor =
       _msg->GetDescriptor();
