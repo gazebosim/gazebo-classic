@@ -152,6 +152,9 @@ namespace gazebo
       /// \brief TODO
       Q_SIGNALS: void ColorChanged(QColor _color);
 
+      /// \brief TODO
+      Q_SIGNALS: void TextureChanged(QString _texture);
+
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
       /// \param[in] _x New X position in pixel coordinates.

@@ -367,7 +367,10 @@ void BuildingModelManip::SetTexture(QString _texture)
   else if (_texture == ":/images/bricks.png")
     this->texture = "Gazebo/Bricks";
 
+  // BuildingModelManip and BuildingMaker handle material names,
+  // Inspectors and palette handle thumbnail uri
   this->visual->SetMaterial(this->texture);
+  emit TextureChanged(_texture);
 }
 
 /////////////////////////////////////////////////

@@ -183,6 +183,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   // manip changes -> item changes
   QObject::connect(manip, SIGNAL(ColorChanged(QColor)),
       _item, SLOT(OnColorChanged(QColor)));
+  QObject::connect(manip, SIGNAL(TextureChanged(QString)),
+      _item, SLOT(OnTextureChanged(QString)));
 }
 
 /////////////////////////////////////////////////

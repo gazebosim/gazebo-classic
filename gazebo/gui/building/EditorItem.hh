@@ -181,6 +181,9 @@ namespace gazebo
       /// \brief TODO
       private slots: void OnColorChanged(QColor _color);
 
+      /// \brief TODO
+      private slots: void OnTextureChanged(QString _texture);
+
       /// \brief Type of editor item.
       protected: std::string editorType;
 
