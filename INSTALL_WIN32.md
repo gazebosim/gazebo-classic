@@ -23,6 +23,7 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
     - [Boost 1.56.0](http://packages.osrfoundation.org/win32/deps/boost_1_56_0.zip)
     - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-8-1.zip)
     - [FreeImage 3.1.6](http://packages.osrfoundation.org/win32/deps/FreeImage.git.zip)
+    - [Libcurl HEAD](http://packages.osrfoundation.org/win32/deps/libcurl-vc12-x64-release-static-ipv6-sspi-winssl.zip)
 
 1. Unzip each of them in gz-ws.
 
