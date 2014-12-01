@@ -160,6 +160,12 @@ namespace gazebo
       /// endpoint.
       public: std::vector<GrabberHandle *> grabbers;
 
+      /// \brief Angle to snap in degrees.
+      public: static const double SnapAngle;
+
+      /// \brief Length to snap in meters.
+      public: static const double SnapLength;
+
       /// \brief Scale for converting pixels to metric units.
       protected: double scale;
 

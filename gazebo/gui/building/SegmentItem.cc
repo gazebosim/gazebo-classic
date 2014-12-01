@@ -23,6 +23,9 @@
 using namespace gazebo;
 using namespace gui;
 
+const double SegmentItem::SnapAngle = 15;
+const double SegmentItem::SnapLength = 0.25;
+
 /////////////////////////////////////////////////
 SegmentItem::SegmentItem(QGraphicsItem *_parent)
     : EditorItem(), QGraphicsLineItem(_parent), start(0, 0),
@@ -273,19 +276,19 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
-      // Snap to 15 degrees increments
+      // Snap to angular increments
       QLineF newLine(p1, p2);
       double angle = GZ_DTOR(QLineF(p1, p2).angle());
-      double range = GZ_DTOR(15);
+      double range = GZ_DTOR(SegmentItem::SnapAngle);
       int angleIncrement = angle / range;
 
       if ((angle - range*angleIncrement) > range/2)
         angleIncrement++;
       angle = -range*angleIncrement;
 
-      // Snap to 0.25 m increments
+      // Snap to length increments
       double newLength = newLine.length();
-      double lengthIncrement = 0.25 / this->GetScale();
+      double lengthIncrement = SegmentItem::SnapLength / this->GetScale();
       newLength  = round(newLength/lengthIncrement)*lengthIncrement-
           this->GetThickness();
 

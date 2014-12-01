@@ -359,19 +359,20 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
 
           if (!this->snapToGrabber)
           {
-            // Snap to 15 degrees increments
+            // Snap to angular increments
             QLineF newLine(p1, p2);
             double angle = GZ_DTOR(QLineF(p1, p2).angle());
-            double range = GZ_DTOR(15);
+            double range = GZ_DTOR(SegmentItem::SnapAngle);
             int angleIncrement = angle / range;
 
             if ((angle - range*angleIncrement) > range*0.5)
               angleIncrement++;
             angle = -range*angleIncrement;
 
-            // Snap to 0.25 m increments
+            // Snap to length increments
             double newLength = newLine.length();
-            double lengthIncrement = 0.25 / wallSegmentItem->GetScale();
+            double lengthIncrement = SegmentItem::SnapLength /
+                wallSegmentItem->GetScale();
             newLength  = round(newLength/lengthIncrement)*lengthIncrement-
                 wallSegmentItem->GetThickness();
 
