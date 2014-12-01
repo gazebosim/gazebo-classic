@@ -33,6 +33,7 @@ set (files
   trunk.jpg
   white.bmp
   willowMap.png
+  window_frame.png
   wood.jpg
   WoodPallet.png
 )
