@@ -258,7 +258,7 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
     // TODO: snap to other grabbers on the scene
 
     // Snap to 15 degrees increments
-    if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
       QLineF newLine(p1, p2);
       double angle = GZ_DTOR(QLineF(p1, p2).angle());
