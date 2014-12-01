@@ -118,6 +118,8 @@
     1. Snapping on by default, off holding Shift. Improved snapping.
         * [Pull request #1304](https://bitbucket.org/osrf/gazebo/pull-request/1304)
 
+    1. Save building models in folders, improve save flow.
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
