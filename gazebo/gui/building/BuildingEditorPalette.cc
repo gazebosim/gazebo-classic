@@ -338,7 +338,8 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnCreateEditorItem(const std::string &_mode)
 {
-//  gui::editor::Events::materialSelected(QColor::Invalid);
+  gui::editor::Events::colorSelected(QColor::Invalid);
+  gui::editor::Events::textureSelected(QString(""));
 
   if (_mode.empty() || this->currentMode == _mode)
   {
