@@ -57,7 +57,6 @@ class GZ_COMMON_VISIBLE SingletonT
 
 /// \brief Initialization of the singleton instance.
 template <class T>
-GZ_COMMON_VISIBLE
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 /// \}
 

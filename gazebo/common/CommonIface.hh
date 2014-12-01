@@ -77,7 +77,6 @@ namespace gazebo
   ///////////////////////////////////////////////
   // Implementation of get_sha1
   template<typename T>
-  GZ_COMMON_VISIBLE
   std::string common::get_sha1(const T &_buffer)
   {
     boost::uuids::detail::sha1 sha1;
