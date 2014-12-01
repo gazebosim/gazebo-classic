@@ -313,7 +313,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         QPointF pf;
         pf = p2;
 
-        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
         {
           double distanceToClose = 30;
 
@@ -604,6 +604,43 @@ void EditorView::DrawWall(const QPoint &_pos)
 
     wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
         this->levelDefaultHeight);
+
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
+    {
+      double distanceToClose = 30;
+
+      // Snap to other walls' points
+      QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
+          QPointF(pointStart.x() - distanceToClose/2,
+                  pointStart.y() - distanceToClose/2),
+          QPointF(pointStart.x() + distanceToClose/2,
+                  pointStart.y() + distanceToClose/2)));
+      for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
+          it  != itemsList.end(); ++it)
+      {
+        WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>(*it);
+        if (anotherWall)
+        {
+          if (QVector2D(pointStart - anotherWall->GetStartPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
+            this->LinkGrabbers(anotherWall->grabbers[0],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+          else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
+            this->LinkGrabbers(anotherWall->grabbers[1],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+        }
+      }
+    }
+
     wallSegmentItem->SetLevel(this->currentLevel);
     wallSegmentItem->SetLevelBaseHeight(this->levels[this->currentLevel]->
         baseHeight);
