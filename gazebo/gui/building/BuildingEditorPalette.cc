@@ -146,7 +146,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   QSize textureIconSize(40, 40);
 
   // wood
-  this->textureList.push_back(":/images/wood.jpg");
+  this->textureList.push_back(":/images/wood.png");
   QToolButton *textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);
@@ -159,7 +159,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   texturesLayout->addWidget(textureButton, 0, 0);
 
   // tiles
-  this->textureList.push_back(":/images/ceiling_tiled.jpg");
+  this->textureList.push_back(":/images/ceiling_tiled.png");
   textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);
@@ -171,8 +171,8 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   brushes->addButton(textureButton, brushes->buttons().size());
   texturesLayout->addWidget(textureButton, 0, 1);
 
-  // sidewalk
-  this->textureList.push_back(":/images/sidewalk.jpg");
+  // bricks
+  this->textureList.push_back(":/images/bricks.png");
   textureButton = new QToolButton(this);
   textureButton->setFixedSize(textureButtonSize);
   textureButton->setCheckable(true);

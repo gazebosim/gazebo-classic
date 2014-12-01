@@ -50,7 +50,8 @@
   <file>images/z_min.png</file>
   <file>images/z_center.png</file>  
   <file>images/z_max.png</file>
-  <file>images/wood.jpg</file>
-  <file>images/ceiling_tiled.jpg</file>
+  <file>images/wood.png</file>
+  <file>images/ceiling_tiled.png</file>
+  <file>images/bricks.png</file>
 </qresource>
 </RCC>

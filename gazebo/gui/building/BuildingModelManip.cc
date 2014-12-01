@@ -360,10 +360,12 @@ void BuildingModelManip::SetTexture(QString _texture)
   // TODO For now setting existing material scripts.
   // Add support for custom textures.
   this->texture = "Gazebo/Grey";
-  if (_texture == ":/images/wood.jpg")
+  if (_texture == ":/images/wood.png")
     this->texture = "Gazebo/Wood";
-  else if (_texture == ":/images/ceiling_tiled.jpg")
+  else if (_texture == ":/images/ceiling_tiled.png")
     this->texture = "Gazebo/CeilingTiled";
+  else if (_texture == ":/images/bricks.png")
+    this->texture = "Gazebo/Bricks";
 
   this->visual->SetMaterial(this->texture);
 }
