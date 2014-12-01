@@ -95,9 +95,6 @@ namespace gazebo
       /// \brief All the brushes (wall, door, window, stair, etc).
       private: QButtonGroup *brushes;
 
-      /// \brief True if the model has been saved, false otherwise.
-      private: bool saved;
-
       /// \brief Name of model.
       private: std::string modelName;
 

@@ -1457,6 +1457,31 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
   }
   if (this->saveDialog->exec() == QDialog::Accepted)
   {
+    if (this->saveDialog->GetModelName().size() == 0)
+    {
+      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Name"),
+                       QString("Please give your model a non-empty name."));
+
+      msgBox.exec();
+      return this->OnSaveAs(_saveName);
+    }
+    if (this->saveDialog->GetSaveLocation().size() == 0)
+    {
+      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Location"),
+             QString("Please give a path to where your model will be saved."));
+
+      msgBox.exec();
+      return this->OnSaveAs(_saveName);
+    }
+    if (this->saveDialog->GetModelFolderName().size() == 0)
+    {
+      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Folder"),
+             QString("Please give a folder name for your model."));
+
+      msgBox.exec();
+      return this->OnSaveAs(_saveName);
+    }
+
     this->modelName = this->saveDialog->GetModelName();
     this->saveLocation = this->saveDialog->GetSaveLocation();
     this->modelFolderName = this->saveDialog->GetModelFolderName();
@@ -1665,6 +1690,6 @@ void BuildingMaker::OnExit()
   }
 
   this->FinishModel();
-  gui::editor::Events::finishBuildingModel();
   gui::editor::Events::newBuildingModel();
+  gui::editor::Events::finishBuildingModel();
 }

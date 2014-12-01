@@ -231,7 +231,7 @@ void BuildingEditorPalette::OnSaveModel(const std::string &_saveName,
 /////////////////////////////////////////////////
 void BuildingEditorPalette::OnNameChanged(const QString &_name)
 {
-  gui::editor::Events::buildingNameChanged(_name.toUtf8().constData());
+  gui::editor::Events::buildingNameChanged(_name.toStdString());
 }
 
 /////////////////////////////////////////////////
