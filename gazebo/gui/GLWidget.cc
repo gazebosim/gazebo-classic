@@ -119,10 +119,18 @@ GLWidget::GLWidget(QWidget *_parent)
   this->modelPub = this->node->Advertise<msgs::Model>("~/model/modify");
 
   this->factoryPub = this->node->Advertise<msgs::Factory>("~/factory");
+
+  // Subscribes to selection messages.
   this->selectionSub = this->node->Subscribe("~/selection",
       &GLWidget::OnSelectionMsg, this);
+
+  // Publishes information about user selections.
+  this->selectionPub =
+    this->node->Advertise<msgs::Selection>("~/selection");
+
   this->requestSub = this->node->Subscribe("~/request",
       &GLWidget::OnRequest, this);
+
 
   this->installEventFilter(this);
   this->keyModifiers = 0;
@@ -157,6 +165,7 @@ GLWidget::~GLWidget()
   this->node.reset();
   this->modelPub.reset();
   this->selectionSub.reset();
+  this->selectionPub.reset();
 
   this->userCamera.reset();
 }
@@ -874,33 +883,47 @@ void GLWidget::OnOrbit()
 /////////////////////////////////////////////////
 void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 {
-  if (_msg->has_selected())
+  if (_msg->has_selected() && _msg->selected())
   {
-    if (_msg->selected())
-    {
-      this->SetSelectedVisual(this->scene->GetVisual(_msg->name()));
-    }
-    else
-    {
-      this->SetSelectedVisual(rendering::VisualPtr());
-    }
+    this->OnSetSelectedEntity(_msg->name(), "normal");
   }
 }
 
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
-  if (this->selectedVis)
+  boost::mutex::scoped_lock lock(this->selectionMutex);
+
+  msgs::Selection msg;
+
+  if (this->selectedVis && _vis != this->selectedVis)
   {
     this->selectedVis->SetHighlighted(false);
+
+    msg.set_id(this->selectedVis->GetId());
+    msg.set_name(this->selectedVis->GetName());
+    msg.set_selected(false);
+
+    // The order of the following two lines matters. Make sure to publish
+    // after resetting this->selectedVis
+    this->selectedVis.reset();
+    this->selectionPub->Publish(msg);
   }
 
   this->selectedVis = _vis;
 
-  if (this->selectedVis && !this->selectedVis->IsPlane())
+  if (this->selectedVis)
   {
-    this->selectedVis->SetHighlighted(true);
-    g_copyAct->setEnabled(true);
+    msg.set_id(this->selectedVis->GetId());
+    msg.set_name(this->selectedVis->GetName());
+    msg.set_selected(true);
+    this->selectionPub->Publish(msg);
+
+    if (!this->selectedVis->IsPlane())
+    {
+      this->selectedVis->SetHighlighted(true);
+      g_copyAct->setEnabled(true);
+    }
   }
   else
   {
@@ -1000,10 +1023,15 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
-    this->SetSelectedVisual(this->scene->GetVisual(name));
-    this->scene->SelectVisual(name, _mode);
+    // Shortcircuit the case when GLWidget published the message about
+    // visual selection.
+    if (!this->selectedVis || name != this->selectedVis->GetName())
+    {
+      this->SetSelectedVisual(this->scene->GetVisual(name));
+      this->scene->SelectVisual(name, _mode);
+    }
   }
-  else
+  else if (this->selectedVis)
   {
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);

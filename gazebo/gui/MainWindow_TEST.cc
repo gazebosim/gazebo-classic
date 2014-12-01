@@ -34,6 +34,13 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
+bool g_gotBoxSelection = false;
+void OnSelection(ConstSelectionPtr &_msg)
+{
+  if (_msg->name() == "box" && _msg->has_selected() && _msg->selected())
+    g_gotBoxSelection = true;
+}
+
 /////////////////////////////////////////////////
 void MainWindow_TEST::CopyPasteModel()
 {
@@ -390,6 +397,55 @@ void MainWindow_TEST::NonDefaultWorld()
   QVERIFY(sum > 0);
 
   cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
+void MainWindow_TEST::SelectObject()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, true);
+
+  gazebo::transport::NodePtr node;
+  gazebo::transport::SubscriberPtr sub;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  sub = node->Subscribe("~/selection", &OnSelection, this);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  gazebo::rendering::Events::createScene("default");
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get GLWidget
+  gazebo::gui::GLWidget *glWidget =
+      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  // Click in the center of the screen
+  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
+  QTest::qWait(500);
+
+  // Verify the box was selected
+  QVERIFY(g_gotBoxSelection);
+
   mainWindow->close();
   delete mainWindow;
 }

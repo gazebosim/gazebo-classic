@@ -194,6 +194,10 @@ namespace gazebo
 
       private: transport::NodePtr node;
       private: transport::PublisherPtr modelPub, factoryPub;
+
+      /// \brief Publishes information about user selections.
+      private: transport::PublisherPtr selectionPub;
+
       private: transport::SubscriberPtr selectionSub, requestSub;
 
       private: std::string keyText;
@@ -212,6 +216,9 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
+
+      /// \brief Mutex to protect use selections
+      private: boost::mutex selectionMutex;
     };
   }
 }
