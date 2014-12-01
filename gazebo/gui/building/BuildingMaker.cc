@@ -1561,7 +1561,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
                                                  QMessageBox::ApplyRole);
       msgBox.addButton(QMessageBox::Cancel);
       msgBox.exec();
-      if (msgBox.clickedButton() == saveButton)
+      if (msgBox.clickedButton() != saveButton)
       {
         return this->OnSaveAs(this->modelName);
       }
