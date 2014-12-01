@@ -172,9 +172,18 @@ if(NOT current_property) # property non-existent or empty
 else()
   set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
 endif()
+
+# CURL is used on linking msgs, probably via
+# gazebo_common. MSVC needs to know about the
+# linking path.
+# TODO: this should be in gazebo/msgs but did not
+# work for me.
+#link_directories(${CURL_LIBDIR})
+
 target_link_libraries(gazebo_msgs
   gazebo_common
   gazebo_math
+  ${CURL_LIBRARIES}
   ${PROTOBUF_LIBRARY}
 )
 

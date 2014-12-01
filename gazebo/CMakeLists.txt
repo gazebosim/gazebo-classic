@@ -13,6 +13,12 @@ link_directories(
   ${PROJECT_BINARY_DIR}/test
 )
 
+# TODO: this should work here but it did not for me
+# the workaround was to move this line to ..\CMakeLists.txt
+# review why this is not working here and remove the
+# workaround.
+link_directories(${CURL_LIBDIR})
+
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
