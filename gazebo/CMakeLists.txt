@@ -17,6 +17,11 @@ if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
 endif()
 
+if (WIN32)
+ add_definitions(-DBUILDING_DLL)
+ add_definitions(-DBUILDING_DLL_GZ_COMMON)
+endif()
+
 add_subdirectory(msgs)
 add_subdirectory(math)
 add_subdirectory(transport)
