@@ -280,15 +280,21 @@ void StairsInspectorDialog::SetSteps(int _steps)
 /////////////////////////////////////////////////
 void StairsInspectorDialog::SetColor(const QColor _color)
 {
-  // Find index corresponding to color (only a few colors allowed so far)
   for (unsigned int i = 0; i < this->colorList.size(); ++i)
   {
     if (this->colorList[i] == _color)
     {
       this->colorComboBox->setCurrentIndex(i);
-      break;
+      return;
     }
   }
+
+  // Add a new color
+  this->colorList.push_back(_color);
+  QPixmap colorIcon(15, 15);
+  colorIcon.fill(this->colorList.back());
+  this->colorComboBox->addItem(colorIcon, QString(""));
+  this->colorComboBox->setCurrentIndex(this->colorComboBox->count()-1);
 }
 
 /////////////////////////////////////////////////

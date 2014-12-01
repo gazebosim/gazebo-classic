@@ -179,17 +179,21 @@ void LevelInspectorDialog::SetHeight(double _height)
 /////////////////////////////////////////////////
 void LevelInspectorDialog::SetFloorColor(const QColor _color)
 {
-  // Find index corresponding to color (only a few colors allowed so far)
-  int index = 0;
   for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
   {
     if (this->floorColorList[i] == _color)
     {
-      index = i;
-      break;
+      this->floorColorComboBox->setCurrentIndex(i);
+      return;
     }
   }
-  this->floorColorComboBox->setCurrentIndex(index);
+
+  // Add a new color
+  this->floorColorList.push_back(_color);
+  QPixmap colorIcon(15, 15);
+  colorIcon.fill(this->floorColorList.back());
+  this->floorColorComboBox->addItem(colorIcon, QString(""));
+  this->floorColorComboBox->setCurrentIndex(this->floorColorComboBox->count()-1);
 }
 
 /////////////////////////////////////////////////
