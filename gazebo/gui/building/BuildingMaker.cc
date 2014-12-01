@@ -1493,27 +1493,19 @@ void BuildingMaker::OnExit()
 /////////////////////////////////////////////////
 void BuildingMaker::OnColorSelected(QColor _color)
 {
-  if (!_color.isValid())
-  {
-    this->StopMaterialModes();
-    return;
-  }
-
-  this->selectedColor = _color;
   this->selectedTexture = "";
+
+  if (_color.isValid())
+    this->selectedColor = _color;
 }
 
 /////////////////////////////////////////////////
 void BuildingMaker::OnTextureSelected(QString _texture)
 {
-  if (_texture == QString(""))
-  {
-    this->StopMaterialModes();
-    return;
-  }
-
-  this->selectedTexture = _texture;
   this->selectedColor = QColor::Invalid;
+
+  if (_texture != QString(""))
+    this->selectedTexture = _texture;
 }
 
 /////////////////////////////////////////////////
@@ -1631,4 +1623,7 @@ void BuildingMaker::StopMaterialModes()
 
   this->selectedTexture = QString("");
   this->selectedColor = QColor::Invalid;
+  gui::editor::Events::colorSelected(this->selectedColor.convertTo(
+      QColor::Invalid));
+  gui::editor::Events::createBuildingEditorItem(std::string());
 }
