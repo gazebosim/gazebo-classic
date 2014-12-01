@@ -34,10 +34,18 @@
               <ode>
                 <mu>0.9</mu>
                 <mu2>0.9</mu2>
-                <slip1>0.3</slip1>
-                <slip2>0.1</slip2>
+                <slip1>0.0</slip1>
+                <slip2>0.0</slip2>
               </ode>
             </friction>
+            <contact>
+              <ode>
+                <kp>1e4</kp>
+                <kd>1</kd>
+                <min_depth>0.003</min_depth>
+                <max_vel>0.1</max_vel>
+              </ode>
+            </contact>
           </surface>
         </collision>
 
@@ -156,15 +164,19 @@
         </sensor>
       </joint>
 
-      <joint type="revolute" name="upright_axel">
+      <joint type="prismatic" name="upright_axel">
         <parent>upright</parent>
         <child>axel</child>
         <axis>
-          <xyz>1 0 0</xyz>
+          <xyz>0 0 1</xyz>
           <limit>
-            <upper>0.75</upper>
-            <lower>-0.75</lower>
+            <upper>1</upper>
+            <lower>-1</lower>
           </limit>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000</spring_stiffness>
+          </dynamics>
         </axis>
       </joint>
 
@@ -174,8 +186,8 @@
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <upper>1.5707</upper>
-            <lower>-1.5707</lower>
+            <upper>0</upper>
+            <lower>0</lower>
           </limit>
         </axis>
       </joint>
@@ -215,10 +227,18 @@
               <ode>
                 <mu>0.9</mu>
                 <mu2>0.9</mu2>
-                <slip1>0.3</slip1>
-                <slip2>0.1</slip2>
+                <slip1>0</slip1>
+                <slip2>0</slip2>
               </ode>
             </friction>
+            <contact>
+              <ode>
+                <kp>1e4</kp>
+                <kd>1</kd>
+                <min_depth>0.003</min_depth>
+                <max_vel>0.1</max_vel>
+              </ode>
+            </contact>
           </surface>
         </collision>
 

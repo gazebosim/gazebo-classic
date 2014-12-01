@@ -149,11 +149,14 @@ void TireFrictionPlugin::OnUpdate()
   //  First compute average position and normal of contact points.
   math::Vector3 positionAverage;
   math::Vector3 normalAverage;
+  math::Vector3 forceAverage;
+  math::Vector3 torqueAverage;
+
   {
-    math::Vector3 positionSum;
     int positionCount = 0;
-    math::Vector3 normalSum;
     int normalCount = 0;
+    int forceCount = 0;
+
     for (int i = 0; i < contacts.contact_size(); ++i)
     {
       const msgs::Contact *contact = &contacts.contact(i);
@@ -167,18 +170,33 @@ void TireFrictionPlugin::OnUpdate()
         normalAverage += msgs::Convert(contact->normal(j));
         normalCount++;
       }
+
+      for (int j = 0; j < contact->wrench_size(); ++j)
+      {
+        forceAverage += msgs::Convert(
+            contact->wrench(j).body_1_wrench().force());
+        torqueAverage += msgs::Convert(
+            contact->wrench(j).body_1_wrench().torque());
+        forceCount++;
+      }
     }
+
     if (positionCount > 0)
     {
-      positionAverage = positionSum / positionCount;
+      positionAverage = positionAverage / positionCount;
     }
     if (normalCount > 0)
     {
-      normalAverage = normalSum / normalCount;
+      normalAverage = normalAverage / normalCount;
+    }
+    if (forceCount > 0)
+    {
+      forceAverage = forceAverage / forceCount;
+      torqueAverage = torqueAverage / forceCount;
     }
   }
 
-  //  Then compute velocity on body at that average contact point.
+  // Then compute velocity on body at that average contact point.
   math::Vector3 contactPointVelocity;
   {
     math::Pose linkPose = this->dataPtr->link->GetWorldPose();
@@ -187,7 +205,7 @@ void TireFrictionPlugin::OnUpdate()
       this->dataPtr->link->GetWorldLinearVel(offset, math::Quaternion());
   }
 
-  //  Compute contact point speed in tangential directions.
+  // Compute contact point speed in tangential directions.
   double speedTangential;
   {
     math::Vector3 velocityTangential = contactPointVelocity -
@@ -195,8 +213,8 @@ void TireFrictionPlugin::OnUpdate()
     speedTangential = velocityTangential.GetLength();
   }
 
-  //  Then normalize that tangential speed somehow.
-  //   Use speed at origin of link frame.
+  // Then normalize that tangential speed somehow.
+  // Use speed at origin of link frame.
   double slip;
   {
     double speed = this->dataPtr->link->GetWorldLinearVel().GetLength();
@@ -208,6 +226,7 @@ void TireFrictionPlugin::OnUpdate()
     slip = speedTangential / speed;
   }
 
+  std::cout << "Slip[" << slip << "] Force[" << forceAverage << "] Torque[" << torqueAverage << "]\n";
   // Compute friction from slip.
   // Set friction coefficient.
 }

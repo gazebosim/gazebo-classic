@@ -7,7 +7,7 @@
     </include>
 
     <model name="tire">
-      <pose>0 0 0.5 0 0 0</pose>
+      <pose>0 0 0.5 0 0 0.261799388</pose>
 
       <link name="wheel">
         <inertial>
@@ -174,8 +174,8 @@
         <axis>
           <xyz>0 0 1</xyz>
           <limit>
-            <upper>1.5707</upper>
-            <lower>-1.5707</lower>
+            <upper>0</upper>
+            <lower>0</lower>
           </limit>
         </axis>
       </joint>
