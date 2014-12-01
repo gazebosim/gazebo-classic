@@ -1570,7 +1570,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     const char* modelConfigString = modelConfigPath.string().c_str();
     gzdbg << "Saving file to " << modelConfigString << std::endl;
 
-    std::ofstream savefile;
+    /*std::ofstream savefile;
     savefile.open(modelConfigString);
     if (!savefile.is_open())
     {
@@ -1579,7 +1579,8 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
     // TODO: human-readable formatting of XML output
     savefile << xmlDoc;
-    savefile.close();
+    savefile.close();*/
+    xmlDoc.SaveFile(modelConfigString);
 
     this->SaveModelFiles();
 
