@@ -56,10 +56,6 @@ namespace gazebo
       /// \return The model name.
       public: std::string GetModelName() const;
 
-      /// \brief Get the name of the folder that stores model data.
-      /// \return The model folder name.
-      public: std::string GetModelFolderName() const;
-
       /// \brief Get the save location.
       /// \return Path of the save location.
       public: std::string GetSaveLocation() const;
@@ -67,10 +63,6 @@ namespace gazebo
       /// \brief Set the building model name.
       /// \param[in] _name Name to set the model to.
       public: void SetModelName(const std::string &_name);
-
-      /// \brief Set the building folder name.
-      /// \param[in] _name Folder name for saving model data.
-      public: void SetFolderName(const std::string &_name);
 
       /// \brief Set the save location.
       /// \param[in] _location Location to save to.
@@ -107,6 +99,9 @@ namespace gazebo
       /// \brief Widget container to hold advanced model saving options.
       private: QWidget *advancedOptionsWidget;
 
+      /// \brief Label appearing at the top of the dialog box.
+      private: QLabel *messageLabel;
+
       /// \brief Editable line that holds the model name.
       private: QLineEdit* modelNameLineEdit;
 
@@ -124,9 +119,6 @@ namespace gazebo
 
       /// \brief Editable line that holds the model's save location.
       private: QLineEdit* modelLocationLineEdit;
-
-      /// \brief Editable line that holds the model's filename.
-      private: QLineEdit* modelFolderNameLineEdit;
     };
     /// \}
   }

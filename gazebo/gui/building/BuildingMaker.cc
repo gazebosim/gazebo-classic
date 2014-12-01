@@ -54,9 +54,35 @@ using namespace gui;
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
+// Helper function to generate a valid folder name from a human-readable model
+// name.
+std::string GetFolderNameFromModelName(const std::string &_modelName)
+{
+  // Auto-generate folder name based on model name
+  std::string foldername = _modelName;
+
+  std::vector<std::pair<std::string, std::string> > replacePairs;
+  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
+
+  for (unsigned int i = 0; i < replacePairs.size(); i++)
+  {
+    std::string forbiddenChar = replacePairs[i].first;
+    std::string replaceChar = replacePairs[i].second;
+    size_t index = foldername.find(forbiddenChar);
+    while (index != std::string::npos)
+    {
+      foldername.replace(index, forbiddenChar.size(), replaceChar);
+      index = foldername.find(forbiddenChar);
+    }
+  }
+
+  return foldername;
+}
+
+/////////////////////////////////////////////////
   BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->buildingDefaultName = "BuildingDefaultName";
+  this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
 
   this->conversionScale = 0.01;
@@ -489,9 +515,11 @@ void BuildingMaker::Reset()
 
   this->saved = false;
   this->savedChanges = false;
-  this->saveLocation = (QDir::homePath()+"/building_editor_models").
-                       toStdString();
   this->modelName = this->buildingDefaultName;
+  this->defaultPath = (QDir::homePath() + "/building_editor_models")
+                        .toStdString();
+  this->saveLocation = defaultPath + "/" +
+                        GetFolderNameFromModelName(this->modelName);
 
   this->modelVisual.reset(new rendering::Visual(this->modelName,
       scene->GetWorldVisual()));
@@ -518,6 +546,7 @@ bool BuildingMaker::IsActive() const
 void BuildingMaker::SetModelName(const std::string &_modelName)
 {
   this->modelName = _modelName;
+  this->saveDialog->SetModelName(_modelName);
 }
 
 /////////////////////////////////////////////////
@@ -526,7 +555,7 @@ void BuildingMaker::SaveToSDF(const std::string &_savePath)
   this->saveLocation = _savePath;
   std::ofstream savefile;
   boost::filesystem::path path;
-  path = path / this->saveLocation / this->modelFolderName / "model.sdf";
+  path = path / this->saveLocation / "model.sdf";
   gzdbg << "Saving file to " << path.string() << std::endl;
 
   savefile.open(path.string().c_str());
@@ -578,7 +607,8 @@ void BuildingMaker::GenerateSDF()
   std::stringstream visualNameStream;
   std::stringstream collisionNameStream;
 
-  modelElem->GetAttribute("name")->Set(this->modelFolderName);
+  modelElem->GetAttribute("name")->Set(
+    GetFolderNameFromModelName(this->modelName));
 
   std::map<std::string, BuildingModelManip *>::iterator itemsIt;
 
@@ -1432,25 +1462,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 {
   this->saveDialog->SetModelName(_saveName);
 
-  // Auto-generate folder name based on model name
-  std::string foldername = _saveName;
-
-  std::vector<std::pair<std::string, std::string> > replacePairs;
-  replacePairs.push_back(std::pair<std::string, std::string>(" ", "_"));
-
-  for (unsigned int i = 0; i < replacePairs.size(); i++)
-  {
-    std::string forbiddenChar = replacePairs[i].first;
-    std::string replaceChar = replacePairs[i].second;
-    size_t index = foldername.find(forbiddenChar);
-    while (index != std::string::npos)
-    {
-      foldername.replace(index, forbiddenChar.size(), replaceChar);
-      index = foldername.find(forbiddenChar);
-    }
-  }
-  this->saveDialog->SetFolderName(foldername);
-
   if (this->saveLocation.length() > 0)
   {
     this->saveDialog->SetSaveLocation(this->saveLocation);
@@ -1473,18 +1484,9 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       msgBox.exec();
       return this->OnSaveAs(_saveName);
     }
-    if (this->saveDialog->GetModelFolderName().size() == 0)
-    {
-      QMessageBox msgBox(QMessageBox::Warning, QString("Empty Folder"),
-             QString("Please give a folder name for your model."));
-
-      msgBox.exec();
-      return this->OnSaveAs(_saveName);
-    }
 
     this->modelName = this->saveDialog->GetModelName();
     this->saveLocation = this->saveDialog->GetSaveLocation();
-    this->modelFolderName = this->saveDialog->GetModelFolderName();
     this->authorName = this->saveDialog->GetAuthorName();
     this->authorEmail = this->saveDialog->GetAuthorEmail();
     this->description = this->saveDialog->GetDescription();
@@ -1556,7 +1558,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     }
 
     boost::filesystem::path path;
-    path = path / this->saveLocation/ this->modelFolderName;
+    path = path / this->saveLocation;
     if (!boost::filesystem::exists(path))
     {
       if (!boost::filesystem::create_directories(path))
@@ -1599,7 +1601,8 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 
     this->SaveModelFiles();
 
-    // Check if this this->saveLocation is in GAZEBO_MODEL_PATHS
+    // Check if this this->saveLocation is in the model path
+    // TODO: Add the directory ABOVE saveLocation to SystemPaths
     std::list<std::string> modelPaths =
                 gazebo::common::SystemPaths::Instance()->GetModelPaths();
     std::list<std::string>::iterator iter;
@@ -1631,7 +1634,14 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
   this->SetModelName(_name);
+  // Set new saveLocation
+  boost::filesystem::path oldPath(this->saveLocation);
+  boost::filesystem::path newPath = oldPath.parent_path() /
+    GetFolderNameFromModelName(_name);
+  this->saveLocation = newPath.string();
+
   this->savedChanges = false;
+  this->saved = false;
 }
 
 /////////////////////////////////////////////////

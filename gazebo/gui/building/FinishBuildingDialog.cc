@@ -31,17 +31,17 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   else if (_mode == MODEL_SAVE)
     this->setWindowTitle(tr("Save Model"));
 
-  QLabel *messageLabel = new QLabel;
+  this->messageLabel = new QLabel;
   if (_mode == MODEL_FINISH)
   {
-    messageLabel->setText(
+    this->messageLabel->setText(
         tr("Before we finalize your model, please make sure that\n"
         "the following information is correct:\n"));
   }
   else if (_mode == MODEL_SAVE)
   {
-    messageLabel->setText(
-        tr("Please give your model a name:\n"));
+    this->messageLabel->setText(
+        tr("Pick a location for your model \"Untitled\":\n"));
   }
 
   QLabel *modelLabel = new QLabel;
@@ -83,9 +83,6 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   modelDescription->setText(tr("  Description:"));
   this->modelDescriptionLineEdit = new QLineEdit;
 
-  QLabel *modelFolderName = new QLabel;
-  modelFolderName->setText(tr("  Name:"));
-  this->modelFolderNameLineEdit = new QLineEdit;
 
 /*  QString contributeText(
       tr("Contribute this model to the Model Database so that\n"
@@ -108,10 +105,12 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   buttonsLayout->addWidget(cancelButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
-  QGridLayout *gridLayout = new QGridLayout;
-  gridLayout->addWidget(modelLabel, 0, 0);
-  gridLayout->addWidget(modelNameLineEdit, 0, 1);
+  QHBoxLayout *locationLayout = new QHBoxLayout;
 
+  locationLayout->addWidget(modelLocation);
+  locationLayout->addWidget(this->modelLocationLineEdit);
+  locationLayout->addWidget(browseButton);
+  
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
   advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
@@ -135,24 +134,24 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 
   // Advanced options
   QGridLayout *advancedOptionsGrid = new QGridLayout();
-  advancedOptionsGrid->addWidget(modelHeader, 0, 0);
-  advancedOptionsGrid->addWidget(modelVersion, 1, 0);
-  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 1, 1);
-  advancedOptionsGrid->addWidget(modelDescription, 2, 0);
-  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 2, 1);
+  advancedOptionsGrid->addWidget(modelLabel, 0, 0);
+  advancedOptionsGrid->addWidget(modelNameLineEdit, 0, 1);
 
-  advancedOptionsGrid->addWidget(authorHeader, 3, 0);
-  advancedOptionsGrid->addWidget(modelAuthorName, 4, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 4, 1);
-  advancedOptionsGrid->addWidget(modelAuthorEmail, 5, 0);
-  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 5, 1);
+  advancedOptionsGrid->addWidget(modelHeader, 1, 0);
+  advancedOptionsGrid->addWidget(modelVersion, 2, 0);
+  advancedOptionsGrid->addWidget(this->modelVersionLineEdit, 2, 1);
+  advancedOptionsGrid->addWidget(modelDescription, 3, 0);
+  advancedOptionsGrid->addWidget(this->modelDescriptionLineEdit, 3, 1);
 
-  advancedOptionsGrid->addWidget(fileHeader, 6, 0);
-  advancedOptionsGrid->addWidget(modelFolderName, 7, 0);
-  advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 7, 1);
-  advancedOptionsGrid->addWidget(modelLocation, 8, 0);
-  advancedOptionsGrid->addWidget(this->modelLocationLineEdit, 8, 1);
-  advancedOptionsGrid->addWidget(browseButton, 8, 2);
+  advancedOptionsGrid->addWidget(authorHeader, 4, 0);
+  advancedOptionsGrid->addWidget(modelAuthorName, 5, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 5, 1);
+  advancedOptionsGrid->addWidget(modelAuthorEmail, 6, 0);
+  advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 6, 1);
+
+  //advancedOptionsGrid->addWidget(fileHeader, 6, 0);
+  //advancedOptionsGrid->addWidget(modelFolderName, 7, 0);
+  //advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 7, 1);
 
   this->advancedOptionsWidget = new QWidget();
   this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
@@ -160,7 +159,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(messageLabel);
-  mainLayout->addLayout(gridLayout);
+  mainLayout->addLayout(locationLayout);
 
   mainLayout->addLayout(advancedOptions);
   mainLayout->addWidget(this->advancedOptionsWidget);
@@ -183,12 +182,6 @@ FinishBuildingDialog::~FinishBuildingDialog()
 std::string FinishBuildingDialog::GetModelName() const
 {
   return this->modelNameLineEdit->text().toStdString();
-}
-
-/////////////////////////////////////////////////
-std::string FinishBuildingDialog::GetModelFolderName() const
-{
-  return this->modelFolderNameLineEdit->text().toStdString();
 }
 
 /////////////////////////////////////////////////
@@ -225,12 +218,9 @@ std::string FinishBuildingDialog::GetVersion() const
 void FinishBuildingDialog::SetModelName(const std::string &_name)
 {
   this->modelNameLineEdit->setText(tr(_name.c_str()));
-}
-
-/////////////////////////////////////////////////
-void FinishBuildingDialog::SetFolderName(const std::string &_name)
-{
-  this->modelFolderNameLineEdit->setText(tr(_name.c_str()));
+  std::string label = "Pick a location for your model \""
+                      + _name + "\":\n";
+  this->messageLabel->setText(QString(label.c_str()));
 }
 
 /////////////////////////////////////////////////

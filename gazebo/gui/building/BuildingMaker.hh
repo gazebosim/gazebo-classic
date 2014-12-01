@@ -308,11 +308,11 @@ namespace gazebo
       /// \brief Indicate whether all the changes to the model have been saved.
       private: bool savedChanges;
 
+      /// \brief Default directory to save models: ~/building_editor_models
+      private: std::string defaultPath;
+
       /// \brief Path to where the model is saved.
       private: std::string saveLocation;
-
-      /// \brief Folder name containing model data.
-      private: std::string modelFolderName;
 
       /// \brief Name of the building model's author.
       private: std::string authorName;
