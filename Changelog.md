@@ -121,7 +121,7 @@
     1. Added EditorItem::SetHighlighted.
         * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
 
-    1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale.
+    1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
         * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
 
 1. Model editor updates
