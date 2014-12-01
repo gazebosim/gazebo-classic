@@ -220,6 +220,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
   this->allItems[linkName] = wallManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -309,6 +310,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -380,6 +382,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
   }
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -445,6 +448,7 @@ void BuildingMaker::RemovePart(const std::string &_partName)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
   delete manip;
+  this->savedChanges = false;
 }
 
 /////////////////////////////////////////////////
@@ -1387,7 +1391,6 @@ void BuildingMaker::OnNew()
   {
     if (!this->savedChanges && msgBox.clickedButton() == saveButton)
     {
-      //FIXME name for unsaved models
       if (!this->OnSave(this->modelName))
       {
         return;
@@ -1395,10 +1398,7 @@ void BuildingMaker::OnNew()
     }
 
     gui::editor::Events::newBuildingModel();
-    this->modelName = this->buildingDefaultName;
-    // TODO: Reset values in saveDialog
-    this->saveLocation = (QDir::homePath()+"/building_editor_models").
-                         toStdString();
+
     this->saved = false;
     this->savedChanges = false;
   }
@@ -1413,8 +1413,9 @@ void BuildingMaker::SaveModelFiles()
 
 bool BuildingMaker::FileOverwriteDialog(const std::string &pathName)
 {
-  std::string msg = "A file named " + pathName + " already exists.\n\n"
-                    "Do you wish to overwrite the existing file?\n";
+  std::string msg = "A model named " + pathName + " already exists.\n\n"
+                    "Do you wish to overwrite the existing model files?\n";
+
   QMessageBox msgBox(QMessageBox::Warning, QString("File Exists"),
                      QString(msg.c_str()));
 
@@ -1431,7 +1432,6 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-  // todo
   if (this->saved)
   {
     this->SaveModelFiles();
@@ -1560,12 +1560,15 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 
     boost::filesystem::path modelConfigPath = path / "model.config";
 
-    if (boost::filesystem::exists(modelConfigPath))
+    boost::filesystem::path sdfPath = path / "model.sdf";
+
+    // Before writing
+    if (boost::filesystem::exists(sdfPath) ||
+          boost::filesystem::exists(modelConfigPath))
     {
-      bool save = this->FileOverwriteDialog(modelConfigPath.string());
-      if (!save)
+      if (!FileOverwriteDialog(this->modelFolderName))
       {
-        return this->OnSaveAs(_saveName);
+        return this->OnSaveAs(this->modelName);
       }
     }
     
@@ -1582,18 +1585,6 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     // TODO: human-readable formatting of XML output
     savefile << xmlDoc;
     savefile.close();
-
-    // Save all the things
-    path = path / "model.sdf";
-
-    if (boost::filesystem::exists(path))
-    {
-      bool save = FileOverwriteDialog(path.string());
-      if (!save)
-      {
-        return this->OnSaveAs(this->modelName);
-      }
-    }
 
     this->SaveModelFiles();
 
@@ -1615,6 +1606,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
       gazebo::common::SystemPaths::Instance()->
         AddModelPathsUpdate(this->saveLocation);
     }
+
     this->saved = true;
     this->savedChanges = true;
 
@@ -1627,7 +1619,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
-  this->modelName = _name;
+  this->SetModelName(_name);
   this->savedChanges = false;
 }
 
@@ -1653,8 +1645,6 @@ void BuildingMaker::OnExit()
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
     {
-      //gui::editor::Events::finishBuildingModel();
-      //return;
       return;
     }
   }
@@ -1669,26 +1659,21 @@ void BuildingMaker::OnExit()
       QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
       QMessageBox::ApplyRole);
-    QPushButton *newButton = msgBox.addButton("Don't Save, Exit",
+    QPushButton *exitButton = msgBox.addButton("Don't Save, Exit",
       QMessageBox::ApplyRole);
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
       return;
 
-    if (msgBox.clickedButton() == newButton)
+    if (msgBox.clickedButton() == exitButton)
     {
-      gui::editor::Events::newBuildingModel();
-      this->modelName = this->buildingDefaultName;
-      this->saveLocation = (QDir::homePath()+"/building_editor_models").toStdString();
       this->saved = false;
       this->savedChanges = false;
-      gui::editor::Events::finishBuildingModel();
     }
     else if (msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {
-        //gui::editor::Events::finishBuildingModel();
         return;
       }
     }
@@ -1696,4 +1681,5 @@ void BuildingMaker::OnExit()
   
   this->FinishModel();
   gui::editor::Events::finishBuildingModel();
+  gui::editor::Events::newBuildingModel();
 }
