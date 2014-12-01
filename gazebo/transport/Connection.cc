@@ -24,6 +24,7 @@
   #include <iphlpapi.h>
   // Type used for raw data on this platform.
   typedef char raw_type;
+  #define snprintf _snprintf
 #else
   // For data types
   #include <sys/types.h>
@@ -722,6 +723,7 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
   // GAZEBO_HOSTNAME have failed.
   if (addressIsUnspecified(address))
   {
+#ifndef _WIN32
     // the following is *nix implementation to get the external IP of the
     // current machine.
 
@@ -779,6 +781,68 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     }
 
     freeifaddrs(ifaddr);
+#else // _WIN32
+  // Establish our default return value, in case everything below fails.
+  std::string ret_addr("127.0.0.1");
+  // Look up our address.
+  ULONG outBufLen = 0;
+  PIP_ADAPTER_ADDRESSES addrs = NULL;
+  // Not sure whether these are the right flags, but they work for
+  // me on Windows 7
+  ULONG flags = (GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST |
+                 GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME);
+  // The first time, it'll fail; we're asking how much space is needed to
+  // store the result.
+  GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen);
+  // Allocate the required space.
+  addrs = new IP_ADAPTER_ADDRESSES[outBufLen];
+  ULONG ret;
+  // Now the call should succeed.
+  if ((ret = GetAdaptersAddresses(AF_INET, flags, NULL, addrs, &outBufLen)) ==
+    NO_ERROR)
+  {
+    // Iterate over all returned adapters, arbitrarily sticking with the
+    // last non-loopback one that we find.
+    for (PIP_ADAPTER_ADDRESSES curr = addrs; curr; curr = curr->Next)
+    {
+      // Iterate over all unicast addresses for this adapter
+      for (PIP_ADAPTER_UNICAST_ADDRESS unicast = curr->FirstUnicastAddress;
+           unicast; unicast = unicast->Next)
+      {
+        // Cast to get an IPv4 numeric address (the AF_INET flag used above
+        // ensures that we're only going to get IPv4 address here).
+        sockaddr_in* sockaddress =
+          reinterpret_cast<sockaddr_in*>(unicast->Address.lpSockaddr);
+        // Make it a dotted quad
+        char ipv4_str[3*4+3+1];
+        sprintf(ipv4_str, "%d.%d.%d.%d",
+          sockaddress->sin_addr.S_un.S_un_b.s_b1,
+          sockaddress->sin_addr.S_un.S_un_b.s_b2,
+          sockaddress->sin_addr.S_un.S_un_b.s_b3,
+          sockaddress->sin_addr.S_un.S_un_b.s_b4);
+        // Ignore loopback address (that's our default anyway)
+        if (!strcmp(ipv4_str, "127.0.0.1"))
+          continue;
+        ret_addr = ipv4_str;
+      }
+    }
+  }
+  else
+    gzerr << "GetAdaptersAddresses() failed: " << ret << std::endl;
+  delete [] addrs;
+  gzdbg << "Determined my IP address to be: " <<
+    ret_addr << std::endl;
+  if (ret_addr == "127.0.0.1")
+  {
+    gzwarn <<
+      "Couldn't find a preferred IP via the GetAdaptersAddresses() call; "
+      "I'm assuming that your IP "
+      "address is 127.0.0.1.  This should work for local processes, "
+      "but will almost certainly not work if you have remote processes."
+      "Report to the disc-zmq development team to seek a fix." << std::endl;
+  }
+  address = boost::asio::ip::address_v4::from_string(ret_addr);
+#endif
   }
 
   // Complain if we were unable to find a valid address

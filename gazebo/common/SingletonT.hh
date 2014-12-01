@@ -30,7 +30,13 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-class GZ_COMMON_VISIBLE SingletonT
+class
+#ifdef BUILDING_DLL_GZ_TRANSPORT
+  GZ_TRANSPORT_VISIBLE
+#else
+  GZ_COMMON_VISIBLE
+#endif
+SingletonT
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()

@@ -44,7 +44,7 @@ namespace gazebo
 {
   namespace transport
   {
-    extern bool is_stopped();
+    extern GZ_TRANSPORT_VISIBLE bool is_stopped();
 
     class IOManager;
     class Connection;

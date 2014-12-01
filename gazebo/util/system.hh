@@ -125,4 +125,29 @@
   #endif
 #endif
 
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_MSGS
+    #ifdef __GNUC__
+      #define GZ_MSGS_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_MSGS_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_MSGS_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_MSGS_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_MSGS_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_MSGS_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_MSGS_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_MSGS_VISIBLE
+    #define GZ_MSGS_HIDDEN
+  #endif
+#endif
+
 #endif /* GAZEBO_VISIBLE_HH */

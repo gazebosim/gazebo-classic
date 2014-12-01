@@ -24,6 +24,7 @@ Windows `cmd` for configuring and building.  You might also need to [disable the
     - [OGRE 1.8.1](http://packages.osrfoundation.org/win32/deps/OgreSDK_vc10_v1-8-1.zip)
     - [FreeImage 3.x, slightly modified to build on VS2013](http://packages.osrfoundation.org/win32/deps/FreeImage-vc12-x64-release-debug.zip)
     - [Libcurl HEAD](http://packages.osrfoundation.org/win32/deps/libcurl-vc12-x64-release-static-ipv6-sspi-winssl.zip)
+    - [TBB 4.3](http://packages.osrfoundation.org/win32/deps/tbb43_20141023oss_win.zip)
 
 1. Unzip each of them in gz-ws.
 

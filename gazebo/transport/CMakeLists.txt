@@ -49,6 +49,10 @@ set_property(
 
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_TRANSPORT")
+if (WIN32)
+  # 0x601 = Windows 7.  TBB needs to know this.
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
+endif ()
 
 gz_add_library(gazebo_transport ${sources})
 target_link_libraries(gazebo_transport
@@ -57,6 +61,9 @@ target_link_libraries(gazebo_transport
   ${Boost_LIBRARIES}
   ${TBB_LIBRARIES} 
 )
+if (WIN32)
+  target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
+endif()
 
 gz_install_library(gazebo_transport)
 gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport.hh)

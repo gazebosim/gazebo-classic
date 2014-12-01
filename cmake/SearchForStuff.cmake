@@ -215,7 +215,7 @@ endif()
       set(TBB_FOUND true)
       set(TBB_LIBRARIES ${tbb_library})
     else (tbb_library)
-      #BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
+      BUILD_ERROR ("Missing: TBB - Threading Building Blocks")
     endif(tbb_library)
   endif (NOT TBB_FOUND)
 
