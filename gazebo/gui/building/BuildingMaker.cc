@@ -510,6 +510,11 @@ void BuildingMaker::Reset()
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
+  if (!scene)
+  {
+    gzerr << "Couldn't get scene node from BuildingMaker" << std::endl;
+  }
+
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 
@@ -1071,8 +1076,30 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  this->GenerateSDF();
+  if (!savedChanges)
+    this->GenerateSDF();
+
   msgs::Factory msg;
+  // Create a new name if the model exists
+  if (!this->modelSDF->root->HasElement("model"))
+  {
+    gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
+    return;
+  }
+
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  std::string modelElemName = modelElem->Get<std::string>("name");
+  if (has_entity_name(modelElemName))
+  {
+    int i = 0;
+    while (has_entity_name(modelElemName))
+    {
+      modelElemName = modelElem->Get<std::string>("name") + "_" +
+        boost::lexical_cast<std::string>(i++);
+    }
+    modelElem->GetAttribute("name")->Set(modelElemName);
+  }
+
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
@@ -1389,6 +1416,7 @@ void BuildingMaker::OnNew()
 {
   if (this->allItems.empty())
   {
+    this->Reset();
     gui::editor::Events::newBuildingModel();
     return;
   }
@@ -1427,6 +1455,7 @@ void BuildingMaker::OnNew()
       }
     }
 
+    this->Reset();
     gui::editor::Events::newBuildingModel();
 
     this->saved = false;
