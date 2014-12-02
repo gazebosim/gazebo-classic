@@ -129,6 +129,10 @@ namespace gazebo
       /// \param[in] _height Height pixels.
       public: void SetSize(double _width, double _depth, double _height);
 
+      /// \brief Set the transparency of the manip.
+      /// \param[in] _transparency Transparency.
+      public: void SetTransparency(float _transparency);
+
       /// \brief Set the level for this manip.
       /// \param[in] _level The level for this manip.
       public: void SetLevel(const int _level);
@@ -216,6 +220,11 @@ namespace gazebo
       /// has changed.
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
+
+      /// \brief Qt callback when the 3D visual's transparency has been changed
+      /// from the associated editor item.
+      /// \param[in] _transparency Transparency.
+      private slots: void OnTransparencyChanged(float _transparency);
 
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();

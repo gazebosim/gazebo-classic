@@ -49,8 +49,11 @@ namespace gazebo
       /// style sheet.
       /// \param[in] _tabLabel String used for the tab label.
       /// \param[in] _widget Widget that is put inside the tab.
+      /// \param[in] _cornerWidget Optional widget to go on the top right
+      /// corner.
       protected: void Init(const std::string &_objName,
-                     const std::string &_tabLabel, QWidget *_widget);
+          const std::string &_tabLabel, QWidget *_widget,
+          QWidget *_cornerWidget = NULL);
 
       /// \brief The tab widget that holds the editor's set of buttons.
       protected: QTabWidget *tabWidget;

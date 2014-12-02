@@ -48,7 +48,7 @@ gui::ModelRightMenu *g_modelRightMenu = NULL;
 std::string g_worldname = "default";
 
 QApplication *g_app;
-gui::MainWindow *g_main_win;
+gui::MainWindow *g_main_win = NULL;
 rendering::UserCameraPtr g_active_camera;
 bool g_fullscreen = false;
 
@@ -234,14 +234,17 @@ bool gui::load()
 /////////////////////////////////////////////////
 unsigned int gui::get_entity_id(const std::string &_name)
 {
-  return g_main_win->GetEntityId(_name);
+  if (g_main_win)
+    return g_main_win->GetEntityId(_name);
+  else
+    return 0;
 }
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
-  gzLogInit("gzclient.log");
+  gzLogInit("client-", "gzclient.log");
 
   // Make sure the model database has started
   gazebo::common::ModelDatabase::Instance()->Start();
@@ -332,4 +335,10 @@ bool gui::saveINI(const boost::filesystem::path &_file)
     result = false;
   }
   return result;
+}
+
+/////////////////////////////////////////////////
+gui::MainWindow *gui::get_main_window()
+{
+  return g_main_win;
 }

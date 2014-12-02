@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Camera for viewing the world
- * Author: Nate Koenig
- * Date: 19 Jun 2008
- */
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
@@ -49,8 +44,10 @@ UserCamera::UserCamera(const std::string &_name, ScenePtr _scene)
   this->dataPtr->orbitViewController = NULL;
   this->dataPtr->fpsViewController = NULL;
   this->dataPtr->viewController = NULL;
-
   this->dataPtr->selectionBuffer = NULL;
+  this->dataPtr->joyTwistControl = true;
+  this->dataPtr->joystickButtonToggleLast = false;
+  this->dataPtr->joyPoseControl = true;
 
   // Set default UserCamera render rate to 30Hz
   this->SetRenderRate(30.0);
@@ -83,6 +80,14 @@ void UserCamera::Load(sdf::ElementPtr _sdf)
 void UserCamera::Load()
 {
   Camera::Load();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+  this->dataPtr->joySubTwist =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_twist",
+    &UserCamera::OnJoyTwist, this);
+  this->dataPtr->joySubPose =
+    this->dataPtr->node->Subscribe("~/user_camera/joy_pose",
+    &UserCamera::OnJoyPose, this);
 }
 
 //////////////////////////////////////////////////
@@ -184,6 +189,9 @@ void UserCamera::Update()
 
   if (this->dataPtr->gui)
     this->dataPtr->gui->Update();
+
+  if (this->dataPtr->viewController)
+    this->dataPtr->viewController->Update();
 }
 
 //////////////////////////////////////////////////
@@ -239,13 +247,30 @@ void UserCamera::HandleKeyReleaseEvent(const std::string &_key)
 /////////////////////////////////////////////////
 bool UserCamera::IsCameraSetInWorldFile()
 {
+  // note: this function is used in rendering::Heightmap
+  // to check if user specified custom pose for the camera.
+  // Otherwise, camera is raised based on heightmap height
+  // automatically.
   return this->dataPtr->isCameraSetInWorldFile;
 }
 
 //////////////////////////////////////////////////
 void UserCamera::SetUseSDFPose(bool _value)
 {
+  // true if user specified custom pose for the camera.
   this->dataPtr->isCameraSetInWorldFile = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyTwistControl(bool _value)
+{
+  this->dataPtr->joyTwistControl = _value;
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetJoyPoseControl(bool _value)
+{
+  this->dataPtr->joyPoseControl = _value;
 }
 
 /////////////////////////////////////////////////
@@ -268,8 +293,8 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
       pitch = acos(zDiff/dist);
     }
 
-    this->RotateYaw(yaw);
-    this->RotatePitch(pitch);
+    this->Yaw(yaw);
+    this->Pitch(pitch);
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();
@@ -617,4 +642,71 @@ std::string UserCamera::GetViewControllerTypeString()
 {
   GZ_ASSERT(this->dataPtr->viewController, "ViewController != NULL");
   return this->dataPtr->viewController->GetTypeString();
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoyTwist(ConstJoystickPtr &_msg)
+{
+  // Scaling factor applied to rotations.
+  static math::Vector3 rpyFactor(0, 0.01, 0.05);
+
+  // toggle using joystick to move camera
+  if (this->dataPtr->joystickButtonToggleLast == false &&
+      _msg->buttons().size() == 2 && _msg->buttons(0) == 1)
+  {
+    this->dataPtr->joyTwistControl =
+      !this->dataPtr->joyTwistControl;
+
+    this->dataPtr->joystickButtonToggleLast = true;
+
+    if (this->dataPtr->joyTwistControl)
+      gzmsg << "Joystick camera viewpoint control active.\n";
+    else
+      gzmsg << "Joystick camera viewpoint control deactivated.\n";
+  }
+  else if (_msg->buttons().size() == 2 && _msg->buttons(0) == 0)
+  {
+    // detect button release
+    this->dataPtr->joystickButtonToggleLast = false;
+  }
+
+  // This function was establish when integrating the space navigator
+  // joystick.
+  if (this->dataPtr->joyTwistControl &&
+      (_msg->has_translation() || _msg->has_rotation()))
+  {
+    math::Pose pose = this->GetWorldPose();
+
+    // Get the joystick XYZ
+    if (_msg->has_translation())
+    {
+      const double transRotRatio = 0.05;
+      math::Vector3 trans = msgs::Convert(_msg->translation()) * transRotRatio;
+      pose.pos = pose.rot.RotateVector(trans) + pose.pos;
+    }
+
+    // Get the jostick RPY. We are disabling rotation around x.
+    if (_msg->has_rotation())
+    {
+      math::Vector3 rot = msgs::Convert(_msg->rotation()) * rpyFactor;
+      pose.rot.SetFromEuler(pose.rot.GetAsEuler() + rot);
+    }
+
+    this->SetWorldPose(pose);
+  }
+}
+
+//////////////////////////////////////////////////
+void UserCamera::OnJoyPose(ConstPosePtr &_msg)
+{
+  if (!this->dataPtr->joyPoseControl)
+    return;
+
+  if (_msg->has_position() && _msg->has_orientation())
+  {
+    // Get the XYZ
+    math::Pose pose(msgs::Convert(_msg->position()),
+                    msgs::Convert(_msg->orientation()));
+    this->SetWorldPose(pose);
+  }
 }

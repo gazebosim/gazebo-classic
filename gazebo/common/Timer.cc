@@ -24,10 +24,9 @@
 using namespace gazebo;
 using namespace common;
 
-
 //////////////////////////////////////////////////
 Timer::Timer()
-  : running(false)
+  : reset(true), running(false)
 {
 }
 
@@ -39,7 +38,12 @@ Timer::~Timer()
 //////////////////////////////////////////////////
 void Timer::Start()
 {
-  this->start = Time::GetWallTime();
+  if (this->reset)
+  {
+    this->start = Time::GetWallTime();
+    this->reset = false;
+  }
+
   this->running = true;
 }
 
@@ -48,6 +52,14 @@ void Timer::Stop()
 {
   this->stop = Time::GetWallTime();
   this->running = false;
+}
+
+//////////////////////////////////////////////////
+void Timer::Reset()
+{
+  this->running = false;
+  this->reset = true;
+  this->start = this->stop = Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////

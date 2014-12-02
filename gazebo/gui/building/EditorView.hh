@@ -30,10 +30,11 @@ namespace gazebo
   namespace gui
   {
     class EditorItem;
+    class GrabberHandle;
     class WindowItem;
     class StairsItem;
     class DoorItem;
-    class WallItem;
+    class WallSegmentItem;
     class FloorItem;
     class BuildingMaker;
     class LevelInspectorDialog;
@@ -43,6 +44,12 @@ namespace gazebo
     /// \brief A convenient structure for storing level information
     class GAZEBO_VISIBLE Level
     {
+      /// \brief Constructor
+      public: Level() : level(0), name("level"), baseHeight(0),
+              // 2.4384m == 8ft, standard room height in US
+              height(2.4384),
+              backgroundPixmap(NULL) {}
+
       /// \brief Level number
       public: int level;
 
@@ -50,7 +57,13 @@ namespace gazebo
       public: std::string name;
 
       /// \brief Level height from ground
+      public: double baseHeight;
+
+      /// \brief Level height
       public: double height;
+
+      /// \brief Background pixmap for a level
+      public: QGraphicsPixmapItem *backgroundPixmap;
     };
 
     /// \addtogroup gazebo_gui
@@ -90,6 +103,12 @@ namespace gazebo
       /// \brief Delete an editor item.
       /// \param[in] _item Item to be deleted.
       public: void DeleteItem(EditorItem *_item);
+
+      /// \brief Set the graphics view background image.
+      /// \param[in] _filename Name of the image file.
+      /// \param[in] _scale Image scale, in meters/pixel.
+      public: void SetBackgroundImage(const std::string &_filename,
+                  double _scale);
 
       /// \brief Qt resize event received when the parent widget changes size.
       /// \param[in] _event Qt resize event
@@ -187,14 +206,43 @@ namespace gazebo
       /// \brief Cancel the current drawing operation.
       private: void CancelDrawMode();
 
+      /// \brief Toggle visibility of background floorplan.
+      private: void OnShowFloorplan();
+
+      /// \brief Toggle visibility of editor items.
+      private: void OnShowElements();
+
+      /// \brief Show current level items if not currently hiding.
+      private: void ShowCurrentLevelItems();
+
+      /// \brief Link grabbers so they move together.
+      /// \param[in] _grabber1 First grabber to be liked.
+      /// \param[in] _grabber2 Second grabber to be unliked.
+      private: void LinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2);
+
+      /// \brief Unlink grabbers so they don't move together anymore. If only
+      /// one grabber is input, that grabber is unliked from all its current
+      /// links.
+      /// \param[in] _grabber1 First grabber to be unliked.
+      /// \param[in] _grabber2 Second grabber to be unliked.
+      private: void UnlinkGrabbers(GrabberHandle *_grabber1,
+          GrabberHandle *_grabber2 = NULL);
+
       /// \brief Current draw mode
       private: int drawMode;
 
       /// \brief Indicate whether or not a drawing operation is taking place.
       private: bool drawInProgress;
 
-      /// \brief A list of wall items in the scene.
-      private: std::vector<WallItem*> wallList;
+      /// \brief Indicate whether or not the floorplan is visible.
+      private: bool floorplanVisible;
+
+      /// \brief Indicate whether or not the editor items are visible.
+      private: bool elementsVisible;
+
+      /// \brief A list of wall segment items in the scene.
+      private: std::vector<WallSegmentItem*> wallSegmentList;
 
       /// \brief A list of window items in the scene.
       private: std::vector<WindowItem*> windowList;
@@ -224,8 +272,6 @@ namespace gazebo
       /// \brief Building maker manages the creation of 3D visuals
       private: BuildingMaker *buildingMaker;
 
-      // private: std::string lastWallSegmentName;
-
       /// \brief Current building level associated to the view.
       private: int currentLevel;
 
@@ -235,6 +281,9 @@ namespace gazebo
       /// \brief A counter that holds the total number of levels in the building
       /// model.
       private: int levelCounter;
+
+      /// \brief Default height for levels
+      private: double levelDefaultHeight;
 
       /// \brief Qt action for opening a building level inspector.
       private: QAction *openLevelInspectorAct;
@@ -258,9 +307,15 @@ namespace gazebo
       /// \brief Scale (zoom level) of the editor view.
       private: double viewScale;
 
-      /// \brief Indicate whether or not the wall can be closed during a draw
-      /// wall operation.
-      private: bool snapToCloseWall;
+      /// \brief Indicate whether or not the wall will snap to a grabber
+      /// during a draw wall operation.
+      private: bool snapToGrabber;
+
+      /// \brief Existing grabber to snap towards.
+      private: GrabberHandle *snapGrabberOther;
+
+      /// \brief Currently held grabber which will be snapped.
+      private: GrabberHandle *snapGrabberCurrent;
     };
     /// \}
   }

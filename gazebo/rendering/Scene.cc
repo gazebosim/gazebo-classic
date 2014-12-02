@@ -1954,11 +1954,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         parentVis->AttachVisual(cameraVis);
 
         cameraVis->SetPose(msgs::Convert(_msg->pose()));
-
         cameraVis->SetId(_msg->id());
-        cameraVis->Load(_msg->camera().image_size().x(),
-            _msg->camera().image_size().y());
-
+        cameraVis->Load(_msg->camera());
         this->visuals[cameraVis->GetId()] = cameraVis;
       }
     }
@@ -2067,7 +2064,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return false;
 
   JointVisualPtr jointVis(new JointVisual(
-        _msg->name() + "_JOINT_VISUAL__", childVis));
+      _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
   jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())
