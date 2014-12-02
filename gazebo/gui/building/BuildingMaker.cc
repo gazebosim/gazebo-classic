@@ -148,14 +148,14 @@ void BuildingMaker::AttachManip(const std::string &_child,
       this->allItems.find(_child);
   if (it == this->allItems.end())
   {
-    gzerr << "Child manip not found." << std::endl;
+    gzerr << "Child manip " << _child << " not found." << std::endl;
     return;
   }
 
   it = this->allItems.find(_parent);
   if (it == this->allItems.end())
   {
-    gzerr << "Parent manip not found." << std::endl;
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
     return;
   }
 
@@ -172,14 +172,14 @@ void BuildingMaker::DetachManip(const std::string &_child,
       this->allItems.find(_child);
   if (it == this->allItems.end())
   {
-    gzerr << "Child manip " << _child.c_str() << " not found." << std::endl;
+    gzerr << "Child manip " << _child << " not found." << std::endl;
     return;
   }
 
   it = this->allItems.find(_parent);
   if (it == this->allItems.end())
   {
-    gzerr << "Parent manip " << _parent.c_str() << " not found." << std::endl;
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
     return;
   }
 
@@ -195,7 +195,7 @@ void BuildingMaker::DetachAllChildren(const std::string &_manip)
       this->allItems.find(_manip);
   if (it == this->allItems.end())
   {
-    gzerr << "Manip " << _manip.c_str() << " not found." << std::endl;
+    gzerr << "Manip " << _manip << " not found." << std::endl;
     return;
   }
 
