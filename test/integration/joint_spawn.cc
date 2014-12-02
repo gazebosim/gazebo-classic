@@ -105,6 +105,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != NULL);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetJointType()));
     for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
     {
       CheckJointProperties(i, joint);
@@ -360,7 +361,16 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   // Test Coloumb friction
-  if (!isOde && !isBullet)
+  if (isBullet && !_joint->HasType(physics::Base::HINGE_JOINT))
+  {
+    gzerr << "Skipping friction test for "
+          << physics->GetType()
+          << " "
+          << msgs::ConvertJointType(_joint->GetJointType())
+          << " joint"
+          << std::endl;
+  }
+  else if (!isOde && !isBullet)
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
