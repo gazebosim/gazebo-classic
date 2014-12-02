@@ -152,7 +152,7 @@ TEST_F(TireSlipTest, Angle15Degrees)
     drumPIDPub->Publish(jointCmdMsg);
   }
   common::Time::Sleep(10);
-}*/
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
