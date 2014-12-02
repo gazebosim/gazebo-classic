@@ -808,7 +808,6 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
 
     this->plugins.push_back(plugin);
   }
-
 }
 
 //////////////////////////////////////////////////
