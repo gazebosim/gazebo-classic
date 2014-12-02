@@ -947,6 +947,7 @@ void EditorView::OnAddLevel()
   newLevel->baseHeight = maxHeight;
 
   FloorItem *floorItem = new FloorItem();
+  this->levels[this->currentLevel]->floorItem = floorItem;
   std::vector<WallSegmentItem *> newWalls;
   std::map<WallSegmentItem *, WallSegmentItem *> clonedWallMap;
   for (std::vector<WallSegmentItem *>::iterator it = wallSegmentList.begin();
@@ -1021,6 +1022,7 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
+  floorItem->Set3dTransparency(0.4);
 }
 
 /////////////////////////////////////////////////
@@ -1036,6 +1038,7 @@ void EditorView::DeleteLevel(int _level)
       || _level >= static_cast<int>(this->levels.size()))
     return;
 
+  // Delete current level and move to level below or above
   int newLevelIndex = _level - 1;
   if (newLevelIndex < 0)
     newLevelIndex = _level + 1;
@@ -1162,6 +1165,16 @@ void EditorView::OnChangeLevel(int _level)
 void EditorView::OnOpenLevelInspector()
 {
   this->levelInspector->SetLevelName(this->levels[this->currentLevel]->name);
+  FloorItem *floorItem = this->levels[this->currentLevel]->floorItem;
+  if (floorItem)
+  {
+    this->levelInspector->floorWidget->show();
+    this->levelInspector->SetFloorColor(floorItem->Get3dColor());
+  }
+  else
+  {
+    this->levelInspector->floorWidget->hide();
+  }
   this->levelInspector->show();
 }
 
@@ -1173,6 +1186,9 @@ void EditorView::OnLevelApply()
 
   std::string newLevelName = dialog->GetLevelName();
   this->levels[this->currentLevel]->name = newLevelName;
+  this->levels[this->currentLevel]->floorItem->Set3dColor(dialog->
+      GetFloorColor());
+  this->levels[this->currentLevel]->floorItem->FloorChanged();
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);
 }
 
