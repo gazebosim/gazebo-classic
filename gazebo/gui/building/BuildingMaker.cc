@@ -71,7 +71,7 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
     size_t index = foldername.find(forbiddenChar);
     while (index != std::string::npos)
     {
-      foldername.replace(index forbiddenChar.size(), replaceChar);
+      foldername.replace(index, forbiddenChar.size(), replaceChar);
       index = foldername.find(forbiddenChar);
     }
   }
