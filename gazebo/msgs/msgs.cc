@@ -1358,7 +1358,6 @@ namespace gazebo
         }
         if (heightmapGeom.has_filename())
           geom->GetElement("uri")->Set(heightmapGeom.filename());
-
       }
       if (_msg.type() == msgs::Geometry::MESH)
       {

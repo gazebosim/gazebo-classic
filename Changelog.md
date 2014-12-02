@@ -66,6 +66,9 @@
 1. Added GLWidget::OnModelEditor when model editor is triggered, and MainWindow::OnEditorGroup to manually uncheck editor actions.
     * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
 
+1. Added Link, Collision, Geometry, Inertial, Surface Msg-to-SDF conversion functions.
+    * [Pull request #1315](https://bitbucket.org/osrf/gazebo/pull-request/1315)
+
 1. Building editor updates
     1. Fixed inspector resizing.
         * [Pull request #1230](https://bitbucket.org/osrf/gazebo/pull-request/1230)
