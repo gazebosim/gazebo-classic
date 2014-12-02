@@ -50,7 +50,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet collisions
-    class GAZEBO_VISIBLE BulletCollision : public Collision
+    class GZ_PHYSICS_VISIBLE BulletCollision : public Collision
     {
       /// \brief Constructor
       public: BulletCollision(LinkPtr _parent);

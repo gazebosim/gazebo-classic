@@ -175,4 +175,30 @@
   #endif
 #endif
 
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_PHYSICS
+    #ifdef __GNUC__
+      #define GZ_PHYSICS_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_PHYSICS_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_PHYSICS_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_PHYSICS_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_PHYSICS_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_PHYSICS_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_PHYSICS_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_PHYSICS_VISIBLE
+    #define GZ_PHYSICS_HIDDEN
+  #endif
+#endif
+
+
 #endif /* GAZEBO_VISIBLE_HH */

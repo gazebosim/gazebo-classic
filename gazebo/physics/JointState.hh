@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class JointState JointState.hh physics/physics.hh
     /// \brief keeps track of state of a physics::Joint
-    class GAZEBO_VISIBLE JointState : public State
+    class GZ_PHYSICS_VISIBLE JointState : public State
     {
       /// \brief Default constructor.
       public: JointState();

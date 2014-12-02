@@ -33,7 +33,7 @@ namespace gazebo
     /// Axis1 and axis2 are body-fixed, with axis1 attached to parent
     /// body and axis2 attached to child body.
     template<class T>
-    class GAZEBO_VISIBLE UniversalJoint : public T
+    class GZ_PHYSICS_VISIBLE UniversalJoint : public T
     {
       /// \enum AxisIndex
       /// \brief Map joint axes to corresponding link.

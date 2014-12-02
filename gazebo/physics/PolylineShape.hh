@@ -29,7 +29,7 @@ namespace gazebo
 
     /// \class PolylineShape PolylineShape.hh physics/physcs.hh
     /// \brief Polyline geometry primitive.
-    class GAZEBO_VISIBLE PolylineShape : public Shape
+    class GZ_PHYSICS_VISIBLE PolylineShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.

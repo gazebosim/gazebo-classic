@@ -34,7 +34,7 @@ namespace gazebo
 
     /// \class CylinderShape CylinderShape.hh physics/physics.hh
     /// \brief Cylinder collision
-    class GAZEBO_VISIBLE CylinderShape : public Shape
+    class GZ_PHYSICS_VISIBLE CylinderShape : public Shape
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.

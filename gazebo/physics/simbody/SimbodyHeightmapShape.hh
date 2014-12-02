@@ -34,7 +34,7 @@ namespace gazebo
     /// \{
 
     /// \brief Height map collision.
-    class GAZEBO_VISIBLE SimbodyHeightmapShape : public HeightmapShape
+    class GZ_PHYSICS_VISIBLE SimbodyHeightmapShape : public HeightmapShape
     {
       /// \brief Constructor.
       public: SimbodyHeightmapShape(CollisionPtr _parent);

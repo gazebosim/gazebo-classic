@@ -31,7 +31,7 @@ namespace gazebo
     /// \class ScrewJoint ScrewJoint.hh physics/physics.hh
     /// \brief A screw joint, which has both  prismatic and rotational DOFs
     template<class T>
-    class GAZEBO_VISIBLE ScrewJoint : public T
+    class GZ_PHYSICS_VISIBLE ScrewJoint : public T
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the joint.

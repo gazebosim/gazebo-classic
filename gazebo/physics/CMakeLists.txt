@@ -1,6 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
+endif()
+
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()

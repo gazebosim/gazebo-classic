@@ -38,7 +38,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Information about a trajectory for an Actor.
-    class GAZEBO_VISIBLE TrajectoryInfo
+    class GZ_PHYSICS_VISIBLE TrajectoryInfo
     {
       /// \brief Constructor.
       public: TrajectoryInfo();
@@ -68,7 +68,7 @@ namespace gazebo
     /// \class Actor Actor.hh physics/physics.hh
     /// \brief Actor class enables GPU based mesh model / skeleton
     /// scriptable animation.
-    class GAZEBO_VISIBLE Actor : public Model
+    class GZ_PHYSICS_VISIBLE Actor : public Model
     {
       /// \brief Constructor
       /// \param[in] _parent Parent object

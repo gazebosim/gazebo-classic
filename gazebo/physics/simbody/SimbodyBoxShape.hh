@@ -31,7 +31,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody box collision
-    class GAZEBO_VISIBLE SimbodyBoxShape : public BoxShape
+    class GZ_PHYSICS_VISIBLE SimbodyBoxShape : public BoxShape
     {
       /// \brief Constructor
       public: SimbodyBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
