@@ -58,16 +58,8 @@ EditorView::EditorView(QWidget *_parent)
       gui::editor::Events::ConnectTextureSelected(
       boost::bind(&EditorView::OnTextureSelected, this, _1)));
 
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectSaveModel(
-    boost::bind(&EditorView::OnSaveModel, this, _1, _2)));*/
-
-/*  this->connections.push_back(
-  gui::editor::Events::ConnectDone(
-    boost::bind(&EditorView::OnDone, this)));*/
-
   this->connections.push_back(
-      gui::editor::Events::ConnectDiscardBuildingModel(
+      gui::editor::Events::ConnectNewBuildingModel(
       boost::bind(&EditorView::OnDiscardModel, this)));
 
   this->connections.push_back(
@@ -981,6 +973,7 @@ void EditorView::OnDiscardModel()
   this->gridLines = new GridLines(this->scene()->sceneRect().width(),
       this->scene()->sceneRect().height());
   this->scene()->addItem(this->gridLines);
+  this->scene()->advance();
 
   this->currentMouseItem = NULL;
   this->drawInProgress = false;
