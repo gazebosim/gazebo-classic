@@ -15,28 +15,18 @@
  *
 */
 
-#ifndef _MAINWINDOW_TEST_HH_
-#define _MAINWINDOW_TEST_HH_
+#ifndef _GLWIDGET_TEST_HH_
+#define _GLWIDGET_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the DataLogger widget.
-class MainWindow_TEST : public QTestFixture
+class GLWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test copying and pasting a model and a light
-  private slots: void CopyPaste();
-
-  /// \brief Test that trigger of the view wireframe action creates an
-  /// appropriate request.
-  private slots: void Wireframe();
-
-  /// \brief Test creating a main window with non-default world
-  private slots: void NonDefaultWorld();
-
-  /// \brief Test moving the user camera via a joystick message.
-  private slots: void UserCameraJoystick();
+  /// \brief Test selecting an object.
+  private slots: void SelectObject();
 };
 
 #endif

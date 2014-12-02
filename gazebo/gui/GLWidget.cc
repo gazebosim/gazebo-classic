@@ -916,49 +916,48 @@ void GLWidget::OnSelectionMsg(ConstSelectionPtr &_msg)
 /////////////////////////////////////////////////
 void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
 {
+  msgs::Selection msg;
+
   // deselect all if not in multi-selection mode.
   if (!this->mouseEvent.control)
   {
     for (unsigned int i = 0; i < this->selectedVisuals.size(); ++i)
     {
       this->selectedVisuals[i]->SetHighlighted(false);
-      msg.set_id(this->selectedVis->GetId());
-      msg.set_name(this->selectedVis->GetName());
+      msg.set_id(this->selectedVisuals[i]->GetId());
+      msg.set_name(this->selectedVisuals[i]->GetName());
       msg.set_selected(false);
       this->selectionPub->Publish(msg);
     }
     this->selectedVisuals.clear();
   }
 
-  if (_vis)
+  if (_vis && !_vis->IsPlane())
   {
+    _vis->SetHighlighted(true);
+
+    // enable multi-selection if control is pressed
+    if (this->selectedVisuals.empty() || this->mouseEvent.control)
+    {
+      std::vector<rendering::VisualPtr>::iterator it =
+        std::find(this->selectedVisuals.begin(),
+            this->selectedVisuals.end(), _vis);
+      if (it == this->selectedVisuals.end())
+        this->selectedVisuals.push_back(_vis);
+      else
+      {
+        // if element already exists, move to the back of vector
+        rendering::VisualPtr vis = (*it);
+        this->selectedVisuals.erase(it);
+        this->selectedVisuals.push_back(vis);
+      }
+    }
+    g_copyAct->setEnabled(true);
+
     msg.set_id(_vis->GetId());
     msg.set_name(_vis->GetName());
     msg.set_selected(true);
     this->selectionPub->Publish(msg);
-
-    if (!_vis->IsPlane())
-    {
-      _vis->SetHighlighted(true);
-
-      // enable multi-selection if control is pressed
-      if (this->selectedVisuals.empty() || this->mouseEvent.control)
-      {
-        std::vector<rendering::VisualPtr>::iterator it =
-            std::find(this->selectedVisuals.begin(),
-            this->selectedVisuals.end(), _vis);
-        if (it == this->selectedVisuals.end())
-          this->selectedVisuals.push_back(_vis);
-        else
-        {
-          // if element already exists, move to the back of vector
-          rendering::VisualPtr vis = (*it);
-          this->selectedVisuals.erase(it);
-          this->selectedVisuals.push_back(vis);
-        }
-      }
-      g_copyAct->setEnabled(true);
-    }
   }
   else
   {
@@ -973,7 +972,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
 {
   this->state = _mode;
 
-  if (!this->selectedVisuals.empty())
+  if (!this->selectedVisuals.empty() && this->selectedVisuals.back())
   {
     ModelManipulator::Instance()->SetAttachedVisual(
         this->selectedVisuals.back());
@@ -1079,15 +1078,20 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
     std::string name = _name;
     boost::replace_first(name, gui::get_world()+"::", "");
 
-    // Shortcircuit the case when GLWidget published the message about
-    // visual selection.
-    if (!this->selectedVis || name != this->selectedVis->GetName())
+    rendering::VisualPtr selection = this->scene->GetVisual(name);
+
+    std::vector<rendering::VisualPtr>::iterator it =
+      std::find(this->selectedVisuals.begin(),
+          this->selectedVisuals.end(), selection);
+
+    // Shortcircuit the case when GLWidget already selected the visual.
+    if (it == this->selectedVisuals.end() || _name != (*it)->GetName())
     {
-      this->SetSelectedVisual(this->scene->GetVisual(name));
+      this->SetSelectedVisual(selection);
       this->scene->SelectVisual(name, _mode);
     }
   }
-  else if (this->selectedVis)
+  else if (!this->selectedVisuals.empty())
   {
     this->SetSelectedVisual(rendering::VisualPtr());
     this->scene->SelectVisual("", _mode);

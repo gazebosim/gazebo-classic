@@ -34,44 +34,25 @@ void OnRequest(ConstRequestPtr &_msg)
     g_gotSetWireframe = true;
 }
 
-bool g_gotBoxSelection = false;
-void OnSelection(ConstSelectionPtr &_msg)
-{
-  if (_msg->name() == "box" && _msg->has_selected() && _msg->selected())
-    g_gotBoxSelection = true;
-}
-
 /////////////////////////////////////////////////
-void MainWindow_TEST::CopyPasteModel()
+void MainWindow_TEST::CopyPaste()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
+
   // Create the main window.
   mainWindow->Load();
+
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+
   mainWindow->Init();
   mainWindow->show();
-
-  std::string modelName = "cylinder";
-
-  gazebo::rendering::Events::createScene("default");
-
-  // trigger selection to initialize wirebox's vertex buffer creation first.
-  // Otherwise test segfaults later when selecting a model due to making
-  // this call outside the rendering thread.
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -79,154 +60,129 @@ void MainWindow_TEST::CopyPasteModel()
   gazebo::rendering::ScenePtr scene = cam->GetScene();
   QVERIFY(scene != NULL);
 
-  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
-  QVERIFY(modelVis != NULL);
-
-  // Select the model
-  gazebo::event::Events::setSelectedEntity(modelName, "normal");
-
-  // Wait until the model is selected
-  int sleep = 0;
-  int maxSleep = 100;
-  while (!modelVis->GetHighlighted() && sleep < maxSleep)
-  {
-    gazebo::common::Time::MSleep(30);
-    sleep++;
-  }
-  QVERIFY(modelVis->GetHighlighted());
-
   // Get GLWidget
   gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+    mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  // Copy the model
-  QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Move to center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseMove(glWidget, moveTo);
-  QTest::qWait(500);
-
-  // Paste the model
-  QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Release and spawn the model
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
-
-  QCoreApplication::processEvents();
-
-  // Verify there is a clone of the model
-  gazebo::rendering::VisualPtr modelVisClone;
-  sleep = 0;
-  maxSleep = 100;
-  while (!modelVisClone && sleep < maxSleep)
+  // Test model copy
   {
-    modelVisClone = scene->GetVisual(modelName + "_clone");
-    QTest::qWait(30);
-    sleep++;
-  }
-  QVERIFY(modelVisClone);
+    std::string modelName = "cylinder";
 
-  cam->Fini();
-  mainWindow->close();
-  delete mainWindow;
-}
+    // trigger selection to initialize wirebox's vertex buffer creation first.
+    // Otherwise test segfaults later when selecting a model due to making
+    // this call outside the rendering thread.
+    gazebo::event::Events::setSelectedEntity(modelName, "normal");
 
-/////////////////////////////////////////////////
-void MainWindow_TEST::CopyPasteLight()
-{
-  this->resMaxPercentChange = 5.0;
-  this->shareMaxPercentChange = 2.0;
+    // Process some events, and draw the screen
+    for (unsigned int i = 0; i < 10; ++i)
+    {
+      gazebo::common::Time::MSleep(30);
+      QCoreApplication::processEvents();
+      mainWindow->repaint();
+    }
 
-  this->Load("worlds/shapes.world", false, false, true);
+    gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
+    QVERIFY(modelVis != NULL);
 
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
-  // Create the main window.
-  mainWindow->Load();
-  mainWindow->Init();
-  mainWindow->show();
+    // Select the model
+    gazebo::event::Events::setSelectedEntity(modelName, "normal");
 
-  std::string lightName = "sun";
+    // Wait until the model is selected
+    int sleep = 0;
+    int maxSleep = 100;
+    while (!modelVis->GetHighlighted() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(30);
+      sleep++;
+    }
+    QVERIFY(modelVis->GetHighlighted());
 
-  gazebo::rendering::Events::createScene("default");
+    // Copy the model
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
+    QTest::qWait(500);
 
-  // trigger selection to initialize wirebox's vertex buffer creation first.
-  // Otherwise test segfaults later when selecting a model due to making
-  // this call outside the rendering thread.
-  gazebo::event::Events::setSelectedEntity(lightName, "normal");
+    // Move to center of the screen
+    QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+    QTest::mouseMove(glWidget, moveTo);
+    QTest::qWait(500);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
+    // Paste the model
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
+    QTest::qWait(500);
+
+    // Release and spawn the model
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
+    QTest::qWait(500);
+
     QCoreApplication::processEvents();
-    mainWindow->repaint();
+
+    // Verify there is a clone of the model
+    gazebo::rendering::VisualPtr modelVisClone;
+    sleep = 0;
+    maxSleep = 100;
+    while (!modelVisClone && sleep < maxSleep)
+    {
+      modelVisClone = scene->GetVisual(modelName + "_clone");
+      QTest::qWait(30);
+      sleep++;
+    }
+    QVERIFY(modelVisClone);
   }
 
-  // Get the user camera and scene
-  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
-  gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
-
-  gazebo::rendering::VisualPtr lightVis = scene->GetVisual(lightName);
-  QVERIFY(lightVis != NULL);
-
-  // Select the light
-  gazebo::event::Events::setSelectedEntity(lightName, "normal");
-
-  // Wait until the light is selected
-  int sleep = 0;
-  int maxSleep = 100;
-  while (!lightVis->GetHighlighted() && sleep < maxSleep)
+  // Test light copy
   {
-    gazebo::common::Time::MSleep(30);
-    sleep++;
+    std::string lightName = "sun";
+    // Select the light
+    gazebo::event::Events::setSelectedEntity(lightName, "normal");
+
+    gazebo::rendering::VisualPtr lightVis = scene->GetVisual(lightName);
+    QVERIFY(lightVis != NULL);
+
+    // Wait until the light is selected
+    int sleep = 0;
+    int maxSleep = 100;
+    while (!lightVis->GetHighlighted() && sleep < maxSleep)
+    {
+      gazebo::common::Time::MSleep(30);
+      sleep++;
+    }
+    QVERIFY(lightVis->GetHighlighted());
+
+    // Copy the light
+    QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
+    QTest::qWait(500);
+
+    // Move to center of the screen
+    QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
+    QTest::mouseMove(glWidget, moveTo);
+    QTest::qWait(500);
+
+    // Paste the light
+    QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
+    QTest::qWait(500);
+
+    // Release and spawn the model
+    QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
+    QTest::qWait(500);
+
+    QCoreApplication::processEvents();
+
+    // Verify there is a clone of the light
+    gazebo::rendering::LightPtr lightClone;
+    sleep = 0;
+    maxSleep = 100;
+    while (!lightClone && sleep < maxSleep)
+    {
+      lightClone = scene->GetLight(lightName + "_clone");
+      QTest::qWait(30);
+      sleep++;
+    }
+    QVERIFY(lightClone);
+
+    lightClone.reset();
   }
-  QVERIFY(lightVis->GetHighlighted());
 
-  // Get GLWidget
-  gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
-
-  // Copy the light
-  QTest::keyClick(glWidget, Qt::Key_C, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Move to center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseMove(glWidget, moveTo);
-  QTest::qWait(500);
-
-  // Paste the light
-  QTest::keyClick(glWidget, Qt::Key_V, Qt::ControlModifier);
-  QTest::qWait(500);
-
-  // Release and spawn the model
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
-
-  QCoreApplication::processEvents();
-
-  // Verify there is a clone of the light
-  gazebo::rendering::LightPtr lightClone;
-  sleep = 0;
-  maxSleep = 100;
-  while (!lightClone && sleep < maxSleep)
-  {
-    lightClone = scene->GetLight(lightName + "_clone");
-    QTest::qWait(30);
-    sleep++;
-  }
-  QVERIFY(lightClone);
-
-  lightClone.reset();
   cam->Fini();
   mainWindow->close();
   delete mainWindow;
@@ -407,16 +363,18 @@ void MainWindow_TEST::UserCameraJoystick()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
+
+  gazebo::rendering::create_scene(
+      gazebo::physics::get_world()->GetName(), false);
+
   mainWindow->Init();
   mainWindow->show();
-
-  gazebo::rendering::Events::createScene("default");
 
   // Process some events, and draw the screen
   for (unsigned int i = 0; i < 10; ++i)
@@ -438,7 +396,7 @@ void MainWindow_TEST::UserCameraJoystick()
   node->Init();
 
   gazebo::transport::PublisherPtr joyPub =
-    node->Advertise<gazebo::msgs::Joystick>("~/spacenav/joy");
+    node->Advertise<gazebo::msgs::Joystick>("~/user_camera/joy_twist");
 
   // Test with just translation
   {
@@ -459,6 +417,7 @@ void MainWindow_TEST::UserCameraJoystick()
     }
 
     gazebo::math::Pose endPose = cam->GetWorldPose();
+    std::cout << "EndPose[" << endPose << "]\n";
     QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
                                           0, 0.275643, 2.35619));
   }
@@ -514,55 +473,6 @@ void MainWindow_TEST::UserCameraJoystick()
   }
 
   cam->Fini();
-  mainWindow->close();
-  delete mainWindow;
-}
-
-/////////////////////////////////////////////////
-void MainWindow_TEST::SelectObject()
-{
-  this->resMaxPercentChange = 5.0;
-  this->shareMaxPercentChange = 2.0;
-
-  this->Load("worlds/shapes.world", false, false, true);
-
-  gazebo::transport::NodePtr node;
-  gazebo::transport::SubscriberPtr sub;
-  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
-  node->Init();
-  sub = node->Subscribe("~/selection", &OnSelection, this);
-
-  // Create the main window.
-  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
-
-  mainWindow->Load();
-  mainWindow->Init();
-  mainWindow->show();
-
-  gazebo::rendering::Events::createScene("default");
-
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
-
-  // Get GLWidget
-  gazebo::gui::GLWidget *glWidget =
-      mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
-  QVERIFY(glWidget != NULL);
-
-  // Click in the center of the screen
-  QPoint moveTo(glWidget->width()/2, glWidget->height()/2);
-  QTest::mouseClick(glWidget, Qt::LeftButton, Qt::NoModifier, moveTo);
-  QTest::qWait(500);
-
-  // Verify the box was selected
-  QVERIFY(g_gotBoxSelection);
-
   mainWindow->close();
   delete mainWindow;
 }
