@@ -275,7 +275,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
       {
         StairsItem *stairsItem = dynamic_cast<StairsItem *>(
             this->currentMouseItem);
-        stairsItem->Set3dColor(QColor(255, 255, 255, 255));
+        stairsItem->Set3dColor(Qt::white);
         this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
@@ -678,7 +678,7 @@ void EditorView::DrawWall(const QPoint &_pos)
     this->snapGrabberCurrent = NULL;
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
-    wallSegmentItem->Set3dColor(QColor(255, 255, 255, 255));
+    wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
     wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
@@ -1017,7 +1017,7 @@ void EditorView::OnAddLevel()
     this->itemToVisualMap[wallSegmentItem] = wallSegmentName;
 
     floorItem->AttachWallSegment(wallSegmentItem);
-    wallSegmentItem->Set3dColor(QColor(255, 255, 255, 255));
+    wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
   }
 
@@ -1062,7 +1062,7 @@ void EditorView::OnAddLevel()
   this->itemToVisualMap[floorItem] = floorName;
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
-  floorItem->Set3dColor(QColor(255, 255, 255, 255));
+  floorItem->Set3dColor(Qt::white);
   floorItem->SetHighlighted(false);
 }
 
