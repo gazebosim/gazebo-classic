@@ -104,7 +104,7 @@ namespace gazebo
     /// \class CallbackHelperT CallbackHelper.hh transport/transport.hh
     /// \brief Callback helper Template
     template<class M>
-    class GZ_TRANSPORT_VISIBLE CallbackHelperT : public CallbackHelper
+    class CallbackHelperT : public CallbackHelper
     {
       /// \brief Constructor
       /// \param[in] _cb boost function to call on incoming messages

@@ -15,6 +15,18 @@
  *
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  // Seems like W_OK does not exists on Windows.
+  // Reading access function documentation, the value should be 2
+  // http://msdn.microsoft.com/en-us/library/1w06ktdy.aspx
+  #include <io.h>
+  #define W_OK    2 /* Test for write permission.  */
+  #define access _access
+#endif
+
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
@@ -409,7 +421,6 @@ void LogRecord::SetBasePath(const std::string &_path)
   }
 
   // Make sure the path is writable.
-  // Note: This is not cross-platform compatible.
   if (access(_path.c_str(), W_OK) != 0)
   {
     gzerr << "You do no have permission to write into " << _path << "\n";

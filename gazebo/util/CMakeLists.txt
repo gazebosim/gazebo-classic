@@ -1,5 +1,7 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_definitions(-DBUILDING_DLL_GZ_UTIL)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -10,6 +12,15 @@ set (sources
   LogRecord.cc
   OpenAL.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (headers 
   Diagnostics.hh

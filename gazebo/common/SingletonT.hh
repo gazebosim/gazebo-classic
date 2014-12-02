@@ -31,11 +31,6 @@
 /// \brief Singleton template class
 template <class T>
 class
-#ifdef BUILDING_DLL_GZ_TRANSPORT
-  GZ_TRANSPORT_VISIBLE
-#else
-  GZ_COMMON_VISIBLE
-#endif
 SingletonT
 {
   /// \brief Get an instance of the singleton
