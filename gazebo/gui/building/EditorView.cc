@@ -566,6 +566,8 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
+  this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
+
   if (_item->GetType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
@@ -1215,6 +1217,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->hide();
   }
+  this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
 }
 
