@@ -223,6 +223,13 @@ void DoorItem::RectUpdated()
     this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
     this->measures[0]->setParentItem(this);
     this->measures[1]->setParentItem(this);
+    this->measures[0]->setVisible(false);
+    this->measures[1]->setVisible(false);
+  }
+
+  for (unsigned int j = 0; j < this->measures.size(); ++j)
+  {
+    this->measures[j]->setVisible(this->highlighted && (this->parentWall != NULL));
   }
 
   if (this->parentWall)
@@ -241,13 +248,5 @@ void DoorItem::RectUpdated()
     this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*(1-p), -d));
     this->measures[1]->SetValue(
         (this->measures[1]->line().length())*this->scale);
-
-    this->measures[0]->setVisible(true);
-    this->measures[1]->setVisible(true);
-  }
-  else
-  {
-    this->measures[0]->setVisible(false);
-    this->measures[1]->setVisible(false);
   }
 }

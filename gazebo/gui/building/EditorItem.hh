@@ -176,6 +176,9 @@ namespace gazebo
 
       /// \brief Transparency of the associated 3D visual.
       protected: float visual3dTransparency;
+
+      /// \brief TODO
+      protected: bool highlighted;
     };
     /// \}
   }

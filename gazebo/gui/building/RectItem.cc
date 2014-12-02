@@ -34,6 +34,7 @@ RectItem::RectItem()
   this->height = 100;
   this->visual3dColor = QColor(255, 255, 255, 255);
   this->visual3dTransparency = 0.5;
+  this->highlighted = true;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;
@@ -144,10 +145,6 @@ void RectItem::SetHighlighted(bool _highlighted)
       if (this->grabbers[i]->isEnabled())
         this->grabbers[i]->installSceneEventFilter(this);
     }
-    for (int j = 0; j < this->measures.size(); ++j)
-    {
-      this->measures[j]->setVisible(true);
-    }
     this->rotateHandle->installSceneEventFilter(this);
     this->Set3dTransparency(0.0);
   }
@@ -159,14 +156,16 @@ void RectItem::SetHighlighted(bool _highlighted)
       if (this->grabbers[i]->isEnabled())
         this->grabbers[i]->removeSceneEventFilter(this);
     }
-    for (int j = 0; j < this->measures.size(); ++j)
-    {
-      this->measures[j]->setVisible(false);
-    }
     this->rotateHandle->removeSceneEventFilter(this);
     this->Set3dTransparency(0.4);
   }
+  for (unsigned int j = 0; j < this->measures.size(); ++j)
+  {
+    this->measures[j]->setVisible(_highlighted && (this->parentWall != NULL));
+  }
+  this->highlighted = _highlighted;
   emit TransparencyChanged(this->visual3dTransparency);
+  this->RectUpdated();
 }
 
 /////////////////////////////////////////////////
@@ -488,6 +487,11 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(-angle) * deltaWidth/2;
         dy = -sin(-angle) * deltaWidth/2;
         this->SetPosition(this->pos() - QPointF(dx, dy));
+        if (this->parentWall)
+        {
+          this->positionOnWall -= deltaWidth /
+              (2*this->parentWall->line().length());
+        }
         break;
       }
       case 5:
@@ -502,11 +506,17 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(angle) * deltaWidth/2;
         dy = sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
+        if (this->parentWall)
+        {
+          this->positionOnWall += deltaWidth /
+              (2*this->parentWall->line().length());
+        }
         break;
       }
       default:
         break;
     }
+
     this->UpdateCornerPositions();
     this->update();
   }
