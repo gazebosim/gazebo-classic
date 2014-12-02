@@ -20,7 +20,8 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(ExceptionModelPluginConstructor)
 
 /////////////////////////////////////////////////
-ExceptionModelPluginConstructor::ExceptionModelPluginConstructor() : ModelPlugin()
+ExceptionModelPluginConstructor::ExceptionModelPluginConstructor()
+: ModelPlugin()
 {
   throw std::runtime_error("Example error");
 }

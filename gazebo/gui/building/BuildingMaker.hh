@@ -140,6 +140,10 @@ namespace gazebo
       public: void DetachManip(const std::string &_child,
           const std::string &_parent);
 
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _manip Name of the building part.
+      public: void DetachAllChildren(const std::string &_manip);
+
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
