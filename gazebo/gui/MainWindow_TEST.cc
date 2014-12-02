@@ -417,7 +417,6 @@ void MainWindow_TEST::UserCameraJoystick()
     }
 
     gazebo::math::Pose endPose = cam->GetWorldPose();
-    std::cout << "EndPose[" << endPose << "]\n";
     QVERIFY(endPose == gazebo::math::Pose(4.98664, -5.00091, 2.01306,
                                           0, 0.275643, 2.35619));
   }
