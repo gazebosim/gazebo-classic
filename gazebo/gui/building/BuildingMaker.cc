@@ -71,7 +71,7 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
     size_t index = foldername.find(forbiddenChar);
     while (index != std::string::npos)
     {
-      foldername.replace(index, forbiddenChar.size(), replaceChar);
+      foldername.replace(index forbiddenChar.size(), replaceChar);
       index = foldername.find(forbiddenChar);
     }
   }
@@ -518,7 +518,7 @@ void BuildingMaker::Reset()
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 
-  this->saved = false;
+  this->saved = NEVER_SAVED;
   this->savedChanges = false;
   this->modelName = this->buildingDefaultName;
   this->defaultPath = (QDir::homePath() + "/building_editor_models")
@@ -539,10 +539,6 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
-
-
-  this->saved = false;
-  this->savedChanges = false;
 }
 
 /////////////////////////////////////////////////
@@ -1080,8 +1076,8 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  if (!this->savedChanges || !this->saved)
-    this->GenerateSDF();
+  /*if (!this->savedChanges || !this->saved)
+    this->GenerateSDF();*/
 
   msgs::Factory msg;
   // Create a new name if the model exists
@@ -1477,7 +1473,7 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-  if (this->saved)
+  if (this->saved == SAVED)
   {
     this->SaveModelFiles();
     this->savedChanges = true;
@@ -1655,7 +1651,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
         AddModelPathsUpdate(parentDirectory);
     }
 
-    this->saved = true;
+    this->saved = SAVED;
     this->savedChanges = true;
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
@@ -1675,7 +1671,7 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
   this->saveLocation = newPath.string();
 
   this->savedChanges = false;
-  this->saved = false;
+  this->saved = NAME_CHANGED;
 }
 
 /////////////////////////////////////////////////
@@ -1720,19 +1716,22 @@ void BuildingMaker::OnExit()
     if (msgBox.clickedButton() == cancelButton)
       return;
 
-    if (msgBox.clickedButton() == exitButton)
+    /*if (msgBox.clickedButton() == exitButton)
     {
       this->Reset();
     }
-    else if (msgBox.clickedButton() == saveButton)
+    else */if (msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {
         return;
       }
-      this->FinishModel();
     }
   }
+  if (this->saved == SAVED || this->saved == NAME_CHANGED)
+    this->FinishModel();
+
+  this->Reset();
 
   gui::editor::Events::newBuildingModel();
   gui::editor::Events::finishBuildingModel();

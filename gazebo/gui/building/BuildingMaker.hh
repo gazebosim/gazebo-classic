@@ -46,10 +46,13 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
+    enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
+
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
     class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
+
       /// \brief Constructor
       public: BuildingMaker();
 
@@ -303,7 +306,7 @@ namespace gazebo
       private: int floorCounter;
 
       /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
+      private: enum SaveState saved;
 
       /// \brief Indicate whether all the changes to the model have been saved.
       private: bool savedChanges;
