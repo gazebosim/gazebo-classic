@@ -202,6 +202,8 @@ namespace gazebo
       /// \param[in] _show True to enable wireframe for this visual.
       public: void SetWireframe(bool _show);
 
+      private: void SetTransparencyInnerLoop(float _trans);
+
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
