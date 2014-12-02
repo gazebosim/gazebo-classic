@@ -539,6 +539,10 @@ void BuildingMaker::Reset()
   for (it = this->allItems.begin(); it != this->allItems.end(); ++it)
     delete (*it).second;
   this->allItems.clear();
+
+
+  this->saved = false;
+  this->savedChanges = false;
 }
 
 /////////////////////////////////////////////////
@@ -1076,7 +1080,7 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  if (!savedChanges)
+  if (!this->savedChanges || !this->saved)
     this->GenerateSDF();
 
   msgs::Factory msg;
@@ -1457,9 +1461,6 @@ void BuildingMaker::OnNew()
 
     this->Reset();
     gui::editor::Events::newBuildingModel();
-
-    this->saved = false;
-    this->savedChanges = false;
   }
 }
 
@@ -1700,6 +1701,7 @@ void BuildingMaker::OnExit()
     {
       return;
     }
+    this->FinishModel();
   }
   else
   {
@@ -1720,8 +1722,7 @@ void BuildingMaker::OnExit()
 
     if (msgBox.clickedButton() == exitButton)
     {
-      this->saved = false;
-      this->savedChanges = false;
+      this->Reset();
     }
     else if (msgBox.clickedButton() == saveButton)
     {
@@ -1729,10 +1730,10 @@ void BuildingMaker::OnExit()
       {
         return;
       }
+      this->FinishModel();
     }
   }
 
-  this->FinishModel();
   gui::editor::Events::newBuildingModel();
   gui::editor::Events::finishBuildingModel();
 }
