@@ -20,7 +20,6 @@
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/WallInspectorDialog.hh"
-#include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/WallSegmentItem.hh"
 
 using namespace gazebo;
@@ -31,7 +30,6 @@ WallSegmentItem::WallSegmentItem(const QPointF &_start, const QPointF &_end,
     const double _height) : SegmentItem(), BuildingItem()
 {
   this->editorType = "WallSegment";
-  this->scale = BuildingMaker::conversionScale;
 
   this->measure = new MeasureItem(this->GetStartPoint(),
                                   this->GetEndPoint());
