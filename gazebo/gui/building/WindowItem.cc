@@ -248,13 +248,21 @@ void WindowItem::RectUpdated()
     double l = this->parentWall->line().length();
     double p = this->GetPositionOnWall();
 
-    this->measures[0]->SetStartPoint(QPointF(-(t*0.5 + l*p), -d));
+    if (this->GetAngleOnWall() < 90)
+    {
+      this->measures[0]->SetStartPoint(QPointF(-(t*0.5 + l*p), -d));
+      this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*(1-p), -d));
+    }
+    else
+    {
+      this->measures[0]->SetStartPoint(QPointF(-(t*0.5 + l*(1-p)), -d));
+      this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*p, -d));
+    }
     this->measures[0]->SetEndPoint(QPointF(-this->windowWidth/2, -d));
+    this->measures[1]->SetStartPoint(QPointF(this->windowWidth/2, -d));
+
     this->measures[0]->SetValue(
         (this->measures[0]->line().length())*this->scale);
-
-    this->measures[1]->SetStartPoint(QPointF(this->windowWidth/2, -d));
-    this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*(1-p), -d));
     this->measures[1]->SetValue(
         (this->measures[1]->line().length())*this->scale);
   }

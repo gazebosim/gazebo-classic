@@ -40,6 +40,7 @@ RectItem::RectItem()
   this->drawingOriginY = 0;
 
   this->positionOnWall = 0;
+  this->angleOnWall = 0;
   this->parentWall = NULL;
 
   this->drawingWidth = this->width;
@@ -255,6 +256,10 @@ bool RectItem::RotateEventFilter(RotateHandle *_rotate, QEvent *_event)
       {
         angle = 180;
         this->SetRotation(this->GetRotation() + angle);
+        if (this->GetAngleOnWall() < 90)
+          this->SetAngleOnWall(180);
+        else
+          this->SetAngleOnWall(0);
       }
     }
     else
@@ -728,6 +733,19 @@ void RectItem::SetPositionOnWall(double _positionOnWall,
 double RectItem::GetPositionOnWall() const
 {
   return this->positionOnWall;
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetAngleOnWall(double _angleOnWall)
+{
+  this->angleOnWall = _angleOnWall;
+  this->RectUpdated();
+}
+
+/////////////////////////////////////////////////
+double RectItem::GetAngleOnWall() const
+{
+  return this->angleOnWall;
 }
 
 /////////////////////////////////////////////////
