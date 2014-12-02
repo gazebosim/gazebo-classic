@@ -454,6 +454,7 @@ void Visual::Load()
 {
   std::ostringstream stream;
   math::Pose pose;
+  Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = NULL;
 
   if (this->dataPtr->parent)
@@ -498,6 +499,10 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
+
+  // Get the size of the mesh
+  if (obj)
+    meshSize = obj->getBoundingBox().getSize();
 
   if (this->dataPtr->sdf->HasElement("geometry"))
   {
@@ -1391,20 +1396,24 @@ void Visual::SetHighlighted(bool _highlighted)
 {
   if (_highlighted)
   {
+    math::Box bbox = this->GetBoundingBox();
+    // GetBoundingBox returns the box in world coordinates
+    // Invert thes scale of the box before attaching to the visual
+    // so that the new inherited scale after attachment is correct.
+    math::Vector3 scale = Conversions::Convert(
+          this->dataPtr->sceneNode->_getDerivedScale());
+    bbox.min = bbox.min / scale;
+    bbox.max = bbox.max / scale;
+
     // Create the bounding box if it's not already created.
     if (!this->dataPtr->boundingBox)
     {
-      math::Box bbox = this->GetBoundingBox();
-      // GetBoundingBox returns the box in world coordinates
-      // Invert thes scale of the box before attaching to the visual
-      // so that the new inherited scale after attachment is correct.
-      math::Vector3 scale = Conversions::Convert(
-            this->dataPtr->sceneNode->_getDerivedScale());
-      bbox.min = bbox.min / scale;
-      bbox.max = bbox.max / scale;
       this->dataPtr->boundingBox = new WireBox(shared_from_this(), bbox);
     }
-
+    else
+    {
+      this->dataPtr->boundingBox->Init(bbox);
+    }
     this->dataPtr->boundingBox->SetVisible(true);
   }
   else if (this->dataPtr->boundingBox)

@@ -19,6 +19,7 @@
 #define _WALL_SEGMENT_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 
@@ -105,8 +106,8 @@ namespace gazebo
       /// \brief Height of the wall segment in meters.
       private: double wallHeight;
 
-      /// \brief Scale for converting pixels to metric units.
-      private: double scale;
+      /// \brief This wall segment's measure item.
+      private: MeasureItem *measure;
 
       /// \brief Qt action for opening the inspector.
       private: QAction *openInspectorAct;

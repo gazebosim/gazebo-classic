@@ -74,6 +74,14 @@ namespace gazebo
       /// \return Thickness in pixels.
       public: double GetThickness() const;
 
+      /// \brief Get the scale of the segment item.
+      /// \return Scale of the segment item in px/m.
+      public: double GetScale() const;
+
+      /// \brief Set the scale of the segment item.
+      /// param[in] _scale Scale of the segment item in px/m.
+      public: void SetScale(double _scale);
+
       /// \brief Set the color of the segment item.
       /// \param[in] _color Color.
       public: void SetColor(QColor _color);
@@ -151,6 +159,15 @@ namespace gazebo
       /// \brief A list of grabber handles for this item. One grabber for each
       /// endpoint.
       public: std::vector<GrabberHandle *> grabbers;
+
+      /// \brief Angle to snap in degrees.
+      public: static const double SnapAngle;
+
+      /// \brief Length to snap in meters.
+      public: static const double SnapLength;
+
+      /// \brief Scale for converting pixels to metric units.
+      protected: double scale;
 
       /// \brief Segment's start position in pixel coordinates.
       private: QPointF start;

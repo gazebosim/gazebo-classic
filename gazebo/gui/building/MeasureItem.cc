@@ -55,7 +55,7 @@ void MeasureItem::paint(QPainter *_painter,
 
   QPen measurePen;
   measurePen.setStyle(Qt::SolidLine);
-  measurePen.setColor(QColor(247, 142, 30));
+  measurePen.setColor(QColor(247, 142, 30, 120));
   double tipLength = 10;
   measurePen.setWidth(3);
   _painter->setPen(measurePen);
@@ -76,7 +76,7 @@ void MeasureItem::paint(QPainter *_painter,
 
   // Value
   std::ostringstream stream;
-  stream << std::fixed << std::setprecision(4)
+  stream << std::fixed << std::setprecision(3)
          << this->value << " m";
 
   double margin = 10;
