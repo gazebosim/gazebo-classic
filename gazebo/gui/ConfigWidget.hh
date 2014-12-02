@@ -196,43 +196,43 @@ namespace gazebo
 
       /// \brief Get an integer value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \return Value of the widget.
+      /// \return Integer value.
       public: int GetIntWidgetValue(const std::string &_name) const;
 
       /// \brief Get an unsigned integer value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Unsigned integer value.
       public: unsigned int GetUIntWidgetValue(const std::string &_name) const;
 
       /// \brief Get a double value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Double value.
       public: double GetDoubleWidgetValue(const std::string &_name) const;
 
       /// \brief Get a bool value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Bool value.
       public: bool GetBoolWidgetValue(const std::string &_name) const;
 
       /// \brief Get a string value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return String value.
       public: std::string GetStringWidgetValue(const std::string &_name) const;
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Vector3 value.
       public: math::Vector3 GetVector3WidgetValue(const std::string &_name)
           const;
 
       /// \brief Get a color value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Color value.
       public: common::Color GetColorWidgetValue(const std::string &_name) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \param[in] _value Value of the widget.
+      /// \return Pose value.
       public: math::Pose GetPoseWidgetValue(const std::string &_name) const;
 
       /// \brief Get a geometry value from a child widget.
