@@ -321,7 +321,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
         QPointF pf;
         pf = p2;
 
-        if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+        if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
         {
           double distanceToClose = 30;
 
@@ -357,20 +357,27 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
             }
           }
 
-          // Snap to 15 degrees increments
           if (!this->snapToGrabber)
           {
+            // Snap to angular increments
             QLineF newLine(p1, p2);
             double angle = GZ_DTOR(QLineF(p1, p2).angle());
-            double range = GZ_DTOR(15);
-            int increment = angle / range;
+            double range = GZ_DTOR(SegmentItem::SnapAngle);
+            int angleIncrement = angle / range;
 
-            if ((angle - range*increment) > range*0.5)
-              increment++;
-            angle = -range*increment;
+            if ((angle - range*angleIncrement) > range*0.5)
+              angleIncrement++;
+            angle = -range*angleIncrement;
 
-            pf.setX(p1.x() + qCos(angle)*newLine.length());
-            pf.setY(p1.y() + qSin(angle)*newLine.length());
+            // Snap to length increments
+            double newLength = newLine.length();
+            double lengthIncrement = SegmentItem::SnapLength /
+                wallSegmentItem->GetScale();
+            newLength  = round(newLength/lengthIncrement)*lengthIncrement-
+                wallSegmentItem->GetThickness();
+
+            pf.setX(p1.x() + qCos(angle)*newLength);
+            pf.setY(p1.y() + qSin(angle)*newLength);
           }
         }
         wallSegmentItem->SetEndPoint(pf);
@@ -612,6 +619,43 @@ void EditorView::DrawWall(const QPoint &_pos)
 
     wallSegmentItem = new WallSegmentItem(pointStart, pointEnd,
         this->levelDefaultHeight);
+
+    if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
+    {
+      double distanceToClose = 30;
+
+      // Snap to other walls' points
+      QList<QGraphicsItem *> itemsList = this->scene()->items(QRectF(
+          QPointF(pointStart.x() - distanceToClose/2,
+                  pointStart.y() - distanceToClose/2),
+          QPointF(pointStart.x() + distanceToClose/2,
+                  pointStart.y() + distanceToClose/2)));
+      for (QList<QGraphicsItem *>::iterator it = itemsList.begin();
+          it  != itemsList.end(); ++it)
+      {
+        WallSegmentItem *anotherWall = dynamic_cast<WallSegmentItem *>(*it);
+        if (anotherWall)
+        {
+          if (QVector2D(pointStart - anotherWall->GetStartPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetStartPoint());
+            this->LinkGrabbers(anotherWall->grabbers[0],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+          else if (QVector2D(pointStart - anotherWall->GetEndPoint()).length()
+              <= distanceToClose)
+          {
+            wallSegmentItem->SetStartPoint(anotherWall->GetEndPoint());
+            this->LinkGrabbers(anotherWall->grabbers[1],
+                wallSegmentItem->grabbers[0]);
+            break;
+          }
+        }
+      }
+    }
+
     wallSegmentItem->SetLevel(this->currentLevel);
     wallSegmentItem->SetLevelBaseHeight(this->levels[this->currentLevel]->
         baseHeight);
@@ -1175,6 +1219,7 @@ void EditorView::OnOpenLevelInspector()
   {
     this->levelInspector->floorWidget->hide();
   }
+  this->levelInspector->move(QCursor::pos());
   this->levelInspector->show();
 }
 

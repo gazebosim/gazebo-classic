@@ -115,6 +115,12 @@
     1. Added color picker to inspector dialogs.
         * [Pull request #1298](https://bitbucket.org/osrf/gazebo/pull-request/1298)
 
+    1. Snapping on by default, off holding Shift. Improved snapping.
+        * [Pull request #1304](https://bitbucket.org/osrf/gazebo/pull-request/1304)
+
+    1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
+        * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
+
     1. Current level is transparent, lower levels opaque, higher levels invisible.
         * [Pull request #1303](https://bitbucket.org/osrf/gazebo/pull-request/1303)
 
@@ -125,8 +131,6 @@
 ## Gazebo 4.0
 
 ### Gazebo 4.x.x (yyyy-mm-dd)
-
-
 
 ### Gazebo 4.1.0 (2014-11-20)
 

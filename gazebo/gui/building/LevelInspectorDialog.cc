@@ -25,6 +25,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
   this->levelNameLineEdit = new QLineEdit;
@@ -101,6 +102,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
