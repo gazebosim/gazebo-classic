@@ -908,7 +908,6 @@ void EditorView::OnDiscardModel()
   this->stairsList.clear();
   this->floorList.clear();
   this->itemToVisualMap.clear();
-  //this->buildingMaker->Reset();
 
   for (unsigned int i = 0; i < this->levels.size(); ++i)
     delete this->levels[i];

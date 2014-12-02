@@ -1710,17 +1710,12 @@ void BuildingMaker::OnExit()
       QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
       QMessageBox::ApplyRole);
-    QPushButton *exitButton = msgBox.addButton("Don't Save, Exit",
-      QMessageBox::ApplyRole);
+    msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
       return;
 
-    /*if (msgBox.clickedButton() == exitButton)
-    {
-      this->Reset();
-    }
-    else */if (msgBox.clickedButton() == saveButton)
+    if (msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {

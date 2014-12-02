@@ -108,7 +108,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   locationLayout->addWidget(modelLocation);
   locationLayout->addWidget(this->modelLocationLineEdit);
   locationLayout->addWidget(browseButton);
-  
+
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
   advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
@@ -146,10 +146,6 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   advancedOptionsGrid->addWidget(this->modelAuthorNameLineEdit, 5, 1);
   advancedOptionsGrid->addWidget(modelAuthorEmail, 6, 0);
   advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 6, 1);
-
-  //advancedOptionsGrid->addWidget(fileHeader, 6, 0);
-  //advancedOptionsGrid->addWidget(modelFolderName, 7, 0);
-  //advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 7, 1);
 
   this->advancedOptionsWidget = new QWidget();
   this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
