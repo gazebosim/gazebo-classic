@@ -19,6 +19,7 @@
 #define _DOOR_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
@@ -54,6 +55,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetSceneRotation() const;
+
+      /// \brief Update door item when rect item is updated.
+      protected: void RectUpdated();
 
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,

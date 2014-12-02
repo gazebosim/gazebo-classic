@@ -86,3 +86,8 @@ void EditorItem::Set3dTransparency(float _transparency)
 {
   this->visual3dTransparency = _transparency;
 }
+
+/////////////////////////////////////////////////
+void EditorItem::SetHighlighted(bool /*_highlighted*/)
+{
+}

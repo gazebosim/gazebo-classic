@@ -407,6 +407,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
   if (grabber && editorItem && (editorItem->GetType() == "Window"
       || editorItem->GetType() == "Door") )
   {
+    editorItem->SetPositionOnWall(0, NULL);
     if (grabber->parentItem())
     {
       WallSegmentItem *wallSegmentItem =
@@ -449,7 +450,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                        absPositionOnWall.y()*
                                        absPositionOnWall.y());
           editorItem->SetPositionOnWall(positionLength /
-              wallSegmentItem->line().length());
+              wallSegmentItem->line().length(), wallSegmentItem);
         }
         return;
       }
@@ -483,7 +484,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                          absPositionOnWall.y()*
                                          absPositionOnWall.y());
             editorItem->SetPositionOnWall(positionLength /
-                wallSegmentItem->line().length());
+                wallSegmentItem->line().length(), wallSegmentItem);
             return;
           }
         }

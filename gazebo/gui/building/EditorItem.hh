@@ -77,6 +77,10 @@ namespace gazebo
       /// \param[in] _transparency Transparency.
       public: void Set3dTransparency(float _transparency);
 
+      /// \brief Set whether this item should be highlighted or not.
+      /// \param[in] _highlighted True for highlighted.
+      public: virtual void SetHighlighted(bool _highlighted);
+
       /// \brief Qt signal emitted when the editor item size has changed.
       /// \param[in] _width Width of item in pixels.
       /// \param[in] _depth Depth of item in pixels.

@@ -39,6 +39,7 @@ RectItem::RectItem()
   this->drawingOriginY = 0;
 
   this->positionOnWall = 0;
+  this->parentWall = NULL;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -121,29 +122,7 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
 {
   if (_change == QGraphicsItem::ItemSelectedChange && this->scene())
   {
-    if (_value.toBool())
-    {
-      this->setZValue(zValueSelected);
-      for (int i = 0; i < 8; ++i)
-      {
-        if (this->grabbers[i]->isEnabled())
-          this->grabbers[i]->installSceneEventFilter(this);
-      }
-      this->rotateHandle->installSceneEventFilter(this);
-      this->Set3dTransparency(0.0);
-    }
-    else
-    {
-      this->setZValue(zValueIdle);
-      for (int i = 0; i < 8; ++i)
-      {
-        if (this->grabbers[i]->isEnabled())
-          this->grabbers[i]->removeSceneEventFilter(this);
-      }
-      this->rotateHandle->removeSceneEventFilter(this);
-      this->Set3dTransparency(0.5);
-    }
-    emit TransparencyChanged(this->visual3dTransparency);
+    this->SetHighlighted(_value.toBool());
   }
   else if (_change == QGraphicsItem::ItemScenePositionHasChanged
       && this->scene())
@@ -152,6 +131,42 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
     emit PosYChanged(this->scenePos().y());
   }
   return QGraphicsItem::itemChange(_change, _value);
+}
+
+/////////////////////////////////////////////////
+void RectItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->setZValue(zValueSelected);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->installSceneEventFilter(this);
+    }
+    for (int j = 0; j < this->measures.size(); ++j)
+    {
+      this->measures[j]->setVisible(true);
+    }
+    this->rotateHandle->installSceneEventFilter(this);
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->setZValue(zValueIdle);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->removeSceneEventFilter(this);
+    }
+    for (int j = 0; j < this->measures.size(); ++j)
+    {
+      this->measures[j]->setVisible(false);
+    }
+    this->rotateHandle->removeSceneEventFilter(this);
+    this->Set3dTransparency(0.4);
+  }
+  emit TransparencyChanged(this->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////
@@ -691,9 +706,12 @@ double RectItem::GetHeight() const
 }
 
 /////////////////////////////////////////////////
-void RectItem::SetPositionOnWall(double _positionOnWall)
+void RectItem::SetPositionOnWall(double _positionOnWall,
+    WallSegmentItem *_wall)
 {
   this->positionOnWall = _positionOnWall;
+  this->parentWall = _wall;
+  this->RectUpdated();
 }
 
 /////////////////////////////////////////////////
@@ -863,4 +881,10 @@ void RectItem::SetResizeFlag(unsigned int _flag)
     this->grabbers[4]->setEnabled(true);
     this->grabbers[6]->setEnabled(true);
   }
+}
+
+/////////////////////////////////////////////////
+void RectItem::RectUpdated()
+{
+  // virtual
 }
