@@ -861,6 +861,7 @@ void RectItem::SizeChanged()
 {
   emit DepthChanged(this->drawingHeight);
   emit WidthChanged(this->drawingWidth);
+  this->RectUpdated();
 }
 
 /////////////////////////////////////////////////
