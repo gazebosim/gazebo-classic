@@ -291,6 +291,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   bool isOde = physics->GetType().compare("ode") == 0;
+  bool isBullet = physics->GetType().compare("bullet") == 0;
   double dt = physics->GetMaxStepSize();
 
   if (_joint->HasType(physics::Base::HINGE2_JOINT) ||
@@ -359,7 +360,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   }
 
   // Test Coloumb friction
-  if (!isOde)
+  if (!isOde && !isBullet)
   {
     gzerr << "Skipping friction test for "
           << physics->GetType()
