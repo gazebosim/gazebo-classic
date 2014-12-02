@@ -16,6 +16,8 @@
 */
 #ifndef _GAZEBO_BULLETSLIDERJOINT_HH_
 #define _GAZEBO_BULLETSLIDERJOINT_HH_
+
+#include <string>
 #include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"

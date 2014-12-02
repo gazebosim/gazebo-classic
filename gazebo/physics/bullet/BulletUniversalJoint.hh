@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_BULLETUNIVERSALJOINT_HH_
 #define _GAZEBO_BULLETUNIVERSALJOINT_HH_
 
+#include <string>
 #include "gazebo/physics/bullet/gzBtUniversalConstraint.hh"
 #include "gazebo/physics/UniversalJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
