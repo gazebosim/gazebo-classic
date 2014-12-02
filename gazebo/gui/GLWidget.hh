@@ -233,9 +233,6 @@ namespace gazebo
       /// \brief Flag that is set to true when GLWidget has responded to
       ///  OnCreateScene
       private: bool sceneCreated;
-
-      /// \brief Mutex to protect use selections
-      private: boost::mutex selectionMutex;
     };
   }
 }
