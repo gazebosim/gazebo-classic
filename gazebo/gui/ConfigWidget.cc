@@ -1833,7 +1833,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   }
   else
   {
-    gzerr << "Error getting geometry dimensions for type: '" << value "'"
+    gzerr << "Error getting geometry dimensions for type: '" << value << "'"
         << std::endl;
   }
   return value;
