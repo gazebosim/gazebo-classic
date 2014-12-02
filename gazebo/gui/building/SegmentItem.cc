@@ -16,11 +16,15 @@
 */
 
 #include "gazebo/math/Angle.hh"
+#include "gazebo/gui/building/BuildingMaker.hh"
 #include "gazebo/gui/building/GrabberHandle.hh"
 #include "gazebo/gui/building/SegmentItem.hh"
 
 using namespace gazebo;
 using namespace gui;
+
+const double SegmentItem::SnapAngle = 15;
+const double SegmentItem::SnapLength = 0.25;
 
 /////////////////////////////////////////////////
 SegmentItem::SegmentItem(QGraphicsItem *_parent)
@@ -28,6 +32,7 @@ SegmentItem::SegmentItem(QGraphicsItem *_parent)
       end(0, 0)
 {
   this->editorType = "Segment";
+  this->scale = BuildingMaker::conversionScale;
 
   if (_parent)
     this->setParentItem(_parent);
@@ -126,6 +131,18 @@ void SegmentItem::SetThickness(double _thickness)
 double SegmentItem::GetThickness() const
 {
   return this->thickness;
+}
+
+/////////////////////////////////////////////////
+double SegmentItem::GetScale() const
+{
+  return this->scale;
+}
+
+/////////////////////////////////////////////////
+void SegmentItem::SetScale(double _scale)
+{
+  this->scale = _scale;
 }
 
 /////////////////////////////////////////////////
@@ -257,20 +274,26 @@ bool SegmentItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
 
     // TODO: snap to other grabbers on the scene
 
-    // Snap to 15 degrees increments
     if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
     {
+      // Snap to angular increments
       QLineF newLine(p1, p2);
       double angle = GZ_DTOR(QLineF(p1, p2).angle());
-      double range = GZ_DTOR(15);
-      int increment = angle / range;
+      double range = GZ_DTOR(SegmentItem::SnapAngle);
+      int angleIncrement = angle / range;
 
-      if ((angle - range*increment) > range/2)
-        increment++;
-      angle = -range*increment;
+      if ((angle - range*angleIncrement) > range/2)
+        angleIncrement++;
+      angle = -range*angleIncrement;
 
-      pf.setX(p1.x() + qCos(angle)*newLine.length());
-      pf.setY(p1.y() + qSin(angle)*newLine.length());
+      // Snap to length increments
+      double newLength = newLine.length();
+      double lengthIncrement = SegmentItem::SnapLength / this->GetScale();
+      newLength  = round(newLength/lengthIncrement)*lengthIncrement-
+          this->GetThickness();
+
+      pf.setX(p1.x() + qCos(angle)*newLength);
+      pf.setY(p1.y() + qSin(angle)*newLength);
     }
 
     if (index == 0)
