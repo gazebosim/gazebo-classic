@@ -203,8 +203,7 @@ namespace gazebo
       public: void SetWireframe(bool _show);
 
       /// \brief Set the transparency of a single visual without calling
-      /// 
-      /// .
+      /// UpdateShaders.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
       private: void SetTransparencyInnerLoop(float _trans);
