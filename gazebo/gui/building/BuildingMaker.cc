@@ -160,6 +160,16 @@ void BuildingMaker::DetachManip(const std::string &_child,
 }
 
 /////////////////////////////////////////////////
+void BuildingMaker::DetachAllChildren(const std::string &_manip)
+{
+  BuildingModelManip *manip = this->allItems[_manip];
+  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  {
+    (manip->GetAttachedManip(i))->DetachFromParent();
+  }
+}
+
+/////////////////////////////////////////////////
 std::string BuildingMaker::CreateModel()
 {
   this->Reset();
