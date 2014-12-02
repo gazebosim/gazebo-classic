@@ -27,6 +27,11 @@
 
 #include <sdf/sdf.hh>
 
+#ifdef _WIN32
+  #undef far
+  #undef near
+#endif
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"

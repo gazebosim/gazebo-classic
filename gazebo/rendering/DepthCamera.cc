@@ -20,7 +20,11 @@
  * Date: 15 July 2003
  */
 
-#include <dirent.h>
+#ifdef _WIN32
+  #include "gazebo/common/win_dirent.h"
+#else
+  #include <dirent.h>
+#endif
 #include <sstream>
 
 #include "gazebo/rendering/ogre_gazebo.h"

@@ -15,7 +15,11 @@
  *
 */
 
-#include <dirent.h>
+#ifdef _WIN32
+  #include "gazebo/common/win_dirent.h"
+#else
+  #include <dirent.h>
+#endif
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <sdf/sdf.hh>
@@ -1051,7 +1055,8 @@ bool Camera::SaveFrame(const unsigned char *_image,
   Ogre::Codec::CodecDataPtr codecDataPtr(imgData);
 
   // OGRE 1.9 renames codeToFile to encodeToFile
-  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0))
+  // Looks like 1.9RC, which we're using on Windows, doesn't have this change.
+  #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
   pCodec->codeToFile(stream, filename, codecDataPtr);
   #else
   pCodec->encodeToFile(stream, filename, codecDataPtr);

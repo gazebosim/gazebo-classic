@@ -26,7 +26,11 @@
 #endif
 
 #include <sys/types.h>
-#include <dirent.h>
+#ifdef _WIN32
+  #include "gazebo/common/win_dirent.h"
+#else
+  #include <dirent.h>
+#endif
 #include <string>
 #include <iostream>
 
