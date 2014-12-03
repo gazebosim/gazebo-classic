@@ -24,7 +24,6 @@ set (sources
   BoxMaker.cc
   CloneWindow.cc
   ConfigWidget.cc
-  CopyPasteManip.cc
   CylinderMaker.cc
   DataLogger.cc
   Editor.cc
@@ -81,7 +80,6 @@ set (headers
   qt_test.h
   BoxMaker.hh
   CylinderMaker.hh
-  CopyPasteManip.hh
   EntityMaker.hh
   GuiIface.hh
   GuiEvents.hh

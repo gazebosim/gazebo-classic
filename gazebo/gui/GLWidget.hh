@@ -35,7 +35,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/gui/CopyPasteManip.hh"
 #include "gazebo/gui/BoxMaker.hh"
 #include "gazebo/gui/SphereMaker.hh"
 #include "gazebo/gui/CylinderMaker.hh"
@@ -68,11 +67,13 @@ namespace gazebo
 
       signals: void clicked();
 
+
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
       protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void enterEvent(QEvent * event);
+
 
       protected: void keyPressEvent(QKeyEvent *_event);
       protected: void keyReleaseEvent(QKeyEvent *_event);
@@ -189,8 +190,6 @@ namespace gazebo
       private: common::KeyEvent keyEvent;
 
       private: std::vector<event::ConnectionPtr> connections;
-
-      private: CopyPasteManip *copyPasteManip;
 
       private: EntityMaker *entityMaker;
       private: BoxMaker boxMaker;
