@@ -133,6 +133,9 @@ GLWidget::GLWidget(QWidget *_parent)
   this->installEventFilter(this);
   this->keyModifiers = 0;
 
+  this->copyPasteManip = new CopyPasteManip(this->userCamera,
+                                            &this->mouseEvent);
+
   MouseEventHandler::Instance()->AddPressFilter("glwidget",
       boost::bind(&GLWidget::OnMousePress, this, _1));
 
@@ -995,7 +998,37 @@ void GLWidget::OnCopy()
 /////////////////////////////////////////////////
 void GLWidget::OnPaste()
 {
-  this->Paste(this->copyEntityName);
+  //this->Paste(this->copyEntityName);
+  if (!this->copyEntityName.empty())
+  {
+    bool isModel = false;
+    bool isLight = false;
+    if (this->scene->GetLight(this->copyEntityName))
+      isLight = true;
+    else if (this->scene->GetVisual(this->copyEntityName))
+      isModel = true;
+
+    if (isLight || isModel)
+    {
+      this->ClearSelection();
+      if (this->entityMaker)
+        this->entityMaker->Stop();
+
+      if (isLight && this->lightMaker.InitFromLight(this->copyEntityName))
+      {
+        this->entityMaker = &this->lightMaker;
+      }
+      else if (isModel && this->modelMaker.InitFromModel(this->copyEntityName))
+      {
+        this->entityMaker = &this->modelMaker;
+      }
+      /*this->entityMaker->Start(this->userCamera);
+      // this makes the entity appear at the mouse cursor
+      this->entityMaker->OnMouseMove(this->mouseEvent);
+      gui::Events::manipMode("make_entity");*/
+      this->copyPasteManip->Paste(entityMaker);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1008,7 +1041,7 @@ void GLWidget::Copy(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::Paste(const std::string &_name)
 {
-  if (!this->_name.empty())
+  /*if (!this->_name.empty())
   {
     bool isModel = false;
     bool isLight = false;
@@ -1036,7 +1069,7 @@ void GLWidget::Paste(const std::string &_name)
       this->entityMaker->OnMouseMove(this->mouseEvent);
       gui::Events::manipMode("make_entity");
     }
-  }
+  }*/
 }
 
 /////////////////////////////////////////////////

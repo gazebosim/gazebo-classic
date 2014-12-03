@@ -35,6 +35,7 @@
 
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/gui/CopyPasteManip.hh"
 #include "gazebo/gui/BoxMaker.hh"
 #include "gazebo/gui/SphereMaker.hh"
 #include "gazebo/gui/CylinderMaker.hh"
@@ -188,6 +189,8 @@ namespace gazebo
       private: common::KeyEvent keyEvent;
 
       private: std::vector<event::ConnectionPtr> connections;
+
+      private: CopyPasteManip *copyPasteManip;
 
       private: EntityMaker *entityMaker;
       private: BoxMaker boxMaker;
