@@ -1,10 +1,6 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 add_subdirectory(ode)
 
-if (WIN32)
-  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
-endif()
-
 if (HAVE_BULLET)
   add_subdirectory(bullet)
 endif()
@@ -19,6 +15,13 @@ endif()
 if (HAVE_GDAL)
   include_directories(${GDAL_INCLUDE_DIR})
 endif()
+
+# Be sure to locate this definition *after* add_subdirectories
+# in order to get the proper visibility when building libs
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
+endif()
+
 
 set (sources
   Actor.cc
