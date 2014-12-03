@@ -220,6 +220,27 @@ QVariant WallSegmentItem::itemChange(GraphicsItemChange _change,
 }
 
 /////////////////////////////////////////////////
+void WallSegmentItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->ShowHandles(true);
+    this->measure->setVisible(true);
+    this->setZValue(5);
+    this->SetColor(QColor(247, 142, 30));
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->ShowHandles(false);
+    this->measure->setVisible(false);
+    this->setZValue(0);
+    this->SetColor(Qt::black);
+    this->Set3dTransparency(0.4);
+  }
+}
+
+/////////////////////////////////////////////////
 void WallSegmentItem::OnApply()
 {
   WallInspectorDialog *dialog =

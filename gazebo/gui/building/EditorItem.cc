@@ -115,3 +115,8 @@ void EditorItem::SetLevelBaseHeight(double _height)
 {
   this->levelBaseHeight = _height;
 }
+
+/////////////////////////////////////////////////
+void EditorItem::SetHighlighted(bool /*_highlighted*/)
+{
+}

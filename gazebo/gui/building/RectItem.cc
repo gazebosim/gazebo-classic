@@ -154,6 +154,33 @@ QVariant RectItem::itemChange(GraphicsItemChange _change,
 }
 
 /////////////////////////////////////////////////
+void RectItem::SetHighlighted(bool _highlighted)
+{
+  if (_highlighted)
+  {
+    this->setZValue(zValueSelected);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->installSceneEventFilter(this);
+    }
+    this->rotateHandle->installSceneEventFilter(this);
+    this->Set3dTransparency(0.0);
+  }
+  else
+  {
+    this->setZValue(zValueIdle);
+    for (int i = 0; i < 8; ++i)
+    {
+      if (this->grabbers[i]->isEnabled())
+        this->grabbers[i]->removeSceneEventFilter(this);
+    }
+    this->rotateHandle->removeSceneEventFilter(this);
+    this->Set3dTransparency(0.4);
+  }
+}
+
+/////////////////////////////////////////////////
 bool RectItem::sceneEventFilter(QGraphicsItem * _watched, QEvent *_event)
 {
   RotateHandle *rotateH = dynamic_cast<RotateHandle *>(_watched);
