@@ -67,6 +67,7 @@ ModelCreator::ModelCreator()
 
   this->jointMaker = new JointMaker();
 
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
   connect(g_deleteAct, SIGNAL(DeleteSignal(const std::string &)), this,
           SLOT(OnDelete(const std::string &)));
 
