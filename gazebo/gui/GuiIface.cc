@@ -15,6 +15,13 @@
  *
 */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+  #define snprintf _snprintf
+#endif
+
 #include <signal.h>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -260,6 +267,7 @@ bool gui::run(int _argc, char **_argv)
 
   gazebo::gui::init();
 
+#ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
   struct sigaction sigact;
@@ -269,6 +277,7 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
+#endif
 
   g_app->exec();
 

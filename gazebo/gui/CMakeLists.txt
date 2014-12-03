@@ -10,6 +10,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps
 )
 
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
+
 add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory(qtpropertybrowser)
@@ -53,6 +56,15 @@ set (sources
   ToolsWidget.cc
   TopicSelector.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (qt_headers
   Actions.hh
@@ -155,37 +167,44 @@ target_link_libraries(gazebo_gui
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
+  #gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  libgazebo
+  #libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  pthread
+  ${tinyxml_LIBRARIES}
 )
+
+if (UNIX)
+  target_link_libraries(gazebo_gui pthread)
+endif()
 
 target_link_libraries(gzclient
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  gazebo_sensors
+  #gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  libgazebo
+  #libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
-  pthread
 )
+
+if (UNIX)
+  target_link_libraries(gzclient pthread)
+endif()
 
 if (SPNAV_LIBRARY)
   target_link_libraries(gazebo_gui ${SPNAV_LIBRARY})

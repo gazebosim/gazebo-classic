@@ -278,7 +278,7 @@ namespace gazebo
 
     /// \class SensorData SensorData.hh
     /// \brief Helper class to store sensor data
-    class GZ_GUI_MODEL_VISIBLE SensorData
+    class SensorData
     {
       /// \brief Name of sensor.
       public: std::string name;

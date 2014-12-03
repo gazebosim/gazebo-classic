@@ -34,6 +34,7 @@ using namespace gui;
 std::map<std::string, ViewFactoryFn> ViewFactory::viewMap;
 
 /////////////////////////////////////////////////
+GZ_GUI_VIEWERS_VISIBLE
 void ViewFactory::RegisterAll()
 {
   RegisterLaserView();
@@ -49,6 +50,7 @@ void ViewFactory::RegisterView(const std::string &_msgType,
 }
 
 /////////////////////////////////////////////////
+GZ_GUI_VIEWERS_VISIBLE
 TopicView *ViewFactory::NewView(const std::string &_msgType,
                                 const std::string &_topicName,
                                 QWidget *_parent)

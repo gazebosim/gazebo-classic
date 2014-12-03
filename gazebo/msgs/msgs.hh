@@ -302,6 +302,7 @@ namespace gazebo
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
     /// \return The new SDF element.
+    GZ_MSGS_VISIBLE
     sdf::ElementPtr PluginToSDF(const msgs::Plugin &_plugin,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
