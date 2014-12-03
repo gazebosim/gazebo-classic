@@ -19,6 +19,7 @@
 #define _WINDOW_ITEM_HH_
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/MeasureItem.hh"
 #include "gazebo/gui/building/RectItem.hh"
 #include "gazebo/gui/building/BuildingItem.hh"
 #include "gazebo/util/system.hh"
@@ -73,6 +74,9 @@ namespace gazebo
 
         /// \brief Emit window changed Qt signals.
         public: void WindowChanged();
+
+        /// \brief Update window item when rect item is updated.
+        protected: void RectUpdated();
 
         /// \brief Depth of the window item in pixels.
         private: double windowDepth;

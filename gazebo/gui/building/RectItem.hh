@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/building/WallSegmentItem.hh"
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/util/system.hh"
 
@@ -72,11 +73,22 @@ namespace gazebo
 
       /// \brief Set the position of this item inside its parent wall.
       /// \param[in] _positionOnWall New normalized position on wall.
-      public: void SetPositionOnWall(double _positionOnWall);
+      /// TODO
+      public: void SetPositionOnWall(double _positionOnWall,
+          WallSegmentItem *_wall);
 
       /// \brief Get the position of this item inside its parent wall.
       /// \return Normalized position on parent wall.
       public: double GetPositionOnWall() const;
+
+      /// \brief Set the amgle of this item inside its parent wall.
+      /// \param[in] _engleOnWall New angle on wall, either 0 or 180 degrees.
+      /// TODO
+      public: void SetAngleOnWall(double _angleOnWall);
+
+      /// \brief Get the amgle of this item on its parent wall.
+      /// \return Angle on parent wall in degrees.
+      public: double GetAngleOnWall() const;
 
       /// \brief Show the grabber and rotate handles of the rect item.
       /// \param[in] _show True to draw the handles, and false to hide them.
@@ -127,6 +139,9 @@ namespace gazebo
       /// \brief Get the bounding box of the rect item.
       /// \return The bounding box of the rect item.
       protected: virtual QRectF boundingRect() const;
+
+      /// \brief Update item.
+      protected: virtual void RectUpdated();
 
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
@@ -252,6 +267,12 @@ namespace gazebo
       /// \brief Qt action for deleting the item.
       protected: QAction *deleteItemAct;
 
+      /// \brief TODO
+      protected: WallSegmentItem *parentWall;
+
+      /// \brief TODO
+      protected: std::vector<MeasureItem *> measures;
+
       /// \brief Mouse press position in pixel coordinates.
       private: QPointF mousePressPos;
 
@@ -278,6 +299,9 @@ namespace gazebo
       /// \brief Normalized position with respect to the wall segment's start
       /// point.
       private: double positionOnWall;
+
+      /// \brief TODO
+      private: double angleOnWall;
     };
     /// \}
   }
