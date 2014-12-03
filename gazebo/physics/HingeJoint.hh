@@ -36,7 +36,7 @@ namespace gazebo
     /// \class HingeJoint HingeJoint.hh physics/physics.hh
     /// \brief A single axis hinge joint
     template<class T>
-    class GAZEBO_VISIBLE HingeJoint : public T
+    class GZ_PHYSICS_VISIBLE HingeJoint : public T
     {
       /// \brief Constructor
       /// \param[in] _parent Parent link

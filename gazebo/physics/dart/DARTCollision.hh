@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief Base class for all DART collisions.
-    class GAZEBO_VISIBLE DARTCollision : public Collision
+    class GZ_PHYSICS_VISIBLE DARTCollision : public Collision
     {
       /// \brief Constructor.
       /// \param[in] _link Parent Link

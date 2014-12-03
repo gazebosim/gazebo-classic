@@ -27,7 +27,7 @@ namespace gazebo
     class BulletMesh;
 
     /// \brief Bullet polyline shape
-    class GAZEBO_VISIBLE BulletPolylineShape : public PolylineShape
+    class GZ_PHYSICS_VISIBLE BulletPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

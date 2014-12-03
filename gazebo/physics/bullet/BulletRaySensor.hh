@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief An Bullet Ray sensor
-    class GAZEBO_VISIBLE BulletRaySensor : public PhysicsRaySensor
+    class GZ_PHYSICS_VISIBLE BulletRaySensor : public PhysicsRaySensor
     {
       /// \brief Constructor
       public: BulletRaySensor(Link *body);

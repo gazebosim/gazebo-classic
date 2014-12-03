@@ -27,7 +27,7 @@ namespace gazebo
     class SimbodyMesh;
 
     /// \brief Simbody polyline shape
-    class GAZEBO_VISIBLE SimbodyPolylineShape : public PolylineShape
+    class GZ_PHYSICS_VISIBLE SimbodyPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

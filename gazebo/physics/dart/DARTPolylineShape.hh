@@ -27,7 +27,7 @@ namespace gazebo
     class DARTMesh;
 
     /// \brief DART polyline shape
-    class GAZEBO_VISIBLE DARTPolylineShape : public PolylineShape
+    class GZ_PHYSICS_VISIBLE DARTPolylineShape : public PolylineShape
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.

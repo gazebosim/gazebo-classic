@@ -6,6 +6,10 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
 )
 
+if (WIN32)
+  add_definitions(-DBUILDING_DLL_GZ_PHYSICS_ODE)
+endif()
+
 set (sources
   ODEBallJoint.cc
   ODECollision.cc

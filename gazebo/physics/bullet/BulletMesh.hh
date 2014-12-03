@@ -30,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Triangle mesh collision helper class
-    class GAZEBO_VISIBLE BulletMesh
+    class GZ_PHYSICS_VISIBLE BulletMesh
     {
       /// \brief Constructor
       public: BulletMesh();

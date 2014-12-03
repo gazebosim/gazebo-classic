@@ -41,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Bullet Link class
-    class GAZEBO_VISIBLE BulletLink : public Link
+    class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
       public: BulletLink(EntityPtr _parent);

@@ -30,7 +30,7 @@ namespace gazebo
     /// \{
 
     /// \brief Simbody collision for an infinite plane.
-    class GAZEBO_VISIBLE SimbodyPlaneShape : public PlaneShape
+    class GZ_PHYSICS_VISIBLE SimbodyPlaneShape : public PlaneShape
     {
       /// \brief Constructor
       public: SimbodyPlaneShape(CollisionPtr _parent);

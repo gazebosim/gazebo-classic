@@ -31,7 +31,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A slider joint
-    class GAZEBO_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
+    class GZ_PHYSICS_ODE_VISIBLE ODESliderJoint : public SliderJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldId ODE world id.

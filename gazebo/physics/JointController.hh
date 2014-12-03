@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class JointController JointController.hh physics/physics.hh
     /// \brief A class for manipulating physics::Joint
-    class GAZEBO_VISIBLE JointController
+    class GZ_PHYSICS_VISIBLE JointController
     {
       /// \brief Constructor
       /// \param[in] _model Model that uses this joint controller.

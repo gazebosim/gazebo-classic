@@ -41,7 +41,7 @@ namespace gazebo
     /// \{
 
     /// \brief Base class for all collision entities
-    class GAZEBO_VISIBLE Collision : public Entity
+    class GZ_PHYSICS_VISIBLE Collision : public Entity
     {
       /// \brief Constructor.
       /// \param[in] _link Link that contains this collision object.

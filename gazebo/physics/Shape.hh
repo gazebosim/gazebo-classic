@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class Shape Shape.hh physics/physics.hh
     /// \brief Base class for all shapes.
-    class GAZEBO_VISIBLE Shape : public Base
+    class GZ_PHYSICS_VISIBLE Shape : public Base
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the shape.
