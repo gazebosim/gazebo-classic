@@ -161,9 +161,35 @@ void gui::init()
 }
 
 /////////////////////////////////////////////////
-bool gui::loadINI(const boost::filesystem::path &_file)
+bool gui::loadINI(boost::filesystem::path _file)
 {
   bool result = true;
+
+  // Only use the environment variables if _file is empty.
+  if (_file.empty())
+  {
+    // Get the gui.ini path environment variable
+    char *guiINIFile = getenv("GAZEBO_GUI_INI_FILE");
+    char *home = getenv("HOME");
+
+    // If the environment variable was specified
+    if (guiINIFile)
+    {
+      _file = guiINIFile;
+      if (!boost::filesystem::exists(_file))
+      {
+        gzerr << "GAZEBO_GUI_INI_FILE does not exist: " << _file << ".\n";
+        return false;
+      }
+    }
+    else if (home)
+    {
+      // Check the home directory
+      // Construct the path to gui.ini
+      _file = home;
+      _file = _file / ".gazebo" / "gui.ini";
+    }
+  }
 
   // Create the gui.ini file if it doesn't exist.
   if (!boost::filesystem::exists(_file))
@@ -171,7 +197,7 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     gui::setINIProperty("geometry.x", 0);
     gui::setINIProperty("geometry.y", 0);
     gui::saveINI(_file);
-    gzmsg << "Couldn't locate specified .ini. Creating file at " << _file
+    gzwarn << "Couldn't locate specified .ini. Creating file at " << _file
           << std::endl;
   }
 
@@ -186,55 +212,14 @@ bool gui::loadINI(const boost::filesystem::path &_file)
     result = false;
   }
 
+  gzlog << "Loaded .ini file from: " << _file << std::endl;
   return result;
-}
-
-/////////////////////////////////////////////////
-/// If the GAZEBO_GUI_INI_PATH environment variable is set and contains
-/// valid content, load and return true.
-/// If GAZEBO_GUI_INI_PATH is not set, load from ~/.gazebo/gui.ini and return
-/// true.
-/// If GAZEBO_GUI_INI_PATH is set but the path does not exist, or if it exists
-/// and contains invalid content, do not load, and return false.
-bool gui::getGUIINIPath()
-{
-  // Get the gui.ini path environment variable
-  char *guiINIPath = getenv("GAZEBO_GUI_INI_PATH");
-  char *home = getenv("HOME");
-
-  boost::filesystem::path path;
-  // If the environment variable was specified
-  if (guiINIPath)
-  {
-    path = guiINIPath;
-    if (!boost::filesystem::exists(path))
-    {
-      gzerr << "GAZEBO_GUI_INI_PATH does not exist: " << path << ".\n";
-      return false;
-    }
-  }
-  else if (home)
-  {
-    // Check the home directory
-    // Construct the path to gui.ini
-    path = home;
-    path = path / ".gazebo" / "gui.ini";
-  }
-
-  if (!gui::loadINI(path))
-  {
-    gzerr << "Unable to read .ini file from " << path << ".\n";
-    return false;
-  }
-
-  gzmsg << "Loaded .ini file from: " << path << std::endl;
-  return true;
 }
 
 /////////////////////////////////////////////////
 bool gui::load()
 {
-  getGUIINIPath();
+  gui::loadINI();
 
   g_modelRightMenu = new gui::ModelRightMenu();
 
