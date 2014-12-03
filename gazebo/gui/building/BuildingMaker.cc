@@ -1853,7 +1853,7 @@ void BuildingMaker::OnExit()
       }
     }
   }
-  if (this->saved == SAVED || this->saved == NAME_CHANGED)
+  if (this->currentSaveState != NEVER_SAVED )
     this->FinishModel();
 
   this->Reset();
