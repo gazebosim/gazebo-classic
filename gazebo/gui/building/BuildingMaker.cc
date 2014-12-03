@@ -117,6 +117,8 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
   this->connections.push_back(
   gui::editor::Events::ConnectChangeBuildingLevel(
     boost::bind(&BuildingMaker::OnChangeLevel, this, _1)));
+
+  this->connections.push_back(
     gui::editor::Events::ConnectBuildingNameChanged(
       boost::bind(&BuildingMaker::OnNameChanged, this, _1)));
 
@@ -2015,4 +2017,10 @@ void BuildingMaker::StopMaterialModes()
   gui::editor::Events::colorSelected(this->selectedColor.convertTo(
       QColor::Invalid));
   gui::editor::Events::createBuildingEditorItem(std::string());
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::OnChangeLevel(int _level)
+{
+  this->currentLevel = _level;
 }
