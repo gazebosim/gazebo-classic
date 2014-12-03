@@ -611,16 +611,6 @@ void MainWindow::OnFollow(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-void MainWindow::NewModel()
-{
-  /*ModelBuilderWidget *modelBuilder = new ModelBuilderWidget();
-  modelBuilder->Init();
-  modelBuilder->show();
-  modelBuilder->resize(800, 600);
-  */
-}
-
-/////////////////////////////////////////////////
 void MainWindow::OnResetModelOnly()
 {
   msgs::WorldControl msg;
@@ -971,11 +961,6 @@ void MainWindow::CreateActions()
   g_quitAct->setStatusTip(tr("Quit"));
   connect(g_quitAct, SIGNAL(triggered()), this, SLOT(close()));
 
-  g_newModelAct = new QAction(tr("New &Model"), this);
-  g_newModelAct->setShortcut(tr("Ctrl+M"));
-  g_newModelAct->setStatusTip(tr("Create a new model"));
-  connect(g_newModelAct, SIGNAL(triggered()), this, SLOT(NewModel()));
-
   g_resetModelsAct = new QAction(tr("&Reset Model Poses"), this);
   g_resetModelsAct->setShortcut(tr("Ctrl+Shift+R"));
   g_resetModelsAct->setStatusTip(tr("Reset model poses"));
@@ -988,6 +973,10 @@ void MainWindow::CreateActions()
   connect(g_resetWorldAct, SIGNAL(triggered()), this, SLOT(OnResetWorld()));
 
   QActionGroup *editorGroup = new QActionGroup(this);
+  // Exclusive doesn't allow all actions to be unchecked at the same time
+  editorGroup->setExclusive(false);
+  connect(editorGroup, SIGNAL(triggered(QAction *)), this,
+      SLOT(OnEditorGroup(QAction *)));
 
   g_editBuildingAct = new QAction(tr("&Building Editor"), editorGroup);
   g_editBuildingAct->setShortcut(tr("Ctrl+B"));
@@ -1791,4 +1780,18 @@ void MainWindow::SetLeftPaneVisibility(bool _on)
   sizes.push_back(rightPane);
 
   this->splitter->setSizes(sizes);
+}
+
+/////////////////////////////////////////////////
+void MainWindow::OnEditorGroup(QAction *_action)
+{
+  QActionGroup * editorGroup = _action->actionGroup();
+  // Manually uncheck all other actions in the group
+  for (int i = 0; i < editorGroup->actions().size(); ++i)
+  {
+    if (editorGroup->actions()[i] != _action)
+    {
+      editorGroup->actions()[i]->setChecked(false);
+    }
+  }
 }

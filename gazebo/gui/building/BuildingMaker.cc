@@ -46,14 +46,13 @@
 #include "gazebo/gui/building/EditorItem.hh"
 #include "gazebo/gui/building/BuildingMaker.hh"
 
-
 using namespace gazebo;
 using namespace gui;
 
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "BuildingDefaultName";
   this->modelName = this->buildingDefaultName;
@@ -119,6 +118,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnPositionChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(RotationChanged(double, double, double)),
       manip, SLOT(OnRotationChanged(double, double, double)));
+  QObject::connect(_item, SIGNAL(ColorChanged(QColor)),
+      manip, SLOT(OnColorChanged(QColor)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
       manip, SLOT(OnTransparencyChanged(float)));
 
@@ -143,6 +144,21 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->AttachManip(child);
@@ -152,9 +168,42 @@ void BuildingMaker::AttachManip(const std::string &_child,
 void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->DetachManip(child);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::DetachAllChildren(const std::string &_manip)
+{
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_manip);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Manip " << _manip << " not found." << std::endl;
+    return;
+  }
+
+  BuildingModelManip *manip = this->allItems[_manip];
+  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  {
+    (manip->GetAttachedManip(i))->DetachFromParent();
+  }
 }
 
 /////////////////////////////////////////////////
@@ -584,10 +633,10 @@ void BuildingMaker::GenerateSDF()
     newLinkElem->GetAttribute("name")->Set(buildingModelManip->GetName());
     newLinkElem->GetElement("pose")->Set(visual->GetParent()->GetWorldPose());
 
+    // Only stairs have children
     if (visual->GetChildCount() == 0)
     {
-      // subdivide wall surface to create holes for representing
-      // window/doors
+      // Window / Door not attached to walls
       if (name.find("Window") != std::string::npos
           || name.find("Door") != std::string::npos)
       {
@@ -604,9 +653,10 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale());
       }
-      // check if walls have attached children, i.e. windows or doors
+      // Wall
       else if (name.find("Wall") != std::string::npos)
       {
+        // check if walls have attached children, i.e. windows or doors
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
@@ -673,13 +723,16 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 wallVis->GetScale().y, subdivisions[i].height());
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Wall without windows or doors
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -688,15 +741,18 @@ void BuildingMaker::GenerateSDF()
               + "_Collision");
           visualElem->GetElement("pose")->Set(visual->GetPose());
           collisionElem->GetElement("pose")->Set(visual->GetPose());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
           visualElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
         }
       }
-      // check if floors have attached children, i.e. stairs
+      // Floor
       else if (name.find("Floor") != std::string::npos)
       {
+        // check if floors have attached children, i.e. stairs
         if (buildingModelManip->GetAttachedManipCount() != 0 )
         {
           std::vector<QRectF> holes;
@@ -765,13 +821,16 @@ void BuildingMaker::GenerateSDF()
             math::Vector3 blockSize(subdivisions[i].width(),
                 subdivisions[i].height(), floorVis->GetScale().z);
             visualElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
             collisionElem->GetElement("geometry")->GetElement("box")->
-              GetElement("size")->Set(blockSize);
+                GetElement("size")->Set(blockSize);
+            visualElem->GetElement("material")->GetElement("ambient")->
+                Set(buildingModelManip->GetColor());
             newLinkElem->InsertElement(visualElem);
             newLinkElem->InsertElement(collisionElem);
           }
         }
+        // Floor without stairs
         else
         {
           visualElem->GetAttribute("name")->Set(buildingModelManip->GetName()
@@ -784,12 +843,15 @@ void BuildingMaker::GenerateSDF()
               GetElement("size")->Set(visual->GetScale());
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->GetScale());
+          visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
         }
       }
     }
+    // Stairs
     else
     {
-      // TODO: This handles the special case for stairs where
+      // TODO: This handles the special case for stairs, where
       // there are nested visuals which SDF doesn't support.
       // Should somehow generalize/combine the code above and below
       newLinkElem->ClearElements();
@@ -813,6 +875,8 @@ void BuildingMaker::GenerateSDF()
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->GetScale()*childVisual->GetScale());
+        visualElem->GetElement("material")->GetElement("ambient")->
+              Set(buildingModelManip->GetColor());
 
         newLinkElem->InsertElement(visualElem);
         newLinkElem->InsertElement(collisionElem);

@@ -202,7 +202,6 @@ void FloorItem::FloorChanged()
   emit HeightChanged(this->floorHeight);
   emit PositionChanged(this->floorPos.x(), this->floorPos.y(),
       this->levelBaseHeight/* + this->floorElevation*/);
-  emit TransparencyChanged(this->visual3dTransparency);
 }
 
 /////////////////////////////////////////////////
