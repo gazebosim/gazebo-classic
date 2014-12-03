@@ -52,7 +52,7 @@ using namespace gui;
 double BuildingMaker::conversionScale;
 
 /////////////////////////////////////////////////
-  BuildingMaker::BuildingMaker() : EntityMaker()
+BuildingMaker::BuildingMaker() : EntityMaker()
 {
   this->buildingDefaultName = "BuildingDefaultName";
   this->modelName = this->buildingDefaultName;
@@ -146,6 +146,21 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
 void BuildingMaker::AttachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->AttachManip(child);
@@ -155,9 +170,42 @@ void BuildingMaker::AttachManip(const std::string &_child,
 void BuildingMaker::DetachManip(const std::string &_child,
     const std::string &_parent)
 {
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_child);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Child manip " << _child << " not found." << std::endl;
+    return;
+  }
+
+  it = this->allItems.find(_parent);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Parent manip " << _parent << " not found." << std::endl;
+    return;
+  }
+
   BuildingModelManip *child = this->allItems[_child];
   BuildingModelManip *parent = this->allItems[_parent];
   parent->DetachManip(child);
+}
+
+/////////////////////////////////////////////////
+void BuildingMaker::DetachAllChildren(const std::string &_manip)
+{
+  std::map<std::string, BuildingModelManip *>::const_iterator it =
+      this->allItems.find(_manip);
+  if (it == this->allItems.end())
+  {
+    gzerr << "Manip " << _manip << " not found." << std::endl;
+    return;
+  }
+
+  BuildingModelManip *manip = this->allItems[_manip];
+  for (int i = manip->GetAttachedManipCount()-1; i >= 0; i--)
+  {
+    (manip->GetAttachedManip(i))->DetachFromParent();
+  }
 }
 
 /////////////////////////////////////////////////

@@ -118,6 +118,15 @@
     1. Snapping on by default, off holding Shift. Improved snapping.
         * [Pull request #1304](https://bitbucket.org/osrf/gazebo/pull-request/1304)
 
+    1. Snap walls to length increments, moved scale to SegmentItem and added Get/SetScale, added SegmentItem::SnapAngle and SegmentItem::SnapLength.
+        * [Pull request #1311](https://bitbucket.org/osrf/gazebo/pull-request/1311)
+
+    1. Added EditorItem::SetHighlighted.
+        * [Pull request #1308](https://bitbucket.org/osrf/gazebo/pull-request/1308)
+
+    1. Detach all child manips when item is deleted, added BuildingMaker::DetachAllChildren.
+        * [Pull request #1316](https://bitbucket.org/osrf/gazebo/pull-request/1316)
+
 1. Model editor updates
     1. Fix adding/removing event filters .
         * [Pull request #1279](https://bitbucket.org/osrf/gazebo/pull-request/1279)
