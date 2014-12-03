@@ -7,11 +7,14 @@ include_directories(SYSTEM
   skyx/include
 )
 
-#if (${OGRE_VERSION} GREATER 1.7.4)
-#  add_subdirectory(deferred_shading)
-#endif()
+if (${OGRE_VERSION} GREATER 1.7.4)
+  add_subdirectory(deferred_shading)
+endif()
 add_subdirectory(skyx)
 add_subdirectory(selection_buffer)
+
+include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS})
 
 set (sources
   ArrowVisual.cc
@@ -57,6 +60,15 @@ set (sources
   WindowManager.cc
   WrenchVisual.cc
 )
+
+if (NOT USE_EXTERNAL_TINYXML)
+  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
+  set (sources ${sources}
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlerror.cpp
+       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
+endif()
 
 set (headers
   ArrowVisual.hh
@@ -142,6 +154,8 @@ link_directories(
   ${ogre_library_dirs}
 )
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_RENDERING")
+
 gz_add_library(gazebo_rendering ${sources})
 
 target_link_libraries(gazebo_rendering
@@ -153,6 +167,7 @@ target_link_libraries(gazebo_rendering
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${CEGUI_LIBRARIES}
+  ${tinyxml_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
@@ -161,13 +176,13 @@ if (HAVE_OCULUS)
   )
 endif()
 
-if (NOT APPLE)
+if (NOT APPLE AND NOT WIN32)
   target_link_libraries(gazebo_rendering X11)
 endif()
 
-#if (${OGRE_VERSION} GREATER 1.7.4)
-#  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
-#endif()
+if (${OGRE_VERSION} GREATER 1.7.4)
+  target_link_libraries(gazebo_rendering gazebo_rendering_deferred)
+endif()
 
 gz_install_library(gazebo_rendering)
 gz_install_includes("rendering" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/rendering.hh)

@@ -48,7 +48,7 @@ namespace gazebo
 
     /// \class DummyPageProvider Heightmap.hh rendering/rendering.hh
     /// \brief Pretends to provide procedural page content to avoid page loading
-    class GAZEBO_VISIBLE DummyPageProvider : public Ogre::PageProvider
+    class GZ_RENDERING_VISIBLE DummyPageProvider : public Ogre::PageProvider
     {
       /// \brief Give a provider the opportunity to prepare page content
       /// procedurally. The parameters are not used.
@@ -85,7 +85,7 @@ namespace gazebo
 
     /// \class Heightmap Heightmap.hh rendering/rendering.hh
     /// \brief Rendering a terrain using heightmap information
-    class GAZEBO_VISIBLE Heightmap
+    class GZ_RENDERING_VISIBLE Heightmap
     {
       /// \brief Constructor
       /// \param[in] _scene Pointer to the scene that will contain the heightmap
@@ -346,7 +346,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Custom terrain material generator for GLSL terrains.
-    class GAZEBO_VISIBLE GzTerrainMatGen
+    class GZ_RENDERING_VISIBLE GzTerrainMatGen
       : public Ogre::TerrainMaterialGeneratorA
     {
       /// \brief Constructor
@@ -471,6 +471,10 @@ namespace gazebo
           private: Ogre::String GetChannel(Ogre::uint _idx);
         };
 
+	// Needed to allow access from ShaderHelperGLSL to protected members
+	// of SM2Profile.
+	friend ShaderHelperGLSL;
+
         /// Keeping the CG shader for reference.
         /// Utility class to help with generating shaders for Cg / HLSL.
         protected: class ShaderHelperCg :
@@ -511,6 +515,11 @@ namespace gazebo
                          TechniqueType _tt,
                          Ogre::StringUtil::StrStreamType &_outStream);
         };
+
+	// Needed to allow access from ShaderHelperCg to protected members
+	// of SM2Profile.
+	friend ShaderHelperCg;
+
 #ifdef __clang__
 #pragma clang diagnostic pop
 #endif  // ifdef __clang__

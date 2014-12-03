@@ -19,6 +19,12 @@
  * Date: 12 May 2009
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <string.h>
 #include <math.h>
 
@@ -944,7 +950,7 @@ GzTerrainMatGen::~GzTerrainMatGen()
 GzTerrainMatGen::SM2Profile::SM2Profile(
     Ogre::TerrainMaterialGenerator *_parent, const Ogre::String &_name,
     const Ogre::String &_desc)
-: TerrainMaterialGeneratorA::SM2Profile::SM2Profile(_parent, _name, _desc)
+: TerrainMaterialGeneratorA::SM2Profile(_parent, _name, _desc)
 {
   this->mShaderGen = NULL;
 }

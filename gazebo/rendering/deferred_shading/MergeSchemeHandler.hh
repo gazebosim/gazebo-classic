@@ -30,7 +30,7 @@ namespace gazebo
   {
     /// Class for handling materials who did not specify techniques for the
     /// merging step of deferred/inferred lighting.
-    class GAZEBO_VISIBLE MergeSchemeHandler :
+    class GZ_RENDERING_DEFERRED_VISIBLE MergeSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
       public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)

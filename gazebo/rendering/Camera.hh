@@ -75,7 +75,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This is the base class for all cameras.
-    class GAZEBO_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
+    class GZ_RENDERING_VISIBLE Camera : public boost::enable_shared_from_this<Camera>
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

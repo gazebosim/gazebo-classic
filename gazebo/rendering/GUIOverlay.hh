@@ -18,6 +18,12 @@
 #ifndef _GUI_OVERLAY_HH_
 #define _GUI_OVERLAY_HH_
 
+#ifdef _WIN32
+  // Oh, yeah, CreateWindow is taken, too.
+  #include <windows.h>
+  #undef CreateWindow
+#endif
+
 #include <string>
 #include <map>
 

@@ -17,7 +17,10 @@
 #ifndef _GZ_PLUGIN_HH_
 #define _GZ_PLUGIN_HH_
 
-#include <unistd.h>
+#ifndef _WIN32
+  #include <unistd.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -68,7 +71,7 @@ namespace gazebo
   /// \class PluginT Plugin.hh common/common.hh
   /// \brief A class which all plugins must inherit from
   template<class T>
-  class GZ_COMMON_VISIBLE PluginT
+  class PluginT
   {
     /// \brief plugin pointer type definition
     public: typedef boost::shared_ptr<T> TPtr;
@@ -205,7 +208,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::World.  See
   /// <a href="http://gazebosim.org/tutorials/?tut=plugins_world
   /// &cat=write_plugin">reference</a>.
-  class GZ_COMMON_VISIBLE WorldPlugin : public PluginT<WorldPlugin>
+  class WorldPlugin : public PluginT<WorldPlugin>
   {
     /// \brief Constructor
     public: WorldPlugin()
@@ -230,7 +233,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::Model.  See
   /// <a href="http://gazebosim.org/tutorials?tut=plugins_model
   /// &cat=write_plugin">reference</a>.
-  class GZ_COMMON_VISIBLE ModelPlugin : public PluginT<ModelPlugin>
+  class ModelPlugin : public PluginT<ModelPlugin>
   {
     /// \brief Constructor
     public: ModelPlugin()
@@ -259,7 +262,7 @@ namespace gazebo
   /// \brief A plugin with access to physics::Sensor.  See
   /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
   /// &cat=write_plugin">reference</a>.
-  class GZ_COMMON_VISIBLE SensorPlugin : public PluginT<SensorPlugin>
+  class SensorPlugin : public PluginT<SensorPlugin>
   {
     /// \brief Constructor
     public: SensorPlugin()
@@ -288,7 +291,7 @@ namespace gazebo
   /// <a href="http://gazebosim.org/tutorials?tut=system_plugin
   /// &cat=write_plugin">reference</a>
   /// @todo how to make doxygen reference to the file gazebo.cc#g_plugins?
-  class GZ_COMMON_VISIBLE SystemPlugin : public PluginT<SystemPlugin>
+  class SystemPlugin : public PluginT<SystemPlugin>
   {
     /// \brief Constructor
     public: SystemPlugin()
@@ -316,7 +319,7 @@ namespace gazebo
   /// \brief A plugin loaded within the gzserver on startup.  See
   /// <a href="http://gazebosim.org/tutorials?tut=plugins_hello_world
   /// &cat=write_plugin">reference</a>.
-  class GZ_COMMON_VISIBLE VisualPlugin : public PluginT<VisualPlugin>
+  class VisualPlugin : public PluginT<VisualPlugin>
   {
     public: VisualPlugin()
              {this->type = VISUAL_PLUGIN;}

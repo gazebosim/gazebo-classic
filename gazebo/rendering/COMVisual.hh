@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class COMVisual COMVisual.hh rendering/rendering.hh
     /// \brief Basic Center of Mass visualization
-    class GAZEBO_VISIBLE COMVisual : public Visual
+    class GZ_RENDERING_VISIBLE COMVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the Visual

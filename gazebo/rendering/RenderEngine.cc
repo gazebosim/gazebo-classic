@@ -19,7 +19,7 @@
 # include <QtCore/qglobal.h>
 #endif
 
-#ifndef Q_OS_MAC  // Not Apple
+#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
 # include <X11/Xlib.h>
 # include <X11/Xutil.h>
 # include <GL/glx.h>
@@ -373,7 +373,7 @@ void RenderEngine::Fini()
     this->scenes[i].reset();
   this->scenes.clear();
 
-#ifndef Q_OS_MAC
+#if not defined( Q_OS_MAC) && not defined(_WIN32)  // Not Apple or Windows
   if (this->dummyDisplay)
   {
     glXDestroyContext(static_cast<Display*>(this->dummyDisplay),
@@ -673,7 +673,7 @@ bool RenderEngine::CreateContext()
 {
   bool result = true;
 
-#ifdef Q_OS_MAC
+#if defined Q_OS_MAC || _WIN32
   this->dummyDisplay = 0;
 #else
   try

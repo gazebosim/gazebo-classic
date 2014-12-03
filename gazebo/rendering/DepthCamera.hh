@@ -54,7 +54,7 @@ namespace gazebo
 
     /// \class DepthCamera DepthCamera.hh rendering/rendering.hh
     /// \brief Depth camera used to render depth data into an image buffer
-    class GAZEBO_VISIBLE DepthCamera : public Camera
+    class GZ_RENDERING_VISIBLE DepthCamera : public Camera
     {
       /// \brief Constructor
       /// \param[in] _namePrefix Unique prefix name for the camera.

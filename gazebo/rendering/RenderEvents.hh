@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class Events Events.hh rendering/rendering.hh
     /// \brief Base class for rendering events
-    class GAZEBO_VISIBLE Events
+    class GZ_RENDERING_VISIBLE Events
     {
       /// \brief Connect to a scene created event.
       /// \param[in] _subscriber Callback to trigger when event occurs.

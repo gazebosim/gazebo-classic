@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class SelectionObj SelectionObj.hh
     /// \brief Interactive selection object for models and links
-    class GAZEBO_VISIBLE SelectionObj : public Visual
+    class GZ_RENDERING_VISIBLE SelectionObj : public Visual
     {
       /// \enum Manipulation modes
       /// \brief Unique identifiers for manipulation modes.

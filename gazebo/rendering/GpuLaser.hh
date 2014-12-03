@@ -27,11 +27,6 @@
 
 #include <sdf/sdf.hh>
 
-#ifdef _WIN32
-  #undef far
-  #undef near
-#endif
-
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -70,7 +65,7 @@ namespace gazebo
 
     /// \class GpuLaser GpuLaser.hh rendering/rendering.hh
     /// \brief GPU based laser distance sensor
-    class GAZEBO_VISIBLE GpuLaser
+    class GZ_RENDERING_VISIBLE GpuLaser
       : public Camera, public Ogre::RenderObjectListener
     {
       /// \brief Constructor
@@ -284,10 +279,14 @@ namespace gazebo
       protected: double cvfov;
 
       /// \brief Near clip plane.
-      protected: double near;
+      /// To know why this variable isn't called 'near', read:
+      /// http://lolengine.net/blog/2011/3/4/fuck-you-microsoft-near-far-macros
+      protected: double nearClipPlane;
 
       /// \brief Far clip plane.
-      protected: double far;
+      /// To know why this variable isn't called 'far', read:
+      /// http://lolengine.net/blog/2011/3/4/fuck-you-microsoft-near-far-macros
+      protected: double farClipPlane;
 
       /// \brief True if the sensor is horizontal only.
       protected: bool isHorizontal;

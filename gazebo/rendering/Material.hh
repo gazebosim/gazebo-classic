@@ -27,7 +27,7 @@ namespace gazebo
   {
     /// \class Material Material.hh rendering/rendering.hh
     /// \brief An internal class used by Visuals to add materials to Ogre.
-    class GAZEBO_VISIBLE Material
+    class GZ_RENDERING_VISIBLE Material
     {
       /// \brief Create all the default materials
       public: static void CreateMaterials();

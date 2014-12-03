@@ -35,7 +35,7 @@ namespace gazebo
     // XXX Could make this a singleton/make it private to the
     // DeferredShadingSystem e.g.
     template<class techniquePolicy>
-    class GAZEBO_VISIBLE AmbientLight
+    class AmbientLight
       : public Ogre::SimpleRenderable, public techniquePolicy
     {
       /// \brief Constructor

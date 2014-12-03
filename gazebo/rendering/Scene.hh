@@ -76,7 +76,7 @@ namespace gazebo
     /// \brief Representation of an entire scene graph.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
-    class GAZEBO_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
+    class GZ_RENDERING_VISIBLE Scene : public boost::enable_shared_from_this<Scene>
     {
       public: enum SkyXMode {
         GZ_SKYX_ALL = 0x0FFFFFFF,

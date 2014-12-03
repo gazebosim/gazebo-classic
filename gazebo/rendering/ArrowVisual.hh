@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class ArrowVisual ArrowVisual.hh rendering/rendering.hh
     /// \brief Basic arrow visualization
-    class GAZEBO_VISIBLE ArrowVisual : public Visual
+    class GZ_RENDERING_VISIBLE ArrowVisual : public Visual
     {
       /// \brief Constructor
       /// \param[in] _name Name of the arrow visual

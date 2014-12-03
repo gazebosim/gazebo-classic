@@ -151,6 +151,56 @@
 #endif
 
 #if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_SELECTION_BUFFER
+    #ifdef __GNUC__
+      #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_SELECTION_BUFFER_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_SELECTION_BUFFER_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_SELECTION_BUFFER_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_SELECTION_BUFFER_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_SELECTION_BUFFER_VISIBLE
+    #define GZ_SELECTION_BUFFER_HIDDEN
+  #endif
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_RENDERING
+    #ifdef __GNUC__
+      #define GZ_RENDERING_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_RENDERING_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_RENDERING_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_RENDERING_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_RENDERING_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_RENDERING_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_RENDERING_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_RENDERING_VISIBLE
+    #define GZ_RENDERING_HIDDEN
+  #endif
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
   #ifdef BUILDING_DLL_GZ_UTIL
     #ifdef __GNUC__
       #define GZ_UTIL_VISIBLE __attribute__ ((dllexport))
@@ -172,6 +222,31 @@
   #else
     #define GZ_UTIL_VISIBLE
     #define GZ_UTIL_HIDDEN
+  #endif
+#endif
+
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef BUILDING_DLL_GZ_RENDERING_DEFERRED
+    #ifdef __GNUC__
+      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GZ_RENDERING_DEFERRED_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GZ_RENDERING_DEFERRED_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GZ_RENDERING_DEFERRED_VISIBLE __attribute__ ((visibility ("default")))
+    #define GZ_RENDERING_DEFERRED_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GZ_RENDERING_DEFERRED_VISIBLE
+    #define GZ_RENDERING_DEFERRED_HIDDEN
   #endif
 #endif
 
