@@ -289,7 +289,20 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete)
   {
     while (!this->selectedVisuals.empty())
-      g_deleteAct->Signal(this->selectedVisuals.back()->GetName());
+    {
+      std::string name = this->selectedVisuals.back()->GetName();
+      int id = this->selectedVisuals.back()->GetId();
+      this->selectedVisuals.pop_back();
+
+      // Publish message about visual deselection
+      msgs::Selection msg;
+      msg.set_id(id);
+      msg.set_name(name);
+      msg.set_selected(false);
+      this->selectionPub->Publish(msg);
+
+      g_deleteAct->Signal(name);
+    }
   }
 
   if (_event->key() == Qt::Key_Escape)
