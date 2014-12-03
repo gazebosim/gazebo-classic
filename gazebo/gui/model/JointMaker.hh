@@ -43,7 +43,7 @@ namespace gazebo
 
     /// \class JointMaker JointMaker.hh
     /// \brief Joint visualization
-    class GAZEBO_VISIBLE JointMaker : public QObject
+    class JointMaker : public QObject
     {
       Q_OBJECT
 
@@ -194,7 +194,7 @@ namespace gazebo
 
     /// \class JointData JointData.hh
     /// \brief Helper class to store joint data
-    class GAZEBO_VISIBLE JointData : public QObject
+    class JointData : public QObject
     {
       Q_OBJECT
 

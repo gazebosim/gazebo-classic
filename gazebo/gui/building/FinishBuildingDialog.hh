@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class FinishBuildingDialog FinishBuildingDialog.hh
     /// \brief Dialog for saving the building model.
-    class GAZEBO_VISIBLE FinishBuildingDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE FinishBuildingDialog : public QDialog
     {
       Q_OBJECT
 

@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class ImportImageView ImportImageView.hh
     /// \brief Control the import image view and manage contents in the scene.
-    class GAZEBO_VISIBLE ImportImageView : public QGraphicsView
+    class GZ_GUI_BUILDING_VISIBLE ImportImageView : public QGraphicsView
     {
       Q_OBJECT
 

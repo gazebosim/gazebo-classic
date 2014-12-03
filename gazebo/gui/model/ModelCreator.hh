@@ -50,7 +50,7 @@ namespace gazebo
 
     /// \class ModelCreator ModelCreator.hh
     /// \brief Create and manage 3D visuals of a model with parts and joints.
-    class GAZEBO_VISIBLE ModelCreator : public QObject
+    class ModelCreator : public QObject
     {
       Q_OBJECT
 
@@ -278,7 +278,7 @@ namespace gazebo
 
     /// \class SensorData SensorData.hh
     /// \brief Helper class to store sensor data
-    class GAZEBO_VISIBLE SensorData
+    class GZ_GUI_MODEL_VISIBLE SensorData
     {
       /// \brief Name of sensor.
       public: std::string name;
@@ -301,7 +301,7 @@ namespace gazebo
 
     /// \class PartData PartData.hh
     /// \brief Helper class to store part data
-    class GAZEBO_VISIBLE PartData : public QObject
+    class PartData : public QObject
     {
       Q_OBJECT
 

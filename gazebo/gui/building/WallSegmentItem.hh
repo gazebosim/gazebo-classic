@@ -37,7 +37,7 @@ namespace gazebo
 
     /// \class WallSegmentItem WallSegmentItem.hh
     /// \brief 2D representation of a wall.
-    class GAZEBO_VISIBLE WallSegmentItem : public SegmentItem, public
+    class GZ_GUI_BUILDING_VISIBLE WallSegmentItem : public SegmentItem, public
         BuildingItem
     {
       Q_OBJECT

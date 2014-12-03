@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class StairsInspectorDialog StairsInspectorDialog.hh
     /// \brief Dialog for configuring a staircase item.
-    class GAZEBO_VISIBLE StairsInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE StairsInspectorDialog : public QDialog
     {
       Q_OBJECT
 

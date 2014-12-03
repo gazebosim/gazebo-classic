@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class GridLines GridLines.hh
     /// \brief A widget for adding and changing building levels.
-    class GAZEBO_VISIBLE LevelWidget : public QWidget
+    class GZ_GUI_BUILDING_VISIBLE LevelWidget : public QWidget
     {
       Q_OBJECT
 

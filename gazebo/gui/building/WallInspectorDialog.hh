@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \class WallInspectorDialog WallInspectorDialog.hh
     /// \brief Dialog for configuring a wall item.
-    class GAZEBO_VISIBLE WallInspectorDialog : public QDialog
+    class GZ_GUI_BUILDING_VISIBLE WallInspectorDialog : public QDialog
     {
       Q_OBJECT
 
