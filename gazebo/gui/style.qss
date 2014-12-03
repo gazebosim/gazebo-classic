@@ -746,3 +746,8 @@ QwtScaleWidget
   color: white;
   font-size: 11px;
 }
+
+#configWidget
+{
+  background-color: #808080;
+}
