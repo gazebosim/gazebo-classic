@@ -48,7 +48,7 @@ WindowItem::WindowItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
-  this->RectUpdated();
+  this->UpdateMeasures();
 
   this->zValueIdle = 3;
   this->setZValue(this->zValueIdle);
@@ -221,52 +221,4 @@ void WindowItem::OnOpenInspector()
 void WindowItem::OnDeleteItem()
 {
   dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(this);
-}
-
-/////////////////////////////////////////////////
-void WindowItem::RectUpdated()
-{
-  if (this->measures.empty())
-  {
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures[0]->setParentItem(this);
-    this->measures[1]->setParentItem(this);
-    this->measures[0]->setVisible(false);
-    this->measures[1]->setVisible(false);
-  }
-
-  this->measures[0]->setVisible(this->highlighted &&
-      (this->parentItem() != NULL));
-  this->measures[1]->setVisible(this->highlighted &&
-      (this->parentItem() != NULL));
-
-  if (this->parentItem())
-  {
-    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
-        this->parentItem());
-
-    double d = 20 + this->windowDepth/2.0;
-    double t = wallItem->GetThickness()/2.0;
-    double l = wallItem->line().length();
-    double p = this->GetPositionOnWall();
-
-    if (this->GetAngleOnWall() < 90)
-    {
-      this->measures[0]->SetStartPoint(QPointF(-(t + l*p), -d));
-      this->measures[1]->SetEndPoint(QPointF(t + l*(1-p), -d));
-    }
-    else
-    {
-      this->measures[0]->SetStartPoint(QPointF(-(t + l*(1-p)), -d));
-      this->measures[1]->SetEndPoint(QPointF(t + l*p, -d));
-    }
-    this->measures[0]->SetEndPoint(QPointF(-this->windowWidth/2, -d));
-    this->measures[1]->SetStartPoint(QPointF(this->windowWidth/2, -d));
-
-    this->measures[0]->SetValue(
-        (this->measures[0]->line().length())*this->scale);
-    this->measures[1]->SetValue(
-        (this->measures[1]->line().length())*this->scale);
-  }
 }

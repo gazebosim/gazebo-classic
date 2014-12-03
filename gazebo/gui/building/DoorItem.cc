@@ -46,7 +46,7 @@ DoorItem::DoorItem(): RectItem(), BuildingItem()
   this->drawingHeight = this->height;
 
   this->UpdateCornerPositions();
-  this->RectUpdated();
+  this->UpdateMeasures();
 
   this->doorPos = this->scenePos();
 
@@ -205,59 +205,11 @@ void DoorItem::SizeChanged()
 {
   emit WidthChanged(this->doorWidth);
   emit DepthChanged(this->doorDepth);
-  this->RectUpdated();
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
 void DoorItem::OnDeleteItem()
 {
   dynamic_cast<EditorView *>(this->scene()->views()[0])->DeleteItem(this);
-}
-
-/////////////////////////////////////////////////
-void DoorItem::RectUpdated()
-{
-  if (this->measures.empty())
-  {
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
-    this->measures[0]->setParentItem(this);
-    this->measures[1]->setParentItem(this);
-    this->measures[0]->setVisible(false);
-    this->measures[1]->setVisible(false);
-  }
-
-  this->measures[0]->setVisible(this->highlighted &&
-      (this->parentItem() != NULL));
-  this->measures[1]->setVisible(this->highlighted &&
-      (this->parentItem() != NULL));
-
-  if (this->parentItem())
-  {
-    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
-        this->parentItem());
-
-    double d = 20 + this->doorDepth/2.0;
-    double t = wallItem->GetThickness()/2.0;
-    double l = wallItem->line().length();
-    double p = this->GetPositionOnWall();
-
-    if (this->GetAngleOnWall() < 90)
-    {
-      this->measures[0]->SetStartPoint(QPointF(-(t + l*p), -d));
-      this->measures[1]->SetEndPoint(QPointF(t + l*(1-p), -d));
-    }
-    else
-    {
-      this->measures[0]->SetStartPoint(QPointF(-(t + l*(1-p)), -d));
-      this->measures[1]->SetEndPoint(QPointF(t + l*p, -d));
-    }
-    this->measures[0]->SetEndPoint(QPointF(-this->doorWidth/2, -d));
-    this->measures[1]->SetStartPoint(QPointF(this->doorWidth/2, -d));
-
-    this->measures[0]->SetValue(
-        (this->measures[0]->line().length())*this->scale);
-    this->measures[1]->SetValue(
-        (this->measures[1]->line().length())*this->scale);
-  }
 }

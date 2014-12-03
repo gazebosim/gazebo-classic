@@ -138,8 +138,8 @@ namespace gazebo
       /// \return The bounding box of the rect item.
       protected: virtual QRectF boundingRect() const;
 
-      /// \brief Update item.
-      protected: virtual void RectUpdated();
+      /// \brief Update this item's measures.
+      protected: void UpdateMeasures();
 
       /// \brief Filter Qt events and redirect them to the rotate handle.
       /// \param[in] _rotateHandle Rotate handle that will handle the event.
@@ -268,6 +268,9 @@ namespace gazebo
       /// \brief TODO
       protected: std::vector<MeasureItem *> measures;
 
+      /// \brief Scale for converting from pixel to metric units.
+      protected: double scale;
+
       /// \brief Mouse press position in pixel coordinates.
       private: QPointF mousePressPos;
 
@@ -295,7 +298,7 @@ namespace gazebo
       /// point.
       private: double positionOnWall;
 
-      /// \brief TODO
+      /// \brief Angle with respect to parent wall, either 0 or 180 degrees.
       private: double angleOnWall;
     };
     /// \}

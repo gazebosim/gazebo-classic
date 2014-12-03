@@ -163,7 +163,7 @@ void RectItem::SetHighlighted(bool _highlighted)
   }
   this->highlighted = _highlighted;
   emit TransparencyChanged(this->visual3dTransparency);
-  this->RectUpdated();
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -746,7 +746,7 @@ double RectItem::GetHeight() const
 void RectItem::SetPositionOnWall(double _positionOnWall)
 {
   this->positionOnWall = _positionOnWall;
-  this->RectUpdated();
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -759,7 +759,7 @@ double RectItem::GetPositionOnWall() const
 void RectItem::SetAngleOnWall(double _angleOnWall)
 {
   this->angleOnWall = _angleOnWall;
-  this->RectUpdated();
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -899,7 +899,7 @@ void RectItem::SizeChanged()
 {
   emit DepthChanged(this->drawingHeight);
   emit WidthChanged(this->drawingWidth);
-  this->RectUpdated();
+  this->UpdateMeasures();
 }
 
 /////////////////////////////////////////////////
@@ -933,7 +933,56 @@ void RectItem::SetResizeFlag(unsigned int _flag)
 }
 
 /////////////////////////////////////////////////
-void RectItem::RectUpdated()
+void RectItem::UpdateMeasures()
 {
-  // virtual
+  // Only windows and doors can have a wall as parent
+  WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+    this->parentItem());
+  if (this->parentItem() == NULL)
+  {
+    for (unsigned int i = 0; i < this->measures.size(); ++i)
+    {
+      this->measures[i]->setVisible(false);
+    }
+    return;
+  }
+
+  if (this->measures.empty())
+  {
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures.push_back(new MeasureItem(QPointF(0, 0), QPointF(0, 1)));
+    this->measures[0]->setParentItem(this);
+    this->measures[1]->setParentItem(this);
+    this->measures[0]->setVisible(false);
+    this->measures[1]->setVisible(false);
+  }
+
+  this->measures[0]->setVisible(this->highlighted);
+  this->measures[1]->setVisible(this->highlighted);
+
+  if (this->highlighted)
+  {
+    double d = 20 + this->drawingHeight/2.0;
+    double t = wallItem->GetThickness()/2.0;
+    double l = wallItem->line().length();
+    double p = this->GetPositionOnWall();
+
+    if (this->GetAngleOnWall() < 90)
+    {
+      this->measures[0]->SetStartPoint(QPointF(-(t + l*p), -d));
+      this->measures[1]->SetEndPoint(QPointF(t + l*(1-p), -d));
+    }
+    else
+    {
+      this->measures[0]->SetStartPoint(QPointF(-(t + l*(1-p)), -d));
+      this->measures[1]->SetEndPoint(QPointF(t + l*p, -d));
+    }
+    this->measures[0]->SetEndPoint(QPointF(-this->drawingWidth/2, -d));
+    this->measures[1]->SetStartPoint(QPointF(this->drawingWidth/2, -d));
+
+    this->measures[0]->SetValue(
+        (this->measures[0]->line().length())*this->scale);
+    this->measures[1]->SetValue(
+        (this->measures[1]->line().length())*this->scale);
+  }
 }

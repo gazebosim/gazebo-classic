@@ -56,9 +56,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual double GetSceneRotation() const;
 
-      /// \brief Update door item when rect item is updated.
-      protected: void RectUpdated();
-
       // Documentation inherited
       private: virtual void paint(QPainter *_painter,
           const QStyleOptionGraphicsItem *_option, QWidget *_widget);
@@ -95,9 +92,6 @@ namespace gazebo
 
       /// \brief Door scene position in pixel coordinates.
       private: QPointF doorPos;
-
-      /// \brief Scale for converting from pixel to metric units.
-      private: double scale;
 
       /// \brief Inspector for configuring the door item.
       private: WindowDoorInspectorDialog *inspector;

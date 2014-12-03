@@ -75,9 +75,6 @@ namespace gazebo
         /// \brief Emit window changed Qt signals.
         public: void WindowChanged();
 
-        /// \brief Update window item when rect item is updated.
-        protected: void RectUpdated();
-
         /// \brief Depth of the window item in pixels.
         private: double windowDepth;
 
@@ -95,9 +92,6 @@ namespace gazebo
 
         /// \brief Elevation of the window item in pixels.
         private: double windowElevation;
-
-        /// \brief Scale for converting pixels to metric units.
-        private: double scale;
 
         /// \brief Inspector for configuring the window item.
         private: WindowDoorInspectorDialog *inspector;
