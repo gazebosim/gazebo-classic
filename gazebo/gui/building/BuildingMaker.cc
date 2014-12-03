@@ -1894,6 +1894,8 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
   // Highlight visual on hover
   if (vis)
   {
+    if (vis->GetTransparency() > 0.9)
+      return true;
     std::string visName = vis->GetParent()->GetName();
     // Stairs have nested visuals
     if (visName.find("Stair") != std::string::npos)
