@@ -79,12 +79,11 @@ namespace gazebo
       /// \return Normalized position on parent wall.
       public: double GetPositionOnWall() const;
 
-      /// \brief Set the amgle of this item inside its parent wall.
-      /// \param[in] _engleOnWall New angle on wall, either 0 or 180 degrees.
-      /// TODO
+      /// \brief Set the angle of this item inside its parent wall.
+      /// \param[in] _angleOnWall New angle on wall, either 0 or 180 degrees.
       public: void SetAngleOnWall(double _angleOnWall);
 
-      /// \brief Get the amgle of this item on its parent wall.
+      /// \brief Get the angle of this item inside its parent wall.
       /// \return Angle on parent wall in degrees.
       public: double GetAngleOnWall() const;
 
@@ -265,7 +264,9 @@ namespace gazebo
       /// \brief Qt action for deleting the item.
       protected: QAction *deleteItemAct;
 
-      /// \brief TODO
+      /// \brief A vector containing this item's measure items.
+      /// Currently only used for windows and doors, containing one measure
+      /// towards each end of this item's parent wall.
       protected: std::vector<MeasureItem *> measures;
 
       /// \brief Scale for converting from pixel to metric units.

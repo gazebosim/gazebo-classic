@@ -407,6 +407,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
       || editorItem->GetType() == "Door") )
   {
     editorItem->SetPositionOnWall(0);
+    editorItem->SetAngleOnWall(0);
     if (grabber->parentItem())
     {
       WallSegmentItem *wallSegmentItem =

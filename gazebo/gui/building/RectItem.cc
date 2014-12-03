@@ -157,12 +157,7 @@ void RectItem::SetHighlighted(bool _highlighted)
     this->rotateHandle->removeSceneEventFilter(this);
     this->Set3dTransparency(0.4);
   }
-  for (unsigned int j = 0; j < this->measures.size(); ++j)
-  {
-    this->measures[j]->setVisible(_highlighted && (this->parentItem() != NULL));
-  }
   this->highlighted = _highlighted;
-  emit TransparencyChanged(this->visual3dTransparency);
   this->UpdateMeasures();
 }
 
