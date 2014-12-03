@@ -46,17 +46,19 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
-    // Enums to keep track of saved state:
-    // NEVER_SAVED: The building has never been saved
-    // SAVED: The building has been saved through the "Save As" dialog
-    // NAME_CHANGED: The building experienced the "Save As" dialog, then the
-    // name was changed, and it has not been saved through "Save As" since.
-    enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
-
     /// \class BuildingMaker BuildingMaker.hh
     /// \brief Create and manage 3D visuals of a building.
     class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      // NEVER_SAVED: The building has never been saved
+      // SAVED: The building has been saved through the "Save As" dialog
+      // NAME_CHANGED: The building experienced the "Save As" dialog, then the
+      // name was changed, and it has not been saved through "Save As" since.
+      private: enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
+    
+
       /// \brief Constructor
       public: BuildingMaker();
 
