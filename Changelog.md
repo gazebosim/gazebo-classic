@@ -6,13 +6,13 @@
     * [Pull request #1278](https://bitbucket.org/osrf/gazebo/pull-request/1278)
     * [Issue #1327](https://bitbucket.org/osrf/gazebo/issue/1327)
 
-1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI. 
+1. Added a GUI timer plugin that facilitates the display and control a timer inside the Gazebo UI.
     * [Pull request #1270](https://bitbucket.org/osrf/gazebo/pull-request/1270)
 
-1. Added ability to load plugins via SDF. 
+1. Added ability to load plugins via SDF.
     * [Pull request #1261](https://bitbucket.org/osrf/gazebo/pull-request/1261)
 
-1. Added GUIEvent to hide/show the left GUI pane. 
+1. Added GUIEvent to hide/show the left GUI pane.
     * [Pull request #1269](https://bitbucket.org/osrf/gazebo/pull-request/1269)
 
 1. Modified KeyEventHandler and GLWidget so that hotkeys can be suppressed by custom KeyEvents set up by developers
@@ -66,7 +66,7 @@
 1. Added GLWidget::OnModelEditor when model editor is triggered, and MainWindow::OnEditorGroup to manually uncheck editor actions.
     * [Pull request #1283](https://bitbucket.org/osrf/gazebo/pull-request/1283)
 
-1. Added Link, Collision, Geometry, Inertial, Surface Msg-to-SDF conversion functions.
+1. Added Collision, Geometry, Inertial, Surface Msg-to-SDF conversion functions.
     * [Pull request #1315](https://bitbucket.org/osrf/gazebo/pull-request/1315)
 
 1. Building editor updates

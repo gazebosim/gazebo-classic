@@ -1233,7 +1233,7 @@ namespace gazebo
       sdf::ElementPtr physicsEngElem = contactElem->GetElement("ode");
       if (_msg.has_soft_cfm())
         physicsEngElem->GetElement("soft_cfm")->Set(_msg.soft_cfm());
-      if (_msg.has_soft_cfm())
+      if (_msg.has_soft_erp())
         physicsEngElem->GetElement("soft_erp")->Set(_msg.soft_erp());
       if (_msg.has_kp())
         physicsEngElem->GetElement("kp")->Set(_msg.kp());

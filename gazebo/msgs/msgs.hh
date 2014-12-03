@@ -314,7 +314,8 @@ namespace gazebo
     sdf::ElementPtr CollisionToSDF(const msgs::Collision &_msg,
         sdf::ElementPtr _sdf = sdf::ElementPtr());
 
-    /// \brief Create an SDF element from a msgs::Link
+    /// \internal
+    /// \brief Create an SDF element from a msgs::Link.
     /// \param[in] _msg Link messsage
     /// \param[in] _sdf if supplied, performs an update from _msg intead of
     /// creating a new sdf element.
