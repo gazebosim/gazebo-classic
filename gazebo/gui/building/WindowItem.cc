@@ -236,27 +236,30 @@ void WindowItem::RectUpdated()
     this->measures[1]->setVisible(false);
   }
 
-  for (unsigned int j = 0; j < this->measures.size(); ++j)
-  {
-    this->measures[j]->setVisible(this->highlighted && (this->parentWall != NULL));
-  }
+  this->measures[0]->setVisible(this->highlighted &&
+      (this->parentItem() != NULL));
+  this->measures[1]->setVisible(this->highlighted &&
+      (this->parentItem() != NULL));
 
-  if (this->parentWall)
+  if (this->parentItem())
   {
-    double d = 20 + this->windowDepth/2;
-    double t = this->parentWall->GetThickness();
-    double l = this->parentWall->line().length();
+    WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+        this->parentItem());
+
+    double d = 20 + this->windowDepth/2.0;
+    double t = wallItem->GetThickness()/2.0;
+    double l = wallItem->line().length();
     double p = this->GetPositionOnWall();
 
     if (this->GetAngleOnWall() < 90)
     {
-      this->measures[0]->SetStartPoint(QPointF(-(t*0.5 + l*p), -d));
-      this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*(1-p), -d));
+      this->measures[0]->SetStartPoint(QPointF(-(t + l*p), -d));
+      this->measures[1]->SetEndPoint(QPointF(t + l*(1-p), -d));
     }
     else
     {
-      this->measures[0]->SetStartPoint(QPointF(-(t*0.5 + l*(1-p)), -d));
-      this->measures[1]->SetEndPoint(QPointF(t*0.5 + l*p, -d));
+      this->measures[0]->SetStartPoint(QPointF(-(t + l*(1-p)), -d));
+      this->measures[1]->SetEndPoint(QPointF(t + l*p, -d));
     }
     this->measures[0]->SetEndPoint(QPointF(-this->windowWidth/2, -d));
     this->measures[1]->SetStartPoint(QPointF(this->windowWidth/2, -d));

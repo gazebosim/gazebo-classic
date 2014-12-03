@@ -39,7 +39,6 @@ RectItem::RectItem()
 
   this->positionOnWall = 0;
   this->angleOnWall = 0;
-  this->parentWall = NULL;
 
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
@@ -160,7 +159,7 @@ void RectItem::SetHighlighted(bool _highlighted)
   }
   for (unsigned int j = 0; j < this->measures.size(); ++j)
   {
-    this->measures[j]->setVisible(_highlighted && (this->parentWall != NULL));
+    this->measures[j]->setVisible(_highlighted && (this->parentItem() != NULL));
   }
   this->highlighted = _highlighted;
   emit TransparencyChanged(this->visual3dTransparency);
@@ -490,10 +489,23 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(-angle) * deltaWidth/2;
         dy = -sin(-angle) * deltaWidth/2;
         this->SetPosition(this->pos() - QPointF(dx, dy));
-        if (this->parentWall)
+        if (this->parentItem())
         {
-          this->positionOnWall -= deltaWidth /
-              (2*this->parentWall->line().length());
+          WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+              this->parentItem());
+          if (wallItem)
+          {
+            if (this->GetAngleOnWall() < 90)
+            {
+              this->positionOnWall -= deltaWidth /
+                  (2*wallItem->line().length());
+            }
+            else
+            {
+              this->positionOnWall += deltaWidth /
+                  (2*wallItem->line().length());
+            }
+          }
         }
         break;
       }
@@ -509,10 +521,23 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
         dx = cos(angle) * deltaWidth/2;
         dy = sin(angle) * deltaWidth/2;
         this->SetPosition(this->pos() + QPointF(dx, dy));
-        if (this->parentWall)
+        if (this->parentItem())
         {
-          this->positionOnWall += deltaWidth /
-              (2*this->parentWall->line().length());
+          WallSegmentItem *wallItem = dynamic_cast<WallSegmentItem *>(
+              this->parentItem());
+          if (wallItem)
+          {
+            if (this->GetAngleOnWall() < 90)
+            {
+              this->positionOnWall += deltaWidth /
+                  (2*wallItem->line().length());
+            }
+            else
+            {
+              this->positionOnWall -= deltaWidth /
+                  (2*wallItem->line().length());
+            }
+          }
         }
         break;
       }
@@ -718,11 +743,9 @@ double RectItem::GetHeight() const
 }
 
 /////////////////////////////////////////////////
-void RectItem::SetPositionOnWall(double _positionOnWall,
-    WallSegmentItem *_wall)
+void RectItem::SetPositionOnWall(double _positionOnWall)
 {
   this->positionOnWall = _positionOnWall;
-  this->parentWall = _wall;
   this->RectUpdated();
 }
 

@@ -73,9 +73,7 @@ namespace gazebo
 
       /// \brief Set the position of this item inside its parent wall.
       /// \param[in] _positionOnWall New normalized position on wall.
-      /// TODO
-      public: void SetPositionOnWall(double _positionOnWall,
-          WallSegmentItem *_wall);
+      public: void SetPositionOnWall(double _positionOnWall);
 
       /// \brief Get the position of this item inside its parent wall.
       /// \return Normalized position on parent wall.
@@ -266,9 +264,6 @@ namespace gazebo
 
       /// \brief Qt action for deleting the item.
       protected: QAction *deleteItemAct;
-
-      /// \brief TODO
-      protected: WallSegmentItem *parentWall;
 
       /// \brief TODO
       protected: std::vector<MeasureItem *> measures;

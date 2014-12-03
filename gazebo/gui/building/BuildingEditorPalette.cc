@@ -60,7 +60,7 @@ BuildingEditorPalette::BuildingEditorPalette(QWidget *_parent)
   wallButton->setIcon(QPixmap(":/images/wall.svg"));
   wallButton->setText("Wall");
   wallButton->setIconSize(QSize(iconSize));
-  wallButton->setToolTip("Hold Shift to snap while drawing");
+  wallButton->setToolTip("Hold Shift to override snapping");
   connect(wallButton, SIGNAL(clicked()), this, SLOT(OnDrawWall()));
 
   // Features label
