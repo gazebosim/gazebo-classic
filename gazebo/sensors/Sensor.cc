@@ -19,6 +19,12 @@
  * Date: 25 May 2007
  */
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/transport.hh"
