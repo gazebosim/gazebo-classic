@@ -19,6 +19,7 @@
 #define _STAIRS_INSPECTOR_DIALOG_HH_
 
 #include <string>
+#include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -62,6 +63,10 @@ namespace gazebo
       /// \return Number of steps in the staircase.
       public: int GetSteps() const;
 
+      /// \brief Get the color of the staircase.
+      /// \return Stairs color.
+      public: QColor GetColor() const;
+
       /// \brief Set the name of the staircase.
       /// \param[in] _name Name to set to.
       public: void SetName(const std::string &_name);
@@ -85,6 +90,10 @@ namespace gazebo
       /// \brief Set the number of steps in the staircase.
       /// \param[in] _steps Number of steps.
       public: void SetSteps(int _steps);
+
+      /// \brief Set the color of the staircase.
+      /// \param[in] _color Color.
+      public: void SetColor(const QColor _color);
 
       /// \brief Qt signal emitted to indicate that changes should be applied.
       Q_SIGNALS: void Applied();
@@ -120,6 +129,12 @@ namespace gazebo
 
       /// \brief Label that holds the name of the staircase.
       private: QLabel* stairsNameLabel;
+
+      /// \brief Combo box for selecting the color of the staircase.
+      private: QComboBox *colorComboBox;
+
+      /// \brief Vector of color options.
+      private: std::vector<QColor> colorList;
     };
     /// \}
   }

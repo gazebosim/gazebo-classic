@@ -50,9 +50,8 @@ namespace gazebo
       public: virtual ~CameraVisual();
 
       /// \brief Load the Visual
-      /// \param[in] _width Width of the Camera image
-      /// \param[in] _height Height of the Camera image
-      public: void Load(unsigned int _width, unsigned int _height);
+      /// \param[in] _msg Message describing the camera sensor.
+      public: void Load(const msgs::CameraSensor &_msg);
       using Visual::Load;
 
       /// \brief Update the visual

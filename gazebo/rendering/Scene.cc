@@ -1825,15 +1825,18 @@ void Scene::PreRender()
       for (int i = 0; i < (*spIter)->pose_size(); i++)
       {
         const msgs::Pose& pose_msg = (*spIter)->pose(i);
-        Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
-        if (iter2 != this->visuals.end())
+        if (pose_msg.has_id())
         {
-          // If an object is selected, don't let the physics engine move it.
-          if (!this->selectedVis || this->selectionMode != "move" ||
-              iter->first != this->selectedVis->GetId())
+          Visual_M::iterator iter2 = this->visuals.find(pose_msg.id());
+          if (iter2 != this->visuals.end())
           {
-            math::Pose pose = msgs::Convert(pose_msg);
-            iter2->second->SetPose(pose);
+            // If an object is selected, don't let the physics engine move it.
+            if (!this->selectedVis || this->selectionMode != "move" ||
+              iter->first != this->selectedVis->GetId())
+            {
+              math::Pose pose = msgs::Convert(pose_msg);
+              iter2->second->SetPose(pose);
+            }
           }
         }
       }
@@ -1951,11 +1954,8 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
         parentVis->AttachVisual(cameraVis);
 
         cameraVis->SetPose(msgs::Convert(_msg->pose()));
-
         cameraVis->SetId(_msg->id());
-        cameraVis->Load(_msg->camera().image_size().x(),
-            _msg->camera().image_size().y());
-
+        cameraVis->Load(_msg->camera());
         this->visuals[cameraVis->GetId()] = cameraVis;
       }
     }
@@ -2064,7 +2064,7 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
     return false;
 
   JointVisualPtr jointVis(new JointVisual(
-        _msg->name() + "_JOINT_VISUAL__", childVis));
+      _msg->name() + "_JOINT_VISUAL__", childVis));
   jointVis->Load(_msg);
   jointVis->SetVisible(this->showJoints);
   if (_msg->has_id())

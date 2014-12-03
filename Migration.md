@@ -1,4 +1,75 @@
+## Gazebo 4.X to 5.X
+
+### Modifications
+
+1. **gazebo/math/Box.hh**
+    + The constructor that takes two math::Vector3 values now treats these as two corners, and computes the minimum and maximum values automatically. This change is API and ABI compatible.
+
+1. **Informational logs:** The log files will be created inside
+  ~/.gazebo/server-<GAZEBO_MASTER_PORT> and
+  ~/.gazebo/client-<GAZEBO_MASTER_PORT>. The motivation for this
+  change is to avoid name collisions when cloning a simulation. If the
+  environment variable GAZEBO_MASTER_URI is not present or invalid,
+  <GAZEBO_MASTER_PORT> will be replaced by "default".
+
+1. **gazebo/common/Plugin.hh**
+    + ***Removed:*** protected: std::string Plugin::handle
+    + ***Replacement:*** protected: std::string Plugin::handleName
+
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Removed:*** public: void HandlePress(const common::KeyEvent &_event);
+    + ***Replacement:*** public: bool HandlePress(const common::KeyEvent &_event);
+
+1. **gazebo/gui/KeyEventHandler.hh**
+    + ***Removed:*** public: void HandleRelease(const common::KeyEvent &_event);
+    + ***Replacement:*** public: bool HandleRelease(const common::KeyEvent &_event);
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Removed:*** private: void OnJoy(ConstJoystickPtr &_msg)
+    + ***Replacement:*** private: void OnJoyTwist(ConstJoystickPtr &_msg)
+
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** public: void RotatePitch(math::Angle _angle);
+    + ***Replacement:*** public: void Pitch(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    + ***Deprecation:*** public: void RotateYaw(math::Angle _angle);
+    + ***Replacement:*** public: void Yaw(const math::Angle &_angle,
+                                        Ogre::Node::TransformSpace _relativeTo = Ogre::Node::TS_LOCAL);
+    
+1. **gazebo/rendering/AxisVisual.hh**
+    + ***Removed:*** public: void ShowRotation(unsigned int _axis)
+    + ***Replacement:*** public: void ShowAxisRotation(unsigned int _axis, bool _show)
+
+1. **gazebo/rendering/ArrowVisual.hh**
+    + ***Removed:*** public: void ShowRotation()
+    + ***Replacement:*** public: void ShowRotation(bool _show)
+
+### Deletions
+
+1. **gazebo/physics/Collision.hh**
+    + unsigned int GetShapeType()
+
 ## Gazebo 3.1 to 4.0
+
+### New Deprecations
+
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation*** unsigned int GetShapeType()
+    + ***Replacement*** unsigned int GetShapeType() const
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation*** virtual double GetMaxForce(unsigned int)
+    + ***Deprecation*** virtual void SetMaxForce(unsigned int, double)
+    + ***Deprecation*** virtual void SetAngle(unsigned int, math::Angle)
+    + ***Replacement*** virtual void SetPosition(unsigned int, double)
+
+### Modifications
+1. **gazebo/physics/Model.hh**
+    + ***Removed:*** Link_V GetLinks() const `ABI Change`
+    + ***Replacement:***  const Link_V &GetLinks() const
+
+1. **gzprop command line tool**
+    + The `gzprop` command line tool outputs a zip file instead of a tarball.
 
 ### Additions
 
@@ -30,6 +101,21 @@
 1. **gazebo/math/Filter.hh**
     + ***New classes:*** Filter, OnePole, OnePoleQuaternion, OnePoleVector3, BiQuad, and BiQuadVector3
 
+1. **gazebo/physics/Joint.hh**
+      + bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks);
+      + math::Pose ComputeChildLinkPose( unsigned int _index,
+          double _position);
+
+1. **gazebo/physics/Link.hh**
+      + void Move(const math::Pose &_worldRefernceFrameSrc,
+                        const math::Pose &_worldRefernceFrameDst);
+      + bool FindAllConnectedLinksHelper(
+          const LinkPtr &_originalParentLink,
+          Link_V &_connectedLinks, bool _fistLink = false);
+      + bool ContainsLink(const Link_V &_vector, const LinkPtr &_value);
+      + msgs::Visual GetVisualMessage(const std::string &_name)
+
 ### Modifications
 1. **gazebo/physics/Model.hh**
     + ***Removed:*** Link_V GetLinks() const `ABI Change`
@@ -42,6 +128,10 @@
 ## Gazebo 3.0 to 3.1
 
 ### Additions
+
+1. **gazebo/physics/World.hh**
+      + void RemoveModel(const std::string &_name);
+      + void RemoveModel(ModelPtr _model);
 
 1. **gazebo/physics/JointController.hh**
     + void SetPositionPID(const std::string &_jointName, const common::PID &_pid);

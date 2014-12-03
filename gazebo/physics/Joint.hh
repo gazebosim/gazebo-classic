@@ -282,7 +282,17 @@ namespace gazebo
       /// \return Velocity limit specified in SDF
       public: virtual double GetVelocityLimit(unsigned int _index);
 
+      /// \brief Set the velocity limit on a joint axis.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _velocity Velocity limit for the axis.
+      public: virtual void SetVelocityLimit(unsigned int _index,
+                                                  double _velocity);
+
       /// \brief Set the velocity of an axis(index).
+      /// In ODE and Bullet, the SetVelocityMaximal function is used to
+      /// set the velocity of the child link relative to the parent.
+      /// In Simbody and DART, this function updates the velocity state,
+      /// which has a recursive effect on the rest of the chain.
       /// \param[in] _index Index of the axis.
       /// \param[in] _vel Velocity.
       public: virtual void SetVelocity(unsigned int _index, double _vel) = 0;
@@ -352,14 +362,17 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Maximum force that can be applied to the axis.
-      public: virtual void SetMaxForce(unsigned int _index, double _force) = 0;
+      public: virtual void SetMaxForce(unsigned int _index, double _force)
+              GAZEBO_DEPRECATED(5.0) = 0;
 
-      /// \brief Get the max allowed force of an axis(index).
+      /// \brief Get the max allowed force of an axis(index) when using
+      /// Joint::SetVelocity.
       /// Note that the unit of force should be consistent with the rest
       /// of the simulation scales.
       /// \param[in] _index Index of the axis.
       /// \return The maximum force.
-      public: virtual double GetMaxForce(unsigned int _index) = 0;
+      public: virtual double GetMaxForce(unsigned int _index)
+              GAZEBO_DEPRECATED(5.0) = 0;
 
       /// \brief Get the angle of rotation of an axis(index)
       /// \param[in] _index Index of the axis.
@@ -374,13 +387,43 @@ namespace gazebo
       /// this Joint as a scalar inside the Joint class, so
       /// this call will NOT move the joint dynamically for a static Model.
       /// But if this Model is not static, then it is updated dynamically.
-      /// The child link of this joint is updated based on position change.
+      /// The child links of this joint are updated based on position change.
       /// And all the links connected to the child link of this joint
       /// except through the parent link of this joint moves with the child
       /// link.
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Angle to set the joint to.
-      public: void SetAngle(unsigned int _index, math::Angle _angle);
+      public: void SetAngle(unsigned int _index, math::Angle _angle)
+              GAZEBO_DEPRECATED(4.0);
+
+      /// \brief The child links of this joint are updated based on desired
+      /// position.  And all the links connected to the child link of this joint
+      /// except through the parent link of this joint moves with the child
+      /// link.
+      /// \param[in] _index Index of the joint axis (degree of freedom).
+      /// \param[in] _position Position to set the joint to.
+      /// unspecified, pure kinematic teleportation.
+      /// \return returns true if operation succeeds, false if it fails.
+      public: virtual bool SetPosition(unsigned int _index, double _position);
+
+      /// \brief Helper function for maximal coordinate solver SetPosition.
+      /// The child links of this joint are updated based on position change.
+      /// And all the links connected to the child link of this joint
+      /// except through the parent link of this joint moves with the child
+      /// link.
+      /// \param[in] _index Index of the joint axis (degree of freedom).
+      /// \param[in] _position Position to set the joint to.
+      /// \return returns true if operation succeeds, false if it fails.
+      protected: bool SetPositionMaximal(unsigned int _index, double _position);
+
+      /// \brief Helper function for maximal coordinate solver SetVelocity.
+      /// The velocity of the child link of this joint is updated relative
+      /// to the current parent velocity.
+      /// It currently does not act recursively.
+      /// \param[in] _index Index of the joint axis (degree of freedom).
+      /// \param[in] _velocity Velocity to set at this joint.
+      /// \return returns true if operation succeeds, false if it fails.
+      protected: bool SetVelocityMaximal(unsigned int _index, double _velocity);
 
       /// \brief Get the forces applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -401,6 +444,10 @@ namespace gazebo
 
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
+      /// List of parameters:
+      ///  "friction"     Axis Coulomb joint friction coefficient.
+      ///  "hi_stop"      Axis upper limit.
+      ///  "lo_stop"      Axis lower limit.
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       /// \param[in] _value Value of the attribute.
@@ -409,6 +456,7 @@ namespace gazebo
                                     const boost::any &_value) = 0;
 
       /// \brief Get a non-generic parameter for the joint.
+      /// \sa SetParam(const std::string &, unsigned int, const boost::any)
       /// \param[in] _key String key.
       /// \param[in] _index Index of the axis.
       public: virtual double GetParam(const std::string &_key,

@@ -63,10 +63,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(0, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -82,10 +78,6 @@ void BulletJoint::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr dynamicsElem = axisElem->GetElement("dynamics");
 
-      if (dynamicsElem->HasElement("damping"))
-      {
-        this->SetDamping(1, dynamicsElem->Get<double>("damping"));
-      }
       if (dynamicsElem->HasElement("friction"))
       {
         sdf::ElementPtr frictionElem = dynamicsElem->GetElement("friction");
@@ -550,10 +542,21 @@ bool BulletJoint::SetParam(const std::string &/*_key*/,
 }
 
 //////////////////////////////////////////////////
-double BulletJoint::GetParam(const std::string &/*_key*/,
-    unsigned int /*_index*/)
+double BulletJoint::GetParam(const std::string &_key,
+    unsigned int _index)
 {
-  gzdbg << "Not implement in Bullet\n";
+  if (_key == "hi_stop")
+  {
+    return this->GetHighStop(_index).Radian();
+  }
+  else if (_key == "lo_stop")
+  {
+    return this->GetLowStop(_index).Radian();
+  }
+  gzerr << "GetParam unrecognized parameter ["
+        << _key
+        << "]"
+        << std::endl;
   return 0;
 }
 
@@ -567,4 +570,10 @@ math::Angle BulletJoint::GetHighStop(unsigned int _index)
 math::Angle BulletJoint::GetLowStop(unsigned int _index)
 {
   return this->GetLowerLimit(_index);
+}
+
+//////////////////////////////////////////////////
+bool BulletJoint::SetPosition(unsigned int _index, double _position)
+{
+  return Joint::SetPositionMaximal(_index, _position);
 }

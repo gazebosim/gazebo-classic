@@ -72,6 +72,11 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   connect(this->dataPtr->watcher, SIGNAL(directoryChanged(const QString &)),
           this, SLOT(OnDirectoryChanged(const QString &)));
 
+  // Connect a callback to trigger when the model paths are updated.
+  this->connections.push_back(
+          common::SystemPaths::Instance()->updateModelRequest.Connect(
+            boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
+
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
 
@@ -150,6 +155,7 @@ void InsertModelWidget::OnModels(
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   if (_item)
   {
     std::string path, filename;
@@ -292,5 +298,13 @@ void InsertModelWidget::UpdateAllLocalPaths()
 /////////////////////////////////////////////////
 void InsertModelWidget::OnDirectoryChanged(const QString &_path)
 {
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->UpdateLocalPath(_path.toStdString());
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::OnModelUpdateRequest(const std::string &_path)
+{
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  this->UpdateLocalPath(_path);
 }

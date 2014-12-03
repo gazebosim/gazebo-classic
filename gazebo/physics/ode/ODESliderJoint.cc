@@ -88,9 +88,9 @@ double ODESliderJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODESliderJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODESliderJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

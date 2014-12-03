@@ -47,17 +47,21 @@ CameraVisual::~CameraVisual()
 }
 
 /////////////////////////////////////////////////
-void CameraVisual::Load(unsigned int _width, unsigned int _height)
+void CameraVisual::Load(const msgs::CameraSensor &_msg)
 {
   CameraVisualPrivate *dPtr =
       reinterpret_cast<CameraVisualPrivate *>(this->dataPtr);
 
+  math::Vector2d imageSize = msgs::Convert(_msg.image_size());
+
   double dist = 2.0;
   double width = 1.0;
-  double height = _height / static_cast<double>(_width);
+  double height = imageSize.y / static_cast<double>(imageSize.x);
 
   dPtr->camera = dPtr->scene->CreateCamera(this->GetName(), false);
-  dPtr->camera->Load();
+
+  sdf::ElementPtr cameraElem = msgs::CameraSensorToSDF(_msg);
+  dPtr->camera->Load(cameraElem);
   dPtr->camera->Init();
   dPtr->camera->CreateRenderTexture(this->GetName() + "_RTT");
 

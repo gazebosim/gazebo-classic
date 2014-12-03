@@ -104,7 +104,7 @@ namespace gazebo
       /// \brief Get the shape type.
       /// \return The shape type.
       /// \sa EntityType
-      public: unsigned int GetShapeType();
+      public: unsigned int GetShapeType() const;
 
       /// \brief Set the shape for this collision.
       /// \param[in] _shape The shape for this collision object.

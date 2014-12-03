@@ -49,8 +49,6 @@ ODEHingeJoint::~ODEHingeJoint()
 void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 {
   HingeJoint<ODEJoint>::Load(_sdf);
-
-  this->SetParam(dParamFMax, 0);
 }
 
 //////////////////////////////////////////////////
@@ -140,11 +138,9 @@ double ODEHingeJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetVelocity(unsigned int /*index*/, double _angle)
+void ODEHingeJoint::SetVelocity(unsigned int _index, double _angle)
 {
-  /// \TODO: FIXME: change this implementation to kinematic velocity setting
-  // similar to BulletHingeJoint::SetVelocity
-  this->SetParam(dParamVel, _angle);
+  this->SetVelocityMaximal(_index, _angle);
 }
 
 //////////////////////////////////////////////////

@@ -719,8 +719,6 @@ unsigned int Visual::GetAttachedObjectCount() const
 void Visual::DetachObjects()
 {
   this->dataPtr->sceneNode->detachAllObjects();
-  this->dataPtr->meshName = "";
-  this->dataPtr->subMeshName = "";
 }
 
 //////////////////////////////////////////////////
@@ -766,22 +764,18 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   if (_meshName.empty())
     return NULL;
 
-  this->dataPtr->meshName = _meshName;
-  this->dataPtr->subMeshName = _subMesh;
-
   Ogre::MovableObject *obj;
   std::string objName = _objName;
-  std::string entityMeshName = _meshName;
-  entityMeshName += _subMesh.empty() ? "" : "::" + _subMesh;
+  std::string meshName = _meshName;
+  meshName += _subMesh.empty() ? "" : "::" + _subMesh;
 
   if (objName.empty())
-    objName = this->dataPtr->sceneNode->getName() + "_ENTITY_" + entityMeshName;
+    objName = this->dataPtr->sceneNode->getName() + "_ENTITY_" + meshName;
 
   this->InsertMesh(_meshName, _subMesh, _centerSubmesh);
 
   obj = (Ogre::MovableObject*)
-      (this->dataPtr->sceneNode->getCreator()->createEntity(
-      objName, entityMeshName));
+      (this->dataPtr->sceneNode->getCreator()->createEntity(objName, meshName));
 
   this->AttachObject(obj);
   return obj;
@@ -2291,11 +2285,6 @@ bool Visual::IsPlane() const
 //////////////////////////////////////////////////
 std::string Visual::GetMeshName() const
 {
-  if (!this->dataPtr->meshName.empty())
-  {
-    return this->dataPtr->meshName;
-  }
-
   if (this->dataPtr->sdf->HasElement("geometry"))
   {
     sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
@@ -2334,11 +2323,6 @@ std::string Visual::GetMeshName() const
 //////////////////////////////////////////////////
 std::string Visual::GetSubMeshName() const
 {
-  if (!this->dataPtr->subMeshName.empty())
-  {
-    return this->dataPtr->subMeshName;
-  }
-
   std::string result;
 
   if (this->dataPtr->sdf->HasElement("geometry"))

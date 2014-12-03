@@ -140,6 +140,10 @@ namespace gazebo
       public: void DetachManip(const std::string &_child,
           const std::string &_parent);
 
+      /// \brief Detach all child building parts from the given manip.
+      /// \param[in] _manip Name of the building part.
+      public: void DetachAllChildren(const std::string &_manip);
+
       /// \brief Helper method to convert size from editor coordinate system
       /// to Gazebo coordinate system.
       /// \param[in] _size Size vector in pixels.
@@ -242,14 +246,16 @@ namespace gazebo
         const std::vector<QRectF> &_holes, std::vector<QRectF> &_subdivisions);
 
       /// \brief Callback for saving the model.
-      private: void OnSave();
+      /// \param[in] _saveName Name to save the model.
+      private: void OnSave(const std::string &_saveName = "");
 
       /// \brief Callback for discarding the model.
       private: void OnDiscard();
 
       /// \brief Callback when the model is to be finished and uploaded on to
       /// the server.
-      private: void OnDone();
+      /// \param[in] _saveName Name to save the model.
+      private: void OnDone(const std::string &_saveName = "");
 
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();

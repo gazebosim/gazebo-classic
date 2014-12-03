@@ -90,6 +90,10 @@ namespace gazebo
       /// \brief Reset the model.
       public: void Reset();
 
+      /// \brief Reset the velocity, acceleration, force and torque of
+      /// all child links.
+      public: void ResetPhysicsStates();
+
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
       public: void SetLinearVel(const math::Vector3 &_vel);

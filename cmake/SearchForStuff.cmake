@@ -67,12 +67,6 @@ endif ()
 ########################################
 # Find packages
 if (PKG_CONFIG_FOUND)
-
-  pkg_check_modules(SDF sdformat>=2.0.0)
-  if (NOT SDF_FOUND)
-    BUILD_ERROR ("Missing: SDF. Required for reading and writing SDF files.")
-  endif()
-
   pkg_check_modules(CURL libcurl)
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
@@ -137,13 +131,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.0 QUIET)
+  find_package(DARTCore 4.1 QUIET)
   if (DARTCore_FOUND)
     message (STATUS "Looking for DARTCore - found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -391,6 +385,18 @@ else (PKG_CONFIG_FOUND)
   BUILD_ERROR ("Error: pkg-config not found")
 endif ()
 
+########################################
+# Find SDFormat
+find_package(SDFormat 2.1.0)
+if (NOT SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat - not found")
+  BUILD_ERROR ("Missing: SDF version >=2.1.0. Required for reading and writing SDF files.")
+else()
+  message (STATUS "Looking for SDFormat - found")
+endif()
+
+########################################
+# Find QT
 find_package (Qt4)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
@@ -469,6 +475,18 @@ endif()
 include (${gazebo_cmake_dir}/Ronn2Man.cmake)
 include (${gazebo_cmake_dir}/Man.cmake)
 add_manpage_target()
+
+########################################
+# Find Space Navigator header and library
+find_library(SPNAV_LIBRARY NAMES spnav)
+find_file(SPNAV_HEADER NAMES spnav.h)
+if (SPNAV_LIBRARY AND SPNAV_HEADER)
+  message(STATUS "Looking for libspnav and spnav.h - found")
+  set(HAVE_SPNAV TRUE)
+else()
+  message(STATUS "Looking for libspnav and spnav.h - not found")
+  set(HAVE_SPNAV FALSE)
+endif()
 
 ########################################
 # Find QWT (QT graphing library)

@@ -80,7 +80,7 @@ namespace gazebo
       private slots: void OnDeleteItem();
 
       /// \brief Emit stairs changed Qt signals.
-      private: void StairsChanged();
+      public: void StairsChanged();
 
       /// \brief Emit steps changed Qt signals.
       private: void StepsChanged();

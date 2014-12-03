@@ -199,10 +199,11 @@ void OculusCamera::Update()
   Camera::Update();
 
   OVR::Quatf q = this->sensorFusion->GetPredictedOrientation();
-  math::Quaternion quat(q.w, -q.z, -q.x, q.y);
 
   // Set the orientation, and correct for the oculus coordinate system
-  this->SetWorldRotation(quat);
+  this->sceneNode->setOrientation(Ogre::Quaternion(q.w, -q.z, -q.x, q.y));
+
+  this->sceneNode->needUpdate();
 }
 
 //////////////////////////////////////////////////
@@ -250,8 +251,8 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
       pitch = acos(zDiff/dist);
     }
 
-    this->RotateYaw(yaw);
-    this->RotatePitch(pitch);
+    this->Yaw(yaw);
+    this->Pitch(pitch);
 
     math::Box bb = _visual->GetBoundingBox();
     math::Vector3 pos = bb.GetCenter();

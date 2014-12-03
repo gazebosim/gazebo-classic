@@ -1223,6 +1223,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   }
   else if (typeElem->FirstChildElement("texture"))
   {
+    _mat->SetLighting(true);
     TiXmlElement *imageXml = NULL;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
@@ -1313,6 +1314,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
   const unsigned int TEXCOORD = 2;
+  unsigned int otherSemantics = TEXCOORD + 1;
   bool hasVertices = false;
   bool hasNormals = false;
   bool hasTexcoords = false;
@@ -1358,8 +1360,9 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
     }
     else
     {
+      inputs[otherSemantics++] = math::parseInt(offset);
       gzwarn << "Polylist input semantic: '" << semantic << "' is currently"
-          << "not supported" << std::endl;
+          << " not supported" << std::endl;
     }
 
     polylistInputXml = polylistInputXml->NextSiblingElement("input");
@@ -1518,10 +1521,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                   subMesh->GetVertex(newVertIndex));
               Skeleton *skel = _mesh->GetSkeleton();
               for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
+                  i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
               {
                 std::pair<std::string, double> node_weight =
-                  skel->GetVertNodeWeight(values[daeVertIndex], i);
+                  skel->GetVertNodeWeight(daeVertIndex, i);
                 SkeletonNode *node =
                     _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
                 subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
@@ -1610,6 +1613,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   const unsigned int VERTEX = 0;
   const unsigned int NORMAL = 1;
   const unsigned int TEXCOORD = 2;
+  unsigned int otherSemantics = TEXCOORD + 1;
   bool hasVertices = false;
   bool hasNormals = false;
   bool hasTexcoords = false;
@@ -1652,8 +1656,9 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     }
     else
     {
+      inputs[otherSemantics++] = math::parseInt(offset);
       gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
-          << "not supported" << std::endl;
+          << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
     offsetSize++;

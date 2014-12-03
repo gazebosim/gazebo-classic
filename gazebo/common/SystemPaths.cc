@@ -34,7 +34,6 @@
 using namespace gazebo;
 using namespace common;
 
-
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
 {
@@ -175,12 +174,11 @@ void SystemPaths::UpdateModelPaths()
   char *pathCStr = getenv("GAZEBO_MODEL_PATH");
   if (!pathCStr || *pathCStr == '\0')
   {
-    // gzdbg << "gazeboPaths is empty and GAZEBO_RESOURCE_PATH doesn't exist. "
-    //  << "Set GAZEBO_RESOURCE_PATH to gazebo's installation path. "
-    //  << "...or are you using SystemPlugins?\n";
-    return;
+    // No env var; take the compile-time default.
+    path = GAZEBO_MODEL_PATH;
   }
-  path = pathCStr;
+  else
+    path = pathCStr;
 
   /// \TODO: Use boost to split string.
   size_t pos1 = 0;
@@ -488,6 +486,13 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(delim, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddModelPathsUpdate(const std::string &_path)
+{
+  this->AddModelPaths(_path);
+  updateModelRequest(_path);
 }
 
 /////////////////////////////////////////////////
