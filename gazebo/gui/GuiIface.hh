@@ -28,6 +28,8 @@ namespace gazebo
 {
   namespace gui
   {
+    class MainWindow;
+
     /// \brief Load the graphical interface.
     /// \return True on success.
     GAZEBO_VISIBLE
@@ -52,6 +54,10 @@ namespace gazebo
     rendering::UserCameraPtr get_active_camera();
     GAZEBO_VISIBLE
     void clear_active_camera();
+
+    /// \brief Return a pointer to the main graphical window.
+    GAZEBO_VISIBLE
+    MainWindow *get_main_window();
 
     GAZEBO_VISIBLE
     unsigned int get_entity_id(const std::string &_name);

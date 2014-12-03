@@ -182,6 +182,11 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
   sdf::ElementPtr solverElem = odeElem->GetElement("solver");
 
   this->stepType = solverElem->Get<std::string>("type");
+  if (solverElem->HasElement("use_dynamic_moi_rescaling"))
+  {
+    dWorldSetQuickStepInertiaRatioReduction(this->worldId,
+      solverElem->Get<bool>("use_dynamic_moi_rescaling"));
+  }
 
   dWorldSetDamping(this->worldId, 0.0001, 0.0001);
 

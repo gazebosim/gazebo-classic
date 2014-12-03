@@ -25,14 +25,14 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   : QGraphicsItem(_parent)
 {
   this->index = _index;
-  this-> mouseDownX = 0;
-  this-> mouseDownY = 0;
+  this->mouseDownX = 0;
+  this->mouseDownY = 0;
   this->borderColor = Qt::black;
   this->width = 8;
   this->height = 8;
   this->widthGrabBuffer = 10;
   this->heightGrabBuffer = 10;
-  this-> mouseButtonState = QEvent::GraphicsSceneMouseRelease;
+  this->mouseButtonState = QEvent::GraphicsSceneMouseRelease;
   this->setParentItem(_parent);
 
   this->setZValue(_parent->zValue() + 1);

@@ -37,7 +37,7 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->modelPalette = new ModelEditorPalette(_mainWindow);
   this->Init("modelEditorTab", "Model Editor", this->modelPalette);
 
-  connect(g_editModelAct, SIGNAL(triggered(bool)), this, SLOT(OnEdit(bool)));
+  connect(g_editModelAct, SIGNAL(toggled(bool)), this, SLOT(OnEdit(bool)));
 
   this->connections.push_back(
       gui::model::Events::ConnectFinishModel(
@@ -62,16 +62,16 @@ void ModelEditor::OnEdit(bool /*_checked*/)
     this->mainWindow->ShowLeftColumnWidget();
     this->mainWindow->Play();
   }
-  event::Events::setSelectedEntity("", "normal");
   this->active = !this->active;
   this->ToggleToolbar();
-  g_editModelAct->setChecked(this->active);
+//  g_editModelAct->setChecked(this->active);
 }
 
 /////////////////////////////////////////////////
 void ModelEditor::OnFinish()
 {
-  this->OnEdit(g_editModelAct->isChecked());
+//  this->OnEdit(g_editModelAct->isChecked());
+  g_editModelAct->trigger();
 }
 
 /////////////////////////////////////////////////
