@@ -1008,13 +1008,13 @@ void GLWidget::Copy(const std::string &_name)
 /////////////////////////////////////////////////
 void GLWidget::Paste(const std::string &_name)
 {
-  if (!_name.empty())
+  if (!this->_name.empty())
   {
     bool isModel = false;
     bool isLight = false;
-    if (scene->GetLight(_name))
+    if (this->scene->GetLight(_name))
       isLight = true;
-    else if (scene->GetVisual(_name))
+    else if (this->scene->GetVisual(_name))
       isModel = true;
 
     if (isLight || isModel)
@@ -1026,19 +1026,15 @@ void GLWidget::Paste(const std::string &_name)
       if (isLight && this->lightMaker.InitFromLight(_name))
       {
         this->entityMaker = &this->lightMaker;
-        this->entityMaker->Start(this->userCamera);
-        // this makes the entity appear at the mouse cursor
-        this->entityMaker->OnMouseMove(this->mouseEvent);
-        gui::Events::manipMode("make_entity");
       }
       else if (isModel && this->modelMaker.InitFromModel(_name))
       {
         this->entityMaker = &this->modelMaker;
-        this->entityMaker->Start(this->userCamera);
-        // this makes the entity appear at the mouse cursor
-        this->entityMaker->OnMouseMove(this->mouseEvent);
-        gui::Events::manipMode("make_entity");
       }
+      this->entityMaker->Start(this->userCamera);
+      // this makes the entity appear at the mouse cursor
+      this->entityMaker->OnMouseMove(this->mouseEvent);
+      gui::Events::manipMode("make_entity");
     }
   }
 }

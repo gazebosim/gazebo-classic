@@ -67,13 +67,11 @@ namespace gazebo
 
       signals: void clicked();
 
-
       protected: virtual void moveEvent(QMoveEvent *_e);
       protected: virtual void paintEvent(QPaintEvent *_e);
       protected: virtual void resizeEvent(QResizeEvent *_e);
       protected: virtual void showEvent(QShowEvent *_e);
       protected: virtual void enterEvent(QEvent * event);
-
 
       protected: void keyPressEvent(QKeyEvent *_event);
       protected: void keyReleaseEvent(QKeyEvent *_event);
