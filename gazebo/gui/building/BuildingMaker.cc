@@ -338,6 +338,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -501,6 +502,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
   this->allItems[linkName] = floorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 

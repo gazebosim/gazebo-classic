@@ -46,6 +46,11 @@ namespace gazebo
     /// \addtogroup gazebo_gui
     /// \{
 
+    // Enums to keep track of saved state:
+    // NEVER_SAVED: The building has never been saved
+    // SAVED: The building has been saved through the "Save As" dialog
+    // NAME_CHANGED: The building experienced the "Save As" dialog, then the
+    // name was changed, and it has not been saved through "Save As" since.
     enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
 
     /// \class BuildingMaker BuildingMaker.hh
@@ -263,6 +268,8 @@ namespace gazebo
       /// \return True if the user chose to save, false if the user cancelled.
       private: bool OnSaveAs(const std::string &_saveName);
 
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered building name.
       private: void OnNameChanged(const std::string &_modelName);
 
       /// \brief Callback for newing the model.

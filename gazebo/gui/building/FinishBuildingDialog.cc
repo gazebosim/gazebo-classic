@@ -152,7 +152,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   this->advancedOptionsWidget->hide();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(messageLabel);
+  mainLayout->addWidget(this->messageLabel);
   mainLayout->addLayout(locationLayout);
 
   mainLayout->addLayout(advancedOptions);
@@ -160,6 +160,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 //  if (_mode == MODEL_FINISH)
 //    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
+  mainLayout->setAlignment(Qt::AlignTop);
 
   this->setLayout(mainLayout);
   this->setMinimumSize(400, 150);
