@@ -160,6 +160,8 @@ void PartData::OnApply()
         updateMsg->mutable_material()->clear_specular();
         updateMsg->mutable_material()->clear_emissive();
 
+        // std::cerr << " updateMsg after " << updateMsg->DebugString() << std::endl;
+
 //        msgs::Visual msg;
 //        msg.CopyFrom(*updateMsg);
 
@@ -248,7 +250,10 @@ void PartData::Update()
     {
       if (it->second.name() == updateMsgPtr->name())
       {
+        std::string origMatName = it->first->GetMaterialName();
         it->first->UpdateFromMsg(updateMsgPtr);
+        if (it->first->GetMaterialName() != origMatName)
+          it->first->SetTransparency(0.5);
       }
     }
   }

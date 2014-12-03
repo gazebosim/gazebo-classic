@@ -82,6 +82,9 @@ namespace gazebo
       /// \param[in] _show True to draw the handles, and false to hide them.
       public: void ShowHandles(bool _show);
 
+      // Documentation inherited
+      public: void SetHighlighted(bool _highlighted);
+
       /// \brief Helper method for Updating the corner positions of the rect
       /// item.
       protected: void UpdateCornerPositions();

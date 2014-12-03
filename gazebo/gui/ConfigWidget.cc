@@ -150,7 +150,6 @@ void ConfigWidget::SetWidgetReadOnly(const std::string &_name, bool _readOnly)
     }
     iter->second->setEnabled(!_readOnly);
   }
-
 }
 
 /////////////////////////////////////////////////
@@ -1474,7 +1473,7 @@ void ConfigWidget::UpdateMsg(google::protobuf::Message *_msg,
 
 /////////////////////////////////////////////////
 void ConfigWidget::UpdateVector3Msg(google::protobuf::Message *_msg,
-    const math::Vector3 _value)
+    const math::Vector3 &_value)
 {
   const google::protobuf::Descriptor *valueDescriptor =
       _msg->GetDescriptor();
@@ -1669,7 +1668,7 @@ int ConfigWidget::GetIntWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting Int Config widget" << std::endl;
+    gzerr << "Error getting value from Int Config widget" << std::endl;
   }
   return value;
 }
@@ -1684,7 +1683,7 @@ unsigned int ConfigWidget::GetUIntWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting UInt Config widget" << std::endl;
+    gzerr << "Error getting value from UInt Config widget" << std::endl;
   }
   return value;
 }
@@ -1699,7 +1698,7 @@ double ConfigWidget::GetDoubleWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting Double Config widget" << std::endl;
+    gzerr << "Error getting value from Double Config widget" << std::endl;
   }
   return value;
 }
@@ -1715,7 +1714,7 @@ std::string ConfigWidget::GetStringWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting String Config Widget" << std::endl;
+    gzerr << "Error getting value from String Config Widget" << std::endl;
   }
   return value;
 }
@@ -1730,7 +1729,7 @@ bool ConfigWidget::GetBoolWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting Bool Config widget" << std::endl;
+    gzerr << "Error getting value from Bool Config widget" << std::endl;
   }
   return value;
 }
@@ -1748,7 +1747,7 @@ math::Vector3 ConfigWidget::GetVector3WidgetValue(ConfigChildWidget *_widget)
   }
   else
   {
-    gzerr << "Error getting Vector3 Config widget" << std::endl;
+    gzerr << "Error getting value from Vector3 Config widget" << std::endl;
   }
   return value;
 }
@@ -1767,7 +1766,7 @@ common::Color ConfigWidget::GetColorWidgetValue(ConfigChildWidget *_widget)
   }
   else
   {
-    gzerr << "Error getting Color Config widget" << std::endl;
+    gzerr << "Error getting value from Color Config widget" << std::endl;
   }
   return value;
 }
@@ -1790,7 +1789,7 @@ math::Pose ConfigWidget::GetPoseWidgetValue(ConfigChildWidget *_widget) const
   }
   else
   {
-    gzerr << "Error getting Pose Config widget" << std::endl;
+    gzerr << "Error getting value from Pose Config widget" << std::endl;
   }
   return value;
 }
@@ -1802,7 +1801,7 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
   std::string value;
   if (_widget->widgets.size() != 6u)
   {
-    gzerr << "Error getting Geometry Config widget " << std::endl;
+    gzerr << "Error getting value from Geometry Config widget " << std::endl;
     return value;
   }
 
@@ -1832,6 +1831,11 @@ std::string ConfigWidget::GetGeometryWidgetValue(ConfigChildWidget *_widget,
         qobject_cast<QDoubleSpinBox *>(_widget->widgets[4])->value()*2.0;
     _dimensions.y = _dimensions.x;
     _dimensions.z = _dimensions.x;
+  }
+  else
+  {
+    gzerr << "Error getting geometry dimensions for type: '" << value << "'"
+        << std::endl;
   }
   return value;
 }

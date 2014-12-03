@@ -53,12 +53,6 @@ PartInspector::PartInspector(QWidget *_parent) : QDialog(_parent)
   this->tabWidget->addTab(this->visualConfig, "Visual");
 //  this->tabWidget->addTab(this->collisionConfig, "Collision");
 
-/*  ConfigWidget *configWidget = new ConfigWidget;
-  msgs::Link msg;
-  configWidget->Load(&msg);
-  this->tabWidget->addTab(configWidget, "test");
-  msgs::Visual *retMsg = dynamic_cast<msgs::Visual *>(configWidget->GetMsg());*/
-
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));

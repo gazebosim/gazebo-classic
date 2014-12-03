@@ -25,10 +25,40 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 {
   this->setObjectName("levelInspectorDialog");
   this->setWindowTitle(tr("Level Inspector"));
+  this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
   QLabel *levelLabel = new QLabel(tr("Level Name: "));
   this->levelNameLineEdit = new QLineEdit;
   this->levelNameLineEdit->setPlaceholderText(tr("Level X"));
+
+  QLabel *floorColorLabel = new QLabel(tr("Floor Color: "));
+  this->floorColorComboBox = new QComboBox;
+  this->floorColorComboBox->setIconSize(QSize(15, 15));
+  this->floorColorComboBox->setMinimumWidth(50);
+  this->floorColorComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  QPixmap floorColorIcon(15, 15);
+  this->floorColorList.push_back(QColor(255, 255, 255, 255));
+  this->floorColorList.push_back(QColor(194, 169, 160, 255));
+  this->floorColorList.push_back(QColor(235, 206, 157, 255));
+  this->floorColorList.push_back(QColor(254, 121,   5, 255));
+  this->floorColorList.push_back(QColor(255, 195,  78, 255));
+  this->floorColorList.push_back(QColor(111, 203, 172, 255));
+  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
+  {
+    floorColorIcon.fill(this->floorColorList.at(i));
+    this->floorColorComboBox->addItem(floorColorIcon, QString(""));
+  }
+
+  QHBoxLayout *floorColorLayout = new QHBoxLayout;
+  floorColorLayout->addWidget(floorColorLabel);
+  floorColorLayout->addWidget(floorColorComboBox);
+
+  QVBoxLayout *floorLayout = new QVBoxLayout;
+  floorLayout->addLayout(floorColorLayout);
+
+  this->floorWidget = new QWidget;
+  this->floorWidget->setLayout(floorLayout);
 
   /// TODO add the widgets back in after the functions is implemented
 /*  QLabel *floorThicknessLabel = new QLabel(tr("Floor Thickness: "));
@@ -43,11 +73,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->heightSpinBox->setRange(-1000, 1000);
   this->heightSpinBox->setSingleStep(0.001);
   this->heightSpinBox->setDecimals(3);
-  this->heightSpinBox->setValue(0.000);
-
-  QLabel *materialLabel = new QLabel(tr("Floor Material: "));
-  this->materialComboBox = new QComboBox;
-  this->materialComboBox->addItem(QString("Hardwood"));*/
+  this->heightSpinBox->setValue(0.000);*/
 
   QGridLayout *levelLayout = new QGridLayout;
   levelLayout->addWidget(levelLabel, 0, 0);
@@ -55,9 +81,7 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 /*  levelLayout->addWidget(floorThicknessLabel, 1, 0);
   levelLayout->addWidget(this->floorThicknessSpinBox, 1, 1);
   levelLayout->addWidget(heightLabel, 2, 0);
-  levelLayout->addWidget(this->heightSpinBox, 2, 1);
-  levelLayout->addWidget(materialLabel, 3, 0);
-  levelLayout->addWidget(this->materialComboBox, 3, 1);*/
+  levelLayout->addWidget(this->heightSpinBox, 2, 1);*/
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   QPushButton *cancelButton = new QPushButton(tr("&Cancel"));
@@ -74,9 +98,11 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addLayout(levelLayout);
+  mainLayout->addWidget(this->floorWidget);
   mainLayout->addLayout(buttonsLayout);
 
   this->setLayout(mainLayout);
+  this->layout()->setSizeConstraint(QLayout::SetFixedSize);
 }
 
 /////////////////////////////////////////////////
@@ -97,6 +123,12 @@ double LevelInspectorDialog::GetHeight() const
 }
 
 /////////////////////////////////////////////////
+QColor LevelInspectorDialog::GetFloorColor() const
+{
+  return this->floorColorList[this->floorColorComboBox->currentIndex()];
+}
+
+/////////////////////////////////////////////////
 void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 {
   this->levelNameLineEdit->setText(QString(_levelName.c_str()));
@@ -107,6 +139,20 @@ void LevelInspectorDialog::SetLevelName(const std::string &_levelName)
 void LevelInspectorDialog::SetHeight(double _height)
 {
   this->heightSpinBox->setValue(_height);
+}
+
+/////////////////////////////////////////////////
+void LevelInspectorDialog::SetFloorColor(const QColor _color)
+{
+  // Find index corresponding to color (only a few colors allowed so far)
+  for (unsigned int i = 0; i < this->floorColorList.size(); ++i)
+  {
+    if (this->floorColorList[i] == _color)
+    {
+      this->floorColorComboBox->setCurrentIndex(i);
+      break;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
