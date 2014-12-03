@@ -1565,6 +1565,13 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     this->description = this->saveDialog->GetDescription();
     this->version = this->saveDialog->GetVersion();
 
+    if (this->modelName.compare(this->buildingDefaultName) == 0)
+    {
+      // Parse saveLocation and set model name
+      boost::filesystem::path saveLocPath(this->saveLocation);
+      this->SetModelName(saveLocPath.filename().string());
+    }
+
     // Create an xml config file
     TiXmlDocument xmlDoc;
     xmlDoc.Parse(this->GetTemplateConfigString().c_str());
