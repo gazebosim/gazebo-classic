@@ -167,14 +167,14 @@ target_link_libraries(gazebo_gui
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  #gazebo_sensors
+  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  #libgazebo
+  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
@@ -189,14 +189,14 @@ target_link_libraries(gzclient
   gazebo_common
   gazebo_transport
   gazebo_rendering
-  #gazebo_sensors
+  gazebo_sensors
   gazebo_msgs
   gazebo_gui_building
   gazebo_gui_model
   gazebo_gui_terrain
   gazebo_gui_viewers
   gzqtpropertybrowser
-  #libgazebo
+  libgazebo
   ${QT_LIBRARIES}
   ${ogre_libraries}
   ${Boost_LIBRARIES}
