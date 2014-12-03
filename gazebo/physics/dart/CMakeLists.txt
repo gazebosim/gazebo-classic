@@ -57,7 +57,9 @@ gz_build_tests(${gtest_sources})
 
 gz_add_library(gazebo_physics_dart ${headers} ${sources})
 
-target_link_libraries(gazebo_physics_dart ${DARTCore_LIBRARIES})
+target_link_libraries(gazebo_physics_dart 
+     gazebo_physics
+     ${DARTCore_LIBRARIES})
 
 gz_install_library(gazebo_physics_dart)
 gz_install_includes("physics/dart" ${headers})
