@@ -59,16 +59,18 @@ LevelInspectorDialog::LevelInspectorDialog(QWidget *_parent) : QDialog(_parent)
   this->floorTextureComboBox->setIconSize(QSize(30, 30));
   this->floorTextureComboBox->setMinimumWidth(50);
   this->floorTextureComboBox->setMinimumHeight(50);
-  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  this->floorTextureList.push_back(":/images/wood.jpg");
-  this->floorTextureList.push_back(":/images/ceiling_tiled.jpg");
+  this->floorTextureComboBox->setSizePolicy(QSizePolicy::Fixed,
+      QSizePolicy::Fixed);
+  this->floorTextureList.push_back(":/images/wood.png");
+  this->floorTextureList.push_back(":/images/ceiling_tiled.png");
   for (unsigned int i = 0; i < this->floorTextureList.size(); ++i)
   {
     this->floorTextureComboBox->addItem(QPixmap(this->floorTextureList[i]),
         QString(""));
   }
   this->floorTextureComboBox->addItem("X");
-  this->floorTextureComboBox->setCurrentIndex(this->floorTextureComboBox->count()-1);
+  this->floorTextureComboBox->setCurrentIndex(
+      this->floorTextureComboBox->count()-1);
 
   QHBoxLayout *floorTextureLayout = new QHBoxLayout;
   floorTextureLayout->addWidget(floorTextureLabel);
@@ -157,7 +159,8 @@ QString LevelInspectorDialog::GetFloorTexture() const
       this->floorTextureComboBox->currentIndex() <
       this->floorTextureComboBox->count() - 1)
   {
-    floorTexture = this->floorTextureList[this->floorTextureComboBox->currentIndex()];
+    floorTexture = this->floorTextureList[
+        this->floorTextureComboBox->currentIndex()];
   }
   return floorTexture;
 }
