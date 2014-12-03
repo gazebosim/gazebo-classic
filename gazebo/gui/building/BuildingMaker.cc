@@ -82,9 +82,9 @@ std::string GetFolderNameFromModelName(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-BuildingMaker::BuildingMaker() : EntityMaker()
+  BuildingMaker::BuildingMaker() : EntityMaker()
 {
-  this->buildingDefaultName = "BuildingDefaultName";
+  this->buildingDefaultName = "Untitled";
   this->modelName = this->buildingDefaultName;
 
   this->conversionScale = 0.01;
@@ -385,6 +385,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -549,6 +550,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
+  this->savedChanges = false;
   return linkName;
 }
 
@@ -605,12 +607,18 @@ void BuildingMaker::Reset()
 
   rendering::ScenePtr scene = gui::get_active_camera()->GetScene();
 
+  if (!scene)
+  {
+    gzerr << "Couldn't get scene node from BuildingMaker" << std::endl;
+  }
+
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 
-  this->saved = false;
+  this->saved = NEVER_SAVED;
   this->savedChanges = false;
-  this->modelName = this->buildingDefaultName;
+  //this->modelName = this->buildingDefaultName;
+  this->SetModelName(this->buildingDefaultName);
   this->defaultPath = (QDir::homePath() + "/building_editor_models")
                         .toStdString();
   this->saveLocation = defaultPath + "/" +
@@ -1176,8 +1184,27 @@ void BuildingMaker::GenerateSDFWithCSG()
 /////////////////////////////////////////////////
 void BuildingMaker::CreateTheEntity()
 {
-  this->GenerateSDF();
   msgs::Factory msg;
+  // Create a new name if the model exists
+  if (!this->modelSDF->root->HasElement("model"))
+  {
+    gzerr << "Generated invalid SDF! Cannot create entity." << std::endl;
+    return;
+  }
+
+  sdf::ElementPtr modelElem = this->modelSDF->root->GetElement("model");
+  std::string modelElemName = modelElem->Get<std::string>("name");
+  if (has_entity_name(modelElemName))
+  {
+    int i = 0;
+    while (has_entity_name(modelElemName))
+    {
+      modelElemName = modelElem->Get<std::string>("name") + "_" +
+        boost::lexical_cast<std::string>(i++);
+    }
+    modelElem->GetAttribute("name")->Set(modelElemName);
+  }
+
   msg.set_sdf(this->modelSDF->ToString());
   this->makerPub->Publish(msg);
 }
@@ -1494,6 +1521,7 @@ void BuildingMaker::OnNew()
 {
   if (this->allItems.empty())
   {
+    this->Reset();
     gui::editor::Events::newBuildingModel();
     return;
   }
@@ -1532,10 +1560,8 @@ void BuildingMaker::OnNew()
       }
     }
 
+    this->Reset();
     gui::editor::Events::newBuildingModel();
-
-    this->saved = false;
-    this->savedChanges = false;
   }
 }
 
@@ -1552,7 +1578,7 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-  if (this->saved)
+  if (this->saved == SAVED)
   {
     this->SaveModelFiles();
     this->savedChanges = true;
@@ -1730,7 +1756,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
         AddModelPathsUpdate(parentDirectory);
     }
 
-    this->saved = true;
+    this->saved = SAVED;
     this->savedChanges = true;
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
@@ -1742,6 +1768,10 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
+  if (_name.compare(this->modelName) == 0)
+  {
+    return;
+  }
   this->SetModelName(_name);
   // Set new saveLocation
   boost::filesystem::path oldPath(this->saveLocation);
@@ -1750,7 +1780,7 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
   this->saveLocation = newPath.string();
 
   this->savedChanges = false;
-  this->saved = false;
+  this->saved = NAME_CHANGED;
 }
 
 /////////////////////////////////////////////////
@@ -1776,6 +1806,7 @@ void BuildingMaker::OnExit()
     {
       return;
     }
+    this->FinishModel();
   }
   else
   {
@@ -1788,18 +1819,12 @@ void BuildingMaker::OnExit()
       QMessageBox::ApplyRole);
     QPushButton *saveButton = msgBox.addButton("Save and Exit",
       QMessageBox::ApplyRole);
-    QPushButton *exitButton = msgBox.addButton("Don't Save, Exit",
-      QMessageBox::ApplyRole);
+    msgBox.addButton("Don't Save, Exit", QMessageBox::ApplyRole);
     msgBox.exec();
     if (msgBox.clickedButton() == cancelButton)
       return;
 
-    if (msgBox.clickedButton() == exitButton)
-    {
-      this->saved = false;
-      this->savedChanges = false;
-    }
-    else if (msgBox.clickedButton() == saveButton)
+    if (msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {
@@ -1807,8 +1832,11 @@ void BuildingMaker::OnExit()
       }
     }
   }
+  if (this->saved == SAVED || this->saved == NAME_CHANGED)
+    this->FinishModel();
 
-  this->FinishModel();
+  this->Reset();
+
   gui::editor::Events::newBuildingModel();
   gui::editor::Events::finishBuildingModel();
 }

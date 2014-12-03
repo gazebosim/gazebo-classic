@@ -108,7 +108,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   locationLayout->addWidget(modelLocation);
   locationLayout->addWidget(this->modelLocationLineEdit);
   locationLayout->addWidget(browseButton);
-  
+
   QRadioButton *advancedOptionsCollapser = new QRadioButton();
   advancedOptionsCollapser->setChecked(false);
   advancedOptionsCollapser->setText("Advanced Options");
@@ -147,16 +147,12 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
   advancedOptionsGrid->addWidget(modelAuthorEmail, 6, 0);
   advancedOptionsGrid->addWidget(this->modelAuthorEmailLineEdit, 6, 1);
 
-  //advancedOptionsGrid->addWidget(fileHeader, 6, 0);
-  //advancedOptionsGrid->addWidget(modelFolderName, 7, 0);
-  //advancedOptionsGrid->addWidget(this->modelFolderNameLineEdit, 7, 1);
-
   this->advancedOptionsWidget = new QWidget();
   this->advancedOptionsWidget->setLayout(advancedOptionsGrid);
   this->advancedOptionsWidget->hide();
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(messageLabel);
+  mainLayout->addWidget(this->messageLabel);
   mainLayout->addLayout(locationLayout);
 
   mainLayout->addLayout(advancedOptions);
@@ -164,6 +160,7 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 //  if (_mode == MODEL_FINISH)
 //    mainLayout->addWidget(contributeCheckBox);
   mainLayout->addLayout(buttonsLayout);
+  mainLayout->setAlignment(Qt::AlignTop);
 
   this->setLayout(mainLayout);
   this->setMinimumSize(400, 150);

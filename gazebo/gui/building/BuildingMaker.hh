@@ -52,6 +52,14 @@ namespace gazebo
     /// \brief Create and manage 3D visuals of a building.
     class GAZEBO_VISIBLE BuildingMaker : public EntityMaker
     {
+      /// \enum SaveState
+      /// \brief Save states for the building editor.
+      // NEVER_SAVED: The building has never been saved
+      // SAVED: The building has been saved through the "Save As" dialog
+      // NAME_CHANGED: The building experienced the "Save As" dialog, then the
+      // name was changed, and it has not been saved through "Save As" since.
+      private: enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
+
       /// \brief Constructor
       public: BuildingMaker();
 
@@ -266,6 +274,8 @@ namespace gazebo
       /// \return True if the user chose to save, false if the user cancelled.
       private: bool OnSaveAs(const std::string &_saveName);
 
+      /// \brief Callback for when the name is changed through the Palette.
+      /// \param[in] _modelName The newly entered building name.
       private: void OnNameChanged(const std::string &_modelName);
 
       /// \brief Callback for newing the model.
@@ -333,7 +343,7 @@ namespace gazebo
       private: int floorCounter;
 
       /// \brief Indicate whether the model has been saved before or not.
-      private: bool saved;
+      private: enum SaveState saved;
 
       /// \brief Indicate whether all the changes to the model have been saved.
       private: bool savedChanges;
