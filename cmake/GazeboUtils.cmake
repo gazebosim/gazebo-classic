@@ -95,7 +95,7 @@ endmacro (BUILD_WARNING)
 
 #################################################
 macro (gz_add_library _name)
-  add_library(${_name} SHARED ${ARGN})
+  add_library(${_name} STATIC ${ARGN})
   target_link_libraries (${_name} ${general_libraries})
 endmacro ()
 
