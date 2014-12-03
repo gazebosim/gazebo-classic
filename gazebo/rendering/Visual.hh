@@ -206,7 +206,7 @@ namespace gazebo
       /// UpdateShaders.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
       /// transparency.
-      private: void SetTransparencyInnerLoop(float _trans);
+      private: void SetTransparencyInnerLoop();
 
       /// \brief Set the transparency.
       /// \param[in] _trans The transparency, between 0 and 1 where 0 is no
