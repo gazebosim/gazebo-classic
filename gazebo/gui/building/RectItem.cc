@@ -32,8 +32,6 @@ RectItem::RectItem()
 
   this->width = 100;
   this->height = 100;
-  this->visual3dColor = QColor(255, 255, 255, 255);
-  this->visual3dTransparency = 0.5;
   this->highlighted = true;
 
   this->drawingOriginX = 0;
@@ -521,7 +519,6 @@ bool RectItem::GrabberEventFilter(GrabberHandle *_grabber, QEvent *_event)
       default:
         break;
     }
-
     this->UpdateCornerPositions();
     this->update();
   }
