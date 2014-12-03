@@ -569,7 +569,8 @@ void BuildingMaker::Reset()
 
   this->saved = NEVER_SAVED;
   this->savedChanges = false;
-  this->modelName = this->buildingDefaultName;
+  //this->modelName = this->buildingDefaultName;
+  this->SetModelName(this->buildingDefaultName);
   this->defaultPath = (QDir::homePath() + "/building_editor_models")
                         .toStdString();
   this->saveLocation = defaultPath + "/" +
@@ -1709,6 +1710,10 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
 /////////////////////////////////////////////////
 void BuildingMaker::OnNameChanged(const std::string &_name)
 {
+  if (_name.compare(this->modelName) == 0)
+  {
+    return;
+  }
   this->SetModelName(_name);
   // Set new saveLocation
   boost::filesystem::path oldPath(this->saveLocation);

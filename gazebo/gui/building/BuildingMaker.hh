@@ -57,7 +57,6 @@ namespace gazebo
       // NAME_CHANGED: The building experienced the "Save As" dialog, then the
       // name was changed, and it has not been saved through "Save As" since.
       private: enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
-    
 
       /// \brief Constructor
       public: BuildingMaker();
