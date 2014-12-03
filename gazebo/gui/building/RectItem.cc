@@ -33,6 +33,8 @@ RectItem::RectItem()
   this->width = 100;
   this->height = 100;
   this->highlighted = true;
+  this->visual3dColor = QColor(255, 255, 255, 255);
+  this->visual3dTransparency = 0.0;
 
   this->drawingOriginX = 0;
   this->drawingOriginY = 0;

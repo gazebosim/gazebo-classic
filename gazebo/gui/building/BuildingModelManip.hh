@@ -21,6 +21,7 @@
 #include <vector>
 #include "gazebo/gui/qt.h"
 #include "gazebo/common/Color.hh"
+#include "gazebo/common/Event.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -154,6 +155,14 @@ namespace gazebo
 
       /// \brief TODO
       Q_SIGNALS: void TextureChanged(QString _texture);
+      /// \brief Set the level for this manip.
+
+      /// \param[in] _level The level for this manip.
+      public: void SetLevel(const int _level);
+
+      /// \brief Get the level for this manip.
+      /// \reutrn The level for this manip.
+      public: int GetLevel() const;
 
       /// \brief Qt callback when the pose of the associated editor item has
       /// changed.
@@ -235,6 +244,11 @@ namespace gazebo
       /// \param[in] _posZ New yaw rotation in degrees.
       private slots: void OnYawChanged(double _yaw);
 
+      /// \brief Qt callback when the level of the associated editor item
+      /// has changed.
+      /// \param[in] _level New level.
+      private slots: void OnLevelChanged(int _level);
+
       /// \brief Qt callback when the 3D visual's color has been changed from
       /// the associated editor item.
       /// \param[in] _color New color.
@@ -252,6 +266,12 @@ namespace gazebo
 
       /// \brief Qt callback when the associated editor item has been deleted.
       private slots: void OnDeleted();
+
+      /// \brief Callback received when the building level being edited has
+      /// changed. Do not confuse with OnLevelChange, where the manip's level
+      /// is changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
 
       /// \brief Name of the manip.
       private: std::string name;
@@ -279,6 +299,13 @@ namespace gazebo
 
       /// \brief Visual's texture.
       private: std::string texture;
+
+      /// \brief Level this manipulator is on.
+      private: int level;
+
+      /// \brief A list of gui editor events connected to this view.
+      private: std::vector<event::ConnectionPtr> connections;
+    };
     };
     /// \}
   }

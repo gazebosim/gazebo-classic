@@ -284,6 +284,11 @@ namespace gazebo
       /// \brief Callback received when exiting the editor mode.
       private: void OnExit();
 
+      /// \brief Callback received when a level on a building model is to
+      /// be changed.
+      /// \param[in] _level The level that is currently being edited.
+      private: void OnChangeLevel(int _level);
+
       /// \brief TODO
       private: void StopMaterialModes();
 
@@ -383,6 +388,9 @@ namespace gazebo
 
       /// \brief TODO
       private: QString selectedTexture;
+
+      /// \brief The current level that is being edited.
+      private: int currentLevel;
     };
     /// \}
   }
