@@ -187,47 +187,93 @@ void ConfigWidget_TEST::VisualMsgWidget()
   // verify that the new message contains the updated values.
   {
     // visual
-    visualConfigWidget->SetStringWidgetProperty("name", "test_visual_updated");
-    visualConfigWidget->SetUIntWidgetProperty("id", 11111u);
-    visualConfigWidget->SetStringWidgetProperty("parent_name",
+    visualConfigWidget->SetStringWidgetValue("name", "test_visual_updated");
+    visualConfigWidget->SetUIntWidgetValue("id", 11111u);
+    visualConfigWidget->SetStringWidgetValue("parent_name",
         "test_visual_parent_updated");
-    visualConfigWidget->SetUIntWidgetProperty("parent_id", 55555u);
-    visualConfigWidget->SetBoolWidgetProperty("cast_shadows", false);
-    visualConfigWidget->SetDoubleWidgetProperty("transparency", 1.0);
-    visualConfigWidget->SetBoolWidgetProperty("visible", false);
-    visualConfigWidget->SetBoolWidgetProperty("delete_me", true);
-    visualConfigWidget->SetBoolWidgetProperty("is_static", true);
-    visualConfigWidget->SetVector3WidgetProperty("scale",
+    visualConfigWidget->SetUIntWidgetValue("parent_id", 55555u);
+    visualConfigWidget->SetBoolWidgetValue("cast_shadows", false);
+    visualConfigWidget->SetDoubleWidgetValue("transparency", 1.0);
+    visualConfigWidget->SetBoolWidgetValue("visible", false);
+    visualConfigWidget->SetBoolWidgetValue("delete_me", true);
+    visualConfigWidget->SetBoolWidgetValue("is_static", true);
+    visualConfigWidget->SetVector3WidgetValue("scale",
         gazebo::math::Vector3(2.0, 1.5, 0.5));
 
     // pose
     gazebo::math::Vector3 pos(-2.0, -3.0, -4.0);
     gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
-    visualConfigWidget->SetPoseWidgetProperty("pose",
+    visualConfigWidget->SetPoseWidgetValue("pose",
         gazebo::math::Pose(pos, quat));
 
     // geometry
-    visualConfigWidget->SetGeometryWidgetProperty("geometry", "box",
+    visualConfigWidget->SetGeometryWidgetValue("geometry", "box",
         gazebo::math::Vector3(5.0, 3.0, 4.0));
 
     // material
-    visualConfigWidget->SetStringWidgetProperty("material::normal_map",
+    visualConfigWidget->SetStringWidgetValue("material::normal_map",
         "test_normal_map_updated");
-    visualConfigWidget->SetColorWidgetProperty("material::ambient",
+    visualConfigWidget->SetColorWidgetValue("material::ambient",
         gazebo::common::Color(0.2, 0.3, 0.4, 0.5));
-    visualConfigWidget->SetColorWidgetProperty("material::diffuse",
+    visualConfigWidget->SetColorWidgetValue("material::diffuse",
         gazebo::common::Color(0.1, 0.8, 0.6, 0.4));
-    visualConfigWidget->SetColorWidgetProperty("material::specular",
+    visualConfigWidget->SetColorWidgetValue("material::specular",
         gazebo::common::Color(0.5, 0.4, 0.3, 0.2));
-    visualConfigWidget->SetColorWidgetProperty("material::emissive",
+    visualConfigWidget->SetColorWidgetValue("material::emissive",
         gazebo::common::Color(0.4, 0.6, 0.8, 0.1));
-    visualConfigWidget->SetBoolWidgetProperty("material::lighting", false);
+    visualConfigWidget->SetBoolWidgetValue("material::lighting", false);
     // material::script
-    visualConfigWidget->SetStringWidgetProperty("material::script::name",
+    visualConfigWidget->SetStringWidgetValue("material::script::name",
         "test_script_name_updated");
   }
 
-  // verify updates
+  // verify widget values
+  {
+    QVERIFY(visualConfigWidget->GetStringWidgetValue("name") ==
+        "test_visual_updated");
+    QCOMPARE(visualConfigWidget->GetUIntWidgetValue("id"), 11111u);
+    QVERIFY(visualConfigWidget->GetStringWidgetValue("parent_name") ==
+        "test_visual_parent_updated");
+    QCOMPARE(visualConfigWidget->GetUIntWidgetValue("parent_id"), 55555u);
+    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("cast_shadows"), false);
+    QCOMPARE(visualConfigWidget->GetDoubleWidgetValue("transparency"), 1.0);
+    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("visible"), false);
+    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("delete_me"), true);
+    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("is_static"), true);
+    QCOMPARE(visualConfigWidget->GetVector3WidgetValue("scale"),
+        gazebo::math::Vector3(2.0, 1.5, 0.5));
+
+    // pose
+    gazebo::math::Vector3 pos(-2.0, -3.0, -4.0);
+    gazebo::math::Quaternion quat(0.0, 1.57, 0.0);
+    QCOMPARE(visualConfigWidget->GetPoseWidgetValue("pose"),
+        gazebo::math::Pose(pos, quat));
+
+    // geometry
+    gazebo::math::Vector3 dimensions;
+    QVERIFY(visualConfigWidget->GetGeometryWidgetValue("geometry", dimensions)
+        ==  "box");
+    QCOMPARE(dimensions, gazebo::math::Vector3(5.0, 3.0, 4.0));
+
+    // material
+    QVERIFY(visualConfigWidget->GetStringWidgetValue("material::normal_map") ==
+        "test_normal_map_updated");
+    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::ambient"),
+        gazebo::common::Color(0.2, 0.3, 0.4, 0.5));
+    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::diffuse"),
+        gazebo::common::Color(0.1, 0.8, 0.6, 0.4));
+    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::specular"),
+        gazebo::common::Color(0.5, 0.4, 0.3, 0.2));
+    QCOMPARE(visualConfigWidget->GetColorWidgetValue("material::emissive"),
+        gazebo::common::Color(0.4, 0.6, 0.8, 0.1));
+    QCOMPARE(visualConfigWidget->GetBoolWidgetValue("material::lighting"),
+        false);
+    // material::script
+    QVERIFY(visualConfigWidget->GetStringWidgetValue("material::script::name")
+        == "test_script_name_updated");
+  }
+
+  // verify updates in new msg
   {
     gazebo::msgs::Visual *retVisualMsg =
         dynamic_cast<gazebo::msgs::Visual *>(visualConfigWidget->GetMsg());
@@ -301,6 +347,171 @@ void ConfigWidget_TEST::VisualMsgWidget()
     QVERIFY(scriptMsg.uri(0) == "test_script_uri_0");
     QVERIFY(scriptMsg.uri(1) == "test_script_uri_1");
     QVERIFY(scriptMsg.name() == "test_script_name_updated");
+  }
+
+  delete visualConfigWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::ConfigWidgetVisible()
+{
+  gazebo::gui::ConfigWidget *visualConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Visual visualMsg;
+
+{
+    // visual
+    visualMsg.set_id(12345u);
+
+    // pose
+    gazebo::math::Vector3 pos(2.0, 3.0, 4.0);
+    gazebo::math::Quaternion quat(1.57, 0.0, 0.0);
+    gazebo::msgs::Set(visualMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+
+    // geometry
+    gazebo::msgs::Geometry *geometryMsg = visualMsg.mutable_geometry();
+    geometryMsg->set_type(gazebo::msgs::Geometry::CYLINDER);
+    gazebo::msgs::CylinderGeom *cylinderGeomMsg =
+        geometryMsg->mutable_cylinder();
+    cylinderGeomMsg->set_radius(3.0);
+    cylinderGeomMsg->set_length(0.2);
+
+    // material
+    gazebo::msgs::Material *materialMsg = visualMsg.mutable_material();
+    gazebo::msgs::Set(materialMsg->mutable_ambient(),
+        gazebo::common::Color(0.0, 1.0, 0.0, 1.0));
+    gazebo::msgs::Set(materialMsg->mutable_diffuse(),
+        gazebo::common::Color(0.0, 1.0, 1.0, 0.4));
+
+    // material::script
+    gazebo::msgs::Material::Script *scriptMsg = materialMsg->mutable_script();
+    scriptMsg->set_name("test_script_name");
+  }
+  visualConfigWidget->Load(&visualMsg);
+  visualConfigWidget->show();
+
+  // set different types of widgets to be not visibile
+  {
+    // primitive widget
+    visualConfigWidget->SetWidgetVisible("id", false);
+    // custom pose message widget
+    visualConfigWidget->SetWidgetVisible("pose", false);
+    // custom geometry message widget
+    visualConfigWidget->SetWidgetVisible("geometry", false);
+    // widget inside a group widget
+    visualConfigWidget->SetWidgetVisible("material::diffuse", false);
+    // widget two levels deep
+    visualConfigWidget->SetWidgetVisible("material::script::name", false);
+    // group widget
+    visualConfigWidget->SetWidgetVisible("material", false);
+
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("id"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("pose"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("geometry"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::diffuse"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::script::name"),
+        false);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material"), false);
+  }
+
+  // set visible back to true
+  {
+    visualConfigWidget->SetWidgetVisible("id", true);
+    visualConfigWidget->SetWidgetVisible("pose", true);
+    visualConfigWidget->SetWidgetVisible("geometry", true);
+    visualConfigWidget->SetWidgetVisible("material::diffuse", true);
+    visualConfigWidget->SetWidgetVisible("material::script::name", true);
+    visualConfigWidget->SetWidgetVisible("material", true);
+
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("id"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("pose"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("geometry"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::diffuse"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material::script::name"),
+        true);
+    QCOMPARE(visualConfigWidget->GetWidgetVisible("material"), true);
+  }
+
+  delete visualConfigWidget;
+}
+
+/////////////////////////////////////////////////
+void ConfigWidget_TEST::ConfigWidgetReadOnly()
+{
+  gazebo::gui::ConfigWidget *visualConfigWidget =
+      new gazebo::gui::ConfigWidget;
+  gazebo::msgs::Visual visualMsg;
+
+{
+    // visual
+    visualMsg.set_id(12345u);
+
+    // pose
+    gazebo::math::Vector3 pos(2.0, 3.0, 4.0);
+    gazebo::math::Quaternion quat(1.57, 0.0, 0.0);
+    gazebo::msgs::Set(visualMsg.mutable_pose(), gazebo::math::Pose(pos, quat));
+
+    // geometry
+    gazebo::msgs::Geometry *geometryMsg = visualMsg.mutable_geometry();
+    geometryMsg->set_type(gazebo::msgs::Geometry::CYLINDER);
+    gazebo::msgs::CylinderGeom *cylinderGeomMsg =
+        geometryMsg->mutable_cylinder();
+    cylinderGeomMsg->set_radius(3.0);
+    cylinderGeomMsg->set_length(0.2);
+
+    // material
+    gazebo::msgs::Material *materialMsg = visualMsg.mutable_material();
+    gazebo::msgs::Set(materialMsg->mutable_ambient(),
+        gazebo::common::Color(0.0, 1.0, 0.0, 1.0));
+    gazebo::msgs::Set(materialMsg->mutable_diffuse(),
+        gazebo::common::Color(0.0, 1.0, 1.0, 0.4));
+
+    // material::script
+    gazebo::msgs::Material::Script *scriptMsg = materialMsg->mutable_script();
+    scriptMsg->set_name("test_script_name");
+  }
+  visualConfigWidget->Load(&visualMsg);
+
+  // set different types of widgets to be read-only
+  {
+    // primitive widget
+    visualConfigWidget->SetWidgetReadOnly("id", true);
+    // custom pose message widget
+    visualConfigWidget->SetWidgetReadOnly("pose", true);
+    // custom geometry message widget
+    visualConfigWidget->SetWidgetReadOnly("geometry", true);
+    // widget inside a group widget
+    visualConfigWidget->SetWidgetReadOnly("material::diffuse", true);
+    // widget two levels deep
+    visualConfigWidget->SetWidgetReadOnly("material::script::name", true);
+    // group widget
+    visualConfigWidget->SetWidgetReadOnly("material", true);
+
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), true);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::script::name"),
+        true);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material"), true);
+  }
+
+  // set read-only back to false
+  {
+    visualConfigWidget->SetWidgetReadOnly("id", false);
+    visualConfigWidget->SetWidgetReadOnly("pose", false);
+    visualConfigWidget->SetWidgetReadOnly("geometry", false);
+    visualConfigWidget->SetWidgetReadOnly("material::diffuse", false);
+    visualConfigWidget->SetWidgetReadOnly("material::script::name", false);
+    visualConfigWidget->SetWidgetReadOnly("material", false);
+
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("id"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("pose"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("geometry"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::diffuse"), false);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material::script::name"),
+        false);
+    QCOMPARE(visualConfigWidget->GetWidgetReadOnly("material"), false);
   }
 
   delete visualConfigWidget;

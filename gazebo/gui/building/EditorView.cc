@@ -282,7 +282,7 @@ void EditorView::mouseReleaseEvent(QMouseEvent *_event)
         StairsItem *stairsItem = dynamic_cast<StairsItem *>(
             this->currentMouseItem);
         stairsItem->Set3dTexture(QString(""));
-        stairsItem->Set3dColor(QColor(255, 255, 255, 255));
+        stairsItem->Set3dColor(Qt::white);
         this->stairsList.push_back(stairsItem);
         if ((this->currentLevel) < static_cast<int>(floorList.size()))
         {
@@ -590,6 +590,8 @@ void EditorView::DeleteItem(EditorItem *_item)
   if (!_item)
     return;
 
+  this->buildingMaker->DetachAllChildren(this->itemToVisualMap[_item]);
+
   if (_item->GetType() == "WallSegment")
   {
     WallSegmentItem *wallSegmentItem = dynamic_cast<WallSegmentItem *>(_item);
@@ -703,7 +705,7 @@ void EditorView::DrawWall(const QPoint &_pos)
 
     wallSegmentItem = dynamic_cast<WallSegmentItem*>(this->currentMouseItem);
     wallSegmentItem->Set3dTexture(QString(""));
-    wallSegmentItem->Set3dColor(QColor(255, 255, 255, 255));
+    wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
     wallSegmentList.push_back(wallSegmentItem);
     if (wallSegmentItem->GetLevel() > 0)
@@ -1058,7 +1060,7 @@ void EditorView::OnAddLevel()
 
     floorItem->AttachWallSegment(wallSegmentItem);
     wallSegmentItem->Set3dTexture(QString(""));
-    wallSegmentItem->Set3dColor(QColor(255, 255, 255, 255));
+    wallSegmentItem->Set3dColor(Qt::white);
     wallSegmentItem->SetHighlighted(false);
   }
 
@@ -1104,7 +1106,7 @@ void EditorView::OnAddLevel()
   this->scene()->addItem(floorItem);
   this->floorList.push_back(floorItem);
   floorItem->Set3dTexture(QString(""));
-  floorItem->Set3dColor(QColor(255, 255, 255, 255));
+  floorItem->Set3dColor(Qt::white);
   floorItem->SetHighlighted(false);
 }
 
