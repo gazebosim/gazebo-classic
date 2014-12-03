@@ -50,8 +50,6 @@ FinishBuildingDialog::FinishBuildingDialog(int _mode, QWidget *_parent)
 
   QLabel *modelHeader = new QLabel;
   modelHeader->setText(tr("<b>Model</b>"));
-  /*QLabel *fileHeader = new QLabel;
-  fileHeader->setText(tr("<b>Folder</b>"));*/
 
   QLabel *modelLocation = new QLabel;
   modelLocation->setText(tr("  Location:"));

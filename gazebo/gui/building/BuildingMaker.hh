@@ -55,10 +55,11 @@ namespace gazebo
       /// \enum SaveState
       /// \brief Save states for the building editor.
       // NEVER_SAVED: The building has never been saved
-      // SAVED: The building has been saved through the "Save As" dialog
-      // NAME_CHANGED: The building experienced the "Save As" dialog, then the
+      // SAVED: Has been saved through the "Save As" dialog
+      // UNSAVED_CHANGES: Has been saved before, but has unsaved changes
+      // NAME_CHANGED: Has been saved through "Save As" dialog, then the
       // name was changed, and it has not been saved through "Save As" since.
-      private: enum SaveState { NEVER_SAVED, SAVED, NAME_CHANGED };
+      private: enum SaveState { NEVER_SAVED, SAVED, UNSAVED_CHANGES, NAME_CHANGED };
 
       /// \brief Constructor
       public: BuildingMaker();
@@ -347,11 +348,8 @@ namespace gazebo
       /// \brief Counter for the number of floors in the model.
       private: int floorCounter;
 
-      /// \brief Indicate whether the model has been saved before or not.
-      private: enum SaveState saved;
-
-      /// \brief Indicate whether all the changes to the model have been saved.
-      private: bool savedChanges;
+      /// \brief Store the save state of the model (pending unsaved changes, etc).
+      private: enum SaveState currentSaveState;
 
       /// \brief Default directory to save models: ~/building_editor_models
       private: std::string defaultPath;

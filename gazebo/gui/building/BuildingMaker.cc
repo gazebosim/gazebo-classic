@@ -350,7 +350,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
   return linkName;
 }
 
@@ -396,7 +396,7 @@ std::string BuildingMaker::AddWindow(const QVector3D &_size,
   this->allItems[linkName] = windowManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
   return linkName;
 }
 
@@ -443,7 +443,7 @@ std::string BuildingMaker::AddDoor(const QVector3D &_size,
   this->allItems[linkName] = doorManip;
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
   return linkName;
 }
 
@@ -518,7 +518,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
   return linkName;
 }
 
@@ -567,7 +567,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
 
   linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI |
       GZ_VISIBILITY_SELECTABLE);
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
   return linkName;
 }
 
@@ -588,7 +588,7 @@ void BuildingMaker::RemovePart(const std::string &_partName)
     scene->RemoveVisual(visParent);
   this->allItems.erase(_partName);
   delete manip;
-  this->savedChanges = false;
+  this->currentSaveState = UNSAVED_CHANGES;
 }
 
 /////////////////////////////////////////////////
@@ -627,13 +627,13 @@ void BuildingMaker::Reset()
   if (!scene)
   {
     gzerr << "Couldn't get scene node from BuildingMaker" << std::endl;
+    return;
   }
 
   if (this->modelVisual)
     scene->RemoveVisual(this->modelVisual);
 
-  this->saved = NEVER_SAVED;
-  this->savedChanges = false;
+  this->currentSaveState = NEVER_SAVED;
   //this->modelName = this->buildingDefaultName;
   this->SetModelName(this->buildingDefaultName);
   this->defaultPath = (QDir::homePath() + "/building_editor_models")
@@ -1547,7 +1547,7 @@ void BuildingMaker::OnNew()
   QPushButton *cancelButton = msgBox.addButton("Cancel", QMessageBox::YesRole);
   QPushButton *saveButton = msgBox.addButton("Save", QMessageBox::YesRole);
 
-  if (this->savedChanges)
+  if (this->currentSaveState == SAVED)
   {
     msg.append("Are you sure you want to close this model and open a new "
                "canvas?\n\n");
@@ -1569,7 +1569,7 @@ void BuildingMaker::OnNew()
 
   if (msgBox.clickedButton() != cancelButton)
   {
-    if (!this->savedChanges && msgBox.clickedButton() == saveButton)
+    if (this->currentSaveState != SAVED && msgBox.clickedButton() == saveButton)
     {
       if (!this->OnSave(this->modelName))
       {
@@ -1595,10 +1595,9 @@ bool BuildingMaker::OnSave(const std::string &_saveName)
   if (_saveName != "")
     this->SetModelName(_saveName);
 
-  if (this->saved == SAVED)
+  if (this->currentSaveState == SAVED)
   {
     this->SaveModelFiles();
-    this->savedChanges = true;
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
   }
@@ -1639,6 +1638,13 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
     this->authorEmail = this->saveDialog->GetAuthorEmail();
     this->description = this->saveDialog->GetDescription();
     this->version = this->saveDialog->GetVersion();
+
+    if (this->modelName.compare(this->buildingDefaultName) == 0)
+    {
+      // Parse saveLocation and set model name
+      boost::filesystem::path saveLocPath(this->saveLocation);
+      this->SetModelName(saveLocPath.filename().string());
+    }
 
     // Create an xml config file
     TiXmlDocument xmlDoc;
@@ -1773,8 +1779,7 @@ bool BuildingMaker::OnSaveAs(const std::string &_saveName)
         AddModelPathsUpdate(parentDirectory);
     }
 
-    this->saved = SAVED;
-    this->savedChanges = true;
+    this->currentSaveState = SAVED;
 
     gui::editor::Events::saveBuildingModel(this->modelName, this->saveLocation);
     return true;
@@ -1796,8 +1801,7 @@ void BuildingMaker::OnNameChanged(const std::string &_name)
     GetFolderNameFromModelName(_name);
   this->saveLocation = newPath.string();
 
-  this->savedChanges = false;
-  this->saved = NAME_CHANGED;
+  this->currentSaveState = NAME_CHANGED;
 }
 
 /////////////////////////////////////////////////
@@ -1809,7 +1813,7 @@ void BuildingMaker::OnExit()
     return;
   }
 
-  if (this->savedChanges)
+  if (this->currentSaveState == SAVED)
   {
     QString msg("Once you exit the Building Editor, "
       "your building will no longer be editable.\n\n"
